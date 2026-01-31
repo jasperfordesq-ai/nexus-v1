@@ -2465,3 +2465,26 @@
     margin-left: var(--space-1);
     font-size: 0.7em;
 }
+
+/* ============================================
+   SERVICE REACH TAGS
+   GOV.UK compliant tag variants for member profiles
+   ============================================ */
+
+/* Default: Local services only - grey */
+.govuk-tag--reach-local {
+    background: var(--color-govuk-grey-dark, #505a5f);
+    color: var(--color-white);
+}
+
+/* Remote OK - blue */
+.govuk-tag--reach-remote {
+    background: var(--color-govuk-blue-light, #1d70b8);
+    color: var(--color-white);
+}
+
+/* Will travel - green */
+.govuk-tag--reach-travel {
+    background: var(--color-govuk-green, #00703c);
+    color: var(--color-white);
+}

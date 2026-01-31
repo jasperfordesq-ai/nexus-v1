@@ -1,1 +1,754 @@
-:root{}:root{}@media (prefers-reduced-motion:reduce){:root{}}:root{}@media print{:root{}}
+/**
+ * Design Tokens - Foundation System
+ * Central source of truth for all design values
+ * Version: 2.0 - Path to 100/100
+ */
+
+:root {
+    /* ==========================================
+       SPACING SCALE - 8px base unit
+       ========================================== */    /* 0.125rem - Hairline */      /* 0.25rem - Micro spacing */    /* 0.375rem - Tiny spacing */      /* 0.5rem - Tight spacing */   /* 0.625rem - Small-compact */     /* 0.75rem - Compact spacing */   /* 0.875rem - Snug spacing */     /* 1rem - Default spacing */     /* 1.25rem - Comfortable spacing */     /* 1.5rem - Generous spacing */     /* 1.75rem - Medium-large spacing */     /* 2rem - Section spacing */     /* 2.25rem - Large section */    /* 2.5rem - Large spacing */    /* 3rem - XL spacing */    /* 3.5rem - Toggle width */    /* 4rem - XXL spacing */    /* 5rem - Hero spacing */    /* 6rem - Giant spacing */   /* 6.25rem - Fixed header offset */   /* 7rem - Extra large spacing */   /* 7.5rem - Fixed header offset (large) */   /* 8rem - Maximum spacing */
+
+    /* Extended spacing (for legacy compatibility) */    /* 2.75rem - Between 10 and 12 */    /* 3.75rem - Between 14 and 16 */    /* 4.5rem - Between 16 and 20 */   /* 8.75rem - Extra large */   /* 1.125rem - Between 4 and 5 */   /* 1.375rem - Between 5 and 6 */
+
+    /* ==========================================
+       LAYOUT DIMENSIONS - Prevents CLS
+       ========================================== */           /* Utility bar height */           /* Main navbar height */      /* Same as header-height for clarity */ /* 56 + 64 = 120px */ /* 120 + 16 = 136px */
+
+    /* ==========================================
+       COLORS - Theme-aware system
+       ========================================== */
+
+    /* Primary palette */
+
+    /* Primary RGB values (for rgba() usage) */
+
+    /* Semantic colors */   /* Green */   /* Amber */    /* Red */      /* Blue */
+
+    /* Extended palette - Additional colors for UI variety */  /* Pink - Used for likes, volunteer */  /* Pink 600 - Goals primary */  /* Pink 700 - Goals dark */  /* Pink 800 - Deep accent */  /* Pink 900 - Darkest, for text on light pink */  /* Pink 400 - Goals light accent */  /* Pink 300 - Goals lighter */  /* Pink 200 - Goals background */  /* Pink 100 - Goals background light */   /* Pink 50 - Goals background lightest */ /* Purple - Used for polls, magic */ /* Purple 400 - Used for accents */  /* Orange 50 - Background lightest */ /* Orange 100 - Background light */ /* Orange - Used for help, alerts */ /* Orange 600 - Used for admin sections */
+
+    /* Green palette - Goals */   /* Green 50 - Success background lightest */  /* Green 100 - Success background light */  /* Green 200 - Success background */  /* Green 300 - Success lighter */  /* Green 400 - Success light */  /* Green 500 - Success, goals buddy */  /* Green 600 - Success dark */  /* Green 700 - Success darker */  /* Green 800 - Success darkest */
+
+    /* Lime palette - Goals index */   /* Lime 500 - Goals growth theme */   /* Lime 600 - Goals dark */   /* Lime 400 - Goals light */   /* Lime 300 - Goals lighter */   /* Lime 200 - Goals lightest */
+
+    /* Neutral palette - Light theme */
+
+    /* Slate palette - Goals text */
+
+    /* Blue palette - Goals status */
+
+    /* Cyan palette - Goals status */
+
+    /* Amber palette - Goals status */
+
+    /* Red palette - Error states */
+
+    /* ==========================================
+       HIGH-IMPACT EXTENDED PALETTE
+       Added 2026-01-21 - Smart Hybrid Migration
+       ========================================== */
+
+    /* Emerald palette - Community, environmental themes */
+
+    /* Teal palette - Info states, wellness */
+
+    /* Card background grays */
+
+    /* Purple variants - Premium features, polls */  /* Purple 150 - Between 100 and 200, for gradients */
+
+    /* Violet palette - Blog decorative gradients */
+
+    /* Wallet-specific colors */
+
+    /* ==========================================
+       RGBA OPACITY VARIANTS
+       For backgrounds, overlays, and glass effects
+       ========================================== */
+
+    /* Indigo/Primary opacity variants (99, 102, 241 = #6366f1) */
+
+    /* Purple opacity variants (168, 85, 247 = #a855f7) */
+
+    /* Purple-300 opacity variants (196, 181, 253 = #c4b5fd) */
+
+    /* Pink opacity variants (236, 72, 153 = #ec4899) */
+
+    /* Emerald/Success opacity variants (16, 185, 129 = #10b981) */
+
+    /* Emerald-600 opacity variants (5, 150, 105 = #059669) */
+
+    /* Emerald-300 opacity variants (52, 211, 153 = #34d399) */
+
+    /* Red/Error opacity variants (239, 68, 68 = #ef4444) */
+
+    /* Red-400 opacity variants (248, 113, 113 = #f87171) */
+
+    /* Red-300 opacity variants (252, 165, 165 = #fca5a5) */
+
+    /* Red-200 opacity variants (254, 202, 202 = #fecaca) */
+
+    /* Red-100 opacity variants (254, 226, 226 = #fee2e2) */
+
+    /* Orange opacity variants (249, 115, 22 = #f97316) */
+
+    /* Orange-400 - solid and opacity variants (251, 146, 60 = #fb923c) */
+
+    /* Orange-300 opacity variants (253, 186, 116 = #fdba74) */
+
+    /* Orange-200 opacity variants (254, 215, 170 = #fed7aa) */
+
+    /* Orange-100 opacity variants (255, 237, 213 = #ffedd5) */
+
+    /* Amber-200 glow variant (255, 200, 100) */
+
+    /* Dark orange/brown opacity variants for dark mode (67, 20, 7) */
+
+    /* Orange-600 opacity variants (234, 88, 12 = #ea580c) */
+
+    /* Blue/Info opacity variants (59, 130, 246 = #3b82f6) */
+
+    /* Amber/Warning opacity variants (251, 191, 36 = #fbbf24) */
+
+    /* White opacity variants */
+
+    /* Slate/Dark opacity variants (30, 41, 59 = #1e293b) */
+
+    /* Slate-900 opacity variants (15, 23, 42 = #0f172a) */
+
+    /* Slate-50 opacity variants (248, 250, 252 = #f8fafc) */
+
+    /* Black opacity variants */
+
+    /* Gray opacity variants (107, 114, 128 = #6b7280) */
+
+    /* Violet opacity variants (139, 92, 246 = #8b5cf6) */
+
+    /* Cyan opacity variants (6, 182, 212 = #06b6d4) */
+
+    /* Indigo-300 opacity variants (129, 140, 248 = #818cf8) */
+
+    /* Violet-300 opacity variants (167, 139, 250 = #a78bfa) */
+
+    /* Violet-200 opacity variants (196, 181, 253 = #c4b5fd) */
+
+    /* Violet-100 opacity variants (221, 214, 254 = #ddd6fe) */
+
+    /* Violet-50 opacity variants (237, 233, 254 = #ede9fe) */
+
+    /* Gray-200 border opacity variants (229, 231, 235 = #e5e7eb) */
+
+    /* Gray-50 opacity variants (249, 250, 251 = #f9fafb) */
+
+    /* Gray-100 opacity variants (243, 244, 246 = #f3f4f6) */
+
+    /* Amber-500 opacity variants (245, 158, 11 = #f59e0b) */
+    /* Amber-100 opacity variants (254, 243, 199 = #fef3c7) */
+
+    /* Amber-200 opacity variants (253, 230, 138 = #fde68a) */
+
+    /* Amber-800 opacity variants (146, 64, 14 = #92400e) */
+
+    /* Slate-100 opacity variants (241, 245, 249 = #f1f5f9) */
+
+    /* Slate-600/Slate-Dark opacity variants (71, 85, 105 = #475569) */
+
+    /* Sky-500 opacity variants (14, 165, 233 = #0ea5e9) */
+
+    /* Glass effect variants (31, 38, 135) */
+
+    /* Cyan glow opacity variants (0, 200, 255 = #00c8ff) */
+
+    /* Cyan opacity variants expanded (6, 182, 212 = #06b6d4) */
+
+    /* Pink-400 opacity variants (244, 114, 182 = #f472b6) */
+
+    /* Pink-600 opacity variants (219, 39, 119 = #db2777) */
+
+    /* Violet expanded opacity variants (139, 92, 246 = #8b5cf6) */
+
+    /* Gray-800 opacity variants (31, 41, 55 = #1f2937) */
+
+    /* Blue-600 opacity variants (37, 99, 235 = #2563eb) */
+
+    /* Primary-500/Indigo-500 opacity variants (99, 102, 241 = #6366f1) */
+
+    /* Primary-400/Indigo-400 opacity variants (129, 140, 248 = #818cf8) - for dark theme */
+
+    /* Primary-600/Indigo-600 opacity variants (79, 70, 229 = #4f46e5) */
+
+    /* Green-600 opacity variants (22, 163, 74 = #16a34a) */
+
+    /* Green-500 opacity variants (34, 197, 94 = #22c55e) */
+
+    /* Green-400 opacity variants (74, 222, 128 = #4ade80) */
+
+    /* Green-300 opacity variants (134, 239, 172 = #86efac) */
+
+    /* Red-800 opacity variants (153, 27, 27 = #991b1b) */
+
+    /* Red-900 opacity variants (127, 29, 29 = #7f1d1d) */
+
+    /* Emerald-300 opacity variants (52, 211, 153 = #34d399) */
+
+    /* Slate-800 opacity variants (30, 41, 59 = #1e293b) */
+
+    /* Slate-900 opacity variants (15, 23, 42 = #0f172a) */
+
+    /* Slate-600 opacity variants (51, 65, 85 = #334155) */
+
+    /* Medal/Ranking colors */
+    /* Gold (255, 215, 0 = #ffd700) */
+    /* Silver (192, 192, 192 = #c0c0c0) */
+    /* Bronze (205, 127, 50 = #cd7f32) */
+    /* Bronze Dark (184, 115, 51 = #b87333) for gradients */
+    /* Dark Gray (169, 169, 169 = #a9a9a9) for silver gradients */
+    /* Amber-400 (251, 191, 36 = #fbbf24) */
+    /* Yellow-500 alt (255, 193, 7 = #ffc107) */
+
+    /* Yellow-500 opacity variants (234, 179, 8 = #eab308) */
+
+    /* Amber-600 opacity variants (217, 119, 6 = #d97706) */
+
+    /* Blue-600 opacity variants extended (37, 99, 235 = #2563eb) */
+
+    /* Teal-700 opacity variants (15, 118, 110 = #0f766e) */
+
+    /* Teal-300 opacity variants (94, 234, 212 = #5eead4) */
+
+    /* Blue-400 opacity variants (96, 165, 250 = #60a5fa) */
+
+    /* Green-pure opacity variants (0, 128, 0 = #008000) */
+
+    /* Black expanded opacity variants */
+
+    /* Dark purple background variants (15, 12, 41) */
+
+    /* Dark surface opacity variants (30, 30, 40 = #1e1e28) */
+
+    /* Dark purple alt background variants (30, 27, 75) */
+
+    /* Purple-500 opacity variants (168, 85, 247 = #a855f7) */
+
+    /* Purple-500-alt opacity variants (147, 51, 234 = #9333ea) */
+
+    /* Purple-400 opacity variants (192, 132, 252 = #c084fc) */
+
+    /* ==========================================
+       EXTENDED RGBA OPACITY VARIANTS
+       Added for glassmorphism and UI effects
+       ========================================== */
+
+    /* White expanded opacity variants */
+
+    /* Black expanded opacity variants */
+
+    /* Indigo-300 opacity variants (165, 180, 252 = #a5b4fc) */
+
+    /* Slate-900 expanded opacity variants (15, 23, 42 = #0f172a) */
+
+    /* Slate-500 opacity variants (100, 116, 139 = #64748b) */
+
+    /* Slate-700 opacity variants (51, 65, 85 = #334155) */
+
+    /* Slate-400 opacity variants (148, 163, 184 = #94a3b8) */
+
+    /* Teal-600 opacity variants (13, 148, 136 = #0d9488) */
+
+    /* Teal-400 opacity variants (45, 212, 191 = #2dd4bf) */
+
+    /* Teal-500 opacity variants (20, 184, 166 = #14b8a6) */
+
+    /* Primary-600/Indigo-600 expanded opacity variants (79, 70, 229 = #4f46e5) */
+
+    /* Indigo expanded opacity variants (99, 102, 241 = #6366f1) */
+
+    /* Indigo-50 opacity variants (238, 242, 255 = #eef2ff) */
+
+    /* Cyan-50 opacity variants (236, 254, 255 = #ecfeff) */
+
+    /* Green-50 opacity variants (240, 253, 244 = #f0fdf4) */
+
+    /* Red-50 opacity variants (254, 242, 242 = #fef2f2) */
+
+    /* Amber-50 opacity variants (255, 251, 235 = #fffbeb) */
+
+    /* Blue-50 opacity variants (239, 246, 255 = #eff6ff) */
+
+    /* Blue-950 opacity variants (23, 37, 84 = #172554) */
+
+    /* Dark purple alt background variants (30, 27, 75) */
+
+    /* Violet expanded opacity variants (139, 92, 246 = #8b5cf6) */
+
+    /* Pink expanded opacity variants (236, 72, 153 = #ec4899) */
+
+    /* Red-600 opacity variants (220, 38, 38 = #dc2626) */
+
+    /* Amber expanded opacity variants (251, 191, 36 = #fbbf24) */
+
+    /* Emerald expanded opacity variants (16, 185, 129 = #10b981) */
+
+    /* Gray-500 opacity variants (107, 114, 128 = #6b7280) */
+
+    /* Blue-500 opacity variants (59, 130, 246 = #3b82f6) */
+
+    /* Slate-200 opacity variants (226, 232, 240 = #e2e8f0) */
+
+    /* Slate-300 opacity variants (203, 213, 225 = #cbd5e1) */
+
+    /* Gray-700 opacity variants (55, 65, 81 = #374151) */
+
+    /* Gray-600 opacity variants (75, 85, 99 = #4b5563) */
+
+    /* Glass shadow expanded (31, 38, 135) */
+
+    /* Fuchsia palette - Brand accent, magic effects */
+
+    /* Fuchsia-500 opacity variants (217, 70, 239 = #d946ef) */
+
+    /* Purple-600 opacity variants (124, 58, 237 = #7c3aed) */
+
+    /* Red-700 opacity variants (185, 28, 28 = #b91c1c) */
+
+    /* Emerald-800 opacity variants (6, 95, 70 = #065f46) */
+
+    /* Amber-600 opacity variants (217, 119, 6 = #d97706) */
+
+    /* Blue-700 opacity variants (29, 78, 216 = #1d4ed8) */
+
+    /* Rose palette - Alerts, important actions */
+
+    /* Sky palette - Information, communication */
+
+    /* Brand colors - Social platforms */
+
+    /* Yellow palette - Highlights, attention */
+
+    /* Zinc palette - Alternative neutrals */
+
+    /* Zinc-900 opacity variants (24, 24, 27 = #18181b) */
+
+    /* iOS Dark Mode background (28, 28, 30 = #1c1c1e) */
+
+    /* Blue-750 opacity variants (30, 64, 175 = #1e40af) */
+
+    /* Blue-900 opacity variants (30, 58, 138 = #1e3a8a) */
+
+    /* Amber-900 opacity variants (120, 53, 15 = #78350f) */
+
+
+    /* Lime-500 opacity variants (132, 204, 22 = #84cc16) - Goals growth theme */
+
+    /* Lime-400 opacity variants (163, 230, 53 = #a3e635) - Goals light */
+
+    /* Lime-300 opacity variants (190, 242, 100 = #bef264) - Goals lighter */
+
+    /* Lime-200 opacity variants (217, 249, 157 = #d9f99d) - Goals lightest */
+
+    /* Lime-100 opacity variants (236, 252, 203 = #ecfccb) - Goals background */
+
+    /* Pink-600 extended opacity variants (219, 39, 119 = #db2777) */
+
+    /* Glass shadow (31, 38, 135) extended opacity variants */
+
+    /* Gradient blue-purple (102, 126, 234 = #667eea) opacity variants */
+
+    /* Holographic/Glow effect colors */
+
+    /* ================================================
+       HEADER GLASSMORPHISM TOKENS
+       Added for nexus-modern-header.css migration
+       ================================================ */
+
+    /* Slate-400 expanded opacity variants (148, 163, 184 = #94a3b8) */
+
+    /* Slate-900 expanded opacity variants (15, 23, 42 = #0f172a) */
+
+    /* Slate-50 expanded opacity variants (248, 250, 252 = #f8fafc) */
+
+    /* Gray-100 expanded opacity variants (243, 244, 246 = #f3f4f6) */
+
+    /* Gray-300 opacity variants (209, 213, 219 = #d1d5db) */
+
+    /* Slate-500 expanded opacity variants (100, 116, 139 = #64748b) */
+
+    /* Black expanded opacity variants */
+
+    /* White expanded opacity variants */
+
+    /* Indigo expanded opacity variants (99, 102, 241 = #6366f1) */
+
+    /* Violet expanded opacity variants (139, 92, 246 = #8b5cf6) */
+
+    /* Primary-600 expanded opacity variants (79, 70, 229 = #4f46e5) */
+
+    /* Blue-400 expanded opacity variants (96, 165, 250 = #60a5fa) */
+
+    /* Rose-500 opacity variants (244, 63, 94 = #f43f5e) */
+
+    /* Yellow-500 expanded opacity variants (234, 179, 8 = #eab308) */
+
+    /* Purple-600 expanded opacity variants (124, 58, 237 = #7c3aed) */
+
+    /* Purple-500 extended opacity variants (168, 85, 247 = #a855f7) - Nexus Score */
+
+    /* Gray-400 opacity variants (156, 163, 175 = #9ca3af) - Podium/Rankings */
+
+    /* Gray-500 opacity variants (107, 114, 128 = #6b7280) - Podium/Rankings */
+
+    /* Amber-700 opacity variants (180, 83, 9 = #b45309) - Bronze rankings */
+
+    /* Amber-600 extended opacity variants (217, 119, 6 = #d97706) - Rankings */
+
+    /* Amber-400 extended opacity variants (251, 191, 36 = #fbbf24) - Gold rankings */
+
+    /* Cyan extended opacity variants (6, 182, 212 = #06b6d4) */
+
+    /* GOV.UK Design System - CivicOne official colors */
+
+    /* GOV.UK Button shadow colors (darker variants for 3D effect) */
+
+    /* GOV.UK Bright pink/purple - used for decorative/highlight elements */
+
+    /* GOV.UK Link colors */      /* Lighter blue for dark backgrounds */ /* Even lighter blue for hover on dark */
+
+    /* GOV.UK Tag colors - Official GOV.UK Design System
+       Source: https://github.com/alphagov/govuk-frontend/blob/main/packages/govuk-frontend/src/govuk/components/tag/_index.scss */      /* blue shade-50 */        /* blue tint-80 */  /* blue tint-95 */     /* green shade-50 */       /* green tint-80 */       /* red shade-50 */         /* red tint-80 */    /* yellow shade-50 */      /* yellow tint-80 */      /* black tint-25 */        /* black tint-95 */    /* purple shade-50 */      /* purple tint-80 */    /* orange shade-50 */      /* orange tint-80 */      /* teal shade-50 */        /* teal tint-80 */   /* magenta shade-50 */     /* magenta tint-80 */
+    /* Legacy alias */
+
+    /* GOV.UK Border color */             /* black tint-80 */
+
+    /* GOV.UK Header colors (rebranded service navigation) */          /* blue tint-95 */      /* rebranded border */        /* blue shade-25, darker for contrast */
+
+    /* GOV.UK Green opacity variants (0, 112, 60 = #00703c) */
+
+    /* GOV.UK Black opacity variants (11, 12, 12 = #0b0c0c) */
+
+    /* GOV.UK Red opacity variants (212, 53, 28 = #d4351c) */
+
+    /* GOV.UK Blue Light opacity variants (29, 112, 184 = #1d70b8) */
+
+    /* GOV.UK Blue (primary) opacity variants (0, 48, 120 = #003078) */
+
+    /* GOV.UK Orange opacity variants (244, 119, 56 = #f47738) */
+
+    /* Gold/Bootstrap Amber opacity variants (255, 193, 7 = #ffc107) */
+
+    /* Material Purple opacity variants (156, 39, 176 = #9c27b0) */
+
+    /* Achievement/Medal colors */
+
+    /* Listing type colors */
+
+    /* WCAG-compliant button colors */
+
+    /* Extended red palette - Dev banners, dark states */
+
+    /* Extended emerald palette - Accessible themes */
+
+    /* Extended blue palette - Info themes */
+
+    /* Neutral grays - Dev banner hover states */
+
+    /* Semantic color aliases for WCAG refactoring */
+
+    /* Brand colors - Special identities */    /* Gold, awards */
+
+    /* Red variants - Additional error states */
+
+    /* Blue variants - Additional info states */
+
+    /* Cyan variants - Additional accent */
+
+    /* Emerald variants - Additional success states */
+
+    /* Amber/Orange variants - Additional warnings */
+
+    /* Neutral variants */
+
+    /* ==========================================
+       GLASSMORPHISM SYSTEM
+       ========================================== */
+
+    /* ==========================================
+       TYPOGRAPHY
+       ========================================== */    /* 12px */   /* 14px */     /* 16px */   /* 18px */    /* 20px */    /* 24px */  /* 30px */   /* 36px */
+
+    /* ==========================================
+       TRANSITIONS & ANIMATIONS
+       ========================================== */
+
+    /* Duration tokens (for JS and CSS animations) */
+
+    /* Extended easing functions */
+
+    /* Spring animations */
+
+    /* Hover system transitions */
+
+    /* ==========================================
+       SHADOWS
+       ========================================== */
+
+    /* Glass shadows */
+
+    /* ==========================================
+       EFFECTS BUDGET TOKENS (Modern theme)
+       Standardized elevation, glow, blur, and opacity
+       Added for convergence - use only these tokens
+       ========================================== */
+
+    /* Elevation Shadows - 4 levels only
+       Use instead of ad-hoc box-shadow recipes */
+
+    /* Blur Scale - 3 levels only */
+
+    /* Glow Effects - 3 variants only */
+
+    /* Opacity Scale - 6 stops only
+       For generating rgba values in components */
+
+    /* ==========================================
+       BORDER RADIUS
+       ========================================== */
+
+    /* ==========================================
+       Z-INDEX SCALE
+       Documented hierarchy to prevent z-index wars
+
+       Layer Groups:
+       - Base (0-99): In-flow elements, local stacking
+       - Navigation (100-199): Headers, navbars, sticky elements
+       - Overlays (200-299): Dropdowns, menus, popovers
+       - Modals (300-399): Modal backdrops and dialogs
+       - Notifications (400-499): Toasts, alerts, tooltips
+       - Critical (500+): Emergency overlays, system UI
+       ========================================== */
+
+    /* Base layer - default stacking */
+
+    /* Navigation layer - sticky headers, navbars */
+
+    /* Overlay layer - dropdowns, popovers */
+
+    /* Modal layer - dialogs, sheets */
+
+    /* Notification layer - toasts, tooltips */
+
+    /* Critical layer - system UI that must be on top */
+
+    /* ==========================================
+       BREAKPOINTS (for JS usage)
+       ========================================== */
+}
+
+/* ==========================================
+   DARK THEME OVERRIDES
+   ========================================== */
+[data-theme="dark"] {
+    /* Inverted gray scale for dark mode */
+
+    /* Glassmorphism for dark mode */
+
+    /* Semantic background hierarchy */
+
+    /* Semantic text hierarchy */
+
+    /* Semantic border colors */
+
+    /* Enhanced glassmorphism */
+
+    /* Surface overlays */
+
+    /* Primary color adjustments */
+
+    /* Legacy alias overrides for dark mode */
+}
+
+/* Light theme semantic tokens (explicit defaults) */
+:root {
+}
+
+/* ==========================================
+   REDUCED MOTION SUPPORT
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+    }
+}
+
+/* ==========================================
+   SEMANTIC COLOR TOKENS
+   Purpose-driven aliases for better maintainability
+   ========================================== */
+:root {
+    /* CivicOne brand identity */
+
+    /* Feature-specific colors */
+
+    /* Status indicators */
+
+    /* Interactive states */
+
+    /* Component-specific semantic tokens */
+
+    /* Social features */
+
+    /* Trust & safety */
+
+    /* ==========================================
+       LEGACY ALIAS VARIABLES
+       Backwards compatibility for older CSS files
+       These map legacy prefixes to canonical tokens
+       ========================================== */
+
+    /* --civic-* aliases (CivicOne theme) */
+
+    /* --civicone-* aliases (CivicOne specific) */
+
+    /* --govuk-* aliases (GOV.UK Design System) */
+
+    /* --admin-* aliases (Admin panel) */
+
+    /* --htb-* aliases (Hour TimeBank legacy) */
+
+    /* --holo-* aliases (Holographic theme) */
+
+    /* --feed-* aliases (Feed components) */
+
+    /* Safe area insets (mobile) */
+
+    /* Mobile navigation */
+
+    /* Focus ring system */
+
+    /* Border width utilities */
+
+    /* Pill/badge backgrounds */
+
+    /* Text color utility */
+
+    /* Accent color utility */
+
+    /* Card backgrounds */
+
+    /* Input backgrounds */
+
+    /* Skin/theme colors */
+
+    /* Page transitions */
+
+    /* Theme transitions */
+
+    /* Header dimensions */
+
+    /* Z-index aliases */
+
+    /* Radius aliases for numeric scale */
+
+    /* Blur utilities */
+
+    /* Progress variable (for progress bars) */
+
+    /* Badge/category dynamic colors */
+
+    /* Drawer/sidebar */
+
+    /* Hamburger menu */
+
+    /* Navigation */
+
+    /* Overlay backgrounds */
+
+    /* View transition names */
+
+    /* Animation delay */
+
+    /* Toast notifications */
+
+    /* Holographic effects */
+
+    /* Gradients */
+
+    /* News/Article colors */
+
+    /* Pull to refresh */
+
+    /* Box shadow alias */
+
+    /* Heading gradient */
+
+    /* Icon gradient */
+
+    /* Action/stat gradients */
+
+    /* Mouse position (for effects) */
+
+    /* Tracking (letter-spacing) */
+
+    /* --settings-* aliases (Settings page) */
+
+    /* --md-* aliases (Modern design) */
+
+    /* --ob-* aliases (Onboarding) */
+
+    /* --msg-* aliases (Messages) */
+
+    /* --chat-* aliases (Chat) */
+
+    /* --ed-* aliases (Editor) */
+
+    /* --ff-* aliases (Feed filters) */
+
+    /* --sc-* aliases (Share compose) */
+
+    /* --legal-* aliases (Legal pages) */
+
+    /* --native-* aliases (Native app inputs) */
+
+    /* --status-* aliases (Status badges) */
+
+    /* --auth-* aliases (Authentication) */
+
+    /* --fed-* aliases (Federation) */
+
+    /* --poll-* aliases (Polls) */
+
+    /* --score-* aliases (Score/Nexus Score) */
+
+    /* --primary-* aliases */
+
+    /* --bg-* aliases */
+
+    /* --border-* aliases */
+
+    /* --privacy-* and --terms-* aliases (Legal pages) */
+
+    /* --mg-* aliases (Magic/misc) */
+
+    /* Theme page aliases */
+
+    /* --text-* aliases */
+
+    /* --transition-* aliases */
+
+    /* --accent-* aliases */
+
+    /* --date-* aliases */
+
+    /* --nexus-* aliases */
+
+    /* Misc aliases */
+
+    /* Transform translate aliases (for animations) */
+
+    /* Color aliases for common patterns */
+}
+
+/* ==========================================
+   PRINT OPTIMIZATIONS
+   ========================================== */
+@media print {
+    :root {
+    }
+}

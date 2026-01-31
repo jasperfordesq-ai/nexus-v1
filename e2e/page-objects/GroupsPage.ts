@@ -18,7 +18,7 @@ export class GroupsPage extends BasePage {
 
     this.groupCards = page.locator('.groups-grid .glass-group-card, .glass-group-card, .group-card, .hub-card, [data-group], article[class*="group"]');
     this.searchInput = page.locator('#groups-search, .glass-search-input, input[name="q"], input[name="search"], input[placeholder*="Search"]');
-    this.createGroupButton = page.locator('a[href*="groups/create"], a[href*="create-group"], .glass-btn-primary:has-text("Create"), button:has-text("Create"), a:has-text("Create Group"), a:has-text("Create Hub")');
+    this.createGroupButton = page.locator('a[href*="groups/create"], a[href*="create-group"], .btn--primary:has-text("Create"), button:has-text("Create"), a:has-text("Create Group"), a:has-text("Create Hub")');
     this.myGroupsTab = page.locator('a[href*="my-groups"], a[href*="my-hubs"], [data-tab="my-groups"]');
     this.allGroupsTab = page.locator('a[href*="groups"]:not([href*="my-groups"]), [data-tab="all"]');
     this.categoryFilter = page.locator('.glass-select, select[name="type"], select[name="category"], select[name="category_id"]');

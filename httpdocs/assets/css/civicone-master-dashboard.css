@@ -138,7 +138,7 @@
     }
 
     [data-theme="dark"] div[style*="background: #f0fdfa"] label[style*="color:var(--color-teal-800)"] {
-        color: #99f6e4 !important;
+        color: var(--color-teal-200, #99f6e4) !important;
     }
 
     /* Form inputs */

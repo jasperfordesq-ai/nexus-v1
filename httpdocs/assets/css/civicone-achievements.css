@@ -27,13 +27,30 @@
 }
 
 .nav-pill:hover {
-    background: var(--color-blue-50);
+    background: var(--color-white);
+    border-color: var(--color-govuk-black);
+}
+
+.nav-pill:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
 }
 
 .nav-pill.active {
     background: var(--color-govuk-blue-light);
     color: var(--color-white);
     border-color: var(--color-govuk-blue-light);
+}
+
+.nav-pill.active:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
 }
 
 .back-link {

@@ -145,6 +145,157 @@
     }
 
     /**
+     * GOV.UK Tabs Component
+     * Full implementation based on GOV.UK Frontend v5.x
+     * Source: https://github.com/alphagov/govuk-frontend/blob/main/packages/govuk-frontend/src/govuk/components/tabs/tabs.mjs
+     * Used by: Groups show, Profile pages, any page with .govuk-tabs
+     */
+    function initGovukTabs() {
+        var tabContainers = document.querySelectorAll('[data-module="govuk-tabs"], .govuk-tabs');
+
+        tabContainers.forEach(function(container) {
+            var tabs = container.querySelectorAll('.govuk-tabs__tab');
+            var panels = container.querySelectorAll('.govuk-tabs__panel');
+
+            if (!tabs.length || !panels.length) return;
+
+            // Set up ARIA attributes
+            var tabList = container.querySelector('.govuk-tabs__list');
+            if (tabList) {
+                tabList.setAttribute('role', 'tablist');
+            }
+
+            tabs.forEach(function(tab, index) {
+                var panelId = tab.getAttribute('href');
+                if (!panelId || panelId.charAt(0) !== '#') return;
+
+                var panel = container.querySelector(panelId);
+                if (!panel) return;
+
+                // Set up tab attributes
+                tab.setAttribute('role', 'tab');
+                tab.setAttribute('aria-controls', panelId.substring(1));
+                tab.setAttribute('tabindex', index === 0 ? '0' : '-1');
+
+                // Set up panel attributes
+                panel.setAttribute('role', 'tabpanel');
+                panel.setAttribute('aria-labelledby', tab.id || 'tab-' + panelId.substring(1));
+
+                // Give tab an ID if it doesn't have one
+                if (!tab.id) {
+                    tab.id = 'tab-' + panelId.substring(1);
+                }
+
+                // Set initial state
+                var listItem = tab.closest('.govuk-tabs__list-item');
+                var isSelected = listItem && listItem.classList.contains('govuk-tabs__list-item--selected');
+
+                tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+
+                if (!isSelected) {
+                    panel.classList.add('govuk-tabs__panel--hidden');
+                } else {
+                    panel.classList.remove('govuk-tabs__panel--hidden');
+                }
+            });
+
+            // Handle tab clicks
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    activateTab(container, tab);
+                });
+
+                // Keyboard navigation
+                tab.addEventListener('keydown', function(e) {
+                    var tabArray = Array.from(tabs);
+                    var currentIndex = tabArray.indexOf(tab);
+                    var newIndex;
+
+                    switch (e.key) {
+                        case 'ArrowLeft':
+                        case 'ArrowUp':
+                            e.preventDefault();
+                            newIndex = currentIndex - 1;
+                            if (newIndex < 0) newIndex = tabArray.length - 1;
+                            tabArray[newIndex].focus();
+                            activateTab(container, tabArray[newIndex]);
+                            break;
+                        case 'ArrowRight':
+                        case 'ArrowDown':
+                            e.preventDefault();
+                            newIndex = currentIndex + 1;
+                            if (newIndex >= tabArray.length) newIndex = 0;
+                            tabArray[newIndex].focus();
+                            activateTab(container, tabArray[newIndex]);
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            tabArray[0].focus();
+                            activateTab(container, tabArray[0]);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            tabArray[tabArray.length - 1].focus();
+                            activateTab(container, tabArray[tabArray.length - 1]);
+                            break;
+                    }
+                });
+            });
+
+            // Check for hash in URL to activate specific tab
+            if (window.location.hash) {
+                var hashTab = container.querySelector('.govuk-tabs__tab[href="' + window.location.hash + '"]');
+                if (hashTab) {
+                    activateTab(container, hashTab);
+                }
+            }
+        });
+
+        function activateTab(container, selectedTab) {
+            var tabs = container.querySelectorAll('.govuk-tabs__tab');
+            var panels = container.querySelectorAll('.govuk-tabs__panel');
+
+            // Deactivate all tabs
+            tabs.forEach(function(tab) {
+                var listItem = tab.closest('.govuk-tabs__list-item');
+                if (listItem) {
+                    listItem.classList.remove('govuk-tabs__list-item--selected');
+                }
+                tab.setAttribute('aria-selected', 'false');
+                tab.setAttribute('tabindex', '-1');
+            });
+
+            // Hide all panels
+            panels.forEach(function(panel) {
+                panel.classList.add('govuk-tabs__panel--hidden');
+            });
+
+            // Activate selected tab
+            var selectedListItem = selectedTab.closest('.govuk-tabs__list-item');
+            if (selectedListItem) {
+                selectedListItem.classList.add('govuk-tabs__list-item--selected');
+            }
+            selectedTab.setAttribute('aria-selected', 'true');
+            selectedTab.setAttribute('tabindex', '0');
+
+            // Show selected panel
+            var panelId = selectedTab.getAttribute('href');
+            if (panelId && panelId.charAt(0) === '#') {
+                var panel = container.querySelector(panelId);
+                if (panel) {
+                    panel.classList.remove('govuk-tabs__panel--hidden');
+                }
+            }
+
+            // Update URL hash without scrolling
+            if (panelId && history.pushState) {
+                history.pushState(null, null, panelId);
+            }
+        }
+    }
+
+    /**
      * Filter Tabs Handler
      * Handles GOV.UK-style filter tabs with data-filter attribute
      * Used by: Activity page, listings filter
@@ -157,7 +308,9 @@
         var filterItems = listId ? listId.querySelectorAll('[data-type]') : document.querySelectorAll('#activity-list li[data-type]');
 
         filterTabs.forEach(function(tab) {
-            tab.addEventListener('click', function() {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+
                 // Update active tab styling
                 document.querySelectorAll('.govuk-tabs__list-item').forEach(function(item) {
                     item.classList.remove('govuk-tabs__list-item--selected');
@@ -194,6 +347,7 @@
         initConfirmDelete();
         initCharacterCounters();
         initSmoothScroll();
+        initGovukTabs();
         initFilterTabs();
     }
 
@@ -213,6 +367,7 @@
     window.CivicOne.initConfirmDelete = initConfirmDelete;
     window.CivicOne.initCharacterCounters = initCharacterCounters;
     window.CivicOne.initSmoothScroll = initSmoothScroll;
+    window.CivicOne.initGovukTabs = initGovukTabs;
     window.CivicOne.initFilterTabs = initFilterTabs;
 
 })();

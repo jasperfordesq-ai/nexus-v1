@@ -1,1 +1,323 @@
-:root{--govuk-focus-colour:var(--color-brand-yellow);--govuk-focus-text-colour:var(--color-govuk-black);--civicone-focus:var(--govuk-focus-colour);--civicone-focus-text:var(--govuk-focus-text-colour);--civicone-focus-outline:3px solid var(--govuk-focus-colour)}.civic-utility-link:focus,.civic-utility-link:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}.civic-nav-link:focus,.civic-nav-link:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important;box-shadow:0 -var(--space-1) var(--civicone-focus),0 var(--space-1) var(--civicone-focus-text) !important}.civic-logo:focus,.civic-logo:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:var(--space-1) !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}.civic-menu-btn:focus,.civic-menu-btn:focus-visible,#civic-mega-menu-btn:focus,#civic-mega-menu-btn:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}.civic-mega-menu a:focus,.civic-mega-menu a:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}.civic-dropdown-content a:focus,.civic-dropdown-content a:focus-visible,.civic-dropdown-content button:focus,.civic-dropdown-content button:focus-visible{outline:3px solid var(--civicone-focus-text) !important;outline-offset:-3px !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important;box-shadow:none !important}.civic-search-form input:focus,.civic-search-form input:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;border-color:var(--civicone-focus-text) !important}.civic-search-form button:focus,.civic-search-form button:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}.civic-mobile-search-bar input:focus,.civic-mobile-search-bar input:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;border-color:var(--civicone-focus-text) !important}.civic-mobile-search-btn:focus,.civic-mobile-search-btn:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}.civic-footer a:focus,.civic-footer a:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}.civic-footer-social a:focus,.civic-footer-social a:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:var(--space-1) !important;background-color:var(--civicone-focus) !important}.civic-card:focus-within{outline:var(--civicone-focus-outline);outline-offset:var(--space-1)}.civic-mobile-nav a:focus,.civic-mobile-nav a:focus-visible,.civic-mobile-nav button:focus,.civic-mobile-nav button:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:0 !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}.civic-bottom-nav a:focus,.civic-bottom-nav a:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:-3px !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}.civic-experimental-switch:focus,.civic-experimental-switch:focus-visible{outline:var(--civicone-focus-outline) !important;outline-offset:var(--space-1) !important;background-color:var(--civicone-focus) !important;color:var(--civicone-focus-text) !important}@media (prefers-contrast:more){:root{--civicone-focus:var(--color-govuk-yellow);--civicone-focus-text:var(--color-govuk-black)}}@media (prefers-reduced-motion:reduce){*:focus,*:focus-visible{transition:none !important}}
+/**
+ * CivicOne GOV.UK Focus States
+ * WCAG 2.1 AA Compliant Focus Indicators
+ * Based on GOV.UK Design System v5.x
+ *
+ * Reference: https://design-system.service.gov.uk/styles/focus-state/
+ * See: docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md Section 7
+ *
+ * GOV.UK Focus Pattern:
+ * - Yellow (var(--color-brand-yellow)) background highlight
+ * - Black (var(--color-govuk-black)) text color when focused
+ * - 3px black bottom border on links (simulates underline)
+ * - No outline on the element itself (replaced by background)
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ */
+
+/* ===========================================
+   GOV.UK Design Tokens for Focus
+   =========================================== */
+:root {
+    /* GOV.UK Official Focus Colors */
+    --govuk-focus-colour: var(--color-brand-yellow);
+    --govuk-focus-text-colour: var(--color-govuk-black);
+
+    /* CivicOne mappings to GOV.UK */
+    --civicone-focus: var(--govuk-focus-colour);
+    --civicone-focus-text: var(--govuk-focus-text-colour);
+
+    /* Focus outline (fallback for non-link elements) */
+    --civicone-focus-outline: 3px solid var(--govuk-focus-colour);
+    --civicone-focus-outline-offset: 0;
+}
+
+/* ===========================================
+   Base Focus Mixin Pattern
+   Applied to all interactive elements
+   =========================================== */
+
+/* Links - GOV.UK style: yellow background + black underline */
+.civicone a:focus,
+.civicone a:focus-visible,
+[data-layout="civicone"] a:focus,
+[data-layout="civicone"] a:focus-visible {
+    outline: var(--civicone-focus-outline);
+    outline-offset: var(--civicone-focus-outline-offset);
+    background-color: var(--civicone-focus);
+    color: var(--civicone-focus-text) !important;
+    text-decoration: none;
+    box-shadow: 0 -var(--space-1) var(--civicone-focus), 0 var(--space-1) var(--civicone-focus-text);
+}
+
+/* Buttons - GOV.UK style: yellow outline */
+.civicone button:focus,
+.civicone button:focus-visible,
+.civicone [role="button"]:focus,
+.civicone [role="button"]:focus-visible,
+[data-layout="civicone"] button:focus,
+[data-layout="civicone"] button:focus-visible,
+[data-layout="civicone"] [role="button"]:focus,
+[data-layout="civicone"] [role="button"]:focus-visible {
+    outline: var(--civicone-focus-outline);
+    outline-offset: var(--civicone-focus-outline-offset);
+    box-shadow: inset 0 0 0 var(--space-1) var(--civicone-focus-text);
+}
+
+/* Form inputs - Yellow outline with thicker border */
+.civicone input:focus,
+.civicone input:focus-visible,
+.civicone select:focus,
+.civicone select:focus-visible,
+.civicone textarea:focus,
+.civicone textarea:focus-visible,
+[data-layout="civicone"] input:focus,
+[data-layout="civicone"] input:focus-visible,
+[data-layout="civicone"] select:focus,
+[data-layout="civicone"] select:focus-visible,
+[data-layout="civicone"] textarea:focus,
+[data-layout="civicone"] textarea:focus-visible {
+    outline: var(--civicone-focus-outline);
+    outline-offset: var(--civicone-focus-outline-offset);
+    border-color: var(--civicone-focus-text);
+}
+
+/* ===========================================
+   Header Navigation Focus States
+   =========================================== */
+
+/* Utility bar links */
+.civic-utility-link:focus,
+.civic-utility-link:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* Main navigation links */
+.civic-nav-link:focus,
+.civic-nav-link:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+    box-shadow: 0 -var(--space-1) var(--civicone-focus), 0 var(--space-1) var(--civicone-focus-text) !important;
+}
+
+/* Logo focus */
+.civic-logo:focus,
+.civic-logo:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: var(--space-1) !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* Menu button focus */
+.civic-menu-btn:focus,
+.civic-menu-btn:focus-visible,
+#civic-mega-menu-btn:focus,
+#civic-mega-menu-btn:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* Mega menu links */
+.civic-mega-menu a:focus,
+.civic-mega-menu a:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* Dropdown menu items */
+.civic-dropdown-content a:focus,
+.civic-dropdown-content a:focus-visible,
+.civic-dropdown-content button:focus,
+.civic-dropdown-content button:focus-visible {
+    outline: 3px solid var(--civicone-focus-text) !important;
+    outline-offset: -3px !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+    box-shadow: none !important;
+}
+
+/* ===========================================
+   Skip Link - Critical for Accessibility
+   =========================================== */
+.skip-link:focus {
+    position: fixed !important;
+    top: var(--space-2) !important;
+    left: var(--space-2) !important;
+    z-index: 100000 !important;
+    padding: var(--space-3) var(--space-4) !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+    font-weight: var(--font-weight-bold) !important;
+    text-decoration: none !important;
+    outline: 3px solid var(--civicone-focus-text) !important;
+    outline-offset: 0 !important;
+    box-shadow: 0 var(--space-1) var(--space-2) var(--color-black-alpha-30) !important;
+}
+
+/* ===========================================
+   Search Focus States
+   =========================================== */
+.civic-search-form input:focus,
+.civic-search-form input:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    border-color: var(--civicone-focus-text) !important;
+}
+
+.civic-search-form button:focus,
+.civic-search-form button:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* Mobile search */
+.civic-mobile-search-bar input:focus,
+.civic-mobile-search-bar input:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    border-color: var(--civicone-focus-text) !important;
+}
+
+.civic-mobile-search-btn:focus,
+.civic-mobile-search-btn:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* ===========================================
+   Notification Drawer Focus States
+   =========================================== */
+.notif-drawer-close:focus,
+.notif-drawer-close:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+.notif-drawer-item:focus,
+.notif-drawer-item:focus-visible {
+    outline: 3px solid var(--civicone-focus-text) !important;
+    outline-offset: -3px !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+    box-shadow: none !important;
+}
+
+.notif-drawer-footer a:focus,
+.notif-drawer-footer a:focus-visible,
+.notif-drawer-footer button:focus,
+.notif-drawer-footer button:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* ===========================================
+   Footer Focus States
+   =========================================== */
+.civic-footer a:focus,
+.civic-footer a:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+.civic-footer-social a:focus,
+.civic-footer-social a:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: var(--space-1) !important;
+    background-color: var(--civicone-focus) !important;
+}
+
+/* ===========================================
+   Cards and Interactive Elements
+   =========================================== */
+.civic-card:focus-within,
+[data-layout="civicone"] .card:focus-within {
+    outline: var(--civicone-focus-outline);
+    outline-offset: var(--space-1);
+}
+
+/* ===========================================
+   Mobile Navigation Focus States
+   =========================================== */
+.civic-mobile-nav a:focus,
+.civic-mobile-nav a:focus-visible,
+.civic-mobile-nav button:focus,
+.civic-mobile-nav button:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: 0 !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* Bottom tab bar */
+.civic-bottom-nav a:focus,
+.civic-bottom-nav a:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: -3px !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* ===========================================
+   Experimental Banner Focus
+   =========================================== */
+.civic-experimental-switch:focus,
+.civic-experimental-switch:focus-visible {
+    outline: var(--civicone-focus-outline) !important;
+    outline-offset: var(--space-1) !important;
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* ===========================================
+   Dark Mode Adjustments
+   Focus states should remain yellow even in dark mode
+   Scoped to .civicone per GR-016
+   =========================================== */
+.civicone.dark-mode .civic-nav-link:focus,
+.civicone.dark-mode .civic-nav-link:focus-visible,
+.civicone.dark-mode .civic-utility-link:focus,
+.civicone.dark-mode .civic-utility-link:focus-visible,
+.civicone.dark-mode .civic-logo:focus,
+.civicone.dark-mode .civic-logo:focus-visible {
+    background-color: var(--civicone-focus) !important;
+    color: var(--civicone-focus-text) !important;
+}
+
+/* ===========================================
+   High Contrast Mode Support
+   =========================================== */
+@media (prefers-contrast: more) {
+    :root {
+        --civicone-focus: var(--color-govuk-yellow); /* Brighter yellow for high contrast - GOV.UK yellow */
+        --civicone-focus-text: var(--color-govuk-black); /* GOV.UK black */
+    }
+}
+
+/* ===========================================
+   Reduced Motion - Instant focus transitions
+   =========================================== */
+@media (prefers-reduced-motion: reduce) {
+    *:focus,
+    *:focus-visible {
+        transition: none !important;
+    }
+}

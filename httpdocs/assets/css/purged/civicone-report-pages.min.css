@@ -1,0 +1,75 @@
+/**
+ * CivicOne Report Pages (Strategic Plan & Impact Report)
+ * Shared styles for tenant report pages
+ * Date: 2026-01-21
+ * Migrated to design tokens for consistency
+ */
+
+/* === SHARED COMPONENTS === */
+
+/* Header Section */
+.report-header {
+    margin-bottom: var(--space-10);
+    text-align: center;
+    padding: var(--space-10);
+}
+
+.report-title {
+    margin-bottom: var(--space-4);
+    font-size: var(--font-size-4xl);
+    color: var(--skin-primary);
+    text-transform: uppercase;
+}
+
+.report-subtitle {
+    font-size: var(--font-size-xl);
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--color-gray-600);
+    line-height: var(--line-height-normal);
+}
+
+/* Layout Grid */
+
+/* Sidebar TOC */
+
+/* TOC Actions */
+
+/* Section Styling */
+.report-section {
+    margin-bottom: var(--space-10);
+}
+
+/* Case Study Boxes */
+
+/* Mission/Vision Boxes */
+
+/* SWOT Grid */
+
+/* Tables */
+
+/* Roadmap Badges */
+
+/* Pillar Headings */
+
+/* Stat Grid */
+
+/* Highlights Box */
+
+/* Key Findings */
+
+/* SROI Box */
+
+/* Recommendation Boxes */
+
+/* Bibliography */
+
+/* ========================================
+   Progress Bars (Age Bands, etc.)
+   ======================================== */
+
+/* ========================================
+   SROI Hero Section (Gradient)
+   ======================================== */
+
+/* Report Table Styling */

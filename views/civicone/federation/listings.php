@@ -220,7 +220,7 @@ if (!empty($filters['search'])) {
                                             <?php endif; ?>
                                             Shared from <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner') ?>
                                             <?php if ($isExternal): ?>
-                                            <span class="govuk-tag govuk-tag--blue" style="margin-left: 4px; font-size: 0.75em;">External</span>
+                                            <span class="govuk-tag govuk-tag--blue govuk-tag--external-small">External</span>
                                             <?php endif; ?>
                                         </span>
                                     </div>

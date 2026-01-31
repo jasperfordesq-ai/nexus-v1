@@ -337,7 +337,7 @@
 }
 
 .is-native:not(.messages-page) input[type="radio"] {
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .is-native:not(.messages-page) input[type="checkbox"]:checked,
@@ -366,7 +366,7 @@
     width: calc(var(--space-2) + var(--space-1));
     height: calc(var(--space-2) + var(--space-1));
     background: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     transform: translate(-50%, -50%);
 }
 
@@ -391,7 +391,7 @@
     }
 
     body:not(.is-native):not(.messages-page) input[type="radio"] {
-        border-radius: 50%;
+        border-radius: var(--radius-full);
     }
 
     body:not(.is-native):not(.messages-page) input[type="checkbox"]:checked,
@@ -420,7 +420,7 @@
         width: calc(var(--space-2) + var(--space-1));
         height: calc(var(--space-2) + var(--space-1));
         background: white;
-        border-radius: 50%;
+        border-radius: var(--radius-full);
         transform: translate(-50%, -50%);
     }
 }

@@ -1,1 +1,244 @@
-@media (max-width:600px){}
+/**
+ * Post Card Component CSS
+ * Extracted from views/modern/components/shared/post-card.php
+ * Created: 2026-01-19
+ * Migrated to design tokens: 2026-01-21
+ *
+ * Prefix: post- for post card specific classes
+ * Provides styling for feed posts, profile posts, and shared post components
+ */
+
+/* ========================================
+   POST CARD BASE
+   ======================================== */
+
+.post-card {
+    padding: var(--space-5);
+    margin-bottom: var(--space-5);
+}
+
+/* ========================================
+   POST HEADER
+   ======================================== */
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.post-meta-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+}
+
+.post-timestamp {
+    font-size: var(--font-size-sm);
+    color: var(--htb-text-muted);
+}
+
+/* ========================================
+   VISIBILITY BADGE
+   ======================================== */
+
+.visibility-badge {
+    font-size: var(--font-size-xs);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-md);
+    background: var(--color-indigo-alpha-10);
+    color: var(--color-primary-500);
+}
+
+/* ========================================
+   POST DELETE BUTTON
+   ======================================== */
+
+.post-delete-btn {
+    padding: var(--space-2);
+    background: transparent;
+    border: none;
+    color: var(--htb-text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-base);
+    transition: all var(--transition-base);
+}
+
+.post-delete-btn:hover {
+    background: var(--color-red-alpha-10);
+    color: var(--color-danger);
+}
+
+/* ========================================
+   POST CONTENT
+   ======================================== */
+
+.post-content {
+    margin-bottom: var(--space-4);
+    line-height: var(--line-height-normal);
+    color: var(--htb-text-main);
+    word-wrap: break-word;
+}
+
+/* ========================================
+   POST IMAGE
+   ======================================== */
+
+.post-image {
+    margin: var(--space-4) 0;
+}
+
+.post-image img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: var(--htb-radius);
+}
+
+/* ========================================
+   POST ACTIONS FOOTER
+   ======================================== */
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--htb-border-color);
+}
+
+/* ========================================
+   POST ACTION BUTTONS
+   ======================================== */
+
+.post-action-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-base);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    color: var(--htb-text-muted);
+}
+
+.post-action-btn:hover {
+    background: var(--color-indigo-alpha-10);
+    color: var(--color-primary-500);
+}
+
+/* Like Button */
+.post-action-btn.like-btn.active {
+    color: var(--color-danger);
+}
+
+.post-action-btn.like-btn:hover {
+    color: var(--color-danger);
+}
+
+/* Comment Button */
+.post-action-btn.comment-btn:hover {
+    color: var(--color-primary-500);
+}
+
+/* Share Button */
+.post-action-btn.share-btn:hover {
+    color: var(--color-primary-500);
+}
+
+/* ========================================
+   COMMENTS SECTION
+   ======================================== */
+
+.post-comments {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--htb-border-color);
+}
+
+.post-comments.hidden {
+    display: none;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+   ======================================== */
+
+@media (max-width: 600px) {
+    .post-card {
+        padding: var(--space-4);
+    }
+
+    /* Hide text labels on mobile, keep icons */
+    .post-action-btn span:not(.like-count) {
+        display: none;
+    }
+
+    .post-actions {
+        gap: var(--space-2);
+    }
+
+    .post-action-btn {
+        padding: var(--space-2);
+    }
+}
+
+/* ========================================
+   DARK MODE
+   ======================================== */
+
+[data-theme="dark"] .post-card {
+    background: var(--color-slate-alpha-60);
+    border-color: var(--color-white-alpha-10);
+}
+
+[data-theme="dark"] .post-timestamp {
+    color: var(--color-slate-400);
+}
+
+[data-theme="dark"] .visibility-badge {
+    background: var(--color-indigo-alpha-20);
+    color: var(--color-primary-300);
+}
+
+[data-theme="dark"] .post-delete-btn {
+    color: var(--color-slate-400);
+}
+
+[data-theme="dark"] .post-delete-btn:hover {
+    background: var(--color-red-alpha-20);
+    color: var(--color-red-500);
+}
+
+[data-theme="dark"] .post-content {
+    color: var(--color-slate-200);
+}
+
+[data-theme="dark"] .post-actions {
+    border-top-color: var(--color-white-alpha-10);
+}
+
+[data-theme="dark"] .post-action-btn {
+    color: var(--color-slate-400);
+}
+
+[data-theme="dark"] .post-action-btn:hover {
+    background: var(--color-indigo-alpha-20);
+    color: var(--color-primary-300);
+}
+
+[data-theme="dark"] .post-action-btn.like-btn.active {
+    color: var(--color-red-500);
+}
+
+[data-theme="dark"] .post-action-btn.like-btn:hover {
+    color: var(--color-red-500);
+}
+
+[data-theme="dark"] .post-comments {
+    border-top-color: var(--color-white-alpha-10);
+}

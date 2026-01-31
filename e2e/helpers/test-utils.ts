@@ -21,7 +21,7 @@ export function tenantUrl(path: string, tenant: string = DEFAULT_TENANT): string
  */
 export async function goToTenantPage(page: Page, path: string, tenant: string = DEFAULT_TENANT): Promise<void> {
   await page.goto(tenantUrl(path, tenant));
-  await dismissDevNoticeModal(page);
+  await dismissBlockingModals(page);
 }
 
 /**
@@ -34,6 +34,26 @@ export async function dismissDevNoticeModal(page: Page): Promise<void> {
     await continueBtn.click();
     await page.waitForTimeout(300);
   }
+}
+
+/**
+ * Dismiss the cookie consent dialog if present
+ * This dialog blocks all interactions until dismissed
+ */
+export async function dismissCookieConsent(page: Page): Promise<void> {
+  const acceptBtn = page.locator('button:has-text("Accept All"), button:has-text("Accept all cookies")');
+  if (await acceptBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await acceptBtn.first().click();
+    await page.waitForTimeout(300);
+  }
+}
+
+/**
+ * Dismiss all blocking modals (dev notice + cookie consent)
+ */
+export async function dismissBlockingModals(page: Page): Promise<void> {
+  await dismissDevNoticeModal(page);
+  await dismissCookieConsent(page);
 }
 
 /**

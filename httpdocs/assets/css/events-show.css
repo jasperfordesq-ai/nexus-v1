@@ -36,14 +36,14 @@
     }
 
     /* Button Press States */
-    .glass-btn:active,
+    .btn--glass:active,
     button:active {
         transform: scale(0.96) !important;
         transition: transform var(--transition-fast) !important;
     }
 
     /* Touch Targets - WCAG 2.1 AA (44px minimum) */
-    .glass-btn,
+    .btn--glass,
     button,
     input[type="text"],
     input[type="checkbox"] {
@@ -55,7 +55,7 @@
     }
 
     /* Focus Visible */
-    .glass-btn:focus-visible,
+    .btn--glass:focus-visible,
     button:focus-visible,
     a:focus-visible,
     input:focus-visible {
@@ -71,7 +71,7 @@
 
     /* Mobile Responsive Enhancements */
     @media (max-width: 768px) {
-        .glass-btn,
+        .btn--glass,
         button {
             min-height: var(--space-12);
         }
@@ -360,7 +360,7 @@
         gap: var(--space-3);
     }
 
-    #unique-glass-page-wrapper .glass-btn {
+    #unique-glass-page-wrapper .btn--glass {
         flex: 1;
         padding: var(--space-3);
         border-radius: var(--radius-md);
@@ -374,17 +374,17 @@
         border: var(--pill-border);
     }
 
-    #unique-glass-page-wrapper .glass-btn:hover {
+    #unique-glass-page-wrapper .btn--glass:hover {
         background: var(--color-white-alpha-20);
     }
 
-    #unique-glass-page-wrapper .glass-btn.primary {
+    #unique-glass-page-wrapper .btn--primary {
         background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 100%);
         color: white;
         border: none;
     }
 
-    #unique-glass-page-wrapper .glass-btn.danger {
+    #unique-glass-page-wrapper .btn--danger {
         background: var(--color-red-alpha-15);
         border-color: var(--color-red-alpha-30);
         color: var(--color-danger);
@@ -406,7 +406,7 @@
     #unique-glass-page-wrapper .avatar {
         width: var(--space-10);
         height: var(--space-10);
-        border-radius: 50%;
+        border-radius: var(--radius-full);
         object-fit: cover;
         border: 2px solid var(--accent-color);
     }

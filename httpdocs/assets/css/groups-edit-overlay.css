@@ -238,7 +238,7 @@
 .govuk-overlay-user-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--color-govuk-blue-light);
     color: var(--color-white);
     display: flex;

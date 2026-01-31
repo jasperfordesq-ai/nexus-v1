@@ -1168,7 +1168,7 @@
     background: transparent;
     border: none;
     border-radius: var(--radius-full);
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: var(--font-family-primary);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
     color: var(--ff-text-secondary);
@@ -1274,7 +1274,7 @@
     background: var(--ff-pill-bg);
     border: none;
     border-radius: var(--radius-full);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-family-primary);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
     color: var(--ff-text-secondary);
@@ -1329,7 +1329,7 @@
     background: var(--ff-pill-bg);
     border: none;
     border-radius: var(--radius-full);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-family-primary);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
     color: var(--ff-text-secondary);
@@ -1423,7 +1423,7 @@
     background: transparent;
     border: 1px solid transparent;
     border-radius: var(--radius-full);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-family-primary);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
     color: var(--ff-text-secondary);

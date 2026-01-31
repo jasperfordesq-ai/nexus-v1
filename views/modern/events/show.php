@@ -120,7 +120,7 @@ require __DIR__ . '/../../layouts/header.php';
                         <?php if (isset($_SESSION['user_id'])): ?>
                         <form id="commentForm" onsubmit="eventSubmitComment(event)" class="event-comment-form">
                             <input type="text" id="commentInput" placeholder="Write a comment..." required class="event-comment-input">
-                            <button type="submit" class="glass-btn primary event-comment-submit">Post</button>
+                            <button type="submit" class="btn btn--primary event-comment-submit">Post</button>
                         </form>
                         <?php else: ?>
                         <p class="event-login-prompt"><a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="event-login-link">Login</a> to comment</p>
@@ -140,8 +140,8 @@ require __DIR__ . '/../../layouts/header.php';
                         <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/rsvp" method="POST" class="rsvp-actions">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
-                            <button name="status" value="going" class="glass-btn primary">Accept</button>
-                            <button name="status" value="declined" class="glass-btn">Decline</button>
+                            <button name="status" value="going" class="btn btn--primary">Accept</button>
+                            <button name="status" value="declined" class="btn btn--ghost">Decline</button>
                         </form>
                     </div>
                 <?php endif; ?>
@@ -150,7 +150,7 @@ require __DIR__ . '/../../layouts/header.php';
                 <div class="sidebar-card">
                     <h4 class="sidebar-title">Your RSVP</h4>
                     <?php if (!isset($_SESSION['user_id'])): ?>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="glass-btn primary event-login-rsvp-btn">Login to RSVP</a>
+                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="btn btn--primary event-login-rsvp-btn">Login to RSVP</a>
                     <?php else: ?>
                         <?php if ($myStatus == 'going'): ?>
                             <div class="event-going-status">
@@ -162,8 +162,8 @@ require __DIR__ . '/../../layouts/header.php';
                             <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/rsvp" method="POST" class="rsvp-actions">
                                 <?= \Nexus\Core\Csrf::input() ?>
                                 <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
-                                <button name="status" value="going" class="glass-btn <?= $myStatus == 'going' ? 'primary' : '' ?>">Yes</button>
-                                <button name="status" value="declined" class="glass-btn <?= $myStatus == 'declined' ? 'danger' : '' ?>">No</button>
+                                <button name="status" value="going" class="btn <?= $myStatus == 'going' ? 'btn--primary' : 'btn--ghost' ?>">Yes</button>
+                                <button name="status" value="declined" class="btn <?= $myStatus == 'declined' ? 'btn--danger' : 'btn--ghost' ?>">No</button>
                             </form>
                         <?php endif; ?>
                     <?php endif; ?>
@@ -192,7 +192,7 @@ require __DIR__ . '/../../layouts/header.php';
                                             <?= \Nexus\Core\Csrf::input() ?>
                                             <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
                                             <input type="hidden" name="user_id" value="<?= $att['user_id'] ?>">
-                                            <button type="submit" class="glass-btn primary event-checkin-btn">Check In</button>
+                                            <button type="submit" class="btn btn--primary event-checkin-btn">Check In</button>
                                         </form>
                                     <?php endif; ?>
                                 </div>
@@ -207,14 +207,14 @@ require __DIR__ . '/../../layouts/header.php';
                         <h4 class="sidebar-title">Manage</h4>
                         <div class="event-manage-actions">
                             <?php if (!empty($canInvite)): ?>
-                                <button onclick="document.getElementById('inviteModal').classList.add('visible')" class="glass-btn">📩 Invite People</button>
+                                <button onclick="document.getElementById('inviteModal').classList.add('visible')" class="btn btn--ghost">📩 Invite People</button>
                             <?php endif; ?>
 
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>/edit" class="glass-btn event-edit-link">⚙️ Edit Event</a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>/edit" class="btn btn--ghost event-edit-link">⚙️ Edit Event</a>
 
                             <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>/delete" method="POST" onsubmit="return confirm('Cancel event?');">
                                 <?= \Nexus\Core\Csrf::input() ?>
-                                <button type="submit" class="glass-btn danger event-cancel-btn">Cancel Event</button>
+                                <button type="submit" class="btn btn--danger event-cancel-btn">Cancel Event</button>
                             </form>
                         </div>
                     </div>
@@ -247,8 +247,8 @@ require __DIR__ . '/../../layouts/header.php';
                             </div>
 
                             <div class="event-modal-buttons">
-                                <button type="submit" class="glass-btn primary event-modal-btn-flex">Send Invites</button>
-                                <button type="button" onclick="document.getElementById('inviteModal').classList.remove('visible')" class="glass-btn event-modal-btn-flex">Cancel</button>
+                                <button type="submit" class="btn btn--primary event-modal-btn-flex">Send Invites</button>
+                                <button type="button" onclick="document.getElementById('inviteModal').classList.remove('visible')" class="btn btn--ghost event-modal-btn-flex">Cancel</button>
                             </div>
                         </form>
 
@@ -271,7 +271,7 @@ require __DIR__ . '/../../layouts/header.php';
                     <?php else: ?>
                         <div class="event-no-invitees">
                             <p>No eligible members found to invite.</p>
-                            <button type="button" onclick="document.getElementById('inviteModal').classList.remove('visible')" class="glass-btn event-close-btn-margin">Close</button>
+                            <button type="button" onclick="document.getElementById('inviteModal').classList.remove('visible')" class="btn btn--ghost event-close-btn-margin">Close</button>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -699,7 +699,7 @@ document.querySelectorAll('form').forEach(form => {
 });
 
 // Button Press States
-document.querySelectorAll('.glass-btn, button').forEach(btn => {
+document.querySelectorAll('.btn, button').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

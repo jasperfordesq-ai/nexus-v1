@@ -1,1 +1,462 @@
-.htb-main-title{view-transition-name:title}.nexus-native-nav{view-transition-name:bottom-nav}.nexus-native-drawer{view-transition-name:drawer}.nexus-quick-fab{view-transition-name:fab}::view-transition-old(hero){animation:heroOut 0.4s ease-out both}::view-transition-new(hero){animation:heroIn 0.4s ease-out both}@keyframes heroOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.05)}}@keyframes heroIn{0%{opacity:0;transform:scale(0.95)}100%{opacity:1;transform:scale(1)}}::view-transition-image-pair(hero){isolation:isolate}::view-transition-old(hero),::view-transition-new(hero){mix-blend-mode:normal}::view-transition-old(avatar){animation:avatarOut 0.35s var(--spring-smooth) both}::view-transition-new(avatar){animation:avatarIn 0.35s var(--spring-smooth) both}@keyframes avatarOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.8)}}@keyframes avatarIn{0%{opacity:0;transform:scale(0.8)}100%{opacity:1;transform:scale(1)}}::view-transition-old(card-image){animation:cardImageOut 0.3s ease-out both}::view-transition-new(card-image){animation:cardImageIn 0.3s ease-out both}@keyframes cardImageOut{0%{opacity:1;clip-path:inset(0 0 0 0 round 16px)}100%{opacity:0;clip-path:inset(0 0 0 0 round 0)}}@keyframes cardImageIn{0%{opacity:0;clip-path:inset(10% 10% 10% 10% round 16px)}100%{opacity:1;clip-path:inset(0 0 0 0 round 0)}}::view-transition-old(content){animation:contentOut 0.25s ease-out both}::view-transition-new(content){animation:contentIn 0.35s ease-out 0.1s both}@keyframes contentOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-20px)}}@keyframes contentIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}::view-transition-old(title){animation:titleOut 0.2s ease-out both}::view-transition-new(title){animation:titleIn 0.3s ease-out 0.1s both}@keyframes titleOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-10px)}}@keyframes titleIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}::view-transition-old(bottom-nav),::view-transition-new(bottom-nav){animation:none}::view-transition-old(drawer),::view-transition-new(drawer){animation:none}::view-transition-old(fab),::view-transition-new(fab){animation:none}.navigating-back::view-transition-old(content){animation:contentBackOut 0.25s ease-out both}.navigating-back::view-transition-new(content){animation:contentBackIn 0.35s ease-out 0.1s both}@keyframes contentBackOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(20px)}}@keyframes contentBackIn{0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}}.profile-header-avatar{view-transition-name:member-avatar}.profile-header-name{view-transition-name:member-name}.nexus-bottom-sheet{view-transition-name:sheet}::view-transition-old(sheet){animation:sheetOut 0.2s ease-out both}::view-transition-new(sheet){animation:sheetIn 0.3s var(--spring-bounce) both}@keyframes sheetOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(100%)}}@keyframes sheetIn{0%{opacity:0;transform:translateY(100%)}100%{opacity:1;transform:translateY(0)}}@supports not (view-transition-name:none){}@media (prefers-reduced-motion:reduce){::view-transition-old(*),::view-transition-new(*){animation-duration:0.01ms !important}}.htb-hero-header,.nexus-avatar{will-change:transform,opacity;contain:layout style paint}
+/**
+ * Project NEXUS - Shared Element Transitions
+ * Hero images, cards, and avatars morph between pages
+ * Uses View Transitions API with fallbacks
+ */
+
+/* ============================================
+   1. VIEW TRANSITION NAMING
+   Elements with these classes will transition smoothly between pages
+   ============================================ */
+
+/* Hero images - DISABLED to prevent duplicate view-transition-name errors */
+/* Multiple heroes on a page cause errors. Use specific IDs instead. */
+/*
+.htb-hero-header,
+.nexus-hero,
+[class*="hero"] {
+    view-transition-name: hero;
+}
+*/
+
+/* Profile avatars - DISABLED to prevent duplicate view-transition-name errors */
+/* Multiple avatars on a page cause errors. Use specific IDs instead. */
+/*
+.nexus-avatar,
+.profile-avatar,
+.user-avatar,
+[class*="avatar"]:not(.skeleton-avatar) {
+    view-transition-name: avatar;
+}
+*/
+
+/* Card thumbnails - use data attribute for unique names */
+
+/* Main content area - only apply to main element to avoid duplicates */
+main#main-content {
+    view-transition-name: content;
+}
+
+/* Containers inside main should not have their own transition name */
+main .htb-container,
+main .htb-container-full {
+    view-transition-name: none;
+}
+
+/* Page titles */
+.htb-main-title,
+.page-title,
+h1.title {
+    view-transition-name: title;
+}
+
+/* Bottom navigation - stays in place */
+.nexus-native-nav {
+    view-transition-name: bottom-nav;
+}
+
+/* Drawer - stays in place */
+.nexus-native-drawer {
+    view-transition-name: drawer;
+}
+
+/* FAB - stays in place */
+.nexus-quick-fab {
+    view-transition-name: fab;
+}
+
+
+/* ============================================
+   2. HERO TRANSITIONS
+   ============================================ */
+
+/* Hero morphs between pages */
+::view-transition-old(hero) {
+    animation: heroOut 0.4s ease-out both;
+}
+
+::view-transition-new(hero) {
+    animation: heroIn 0.4s ease-out both;
+}
+
+@keyframes heroOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes heroIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Cross-fade for different hero images */
+::view-transition-image-pair(hero) {
+    isolation: isolate;
+}
+
+::view-transition-old(hero),
+::view-transition-new(hero) {
+    mix-blend-mode: normal;
+}
+
+
+/* ============================================
+   3. AVATAR TRANSITIONS
+   ============================================ */
+
+/* Avatar morphs and moves between positions */
+::view-transition-old(avatar) {
+    animation: avatarOut 0.35s var(--spring-smooth) both;
+}
+
+::view-transition-new(avatar) {
+    animation: avatarIn 0.35s var(--spring-smooth) both;
+}
+
+@keyframes avatarOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+@keyframes avatarIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* ============================================
+   4. CARD IMAGE TRANSITIONS
+   ============================================ */
+
+/* Card images expand into full view */
+::view-transition-old(card-image) {
+    animation: cardImageOut 0.3s ease-out both;
+}
+
+::view-transition-new(card-image) {
+    animation: cardImageIn 0.3s ease-out both;
+}
+
+@keyframes cardImageOut {
+    0% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0 round 16px);
+    }
+    100% {
+        opacity: 0;
+        clip-path: inset(0 0 0 0 round 0);
+    }
+}
+
+@keyframes cardImageIn {
+    0% {
+        opacity: 0;
+        clip-path: inset(10% 10% 10% 10% round 16px);
+    }
+    100% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0 round 0);
+    }
+}
+
+
+/* ============================================
+   5. CONTENT TRANSITIONS
+   ============================================ */
+
+/* Main content slides and fades */
+::view-transition-old(content) {
+    animation: contentOut 0.25s ease-out both;
+}
+
+::view-transition-new(content) {
+    animation: contentIn 0.35s ease-out 0.1s both;
+}
+
+@keyframes contentOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes contentIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ============================================
+   6. TITLE TRANSITIONS
+   ============================================ */
+
+::view-transition-old(title) {
+    animation: titleOut 0.2s ease-out both;
+}
+
+::view-transition-new(title) {
+    animation: titleIn 0.3s ease-out 0.1s both;
+}
+
+@keyframes titleOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes titleIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ============================================
+   7. PERSISTENT ELEMENTS (No animation)
+   ============================================ */
+
+/* Bottom nav stays fixed */
+::view-transition-old(bottom-nav),
+::view-transition-new(bottom-nav) {
+    animation: none;
+}
+
+/* Drawer stays fixed */
+::view-transition-old(drawer),
+::view-transition-new(drawer) {
+    animation: none;
+}
+
+/* FAB stays fixed */
+::view-transition-old(fab),
+::view-transition-new(fab) {
+    animation: none;
+}
+
+
+/* ============================================
+   8. BACKWARDS NAVIGATION
+   ============================================ */
+
+/* Reverse animations for back navigation */
+.navigating-back::view-transition-old(content) {
+    animation: contentBackOut 0.25s ease-out both;
+}
+
+.navigating-back::view-transition-new(content) {
+    animation: contentBackIn 0.35s ease-out 0.1s both;
+}
+
+@keyframes contentBackOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+@keyframes contentBackIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ============================================
+   9. LISTING DETAIL TRANSITION
+   ============================================ */
+
+/* Special transition for listing cards to detail pages */
+.listing-card[data-listing-id] {
+    view-transition-name: var(--listing-vt-name);
+}
+
+/* Generate unique view-transition-names via CSS custom properties */
+.listing-card:nth-child(1) { --listing-vt-name: listing-1; }
+.listing-card:nth-child(2) { --listing-vt-name: listing-2; }
+.listing-card:nth-child(3) { --listing-vt-name: listing-3; }
+.listing-card:nth-child(4) { --listing-vt-name: listing-4; }
+.listing-card:nth-child(5) { --listing-vt-name: listing-5; }
+.listing-card:nth-child(6) { --listing-vt-name: listing-6; }
+.listing-card:nth-child(7) { --listing-vt-name: listing-7; }
+.listing-card:nth-child(8) { --listing-vt-name: listing-8; }
+.listing-card:nth-child(9) { --listing-vt-name: listing-9; }
+.listing-card:nth-child(10) { --listing-vt-name: listing-10; }
+
+/* Detail page receives the same name */
+
+
+/* ============================================
+   10. PROFILE TRANSITION
+   ============================================ */
+
+/* Member card to profile page */
+.member-card {
+    view-transition-name: member-card;
+}
+
+.member-card .member-avatar {
+    view-transition-name: member-avatar;
+}
+
+.member-card .member-name {
+    view-transition-name: member-name;
+}
+
+/* Profile page elements */
+.profile-header-avatar {
+    view-transition-name: member-avatar;
+}
+
+.profile-header-name {
+    view-transition-name: member-name;
+}
+
+
+/* ============================================
+   11. MODAL/SHEET TRANSITIONS
+   ============================================ */
+
+/* Bottom sheet entrance */
+.nexus-bottom-sheet {
+    view-transition-name: sheet;
+}
+
+::view-transition-old(sheet) {
+    animation: sheetOut 0.2s ease-out both;
+}
+
+::view-transition-new(sheet) {
+    animation: sheetIn 0.3s var(--spring-bounce) both;
+}
+
+@keyframes sheetOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+}
+
+@keyframes sheetIn {
+    0% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ============================================
+   12. FALLBACK FOR UNSUPPORTED BROWSERS
+   ============================================ */
+
+@supports not (view-transition-name: none) {
+    /* Simple fade transitions for older browsers */
+    .page-transitioning * {
+        animation: simpleFade 0.3s ease-out !important;
+    }
+
+    @keyframes simpleFade {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+}
+
+
+/* ============================================
+   13. REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation-duration: 0.01ms !important;
+    }
+
+    *[style*="view-transition-name"] {
+        view-transition-name: none !important;
+    }
+}
+
+
+/* ============================================
+   14. PERFORMANCE HINTS
+   ============================================ */
+
+/* Prepare elements for animation */
+[style*="view-transition-name"],
+.htb-hero-header,
+.nexus-avatar,
+.listing-card,
+.member-card {
+    will-change: transform, opacity;
+    contain: layout style paint;
+}
+
+/* Reset after navigation */
+.view-transition-complete [style*="view-transition-name"] {
+    will-change: auto;
+}

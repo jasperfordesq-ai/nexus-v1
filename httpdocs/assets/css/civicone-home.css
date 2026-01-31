@@ -84,7 +84,7 @@
 
 .civicone-meta-text,
 .civicone-secondary-text {
-    color: #505a5f; /* GOV.UK secondary-text-colour */
+    color: var(--color-govuk-grey-dark, #505a5f); /* GOV.UK secondary-text-colour */
 }
 
 /* ==========================================================================

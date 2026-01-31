@@ -4523,7 +4523,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <span class="glass-price-amount">19</span>
                             <span class="glass-price-period">/month</span>
                         </div>
-                        <button class="glass-card-btn glass-btn-outline">Get Started</button>
+                        <button class="glass-card-btn btn btn--ghost">Get Started</button>
                     </div>
                     <div class="glass-card">
                         <div class="glass-card-shine"></div>
@@ -4543,7 +4543,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         <div class="glass-card-price">
                             <span class="glass-price-custom">Contact Us</span>
                         </div>
-                        <button class="glass-card-btn glass-btn-outline">Contact Sales</button>
+                        <button class="glass-card-btn btn btn--ghost">Contact Sales</button>
                     </div>
                 </div>
             </section>`

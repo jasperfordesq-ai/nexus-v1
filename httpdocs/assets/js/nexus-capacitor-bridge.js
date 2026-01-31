@@ -534,7 +534,7 @@
         const interactiveSelectors = [
             'button',
             '.btn',
-            '.glass-btn',
+            '.btn--glass',
             '[role="button"]',
             '.nexus-bottom-nav-item',
             '.nexus-native-nav-item',
@@ -565,7 +565,7 @@
 
             // Stronger feedback for primary actions
             if (target.classList.contains('btn-primary') ||
-                target.classList.contains('glass-btn-primary') ||
+                target.classList.contains('btn--primary') ||
                 target.classList.contains('fab') ||
                 target.classList.contains('nexus-fab')) {
                 hapticType = 'medium';

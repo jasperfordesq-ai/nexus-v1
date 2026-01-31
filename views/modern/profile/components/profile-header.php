@@ -176,7 +176,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             <?= Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                             <button type="submit"
-                                    class="glass-btn mte-profile-header--btn-impersonate"
+                                    class="btn btn--warning mte-profile-header--btn-impersonate"
                                     aria-label="Login as this user (admin action)">
                                 <i class="fa-solid fa-user-secret" aria-hidden="true"></i> Login As User
                             </button>
@@ -186,13 +186,13 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['id']): ?>
                         <!-- Own Profile Actions -->
                         <a href="<?= $basePath ?>/profile/edit"
-                           class="glass-btn glass-btn-secondary"
+                           class="btn btn--secondary"
                            aria-label="Edit your profile">
                             <i class="fa-solid fa-pen" aria-hidden="true"></i> Edit Profile
                         </a>
                         <?php if (\Nexus\Core\TenantContext::hasFeature('timebanking')): ?>
                         <a href="<?= $basePath ?>/wallet/insights"
-                           class="glass-btn mte-profile-header--btn-insights"
+                           class="btn btn--primary mte-profile-header--btn-insights"
                            aria-label="View your wallet insights">
                             <i class="fa-solid fa-chart-line" aria-hidden="true"></i> My Insights
                         </a>
@@ -205,7 +205,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                 <?= Nexus\Core\Csrf::input() ?>
                                 <input type="hidden" name="receiver_id" value="<?= $user['id'] ?>">
                                 <button type="submit"
-                                        class="glass-btn"
+                                        class="btn btn--glass"
                                         aria-label="Send friend request to <?= htmlspecialchars($displayName) ?>">
                                     <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add Friend
                                 </button>
@@ -213,7 +213,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         <?php elseif ($connection['status'] === 'pending' && $connection['requester_id'] == $_SESSION['user_id']): ?>
                             <!-- Friend request sent -->
                             <button disabled
-                                    class="glass-btn glass-btn-secondary mte-profile-header--btn-disabled"
+                                    class="btn btn--secondary mte-profile-header--btn-disabled"
                                     aria-label="Friend request already sent">
                                 <i class="fa-solid fa-clock" aria-hidden="true"></i> Request Sent
                             </button>
@@ -223,14 +223,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                 <?= Nexus\Core\Csrf::input() ?>
                                 <input type="hidden" name="connection_id" value="<?= $connection['id'] ?>">
                                 <button type="submit"
-                                        class="glass-btn glass-btn-success"
+                                        class="btn btn--success"
                                         aria-label="Accept friend request from <?= htmlspecialchars($displayName) ?>">
                                     <i class="fa-solid fa-check" aria-hidden="true"></i> Accept Request
                                 </button>
                             </form>
                         <?php elseif ($connection['status'] === 'accepted'): ?>
                             <!-- Already friends -->
-                            <span class="glass-btn glass-btn-success mte-profile-header--btn-friends"
+                            <span class="btn btn--success mte-profile-header--btn-friends"
                                   role="status"
                                   aria-label="You are friends with <?= htmlspecialchars($displayName) ?>">
                                 <i class="fa-solid fa-check" aria-hidden="true"></i> Friends
@@ -238,18 +238,18 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         <?php endif; ?>
 
                         <a href="<?= $basePath ?>/messages/<?= $user['id'] ?>"
-                           class="glass-btn"
+                           class="btn btn--glass"
                            aria-label="Send message to <?= htmlspecialchars($displayName) ?>">
                             <i class="fa-solid fa-message" aria-hidden="true"></i> Message
                         </a>
                         <a href="<?= $basePath ?>/wallet?to=<?= $user['id'] ?>"
-                           class="glass-btn glass-btn-secondary"
+                           class="btn btn--secondary"
                            aria-label="Send credits to <?= htmlspecialchars($displayName) ?>">
                             <i class="fa-solid fa-coins" aria-hidden="true"></i> Send Credits
                         </a>
                         <button type="button"
                                 onclick="openReviewModal()"
-                                class="glass-btn mte-profile-header--btn-review"
+                                class="btn btn--warning mte-profile-header--btn-review"
                                 aria-label="Leave a review for <?= htmlspecialchars($displayName) ?>">
                             <i class="fa-solid fa-star" aria-hidden="true"></i> Leave Review
                         </button>
@@ -257,7 +257,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
                     <?php if ((isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
                         <a href="<?= $basePath ?>/admin/users/<?= $user['id'] ?>/edit"
-                           class="glass-btn mte-profile-header--btn-admin"
+                           class="btn btn--danger mte-profile-header--btn-admin"
                            aria-label="Admin: Edit user settings">
                             <i class="fa-solid fa-shield" aria-hidden="true"></i> Admin
                         </a>

@@ -162,6 +162,9 @@ $isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
                     &copy; <?= date('Y') ?> <?= htmlspecialchars($tenantName) ?>. Built on
                     <a class="govuk-footer__link" href="https://project-nexus.ie" target="_blank" rel="noopener">Nexus Platform</a>.
                 </p>
+                <p class="govuk-body-s civicone-footer-meta govuk-!-margin-top-1">
+                    Built with elements from the <a class="govuk-footer__link" href="https://design-system.service.gov.uk/" target="_blank" rel="noopener">GOV.UK Design System</a>. This service is not affiliated with the Government of UK.
+                </p>
             </div>
         </div>
 

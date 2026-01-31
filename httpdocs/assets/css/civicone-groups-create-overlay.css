@@ -21,7 +21,7 @@ body {
 
 /* Theme Variables */
 [data-theme="light"] {
-    --bg-primary: #f5f5f5;
+    --bg-primary: var(--color-govuk-light-grey, #f3f2f1);
     --bg-secondary: var(--color-white);
     --text-primary: var(--color-gray-800);
     --text-secondary: var(--color-gray-500);

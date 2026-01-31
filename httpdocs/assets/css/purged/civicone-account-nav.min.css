@@ -1,1 +1,140 @@
-.civicone-account-area{margin-top:var(--space-5)}.civicone-account-area .moj-sub-navigation{border-bottom:1px solid var(--civicone-border,var(--color-govuk-grey));margin-bottom:var(--space-6)}.civicone-account-area .moj-sub-navigation__list{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--space-2)}.civicone-account-area .moj-sub-navigation__item{margin:0}.civicone-account-area .moj-sub-navigation__link{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-3) var(--space-5);text-decoration:none;color:var(--civicone-link,var(--color-govuk-blue-light));border-bottom:4px solid transparent;transition:border-color var(--transition-fast)}.civicone-account-area .moj-sub-navigation__link:hover{border-bottom-color:var(--civicone-border,var(--color-govuk-grey));text-decoration:underline}.civicone-account-area .moj-sub-navigation__link:focus{outline:3px solid var(--civicone-focus,var(--color-brand-yellow));outline-offset:0;background-color:var(--civicone-focus,var(--color-brand-yellow));color:var(--civicone-focus-text,var(--color-govuk-black));text-decoration:none;border-bottom-color:var(--civicone-focus-text,var(--color-govuk-black))}.civicone-account-area .moj-sub-navigation__item--active .moj-sub-navigation__link{border-bottom-color:var(--civicone-link,var(--color-govuk-blue-light));font-weight:var(--font-weight-bold);color:var(--civicone-text,var(--color-govuk-black))}.civicone-account-area .moj-sub-navigation__item--active .moj-sub-navigation__link:hover{border-bottom-color:var(--civicone-link-hover,var(--color-govuk-blue))}.civicone-account-area .moj-sub-navigation__link i{font-size:1.1em}.civicone-account-area .moj-notification-badge{display:inline-flex;align-items:center;justify-content:center;min-width:var(--space-5);height:var(--space-5);padding:0 var(--space-2);background-color:var(--civicone-error,var(--color-govuk-red));color:var(--color-white);font-size:var(--font-size-xs);font-weight:var(--font-weight-bold);border-radius:var(--radius-full);line-height:1}.civicone-account-area .moj-sub-navigation__link:focus .moj-notification-badge{background-color:var(--civicone-focus-text,var(--color-govuk-black));color:var(--civicone-focus,var(--color-brand-yellow))}@media (max-width:640px){.civicone-account-area .moj-sub-navigation__list{flex-direction:column;gap:0}.civicone-account-area .moj-sub-navigation__item{width:100%}.civicone-account-area .moj-sub-navigation__link{width:100%;justify-content:flex-start;padding:var(--space-3);border-bottom:1px solid var(--civicone-border,var(--color-govuk-grey))}.civicone-account-area .moj-sub-navigation__item--active .moj-sub-navigation__link{border-left:4px solid var(--civicone-link,var(--color-govuk-blue-light));border-bottom:1px solid var(--civicone-border,var(--color-govuk-grey));padding-left:calc(var(--space-3) - 4px)}}@media (prefers-reduced-motion:reduce){.civicone-account-area .moj-sub-navigation__link{transition:none}}
+/**
+ * CivicOne Account Area Navigation
+ * MOJ Sub navigation pattern
+ * https://design-patterns.service.justice.gov.uk/components/sub-navigation/
+ * Scoped under .civicone or .civicone-account-area
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ */
+
+/* Account Area Container */
+.civicone-account-area {
+    margin-top: var(--space-5);
+}
+
+/* MOJ Sub navigation */
+
+.civicone-account-area .moj-sub-navigation {
+    border-bottom: 1px solid var(--civicone-border, var(--color-govuk-grey));
+    margin-bottom: var(--space-6);
+}
+
+
+.civicone-account-area .moj-sub-navigation__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+
+.civicone-account-area .moj-sub-navigation__item {
+    margin: 0;
+}
+
+
+.civicone-account-area .moj-sub-navigation__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    text-decoration: none;
+    color: var(--civicone-link, var(--color-govuk-blue-light));
+    border-bottom: 4px solid transparent;
+    transition: border-color var(--transition-fast);
+}
+
+
+.civicone-account-area .moj-sub-navigation__link:hover {
+    border-bottom-color: var(--civicone-border, var(--color-govuk-grey));
+    text-decoration: underline;
+}
+
+
+.civicone-account-area .moj-sub-navigation__link:focus {
+    outline: 3px solid var(--civicone-focus, var(--color-brand-yellow));
+    outline-offset: 0;
+    background-color: var(--civicone-focus, var(--color-brand-yellow));
+    color: var(--civicone-focus-text, var(--color-govuk-black));
+    text-decoration: none;
+    border-bottom-color: var(--civicone-focus-text, var(--color-govuk-black));
+}
+
+.civicone .moj-sub-navigation__item--active .moj-sub-navigation__link,
+.civicone-account-area .moj-sub-navigation__item--active .moj-sub-navigation__link {
+    border-bottom-color: var(--civicone-link, var(--color-govuk-blue-light));
+    font-weight: var(--font-weight-bold);
+    color: var(--civicone-text, var(--color-govuk-black));
+}
+
+.civicone .moj-sub-navigation__item--active .moj-sub-navigation__link:hover,
+.civicone-account-area .moj-sub-navigation__item--active .moj-sub-navigation__link:hover {
+    border-bottom-color: var(--civicone-link-hover, var(--color-govuk-blue));
+}
+
+/* Icons in navigation */
+
+.civicone-account-area .moj-sub-navigation__link i {
+    font-size: 1.1em;
+}
+
+/* MOJ Notification badge */
+
+.civicone-account-area .moj-notification-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--space-5);
+    height: var(--space-5);
+    padding: 0 var(--space-2);
+    background-color: var(--civicone-error, var(--color-govuk-red));
+    color: var(--color-white);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--radius-full);
+    line-height: 1;
+}
+
+
+.civicone-account-area .moj-sub-navigation__link:focus .moj-notification-badge {
+    background-color: var(--civicone-focus-text, var(--color-govuk-black));
+    color: var(--civicone-focus, var(--color-brand-yellow));
+}
+
+/* Responsive: Stack on mobile */
+@media (max-width: 640px) {
+    
+    .civicone-account-area .moj-sub-navigation__list {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    
+    .civicone-account-area .moj-sub-navigation__item {
+        width: 100%;
+    }
+
+    
+    .civicone-account-area .moj-sub-navigation__link {
+        width: 100%;
+        justify-content: flex-start;
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--civicone-border, var(--color-govuk-grey));
+    }
+
+    .civicone .moj-sub-navigation__item--active .moj-sub-navigation__link,
+    .civicone-account-area .moj-sub-navigation__item--active .moj-sub-navigation__link {
+        border-left: 4px solid var(--civicone-link, var(--color-govuk-blue-light));
+        border-bottom: 1px solid var(--civicone-border, var(--color-govuk-grey));
+        padding-left: calc(var(--space-3) - 4px);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    
+    .civicone-account-area .moj-sub-navigation__link {
+        transition: none;
+    }
+}

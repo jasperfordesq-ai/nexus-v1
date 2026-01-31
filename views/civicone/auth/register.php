@@ -84,11 +84,11 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <div id="password-rules" class="govuk-!-margin-top-3" role="status" aria-live="polite">
                     <p class="govuk-body-s govuk-!-margin-bottom-2"><strong>Password requirements:</strong></p>
                     <ul class="govuk-list govuk-body-s">
-                        <li id="rule-length"><span aria-hidden="true">❌</span> At least 12 characters</li>
-                        <li id="rule-upper"><span aria-hidden="true">❌</span> At least 1 uppercase letter</li>
-                        <li id="rule-lower"><span aria-hidden="true">❌</span> At least 1 lowercase letter</li>
-                        <li id="rule-number"><span aria-hidden="true">❌</span> At least 1 number</li>
-                        <li id="rule-symbol"><span aria-hidden="true">❌</span> At least 1 special character</li>
+                        <li id="rule-length" class="password-rule password-rule--invalid"><span aria-hidden="true">❌</span> At least 12 characters</li>
+                        <li id="rule-upper" class="password-rule password-rule--invalid"><span aria-hidden="true">❌</span> At least 1 uppercase letter</li>
+                        <li id="rule-lower" class="password-rule password-rule--invalid"><span aria-hidden="true">❌</span> At least 1 lowercase letter</li>
+                        <li id="rule-number" class="password-rule password-rule--invalid"><span aria-hidden="true">❌</span> At least 1 number</li>
+                        <li id="rule-symbol" class="password-rule password-rule--invalid"><span aria-hidden="true">❌</span> At least 1 special character</li>
                     </ul>
                 </div>
             </div>
@@ -162,10 +162,12 @@ function checkPasswordStrength() {
         var span = el.querySelector('span');
         if (rules[key]) {
             span.textContent = '✅';
-            el.style.color = '#00703c';
+            el.classList.add('password-rule--valid');
+            el.classList.remove('password-rule--invalid');
         } else {
             span.textContent = '❌';
-            el.style.color = '#505a5f';
+            el.classList.add('password-rule--invalid');
+            el.classList.remove('password-rule--valid');
         }
     }
 }

@@ -1,1 +1,196 @@
-.civicone-wrapper-auth{padding-top:var(--space-10)}
+/**
+ * Authentication Login Page
+ * Login form and branding
+ * CivicOne Theme
+ */
+
+/* ===========================================
+   LAYOUT & STRUCTURE
+   =========================================== */
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+    box-sizing: border-box;
+}
+
+.auth-card {
+    margin-top: 0;
+    position: relative;
+    z-index: 10;
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10), 0 2px 4px -1px var(--color-black-alpha-6);
+}
+
+.auth-card-body {
+    padding: var(--space-10);
+}
+
+/* ===========================================
+   AUTH PAGE TYPOGRAPHY
+   =========================================== */
+
+/* ===========================================
+   AUTH ALERT MESSAGES
+   =========================================== */
+
+/* ===========================================
+   BIOMETRIC LOGIN SECTION
+   =========================================== */
+
+.biometric-btn {
+    width: 100%;
+    padding: var(--space-3-5);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    color: white;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2-5);
+}
+
+.biometric-divider {
+    text-align: center;
+    margin: var(--space-4) 0;
+    color: var(--color-slate-400);
+    font-size: 0.9rem;
+}
+
+/* ===========================================
+   BIOMETRIC PROMO BOX
+   =========================================== */
+
+.biometric-promo {
+    display: none;
+    margin-bottom: var(--space-5);
+    padding: var(--space-3-5) var(--space-4);
+    background: linear-gradient(135deg, var(--color-indigo-alpha-8), var(--color-violet-alpha-8));
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-indigo-alpha-20);
+}
+
+/* ===========================================
+   AUTH FORM ELEMENTS
+   =========================================== */
+
+/* ===========================================
+   AUTH LINKS
+   =========================================== */
+
+/* ===========================================
+   AUTH BUTTONS - GOV.UK Design System Pattern
+   WCAG 2.1 AA Compliant
+   =========================================== */
+
+.auth-submit-btn {
+    /* GOV.UK Button base */
+    width: 100%;
+    min-height: 44px; /* WCAG touch target */
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-govuk-green);
+    color: var(--color-white);
+    font-weight: 700;
+    font-size: 1.1875rem;
+    line-height: 1.2;
+    border: 2px solid transparent;
+    border-radius: 0; /* GOV.UK: no border radius */
+    box-shadow: 0 2px 0 var(--color-govuk-green-darker);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    text-decoration: none;
+}
+
+.auth-submit-btn:hover {
+    background-color: var(--color-govuk-green-dark, var(--color-govuk-green-dark));
+}
+
+.auth-submit-btn:focus {
+    outline: 3px solid transparent;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    box-shadow: 0 2px 0 var(--color-govuk-black);
+}
+
+.auth-submit-btn:active {
+    top: 2px;
+    box-shadow: none;
+}
+
+/* ===========================================
+   AUTH FOOTER TEXT
+   =========================================== */
+
+/* ===========================================
+   CIVICONE WRAPPER SPACING
+   =========================================== */
+
+.civicone-wrapper-auth {
+    padding-top: var(--space-10);
+}
+
+/* ===========================================
+   RESPONSIVE STYLES
+   =========================================== */
+
+/* Desktop spacing for no-hero layout */
+@media (min-width: 601px) {
+    .auth-wrapper {
+        padding-top: 140px;
+    }
+}
+
+@media (max-width: 600px) {
+    .auth-wrapper {
+        padding-top: 120px;
+        padding-left: var(--space-2-5);
+        padding-right: var(--space-2-5);
+    }
+
+    .auth-card-body {
+        padding: var(--space-6) !important;
+    }
+}
+
+/* ===========================================
+   DARK MODE
+   =========================================== */
+
+[data-theme="dark"] .auth-card {
+    background: var(--color-slate-alpha-85);
+    border: 1px solid var(--color-white-alpha-10);
+    box-shadow: 0 10px 40px var(--color-black-alpha-40);
+}
+
+/* Sign In heading */
+
+/* Success message */
+
+/* Error message */
+
+/* Biometric promo box */
+[data-theme="dark"] .biometric-promo {
+    background: linear-gradient(135deg, var(--color-indigo-alpha-15), var(--color-violet-alpha-15));
+    border-color: var(--color-indigo-alpha-30);
+}
+
+/* Divider text ("or") */
+[data-theme="dark"] .biometric-divider {
+    color: var(--color-slate-500);
+}
+
+/* Form labels */
+
+/* Form inputs */
+
+/* Links */
+
+/* Footer text */

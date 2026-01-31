@@ -1282,7 +1282,7 @@ require __DIR__ . '/../layouts/modern/header.php';
 
 
 <!-- Main content wrapper (main tag opened in header.php) -->
-<div class="htb-container htb-container-full home-feed-wrapper">
+<div class="htb-container htb-container-full home-feed-wrapper" style="padding-top: 136px !important;">
     <div id="home-glass-wrapper">
 
     <div class="home-two-column-grid">

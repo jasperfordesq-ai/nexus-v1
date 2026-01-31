@@ -1,1 +1,536 @@
-:root{}*{transition-timing-function:var(--ease-in-out)}.glass-btn{transition:transform var(--transition-fast),box-shadow var(--transition-fast),background-color var(--transition-fast);transition-timing-function:var(--ease-in-out);transform:translateZ(0);will-change:auto}.glass-btn:hover{will-change:transform}.glass-btn:not(:hover){will-change:auto}.glass-btn:active{transition-duration:0.05s}.nexus-card,.glass-card{transition:transform 0.25s var(--ease-in-out),box-shadow 0.25s var(--ease-in-out);transform:translateZ(0)}.nexus-card:hover,.glass-card:hover{transition-duration:var(--transition-fast)}.nexus-card:not(:hover),.glass-card:not(:hover){transition-duration:var(--transition-base)}#nexus-toast{transition:transform var(--transition-base) var(--ease-out),opacity 0.3s var(--ease-out)}.badge{transition:all var(--transition-fast) var(--ease-in-out)}.nexus-navbar,.nexus-utility-bar{transition:transform var(--transition-base) var(--ease-in-out),box-shadow 0.3s var(--ease-in-out),background-color var(--transition-base) var(--ease-in-out);transform:translateZ(0)}.nexus-navbar.scrolled{box-shadow:0 var(--space-2) var(--space-8) var(--color-black-alpha-30),0 0 0 1px var(--color-indigo-alpha-10);background:var(--color-slate-900-alpha-98);-webkit-backdrop-filter:blur(30px) saturate(200%);backdrop-filter:blur(30px) saturate(200%)}.nexus-navbar.hide-on-scroll{transform:translateY(-100%)}.nexus-brand-link{position:relative;display:inline-flex;align-items:baseline;gap:0;color:white !important;font-weight:var(--font-weight-bold);text-decoration:none !important;font-size:clamp(1.1rem,2.5vw,1.5rem);letter-spacing:-0.5px;text-transform:uppercase;line-height:var(--line-height-tight);padding-bottom:var(--space-1);transition:all var(--transition-base) var(--ease-in-out)}.nexus-brand-link .brand-primary{position:relative;color:inherit;font-weight:var(--font-weight-bold);transition:all var(--transition-base) ease}.nexus-brand-link .brand-secondary{opacity:0.65;font-weight:800;transition:opacity var(--transition-base) ease}.nexus-brand-link::before{content:'';position:absolute;inset:calc(var(--space-2) * -1) calc(var(--space-3) * -1);border-radius:var(--radius-md);background:linear-gradient(135deg,var(--color-indigo-alpha-15),var(--color-violet-alpha-15));opacity:0;transition:opacity var(--transition-base) ease;z-index:-1}.nexus-brand-link:hover::before{opacity:1}.nexus-brand-link:hover{transform:translateY(-1px);text-shadow:0 var(--space-1) var(--space-5) var(--color-white-alpha-15)}.nexus-brand-link:hover .brand-secondary{opacity:0.85}.nexus-brand-link:active{transform:translateY(0) scale(0.98)}.nexus-brand-link:focus-visible{outline:2px solid var(--color-indigo-alpha-80);outline-offset:var(--space-1);border-radius:var(--radius-sm)}.nexus-card,.glass-card{backface-visibility:hidden;perspective:1000px}@media (hover:none){.nexus-card:hover,.glass-card:hover{transform:translateZ(0)}}@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.001s !important;animation-iteration-count:1 !important;transition-duration:0.001s !important}.nexus-navbar{transition-duration:0.01ms !important}}*:focus-visible{outline:3px solid var(--color-primary-500);outline-offset:2px}
+/**
+ * Nexus Polish
+ * Consolidated transitions, timing, and performance optimizations
+ * Replaces: nexus-smooth-polish.css, nexus-header-polish.css
+ * Version: 2.0 - Migrated to Design Tokens
+ */
+
+/* ============================================
+   CSS VARIABLES - Easing Curves
+   ============================================ */
+:root {
+    /* Note: Primary easing curves from design-tokens.css */
+    /* Legacy variables kept for backwards compatibility */
+}
+
+/* ============================================
+   1. GLOBAL TRANSITIONS
+   ============================================ */
+
+/* Default timing function */
+* {
+    transition-timing-function: var(--ease-in-out);
+}
+
+/* Theme transitions */
+[data-theme] {
+    transition: background-color var(--transition-base) var(--ease-in-out),
+                color var(--transition-base) var(--ease-in-out);
+}
+
+/* ============================================
+   2. BUTTON POLISH
+   ============================================ */
+button,
+.btn,
+.btn--glass {
+    transition: transform var(--transition-fast),
+                box-shadow var(--transition-fast),
+                background-color var(--transition-fast);
+    transition-timing-function: var(--ease-in-out);
+    transform: translateZ(0);
+    will-change: auto;
+}
+
+button:hover,
+.btn:hover,
+.btn--glass:hover {
+    will-change: transform;
+}
+
+button:not(:hover),
+.btn:not(:hover),
+.btn--glass:not(:hover) {
+    will-change: auto;
+}
+
+button:active,
+.btn:active,
+.btn--glass:active {
+    transition-duration: 0.05s;
+}
+
+/* ============================================
+   3. CARD POLISH
+   ============================================ */
+.nexus-card,
+.glass-card,
+.post-card {
+    transition: transform 0.25s var(--ease-in-out),
+                box-shadow 0.25s var(--ease-in-out);
+    transform: translateZ(0);
+}
+
+.nexus-card:hover,
+.glass-card:hover,
+.post-card:hover {
+    transition-duration: var(--transition-fast);
+}
+
+.nexus-card:not(:hover),
+.glass-card:not(:hover),
+.post-card:not(:hover) {
+    transition-duration: var(--transition-base);
+}
+
+/* ============================================
+   4. NAVIGATION POLISH
+   ============================================ */
+.nav-link,
+a.nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    color: var(--color-white-alpha-80);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-base);
+    transition: all 0.2s var(--ease-in-out);
+    transform: translateZ(0);
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-base);
+    background: var(--color-white-alpha-5);
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: -1;
+}
+
+.nav-link:hover {
+    color: white;
+    transform: translateY(-2px);
+    transition-duration: var(--transition-fast);
+}
+
+.nav-link:hover::before {
+    opacity: 1;
+}
+
+.nav-link:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.nav-link.active,
+.nav-link[aria-current="page"] {
+    color: white;
+    background: var(--color-indigo-alpha-15);
+    box-shadow: inset 0 1px 0 var(--color-white-alpha-10),
+                0 2px var(--space-2) var(--color-indigo-alpha-30);
+}
+
+.nav-link i {
+    font-size: var(--font-size-xs);
+    opacity: 0.8;
+    transition: all 0.2s;
+}
+
+.nav-link:hover i,
+.nav-link.active i {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* ============================================
+   5. DROPDOWN POLISH
+   ============================================ */
+.dropdown-menu {
+    transition: opacity 0.2s var(--ease-out),
+                transform 0.2s var(--ease-out),
+                visibility 0s linear 0.2s;
+}
+
+.dropdown.active .dropdown-menu,
+.dropdown:hover .dropdown-menu {
+    transition-delay: 0s;
+    visibility: visible;
+}
+
+.dropdown-item {
+    transition: all var(--transition-fast) var(--ease-in-out);
+}
+
+.dropdown-toggle i.fa-chevron-down {
+    font-size: var(--font-size-xs);
+    transition: transform var(--transition-base) var(--ease-in-out);
+}
+
+.dropdown.active .dropdown-toggle i.fa-chevron-down,
+.dropdown:hover .dropdown-toggle i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+/* ============================================
+   6. MODAL POLISH
+   ============================================ */
+.modal {
+    transition: opacity 0.25s var(--ease-out);
+}
+
+.modal-content,
+.modal-dialog {
+    transition: transform 0.25s var(--ease-out);
+}
+
+.modal.active .modal-content,
+.modal.active .modal-dialog {
+    transform: scale(1) translateZ(0);
+}
+
+/* ============================================
+   7. FORM INPUT POLISH
+   ============================================ */
+input,
+textarea,
+select {
+    transition: border-color 0.2s var(--ease-in-out),
+                box-shadow 0.2s var(--ease-in-out),
+                background-color 0.2s var(--ease-in-out);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    transition-duration: var(--transition-fast);
+}
+
+/* ============================================
+   8. TOOLTIP/POPOVER POLISH
+   ============================================ */
+.tooltip,
+[role="tooltip"] {
+    transition: opacity var(--transition-fast) var(--ease-out),
+                transform 0.15s var(--ease-out);
+}
+
+/* ============================================
+   9. TOAST POLISH
+   ============================================ */
+#nexus-toast,
+.toast,
+.notification {
+    transition: transform var(--transition-base) var(--ease-out),
+                opacity 0.3s var(--ease-out);
+}
+
+/* ============================================
+   10. BADGE/CHIP POLISH
+   ============================================ */
+.badge,
+.chip,
+.tag {
+    transition: all var(--transition-fast) var(--ease-in-out);
+}
+
+/* ============================================
+   11. LINK HOVER POLISH
+   ============================================ */
+a:not(.nav-link):not(.btn) {
+    transition: color 0.15s var(--ease-in-out),
+                text-decoration-color 0.15s var(--ease-in-out);
+}
+
+/* ============================================
+   12. ICON POLISH
+   ============================================ */
+i,
+.icon,
+[class*="fa-"] {
+    transition: transform 0.2s var(--ease-in-out),
+                color 0.2s var(--ease-in-out);
+}
+
+i:hover,
+.icon:hover {
+    transition-duration: var(--transition-fast);
+}
+
+/* ============================================
+   13. HEADER SCROLL BEHAVIOR
+   ============================================ */
+.nexus-navbar,
+.nexus-utility-bar {
+    transition: transform var(--transition-base) var(--ease-in-out),
+                box-shadow 0.3s var(--ease-in-out),
+                background-color var(--transition-base) var(--ease-in-out);
+    transform: translateZ(0);
+}
+
+.nexus-navbar.scrolled {
+    box-shadow: 0 var(--space-2) var(--space-8) var(--color-black-alpha-30),
+                0 0 0 1px var(--color-indigo-alpha-10);
+    background: var(--color-slate-900-alpha-98);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    backdrop-filter: blur(30px) saturate(200%);
+}
+
+.nexus-navbar.hide-on-scroll {
+    transform: translateY(-100%);
+}
+
+/* ============================================
+   14. BRAND LOGO POLISH
+   ============================================ */
+.nexus-brand-link {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0;
+    color: white !important;
+    font-weight: var(--font-weight-bold);
+    text-decoration: none !important;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    line-height: var(--line-height-tight);
+    padding-bottom: var(--space-1);
+    transition: all var(--transition-base) var(--ease-in-out);
+}
+
+.nexus-brand-link .brand-primary {
+    position: relative;
+    color: inherit;
+    font-weight: var(--font-weight-bold);
+    transition: all var(--transition-base) ease;
+}
+
+/* Red underline removed - clean brand styling */
+
+.nexus-brand-link .brand-secondary {
+    opacity: 0.65;
+    font-weight: 800;
+    transition: opacity var(--transition-base) ease;
+}
+
+.nexus-brand-link::before {
+    content: '';
+    position: absolute;
+    inset: calc(var(--space-2) * -1) calc(var(--space-3) * -1);
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--color-indigo-alpha-15), var(--color-violet-alpha-15));
+    opacity: 0;
+    transition: opacity var(--transition-base) ease;
+    z-index: -1;
+}
+
+.nexus-brand-link:hover::before {
+    opacity: 1;
+}
+
+.nexus-brand-link:hover {
+    transform: translateY(-1px);
+    text-shadow: 0 var(--space-1) var(--space-5) var(--color-white-alpha-15);
+}
+
+/* Red underline hover removed */
+
+.nexus-brand-link:hover .brand-secondary {
+    opacity: 0.85;
+}
+
+.nexus-brand-link:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.nexus-brand-link:focus-visible {
+    outline: 2px solid var(--color-indigo-alpha-80);
+    outline-offset: var(--space-1);
+    border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   15. USER MENU POLISH
+   ============================================ */
+
+/* ============================================
+   16. IMAGE LOADING POLISH
+   ============================================ */
+img {
+    transition: opacity var(--transition-base) var(--ease-out);
+}
+
+/* img[loading="lazy"] rules consolidated in bundles/core.css */
+
+/* ============================================
+   17. SMOOTH SCROLL
+   ============================================ */
+html.content-loaded {
+    scroll-behavior: smooth;
+}
+
+/* ============================================
+   18. GPU OPTIMIZATION
+   ============================================ */
+.nexus-card,
+.glass-card,
+.nav-link,
+.dropdown-menu,
+.modal,
+button,
+.btn {
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* ============================================
+   19. MOBILE OPTIMIZATIONS
+   ============================================ */
+@media (hover: none) {
+    .nexus-card:hover,
+    .glass-card:hover,
+    button:hover,
+    .btn:hover {
+        transform: translateZ(0);
+    }
+}
+
+@media (max-width: 900px) {
+
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+/* ============================================
+   20. RESIZE OPTIMIZATION
+   ============================================ */
+.resizing * {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* ============================================
+   21. INITIAL RENDER OPTIMIZATION
+   ============================================ */
+@media (prefers-reduced-motion: no-preference) {
+    html:not(.content-loaded) * {
+        transition-duration: 0s !important;
+    }
+}
+
+/* ============================================
+   22. LIGHT MODE OVERRIDES
+   ============================================ */
+[data-theme="light"] .nexus-navbar,
+[data-theme="light"] .nexus-utility-bar {
+    background: var(--color-white-alpha-95);
+    border-bottom-color: var(--color-indigo-alpha-15);
+}
+
+[data-theme="light"] .nexus-navbar.scrolled {
+    background: var(--color-white-alpha-98);
+    box-shadow: 0 var(--space-2) var(--space-8) var(--color-black-alpha-10),
+                0 0 0 1px var(--color-indigo-alpha-10);
+}
+
+[data-theme="light"] .nexus-brand-link {
+    color: var(--color-slate-900) !important;
+}
+
+[data-theme="light"] .nexus-brand-link .brand-secondary {
+    opacity: 0.55;
+}
+
+[data-theme="light"] .nexus-brand-link:hover .brand-secondary {
+    opacity: 0.75;
+}
+
+[data-theme="light"] .nexus-brand-link::before {
+    background: linear-gradient(135deg, var(--color-indigo-alpha-10), var(--color-violet-alpha-10));
+}
+
+[data-theme="light"] .nexus-brand-link:hover {
+    text-shadow: 0 var(--space-1) var(--space-5) var(--color-slate-900-alpha-10);
+}
+
+/* Light mode red underline removed */
+
+[data-theme="light"] .nav-link {
+    color: var(--color-slate-900-alpha-80);
+}
+
+[data-theme="light"] .nav-link:hover,
+[data-theme="light"] .nav-link.active {
+    color: var(--color-slate-900);
+}
+
+[data-theme="light"] .dropdown-menu {
+    background: var(--color-white-alpha-98);
+}
+
+[data-theme="light"] .dropdown-item {
+    color: var(--color-slate-900-alpha-80);
+}
+
+[data-theme="light"] .dropdown-item:hover {
+    color: var(--color-slate-900);
+}
+
+/* ============================================
+   23. ACCESSIBILITY - REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001s !important;
+    }
+
+    html {
+        scroll-behavior: auto !important;
+    }
+
+    button:active,
+    .btn:active {
+        transform: scale(0.98);
+    }
+
+    .nexus-navbar,
+    .nav-link,
+    .dropdown-menu,
+    .dropdown-toggle i {
+        transition-duration: 0.01ms !important;
+    }
+
+    .notification-badge .badge-count {
+        animation: none !important;
+    }
+}
+
+/* ============================================
+   24. FOCUS STATES - ACCESSIBILITY
+   ============================================ */
+*:focus-visible {
+    outline: 3px solid var(--color-primary-500);
+    outline-offset: 2px;
+}
+
+.nav-link:focus-visible,
+.dropdown-toggle:focus-visible,
+.notification-badge:focus-visible {
+    outline: 3px solid var(--color-primary-500);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
+}
+
+.nav-link:focus-visible::before {
+    opacity: 1;
+}

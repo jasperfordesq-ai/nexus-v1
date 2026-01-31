@@ -44,11 +44,12 @@
     /* ==========================================
        LAYOUT DIMENSIONS - Prevents CLS
        ========================================== */
-    --layout-header-height: 56px;
+    --layout-header-height: 56px;           /* Utility bar height */
     --layout-header-height-scrolled: 48px;
-    --layout-utility-bar-height: 44px;
-    --layout-total-header-height: calc(var(--layout-header-height) + var(--layout-utility-bar-height));
-    --layout-content-padding-top: calc(var(--layout-total-header-height) + var(--space-8));
+    --layout-navbar-height: 64px;           /* Main navbar height */
+    --layout-utility-bar-height: 56px;      /* Same as header-height for clarity */
+    --layout-total-header-height: calc(var(--layout-header-height) + var(--layout-navbar-height)); /* 56 + 64 = 120px */
+    --layout-content-padding-top: calc(var(--layout-total-header-height) + var(--space-4)); /* 120 + 16 = 136px */
     --layout-mobile-nav-height: 84px;
     --layout-sidebar-width: 360px;
     --layout-sidebar-width-tablet: 320px;
@@ -88,6 +89,8 @@
     --color-pink-500: #ec4899;  /* Pink - Used for likes, volunteer */
     --color-pink-600: #db2777;  /* Pink 600 - Goals primary */
     --color-pink-700: #be185d;  /* Pink 700 - Goals dark */
+    --color-pink-800: #9d174d;  /* Pink 800 - Deep accent */
+    --color-pink-900: #831843;  /* Pink 900 - Darkest, for text on light pink */
     --color-pink-400: #f472b6;  /* Pink 400 - Goals light accent */
     --color-pink-300: #f9a8d4;  /* Pink 300 - Goals lighter */
     --color-pink-200: #fbcfe8;  /* Pink 200 - Goals background */
@@ -152,6 +155,8 @@
     --color-blue-300: #93c5fd;
 
     /* Cyan palette - Goals status */
+    --color-cyan-50: #ecfeff;
+    --color-cyan-100: #cffafe;
     --color-cyan-500: #06b6d4;
     --color-cyan-600: #0891b2;
 
@@ -204,6 +209,7 @@
     /* Purple variants - Premium features, polls */
     --color-purple-50: #faf5ff;
     --color-purple-100: #f3e8ff;
+    --color-purple-150: #e9d5ff;  /* Purple 150 - Between 100 and 200, for gradients */
     --color-purple-200: #ddd6fe;
     --color-purple-300: #c4b5fd;
     --color-purple-400: #c084fc;
@@ -213,6 +219,9 @@
     --color-purple-700: #6d28d9;
     --color-purple-950: #2e1065;
     --color-indigo-800: #5b21b6;
+
+    /* Violet palette - Blog decorative gradients */
+    --color-violet-900: #4c1d95;
 
     /* Wallet-specific colors */
     --color-selected-user-bg: #f0f9ff;
@@ -351,7 +360,8 @@
     --color-orange-alpha-50: rgba(249, 115, 22, 0.5);
     --color-orange-alpha-60: rgba(249, 115, 22, 0.6);
 
-    /* Orange-400 opacity variants (251, 146, 60 = #fb923c) */
+    /* Orange-400 - solid and opacity variants (251, 146, 60 = #fb923c) */
+    --color-orange-400: #fb923c;
     --color-orange-400-alpha-8: rgba(251, 146, 60, 0.08);
     --color-orange-400-alpha-10: rgba(251, 146, 60, 0.1);
     --color-orange-400-alpha-12: rgba(251, 146, 60, 0.12);
@@ -1072,6 +1082,7 @@
     --color-blue-700-alpha-35: rgba(29, 78, 216, 0.35);
 
     /* Rose palette - Alerts, important actions */
+    --color-rose-200: #fecdd3;
     --color-rose-300: #fda4af;
     --color-rose-400: #fb7185;
     --color-rose-500: #f43f5e;
@@ -1312,6 +1323,10 @@
     --color-govuk-inverse-hover: #e8e8e8;
     --color-govuk-inverse-shadow: #595959;
 
+    /* GOV.UK Bright pink/purple - used for decorative/highlight elements */
+    --color-govuk-pink: #912b88;
+    --color-govuk-orange: #f47738;
+
     /* GOV.UK Link colors */
     --color-govuk-link-visited: #4c2c92;
     --color-govuk-link-dark-mode: #8eb4e8;      /* Lighter blue for dark backgrounds */
@@ -1549,6 +1564,38 @@
     /* Glass shadows */
     --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     --shadow-glass-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+
+    /* ==========================================
+       EFFECTS BUDGET TOKENS (Modern theme)
+       Standardized elevation, glow, blur, and opacity
+       Added for convergence - use only these tokens
+       ========================================== */
+
+    /* Elevation Shadows - 4 levels only
+       Use instead of ad-hoc box-shadow recipes */
+    --shadow-1: 0 2px 8px -2px var(--color-black-alpha-8), 0 1px 3px var(--color-black-alpha-4);
+    --shadow-2: 0 8px 24px -6px var(--color-black-alpha-10), 0 4px 10px -2px var(--color-black-alpha-6);
+    --shadow-3: 0 12px 32px -8px var(--color-black-alpha-12), 0 6px 16px -4px var(--color-black-alpha-8);
+    --shadow-4: 0 20px 50px -10px var(--color-black-alpha-20), 0 10px 24px -6px var(--color-black-alpha-10);
+
+    /* Blur Scale - 3 levels only */
+    --blur-subtle: 16px;
+    --blur-standard: 20px;
+    --blur-heavy: 24px;
+
+    /* Glow Effects - 3 variants only */
+    --glow-subtle: 0 0 12px var(--color-primary-500-alpha-15);
+    --glow-primary: 0 0 20px var(--color-primary-500-alpha-30);
+    --glow-holo: 0 0 20px var(--color-primary-600-alpha-20), 0 0 40px var(--color-pink-alpha-10);
+
+    /* Opacity Scale - 6 stops only
+       For generating rgba values in components */
+    --opacity-5: 0.05;
+    --opacity-10: 0.10;
+    --opacity-20: 0.20;
+    --opacity-40: 0.40;
+    --opacity-60: 0.60;
+    --opacity-80: 0.80;
 
     /* ==========================================
        BORDER RADIUS

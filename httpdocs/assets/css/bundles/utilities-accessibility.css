@@ -439,9 +439,9 @@ button:focus-visible,
    BUTTONS - Glow ring effect
    ============================================== */
 .btn:focus-visible,
-.glass-btn:focus-visible,
-.glass-btn-primary:focus-visible,
-.glass-btn-secondary:focus-visible,
+.btn--glass:focus-visible,
+.btn--primary:focus-visible,
+.btn--secondary:focus-visible,
 .nexus-smart-btn:focus-visible,
 .htb-btn:focus-visible,
 [class*="btn-"]:focus-visible {

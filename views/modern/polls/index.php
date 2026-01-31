@@ -125,7 +125,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                 <div style="font-size: 4rem; margin-bottom: 20px;">🗳️</div>
                 <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--htb-text-main);">No active polls</h3>
                 <p style="color: var(--htb-text-muted); margin-bottom: 20px;">Start a discussion by creating a poll!</p>
-                <a href="<?= $basePath ?>/compose?type=poll" class="glass-btn-primary">
+                <a href="<?= $basePath ?>/compose?type=poll" class="btn btn--primary">
                     <i class="fa-solid fa-plus"></i> Create Poll
                 </a>
             </div>
@@ -174,7 +174,7 @@ document.querySelectorAll('form').forEach(form => {
 });
 
 // Button Press States
-document.querySelectorAll('.htb-btn, button, .nexus-smart-btn, .glass-btn-primary, .vote-link').forEach(btn => {
+document.querySelectorAll('.htb-btn, button, .nexus-smart-btn, .btn--primary, .vote-link').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

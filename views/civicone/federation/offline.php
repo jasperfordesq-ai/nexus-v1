@@ -16,65 +16,10 @@ $basePath = $basePath ?? '';
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/assets/govuk-frontend-5.14.0/govuk-frontend.min.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: "GDS Transport", arial, sans-serif;
-            background: #f3f2f1;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .govuk-offline-container {
-            text-align: center;
-            padding: 40px 20px;
-            max-width: 480px;
-        }
-        .govuk-offline-icon {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 24px;
-            background: #1d70b8;
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-        }
-        .govuk-offline-status {
-            margin-top: 24px;
-            padding: 15px;
-            background: #f47738;
-            color: #fff;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .govuk-offline-status.online {
-            background: #00703c;
-        }
-        .govuk-button--retry.retrying {
-            opacity: 0.7;
-            cursor: wait;
-        }
-        .govuk-button--retry.retrying .retry-text { display: none; }
-        .govuk-button--retry .retry-spinner { display: none; }
-        .govuk-button--retry.retrying .retry-spinner {
-            display: inline-block;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="stylesheet" href="/assets/css/design-tokens.min.css">
+    <link rel="stylesheet" href="/assets/css/civicone-federation.min.css">
 </head>
-<body class="govuk-template__body">
+<body class="govuk-template__body govuk-offline-body">
     <main class="govuk-offline-container" role="main" aria-labelledby="offline-title">
         <div class="govuk-offline-icon" aria-hidden="true">
             <i class="fa-solid fa-globe"></i>
@@ -85,9 +30,9 @@ $basePath = $basePath ?? '';
             Federation features require an internet connection to communicate with partner timebanks.
         </p>
 
-        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #fff; border-left: 5px solid #00703c; text-align: left;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-offline-panel">
             <h2 class="govuk-heading-s">
-                <i class="fa-solid fa-check-circle govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                <i class="fa-solid fa-check-circle govuk-!-margin-right-2 civicone-icon-green" aria-hidden="true"></i>
                 Available Offline
             </h2>
             <ul class="govuk-list govuk-list--bullet">
@@ -97,7 +42,7 @@ $basePath = $basePath ?? '';
             </ul>
         </div>
 
-        <div class="govuk-button-group" style="justify-content: center;">
+        <div class="govuk-button-group civicone-button-group-center">
             <button class="govuk-button govuk-button--retry" id="retryBtn" type="button" data-module="govuk-button" aria-describedby="connectionStatus">
                 <span class="retry-spinner" aria-hidden="true">
                     <i class="fa-solid fa-rotate"></i>

@@ -17,7 +17,7 @@
 /* Only add transitions to specific elements that need them */
 button,
 .btn,
-.glass-btn,
+.btn--glass,
 .nav-link,
 a,
 .nexus-card,

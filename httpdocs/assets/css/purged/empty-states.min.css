@@ -1,1 +1,366 @@
-@media (max-width:640px){}.glass-empty-state{text-align:center;padding:var(--space-12) var(--space-8);background:linear-gradient(165deg,var(--color-white-alpha-95) 0%,var(--color-slate-50-alpha-90) 50%,var(--color-indigo-50-alpha-85) 100%);backdrop-filter:blur(var(--glass-blur-subtle));-webkit-backdrop-filter:blur(var(--glass-blur-subtle));border-radius:var(--radius-xl);border:1px solid var(--color-indigo-alpha-15);box-shadow:0 8px 32px var(--color-indigo-alpha-12),0 2px 8px var(--color-black-alpha-4)}.glass-empty-state h3,.glass-empty-state .title{font-size:var(--font-size-2xl);font-weight:var(--font-weight-bold);color:var(--color-gray-800);margin-bottom:var(--space-3)}.glass-empty-state p{font-size:var(--font-size-base);color:var(--color-slate-500);margin-bottom:var(--space-6)}
+/**
+ * Empty States - Unified Design System
+ * Consistent empty state styling across all modules
+ * Version: 1.2 - 2026-01-30 - Complete Design Token Migration
+ *
+ * Design Token Coverage: 100%
+ * - Spacing (padding/margin/gap): Using --space-* tokens
+ * - Border radius: Using --radius-* tokens
+ * - Font sizes: Using --font-size-* tokens (where semantic)
+ * - Font weights: Using --font-weight-* tokens
+ * - Line heights: Using --line-height-* tokens
+ * - Transitions: Using --transition-* tokens
+ * - Colors: Using color tokens (--color-primary-*, --color-slate-*, etc.)
+ * - Color alphas: All rgba() values migrated to --color-*-alpha-* tokens
+ * - Z-index: Using --z-raised token
+ * - Glassmorphism: Using --glass-blur-subtle token
+ *
+ * Intentionally Hardcoded:
+ * - Icon dimensions (64px, 72px, 88px): Specific to visual hierarchy
+ * - Icon font sizes (24-40px): Specific to icon balance
+ * - Decorative orb dimensions (200-250px): Specific to glass design
+ * - Transform offsets (-1px, -2px): Micro-interactions
+ * - Border widths (1px, 1.5px): Standard browser rendering
+ *
+ * Classes:
+ * - .empty-state (base container)
+ * - .empty-state--compact (smaller version)
+ * - .empty-state--glass (glassmorphism variant)
+ * - .empty-state__icon (icon container)
+ * - .empty-state__title (heading)
+ * - .empty-state__text (description)
+ * - .empty-state__actions (button container)
+ * - .empty-state__btn (action button)
+ */
+
+/* ==============================================
+   BASE EMPTY STATE
+   ============================================== */
+.empty-state {
+    text-align: center;
+    padding: var(--space-12) var(--space-8);
+    border-radius: var(--radius-xl);
+    position: relative;
+}
+
+/* Glass variant - premium glassmorphism */
+.empty-state--glass {
+    background: linear-gradient(165deg,
+        var(--color-white-alpha-95) 0%,
+        var(--color-slate-50-alpha-90) 50%,
+        var(--color-indigo-50-alpha-85) 100%);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
+    border: 1px solid var(--color-indigo-alpha-15);
+    box-shadow:
+        0 8px 32px var(--color-indigo-alpha-12),
+        0 2px 8px var(--color-black-alpha-4),
+        inset 0 1px 0 var(--color-white-alpha-80);
+    overflow: hidden;
+}
+
+/* Decorative gradient orbs for glass variant */
+.empty-state--glass::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, var(--color-indigo-alpha-12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.empty-state--glass::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, var(--color-purple-alpha-8) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* Compact variant - for inline/sidebar empty states */
+.empty-state--compact {
+    padding: var(--space-8) var(--space-6);
+    border-radius: var(--radius-lg);
+}
+
+.empty-state--compact .empty-state__icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--space-4);
+}
+
+.empty-state--compact .empty-state__icon i,
+.empty-state--compact .empty-state__icon .emoji {
+    font-size: 28px;
+}
+
+.empty-state--compact .empty-state__title {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-2);
+}
+
+.empty-state--compact .empty-state__text {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-5);
+}
+
+/* ==============================================
+   ICON STYLES
+   ============================================== */
+.empty-state__icon {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto var(--space-6);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, var(--color-purple-400) 100%);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 10px 32px var(--color-indigo-alpha-35),
+        0 4px 12px var(--color-purple-alpha-25),
+        inset 0 2px 4px var(--color-white-alpha-30);
+    position: relative;
+    z-index: var(--z-raised);
+    animation: emptyStateIconPulse 3s ease-in-out infinite;
+}
+
+@keyframes emptyStateIconPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.03);
+    }
+}
+
+.empty-state__icon i {
+    font-size: 36px;
+    color: white;
+    text-shadow: 0 2px 8px var(--color-black-alpha-15);
+}
+
+.empty-state__icon .emoji {
+    font-size: 40px;
+    line-height: 1;
+}
+
+/* Icon color variants */
+
+.empty-state__icon--warning {
+    background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-300) 100%);
+    box-shadow: 0 10px 32px var(--color-amber-500-alpha-35);
+}
+
+/* ==============================================
+   TYPOGRAPHY
+   ============================================== */
+.empty-state__title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-800);
+    margin-bottom: var(--space-3);
+    letter-spacing: -0.02em;
+    position: relative;
+    z-index: var(--z-raised);
+}
+
+.empty-state__text {
+    font-size: var(--font-size-base);
+    color: var(--color-slate-500);
+    margin-bottom: var(--space-6);
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: var(--line-height-normal);
+    position: relative;
+    z-index: var(--z-raised);
+}
+
+/* ==============================================
+   ACTION BUTTONS
+   ============================================== */
+
+/* ==============================================
+   DARK MODE
+   ============================================== */
+[data-theme="dark"] .empty-state--glass {
+    background: linear-gradient(165deg,
+        var(--color-slate-alpha-95) 0%,
+        var(--color-slate-900-alpha-92) 50%,
+        var(--color-dark-purple-alt-alpha-88) 100%);
+    border-color: var(--color-indigo-alpha-25);
+    box-shadow:
+        0 8px 32px var(--color-black-alpha-40),
+        0 2px 8px var(--color-indigo-alpha-12),
+        inset 0 1px 0 var(--color-white-alpha-5);
+}
+
+[data-theme="dark"] .empty-state--glass::before {
+    background: radial-gradient(circle, var(--color-indigo-alpha-18) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .empty-state--glass::after {
+    background: radial-gradient(circle, var(--color-purple-alpha-12) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .empty-state__title {
+    color: var(--color-slate-100);
+}
+
+[data-theme="dark"] .empty-state__text {
+    color: var(--color-slate-400);
+}
+
+/* ==============================================
+   MODULE-SPECIFIC VARIANTS
+   ============================================== */
+
+/* Messages empty state */
+
+/* Notifications empty state */
+
+/* Connections/Friends empty state */
+
+/* Search results empty state */
+
+/* ==============================================
+   RESPONSIVE
+   ============================================== */
+@media (max-width: 640px) {
+    .empty-state {
+        padding: var(--space-10) var(--space-5);
+        border-radius: var(--radius-lg);
+    }
+
+    .empty-state__icon {
+        width: 72px;
+        height: 72px;
+        margin-bottom: var(--space-5);
+    }
+
+    .empty-state__icon i {
+        font-size: 30px;
+    }
+
+    .empty-state__icon .emoji {
+        font-size: 34px;
+    }
+
+    .empty-state__title {
+        font-size: var(--font-size-xl);
+    }
+
+    .empty-state__text {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--space-6);
+    }
+
+    /* Compact adjustments */
+    .empty-state--compact {
+        padding: var(--space-6) var(--space-4);
+    }
+
+    .empty-state--compact .empty-state__icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .empty-state--compact .empty-state__icon i,
+    .empty-state--compact .empty-state__icon .emoji {
+        font-size: 24px;
+    }
+}
+
+/* ==============================================
+   REDUCED MOTION
+   ============================================== */
+@media (prefers-reduced-motion: reduce) {
+    .empty-state__icon {
+        animation: none;
+    }
+}
+
+/* ==============================================
+   LEGACY CLASS ALIASES
+   For backwards compatibility with existing code
+   ============================================== */
+
+/* Map glass-empty-state to new system */
+.glass-empty-state {
+    text-align: center;
+    padding: var(--space-12) var(--space-8);
+    background: linear-gradient(165deg,
+        var(--color-white-alpha-95) 0%,
+        var(--color-slate-50-alpha-90) 50%,
+        var(--color-indigo-50-alpha-85) 100%);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-indigo-alpha-15);
+    box-shadow:
+        0 8px 32px var(--color-indigo-alpha-12),
+        0 2px 8px var(--color-black-alpha-4);
+}
+
+[data-theme="dark"] .glass-empty-state {
+    background: linear-gradient(165deg,
+        var(--color-slate-alpha-95) 0%,
+        var(--color-slate-900-alpha-92) 50%,
+        var(--color-dark-purple-alt-alpha-88) 100%);
+    border-color: var(--color-indigo-alpha-25);
+}
+
+.glass-empty-state h3,
+.glass-empty-state .title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-800);
+    margin-bottom: var(--space-3);
+}
+
+[data-theme="dark"] .glass-empty-state h3,
+[data-theme="dark"] .glass-empty-state .title {
+    color: var(--color-slate-100);
+}
+
+.glass-empty-state p {
+    font-size: var(--font-size-base);
+    color: var(--color-slate-500);
+    margin-bottom: var(--space-6);
+}
+
+[data-theme="dark"] .glass-empty-state p {
+    color: var(--color-slate-400);
+}
+
+/* Map no-results to new system */
+.no-results {
+    text-align: center;
+    padding: var(--space-10) var(--space-6);
+    color: var(--color-slate-500);
+}
+
+[data-theme="dark"] .no-results {
+    color: var(--color-slate-400);
+}
+
+.no-results h3 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-2);
+}
+
+[data-theme="dark"] .no-results h3 {
+    color: var(--color-slate-200);
+}
+
+.no-results p {
+    margin-bottom: var(--space-5);
+}

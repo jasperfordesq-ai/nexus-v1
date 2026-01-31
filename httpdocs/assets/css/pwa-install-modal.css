@@ -114,7 +114,7 @@
     color: var(--color-primary-500);
     border: none;
     padding: 8px 16px;
-    border-radius: 10px;
+    border-radius: var(--radius-base);
     font-weight: 700;
     font-size: 0.875rem;
     cursor: pointer;
@@ -176,7 +176,7 @@
     width: 52px;
     height: 52px;
     background: linear-gradient(135deg, var(--color-amber-500) 0%, #f97316 100%);
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -284,7 +284,7 @@
         var(--color-gray-50-alpha-95) 100%);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border-radius: 28px 28px 0 0;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
     padding: 24px 20px 32px;
     width: 100%;
     max-width: 100%;
@@ -348,7 +348,7 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--effect-white-30);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -377,7 +377,7 @@
 .nexus-install-icon img {
     width: 88px;
     height: 88px;
-    border-radius: 22px;
+    border-radius: var(--radius-xl);
     box-shadow: 0 16px 48px var(--effect-primary-30),
                 0 8px 24px var(--effect-black-10);
     animation: pwaIconFloat 4s ease-in-out infinite,
@@ -496,7 +496,7 @@
 .nexus-install-btn-primary {
     flex: 1;
     padding: 16px 24px;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
@@ -583,7 +583,7 @@
         var(--color-gray-50-alpha-80) 0%,
         var(--color-gray-100-alpha-60) 100%);
     border: 1px solid var(--color-black-alpha-6);
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
     text-align: left;
     margin-bottom: 16px;
@@ -628,7 +628,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 4px 10px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
     box-shadow: 0 2px 8px var(--effect-primary-30);
@@ -776,7 +776,7 @@
     height: 36px;
     background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -826,7 +826,7 @@
         var(--color-gray-50-alpha-95) 100%);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border-radius: 28px;
+    border-radius: var(--radius-2xl);
     padding: 36px 28px;
     max-width: 360px;
     width: 100%;
@@ -882,7 +882,7 @@
 .nexus-biometric-btn-primary {
     flex: 1;
     padding: 14px 20px;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
@@ -926,7 +926,7 @@
     }
 
     .nexus-install-prompt-card {
-        border-radius: 28px;
+        border-radius: var(--radius-2xl);
         max-width: 440px;
         padding: 36px 32px;
         transform: scale(0.9) translateY(30px);

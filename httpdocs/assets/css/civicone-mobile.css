@@ -219,17 +219,28 @@
     right: var(--space-5);
     width: var(--space-14);
     height: var(--space-14);
-    background: linear-gradient(135deg, var(--civic-brand, var(--color-blue-600)) 0%, var(--civic-brand-hover, var(--color-blue-700)) 100%);
-    color: white;
+    background: var(--color-govuk-green, #00703c);
+    color: var(--color-white);
     border: none;
     border-radius: 50%;
-    box-shadow: 0 6px 20px var(--color-blue-600-alpha-40);
+    box-shadow: 0 2px 0 var(--color-govuk-green-darker, #005a30);
     cursor: pointer;
     z-index: 8999;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
+}
+
+.civic-fab:hover {
+    background: var(--color-govuk-green-darker, #005a30);
+}
+
+.civic-fab:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow, #ffdd00);
+    color: var(--color-govuk-black, #0b0c0c);
 }
 
 .civic-fab:focus-visible {
@@ -920,8 +931,7 @@
     flex-shrink: 0;
     width: var(--space-12);
     height: var(--space-12);
-    background: linear-gradient(135deg, var(--civic-brand, var(--color-blue-600)) 0%, var(--color-blue-700) 100%);
-    border-radius: var(--radius-md);
+    background: var(--color-govuk-blue-light, #1d70b8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1034,10 +1044,9 @@
     right: var(--space-4);
     max-width: 400px;
     margin: 0 auto;
-    background: linear-gradient(135deg, var(--color-success-600) 0%, var(--color-success-700) 100%);
+    background: var(--color-govuk-green, #00703c);
     color: var(--color-white);
-    border-radius: var(--radius-md);
-    box-shadow: 0 8px 24px var(--color-emerald-600-alpha-30);
+    border-left: 4px solid var(--color-govuk-green-darker, #005a30);
     z-index: var(--z-dropdown, 1000);
     padding: var(--space-3) var(--space-4);
     transform: translateY(-120%);
@@ -1168,7 +1177,7 @@
     width: var(--space-20);
     height: var(--space-20);
     margin: 0 auto var(--space-5);
-    background: linear-gradient(135deg, var(--civic-brand, var(--color-blue-600)) 0%, var(--color-blue-700) 100%);
+    background: var(--color-govuk-blue-light, #1d70b8);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1358,13 +1367,17 @@ body:not(.biometrics-available) .civic-biometric-btn {
 }
 
 .civic-badge--success {
-    background: var(--color-emerald-600-alpha-10);
-    color: var(--color-success-600);
+    background: var(--color-govuk-light-grey, #f3f2f1);
+    color: var(--color-govuk-green, #00703c);
+    border-left: 3px solid var(--color-govuk-green, #00703c);
+    border-radius: 0;
 }
 
 .civic-badge--neutral {
-    background: var(--color-gray-500-alpha-10);
-    color: var(--color-gray-500);
+    background: var(--color-govuk-light-grey, #f3f2f1);
+    color: var(--color-govuk-grey-dark, #505a5f);
+    border-left: 3px solid var(--color-govuk-grey, #b1b4b6);
+    border-radius: 0;
 }
 
 

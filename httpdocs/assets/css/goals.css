@@ -23,7 +23,7 @@
 /* Floating Orbs */
 .holo-orb {
     position: absolute;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(60px);
     opacity: 0.5;
     pointer-events: none;
@@ -552,7 +552,7 @@ textarea.holo-input {
 /* Floating Orbs */
 .holo-orb {
     position: absolute;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(60px);
     opacity: 0.5;
     pointer-events: none;
@@ -1059,7 +1059,7 @@ textarea.holo-input {
 
         /* Button Press States */
         .htb-btn:active,
-        .glass-btn-primary:active,
+        .btn--primary:active,
         .nexus-smart-btn:active,
         .quick-action-btn:active,
         button:active {
@@ -1069,7 +1069,7 @@ textarea.holo-input {
 
         /* Touch Targets - WCAG 2.1 AA (44px minimum) */
         .htb-btn,
-        .glass-btn-primary,
+        .btn--primary,
         .nexus-smart-btn,
         .quick-action-btn,
         button {
@@ -1091,7 +1091,7 @@ textarea.holo-input {
 
         /* Focus Visible */
         .htb-btn:focus-visible,
-        .glass-btn-primary:focus-visible,
+        .btn--primary:focus-visible,
         .nexus-smart-btn:focus-visible,
         .quick-action-btn:focus-visible,
         button:focus-visible,
@@ -1109,7 +1109,7 @@ textarea.holo-input {
         /* Mobile Responsive Enhancements */
         @media (max-width: 768px) {
             .htb-btn,
-            .glass-btn-primary,
+            .btn--primary,
             .nexus-smart-btn,
             .quick-action-btn,
             button {
@@ -1317,7 +1317,7 @@ textarea.holo-input {
         }
 
         /* Glass Primary Button */
-        #goals-glass-wrapper .glass-btn-primary {
+        #goals-glass-wrapper .btn--primary {
             background: linear-gradient(135deg, var(--color-lime-500) 0%, var(--color-lime-600) 100%);
             color: white;
             border: none;
@@ -1335,7 +1335,7 @@ textarea.holo-input {
             gap: 8px;
         }
 
-        #goals-glass-wrapper .glass-btn-primary:hover {
+        #goals-glass-wrapper .btn--primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px var(--effect-lime-40),
                         inset 0 1px 0 var(--effect-white-30);
@@ -1417,7 +1417,7 @@ textarea.holo-input {
             width: 150px;
             height: 150px;
             background: var(--effect-white-10);
-            border-radius: 50%;
+            border-radius: var(--radius-full);
             top: -50px;
             right: -50px;
         }

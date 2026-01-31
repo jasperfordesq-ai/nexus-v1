@@ -56,7 +56,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                     <?= count($resources ?? []) ?> resources available
                 </p>
             </div>
-            <a href="<?= $basePath ?>/resources/create" class="glass-btn-primary">
+            <a href="<?= $basePath ?>/resources/create" class="btn btn--primary">
                 <i class="fa-solid fa-upload"></i> Upload File
             </a>
         </div>
@@ -94,7 +94,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                 <p style="color: var(--htb-text-muted); margin-bottom: 20px; font-size: 0.95rem;">
                     Help the community with guides and tools.
                 </p>
-                <a href="<?= $basePath ?>/resources/create" class="glass-btn-primary">
+                <a href="<?= $basePath ?>/resources/create" class="btn btn--primary">
                     <i class="fa-solid fa-upload"></i> Upload File
                 </a>
             </div>
@@ -168,7 +168,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                 <div style="font-size: 4rem; margin-bottom: 20px;">📚</div>
                 <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--htb-text-main);">Library is Empty</h3>
                 <p style="color: var(--htb-text-muted); margin-bottom: 20px;">Share the first guide or toolkit!</p>
-                <a href="<?= $basePath ?>/resources/create" class="glass-btn-primary">
+                <a href="<?= $basePath ?>/resources/create" class="btn btn--primary">
                     <i class="fa-solid fa-upload"></i> Upload Resource
                 </a>
             </div>
@@ -206,7 +206,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 })();
 
 // Button Press States
-document.querySelectorAll('.htb-btn, .glass-btn-primary, .nexus-smart-btn, .quick-action-btn, .download-btn, button').forEach(btn => {
+document.querySelectorAll('.htb-btn, .btn--primary, .nexus-smart-btn, .quick-action-btn, .download-btn, button').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

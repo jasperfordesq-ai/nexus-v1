@@ -1130,6 +1130,7 @@
        ========================================== */
     --font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-family-display: "Outfit", var(--font-family-primary);
+    --font-family-mono: "Fira Code", "Monaco", "Consolas", "Liberation Mono", monospace;
 
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.875rem;
@@ -1862,7 +1863,7 @@
     --htb-text-muted: var(--color-slate-300);
     --htb-border-color: rgba(255, 255, 255, 0.1);
     --htb-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-    --htb-glass-blur: blur(24px);
+    --htb-glass-blur: blur(var(--blur-heavy));
 
     /* Legacy alias overrides */
     --feed-text-primary: var(--text-primary);

@@ -39,7 +39,7 @@
         .htb-btn:active,
         button:active,
         .nexus-smart-btn:active,
-        .glass-btn-primary:active,
+        .btn--primary:active,
         .view-link:active {
             transform: scale(0.96) !important;
             transition: transform 0.1s ease !important;
@@ -49,7 +49,7 @@
         .htb-btn,
         button,
         .nexus-smart-btn,
-        .glass-btn-primary,
+        .btn--primary,
         .glass-select,
         input[type="text"],
         input[type="search"][aria-label="Search"] {
@@ -68,7 +68,7 @@
         input:focus-visible,
         select:focus-visible,
         .nexus-smart-btn:focus-visible,
-        .glass-btn-primary:focus-visible {
+        .btn--primary:focus-visible {
             outline: 3px solid var(--color-orange-alpha-50);
             outline-offset: var(--space-1);
         }
@@ -87,7 +87,7 @@
 
             .htb-btn,
             .nexus-smart-btn,
-            .glass-btn-primary,
+            .btn--primary,
             .glass-select {
                 min-height: 48px;
             }
@@ -338,7 +338,7 @@
         }
 
         /* Glass Primary Button */
-        #events-glass-wrapper .glass-btn-primary {
+        #events-glass-wrapper .btn--primary {
             background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 100%);
             color: white;
             border: none;
@@ -356,7 +356,7 @@
             gap: var(--space-2);
         }
 
-        #events-glass-wrapper .glass-btn-primary:hover {
+        #events-glass-wrapper .btn--primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px var(--color-orange-alpha-40),
                         inset 0 1px 0 var(--effect-white-30);
@@ -441,7 +441,7 @@
             width: 150px;
             height: 150px;
             background: var(--effect-white-10);
-            border-radius: 50%;
+            border-radius: var(--radius-full);
             top: -50px;
             right: -50px;
         }

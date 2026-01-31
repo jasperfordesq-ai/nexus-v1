@@ -126,7 +126,7 @@
 .feed-shared-avatar {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
 }
 
@@ -520,7 +520,7 @@
 .feed-review-avatar {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 2px solid var(--color-amber-alpha-30);
     flex-shrink: 0;

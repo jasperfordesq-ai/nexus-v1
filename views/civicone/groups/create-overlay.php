@@ -36,147 +36,27 @@ $isAdmin = $isAdmin ?? false;
     <title><?= $pageTitle ?? 'Create Group' ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/assets/govuk-frontend-5.14.0/govuk-frontend.min.css">
+    <link rel="stylesheet" href="/assets/css/design-tokens.min.css">
+    <link rel="stylesheet" href="/assets/css/groups-edit-overlay.min.css">
     <style>
+        /* Minimal reset - everything else in external CSS */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: "GDS Transport", arial, sans-serif;
-            background: rgba(11, 12, 12, 0.7);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .overlay-container {
-            background: white;
-            max-width: 640px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            border-radius: 0;
-        }
-        .overlay-header {
-            background: #1d70b8;
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        .overlay-header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin: 0;
-        }
-        .close-btn {
-            background: transparent;
-            border: 2px solid white;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .close-btn:hover { background: rgba(255,255,255,0.1); }
-        .type-pills {
-            display: flex;
-            gap: 8px;
-            padding: 16px 20px;
-            background: #f3f2f1;
-            border-bottom: 1px solid #b1b4b6;
-            flex-wrap: wrap;
-        }
-        .type-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: white;
-            border: 2px solid #b1b4b6;
-            color: #0b0c0c;
-            font-size: 16px;
-            font-weight: 400;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .type-pill:hover { border-color: #0b0c0c; }
-        .type-pill.active {
-            background: #1d70b8;
-            border-color: #1d70b8;
-            color: white;
-        }
-        .type-pill .admin-badge {
-            background: #912b88;
-            color: white;
-            padding: 2px 6px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-        .overlay-content { padding: 20px; }
-        .overlay-footer {
-            padding: 20px;
-            background: #f3f2f1;
-            border-top: 1px solid #b1b4b6;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            position: sticky;
-            bottom: 0;
-        }
-        .image-upload-area {
-            border: 3px dashed #b1b4b6;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.15s;
-            background: #f3f2f1;
-        }
-        .image-upload-area:hover { border-color: #1d70b8; background: white; }
-        .image-upload-area i { font-size: 48px; color: #505a5f; margin-bottom: 12px; }
-        .image-preview { display: none; position: relative; margin-top: 12px; }
-        .image-preview.show { display: block; }
-        .image-preview img { width: 100%; max-height: 200px; object-fit: cover; border: 1px solid #b1b4b6; }
-        .image-preview .remove-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #d4351c;
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .file-input-hidden { display: none; }
-        @media (max-width: 640px) {
-            body { padding: 0; }
-            .overlay-container { max-height: 100vh; height: 100vh; border-radius: 0; }
-        }
     </style>
     <script>
         window.TENANT_BASE_PATH = '<?= $basePath ?>';
     </script>
 </head>
-<body>
-    <div class="overlay-container" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+<body class="govuk-overlay-body">
+    <div class="govuk-overlay-container" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
         <!-- Header -->
-        <div class="overlay-header">
+        <div class="govuk-overlay-header">
+            <button type="button" class="govuk-overlay-close-btn" onclick="closeOverlay()" aria-label="Close">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
             <h1 id="overlay-title">
                 <i class="fa-solid fa-users govuk-!-margin-right-2" aria-hidden="true"></i>
                 Create New Group
             </h1>
-            <button type="button" class="close-btn" onclick="closeOverlay()" aria-label="Close">
-                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-            </button>
         </div>
 
         <?php if ($error): ?>
@@ -201,10 +81,10 @@ $isAdmin = $isAdmin ?? false;
 
         <!-- Type Pills Navigation -->
         <?php if (count($groupTypes) > 1): ?>
-        <nav class="type-pills" role="navigation" aria-label="Group type selection">
+        <nav class="govuk-overlay-type-pills" role="navigation" aria-label="Group type selection">
             <?php foreach ($groupTypes as $index => $type): ?>
             <button type="button"
-                    class="type-pill <?= $type['id'] == $defaultTypeId ? 'active' : '' ?>"
+                    class="govuk-overlay-type-pill <?= $type['id'] == $defaultTypeId ? 'active' : '' ?>"
                     data-type-id="<?= $type['id'] ?>"
                     data-is-hub="<?= $type['is_hub'] ?>"
                     onclick="selectType(<?= $type['id'] ?>, <?= $type['is_hub'] ?>)"
@@ -212,7 +92,7 @@ $isAdmin = $isAdmin ?? false;
                 <i class="<?= htmlspecialchars($type['icon'] ?? 'fa-solid fa-layer-group') ?>" aria-hidden="true"></i>
                 <span><?= htmlspecialchars($type['name']) ?></span>
                 <?php if ($type['is_hub']): ?>
-                <span class="admin-badge">
+                <span class="govuk-overlay-admin-badge">
                     <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Admin
                 </span>
                 <?php endif; ?>
@@ -222,7 +102,7 @@ $isAdmin = $isAdmin ?? false;
         <?php endif; ?>
 
         <!-- Form Content -->
-        <form id="createGroupForm" action="<?= $basePath ?>/groups/store" method="POST" enctype="multipart/form-data" class="overlay-content">
+        <form id="createGroupForm" action="<?= $basePath ?>/groups/store" method="POST" enctype="multipart/form-data" class="govuk-overlay-content">
             <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
             <input type="hidden" name="type_id" id="typeIdInput" value="<?= $defaultTypeId ?>">
 
@@ -272,22 +152,22 @@ $isAdmin = $isAdmin ?? false;
                     Group Image
                     <span class="govuk-hint civicone-hint-inline">(optional)</span>
                 </label>
-                <div class="image-upload-area" id="uploadArea" onclick="document.getElementById('imageFile').click()" role="button" tabindex="0" aria-label="Click to upload group image" onkeypress="if(event.key==='Enter'||event.key===' ')document.getElementById('imageFile').click()">
+                <div class="govuk-overlay-image-upload-area" id="uploadArea" onclick="document.getElementById('imageFile').click()" role="button" tabindex="0" aria-label="Click to upload group image" onkeypress="if(event.key==='Enter'||event.key===' ')document.getElementById('imageFile').click()">
                     <i class="fa-solid fa-image" aria-hidden="true"></i>
                     <p class="govuk-body">Click to upload an image</p>
                 </div>
-                <div class="image-preview" id="imagePreview">
+                <div class="govuk-overlay-image-preview" id="imagePreview">
                     <img id="previewImg" src="" alt="Group image preview" loading="lazy">
                     <button type="button" class="remove-btn" onclick="removeImage(event)" aria-label="Remove image">
                         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                     </button>
                 </div>
-                <input type="file" name="image" id="imageFile" accept="image/*" class="file-input-hidden" onchange="previewImage(this)" aria-label="Group image file upload">
+                <input type="file" name="image" id="imageFile" accept="image/*" class="govuk-file-input-hidden" onchange="previewImage(this)" aria-label="Group image file upload">
             </div>
         </form>
 
         <!-- Footer Actions -->
-        <div class="overlay-footer">
+        <div class="govuk-overlay-footer">
             <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" onclick="closeOverlay()">
                 Cancel
             </button>

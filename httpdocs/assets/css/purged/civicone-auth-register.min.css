@@ -1,1 +1,287 @@
-.civicone-wrapper--auth{padding-top:var(--space-10)}
+/**
+ * Auth Register
+ * CivicOne Theme
+ */
+
+    /* Scoped Refactor Styles */
+    .auth-wrapper {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0 var(--space-4);
+        box-sizing: border-box;
+        /* Prevent overflow */
+    }
+
+    .auth-card {
+        margin-top: 0;
+        position: relative;
+        z-index: 10;
+        background: white;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px var(--color-black-alpha-10), 0 2px 4px -1px var(--color-black-alpha-6);
+    }
+
+    /* Reset negative margin for Social/Civic layouts */
+    
+
+    .auth-card-body {
+        /* CRITICAL: Explicit padding to prevent edge flushness */
+        padding: var(--space-12);
+    }
+
+    .form-row {
+        display: flex;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-5);
+    }
+
+    .form-group {
+        margin-bottom: var(--space-5);
+        width: 100%;
+        /* Default full width */
+    }
+
+    .flex-1 {
+        flex: 1;
+        min-width: 240px;
+        /* Force wrap earlier */
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+        color: var(--htb-text-main, var(--color-govuk-black));
+        font-size: 1rem;
+    }
+
+    .form-input {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        /* Fix width calc */
+        padding: var(--space-3);
+        /* Standard padding */
+        border: var(--space-0-5) solid var(--color-gray-200);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--color-govuk-blue-light) !important;
+    }
+
+    .form-note {
+        font-size: 0.8rem;
+        color: var(--color-gray-500);
+        margin-top: var(--space-1-5);
+    }
+
+    .password-rules {
+        margin-top: var(--space-3);
+        font-size: 0.85rem;
+        color: var(--color-gray-500);
+        background: var(--color-gray-50);
+        padding: var(--space-3);
+        border-radius: var(--radius-base);
+    }
+
+    .rules-title {
+        font-weight: 700;
+        margin-bottom: var(--space-1-5);
+    }
+
+    .auth-submit-btn {
+        /* GOV.UK Button - disabled state by default (enabled via JS) */
+        width: 100%;
+        min-height: 44px;
+        font-size: 1.1875rem;
+        font-weight: 700;
+        padding: var(--space-3) var(--space-4);
+        background-color: var(--color-govuk-grey);
+        color: var(--color-white);
+        opacity: 0.5;
+        pointer-events: none;
+        border: 2px solid transparent;
+        border-radius: 0;
+        box-shadow: 0 2px 0 var(--color-gray-500);
+        margin-top: var(--space-2-5);
+        cursor: not-allowed;
+    }
+
+    .auth-submit-btn:not([disabled]) {
+        background-color: var(--color-govuk-green);
+        box-shadow: 0 2px 0 var(--color-govuk-green-darker);
+        opacity: 1;
+        pointer-events: auto;
+        cursor: pointer;
+    }
+
+    .auth-submit-btn:not([disabled]):hover {
+        background-color: var(--color-govuk-green-dark, var(--color-govuk-green-dark));
+    }
+
+    .auth-submit-btn:not([disabled]):focus {
+        outline: 3px solid transparent;
+        background-color: var(--color-govuk-yellow);
+        color: var(--color-govuk-black);
+        box-shadow: 0 2px 0 var(--color-govuk-black);
+    }
+
+    .auth-login-link {
+        margin-top: var(--space-6);
+        text-align: center;
+        font-size: 0.95rem;
+        color: var(--htb-text-muted, var(--color-govuk-grey-dark));
+    }
+
+    .auth-login-link a {
+        color: var(--color-govuk-blue-light);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    /* Desktop spacing for no-hero layout */
+    @media (min-width: 601px) {
+        .auth-wrapper {
+            padding-top: 140px;
+        }
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 600px) {
+        .auth-wrapper {
+            padding-top: 120px;
+            padding-left: var(--space-2-5);
+            padding-right: var(--space-2-5);
+        }
+
+        .auth-card-body {
+            padding: var(--space-6) !important;
+        }
+
+        .form-row {
+            gap: 0;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+    }
+
+    /* ========================================
+       DARK MODE FOR REGISTRATION
+       ======================================== */
+
+    [data-theme="dark"] .auth-card {
+        background: var(--color-slate-alpha-85);
+        border: 1px solid var(--color-white-alpha-10);
+        box-shadow: 0 10px 40px var(--color-black-alpha-40);
+    }
+
+    [data-theme="dark"] .form-label {
+        color: var(--color-slate-200);
+    }
+
+    [data-theme="dark"] .form-input {
+        background: var(--color-slate-900-alpha-60);
+        border-color: var(--color-white-alpha-15);
+        color: var(--color-slate-100);
+    }
+
+    [data-theme="dark"] .form-input::placeholder {
+        color: var(--color-slate-500);
+    }
+
+    [data-theme="dark"] .form-input:focus {
+        border-color: var(--color-primary-500) !important;
+        box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
+    }
+
+    [data-theme="dark"] .form-note {
+        color: var(--color-slate-400);
+    }
+
+    /* Password Rules */
+    [data-theme="dark"] .password-rules {
+        background: var(--color-slate-900-alpha-60);
+        color: var(--color-slate-400);
+        border: 1px solid var(--color-white-alpha-10);
+    }
+
+    [data-theme="dark"] .rules-title {
+        color: var(--color-slate-200);
+    }
+
+    /* GDPR Consent Label */
+
+    /* Data Protection Notice Box */
+
+    /* Login Link */
+    [data-theme="dark"] .auth-login-link {
+        color: var(--color-slate-400);
+    }
+
+    [data-theme="dark"] .auth-login-link a {
+        color: var(--color-govuk-blue-lighter);
+    }
+
+    /* Select dropdown */
+    [data-theme="dark"] select.form-input {
+        background: var(--color-slate-900-alpha-60);
+        color: var(--color-slate-100);
+    }
+
+    [data-theme="dark"] select.form-input option {
+        background: var(--color-slate-800);
+        color: var(--color-slate-100);
+    }
+
+/* ==========================================
+   Additional Utility Classes
+   GOV.UK Compliant - No inline styles
+   ========================================== */
+
+/* CivicOne wrapper with top padding */
+.civicone-wrapper--auth {
+    padding-top: var(--space-10);
+}
+
+/* Honeypot field (hidden from users) */
+
+/* Organisation field visibility toggle */
+
+/* GDPR Consent section */
+
+/* Links with underline */
+
+/* Data Protection Notice Box */
+
+/* Password rule validation states */
+.password-rule {
+    transition: color 0.2s ease;
+}
+
+.password-rule--valid {
+    color: var(--color-govuk-green);
+}
+
+.password-rule--invalid {
+    color: var(--color-govuk-red);
+}
+
+/* Submit button enabled state (controlled by JS) */
+
+/* GOV.UK Focus states for form inputs */
+.form-input:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    border-color: var(--color-govuk-black);
+}
+
+/* Dark mode for additional classes */

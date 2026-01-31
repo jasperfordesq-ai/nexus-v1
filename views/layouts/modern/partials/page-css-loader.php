@@ -208,6 +208,12 @@ $pageSpecificCSS = [
         'files' => ['federation/federation-transactions.css']
     ],
 
+    // Federation - Events
+    'federation-events' => [
+        'condition' => strpos($normPath, '/federation/events') !== false,
+        'files' => ['federation.css']
+    ],
+
     // Wallet/Transactions (non-federation) - still uses the main federation.css for now
     'wallet-transactions' => [
         'condition' => strpos($normPath, '/transactions') !== false && strpos($normPath, '/federation') === false,

@@ -1,1 +1,119 @@
-.htb-card{}.htb-btn:active{transform:scale(0.96) !important;transition:transform 0.1s ease !important}.htb-btn{min-height:var(--space-11)}.htb-btn:focus-visible{outline:3px solid var(--color-red-alpha-50);outline-offset:2px}@media (max-width:768px){.htb-btn{min-height:var(--space-12)}}.htb-btn-danger{background:var(--color-error-500);color:white;border:none}.htb-btn-danger:hover{background:var(--color-error-600)}
+/**
+ * Goals Delete Page
+ * Goal deletion confirmation
+ * CivicOne Theme
+ */
+
+/* ============================================
+   GOLD STANDARD - Native App Features
+   ============================================ */
+
+/* Offline Banner */
+.offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    padding: var(--space-3) var(--space-5);
+    background: linear-gradient(135deg, var(--color-error-500), var(--color-error-600));
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.offline-banner.visible {
+    transform: translateY(0);
+}
+
+
+.htb-card {
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Button Press States */
+.htb-btn:active,
+button:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s ease !important;
+}
+
+/* Touch Targets - WCAG 2.1 AA (44px minimum) */
+.htb-btn,
+button {
+    min-height: var(--space-11);
+}
+
+/* Focus Visible */
+.htb-btn:focus-visible,
+button:focus-visible,
+a:focus-visible {
+    outline: 3px solid var(--color-red-alpha-50);
+    outline-offset: 2px;
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile Responsive Enhancements */
+@media (max-width: 768px) {
+    .htb-btn,
+    button {
+        min-height: var(--space-12);
+    }
+}
+
+/* ============================================
+   DELETE PAGE SPECIFIC STYLES
+   ============================================ */
+
+/* Wrapper container */
+
+/* Card body centered */
+
+/* Warning icon */
+
+/* Title reset */
+
+/* Description text */
+
+/* Actions container */
+
+/* Danger button (delete confirmation) */
+.htb-btn-danger {
+    background: var(--color-error-500);
+    color: white;
+    border: none;
+}
+
+.htb-btn-danger:hover {
+    background: var(--color-error-600);
+}
+
+/* ========================================
+   DARK MODE FOR DELETE GOAL
+   ======================================== */
+
+[data-theme="dark"] .htb-card {
+    background: var(--color-slate-alpha-85);
+    border: 1px solid var(--color-white-alpha-10);
+}
+
+[data-theme="dark"] .htb-card h2 {
+    color: var(--color-slate-100);
+}
+
+[data-theme="dark"] .htb-btn-secondary {
+    background: var(--color-slate-600-alpha-60) !important;
+    border-color: var(--color-white-alpha-15) !important;
+    color: var(--color-slate-200) !important;
+}

@@ -1,1 +1,96 @@
-@media (max-width:768px){}
+/**
+ * Responsive Tables - Mobile-First Table Patterns
+ * Converts tables to stacked cards on mobile devices
+ * Version: 1.0
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ */
+
+/* ==========================================
+   BASE RESPONSIVE TABLE WRAPPER
+   ========================================== */
+
+/* Wrapper enables horizontal scroll on overflow */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: var(--space-4, 16px);
+}
+
+/* Scroll hint shadow on overflow */
+.table-responsive::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--space-8);
+    background: linear-gradient(to left, var(--color-black-alpha-5), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-fast, 150ms);
+}
+
+.table-responsive.has-overflow::after {
+    opacity: 1;
+}
+
+/* ==========================================
+   TABLE TO CARDS PATTERN
+   Apply .table-cards class to tables that should
+   convert to stacked cards on mobile
+   ========================================== */
+
+/* Dark mode */
+
+/* ==========================================
+   MOBILE CARD TRANSFORMATION
+   At 768px and below, tables become stacked cards
+   ========================================== */
+
+@media (max-width: 768px) {
+
+    /* Hide table header on mobile */
+
+    /* Each row becomes a card */
+
+    /* Each cell becomes a row with label */
+
+    /* Show data-label as the row label */
+
+    /* Cell content alignment */
+}
+
+/* ==========================================
+   EXTRA SMALL SCREENS (360px and below)
+   ========================================== */
+
+/* ==========================================
+   TABLE VARIANTS
+   ========================================== */
+
+/* Compact table - tighter spacing */
+
+/* Striped table */
+
+/* ==========================================
+   ACTION CELLS
+   Cells with buttons/actions
+   ========================================== */
+
+/* ==========================================
+   STATUS BADGES IN TABLES
+   ========================================== */
+
+/* ==========================================
+   AVATAR IN TABLES
+   ========================================== */
+
+/* ==========================================
+   SIMPLE SCROLL TABLE
+   For tables that should just scroll on mobile
+   ========================================== */
+
+/* ==========================================
+   EMPTY STATE FOR TABLES
+   ========================================== */

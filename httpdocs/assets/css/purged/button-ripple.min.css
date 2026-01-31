@@ -1,1 +1,315 @@
-.glass-btn,.glass-btn-primary,.glass-btn-secondary,.glass-btn-outline,.nexus-smart-btn{position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}.glass-btn-primary .ripple-effect,.nexus-smart-btn-primary .ripple-effect{background:var(--color-white-alpha-35)}.glass-btn-secondary .ripple-effect,.glass-btn-outline .ripple-effect{background:color-mix(in srgb,var(--color-primary-500) 20%,transparent)}.glass-card[onclick] .ripple-effect,.glass-card[role="button"] .ripple-effect{background:color-mix(in srgb,var(--color-primary-500) 10%,transparent)}.nexus-header-icon-btn{position:relative;overflow:hidden}.nexus-header-icon-btn .ripple-effect{background:color-mix(in srgb,var(--color-primary-500) 20%,transparent)}.fab .ripple-effect{background:var(--color-white-alpha-30)}@media (prefers-reduced-motion:reduce){}
+/**
+ * Button Ripple Effects - Material Design Style
+ * Touch/click feedback with expanding ripple animation
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
+ *
+ * Features:
+ * - Expanding ripple from click point
+ * - Works on buttons, links, and any clickable element
+ * - Automatic color detection (light/dark ripple)
+ * - Touch and mouse support
+ * - Reduced motion support
+ */
+
+/* ==============================================
+   RIPPLE CONTAINER SETUP
+   ============================================== */
+
+/* Elements that should have ripple effect */
+.ripple,
+.btn,
+.nexus-smart-btn,
+.nav-link,
+.tab-item,
+.dropdown-item,
+[data-ripple="true"] {
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Ripple container */
+.ripple-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+/* ==============================================
+   RIPPLE ELEMENT
+   ============================================== */
+.ripple-effect {
+    position: absolute;
+    border-radius: var(--radius-full);
+    background: currentColor;
+    opacity: 0;
+    transform: scale(0);
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+/* Light ripple (for dark backgrounds) */
+.ripple-effect.ripple-light {
+    background: var(--color-white-alpha-35);
+}
+
+/* Dark ripple (for light backgrounds) */
+.ripple-effect.ripple-dark {
+    background: var(--color-black-alpha-12);
+}
+
+/* Primary color ripple */
+
+/* Success ripple */
+
+/* Danger ripple */
+
+/* ==============================================
+   RIPPLE ANIMATION
+   ============================================== */
+.ripple-effect.ripple-animate {
+    animation: ripple-expand var(--transition-slow) var(--ease-in-out) forwards;
+}
+
+@keyframes ripple-expand {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Faster ripple for small buttons */
+.btn-sm .ripple-effect.ripple-animate {
+    animation-duration: 400ms;
+}
+
+/* Slower ripple for large areas */
+.btn-lg .ripple-effect.ripple-animate,
+.card .ripple-effect.ripple-animate {
+    animation-duration: 800ms;
+}
+
+/* ==============================================
+   RIPPLE ON SPECIFIC BUTTON TYPES
+   ============================================== */
+
+/* Primary buttons - light ripple */
+.btn-primary .ripple-effect,
+.btn--primary .ripple-effect,
+.nexus-smart-btn-primary .ripple-effect {
+    background: var(--color-white-alpha-35);
+}
+
+/* Secondary/outline buttons - primary color ripple */
+.btn-secondary .ripple-effect,
+.btn-outline .ripple-effect,
+.btn--secondary .ripple-effect,
+.btn--ghost .ripple-effect {
+    background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+}
+
+/* Danger buttons */
+.btn-danger .ripple-effect {
+    background: var(--color-white-alpha-35);
+}
+
+/* Success buttons */
+.btn-success .ripple-effect {
+    background: var(--color-white-alpha-35);
+}
+
+/* Ghost/text buttons */
+
+.btn-text .ripple-effect {
+    background: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
+}
+
+/* ==============================================
+   DARK MODE ADJUSTMENTS
+   ============================================== */
+[data-theme="dark"] .ripple-effect.ripple-dark {
+    background: var(--color-white-alpha-15);
+}
+
+[data-theme="dark"] .btn-secondary .ripple-effect,
+[data-theme="dark"] .btn-outline .ripple-effect,
+[data-theme="dark"] .btn--secondary .ripple-effect,
+[data-theme="dark"] .btn--ghost .ripple-effect {
+    background: color-mix(in srgb, var(--color-primary-400) 25%, transparent);
+}
+
+[data-theme="dark"] .nav-link .ripple-effect,
+[data-theme="dark"] .dropdown-item .ripple-effect {
+    background: var(--color-white-alpha-10);
+}
+
+/* ==============================================
+   RIPPLE ON NAVIGATION
+   ============================================== */
+.nav-link .ripple-effect,
+.tab-item .ripple-effect {
+    background: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
+}
+
+.nav-link.active .ripple-effect,
+.tab-item.active .ripple-effect {
+    background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+}
+
+/* Mobile tab bar */
+.mobile-tab-bar .tab-item .ripple-effect {
+    background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+}
+
+/* ==============================================
+   RIPPLE ON CARDS
+   ============================================== */
+
+.glass-card[onclick] .ripple-effect,
+.glass-card[role="button"] .ripple-effect,
+a.glass-card .ripple-effect {
+    background: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
+}
+
+
+[data-theme="dark"] a.glass-card .ripple-effect {
+    background: color-mix(in srgb, var(--color-primary-400) 15%, transparent);
+}
+
+/* ==============================================
+   RIPPLE ON LIST ITEMS
+   ============================================== */
+
+.dropdown-item .ripple-effect,
+.menu-item .ripple-effect {
+    background: var(--color-black-alpha-8);
+}
+
+
+[data-theme="dark"] .menu-item .ripple-effect {
+    background: var(--color-white-alpha-8);
+}
+
+/* ==============================================
+   RIPPLE STATES
+   ============================================== */
+
+/* Pressed/active state enhancement */
+.ripple:active,
+[data-ripple="true"]:active {
+    transform: scale(0.98);
+}
+
+/* Disabled elements - no ripple */
+.ripple:disabled .ripple-container,
+.ripple.disabled .ripple-container,
+[data-ripple="true"]:disabled .ripple-container,
+[aria-disabled="true"] .ripple-container {
+    display: none;
+}
+
+/* ==============================================
+   CENTERED RIPPLE (for icon buttons)
+   ============================================== */
+.ripple-centered .ripple-effect {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0);
+}
+
+.ripple-centered .ripple-effect.ripple-animate {
+    animation: ripple-expand-centered var(--transition-slow) var(--ease-in-out) forwards;
+}
+
+@keyframes ripple-expand-centered {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
+    }
+}
+
+/* ==============================================
+   ICON BUTTONS
+   ============================================== */
+.icon-btn,
+.nexus-header-icon-btn,
+.btn-icon {
+    position: relative;
+    overflow: hidden;
+}
+
+.icon-btn .ripple-effect,
+.nexus-header-icon-btn .ripple-effect,
+.btn-icon .ripple-effect {
+    background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+}
+
+/* ==============================================
+   FLOATING ACTION BUTTON
+   ============================================== */
+.fab .ripple-effect {
+    background: var(--color-white-alpha-30);
+}
+
+/* ==============================================
+   FORM ELEMENTS
+   ============================================== */
+
+/* Checkbox/Radio ripple */
+
+/* ==============================================
+   UNBOUNDED RIPPLE (expands beyond container)
+   ============================================== */
+
+/* ==============================================
+   REDUCED MOTION
+   ============================================== */
+@media (prefers-reduced-motion: reduce) {
+    .ripple-effect {
+        animation: none !important;
+    }
+
+    .ripple-effect.ripple-animate {
+        opacity: 0.2;
+        transform: scale(2);
+        transition: opacity var(--transition-fast) ease;
+    }
+
+    /* Fade out instead of animate */
+    .ripple-effect.ripple-fade {
+        opacity: 0;
+    }
+}
+
+/* ==============================================
+   PRINT - No ripple
+   ============================================== */
+@media print {
+    .ripple-container,
+    .ripple-effect {
+        display: none !important;
+    }
+}
+
+/* ==============================================
+   HIGH CONTRAST MODE
+   ============================================== */
+@media (prefers-contrast: high) {
+    .ripple-effect {
+        background: currentColor;
+        opacity: 0.3;
+    }
+}

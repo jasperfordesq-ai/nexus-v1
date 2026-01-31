@@ -1,1 +1,281 @@
-.nexus-skin-civicone{.civicone-action-bar{margin-bottom:var(--space-5);display:flex;gap:var(--space-3);flex-wrap:wrap}.civicone-alert{padding:var(--space-4);border-radius:var(--radius-1);margin-bottom:var(--space-5);display:flex;align-items:center;gap:var(--space-2);font-weight:500}.civicone-alert--success{background:var(--color-success-bg);color:var(--color-success);border:1px solid var(--color-success)}.civicone-alert .dashicons{flex-shrink:0}.civicone-event-detail{}.civicone-event-grid{display:grid;grid-template-columns:2fr 1fr;gap:var(--space-6);margin-top:var(--space-5)}@media (max-width:768px){.civicone-event-grid{grid-template-columns:1fr}}.civicone-event-main{}.civicone-event-body{line-height:1.6;color:var(--civicone-text-main);margin-bottom:var(--space-5)}.civicone-event-info-box{margin-top:var(--space-5);padding:var(--space-5);background:var(--color-gray-50);border-radius:var(--radius-2);border:1px solid var(--color-gray-200)}.civicone-section-subtitle{margin-top:0;margin-bottom:var(--space-4);display:flex;align-items:center;gap:var(--space-2);color:var(--civicone-text-main);font-weight:600}.civicone-event-details{margin:0}.civicone-detail-item{display:grid;grid-template-columns:140px 1fr;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-gray-200)}.civicone-detail-item:last-child{border-bottom:none}.civicone-detail-item dt{font-weight:600;color:var(--civicone-text-muted);display:flex;align-items:center;gap:var(--space-2)}.civicone-detail-item dd{margin:0;color:var(--civicone-text-main)}@media (max-width:600px){.civicone-detail-item{grid-template-columns:1fr;gap:var(--space-1)}}.civicone-attendees-section{margin-top:var(--space-5)}.civicone-attendees-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:var(--space-3);margin-top:var(--space-4)}.civicone-attendee{display:block;position:relative;aspect-ratio:1;border-radius:50%;overflow:hidden;transition:transform 0.2s ease}.civicone-attendee:hover{transform:scale(1.05)}.civicone-attendee:focus-visible{outline:3px solid var(--color-focus);outline-offset:2px}.civicone-attendee img{width:100%;height:100%;object-fit:cover}.civicone-event-sidebar{position:sticky;top:var(--space-4)}.civicone-rsvp-card{}.civicone-rsvp-form{margin-top:var(--space-4)}.civicone-rsvp-buttons{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)}.civicone-rsvp-buttons .civicone-button{justify-content:center}.civicone-login-prompt{margin:var(--space-4) 0 0 0;color:var(--civicone-text-muted);text-align:center}.civicone-login-prompt a{color:var(--civicone-brand);text-decoration:underline;font-weight:600}.civicone-login-prompt a:hover{text-decoration:none}.civicone-invite-section{margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-gray-200)}.civicone-invite-section .civicone-button{width:100%;justify-content:center}.civicone-host-card{margin-top:var(--space-4)}.civicone-host-link{display:block;padding:var(--space-3);margin-top:var(--space-3);background:var(--color-gray-50);border-radius:var(--radius-1);color:var(--civicone-brand);text-decoration:none;font-weight:600;transition:background 0.2s ease}.civicone-host-link:hover{background:var(--color-gray-100);text-decoration:underline}.civicone-host-link:focus-visible{outline:3px solid var(--color-focus);outline-offset:0;background:var(--color-focus);color:var(--civicone-text-main)}@media (max-width:768px){.civicone-event-sidebar{position:static}.civicone-action-bar{flex-direction:column}.civicone-action-bar .civicone-button{width:100%;justify-content:center}}}
+/**
+ * CivicOne Events Show Page Styles
+ * Template C: Detail Page (Section 10.4)
+ * Extracted from inline styles per CLAUDE.md
+ */
+
+.nexus-skin-civicone {
+
+    /* ==========================================
+       Action Bar
+       ========================================== */
+
+    .civicone-action-bar {
+        margin-bottom: var(--space-5);
+        display: flex;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+    }
+
+    /* ==========================================
+       Alert Messages
+       ========================================== */
+
+    .civicone-alert {
+        padding: var(--space-4);
+        border-radius: var(--radius-1);
+        margin-bottom: var(--space-5);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-weight: 500;
+    }
+
+    .civicone-alert--success {
+        background: var(--color-success-bg);
+        color: var(--color-success);
+        border: 1px solid var(--color-success);
+    }
+
+    .civicone-alert .dashicons {
+        flex-shrink: 0;
+    }
+
+    /* ==========================================
+       Event Detail Layout (2/3 + 1/3)
+       ========================================== */
+
+    .civicone-event-detail {
+        /* Container for event detail page */
+    }
+
+    .civicone-event-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: var(--space-6);
+        margin-top: var(--space-5);
+    }
+
+    @media (max-width: 768px) {
+        .civicone-event-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ==========================================
+       Main Content (2/3)
+       ========================================== */
+
+    .civicone-event-main {
+        /* Main content area */
+    }
+
+    .civicone-event-body {
+        line-height: 1.6;
+        color: var(--civicone-text-main);
+        margin-bottom: var(--space-5);
+    }
+
+    .civicone-event-info-box {
+        margin-top: var(--space-5);
+        padding: var(--space-5);
+        background: var(--color-gray-50);
+        border-radius: var(--radius-2);
+        border: 1px solid var(--color-gray-200);
+    }
+
+    .civicone-section-subtitle {
+        margin-top: 0;
+        margin-bottom: var(--space-4);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--civicone-text-main);
+        font-weight: 600;
+    }
+
+    .civicone-event-details {
+        margin: 0;
+    }
+
+    .civicone-detail-item {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: var(--space-3);
+        padding: var(--space-3) 0;
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .civicone-detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .civicone-detail-item dt {
+        font-weight: 600;
+        color: var(--civicone-text-muted);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .civicone-detail-item dd {
+        margin: 0;
+        color: var(--civicone-text-main);
+    }
+
+    @media (max-width: 600px) {
+        .civicone-detail-item {
+            grid-template-columns: 1fr;
+            gap: var(--space-1);
+        }
+    }
+
+    /* ==========================================
+       Attendees Section
+       ========================================== */
+
+    .civicone-attendees-section {
+        margin-top: var(--space-5);
+    }
+
+    .civicone-attendees-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: var(--space-3);
+        margin-top: var(--space-4);
+    }
+
+    .civicone-attendee {
+        display: block;
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+
+    .civicone-attendee:hover {
+        transform: scale(1.05);
+    }
+
+    .civicone-attendee:focus-visible {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 2px;
+    }
+
+    .civicone-attendee img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* ==========================================
+       Sidebar (1/3)
+       ========================================== */
+
+    .civicone-event-sidebar {
+        position: sticky;
+        top: var(--space-4);
+    }
+
+    .civicone-rsvp-card {
+        /* RSVP card styling */
+    }
+
+    .civicone-rsvp-form {
+        margin-top: var(--space-4);
+    }
+
+    .civicone-rsvp-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-2);
+    }
+
+    .civicone-rsvp-buttons .civicone-button {
+        justify-content: center;
+    }
+
+    .civicone-login-prompt {
+        margin: var(--space-4) 0 0 0;
+        color: var(--civicone-text-muted);
+        text-align: center;
+    }
+
+    .civicone-login-prompt a {
+        color: var(--civicone-brand);
+        text-decoration: underline;
+        font-weight: 600;
+    }
+
+    .civicone-login-prompt a:hover {
+        text-decoration: none;
+    }
+
+    /* ==========================================
+       Invite Section
+       ========================================== */
+
+    .civicone-invite-section {
+        margin-top: var(--space-4);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--color-gray-200);
+    }
+
+    .civicone-invite-section .civicone-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ==========================================
+       Event Host Card
+       ========================================== */
+
+    .civicone-host-card {
+        margin-top: var(--space-4);
+    }
+
+    .civicone-host-link {
+        display: block;
+        padding: var(--space-3);
+        margin-top: var(--space-3);
+        background: var(--color-gray-50);
+        border-radius: var(--radius-1);
+        color: var(--civicone-brand);
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s ease;
+    }
+
+    .civicone-host-link:hover {
+        background: var(--color-gray-100);
+        text-decoration: underline;
+    }
+
+    .civicone-host-link:focus-visible {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 0;
+        background: var(--color-focus);
+        color: var(--civicone-text-main);
+    }
+
+    /* ==========================================
+       Mobile Responsive
+       ========================================== */
+
+    @media (max-width: 768px) {
+        .civicone-event-sidebar {
+            position: static;
+        }
+
+        .civicone-action-bar {
+            flex-direction: column;
+        }
+
+        .civicone-action-bar .civicone-button {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+}

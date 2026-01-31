@@ -63,7 +63,7 @@ require_once __DIR__ . '/../layouts/modern/header.php';
                             <?= htmlspecialchars(substr($post['excerpt'] ?: strip_tags($post['content']), 0, 100)) ?>...
                         </p>
 
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog/<?= $post['slug'] ?>" class="glass-btn">
+                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog/<?= $post['slug'] ?>" class="btn btn--glass">
                             READ ARTICLE &rarr;
                         </a>
                     </div>
@@ -79,28 +79,28 @@ require_once __DIR__ . '/../layouts/modern/header.php';
         </div>
 
         <?php if ($page > 1): ?>
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog?page=<?= $page - 1 ?>" class="glass-btn" style="margin-right:10px;">
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog?page=<?= $page - 1 ?>" class="btn btn--glass" style="margin-right:10px;">
                 &larr; Prev
             </a>
         <?php else: ?>
-            <span class="glass-btn" style="opacity:0.5; cursor:not-allowed; margin-right:10px;">&larr; Prev</span>
+            <span class="btn btn--glass" style="opacity:0.5; cursor:not-allowed; margin-right:10px;">&larr; Prev</span>
         <?php endif; ?>
 
         <!-- Numbered Links -->
         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
             <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog?page=<?= $i ?>"
-                class="glass-btn <?= $i == $page ? 'active' : '' ?>"
+                class="btn btn--glass <?= $i == $page ? 'active' : '' ?>"
                 style="<?= $i == $page ? 'background:rgba(255,255,255,0.3); border-color:#fff;' : '' ?> padding: 8px 12px; margin: 0 2px;">
                 <?= $i ?>
             </a>
         <?php endfor; ?>
 
         <?php if ($page < $totalPages): ?>
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog?page=<?= $page + 1 ?>" class="glass-btn" style="margin-left:10px;">
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog?page=<?= $page + 1 ?>" class="btn btn--glass" style="margin-left:10px;">
                 Next &rarr;
             </a>
         <?php else: ?>
-            <span class="glass-btn" style="opacity:0.5; cursor:not-allowed; margin-left:10px;">Next &rarr;</span>
+            <span class="btn btn--glass" style="opacity:0.5; cursor:not-allowed; margin-left:10px;">Next &rarr;</span>
         <?php endif; ?>
     </div>
 

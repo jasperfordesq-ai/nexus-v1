@@ -2692,13 +2692,13 @@
     padding: 8px 12px;
 }
 
-/* Gradient backgrounds for icons */
+/* Icon backgrounds - GOV.UK Design System Compliant (no gradients) */
 .civicone-section-icon--gradient-blue-green {
-    background: linear-gradient(135deg, #1d70b8, #00703c);
+    background: var(--color-govuk-blue-light, #1d70b8);
 }
 
 .civicone-section-icon--gradient-orange-red {
-    background: linear-gradient(135deg, #f47738, #d4351c);
+    background: var(--color-govuk-orange, #f47738);
 }
 
 /* Text italic */

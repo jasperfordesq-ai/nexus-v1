@@ -55,14 +55,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 /* Button Press States */
 .quick-action-btn:active,
-.glass-btn-primary:active {
+.btn--primary:active {
     transform: scale(0.96) !important;
     transition: transform 0.1s ease !important;
 }
 
 /* Touch Targets - WCAG 2.1 AA (44px minimum) */
 .quick-action-btn,
-.glass-btn-primary {
+.btn--primary {
     min-height: 44px !important;
 }
 
@@ -75,7 +75,7 @@ textarea {
 
 /* Focus Visible */
 .quick-action-btn:focus-visible,
-.glass-btn-primary:focus-visible,
+.btn--primary:focus-visible,
 a:focus-visible {
     outline: 3px solid rgba(190, 24, 93, 0.5);
     outline-offset: 2px;
@@ -90,7 +90,7 @@ html {
 /* Mobile Responsive Enhancements */
 @media (max-width: 768px) {
     .quick-action-btn,
-    .glass-btn-primary {
+    .btn--primary {
         min-height: 48px !important;
     }
 }
@@ -561,7 +561,7 @@ html {
         }
 
         /* Glass Primary Button */
-        #story-glass-wrapper .glass-btn-primary {
+        #story-glass-wrapper .btn--primary {
             background: linear-gradient(135deg, #be185d 0%, #db2777 100%);
             color: white;
             border: none;
@@ -579,7 +579,7 @@ html {
             gap: 8px;
         }
 
-        #story-glass-wrapper .glass-btn-primary:hover {
+        #story-glass-wrapper .btn--primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(190, 24, 93, 0.4),
                         inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -726,7 +726,7 @@ html {
             <div class="cta-box">
                 <h4>Want proof of our impact?</h4>
                 <p>We have an independently verified Social Return on Investment (SROI) study.</p>
-                <a href="<?= $basePath ?>/impact-report" class="glass-btn-primary">
+                <a href="<?= $basePath ?>/impact-report" class="btn btn--primary">
                     📊 View Full Report
                 </a>
             </div>
@@ -764,7 +764,7 @@ html {
 })();
 
 // Button Press States
-document.querySelectorAll('.quick-action-btn, .glass-btn-primary').forEach(btn => {
+document.querySelectorAll('.quick-action-btn, .btn--primary').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

@@ -1,1 +1,692 @@
-:root{}*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important}}
+/**
+ * CivicOne Mobile About Page CSS
+ * Mobile-Only About Page - Android Launcher Style
+ * Tenant-specific: Hour Timebank (tenant_id = 2)
+ * Full holographic glassmorphism design
+ * Extracted from views/civicone/pages/mobile-about.php
+ */
+
+/* ========================================
+   CSS CUSTOM PROPERTIES - DESIGN TOKENS
+   ======================================== */
+:root {
+    /* Light Mode Colors */
+    --bg-primary: var(--color-slate-50);
+    --bg-glass: var(--color-white-alpha-72);
+    --bg-glass-strong: var(--color-white-alpha-85);
+    --border-glass: var(--color-white-alpha-60);
+    --border-subtle: var(--color-black-alpha-6);
+    --text-primary: var(--color-slate-900);
+    --text-secondary: var(--color-slate-600);
+    --text-muted: var(--color-slate-400);
+    --shadow-sm: 0 2px 8px var(--color-black-alpha-4);
+    --shadow-md: 0 8px 24px var(--color-black-alpha-8);
+    --shadow-lg: 0 16px 48px var(--color-black-alpha-12);
+
+    /* Holographic Gradients */
+    --gradient-brand: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-pink-500) 50%, var(--color-warning-500) 100%);
+    --gradient-hero: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-700) 25%, var(--color-pink-600) 50%, var(--color-warning-500) 75%, var(--color-amber-300) 100%);
+
+    /* Blur Values */
+    --blur-lg: blur(24px);
+    --blur-xl: blur(40px);
+
+    /* Transitions */
+    --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="dark"] {
+    --bg-primary: var(--color-slate-900);
+    --bg-glass: var(--color-slate-alpha-72);
+    --bg-glass-strong: var(--color-slate-alpha-88);
+    --border-glass: var(--color-white-alpha-8);
+    --border-subtle: var(--color-white-alpha-6);
+    --text-primary: var(--color-slate-100);
+    --text-secondary: var(--color-slate-300);
+    --text-muted: var(--color-slate-500);
+    --shadow-sm: 0 2px 8px var(--color-black-alpha-20);
+    --shadow-md: 0 8px 24px var(--color-black-alpha-30);
+    --shadow-lg: 0 16px 48px var(--color-black-alpha-40);
+}
+
+/* ========================================
+   CSS RESET & BASE
+   ======================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+body {
+    min-height: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ========================================
+   HOLOGRAPHIC ANIMATED BACKGROUND
+   ======================================== */
+.holo-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Animated gradient orbs */
+.holo-bg::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background:
+        radial-gradient(ellipse 40% 30% at 25% 30%, var(--color-indigo-alpha-25), transparent 60%),
+        radial-gradient(ellipse 35% 35% at 75% 25%, var(--color-pink-alpha-20), transparent 55%),
+        radial-gradient(ellipse 45% 40% at 60% 70%, var(--color-amber-500-alpha-18), transparent 60%),
+        radial-gradient(ellipse 30% 25% at 20% 75%, var(--color-cyan-alpha-15), transparent 50%),
+        radial-gradient(ellipse 50% 45% at 85% 60%, var(--color-violet-alpha-12), transparent 55%);
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Noise texture overlay for depth */
+.holo-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg,
+            var(--bg-primary) 0%,
+            transparent 15%,
+            transparent 85%,
+            var(--bg-primary) 100%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+}
+
+[data-theme="dark"] .holo-bg::before {
+    background:
+        radial-gradient(ellipse 40% 30% at 25% 30%, var(--color-indigo-alpha-35), transparent 60%),
+        radial-gradient(ellipse 35% 35% at 75% 25%, var(--color-pink-alpha-28), transparent 55%),
+        radial-gradient(ellipse 45% 40% at 60% 70%, var(--color-violet-alpha-25), transparent 60%),
+        radial-gradient(ellipse 30% 25% at 20% 75%, var(--color-cyan-alpha-20), transparent 50%),
+        radial-gradient(ellipse 50% 45% at 85% 60%, var(--color-amber-500-alpha-15), transparent 55%);
+}
+
+[data-theme="dark"] .holo-bg::after {
+    opacity: 0.015;
+}
+
+/* Animation removed for GOV.UK compliance */
+
+/* ========================================
+   MAIN CONTAINER
+   ======================================== */
+.app-container {
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+/* ========================================
+   HEADER - GLASSMORPHIC
+   ======================================== */
+.app-header {
+    padding: var(--space-2-5) 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.header-btn {
+    width: var(--space-10);
+    height: var(--space-10);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-glass);
+    backdrop-filter: var(--blur-lg) saturate(180%);
+    -webkit-backdrop-filter: var(--blur-lg) saturate(180%);
+    border: 1px solid var(--border-glass);
+    color: var(--text-primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-spring);
+    box-shadow: var(--shadow-sm);
+}
+
+.header-btn:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.header-btn:active {
+    transform: scale(0.95);
+}
+
+.header-btn i {
+    font-size: 1.1rem;
+}
+
+.header-title {
+    flex: 1;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: var(--gradient-brand);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% 200%;
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Animation removed for GOV.UK compliance */
+
+/* Theme toggle icon animation */
+.theme-icon {
+    transition: transform var(--transition-spring);
+}
+
+.theme-icon--rotating {
+    transform: rotate(360deg) scale(0);
+}
+
+[data-theme="dark"] .theme-icon {
+    color: var(--color-warning-400);
+}
+
+/* ========================================
+   HERO SECTION - GLASSMORPHIC CARD
+   ======================================== */
+
+/* Holographic border glow */
+
+/* Animation removed for GOV.UK compliance */
+
+/* Animation removed for GOV.UK compliance */
+
+/* Inner glow ring */
+
+.hero-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+
+/* ========================================
+   APP GRID CONTAINER
+   ======================================== */
+.app-grid-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--space-5) 16px calc(100px + env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+.app-grid-container::-webkit-scrollbar {
+    width: var(--space-1);
+}
+
+.app-grid-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.app-grid-container::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 3px;
+    opacity: 0.5;
+}
+
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6) 8px;
+    max-width: 380px;
+    margin: 0 auto;
+}
+
+@media (min-width: 400px) {
+    .app-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-7) var(--space-3);
+        max-width: 420px;
+    }
+}
+
+/* ========================================
+   APP ICON - ULTIMATE PREMIUM DESIGN
+   ======================================== */
+.app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform var(--transition-spring);
+    outline: none;
+    /* animation removed for GOV.UK compliance */
+    animation-delay: var(--anim-delay, 0s);
+}
+
+/* Animation removed for GOV.UK compliance */
+
+.app-icon:active {
+    transform: scale(0.85);
+}
+
+.app-icon:focus-visible .app-icon-circle {
+    outline: 3px solid var(--accent-color, var(--color-govuk-blue-light));
+    outline-offset: 4px;
+}
+
+/* Icon Circle - Main Container */
+.app-icon-circle {
+    width: 88px;
+    height: 88px;
+    border-radius: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: var(--space-3);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-style: preserve-3d;
+}
+
+/* Pulsing glow ring animation */
+.app-icon-circle .glow-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 30px;
+    background: var(--icon-gradient);
+    opacity: 0;
+    filter: blur(12px);
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    /* animation removed for GOV.UK compliance */
+    animation-delay: var(--anim-delay, 0s);
+}
+
+/* Animation removed for GOV.UK compliance */
+
+[data-theme="dark"] .app-icon-circle .glow-ring {
+    opacity: 0.4;
+}
+
+.app-icon:hover .glow-ring,
+.app-icon:focus .glow-ring {
+    opacity: 0.7 !important;
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Glass shine overlay - premium reflection */
+.app-icon-circle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 26px;
+    background:
+        linear-gradient(
+            145deg,
+            var(--color-white-alpha-55) 0%,
+            var(--color-white-alpha-25) 25%,
+            var(--color-white-alpha-5) 50%,
+            transparent 100%
+        );
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Inner highlight ring */
+.app-icon-circle::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: 25px;
+    border: 1.5px solid var(--color-white-alpha-35);
+    border-bottom-color: var(--color-white-alpha-10);
+    border-right-color: var(--color-white-alpha-15);
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* Icon itself */
+.app-icon-circle i {
+    font-size: 2.1rem;
+    color: white;
+    position: relative;
+    z-index: 4;
+    filter: drop-shadow(0 2px 4px var(--color-black-alpha-30));
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Hover/Focus states */
+.app-icon:hover .app-icon-circle,
+.app-icon:focus .app-icon-circle {
+    transform: translateY(-6px) scale(1.08);
+}
+
+.app-icon:hover .app-icon-circle i,
+.app-icon:focus .app-icon-circle i {
+    transform: scale(1.15) rotate(-3deg);
+    filter: drop-shadow(0 4px 8px var(--color-black-alpha-35));
+}
+
+/* Special animation for heart icon */
+.app-icon-circle i.fa-heart {
+    /* animation removed for GOV.UK compliance */
+    animation-delay: var(--anim-delay, 0s);
+}
+
+/* Animation removed for GOV.UK compliance */
+
+.app-icon:hover .app-icon-circle i.fa-heart {
+    /* animation removed for GOV.UK compliance */
+    transform: scale(1.15);
+}
+
+/* Special animation for compass icon */
+.app-icon-circle i.fa-compass {
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Animation removed for GOV.UK compliance */
+
+.app-icon:hover .app-icon-circle i.fa-compass {
+    /* animation removed for GOV.UK compliance */
+    transform: scale(1.15) rotate(-10deg);
+}
+
+/* Label styling */
+.app-icon-label {
+    font-size: 0.73rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: var(--space-20);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    letter-spacing: -0.01em;
+}
+
+.app-icon:hover .app-icon-label,
+.app-icon:focus .app-icon-label {
+    color: var(--text-primary);
+    transform: translateY(2px);
+}
+
+/* Ripple effect on tap */
+.app-icon-circle .ripple {
+    position: absolute;
+    inset: 0;
+    border-radius: 26px;
+    background: radial-gradient(circle, var(--color-white-alpha-40) 0%, transparent 70%);
+    opacity: 0;
+    transform: scale(0);
+    z-index: 5;
+    pointer-events: none;
+}
+
+.app-icon:active .ripple {
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Animation removed for GOV.UK compliance */
+
+/* Shimmer effect on hover */
+.app-icon-circle .shimmer {
+    position: absolute;
+    inset: 0;
+    border-radius: 26px;
+    background: linear-gradient(
+        110deg,
+        transparent 20%,
+        var(--color-white-alpha-40) 50%,
+        transparent 80%
+    );
+    opacity: 0;
+    transform: translateX(-100%);
+    z-index: 6;
+    pointer-events: none;
+}
+
+.app-icon:hover .shimmer {
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Animation removed for GOV.UK compliance */
+
+/* ========================================
+   DOCK BAR - FLOATING GLASSMORPHIC
+   ======================================== */
+.dock-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-3) var(--space-6) calc(16px + env(safe-area-inset-bottom));
+    display: flex;
+    justify-content: center;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.dock-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-2-5) var(--space-5);
+    background: var(--bg-glass-strong);
+    backdrop-filter: var(--blur-xl) saturate(200%);
+    -webkit-backdrop-filter: var(--blur-xl) saturate(200%);
+    border-radius: 22px;
+    border: 1px solid var(--border-glass);
+    box-shadow:
+        var(--shadow-lg),
+        0 0 0 1px var(--border-subtle) inset;
+    pointer-events: auto;
+}
+
+.dock-item {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    position: relative;
+    transition: all var(--transition-spring);
+}
+
+.dock-item:active {
+    transform: scale(0.85);
+}
+
+.dock-item i {
+    font-size: 1.25rem;
+    color: white;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 1px 2px var(--color-black-alpha-20));
+}
+
+/* Glass shine on dock items */
+.dock-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(
+        135deg,
+        var(--color-white-alpha-35) 0%,
+        transparent 50%
+    );
+    pointer-events: none;
+}
+
+.dock-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-white-alpha-20);
+}
+
+/* Dock item colors */
+.dock-home {
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
+    box-shadow: 0 4px 16px var(--color-indigo-alpha-40);
+}
+
+.dock-explore {
+    background: linear-gradient(135deg, var(--color-pink-500) 0%, var(--color-govuk-red) 100%);
+    box-shadow: 0 4px 16px var(--color-pink-alpha-40);
+}
+
+.dock-profile {
+    background: linear-gradient(135deg, var(--color-govuk-blue-light) 0%, var(--color-cyan-500) 100%);
+    box-shadow: 0 4px 16px var(--color-sky-500-alpha-40);
+}
+
+/* ========================================
+   DESKTOP NOTICE
+   ======================================== */
+.desktop-notice {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--bg-primary);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-10);
+}
+
+.desktop-notice::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-hero);
+    opacity: 0.08;
+}
+
+.desktop-notice-content {
+    position: relative;
+    z-index: 1;
+}
+
+.desktop-notice-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto var(--space-6);
+    border-radius: 28px;
+    background: var(--gradient-brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 16px 48px var(--color-indigo-alpha-30);
+}
+
+.desktop-notice-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.desktop-notice h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--space-3);
+    letter-spacing: -0.02em;
+}
+
+.desktop-notice p {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-7);
+    max-width: 400px;
+    line-height: 1.6;
+}
+
+.desktop-notice a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2-5);
+    padding: var(--space-3-5) var(--space-7);
+    background: var(--gradient-brand);
+    border-radius: 14px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all var(--transition-smooth);
+    box-shadow: 0 8px 24px var(--color-indigo-alpha-30);
+}
+
+.desktop-notice a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px var(--color-indigo-alpha-40);
+}
+
+@media (min-width: 769px) {
+    .desktop-notice {
+        display: flex;
+    }
+
+    .app-container {
+        display: none;
+    }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

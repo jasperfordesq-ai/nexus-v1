@@ -137,7 +137,7 @@
 .impersonation-banner-icon {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--color-white-alpha-20);
     display: flex;
     align-items: center;

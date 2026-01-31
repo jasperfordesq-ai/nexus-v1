@@ -1,0 +1,450 @@
+/* ============================================
+   RESOURCES CREATE - Holographic Glassmorphism
+   Teal Theme (var(--color-teal-600))
+   ============================================ */
+
+.holo-resource-page {
+    min-height: 100vh;
+    padding: 180px var(--space-5) 60px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%);
+}
+
+[data-theme="dark"] .holo-resource-page {
+    background: linear-gradient(135deg, #042f2e 0%, #0f3d3a 50%, #134e4a 100%);
+}
+
+/* Floating Orbs */
+.holo-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+    /* animation removed for GOV.UK compliance */
+
+.holo-orb-1 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--color-teal-600-alpha-40) 0%, transparent 70%);
+    top: -100px;
+    left: -100px;
+    animation-delay: 0s;
+}
+
+.holo-orb-2 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, var(--color-teal-500-alpha-35) 0%, transparent 70%);
+    top: 40%;
+    right: -var(--space-20);
+    animation-delay: -7s;
+}
+
+.holo-orb-3 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, var(--color-cyan-alpha-30) 0%, transparent 70%);
+    bottom: -50px;
+    left: 30%;
+    animation-delay: -14s;
+}
+
+[data-theme="dark"] .holo-orb-1 {
+    background: radial-gradient(circle, var(--color-teal-600-alpha-30) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .holo-orb-2 {
+    background: radial-gradient(circle, var(--color-teal-500-alpha-25) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .holo-orb-3 {
+    background: radial-gradient(circle, var(--color-cyan-alpha-20) 0%, transparent 70%);
+}
+
+
+/* Glass Card */
+.holo-glass-card {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--color-white-alpha-70);
+    border-radius: 28px;
+    border: 1px solid var(--color-white-alpha-50);
+    padding: var(--space-12);
+    box-shadow:
+        0 25px 50px -12px var(--color-black-alpha-10),
+        0 0 0 1px var(--color-white-alpha-30) inset;
+    overflow: hidden;
+}
+
+[data-theme="dark"] .holo-glass-card {
+    background: var(--color-zinc-900-alpha-60);
+    border-color: var(--color-white-alpha-10);
+    box-shadow:
+        0 25px 50px -12px var(--color-black-alpha-40),
+        0 0 0 1px var(--color-white-alpha-5) inset;
+}
+
+/* Shimmer Effect */
+.holo-glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--color-white-alpha-10),
+        transparent
+    );
+    /* animation removed for GOV.UK compliance */
+    pointer-events: none;
+}
+
+/* Animation removed for GOV.UK compliance */
+}
+
+/* Iridescent Top Edge */
+.holo-glass-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--space-0-5);
+    background: linear-gradient(90deg,
+        transparent,
+        var(--color-teal-600-alpha-60),
+        var(--color-cyan-alpha-60),
+        var(--color-teal-500-alpha-60),
+        transparent
+    );
+}
+
+/* Header */
+.holo-header {
+    text-align: center;
+    margin-bottom: var(--space-10);
+}
+
+.holo-header-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto var(--space-5);
+    background: linear-gradient(135deg, var(--color-teal-600) 0%, var(--color-teal-700) 100%);
+    border-radius: var(--radius-2xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    box-shadow: 0 10px 30px var(--color-teal-600-alpha-30);
+}
+
+.holo-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 var(--space-2-5);
+    background: linear-gradient(135deg, var(--color-teal-700) 0%, var(--color-teal-600) 50%, var(--color-teal-500) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .holo-title {
+    background: linear-gradient(135deg, var(--color-teal-300) 0%, var(--color-teal-400) 50%, var(--color-white) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.holo-subtitle {
+    font-size: 1rem;
+    color: var(--color-slate-500);
+    margin: 0;
+}
+
+[data-theme="dark"] .holo-subtitle {
+    color: var(--color-white-alpha-60);
+}
+
+/* Form Styles */
+.holo-form-group {
+    margin-bottom: var(--space-6);
+}
+
+.holo-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-slate-700);
+    margin-bottom: var(--space-2-5);
+    padding-left: var(--space-1);
+}
+
+[data-theme="dark"] .holo-label {
+    color: var(--color-white-alpha-90);
+}
+
+.holo-input,
+.holo-select {
+    width: 100%;
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-xl);
+    border: 2px solid var(--color-teal-600-alpha-15);
+    background: var(--color-white-alpha-60);
+    color: var(--color-slate-800);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.holo-input:focus,
+.holo-select:focus {
+    outline: none;
+    border-color: var(--color-teal-600);
+    background: var(--color-white-alpha-90);
+    box-shadow: 0 0 0 4px var(--color-teal-600-alpha-10);
+}
+
+.holo-input::placeholder {
+    color: var(--color-slate-400);
+}
+
+[data-theme="dark"] .holo-input,
+[data-theme="dark"] .holo-select {
+    background: var(--color-white-alpha-8);
+    border-color: var(--color-white-alpha-10);
+    color: var(--color-slate-50);
+}
+
+[data-theme="dark"] .holo-input:focus,
+[data-theme="dark"] .holo-select:focus {
+    background: var(--color-white-alpha-12);
+    border-color: var(--color-teal-400);
+    box-shadow: 0 0 0 4px var(--color-teal-400-alpha-15);
+}
+
+[data-theme="dark"] .holo-input::placeholder {
+    color: var(--color-white-alpha-40);
+}
+
+[data-theme="dark"] .holo-select option {
+    background: var(--color-slate-800);
+    color: var(--color-slate-50);
+}
+
+textarea.holo-input {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+}
+
+/* File Upload Zone */
+.holo-upload-zone {
+    padding: var(--space-10) 30px;
+    border: 2px dashed var(--color-teal-600-alpha-30);
+    border-radius: var(--radius-2xl);
+    text-align: center;
+    background: linear-gradient(135deg, var(--color-teal-600-alpha-5) 0%, var(--color-teal-500-alpha-5) 100%);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.holo-upload-zone:hover {
+    border-color: var(--color-teal-600-alpha-50);
+    background: linear-gradient(135deg, var(--color-teal-600-alpha-8) 0%, var(--color-teal-500-alpha-8) 100%);
+}
+
+.holo-upload-zone.dragover {
+    border-color: var(--color-teal-600);
+    background: var(--color-teal-600-alpha-10);
+    transform: scale(1.01);
+}
+
+[data-theme="dark"] .holo-upload-zone {
+    border-color: var(--color-teal-400-alpha-20);
+    background: linear-gradient(135deg, var(--color-teal-600-alpha-10) 0%, var(--color-teal-500-alpha-5) 100%);
+}
+
+[data-theme="dark"] .holo-upload-zone:hover {
+    border-color: var(--color-teal-400-alpha-40);
+}
+
+.holo-upload-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--color-teal-600-alpha-15) 0%, var(--color-teal-500-alpha-10) 100%);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--color-teal-600);
+}
+
+[data-theme="dark"] .holo-upload-icon {
+    color: var(--color-teal-400);
+    background: var(--color-teal-400-alpha-15);
+}
+
+.holo-upload-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-slate-700);
+    margin-bottom: var(--space-2);
+}
+
+[data-theme="dark"] .holo-upload-text {
+    color: var(--color-white-alpha-90);
+}
+
+.holo-upload-hint {
+    font-size: 0.85rem;
+    color: var(--color-slate-500);
+}
+
+[data-theme="dark"] .holo-upload-hint {
+    color: var(--color-white-alpha-50);
+}
+
+.holo-file-input {
+    display: none;
+}
+
+.holo-file-name {
+    margin-top: var(--space-4);
+    padding: var(--space-3) 16px;
+    background: var(--color-teal-600-alpha-10);
+    border-radius: var(--radius-lg);
+    font-size: 0.9rem;
+    color: var(--color-teal-600);
+    font-weight: 600;
+    display: none;
+}
+
+.holo-file-name.visible {
+    display: block;
+}
+
+[data-theme="dark"] .holo-file-name {
+    background: var(--color-teal-400-alpha-15);
+    color: var(--color-teal-400);
+}
+
+/* Buttons */
+.holo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+}
+
+.holo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2-5);
+    padding: var(--space-4) var(--space-7);
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    font-family: inherit;
+    min-height: var(--space-12);
+}
+
+.holo-btn-primary {
+    background: linear-gradient(135deg, var(--color-teal-600) 0%, var(--color-teal-700) 100%);
+    color: white;
+    box-shadow: 0 8px 24px var(--color-teal-600-alpha-35);
+}
+
+.holo-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px var(--color-teal-600-alpha-45);
+}
+
+.holo-btn-primary:active {
+    transform: scale(0.98);
+}
+
+.holo-btn-secondary {
+    background: transparent;
+    color: var(--color-slate-500);
+    border: 2px solid var(--color-slate-500-alpha-20);
+}
+
+.holo-btn-secondary:hover {
+    background: var(--color-slate-500-alpha-8);
+    color: var(--color-slate-600);
+}
+
+[data-theme="dark"] .holo-btn-secondary {
+    color: var(--color-white-alpha-60);
+    border-color: var(--color-white-alpha-10);
+}
+
+[data-theme="dark"] .holo-btn-secondary:hover {
+    background: var(--color-white-alpha-5);
+    color: var(--color-white-alpha-80);
+}
+
+/* Offline Banner */
+.holo-offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    padding: var(--space-3-5) var(--space-5);
+    background: linear-gradient(135deg, var(--color-error-500), var(--color-error-600));
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2-5);
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.holo-offline-banner.visible {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 900px) {
+    .holo-resource-page {
+        padding: var(--space-5) 16px 120px;
+    }
+
+    .holo-glass-card {
+        padding: var(--space-8) var(--space-6);
+        border-radius: var(--radius-2xl);
+    }
+
+    .holo-title {
+        font-size: 1.7rem;
+    }
+
+    .holo-header-icon {
+        width: var(--space-16);
+        height: var(--space-16);
+        font-size: 1.5rem;
+    }
+
+    .holo-upload-zone {
+        padding: var(--space-8) var(--space-5);
+    }
+}

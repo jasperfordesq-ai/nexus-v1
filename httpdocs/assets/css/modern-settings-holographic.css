@@ -520,7 +520,7 @@ select.settings-input,
 .settings-avatar-preview {
     width: 100px;
     height: 100px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 3px solid var(--effect-primary-30);
     box-shadow:
@@ -626,7 +626,7 @@ select.settings-input,
     left: 50%;
     width: 0;
     height: 0;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--effect-white-20);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
@@ -773,7 +773,7 @@ select.settings-input,
     bottom: 3px;
     background: linear-gradient(135deg, var(--color-white) 0%, var(--color-primary-100) 100%);
     transition: var(--transition-smooth);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: 0 2px 8px var(--effect-black-30);
 }
 

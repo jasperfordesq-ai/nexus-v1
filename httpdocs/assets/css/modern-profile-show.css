@@ -251,7 +251,7 @@
     height: 80px;
     margin: 0 auto 20px;
     background: linear-gradient(135deg, var(--color-amber-500-alpha-15), var(--color-amber-600-alpha-10));
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -430,7 +430,7 @@
 .comment-avatar {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     flex-shrink: 0;
 }

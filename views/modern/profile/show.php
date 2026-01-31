@@ -464,18 +464,18 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" class="inline-form">
                             <?= Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                            <button type="submit" class="glass-btn btn-warning">
+                            <button type="submit" class="btn btn--warning">
                                 <i class="fa-solid fa-user-secret"></i> Login As User
                             </button>
                         </form>
                     <?php endif; ?>
 
                     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['id']): ?>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/profile/edit" class="glass-btn glass-btn-secondary">
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/profile/edit" class="btn btn--secondary">
                             <i class="fa-solid fa-pen"></i> Edit Profile
                         </a>
                         <?php if (\Nexus\Core\TenantContext::hasFeature('timebanking')): ?>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/wallet/insights" class="glass-btn btn-purple">
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/wallet/insights" class="btn btn--primary">
                             <i class="fa-solid fa-chart-line"></i> My Insights
                         </a>
                         <?php endif; ?>
@@ -485,43 +485,43 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             <!-- Not friends - show Add Friend button -->
                             <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/connections/add" method="POST" class="inline-form">
                                 <input type="hidden" name="receiver_id" value="<?= $user['id'] ?>">
-                                <button type="submit" class="glass-btn">
+                                <button type="submit" class="btn btn--glass">
                                     <i class="fa-solid fa-user-plus"></i> Add Friend
                                 </button>
                             </form>
                         <?php elseif ($connection['status'] === 'pending' && $connection['requester_id'] == $_SESSION['user_id']): ?>
                             <!-- Friend request sent -->
-                            <button disabled class="glass-btn glass-btn-secondary btn-disabled">
+                            <button disabled class="btn btn--secondary btn-disabled">
                                 <i class="fa-solid fa-clock"></i> Request Sent
                             </button>
                         <?php elseif ($connection['status'] === 'pending' && $connection['receiver_id'] == $_SESSION['user_id']): ?>
                             <!-- Accept friend request -->
                             <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/connections/accept" method="POST" class="inline-form">
                                 <input type="hidden" name="connection_id" value="<?= $connection['id'] ?>">
-                                <button type="submit" class="glass-btn glass-btn-success">
+                                <button type="submit" class="btn btn--success">
                                     <i class="fa-solid fa-check"></i> Accept Request
                                 </button>
                             </form>
                         <?php elseif ($connection['status'] === 'accepted'): ?>
                             <!-- Already friends -->
-                            <span class="glass-btn glass-btn-success btn-static">
+                            <span class="btn btn--success btn-static">
                                 <i class="fa-solid fa-check"></i> Friends
                             </span>
                         <?php endif; ?>
 
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages/<?= $user['id'] ?>" class="glass-btn">
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages/<?= $user['id'] ?>" class="btn btn--glass">
                             <i class="fa-solid fa-message"></i> Message
                         </a>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/wallet?to=<?= $user['id'] ?>" class="glass-btn glass-btn-secondary">
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/wallet?to=<?= $user['id'] ?>" class="btn btn--secondary">
                             <i class="fa-solid fa-coins"></i> Send Credits
                         </a>
-                        <button type="button" onclick="openReviewModal()" class="glass-btn btn-warning">
+                        <button type="button" onclick="openReviewModal()" class="btn btn--warning">
                             <i class="fa-solid fa-star"></i> Leave Review
                         </button>
                     <?php endif; ?>
 
                     <?php if ((isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/users/<?= $user['id'] ?>/edit" class="glass-btn btn-danger">
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/users/<?= $user['id'] ?>/edit" class="btn btn--danger">
                             <i class="fa-solid fa-shield"></i> Admin
                         </a>
                     <?php endif; ?>
@@ -793,7 +793,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user['id']): ?>
-                <button type="button" onclick="openReviewModal()" class="glass-btn btn-write-review">
+                <button type="button" onclick="openReviewModal()" class="btn btn--primary btn-write-review">
                     <i class="fa-solid fa-pen"></i> Write a Review
                 </button>
                 <?php endif; ?>
@@ -871,7 +871,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <?php endif; ?>
                 </p>
                 <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user['id']): ?>
-                <button onclick="openReviewModal()" class="glass-btn btn-write-review">
+                <button onclick="openReviewModal()" class="btn btn--primary btn-write-review">
                     <i class="fa-solid fa-star"></i> Leave a Review
                 </button>
                 <?php endif; ?>
@@ -1660,7 +1660,7 @@ document.querySelectorAll('form').forEach(form => {
 });
 
 // Button Press States
-document.querySelectorAll('.htb-btn, button, .glass-btn').forEach(btn => {
+document.querySelectorAll('.htb-btn, button, .btn').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

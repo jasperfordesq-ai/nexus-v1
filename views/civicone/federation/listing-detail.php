@@ -22,7 +22,7 @@ $ownerName = $listing['owner_name'] ?? 'Unknown';
 $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=00703c&color=fff&size=200';
 $ownerAvatar = !empty($listing['owner_avatar']) ? $listing['owner_avatar'] : $fallbackAvatar;
 $type = $listing['type'] ?? 'offer';
-$typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
+// Type color now handled by CSS classes: civicone-fed-tag-offer, civicone-fed-tag-request
 ?>
 
 <div class="govuk-width-container">
@@ -45,10 +45,10 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <!-- Listing Card -->
-                <article class="govuk-!-padding-6" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid <?= $typeColor ?>;" aria-labelledby="listing-title">
+                <article class="govuk-!-padding-6 civicone-fed-listing-article civicone-fed-listing-article--<?= $type ?>" aria-labelledby="listing-title">
                     <!-- Badges -->
                     <div class="govuk-!-margin-bottom-4">
-                        <span class="govuk-tag" style="background: <?= $typeColor ?>;">
+                        <span class="govuk-tag civicone-fed-tag-<?= $type ?>">
                             <i class="fa-solid <?= $type === 'offer' ? 'fa-hand-holding-heart' : 'fa-hand-holding' ?> govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= ucfirst($type) ?>
                         </span>
@@ -56,7 +56,7 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
                             <i class="fa-solid <?= $isExternalListing ? 'fa-globe' : 'fa-building' ?> govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner Timebank') ?>
                             <?php if ($isExternalListing): ?>
-                            <span class="govuk-tag govuk-tag--blue" style="margin-left: 4px; font-size: 0.7em;">External</span>
+                            <span class="govuk-tag govuk-tag--blue govuk-tag--external-small">External</span>
                             <?php endif; ?>
                         </span>
                     </div>

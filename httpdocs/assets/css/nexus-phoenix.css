@@ -44,7 +44,7 @@ img.avatar-img {
     max-height: 44px !important;
     min-width: 44px !important;
     min-height: 44px !important;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     flex-shrink: 0;
 }
@@ -80,7 +80,7 @@ img.avatar-img {
     --htb-text-muted: var(--color-slate-300);
     --htb-border-color: var(--effect-white-10);
     --htb-shadow: 0 10px 30px -5px var(--effect-black-50);
-    --htb-glass-blur: blur(24px);
+    --htb-glass-blur: blur(var(--blur-heavy));
 }
 
 /* SMOOTH THEME TRANSITIONS */
@@ -123,8 +123,8 @@ body,
 [data-theme="dark"] .htb-dropdown-content {
     background: var(--color-slate-900-alpha-85);
     border: 1px solid var(--effect-white-10);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(var(--blur-standard));
+    backdrop-filter: blur(var(--blur-standard));
 }
 
 [data-theme="dark"] .htb-dropdown-content a {
@@ -306,7 +306,7 @@ body,
 body.nexus-skin-modern {
     background-color: var(--htb-bg-page);
     color: var(--htb-text-main);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-family-primary);
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -416,8 +416,8 @@ html {
         0 0 40px var(--color-indigo-alpha-6),
         0 0 80px var(--color-purple-alpha-5),
         inset 0 1px 0 var(--effect-white-80);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-subtle)) saturate(180%);
+    backdrop-filter: blur(var(--blur-subtle)) saturate(180%);
     position: relative;
     overflow: hidden;
 }
@@ -504,8 +504,8 @@ html {
 .htb-card,
 .nexus-card {
     background: var(--color-white-alpha-70);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(var(--blur-subtle));
+    backdrop-filter: blur(var(--blur-subtle));
     border-radius: var(--htb-radius);
     box-shadow: var(--htb-shadow);
     overflow: hidden;
@@ -516,8 +516,8 @@ html {
 .nexus-glass,
 .nexus-card.nexus-glass {
     background: var(--effect-white-65) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(var(--blur-subtle)) !important;
+    backdrop-filter: blur(var(--blur-subtle)) !important;
     border: 1px solid var(--effect-white-60) !important;
 }
 
@@ -703,7 +703,7 @@ table.htb-table tr:last-child td {
     width: 200px;
     height: 200px;
     background: var(--color-primary-600-alpha-5);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(40px);
 }
 
@@ -835,7 +835,7 @@ table.htb-table tr:last-child td {
 .htb-member-avatar {
     width: 100px;
     height: 100px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 2px solid var(--color-gray-100);
     object-fit: cover;
     margin-bottom: var(--space-4);
@@ -1102,7 +1102,7 @@ body.dark-mode {
     --htb-text-muted: var(--color-slate-300);
     --htb-border-color: var(--effect-white-10);
     --htb-shadow: 0 10px 30px -5px var(--effect-black-50);
-    --htb-glass-blur: blur(24px);
+    --htb-glass-blur: blur(var(--blur-heavy));
 }
 
 body.dark-mode .htb-card,
@@ -1198,7 +1198,7 @@ body.dark-mode *:focus-visible {
 @media (max-width: 900px) {
     button,
     a.btn,
-    a.glass-btn,
+    a.btn--glass,
     input[type="button"],
     input[type="submit"],
     [role="button"] {
@@ -1215,8 +1215,8 @@ body.dark-mode *:focus-visible {
 /* Profile Card Container */
 .glass-profile-card {
     background: var(--card-background-color, var(--effect-white-70));
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(var(--blur-standard));
+    backdrop-filter: blur(var(--blur-standard));
     border-radius: var(--radius-2xl);
     border: 1px solid var(--effect-white-40);
     box-shadow: 0 8px 32px 0 var(--color-glass-shadow);
@@ -1233,7 +1233,7 @@ body.dark-mode *:focus-visible {
 .glass-avatar {
     width: 150px;
     height: 150px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 4px solid var(--effect-primary-30);
     box-shadow: 0 8px 32px var(--effect-primary-20);
@@ -1296,47 +1296,6 @@ body.dark-mode *:focus-visible {
     color: inherit !important;
 }
 
-/* Glass Buttons */
-.glass-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-6);
-    background: linear-gradient(135deg, var(--color-indigo-alpha-90), var(--color-violet-alpha-90)) !important;
-    border: none !important;
-    border-radius: var(--radius-md);
-    color: white !important;
-    font-weight: 600;
-    font-size: var(--font-size-sm);
-    cursor: pointer;
-    transition: all var(--transition-fast) var(--ease-in-out);
-    box-shadow: 0 4px 15px var(--effect-primary-30);
-    text-decoration: none;
-}
-
-.glass-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--effect-primary-40);
-    filter: brightness(1.05);
-}
-
-.glass-btn-secondary {
-    background: var(--effect-white-10) !important;
-    border: 1px solid var(--effect-white-20) !important;
-    color: var(--text-color, var(--color-slate-800)) !important;
-    box-shadow: none;
-}
-
-[data-theme="dark"] .glass-btn-secondary {
-    background: var(--effect-white-5) !important;
-    color: var(--color-slate-200);
-}
-
-.glass-btn-secondary:hover {
-    background: var(--effect-primary-15) !important;
-    border-color: var(--effect-primary-30) !important;
-}
-
 /* Glass Divider */
 .glass-divider {
     height: 1px;
@@ -1347,8 +1306,8 @@ body.dark-mode *:focus-visible {
 /* Profile Friends Card */
 .profile-friends-card {
     background: var(--card-background-color, var(--effect-white-70));
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(var(--blur-standard));
+    backdrop-filter: blur(var(--blur-standard));
     border-radius: var(--radius-lg);
     border: 1px solid var(--effect-white-40);
     padding: var(--space-5);
@@ -1702,8 +1661,8 @@ body.dark-mode *:focus-visible {
 /* Sidebar Cards */
 .profile-sidebar-card {
     background: var(--card-background-color, var(--effect-white-70));
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(var(--blur-standard));
+    backdrop-filter: blur(var(--blur-standard));
     border-radius: var(--radius-lg);
     border: 1px solid var(--effect-white-40);
     padding: var(--space-5);
@@ -1772,7 +1731,7 @@ body.dark-mode *:focus-visible {
     right: var(--space-2);
     width: var(--space-6);
     height: var(--space-6);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 3px solid var(--htb-card-bg, var(--color-slate-800));
 }
 

@@ -159,7 +159,7 @@ test.describe('Volunteering - Opportunity Detail', () => {
       await dismissDevNoticeModal(page);
 
       // Check for apply button - using actual selectors
-      const hasApplyBtn = await page.locator('.glass-btn-primary, .govuk-button:has-text("Apply")').isVisible({ timeout: 5000 }).catch(() => false);
+      const hasApplyBtn = await page.locator('.btn--primary, .govuk-button:has-text("Apply")').isVisible({ timeout: 5000 }).catch(() => false);
       const hasApplyText = await page.getByRole('button', { name: /apply|volunteer/i }).isVisible({ timeout: 3000 }).catch(() => false);
 
       expect(hasApplyBtn || hasApplyText || true).toBeTruthy();

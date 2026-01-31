@@ -137,7 +137,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                         : 'No active buddy requests found right now.' ?>
                 </p>
                 <?php if (($view ?? 'my-goals') === 'my-goals'): ?>
-                <a href="<?= $basePath ?>/compose?type=goal" class="glass-btn-primary">
+                <a href="<?= $basePath ?>/compose?type=goal" class="btn btn--primary">
                     <i class="fa-solid fa-plus"></i> Get Started
                 </a>
                 <?php endif; ?>
@@ -176,7 +176,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 })();
 
 // Button Press States
-document.querySelectorAll('.htb-btn, .glass-btn-primary, .nexus-smart-btn, .quick-action-btn, button').forEach(btn => {
+document.querySelectorAll('.htb-btn, .btn--primary, .nexus-smart-btn, .quick-action-btn, button').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

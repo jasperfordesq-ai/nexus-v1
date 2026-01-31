@@ -183,7 +183,7 @@ body.is-offline #federation-review-wrapper {
     content: '';
     position: absolute;
     inset: -6px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt), var(--color-purple-300));
     opacity: 0.3;
     animation: rotate 3s linear infinite;
@@ -197,7 +197,7 @@ body.is-offline #federation-review-wrapper {
 .avatar-lg {
     width: 96px;
     height: 96px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 4px solid white;
     box-shadow: 0 4px 20px var(--color-violet-alpha-25),
@@ -376,7 +376,7 @@ body.is-offline #federation-review-wrapper {
     content: '';
     position: absolute;
     inset: -8px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: transparent;
     transition: background 0.2s ease;
 }
@@ -409,7 +409,7 @@ body.is-offline #federation-review-wrapper {
 .star-btn:focus {
     outline: 3px solid var(--color-violet-alpha-50);
     outline-offset: 6px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 /* Rating Text */

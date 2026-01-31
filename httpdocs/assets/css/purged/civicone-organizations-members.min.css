@@ -1,1 +1,767 @@
-.org-members-bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:-1;background:linear-gradient(135deg,var(--color-slate-50) 0%,var(--color-blue-50) 25%,var(--color-blue-100) 50%,var(--color-blue-50) 75%,var(--color-slate-50) 100%)}.org-members-bg::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 20% 30%,var(--color-blue-alpha-12) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,var(--color-indigo-alpha-10) 0%,transparent 45%);.org-members-container{max-width:1200px;margin:0 auto;padding:120px var(--space-6) var(--space-10) var(--space-6);position:relative;z-index:10}.org-members-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-8);flex-wrap:wrap;gap:var(--space-4)}.org-members-title{display:flex;align-items:center;gap:var(--space-4)}.org-members-title h1{margin:0;font-size:1.75rem;font-weight:800;color:var(--color-gray-800)}.org-members-nav{display:flex;gap:var(--space-2)}.org-members-nav-link{padding:var(--space-2-5) var(--space-5);background:var(--color-white-alpha-80);border:1px solid var(--color-blue-alpha-20);border-radius:var(--radius-lg);color:var(--color-gray-700);font-weight:600;font-size:0.9rem;text-decoration:none;transition:all 0.2s;display:flex;align-items:center;gap:var(--space-2)}.org-members-nav-link:hover{background:var(--color-blue-alpha-10);border-color:var(--color-blue-alpha-40)}.org-members-nav-link.active{background:linear-gradient(135deg,var(--color-blue-500) 0%,var(--color-govuk-blue-light) 100%);color:white;border-color:transparent}}.badge-pill-amber{background:var(--color-warning-500);color:white;padding:var(--space-0-5) var(--space-2-5);border-radius:var(--radius-md);font-size:0.75rem;margin-left:auto}@media (max-width:768px){.org-members-container{padding:100px 16px 100px 16px}.org-members-header{flex-direction:column;align-items:flex-start}.org-members-nav{width:100%;overflow-x:auto}}
+/**
+ * Organization Members Page - Glassmorphism Style
+ * CivicOne Theme
+ */
+
+/* Reuse org wallet background */
+.org-members-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-blue-50) 25%, var(--color-blue-100) 50%, var(--color-blue-50) 75%, var(--color-slate-50) 100%);
+}
+
+.org-members-bg::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+        radial-gradient(ellipse at 20% 30%, var(--color-blue-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--color-indigo-alpha-10) 0%, transparent 45%);
+    /* animation removed for GOV.UK compliance */
+
+[data-theme="dark"] .org-members-bg {
+    background: linear-gradient(135deg, var(--color-slate-900) 0%, #1e3a5f 50%, var(--color-slate-900) 100%);
+}
+
+[data-theme="dark"] .org-members-bg::before {
+    background:
+        radial-gradient(ellipse at 20% 30%, var(--color-blue-alpha-20) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--color-indigo-alpha-15) 0%, transparent 45%);
+}
+
+
+.org-members-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 120px var(--space-6) var(--space-10) var(--space-6);
+    position: relative;
+    z-index: 10;
+}
+
+/* Header */
+.org-members-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-8);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.org-members-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.org-members-title h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-gray-800);
+}
+
+[data-theme="dark"] .org-members-title h1 {
+    color: var(--color-slate-100);
+}
+
+.org-members-nav {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.org-members-nav-link {
+    padding: var(--space-2-5) var(--space-5);
+    background: var(--color-white-alpha-80);
+    /* backdrop-filter removed for GOV.UK compliance */
+    border: 1px solid var(--color-blue-alpha-20);
+    border-radius: var(--radius-lg);
+    color: var(--color-gray-700);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.org-members-nav-link:hover {
+    background: var(--color-blue-alpha-10);
+    border-color: var(--color-blue-alpha-40);
+}
+
+.org-members-nav-link.active {
+    background: linear-gradient(135deg, var(--color-blue-500) 0%, var(--color-govuk-blue-light) 100%);
+    color: white;
+    border-color: transparent;
+}
+
+[data-theme="dark"] .org-members-nav-link {
+    background: var(--color-slate-alpha-80);
+    border-color: var(--color-blue-alpha-30);
+    color: var(--color-slate-200);
+}
+
+/* Glass Card */
+.members-glass-card {
+    background: linear-gradient(135deg,
+        var(--color-white-alpha-90) 0%,
+        var(--color-white-alpha-75) 100%);
+    /* backdrop-filter removed for GOV.UK compliance */
+    border: 1px solid var(--color-white-alpha-50);
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 8px 32px var(--color-glass-shadow);
+    overflow: hidden;
+    margin-bottom: var(--space-6);
+}
+
+[data-theme="dark"] .members-glass-card {
+    background: linear-gradient(135deg,
+        var(--color-slate-alpha-90) 0%,
+        var(--color-slate-alpha-75) 100%);
+    border-color: var(--color-white-alpha-10);
+}
+
+.members-section-title {
+    margin: 0;
+    padding: var(--space-6) var(--space-6) 0 24px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-gray-800);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2-5);
+}
+
+[data-theme="dark"] .members-section-title {
+    color: var(--color-slate-100);
+}
+
+/* Members Grid */
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+    padding: var(--space-6);
+}
+
+/* Member Card */
+.member-card {
+    display: flex;
+    align-items: center;
+    padding: var(--space-4);
+    background: var(--color-white-alpha-50);
+    border-radius: var(--radius-xl);
+    gap: var(--space-3-5);
+    transition: all 0.2s;
+}
+
+.member-card:hover {
+    background: var(--color-white-alpha-80);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--color-black-alpha-8);
+}
+
+[data-theme="dark"] .member-card {
+    background: var(--color-slate-alpha-50);
+}
+
+[data-theme="dark"] .member-card:hover {
+    background: var(--color-slate-alpha-80);
+}
+
+.member-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-blue-500), var(--color-govuk-blue-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.member-avatar.owner {
+    background: linear-gradient(135deg, var(--color-warning-500), var(--color-warning-600));
+}
+
+.member-avatar.admin {
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-primary-700));
+}
+
+.member-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.member-name {
+    font-weight: 700;
+    color: var(--color-gray-800);
+    font-size: 0.95rem;
+    margin-bottom: var(--space-0-5);
+}
+
+[data-theme="dark"] .member-name {
+    color: var(--color-slate-100);
+}
+
+.member-email {
+    font-size: 0.8rem;
+    color: var(--color-gray-500);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .member-email {
+    color: var(--color-slate-400);
+}
+
+.member-role-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-2-5);
+    border-radius: var(--radius-base);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: var(--space-1);
+}
+
+.member-role-badge.owner {
+    background: var(--color-amber-alpha-20);
+    color: var(--color-warning-700);
+}
+
+.member-role-badge.admin {
+    background: var(--color-violet-alpha-20);
+    color: var(--color-primary-700);
+}
+
+.member-role-badge.member {
+    background: var(--color-gray-alpha-20);
+    color: var(--color-gray-500);
+}
+
+[data-theme="dark"] .member-role-badge.owner {
+    background: var(--color-amber-alpha-30);
+    color: var(--color-warning-400);
+}
+
+[data-theme="dark"] .member-role-badge.admin {
+    background: var(--color-violet-alpha-30);
+    color: var(--color-purple-400);
+}
+
+[data-theme="dark"] .member-role-badge.member {
+    background: var(--color-gray-alpha-30);
+    color: var(--color-gray-400);
+}
+
+.member-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1-5);
+}
+
+.member-action-btn {
+    padding: var(--space-1-5) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.member-action-btn.promote {
+    background: var(--color-violet-alpha-10);
+    color: var(--color-primary-700);
+}
+
+.member-action-btn.promote:hover {
+    background: var(--color-violet-alpha-20);
+}
+
+.member-action-btn.demote {
+    background: var(--color-gray-alpha-10);
+    color: var(--color-gray-500);
+}
+
+.member-action-btn.demote:hover {
+    background: var(--color-gray-alpha-20);
+}
+
+.member-action-btn.remove {
+    background: var(--color-red-alpha-10);
+    color: var(--color-error-500);
+}
+
+.member-action-btn.remove:hover {
+    background: var(--color-red-alpha-20);
+}
+
+.member-action-btn.pay {
+    background: var(--color-emerald-alpha-10);
+    color: var(--color-success-500);
+}
+
+.member-action-btn.pay:hover {
+    background: var(--color-emerald-alpha-20);
+}
+
+/* Pay Modal */
+.pay-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-black-alpha-50);
+    /* backdrop-filter removed for GOV.UK compliance */
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-5);
+}
+
+.pay-modal-overlay.active {
+    display: flex;
+}
+
+.pay-modal {
+    background: white;
+    border-radius: var(--radius-2xl);
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px var(--color-black-alpha-20);
+    overflow: hidden;
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Animation removed for GOV.UK compliance */
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+[data-theme="dark"] .pay-modal {
+    background: var(--color-slate-800);
+}
+
+.pay-modal-header {
+    padding: var(--space-5) var(--space-6);
+    background: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pay-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2-5);
+}
+
+.pay-modal-close {
+    background: var(--color-white-alpha-20);
+    border: none;
+    color: white;
+    width: var(--space-8);
+    height: var(--space-8);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.pay-modal-close:hover {
+    background: var(--color-white-alpha-30);
+}
+
+.pay-modal-body {
+    padding: var(--space-6);
+}
+
+.pay-recipient-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--color-emerald-alpha-8);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-5);
+}
+
+.pay-recipient-avatar {
+    width: var(--space-12);
+    height: var(--space-12);
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-blue-500), var(--color-govuk-blue-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.pay-recipient-name {
+    font-weight: 700;
+    color: var(--color-gray-800);
+    font-size: 1rem;
+}
+
+[data-theme="dark"] .pay-recipient-name {
+    color: var(--color-slate-100);
+}
+
+.pay-recipient-email {
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+}
+
+[data-theme="dark"] .pay-recipient-email {
+    color: var(--color-slate-400);
+}
+
+.pay-form-group {
+    margin-bottom: var(--space-4);
+}
+
+.pay-form-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-2);
+    font-size: 0.9rem;
+}
+
+[data-theme="dark"] .pay-form-group label {
+    color: var(--color-slate-200);
+}
+
+.pay-form-group input,
+.pay-form-group textarea {
+    width: 100%;
+    padding: var(--space-3) 16px;
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: white;
+    color: var(--color-gray-800);
+}
+
+[data-theme="dark"] .pay-form-group input,
+[data-theme="dark"] .pay-form-group textarea {
+    background: var(--color-slate-900);
+    border-color: var(--color-slate-700);
+    color: var(--color-slate-100);
+}
+
+.pay-form-group input:focus,
+.pay-form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-success-500);
+    box-shadow: 0 0 0 3px var(--color-emerald-alpha-15);
+}
+
+.pay-form-group textarea {
+    min-height: var(--space-20);
+    resize: vertical;
+}
+
+.pay-balance-info {
+    padding: var(--space-3) 16px;
+    background: var(--color-blue-alpha-8);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    color: var(--color-blue-500);
+    margin-bottom: var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.pay-modal-actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+}
+
+.pay-btn-cancel {
+    flex: 1;
+    padding: var(--space-3-5);
+    border: 2px solid var(--color-gray-200);
+    background: transparent;
+    color: var(--color-gray-500);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pay-btn-cancel:hover {
+    background: var(--color-gray-alpha-10);
+}
+
+[data-theme="dark"] .pay-btn-cancel {
+    border-color: var(--color-slate-700);
+    color: var(--color-slate-400);
+}
+
+.pay-btn-submit {
+    flex: 2;
+    padding: var(--space-3-5);
+    background: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.pay-btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--color-emerald-alpha-30);
+}
+
+.pay-btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Pending Members */
+.pending-member-card {
+    display: flex;
+    align-items: center;
+    padding: var(--space-4);
+    background: var(--color-amber-alpha-10);
+    border: 1px solid var(--color-amber-alpha-30);
+    border-radius: var(--radius-xl);
+    gap: var(--space-3-5);
+}
+
+[data-theme="dark"] .pending-member-card {
+    background: var(--color-amber-alpha-15);
+    border-color: var(--color-amber-alpha-40);
+}
+
+.pending-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.pending-btn {
+    padding: var(--space-2) var(--space-3-5);
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.pending-btn.approve {
+    background: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 100%);
+    color: white;
+}
+
+.pending-btn.approve:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--color-emerald-alpha-30);
+}
+
+.pending-btn.reject {
+    background: var(--color-red-alpha-10);
+    color: var(--color-error-500);
+}
+
+.pending-btn.reject:hover {
+    background: var(--color-red-alpha-20);
+}
+
+/* Stats Bar */
+.members-stats {
+    display: flex;
+    gap: var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    background: var(--color-blue-alpha-5);
+    border-bottom: 1px solid var(--color-blue-alpha-10);
+}
+
+.member-stat {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.member-stat-value {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--color-blue-500);
+}
+
+.member-stat-label {
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+}
+
+[data-theme="dark"] .members-stats {
+    background: var(--color-blue-alpha-10);
+    border-bottom-color: var(--color-blue-alpha-20);
+}
+
+[data-theme="dark"] .member-stat-label {
+    color: var(--color-slate-400);
+}
+
+/* Empty State */
+.members-empty {
+    text-align: center;
+    padding: var(--space-16) var(--space-5);
+    color: var(--color-gray-400);
+}
+
+.members-empty-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+    margin-bottom: var(--space-4);
+}
+
+/* Add Member Form Styles */
+.add-member-form {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+/* Transfer Ownership Card */
+
+.transfer-btn {
+    padding: var(--space-3) var(--space-6);
+    background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-600) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.transfer-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--color-amber-500-alpha-30);
+}
+
+/* Card Section Styles */
+
+/* Icon Colors */
+
+.icon-amber {
+    color: var(--color-warning-500);
+}
+
+.icon-blue {
+    color: var(--color-blue-500);
+}
+
+/* Stat Value Colors */
+
+/* Badge Pill */
+.badge-pill-amber {
+    background: var(--color-warning-500);
+    color: white;
+    padding: var(--space-0-5) var(--space-2-5);
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    margin-left: auto;
+}
+
+/* Pending Request Meta */
+
+/* Inline Form Display */
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .org-members-container {
+        padding: 100px 16px 100px 16px;
+    }
+
+    .org-members-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .org-members-nav {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .members-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .member-card {
+        flex-wrap: wrap;
+    }
+
+    .member-actions {
+        width: 100%;
+        flex-direction: row;
+        margin-top: var(--space-2);
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--color-gray-border-alpha-30);
+    }
+
+    .member-action-btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .members-stats {
+        flex-wrap: wrap;
+        gap: var(--space-4);
+    }
+}

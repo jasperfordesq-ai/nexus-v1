@@ -1,1 +1,700 @@
-:root{}@media (prefers-reduced-motion:reduce){:root{}}@media print{:root{}}
+/**
+ * Modern Theme Tokens - SINGLE SOURCE OF TRUTH
+ * ==============================================
+ * Created: 2026-01-26
+ * Purpose: Consolidate all CSS variables for the Modern (Glassmorphic) theme
+ *          into ONE file to eliminate FOUC caused by cascading :root definitions.
+ *
+ * CRITICAL: This file should be loaded FIRST in the Modern theme's <head>
+ *           BEFORE any other CSS files. All other CSS files should REFERENCE
+ *           these variables, not redefine them.
+ *
+ * Sources consolidated:
+ * - design-tokens.css (primary source)
+ * - nexus-phoenix.css (htb-* brand variables)
+ *
+ * DO NOT load this file in CivicOne theme - use civicone-theme-tokens.css instead.
+ */
+
+:root {
+    /* ==========================================
+       SPACING SCALE - 8px base unit
+       ========================================== */
+
+    /* ==========================================
+       LAYOUT DIMENSIONS
+       ========================================== */
+
+    /* ==========================================
+       PRIMARY COLOR PALETTE
+       Modern theme uses Indigo as primary
+       ========================================== */
+
+    /* Primary RGB values (for rgba() usage) */
+
+    /* ==========================================
+       SEMANTIC COLORS
+       ========================================== */
+
+    /* ==========================================
+       EXTENDED COLOR PALETTE
+       ========================================== */
+
+    /* Gray scale */
+
+    /* Slate scale */
+
+    /* Purple palette */
+
+    /* Pink palette */
+
+    /* Green palette */
+
+    /* Emerald palette */
+
+    /* Teal palette */
+
+    /* Cyan palette */
+
+    /* Blue palette */
+
+    /* Indigo extras */
+
+    /* Sky palette */
+
+    /* Lime palette */
+
+    /* Amber palette */
+
+    /* Orange palette */
+
+    /* Yellow palette */
+
+    /* Red palette */
+
+    /* Rose palette */
+
+    /* Zinc palette */
+
+    /* Core colors */
+
+    /* Brand colors */
+
+    /* ==========================================
+       SEMANTIC BACKGROUND TOKENS (Light Theme)
+       ========================================== */
+
+    /* ==========================================
+       SEMANTIC TEXT TOKENS (Light Theme)
+       ========================================== */
+
+    /* ==========================================
+       SEMANTIC BORDER TOKENS (Light Theme)
+       ========================================== */
+
+    /* ==========================================
+       GLASSMORPHISM SYSTEM
+       ========================================== */
+
+    /* Surface overlays */
+
+    /* ==========================================
+       EFFECT TOKENS - Opacity-based Color Effects
+       Phase 2 CSS Cleanup (2026-01-27)
+       Phase 3 Consolidation (2026-01-27)
+       ==========================================
+
+       TABLE OF CONTENTS:
+       1. White effects (0-100% opacity)
+       2. Black effects (0-80% opacity)
+       3. Primary/Indigo effects (99, 102, 241)
+       4. Purple family (purple, purple-300, purple-200, purple-100)
+       5. Violet effects (168, 85, 247)
+       6. Emerald family (emerald, emerald-600, emerald-700)
+       7. Teal family (teal, teal-500 aliases, teal-600)
+       8. Cyan family (cyan, cyan-300, cyan-400, cyan-100, cyan-200)
+       9. Red family (red, red-600, red-custom)
+       10. Amber family (amber, amber-300, amber-600)
+       11. Blue family (blue, blue-600)
+       12. Yellow effects
+       13. Green family (green, green-600)
+       14. Orange family (orange, orange-300, orange-400, orange-600, orange-custom)
+       15. Pink family (pink, pink-600)
+       16. Fuchsia effects
+       17. Sky effects
+       18. Slate family (slate-800, slate-900, slate-600, slate-500, slate-400, slate-200, slate-50)
+       19. Gray family (gray, gray-50, gray-100, gray-200, gray-300, gray-400, gray-500, gray-600)
+       20. Zinc effects
+       21. Indigo family (indigo-600, indigo-400, indigo-300, indigo-50)
+       22. Glass shadow effects
+       23. Specialty effects (gold, silver, bronze, warm-accent, neutral)
+       24. Aliases (backwards compatibility)
+
+       NAMING CONVENTION:
+       --effect-{color}-{opacity} where opacity is 0-100 (percentage)
+       --effect-{color}-{shade}-{opacity} for shade variants (e.g., purple-300-10)
+       ========================================== */
+
+    /* White effects (for overlays, glass borders, text) */
+
+    /* Black effects (for shadows, borders, overlays) */
+
+    /* Primary/Indigo effects (99, 102, 241) */
+
+    /* Purple effects (139, 92, 246) */
+
+    /* Purple-300 effects (192, 132, 252) */
+
+    /* Purple-200 effects (216, 180, 254) */
+
+    /* Purple-100 effects (233, 213, 255) */
+
+    /* Violet effects (168, 85, 247) - purple-400 */
+
+    /* Emerald effects (16, 185, 129) */
+
+    /* Emerald-600 effects (5, 150, 105) */
+
+    /* Emerald-700 effects (4, 120, 87) */
+
+    /* Red-600 effects (220, 38, 38) */
+
+    /* Teal effects (20, 184, 166) - teal-500 */
+
+    /* Teal-600 effects (13, 148, 136) */
+
+    /* Cyan effects (6, 182, 212) */
+
+    /* Cyan-300 effects (34, 211, 238) */
+
+    /* Red effects (239, 68, 68) */
+
+    /* Amber effects (245, 158, 11) */
+
+    /* Amber-300 effects (251, 191, 36) */
+
+    /* Blue effects (59, 130, 246) */
+
+    /* Yellow/Amber-400 effects (234, 179, 8) */
+
+    /* Green-500 effects (34, 197, 94) */
+
+    /* Green-600 effects (22, 163, 74) */
+
+    /* Gray-500 effects (107, 114, 128) */
+
+    /* Neutral Gray effects (100, 100, 100) */
+
+    /* Orange effects (249, 115, 22) */
+
+    /* Pink effects (236, 72, 153) */
+
+    /* Primary-600/Indigo-600 effects (79, 70, 229) */
+
+    /* Primary-300/Indigo-300 effects (165, 180, 252) */
+
+    /* Slate effects (30, 41, 59) - slate-800 */
+
+    /* Slate-900 effects (15, 23, 42) */
+
+    /* Slate-600 effects (51, 65, 85) */
+
+    /* Indigo-400 effects (129, 140, 248) */
+
+    /* Glass shadow effects (31, 38, 135) */
+
+    /* Black/White aliases (alternative syntax without spaces - for backwards compatibility) */
+    /* --effect-white-12 defined earlier - DUPLICATE REMOVED */
+
+    /* Primary color hover/active states */
+
+    /* Additional primary effects */
+
+    /* Glass shadow 12 (31, 38, 135) */
+
+    /* Teal-500 aliases (same as teal base - 20, 184, 166) */
+
+    /* Emerald high opacity (16, 185, 129) */
+
+    /* Cyan high opacity (6, 182, 212) */
+
+    /* Emerald-600 high opacity (5, 150, 105) */
+
+    /* Slate-800 additional (30, 41, 59) */
+
+    /* Slate-600 additional (51, 65, 85) */
+
+    /* Gray-600 effects (55, 65, 81) */
+
+    /* Gray-500 effects (75, 85, 99) */
+
+    /* Indigo-600 additional (79, 70, 229) */
+
+    /* Blue additional (59, 130, 246) */
+
+    /* Green-500 additional (34, 197, 94) */
+
+    /* Black additional */
+
+    /* White aliases (no-space variants for backwards compatibility) */
+
+    /* Slate-800 additional (30, 41, 59) */
+
+    /* Amber-300 additional (251, 191, 36) */
+
+    /* Light grays (slate-50, gray-100, gray-200, slate-200) */
+
+    /* Teal-500 aliases (same as teal base) */
+
+    /* Emerald additional (16, 185, 129) */
+
+    /* Slate-900 additional (15, 23, 42) */
+
+    /* Sky-500 effects (14, 165, 233) */
+
+    /* Black high opacity */
+    /* --effect-black-4 defined earlier - DUPLICATE REMOVED */
+
+    /* Slate-800 additional (30, 41, 59) */
+
+    /* Zinc-900 effects (24, 24, 27) */
+
+    /* Dark neutral (30, 30, 30) */
+
+    /* Warm accent (255, 200, 100) */
+
+    /* Teal-500 alias */
+
+    /* --effect-violet-20 defined earlier - DUPLICATE REMOVED */
+
+    /* --effect-slate-900-50 defined earlier - DUPLICATE REMOVED */
+
+    /* Slate-400 (148, 163, 184) */
+
+    /* Primary additional */
+    /* --effect-primary-35 defined earlier - DUPLICATE REMOVED */
+    /* --effect-primary-45 defined earlier - DUPLICATE REMOVED */
+
+    /* Cyan additional (6, 182, 212) */
+
+    /* Cyan-300 additional (34, 211, 238) */
+
+    /* Green-500 additional (34, 197, 94) */
+
+    /* Glass shadow additional (31, 38, 135) */
+
+    /* Gold (255, 215, 0) */
+
+    /* Orange-300 (253, 186, 116) */
+
+    /* --effect-amber-300-15 defined earlier - DUPLICATE REMOVED */
+
+    /* Orange-400 (251, 146, 60) */
+
+    /* --effect-orange-50 defined earlier - DUPLICATE REMOVED */
+
+    /* Amber duplicates removed - defined earlier */
+    /* --effect-amber-8, --effect-amber-25, --effect-amber-30 already exist */
+
+    /* Red additional (239, 68, 68) */
+
+    /* --effect-blue-20 defined earlier - DUPLICATE REMOVED */
+
+    /* --effect-slate-600-50 defined earlier - DUPLICATE REMOVED */
+
+    /* Slate-600 solid (71, 85, 105) */
+
+    /* --effect-white-1 and --effect-white-100 defined earlier - DUPLICATES REMOVED */
+
+    /* Red-0 (transparent red for gradients) */
+
+    /* Yellow/Amber-400 additional (234, 179, 8) */
+
+    /* Slate-200 additional (226, 232, 240) */
+
+    /* Green-600 additional (22, 163, 74) */
+
+    /* Fuchsia-500 (217, 70, 239) */
+
+    /* Amber-600 (217, 119, 6) */
+
+    /* Cyan-100 (207, 250, 254) */
+
+    /* --effect-violet-6, --effect-violet-35 defined earlier - DUPLICATES REMOVED */
+    /* Violet-500 additional (168, 85, 247) */
+
+    /* Cyan-200 (165, 243, 252) */
+
+    /* Bronze (205, 127, 50) */
+
+    /* Silver (192, 192, 192) */
+
+    /* Purple-400 (192, 132, 252) */
+
+    /* Cyan-400 (103, 232, 249) */
+
+    /* Slate-500 (100, 116, 139) */
+
+    /* Violet-600 (124, 58, 237) */
+
+    /* DUPLICATES REMOVED - all defined earlier:
+       --effect-indigo-400-20, --effect-purple-35, --effect-purple-60,
+       --effect-emerald-5, --effect-emerald-25, --effect-emerald-40,
+       --effect-slate-900-70, --effect-slate-900-85, --effect-slate-900-90,
+       --effect-sky-20 */
+
+    /* Black alias and additional */
+
+    /* Gray-100 additional (243, 244, 246) */
+
+    /* Gray-300 (209, 213, 219) */
+
+    /* Primary additional */
+
+    /* Purple additional (139, 92, 246) */
+
+    /* Gray-50 (249, 250, 251) */
+
+    /* Gray-200 additional (229, 231, 235) */
+
+    /* Gray-300 additional (209, 213, 219) */
+
+    /* Gray-100 additional (243, 244, 246) */
+
+    /* Indigo-50 (238, 242, 255) */
+
+    /* Pink-600 (219, 39, 119) */
+
+    /* --effect-violet-12 defined earlier - DUPLICATE REMOVED */
+
+    /* Gray-500 (107, 114, 128) */
+
+    /* --effect-pink-15 defined earlier - DUPLICATE REMOVED */
+    /* Pink additional (236, 72, 153) */
+
+    /* Emerald-600 additional (5, 150, 105) */
+    /* --effect-emerald-600-15 defined earlier - DUPLICATE REMOVED */
+
+    /* Green-500 additional (34, 197, 94) */
+
+    /* Green-300 (134, 239, 172) */
+
+    /* Lime-500 (132, 204, 22) - Goals growth theme */
+
+    /* Lime-400 (163, 230, 53) */
+
+    /* Lime-300 (190, 242, 100) */
+
+    /* Lime-200 (217, 249, 157) */
+
+    /* Lime-100 (236, 252, 203) */
+
+    /* Pink-400 (244, 114, 182) - Goals holo effect */
+
+    /* Pink-600 additional (219, 39, 119) */
+
+    /* Glass shadow (31, 38, 135) */
+
+    /* Orange-400 additional (251, 146, 60) */
+
+    /* Amber additional (245, 158, 11) */
+
+    /* Amber-600 additional (217, 119, 6) */
+
+    /* Violet-500 additional (168, 85, 247) */
+    /* --effect-violet-8 defined earlier - DUPLICATE REMOVED */
+
+    /* Emerald additional (16, 185, 129) */
+    /* --effect-emerald-30, --effect-emerald-35 defined earlier - DUPLICATES REMOVED */
+
+    /* Slate-900 additional (15, 23, 42) */
+
+    /* Purple additional (139, 92, 246) */
+    /* --effect-purple-6, --effect-purple-45 defined earlier - DUPLICATES REMOVED */
+
+    /* Indigo-400 additional (129, 140, 248) */
+
+    /* Gray-500 additional (107, 114, 128) */ /* Alias: same value */
+
+    /* Slate-500 additional (100, 116, 139) */
+
+    /* Black additional */
+
+    /* Indigo-600 additional (79, 70, 229) */
+
+    /* Slate-500 solid (71, 85, 105) */
+
+    /* --effect-cyan-50 defined earlier - DUPLICATE REMOVED */
+
+    /* Blue additional (59, 130, 246) */
+    /* --effect-blue-10 defined earlier - DUPLICATE REMOVED */
+
+    /* --effect-slate-600-40 defined earlier - DUPLICATE REMOVED */
+
+    /* Blue-600 (37, 99, 235) */
+
+    /* Gray-50 additional (249, 250, 251) */
+
+    /* Slate-50 additional (248, 250, 252) */
+
+    /* --effect-amber-35 defined earlier - DUPLICATE REMOVED */
+
+    /* Red typo fix: --effect-red-3 was 0.3 opacity, should be --effect-red-30 */
+    /* --effect-red-30 defined earlier - this was a typo DUPLICATE REMOVED */
+
+    /* Pink additional (236, 72, 153) */
+
+    /* Orange-600 (234, 88, 12) */
+
+    /* Red-600 (220, 38, 38) */
+
+    /* Pink-600 additional (219, 39, 119) */
+
+    /* Pink-500 additional (236, 72, 153) */
+
+    /* Red-500 additional (239, 68, 68) */
+
+    /* Red-600 additional (220, 38, 38) */
+
+    /* Orange custom (212, 98, 31) */
+
+    /* Red custom (185, 30, 10) */
+
+    /* Gray-400 (156, 163, 175) */
+
+    /* Slate-400 additional (148, 163, 184) */
+
+    /* Violet-600 additional (124, 58, 237) */
+
+    /* ==========================================
+       TYPOGRAPHY
+       ========================================== */
+
+    /* ==========================================
+       TRANSITIONS & ANIMATIONS
+       ========================================== */
+
+    /* ==========================================
+       SHADOWS
+       ========================================== */
+
+    /* ==========================================
+       BORDER RADIUS
+       ========================================== */
+
+    /* ==========================================
+       Z-INDEX SCALE
+       ========================================== */
+
+    /* ==========================================
+       BREAKPOINTS (for JS usage)
+       ========================================== */
+
+    /* ==========================================
+       HTB (HOUR TIMEBANK) BRAND VARIABLES
+       From nexus-phoenix.css
+       ========================================== */
+
+    /* HTB Theme variables */
+
+    /* HTB Gradients */
+
+    /* ==========================================
+       COMPONENT SEMANTIC TOKENS
+       ========================================== */
+
+    /* Card backgrounds */
+
+    /* Input backgrounds */
+
+    /* Header */
+
+    /* Navigation */
+
+    /* Sidebar/Drawer */
+
+    /* Pill/badge */
+
+    /* Mobile navigation */
+
+    /* Focus ring system */
+
+    /* Border width */
+
+    /* Safe area insets (mobile) */
+
+    /* ==========================================
+       ALIAS VARIABLES (Backwards Compatibility)
+       ========================================== */
+
+    /* Primary aliases */
+
+    /* Background aliases */
+
+    /* Border aliases */
+
+    /* Text aliases */
+
+    /* Accent aliases */
+
+    /* Skin/theme colors */
+
+    /* Gradients */
+
+    /* Holographic effects */
+
+    /* Blur utilities */
+
+    /* Hamburger menu */
+
+    /* Page/theme transitions */
+
+    /* View transition names */
+
+    /* Animation */
+
+    /* Mouse position (for effects) */
+
+    /* Transform translate */
+
+    /* Tracking */
+
+    /* Progress */
+
+    /* ==========================================
+       HOLO (HOLOGRAPHIC) ALIASES
+       ========================================== */
+
+    /* ==========================================
+       FEED ALIASES
+       ========================================== */
+
+    /* ==========================================
+       ADMIN ALIASES
+       ========================================== */
+
+    /* ==========================================
+       MD (MODERN DESIGN) ALIASES
+       ========================================== */
+
+    /* ==========================================
+       SETTINGS ALIASES
+       ========================================== */
+
+    /* ==========================================
+       MESSAGE/CHAT ALIASES
+       ========================================== */
+
+    /* ==========================================
+       ONBOARDING ALIASES
+       ========================================== */
+
+    /* ==========================================
+       FEED FILTER ALIASES
+       ========================================== */
+
+    /* ==========================================
+       LEGAL PAGE ALIASES
+       ========================================== */
+
+    /* ==========================================
+       NATIVE INPUT ALIASES
+       ========================================== */
+
+    /* ==========================================
+       SHARE COMPOSE ALIASES
+       ========================================== */
+
+    /* ==========================================
+       EDITOR ALIASES
+       ========================================== */
+
+    /* ==========================================
+       AUTH ALIASES
+       ========================================== */
+
+    /* ==========================================
+       FEDERATION ALIASES
+       ========================================== */
+
+    /* ==========================================
+       POLL ALIASES
+       ========================================== */
+
+    /* ==========================================
+       SCORE/NEXUS SCORE ALIASES
+       ========================================== */
+
+    /* ==========================================
+       PULL TO REFRESH ALIASES
+       ========================================== */
+
+    /* ==========================================
+       NEWS/ARTICLE ALIASES
+       ========================================== */
+
+    /* ==========================================
+       STATUS BADGE ALIASES
+       ========================================== */
+
+    /* ==========================================
+       DATE BADGE ALIASES
+       ========================================== */
+
+    /* ==========================================
+       MAGIC/MISC ALIASES
+       ========================================== */
+
+    /* ==========================================
+       BADGE/CATEGORY DYNAMIC COLORS
+       ========================================== */
+
+    /* ==========================================
+       NEXUS ALIASES
+       ========================================== */
+
+    /* ==========================================
+       GLASS HOVER SHADOW
+       ========================================== */
+}
+
+/* ==========================================
+   DARK THEME OVERRIDES
+   ========================================== */
+[data-theme="dark"] {
+    /* Inverted gray scale */
+
+    /* Semantic backgrounds */
+
+    /* Semantic text */
+
+    /* Semantic borders */
+
+    /* Glassmorphism */
+
+    /* Surface overlays */
+
+    /* Primary color adjustments */
+
+    /* HTB dark theme overrides */
+
+    /* Legacy alias overrides */
+
+    /* Mobile navigation dark overrides */
+}
+
+/* ==========================================
+   REDUCED MOTION SUPPORT
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+    }
+}
+
+/* ==========================================
+   PRINT OPTIMIZATIONS
+   ========================================== */
+@media print {
+    :root {
+    }
+}

@@ -1,1 +1,425 @@
-.civic-composer{padding:var(--space-4,20px);background:var(--color-white,var(--color-white));border:1px solid var(--color-govuk-grey,var(--color-govuk-grey));border-radius:var(--radius-sm)}.civic-composer-actions{display:flex;gap:var(--space-3,15px);align-items:center;margin-top:var(--space-3,15px)}.civic-composer-actions label{cursor:pointer}.civic-post-card{padding:var(--space-5,25px);background:var(--color-white,var(--color-white));border:1px solid var(--color-govuk-grey,var(--color-govuk-grey));border-radius:var(--radius-sm);margin-bottom:var(--space-5,25px)}.civic-post-header{display:flex;gap:var(--space-3,15px);align-items:flex-start;margin-bottom:var(--space-4,20px)}.civic-post-header > div{flex:1}.civic-post-content{margin-bottom:var(--space-4,20px);white-space:pre-wrap;word-wrap:break-word}.civic-post-image{width:100%;max-width:600px;height:auto;border-radius:var(--radius-sm);margin-bottom:var(--space-4,20px)}.civic-post-actions{display:flex;gap:var(--space-4,20px);padding-top:var(--space-3,15px);border-top:1px solid var(--color-govuk-grey-light,var(--color-govuk-light-grey))}.civic-action-btn{display:inline-flex;align-items:center;gap:var(--space-2,10px);padding:var(--space-2,10px) var(--space-3,15px);background:transparent;border:none;color:var(--color-text-secondary,var(--color-govuk-grey-dark));cursor:pointer;font-size:var(--font-size-base,19px);transition:color 0.2s ease}.civic-action-btn:hover{color:var(--color-primary-500,var(--color-govuk-blue-light))}.civic-action-btn:focus{outline:3px solid var(--color-brand-yellow,var(--color-govuk-yellow));outline-offset:0;background:var(--color-brand-yellow,var(--color-govuk-yellow));color:var(--color-text-primary,var(--color-govuk-black))}.civic-action-btn.liked{color:var(--color-error,var(--color-govuk-red))}.civic-comments-section{display:none;padding-top:var(--space-4,20px);border-top:1px solid var(--color-govuk-grey-light,var(--color-govuk-light-grey));margin-top:var(--space-4,20px)}.civic-comment{display:flex;gap:var(--space-3,15px);margin-bottom:var(--space-4,20px)}.civic-comment--depth-0{margin-left:0}.civic-comment--depth-1{margin-left:var(--space-10)}.civic-comment--depth-2{margin-left:var(--space-20)}.civic-comment-avatar{width:var(--space-10);height:var(--space-10);border-radius:50%;flex-shrink:0}.civic-comment-bubble{flex:1;background:var(--color-govuk-grey-light,var(--color-govuk-light-grey));padding:var(--space-3,15px);border-radius:var(--radius-md)}.civic-comment-author{font-weight:600;margin-bottom:var(--space-1,5px);display:flex;align-items:center;gap:var(--space-2,10px)}.civic-comment-edited{font-size:var(--font-size-sm,16px);color:var(--color-text-secondary,var(--color-govuk-grey-dark));font-weight:400}.civic-comment-action{cursor:pointer;padding:var(--space-1,5px);display:inline-block;transition:transform 0.2s ease}.civic-comment-action:hover{transform:scale(1.2)}.civic-comment-action:focus{outline:3px solid var(--color-brand-yellow,var(--color-govuk-yellow));outline-offset:2px}.civic-comment-text{margin-bottom:var(--space-2,10px);white-space:pre-wrap;word-wrap:break-word}.civic-comment-meta{font-size:var(--font-size-sm,16px);color:var(--color-text-secondary,var(--color-govuk-grey-dark));cursor:pointer}.civic-comment-meta span{cursor:pointer;padding:var(--space-1,5px)}.civic-comment-meta span:hover{text-decoration:underline}.civic-mention{color:var(--color-primary-500,var(--color-govuk-blue-light));font-weight:600}.civic-reactions{display:flex;gap:var(--space-2,10px);margin-top:var(--space-2,10px);flex-wrap:wrap}.civic-reaction{display:inline-flex;align-items:center;gap:var(--space-1);padding:var(--space-1) 8px;background:var(--color-white,var(--color-white));border:1px solid var(--color-govuk-grey,var(--color-govuk-grey));border-radius:var(--radius-lg);cursor:pointer;font-size:var(--font-size-sm,16px);transition:all 0.2s ease}.civic-reaction:hover{background:var(--color-primary-50,#d5e8f3);border-color:var(--color-primary-500,var(--color-govuk-blue-light))}.civic-reaction:focus{outline:3px solid var(--color-brand-yellow,var(--color-govuk-yellow));outline-offset:0}.civic-reaction.active{background:var(--color-primary-50,#d5e8f3);border-color:var(--color-primary-500,var(--color-govuk-blue-light))}.civic-reaction-picker{position:relative}.civic-reaction-picker-menu{display:none;position:absolute;bottom:100%;left:0;background:var(--color-white,var(--color-white));border:1px solid var(--color-govuk-grey,var(--color-govuk-grey));border-radius:var(--radius-md);padding:var(--space-2,10px);box-shadow:0 4px 8px var(--color-black-alpha-10);z-index:10}.civic-reaction-picker-menu span{display:inline-block;padding:var(--space-1,5px);cursor:pointer;font-size:1.5rem;transition:transform 0.2s ease}.civic-reaction-picker-menu span:hover{transform:scale(1.3)}.civic-reply-form{display:none;margin-top:var(--space-3,15px)}.civic-reply-form-wrapper{display:flex;gap:var(--space-2,10px)}.civic-reply-input{flex:1}.civic-comment-submit{padding:var(--space-2,10px) var(--space-3,15px)}.civic-comment-form{display:flex;gap:var(--space-2,10px);align-items:center}.civic-comment-input{flex:1}.civic-toast{position:fixed;bottom:30px;right:30px;background:var(--color-success,var(--color-govuk-green));color:var(--color-white,var(--color-white));padding:var(--space-3,15px) var(--space-4,20px);border-radius:var(--radius-sm);box-shadow:0 4px 12px var(--color-black-alpha-20);opacity:0;transform:translateY(20px);transition:all 0.3s ease;z-index:1000;pointer-events:none}.civic-toast.show{opacity:1;transform:translateY(0)}.civic-loading-message,.civic-empty-message,.civic-error-message{text-align:center;padding:var(--space-4,20px);font-size:var(--font-size-base,19px)}.civic-loading-message{color:var(--color-text-secondary,var(--color-govuk-grey-dark))}.civic-empty-message{color:var(--color-text-secondary,var(--color-govuk-grey-dark))}.civic-error-message{color:var(--color-error,var(--color-govuk-red))}.civic-avatar-sm{width:var(--space-12);height:var(--space-12);border-radius:50%;object-fit:cover}.civic-review-rating{color:var(--color-warning,var(--color-orange-500));font-size:1.2rem}@media (max-width:640px){.civic-post-card{padding:var(--space-4,20px)}.civic-post-actions{flex-wrap:wrap;gap:var(--space-2,10px)}.civic-action-btn{font-size:var(--font-size-sm,16px);padding:var(--space-1,5px) var(--space-2,10px)}.civic-comment{gap:var(--space-2,10px)}.civic-comment--depth-1{margin-left:var(--space-5)}.civic-comment--depth-2{margin-left:var(--space-10)}.civic-comment-avatar{width:var(--space-8);height:var(--space-8)}.civic-toast{bottom:var(--space-5);right:var(--space-5);left:var(--space-5)}}
+/**
+ * CivicOne Profile Show Page - Component Styles
+ *
+ * GOV.UK Design System compliant
+ * WCAG 2.1 AA compliant
+ *
+ * Refactored: 2026-01-22
+ * Extracted from inline styles per CLAUDE.md
+ */
+
+/* ============================================
+   Post Composer
+   ============================================ */
+
+.civic-composer {
+    padding: var(--space-4, 20px);
+    background: var(--color-white, var(--color-white));
+    border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
+    border-radius: var(--radius-sm);
+}
+
+.civic-composer-actions {
+    display: flex;
+    gap: var(--space-3, 15px);
+    align-items: center;
+    margin-top: var(--space-3, 15px);
+}
+
+.civic-composer-actions label {
+    cursor: pointer;
+}
+
+/* ============================================
+   Post Card
+   ============================================ */
+
+.civic-post-card {
+    padding: var(--space-5, 25px);
+    background: var(--color-white, var(--color-white));
+    border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-5, 25px);
+}
+
+/* Post Header */
+.civic-post-header {
+    display: flex;
+    gap: var(--space-3, 15px);
+    align-items: flex-start;
+    margin-bottom: var(--space-4, 20px);
+}
+
+.civic-post-header > div {
+    flex: 1;
+}
+
+/* Post Content */
+.civic-post-content {
+    margin-bottom: var(--space-4, 20px);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.civic-post-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-4, 20px);
+}
+
+/* Post Actions */
+.civic-post-actions {
+    display: flex;
+    gap: var(--space-4, 20px);
+    padding-top: var(--space-3, 15px);
+    border-top: 1px solid var(--color-govuk-grey-light, var(--color-govuk-light-grey));
+}
+
+.civic-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 10px);
+    padding: var(--space-2, 10px) var(--space-3, 15px);
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
+    cursor: pointer;
+    font-size: var(--font-size-base, 19px);
+    transition: color 0.2s ease;
+}
+
+.civic-action-btn:hover {
+    color: var(--color-primary-500, var(--color-govuk-blue-light));
+}
+
+.civic-action-btn:focus {
+    outline: 3px solid var(--color-brand-yellow, var(--color-govuk-yellow));
+    outline-offset: 0;
+    background: var(--color-brand-yellow, var(--color-govuk-yellow));
+    color: var(--color-text-primary, var(--color-govuk-black));
+}
+
+.civic-action-btn.liked {
+    color: var(--color-error, var(--color-govuk-red));
+}
+
+/* ============================================
+   Comments Section
+   ============================================ */
+
+.civic-comments-section {
+    display: none;
+    padding-top: var(--space-4, 20px);
+    border-top: 1px solid var(--color-govuk-grey-light, var(--color-govuk-light-grey));
+    margin-top: var(--space-4, 20px);
+}
+
+.comments-list {
+    margin-bottom: var(--space-4, 20px);
+}
+
+/* Comment */
+.civic-comment {
+    display: flex;
+    gap: var(--space-3, 15px);
+    margin-bottom: var(--space-4, 20px);
+}
+
+.civic-comment--depth-0 {
+    margin-left: 0;
+}
+
+.civic-comment--depth-1 {
+    margin-left: var(--space-10);
+}
+
+.civic-comment--depth-2 {
+    margin-left: var(--space-20);
+}
+
+.civic-comment-avatar {
+    width: var(--space-10);
+    height: var(--space-10);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.civic-comment-bubble {
+    flex: 1;
+    background: var(--color-govuk-grey-light, var(--color-govuk-light-grey));
+    padding: var(--space-3, 15px);
+    border-radius: var(--radius-md);
+}
+
+.civic-comment-author {
+    font-weight: 600;
+    margin-bottom: var(--space-1, 5px);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 10px);
+}
+
+.civic-comment-edited {
+    font-size: var(--font-size-sm, 16px);
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
+    font-weight: 400;
+}
+
+.civic-comment-action {
+    cursor: pointer;
+    padding: var(--space-1, 5px);
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.civic-comment-action:hover {
+    transform: scale(1.2);
+}
+
+.civic-comment-action:focus {
+    outline: 3px solid var(--color-brand-yellow, var(--color-govuk-yellow));
+    outline-offset: 2px;
+}
+
+.civic-comment-text {
+    margin-bottom: var(--space-2, 10px);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.civic-comment-meta {
+    font-size: var(--font-size-sm, 16px);
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
+    cursor: pointer;
+}
+
+.civic-comment-meta span {
+    cursor: pointer;
+    padding: var(--space-1, 5px);
+}
+
+.civic-comment-meta span:hover {
+    text-decoration: underline;
+}
+
+/* Mention highlighting */
+.civic-mention {
+    color: var(--color-primary-500, var(--color-govuk-blue-light));
+    font-weight: 600;
+}
+
+/* ============================================
+   Reactions
+   ============================================ */
+
+.civic-reactions {
+    display: flex;
+    gap: var(--space-2, 10px);
+    margin-top: var(--space-2, 10px);
+    flex-wrap: wrap;
+}
+
+.civic-reaction {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) 8px;
+    background: var(--color-white, var(--color-white));
+    border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-size: var(--font-size-sm, 16px);
+    transition: all 0.2s ease;
+}
+
+.civic-reaction:hover {
+    background: var(--color-primary-50, #d5e8f3);
+    border-color: var(--color-primary-500, var(--color-govuk-blue-light));
+}
+
+.civic-reaction:focus {
+    outline: 3px solid var(--color-brand-yellow, var(--color-govuk-yellow));
+    outline-offset: 0;
+}
+
+.civic-reaction.active {
+    background: var(--color-primary-50, #d5e8f3);
+    border-color: var(--color-primary-500, var(--color-govuk-blue-light));
+}
+
+/* Reaction Picker */
+.civic-reaction-picker {
+    position: relative;
+}
+
+.civic-reaction-picker-menu {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: var(--color-white, var(--color-white));
+    border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
+    border-radius: var(--radius-md);
+    padding: var(--space-2, 10px);
+    box-shadow: 0 4px 8px var(--color-black-alpha-10);
+    z-index: 10;
+}
+
+.civic-reaction-picker-menu span {
+    display: inline-block;
+    padding: var(--space-1, 5px);
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.civic-reaction-picker-menu span:hover {
+    transform: scale(1.3);
+}
+
+/* ============================================
+   Reply Form
+   ============================================ */
+
+.civic-reply-form {
+    display: none;
+    margin-top: var(--space-3, 15px);
+}
+
+.civic-reply-form-wrapper {
+    display: flex;
+    gap: var(--space-2, 10px);
+}
+
+.civic-reply-input {
+    flex: 1;
+}
+
+.civic-comment-submit {
+    padding: var(--space-2, 10px) var(--space-3, 15px);
+}
+
+/* Comment Form (Top-level) */
+.civic-comment-form {
+    display: flex;
+    gap: var(--space-2, 10px);
+    align-items: center;
+}
+
+.civic-comment-input {
+    flex: 1;
+}
+
+/* ============================================
+   Toast Notification
+   ============================================ */
+
+.civic-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--color-success, var(--color-govuk-green));
+    color: var(--color-white, var(--color-white));
+    padding: var(--space-3, 15px) var(--space-4, 20px);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 12px var(--color-black-alpha-20);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.civic-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   Loading/Empty/Error States
+   ============================================ */
+
+.civic-loading-message,
+.civic-empty-message,
+.civic-error-message {
+    text-align: center;
+    padding: var(--space-4, 20px);
+    font-size: var(--font-size-base, 19px);
+}
+
+.civic-loading-message {
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
+}
+
+.civic-empty-message {
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
+}
+
+.civic-error-message {
+    color: var(--color-error, var(--color-govuk-red));
+}
+
+/* ============================================
+   Avatar Utilities
+   ============================================ */
+
+.civic-avatar-sm {
+    width: var(--space-12);
+    height: var(--space-12);
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ============================================
+   Reviews
+   ============================================ */
+
+.civic-review-rating {
+    color: var(--color-warning, var(--color-orange-500));
+    font-size: 1.2rem;
+}
+
+/* ============================================
+   Mobile Responsive
+   ============================================ */
+
+@media (max-width: 640px) {
+    .civic-post-card {
+        padding: var(--space-4, 20px);
+    }
+
+    .civic-post-actions {
+        flex-wrap: wrap;
+        gap: var(--space-2, 10px);
+    }
+
+    .civic-action-btn {
+        font-size: var(--font-size-sm, 16px);
+        padding: var(--space-1, 5px) var(--space-2, 10px);
+    }
+
+    .civic-comment {
+        gap: var(--space-2, 10px);
+    }
+
+    .civic-comment--depth-1 {
+        margin-left: var(--space-5);
+    }
+
+    .civic-comment--depth-2 {
+        margin-left: var(--space-10);
+    }
+
+    .civic-comment-avatar {
+        width: var(--space-8);
+        height: var(--space-8);
+    }
+
+    .civic-toast {
+        bottom: var(--space-5);
+        right: var(--space-5);
+        left: var(--space-5);
+    }
+}

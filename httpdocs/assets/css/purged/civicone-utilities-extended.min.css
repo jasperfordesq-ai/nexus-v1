@@ -1,1 +1,369 @@
-.hidden{display:none}.visible{visibility:visible}.civicone-honeypot{position:absolute;left:-9999px}.civicone-card-bordered-accent{border:1px solid #b1b4b6;border-left:5px solid #1d70b8}.civicone-card-bordered-full{border:1px solid #b1b4b6;height:100%}.civicone-danger-zone{border:2px solid #d4351c;background:#fef7f7}.civicone-danger-heading{color:#d4351c}.civicone-text-secondary{color:#505a5f}.civicone-max-width-800{max-width:800px}.civicone-tag-inline-small{margin-left:4px;font-size:0.7em}.civicone-notification-item{border:1px solid #b1b4b6;border-left:5px solid #b1b4b6}.civicone-notification-item--unread{border-left-color:#1d70b8}.civicone-progress-bar-fill--blue{background-color:#1d70b8}.civicone-progress-bar-fill--green{background-color:#00703c}.civicone-progress-bar-fill--pink{background-color:#d53880}
+/**
+ * CivicOne Extended Utilities
+ * CSS classes extracted from inline styles per CLAUDE.md
+ */
+
+/* ============================================
+   LAYOUT - Flexbox
+   ============================================ */
+.flex { display: flex; }
+.flex-wrap { display: flex; flex-wrap: wrap; }
+.flex-end { display: flex; justify-content: flex-end; }
+.items-center { align-items: center; }
+
+/* ============================================
+   LAYOUT - Grid
+   ============================================ */
+.grid { display: grid; }
+
+/* ============================================
+   LAYOUT - Centering
+   ============================================ */
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* ============================================
+   SPACING - Margins
+   ============================================ */
+
+.mb-0 { margin-bottom: 0; }
+
+/* ============================================
+   SPACING - Padding
+   ============================================ */
+.p-0 { padding: 0; }
+
+/* ============================================
+   WIDTH & HEIGHT
+   ============================================ */
+.w-full { width: 100%; }
+
+/* Icon sizing */
+
+/* ============================================
+   TYPOGRAPHY - Font Size
+   ============================================ */
+.text-sm { font-size: 0.8rem; }
+
+/* ============================================
+   TYPOGRAPHY - Font Weight
+   ============================================ */
+
+/* ============================================
+   TYPOGRAPHY - Alignment & Decoration
+   ============================================ */
+.text-center { text-align: center; }
+.uppercase { text-transform: uppercase; }
+.underline { text-decoration: underline; }
+.italic { font-style: italic; }
+
+/* ============================================
+   TYPOGRAPHY - Colors (using design tokens)
+   ============================================ */
+.text-white { color: white; }
+.text-muted { color: var(--color-gray-500, var(--color-govuk-grey-dark)); opacity: 0.7; }
+
+/* Brand colors */
+.text-primary { color: var(--color-primary-500, var(--color-govuk-blue-light)); }
+.text-red-500 { color: var(--color-error-500); }
+
+/* GOV.UK colors */
+
+/* ============================================
+   BACKGROUNDS
+   ============================================ */
+.bg-transparent { background: transparent; }
+
+/* Tinted backgrounds */
+.bg-red-50 { background: var(--color-red-50); }
+
+/* Solid accent backgrounds */
+
+/* GOV.UK backgrounds */
+
+/* Gradient backgrounds */
+
+/* ============================================
+   BORDERS
+   ============================================ */
+.border { border: 1px solid var(--color-gray-200); }
+.border-light { border: 1px solid var(--color-slate-200); }
+
+/* Accent borders */
+
+/* Border radius */
+.rounded { border-radius: var(--radius-sm); }
+.rounded-lg { border-radius: var(--radius-md); }
+.rounded-full { border-radius: 50%; }
+
+/* ============================================
+   DISPLAY & VISIBILITY
+   ============================================ */
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+.inline-flex { display: inline-flex; }
+.hidden { display: none; }
+.visible { visibility: visible; }
+.invisible { visibility: hidden; }
+.overflow-hidden { overflow: hidden; }
+
+/* ============================================
+   OPACITY
+   ============================================ */
+.opacity-50 { opacity: 0.5; }
+.opacity-60 { opacity: 0.6; }
+
+/* ============================================
+   TRANSITIONS
+   ============================================ */
+.transition { transition: all 0.2s ease; }
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+.form-label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-slate-800);
+}
+
+/* ============================================
+   CARDS & BOXES
+   ============================================ */
+
+/* ============================================
+   TABLES
+   ============================================ */
+
+/* ============================================
+   BADGES & TAGS
+   ============================================ */
+
+.code-block {
+    background: var(--color-gray-900);
+    color: var(--color-success-500);
+    padding: var(--space-4);
+    border-radius: var(--radius-base);
+    font-family: monospace;
+    font-size: 0.85rem;
+    overflow-x: auto;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+/* ============================================
+   STAT CARDS (Master Dashboard)
+   ============================================ */
+.stat-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    margin-bottom: var(--space-1);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+/* ============================================
+   SKELETON LOADERS
+   ============================================ */
+.skeleton-80 { height: var(--space-20); width: 100%; }
+
+/* ============================================
+   OBJECT FIT
+   ============================================ */
+
+/* ============================================
+   EXTRA PADDING VARIANTS
+   ============================================ */
+
+/* ============================================
+   BUTTON VARIANTS
+   ============================================ */
+
+.slug-prefix {
+    border-right: 0;
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+/* ============================================
+   COMPOSE PAGE UTILITIES
+   ============================================ */
+
+/* Alert margin variants */
+.m-16 { margin: var(--space-4); }
+
+/* Textarea with resize */
+.md-textarea-resizable {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.md-textarea-resizable--small {
+    min-height: 60px;
+    resize: vertical;
+}
+
+/* Optional hint text (for SDG labels) */
+.md-optional-hint {
+    font-weight: 400;
+    opacity: 0.6;
+    font-size: 0.85rem;
+}
+
+/* Button as link (inline-flex, no underline) */
+.btn-link-inline {
+    text-decoration: none;
+    display: inline-flex;
+}
+
+/* Event submit button variant */
+.md-submit-btn--event {
+    background: linear-gradient(135deg, var(--color-pink-500) 0%, var(--color-govuk-red) 100%);
+}
+
+/* Button spacing for stacked buttons */
+.md-btn-spaced {
+    margin-bottom: var(--space-3);
+}
+
+/* Avatar with zero font-size (for img inside) */
+.md-avatar--img-only {
+    font-size: 0;
+}
+
+/* ============================================
+   INLINE STYLE REPLACEMENTS
+   Added for CLAUDE.md compliance
+   ============================================ */
+
+/* Display inline for forms */
+
+/* Icon sizes */
+
+/* Small margin utilities */
+
+/* Small font utilities */
+
+/* Audit log specific */
+
+/* Onboarding specific (using CSS variables) */
+
+/* ============================================
+   BUTTON VARIANTS (Danger)
+   ============================================ */
+.btn-danger {
+    background: var(--color-error-500);
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: var(--color-error-600);
+}
+
+/* ============================================
+   FORM ACTION LAYOUTS
+   ============================================ */
+
+/* ============================================
+   EMPTY STATE ICONS (Editor/Overlay context)
+   ============================================ */
+.empty-state-icon {
+    font-size: 3rem;
+    color: var(--ed-text-secondary, var(--color-govuk-grey-dark));
+    margin-bottom: 1rem;
+}
+
+/* ============================================
+   TEXT COLOR VARIANTS (Editor/Overlay)
+   ============================================ */
+
+/* ============================================
+   AI EMPTY STATE
+   ============================================ */
+
+/* ============================================
+   CIVICONE INLINE STYLE FIXES
+   Added to comply with pre-commit hook
+   ============================================ */
+
+/* Honeypot field - hidden off-screen for bot protection */
+.civicone-honeypot {
+    position: absolute;
+    left: -9999px;
+}
+
+/* GOV.UK styled card with left accent border */
+.civicone-card-bordered-accent {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+/* GOV.UK styled card with simple border (legal hub) */
+.civicone-card-bordered-full {
+    border: 1px solid #b1b4b6;
+    height: 100%;
+}
+
+/* Danger zone section styling */
+.civicone-danger-zone {
+    border: 2px solid #d4351c;
+    background: #fef7f7;
+}
+
+/* Danger zone heading color */
+.civicone-danger-heading {
+    color: #d4351c;
+}
+
+/* Secondary text color (GOV.UK grey) */
+.civicone-text-secondary {
+    color: #505a5f;
+}
+
+/* Max width container for feed posts */
+.civicone-max-width-800 {
+    max-width: 800px;
+}
+
+/* Tag inline styling for external badge */
+.civicone-tag-inline-small {
+    margin-left: 4px;
+    font-size: 0.7em;
+}
+
+/* Notification item with dynamic border (unread state) */
+.civicone-notification-item {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #b1b4b6;
+}
+
+/* Notification item - unread state (blue accent) */
+.civicone-notification-item--unread {
+    border-left-color: #1d70b8;
+}
+
+/* Progress bar fill colors for impact report */
+.civicone-progress-bar-fill--blue {
+    background-color: #1d70b8;
+}
+
+.civicone-progress-bar-fill--green {
+    background-color: #00703c;
+}
+
+.civicone-progress-bar-fill--pink {
+    background-color: #d53880;
+}

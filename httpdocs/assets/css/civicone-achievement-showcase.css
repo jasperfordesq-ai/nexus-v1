@@ -122,7 +122,7 @@
 }
 
 .badge-card.legendary {
-    border-color: #4c2c92;
+    border-color: var(--color-rarity-epic, #4c2c92);
     border-width: 2px;
 }
 

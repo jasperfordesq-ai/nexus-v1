@@ -141,7 +141,7 @@ html {
 /* Floating Holographic Orbs */
 .holo-orb {
     position: fixed;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(80px);
     opacity: 0.4;
     pointer-events: none;
@@ -267,7 +267,7 @@ html {
 .article-author-avatar {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--article-primary), var(--article-secondary));
     display: flex;
     align-items: center;

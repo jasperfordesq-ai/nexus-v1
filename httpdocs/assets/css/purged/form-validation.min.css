@@ -1,1 +1,430 @@
-@keyframes form-shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-6px)}20%,40%,60%,80%{transform:translateX(6px)}}.is-invalid,.has-error input,.has-error select,.has-error textarea{border-color:var(--color-danger) !important;box-shadow:0 0 0 3px var(--color-red-alpha-15) !important}.is-invalid:focus,.has-error input:focus{animation:form-shake var(--transition-slow) var(--ease-out)}@keyframes form-checkmark-draw{0%{stroke-dashoffset:24;opacity:0}50%{opacity:1}100%{stroke-dashoffset:0;opacity:1}}.is-valid,.has-success input,.has-success select,.has-success textarea{border-color:var(--color-success) !important;box-shadow:0 0 0 3px var(--color-green-500-alpha-15) !important}.is-valid ~ .form-validation-icon,.is-invalid ~ .form-validation-icon{opacity:1}.is-valid ~ .form-validation-icon--success svg{animation:form-checkmark-draw 0.4s var(--ease-out) forwards}@media (prefers-reduced-motion:reduce){.is-invalid:focus{animation:none}.is-valid ~ .form-validation-icon--success svg{animation:none;stroke-dashoffset:0;opacity:1}}@media (forced-colors:active){.is-invalid{border:2px solid LinkText}.is-valid{border:2px solid LinkText}}
+/**
+ * Form Validation Animations
+ * Shake on error, checkmark on success, smooth transitions
+ * Version: 2.0 - 2026-01-21 - Migrated to design tokens
+ *
+ * Features:
+ * - Shake animation for invalid fields
+ * - Checkmark animation for valid fields
+ * - Smooth border/shadow color transitions
+ * - Error message slide-in
+ * - Success state glow
+ * - Dark mode support
+ */
+
+/* ==========================================================================
+   Base Form Field States
+   ========================================================================== */
+
+/* Input/select/textarea base transition */
+.form-control,
+.form-input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+select,
+textarea {
+    transition:
+        border-color var(--transition-fast) var(--ease-out),
+        box-shadow var(--transition-fast) var(--ease-out),
+        background-color var(--transition-fast) var(--ease-out);
+}
+
+/* ==========================================================================
+   Error State - Shake Animation
+   ========================================================================== */
+
+/* Shake keyframes */
+@keyframes form-shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+    20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+
+@keyframes form-shake-subtle {
+    0%, 100% { transform: translateX(0); }
+    25%, 75% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+}
+
+/* Error state styling */
+.is-invalid,
+.form-error,
+.has-error input,
+.has-error select,
+.has-error textarea,
+input:invalid:not(:placeholder-shown),
+select:invalid:not([data-placeholder]),
+textarea:invalid:not(:placeholder-shown) {
+    border-color: var(--color-danger) !important;
+    box-shadow: 0 0 0 3px var(--color-red-alpha-15) !important;
+}
+
+/* Shake on focus after error */
+.is-invalid:focus,
+.form-error:focus,
+.has-error input:focus {
+    animation: form-shake var(--transition-slow) var(--ease-out);
+}
+
+/* Shake trigger class (for JS-triggered shake) */
+.form-shake {
+    animation: form-shake var(--transition-slow) var(--ease-out);
+}
+
+.form-shake-subtle {
+    animation: form-shake-subtle var(--transition-base) var(--ease-out);
+}
+
+/* ==========================================================================
+   Success State - Checkmark Animation
+   ========================================================================== */
+
+/* Checkmark keyframes */
+@keyframes form-checkmark-draw {
+    0% {
+        stroke-dashoffset: 24;
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+}
+
+@keyframes form-success-pulse {
+    0% {
+        box-shadow: 0 0 0 0 var(--color-green-500-alpha-40);
+    }
+    70% {
+        box-shadow: 0 0 0 8px var(--color-green-500-alpha-0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 var(--color-green-500-alpha-0);
+    }
+}
+
+/* Success state styling */
+.is-valid,
+.form-success,
+.has-success input,
+.has-success select,
+.has-success textarea {
+    border-color: var(--color-success) !important;
+    box-shadow: 0 0 0 3px var(--color-green-500-alpha-15) !important;
+}
+
+/* Pulse on success */
+.form-success-pulse {
+    animation: form-success-pulse 0.6s var(--ease-out);
+}
+
+/* ==========================================================================
+   Validation Icon Container
+   ========================================================================== */
+
+/* Wrapper for input + icon */
+.form-validation-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Validation icon positioning */
+.form-validation-icon {
+    position: absolute;
+    right: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--space-5);
+    height: var(--space-5);
+    opacity: 0;
+    transition: opacity var(--transition-fast) var(--ease-out), transform var(--transition-fast) var(--ease-out);
+    pointer-events: none;
+}
+
+/* Show icon when validation state is set */
+.is-valid ~ .form-validation-icon,
+.is-invalid ~ .form-validation-icon,
+.form-success ~ .form-validation-icon,
+.form-error ~ .form-validation-icon {
+    opacity: 1;
+}
+
+/* Success checkmark */
+
+.is-valid ~ .form-validation-icon--success svg {
+    animation: form-checkmark-draw 0.4s var(--ease-out) forwards;
+}
+
+/* Error X icon */
+
+/* Make room for icon in input */
+.form-validation-wrapper .form-control,
+.form-validation-wrapper input {
+    padding-right: var(--space-10);
+}
+
+/* ==========================================================================
+   Error Message Animation
+   ========================================================================== */
+
+/* Error message keyframes */
+@keyframes form-error-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes form-error-fade-out {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+}
+
+/* Error message styling */
+.form-error-message,
+.error-message {
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+    margin-top: var(--space-1);
+    display: block;
+    animation: form-error-slide-in var(--transition-base) var(--ease-out);
+}
+
+/* Success message styling */
+
+.success-message {
+    color: var(--color-success);
+    font-size: var(--font-size-sm);
+    margin-top: var(--space-1);
+    display: block;
+    animation: form-error-slide-in var(--transition-base) var(--ease-out);
+}
+
+/* Fade out class for removing messages */
+.form-message-fade-out {
+    animation: form-error-fade-out var(--transition-fast) var(--ease-out) forwards;
+}
+
+/* ==========================================================================
+   Field Group Animation
+   ========================================================================== */
+
+/* Entire field group shake */
+.form-group.has-error,
+.field-group.has-error {
+    animation: form-shake-subtle 0.4s var(--ease-out);
+}
+
+/* Label color change */
+.form-group.has-error label,
+.field-group.has-error label {
+    color: var(--color-danger);
+    transition: color var(--transition-fast) var(--ease-out);
+}
+
+.form-group.has-success label,
+.field-group.has-success label {
+    color: var(--color-success);
+    transition: color var(--transition-fast) var(--ease-out);
+}
+
+/* ==========================================================================
+   Password Strength Indicator
+   ========================================================================== */
+
+.password-strength {
+    height: var(--space-1);
+    background: var(--color-gray-200);
+    border-radius: var(--radius-sm);
+    margin-top: var(--space-2);
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0;
+    border-radius: var(--radius-sm);
+    transition: width var(--transition-base) var(--ease-out), background-color var(--transition-base) var(--ease-out);
+}
+
+/* ==========================================================================
+   Character Counter
+   ========================================================================== */
+
+.char-counter {
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+    text-align: right;
+    margin-top: var(--space-1);
+    transition: color var(--transition-fast) var(--ease-out);
+}
+
+.char-counter.warning {
+    color: var(--color-warning);
+}
+
+.char-counter.error {
+    color: var(--color-danger);
+    font-weight: var(--font-weight-medium);
+}
+
+/* ==========================================================================
+   Required Field Indicator
+   ========================================================================== */
+
+/* Pulse animation for required empty fields on submit attempt */
+
+/* ==========================================================================
+   Submit Button States
+   ========================================================================== */
+
+/* Button loading state */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: var(--space-5);
+    height: var(--space-5);
+    top: 50%;
+    left: 50%;
+    margin: calc(var(--space-5) / -2) 0 0 calc(var(--space-5) / -2);
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: var(--radius-full);
+    animation: btn-spin 0.8s linear infinite;
+}
+
+@keyframes btn-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Button success state */
+
+/* Button error state */
+
+/* ==========================================================================
+   Inline Validation (Real-time)
+   ========================================================================== */
+
+/* Typing indicator */
+.form-typing {
+    border-color: var(--color-info) !important;
+    box-shadow: 0 0 0 3px var(--color-blue-alpha-10) !important;
+}
+
+/* Validating state */
+
+/* ==========================================================================
+   Dark Mode
+   ========================================================================== */
+
+[data-theme="dark"] .is-invalid,
+[data-theme="dark"] .form-error,
+[data-theme="dark"] .has-error input {
+    border-color: var(--color-red-400) !important;
+    box-shadow: 0 0 0 3px var(--color-red-400-alpha-20) !important;
+}
+
+[data-theme="dark"] .is-valid,
+[data-theme="dark"] .form-success,
+[data-theme="dark"] .has-success input {
+    border-color: var(--color-green-400) !important;
+    box-shadow: 0 0 0 3px var(--color-green-400-alpha-20) !important;
+}
+
+[data-theme="dark"] .form-error-message,
+[data-theme="dark"] .error-message {
+    color: var(--color-red-400);
+}
+
+
+[data-theme="dark"] .success-message {
+    color: var(--color-green-400);
+}
+
+[data-theme="dark"] .form-group.has-error label {
+    color: var(--color-red-400);
+}
+
+[data-theme="dark"] .form-group.has-success label {
+    color: var(--color-green-400);
+}
+
+[data-theme="dark"] .password-strength {
+    background: var(--color-gray-200);
+}
+
+[data-theme="dark"] .char-counter {
+    color: var(--color-gray-400);
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .form-shake,
+    .form-shake-subtle,
+    .is-invalid:focus,
+    .form-error:focus,
+    .form-group.has-error {
+        animation: none;
+    }
+
+    .form-error-message {
+        animation: none;
+    }
+
+    .is-valid ~ .form-validation-icon--success svg {
+        animation: none;
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+
+    .form-success-pulse {
+        animation: none;
+    }
+}
+
+/* ==========================================================================
+   Accessibility - High Contrast
+   ========================================================================== */
+
+@media (forced-colors: active) {
+    .is-invalid,
+    .form-error {
+        border: 2px solid LinkText;
+    }
+
+    .is-valid,
+    .form-success {
+        border: 2px solid LinkText;
+    }
+}
