@@ -44,6 +44,26 @@
                 }
             }
 
+            /* ===================================
+               MAIN LISTINGS GRID
+               Extracted from inline styles for mobile overflow fix
+               ================================= */
+            .listings-main-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 30px;
+                margin-top: 40px;
+            }
+
+            /* Mobile: single column to prevent horizontal overflow */
+            @media (max-width: 768px) {
+                .listings-main-grid {
+                    grid-template-columns: 1fr;
+                    gap: 16px;
+                    margin-top: 24px;
+                }
+            }
+
             /* Glass Search Card - Light Mode */
             #listings-index-glass-wrapper .glass-search-card {
                 margin-top: 30px !important;
