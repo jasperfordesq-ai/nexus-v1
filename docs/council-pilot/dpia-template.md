@@ -222,7 +222,7 @@ This DPIA does not cover:
 
 | ID | Risk Description | Likelihood | Impact | Risk Score | Mitigation |
 |----|------------------|------------|--------|------------|------------|
-| R1 | Unauthorised access to user accounts | 2 | 3 | 6 (Medium) | Strong passwords, rate limiting, session management, TBC: MFA |
+| R1 | Unauthorised access to user accounts | 2 | 3 | 6 (Medium) | Strong passwords, rate limiting, session management, TOTP-based 2FA |
 | R2 | Data breach via SQL injection | 1 | 5 | 5 (Medium) | Prepared statements throughout, WAF |
 | R3 | Loss of data availability | 2 | 3 | 6 (Medium) | Daily backups, tested restore procedure |
 | R4 | Excessive data collection | 2 | 2 | 4 (Low) | Data minimisation review, optional fields clearly marked |
@@ -283,7 +283,7 @@ Acceptable for pilot with:
 | Encryption at rest | Database TDE, disk encryption | [TO CONFIRM] |
 | Access control | RBAC with principle of least privilege | Implemented |
 | Authentication | Password hashing (bcrypt), session management | Implemented |
-| Multi-factor authentication | TBC | [TO CONFIRM] |
+| Multi-factor authentication | TOTP-based 2FA with authenticator apps | Implemented |
 | Audit logging | Comprehensive admin and security logging | Implemented |
 | Backup encryption | AES-256 encrypted backups | [TO CONFIRM] |
 | Vulnerability management | An independent penetration test must be completed before go-live with real users | [TO SCHEDULE] |
@@ -398,7 +398,7 @@ This DPIA must be reviewed if:
 | A3 | Staff training delivery | HR / DPO | [DATE] | Not Started |
 | A4 | Incident response procedure | IT Security | [DATE] | Not Started |
 | A5 | Backup encryption confirmation | IT Ops | [DATE] | Not Started |
-| A6 | MFA implementation status | IT Dev | [DATE] | Not Started |
+| A6 | Configure 2FA enforcement policy | IT Admin | [DATE] | Not Started |
 | A7 | Third-party DPA review | Legal | [DATE] | Not Started |
 
 ---

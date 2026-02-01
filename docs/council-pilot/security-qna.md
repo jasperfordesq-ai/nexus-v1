@@ -78,20 +78,22 @@ This document provides pre-completed responses to common security questionnaire 
 
 ### 2.2 Is multi-factor authentication (MFA) supported?
 
-**Response:** TBC
+**Response:** Yes. Two-factor authentication (2FA) is implemented using Time-based One-Time Passwords (TOTP).
 
-MFA implementation status requires confirmation. Code review did not identify TOTP or other MFA mechanisms in the reviewed authentication flow.
+**Features:**
 
-**Pilot Mitigation (pending MFA implementation):**
-For the pilot phase, the following compensating controls are recommended:
-- Enforce strong password policy (minimum 12 characters, complexity requirements)
-- Enable login rate limiting (5 attempts / 15-minute lockout)
-- Require IP allowlisting for administrative access where feasible
-- Monitor failed login attempts via audit logs
-- Brief pilot users on password hygiene and phishing awareness
-- Consider network-level controls (VPN requirement for admin access)
+- TOTP-based 2FA compatible with standard authenticator apps (Google Authenticator, Microsoft Authenticator, Authy, etc.)
+- User self-service enrollment via account settings
+- QR code provisioning for easy setup
+- Backup/recovery codes for account recovery
+- Admin ability to require 2FA for specific roles or all users
+- 2FA status visible in admin user management
 
-These measures reduce risk during pilot while MFA implementation is confirmed or completed.
+**Recommended configuration for pilots:**
+
+- Require 2FA for all admin and tenant admin accounts
+- Encourage 2FA for all users handling sensitive data
+- Provide user guidance on authenticator app setup
 
 ### 2.3 What access control model is used?
 
@@ -494,7 +496,7 @@ See Rate Limiting Implementation Plan for application-level roadmap.
 
 | Category | Status | Notes |
 |----------|--------|-------|
-| Authentication | Implemented | MFA TBC, mitigations recommended |
+| Authentication | Implemented | TOTP-based 2FA available |
 | Encryption (transit) | Deployer config | TLS 1.2+ required |
 | Encryption (rest) | Deployer config | Database TDE recommended |
 | Access control | Implemented | RBAC hierarchy |
