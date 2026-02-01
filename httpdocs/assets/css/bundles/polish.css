@@ -525,8 +525,16 @@
 /* Listings grid skeleton container */
 .listings-skeleton-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: 1fr; /* Mobile-first: single column */
+    gap: 16px;
+}
+
+/* Desktop: restore multi-column layout above safe breakpoint */
+@media (min-width: 640px) {
+    .listings-skeleton-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+    }
 }
 
 /* ==============================================
