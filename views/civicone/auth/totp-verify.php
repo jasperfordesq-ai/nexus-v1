@@ -61,6 +61,20 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                        autofocus>
             </div>
 
+            <div class="govuk-form-group">
+                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                    <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="remember-device" name="remember_device" type="checkbox" value="1">
+                        <label class="govuk-label govuk-checkboxes__label" for="remember-device">
+                            Remember this device for 30 days
+                        </label>
+                        <div id="remember-device-hint" class="govuk-hint govuk-checkboxes__hint">
+                            Skip two-factor authentication on this browser for 30 days
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true">
                 Verify and sign in
             </button>

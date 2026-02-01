@@ -376,6 +376,8 @@ $router->add('GET', '/auth/2fa/backup-codes', 'Nexus\Controllers\TotpController@
 $router->add('POST', '/auth/2fa/backup-codes/regenerate', 'Nexus\Controllers\TotpController@regenerateBackupCodes');
 $router->add('GET', '/settings/2fa', 'Nexus\Controllers\TotpController@settings');
 $router->add('POST', '/settings/2fa/disable', 'Nexus\Controllers\TotpController@disable');
+$router->add('POST', '/settings/2fa/devices/revoke', 'Nexus\Controllers\TotpController@revokeDevice');
+$router->add('POST', '/settings/2fa/devices/revoke-all', 'Nexus\Controllers\TotpController@revokeAllDevices');
 
 // Search
 $router->add('GET', '/search', 'Nexus\Controllers\SearchController@index');

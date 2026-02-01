@@ -76,6 +76,60 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 
+            <h2 class="govuk-heading-m">Trusted devices</h2>
+
+            <p class="govuk-body">
+                These devices can skip two-factor authentication for 30 days.
+            </p>
+
+            <?php if (!empty($trusted_devices)): ?>
+                <table class="govuk-table govuk-!-margin-bottom-4">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header">Device</th>
+                            <th scope="col" class="govuk-table__header">Added</th>
+                            <th scope="col" class="govuk-table__header">Last used</th>
+                            <th scope="col" class="govuk-table__header">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        <?php foreach ($trusted_devices as $device): ?>
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell"><?= htmlspecialchars($device['device_name']) ?></td>
+                                <td class="govuk-table__cell"><?= date('j M Y', strtotime($device['trusted_at'])) ?></td>
+                                <td class="govuk-table__cell">
+                                    <?= $device['last_used_at'] ? date('j M Y', strtotime($device['last_used_at'])) : 'Never' ?>
+                                </td>
+                                <td class="govuk-table__cell">
+                                    <form action="<?= $basePath ?>/settings/2fa/devices/revoke" method="POST">
+                                        <?= \Nexus\Core\Csrf::input() ?>
+                                        <input type="hidden" name="device_id" value="<?= $device['id'] ?>">
+                                        <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button" onclick="return confirm('Are you sure you want to remove this device?')">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+                <?php if (count($trusted_devices) > 1): ?>
+                    <form action="<?= $basePath ?>/settings/2fa/devices/revoke-all" method="POST" class="govuk-!-margin-bottom-6">
+                        <?= \Nexus\Core\Csrf::input() ?>
+                        <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button" onclick="return confirm('Are you sure you want to remove all trusted devices? You will need to verify 2FA on your next login.')">
+                            Remove all trusted devices
+                        </button>
+                    </form>
+                <?php endif; ?>
+            <?php else: ?>
+                <p class="govuk-body govuk-!-margin-bottom-6">
+                    <em>No trusted devices. When you sign in and select "Remember this device for 30 days", it will appear here.</em>
+                </p>
+            <?php endif; ?>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
             <div class="govuk-inset-text">
                 <h3 class="govuk-heading-s govuk-!-margin-bottom-1">2FA is mandatory</h3>
                 <p class="govuk-body govuk-!-margin-bottom-0">

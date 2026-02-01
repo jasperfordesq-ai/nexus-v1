@@ -851,6 +851,36 @@
     letter-spacing: 0.3em;
 }
 
+.verify-remember-device {
+    margin-bottom: 20px;
+    text-align: left;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.verify-remember-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #334155;
+}
+
+.verify-remember-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #6366f1;
+}
+
+.verify-remember-hint {
+    margin: 8px 0 0 28px;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
 .verify-submit-btn {
     width: 100%;
     padding: 16px;
