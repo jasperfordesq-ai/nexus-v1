@@ -213,11 +213,27 @@
                 hideStyles.remove();
             }
 
-            // CRITICAL: Force clear any scroll-blocking styles AND enable scrolling
-            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix with !important
-            document.documentElement.style.cssText = 'overflow-y: scroll !important; overflow-x: hidden !important; height: 100% !important;';
-            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix with !important
-            document.body.style.cssText = 'overflow-y: auto !important; overflow-x: hidden !important; height: auto !important; position: static !important;';
+            // CRITICAL: Clear inline styles that may block scroll
+            // DO NOT set height/overflow on html - let CSS handle it
+            // Only clear problematic inline styles, don't add new ones
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.documentElement.style.removeProperty('overflow');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.documentElement.style.removeProperty('overflow-y');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.documentElement.style.removeProperty('overflow-x');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.documentElement.style.removeProperty('height');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('overflow');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('overflow-y');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('overflow-x');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('height');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('position');
 
             // Remove any scroll-blocking event listeners
             document.body.onwheel = null;
