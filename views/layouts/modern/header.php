@@ -59,6 +59,8 @@ try {
 
 <head>
     <meta charset="UTF-8">
+    <!-- SW Kill Switch - MUST be first script, runs if ?nosw=1 present -->
+    <script src="<?= $assetBase ?>/assets/js/sw-killswitch.js?v=<?= $cssVersionTimestamp ?>"></script>
     <!-- Design Tokens MUST load first - CSS variables used by all other stylesheets -->
     <!-- NOTE: Using non-minified - minified causes visual problems (2026-01-25) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/design-tokens.css?v=<?= $cssVersionTimestamp ?>">
