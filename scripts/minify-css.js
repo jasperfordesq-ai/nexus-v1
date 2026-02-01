@@ -87,6 +87,7 @@ const cssFiles = [
     'nexus-modern-footer.css',
     // Auth pages
     'auth.css',
+    'totp.css',
     // Post components
     'post-card.css',
     'feed-item.css',

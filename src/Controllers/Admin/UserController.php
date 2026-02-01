@@ -679,4 +679,46 @@ class UserController
         header('Location: ' . TenantContext::getBasePath() . '/admin/users?super_admin_revoked=1');
         exit;
     }
+
+    /**
+     * Reset 2FA for a user who is locked out
+     * POST /admin/users/{id}/reset-2fa
+     */
+    public function reset2fa(int $id): void
+    {
+        $this->requireAdmin();
+        Csrf::verifyOrDie();
+
+        $targetUser = User::findById($id);
+
+        if (!$targetUser) {
+            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=user_not_found');
+            exit;
+        }
+
+        // Check if current user can manage the target user
+        if (!AdminAuth::canManageUser($targetUser)) {
+            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=insufficient_privileges');
+            exit;
+        }
+
+        $reason = trim($_POST['reason'] ?? '');
+
+        if (empty($reason)) {
+            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $id . '/edit?error=2fa_reset_reason_required');
+            exit;
+        }
+
+        $result = \Nexus\Services\TotpService::adminReset($id, $_SESSION['user_id'], $reason);
+
+        if ($result['success']) {
+            // Log the action
+            \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'reset_2fa', "Reset 2FA for user #{$id}: {$targetUser['email']} - Reason: {$reason}");
+
+            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $id . '/edit?2fa_reset=1');
+        } else {
+            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $id . '/edit?error=' . urlencode($result['error'] ?? '2fa_reset_failed'));
+        }
+        exit;
+    }
 }

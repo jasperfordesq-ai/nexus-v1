@@ -225,6 +225,10 @@ $router->add('POST', '/api/auth/refresh-token', 'Nexus\Controllers\Api\AuthContr
 $router->add('POST', '/api/auth/validate-token', 'Nexus\Controllers\Api\AuthController@validateToken');
 $router->add('GET', '/api/auth/validate-token', 'Nexus\Controllers\Api\AuthController@validateToken');
 
+// TOTP 2FA API
+$router->add('POST', '/api/totp/verify', 'Nexus\Controllers\Api\TotpApiController@verify');
+$router->add('GET', '/api/totp/status', 'Nexus\Controllers\Api\TotpApiController@status');
+
 // Mobile App API (version checking, updates)
 $router->add('POST', '/api/app/check-version', 'Nexus\Controllers\Api\AppController@checkVersion');
 $router->add('GET', '/api/app/version', 'Nexus\Controllers\Api\AppController@version');
@@ -362,6 +366,16 @@ $router->add('GET', '/password/forgot', 'Nexus\Controllers\AuthController@showFo
 $router->add('POST', '/password/email', 'Nexus\Controllers\AuthController@sendResetLink');
 $router->add('GET', '/password/reset', 'Nexus\Controllers\AuthController@showReset');
 $router->add('POST', '/password/reset', 'Nexus\Controllers\AuthController@resetPassword');
+
+// Two-Factor Authentication (TOTP)
+$router->add('GET', '/auth/2fa', 'Nexus\Controllers\TotpController@showVerify');
+$router->add('POST', '/auth/2fa', 'Nexus\Controllers\TotpController@verify');
+$router->add('GET', '/auth/2fa/setup', 'Nexus\Controllers\TotpController@showSetup');
+$router->add('POST', '/auth/2fa/setup', 'Nexus\Controllers\TotpController@completeSetup');
+$router->add('GET', '/auth/2fa/backup-codes', 'Nexus\Controllers\TotpController@showBackupCodes');
+$router->add('POST', '/auth/2fa/backup-codes/regenerate', 'Nexus\Controllers\TotpController@regenerateBackupCodes');
+$router->add('GET', '/settings/2fa', 'Nexus\Controllers\TotpController@settings');
+$router->add('POST', '/settings/2fa/disable', 'Nexus\Controllers\TotpController@disable');
 
 // Search
 $router->add('GET', '/search', 'Nexus\Controllers\SearchController@index');
@@ -1237,6 +1251,7 @@ $router->add('POST', '/admin/users/suspend', 'Nexus\Controllers\Admin\UserContro
 $router->add('POST', '/admin/users/ban', 'Nexus\Controllers\Admin\UserController@ban');
 $router->add('POST', '/admin/users/reactivate', 'Nexus\Controllers\Admin\UserController@reactivate');
 $router->add('POST', '/admin/users/revoke-super-admin', 'Nexus\Controllers\Admin\UserController@revokeSuperAdmin');
+$router->add('POST', '/admin/users/{id}/reset-2fa', 'Nexus\Controllers\Admin\UserController@reset2fa');
 $router->add('POST', '/admin/approve-user', 'Nexus\Controllers\Admin\UserController@approve');
 $router->add('POST', '/admin/users/badges/add', 'Nexus\Controllers\Admin\UserController@addBadge');
 $router->add('POST', '/admin/users/badges/remove', 'Nexus\Controllers\Admin\UserController@removeBadge');
