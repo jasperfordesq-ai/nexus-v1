@@ -85,6 +85,11 @@ class TotpController
         // 2FA successful - complete login
         $this->completeLogin($userId);
 
+        // Trust this device if requested
+        if (!empty($_POST['remember_device'])) {
+            TotpService::trustDevice($userId);
+        }
+
         // Warn if backup codes are low
         if ($useBackupCode && isset($result['codes_remaining']) && $result['codes_remaining'] <= 3) {
             $_SESSION['flash_warning'] = "You have only {$result['codes_remaining']} backup codes remaining. Consider generating new ones.";
@@ -295,6 +300,8 @@ class TotpController
             'title' => '2FA Settings',
             'is_enabled' => TotpService::isEnabled($userId),
             'backup_codes_remaining' => TotpService::getBackupCodeCount($userId),
+            'trusted_devices' => TotpService::getTrustedDevices($userId),
+            'trusted_device_count' => TotpService::getTrustedDeviceCount($userId),
             'flash_success' => $_SESSION['flash_success'] ?? null,
             'flash_error' => $_SESSION['flash_error'] ?? null,
             'csrf_token' => Csrf::token()
@@ -315,6 +322,59 @@ class TotpController
     {
         // 2FA is mandatory - disabling is not allowed
         $_SESSION['flash_error'] = 'Two-factor authentication is mandatory and cannot be disabled.';
+        header('Location: ' . TenantContext::getBasePath() . '/settings/2fa');
+        exit;
+    }
+
+    /**
+     * Revoke a specific trusted device
+     * POST /settings/2fa/devices/{id}/revoke
+     */
+    public function revokeDevice(): void
+    {
+        Csrf::verifyOrDie();
+
+        if (empty($_SESSION['user_id'])) {
+            header('Location: ' . TenantContext::getBasePath() . '/login');
+            exit;
+        }
+
+        $deviceId = (int)($_POST['device_id'] ?? 0);
+
+        if ($deviceId > 0) {
+            $result = TotpService::revokeDevice($_SESSION['user_id'], $deviceId, 'user_action');
+            if ($result) {
+                $_SESSION['flash_success'] = 'Device has been removed from trusted devices.';
+            } else {
+                $_SESSION['flash_error'] = 'Failed to remove device.';
+            }
+        }
+
+        header('Location: ' . TenantContext::getBasePath() . '/settings/2fa');
+        exit;
+    }
+
+    /**
+     * Revoke all trusted devices
+     * POST /settings/2fa/devices/revoke-all
+     */
+    public function revokeAllDevices(): void
+    {
+        Csrf::verifyOrDie();
+
+        if (empty($_SESSION['user_id'])) {
+            header('Location: ' . TenantContext::getBasePath() . '/login');
+            exit;
+        }
+
+        $count = TotpService::revokeAllDevices($_SESSION['user_id'], 'user_action');
+
+        if ($count > 0) {
+            $_SESSION['flash_success'] = "Removed {$count} trusted device(s). You will need to verify on next login.";
+        } else {
+            $_SESSION['flash_error'] = 'No trusted devices to remove.';
+        }
+
         header('Location: ' . TenantContext::getBasePath() . '/settings/2fa');
         exit;
     }

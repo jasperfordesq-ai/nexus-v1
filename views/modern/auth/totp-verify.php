@@ -54,6 +54,15 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                            placeholder="000000"
                            autofocus
                            required>
+
+                    <div class="verify-remember-device">
+                        <label class="verify-remember-label">
+                            <input type="checkbox" name="remember_device" value="1" class="verify-remember-checkbox">
+                            <span>Remember this device for 30 days</span>
+                        </label>
+                        <p class="verify-remember-hint">Skip 2FA on this browser for 30 days</p>
+                    </div>
+
                     <button type="submit" class="verify-submit-btn">
                         Verify Code
                     </button>

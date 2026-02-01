@@ -22,6 +22,8 @@ class TotpService
     private const MAX_ATTEMPTS = 5;
     private const LOCKOUT_SECONDS = 900; // 15 minutes
     private const ISSUER = 'Project NEXUS';
+    private const TRUSTED_DEVICE_DAYS = 30;
+    private const TRUSTED_DEVICE_COOKIE = 'nexus_trusted_device';
 
     /**
      * Generate a new TOTP secret
@@ -606,5 +608,227 @@ class TotpService
         }
 
         return substr($code, 0, 4) . '-' . substr($code, 4);
+    }
+
+    // =========================================================================
+    // TRUSTED DEVICES ("Remember This Device")
+    // =========================================================================
+
+    /**
+     * Check if current device is trusted for this user
+     *
+     * @param int $userId
+     * @return bool
+     */
+    public static function isTrustedDevice(int $userId): bool
+    {
+        $token = $_COOKIE[self::TRUSTED_DEVICE_COOKIE] ?? null;
+        if (!$token) {
+            return false;
+        }
+
+        $tenantId = TenantContext::getId();
+        $tokenHash = hash('sha256', $token);
+
+        $stmt = Database::query(
+            "SELECT id FROM user_trusted_devices
+             WHERE user_id = ? AND tenant_id = ? AND device_token_hash = ?
+             AND is_revoked = 0 AND expires_at > NOW()",
+            [$userId, $tenantId, $tokenHash]
+        );
+        $device = $stmt->fetch();
+
+        if ($device) {
+            // Update last used timestamp
+            Database::query(
+                "UPDATE user_trusted_devices SET last_used_at = NOW() WHERE id = ?",
+                [$device['id']]
+            );
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Trust the current device for this user
+     *
+     * @param int $userId
+     * @return bool Success
+     */
+    public static function trustDevice(int $userId): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        // Generate secure random token
+        $token = bin2hex(random_bytes(32));
+        $tokenHash = hash('sha256', $token);
+
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+        $deviceName = self::parseDeviceName($userAgent);
+        $expiresAt = date('Y-m-d H:i:s', time() + (self::TRUSTED_DEVICE_DAYS * 24 * 60 * 60));
+
+        try {
+            Database::query(
+                "INSERT INTO user_trusted_devices
+                 (user_id, tenant_id, device_token_hash, device_name, ip_address, user_agent, expires_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [$userId, $tenantId, $tokenHash, $deviceName, $ip, $userAgent, $expiresAt]
+            );
+
+            // Set cookie
+            $cookieExpires = time() + (self::TRUSTED_DEVICE_DAYS * 24 * 60 * 60);
+            $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+            $basePath = TenantContext::getBasePath() ?: '/';
+
+            setcookie(
+                self::TRUSTED_DEVICE_COOKIE,
+                $token,
+                [
+                    'expires' => $cookieExpires,
+                    'path' => $basePath,
+                    'secure' => $secure,
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ]
+            );
+
+            return true;
+        } catch (\Exception $e) {
+            error_log("Failed to trust device for user $userId: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get all trusted devices for a user
+     *
+     * @param int $userId
+     * @return array
+     */
+    public static function getTrustedDevices(int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $stmt = Database::query(
+            "SELECT id, device_name, ip_address, trusted_at, last_used_at, expires_at
+             FROM user_trusted_devices
+             WHERE user_id = ? AND tenant_id = ? AND is_revoked = 0 AND expires_at > NOW()
+             ORDER BY last_used_at DESC",
+            [$userId, $tenantId]
+        );
+
+        return $stmt->fetchAll() ?: [];
+    }
+
+    /**
+     * Get count of trusted devices for a user
+     *
+     * @param int $userId
+     * @return int
+     */
+    public static function getTrustedDeviceCount(int $userId): int
+    {
+        $tenantId = TenantContext::getId();
+
+        $stmt = Database::query(
+            "SELECT COUNT(*) as count FROM user_trusted_devices
+             WHERE user_id = ? AND tenant_id = ? AND is_revoked = 0 AND expires_at > NOW()",
+            [$userId, $tenantId]
+        );
+
+        return (int)($stmt->fetch()['count'] ?? 0);
+    }
+
+    /**
+     * Revoke a specific trusted device
+     *
+     * @param int $userId
+     * @param int $deviceId
+     * @param string $reason
+     * @return bool
+     */
+    public static function revokeDevice(int $userId, int $deviceId, string $reason = 'user_action'): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        $result = Database::query(
+            "UPDATE user_trusted_devices
+             SET is_revoked = 1, revoked_at = NOW(), revoked_reason = ?
+             WHERE id = ? AND user_id = ? AND tenant_id = ?",
+            [$reason, $deviceId, $userId, $tenantId]
+        );
+
+        return $result->rowCount() > 0;
+    }
+
+    /**
+     * Revoke all trusted devices for a user
+     *
+     * @param int $userId
+     * @param string $reason
+     * @return int Number of devices revoked
+     */
+    public static function revokeAllDevices(int $userId, string $reason = 'user_action'): int
+    {
+        $tenantId = TenantContext::getId();
+
+        $result = Database::query(
+            "UPDATE user_trusted_devices
+             SET is_revoked = 1, revoked_at = NOW(), revoked_reason = ?
+             WHERE user_id = ? AND tenant_id = ? AND is_revoked = 0",
+            [$reason, $userId, $tenantId]
+        );
+
+        // Also clear the cookie
+        $basePath = TenantContext::getBasePath() ?: '/';
+        setcookie(self::TRUSTED_DEVICE_COOKIE, '', time() - 3600, $basePath);
+
+        return $result->rowCount();
+    }
+
+    /**
+     * Parse user agent string to get a human-readable device name
+     *
+     * @param string|null $userAgent
+     * @return string
+     */
+    private static function parseDeviceName(?string $userAgent): string
+    {
+        if (!$userAgent) {
+            return 'Unknown device';
+        }
+
+        $browser = 'Unknown browser';
+        $os = 'Unknown OS';
+
+        // Detect browser
+        if (strpos($userAgent, 'Firefox') !== false) {
+            $browser = 'Firefox';
+        } elseif (strpos($userAgent, 'Edg') !== false) {
+            $browser = 'Edge';
+        } elseif (strpos($userAgent, 'Chrome') !== false) {
+            $browser = 'Chrome';
+        } elseif (strpos($userAgent, 'Safari') !== false) {
+            $browser = 'Safari';
+        } elseif (strpos($userAgent, 'MSIE') !== false || strpos($userAgent, 'Trident') !== false) {
+            $browser = 'Internet Explorer';
+        }
+
+        // Detect OS (order matters - check mobile OSes first as they contain desktop OS strings)
+        if (strpos($userAgent, 'iPhone') !== false || strpos($userAgent, 'iPad') !== false) {
+            $os = 'iOS';
+        } elseif (strpos($userAgent, 'Android') !== false) {
+            $os = 'Android';
+        } elseif (strpos($userAgent, 'Windows') !== false) {
+            $os = 'Windows';
+        } elseif (strpos($userAgent, 'Mac') !== false) {
+            $os = 'macOS';
+        } elseif (strpos($userAgent, 'Linux') !== false) {
+            $os = 'Linux';
+        }
+
+        return "$browser on $os";
     }
 }
