@@ -259,6 +259,13 @@ body.messages-page {
     border-radius: var(--radius-md);
     background: var(--msg-bg);
     overflow: hidden;
+
+    /* Perf: Skip rendering for off-screen threads */
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 72px;
+
+    /* Perf: Limit repaint scope */
+    contain: layout paint;
 }
 
 [data-theme="dark"] .messages-thread-wrap {
@@ -1243,6 +1250,13 @@ body.messages-page {
     color: inherit;
     transition: all 0.3s ease;
     position: relative;
+
+    /* Perf: Skip rendering for off-screen threads */
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 76px;
+
+    /* Perf: Limit repaint scope */
+    contain: layout paint;
 }
 
 .holo-thread:hover {
@@ -2623,4 +2637,22 @@ body.messages-page {
     height: 1px;
     background: var(--holo-border);
     margin: var(--space-2) 0;
+}
+
+/* ============================================
+   TABLET PERFORMANCE OPTIMIZATIONS
+   Reduce blur on smaller screens for GPU savings
+   ============================================ */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .holo-sidebar {
+        /* Perf: Reduce blur on tablet for GPU savings (was 20px) */
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+    }
+
+    .holo-main {
+        /* Perf: Reduce blur on tablet for GPU savings (was 20px) */
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+    }
 }

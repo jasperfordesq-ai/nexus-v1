@@ -39,7 +39,7 @@
         transform var(--transition-base) cubic-bezier(0.34, 1.56, 0.64, 1),
         box-shadow var(--transition-base) var(--ease-out),
         border-color var(--transition-base) var(--ease-out);
-    will-change: transform, box-shadow;
+    /* Perf: will-change moved to :hover/:focus-visible to reduce GPU memory */
 }
 
 .card-hover:hover,
@@ -57,6 +57,24 @@
 .message-preview:hover,
 .notification-item:hover {
     transform: translateY(-4px);
+    will-change: transform, box-shadow;
+}
+
+.card-hover:focus-visible,
+.glass-card:focus-visible,
+.civic-card:focus-visible,
+.nexus-card:focus-visible,
+.feed-item:focus-visible,
+.post-card:focus-visible,
+.listing-card:focus-visible,
+.event-card:focus-visible,
+.group-card:focus-visible,
+.user-card:focus-visible,
+.resource-card:focus-visible,
+.blog-card:focus-visible,
+.message-preview:focus-visible,
+.notification-item:focus-visible {
+    will-change: transform, box-shadow;
 }
 
 /* ==========================================================================

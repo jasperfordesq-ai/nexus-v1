@@ -845,6 +845,13 @@
     border: 1px solid var(--effect-white-30);
     box-shadow: 0 var(--space-2) var(--space-8) var(--effect-black-10);
     transition: transform var(--transition-base), box-shadow 0.3s;
+
+    /* Perf: Skip rendering for off-screen cards */
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 280px;
+
+    /* Perf: Limit repaint scope */
+    contain: layout paint;
 }
 
 .achievement-card:hover {

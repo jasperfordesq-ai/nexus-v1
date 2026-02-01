@@ -4,17 +4,20 @@
 /* ============================================
    VOLUNTEERING INDEX - Shared Glass Pattern
    Uses nexus-* and glass-* classes for consistency
+   Phase C.1: Class alias .nexus-volunteering-glass-wrapper added for future ID migration
    ============================================ */
 
 /* Volunteering wrapper - scoped styles */
-#volunteering-glass-wrapper {
+#volunteering-glass-wrapper,
+.nexus-volunteering-glass-wrapper {
     padding: var(--space-6);
     max-width: 1400px;
     margin: 0 auto;
 }
 
 /* Welcome Hero - scoped to volunteering */
-#volunteering-glass-wrapper .nexus-welcome-hero {
+#volunteering-glass-wrapper .nexus-welcome-hero,
+.nexus-volunteering-glass-wrapper .nexus-welcome-hero {
     background: linear-gradient(135deg,
         var(--effect-emerald-12) 0%,
         var(--effect-emerald-600-12) 50%,

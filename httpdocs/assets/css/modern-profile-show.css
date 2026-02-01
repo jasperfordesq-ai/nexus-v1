@@ -643,3 +643,18 @@
 [data-theme="dark"] .reviews-empty-text {
     color: var(--color-gray-400);
 }
+
+/* =====================================================
+   REDUCED MOTION SUPPORT
+   Respects user preference for reduced motion (WCAG 2.1 AA)
+   ===================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .profile-online-indicator.online {
+        animation: none;
+    }
+
+    .glass-review-card,
+    .comment-reaction-picker__emoji {
+        transition: none;
+    }
+}

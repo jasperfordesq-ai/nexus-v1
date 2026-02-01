@@ -3,6 +3,7 @@
  * Glassmorphism design for Groups/Hubs pages
  * Created: 2026-01-17 (Recreated after cleanup)
  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ * Phase C.1: Class alias .nexus-groups-glass-wrapper added for future ID migration
  */
 
 /* ============================================
@@ -10,7 +11,8 @@
    ============================================ */
 
 /* Hubs Page - Pink/Magenta theme */
-#groups-glass-wrapper[data-page-type="hubs"] {
+#groups-glass-wrapper[data-page-type="hubs"],
+.nexus-groups-glass-wrapper[data-page-type="hubs"] {
     --primary-color: var(--color-pink-600);
     --primary-gradient-start: var(--color-pink-500);
     --primary-gradient-end: var(--color-pink-600);
@@ -19,7 +21,8 @@
 }
 
 /* Community Groups Page - Orange/Amber theme */
-#groups-glass-wrapper[data-page-type="community"] {
+#groups-glass-wrapper[data-page-type="community"],
+.nexus-groups-glass-wrapper[data-page-type="community"] {
     --primary-color: var(--color-amber-500);
     --primary-gradient-start: var(--color-amber-300);
     --primary-gradient-end: var(--color-amber-500);
@@ -30,7 +33,8 @@
 /* ============================================
    WRAPPER & BACKGROUND
    ============================================ */
-#groups-glass-wrapper {
+#groups-glass-wrapper,
+.nexus-groups-glass-wrapper {
     padding: var(--space-5);
     min-height: 70vh;
     position: relative;
@@ -299,7 +303,14 @@
     box-shadow:
         0 4px 20px var(--effect-black-6),
         inset 0 1px 0 var(--effect-white-40);
-    will-change: transform, box-shadow;
+
+    /* Perf: will-change moved to :hover to reduce GPU memory */
+    /* Perf: Skip rendering for off-screen cards */
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 380px;
+
+    /* Perf: Limit repaint scope */
+    contain: layout paint;
 }
 
 [data-theme="dark"] .glass-group-card {
@@ -319,6 +330,7 @@
         0 24px 70px var(--primary-glow, var(--effect-pink-600-25)),
         0 8px 30px var(--effect-black-12),
         0 0 0 3px var(--primary-glow, var(--effect-pink-600-15));
+    will-change: transform, box-shadow;
 }
 
 [data-theme="dark"] .glass-group-card:hover {

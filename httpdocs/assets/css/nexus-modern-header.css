@@ -1775,12 +1775,18 @@ body>* {
         background: linear-gradient(135deg,
                 var(--effect-white-95) 0%,
                 var(--color-gray-100-alpha-92) 100%);
+        /* Perf: Reduce blur on mobile for GPU savings (was 24px + saturate) */
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
     }
 
     [data-theme="dark"] .nexus-navbar {
         background: linear-gradient(135deg,
                 var(--color-slate-900-alpha-98) 0%,
                 var(--effect-slate-95) 100%);
+        /* Perf: Reduce blur on mobile for GPU savings */
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
     }
 
     /* Adjust body padding for content */
