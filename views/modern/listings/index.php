@@ -666,7 +666,4 @@ require __DIR__ . '/../../layouts/modern/header.php';
 </div><!-- #listings-index-glass-wrapper -->
 </div>
 
-<!-- Mobile Scroll Safety Fix - Route-specific for /listings -->
-<script src="/assets/js/listings-scroll-fix.min.js" defer></script>
-
 <?php require __DIR__ . '/../../layouts/modern/footer.php'; ?>
