@@ -8,6 +8,27 @@
     'use strict';
 
     // ============================================
+    // DEBUG STAMP - TEMPORARY (remove after confirming fix)
+    // ============================================
+    var INSTANT_LOAD_VERSION = 'v2026-02-01-scrollfix';
+    console.log('[NEXUS_INSTANT_LOAD] ' + INSTANT_LOAD_VERSION);
+
+    // Show debug badge if ?debug_instant=1
+    if (window.location.search.indexOf('debug_instant=1') !== -1) {
+        var badge = document.createElement('div');
+        badge.id = 'nexus-instant-load-debug-badge';
+        badge.textContent = 'instant-load ' + INSTANT_LOAD_VERSION;
+        badge.style.cssText = 'position:fixed;bottom:8px;left:8px;z-index:999999;background:#000;color:#0f0;font:10px monospace;padding:4px 8px;border-radius:4px;opacity:0.9;pointer-events:none;';
+        if (document.body) {
+            document.body.appendChild(badge);
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.appendChild(badge);
+            });
+        }
+    }
+
+    // ============================================
     // 1. HIDE EVERYTHING IMMEDIATELY
     // ============================================
 
