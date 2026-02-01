@@ -1,0 +1,1804 @@
+openapi: 3.0.3
+info:
+  title: Project NEXUS API
+  description: |
+    RESTful API for Project NEXUS - a multi-tenant community timebanking platform.
+
+    ## Authentication
+
+    The API supports two authentication methods:
+
+    1. **Bearer Token** (recommended for mobile apps and SPAs)
+       - Obtain tokens via `POST /api/auth/login`
+       - Include in requests: `Authorization: Bearer <token>`
+       - Refresh via `POST /api/auth/refresh-token` before expiry
+
+    2. **Session Cookie** (for web browsers)
+       - Cookies set automatically after login
+       - Include CSRF token in headers for mutating requests
+
+    ## Response Formats
+
+    **Success responses:**
+    ```json
+    {
+      "data": { ... },
+      "meta": { "pagination": { ... } }
+    }
+    ```
+
+    **Error responses:**
+    ```json
+    {
+      "errors": [
+        { "code": "ERROR_CODE", "message": "Human-readable message", "field": "optional_field" }
+      ]
+    }
+    ```
+
+    ## Rate Limiting
+
+    All endpoints include rate limit headers:
+    - `X-RateLimit-Limit`: Max requests per window
+    - `X-RateLimit-Remaining`: Remaining requests
+    - `X-RateLimit-Reset`: Unix timestamp when window resets
+
+    When rate limited, responses include `Retry-After` header.
+
+    ## Pagination
+
+    List endpoints support cursor-based pagination:
+    - `per_page`: Items per page (default 20, max 100)
+    - `cursor`: Cursor from previous response for next page
+
+    Response meta includes:
+    - `has_more`: Whether more items exist
+    - `cursor`: Cursor for next page (if has_more is true)
+
+  version: 2.0.0
+  contact:
+    name: Project NEXUS Support
+    url: https://project-nexus.ie
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://project-nexus.ie
+    description: Production
+  - url: https://hour-timebank.ie
+    description: Hour Timebank
+  - url: http://staging.timebank.local
+    description: Local Development
+
+tags:
+  - name: Auth
+    description: Authentication and session management
+  - name: WebAuthn
+    description: Passkey/biometric authentication
+  - name: TOTP
+    description: Two-factor authentication (TOTP/backup codes)
+  - name: Users
+    description: User profiles and preferences
+  - name: Listings
+    description: Service offers and requests
+  - name: Messages
+    description: Private messaging
+  - name: Events
+    description: Community events
+  - name: Groups
+    description: Community groups
+  - name: Connections
+    description: User connections/friends
+  - name: Wallet
+    description: Time credit transactions
+  - name: Notifications
+    description: User notifications
+  - name: Feed
+    description: Social feed
+  - name: Reviews
+    description: User reviews and trust
+  - name: Search
+    description: Unified search
+  - name: Volunteering
+    description: Volunteer opportunities
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token from /api/auth/login
+
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+      description: Session cookie (web browsers)
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+          example: "VALIDATION_REQUIRED_FIELD"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Email is required"
+        field:
+          type: string
+          description: Field name for validation errors
+          example: "email"
+      required:
+        - code
+        - message
+
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+      required:
+        - errors
+
+    PaginationMeta:
+      type: object
+      properties:
+        per_page:
+          type: integer
+          example: 20
+        has_more:
+          type: boolean
+          example: true
+        cursor:
+          type: string
+          nullable: true
+          example: "MTIzNDU2"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        avatar_url:
+          type: string
+          nullable: true
+          example: "/uploads/avatars/user_123.jpg"
+        bio:
+          type: string
+          nullable: true
+        skills:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        last_active_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    Listing:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 456
+        title:
+          type: string
+          example: "Guitar Lessons"
+        description:
+          type: string
+        type:
+          type: string
+          enum: [offer, request]
+        category:
+          type: string
+          example: "Music"
+        time_credits:
+          type: number
+          format: float
+          example: 1.5
+        status:
+          type: string
+          enum: [active, completed, cancelled]
+        user:
+          $ref: '#/components/schemas/User'
+        image_url:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+        sender_id:
+          type: integer
+        receiver_id:
+          type: integer
+        is_read:
+          type: boolean
+        is_voice:
+          type: boolean
+        voice_url:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        image_url:
+          type: string
+          nullable: true
+        attendee_count:
+          type: integer
+        my_status:
+          type: string
+          enum: [going, interested, not_going, null]
+          nullable: true
+        created_by:
+          $ref: '#/components/schemas/User'
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          example: "message"
+        title:
+          type: string
+        message:
+          type: string
+        link:
+          type: string
+          nullable: true
+        is_read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+          format: float
+        type:
+          type: string
+          enum: [credit, debit, transfer]
+        description:
+          type: string
+        from_user:
+          $ref: '#/components/schemas/User'
+        to_user:
+          $ref: '#/components/schemas/User'
+        listing:
+          $ref: '#/components/schemas/Listing'
+        status:
+          type: string
+          enum: [pending, completed, cancelled]
+        created_at:
+          type: string
+          format: date-time
+
+    LoginSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        user:
+          $ref: '#/components/schemas/User'
+        access_token:
+          type: string
+          description: Bearer token for API authentication
+        refresh_token:
+          type: string
+          description: Token to refresh access_token when it expires
+        token_type:
+          type: string
+          example: "Bearer"
+        expires_in:
+          type: integer
+          description: Access token expiry in seconds
+        refresh_expires_in:
+          type: integer
+          description: Refresh token expiry in seconds
+        is_mobile:
+          type: boolean
+          description: Whether mobile-optimized token expiry was used
+
+    TwoFactorRequiredResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        requires_2fa:
+          type: boolean
+          example: true
+        two_factor_token:
+          type: string
+          description: Token to use with /api/totp/verify endpoint
+          example: "abc123def456..."
+        methods:
+          type: array
+          items:
+            type: string
+            enum: [totp, backup_code]
+          description: Available 2FA methods
+        code:
+          type: string
+          example: "AUTH_2FA_REQUIRED"
+        message:
+          type: string
+          example: "Two-factor authentication required"
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            first_name:
+              type: string
+            email_masked:
+              type: string
+              example: "j*****@example.com"
+
+    WebAuthnChallengeResponse:
+      type: object
+      properties:
+        challenge:
+          type: string
+          description: Base64URL-encoded challenge
+        challenge_id:
+          type: string
+          description: Server-side challenge ID (for stateless verification)
+        rp:
+          type: object
+          properties:
+            name:
+              type: string
+            id:
+              type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            displayName:
+              type: string
+        pubKeyCredParams:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              alg:
+                type: integer
+        timeout:
+          type: integer
+        attestation:
+          type: string
+
+    WebAuthnAuthChallengeResponse:
+      type: object
+      properties:
+        challenge:
+          type: string
+          description: Base64URL-encoded challenge
+        challenge_id:
+          type: string
+          description: Server-side challenge ID (for stateless verification)
+        rpId:
+          type: string
+        timeout:
+          type: integer
+        userVerification:
+          type: string
+        allowCredentials:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              id:
+                type: string
+
+    WebAuthnCredential:
+      type: object
+      properties:
+        credential_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+
+  responses:
+    Unauthorized:
+      description: Authentication required or token invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            errors:
+              - code: "AUTH_TOKEN_MISSING"
+                message: "Authentication required"
+
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            errors:
+              - code: "AUTH_INSUFFICIENT_PERMISSIONS"
+                message: "You don't have permission to access this resource"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            errors:
+              - code: "RESOURCE_NOT_FOUND"
+                message: "Resource not found"
+
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          description: Seconds until rate limit resets
+          schema:
+            type: integer
+        X-RateLimit-Limit:
+          description: Max requests per window
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          description: Remaining requests (0)
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          description: Unix timestamp when limit resets
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            errors:
+              - code: "RATE_LIMIT_EXCEEDED"
+                message: "Rate limit exceeded. Please try again later."
+
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            errors:
+              - code: "VALIDATION_REQUIRED_FIELD"
+                message: "Title is required"
+                field: "title"
+
+paths:
+  # ============================================
+  # AUTH ENDPOINTS
+  # ============================================
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email and password
+      description: |
+        Authenticates user with email and password.
+
+        **Normal login flow:**
+        Returns access and refresh tokens for API authentication.
+
+        **2FA flow (if user has 2FA enabled):**
+        Returns `requires_2fa: true` with a `two_factor_token`. Client must then:
+        1. Show 2FA verification UI
+        2. Call `POST /api/totp/verify` with the `two_factor_token` and TOTP code
+        3. Receive access tokens after successful verification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: |
+            Login response. Check `requires_2fa` field:
+            - If `false` or absent: Login complete, tokens provided
+            - If `true`: 2FA required, use `two_factor_token` to complete auth
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/LoginSuccessResponse'
+                  - $ref: '#/components/schemas/TwoFactorRequiredResponse'
+              examples:
+                success:
+                  summary: Login successful (no 2FA)
+                  value:
+                    success: true
+                    user:
+                      id: 123
+                      first_name: "John"
+                      last_name: "Doe"
+                      email: "john@example.com"
+                    access_token: "eyJ..."
+                    refresh_token: "eyJ..."
+                    token_type: "Bearer"
+                    expires_in: 31536000
+                requires_2fa:
+                  summary: 2FA required
+                  value:
+                    success: false
+                    requires_2fa: true
+                    two_factor_token: "abc123..."
+                    methods: ["totp", "backup_code"]
+                    code: "AUTH_2FA_REQUIRED"
+                    message: "Two-factor authentication required"
+                    user:
+                      id: 123
+                      first_name: "John"
+                      email_masked: "j*****@example.com"
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /api/auth/refresh-token:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      description: Exchange refresh token for new access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+                  refresh_token:
+                    type: string
+                    description: New refresh token (if old one is expiring soon)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout and invalidate session
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  # ============================================
+  # TOTP 2FA ENDPOINTS
+  # ============================================
+  /api/totp/verify:
+    post:
+      tags: [TOTP]
+      summary: Verify TOTP code and complete login
+      description: |
+        Verify a TOTP code to complete 2FA authentication.
+
+        **Stateless flow (mobile/SPA):**
+        Send `two_factor_token` from login response along with the TOTP code.
+
+        **Session flow (browser):**
+        Send CSRF token - session state is used instead of two_factor_token.
+
+        On success, returns access and refresh tokens (same as login response).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                two_factor_token:
+                  type: string
+                  description: Token from login response (stateless flow)
+                code:
+                  type: string
+                  description: 6-digit TOTP code or backup code
+                  example: "123456"
+                use_backup_code:
+                  type: boolean
+                  description: Set true if using a backup code instead of TOTP
+                  default: false
+                trust_device:
+                  type: boolean
+                  description: Remember this device (skip 2FA for 30 days)
+                  default: false
+                csrf_token:
+                  type: string
+                  description: CSRF token (session-based flow only)
+      responses:
+        '200':
+          description: 2FA verification successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/LoginSuccessResponse'
+                  - type: object
+                    properties:
+                      codes_remaining:
+                        type: integer
+                        description: Remaining backup codes (only if backup code was used)
+        '401':
+          description: Invalid code or expired session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_code:
+                  value:
+                    error: "Invalid code"
+                    code: "AUTH_2FA_INVALID"
+                    success: false
+                expired:
+                  value:
+                    error: "2FA session expired. Please log in again."
+                    code: "AUTH_2FA_TOKEN_EXPIRED"
+                    success: false
+                    redirect: "/login"
+                max_attempts:
+                  value:
+                    error: "Too many failed attempts. Please log in again."
+                    code: "AUTH_2FA_MAX_ATTEMPTS"
+                    success: false
+                    redirect: "/login"
+
+  /api/totp/status:
+    get:
+      tags: [TOTP]
+      summary: Get 2FA status for current user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 2FA status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  enabled:
+                    type: boolean
+                    description: Whether 2FA is enabled
+                  setup_required:
+                    type: boolean
+                    description: Whether user needs to set up 2FA
+                  backup_codes_remaining:
+                    type: integer
+                    description: Number of unused backup codes
+                  trusted_devices:
+                    type: integer
+                    description: Number of trusted devices
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================
+  # WEBAUTHN ENDPOINTS
+  # ============================================
+  /api/webauthn/register-challenge:
+    post:
+      tags: [WebAuthn]
+      summary: Generate registration challenge
+      description: |
+        Generate a WebAuthn challenge for registering a new passkey/biometric.
+        Returns a challenge_id for stateless verification.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Registration challenge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAuthnChallengeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/webauthn/register-verify:
+    post:
+      tags: [WebAuthn]
+      summary: Verify and store new passkey
+      description: |
+        Verify the WebAuthn registration response and store the credential.
+
+        **Stateless flow:** Include `challenge_id` from the challenge response.
+        **Session flow:** Challenge is retrieved from session automatically.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, response]
+              properties:
+                challenge_id:
+                  type: string
+                  description: Challenge ID from register-challenge (stateless flow)
+                id:
+                  type: string
+                  description: Credential ID from WebAuthn API
+                response:
+                  type: object
+                  properties:
+                    clientDataJSON:
+                      type: string
+                    attestationObject:
+                      type: string
+      responses:
+        '200':
+          description: Passkey registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '401':
+          description: Challenge expired or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                expired:
+                  value:
+                    error: "Challenge expired or invalid"
+                    code: "AUTH_WEBAUTHN_CHALLENGE_EXPIRED"
+
+  /api/webauthn/auth-challenge:
+    post:
+      tags: [WebAuthn]
+      summary: Generate authentication challenge
+      description: |
+        Generate a WebAuthn challenge for authenticating with a passkey.
+
+        Can be called:
+        - With `email` parameter for passwordless login
+        - With Bearer token for re-authentication
+        - Without either for discoverable credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User email for passwordless login
+      responses:
+        '200':
+          description: Authentication challenge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAuthnAuthChallengeResponse'
+
+  /api/webauthn/auth-verify:
+    post:
+      tags: [WebAuthn]
+      summary: Verify passkey and authenticate
+      description: |
+        Verify the WebAuthn authentication assertion.
+        On success, returns access and refresh tokens.
+
+        **Stateless flow:** Include `challenge_id` from the challenge response.
+        **Session flow:** Challenge is retrieved from session automatically.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, response]
+              properties:
+                challenge_id:
+                  type: string
+                  description: Challenge ID from auth-challenge (stateless flow)
+                id:
+                  type: string
+                  description: Credential ID from WebAuthn API
+                response:
+                  type: object
+                  properties:
+                    clientDataJSON:
+                      type: string
+                    authenticatorData:
+                      type: string
+                    signature:
+                      type: string
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/LoginSuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Authentication successful"
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                expired:
+                  value:
+                    error: "Challenge expired or invalid"
+                    code: "AUTH_WEBAUTHN_CHALLENGE_EXPIRED"
+                not_found:
+                  value:
+                    error: "Credential not found"
+                    code: "AUTH_WEBAUTHN_CREDENTIAL_NOT_FOUND"
+
+  /api/webauthn/credentials:
+    get:
+      tags: [WebAuthn]
+      summary: List registered passkeys
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  credentials:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebAuthnCredential'
+                  count:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/webauthn/remove:
+    post:
+      tags: [WebAuthn]
+      summary: Remove a passkey
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                credential_id:
+                  type: string
+                  description: ID of credential to remove (omit to remove all)
+      responses:
+        '200':
+          description: Credential(s) removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/webauthn/status:
+    get:
+      tags: [WebAuthn]
+      summary: Check if user has passkeys registered
+      description: Can be called without authentication for login page UI
+      responses:
+        '200':
+          description: WebAuthn status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  registered:
+                    type: boolean
+                    description: Whether user has any passkeys
+                  count:
+                    type: integer
+                    description: Number of registered passkeys
+
+  # ============================================
+  # USERS ENDPOINTS
+  # ============================================
+  /api/v2/users/me:
+    get:
+      tags: [Users]
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    put:
+      tags: [Users]
+      summary: Update current user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                bio:
+                  type: string
+                skills:
+                  type: array
+                  items:
+                    type: string
+                location:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v2/users/{id}:
+    get:
+      tags: [Users]
+      summary: Get user profile by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ============================================
+  # LISTINGS ENDPOINTS
+  # ============================================
+  /api/v2/listings:
+    get:
+      tags: [Listings]
+      summary: List all listings
+      description: Get paginated list of listings with optional filters
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [offer, request]
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, completed]
+            default: active
+        - name: user_id
+          in: query
+          description: Filter by user
+          schema:
+            type: integer
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: List of listings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Listing'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+
+    post:
+      tags: [Listings]
+      summary: Create a new listing
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, type]
+              properties:
+                title:
+                  type: string
+                  maxLength: 255
+                description:
+                  type: string
+                type:
+                  type: string
+                  enum: [offer, request]
+                category:
+                  type: string
+                time_credits:
+                  type: number
+                location:
+                  type: string
+      responses:
+        '201':
+          description: Listing created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Listing'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/listings/{id}:
+    get:
+      tags: [Listings]
+      summary: Get listing by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Listing data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Listing'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Listings]
+      summary: Update listing
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                category:
+                  type: string
+                time_credits:
+                  type: number
+                status:
+                  type: string
+                  enum: [active, completed, cancelled]
+      responses:
+        '200':
+          description: Listing updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Listing'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Listings]
+      summary: Delete listing
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Listing deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ============================================
+  # MESSAGES ENDPOINTS
+  # ============================================
+  /api/v2/messages:
+    get:
+      tags: [Messages]
+      summary: List conversations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user:
+                          $ref: '#/components/schemas/User'
+                        last_message:
+                          $ref: '#/components/schemas/Message'
+                        unread_count:
+                          type: integer
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags: [Messages]
+      summary: Send a message
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [receiver_id, content]
+              properties:
+                receiver_id:
+                  type: integer
+                content:
+                  type: string
+      responses:
+        '201':
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Message'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/messages/{id}:
+    get:
+      tags: [Messages]
+      summary: Get conversation with user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID to get conversation with
+          schema:
+            type: integer
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Conversation messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================
+  # NOTIFICATIONS ENDPOINTS
+  # ============================================
+  /api/v2/notifications:
+    get:
+      tags: [Notifications]
+      summary: List notifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [messages, connections, reviews, transactions, social, events, groups, listings, system]
+        - name: unread_only
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      tags: [Notifications]
+      summary: Delete all notifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          description: Only delete notifications in this category
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notifications deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/notifications/counts:
+    get:
+      tags: [Notifications]
+      summary: Get unread notification counts
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Unread counts by category
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: integer
+                    example:
+                      messages: 5
+                      connections: 2
+                      total: 7
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/notifications/read-all:
+    post:
+      tags: [Notifications]
+      summary: Mark all notifications as read
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category:
+                  type: string
+                  description: Only mark this category as read
+      responses:
+        '200':
+          description: Notifications marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      marked_read:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/notifications/{id}:
+    get:
+      tags: [Notifications]
+      summary: Get notification by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Notifications]
+      summary: Delete notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Notification deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v2/notifications/{id}/read:
+    post:
+      tags: [Notifications]
+      summary: Mark notification as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ============================================
+  # WALLET ENDPOINTS
+  # ============================================
+  /api/v2/wallet/balance:
+    get:
+      tags: [Wallet]
+      summary: Get current time credit balance
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Wallet balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      balance:
+                        type: number
+                        format: float
+                        example: 12.5
+                      pending_in:
+                        type: number
+                        format: float
+                      pending_out:
+                        type: number
+                        format: float
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/wallet/transactions:
+    get:
+      tags: [Wallet]
+      summary: List transactions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [credit, debit, all]
+            default: all
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, completed, cancelled, all]
+            default: all
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/wallet/transfer:
+    post:
+      tags: [Wallet]
+      summary: Transfer time credits
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to_user_id, amount]
+              properties:
+                to_user_id:
+                  type: integer
+                amount:
+                  type: number
+                  format: float
+                  minimum: 0.25
+                description:
+                  type: string
+                listing_id:
+                  type: integer
+                  description: Optional listing this transfer is for
+      responses:
+        '201':
+          description: Transfer created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================
+  # SEARCH ENDPOINT
+  # ============================================
+  /api/v2/search:
+    get:
+      tags: [Search]
+      summary: Unified search across content types
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query
+          schema:
+            type: string
+            minLength: 2
+        - name: types
+          in: query
+          description: Comma-separated content types to search
+          schema:
+            type: string
+            example: "listings,users,events"
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      listings:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Listing'
+                      users:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+                      events:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+security:
+  - bearerAuth: []
+  - cookieAuth: []
