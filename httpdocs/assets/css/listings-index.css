@@ -2006,6 +2006,103 @@
 }
 
 /* ============================================
+   MOBILE "BORING MODE" - SCROLL PERFORMANCE FIX
+   Added: 2026-02-01
+   Disables expensive fixed/backdrop effects on real mobile devices
+   Targets: viewport <=768px, native apps, iOS devices
+   ============================================ */
+@media (max-width: 768px) {
+    /* Kill the fixed pseudo-element background completely on mobile
+       This is the PRIMARY cause of scroll jank on real devices */
+    #listings-index-glass-wrapper::before {
+        content: none !important;
+        display: none !important;
+    }
+
+    /* Fallback: simple solid background instead of gradient/blur */
+    #listings-index-glass-wrapper {
+        background: var(--color-gray-50);
+    }
+
+    [data-theme="dark"] #listings-index-glass-wrapper {
+        background: var(--color-gray-900);
+    }
+
+    /* Remove ALL backdrop-filter on mobile for smooth scrolling */
+    #listings-index-glass-wrapper .glass-listing-card,
+    #listings-index-glass-wrapper .glass-search-card,
+    .listings-create-post,
+    .nexus-welcome-hero {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Compensate visually with solid semi-transparent backgrounds */
+    #listings-index-glass-wrapper .glass-listing-card {
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 1px solid var(--color-gray-200);
+    }
+
+    [data-theme="dark"] #listings-index-glass-wrapper .glass-listing-card {
+        background: rgba(30, 41, 59, 0.95) !important;
+        border: 1px solid var(--color-gray-700);
+    }
+
+    #listings-index-glass-wrapper .glass-search-card {
+        background: rgba(255, 255, 255, 0.98) !important;
+    }
+
+    [data-theme="dark"] #listings-index-glass-wrapper .glass-search-card {
+        background: rgba(30, 41, 59, 0.98) !important;
+    }
+
+    .listings-create-post {
+        background: rgba(255, 255, 255, 0.98) !important;
+    }
+
+    [data-theme="dark"] .listings-create-post {
+        background: rgba(30, 41, 59, 0.95) !important;
+    }
+
+    .nexus-welcome-hero {
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    [data-theme="dark"] .nexus-welcome-hero {
+        background: rgba(30, 41, 59, 0.95) !important;
+    }
+}
+
+/* Also target native app and iOS specifically (via body classes set by JS) */
+.is-native #listings-index-glass-wrapper::before,
+.platform-ios #listings-index-glass-wrapper::before {
+    content: none !important;
+    display: none !important;
+}
+
+.is-native #listings-index-glass-wrapper,
+.platform-ios #listings-index-glass-wrapper {
+    background: var(--color-gray-50);
+}
+
+[data-theme="dark"].is-native #listings-index-glass-wrapper,
+[data-theme="dark"].platform-ios #listings-index-glass-wrapper {
+    background: var(--color-gray-900);
+}
+
+.is-native #listings-index-glass-wrapper .glass-listing-card,
+.is-native #listings-index-glass-wrapper .glass-search-card,
+.is-native .listings-create-post,
+.is-native .nexus-welcome-hero,
+.platform-ios #listings-index-glass-wrapper .glass-listing-card,
+.platform-ios #listings-index-glass-wrapper .glass-search-card,
+.platform-ios .listings-create-post,
+.platform-ios .nexus-welcome-hero {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+/* ============================================
    REDUCED MOTION PREFERENCES
    Disable continuous animations for accessibility
    ============================================ */

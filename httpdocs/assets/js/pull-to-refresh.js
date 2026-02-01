@@ -46,6 +46,14 @@
         if (document.body.classList.contains('no-ptr')) return false;
         if (document.documentElement.classList.contains('no-ptr')) return false;
 
+        // Skip on /listings route - causes scroll issues on real mobile devices
+        // Route guard added 2026-02-01 for mobile scroll fix
+        const path = window.location.pathname;
+        if (path.includes('/listings') && !path.includes('/listings/')) {
+            // Skip /listings index but allow /listings/{id} detail pages
+            return false;
+        }
+
         // Skip on certain pages
         const skipPages = ['chat-page', 'messages-fullscreen', 'modal-open'];
         if (skipPages.some(cls => document.body.classList.contains(cls))) return false;
