@@ -6,8 +6,10 @@ use OTPHP\TOTP;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\TotpEncryption;
-use chillerlan\QRCode\QRCode;
-use chillerlan\QRCode\QROptions;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Writer\SvgWriter;
 
 /**
  * TotpService - TOTP Two-Factor Authentication Service
@@ -60,17 +62,17 @@ class TotpService
      */
     public static function generateQrCode(string $provisioningUri): string
     {
-        // Use SVG output - doesn't require GD extension
-        $options = new QROptions([
-            'outputType' => QRCode::OUTPUT_MARKUP_SVG,
-            'eccLevel' => QRCode::ECC_M,
-            'scale' => 4,
-            'addQuietzone' => true,
-            'outputBase64' => false, // Return raw SVG, not base64 data URI
-        ]);
+        // Use endroid/qr-code with SVG output - doesn't require GD extension
+        $result = Builder::create()
+            ->writer(new SvgWriter())
+            ->data($provisioningUri)
+            ->encoding(new Encoding('UTF-8'))
+            ->errorCorrectionLevel(ErrorCorrectionLevel::Medium)
+            ->size(200)
+            ->margin(10)
+            ->build();
 
-        $qrcode = new QRCode($options);
-        return $qrcode->render($provisioningUri);
+        return $result->getString();
     }
 
     /**
