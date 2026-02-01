@@ -1206,8 +1206,10 @@
     --radius-base: 8px;
     --radius-md: 12px;
     --radius-lg: 16px;
+    --radius-18: 18px;
     --radius-xl: 20px;
     --radius-2xl: 24px;
+    --radius-28: 28px;
     --radius-full: 9999px;
     --radius-1: var(--radius-sm);
     --radius-2: var(--radius-base);
@@ -1434,8 +1436,13 @@
     --holographic-shimmer: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
 
     /* Blur utilities */
+    --blur-xs: 2px;
+    --blur-sm: 4px;
+    --blur-md: 8px;
+    --blur-base: 12px;
     --blur-lg: 16px;
     --blur-xl: 24px;
+    --blur-2xl: 40px;
 
     /* Hamburger menu */
     --hamburger-transition: var(--transition-fast);
@@ -1555,15 +1562,16 @@
 
     /* ==========================================
        SETTINGS ALIASES
+       RGB triplet values for use with rgb()/rgba()
        ========================================== */
-    --settings-primary: var(--color-primary-500);
-    --settings-muted: var(--text-muted);
-    --settings-text: var(--text-primary);
-    --settings-surface: var(--bg-surface);
-    --settings-danger: var(--color-danger);
-    --settings-secondary: var(--text-secondary);
-    --settings-success: var(--color-success);
-    --settings-warning: var(--color-warning);
+    --settings-primary: 99, 102, 241;
+    --settings-muted: 107, 114, 128;
+    --settings-text: 17, 24, 39;
+    --settings-surface: 249, 250, 251;
+    --settings-danger: 239, 68, 68;
+    --settings-secondary: 75, 85, 99;
+    --settings-success: 16, 185, 129;
+    --settings-warning: 245, 158, 11;
 
     /* ==========================================
        MESSAGE/CHAT ALIASES

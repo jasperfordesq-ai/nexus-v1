@@ -17,7 +17,7 @@ $readingTime = max(1, ceil($wordCount / 200));
     <span>No internet connection</span>
 </div>
 
-<div id="article-holo-wrapper">
+<div id="article-holo-wrapper" class="nexus-article-holo-wrapper">
     <!-- Holographic Orbs -->
     <div class="holo-orb holo-orb-1"></div>
     <div class="holo-orb holo-orb-2"></div>

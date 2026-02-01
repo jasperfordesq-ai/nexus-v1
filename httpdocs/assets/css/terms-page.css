@@ -1,9 +1,11 @@
 /* ============================================
    TERMS OF SERVICE - GLASSMORPHISM 2025
    Theme: Blue (#3b82f6)
+   Phase C.1: Class alias .nexus-terms-glass-wrapper added for future ID migration
    ============================================ */
 
-#terms-glass-wrapper {
+#terms-glass-wrapper,
+.nexus-terms-glass-wrapper {
     --terms-theme: #3b82f6;
     --terms-theme-rgb: 59, 130, 246;
     --terms-theme-light: #60a5fa;
@@ -62,7 +64,8 @@
     animation: termsFadeInUp 0.4s ease-out;
 }
 
-#terms-glass-wrapper .terms-inner {
+#terms-glass-wrapper .terms-inner,
+.nexus-terms-glass-wrapper .terms-inner {
     max-width: 900px;
     margin: 0 auto;
 }

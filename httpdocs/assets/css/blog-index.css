@@ -8,12 +8,15 @@
    ============================================ */
 
 /* Grid visible immediately - no JS reveal needed */
-#news-holo-wrapper #news-grid-container {
+/* Phase C.1: Added class alias .nexus-news-holo-wrapper for future ID migration */
+#news-holo-wrapper #news-grid-container,
+.nexus-news-holo-wrapper #news-grid-container {
     opacity: 1;
 }
 
 /* Empty state visible immediately */
-#news-holo-wrapper .news-empty-state {
+#news-holo-wrapper .news-empty-state,
+.nexus-news-holo-wrapper .news-empty-state {
     opacity: 1;
 }
 
@@ -121,9 +124,11 @@
     /* ============================================
    HOLOGRAPHIC GLASSMORPHISM NEWS 2025
    Theme: Purple/Cyan Holographic (var(--color-purple-500) / var(--color-cyan-500))
+   Phase C.1: Class alias .nexus-news-holo-wrapper added for future ID migration
    ============================================ */
 
-    #news-holo-wrapper {
+    #news-holo-wrapper,
+    .nexus-news-holo-wrapper {
         --news-primary: var(--color-purple-500);
         --news-primary-rgb: 139, 92, 246;
         --news-secondary: var(--color-cyan-500);
@@ -642,6 +647,20 @@
         opacity: 0.3;
     }
 
+    /* ===== INFINITE SCROLL SENTINEL ===== */
+    #news-scroll-sentinel {
+        height: 80px;
+        margin-top: var(--space-10);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--effect-purple-60);
+    }
+
+    #news-scroll-sentinel .scroll-spinner {
+        display: none;
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
         #news-holo-wrapper {
@@ -668,6 +687,20 @@
         .holo-orb-2,
         .holo-orb-3 {
             opacity: 0.25;
+        }
+    }
+
+    /* Perf: Reduce blur on mobile/tablet for GPU savings (was 80px) */
+    @media (max-width: 1024px) {
+        .holo-orb {
+            filter: blur(24px);
+        }
+    }
+
+    /* Perf: Disable orb animations for reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        .holo-orb {
+            animation: none;
         }
     }
 

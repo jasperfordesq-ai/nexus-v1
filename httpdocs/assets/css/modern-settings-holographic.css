@@ -806,3 +806,37 @@ select.settings-input,
         padding: var(--space-2.5) var(--space-3);
     }
 }
+
+/* ============================================================================
+   REDUCED MOTION SUPPORT
+   Respects user preference for reduced motion (WCAG 2.1 AA)
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .settings-ambient-bg {
+        animation: none;
+    }
+
+    .settings-alert {
+        animation: none;
+    }
+
+    .settings-alert::before {
+        animation: none;
+    }
+
+    .settings-avatar-section::before {
+        animation: none;
+    }
+
+    .settings-sidebar,
+    .settings-nav-item,
+    .settings-nav-icon,
+    .settings-avatar-preview,
+    .settings-btn,
+    .settings-input,
+    .settings-textarea,
+    .settings-toggle-slider,
+    .settings-toggle-slider::before {
+        transition: none;
+    }
+}

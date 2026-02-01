@@ -315,7 +315,8 @@
 
     /* FIX: Force GPU */
     transform: translateX(-50%) translateY(-10px) translateZ(0);
-    will-change: transform, opacity, visibility;
+    /* Perf: removed 'visibility' (non-composited) from will-change */
+    will-change: transform, opacity;
 
     opacity: 0;
     visibility: hidden;
@@ -606,6 +607,15 @@
         top: 0 !important;
         height: 60px;
         padding: var(--space-3) 16px;
+        /* Perf: Reduce blur on mobile for GPU savings */
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
+    }
+
+    .nexus-navbar.scrolled {
+        /* Perf: Reduce blur on mobile for GPU savings */
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
     }
 
     .mega-menu-trigger {

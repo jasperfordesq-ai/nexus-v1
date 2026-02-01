@@ -19,7 +19,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
 ?>
 
 
-<div id="terms-glass-wrapper">
+<div id="terms-glass-wrapper" class="nexus-terms-glass-wrapper">
     <div class="terms-inner">
 
         <!-- Back Link -->

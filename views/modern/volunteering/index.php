@@ -19,7 +19,7 @@ $base = Nexus\Core\TenantContext::getBasePath();
 
 <!-- Main content wrapper -->
 <div class="htb-container-full">
-<div id="volunteering-glass-wrapper">
+<div id="volunteering-glass-wrapper" class="nexus-volunteering-glass-wrapper">
 
     <!-- Smart Welcome Hero Section -->
     <div class="nexus-welcome-hero">

@@ -332,6 +332,13 @@
     margin-bottom: 16px;
     overflow: hidden;
     transition: all 0.3s ease;
+
+    /* Perf: Skip rendering for off-screen cards */
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 400px;
+
+    /* Perf: Limit repaint scope */
+    contain: layout paint;
 }
 
 .feed-card:hover {
@@ -848,6 +855,15 @@
     .feed-compose {
         border-radius: 16px;
         padding: 14px;
+        /* Perf: Reduce blur on mobile for GPU savings (was 20px) */
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+    }
+
+    .feed-card {
+        /* Perf: Reduce blur on mobile for GPU savings (was 20px) */
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
     }
 
     .compose-input {

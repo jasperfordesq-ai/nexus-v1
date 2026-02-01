@@ -20,7 +20,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
 
 <!-- Main content wrapper (main tag opened in header.php) -->
 <div class="htb-container-full">
-<div id="groups-glass-wrapper" data-page-type="<?= $isHubsPage ? 'hubs' : 'community' ?>">
+<div id="groups-glass-wrapper" class="nexus-groups-glass-wrapper" data-page-type="<?= $isHubsPage ? 'hubs' : 'community' ?>">
 
     <!-- Header Section -->
     <div class="glass-header-card">

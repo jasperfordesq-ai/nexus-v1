@@ -7,9 +7,13 @@
  * easy overriding when needed. All values reference design tokens.
  *
  * Created: 2026-01-27 (Phase 7)
+ * Updated: 2026-02-01 (Scoped to Modern theme to prevent cross-theme leakage)
  *
  * Usage: Prefer these primitives over writing new one-off CSS.
  * See: docs/modern-ui-primitives.md for full documentation.
+ *
+ * NOTE: All selectors scoped to [data-layout="modern"] to prevent
+ * these utilities from affecting CivicOne theme.
  */
 
 /* =============================================================================
@@ -20,18 +24,18 @@
  * .container - Centered content container with responsive max-width
  * Uses --container-max-width token with horizontal padding
  */
-.container {
+[data-layout="modern"] .container {
     width: 100%;
     max-width: var(--container-max-width, 1200px);
     margin-inline: auto;
     padding-inline: var(--space-4);
 }
 
-.container--narrow {
+[data-layout="modern"] .container--narrow {
     max-width: var(--container-narrow, 800px);
 }
 
-.container--wide {
+[data-layout="modern"] .container--wide {
     max-width: var(--container-wide, 1400px);
 }
 
@@ -39,51 +43,51 @@
  * .stack - Vertical layout with consistent spacing between children
  * Default gap uses --space-4, customize with gap utilities
  */
-.stack {
+[data-layout="modern"] .stack {
     display: flex;
     flex-direction: column;
     gap: var(--stack-gap, var(--space-4));
 }
 
-.stack--sm { --stack-gap: var(--space-2); }
-.stack--md { --stack-gap: var(--space-4); }
-.stack--lg { --stack-gap: var(--space-6); }
-.stack--xl { --stack-gap: var(--space-8); }
+[data-layout="modern"] .stack--sm { --stack-gap: var(--space-2); }
+[data-layout="modern"] .stack--md { --stack-gap: var(--space-4); }
+[data-layout="modern"] .stack--lg { --stack-gap: var(--space-6); }
+[data-layout="modern"] .stack--xl { --stack-gap: var(--space-8); }
 
 /**
  * .cluster - Horizontal layout that wraps, with consistent spacing
  * Useful for tags, buttons, inline items
  */
-.cluster {
+[data-layout="modern"] .cluster {
     display: flex;
     flex-wrap: wrap;
     gap: var(--cluster-gap, var(--space-3));
     align-items: center;
 }
 
-.cluster--start { justify-content: flex-start; }
-.cluster--center { justify-content: center; }
-.cluster--end { justify-content: flex-end; }
-.cluster--between { justify-content: space-between; }
+[data-layout="modern"] .cluster--start { justify-content: flex-start; }
+[data-layout="modern"] .cluster--center { justify-content: center; }
+[data-layout="modern"] .cluster--end { justify-content: flex-end; }
+[data-layout="modern"] .cluster--between { justify-content: space-between; }
 
 /**
  * .grid - Simple responsive grid with auto-fit columns
  * Default min column width is 250px, customize with CSS custom property
  */
-.grid {
+[data-layout="modern"] .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--grid-min, 250px), 1fr));
     gap: var(--grid-gap, var(--space-4));
 }
 
-.grid--2 { grid-template-columns: repeat(2, 1fr); }
-.grid--3 { grid-template-columns: repeat(3, 1fr); }
-.grid--4 { grid-template-columns: repeat(4, 1fr); }
+[data-layout="modern"] .grid--2 { grid-template-columns: repeat(2, 1fr); }
+[data-layout="modern"] .grid--3 { grid-template-columns: repeat(3, 1fr); }
+[data-layout="modern"] .grid--4 { grid-template-columns: repeat(4, 1fr); }
 
 @media (max-width: 768px) {
-    .grid--2,
-    .grid--3,
-    .grid--4 {
+    [data-layout="modern"] .grid--2,
+    [data-layout="modern"] .grid--3,
+    [data-layout="modern"] .grid--4 {
         grid-template-columns: 1fr;
     }
 }
@@ -92,24 +96,24 @@
  * .sidebar - Two-column layout with fixed sidebar and fluid content
  * Sidebar width defaults to 280px, content fills remaining space
  */
-.sidebar {
+[data-layout="modern"] .sidebar {
     display: flex;
     flex-wrap: wrap;
     gap: var(--sidebar-gap, var(--space-6));
 }
 
-.sidebar > :first-child {
+[data-layout="modern"] .sidebar > :first-child {
     flex-basis: var(--sidebar-width, 280px);
     flex-grow: 1;
 }
 
-.sidebar > :last-child {
+[data-layout="modern"] .sidebar > :last-child {
     flex-basis: 0;
     flex-grow: 999;
     min-width: 50%;
 }
 
-.sidebar--right {
+[data-layout="modern"] .sidebar--right {
     flex-direction: row-reverse;
 }
 
@@ -121,53 +125,53 @@
  * Gap utilities - Use with flex/grid containers
  * Maps to --space-* tokens
  */
-.gap-1 { gap: var(--space-1); }
-.gap-2 { gap: var(--space-2); }
-.gap-3 { gap: var(--space-3); }
-.gap-4 { gap: var(--space-4); }
-.gap-5 { gap: var(--space-5); }
-.gap-6 { gap: var(--space-6); }
-.gap-8 { gap: var(--space-8); }
+[data-layout="modern"] .gap-1 { gap: var(--space-1); }
+[data-layout="modern"] .gap-2 { gap: var(--space-2); }
+[data-layout="modern"] .gap-3 { gap: var(--space-3); }
+[data-layout="modern"] .gap-4 { gap: var(--space-4); }
+[data-layout="modern"] .gap-5 { gap: var(--space-5); }
+[data-layout="modern"] .gap-6 { gap: var(--space-6); }
+[data-layout="modern"] .gap-8 { gap: var(--space-8); }
 
 /**
  * Padding utilities
  * Maps to --space-* tokens
  */
-.p-1 { padding: var(--space-1); }
-.p-2 { padding: var(--space-2); }
-.p-3 { padding: var(--space-3); }
-.p-4 { padding: var(--space-4); }
-.p-5 { padding: var(--space-5); }
-.p-6 { padding: var(--space-6); }
-.p-8 { padding: var(--space-8); }
+[data-layout="modern"] .p-1 { padding: var(--space-1); }
+[data-layout="modern"] .p-2 { padding: var(--space-2); }
+[data-layout="modern"] .p-3 { padding: var(--space-3); }
+[data-layout="modern"] .p-4 { padding: var(--space-4); }
+[data-layout="modern"] .p-5 { padding: var(--space-5); }
+[data-layout="modern"] .p-6 { padding: var(--space-6); }
+[data-layout="modern"] .p-8 { padding: var(--space-8); }
 
-.px-2 { padding-inline: var(--space-2); }
-.px-3 { padding-inline: var(--space-3); }
-.px-4 { padding-inline: var(--space-4); }
-.px-6 { padding-inline: var(--space-6); }
+[data-layout="modern"] .px-2 { padding-inline: var(--space-2); }
+[data-layout="modern"] .px-3 { padding-inline: var(--space-3); }
+[data-layout="modern"] .px-4 { padding-inline: var(--space-4); }
+[data-layout="modern"] .px-6 { padding-inline: var(--space-6); }
 
-.py-2 { padding-block: var(--space-2); }
-.py-3 { padding-block: var(--space-3); }
-.py-4 { padding-block: var(--space-4); }
-.py-6 { padding-block: var(--space-6); }
+[data-layout="modern"] .py-2 { padding-block: var(--space-2); }
+[data-layout="modern"] .py-3 { padding-block: var(--space-3); }
+[data-layout="modern"] .py-4 { padding-block: var(--space-4); }
+[data-layout="modern"] .py-6 { padding-block: var(--space-6); }
 
 /**
  * Margin utilities (top and bottom only - keep minimal)
  * Maps to --space-* tokens
  */
-.mt-0 { margin-top: 0; }
-.mt-2 { margin-top: var(--space-2); }
-.mt-3 { margin-top: var(--space-3); }
-.mt-4 { margin-top: var(--space-4); }
-.mt-6 { margin-top: var(--space-6); }
-.mt-8 { margin-top: var(--space-8); }
+[data-layout="modern"] .mt-0 { margin-top: 0; }
+[data-layout="modern"] .mt-2 { margin-top: var(--space-2); }
+[data-layout="modern"] .mt-3 { margin-top: var(--space-3); }
+[data-layout="modern"] .mt-4 { margin-top: var(--space-4); }
+[data-layout="modern"] .mt-6 { margin-top: var(--space-6); }
+[data-layout="modern"] .mt-8 { margin-top: var(--space-8); }
 
-.mb-0 { margin-bottom: 0; }
-.mb-2 { margin-bottom: var(--space-2); }
-.mb-3 { margin-bottom: var(--space-3); }
-.mb-4 { margin-bottom: var(--space-4); }
-.mb-6 { margin-bottom: var(--space-6); }
-.mb-8 { margin-bottom: var(--space-8); }
+[data-layout="modern"] .mb-0 { margin-bottom: 0; }
+[data-layout="modern"] .mb-2 { margin-bottom: var(--space-2); }
+[data-layout="modern"] .mb-3 { margin-bottom: var(--space-3); }
+[data-layout="modern"] .mb-4 { margin-bottom: var(--space-4); }
+[data-layout="modern"] .mb-6 { margin-bottom: var(--space-6); }
+[data-layout="modern"] .mb-8 { margin-bottom: var(--space-8); }
 
 /* =============================================================================
    TYPOGRAPHY UTILITIES
@@ -176,31 +180,31 @@
 /**
  * Text color utilities using semantic tokens
  */
-.text-primary { color: var(--color-text, var(--color-gray-900)); }
-.text-secondary { color: var(--color-text-secondary, var(--color-gray-600)); }
-.text-muted { color: var(--color-text-muted, var(--color-gray-500)); }
-.text-accent { color: var(--color-primary-500); }
-.text-success { color: var(--color-success, var(--color-emerald-500)); }
-.text-warning { color: var(--color-warning, var(--color-amber-500)); }
-.text-danger { color: var(--color-danger, var(--color-red-500)); }
+[data-layout="modern"] .text-primary { color: var(--color-text, var(--color-gray-900)); }
+[data-layout="modern"] .text-secondary { color: var(--color-text-secondary, var(--color-gray-600)); }
+[data-layout="modern"] .text-muted { color: var(--color-text-muted, var(--color-gray-500)); }
+[data-layout="modern"] .text-accent { color: var(--color-primary-500); }
+[data-layout="modern"] .text-success { color: var(--color-success, var(--color-emerald-500)); }
+[data-layout="modern"] .text-warning { color: var(--color-warning, var(--color-amber-500)); }
+[data-layout="modern"] .text-danger { color: var(--color-danger, var(--color-red-500)); }
 
 /**
  * Text size utilities using font tokens
  */
-.text-xs { font-size: var(--font-size-xs); }
-.text-sm { font-size: var(--font-size-sm); }
-.text-base { font-size: var(--font-size-base); }
-.text-lg { font-size: var(--font-size-lg); }
-.text-xl { font-size: var(--font-size-xl); }
-.text-2xl { font-size: var(--font-size-2xl); }
+[data-layout="modern"] .text-xs { font-size: var(--font-size-xs); }
+[data-layout="modern"] .text-sm { font-size: var(--font-size-sm); }
+[data-layout="modern"] .text-base { font-size: var(--font-size-base); }
+[data-layout="modern"] .text-lg { font-size: var(--font-size-lg); }
+[data-layout="modern"] .text-xl { font-size: var(--font-size-xl); }
+[data-layout="modern"] .text-2xl { font-size: var(--font-size-2xl); }
 
 /**
  * Font weight utilities
  */
-.font-normal { font-weight: var(--font-weight-normal, 400); }
-.font-medium { font-weight: var(--font-weight-medium, 500); }
-.font-semibold { font-weight: var(--font-weight-semibold, 600); }
-.font-bold { font-weight: var(--font-weight-bold, 700); }
+[data-layout="modern"] .font-normal { font-weight: var(--font-weight-normal, 400); }
+[data-layout="modern"] .font-medium { font-weight: var(--font-weight-medium, 500); }
+[data-layout="modern"] .font-semibold { font-weight: var(--font-weight-semibold, 600); }
+[data-layout="modern"] .font-bold { font-weight: var(--font-weight-bold, 700); }
 
 /* =============================================================================
    ACCESSIBILITY UTILITIES
@@ -210,7 +214,7 @@
  * .sr-only - Visually hidden but accessible to screen readers
  * Use for labels, skip links, and other a11y content
  */
-.sr-only {
+[data-layout="modern"] .sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -225,8 +229,8 @@
 /**
  * .sr-only-focusable - Hidden until focused (for skip links)
  */
-.sr-only-focusable:focus,
-.sr-only-focusable:focus-within {
+[data-layout="modern"] .sr-only-focusable:focus,
+[data-layout="modern"] .sr-only-focusable:focus-within {
     position: static;
     width: auto;
     height: auto;
@@ -241,20 +245,20 @@
  * .focus-ring - Consistent focus indicator using design tokens
  * Apply to custom interactive elements
  */
-.focus-ring:focus,
-.focus-ring:focus-visible {
+[data-layout="modern"] .focus-ring:focus,
+[data-layout="modern"] .focus-ring:focus-visible {
     outline: 2px solid var(--color-primary-500);
     outline-offset: 2px;
 }
 
-.focus-ring:focus:not(:focus-visible) {
+[data-layout="modern"] .focus-ring:focus:not(:focus-visible) {
     outline: none;
 }
 
 /**
  * .no-focus-ring - Remove focus ring (use sparingly, ensure alternative indication)
  */
-.no-focus-ring:focus {
+[data-layout="modern"] .no-focus-ring:focus {
     outline: none;
 }
 
@@ -262,116 +266,116 @@
    DISPLAY & VISIBILITY UTILITIES
    ============================================================================= */
 
-.hidden { display: none; }
-.block { display: block; }
-.inline { display: inline; }
-.inline-block { display: inline-block; }
-.flex { display: flex; }
-.inline-flex { display: inline-flex; }
-.grid-display { display: grid; }
+[data-layout="modern"] .hidden { display: none; }
+[data-layout="modern"] .block { display: block; }
+[data-layout="modern"] .inline { display: inline; }
+[data-layout="modern"] .inline-block { display: inline-block; }
+[data-layout="modern"] .flex { display: flex; }
+[data-layout="modern"] .inline-flex { display: inline-flex; }
+[data-layout="modern"] .grid-display { display: grid; }
 
-.visible { visibility: visible; }
-.invisible { visibility: hidden; }
+[data-layout="modern"] .visible { visibility: visible; }
+[data-layout="modern"] .invisible { visibility: hidden; }
 
 /* =============================================================================
    FLEXBOX UTILITIES
    ============================================================================= */
 
-.flex-row { flex-direction: row; }
-.flex-col { flex-direction: column; }
-.flex-wrap { flex-wrap: wrap; }
-.flex-nowrap { flex-wrap: nowrap; }
+[data-layout="modern"] .flex-row { flex-direction: row; }
+[data-layout="modern"] .flex-col { flex-direction: column; }
+[data-layout="modern"] .flex-wrap { flex-wrap: wrap; }
+[data-layout="modern"] .flex-nowrap { flex-wrap: nowrap; }
 
-.items-start { align-items: flex-start; }
-.items-center { align-items: center; }
-.items-end { align-items: flex-end; }
-.items-stretch { align-items: stretch; }
+[data-layout="modern"] .items-start { align-items: flex-start; }
+[data-layout="modern"] .items-center { align-items: center; }
+[data-layout="modern"] .items-end { align-items: flex-end; }
+[data-layout="modern"] .items-stretch { align-items: stretch; }
 
-.justify-start { justify-content: flex-start; }
-.justify-center { justify-content: center; }
-.justify-end { justify-content: flex-end; }
-.justify-between { justify-content: space-between; }
-.justify-around { justify-content: space-around; }
+[data-layout="modern"] .justify-start { justify-content: flex-start; }
+[data-layout="modern"] .justify-center { justify-content: center; }
+[data-layout="modern"] .justify-end { justify-content: flex-end; }
+[data-layout="modern"] .justify-between { justify-content: space-between; }
+[data-layout="modern"] .justify-around { justify-content: space-around; }
 
-.flex-1 { flex: 1 1 0%; }
-.flex-auto { flex: 1 1 auto; }
-.flex-none { flex: none; }
-.flex-grow { flex-grow: 1; }
-.flex-shrink-0 { flex-shrink: 0; }
+[data-layout="modern"] .flex-1 { flex: 1 1 0%; }
+[data-layout="modern"] .flex-auto { flex: 1 1 auto; }
+[data-layout="modern"] .flex-none { flex: none; }
+[data-layout="modern"] .flex-grow { flex-grow: 1; }
+[data-layout="modern"] .flex-shrink-0 { flex-shrink: 0; }
 
 /* =============================================================================
    BORDER & RADIUS UTILITIES
    ============================================================================= */
 
-.rounded-none { border-radius: 0; }
-.rounded-sm { border-radius: var(--radius-sm, 4px); }
-.rounded { border-radius: var(--radius-base, 6px); }
-.rounded-md { border-radius: var(--radius-md, 8px); }
-.rounded-lg { border-radius: var(--radius-lg, 12px); }
-.rounded-xl { border-radius: var(--radius-xl, 16px); }
-.rounded-full { border-radius: var(--radius-full, 9999px); }
+[data-layout="modern"] .rounded-none { border-radius: 0; }
+[data-layout="modern"] .rounded-sm { border-radius: var(--radius-sm, 4px); }
+[data-layout="modern"] .rounded { border-radius: var(--radius-base, 6px); }
+[data-layout="modern"] .rounded-md { border-radius: var(--radius-md, 8px); }
+[data-layout="modern"] .rounded-lg { border-radius: var(--radius-lg, 12px); }
+[data-layout="modern"] .rounded-xl { border-radius: var(--radius-xl, 16px); }
+[data-layout="modern"] .rounded-full { border-radius: var(--radius-full, 9999px); }
 
 /* =============================================================================
    WIDTH & HEIGHT UTILITIES
    ============================================================================= */
 
-.w-full { width: 100%; }
-.w-auto { width: auto; }
-.max-w-full { max-width: 100%; }
+[data-layout="modern"] .w-full { width: 100%; }
+[data-layout="modern"] .w-auto { width: auto; }
+[data-layout="modern"] .max-w-full { max-width: 100%; }
 
-.h-full { height: 100%; }
-.h-auto { height: auto; }
-.min-h-screen { min-height: 100vh; }
+[data-layout="modern"] .h-full { height: 100%; }
+[data-layout="modern"] .h-auto { height: auto; }
+[data-layout="modern"] .min-h-screen { min-height: 100vh; }
 
 /* =============================================================================
    TEXT UTILITIES
    ============================================================================= */
 
-.text-left { text-align: left; }
-.text-center { text-align: center; }
-.text-right { text-align: right; }
+[data-layout="modern"] .text-left { text-align: left; }
+[data-layout="modern"] .text-center { text-align: center; }
+[data-layout="modern"] .text-right { text-align: right; }
 
-.truncate {
+[data-layout="modern"] .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.break-words { overflow-wrap: break-word; }
-.whitespace-nowrap { white-space: nowrap; }
+[data-layout="modern"] .break-words { overflow-wrap: break-word; }
+[data-layout="modern"] .whitespace-nowrap { white-space: nowrap; }
 
 /* =============================================================================
    TRANSITION UTILITIES
    ============================================================================= */
 
-.transition {
+[data-layout="modern"] .transition {
     transition-property: color, background-color, border-color, box-shadow, transform, opacity;
     transition-duration: var(--transition-duration, 150ms);
     transition-timing-function: var(--transition-timing, ease-in-out);
 }
 
-.transition-fast { transition-duration: 100ms; }
-.transition-slow { transition-duration: 300ms; }
+[data-layout="modern"] .transition-fast { transition-duration: 100ms; }
+[data-layout="modern"] .transition-slow { transition-duration: 300ms; }
 
 /* =============================================================================
    CURSOR UTILITIES
    ============================================================================= */
 
-.cursor-pointer { cursor: pointer; }
-.cursor-default { cursor: default; }
-.cursor-not-allowed { cursor: not-allowed; }
+[data-layout="modern"] .cursor-pointer { cursor: pointer; }
+[data-layout="modern"] .cursor-default { cursor: default; }
+[data-layout="modern"] .cursor-not-allowed { cursor: not-allowed; }
 
 /* =============================================================================
    POSITION UTILITIES
    ============================================================================= */
 
-.relative { position: relative; }
-.absolute { position: absolute; }
-.fixed { position: fixed; }
-.sticky { position: sticky; }
+[data-layout="modern"] .relative { position: relative; }
+[data-layout="modern"] .absolute { position: absolute; }
+[data-layout="modern"] .fixed { position: fixed; }
+[data-layout="modern"] .sticky { position: sticky; }
 
-.inset-0 { inset: 0; }
-.top-0 { top: 0; }
-.right-0 { right: 0; }
-.bottom-0 { bottom: 0; }
-.left-0 { left: 0; }
+[data-layout="modern"] .inset-0 { inset: 0; }
+[data-layout="modern"] .top-0 { top: 0; }
+[data-layout="modern"] .right-0 { right: 0; }
+[data-layout="modern"] .bottom-0 { bottom: 0; }
+[data-layout="modern"] .left-0 { left: 0; }

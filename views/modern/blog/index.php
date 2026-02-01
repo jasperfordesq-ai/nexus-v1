@@ -13,7 +13,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <span>No internet connection</span>
 </div>
 
-<div id="news-holo-wrapper">
+<div id="news-holo-wrapper" class="nexus-news-holo-wrapper">
     <!-- Holographic Orbs -->
     <div class="holo-orb holo-orb-1"></div>
     <div class="holo-orb holo-orb-2"></div>
@@ -52,8 +52,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </div>
 
             <!-- Infinite Scroll Sentinel -->
-            <div id="news-scroll-sentinel" style="height: 80px; margin-top: 40px; display: flex; justify-content: center; align-items: center; color: rgba(139, 92, 246, 0.6);">
-                <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="display: none;"></i>
+            <div id="news-scroll-sentinel">
+                <i class="fa-solid fa-circle-notch fa-spin fa-2x scroll-spinner"></i>
             </div>
         <?php endif; ?>
 
