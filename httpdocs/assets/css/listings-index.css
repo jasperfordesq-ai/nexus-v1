@@ -2006,63 +2006,35 @@
 }
 
 /* ============================================
-   MOBILE "BORING MODE" - SCROLL PERFORMANCE FIX
+   MOBILE PERFORMANCE + LAYOUT FIX
    Added: 2026-02-01
-   Disables expensive fixed/backdrop effects on real mobile devices
-   Targets: viewport <=768px, native apps, iOS devices
+   - NO scroll/overflow/position overrides on html/body
+   - Only layout constraints (max-width, box-sizing, min-width)
+   - Disables expensive backdrop effects on mobile
    ============================================ */
 @media (max-width: 768px) {
-    /* SCROLL GUARDRAIL - ensure vertical scroll works
-       Keep overflow-x: hidden to prevent horizontal spill */
-    html, body {
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        height: auto !important;
-        position: static !important;
-    }
-
-    /* Constrain wrapper width - DO NOT use overflow: visible
-       Use overflow-x: hidden to clip horizontal spill */
-    #listings-index-glass-wrapper {
-        overflow-x: hidden !important;
-        overflow-y: visible !important;
-        height: auto !important;
-        min-height: 0 !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    .htb-container-full {
-        overflow-x: hidden !important;
-        overflow-y: visible !important;
-        height: auto !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Grid container - single column, constrained width */
+    /* LAYOUT CONSTRAINTS ONLY - no scroll mechanics */
     #listings-grid,
     .listings-main-grid {
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        min-width: 0 !important;
+        max-width: 100%;
+        box-sizing: border-box;
+        min-width: 0;
     }
 
-    /* Cards - ensure they shrink to fit */
     .glass-listing-card {
-        max-width: 100% !important;
-        min-width: 0 !important;
-        box-sizing: border-box !important;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
 
-    /* Kill the fixed pseudo-element background completely on mobile
-       This is the PRIMARY cause of scroll jank on real devices */
+    /* Kill the fixed pseudo-element background on mobile
+       This causes scroll jank on real devices */
     #listings-index-glass-wrapper::before {
         content: none !important;
         display: none !important;
     }
 
-    /* Fallback: simple solid background instead of gradient/blur */
+    /* Simple solid background instead of gradient */
     #listings-index-glass-wrapper {
         background: var(--color-gray-50);
     }
@@ -2071,7 +2043,7 @@
         background: var(--color-gray-900);
     }
 
-    /* Remove ALL backdrop-filter on mobile for smooth scrolling */
+    /* Remove backdrop-filter on mobile for smooth scrolling */
     #listings-index-glass-wrapper .glass-listing-card,
     #listings-index-glass-wrapper .glass-search-card,
     .listings-create-post,
@@ -2080,7 +2052,7 @@
         backdrop-filter: none !important;
     }
 
-    /* Compensate visually with solid semi-transparent backgrounds */
+    /* Solid backgrounds to compensate visually */
     #listings-index-glass-wrapper .glass-listing-card {
         background: rgba(255, 255, 255, 0.95) !important;
         border: 1px solid var(--color-gray-200);
