@@ -2012,6 +2012,28 @@
    Targets: viewport <=768px, native apps, iOS devices
    ============================================ */
 @media (max-width: 768px) {
+    /* SCROLL GUARDRAIL - ensure page scrolls on /listings
+       Scoped to #listings-index-glass-wrapper parent context */
+    html:has(#listings-index-glass-wrapper),
+    body:has(#listings-index-glass-wrapper) {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        position: static !important;
+    }
+
+    /* Ensure the wrapper itself doesn't block scroll */
+    #listings-index-glass-wrapper {
+        overflow: visible !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    .htb-container-full:has(#listings-index-glass-wrapper) {
+        overflow: visible !important;
+        height: auto !important;
+    }
+
     /* Kill the fixed pseudo-element background completely on mobile
        This is the PRIMARY cause of scroll jank on real devices */
     #listings-index-glass-wrapper::before {
