@@ -2012,26 +2012,47 @@
    Targets: viewport <=768px, native apps, iOS devices
    ============================================ */
 @media (max-width: 768px) {
-    /* SCROLL GUARDRAIL - ensure page scrolls on /listings
-       Scoped to #listings-index-glass-wrapper parent context */
-    html:has(#listings-index-glass-wrapper),
-    body:has(#listings-index-glass-wrapper) {
+    /* SCROLL GUARDRAIL - ensure vertical scroll works
+       Keep overflow-x: hidden to prevent horizontal spill */
+    html, body {
         overflow-y: auto !important;
         overflow-x: hidden !important;
         height: auto !important;
         position: static !important;
     }
 
-    /* Ensure the wrapper itself doesn't block scroll */
+    /* Constrain wrapper width - DO NOT use overflow: visible
+       Use overflow-x: hidden to clip horizontal spill */
     #listings-index-glass-wrapper {
-        overflow: visible !important;
+        overflow-x: hidden !important;
+        overflow-y: visible !important;
         height: auto !important;
         min-height: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
-    .htb-container-full:has(#listings-index-glass-wrapper) {
-        overflow: visible !important;
+    .htb-container-full {
+        overflow-x: hidden !important;
+        overflow-y: visible !important;
         height: auto !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Grid container - single column, constrained width */
+    #listings-grid,
+    .listings-main-grid {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        min-width: 0 !important;
+    }
+
+    /* Cards - ensure they shrink to fit */
+    .glass-listing-card {
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
     }
 
     /* Kill the fixed pseudo-element background completely on mobile
