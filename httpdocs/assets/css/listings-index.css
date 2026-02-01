@@ -914,7 +914,9 @@
             }
 
             #listings-index-glass-wrapper {
-                -webkit-overflow-scrolling: touch;
+                /* NOTE: -webkit-overflow-scrolling: touch removed
+                   Creates composited scrolling layer that causes jank on Android
+                   See MOBILE/TABLET PERFORMANCE REFACTOR section */
                 max-width: 100%;
                 overflow-x: hidden;
             }
@@ -1565,7 +1567,9 @@
                 overflow-y: hidden;
                 padding: 4px 0;
                 scrollbar-width: none;
-                -webkit-overflow-scrolling: touch;
+                /* NOTE: -webkit-overflow-scrolling: touch removed
+                   Creates separate GPU layer that causes scroll conflicts
+                   See MOBILE/TABLET PERFORMANCE REFACTOR section */
                 max-width: 100%;
             }
 
@@ -2006,14 +2010,132 @@
 }
 
 /* ============================================
-   MOBILE PERFORMANCE + LAYOUT FIX
-   Added: 2026-02-01
-   - NO scroll/overflow/position overrides on html/body
-   - Only layout constraints (max-width, box-sizing, min-width)
-   - Disables expensive backdrop effects on mobile
+   MOBILE/TABLET PERFORMANCE REFACTOR
+   Refactored: 2026-02-01
+
+   STRATEGY: Glassmorphism is desktop-only (1024px+)
+   Below 1024px: Solid backgrounds, no blur, no animations
+
+   ROOT CAUSES FIXED:
+   1. Fixed animated background causes GPU thrashing during scroll
+   2. backdrop-filter on 20+ cards = 20+ GPU layers
+   3. -webkit-overflow-scrolling: touch creates composited layers
+   4. 768px breakpoint missed tablets (800-1024px)
    ============================================ */
-@media (max-width: 768px) {
-    /* LAYOUT CONSTRAINTS ONLY - no scroll mechanics */
+
+/* ===========================================
+   PHASE 1: All devices under 1024px
+   (phones AND tablets)
+   =========================================== */
+@media (max-width: 1024px) {
+
+    /* --- KILL THE ANIMATED BACKGROUND --- */
+    #listings-index-glass-wrapper::before {
+        content: none !important;
+        display: none !important;
+        animation: none !important;
+    }
+
+    /* --- SIMPLE SOLID WRAPPER BACKGROUND --- */
+    #listings-index-glass-wrapper {
+        background: var(--color-gray-50) !important;
+        /* Remove any momentum scrolling layer creation */
+        -webkit-overflow-scrolling: auto;
+    }
+
+    [data-theme="dark"] #listings-index-glass-wrapper {
+        background: var(--color-gray-900) !important;
+    }
+
+    /* --- REMOVE ALL BACKDROP-FILTER --- */
+    #listings-index-glass-wrapper .glass-listing-card,
+    #listings-index-glass-wrapper .glass-search-card,
+    .listings-create-post,
+    .nexus-welcome-hero,
+    .skeleton-card,
+    .glass-listings-header,
+    .listings-filter-bar {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* --- SOLID CARD BACKGROUNDS (Light Mode) --- */
+    #listings-index-glass-wrapper .glass-listing-card {
+        background: #ffffff !important;
+        border: 1px solid var(--color-gray-200) !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    #listings-index-glass-wrapper .glass-search-card {
+        background: #ffffff !important;
+        border: 1px solid var(--color-gray-200) !important;
+    }
+
+    .listings-create-post {
+        background: #ffffff !important;
+        border: 1px solid var(--color-gray-200) !important;
+    }
+
+    .nexus-welcome-hero {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+        border: 1px solid var(--color-gray-200) !important;
+    }
+
+    .glass-listings-header {
+        background: #ffffff !important;
+    }
+
+    .listings-filter-bar {
+        background: #ffffff !important;
+    }
+
+    .skeleton-card {
+        background: #f8fafc !important;
+        border: 1px solid var(--color-gray-200) !important;
+    }
+
+    /* --- SOLID CARD BACKGROUNDS (Dark Mode) --- */
+    [data-theme="dark"] #listings-index-glass-wrapper .glass-listing-card {
+        background: #1e293b !important;
+        border: 1px solid var(--color-gray-700) !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    [data-theme="dark"] #listings-index-glass-wrapper .glass-search-card {
+        background: #1e293b !important;
+        border: 1px solid var(--color-gray-700) !important;
+    }
+
+    [data-theme="dark"] .listings-create-post {
+        background: #1e293b !important;
+        border: 1px solid var(--color-gray-700) !important;
+    }
+
+    [data-theme="dark"] .nexus-welcome-hero {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+        border: 1px solid var(--color-gray-700) !important;
+    }
+
+    [data-theme="dark"] .glass-listings-header {
+        background: #1e293b !important;
+    }
+
+    [data-theme="dark"] .listings-filter-bar {
+        background: #1e293b !important;
+    }
+
+    [data-theme="dark"] .skeleton-card {
+        background: #1e293b !important;
+        border: 1px solid var(--color-gray-700) !important;
+    }
+
+    /* --- FIX FILTER PILLS SCROLL LAYER --- */
+    .filter-pills-row {
+        -webkit-overflow-scrolling: auto !important;
+        /* Use standard scrolling, not composited layer */
+    }
+
+    /* --- LAYOUT CONSTRAINTS --- */
     #listings-grid,
     .listings-main-grid {
         max-width: 100%;
@@ -2027,94 +2149,75 @@
         box-sizing: border-box;
     }
 
-    /* Kill the fixed pseudo-element background on mobile
-       This causes scroll jank on real devices */
-    #listings-index-glass-wrapper::before {
-        content: none !important;
-        display: none !important;
+    /* --- DISABLE CARD HOVER ANIMATIONS --- */
+    .glass-listing-card {
+        transform: none !important;
+        transition: box-shadow 0.2s ease !important;
     }
 
-    /* Simple solid background instead of gradient */
-    #listings-index-glass-wrapper {
-        background: var(--color-gray-50);
-    }
-
-    [data-theme="dark"] #listings-index-glass-wrapper {
-        background: var(--color-gray-900);
-    }
-
-    /* Remove backdrop-filter on mobile for smooth scrolling */
-    #listings-index-glass-wrapper .glass-listing-card,
-    #listings-index-glass-wrapper .glass-search-card,
-    .listings-create-post,
-    .nexus-welcome-hero {
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-    }
-
-    /* Solid backgrounds to compensate visually */
-    #listings-index-glass-wrapper .glass-listing-card {
-        background: rgba(255, 255, 255, 0.95) !important;
-        border: 1px solid var(--color-gray-200);
-    }
-
-    [data-theme="dark"] #listings-index-glass-wrapper .glass-listing-card {
-        background: rgba(30, 41, 59, 0.95) !important;
-        border: 1px solid var(--color-gray-700);
-    }
-
-    #listings-index-glass-wrapper .glass-search-card {
-        background: rgba(255, 255, 255, 0.98) !important;
-    }
-
-    [data-theme="dark"] #listings-index-glass-wrapper .glass-search-card {
-        background: rgba(30, 41, 59, 0.98) !important;
-    }
-
-    .listings-create-post {
-        background: rgba(255, 255, 255, 0.98) !important;
-    }
-
-    [data-theme="dark"] .listings-create-post {
-        background: rgba(30, 41, 59, 0.95) !important;
-    }
-
-    .nexus-welcome-hero {
-        background: rgba(255, 255, 255, 0.95) !important;
-    }
-
-    [data-theme="dark"] .nexus-welcome-hero {
-        background: rgba(30, 41, 59, 0.95) !important;
+    .glass-listing-card:hover {
+        transform: none !important;
     }
 }
 
-/* Also target native app and iOS specifically (via body classes set by JS) */
+/* ===========================================
+   PHASE 2: Phone-specific (under 768px)
+   Single column grid
+   =========================================== */
+@media (max-width: 768px) {
+    .listings-main-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+}
+
+/* ===========================================
+   NATIVE APP & PLATFORM OVERRIDES
+   (Capacitor, iOS Safari, etc.)
+   =========================================== */
 .is-native #listings-index-glass-wrapper::before,
-.platform-ios #listings-index-glass-wrapper::before {
+.platform-ios #listings-index-glass-wrapper::before,
+.platform-android #listings-index-glass-wrapper::before {
     content: none !important;
     display: none !important;
 }
 
 .is-native #listings-index-glass-wrapper,
-.platform-ios #listings-index-glass-wrapper {
-    background: var(--color-gray-50);
+.platform-ios #listings-index-glass-wrapper,
+.platform-android #listings-index-glass-wrapper {
+    background: var(--color-gray-50) !important;
+    -webkit-overflow-scrolling: auto !important;
 }
 
 [data-theme="dark"].is-native #listings-index-glass-wrapper,
-[data-theme="dark"].platform-ios #listings-index-glass-wrapper {
-    background: var(--color-gray-900);
+[data-theme="dark"].platform-ios #listings-index-glass-wrapper,
+[data-theme="dark"].platform-android #listings-index-glass-wrapper {
+    background: var(--color-gray-900) !important;
 }
 
-.is-native #listings-index-glass-wrapper .glass-listing-card,
-.is-native #listings-index-glass-wrapper .glass-search-card,
+.is-native .glass-listing-card,
+.is-native .glass-search-card,
 .is-native .listings-create-post,
 .is-native .nexus-welcome-hero,
-.platform-ios #listings-index-glass-wrapper .glass-listing-card,
-.platform-ios #listings-index-glass-wrapper .glass-search-card,
+.is-native .skeleton-card,
+.platform-ios .glass-listing-card,
+.platform-ios .glass-search-card,
 .platform-ios .listings-create-post,
-.platform-ios .nexus-welcome-hero {
+.platform-ios .nexus-welcome-hero,
+.platform-ios .skeleton-card,
+.platform-android .glass-listing-card,
+.platform-android .glass-search-card,
+.platform-android .listings-create-post,
+.platform-android .nexus-welcome-hero,
+.platform-android .skeleton-card {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+}
+
+.is-native .filter-pills-row,
+.platform-ios .filter-pills-row,
+.platform-android .filter-pills-row {
+    -webkit-overflow-scrolling: auto !important;
 }
 
 /* ============================================
