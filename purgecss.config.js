@@ -336,6 +336,7 @@ module.exports = {
         'httpdocs/assets/css/terms-page.css',
         'httpdocs/assets/css/theme-transitions.css',
         'httpdocs/assets/css/toast-notifications.css',
+        'httpdocs/assets/css/totp.css',
         'httpdocs/assets/css/volunteering-critical.css',
         'httpdocs/assets/css/volunteering.css',
         'httpdocs/assets/css/wallet.css',
