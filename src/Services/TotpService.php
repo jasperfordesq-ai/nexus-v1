@@ -62,16 +62,17 @@ class TotpService
      */
     public static function generateQrCode(string $provisioningUri): string
     {
-        // Use endroid/qr-code with SVG output - doesn't require GD extension
-        $result = Builder::create()
-            ->writer(new SvgWriter())
-            ->data($provisioningUri)
-            ->encoding(new Encoding('UTF-8'))
-            ->errorCorrectionLevel(ErrorCorrectionLevel::Medium)
-            ->size(200)
-            ->margin(10)
-            ->build();
+        // Use endroid/qr-code v6.1 API with constructor parameters
+        $builder = new Builder(
+            writer: new SvgWriter(),
+            data: $provisioningUri,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Medium,
+            size: 200,
+            margin: 10
+        );
 
+        $result = $builder->build();
         return $result->getString();
     }
 
