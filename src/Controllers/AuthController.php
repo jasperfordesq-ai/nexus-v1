@@ -110,43 +110,44 @@ class AuthController
                 return;
             }
 
-            // Two-Factor Authentication Check
-            // Check if user has 2FA enabled - redirect to verification before completing login
-            if (!empty($user['totp_enabled'])) {
-                // Check if this is a trusted device (can skip 2FA)
-                // isTrustedDevice() also updates last_used_at if trusted
-                if (!\Nexus\Services\TotpService::isTrustedDevice($user['id'])) {
-                    // Not a trusted device - require 2FA verification
-                    // Store pending 2FA session (partial login state)
-                    $_SESSION['pending_2fa_user_id'] = $user['id'];
-                    $_SESSION['pending_2fa_expires'] = time() + 300; // 5 minute timeout
-
-                    if ($isJson) {
-                        header('Content-Type: application/json');
-                        echo json_encode(['requires_2fa' => true, 'redirect' => '/auth/2fa']);
-                        exit;
-                    }
-
-                    header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa');
-                    exit;
-                }
-                // Trusted device - skip 2FA, continue with normal login
-            }
-
-            // Check if user needs to set up 2FA (mandatory enrollment)
-            if (!empty($user['totp_setup_required'])) {
-                $_SESSION['pending_2fa_setup_user_id'] = $user['id'];
-                $_SESSION['pending_2fa_setup_expires'] = time() + 600; // 10 minute timeout
-
-                if ($isJson) {
-                    header('Content-Type: application/json');
-                    echo json_encode(['requires_2fa_setup' => true, 'redirect' => '/auth/2fa/setup']);
-                    exit;
-                }
-
-                header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa/setup');
-                exit;
-            }
+            // Two-Factor Authentication Check - DISABLED SYSTEM-WIDE
+            // To re-enable, uncomment the block below
+            //
+            // if (!empty($user['totp_enabled'])) {
+            //     // Check if this is a trusted device (can skip 2FA)
+            //     // isTrustedDevice() also updates last_used_at if trusted
+            //     if (!\Nexus\Services\TotpService::isTrustedDevice($user['id'])) {
+            //         // Not a trusted device - require 2FA verification
+            //         // Store pending 2FA session (partial login state)
+            //         $_SESSION['pending_2fa_user_id'] = $user['id'];
+            //         $_SESSION['pending_2fa_expires'] = time() + 300; // 5 minute timeout
+            //
+            //         if ($isJson) {
+            //             header('Content-Type: application/json');
+            //             echo json_encode(['requires_2fa' => true, 'redirect' => '/auth/2fa']);
+            //             exit;
+            //         }
+            //
+            //         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa');
+            //         exit;
+            //     }
+            //     // Trusted device - skip 2FA, continue with normal login
+            // }
+            //
+            // // Check if user needs to set up 2FA (mandatory enrollment)
+            // if (!empty($user['totp_setup_required'])) {
+            //     $_SESSION['pending_2fa_setup_user_id'] = $user['id'];
+            //     $_SESSION['pending_2fa_setup_expires'] = time() + 600; // 10 minute timeout
+            //
+            //     if ($isJson) {
+            //         header('Content-Type: application/json');
+            //         echo json_encode(['requires_2fa_setup' => true, 'redirect' => '/auth/2fa/setup']);
+            //         exit;
+            //     }
+            //
+            //     header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa/setup');
+            //     exit;
+            // }
 
             // Security: Record successful login and clear failed attempts
             if (!empty($email)) {

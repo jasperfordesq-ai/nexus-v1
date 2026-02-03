@@ -125,45 +125,46 @@ class AuthController
             $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
 
             // =====================================================
-            // 2FA CHECK - Before issuing tokens, check if 2FA is required
+            // 2FA CHECK - DISABLED SYSTEM-WIDE
+            // To re-enable, uncomment the block below
             // =====================================================
-            $has2faEnabled = !empty($user['totp_enabled']) || TotpService::isEnabled((int)$user['id']);
-
-            // Check for trusted device (skips 2FA if trusted)
-            $isTrustedDevice = $has2faEnabled && TotpService::isTrustedDevice((int)$user['id']);
-
-            if ($has2faEnabled && !$isTrustedDevice) {
-                // 2FA required - create challenge token instead of access tokens
-                $twoFactorToken = TwoFactorChallengeManager::create(
-                    (int)$user['id'],
-                    ['totp', 'backup_code']
-                );
-
-                // For session-based clients, also store in session for backward compatibility
-                if (!$wantsStateless) {
-                    if (session_status() == PHP_SESSION_NONE) {
-                        session_start();
-                    }
-                    $_SESSION['pending_2fa_user_id'] = $user['id'];
-                    $_SESSION['pending_2fa_expires'] = time() + 300; // 5 minutes
-                }
-
-                // Return 2FA required response - no access token yet
-                return $this->jsonResponse([
-                    'success' => false,
-                    'requires_2fa' => true,
-                    'two_factor_token' => $twoFactorToken,
-                    'methods' => ['totp', 'backup_code'],
-                    'code' => ApiErrorCodes::AUTH_2FA_REQUIRED,
-                    'message' => 'Two-factor authentication required',
-                    // Include partial user info for UI
-                    'user' => [
-                        'id' => $user['id'],
-                        'first_name' => $user['first_name'],
-                        'email_masked' => $this->maskEmail($user['email'])
-                    ]
-                ], 200); // 200 OK because this is expected flow, not an error
-            }
+            // $has2faEnabled = !empty($user['totp_enabled']) || TotpService::isEnabled((int)$user['id']);
+            //
+            // // Check for trusted device (skips 2FA if trusted)
+            // $isTrustedDevice = $has2faEnabled && TotpService::isTrustedDevice((int)$user['id']);
+            //
+            // if ($has2faEnabled && !$isTrustedDevice) {
+            //     // 2FA required - create challenge token instead of access tokens
+            //     $twoFactorToken = TwoFactorChallengeManager::create(
+            //         (int)$user['id'],
+            //         ['totp', 'backup_code']
+            //     );
+            //
+            //     // For session-based clients, also store in session for backward compatibility
+            //     if (!$wantsStateless) {
+            //         if (session_status() == PHP_SESSION_NONE) {
+            //             session_start();
+            //         }
+            //         $_SESSION['pending_2fa_user_id'] = $user['id'];
+            //         $_SESSION['pending_2fa_expires'] = time() + 300; // 5 minutes
+            //     }
+            //
+            //     // Return 2FA required response - no access token yet
+            //     return $this->jsonResponse([
+            //         'success' => false,
+            //         'requires_2fa' => true,
+            //         'two_factor_token' => $twoFactorToken,
+            //         'methods' => ['totp', 'backup_code'],
+            //         'code' => ApiErrorCodes::AUTH_2FA_REQUIRED,
+            //         'message' => 'Two-factor authentication required',
+            //         // Include partial user info for UI
+            //         'user' => [
+            //             'id' => $user['id'],
+            //             'first_name' => $user['first_name'],
+            //             'email_masked' => $this->maskEmail($user['email'])
+            //         ]
+            //     ], 200); // 200 OK because this is expected flow, not an error
+            // }
 
             // =====================================================
             // NO 2FA or TRUSTED DEVICE - Complete login normally
@@ -493,9 +494,17 @@ class AuthController
      * Restore session from Bearer token
      * Mobile apps should call this on page load if they have tokens but no session
      * This bridges the gap between token-based auth and PHP session-based pages
+     *
+     * @deprecated This endpoint violates stateless auth principles. Mobile apps should use
+     *             Bearer tokens directly without session sync. Will be removed after mobile
+     *             app audit confirms no critical dependencies. Sunset: 2026-08-01
      */
     public function restoreSession()
     {
+        // DEPRECATED: Add deprecation headers
+        header('X-API-Deprecated: true');
+        header('Sunset: Sat, 01 Aug 2026 00:00:00 GMT');
+
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
@@ -565,7 +574,12 @@ class AuthController
             'success' => true,
             'message' => 'Session restored from token',
             'user_id' => $user['id'],
-            'session_id' => session_id()
+            'session_id' => session_id(),
+            '_deprecated' => [
+                'message' => 'This endpoint is deprecated. Mobile apps should use Bearer tokens directly without session sync.',
+                'sunset' => '2026-08-01',
+                'replacement' => 'Use Authorization: Bearer <token> header on all API requests'
+            ]
         ]);
     }
 
@@ -773,13 +787,32 @@ class AuthController
     }
 
     /**
-     * Logout - destroys session and invalidates tokens
+     * Logout - destroys session and optionally revokes refresh token
      * POST /api/auth/logout
+     *
+     * Body (optional): { "refresh_token": "..." } to also revoke the refresh token
      */
     public function logout()
     {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
+        }
+
+        // Get user ID before clearing session
+        $userId = $_SESSION['user_id'] ?? null;
+
+        // Also check Bearer token for user ID
+        if (!$userId) {
+            $userId = $this->getAuthenticatedUserId();
+        }
+
+        // If a refresh token is provided, revoke it
+        $data = $this->getJsonInput();
+        $refreshToken = $data['refresh_token'] ?? '';
+        $tokenRevoked = false;
+
+        if (!empty($refreshToken) && $userId) {
+            $tokenRevoked = TokenService::revokeToken($refreshToken, $userId);
         }
 
         // Clear all session data
@@ -802,9 +835,149 @@ class AuthController
         // Destroy the session
         session_destroy();
 
-        return $this->jsonResponse([
+        $response = [
             'success' => true,
             'message' => 'Logged out successfully'
+        ];
+
+        if ($tokenRevoked) {
+            $response['refresh_token_revoked'] = true;
+        }
+
+        return $this->jsonResponse($response);
+    }
+
+    /**
+     * Revoke a specific refresh token
+     * POST /api/auth/revoke
+     *
+     * Requires Bearer token authentication.
+     * Body: { "refresh_token": "..." }
+     */
+    public function revokeToken()
+    {
+        // Require Bearer authentication
+        $userId = $this->getAuthenticatedUserId();
+        if (!$userId) {
+            return $this->errorResponse(
+                'Authentication required',
+                ApiErrorCodes::AUTH_TOKEN_MISSING,
+                401
+            );
+        }
+
+        $data = $this->getJsonInput();
+        $refreshToken = $data['refresh_token'] ?? '';
+
+        if (empty($refreshToken)) {
+            return $this->errorResponse(
+                'Refresh token required',
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                400
+            );
+        }
+
+        // Revoke the token
+        $revoked = TokenService::revokeToken($refreshToken, $userId);
+
+        if (!$revoked) {
+            return $this->errorResponse(
+                'Invalid refresh token or already revoked',
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                400
+            );
+        }
+
+        return $this->jsonResponse([
+            'data' => ['revoked' => true]
+        ]);
+    }
+
+    /**
+     * Revoke all refresh tokens for the authenticated user
+     * POST /api/auth/revoke-all
+     *
+     * Requires Bearer token authentication.
+     * Use for "log out everywhere" functionality.
+     */
+    public function revokeAllTokens()
+    {
+        // Require Bearer authentication
+        $userId = $this->getAuthenticatedUserId();
+        if (!$userId) {
+            return $this->errorResponse(
+                'Authentication required',
+                ApiErrorCodes::AUTH_TOKEN_MISSING,
+                401
+            );
+        }
+
+        // Revoke all tokens for this user
+        $revokedCount = TokenService::revokeAllTokensForUser($userId);
+
+        return $this->jsonResponse([
+            'data' => [
+                'revoked_count' => $revokedCount,
+                'message' => 'All refresh tokens have been revoked. You will need to log in again on all devices.'
+            ]
+        ]);
+    }
+
+    /**
+     * Get authenticated user ID from Bearer token
+     *
+     * @return int|null
+     */
+    private function getAuthenticatedUserId(): ?int
+    {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        if (empty($authHeader) || !preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
+            return null;
+        }
+
+        $token = $matches[1];
+        $payload = TokenService::validateToken($token);
+
+        if (!$payload || ($payload['type'] ?? 'access') !== 'access') {
+            return null;
+        }
+
+        return $payload['user_id'] ?? null;
+    }
+
+    /**
+     * Get a CSRF token for session-based authentication
+     * GET /api/auth/csrf-token
+     *
+     * This endpoint is for SPAs that use session-based auth (not Bearer tokens).
+     * Bearer-authenticated clients do NOT need CSRF tokens.
+     *
+     * Note: Rate limited to prevent token farming.
+     */
+    public function getCsrfToken()
+    {
+        // Rate limit this endpoint (10 per minute per IP)
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $rateLimitResult = \Nexus\Core\RateLimiter::check($ip . ':csrf', 'csrf_token');
+
+        if ($rateLimitResult['limited']) {
+            header('Retry-After: ' . $rateLimitResult['retry_after']);
+            return $this->errorResponse(
+                'Too many requests. Please try again later.',
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                429
+            );
+        }
+
+        \Nexus\Core\RateLimiter::recordAttempt($ip . ':csrf', 'csrf_token', true);
+
+        // Generate and return the CSRF token
+        $token = \Nexus\Core\Csrf::generate();
+
+        return $this->jsonResponse([
+            'data' => [
+                'csrf_token' => $token
+            ]
         ]);
     }
 
