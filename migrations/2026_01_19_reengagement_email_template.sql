@@ -8,9 +8,10 @@
 -- ============================================================================
 
 -- First, check if it already exists to avoid duplicates
+-- Note: Changed from tenant_id=0 to tenant_id=2 (hour-timebank) because tenant 0 doesn't exist
 SET @template_exists = (
     SELECT COUNT(*) FROM newsletter_templates
-    WHERE tenant_id = 0
+    WHERE tenant_id = 2
     AND name = 'Discover the New App'
     AND category = 'starter'
 );
@@ -28,7 +29,7 @@ INSERT INTO newsletter_templates (
     created_at
 )
 SELECT
-    0,
+    2,
     'Discover the New App',
     'Re-engagement email for members who have never logged in. Perfect for introducing legacy members to your new platform. Use with the "Never Logged In" segment.',
     'starter',

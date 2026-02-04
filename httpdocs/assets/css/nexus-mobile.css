@@ -16,7 +16,10 @@
 
     body {
         overflow-x: hidden !important;
-        overflow-y: visible !important;
+        /* FIX 2026-02-01: Changed from visible to auto
+           overflow-y: visible is non-standard and fragile (relies on scroll-fix-emergency.css)
+           auto is correct - allows scrolling when content overflows */
+        overflow-y: auto !important;
         max-width: 100vw !important;
         min-height: 100vh !important;
         position: relative !important;

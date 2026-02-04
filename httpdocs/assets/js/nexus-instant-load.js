@@ -10,7 +10,7 @@
     // ============================================
     // DEBUG STAMP - TEMPORARY (remove after confirming fix)
     // ============================================
-    var INSTANT_LOAD_VERSION = 'v2026-02-01-scrollfix';
+    var INSTANT_LOAD_VERSION = 'v2026-02-01-scrollfix2';
     console.log('[NEXUS_INSTANT_LOAD] ' + INSTANT_LOAD_VERSION);
 
     // Show debug badge if ?debug_instant=1
@@ -220,6 +220,45 @@
             showContent();
         }
     }, 1500);
+
+    // ============================================
+    // 4.5. SAFETY NET: One-time scroll unlock on DOMContentLoaded (2026-02-01)
+    // Fixes stuck scroll-blocking classes when overlay/menu not actually active
+    // ============================================
+
+    function safetyNetScrollUnlock() {
+        // Check if scroll-blocking classes are stuck without their overlays
+        var menuActive = document.getElementById('mobileMenu') &&
+                         document.getElementById('mobileMenu').classList.contains('active');
+        var notifActive = document.getElementById('mobileNotifications') &&
+                          document.getElementById('mobileNotifications').classList.contains('active');
+        var modalActive = document.querySelector('.modal.active, [role="dialog"][aria-hidden="false"]');
+        var sheetActive = document.querySelector('.fds-sheet.active, .mobile-sheet.active');
+
+        // If body has blocking classes but no overlay is actually open, remove them
+        if (!menuActive && !notifActive && !modalActive && !sheetActive) {
+            var blockingClasses = ['js-overflow-hidden', 'mobile-menu-open', 'mobile-notifications-open', 'modal-open', 'fds-sheet-open', 'drawer-open', 'menu-open'];
+            var hadBlockingClass = false;
+
+            blockingClasses.forEach(function(cls) {
+                if (document.body.classList.contains(cls)) {
+                    document.body.classList.remove(cls);
+                    hadBlockingClass = true;
+                }
+            });
+
+            if (hadBlockingClass) {
+                console.log('[NEXUS_INSTANT_LOAD] Safety net: Removed stuck scroll-blocking classes');
+            }
+        }
+    }
+
+    // Run once on DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', safetyNetScrollUnlock);
+    } else {
+        safetyNetScrollUnlock();
+    }
 
     // ============================================
     // 5. GUARANTEED SCROLL RESTORATION

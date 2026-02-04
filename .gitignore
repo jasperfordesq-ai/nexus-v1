@@ -81,7 +81,11 @@ firebase-service-account.json
 # Backup files
 *.bak
 *.backup
-/backups/
+/backups/db/*.sql
+!backups/db/.gitkeep
+
+# Docker local overrides
+.env.docker.local
 
 # Export files
 /exports/

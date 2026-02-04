@@ -361,7 +361,10 @@ button.mobile-tab-item,
         overflow: hidden;
         /* NOTE: position: fixed breaks iOS scroll inside the menu panel.
            Using overflow: hidden alone is sufficient to prevent body scroll. */
-        touch-action: none; /* Prevent touch scroll on body */
+        /* FIX 2026-02-01: Changed from touch-action: none to pan-x
+           touch-action: none kills ALL touch interaction - if class gets stuck, page is dead.
+           pan-x still blocks vertical scroll behind menu but doesn't nuke everything. */
+        touch-action: pan-x;
     }
 }
 
