@@ -101,6 +101,8 @@ tags:
     description: Unified search
   - name: Volunteering
     description: Volunteer opportunities
+  - name: Tenant
+    description: Tenant configuration and bootstrap
 
 components:
   securitySchemes:
@@ -115,6 +117,21 @@ components:
       in: cookie
       name: PHPSESSID
       description: Session cookie (web browsers)
+
+  parameters:
+    X-Tenant-ID:
+      name: X-Tenant-ID
+      in: header
+      description: |
+        Tenant ID for multi-tenant requests. If not provided, tenant is resolved from:
+        1. Domain matching
+        2. Bearer token payload (tenant_id claim)
+        3. URL path slug
+        4. Session (for web clients)
+        5. Default to master tenant
+      schema:
+        type: integer
+        example: 1
 
   schemas:
     Error:
@@ -197,6 +214,154 @@ components:
           type: string
           format: date-time
           nullable: true
+
+    TenantBootstrap:
+      type: object
+      description: Tenant configuration for frontend initialization
+      properties:
+        id:
+          type: integer
+          description: Tenant ID
+          example: 2
+        name:
+          type: string
+          description: Tenant display name
+          example: "Hour Timebank"
+        slug:
+          type: string
+          description: URL slug
+          example: "hour-timebank"
+        domain:
+          type: string
+          description: Custom domain (if configured)
+          example: "hour-timebank.ie"
+        tagline:
+          type: string
+          description: Short description
+          example: "Exchange skills, build community"
+        default_layout:
+          type: string
+          enum: [modern, civicone]
+          description: Default theme
+          example: "modern"
+        branding:
+          type: object
+          properties:
+            logo_url:
+              type: string
+              format: uri
+              example: "https://hour-timebank.ie/uploads/tenants/2/logo.png"
+            favicon_url:
+              type: string
+              format: uri
+            primary_color:
+              type: string
+              description: CSS color value
+              example: "#6366f1"
+            og_image_url:
+              type: string
+              format: uri
+              description: Open Graph image for social sharing
+        features:
+          type: object
+          description: Feature flags indicating which modules are enabled
+          properties:
+            listings:
+              type: boolean
+            events:
+              type: boolean
+            groups:
+              type: boolean
+            wallet:
+              type: boolean
+            messages:
+              type: boolean
+            feed:
+              type: boolean
+            notifications:
+              type: boolean
+            search:
+              type: boolean
+            connections:
+              type: boolean
+            reviews:
+              type: boolean
+            gamification:
+              type: boolean
+            volunteering:
+              type: boolean
+            federation:
+              type: boolean
+            blog:
+              type: boolean
+            resources:
+              type: boolean
+            goals:
+              type: boolean
+            polls:
+              type: boolean
+        seo:
+          type: object
+          properties:
+            meta_title:
+              type: string
+              example: "Hour Timebank | Community Time Exchange"
+            meta_description:
+              type: string
+            h1_headline:
+              type: string
+            hero_intro:
+              type: string
+        config:
+          type: object
+          description: Public configuration
+          properties:
+            footer_text:
+              type: string
+            time_unit:
+              type: string
+              example: "hour"
+            time_unit_plural:
+              type: string
+              example: "hours"
+            modules:
+              type: object
+        contact:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+            phone:
+              type: string
+            address:
+              type: string
+            location:
+              type: string
+        social:
+          type: object
+          properties:
+            facebook:
+              type: string
+              format: uri
+            twitter:
+              type: string
+              format: uri
+            instagram:
+              type: string
+              format: uri
+            linkedin:
+              type: string
+              format: uri
+            youtube:
+              type: string
+              format: uri
+      required:
+        - id
+        - name
+        - slug
+        - default_layout
+        - features
 
     Listing:
       type: object
@@ -550,6 +715,105 @@ components:
                 field: "title"
 
 paths:
+  # ============================================
+  # TENANT BOOTSTRAP ENDPOINT
+  # ============================================
+  /api/v2/tenant/bootstrap:
+    get:
+      tags: [Tenant]
+      summary: Get tenant configuration for frontend initialization
+      description: |
+        Returns public tenant configuration including branding, features, and settings.
+        This is a **public endpoint** (no authentication required).
+
+        Use this endpoint on frontend app load to configure:
+        - Tenant branding (logo, colors, favicon)
+        - Enabled features/modules
+        - SEO metadata
+        - Contact information
+        - Social media links
+
+        **Tenant Resolution:**
+        The tenant is determined by (in order):
+        1. Domain matching (HTTP_HOST)
+        2. X-Tenant-ID header
+        3. Bearer token tenant_id claim (if authenticated)
+        4. Defaults to master tenant
+
+        **Caching:**
+        Response is cached for 10 minutes. Changes to tenant configuration
+        may take up to 10 minutes to propagate.
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: Tenant configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TenantBootstrap'
+                  meta:
+                    type: object
+                    properties:
+                      base_url:
+                        type: string
+                        example: "https://hour-timebank.ie"
+              example:
+                data:
+                  id: 2
+                  name: "Hour Timebank"
+                  slug: "hour-timebank"
+                  domain: "hour-timebank.ie"
+                  tagline: "Exchange skills, build community"
+                  default_layout: "modern"
+                  branding:
+                    logo_url: "https://hour-timebank.ie/uploads/tenants/2/logo.png"
+                    favicon_url: "https://hour-timebank.ie/uploads/tenants/2/favicon.ico"
+                    primary_color: "#6366f1"
+                    og_image_url: "https://hour-timebank.ie/uploads/tenants/2/og.jpg"
+                  features:
+                    listings: true
+                    events: true
+                    groups: true
+                    wallet: true
+                    messages: true
+                    feed: true
+                    notifications: true
+                    search: true
+                    connections: true
+                    reviews: true
+                    gamification: false
+                    volunteering: true
+                    federation: false
+                    blog: true
+                    resources: false
+                    goals: true
+                    polls: true
+                  seo:
+                    meta_title: "Hour Timebank | Community Time Exchange"
+                    meta_description: "Join our community of skills exchangers in Dublin"
+                  config:
+                    footer_text: "Registered Charity Number: 12345"
+                    time_unit: "hour"
+                    time_unit_plural: "hours"
+                  contact:
+                    email: "contact@hour-timebank.ie"
+                    location: "Dublin, Ireland"
+                  social:
+                    facebook: "https://facebook.com/hourtimebank"
+                    twitter: "https://twitter.com/hourtimebank"
+                meta:
+                  base_url: "https://hour-timebank.ie"
+        '400':
+          description: Invalid tenant ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   # ============================================
   # AUTH ENDPOINTS
   # ============================================
@@ -1798,6 +2062,212 @@ paths:
                           $ref: '#/components/schemas/Event'
         '400':
           $ref: '#/components/responses/ValidationError'
+
+  # ============================================
+  # Phase 5 - Token Revocation Endpoints
+  # ============================================
+
+  /api/auth/revoke:
+    post:
+      tags: [Auth]
+      summary: Revoke a specific refresh token
+      description: |
+        Invalidates a specific refresh token. The token will no longer be usable
+        for obtaining new access tokens.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+                  description: The refresh token to revoke
+      responses:
+        '200':
+          description: Token revoked successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      revoked:
+                        type: boolean
+                        example: true
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/auth/revoke-all:
+    post:
+      tags: [Auth]
+      summary: Revoke all refresh tokens (logout everywhere)
+      description: |
+        Invalidates all refresh tokens for the authenticated user.
+        Use this for "log out everywhere" functionality.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: All tokens revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      revoked_count:
+                        type: integer
+                        description: Number of tokens affected
+                        example: 3
+                      message:
+                        type: string
+                        example: "All refresh tokens have been revoked."
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/auth/csrf-token:
+    get:
+      tags: [Auth]
+      summary: Get CSRF token for session-based auth
+      description: |
+        Returns a CSRF token for SPAs using session-based authentication.
+
+        **Note:** Bearer-authenticated clients do NOT need CSRF tokens.
+        Rate limited to 10 requests per minute per IP.
+      responses:
+        '200':
+          description: CSRF token generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      csrf_token:
+                        type: string
+                        example: "a1b2c3d4e5f6..."
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+
+  # ============================================
+  # Phase 5 - V2 Registration
+  # ============================================
+
+  /api/v2/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user account (v2)
+      description: |
+        Creates a new user account and returns access + refresh tokens immediately.
+        Triggers email verification flow automatically.
+
+        Rate limited to 5 registrations per hour per IP.
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - password_confirmation
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  minLength: 12
+                  description: Minimum 12 characters
+                password_confirmation:
+                  type: string
+                name:
+                  type: string
+                  description: Full name (alternative to first_name/last_name)
+                  example: "John Doe"
+                first_name:
+                  type: string
+                  example: "John"
+                last_name:
+                  type: string
+                  example: "Doe"
+                tenant_id:
+                  type: integer
+                  description: Tenant ID (defaults to current tenant context)
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          email:
+                            type: string
+                          first_name:
+                            type: string
+                          last_name:
+                            type: string
+                          name:
+                            type: string
+                          tenant_id:
+                            type: integer
+                      access_token:
+                        type: string
+                      refresh_token:
+                        type: string
+                      token_type:
+                        type: string
+                        example: "Bearer"
+                      expires_in:
+                        type: integer
+                        description: Access token expiry in seconds
+                      refresh_expires_in:
+                        type: integer
+                        description: Refresh token expiry in seconds
+                      requires_verification:
+                        type: boolean
+                        example: true
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
 
 security:
   - bearerAuth: []

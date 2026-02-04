@@ -666,4 +666,9 @@ require __DIR__ . '/../../layouts/modern/header.php';
 </div><!-- #listings-index-glass-wrapper -->
 </div>
 
+<?php if (!empty($_GET['debug_scroll'])): ?>
+<!-- LIVE SCROLL DEBUG - Shows on-screen overlay with computed styles -->
+<script src="/assets/js/debug-scroll-live.js"></script>
+<?php endif; ?>
+
 <?php require __DIR__ . '/../../layouts/modern/footer.php'; ?>

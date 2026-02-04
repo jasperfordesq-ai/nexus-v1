@@ -6,14 +6,17 @@
 -- ============================================
 
 -- Add expiry tracking and versioning to existing cookie_consents table
+-- Note: MariaDB doesn't support COMMENT with AFTER in ADD COLUMN, so we add columns without comments
 ALTER TABLE cookie_consents
-ADD COLUMN IF NOT EXISTS expires_at DATETIME NULL AFTER consent_string COMMENT 'When consent expires (typically 12 months)',
-ADD COLUMN IF NOT EXISTS consent_version VARCHAR(20) DEFAULT '1.0' AFTER expires_at COMMENT 'Version of consent terms',
-ADD COLUMN IF NOT EXISTS last_updated_by_user DATETIME NULL AFTER updated_at COMMENT 'When user last changed preferences',
-ADD COLUMN IF NOT EXISTS withdrawal_date DATETIME NULL AFTER last_updated_by_user COMMENT 'When consent was withdrawn',
-ADD COLUMN IF NOT EXISTS source VARCHAR(50) DEFAULT 'web' AFTER withdrawal_date COMMENT 'Source: web, mobile, api',
-ADD INDEX IF NOT EXISTS idx_expires_at (expires_at),
-ADD INDEX IF NOT EXISTS idx_consent_version (consent_version);
+ADD COLUMN IF NOT EXISTS expires_at DATETIME NULL,
+ADD COLUMN IF NOT EXISTS consent_version VARCHAR(20) DEFAULT '1.0',
+ADD COLUMN IF NOT EXISTS last_updated_by_user DATETIME NULL,
+ADD COLUMN IF NOT EXISTS withdrawal_date DATETIME NULL,
+ADD COLUMN IF NOT EXISTS source VARCHAR(50) DEFAULT 'web';
+
+-- Add indexes separately
+CREATE INDEX IF NOT EXISTS idx_expires_at ON cookie_consents(expires_at);
+CREATE INDEX IF NOT EXISTS idx_consent_version ON cookie_consents(consent_version);
 
 -- ============================================
 -- Cookie Inventory Table
