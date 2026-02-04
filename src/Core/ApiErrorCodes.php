@@ -53,6 +53,12 @@ class ApiErrorCodes
     /** CSRF token is missing or invalid */
     public const AUTH_CSRF_INVALID = 'AUTH_CSRF_INVALID';
 
+    /** Invalid tenant ID provided in X-Tenant-ID header */
+    public const INVALID_TENANT = 'INVALID_TENANT';
+
+    /** Token tenant_id doesn't match X-Tenant-ID header */
+    public const TENANT_MISMATCH = 'TENANT_MISMATCH';
+
     /** 2FA code required to complete login */
     public const AUTH_2FA_REQUIRED = 'AUTH_2FA_REQUIRED';
 
@@ -202,7 +208,8 @@ class ApiErrorCodes
             self::VALIDATION_TOO_SHORT,
             self::VALIDATION_TOO_LONG,
             self::VALIDATION_OUT_OF_RANGE,
-            self::UPLOAD_NO_FILE => 400,
+            self::UPLOAD_NO_FILE,
+            self::INVALID_TENANT => 400,
 
             // 401 Unauthorized
             self::AUTH_TOKEN_EXPIRED,
@@ -227,7 +234,8 @@ class ApiErrorCodes
             self::AUTH_ACCOUNT_DELETED,
             self::AUTH_CSRF_INVALID,
             self::RESOURCE_FORBIDDEN,
-            self::FORBIDDEN => 403,
+            self::FORBIDDEN,
+            self::TENANT_MISMATCH => 403,
 
             // 404 Not Found
             self::RESOURCE_NOT_FOUND => 404,

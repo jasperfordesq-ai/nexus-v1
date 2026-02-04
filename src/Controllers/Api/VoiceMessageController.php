@@ -34,14 +34,8 @@ class VoiceMessageController
             exit;
         }
 
-        // CSRF check for non-API requests
-        if (!empty($_POST['csrf_token'])) {
-            if (!Csrf::verify($_POST['csrf_token'])) {
-                http_response_code(403);
-                echo json_encode(['error' => 'Invalid CSRF token']);
-                exit;
-            }
-        }
+        // CSRF check - automatically skipped for Bearer token auth
+        Csrf::verifyOrDieJson();
 
         try {
             $senderId = $userId;

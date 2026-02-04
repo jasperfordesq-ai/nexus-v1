@@ -3,9 +3,12 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Core\ApiAuth;
+use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\Csrf;
 use Nexus\Core\TenantContext;
 use Nexus\Core\RateLimiter;
+use Nexus\Helpers\UrlHelper;
+use Nexus\Config\ApiDeprecation;
 
 /**
  * BaseApiController - Base class for all API controllers
@@ -14,12 +17,17 @@ use Nexus\Core\RateLimiter;
  * - JSON response handling with consistent envelope format
  * - Authentication (session + Bearer token)
  * - CSRF verification
- * - Rate limiting
+ * - Rate limiting with headers
  * - Input parsing (JSON body + POST)
- * - Error handling
+ * - Error handling with standardized codes
+ * - API versioning headers
  *
  * All API controllers should extend this class to eliminate code duplication
  * and ensure consistent behavior across the API.
+ *
+ * Response envelope formats:
+ * - v1 (legacy): { "success": true/false, "data": {...}, "error": "...", "code": "..." }
+ * - v2 (current): { "data": {...} } or { "errors": [{code, message, field?}] }
  *
  * @package Nexus\Controllers\Api
  */
@@ -27,10 +35,22 @@ abstract class BaseApiController
 {
     use ApiAuth;
 
+    /** Current API version for v2 endpoints */
+    protected const API_VERSION = '2.0';
+
+    /** API version for legacy endpoints */
+    protected const API_VERSION_LEGACY = '1.0';
+
     /**
      * Cached input data from request body
      */
     private ?array $inputData = null;
+
+    /**
+     * Whether this controller is a v2 API (uses respondWithData format)
+     * Override in subclasses to mark as v2
+     */
+    protected bool $isV2Api = false;
 
     // ============================================
     // RESPONSE METHODS
@@ -39,16 +59,121 @@ abstract class BaseApiController
     /**
      * Send a JSON response and exit
      *
+     * Automatically adds:
+     * - Content-Type header
+     * - API version header
+     * - Rate limit headers (if rate limiting was applied)
+     *
      * @param mixed $data Response data
      * @param int $status HTTP status code
      * @return never
      */
     protected function jsonResponse($data, int $status = 200): void
     {
+        // Set content type
         header('Content-Type: application/json');
+
+        // Set API version header
+        $this->setApiVersionHeaders();
+
+        // Set rate limit headers if rate limiting was applied
+        $this->setRateLimitHeaders();
+
+        // Set X-Tenant-ID response header so clients can confirm tenant context
+        $this->setTenantHeader();
+
         http_response_code($status);
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
+    }
+
+    /**
+     * Set API version headers and deprecation signals
+     */
+    private function setApiVersionHeaders(): void
+    {
+        $version = $this->isV2Api ? self::API_VERSION : self::API_VERSION_LEGACY;
+        header('API-Version: ' . $version);
+
+        // For v2 APIs, no deprecation needed
+        if ($this->isV2Api) {
+            return;
+        }
+
+        // Check config-driven deprecation mapping
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+
+        $deprecationHeaders = ApiDeprecation::getDeprecationHeaders($method, $path);
+
+        if (!empty($deprecationHeaders)) {
+            foreach ($deprecationHeaders as $name => $value) {
+                header($name . ': ' . $value);
+            }
+            return;
+        }
+
+        // Fallback: Check controller-level deprecation flag
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        if (strpos($requestUri, '/api/v2/') === false && strpos($requestUri, '/api/') !== false) {
+            if ($this->hasV2Equivalent()) {
+                header('X-API-Deprecated: true');
+                header('Sunset: ' . ApiDeprecation::SUNSET_DATE);
+            }
+        }
+    }
+
+    /**
+     * Check if the current v1 endpoint has a v2 equivalent
+     * Override in controllers to mark specific endpoints as deprecated
+     *
+     * @return bool
+     */
+    protected function hasV2Equivalent(): bool
+    {
+        // Default: assume no v2 equivalent exists
+        // Override in specific controllers to mark deprecation
+        return false;
+    }
+
+    /**
+     * Get deprecation notice for response body
+     *
+     * @return array|null _deprecated object or null
+     */
+    protected function getDeprecationNotice(): ?array
+    {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+
+        return ApiDeprecation::getDeprecationNotice($method, $path);
+    }
+
+    /**
+     * Set rate limit headers from the current rate limit state
+     */
+    private function setRateLimitHeaders(): void
+    {
+        $state = RateLimiter::getCurrentState();
+
+        if ($state === null) {
+            return;
+        }
+
+        header('X-RateLimit-Limit: ' . $state['limit']);
+        header('X-RateLimit-Remaining: ' . $state['remaining']);
+        header('X-RateLimit-Reset: ' . $state['reset']);
+    }
+
+    /**
+     * Set X-Tenant-ID response header so clients can confirm which tenant context is active
+     */
+    private function setTenantHeader(): void
+    {
+        $tenantId = TenantContext::getId();
+        if ($tenantId) {
+            header('X-Tenant-ID: ' . $tenantId);
+        }
     }
 
     /**
@@ -138,12 +263,14 @@ abstract class BaseApiController
      */
     protected function noContent(): void
     {
+        $this->setApiVersionHeaders();
+        $this->setRateLimitHeaders();
         http_response_code(204);
         exit;
     }
 
     /**
-     * Send a paginated response
+     * Send a paginated response (offset-based pagination)
      *
      * @param array $items Array of items
      * @param int $total Total count
@@ -164,6 +291,187 @@ abstract class BaseApiController
                 'has_more' => $page < $totalPages,
             ]
         ]);
+    }
+
+    // ============================================
+    // STANDARDIZED API RESPONSE ENVELOPE
+    // ============================================
+    // These methods implement the universal API response format:
+    // {
+    //   "data": {},          // or [] for collections
+    //   "meta": {},          // pagination, request info
+    //   "errors": []         // array of {code, message, field?}
+    // }
+
+    /**
+     * Send a standardized data response
+     *
+     * Response format:
+     * {
+     *   "data": { ... },
+     *   "meta": { "base_url": "...", ... }  // always includes base_url for absolute URL construction
+     * }
+     *
+     * @param mixed $data Response data (object or array)
+     * @param array|null $meta Optional metadata (base_url is added automatically)
+     * @param int $status HTTP status code (default 200)
+     * @return never
+     */
+    protected function respondWithData($data, ?array $meta = null, int $status = 200): void
+    {
+        $response = ['data' => $data];
+
+        // Always include base_url in meta for v2 APIs
+        $baseMeta = ['base_url' => UrlHelper::getBaseUrl()];
+
+        if ($meta !== null) {
+            $response['meta'] = array_merge($baseMeta, $meta);
+        } else {
+            $response['meta'] = $baseMeta;
+        }
+
+        $this->jsonResponse($response, $status);
+    }
+
+    /**
+     * Send a standardized error response
+     *
+     * Response format:
+     * {
+     *   "errors": [
+     *     { "code": "ERROR_CODE", "message": "Human readable message", "field": "optional_field" }
+     *   ]
+     * }
+     *
+     * @param string $code Error code for programmatic handling
+     * @param string $message Human-readable error message
+     * @param string|null $field Optional field name for validation errors
+     * @param int $status HTTP status code (default 400)
+     * @return never
+     */
+    protected function respondWithError(string $code, string $message, ?string $field = null, int $status = 400): void
+    {
+        $error = [
+            'code' => $code,
+            'message' => $message,
+        ];
+
+        if ($field !== null) {
+            $error['field'] = $field;
+        }
+
+        $this->jsonResponse(['errors' => [$error]], $status);
+    }
+
+    /**
+     * Send multiple errors in a single response
+     *
+     * @param array $errors Array of errors, each with 'code', 'message', optional 'field'
+     * @param int $status HTTP status code (default 400)
+     * @return never
+     */
+    protected function respondWithErrors(array $errors, int $status = 400): void
+    {
+        $this->jsonResponse(['errors' => $errors], $status);
+    }
+
+    /**
+     * Send a standardized collection response with cursor-based pagination
+     *
+     * Response format:
+     * {
+     *   "data": [ ... ],
+     *   "meta": {
+     *     "cursor": "abc123",      // cursor for next page (null if no more)
+     *     "per_page": 20,
+     *     "has_more": true
+     *   }
+     * }
+     *
+     * @param array $items Array of items
+     * @param string|null $cursor Cursor for next page (null if no more items)
+     * @param int $perPage Items per page (for meta info)
+     * @param bool $hasMore Whether more items exist
+     * @return never
+     */
+    protected function respondWithCollection(array $items, ?string $cursor = null, int $perPage = 20, bool $hasMore = false): void
+    {
+        $meta = [
+            'base_url' => UrlHelper::getBaseUrl(),
+            'per_page' => $perPage,
+            'has_more' => $hasMore,
+        ];
+
+        if ($cursor !== null) {
+            $meta['cursor'] = $cursor;
+        }
+
+        $this->jsonResponse([
+            'data' => $items,
+            'meta' => $meta,
+        ]);
+    }
+
+    /**
+     * Send a collection response with offset-based pagination metadata
+     *
+     * Response format:
+     * {
+     *   "data": [ ... ],
+     *   "meta": {
+     *     "page": 1,
+     *     "per_page": 20,
+     *     "total": 100,
+     *     "total_pages": 5,
+     *     "has_more": true
+     *   }
+     * }
+     *
+     * @param array $items Array of items
+     * @param int $total Total count of all items
+     * @param int $page Current page number
+     * @param int $perPage Items per page
+     * @return never
+     */
+    protected function respondWithPaginatedCollection(array $items, int $total, int $page = 1, int $perPage = 20): void
+    {
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 0;
+
+        $this->jsonResponse([
+            'data' => $items,
+            'meta' => [
+                'base_url' => UrlHelper::getBaseUrl(),
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => $totalPages,
+                'has_more' => $page < $totalPages,
+            ],
+        ]);
+    }
+
+    /**
+     * Generate a cursor from an ID for cursor-based pagination
+     * The cursor is base64-encoded to be URL-safe
+     *
+     * @param int|string $id The ID to encode as a cursor
+     * @return string The encoded cursor
+     */
+    protected function encodeCursor($id): string
+    {
+        return base64_encode((string) $id);
+    }
+
+    /**
+     * Decode a cursor back to an ID for cursor-based pagination
+     *
+     * @param string $cursor The cursor to decode
+     * @return string|null The decoded ID, or null if invalid
+     */
+    protected function decodeCursor(string $cursor): ?string
+    {
+        $decoded = base64_decode($cursor, true);
+        return $decoded !== false ? $decoded : null;
     }
 
     // ============================================
@@ -224,7 +532,7 @@ abstract class BaseApiController
 
         if ($value === null || $value === '') {
             $message = $errorMessage ?? "Missing required field: {$key}";
-            $this->error($message, 400, 'VALIDATION_ERROR', ['field' => $key]);
+            $this->error($message, 400, ApiErrorCodes::VALIDATION_REQUIRED_FIELD, ['field' => $key]);
         }
 
         return $value;
@@ -304,6 +612,7 @@ abstract class BaseApiController
 
     /**
      * Require admin role
+     * Works for both Bearer token and session authentication
      *
      * @return int User ID
      */
@@ -311,14 +620,11 @@ abstract class BaseApiController
     {
         $userId = $this->requireAuth();
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        $role = $_SESSION['user_role'] ?? 'member';
+        // Use the trait method which works for both Bearer and session auth
+        $role = $this->getAuthenticatedUserRole() ?? 'member';
 
         if (!in_array($role, ['admin', 'super_admin', 'god'])) {
-            $this->error('Admin access required', 403, 'FORBIDDEN');
+            $this->error('Admin access required', 403, ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS);
         }
 
         return $userId;
@@ -347,6 +653,9 @@ abstract class BaseApiController
     /**
      * Apply rate limiting to an endpoint
      *
+     * Automatically adds X-RateLimit-* headers to all responses.
+     * Returns 429 Too Many Requests with Retry-After header when limit exceeded.
+     *
      * @param string $action Action identifier
      * @param int $maxAttempts Maximum attempts allowed
      * @param int $windowSeconds Time window in seconds
@@ -358,7 +667,18 @@ abstract class BaseApiController
         $key = "api:{$action}:{$identifier}";
 
         if (!RateLimiter::attempt($key, $maxAttempts, $windowSeconds)) {
-            $this->error('Rate limit exceeded. Please try again later.', 429, 'RATE_LIMITED');
+            // Get the rate limit state for headers
+            $state = RateLimiter::getCurrentState();
+            $retryAfter = $state ? ($state['reset'] - time()) : $windowSeconds;
+
+            // Set Retry-After header for 429 responses
+            header('Retry-After: ' . max(1, $retryAfter));
+
+            $this->error(
+                'Rate limit exceeded. Please try again later.',
+                429,
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED
+            );
         }
     }
 
@@ -462,5 +782,41 @@ abstract class BaseApiController
         }
 
         return $intVal;
+    }
+
+    // ============================================
+    // URL HELPERS
+    // ============================================
+
+    /**
+     * Convert a relative URL to absolute
+     *
+     * @param string|null $url The URL to convert
+     * @return string|null Absolute URL or null
+     */
+    protected function absoluteUrl(?string $url): ?string
+    {
+        return UrlHelper::absolute($url);
+    }
+
+    /**
+     * Convert avatar URL to absolute with fallback
+     *
+     * @param string|null $avatarUrl The avatar URL
+     * @return string Absolute avatar URL
+     */
+    protected function absoluteAvatar(?string $avatarUrl): string
+    {
+        return UrlHelper::absoluteAvatar($avatarUrl);
+    }
+
+    /**
+     * Get the base URL for API responses
+     *
+     * @return string Base URL
+     */
+    protected function getBaseUrl(): string
+    {
+        return UrlHelper::getBaseUrl();
     }
 }

@@ -6,6 +6,7 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\CommentService;
 use Nexus\Services\SocialNotificationService;
+use Nexus\Services\FeedService;
 use Nexus\Models\FeedPost;
 
 /**
@@ -18,7 +19,12 @@ use Nexus\Models\FeedPost;
  * - CivicOne Layout
  * - Future layouts
  *
- * Endpoints:
+ * V2 Endpoints (new standardized API with cursor pagination):
+ * - GET  /api/v2/feed              - Load feed items (cursor paginated)
+ * - POST /api/v2/feed/posts        - Create new post
+ * - POST /api/v2/feed/like         - Toggle like on content
+ *
+ * Legacy V1 Endpoints:
  * - POST /api/social/like          - Toggle like
  * - POST /api/social/comments      - Fetch/submit comments
  * - POST /api/social/share         - Repost/share content
@@ -38,7 +44,127 @@ use Nexus\Models\FeedPost;
 class SocialApiController extends BaseApiController
 {
     // ============================================
-    // DEBUG TEST ENDPOINT
+    // V2 ENDPOINTS (New standardized API)
+    // ============================================
+
+    /**
+     * GET /api/v2/feed
+     * Load feed with cursor-based pagination
+     *
+     * Query Parameters:
+     * - type: 'all' (default), 'posts', 'listings', 'events', 'polls', 'goals'
+     * - user_id: int (filter by specific user's content)
+     * - group_id: int (filter by group)
+     * - cursor: string (pagination cursor)
+     * - per_page: int (default 20, max 100)
+     */
+    public function feedV2(): void
+    {
+        $userId = $this->getOptionalUserId();
+        $this->rateLimit('feed_list', 60, 60);
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ];
+
+        if ($this->query('type')) {
+            $filters['type'] = $this->query('type');
+        }
+
+        if ($this->query('user_id')) {
+            $filters['user_id'] = $this->queryInt('user_id');
+        }
+
+        if ($this->query('group_id')) {
+            $filters['group_id'] = $this->queryInt('group_id');
+        }
+
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = FeedService::getFeed($userId, $filters);
+
+        $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
+    }
+
+    /**
+     * POST /api/v2/feed/posts
+     * Create a new feed post
+     *
+     * Request Body (JSON):
+     * {
+     *   "content": "string",
+     *   "image_url": "string (optional)",
+     *   "visibility": "public|private (default: public)",
+     *   "group_id": "int (optional)"
+     * }
+     */
+    public function createPostV2(): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('feed_create', 20, 60);
+
+        $data = $this->getAllInput();
+
+        $postId = FeedService::createPost($userId, $data);
+
+        if ($postId === null) {
+            $errors = FeedService::getErrors();
+            $status = 422;
+
+            foreach ($errors as $error) {
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+
+            $this->respondWithErrors($errors, $status);
+        }
+
+        // Get the created post
+        $post = FeedService::getItem('post', $postId, $userId);
+
+        $this->respondWithData($post, null, 201);
+    }
+
+    /**
+     * POST /api/v2/feed/like
+     * Toggle like on content
+     *
+     * Request Body (JSON):
+     * {
+     *   "target_type": "post|listing|event|poll|goal",
+     *   "target_id": int
+     * }
+     */
+    public function likeV2(): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('feed_like', 60, 60);
+
+        $targetType = $this->input('target_type');
+        $targetId = $this->inputInt('target_id');
+
+        if (empty($targetType) || !$targetId) {
+            $this->respondWithError('VALIDATION_ERROR', 'target_type and target_id are required', null, 400);
+        }
+
+        $result = FeedService::toggleLike($userId, $targetType, $targetId);
+
+        $this->respondWithData($result);
+    }
+
+    // ============================================
+    // DEBUG TEST ENDPOINT (LEGACY)
     // ============================================
 
     /**
@@ -48,14 +174,8 @@ class SocialApiController extends BaseApiController
      */
     public function test()
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
         // SECURITY: Require admin authentication for debug endpoints
-        if (empty($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'super_admin'])) {
-            $this->error('Access denied. Admin authentication required.', 403);
-        }
+        $this->requireAdmin();
 
         $debug = [
             'api_working' => true,
@@ -88,14 +208,12 @@ class SocialApiController extends BaseApiController
 
     /**
      * Check if current user is super admin
+     * Uses ApiAuth trait method for proper Bearer/session support
      */
-    private function isSuperAdmin()
+    private function isSuperAdmin(): bool
     {
-        // Check both old and new session key names for compatibility
-        return ($_SESSION['role'] ?? $_SESSION['user_role'] ?? '') === 'super_admin'
-            || ($_SESSION['user_role'] ?? '') === 'admin'
-            || ($_SESSION['is_admin'] ?? false)
-            || ($_SESSION['is_super_admin'] ?? false);
+        $role = $this->getAuthenticatedUserRole() ?? '';
+        return in_array($role, ['admin', 'super_admin', 'tenant_admin', 'god']);
     }
 
     // ============================================
@@ -301,7 +419,7 @@ class SocialApiController extends BaseApiController
     private function fetchComments($targetType, $targetId)
     {
         try {
-            $userId = $_SESSION['user_id'] ?? 0;
+            $userId = $this->getOptionalUserId() ?? 0;
 
             if (class_exists('\Nexus\Services\CommentService')) {
                 $comments = CommentService::fetchComments($targetType, $targetId, $userId);
@@ -365,12 +483,18 @@ class SocialApiController extends BaseApiController
 
                 $this->notifyComment($userId, $targetType, $targetId, $content);
 
+                // Fetch user info for response (avoid session dependency)
+                $user = Database::query(
+                    "SELECT COALESCE(name, CONCAT(first_name, ' ', last_name)) as name, avatar_url FROM users WHERE id = ?",
+                    [$userId]
+                )->fetch();
+
                 $this->jsonResponse([
                     'success' => true,
                     'status' => 'success',
                     'comment' => [
-                        'author_name' => $_SESSION['user_name'] ?? 'Me',
-                        'author_avatar' => $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.png',
+                        'author_name' => $user['name'] ?? 'Me',
+                        'author_avatar' => $user['avatar_url'] ?? '/assets/img/defaults/default_avatar.png',
                         'content' => $content
                     ]
                 ]);
@@ -880,7 +1004,7 @@ class SocialApiController extends BaseApiController
      */
     public function feed()
     {
-        $currentUserId = $this->getUserId(false); // Not required
+        $currentUserId = $this->getOptionalUserId(); // Not required
         $tenantId = $this->getTenantId();
 
         $page = max(1, (int)$this->getInput('page', 1));

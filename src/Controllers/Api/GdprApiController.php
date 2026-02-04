@@ -10,9 +10,14 @@ use Nexus\Services\Enterprise\GdprService;
 /**
  * GDPR API Controller
  *
- * Handles user-facing GDPR requests (consent updates, data export, account deletion)
+ * Handles user-facing GDPR requests (consent updates, data export, account deletion).
+ * Supports both session-based and Bearer token authentication.
+ *
+ * Response Format:
+ * Success: { "data": {...} }
+ * Error:   { "errors": [{ "code": "...", "message": "..." }] }
  */
-class GdprApiController
+class GdprApiController extends BaseApiController
 {
     private GdprService $gdprService;
 
@@ -22,68 +27,72 @@ class GdprApiController
     }
 
     /**
-     * Update user consent
+     * POST /api/gdpr/consent
+     *
+     * Update user consent preference.
+     *
+     * Request Body (JSON):
+     * {
+     *   "consent_id": int (required),
+     *   "granted": bool (required)
+     * }
+     *
+     * Response: 200 OK with success status
      */
     public function updateConsent(): void
     {
-        header('Content-Type: application/json');
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('gdpr_consent', 30, 60);
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-            return;
-        }
-
-        $data = json_decode(file_get_contents('php://input'), true);
-        $consentId = $data['consent_id'] ?? null;
-        $granted = $data['granted'] ?? false;
+        $consentId = $this->input('consent_id');
+        $granted = $this->inputBool('granted', false);
 
         if (!$consentId) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Missing consent_id']);
-            return;
+            $this->respondWithError('VALIDATION_ERROR', 'Missing consent_id', 'consent_id', 400);
         }
 
         try {
-            $userId = (int) $_SESSION['user_id'];
             $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+            $platform = $this->isStatelessRequest() ? 'mobile' : 'web';
 
             if ($granted) {
-                $result = $this->gdprService->grantConsent($userId, (int) $consentId, 'web', $ip);
+                $result = $this->gdprService->grantConsent($userId, (int) $consentId, $platform, $ip);
             } else {
                 $result = $this->gdprService->withdrawConsent($userId, (int) $consentId, $ip);
             }
 
-            echo json_encode(['success' => $result]);
+            $this->respondWithData([
+                'updated' => $result,
+                'consent_id' => (int) $consentId,
+                'granted' => $granted
+            ]);
         } catch (\Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Failed to update consent']);
+            $this->respondWithError('CONSENT_UPDATE_FAILED', 'Failed to update consent', null, 500);
         }
     }
 
     /**
-     * Create a GDPR request (data export, portability, etc.)
+     * POST /api/gdpr/request
+     *
+     * Create a GDPR data request (export, portability, rectification, access).
+     *
+     * Request Body (JSON):
+     * {
+     *   "type": "data_export" | "data_portability" | "data_rectification" | "data_access" (required),
+     *   "notes": string (optional)
+     * }
+     *
+     * Response: 201 Created with request ID
      */
     public function createRequest(): void
     {
-        header('Content-Type: application/json');
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('gdpr_request', 5, 3600); // 5 requests per hour max
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-            return;
-        }
-
-        $data = json_decode(file_get_contents('php://input'), true);
-        $type = $data['type'] ?? null;
+        $type = $this->input('type');
+        $notes = $this->input('notes');
 
         // Map user-friendly types to internal types
         $typeMap = [
@@ -94,53 +103,64 @@ class GdprApiController
         ];
 
         if (!$type || !isset($typeMap[$type])) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Invalid request type']);
-            return;
+            $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid request type. Valid types: data_export, data_portability, data_rectification, data_access',
+                'type',
+                400
+            );
         }
 
         try {
-            $userId = (int) $_SESSION['user_id'];
             $internalType = $typeMap[$type];
 
             $result = $this->gdprService->createRequest($userId, $internalType, [
-                'notes' => $data['notes'] ?? null,
+                'notes' => $notes,
             ]);
 
-            echo json_encode(['success' => true, 'request_id' => $result['id']]);
+            $this->respondWithData([
+                'request_id' => $result['id'],
+                'type' => $type,
+                'status' => 'pending',
+                'message' => 'Your request has been submitted and will be processed within 30 days.'
+            ], null, 201);
         } catch (\Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->respondWithError('REQUEST_FAILED', $e->getMessage(), null, 500);
         }
     }
 
     /**
-     * Delete user account (GDPR right to erasure)
+     * POST /api/gdpr/delete-account
+     *
+     * Request account deletion (GDPR right to erasure).
+     * Requires password verification for security.
+     *
+     * Request Body (JSON):
+     * {
+     *   "password": string (required),
+     *   "reason": string (optional),
+     *   "feedback": string (optional)
+     * }
+     *
+     * Response: 200 OK with request ID and confirmation message
      */
     public function deleteAccount(): void
     {
-        header('Content-Type: application/json');
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('gdpr_delete', 3, 3600); // 3 attempts per hour
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+        $password = $this->input('password', '');
+        $reason = $this->input('reason');
+        $feedback = $this->input('feedback');
+
+        if (empty($password)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Password is required', 'password', 400);
         }
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-            return;
-        }
-
-        $userId = (int) $_SESSION['user_id'];
-        $password = $_POST['password'] ?? '';
-        $reason = $_POST['reason'] ?? null;
-        $feedback = $_POST['feedback'] ?? null;
 
         // Verify password
         if (!$this->verifyPassword($userId, $password)) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'error' => 'Invalid password']);
-            return;
+            $this->respondWithError('INVALID_PASSWORD', 'Invalid password', 'password', 403);
         }
 
         try {
@@ -149,35 +169,25 @@ class GdprApiController
                 'notes' => $reason,
                 'metadata' => [
                     'feedback' => $feedback,
-                    'self_service' => true
+                    'self_service' => true,
+                    'requested_via' => $this->isStatelessRequest() ? 'api' : 'web'
                 ]
             ]);
 
-            // Log the user out
-            session_destroy();
+            // For session-based auth, destroy the session
+            // For Bearer-based auth, the client should discard their tokens
+            if (!$this->isStatelessRequest() && session_status() === PHP_SESSION_ACTIVE) {
+                session_destroy();
+            }
 
-            echo json_encode([
-                'success' => true,
+            $this->respondWithData([
                 'request_id' => $result['id'],
-                'message' => 'Your account deletion request has been submitted. You will receive confirmation via email.'
+                'message' => 'Your account deletion request has been submitted. You will receive confirmation via email.',
+                'logout_required' => true
             ]);
         } catch (\Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->respondWithError('DELETE_FAILED', $e->getMessage(), null, 500);
         }
-    }
-
-    /**
-     * Get user email by ID
-     */
-    private function getUserEmail(int $userId): string
-    {
-        $db = Database::getInstance();
-        $stmt = $db->prepare("SELECT email FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $user = $stmt->fetch();
-
-        return $user['email'] ?? '';
     }
 
     /**

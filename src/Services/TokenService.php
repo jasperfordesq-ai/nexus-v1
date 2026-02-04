@@ -224,6 +224,33 @@ class TokenService
     }
 
     /**
+     * Validate a refresh token with revocation check
+     *
+     * @param string $token
+     * @return array|null The payload if valid and not revoked, null otherwise
+     */
+    public static function validateRefreshToken(string $token): ?array
+    {
+        $payload = self::validateToken($token);
+
+        if (!$payload) {
+            return null;
+        }
+
+        // Ensure it's a refresh token
+        if (($payload['type'] ?? '') !== 'refresh') {
+            return null;
+        }
+
+        // Check if revoked
+        if (self::isTokenRevoked($token)) {
+            return null;
+        }
+
+        return $payload;
+    }
+
+    /**
      * Check if a token is expired (without full validation)
      *
      * @param string $token
@@ -348,5 +375,177 @@ class TokenService
         $payload = json_decode(self::base64UrlDecode($parts[1]), true);
 
         return $payload['user_id'] ?? null;
+    }
+
+    // ============================================
+    // TOKEN REVOCATION
+    // ============================================
+
+    /**
+     * Revoke a refresh token by its jti claim
+     *
+     * @param string $refreshToken The refresh token to revoke
+     * @param int $userId The user ID (for ownership verification)
+     * @return bool True if revoked, false if token was invalid or not a refresh token
+     */
+    public static function revokeToken(string $refreshToken, int $userId): bool
+    {
+        $payload = self::validateToken($refreshToken);
+
+        if (!$payload) {
+            return false;
+        }
+
+        // Only refresh tokens can be revoked (they have jti)
+        if (($payload['type'] ?? '') !== 'refresh') {
+            return false;
+        }
+
+        // Verify ownership
+        if (($payload['user_id'] ?? 0) !== $userId) {
+            return false;
+        }
+
+        $jti = $payload['jti'] ?? null;
+        if (!$jti) {
+            return false;
+        }
+
+        // Store the revocation
+        try {
+            $db = \Nexus\Core\Database::getConnection();
+
+            // Check if already revoked
+            $stmt = $db->prepare("SELECT id FROM revoked_tokens WHERE jti = ?");
+            $stmt->execute([$jti]);
+            if ($stmt->fetch()) {
+                return true; // Already revoked
+            }
+
+            // Insert revocation record
+            $stmt = $db->prepare(
+                "INSERT INTO revoked_tokens (user_id, jti, expires_at) VALUES (?, ?, FROM_UNIXTIME(?))"
+            );
+            $stmt->execute([$userId, $jti, $payload['exp']]);
+
+            return true;
+        } catch (\Exception $e) {
+            error_log('[TokenService] Failed to revoke token: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Revoke all refresh tokens for a user
+     * This is useful for "log out everywhere" functionality
+     *
+     * @param int $userId The user ID
+     * @return int Number of active tokens that were invalidated (estimate based on new revocations)
+     */
+    public static function revokeAllTokensForUser(int $userId): int
+    {
+        try {
+            $db = \Nexus\Core\Database::getConnection();
+
+            // We can't enumerate all tokens (they're stateless), but we can:
+            // 1. Record a "revoke all" timestamp for the user
+            // 2. Check this timestamp during validation
+
+            // For now, we'll use a special jti entry that marks "all tokens before this time are invalid"
+            $specialJti = 'revoke_all_' . $userId . '_' . time();
+            $farFutureExpiry = time() + (10 * 365 * 24 * 60 * 60); // 10 years
+
+            $stmt = $db->prepare(
+                "INSERT INTO revoked_tokens (user_id, jti, expires_at) VALUES (?, ?, FROM_UNIXTIME(?))"
+            );
+            $stmt->execute([$userId, $specialJti, $farFutureExpiry]);
+
+            // Also store the revoke-all timestamp in a way we can check
+            // Update or insert a user-level "tokens_revoked_at" marker
+            $stmt = $db->prepare(
+                "INSERT INTO revoked_tokens (user_id, jti, expires_at) VALUES (?, ?, FROM_UNIXTIME(?))
+                 ON DUPLICATE KEY UPDATE revoked_at = NOW()"
+            );
+            $globalJti = 'global_revoke_' . $userId;
+            $stmt->execute([$userId, $globalJti, $farFutureExpiry]);
+
+            // Count existing revocations for this user (rough estimate)
+            $stmt = $db->prepare("SELECT COUNT(*) FROM revoked_tokens WHERE user_id = ?");
+            $stmt->execute([$userId]);
+            $count = (int) $stmt->fetchColumn();
+
+            return $count;
+        } catch (\Exception $e) {
+            error_log('[TokenService] Failed to revoke all tokens: ' . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Check if a refresh token has been revoked
+     *
+     * @param string $refreshToken The token to check
+     * @return bool True if revoked, false if valid
+     */
+    public static function isTokenRevoked(string $refreshToken): bool
+    {
+        $payload = self::validateToken($refreshToken);
+
+        if (!$payload) {
+            return true; // Invalid token treated as revoked
+        }
+
+        $jti = $payload['jti'] ?? null;
+        $userId = $payload['user_id'] ?? null;
+        $iat = $payload['iat'] ?? 0;
+
+        if (!$jti || !$userId) {
+            return true;
+        }
+
+        try {
+            $db = \Nexus\Core\Database::getConnection();
+
+            // Check if this specific token is revoked
+            $stmt = $db->prepare("SELECT id FROM revoked_tokens WHERE jti = ?");
+            $stmt->execute([$jti]);
+            if ($stmt->fetch()) {
+                return true;
+            }
+
+            // Check if there's a "revoke all" entry for this user that's newer than the token
+            $stmt = $db->prepare(
+                "SELECT revoked_at FROM revoked_tokens WHERE jti = ? AND revoked_at > FROM_UNIXTIME(?)"
+            );
+            $globalJti = 'global_revoke_' . $userId;
+            $stmt->execute([$globalJti, $iat]);
+            if ($stmt->fetch()) {
+                return true;
+            }
+
+            return false;
+        } catch (\Exception $e) {
+            error_log('[TokenService] Failed to check token revocation: ' . $e->getMessage());
+            return false; // Fail open - don't lock out users on DB errors
+        }
+    }
+
+    /**
+     * Clean up expired revocation records
+     * Should be called periodically via cron
+     *
+     * @return int Number of records deleted
+     */
+    public static function cleanupExpiredRevocations(): int
+    {
+        try {
+            $db = \Nexus\Core\Database::getConnection();
+            $stmt = $db->prepare("DELETE FROM revoked_tokens WHERE expires_at < NOW() AND jti NOT LIKE 'global_revoke_%'");
+            $stmt->execute();
+            return $stmt->rowCount();
+        } catch (\Exception $e) {
+            error_log('[TokenService] Failed to cleanup revocations: ' . $e->getMessage());
+            return 0;
+        }
     }
 }

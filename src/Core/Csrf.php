@@ -62,9 +62,16 @@ class Csrf
 
     /**
      * Verify the token or stop execution with a 403 error.
+     *
+     * NOTE: Skips CSRF verification for Bearer token authenticated requests.
      */
     public static function verifyOrDie()
     {
+        // Skip CSRF for Bearer token authentication
+        if (self::hasBearerToken()) {
+            return;
+        }
+
         if (!self::verify()) {
             // Debug Logging
             $sessionToken = $_SESSION['csrf_token'] ?? 'EMPTY';
@@ -103,11 +110,33 @@ class Csrf
     }
 
     /**
+     * Check if current request is authenticated via Bearer token.
+     * Bearer-authenticated requests don't need CSRF protection because:
+     * 1. The token itself proves the request came from an authorized client
+     * 2. CSRF attacks rely on browser automatically sending cookies, but Bearer tokens
+     *    must be explicitly attached by JavaScript/native code
+     */
+    private static function hasBearerToken(): bool
+    {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        return !empty($authHeader) && stripos($authHeader, 'Bearer ') === 0;
+    }
+
+    /**
      * Verify the token or return JSON error for API endpoints.
      * Returns true if valid, dies with JSON response if invalid.
+     *
+     * NOTE: Skips CSRF verification for Bearer token authenticated requests.
+     * Bearer tokens are not vulnerable to CSRF attacks because they must be
+     * explicitly attached to requests (not automatically sent like cookies).
      */
     public static function verifyOrDieJson()
     {
+        // Skip CSRF for Bearer token authentication (API clients, mobile apps)
+        if (self::hasBearerToken()) {
+            return true;
+        }
+
         if (!self::verify()) {
             // Debug logging for API CSRF failures
             $sessionToken = $_SESSION['csrf_token'] ?? 'EMPTY';

@@ -160,4 +160,98 @@ class UrlHelper
         }
         return '/dashboard';
     }
+
+    // ============================================
+    // ABSOLUTE URL HELPERS (for API responses)
+    // ============================================
+
+    /**
+     * Get the base URL for the current tenant/request.
+     * Used for converting relative URLs to absolute in API responses.
+     *
+     * @return string Base URL (e.g., 'https://project-nexus.ie')
+     */
+    public static function getBaseUrl(): string
+    {
+        // Try tenant domain first
+        $tenantDomain = TenantContext::getDomain();
+        if (!empty($tenantDomain)) {
+            return $tenantDomain;
+        }
+
+        // Fall back to current request host
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            return $protocol . '://' . $_SERVER['HTTP_HOST'];
+        }
+
+        // Last resort - check environment
+        $siteUrl = getenv('SITE_URL') ?: ($_ENV['SITE_URL'] ?? null);
+        if ($siteUrl) {
+            return rtrim($siteUrl, '/');
+        }
+
+        return 'https://project-nexus.ie';
+    }
+
+    /**
+     * Convert a relative URL to an absolute URL.
+     * If the URL is already absolute, returns it unchanged.
+     *
+     * @param string|null $url The URL to convert (e.g., '/uploads/images/foo.jpg')
+     * @return string|null Absolute URL or null if input was null
+     */
+    public static function absolute(?string $url): ?string
+    {
+        if ($url === null || $url === '') {
+            return $url;
+        }
+
+        // Already absolute
+        if (preg_match('#^https?://#i', $url)) {
+            return $url;
+        }
+
+        // Protocol-relative
+        if (str_starts_with($url, '//')) {
+            return 'https:' . $url;
+        }
+
+        // Relative path - make absolute
+        $baseUrl = self::getBaseUrl();
+
+        // Ensure the URL starts with /
+        if (!str_starts_with($url, '/')) {
+            $url = '/' . $url;
+        }
+
+        return $baseUrl . $url;
+    }
+
+    /**
+     * Convert avatar URL to absolute, with fallback to default avatar.
+     *
+     * @param string|null $avatarUrl The avatar URL
+     * @param string $default Default avatar path
+     * @return string Absolute avatar URL
+     */
+    public static function absoluteAvatar(?string $avatarUrl, string $default = '/assets/img/defaults/default_avatar.png'): string
+    {
+        if (empty($avatarUrl)) {
+            return self::absolute($default);
+        }
+        return self::absolute($avatarUrl);
+    }
+
+    /**
+     * Convert an array of URLs to absolute URLs.
+     * Useful for arrays of image URLs.
+     *
+     * @param array $urls Array of URLs
+     * @return array Array of absolute URLs
+     */
+    public static function absoluteAll(array $urls): array
+    {
+        return array_map([self::class, 'absolute'], $urls);
+    }
 }

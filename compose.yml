@@ -1,0 +1,185 @@
+# =============================================================================
+# Project NEXUS - Docker Compose (Source of Truth for Local Development)
+# =============================================================================
+# Port: 8090 (http://localhost:8090)
+# This is an ISOLATED stack - does not share networks/volumes with other projects.
+#
+# IMPORTANT: Uses .env.docker for configuration (not .env which is for XAMPP)
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # PHP Application (Apache + mod_rewrite for .htaccess support)
+  # ---------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexus-php-app
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    ports:
+      - "8090:80"
+    volumes:
+      # Mount entire app for development (excludes vendor via .dockerignore)
+      - .:/var/www/html:cached
+      # Persist uploads between rebuilds
+      - nexus-uploads:/var/www/html/uploads
+      - nexus-httpdocs-uploads:/var/www/html/httpdocs/uploads
+    environment:
+      # Database (uses Docker service name) - HARDCODED to prevent .env override
+      - DB_TYPE=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=nexus
+      - DB_USER=nexus
+      - DB_PASS=nexus_secret
+      # Redis (optional)
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # App settings
+      - APP_ENV=${APP_ENV:-development}
+      - APP_DEBUG=${APP_DEBUG:-true}
+      - APP_URL=http://localhost:8090
+      # JWT Secret for token generation (REQUIRED for login)
+      - JWT_SECRET=${JWT_SECRET:-nexus-dev-jwt-secret-change-in-production}
+      - APP_KEY=${APP_KEY:-nexus-dev-app-key-change-in-production}
+      # Pass through API keys from host .env.docker
+      - PUSHER_APP_KEY=${PUSHER_APP_KEY:-}
+      - PUSHER_APP_SECRET=${PUSHER_APP_SECRET:-}
+      - PUSHER_APP_ID=${PUSHER_APP_ID:-}
+      - PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER:-eu}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - nexus-internal
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ---------------------------------------------------------------------------
+  # MariaDB 10.11 Database (MySQL-compatible, Internal only)
+  # ---------------------------------------------------------------------------
+  db:
+    image: mariadb:10.11
+    container_name: nexus-mysql-db
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-nexus_root_secret}
+      MARIADB_DATABASE: ${DB_NAME:-nexus}
+      MARIADB_USER: ${DB_USER:-nexus}
+      MARIADB_PASSWORD: ${DB_PASS:-nexus_secret}
+    volumes:
+      - nexus-mysql-data:/var/lib/mysql
+      # Optional: mount init scripts
+      # - ./migrations:/docker-entrypoint-initdb.d:ro
+    networks:
+      - nexus-internal
+    # NOT exposed to host by default (security). Uncomment if needed:
+    # ports:
+    #   - "3307:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # Redis 7 (Sessions & Cache - Internal only)
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: nexus-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - nexus-redis-data:/data
+    networks:
+      - nexus-internal
+    # NOT exposed to host by default. Uncomment if needed:
+    # ports:
+    #   - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # React Frontend (Vite Dev Server)
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./react-frontend
+      dockerfile: Dockerfile
+    container_name: nexus-react-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      # Mount source for hot reload (exclude node_modules)
+      - ./react-frontend:/app:cached
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://app:80
+    depends_on:
+      - app
+    networks:
+      - nexus-internal
+
+  # ---------------------------------------------------------------------------
+  # phpMyAdmin (Development only)
+  # ---------------------------------------------------------------------------
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: nexus-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD:-nexus_root_secret}
+      UPLOAD_LIMIT: 100M
+    ports:
+      - "8091:80"
+    depends_on:
+      - db
+    networks:
+      - nexus-internal
+    profiles:
+      - tools
+
+# =============================================================================
+# Volumes (Named, isolated to this project)
+# =============================================================================
+volumes:
+  nexus-mysql-data:
+    name: nexus-mysql-data
+  nexus-redis-data:
+    name: nexus-redis-data
+  nexus-uploads:
+    name: nexus-uploads
+  nexus-httpdocs-uploads:
+    name: nexus-httpdocs-uploads
+
+# =============================================================================
+# Networks (Isolated - does NOT connect to external projects)
+# =============================================================================
+networks:
+  nexus-internal:
+    name: nexus-internal
+    driver: bridge
