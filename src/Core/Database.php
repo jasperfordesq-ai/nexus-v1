@@ -25,6 +25,10 @@ class Database
         try {
             if ($dbConfig['type'] === 'sqlite') {
                 $this->pdo = new PDO('sqlite:' . $dbConfig['file']);
+            } elseif ($dbConfig['type'] === 'pgsql' || $dbConfig['type'] === 'postgresql') {
+                $port = $dbConfig['port'] ?? 5432;
+                $dsn = "pgsql:host={$dbConfig['host']};port={$port};dbname={$dbConfig['name']}";
+                $this->pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass']);
             } else {
                 $port = $dbConfig['port'] ?? 3306;
                 $dsn = "mysql:host={$dbConfig['host']};port={$port};dbname={$dbConfig['name']};charset=utf8mb4";

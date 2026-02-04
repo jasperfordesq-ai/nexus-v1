@@ -88,11 +88,6 @@ class GoalApiController
             ob_clean();
         }
 
-        // Ensure session is started for authentication
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
         try {
             $userId = $this->getUserId();
 
@@ -116,8 +111,8 @@ class GoalApiController
                 return;
             }
 
-            // Store tenant ID for notification (from goal data)
-            $tenantId = $goal['tenant_id'] ?? ($_SESSION['tenant_id'] ?? 1);
+            // Store tenant ID for notification (from goal data, fallback to context)
+            $tenantId = $goal['tenant_id'] ?? TenantContext::getId() ?? 1;
 
             // Verify goal is public (only public goals can have buddies)
             if (empty($goal['is_public'])) {

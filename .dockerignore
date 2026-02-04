@@ -1,0 +1,83 @@
+# =============================================================================
+# Project NEXUS - Docker Ignore
+# =============================================================================
+# Files/folders excluded from Docker build context for faster builds
+# =============================================================================
+
+# Dependencies (installed in container)
+node_modules/
+vendor/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files (use .env.docker instead)
+.env
+.env.local
+.env.*.local
+.env.testing
+
+# Logs
+logs/
+*.log
+
+# Cache
+.phpunit.cache/
+cache/
+
+# Test artifacts
+e2e/test-results/
+e2e/reports/
+playwright-report/
+test-results/
+
+# Build artifacts
+public/build/
+public/hot/
+
+# Backups
+backups/
+*.bak
+*.backup
+exports/
+
+# Documentation (not needed in container)
+docs/
+*.md
+!README.md
+
+# Database files
+*.sqlite
+*.sqlite-journal
+*.sql
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+
+# Secrets
+firebase-service-account.json
+*.pem
+*.key
+
+# Legacy docker folder (using root compose.yml now)
+docker/
+
+# Temp files
+*.tmp
+*.temp
+debug_output.html
