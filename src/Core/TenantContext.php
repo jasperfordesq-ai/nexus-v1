@@ -7,6 +7,12 @@ class TenantContext
     private static $tenant = null;
     private static $basePath = '';
 
+    /** @var int|null Tenant ID extracted from Bearer token (for mismatch detection) */
+    private static $tokenTenantId = null;
+
+    /** @var int|null Tenant ID from X-Tenant-ID header (for mismatch detection) */
+    private static $headerTenantId = null;
+
     /**
      * Resolve the current tenant based on Path
      */
@@ -39,7 +45,75 @@ class TenantContext
             }
         }
 
-        // 2. Path-Based Resolution (for Master/Platform Domain)
+        // 2. X-Tenant-ID Header Resolution (for API requests)
+        // This allows stateless API clients to specify tenant without URL manipulation
+        $headerTenantId = $_SERVER['HTTP_X_TENANT_ID'] ?? null;
+        if ($headerTenantId !== null && is_numeric($headerTenantId)) {
+            $headerTenantId = (int) $headerTenantId;
+            self::$headerTenantId = $headerTenantId;
+
+            // Extract tenant_id from Bearer token (if present) for mismatch detection
+            $tokenTenantId = self::extractTenantIdFromBearerToken();
+            if ($tokenTenantId !== null) {
+                self::$tokenTenantId = $tokenTenantId;
+
+                // Check for mismatch: header and token must agree if both present
+                if ($tokenTenantId !== $headerTenantId) {
+                    self::respondWithTenantMismatchError();
+                    return;
+                }
+            }
+
+            // Validate the tenant ID exists
+            $db = Database::getConnection();
+            $stmt = $db->prepare("SELECT * FROM tenants WHERE id = ?");
+            $stmt->execute([$headerTenantId]);
+            $headerTenant = $stmt->fetch();
+
+            if (!$headerTenant) {
+                self::respondWithInvalidTenantError($headerTenantId);
+                return;
+            }
+
+            // Check if tenant is active
+            if (empty($headerTenant['is_active'])) {
+                self::showInactiveTenantError($headerTenant['name'] ?? 'This community');
+                return;
+            }
+
+            self::$tenant = $headerTenant;
+            self::$basePath = '';
+            return;
+        }
+
+        // 2.5. Bearer Token Tenant Resolution (fallback if no header)
+        // For stateless requests where tenant is embedded in the token
+        $tokenTenantId = self::extractTenantIdFromBearerToken();
+        if ($tokenTenantId !== null) {
+            self::$tokenTenantId = $tokenTenantId;
+
+            // Only use token tenant if this looks like an API request without other resolution
+            $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+            if (strpos($requestUri, '/api/') !== false) {
+                $db = Database::getConnection();
+                $stmt = $db->prepare("SELECT * FROM tenants WHERE id = ?");
+                $stmt->execute([$tokenTenantId]);
+                $tokenTenant = $stmt->fetch();
+
+                if ($tokenTenant) {
+                    if (empty($tokenTenant['is_active'])) {
+                        self::showInactiveTenantError($tokenTenant['name'] ?? 'This community');
+                        return;
+                    }
+
+                    self::$tenant = $tokenTenant;
+                    self::$basePath = '';
+                    return;
+                }
+            }
+        }
+
+        // 3. Path-Based Resolution (for Master/Platform Domain)
         $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
         $segments = array_values(array_filter(explode('/', trim($path, '/'))));
         $firstSegment = $segments[0] ?? '';
@@ -149,7 +223,7 @@ class TenantContext
             }
         }
 
-        // 2.5 For reserved routes (admin, dashboard, etc.), use session tenant if available
+        // 4. For reserved routes (admin, dashboard, etc.), use session tenant if available
         // This ensures admin areas use the logged-in user's tenant, not Master
         if (in_array($firstSegment, $reserved) && !empty($_SESSION['tenant_id'])) {
             $db = Database::getConnection();
@@ -171,7 +245,7 @@ class TenantContext
             }
         }
 
-        // 3. Fallback: Master Tenant (ID 1)
+        // 5. Fallback: Master Tenant (ID 1)
         // This handles Root (/), Restricted Routes (/login, /about), and Master Domain usage.
         try {
             $db = Database::getConnection();
@@ -186,7 +260,7 @@ class TenantContext
             // Fallback
         }
 
-        // 4. Hard Fallback (if DB fails)
+        // 6. Hard Fallback (if DB fails)
         self::$tenant = [
             'id' => 1,
             'name' => 'Project NEXUS',
@@ -378,6 +452,116 @@ class TenantContext
         });
 
         return $pages;
+    }
+
+    /**
+     * Get the tenant ID from the X-Tenant-ID header (if provided)
+     *
+     * @return int|null
+     */
+    public static function getHeaderTenantId(): ?int
+    {
+        return self::$headerTenantId;
+    }
+
+    /**
+     * Get the tenant ID from the Bearer token (if provided)
+     *
+     * @return int|null
+     */
+    public static function getTokenTenantId(): ?int
+    {
+        return self::$tokenTenantId;
+    }
+
+    /**
+     * Extract tenant_id from Bearer token payload
+     *
+     * @return int|null
+     */
+    private static function extractTenantIdFromBearerToken(): ?int
+    {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        if (empty($authHeader) || !preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
+            return null;
+        }
+
+        $token = $matches[1];
+
+        // Decode token payload without full validation (just to extract tenant_id)
+        $parts = explode('.', $token);
+        if (count($parts) !== 3) {
+            return null;
+        }
+
+        $payloadEncoded = $parts[1];
+        $remainder = strlen($payloadEncoded) % 4;
+        if ($remainder) {
+            $payloadEncoded .= str_repeat('=', 4 - $remainder);
+        }
+
+        $payload = json_decode(base64_decode(strtr($payloadEncoded, '-_', '+/')), true);
+        if (!$payload || !isset($payload['tenant_id'])) {
+            return null;
+        }
+
+        return (int) $payload['tenant_id'];
+    }
+
+    /**
+     * Respond with JSON error for invalid tenant ID
+     *
+     * @param int $tenantId
+     */
+    private static function respondWithInvalidTenantError(int $tenantId): void
+    {
+        // Set a minimal tenant context so later code doesn't break
+        self::$tenant = [
+            'id' => 0,
+            'name' => 'Invalid Tenant',
+            'is_active' => 0,
+            'features' => '{}'
+        ];
+        self::$basePath = '';
+
+        header('Content-Type: application/json');
+        http_response_code(400);
+        echo json_encode([
+            'data' => null,
+            'errors' => [[
+                'code' => ApiErrorCodes::INVALID_TENANT,
+                'message' => 'Invalid tenant ID',
+                'field' => null
+            ]]
+        ]);
+        exit;
+    }
+
+    /**
+     * Respond with JSON error for tenant mismatch (header vs token)
+     */
+    private static function respondWithTenantMismatchError(): void
+    {
+        // Set a minimal tenant context so later code doesn't break
+        self::$tenant = [
+            'id' => 0,
+            'name' => 'Tenant Mismatch',
+            'is_active' => 0,
+            'features' => '{}'
+        ];
+        self::$basePath = '';
+
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode([
+            'data' => null,
+            'errors' => [[
+                'code' => ApiErrorCodes::TENANT_MISMATCH,
+                'message' => 'Token tenant does not match requested tenant',
+                'field' => null
+            ]]
+        ]);
+        exit;
     }
 
     /**

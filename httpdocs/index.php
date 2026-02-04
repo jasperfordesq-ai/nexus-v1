@@ -119,6 +119,34 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 // END MAINTENANCE MODE & ERROR HANDLING
 // ===========================================
 
+// ===========================================
+// CORS HANDLING FOR API ROUTES
+// ===========================================
+// Handle CORS early for API routes (before autoloading for performance).
+// This enables React SPAs, mobile apps, and other cross-origin clients.
+// Configuration via ALLOWED_ORIGINS env var (comma-separated list).
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$isApiRequest = (strpos($requestUri, '/api/') === 0 || strpos($requestUri, '/api/') !== false);
+
+if ($isApiRequest) {
+    // Load CorsHelper directly (before autoloader for OPTIONS preflight speed)
+    require_once __DIR__ . '/../src/Helpers/CorsHelper.php';
+
+    // Handle OPTIONS preflight immediately (exits if OPTIONS request)
+    \Nexus\Helpers\CorsHelper::handlePreflight(
+        [], // Additional origins (env-based by default)
+        ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token', 'X-Tenant-ID', 'Accept', 'Origin']
+    );
+
+    // Set CORS headers for actual requests
+    \Nexus\Helpers\CorsHelper::setHeaders(
+        [],
+        ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token', 'X-Tenant-ID', 'Accept', 'Origin']
+    );
+}
+
 // 0. FILE DOWNLOAD BYPASS - Removed
 // Downloads now handled by standalone download.php for clean binary transfer
 // The old download bypass is removed because index.php has output buffering/session
@@ -127,6 +155,18 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 // 0.5 LAYOUT PERSISTENCE
 // Skip session for download routes to prevent header corruption
 $isDownloadRequest = (strpos($_SERVER['REQUEST_URI'] ?? '', '/download') !== false);
+
+// Skip session for stateless API requests (Bearer token auth)
+// This enables true stateless API calls for React SPAs and mobile apps
+$isStatelessApiRequest = false;
+if ($isApiRequest) {
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    // If request has Bearer token OR explicitly requests stateless auth, skip session
+    $isStatelessApiRequest = (
+        (stripos($authHeader, 'Bearer ') === 0) ||
+        isset($_SERVER['HTTP_X_STATELESS_AUTH'])
+    );
+}
 
 // 1. SMART PATH DETECTION (Live vs Local)
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
@@ -234,7 +274,8 @@ if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
 }
 
 // Secure Session Settings
-if (!$isDownloadRequest && session_status() === PHP_SESSION_NONE) {
+// Skip session for downloads and stateless API requests (Bearer token auth)
+if (!$isDownloadRequest && !$isStatelessApiRequest && session_status() === PHP_SESSION_NONE) {
     // Cookie Security
     $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
 

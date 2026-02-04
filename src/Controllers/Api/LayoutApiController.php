@@ -87,8 +87,11 @@ class LayoutApiController
     /**
      * GET /api/layout-debug
      *
-     * Debug endpoint to see session state
+     * Debug endpoint to see layout state
      * SECURITY: Restricted to admin users only in development environment
+     *
+     * Note: This endpoint is session-based only (layout preference is a browser/UI concern).
+     * Bearer token clients should not need this endpoint.
      */
     public function debug()
     {
@@ -96,7 +99,10 @@ class LayoutApiController
 
         // SECURITY: Only allow in development and for admins
         $appEnv = getenv('APP_ENV') ?: ($_ENV['APP_ENV'] ?? 'production');
-        $isAdmin = !empty($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'super_admin']);
+
+        // Check admin status from session (this is a session-only debug endpoint)
+        $userRole = $_SESSION['user_role'] ?? null;
+        $isAdmin = $userRole && in_array($userRole, ['admin', 'super_admin']);
 
         if ($appEnv === 'production' || !$isAdmin) {
             http_response_code(403);
@@ -105,18 +111,15 @@ class LayoutApiController
         }
 
         // Get tenant info
-        $tenantId = 1;
-        if (class_exists('\Nexus\Core\TenantContext')) {
-            $tenantId = \Nexus\Core\TenantContext::getId() ?: 1;
-        }
-
+        $tenantId = \Nexus\Core\TenantContext::getId() ?? 1;
         $sessionKey = 'nexus_active_layout_' . $tenantId;
 
         echo json_encode([
             'tenant_id' => $tenantId,
             'session_key' => $sessionKey,
             'session_value' => $_SESSION[$sessionKey] ?? 'NOT SET',
-            'layout_helper_get' => LayoutHelper::get()
+            'layout_helper_get' => LayoutHelper::get(),
+            'note' => 'This debug endpoint is session-based only (layout is a browser UI concern)'
         ], JSON_PRETTY_PRINT);
         exit;
     }

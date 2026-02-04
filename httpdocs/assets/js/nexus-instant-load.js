@@ -8,6 +8,27 @@
     'use strict';
 
     // ============================================
+    // DEBUG STAMP - TEMPORARY (remove after confirming fix)
+    // ============================================
+    var INSTANT_LOAD_VERSION = 'v2026-02-01-scrollfix2';
+    console.log('[NEXUS_INSTANT_LOAD] ' + INSTANT_LOAD_VERSION);
+
+    // Show debug badge if ?debug_instant=1
+    if (window.location.search.indexOf('debug_instant=1') !== -1) {
+        var badge = document.createElement('div');
+        badge.id = 'nexus-instant-load-debug-badge';
+        badge.textContent = 'instant-load ' + INSTANT_LOAD_VERSION;
+        badge.style.cssText = 'position:fixed;bottom:8px;left:8px;z-index:999999;background:#000;color:#0f0;font:10px monospace;padding:4px 8px;border-radius:4px;opacity:0.9;pointer-events:none;';
+        if (document.body) {
+            document.body.appendChild(badge);
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.appendChild(badge);
+            });
+        }
+    }
+
+    // ============================================
     // 1. HIDE EVERYTHING IMMEDIATELY
     // ============================================
 
@@ -201,6 +222,45 @@
     }, 1500);
 
     // ============================================
+    // 4.5. SAFETY NET: One-time scroll unlock on DOMContentLoaded (2026-02-01)
+    // Fixes stuck scroll-blocking classes when overlay/menu not actually active
+    // ============================================
+
+    function safetyNetScrollUnlock() {
+        // Check if scroll-blocking classes are stuck without their overlays
+        var menuActive = document.getElementById('mobileMenu') &&
+                         document.getElementById('mobileMenu').classList.contains('active');
+        var notifActive = document.getElementById('mobileNotifications') &&
+                          document.getElementById('mobileNotifications').classList.contains('active');
+        var modalActive = document.querySelector('.modal.active, [role="dialog"][aria-hidden="false"]');
+        var sheetActive = document.querySelector('.fds-sheet.active, .mobile-sheet.active');
+
+        // If body has blocking classes but no overlay is actually open, remove them
+        if (!menuActive && !notifActive && !modalActive && !sheetActive) {
+            var blockingClasses = ['js-overflow-hidden', 'mobile-menu-open', 'mobile-notifications-open', 'modal-open', 'fds-sheet-open', 'drawer-open', 'menu-open'];
+            var hadBlockingClass = false;
+
+            blockingClasses.forEach(function(cls) {
+                if (document.body.classList.contains(cls)) {
+                    document.body.classList.remove(cls);
+                    hadBlockingClass = true;
+                }
+            });
+
+            if (hadBlockingClass) {
+                console.log('[NEXUS_INSTANT_LOAD] Safety net: Removed stuck scroll-blocking classes');
+            }
+        }
+    }
+
+    // Run once on DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', safetyNetScrollUnlock);
+    } else {
+        safetyNetScrollUnlock();
+    }
+
+    // ============================================
     // 5. GUARANTEED SCROLL RESTORATION
     // ============================================
 
@@ -213,11 +273,27 @@
                 hideStyles.remove();
             }
 
-            // CRITICAL: Force clear any scroll-blocking styles AND enable scrolling
-            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix with !important
-            document.documentElement.style.cssText = 'overflow-y: scroll !important; overflow-x: hidden !important; height: 100% !important;';
-            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix with !important
-            document.body.style.cssText = 'overflow-y: auto !important; overflow-x: hidden !important; height: auto !important; position: static !important;';
+            // CRITICAL: Clear inline styles that may block scroll
+            // DO NOT set height/overflow on html - let CSS handle it
+            // Only clear problematic inline styles, don't add new ones
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.documentElement.style.removeProperty('overflow');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.documentElement.style.removeProperty('overflow-y');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.documentElement.style.removeProperty('overflow-x');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.documentElement.style.removeProperty('height');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('overflow');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('overflow-y');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('overflow-x');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('height');
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix
+            document.body.style.removeProperty('position');
 
             // Remove any scroll-blocking event listeners
             document.body.onwheel = null;

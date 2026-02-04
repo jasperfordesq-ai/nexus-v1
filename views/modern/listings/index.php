@@ -254,7 +254,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
         </div>
 
         <!-- Grid -->
-        <div id="listings-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; margin-top: 40px;">
+        <div id="listings-grid" class="listings-main-grid">
             <?php if (!empty($listings)): ?>
                 <?php foreach ($listings as $listing):
                     $badgeColor = ($listing['type'] === 'offer') ? '#10b981' : '#f97316';
@@ -665,5 +665,10 @@ require __DIR__ . '/../../layouts/modern/header.php';
 
 </div><!-- #listings-index-glass-wrapper -->
 </div>
+
+<?php if (!empty($_GET['debug_scroll'])): ?>
+<!-- LIVE SCROLL DEBUG - Shows on-screen overlay with computed styles -->
+<script src="/assets/js/debug-scroll-live.js"></script>
+<?php endif; ?>
 
 <?php require __DIR__ . '/../../layouts/modern/footer.php'; ?>

@@ -2,59 +2,65 @@
 
 namespace Nexus\Controllers\Api;
 
+use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
+use Nexus\Services\TokenService;
+use Nexus\Services\WebAuthnChallengeStore;
 
 /**
- * WebAuthn API Controller
- * Handles biometric authentication registration and verification
+ * WebAuthnApiController - WebAuthn/Passkey authentication API
+ *
+ * Handles biometric authentication registration and verification.
+ * Supports both stateless (Bearer token) and session-based authentication.
+ *
+ * Challenge Storage:
+ * - For stateless clients (mobile/SPA): Uses WebAuthnChallengeStore with challenge_id
+ * - For session clients (browsers): Also stores in $_SESSION for backward compatibility
+ *
+ * Flow for stateless clients:
+ * 1. POST /api/webauthn/register-challenge → returns { challenge_id, ... }
+ * 2. POST /api/webauthn/register-verify with { challenge_id, ... }
+ *
+ * Flow for session clients (unchanged):
+ * 1. POST /api/webauthn/register-challenge → returns { ... }
+ * 2. POST /api/webauthn/register-verify → uses session challenge
  */
-class WebAuthnApiController
+class WebAuthnApiController extends BaseApiController
 {
-    use ApiAuth;
-
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    private function getUserId()
-    {
-        return $this->requireAuth();
-    }
-
-    private function getUser($userId)
-    {
-        $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT id, name, email FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        return $stmt->fetch();
-    }
-
     /**
      * POST /api/webauthn/register-challenge
      * Generate a challenge for WebAuthn credential registration
      */
     public function registerChallenge()
     {
-        $userId = $this->getUserId();
+        $userId = $this->requireAuth();
         $user = $this->getUser($userId);
 
         if (!$user) {
-            $this->jsonResponse(['error' => 'User not found'], 404);
+            $this->error('User not found', 404, ApiErrorCodes::RESOURCE_NOT_FOUND);
         }
 
         // Generate random challenge
         $challenge = random_bytes(32);
         $challengeB64 = $this->base64UrlEncode($challenge);
 
-        // Store challenge in session for verification
-        $_SESSION['webauthn_challenge'] = $challengeB64;
-        $_SESSION['webauthn_challenge_expires'] = time() + 300; // 5 minutes
+        // Store challenge in WebAuthnChallengeStore for stateless clients
+        $challengeId = WebAuthnChallengeStore::create(
+            $challengeB64,
+            $userId,
+            'register',
+            ['email' => $user['email']]
+        );
+
+        // Also store in session for backward compatibility with browser clients
+        if (session_status() === PHP_SESSION_ACTIVE || session_status() === PHP_SESSION_NONE) {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $_SESSION['webauthn_challenge'] = $challengeB64;
+            $_SESSION['webauthn_challenge_expires'] = time() + 120; // Match store TTL
+        }
 
         // Get existing credentials to exclude
         $db = Database::getConnection();
@@ -74,6 +80,7 @@ class WebAuthnApiController
 
         $options = [
             'challenge' => $challengeB64,
+            'challenge_id' => $challengeId, // For stateless clients
             'rp' => [
                 'name' => TenantContext::get()['name'] ?? 'Project NEXUS',
                 'id' => $this->getRpId()
@@ -106,19 +113,67 @@ class WebAuthnApiController
      */
     public function registerVerify()
     {
-        $userId = $this->getUserId();
+        $userId = $this->requireAuth();
+        $input = $this->getInput();
 
-        // Check challenge
-        if (empty($_SESSION['webauthn_challenge']) ||
-            empty($_SESSION['webauthn_challenge_expires']) ||
-            time() > $_SESSION['webauthn_challenge_expires']) {
-            $this->jsonResponse(['error' => 'Challenge expired'], 400);
+        // Get challenge - try challenge_id first (stateless), then session (backward compat)
+        $challengeId = $input['challenge_id'] ?? null;
+        $storedChallenge = null;
+
+        if ($challengeId) {
+            // Stateless client - get from challenge store
+            $challengeData = WebAuthnChallengeStore::get($challengeId);
+            if (!$challengeData) {
+                $this->error(
+                    'Challenge expired or invalid',
+                    401,
+                    ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED
+                );
+            }
+
+            // Verify this challenge belongs to the authenticated user
+            if ($challengeData['user_id'] !== $userId) {
+                $this->error(
+                    'Challenge user mismatch',
+                    401,
+                    ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+                );
+            }
+
+            if ($challengeData['type'] !== 'register') {
+                $this->error(
+                    'Invalid challenge type',
+                    401,
+                    ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+                );
+            }
+
+            $storedChallenge = $challengeData['challenge'];
+        } else {
+            // Session-based client (backward compatibility)
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            if (empty($_SESSION['webauthn_challenge']) ||
+                empty($_SESSION['webauthn_challenge_expires']) ||
+                time() > $_SESSION['webauthn_challenge_expires']) {
+                $this->error(
+                    'Challenge expired',
+                    401,
+                    ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED
+                );
+            }
+
+            $storedChallenge = $_SESSION['webauthn_challenge'];
         }
 
-        $input = json_decode(file_get_contents('php://input'), true);
-
         if (empty($input['id']) || empty($input['response'])) {
-            $this->jsonResponse(['error' => 'Invalid credential data'], 400);
+            $this->error(
+                'Invalid credential data',
+                400,
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD
+            );
         }
 
         // Verify client data
@@ -126,12 +181,19 @@ class WebAuthnApiController
         $clientData = json_decode($clientDataJSON, true);
 
         if ($clientData['type'] !== 'webauthn.create') {
-            $this->jsonResponse(['error' => 'Invalid credential type'], 400);
+            $this->error(
+                'Invalid credential type',
+                400,
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+            );
         }
 
-        $expectedChallenge = $_SESSION['webauthn_challenge'];
-        if ($clientData['challenge'] !== $expectedChallenge) {
-            $this->jsonResponse(['error' => 'Challenge mismatch'], 400);
+        if ($clientData['challenge'] !== $storedChallenge) {
+            $this->error(
+                'Challenge mismatch',
+                401,
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+            );
         }
 
         // Verify origin
@@ -140,7 +202,11 @@ class WebAuthnApiController
             error_log("[WebAuthn] Origin mismatch: expected {$expectedOrigin}, got {$clientData['origin']}");
             // Be lenient for development
             if (strpos($clientData['origin'], 'localhost') === false && strpos($expectedOrigin, 'localhost') === false) {
-                $this->jsonResponse(['error' => 'Origin mismatch'], 400);
+                $this->error(
+                    'Origin mismatch',
+                    400,
+                    ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+                );
             }
         }
 
@@ -149,7 +215,11 @@ class WebAuthnApiController
         $publicKey = $this->extractPublicKey($attestationObject);
 
         if (!$publicKey) {
-            $this->jsonResponse(['error' => 'Failed to extract public key'], 400);
+            $this->error(
+                'Failed to extract public key',
+                400,
+                ApiErrorCodes::AUTH_WEBAUTHN_FAILED
+            );
         }
 
         // Store credential
@@ -165,10 +235,15 @@ class WebAuthnApiController
             $publicKey
         ]);
 
-        // Clear challenge
+        // Consume challenge (delete from store - single use)
+        if ($challengeId) {
+            WebAuthnChallengeStore::consume($challengeId);
+        }
+
+        // Clear session challenge
         unset($_SESSION['webauthn_challenge'], $_SESSION['webauthn_challenge_expires']);
 
-        $this->jsonResponse(['success' => true, 'message' => 'Biometric registered']);
+        $this->success(['message' => 'Biometric registered']);
     }
 
     /**
@@ -177,26 +252,28 @@ class WebAuthnApiController
      */
     public function authChallenge()
     {
-        // For authentication, we might not have a session yet
-        // But we need some way to identify the user (email, username, etc.)
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = $this->getInput();
 
         // Generate random challenge
         $challenge = random_bytes(32);
         $challengeB64 = $this->base64UrlEncode($challenge);
 
-        // Store challenge in session
-        $_SESSION['webauthn_auth_challenge'] = $challengeB64;
-        $_SESSION['webauthn_auth_challenge_expires'] = time() + 300;
+        // Determine user context (may be null for passwordless login)
+        $userId = null;
+        $email = $input['email'] ?? null;
+
+        // Check if user is already authenticated (re-auth scenario)
+        $authUserId = $this->getAuthenticatedUserId();
 
         // Get allowed credentials
         $allowCredentials = [];
+        $db = Database::getConnection();
 
-        if (isset($_SESSION['user_id'])) {
+        if ($authUserId) {
             // User is logged in, get their credentials
-            $db = Database::getConnection();
+            $userId = $authUserId;
             $stmt = $db->prepare("SELECT credential_id FROM webauthn_credentials WHERE user_id = ?");
-            $stmt->execute([$_SESSION['user_id']]);
+            $stmt->execute([$userId]);
             $credentials = $stmt->fetchAll(\PDO::FETCH_COLUMN);
 
             $allowCredentials = array_map(function ($credId) {
@@ -205,30 +282,49 @@ class WebAuthnApiController
                     'id' => $credId
                 ];
             }, $credentials);
-        } elseif (!empty($input['email'])) {
+        } elseif ($email) {
             // User provided email for passwordless login
-            $db = Database::getConnection();
             $stmt = $db->prepare("
-                SELECT wc.credential_id
+                SELECT wc.credential_id, u.id as user_id
                 FROM webauthn_credentials wc
                 JOIN users u ON wc.user_id = u.id
                 WHERE u.email = ? AND u.tenant_id = ?
             ");
-            $stmt->execute([$input['email'], TenantContext::getId()]);
-            $credentials = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            $stmt->execute([$email, TenantContext::getId()]);
+            $results = $stmt->fetchAll();
 
-            $allowCredentials = array_map(function ($credId) {
-                return [
-                    'type' => 'public-key',
-                    'id' => $credId
-                ];
-            }, $credentials);
+            if (!empty($results)) {
+                $userId = $results[0]['user_id'];
+                $allowCredentials = array_map(function ($row) {
+                    return [
+                        'type' => 'public-key',
+                        'id' => $row['credential_id']
+                    ];
+                }, $results);
+            }
+        }
 
-            $_SESSION['webauthn_auth_email'] = $input['email'];
+        // Store challenge in WebAuthnChallengeStore
+        $challengeId = WebAuthnChallengeStore::create(
+            $challengeB64,
+            $userId, // May be null for discoverable credentials
+            'authenticate',
+            ['email' => $email]
+        );
+
+        // Also store in session for backward compatibility
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['webauthn_auth_challenge'] = $challengeB64;
+        $_SESSION['webauthn_auth_challenge_expires'] = time() + 120;
+        if ($email) {
+            $_SESSION['webauthn_auth_email'] = $email;
         }
 
         $options = [
             'challenge' => $challengeB64,
+            'challenge_id' => $challengeId,
             'rpId' => $this->getRpId(),
             'timeout' => 60000,
             'userVerification' => 'preferred'
@@ -247,23 +343,62 @@ class WebAuthnApiController
      */
     public function authVerify()
     {
-        // Check challenge
-        if (empty($_SESSION['webauthn_auth_challenge']) ||
-            empty($_SESSION['webauthn_auth_challenge_expires']) ||
-            time() > $_SESSION['webauthn_auth_challenge_expires']) {
-            $this->jsonResponse(['error' => 'Challenge expired'], 400);
+        $input = $this->getInput();
+
+        // Get challenge - try challenge_id first (stateless), then session
+        $challengeId = $input['challenge_id'] ?? null;
+        $storedChallenge = null;
+
+        if ($challengeId) {
+            $challengeData = WebAuthnChallengeStore::get($challengeId);
+            if (!$challengeData) {
+                $this->error(
+                    'Challenge expired or invalid',
+                    401,
+                    ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED
+                );
+            }
+
+            if ($challengeData['type'] !== 'authenticate') {
+                $this->error(
+                    'Invalid challenge type',
+                    401,
+                    ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+                );
+            }
+
+            $storedChallenge = $challengeData['challenge'];
+        } else {
+            // Session-based (backward compatibility)
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            if (empty($_SESSION['webauthn_auth_challenge']) ||
+                empty($_SESSION['webauthn_auth_challenge_expires']) ||
+                time() > $_SESSION['webauthn_auth_challenge_expires']) {
+                $this->error(
+                    'Challenge expired',
+                    401,
+                    ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED
+                );
+            }
+
+            $storedChallenge = $_SESSION['webauthn_auth_challenge'];
         }
 
-        $input = json_decode(file_get_contents('php://input'), true);
-
         if (empty($input['id']) || empty($input['response'])) {
-            $this->jsonResponse(['error' => 'Invalid assertion data'], 400);
+            $this->error(
+                'Invalid assertion data',
+                400,
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD
+            );
         }
 
         // Find credential
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            SELECT wc.*, u.id as user_id, u.name, u.email, u.role
+            SELECT wc.*, u.id as user_id, u.first_name, u.last_name, u.email, u.role, u.tenant_id
             FROM webauthn_credentials wc
             JOIN users u ON wc.user_id = u.id
             WHERE wc.credential_id = ? AND wc.tenant_id = ?
@@ -272,7 +407,11 @@ class WebAuthnApiController
         $credential = $stmt->fetch();
 
         if (!$credential) {
-            $this->jsonResponse(['error' => 'Credential not found'], 400);
+            $this->error(
+                'Credential not found',
+                401,
+                ApiErrorCodes::AUTH_WEBAUTHN_CREDENTIAL_NOT_FOUND
+            );
         }
 
         // Verify client data
@@ -280,62 +419,106 @@ class WebAuthnApiController
         $clientData = json_decode($clientDataJSON, true);
 
         if ($clientData['type'] !== 'webauthn.get') {
-            $this->jsonResponse(['error' => 'Invalid assertion type'], 400);
+            $this->error(
+                'Invalid assertion type',
+                400,
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+            );
         }
 
-        $expectedChallenge = $_SESSION['webauthn_auth_challenge'];
-        if ($clientData['challenge'] !== $expectedChallenge) {
-            $this->jsonResponse(['error' => 'Challenge mismatch'], 400);
+        if ($clientData['challenge'] !== $storedChallenge) {
+            $this->error(
+                'Challenge mismatch',
+                401,
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+            );
         }
 
         // Verify signature (simplified - production should use proper crypto)
         $authenticatorData = $this->base64UrlDecode($input['response']['authenticatorData']);
-        $signature = $this->base64UrlDecode($input['response']['signature']);
-
-        // For production, verify signature using stored public key
-        // This is a simplified version that trusts the browser's verification
 
         // Update sign count
         $signCount = unpack('N', substr($authenticatorData, 33, 4))[1] ?? 0;
         if ($signCount > 0 && $signCount <= $credential['sign_count']) {
-            $this->jsonResponse(['error' => 'Possible cloned authenticator'], 400);
+            $this->error(
+                'Possible cloned authenticator',
+                401,
+                ApiErrorCodes::AUTH_WEBAUTHN_FAILED
+            );
         }
 
         $stmt = $db->prepare("UPDATE webauthn_credentials SET sign_count = ?, last_used_at = NOW() WHERE id = ?");
         $stmt->execute([$signCount, $credential['id']]);
 
-        // Clear challenge
-        unset($_SESSION['webauthn_auth_challenge'], $_SESSION['webauthn_auth_challenge_expires'], $_SESSION['webauthn_auth_email']);
-
-        // If user wasn't logged in, log them in now
-        if (!isset($_SESSION['user_id'])) {
-            // FIXED: Preserve layout preference before session regeneration
-            $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
-
-            // SECURITY: Regenerate session ID to prevent session fixation attacks
-            session_regenerate_id(true);
-
-            // FIXED: Restore layout preference after regeneration
-            if ($preservedLayout) {
-                $_SESSION['nexus_active_layout'] = $preservedLayout;
-                $_SESSION['nexus_layout'] = $preservedLayout;
-            }
-
-            $_SESSION['user_id'] = $credential['user_id'];
-            $_SESSION['user_name'] = $credential['name'];
-            $_SESSION['user_email'] = $credential['email'];
-            $_SESSION['user_role'] = $credential['role'];
+        // Consume challenge
+        if ($challengeId) {
+            WebAuthnChallengeStore::consume($challengeId);
         }
 
-        $this->jsonResponse([
+        // Clear session challenges
+        unset(
+            $_SESSION['webauthn_auth_challenge'],
+            $_SESSION['webauthn_auth_challenge_expires'],
+            $_SESSION['webauthn_auth_email']
+        );
+
+        // Determine if client wants stateless auth
+        $wantsStateless = TokenService::isMobileRequest() || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
+
+        // Generate tokens for API response
+        $isMobile = TokenService::isMobileRequest();
+        $accessToken = TokenService::generateToken(
+            (int)$credential['user_id'],
+            (int)$credential['tenant_id'],
+            ['role' => $credential['role'], 'email' => $credential['email']],
+            $isMobile
+        );
+        $refreshToken = TokenService::generateRefreshToken(
+            (int)$credential['user_id'],
+            (int)$credential['tenant_id'],
+            $isMobile
+        );
+
+        // For session-based clients, also set up session
+        if (!$wantsStateless) {
+            // Check current session user
+            $currentSessionUser = $_SESSION['user_id'] ?? null;
+
+            if ($currentSessionUser === null) {
+                // Not logged in - set up session
+                $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
+                session_regenerate_id(true);
+                if ($preservedLayout) {
+                    $_SESSION['nexus_active_layout'] = $preservedLayout;
+                    $_SESSION['nexus_layout'] = $preservedLayout;
+                }
+
+                $_SESSION['user_id'] = $credential['user_id'];
+                $_SESSION['user_name'] = trim($credential['first_name'] . ' ' . $credential['last_name']);
+                $_SESSION['user_email'] = $credential['email'];
+                $_SESSION['user_role'] = $credential['role'];
+                $_SESSION['tenant_id'] = $credential['tenant_id'];
+                $_SESSION['is_logged_in'] = true;
+            }
+        }
+
+        $response = [
             'success' => true,
             'message' => 'Authentication successful',
             'user' => [
                 'id' => $credential['user_id'],
-                'name' => $credential['name'],
+                'first_name' => $credential['first_name'],
+                'last_name' => $credential['last_name'],
                 'email' => $credential['email']
-            ]
-        ]);
+            ],
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'token_type' => 'Bearer',
+            'expires_in' => TokenService::getAccessTokenExpiry($isMobile),
+            'is_mobile' => $isMobile
+        ];
+
+        $this->jsonResponse($response);
     }
 
     /**
@@ -344,9 +527,8 @@ class WebAuthnApiController
      */
     public function remove()
     {
-        $userId = $this->getUserId();
-
-        $input = json_decode(file_get_contents('php://input'), true);
+        $userId = $this->requireAuth();
+        $input = $this->getInput();
         $credentialId = $input['credential_id'] ?? null;
 
         $db = Database::getConnection();
@@ -361,35 +543,28 @@ class WebAuthnApiController
             $stmt->execute([$userId]);
         }
 
-        $this->jsonResponse(['success' => true, 'message' => 'Credential(s) removed']);
+        $this->success(['message' => 'Credential(s) removed']);
     }
 
     /**
      * POST /api/webauthn/remove-all
      * Remove all WebAuthn credentials for current user
-     * SECURITY: Changed from GET to POST to prevent CSRF attacks
      */
     public function removeAll()
     {
-        // SECURITY: Require POST method
+        // Require POST method
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->jsonResponse([
-                'success' => false,
-                'error' => 'Method not allowed. Use POST request.'
-            ], 405);
-            return;
+            $this->error(
+                'Method not allowed. Use POST request.',
+                405,
+                ApiErrorCodes::VALIDATION_ERROR
+            );
         }
 
-        // SECURITY: Verify CSRF token for browser-based requests
-        if (!$this->verifyCsrfToken()) {
-            $this->jsonResponse([
-                'success' => false,
-                'error' => 'Invalid CSRF token'
-            ], 403);
-            return;
-        }
+        // Verify CSRF for browser requests (Bearer auth skips CSRF)
+        $this->verifyCsrf();
 
-        $userId = $this->getUserId();
+        $userId = $this->requireAuth();
 
         $db = Database::getConnection();
 
@@ -403,32 +578,10 @@ class WebAuthnApiController
         $stmt = $db->prepare("DELETE FROM webauthn_credentials WHERE user_id = ?");
         $stmt->execute([$userId]);
 
-        $this->jsonResponse([
-            'success' => true,
+        $this->success([
             'message' => "Removed {$count} biometric credential(s). You can now re-register on any device.",
             'removed_count' => $count
         ]);
-    }
-
-    /**
-     * Verify CSRF token from request headers or body
-     */
-    private function verifyCsrfToken(): bool
-    {
-        // Check for Bearer token auth (API clients don't need CSRF)
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        if (strpos($authHeader, 'Bearer ') === 0) {
-            return true;
-        }
-
-        // For browser requests, verify CSRF token
-        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
-        if (!$token) {
-            $input = json_decode(file_get_contents('php://input'), true);
-            $token = $input['csrf_token'] ?? null;
-        }
-
-        return $token && isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
     }
 
     /**
@@ -437,7 +590,7 @@ class WebAuthnApiController
      */
     public function credentials()
     {
-        $userId = $this->getUserId();
+        $userId = $this->requireAuth();
 
         $db = Database::getConnection();
         $stmt = $db->prepare("
@@ -462,7 +615,7 @@ class WebAuthnApiController
     public function status()
     {
         // Allow unauthenticated check for login page
-        $userId = $_SESSION['user_id'] ?? null;
+        $userId = $this->getAuthenticatedUserId();
 
         if (!$userId) {
             $this->jsonResponse([
@@ -482,21 +635,44 @@ class WebAuthnApiController
         ]);
     }
 
+    // ========================================================================
+    // HELPER METHODS
+    // ========================================================================
+
     /**
-     * Helper: Get the Relying Party ID (domain)
+     * Get input from JSON body
      */
-    private function getRpId()
+    private function getInput(): array
     {
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        // Remove port if present
-        $host = preg_replace('/:\d+$/', '', $host);
-        return $host;
+        $input = file_get_contents('php://input');
+        return json_decode($input, true) ?? [];
     }
 
     /**
-     * Helper: Get expected origin
+     * Get user by ID
      */
-    private function getExpectedOrigin()
+    private function getUser(int $userId): ?array
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare("SELECT id, CONCAT(first_name, ' ', last_name) as name, email FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetch() ?: null;
+    }
+
+    /**
+     * Get the Relying Party ID (domain)
+     */
+    private function getRpId(): string
+    {
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        // Remove port if present
+        return preg_replace('/:\d+$/', '', $host);
+    }
+
+    /**
+     * Get expected origin
+     */
+    private function getExpectedOrigin(): string
     {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
@@ -504,26 +680,25 @@ class WebAuthnApiController
     }
 
     /**
-     * Helper: Base64 URL encode
+     * Base64 URL encode
      */
-    private function base64UrlEncode($data)
+    private function base64UrlEncode(string $data): string
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
     /**
-     * Helper: Base64 URL decode
+     * Base64 URL decode
      */
-    private function base64UrlDecode($data)
+    private function base64UrlDecode(string $data): string
     {
         return base64_decode(strtr($data, '-_', '+/') . str_repeat('=', (4 - strlen($data) % 4) % 4));
     }
 
     /**
-     * Helper: Extract public key from attestation object
-     * This is a simplified version - production should use CBOR library
+     * Extract public key from attestation object
      */
-    private function extractPublicKey($attestationObject)
+    private function extractPublicKey(string $attestationObject): ?string
     {
         // For simplicity, store the entire attestation object
         // Production should parse CBOR and extract actual public key

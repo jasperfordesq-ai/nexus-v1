@@ -4,68 +4,71 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
 
 /**
  * Push Notification API Controller
- * Handles VAPID key retrieval, subscription management, and push sending
+ *
+ * Handles VAPID key retrieval, subscription management, and push sending.
+ * Supports both session-based and Bearer token authentication.
+ *
+ * Response Format:
+ * Success: { "data": {...} }
+ * Error:   { "errors": [{ "code": "...", "message": "..." }] }
  */
-class PushApiController
+class PushApiController extends BaseApiController
 {
-    use ApiAuth;
-
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    private function getUserId()
-    {
-        return $this->requireAuth();
-    }
-
     /**
      * GET /api/push/vapid-key
-     * Returns the VAPID public key for push subscription
+     *
+     * Returns the VAPID public key for push subscription.
+     * Public endpoint - no authentication required.
+     *
+     * Response: 200 OK with public key
      */
-    public function vapidKey()
+    public function vapidKey(): void
     {
-        // Get VAPID public key from environment or tenant config
         $publicKey = $this->getVapidPublicKey();
 
         if (empty($publicKey)) {
-            $this->jsonResponse(['error' => 'Push notifications not configured'], 500);
+            $this->respondWithError('PUSH_NOT_CONFIGURED', 'Push notifications not configured', null, 500);
         }
 
-        $this->jsonResponse(['publicKey' => $publicKey]);
+        $this->respondWithData(['public_key' => $publicKey]);
     }
 
     /**
      * POST /api/push/subscribe
-     * Stores the push subscription for the current user
-     * Note: CSRF not required - authenticated via session, affects only own subscription,
-     * and PWA contexts can have CSRF token sync issues
+     *
+     * Stores the push subscription for the current user.
+     * Note: CSRF not required - authenticated via session/Bearer, affects only own subscription
+     *
+     * Request Body (JSON):
+     * {
+     *   "endpoint": string (required),
+     *   "keys": { "p256dh": string, "auth": string }
+     * }
+     *
+     * Response: 200 OK on success
      */
-    public function subscribe()
+    public function subscribe(): void
     {
+        $userId = $this->getUserId();
+        $tenantId = $this->getAuthenticatedTenantId() ?? TenantContext::getId();
+        $this->rateLimit('push_subscribe', 10, 60);
+
+        $endpoint = $this->input('endpoint');
+        $keys = $this->input('keys', []);
+
+        if (empty($endpoint)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Endpoint is required', 'endpoint', 400);
+        }
+
         try {
-            $userId = $this->getUserId();
-            $tenantId = TenantContext::getId();
-
-            $input = json_decode(file_get_contents('php://input'), true);
-
-            if (empty($input['endpoint'])) {
-                $this->jsonResponse(['error' => 'Invalid subscription data'], 400);
-            }
-
             $db = Database::getConnection();
 
             // Check if subscription already exists
             $stmt = $db->prepare("SELECT id FROM push_subscriptions WHERE endpoint = ? AND user_id = ?");
-            $stmt->execute([$input['endpoint'], $userId]);
+            $stmt->execute([$endpoint, $userId]);
             $existing = $stmt->fetch();
 
             if ($existing) {
@@ -76,10 +79,11 @@ class PushApiController
                     WHERE id = ?
                 ");
                 $stmt->execute([
-                    $input['keys']['p256dh'] ?? null,
-                    $input['keys']['auth'] ?? null,
+                    $keys['p256dh'] ?? null,
+                    $keys['auth'] ?? null,
                     $existing['id']
                 ]);
+                $action = 'updated';
             } else {
                 // Create new subscription
                 $stmt = $db->prepare("
@@ -89,73 +93,90 @@ class PushApiController
                 $stmt->execute([
                     $userId,
                     $tenantId,
-                    $input['endpoint'],
-                    $input['keys']['p256dh'] ?? null,
-                    $input['keys']['auth'] ?? null
+                    $endpoint,
+                    $keys['p256dh'] ?? null,
+                    $keys['auth'] ?? null
                 ]);
+                $action = 'created';
             }
 
-            $this->jsonResponse(['success' => true, 'message' => 'Subscription saved']);
+            $this->respondWithData([
+                'subscribed' => true,
+                'action' => $action
+            ]);
         } catch (\Exception $e) {
             error_log('[PushApi] Subscribe error: ' . $e->getMessage());
-            $this->jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+            $this->respondWithError('SUBSCRIBE_FAILED', 'Failed to save subscription', null, 500);
         }
     }
 
     /**
      * POST /api/push/unsubscribe
-     * Removes the push subscription for the current user
-     * Note: CSRF not required - authenticated via session, affects only own subscription
+     *
+     * Removes the push subscription for the current user.
+     *
+     * Request Body (JSON):
+     * { "endpoint": string (required) }
+     *
+     * Response: 200 OK on success
      */
-    public function unsubscribe()
+    public function unsubscribe(): void
     {
         $userId = $this->getUserId();
+        $this->rateLimit('push_unsubscribe', 10, 60);
 
-        $input = json_decode(file_get_contents('php://input'), true);
+        $endpoint = $this->input('endpoint');
 
-        if (empty($input['endpoint'])) {
-            $this->jsonResponse(['error' => 'Invalid request'], 400);
+        if (empty($endpoint)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Endpoint is required', 'endpoint', 400);
         }
 
         $db = Database::getConnection();
         $stmt = $db->prepare("DELETE FROM push_subscriptions WHERE endpoint = ? AND user_id = ?");
-        $stmt->execute([$input['endpoint'], $userId]);
+        $stmt->execute([$endpoint, $userId]);
 
-        $this->jsonResponse(['success' => true, 'message' => 'Unsubscribed']);
+        $this->respondWithData(['unsubscribed' => true]);
     }
 
     /**
-     * POST /api/push/send (Admin only)
-     * Sends a push notification to specified users
+     * POST /api/push/send
+     *
+     * Sends a push notification to specified users (admin only).
+     *
+     * Request Body (JSON):
+     * {
+     *   "title": string (required),
+     *   "body": string (required),
+     *   "icon": string (optional),
+     *   "badge": string (optional),
+     *   "url": string (optional),
+     *   "tag": string (optional),
+     *   "user_ids": int[] (optional, if empty sends to all subscribers)
+     * }
+     *
+     * Response: 200 OK with send results
      */
-    public function send()
+    public function send(): void
     {
-        // Security: Verify CSRF token for state-changing operations
-        \Nexus\Core\Csrf::verifyOrDieJson();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+        $this->rateLimit('push_send', 10, 60);
 
-        $userId = $this->getUserId();
-        $tenantId = TenantContext::getId();
+        $tenantId = $this->getAuthenticatedTenantId() ?? TenantContext::getId();
 
-        // Check if user is admin
+        $title = $this->input('title');
+        $body = $this->input('body');
+
+        if (empty($title) || empty($body)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Title and body are required', null, 400);
+        }
+
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT role FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $user = $stmt->fetch();
-
-        if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
-            $this->jsonResponse(['error' => 'Forbidden'], 403);
-        }
-
-        $input = json_decode(file_get_contents('php://input'), true);
-
-        if (empty($input['title']) || empty($input['body'])) {
-            $this->jsonResponse(['error' => 'Title and body are required'], 400);
-        }
 
         // Get target subscriptions
-        $targetUserIds = $input['user_ids'] ?? null;
+        $targetUserIds = $this->input('user_ids');
 
-        if ($targetUserIds) {
+        if ($targetUserIds && is_array($targetUserIds)) {
             $placeholders = str_repeat('?,', count($targetUserIds) - 1) . '?';
             $stmt = $db->prepare("
                 SELECT * FROM push_subscriptions
@@ -172,7 +193,12 @@ class PushApiController
         $subscriptions = $stmt->fetchAll();
 
         if (empty($subscriptions)) {
-            $this->jsonResponse(['success' => false, 'message' => 'No subscribers found']);
+            $this->respondWithData([
+                'sent' => 0,
+                'failed' => 0,
+                'message' => 'No subscribers found'
+            ]);
+            return;
         }
 
         // Send push notifications
@@ -181,12 +207,12 @@ class PushApiController
 
         foreach ($subscriptions as $sub) {
             $result = $this->sendPush($sub, [
-                'title' => $input['title'],
-                'body' => $input['body'],
-                'icon' => $input['icon'] ?? '/assets/images/pwa/icon.svg',
-                'badge' => $input['badge'] ?? '/assets/images/pwa/badge.png',
-                'url' => $input['url'] ?? '/',
-                'tag' => $input['tag'] ?? 'nexus-notification'
+                'title' => $title,
+                'body' => $body,
+                'icon' => $this->input('icon', '/assets/images/pwa/icon.svg'),
+                'badge' => $this->input('badge', '/assets/images/pwa/badge.png'),
+                'url' => $this->input('url', '/'),
+                'tag' => $this->input('tag', 'nexus-notification')
             ]);
 
             if ($result) {
@@ -196,18 +222,21 @@ class PushApiController
             }
         }
 
-        $this->jsonResponse([
-            'success' => true,
+        $this->respondWithData([
             'sent' => $sent,
-            'failed' => $failed
+            'failed' => $failed,
+            'total' => count($subscriptions)
         ]);
     }
 
     /**
      * GET /api/push/status
-     * Returns push subscription status for current user
+     *
+     * Returns push subscription status for current user.
+     *
+     * Response: 200 OK with subscription status
      */
-    public function status()
+    public function status(): void
     {
         $userId = $this->getUserId();
 
@@ -216,36 +245,47 @@ class PushApiController
         $stmt->execute([$userId]);
         $result = $stmt->fetch();
 
-        $this->jsonResponse([
+        $this->respondWithData([
             'subscribed' => $result['count'] > 0,
-            'subscriptionCount' => (int)$result['count']
+            'subscription_count' => (int)$result['count']
         ]);
     }
 
     /**
      * POST /api/push/register-device
-     * Registers an FCM device token for native Android push notifications
-     * Note: CSRF not required - authenticated via session, affects only own device
+     *
+     * Registers an FCM device token for native Android push notifications.
+     *
+     * Request Body (JSON):
+     * {
+     *   "token": string (required),
+     *   "platform": "android" | "ios" (optional, default: android)
+     * }
+     *
+     * Response: 200 OK on success
      */
-    public function registerDevice()
+    public function registerDevice(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true);
+        $this->rateLimit('push_register_device', 10, 60);
 
-        if (empty($input['token'])) {
-            $this->jsonResponse(['error' => 'Token is required'], 400);
+        $token = $this->input('token');
+        $platform = $this->input('platform', 'android');
+
+        if (empty($token)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Token is required', 'token', 400);
         }
 
         // User might not be logged in yet - device can be registered
         // and associated with user later when they log in
-        $userId = $_SESSION['user_id'] ?? null;
+        $userId = $this->getOptionalUserId();
 
         if (!$userId) {
             // Store token without user association for now
             // It will be associated when user logs in
-            $this->jsonResponse([
-                'success' => true,
-                'message' => 'Token received - will be associated on login',
-                'pending' => true
+            $this->respondWithData([
+                'registered' => false,
+                'pending' => true,
+                'message' => 'Token received - will be associated on login'
             ]);
             return;
         }
@@ -255,87 +295,75 @@ class PushApiController
 
             $result = \Nexus\Services\FCMPushService::registerDevice(
                 $userId,
-                $input['token'],
-                $input['platform'] ?? 'android'
+                $token,
+                $platform
             );
 
             if ($result) {
-                $this->jsonResponse([
-                    'success' => true,
+                $this->respondWithData([
+                    'registered' => true,
                     'message' => 'Device registered for push notifications'
                 ]);
             } else {
-                $this->jsonResponse(['error' => 'Failed to register device'], 500);
+                $this->respondWithError('REGISTRATION_FAILED', 'Failed to register device', null, 500);
             }
         } catch (\Exception $e) {
             error_log('[PushApi] Register device error: ' . $e->getMessage());
-            $this->jsonResponse(['error' => 'Server error'], 500);
+            $this->respondWithError('SERVER_ERROR', 'Server error', null, 500);
         }
     }
 
     /**
      * POST /api/push/unregister-device
-     * Removes an FCM device token
+     *
+     * Removes an FCM device token.
+     *
+     * Request Body (JSON):
+     * { "token": string (required) }
+     *
+     * Response: 200 OK on success
      */
-    public function unregisterDevice()
+    public function unregisterDevice(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true);
+        $this->rateLimit('push_unregister_device', 10, 60);
 
-        if (empty($input['token'])) {
-            $this->jsonResponse(['error' => 'Token is required'], 400);
+        $token = $this->input('token');
+
+        if (empty($token)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Token is required', 'token', 400);
         }
 
         try {
-            $result = \Nexus\Services\FCMPushService::unregisterDevice($input['token']);
+            $result = \Nexus\Services\FCMPushService::unregisterDevice($token);
 
-            $this->jsonResponse([
-                'success' => $result,
-                'message' => $result ? 'Device unregistered' : 'Failed to unregister'
+            $this->respondWithData([
+                'unregistered' => $result,
+                'message' => $result ? 'Device unregistered' : 'Device not found'
             ]);
         } catch (\Exception $e) {
             error_log('[PushApi] Unregister device error: ' . $e->getMessage());
-            $this->jsonResponse(['error' => 'Server error'], 500);
+            $this->respondWithError('SERVER_ERROR', 'Server error', null, 500);
         }
     }
 
     /**
      * Helper: Get VAPID public key from config
      */
-    private function getVapidPublicKey()
+    private function getVapidPublicKey(): ?string
     {
-        // First check .env at project root
-        $envPath = dirname(__DIR__, 3) . '/.env';
-        if (file_exists($envPath)) {
-            $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (strpos($line, 'VAPID_PUBLIC_KEY=') === 0) {
-                    return trim(substr($line, 17), '"\'');
-                }
-            }
-        }
-
-        // Also check httpdocs/.env (Plesk structure)
-        $envPath2 = dirname(__DIR__, 3) . '/httpdocs/../.env';
-        if (file_exists($envPath2)) {
-            $lines = file($envPath2, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (strpos($line, 'VAPID_PUBLIC_KEY=') === 0) {
-                    return trim(substr($line, 17), '"\'');
-                }
-            }
+        // Check environment variable first
+        $key = getenv('VAPID_PUBLIC_KEY') ?: ($_ENV['VAPID_PUBLIC_KEY'] ?? null);
+        if ($key) {
+            return $key;
         }
 
         // Fallback to tenant config
         try {
-            if (class_exists('Nexus\Core\TenantContext')) {
-                $tenant = TenantContext::get();
-                if (!empty($tenant['configuration'])) {
-                    $config = json_decode($tenant['configuration'], true);
-                    if (!empty($config['vapid_public_key'])) {
-                        return $config['vapid_public_key'];
-                    }
+            $tenant = TenantContext::get();
+            if (!empty($tenant['configuration'])) {
+                $config = json_decode($tenant['configuration'], true);
+                if (!empty($config['vapid_public_key'])) {
+                    return $config['vapid_public_key'];
                 }
             }
         } catch (\Exception $e) {
@@ -348,41 +376,21 @@ class PushApiController
     /**
      * Helper: Get VAPID private key from config
      */
-    private function getVapidPrivateKey()
+    private function getVapidPrivateKey(): ?string
     {
-        // First check .env at project root
-        $envPath = dirname(__DIR__, 3) . '/.env';
-        if (file_exists($envPath)) {
-            $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (strpos($line, 'VAPID_PRIVATE_KEY=') === 0) {
-                    return trim(substr($line, 18), '"\'');
-                }
-            }
-        }
-
-        // Also check httpdocs/.env (Plesk structure)
-        $envPath2 = dirname(__DIR__, 3) . '/httpdocs/../.env';
-        if (file_exists($envPath2)) {
-            $lines = file($envPath2, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (strpos($line, 'VAPID_PRIVATE_KEY=') === 0) {
-                    return trim(substr($line, 18), '"\'');
-                }
-            }
+        // Check environment variable first
+        $key = getenv('VAPID_PRIVATE_KEY') ?: ($_ENV['VAPID_PRIVATE_KEY'] ?? null);
+        if ($key) {
+            return $key;
         }
 
         // Fallback to tenant config
         try {
-            if (class_exists('Nexus\Core\TenantContext')) {
-                $tenant = TenantContext::get();
-                if (!empty($tenant['configuration'])) {
-                    $config = json_decode($tenant['configuration'], true);
-                    if (!empty($config['vapid_private_key'])) {
-                        return $config['vapid_private_key'];
-                    }
+            $tenant = TenantContext::get();
+            if (!empty($tenant['configuration'])) {
+                $config = json_decode($tenant['configuration'], true);
+                if (!empty($config['vapid_private_key'])) {
+                    return $config['vapid_private_key'];
                 }
             }
         } catch (\Exception $e) {
@@ -395,7 +403,7 @@ class PushApiController
     /**
      * Helper: Send push notification using Web Push protocol
      */
-    private function sendPush($subscription, $payload)
+    private function sendPush(array $subscription, array $payload): bool
     {
         $publicKey = $this->getVapidPublicKey();
         $privateKey = $this->getVapidPrivateKey();
@@ -407,7 +415,6 @@ class PushApiController
 
         // Check if web-push library is available
         if (!class_exists('Minishlink\WebPush\WebPush')) {
-            // Fallback: Log and return false
             error_log('[Push] web-push library not installed. Run: composer require minishlink/web-push');
             return false;
         }
@@ -415,7 +422,7 @@ class PushApiController
         try {
             $auth = [
                 'VAPID' => [
-                    'subject' => 'mailto:' . ($_ENV['MAIL_FROM'] ?? 'admin@nexus.local'),
+                    'subject' => 'mailto:' . (getenv('MAIL_FROM') ?: 'admin@nexus.local'),
                     'publicKey' => $publicKey,
                     'privateKey' => $privateKey,
                 ],
