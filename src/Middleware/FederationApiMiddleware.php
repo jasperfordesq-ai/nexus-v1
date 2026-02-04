@@ -403,25 +403,32 @@ class FederationApiMiddleware
 
     /**
      * Extract API key from request
+     *
+     * SECURITY: API keys are ONLY accepted via HTTP headers, never via query parameters.
+     * Query parameters are logged in server access logs, appear in browser history,
+     * and can leak via referrer headers - making them unsuitable for secrets.
+     *
+     * Supported methods (in order of preference):
+     * 1. Authorization: Bearer <api_key>
+     * 2. X-API-Key: <api_key>
      */
     private static function extractApiKey(): ?string
     {
-        // Check Authorization header (Bearer token)
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['HTTP_X_API_KEY'] ?? '';
+        // Check Authorization header (Bearer token) - preferred method
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
         if (preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
             return $matches[1];
         }
 
-        // Check X-API-Key header
+        // Check X-API-Key header - alternative method
         if (!empty($_SERVER['HTTP_X_API_KEY'])) {
             return $_SERVER['HTTP_X_API_KEY'];
         }
 
-        // Check query parameter (less secure, for testing)
-        if (!empty($_GET['api_key'])) {
-            return $_GET['api_key'];
-        }
+        // SECURITY: Query parameter authentication removed
+        // API keys in URLs are logged in server access logs, browser history,
+        // and can leak via HTTP Referer headers. Use header-based auth only.
 
         return null;
     }
@@ -471,32 +478,106 @@ class FederationApiMiddleware
 
     /**
      * Check rate limit for partner
+     *
+     * Uses a sliding window approach with hourly buckets stored in the database.
+     * Each hour, the counter resets automatically when the hour changes.
+     *
+     * Rate limit headers are set for client visibility:
+     * - X-RateLimit-Limit: Maximum requests per hour
+     * - X-RateLimit-Remaining: Requests remaining in current window
+     * - X-RateLimit-Reset: Unix timestamp when the limit resets
+     *
+     * Requires migration: 2026_02_04_add_rate_limit_tracking_columns.sql
      */
     private static function checkRateLimit(int $keyId): bool
     {
         $db = Database::getInstance();
+        $currentHour = date('Y-m-d H:00:00');
 
-        // Get rate limit config
-        $stmt = $db->prepare("
-            SELECT rate_limit, request_count,
-                   TIMESTAMPDIFF(MINUTE, DATE_FORMAT(NOW(), '%Y-%m-%d %H:00:00'), NOW()) as minutes_in_hour
-            FROM federation_api_keys
-            WHERE id = ?
-        ");
-        $stmt->execute([$keyId]);
-        $config = $stmt->fetch(\PDO::FETCH_ASSOC);
+        try {
+            // Get rate limit config and current usage
+            // Uses new columns (hourly_request_count, rate_limit_hour) for sliding window
+            $stmt = $db->prepare("
+                SELECT
+                    rate_limit,
+                    COALESCE(hourly_request_count, 0) as hourly_request_count,
+                    rate_limit_hour
+                FROM federation_api_keys
+                WHERE id = ?
+            ");
+            $stmt->execute([$keyId]);
+            $config = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-        if (!$config) {
+            if (!$config) {
+                return false;
+            }
+
+            $rateLimit = (int) ($config['rate_limit'] ?? 1000); // Default 1000 requests per hour
+            $storedHour = $config['rate_limit_hour'];
+            $requestCount = (int) $config['hourly_request_count'];
+
+            // Check if we're in a new hour - reset counter if so
+            if ($storedHour !== $currentHour) {
+                // New hour, reset the counter to 1 (this request)
+                $updateStmt = $db->prepare("
+                    UPDATE federation_api_keys
+                    SET hourly_request_count = 1,
+                        rate_limit_hour = ?
+                    WHERE id = ?
+                ");
+                $updateStmt->execute([$currentHour, $keyId]);
+                $requestCount = 1;
+            } else {
+                // Same hour, increment counter
+                $updateStmt = $db->prepare("
+                    UPDATE federation_api_keys
+                    SET hourly_request_count = hourly_request_count + 1
+                    WHERE id = ?
+                ");
+                $updateStmt->execute([$keyId]);
+                $requestCount++;
+            }
+        } catch (\PDOException $e) {
+            // Fallback for pre-migration schemas: use simple request_count
+            // This allows the system to work before migration is applied
+            $stmt = $db->prepare("
+                SELECT rate_limit, request_count
+                FROM federation_api_keys
+                WHERE id = ?
+            ");
+            $stmt->execute([$keyId]);
+            $config = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$config) {
+                return false;
+            }
+
+            $rateLimit = (int) ($config['rate_limit'] ?? 1000);
+            $requestCount = (int) ($config['request_count'] ?? 0);
+
+            // Note: Without the new columns, rate limiting is less accurate
+            // as request_count doesn't auto-reset hourly without a cron job
+            error_log('FederationApiMiddleware: Using legacy rate limiting. Run migration 2026_02_04_add_rate_limit_tracking_columns.sql for proper hourly reset.');
+        }
+
+        // Calculate reset timestamp (start of next hour)
+        $resetTime = strtotime($currentHour) + 3600;
+        $remaining = max(0, $rateLimit - $requestCount);
+
+        // Set rate limit headers for client visibility
+        header("X-RateLimit-Limit: {$rateLimit}");
+        header("X-RateLimit-Remaining: {$remaining}");
+        header("X-RateLimit-Reset: {$resetTime}");
+
+        // Check if rate limit exceeded
+        if ($requestCount > $rateLimit) {
+            // Add Retry-After header when rate limited
+            $retryAfter = max(1, $resetTime - time());
+            header("Retry-After: {$retryAfter}");
             return false;
         }
 
-        $rateLimit = $config['rate_limit'] ?? 1000; // Default 1000 requests per hour
-
-        // Simple hourly rate limiting using request_count
-        // In production, use Redis or a proper rate limiter
-        // Reset count at the start of each hour (handled by cron)
-
-        return true; // Simplified for now - implement proper rate limiting in production
+        return true;
     }
 
     /**
