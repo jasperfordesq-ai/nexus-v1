@@ -129,6 +129,15 @@ window.closeMobileNotifications = function() {
             cleanupMenuClasses();
         }
     });
+
+    // FIX 2026-02-01: bfcache restoration cleanup
+    // Catches back/forward navigation where browser restores page from cache
+    // with mobile-menu-open still on body but menu not actually visible
+    window.addEventListener('pageshow', function(e) {
+        if (e.persisted) {
+            cleanupMenuClasses();
+        }
+    });
 })();
 
 // Haptic Feedback Helper

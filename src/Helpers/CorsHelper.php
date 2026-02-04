@@ -20,6 +20,8 @@ class CorsHelper
         'https://hour-timebank.ie',
         'https://www.hour-timebank.ie',
         'http://staging.timebank.local',
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
     ];
 
     private static ?array $allowedOrigins = null;

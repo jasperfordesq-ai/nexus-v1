@@ -2,20 +2,53 @@
 
 namespace Nexus\Controllers\Api;
 
+use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\Database;
 use Nexus\Services\TokenService;
+use Nexus\Services\TotpService;
+use Nexus\Services\TwoFactorChallengeManager;
 
+/**
+ * AuthController - Authentication API endpoints
+ *
+ * Handles login, registration, token refresh, and session management.
+ * Supports both session-based (web) and stateless Bearer token (mobile/SPA) authentication.
+ *
+ * Response format maintains backward compatibility with existing mobile apps:
+ * - Success: { "success": true, "user": {...}, "access_token": "...", ... }
+ * - Error: { "error": "message", "code": "ERROR_CODE", ... }
+ */
 class AuthController
 {
     /**
-     * Helper to return JSON response
+     * Helper to return JSON response with API version header
      */
     private function jsonResponse($data, $status = 200)
     {
         header('Content-Type: application/json');
+        header('API-Version: 1.0');
         http_response_code($status);
         echo json_encode($data);
         exit;
+    }
+
+    /**
+     * Helper to return error response with standardized error code
+     *
+     * @param string $message Human-readable error message
+     * @param string $code Error code from ApiErrorCodes
+     * @param int $status HTTP status code
+     * @param array $extra Additional fields to include in response
+     */
+    private function errorResponse(string $message, string $code, int $status = 400, array $extra = [])
+    {
+        $response = array_merge([
+            'error' => $message,
+            'code' => $code,
+            'success' => false,
+        ], $extra);
+
+        return $this->jsonResponse($response, $status);
     }
 
     /**
@@ -34,7 +67,11 @@ class AuthController
         $password = $data['password'] ?? '';
 
         if (empty($email) || empty($password)) {
-            return $this->jsonResponse(['error' => 'Email and password required'], 400);
+            return $this->errorResponse(
+                'Email and password required',
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                400
+            );
         }
 
         // SECURITY: Rate limiting to prevent brute force attacks
@@ -45,7 +82,13 @@ class AuthController
             $emailLimit = \Nexus\Core\RateLimiter::check($email, 'email');
             if ($emailLimit['limited']) {
                 $message = \Nexus\Core\RateLimiter::getRetryMessage($emailLimit['retry_after']);
-                return $this->jsonResponse(['error' => $message, 'retry_after' => $emailLimit['retry_after']], 429);
+                header('Retry-After: ' . $emailLimit['retry_after']);
+                return $this->errorResponse(
+                    $message,
+                    ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                    429,
+                    ['retry_after' => $emailLimit['retry_after']]
+                );
             }
         }
 
@@ -53,7 +96,13 @@ class AuthController
         $ipLimit = \Nexus\Core\RateLimiter::check($ip, 'ip');
         if ($ipLimit['limited']) {
             $message = \Nexus\Core\RateLimiter::getRetryMessage($ipLimit['retry_after']);
-            return $this->jsonResponse(['error' => $message, 'retry_after' => $ipLimit['retry_after']], 429);
+            header('Retry-After: ' . $ipLimit['retry_after']);
+            return $this->errorResponse(
+                $message,
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                429,
+                ['retry_after' => $ipLimit['retry_after']]
+            );
         }
 
         $db = Database::getConnection();
@@ -67,30 +116,84 @@ class AuthController
                 \Nexus\Core\RateLimiter::recordAttempt($email, 'email', true);
             }
             \Nexus\Core\RateLimiter::recordAttempt($ip, 'ip', true);
-            // START SESSION FOR WEB CLIENTS
-            if (session_status() == PHP_SESSION_NONE) {
-                session_start();
-            }
-            // FIXED: Preserve layout preference before session regeneration
-            $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
 
-            // SECURITY: Regenerate session ID to prevent session fixation attacks
-            session_regenerate_id(true);
-
-            // FIXED: Restore layout preference after regeneration
-            if ($preservedLayout) {
-                $_SESSION['nexus_active_layout'] = $preservedLayout;
-                $_SESSION['nexus_layout'] = $preservedLayout;
-            }
-
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_email'] = $user['email']; // For biometric login
-            $_SESSION['tenant_id'] = $user['tenant_id'];
-            $_SESSION['user_role'] = $user['role'];
-            $_SESSION['is_logged_in'] = true;
-
-            // Detect if this is a mobile request for platform-appropriate token expiry
+            // Detect if this is a mobile/API request for platform-appropriate token expiry
             $isMobile = TokenService::isMobileRequest();
+
+            // Detect if client wants stateless auth (no session)
+            // Mobile apps and SPAs should use Bearer tokens only, no session
+            $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
+
+            // =====================================================
+            // 2FA CHECK - DISABLED SYSTEM-WIDE
+            // To re-enable, uncomment the block below
+            // =====================================================
+            // $has2faEnabled = !empty($user['totp_enabled']) || TotpService::isEnabled((int)$user['id']);
+            //
+            // // Check for trusted device (skips 2FA if trusted)
+            // $isTrustedDevice = $has2faEnabled && TotpService::isTrustedDevice((int)$user['id']);
+            //
+            // if ($has2faEnabled && !$isTrustedDevice) {
+            //     // 2FA required - create challenge token instead of access tokens
+            //     $twoFactorToken = TwoFactorChallengeManager::create(
+            //         (int)$user['id'],
+            //         ['totp', 'backup_code']
+            //     );
+            //
+            //     // For session-based clients, also store in session for backward compatibility
+            //     if (!$wantsStateless) {
+            //         if (session_status() == PHP_SESSION_NONE) {
+            //             session_start();
+            //         }
+            //         $_SESSION['pending_2fa_user_id'] = $user['id'];
+            //         $_SESSION['pending_2fa_expires'] = time() + 300; // 5 minutes
+            //     }
+            //
+            //     // Return 2FA required response - no access token yet
+            //     return $this->jsonResponse([
+            //         'success' => false,
+            //         'requires_2fa' => true,
+            //         'two_factor_token' => $twoFactorToken,
+            //         'methods' => ['totp', 'backup_code'],
+            //         'code' => ApiErrorCodes::AUTH_2FA_REQUIRED,
+            //         'message' => 'Two-factor authentication required',
+            //         // Include partial user info for UI
+            //         'user' => [
+            //             'id' => $user['id'],
+            //             'first_name' => $user['first_name'],
+            //             'email_masked' => $this->maskEmail($user['email'])
+            //         ]
+            //     ], 200); // 200 OK because this is expected flow, not an error
+            // }
+
+            // =====================================================
+            // NO 2FA or TRUSTED DEVICE - Complete login normally
+            // =====================================================
+
+            // START SESSION ONLY FOR WEB CLIENTS (browsers using session cookies)
+            // Skip session creation for mobile apps and SPAs to keep API stateless
+            if (!$wantsStateless) {
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
+                // FIXED: Preserve layout preference before session regeneration
+                $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
+
+                // SECURITY: Regenerate session ID to prevent session fixation attacks
+                session_regenerate_id(true);
+
+                // FIXED: Restore layout preference after regeneration
+                if ($preservedLayout) {
+                    $_SESSION['nexus_active_layout'] = $preservedLayout;
+                    $_SESSION['nexus_layout'] = $preservedLayout;
+                }
+
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_email'] = $user['email']; // For biometric login
+                $_SESSION['tenant_id'] = $user['tenant_id'];
+                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['is_logged_in'] = true;
+            }
 
             // Generate secure tokens for mobile app
             $accessToken = TokenService::generateToken((int)$user['id'], (int)$user['tenant_id'], [
@@ -132,7 +235,11 @@ class AuthController
         }
         \Nexus\Core\RateLimiter::recordAttempt($ip, 'ip', false);
 
-        return $this->jsonResponse(['error' => 'Invalid credentials', 'success' => false], 401);
+        return $this->errorResponse(
+            'Invalid credentials',
+            ApiErrorCodes::AUTH_INVALID_CREDENTIALS,
+            401
+        );
     }
 
     public function register()
@@ -142,7 +249,13 @@ class AuthController
         $ipLimit = \Nexus\Core\RateLimiter::check($ip, 'ip');
         if ($ipLimit['limited']) {
             $message = \Nexus\Core\RateLimiter::getRetryMessage($ipLimit['retry_after']);
-            return $this->jsonResponse(['error' => $message, 'retry_after' => $ipLimit['retry_after']], 429);
+            header('Retry-After: ' . $ipLimit['retry_after']);
+            return $this->errorResponse(
+                $message,
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                429,
+                ['retry_after' => $ipLimit['retry_after']]
+            );
         }
 
         $data = $this->getJsonInput();
@@ -152,7 +265,11 @@ class AuthController
         $tenant_id = $data['tenant_id'] ?? 1;
 
         if (empty($name) || empty($email) || empty($password)) {
-            return $this->jsonResponse(['error' => 'All fields required'], 400);
+            return $this->errorResponse(
+                'All fields required',
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                400
+            );
         }
 
         $db = Database::getConnection();
@@ -161,11 +278,14 @@ class AuthController
         $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         if ($stmt->fetch()) {
-            return $this->jsonResponse(['error' => 'Email already registered'], 409);
+            return $this->errorResponse(
+                'Email already registered',
+                ApiErrorCodes::VALIDATION_DUPLICATE,
+                409
+            );
         }
 
-        // Create
-        // Create
+        // Create user
         $hashed = password_hash($password, PASSWORD_BCRYPT);
 
         $parts = explode(' ', $name, 2);
@@ -178,7 +298,11 @@ class AuthController
             $stmt->execute([$firstName, $lastName, $email, $hashed, $tenant_id]);
             return $this->jsonResponse(['success' => true, 'message' => 'Registration successful']);
         } catch (\Exception $e) {
-            return $this->jsonResponse(['error' => 'Server error'], 500);
+            return $this->errorResponse(
+                'Server error',
+                ApiErrorCodes::SERVER_INTERNAL_ERROR,
+                500
+            );
         }
     }
     public function checkSession()
@@ -200,7 +324,12 @@ class AuthController
             ]);
         }
 
-        return $this->jsonResponse(['authenticated' => false], 401);
+        return $this->errorResponse(
+            'Not authenticated',
+            ApiErrorCodes::AUTH_TOKEN_MISSING,
+            401,
+            ['authenticated' => false]
+        );
     }
 
     /**
@@ -220,7 +349,11 @@ class AuthController
         $isSessionAuth = !empty($_SESSION['user_id']);
 
         // Also check Bearer token authentication
+        // IMPORTANT: Bearer auth is STATELESS - do NOT sync to $_SESSION
         $tokenInfo = null;
+        $isBearerAuth = false;
+        $bearerUserId = null;
+        $bearerTenantId = null;
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
         if (preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
             $token = $matches[1];
@@ -233,12 +366,11 @@ class AuthController
                     'needs_refresh' => TokenService::needsRefresh($token)
                 ];
 
-                // If session is not set but token is valid, consider authenticated
-                if (!$isSessionAuth) {
-                    $isSessionAuth = true;
-                    $_SESSION['user_id'] = $payload['user_id'];
-                    $_SESSION['tenant_id'] = $payload['tenant_id'];
-                }
+                // Mark as Bearer-authenticated but DO NOT touch $_SESSION
+                // This keeps the API stateless for mobile/SPA clients
+                $isBearerAuth = true;
+                $bearerUserId = $payload['user_id'];
+                $bearerTenantId = $payload['tenant_id'];
             } else {
                 $tokenInfo = [
                     'valid' => false,
@@ -247,80 +379,108 @@ class AuthController
             }
         }
 
-        // Check if user is logged in
-        if (!$isSessionAuth) {
-            return $this->jsonResponse([
-                'error' => 'Unauthorized',
-                'authenticated' => false,
-                'token' => $tokenInfo
-            ], 401);
+        // Determine if user is authenticated (session OR Bearer token)
+        $isAuthenticated = $isSessionAuth || $isBearerAuth;
+
+        // Check if user is logged in (via session or Bearer token)
+        if (!$isAuthenticated) {
+            return $this->errorResponse(
+                'Unauthorized',
+                ApiErrorCodes::AUTH_TOKEN_MISSING,
+                401,
+                ['authenticated' => false, 'token' => $tokenInfo]
+            );
         }
+
+        // Get the user ID from whichever auth method was used
+        $userId = $isBearerAuth ? $bearerUserId : ($_SESSION['user_id'] ?? null);
+        $tenantId = $isBearerAuth ? $bearerTenantId : ($_SESSION['tenant_id'] ?? null);
 
         // NOTE: Session ID regeneration removed from heartbeat to prevent race conditions
         // with concurrent API requests. Session is regenerated only at login time.
         // This prevents 401 errors when multiple requests are in-flight during regeneration.
 
-        // Verify user still exists in database (prevents stale sessions for deleted users)
-        // Only check once per 5 minutes to reduce DB load
-        $lastUserCheck = $_SESSION['_last_user_check'] ?? 0;
-        if (time() - $lastUserCheck >= 300) {
-            try {
-                $user = \Nexus\Models\User::findById($_SESSION['user_id'], false); // Don't enforce tenant for this check
+        // For Bearer-authenticated requests, skip session-related operations
+        // This keeps the API stateless for mobile/SPA clients
+        if (!$isBearerAuth && $isSessionAuth) {
+            // Verify user still exists in database (prevents stale sessions for deleted users)
+            // Only check once per 5 minutes to reduce DB load
+            $lastUserCheck = $_SESSION['_last_user_check'] ?? 0;
+            if (time() - $lastUserCheck >= 300) {
+                try {
+                    $user = \Nexus\Models\User::findById($_SESSION['user_id'], false);
 
-                // Robust retry - don't logout on transient DB issues
-                if (!$user) {
-                    $maxRetries = 3;
-                    for ($i = 0; $i < $maxRetries && !$user; $i++) {
-                        usleep(200000); // 200ms delay
-                        $user = \Nexus\Models\User::findById($_SESSION['user_id'], false);
+                    // Robust retry - don't logout on transient DB issues
+                    if (!$user) {
+                        $maxRetries = 3;
+                        for ($i = 0; $i < $maxRetries && !$user; $i++) {
+                            usleep(200000); // 200ms delay
+                            $user = \Nexus\Models\User::findById($_SESSION['user_id'], false);
+                        }
                     }
-                }
 
-                if (!$user) {
-                    // User genuinely not found after retries - but DON'T destroy session on mobile
-                    // Just log and return 401 - let the app handle re-auth
-                    error_log("[Heartbeat] User ID {$_SESSION['user_id']} not found after retries - possible deleted user");
-                    return $this->jsonResponse([
-                        'error' => 'User not found',
-                        'authenticated' => false,
-                        'should_reauth' => true // Signal to mobile app to re-authenticate
-                    ], 401);
+                    if (!$user) {
+                        error_log("[Heartbeat] User ID {$_SESSION['user_id']} not found after retries - possible deleted user");
+                        return $this->errorResponse(
+                            'User not found',
+                            ApiErrorCodes::AUTH_ACCOUNT_DELETED,
+                            401,
+                            ['authenticated' => false, 'should_reauth' => true]
+                        );
+                    }
+                    $_SESSION['_last_user_check'] = time();
+                } catch (\Throwable $e) {
+                    error_log('[Heartbeat] User check failed: ' . $e->getMessage());
                 }
-                $_SESSION['_last_user_check'] = time();
-            } catch (\Throwable $e) {
-                // DB error - don't logout, just skip the check
-                // Log for debugging but don't fail the heartbeat
-                error_log('[Heartbeat] User check failed: ' . $e->getMessage());
             }
+
+            // Update last activity timestamp in session
+            $_SESSION['_last_heartbeat'] = time();
         }
 
-        // Update last activity timestamp
-        $_SESSION['_last_heartbeat'] = time();
-
-        // Calculate session expiry based on gc_maxlifetime
+        // Calculate session/token expiry info
         $sessionLifetime = (int) ini_get('session.gc_maxlifetime');
         $expiresAt = date('c', time() + $sessionLifetime);
 
         // Update user's last_active_at in database (throttled to once per minute)
-        $lastUpdate = $_SESSION['_last_active_update'] ?? 0;
-        if (time() - $lastUpdate >= 60) {
-            try {
-                if (class_exists('\Nexus\Models\User')) {
-                    \Nexus\Models\User::updateLastActive((int)$_SESSION['user_id']);
-                    $_SESSION['_last_active_update'] = time();
+        // This applies to both session and Bearer-authenticated users
+        static $lastActiveUpdated = false;
+        if (!$lastActiveUpdated && $userId) {
+            // For session auth, check session-based throttle
+            // For Bearer auth, always update (stateless, no throttle tracking)
+            $shouldUpdate = $isBearerAuth;
+            if (!$isBearerAuth) {
+                $lastUpdate = $_SESSION['_last_active_update'] ?? 0;
+                $shouldUpdate = (time() - $lastUpdate >= 60);
+            }
+
+            if ($shouldUpdate) {
+                try {
+                    if (class_exists('\Nexus\Models\User')) {
+                        \Nexus\Models\User::updateLastActive((int)$userId);
+                        if (!$isBearerAuth) {
+                            $_SESSION['_last_active_update'] = time();
+                        }
+                        $lastActiveUpdated = true;
+                    }
+                } catch (\Throwable $e) {
+                    // Silently fail - not critical
                 }
-            } catch (\Throwable $e) {
-                // Silently fail - not critical
             }
         }
 
         $response = [
             'success' => true,
             'authenticated' => true,
-            'expires_at' => $expiresAt,
-            'session_lifetime' => $sessionLifetime,
-            'user_id' => $_SESSION['user_id']
+            'auth_type' => $isBearerAuth ? 'bearer' : 'session',
+            'user_id' => $userId
         ];
+
+        // Include session info only for session-authenticated requests
+        if (!$isBearerAuth) {
+            $response['expires_at'] = $expiresAt;
+            $response['session_lifetime'] = $sessionLifetime;
+        }
 
         // Include token info if a Bearer token was provided
         if ($tokenInfo !== null) {
@@ -334,9 +494,17 @@ class AuthController
      * Restore session from Bearer token
      * Mobile apps should call this on page load if they have tokens but no session
      * This bridges the gap between token-based auth and PHP session-based pages
+     *
+     * @deprecated This endpoint violates stateless auth principles. Mobile apps should use
+     *             Bearer tokens directly without session sync. Will be removed after mobile
+     *             app audit confirms no critical dependencies. Sunset: 2026-08-01
      */
     public function restoreSession()
     {
+        // DEPRECATED: Add deprecation headers
+        header('X-API-Deprecated: true');
+        header('Sunset: Sat, 01 Aug 2026 00:00:00 GMT');
+
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
@@ -344,21 +512,33 @@ class AuthController
         // Check Bearer token
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
         if (empty($authHeader) || !preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
-            return $this->jsonResponse(['error' => 'Bearer token required'], 400);
+            return $this->errorResponse(
+                'Bearer token required',
+                ApiErrorCodes::AUTH_TOKEN_MISSING,
+                400
+            );
         }
 
         $token = $matches[1];
         $payload = TokenService::validateToken($token);
 
         if (!$payload || ($payload['type'] ?? 'access') !== 'access') {
-            return $this->jsonResponse(['error' => 'Invalid or expired token'], 401);
+            return $this->errorResponse(
+                'Invalid or expired token',
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                401
+            );
         }
 
         $userId = $payload['user_id'] ?? null;
         $tenantId = $payload['tenant_id'] ?? null;
 
         if (!$userId) {
-            return $this->jsonResponse(['error' => 'Invalid token payload'], 401);
+            return $this->errorResponse(
+                'Invalid token payload',
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                401
+            );
         }
 
         // Fetch user data to populate session
@@ -368,7 +548,11 @@ class AuthController
         $user = $stmt->fetch();
 
         if (!$user) {
-            return $this->jsonResponse(['error' => 'User not found'], 401);
+            return $this->errorResponse(
+                'User not found',
+                ApiErrorCodes::RESOURCE_NOT_FOUND,
+                401
+            );
         }
 
         // Restore full session (same as regular login)
@@ -390,7 +574,12 @@ class AuthController
             'success' => true,
             'message' => 'Session restored from token',
             'user_id' => $user['id'],
-            'session_id' => session_id()
+            'session_id' => session_id(),
+            '_deprecated' => [
+                'message' => 'This endpoint is deprecated. Mobile apps should use Bearer tokens directly without session sync.',
+                'sunset' => '2026-08-01',
+                'replacement' => 'Use Authorization: Bearer <token> header on all API requests'
+            ]
         ]);
     }
 
@@ -405,7 +594,11 @@ class AuthController
         }
 
         if (empty($_SESSION['user_id'])) {
-            return $this->jsonResponse(['error' => 'Unauthorized'], 401);
+            return $this->errorResponse(
+                'Unauthorized',
+                ApiErrorCodes::AUTH_TOKEN_MISSING,
+                401
+            );
         }
 
         // NOTE: Session ID regeneration removed to prevent race conditions
@@ -443,26 +636,42 @@ class AuthController
         }
 
         if (empty($refreshToken)) {
-            return $this->jsonResponse(['error' => 'Refresh token required'], 400);
+            return $this->errorResponse(
+                'Refresh token required',
+                ApiErrorCodes::AUTH_TOKEN_MISSING,
+                400
+            );
         }
 
         // Validate the refresh token
         $payload = TokenService::validateToken($refreshToken);
 
         if (!$payload) {
-            return $this->jsonResponse(['error' => 'Invalid or expired refresh token'], 401);
+            return $this->errorResponse(
+                'Invalid or expired refresh token',
+                ApiErrorCodes::AUTH_TOKEN_EXPIRED,
+                401
+            );
         }
 
         // Check it's actually a refresh token
         if (($payload['type'] ?? '') !== 'refresh') {
-            return $this->jsonResponse(['error' => 'Invalid token type'], 401);
+            return $this->errorResponse(
+                'Invalid token type',
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                401
+            );
         }
 
         $userId = $payload['user_id'] ?? null;
         $tenantId = $payload['tenant_id'] ?? null;
 
         if (!$userId || !$tenantId) {
-            return $this->jsonResponse(['error' => 'Invalid token payload'], 401);
+            return $this->errorResponse(
+                'Invalid token payload',
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                401
+            );
         }
 
         // Verify user still exists and is active
@@ -472,11 +681,19 @@ class AuthController
         $user = $stmt->fetch();
 
         if (!$user) {
-            return $this->jsonResponse(['error' => 'User not found'], 401);
+            return $this->errorResponse(
+                'User not found',
+                ApiErrorCodes::RESOURCE_NOT_FOUND,
+                401
+            );
         }
 
         if (($user['status'] ?? 'active') === 'suspended') {
-            return $this->jsonResponse(['error' => 'Account suspended'], 403);
+            return $this->errorResponse(
+                'Account suspended',
+                ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED,
+                403
+            );
         }
 
         // Detect if this is a mobile request for platform-appropriate token expiry
@@ -539,16 +756,22 @@ class AuthController
         }
 
         if (empty($token)) {
-            return $this->jsonResponse(['error' => 'Token required'], 400);
+            return $this->errorResponse(
+                'Token required',
+                ApiErrorCodes::AUTH_TOKEN_MISSING,
+                400
+            );
         }
 
         $payload = TokenService::validateToken($token);
 
         if (!$payload) {
-            return $this->jsonResponse([
-                'valid' => false,
-                'error' => 'Invalid or expired token'
-            ], 401);
+            return $this->errorResponse(
+                'Invalid or expired token',
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                401,
+                ['valid' => false]
+            );
         }
 
         // Return token info
@@ -564,13 +787,32 @@ class AuthController
     }
 
     /**
-     * Logout - destroys session and invalidates tokens
+     * Logout - destroys session and optionally revokes refresh token
      * POST /api/auth/logout
+     *
+     * Body (optional): { "refresh_token": "..." } to also revoke the refresh token
      */
     public function logout()
     {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
+        }
+
+        // Get user ID before clearing session
+        $userId = $_SESSION['user_id'] ?? null;
+
+        // Also check Bearer token for user ID
+        if (!$userId) {
+            $userId = $this->getAuthenticatedUserId();
+        }
+
+        // If a refresh token is provided, revoke it
+        $data = $this->getJsonInput();
+        $refreshToken = $data['refresh_token'] ?? '';
+        $tokenRevoked = false;
+
+        if (!empty($refreshToken) && $userId) {
+            $tokenRevoked = TokenService::revokeToken($refreshToken, $userId);
         }
 
         // Clear all session data
@@ -593,9 +835,173 @@ class AuthController
         // Destroy the session
         session_destroy();
 
-        return $this->jsonResponse([
+        $response = [
             'success' => true,
             'message' => 'Logged out successfully'
+        ];
+
+        if ($tokenRevoked) {
+            $response['refresh_token_revoked'] = true;
+        }
+
+        return $this->jsonResponse($response);
+    }
+
+    /**
+     * Revoke a specific refresh token
+     * POST /api/auth/revoke
+     *
+     * Requires Bearer token authentication.
+     * Body: { "refresh_token": "..." }
+     */
+    public function revokeToken()
+    {
+        // Require Bearer authentication
+        $userId = $this->getAuthenticatedUserId();
+        if (!$userId) {
+            return $this->errorResponse(
+                'Authentication required',
+                ApiErrorCodes::AUTH_TOKEN_MISSING,
+                401
+            );
+        }
+
+        $data = $this->getJsonInput();
+        $refreshToken = $data['refresh_token'] ?? '';
+
+        if (empty($refreshToken)) {
+            return $this->errorResponse(
+                'Refresh token required',
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                400
+            );
+        }
+
+        // Revoke the token
+        $revoked = TokenService::revokeToken($refreshToken, $userId);
+
+        if (!$revoked) {
+            return $this->errorResponse(
+                'Invalid refresh token or already revoked',
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                400
+            );
+        }
+
+        return $this->jsonResponse([
+            'data' => ['revoked' => true]
         ]);
+    }
+
+    /**
+     * Revoke all refresh tokens for the authenticated user
+     * POST /api/auth/revoke-all
+     *
+     * Requires Bearer token authentication.
+     * Use for "log out everywhere" functionality.
+     */
+    public function revokeAllTokens()
+    {
+        // Require Bearer authentication
+        $userId = $this->getAuthenticatedUserId();
+        if (!$userId) {
+            return $this->errorResponse(
+                'Authentication required',
+                ApiErrorCodes::AUTH_TOKEN_MISSING,
+                401
+            );
+        }
+
+        // Revoke all tokens for this user
+        $revokedCount = TokenService::revokeAllTokensForUser($userId);
+
+        return $this->jsonResponse([
+            'data' => [
+                'revoked_count' => $revokedCount,
+                'message' => 'All refresh tokens have been revoked. You will need to log in again on all devices.'
+            ]
+        ]);
+    }
+
+    /**
+     * Get authenticated user ID from Bearer token
+     *
+     * @return int|null
+     */
+    private function getAuthenticatedUserId(): ?int
+    {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        if (empty($authHeader) || !preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
+            return null;
+        }
+
+        $token = $matches[1];
+        $payload = TokenService::validateToken($token);
+
+        if (!$payload || ($payload['type'] ?? 'access') !== 'access') {
+            return null;
+        }
+
+        return $payload['user_id'] ?? null;
+    }
+
+    /**
+     * Get a CSRF token for session-based authentication
+     * GET /api/auth/csrf-token
+     *
+     * This endpoint is for SPAs that use session-based auth (not Bearer tokens).
+     * Bearer-authenticated clients do NOT need CSRF tokens.
+     *
+     * Note: Rate limited to prevent token farming.
+     */
+    public function getCsrfToken()
+    {
+        // Rate limit this endpoint (10 per minute per IP)
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $rateLimitResult = \Nexus\Core\RateLimiter::check($ip . ':csrf', 'csrf_token');
+
+        if ($rateLimitResult['limited']) {
+            header('Retry-After: ' . $rateLimitResult['retry_after']);
+            return $this->errorResponse(
+                'Too many requests. Please try again later.',
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                429
+            );
+        }
+
+        \Nexus\Core\RateLimiter::recordAttempt($ip . ':csrf', 'csrf_token', true);
+
+        // Generate and return the CSRF token
+        $token = \Nexus\Core\Csrf::generate();
+
+        return $this->jsonResponse([
+            'data' => [
+                'csrf_token' => $token
+            ]
+        ]);
+    }
+
+    /**
+     * Mask email address for display (e.g., j***@example.com)
+     *
+     * @param string $email
+     * @return string
+     */
+    private function maskEmail(string $email): string
+    {
+        $parts = explode('@', $email);
+        if (count($parts) !== 2) {
+            return '***@***';
+        }
+
+        $local = $parts[0];
+        $domain = $parts[1];
+
+        // Show first character, mask the rest
+        $maskedLocal = strlen($local) > 1
+            ? $local[0] . str_repeat('*', min(strlen($local) - 1, 5))
+            : '*';
+
+        return $maskedLocal . '@' . $domain;
     }
 }

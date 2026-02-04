@@ -1,0 +1,361 @@
+/**
+ * Global Styles
+ * Tailwind CSS v4 + Hero UI + NEXUS Visual Identity
+ *
+ * Design System:
+ * - Glassmorphism surfaces (backdrop blur, translucent)
+ * - Holographic gradient backgrounds (soft, iridescent)
+ * - Depth through layering and shadows
+ * - Tenant-branded accent colors
+ */
+
+@import "tailwindcss";
+
+/* Hero UI theme integration - uses local hero.ts plugin */
+@plugin "./hero.ts";
+
+/* Content sources for Tailwind */
+@source "../index.html";
+@source "./**/*.{js,ts,jsx,tsx}";
+@source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+
+/* Hero UI dark mode variant */
+@custom-variant dark (&:is(.dark *));
+
+/* Override Hero UI's white background to allow holographic gradient to show through */
+:root, [data-theme], [data-theme=light] {
+  --heroui-background: 210 40% 96%;
+}
+
+/* ===========================================
+   TENANT BRANDING VARIABLES
+   These are overridden by useTenantBootstrap
+   =========================================== */
+:root {
+  /* Primary brand color - set by tenant */
+  --tenant-primary: #6366f1;
+  --tenant-primary-rgb: 99, 102, 241;
+  --tenant-secondary: #8b5cf6;
+  --tenant-secondary-rgb: 139, 92, 246;
+  --tenant-accent: #06b6d4;
+  --tenant-accent-rgb: 6, 182, 212;
+
+  /* Holographic gradient stops */
+  --holo-1: rgba(99, 102, 241, 0.15);
+  --holo-2: rgba(139, 92, 246, 0.1);
+  --holo-3: rgba(6, 182, 212, 0.08);
+  --holo-4: rgba(236, 72, 153, 0.05);
+
+  /* Glass effect variables */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg-strong: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --glass-blur: 12px;
+
+  /* Depth layers */
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-float: 0 12px 48px rgba(0, 0, 0, 0.16);
+}
+
+/* ===========================================
+   BASE STYLES
+   =========================================== */
+html {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Ensure body never shows white - fallback for loading states */
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--tenant-primary);
+  outline-offset: 2px;
+}
+
+/* ===========================================
+   HOLOGRAPHIC BACKGROUND
+   Soft iridescent gradient that shifts subtly
+   =========================================== */
+.nexus-bg {
+  background:
+    /* Soft gradient mesh */
+    radial-gradient(ellipse at 0% 0%, var(--holo-1) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 0%, var(--holo-2) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, var(--holo-3) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 100%, var(--holo-4) 0%, transparent 50%),
+    /* Base subtle gradient */
+    linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  background-attachment: fixed;
+}
+
+/* Animated version for hero sections */
+.nexus-bg-animated {
+  background:
+    radial-gradient(ellipse at 0% 0%, var(--holo-1) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 0%, var(--holo-2) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, var(--holo-3) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 100%, var(--holo-4) 0%, transparent 50%),
+    linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  background-attachment: fixed;
+  animation: holo-shift 20s ease-in-out infinite;
+}
+
+@keyframes holo-shift {
+  0%, 100% {
+    background-position: 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%;
+  }
+  25% {
+    background-position: 50% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%;
+  }
+  50% {
+    background-position: 100% 0%, 100% 100%, 0% 100%, 0% 0%, 0% 0%;
+  }
+  75% {
+    background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 0% 0%;
+  }
+}
+
+/* ===========================================
+   GLASSMORPHISM SURFACES
+   =========================================== */
+
+/* Standard glass card */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Stronger glass for headers/important elements */
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Glass with primary color tint */
+.glass-primary {
+  background: rgba(var(--tenant-primary-rgb), 0.08);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(var(--tenant-primary-rgb), 0.2);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Elevated glass (cards that float) */
+.glass-elevated {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-elevated);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-elevated:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-float);
+}
+
+/* Dark glass for footer */
+.glass-dark {
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===========================================
+   ACCENT GRADIENTS
+   For buttons, badges, highlights
+   =========================================== */
+
+/* Primary gradient (brand) */
+.gradient-primary {
+  background: linear-gradient(
+    135deg,
+    var(--tenant-primary) 0%,
+    var(--tenant-secondary) 100%
+  );
+}
+
+/* Accent gradient (call to action) */
+.gradient-accent {
+  background: linear-gradient(
+    135deg,
+    var(--tenant-accent) 0%,
+    var(--tenant-primary) 100%
+  );
+}
+
+/* Holographic shimmer for special elements */
+.gradient-holo {
+  background: linear-gradient(
+    135deg,
+    var(--tenant-primary) 0%,
+    var(--tenant-secondary) 25%,
+    var(--tenant-accent) 50%,
+    var(--tenant-secondary) 75%,
+    var(--tenant-primary) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===========================================
+   TENANT COLOR UTILITIES
+   =========================================== */
+.tenant-primary {
+  color: var(--tenant-primary);
+}
+
+.tenant-bg-primary {
+  background-color: var(--tenant-primary);
+}
+
+.tenant-border-primary {
+  border-color: var(--tenant-primary);
+}
+
+.tenant-secondary {
+  color: var(--tenant-secondary);
+}
+
+.tenant-bg-secondary {
+  background-color: var(--tenant-secondary);
+}
+
+.tenant-accent {
+  color: var(--tenant-accent);
+}
+
+.tenant-bg-accent {
+  background-color: var(--tenant-accent);
+}
+
+/* Ring/focus with tenant primary */
+.tenant-ring-primary {
+  --tw-ring-color: var(--tenant-primary);
+}
+
+/* ===========================================
+   DEPTH & SHADOW UTILITIES
+   =========================================== */
+.shadow-subtle { box-shadow: var(--shadow-subtle); }
+.shadow-medium { box-shadow: var(--shadow-medium); }
+.shadow-elevated { box-shadow: var(--shadow-elevated); }
+.shadow-float { box-shadow: var(--shadow-float); }
+
+/* ===========================================
+   ANIMATIONS
+   =========================================== */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+/* Staggered animation delay utilities */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+
+/* ===========================================
+   SAFE AREAS (iOS/Mobile)
+   =========================================== */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ===========================================
+   HERO UI OVERRIDES
+   Enhance default components with NEXUS styling
+   =========================================== */
+
+/* Cards with glass effect by default */
+[data-heroui="card"] {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Navbar glass enhancement */
+[data-heroui="navbar"] {
+  background: var(--glass-bg-strong) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+/* Button primary gradient */
+[data-heroui="button"][data-variant="solid"][data-color="primary"] {
+  background: linear-gradient(135deg, var(--tenant-primary) 0%, var(--tenant-secondary) 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(var(--tenant-primary-rgb), 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+[data-heroui="button"][data-variant="solid"][data-color="primary"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(var(--tenant-primary-rgb), 0.4);
+}
+
+/* Input fields with subtle glass */
+[data-heroui="input-wrapper"] {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Chip/badge enhancements */
+[data-heroui="chip"][data-variant="flat"] {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}

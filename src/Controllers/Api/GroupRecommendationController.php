@@ -8,146 +8,145 @@ use Nexus\Core\TenantContext;
 /**
  * GroupRecommendationController
  *
- * API endpoints for group discovery and recommendations
+ * API endpoints for group discovery and recommendations.
+ * Supports both session-based and Bearer token authentication.
+ *
+ * Response Format:
+ * Success: { "data": {...}, "meta": {...} }
+ * Error:   { "errors": [{ "code": "...", "message": "..." }] }
  */
-class GroupRecommendationController
+class GroupRecommendationController extends BaseApiController
 {
     /**
-     * Get personalized group recommendations for current user
+     * GET /api/recommendations/groups
      *
-     * GET /api/recommendations/groups?limit=10&type_id=5
+     * Get personalized group recommendations for the authenticated user.
+     *
+     * Query Parameters:
+     * - limit: int (default 10, max 50)
+     * - type_id: int (optional, filter by group type)
+     *
+     * Response: 200 OK with array of recommended groups
      */
-    public function index()
+    public function index(): void
     {
-        header('Content-Type: application/json');
+        $userId = $this->getUserId();
 
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Authentication required']);
-            return;
-        }
-
-        $userId = $_SESSION['user_id'];
-        $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
+        $limit = $this->queryInt('limit', 10, 1, 50);
 
         $options = [];
-        if (isset($_GET['type_id'])) {
-            $options['type_id'] = (int)$_GET['type_id'];
+        $typeId = $this->queryInt('type_id');
+        if ($typeId !== null) {
+            $options['type_id'] = $typeId;
         }
 
         $recommendations = GroupRecommendationEngine::getRecommendations($userId, $limit, $options);
 
-        echo json_encode([
-            'success' => true,
-            'recommendations' => $recommendations,
+        $this->respondWithData($recommendations, [
             'count' => count($recommendations),
+            'limit' => $limit
         ]);
     }
 
     /**
-     * Track user interaction with recommendation
-     *
      * POST /api/recommendations/track
-     * Body: {group_id: 123, action: 'clicked'}
+     *
+     * Track user interaction with a group recommendation.
+     * Used to improve recommendation quality over time.
+     *
+     * Request Body (JSON):
+     * {
+     *   "group_id": int (required),
+     *   "action": "viewed" | "clicked" | "joined" | "dismissed" (required)
+     * }
+     *
+     * Response: 200 OK on success
      */
-    public function track()
+    public function track(): void
     {
-        header('Content-Type: application/json');
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('recommendation_track', 100, 60);
 
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Authentication required']);
-            return;
+        $groupId = $this->inputInt('group_id');
+        $action = $this->input('action');
+
+        if (!$groupId) {
+            $this->respondWithError('VALIDATION_ERROR', 'group_id is required', 'group_id', 400);
         }
 
-        $input = json_decode(file_get_contents('php://input'), true);
-
-        if (empty($input['group_id']) || empty($input['action'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'group_id and action required']);
-            return;
+        if (!$action) {
+            $this->respondWithError('VALIDATION_ERROR', 'action is required', 'action', 400);
         }
-
-        $userId = $_SESSION['user_id'];
-        $groupId = (int)$input['group_id'];
-        $action = $input['action'];
 
         // Validate action
         $validActions = ['viewed', 'clicked', 'joined', 'dismissed'];
         if (!in_array($action, $validActions)) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Invalid action']);
-            return;
+            $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid action. Valid actions: ' . implode(', ', $validActions),
+                'action',
+                400
+            );
         }
 
         GroupRecommendationEngine::trackInteraction($userId, $groupId, $action);
 
-        echo json_encode(['success' => true]);
-    }
-
-    /**
-     * Get recommendation performance metrics (admin only)
-     *
-     * GET /api/recommendations/metrics?days=30
-     */
-    public function metrics()
-    {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Authentication required']);
-            return;
-        }
-
-        // Check if user is admin
-        $role = $_SESSION['user_role'] ?? '';
-        $isAdmin = in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_admin']);
-
-        if (!$isAdmin) {
-            http_response_code(403);
-            echo json_encode(['error' => 'Admin access required']);
-            return;
-        }
-
-        $days = min(365, max(1, (int)($_GET['days'] ?? 30)));
-
-        $metrics = GroupRecommendationEngine::getPerformanceMetrics($days);
-
-        echo json_encode([
-            'success' => true,
-            'metrics' => $metrics,
-            'period_days' => $days,
+        $this->respondWithData([
+            'tracked' => true,
+            'group_id' => $groupId,
+            'action' => $action
         ]);
     }
 
     /**
-     * Get "similar to this group" recommendations
+     * GET /api/recommendations/metrics
      *
-     * GET /api/recommendations/similar/{groupId}?limit=5
+     * Get recommendation performance metrics (admin only).
+     *
+     * Query Parameters:
+     * - days: int (default 30, max 365)
+     *
+     * Response: 200 OK with metrics data
      */
-    public function similar($groupId)
+    public function metrics(): void
     {
-        header('Content-Type: application/json');
+        $this->requireAdmin();
 
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Authentication required']);
-            return;
-        }
+        $days = $this->queryInt('days', 30, 1, 365);
 
-        $userId = $_SESSION['user_id'];
-        $limit = min(20, max(1, (int)($_GET['limit'] ?? 5)));
+        $metrics = GroupRecommendationEngine::getPerformanceMetrics($days);
+
+        $this->respondWithData($metrics, [
+            'period_days' => $days
+        ]);
+    }
+
+    /**
+     * GET /api/recommendations/similar/{groupId}
+     *
+     * Get groups similar to a specific group.
+     *
+     * Query Parameters:
+     * - limit: int (default 5, max 20)
+     *
+     * Response: 200 OK with array of similar groups
+     */
+    public function similar(int $groupId): void
+    {
+        $userId = $this->getUserId();
+
+        $limit = $this->queryInt('limit', 5, 1, 20);
 
         // Get recommendations but exclude the current group
-        $options = ['exclude_ids' => [(int)$groupId]];
+        $options = ['exclude_ids' => [$groupId]];
 
         $recommendations = GroupRecommendationEngine::getRecommendations($userId, $limit, $options);
 
-        echo json_encode([
-            'success' => true,
-            'similar_groups' => $recommendations,
+        $this->respondWithData($recommendations, [
+            'source_group_id' => $groupId,
             'count' => count($recommendations),
+            'limit' => $limit
         ]);
     }
 }

@@ -5,13 +5,30 @@
 | Item | Value |
 |------|-------|
 | **Project** | Project NEXUS - Timebanking Platform |
-| **PHP Version** | 8.1+ |
-| **Database** | MySQL 8.0 |
+| **PHP Version** | 8.2+ |
+| **Database** | MariaDB 10.11 (MySQL compatible) |
 | **Cache** | Redis 7+ |
 | **Live URL** | https://project-nexus.ie |
 | **Alt URL** | https://hour-timebank.ie |
-| **Local Dev** | http://staging.timebank.local/ |
 | **Test Tenant** | `hour-timebank` (tenant 2) |
+
+### Local Development (Docker)
+
+| Service | URL |
+|---------|-----|
+| **React Frontend** | http://localhost:5173 |
+| **PHP API** | http://localhost:8090 |
+| **Legacy PHP Views** | http://localhost:8090/{tenant}/ |
+| **phpMyAdmin** | http://localhost:8091 (with `--profile tools`) |
+
+```bash
+# Start everything
+docker compose up -d
+
+# Stop XAMPP first if running - Docker is the primary dev environment
+```
+
+See [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) for full setup guide.
 
 ---
 
@@ -125,39 +142,50 @@ Project NEXUS is an enterprise multi-tenant community platform with many modules
 - **Federation**: Multi-community network with partnerships
 - **PWA & Mobile**: Service worker, Capacitor Android app
 - **Notifications**: In-app, email digests, and push notifications
+- **React Frontend**: New SPA frontend (in development) at `react-frontend/`
 
 ## Directory Structure
 
-```
-/home/user/hour-timebank/
-├── src/                          # Main PHP source (PSR-4: Nexus\)
-│   ├── Config/                   # Configuration (ai.php, pusher.php, config.php)
-│   ├── Controllers/              # Request handlers (Admin/, Api/)
-│   ├── Core/                     # Framework (Router, Database, Auth, Mailer)
-│   ├── Helpers/                  # Global helpers (ImageUploader, etc.)
+```text
+project-nexus/
+├── react-frontend/               # React 18 SPA (NEW)
+│   ├── src/
+│   │   ├── components/           # Reusable UI components
+│   │   ├── contexts/             # React contexts (Auth, Tenant, Toast)
+│   │   ├── pages/                # Page components
+│   │   ├── lib/                  # API client, helpers
+│   │   ├── hooks/                # Custom React hooks
+│   │   └── types/                # TypeScript types
+│   ├── Dockerfile                # Frontend container
+│   └── package.json              # Dependencies (Vite, HeroUI, etc.)
+├── src/                          # PHP source (PSR-4: Nexus\)
+│   ├── Config/                   # Configuration
+│   ├── Controllers/              # Request handlers
+│   │   └── Api/                  # V2 API controllers (for React)
+│   ├── Core/                     # Framework (Router, Database, Auth)
+│   ├── Helpers/                  # Global helpers
 │   ├── Middleware/               # Request middleware
 │   ├── Models/                   # Data models (59+ files)
-│   ├── Services/                 # Business logic (94+ services)
-│   └── helpers.php               # Global functions (layout(), webp_image())
-├── app/                          # App-specific classes (PSR-4: App\)
-├── views/                        # PHP templates
+│   ├── Services/                 # Business logic (100+ services)
+│   └── helpers.php               # Global functions
+├── views/                        # PHP templates (legacy)
 │   ├── civicone/                 # GOV.UK-based theme (WCAG 2.1 AA)
 │   ├── modern/                   # Modern responsive theme
-│   ├── skeleton/                 # Component library
-│   ├── admin/                    # Admin panel views
-│   └── [feature]/                # Feature-specific views
+│   └── admin/                    # Admin panel views
 ├── httpdocs/                     # Web root
 │   ├── assets/                   # CSS, JS, images
 │   ├── index.php                 # Main entry point
-│   ├── routes.php                # Route definitions (1000+ routes)
-│   └── sw.js                     # Service Worker (PWA)
+│   ├── routes.php                # Route definitions
+│   └── health.php                # Docker health check
+├── compose.yml                   # Docker Compose (primary dev env)
+├── Dockerfile                    # PHP app container
+├── .env.docker                   # Docker environment
 ├── tests/                        # PHPUnit tests
 ├── migrations/                   # SQL migration files
-├── scripts/                      # Build, deploy, maintenance (100+ files)
+├── scripts/                      # Build, deploy, maintenance
 ├── capacitor/                    # Mobile app (Capacitor)
 ├── docs/                         # Documentation
-├── config/                       # App configuration
-└── bootstrap.php                 # Application initialization
+└── config/                       # App configuration
 ```
 
 ## Code Patterns & Conventions
@@ -552,21 +580,45 @@ class ExampleServiceTest extends TestCase
 
 ## Local Development
 
-### URLs
+### Docker (Primary Environment)
 
-- **Local server**: `http://staging.timebank.local/`
-- **Tenant URLs**: `http://staging.timebank.local/{tenant-slug}/`
-- **Test tenant**: `hour-timebank` (tenant 2)
+**Use Docker for all development.** Stop XAMPP if it's running.
 
-### Testing URLs
+```bash
+# Start the stack
+docker compose up -d
 
-- Compose form: `http://staging.timebank.local/hour-timebank/compose`
-- Dashboard: `http://staging.timebank.local/dashboard`
-- Admin panel: `http://staging.timebank.local/admin`
+# View logs
+docker compose logs -f app
 
-### Theme Testing
+# Restart after config changes
+docker compose restart app
+```
+
+### URLs (Docker)
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| React Frontend | http://localhost:5173 | New SPA |
+| PHP API | http://localhost:8090 | Backend API |
+| Legacy PHP | http://localhost:8090/{tenant}/ | Traditional views |
+| phpMyAdmin | http://localhost:8091 | DB admin (needs `--profile tools`) |
+
+### Database Access
+
+```bash
+# CLI access
+docker exec -it nexus-mysql-db mysql -unexus -pnexus_secret nexus
+
+# Or use phpMyAdmin
+docker compose --profile tools up -d
+# Then visit http://localhost:8091
+```
+
+### Theme Testing (Legacy PHP Views)
 
 To test both themes:
+
 1. Change your user's `preferred_layout` in the database, OR
 2. Switch via the UI theme toggle
 
@@ -645,6 +697,44 @@ CREATE INDEX idx_users_email ON users(email);
 php scripts/safe_migrate.php
 ```
 
+## React Frontend
+
+The new React frontend is in `react-frontend/`. It's a Vite + React 18 + TypeScript SPA.
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/lib/api.ts` | API client with token refresh |
+| `src/contexts/AuthContext.tsx` | Authentication state |
+| `src/contexts/TenantContext.tsx` | Tenant config/features |
+| `src/App.tsx` | Routes and providers |
+
+### Running Tests
+
+```bash
+cd react-frontend
+npm test           # Run Vitest tests
+npm run lint       # TypeScript check
+```
+
+### API Endpoints (V2)
+
+The React frontend uses V2 API endpoints at `/api/v2/*`:
+
+| Endpoint | Controller |
+|----------|------------|
+| `/api/v2/tenant/bootstrap` | TenantBootstrapController |
+| `/api/v2/listings` | ListingsApiController |
+| `/api/v2/messages` | MessagesApiController |
+| `/api/v2/users/me` | UsersApiController |
+| `/api/v2/events` | EventsApiController |
+| `/api/v2/groups` | GroupsApiController |
+| `/api/auth/login` | (existing auth) |
+| `/api/auth/logout` | (existing auth) |
+
+See `httpdocs/routes.php` for full V2 route definitions.
+
 ## Key Services Reference
 
 | Service | Purpose |
@@ -657,7 +747,10 @@ php scripts/safe_migrate.php
 | `WebPushService` | Push notifications |
 | `DigestService` | Email digests |
 | `AuditLogService` | Action logging |
-| `LayoutHelper` | Theme/layout detection |
+| `TokenService` | JWT token management (NEW) |
+| `ListingService` | Listings CRUD (V2 API) |
+| `MessageService` | Messages CRUD (V2 API) |
+| `UserService` | User profiles (V2 API) |
 
 ## Key Models Reference
 

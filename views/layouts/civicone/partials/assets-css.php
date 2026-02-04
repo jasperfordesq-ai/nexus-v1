@@ -1,5 +1,7 @@
 <head>
     <meta charset="UTF-8">
+    <!-- SW Kill Switch - MUST be first script, runs if ?nosw=1 present -->
+    <script src="/assets/js/sw-killswitch.js?v=<?= $cssVersionTimestamp ?? time() ?>"></script>
     <!-- CRITICAL: Inline scroll fix - ensures mouse wheel scrolling works -->
     <style id="scroll-fix-inline">
         /* HTML: Always show scrollbar, allow vertical scroll */
