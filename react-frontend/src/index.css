@@ -1,0 +1,24 @@
+/* =============================================
+   NEXUS REACT FRONTEND - MAIN STYLESHEET
+   ============================================= */
+
+/* Tailwind v4 */
+@import "tailwindcss";
+
+/* Hero UI Tailwind plugin */
+@plugin "./hero.ts";
+
+/* Content sources for Tailwind */
+@source "../index.html";
+@source "./**/*.{js,ts,jsx,tsx}";
+@source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+
+/* Hero UI dark mode variant */
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────
+   DESIGN SYSTEM IMPORTS
+   ───────────────────────────────────────────── */
+@import "./styles/tokens.css";
+@import "./styles/glass.css";
+@import "./styles/background.css";
