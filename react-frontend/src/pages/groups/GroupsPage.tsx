@@ -20,6 +20,7 @@ import { EmptyState } from '@/components/feedback';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Group } from '@/types/api';
 
 type GroupFilter = 'all' | 'joined' | 'public' | 'private';
@@ -219,7 +220,7 @@ const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
               {group.recent_members.map((member) => (
                 <Avatar
                   key={member.id}
-                  src={member.avatar || undefined}
+                  src={resolveAvatarUrl(member.avatar)}
                   name={member.name || `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()}
                   className="ring-2 ring-black/50"
                 />

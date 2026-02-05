@@ -25,6 +25,7 @@ import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Listing } from '@/types/api';
 
 export function ListingDetailPage() {
@@ -254,7 +255,7 @@ export function ListingDetailPage() {
 
           <div className="flex items-center gap-4">
             <Avatar
-              src={listing.user?.avatar || listing.author_avatar || undefined}
+              src={resolveAvatarUrl(listing.user?.avatar || listing.author_avatar)}
               name={listing.user?.name || listing.author_name || `${listing.user?.first_name ?? ''} ${listing.user?.last_name ?? ''}`.trim()}
               size="lg"
               className="ring-2 ring-white/20"

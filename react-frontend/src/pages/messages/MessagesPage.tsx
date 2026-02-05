@@ -10,7 +10,7 @@ import { Search, MessageSquare, Circle } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
-import { formatRelativeTime } from '@/lib/helpers';
+import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import type { Conversation } from '@/types/api';
 
@@ -164,7 +164,7 @@ function ConversationCard({ conversation }: ConversationCardProps) {
         <div className="flex items-center gap-4">
           <div className="relative">
             <Avatar
-              src={other_user.avatar || undefined}
+              src={resolveAvatarUrl(other_user.avatar)}
               name={other_user.name}
               size="lg"
               className="ring-2 ring-white/20"

@@ -19,6 +19,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Listing, User as UserType, Event, Group } from '@/types/api';
 
 interface SearchResults {
@@ -217,7 +218,7 @@ export function SearchPage() {
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform">
                             <div className="flex items-center gap-4">
                               <Avatar
-                                src={user.avatar || undefined}
+                                src={resolveAvatarUrl(user.avatar)}
                                 name={user.name}
                                 size="lg"
                                 className="ring-2 ring-white/20"

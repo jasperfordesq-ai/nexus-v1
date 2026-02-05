@@ -24,6 +24,7 @@ import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { useAuth, useFeature } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import type { User as UserType, Listing } from '@/types/api';
 
 export function ProfilePage() {
@@ -107,7 +108,7 @@ export function ProfilePage() {
             {/* Avatar */}
             <div className="relative">
               <Avatar
-                src={profile.avatar || undefined}
+                src={resolveAvatarUrl(profile.avatar)}
                 name={profile.name}
                 className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-white/20"
               />

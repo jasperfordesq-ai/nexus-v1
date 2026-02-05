@@ -12,6 +12,7 @@ import { LoadingScreen } from '@/components/feedback';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Message, User } from '@/types/api';
 
 interface ConversationMeta {
@@ -143,7 +144,7 @@ export function ConversationPage() {
 
             <Link to={`/profile/${other_user.id}`} className="flex items-center gap-3">
               <Avatar
-                src={other_user.avatar || undefined}
+                src={resolveAvatarUrl(other_user.avatar)}
                 name={other_user.name}
                 size="md"
                 className="ring-2 ring-white/20"
@@ -251,7 +252,7 @@ function MessageBubble({ message, isOwn, showAvatar, otherUser }: MessageBubbleP
     >
       {showAvatar && !isOwn ? (
         <Avatar
-          src={otherUser.avatar || undefined}
+          src={resolveAvatarUrl(otherUser.avatar)}
           name={otherUser.name}
           size="sm"
           className="flex-shrink-0"

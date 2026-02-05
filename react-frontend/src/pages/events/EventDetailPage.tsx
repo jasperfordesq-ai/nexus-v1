@@ -25,6 +25,7 @@ import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Event, User } from '@/types/api';
 
 export function EventDetailPage() {
@@ -241,7 +242,7 @@ export function EventDetailPage() {
                 {attendees.map((attendee) => (
                   <Avatar
                     key={attendee.id}
-                    src={attendee.avatar || undefined}
+                    src={resolveAvatarUrl(attendee.avatar)}
                     name={attendee.name}
                     size="sm"
                     className="ring-2 ring-black/50"

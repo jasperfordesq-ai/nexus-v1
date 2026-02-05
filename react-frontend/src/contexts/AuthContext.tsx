@@ -107,6 +107,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await api.get<User>('/v2/users/me');
 
       if (response.success && response.data) {
+        // Ensure tenant ID is synced from user data
+        if (response.data.tenant_id) {
+          tokenManager.setTenantId(response.data.tenant_id);
+        }
         setState({
           user: response.data,
           status: 'authenticated',
@@ -180,6 +184,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (loginData.refresh_token) {
       tokenManager.setRefreshToken(loginData.refresh_token);
     }
+    // Store tenant ID from user data so X-Tenant-ID header matches JWT
+    if (loginData.user?.tenant_id) {
+      tokenManager.setTenantId(loginData.user.tenant_id);
+    }
 
     setState({
       user: loginData.user,
@@ -247,6 +255,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (data.refresh_token) {
       tokenManager.setRefreshToken(data.refresh_token);
     }
+    // Store tenant ID from user data so X-Tenant-ID header matches JWT
+    if (data.user?.tenant_id) {
+      tokenManager.setTenantId(data.user.tenant_id);
+    }
 
     setState({
       user: data.user,
@@ -302,6 +314,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
     if (responseData.refresh_token) {
       tokenManager.setRefreshToken(responseData.refresh_token);
+    }
+    // Store tenant ID from user data so X-Tenant-ID header matches JWT
+    if (responseData.user?.tenant_id) {
+      tokenManager.setTenantId(responseData.user.tenant_id);
     }
 
     setState({

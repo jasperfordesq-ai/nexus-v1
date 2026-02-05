@@ -23,6 +23,7 @@ import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Group, User, FeedPost } from '@/types/api';
 
 interface GroupDetails extends Group {
@@ -234,7 +235,7 @@ export function GroupDetailPage() {
                     <div key={post.id} className="p-4 rounded-lg bg-white/5">
                       <div className="flex items-center gap-3 mb-3">
                         <Avatar
-                          src={post.author?.avatar || undefined}
+                          src={resolveAvatarUrl(post.author?.avatar)}
                           name={post.author?.name}
                           size="sm"
                         />
@@ -283,7 +284,7 @@ export function GroupDetailPage() {
                   <Link key={member.id} to={`/profile/${member.id}`}>
                     <div className="flex items-center gap-4 p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                       <Avatar
-                        src={member.avatar || undefined}
+                        src={resolveAvatarUrl(member.avatar)}
                         name={member.name}
                         size="md"
                         className="ring-2 ring-white/20"

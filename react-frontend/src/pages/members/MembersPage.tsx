@@ -20,6 +20,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import type { User } from '@/types/api';
 
 type SortOption = 'name' | 'joined' | 'rating' | 'hours_given';
@@ -194,7 +195,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
         <GlassCard className="p-4 hover:bg-white/10 transition-colors">
           <div className="flex items-center gap-4">
             <Avatar
-              src={member.avatar || undefined}
+              src={resolveAvatarUrl(member.avatar)}
               name={member.name}
               size="lg"
               className="ring-2 ring-white/20"
@@ -233,7 +234,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
     <Link to={`/profile/${member.id}`}>
       <GlassCard className="p-5 hover:scale-[1.02] transition-transform text-center">
         <Avatar
-          src={member.avatar || undefined}
+          src={resolveAvatarUrl(member.avatar)}
           name={member.name}
           className="w-16 h-16 mx-auto ring-2 ring-white/20 mb-3"
         />

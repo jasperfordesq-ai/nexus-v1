@@ -184,6 +184,7 @@ $router->add('POST', '/api/listings/delete', 'Nexus\Controllers\ListingControlle
 // Returns branding, features, and config for frontend init
 // ============================================
 $router->add('GET', '/api/v2/tenant/bootstrap', 'Nexus\Controllers\Api\TenantBootstrapController@bootstrap');
+$router->add('GET', '/api/v2/tenants', 'Nexus\Controllers\Api\TenantBootstrapController@list');
 
 // ============================================
 // LISTINGS API v2 - RESTful CRUD
