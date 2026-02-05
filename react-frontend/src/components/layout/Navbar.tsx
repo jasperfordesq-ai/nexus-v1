@@ -29,6 +29,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useAuth, useTenant } from '@/contexts';
+import { resolveAvatarUrl } from '@/lib/helpers';
 
 interface NavbarProps {
   onMobileMenuOpen?: () => void;
@@ -207,7 +208,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                     <Avatar
                       as="button"
                       name={`${user?.first_name} ${user?.last_name}`}
-                      src={user?.avatar_url || user?.avatar || undefined}
+                      src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
                       size="sm"
                       className="cursor-pointer ring-2 ring-white/20 hover:ring-indigo-500/50 transition-all"
                       showFallback

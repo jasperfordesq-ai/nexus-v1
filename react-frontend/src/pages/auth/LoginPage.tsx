@@ -1,15 +1,25 @@
 /**
- * Login Page with 2FA Support
+ * Login Page with 2FA Support and Tenant Selection
  */
 
 import { useState, useEffect, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Button, Input, Checkbox, Divider } from '@heroui/react';
+import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
+import { api, tokenManager } from '@/lib/api';
+
+interface Tenant {
+  id: number;
+  name: string;
+  slug: string;
+  domain?: string;
+  tagline?: string;
+  logo_url?: string;
+}
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -25,6 +35,11 @@ export function LoginPage() {
     twoFactorMethods,
   } = useAuth();
 
+  // Tenant state
+  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [selectedTenantId, setSelectedTenantId] = useState<string>('');
+  const [tenantsLoading, setTenantsLoading] = useState(true);
+
   // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,6 +54,39 @@ export function LoginPage() {
   // Redirect after successful login
   const from = (location.state as { from?: string })?.from || '/dashboard';
 
+  // Fetch available tenants on mount
+  useEffect(() => {
+    const fetchTenants = async () => {
+      try {
+        const response = await api.get<Tenant[]>('/v2/tenants', { skipAuth: true, skipTenant: true });
+        if (response.success && response.data) {
+          setTenants(response.data);
+          // If only one tenant, auto-select it
+          if (response.data.length === 1) {
+            setSelectedTenantId(String(response.data[0].id));
+            tokenManager.setTenantId(response.data[0].id);
+          }
+        }
+      } catch {
+        // Silently fail - tenants will be empty
+      } finally {
+        setTenantsLoading(false);
+      }
+    };
+    fetchTenants();
+  }, []);
+
+  // Handle tenant selection
+  const handleTenantChange = (keys: unknown) => {
+    // HeroUI Select returns a Set
+    const selectedKeys = keys as Set<string>;
+    const tenantId = Array.from(selectedKeys)[0] || '';
+    setSelectedTenantId(tenantId);
+    if (tenantId) {
+      tokenManager.setTenantId(tenantId);
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       navigate(from, { replace: true });
@@ -50,12 +98,17 @@ export function LoginPage() {
     if (error) {
       clearError();
     }
-  }, [email, password, twoFactorCode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [email, password, twoFactorCode, selectedTenantId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
+      return;
+    }
+
+    // Ensure tenant is selected before login
+    if (tenants.length > 0 && !selectedTenantId) {
       return;
     }
 
@@ -93,6 +146,7 @@ export function LoginPage() {
 
   const isLoading = status === 'loading';
   const requires2FA = status === 'requires_2fa';
+  const canSubmit = email.trim() && password.trim() && (tenants.length === 0 || selectedTenantId);
 
   return (
     <>
@@ -149,6 +203,56 @@ export function LoginPage() {
 
                 {/* Form */}
                 <form onSubmit={handleLogin} className="space-y-5">
+                  {/* Tenant Selector - Only show if multiple tenants */}
+                  {!tenantsLoading && tenants.length > 1 && (
+                    <Select
+                      label="Community"
+                      placeholder="Select your community"
+                      selectedKeys={selectedTenantId ? new Set([selectedTenantId]) : new Set()}
+                      onSelectionChange={handleTenantChange}
+                      startContent={<Building2 className="w-4 h-4 text-white/40" />}
+                      isRequired
+                      classNames={{
+                        trigger: 'glass-card border-glass-border hover:border-glass-border-hover',
+                        label: 'text-white/70',
+                        value: 'text-white',
+                        popoverContent: 'bg-gray-900 border border-white/10',
+                      }}
+                    >
+                      {tenants.map((tenant) => (
+                        <SelectItem
+                          key={String(tenant.id)}
+                          textValue={tenant.name}
+                          classNames={{
+                            base: 'text-white data-[hover=true]:bg-white/10',
+                          }}
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-white">{tenant.name}</span>
+                            {tenant.tagline && (
+                              <span className="text-white/50 text-xs">{tenant.tagline}</span>
+                            )}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  )}
+
+                  {/* Show selected tenant if only one */}
+                  {!tenantsLoading && tenants.length === 1 && (
+                    <div className="p-3 rounded-xl glass-card border-glass-border">
+                      <div className="flex items-center gap-3">
+                        <Building2 className="w-5 h-5 text-indigo-400" />
+                        <div>
+                          <p className="text-white font-medium">{tenants[0].name}</p>
+                          {tenants[0].tagline && (
+                            <p className="text-white/50 text-xs">{tenants[0].tagline}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <Input
                     type="email"
                     label="Email"
@@ -217,7 +321,7 @@ export function LoginPage() {
                   <Button
                     type="submit"
                     isLoading={isLoading}
-                    isDisabled={!email.trim() || !password.trim()}
+                    isDisabled={!canSubmit}
                     className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
                     size="lg"
                     spinner={<Loader2 className="w-4 h-4 animate-spin" />}

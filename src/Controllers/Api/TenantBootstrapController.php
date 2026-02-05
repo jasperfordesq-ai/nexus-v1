@@ -338,6 +338,61 @@ class TenantBootstrapController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/tenants
+     *
+     * Returns list of all active tenants for login selector.
+     * This is a PUBLIC endpoint - only returns minimal public info.
+     *
+     * Response: 200 OK with array of tenants
+     */
+    public function list(): void
+    {
+        // Try to get from cache first
+        $cacheKey = 'tenants_list_public';
+        $cached = RedisCache::get($cacheKey);
+
+        if ($cached !== null) {
+            $this->respondWithData($cached);
+            return;
+        }
+
+        // Query all active tenants (excluding master/admin tenant ID 1)
+        $db = \Nexus\Core\Database::getConnection();
+        $stmt = $db->query("
+            SELECT id, name, slug, domain, tagline
+            FROM tenants
+            WHERE is_active = 1 AND id > 1
+            ORDER BY name ASC
+        ");
+        $tenants = $stmt->fetchAll();
+
+        // Build minimal public response
+        $data = [];
+        foreach ($tenants as $tenant) {
+            $item = [
+                'id' => (int) $tenant['id'],
+                'name' => $tenant['name'],
+                'slug' => $tenant['slug'],
+            ];
+
+            // Optional fields
+            if (!empty($tenant['domain'])) {
+                $item['domain'] = $tenant['domain'];
+            }
+            if (!empty($tenant['tagline'])) {
+                $item['tagline'] = $tenant['tagline'];
+            }
+
+            $data[] = $item;
+        }
+
+        // Cache for 5 minutes
+        RedisCache::set($cacheKey, $data, 300);
+
+        $this->respondWithData($data);
+    }
+
+    /**
      * Safely parse JSON, returning null on failure
      */
     private function parseJson($value): ?array

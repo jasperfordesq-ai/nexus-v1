@@ -6,6 +6,47 @@ import type { User } from '@/types/api';
 import { logError } from './logger';
 
 /**
+ * API Base URL for resolving relative image/asset URLs
+ * This is the PHP backend URL where uploads are stored
+ */
+const API_ASSET_BASE = import.meta.env.VITE_API_BASE?.replace(/\/api$/, '') || 'https://api.project-nexus.ie';
+
+/**
+ * Resolve a relative URL to an absolute URL pointing to the API server.
+ * Used for images, avatars, and other assets served from the PHP backend.
+ *
+ * @param url - The URL to resolve (can be relative like '/uploads/...' or already absolute)
+ * @param fallback - Optional fallback if url is null/empty
+ * @returns Absolute URL or fallback
+ */
+export function resolveAssetUrl(url: string | null | undefined, fallback?: string): string {
+  if (!url) {
+    return fallback || '';
+  }
+
+  // Already absolute
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+
+  // Protocol-relative
+  if (url.startsWith('//')) {
+    return 'https:' + url;
+  }
+
+  // Relative path - prepend API base
+  const cleanUrl = url.startsWith('/') ? url : '/' + url;
+  return API_ASSET_BASE + cleanUrl;
+}
+
+/**
+ * Resolve an avatar URL with a default fallback
+ */
+export function resolveAvatarUrl(url: string | null | undefined): string {
+  return resolveAssetUrl(url, `${API_ASSET_BASE}/assets/img/defaults/default_avatar.png`);
+}
+
+/**
  * Get a user's display name from their first and last name
  */
 export function getUserDisplayName(user: Pick<User, 'first_name' | 'last_name'>): string {
