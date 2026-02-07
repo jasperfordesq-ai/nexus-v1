@@ -1,9 +1,10 @@
 /**
  * Mobile Navigation Drawer
  * Full-screen slide-in menu for mobile devices
+ * Theme-aware styling for light and dark modes
  */
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Avatar, Divider } from '@heroui/react';
@@ -24,7 +25,7 @@ import {
   Target,
   Hexagon,
 } from 'lucide-react';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useNotifications } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import type { TenantFeatures } from '@/types/api';
 
@@ -64,30 +65,74 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated, logout } = useAuth();
   const { branding, hasFeature } = useTenant();
+  const { unreadCount, counts } = useNotifications();
 
-  // Close on route change
-  useEffect(() => {
-    onClose();
-  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Track previous pathname to only close on actual navigation
+  const prevPathRef = useRef(location.pathname);
 
-  // Close on escape key
+  // Close on route change (but not on initial mount)
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
+    if (prevPathRef.current !== location.pathname) {
+      onClose();
+      prevPathRef.current = location.pathname;
+    }
+  }, [location.pathname, onClose]);
+
+  // Focus trap and escape key handling
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const lastFocusedElement = useRef<HTMLElement | null>(null);
+
+  // Handle keyboard events (Escape, Tab trap)
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose();
+      return;
+    }
+
+    // Focus trap: keep focus within drawer
+    if (e.key === 'Tab' && drawerRef.current) {
+      const focusableElements = drawerRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement?.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement?.focus();
       }
-    };
+    }
+  }, [onClose]);
 
+  // Manage focus and body scroll lock
+  useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
+      // Store the currently focused element to restore later
+      lastFocusedElement.current = document.activeElement as HTMLElement;
+
+      // Lock body scroll
       document.body.style.overflow = 'hidden';
+
+      // Add keyboard listener
+      document.addEventListener('keydown', handleKeyDown);
+
+      // Focus the close button after animation
+      requestAnimationFrame(() => {
+        closeButtonRef.current?.focus();
+      });
+    } else {
+      // Restore focus to previously focused element
+      lastFocusedElement.current?.focus();
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleKeyDown]);
 
   const handleLogout = async () => {
     await logout();
@@ -121,11 +166,10 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         className={({ isActive }) =>
           `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
             isActive
-              ? 'bg-white/10 text-white'
-              : 'text-white/70 hover:text-white hover:bg-white/5'
+              ? 'bg-theme-active text-theme-primary'
+              : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
           }`
         }
-        onClick={onClose}
       >
         <Icon className="w-5 h-5" />
         <span>{item.label}</span>
@@ -142,7 +186,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/60 dark:bg-black/60 backdrop-blur-sm z-50"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -154,21 +198,23 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-[#0a0a0f]/95 backdrop-blur-xl border-l border-white/10 z-50 overflow-y-auto"
+            className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-theme-overlay backdrop-blur-xl border-l border-theme-default z-50 overflow-y-auto"
+            style={{ backgroundColor: 'var(--surface-overlay)' }}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <Link to="/" className="flex items-center gap-2" onClick={onClose}>
-                <Hexagon className="w-8 h-8 text-indigo-400" />
+            <div className="flex items-center justify-between p-4 border-b border-theme-default">
+              <Link to="/" className="flex items-center gap-2">
+                <Hexagon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
                 <span className="font-bold text-xl text-gradient">{branding.name}</span>
               </Link>
               <Button
+                ref={closeButtonRef}
                 isIconOnly
                 variant="light"
-                className="text-white/70 hover:text-white"
+                className="text-theme-muted hover:text-theme-primary"
                 onPress={onClose}
                 aria-label="Close menu"
               >
@@ -178,11 +224,10 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
 
             {/* User Section */}
             {isAuthenticated && user && (
-              <div className="p-4 border-b border-white/10">
+              <div className="p-4 border-b border-theme-default">
                 <Link
                   to="/profile"
                   className="flex items-center gap-3"
-                  onClick={onClose}
                 >
                   <Avatar
                     name={`${user.first_name} ${user.last_name}`}
@@ -191,41 +236,47 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                     showFallback
                   />
                   <div>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-theme-primary">
                       {user.first_name} {user.last_name}
                     </p>
-                    <p className="text-sm text-white/50">{user.email}</p>
+                    <p className="text-sm text-theme-subtle">{user.email}</p>
                   </div>
                 </Link>
 
                 {/* Quick Stats */}
-                {/* Quick Stats - TODO: Replace with real notification counts from context */}
                 <div className="grid grid-cols-3 gap-4 mt-4">
                   <Link
                     to="/wallet"
-                    className="text-center p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
-                    onClick={onClose}
+                    className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors"
                   >
-                    <p className="text-lg font-bold text-white">
+                    <p className="text-lg font-bold text-theme-primary">
                       {user.balance ?? 0}
                     </p>
-                    <p className="text-xs text-white/50">Credits</p>
+                    <p className="text-xs text-theme-subtle">Credits</p>
                   </Link>
                   <Link
                     to="/messages"
-                    className="text-center p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
-                    onClick={onClose}
+                    className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative"
                   >
-                    <p className="text-lg font-bold text-white">—</p>
-                    <p className="text-xs text-white/50">Messages</p>
+                    <p className="text-lg font-bold text-theme-primary">
+                      {counts.messages > 0 ? counts.messages : 0}
+                    </p>
+                    <p className="text-xs text-theme-subtle">Messages</p>
+                    {counts.messages > 0 && (
+                      <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+                    )}
                   </Link>
                   <Link
                     to="/notifications"
-                    className="text-center p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
-                    onClick={onClose}
+                    className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative"
                   >
-                    <p className="text-lg font-bold text-white">—</p>
-                    <p className="text-xs text-white/50">Alerts</p>
+                    <p className="text-lg font-bold text-theme-primary">
+                      {unreadCount > 0 ? unreadCount : 0}
+                    </p>
+                    <p className="text-xs text-theme-subtle">Alerts</p>
+                    {unreadCount > 0 && (
+                      <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+                    )}
                   </Link>
                 </div>
               </div>
@@ -241,7 +292,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               {/* Community */}
               {(hasFeature('connections') || hasFeature('events') || hasFeature('groups')) && (
                 <div>
-                  <p className="px-4 mb-2 text-xs font-semibold text-white/40 uppercase tracking-wider">
+                  <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
                     Community
                   </p>
                   <div className="space-y-1">
@@ -253,7 +304,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               {/* Explore */}
               {(hasFeature('gamification') || hasFeature('goals')) && (
                 <div>
-                  <p className="px-4 mb-2 text-xs font-semibold text-white/40 uppercase tracking-wider">
+                  <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
                     Explore
                   </p>
                   <div className="space-y-1">
@@ -264,7 +315,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
 
               {/* Support */}
               <div>
-                <p className="px-4 mb-2 text-xs font-semibold text-white/40 uppercase tracking-wider">
+                <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
                   Support
                 </p>
                 <div className="space-y-1">
@@ -275,7 +326,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               {/* Account */}
               {isAuthenticated && (
                 <div>
-                  <p className="px-4 mb-2 text-xs font-semibold text-white/40 uppercase tracking-wider">
+                  <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
                     Account
                   </p>
                   <div className="space-y-1">
@@ -284,18 +335,17 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
                           isActive
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/70 hover:text-white hover:bg-white/5'
+                            ? 'bg-theme-active text-theme-primary'
+                            : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
                         }`
                       }
-                      onClick={onClose}
                     >
                       <Settings className="w-5 h-5" />
                       <span>Settings</span>
                     </NavLink>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-red-400 hover:bg-red-500/10 transition-all w-full"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 transition-all w-full"
                     >
                       <LogOut className="w-5 h-5" />
                       <span>Log Out</span>
@@ -307,16 +357,16 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               {/* Auth buttons for guests */}
               {!isAuthenticated && (
                 <div className="space-y-2 pt-4">
-                  <Divider className="bg-white/10" />
-                  <Link to="/login" onClick={onClose}>
+                  <Divider className="bg-theme-default" style={{ backgroundColor: 'var(--border-default)' }} />
+                  <Link to="/login">
                     <Button
                       variant="flat"
-                      className="w-full bg-white/5 text-white/80"
+                      className="w-full bg-theme-elevated text-theme-secondary"
                     >
                       Log In
                     </Button>
                   </Link>
-                  <Link to="/register" onClick={onClose}>
+                  <Link to="/register">
                     <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium">
                       Sign Up
                     </Button>

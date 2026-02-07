@@ -11,8 +11,7 @@ export interface FooterProps {
 
 /**
  * Footer - Glass-styled footer component
- *
- * Subtle glass surface with top border
+ * Theme-aware styling for light and dark modes
  */
 export function Footer({ children, copyright }: FooterProps) {
   const { branding } = useTenant();
@@ -20,7 +19,7 @@ export function Footer({ children, copyright }: FooterProps) {
   const defaultCopyright = `© ${year} ${branding.name}. All rights reserved.`;
 
   return (
-    <footer className="relative z-10 border-t border-white/10 mt-auto bg-black/20 backdrop-blur-sm">
+    <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children ? (
           children
@@ -28,15 +27,10 @@ export function Footer({ children, copyright }: FooterProps) {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xl font-bold text-gradient">{branding.name}</span>
-              <span className="text-white/30">|</span>
-              <span className="text-white/50 text-sm">{branding.tagline || 'Time Banking Platform'}</span>
+              <span className="text-theme-subtle">|</span>
+              <span className="text-theme-muted text-sm">{branding.tagline || 'Time Banking Platform'}</span>
             </div>
-            <div className="flex items-center gap-6">
-              <FooterLink href="/privacy">Privacy</FooterLink>
-              <FooterLink href="/terms">Terms</FooterLink>
-              <FooterLink href="/contact">Contact</FooterLink>
-            </div>
-            <p className="text-sm text-white/30">
+            <p className="text-sm text-theme-subtle">
               {copyright || defaultCopyright}
             </p>
           </div>
@@ -58,7 +52,7 @@ export function FooterLink({ href, children }: FooterLinkProps) {
   return (
     <Link
       to={href}
-      className="text-sm text-white/50 hover:text-white transition-colors"
+      className="text-sm text-theme-muted hover:text-theme-primary transition-colors"
     >
       {children}
     </Link>
