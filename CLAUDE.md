@@ -8,8 +8,11 @@
 | **PHP Version** | 8.2+ |
 | **Database** | MariaDB 10.11 (MySQL compatible) |
 | **Cache** | Redis 7+ |
-| **Live URL** | https://project-nexus.ie |
-| **Alt URL** | https://hour-timebank.ie |
+| **Production Server** | Azure VM `20.224.171.253` |
+| **React Frontend URL** | <https://app.project-nexus.ie> |
+| **PHP API URL** | <https://api.project-nexus.ie> |
+| **Sales Site URL** | <https://project-nexus.ie> |
+| **Legacy URLs** | <https://hour-timebank.ie> |
 | **Test Tenant** | `hour-timebank` (tenant 2) |
 
 ### Local Development (Docker)
@@ -18,6 +21,7 @@
 |---------|-----|
 | **React Frontend** | http://localhost:5173 |
 | **PHP API** | http://localhost:8090 |
+| **Sales Site** | http://localhost:3001 |
 | **Legacy PHP Views** | http://localhost:8090/{tenant}/ |
 | **phpMyAdmin** | http://localhost:8091 (with `--profile tools`) |
 
@@ -375,8 +379,8 @@ if (!AdminAuth::check()) {
 $user = ApiAuth::authenticate();
 
 // CSRF protection (forms)
-$token = Csrf::getToken();
-Csrf::validate($_POST['csrf_token'] ?? '');
+$token = Csrf::token();
+Csrf::verify($_POST['csrf_token'] ?? '');
 ```
 
 ### View Rendering
@@ -628,46 +632,88 @@ To test both themes:
 
 ## Deployment
 
-### Server Details
+### Production Server (Azure) - PRIMARY
 
-- **Host**: jasper@35.205.239.67
-- **Path**: /var/www/vhosts/project-nexus.ie
-- **Method**: SCP (not git pull)
+| Item | Value |
+|------|-------|
+| **Host** | `20.224.171.253` |
+| **User** | `azureuser` |
+| **SSH Key** | `C:\ssh-keys\project-nexus.pem` |
+| **Deploy Path** | `/opt/nexus-php/` |
+| **Method** | Docker containers |
+| **Plesk Panel** | <https://20.224.171.253:8443> |
 
-### Deploy Commands
+#### Production Domains
 
-```bash
-# Preview deployment (dry run)
-npm run deploy:preview
+| Domain | Container | Port | Purpose |
+|--------|-----------|------|---------|
+| `app.project-nexus.ie` | `nexus-react-prod` | 3000 | React Frontend |
+| `api.project-nexus.ie` | `nexus-php-app` | 8090 | PHP API |
+| `project-nexus.ie` | `nexus-sales-site` | 3001 | Sales/Marketing Site |
 
-# Deploy last commit
-npm run deploy
-
-# Deploy only changed files
-npm run deploy:changed
-
-# Deploy full folders
-npm run deploy:full
-```
-
-### Manual SCP
+#### Deploy to Azure (Production)
 
 ```bash
-# Single file
-scp -i ~/.ssh/id_ed25519 "local/file.php" jasper@35.205.239.67:/var/www/vhosts/project-nexus.ie/path/file.php
+# Windows
+scripts\deploy-production.bat           # Full deployment
+scripts\deploy-production.bat quick     # Code sync + restart only
+scripts\deploy-production.bat init      # First-time setup
+scripts\deploy-production.bat status    # Check container status
 
-# Check logs
-ssh -i ~/.ssh/id_ed25519 jasper@35.205.239.67 "tail -50 /var/www/vhosts/project-nexus.ie/logs/error.log"
+# Linux/Git Bash
+./scripts/deploy-production.sh          # Full deployment
+./scripts/deploy-production.sh --quick  # Code sync + restart only
+./scripts/deploy-production.sh --init   # First-time setup
+./scripts/deploy-production.sh --nginx  # Update nginx config only
 ```
 
-### Path Mapping
+#### SSH to Azure
 
-| Local | Remote |
-|-------|--------|
-| `httpdocs/` | `/var/www/vhosts/project-nexus.ie/httpdocs/` |
-| `views/` | `/var/www/vhosts/project-nexus.ie/views/` |
-| `src/` | `/var/www/vhosts/project-nexus.ie/src/` |
-| `config/` | `/var/www/vhosts/project-nexus.ie/config/` |
+```bash
+ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253
+
+# View logs
+ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253 "cd /opt/nexus-php && sudo docker compose logs -f app"
+```
+
+#### ⛔ PROTECTED SERVICES ON AZURE (DO NOT TOUCH)
+
+The Azure server hosts a separate .NET platform. **NEVER modify these:**
+
+| Container | Port | Purpose |
+|-----------|------|---------|
+| `nexus-backend-api` | 5080 | .NET Core API |
+| `nexus-frontend-prod` | 5171 | Next.js Frontend |
+| `nexus-backend-db` | 5432 | PostgreSQL |
+
+Protected directories: `/opt/nexus-backend/`, `/opt/nexus-modern-frontend/`
+
+See [docs/new-production-server.md](docs/new-production-server.md) for full Azure documentation.
+
+---
+
+### ⚠️ Legacy Server (GCP) - DISCONTINUED - REFERENCE ONLY
+
+> **DO NOT DEPLOY TO THIS SERVER.** The GCP server at `35.205.239.67` is discontinued.
+> All deployments go to Azure. This section is kept for historical reference only.
+
+<details>
+<summary>Legacy GCP details (click to expand - for reference only)</summary>
+
+| Item | Value |
+|------|-------|
+| **Host** | `jasper@35.205.239.67` |
+| **SSH Key** | `~/.ssh/id_ed25519` |
+| **Path** | `/var/www/vhosts/project-nexus.ie` |
+| **Method** | rsync/SCP (no Docker) |
+
+Legacy deploy commands (DO NOT USE):
+- `npm run deploy:preview`
+- `npm run deploy`
+- `npm run deploy:changed`
+- `npm run deploy:full`
+
+</details>
 
 ## Database Migrations
 
@@ -700,6 +746,27 @@ php scripts/safe_migrate.php
 ## React Frontend
 
 The new React frontend is in `react-frontend/`. It's a Vite + React 18 + TypeScript SPA.
+
+### 🔴 CRITICAL: Deployment Warning
+
+**NEVER build locally and upload `dist/` to production!**
+
+Local builds use wrong environment variables (`VITE_API_BASE=/api` instead of `https://api.project-nexus.ie/api`), which breaks the community selector on login/register pages.
+
+**Always rebuild on the server:**
+
+```bash
+# Upload source files, then SSH to server:
+cd /opt/nexus-php/react-frontend
+sudo docker build --no-cache -f Dockerfile.prod \
+  --build-arg VITE_API_BASE=https://api.project-nexus.ie/api \
+  -t nexus-react-prod:latest .
+sudo docker stop nexus-react-prod && sudo docker rm nexus-react-prod
+sudo docker run -d --name nexus-react-prod --restart unless-stopped \
+  -p 3000:80 --network nexus-php-internal nexus-react-prod:latest
+```
+
+See [docs/REACT_DEPLOYMENT.md](docs/REACT_DEPLOYMENT.md) for full instructions.
 
 ### Key Files
 
@@ -878,16 +945,38 @@ npm run deploy           # Deploy last commit
 
 ## Troubleshooting
 
-### Common Issues
+### Common Issues (Azure Production)
 
-1. **500 Error**: Check `/var/www/vhosts/project-nexus.ie/logs/error.log`
-2. **Database Error**: Verify `.env` credentials, check MySQL is running
-3. **CSS Not Loading**: Run `npm run build:css`, clear browser cache
-4. **Session Issues**: Check Redis is running, verify session config
+1. **500 Error**: `ssh azureuser@20.224.171.253 "sudo docker compose -f /opt/nexus-php/compose.yml logs -f app"`
+2. **Container Down**: `ssh azureuser@20.224.171.253 "cd /opt/nexus-php && sudo docker compose ps"`
+3. **502 Bad Gateway**: Check if container is running and healthy
+4. **Database Error**: `sudo docker exec nexus-php-app env | grep DB_` to verify credentials
+5. **CSS Not Loading**: Run `npm run build:css`, clear browser cache
+6. **Session Issues**: Check Redis container is healthy
+
+### Debug Commands (Azure)
+
+```bash
+# SSH to server
+ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253
+
+# View PHP logs
+sudo docker compose -f /opt/nexus-php/compose.yml logs -f app
+
+# View all container status
+sudo docker ps --format "table {{.Names}}\t{{.Status}}"
+
+# Test API health
+curl http://127.0.0.1:8090/health.php
+
+# Test frontend health
+curl http://127.0.0.1:3000/health
+```
 
 ### Debug Mode
 
-Set in `.env`:
+Set in `/opt/nexus-php/.env`:
+
 ```
 DEBUG=true
 DB_PROFILING=true
@@ -897,4 +986,4 @@ DB_PROFILING=true
 
 - **Documentation**: `/docs/` directory
 - **API Tests**: `/tests/` directory
-- **Deployment Guide**: `/.claude/DEPLOYMENT.md`
+- **Deployment Guide**: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) (complete, consolidated guide)

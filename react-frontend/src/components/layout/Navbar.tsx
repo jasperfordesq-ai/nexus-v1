@@ -1,6 +1,7 @@
 /**
  * Main Navigation Bar
  * Responsive header with desktop nav and mobile menu trigger
+ * Theme-aware styling for light and dark modes
  */
 
 import { Link, NavLink, useNavigate } from 'react-router-dom';
@@ -27,8 +28,10 @@ import {
   Menu,
   Search,
   Plus,
+  Sun,
+  Moon,
 } from 'lucide-react';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useNotifications, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
 interface NavbarProps {
@@ -52,8 +55,8 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
   const { branding, hasFeature } = useTenant();
-  // TODO: Replace with real notification count from NotificationsContext when implemented
-  const unreadCount = 0;
+  const { unreadCount } = useNotifications();
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     await logout();
@@ -61,7 +64,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/5 backdrop-blur-xl border-b border-white/10">
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b border-theme-default glass-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Mobile Menu Toggle */}
@@ -69,7 +72,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
             <Button
               isIconOnly
               variant="light"
-              className="text-white/70 hover:text-white"
+              className="text-theme-muted hover:text-theme-primary"
               onPress={onMobileMenuOpen}
               aria-label="Open menu"
             >
@@ -83,7 +86,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
               whileHover={{ rotate: 180 }}
               transition={{ duration: 0.5 }}
             >
-              <Hexagon className="w-8 h-8 text-indigo-400" />
+              <Hexagon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
             </motion.div>
             <span className="font-bold text-xl text-gradient hidden sm:inline">
               {branding.name}
@@ -99,8 +102,8 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                 className={({ isActive }) =>
                   `flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     isActive
-                      ? 'bg-white/10 text-white'
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
+                      ? 'bg-theme-active text-theme-primary'
+                      : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
                   }`
                 }
               >
@@ -123,8 +126,8 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                   className={({ isActive }) =>
                     `flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                       isActive
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/70 hover:text-white hover:bg-white/5'
+                        ? 'bg-theme-active text-theme-primary'
+                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
                     }`
                   }
                 >
@@ -139,11 +142,26 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <>
+                {/* Theme Toggle */}
+                <Button
+                  isIconOnly
+                  variant="light"
+                  className="hidden sm:flex text-theme-muted hover:text-theme-primary transition-colors"
+                  onPress={toggleTheme}
+                  aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                >
+                  {resolvedTheme === 'dark' ? (
+                    <Sun className="w-5 h-5 text-amber-400" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-indigo-500" />
+                  )}
+                </Button>
+
                 {/* Search Button */}
                 <Button
                   isIconOnly
                   variant="light"
-                  className="hidden sm:flex text-white/70 hover:text-white"
+                  className="hidden sm:flex text-theme-muted hover:text-theme-primary"
                   onPress={() => navigate('/search')}
                   aria-label="Search"
                 >
@@ -163,13 +181,13 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                   </DropdownTrigger>
                   <DropdownMenu
                     aria-label="Create actions"
-                    className="bg-black/80 backdrop-blur-xl border border-white/10"
+                    className="glass-surface-strong"
                   >
                     <DropdownItem
                       key="listing"
                       startContent={<ListTodo className="w-4 h-4" />}
                       onPress={() => navigate('/listings/create')}
-                      className="text-white/80"
+                      className="text-theme-secondary"
                     >
                       New Listing
                     </DropdownItem>
@@ -178,7 +196,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                         key="event"
                         startContent={<Calendar className="w-4 h-4" />}
                         onPress={() => navigate('/events/create')}
-                        className="text-white/80"
+                        className="text-theme-secondary"
                       >
                         New Event
                       </DropdownItem>
@@ -187,20 +205,22 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                 </Dropdown>
 
                 {/* Notifications */}
-                <Button
-                  isIconOnly
-                  variant="light"
-                  className="relative text-white/70 hover:text-white"
-                  onPress={() => navigate('/notifications')}
-                  aria-label="Notifications"
-                >
-                  <Bell className="w-5 h-5" />
+                <div className="relative">
+                  <Button
+                    isIconOnly
+                    variant="light"
+                    className={`text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
+                    onPress={() => navigate('/notifications')}
+                    aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+                  >
+                    <Bell className="w-5 h-5" />
+                  </Button>
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold bg-red-500 text-white rounded-full">
-                      {unreadCount > 9 ? '9+' : unreadCount}
+                    <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full pointer-events-none animate-pulse">
+                      {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
-                </Button>
+                </div>
 
                 {/* User Dropdown */}
                 <Dropdown placement="bottom-end">
@@ -210,13 +230,13 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                       name={`${user?.first_name} ${user?.last_name}`}
                       src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
                       size="sm"
-                      className="cursor-pointer ring-2 ring-white/20 hover:ring-indigo-500/50 transition-all"
+                      className="cursor-pointer ring-2 ring-border-default hover:ring-indigo-500/50 transition-all"
                       showFallback
                     />
                   </DropdownTrigger>
                   <DropdownMenu
                     aria-label="User actions"
-                    className="bg-black/80 backdrop-blur-xl border border-white/10"
+                    className="glass-surface-strong"
                   >
                     <DropdownItem
                       key="profile-header"
@@ -224,16 +244,16 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                       textValue="Profile"
                       isReadOnly
                     >
-                      <p className="font-semibold text-white">
+                      <p className="font-semibold text-theme-primary">
                         {user?.first_name} {user?.last_name}
                       </p>
-                      <p className="text-sm text-white/50">{user?.email}</p>
+                      <p className="text-sm text-theme-subtle">{user?.email}</p>
                     </DropdownItem>
                     <DropdownItem
                       key="dashboard"
                       startContent={<LayoutDashboard className="w-4 h-4" />}
                       onPress={() => navigate('/dashboard')}
-                      className="text-white/80"
+                      className="text-theme-secondary"
                     >
                       Dashboard
                     </DropdownItem>
@@ -241,7 +261,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                       key="profile"
                       startContent={<Users className="w-4 h-4" />}
                       onPress={() => navigate('/profile')}
-                      className="text-white/80"
+                      className="text-theme-secondary"
                     >
                       My Profile
                     </DropdownItem>
@@ -249,7 +269,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                       key="settings"
                       startContent={<Settings className="w-4 h-4" />}
                       onPress={() => navigate('/settings')}
-                      className="text-white/80"
+                      className="text-theme-secondary"
                     >
                       Settings
                     </DropdownItem>
@@ -258,7 +278,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                       color="danger"
                       startContent={<LogOut className="w-4 h-4" />}
                       onPress={handleLogout}
-                      className="text-red-400"
+                      className="text-red-500 dark:text-red-400"
                     >
                       Log Out
                     </DropdownItem>
@@ -268,7 +288,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="light" className="text-white/80 hover:text-white">
+                  <Button variant="light" className="text-theme-secondary hover:text-theme-primary">
                     Log In
                   </Button>
                 </Link>
