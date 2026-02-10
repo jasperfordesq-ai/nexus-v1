@@ -101,11 +101,11 @@ export function SearchPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Search Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-          <Search className="w-7 h-7 text-indigo-400" />
+        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+          <Search className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
           Search
         </h1>
-        <p className="text-white/60 mt-1">Find listings, members, events, and groups</p>
+        <p className="text-theme-muted mt-1">Find listings, members, events, and groups</p>
       </div>
 
       {/* Search Form */}
@@ -115,11 +115,11 @@ export function SearchPage() {
             placeholder="Search for anything..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            startContent={<Search className="w-5 h-5 text-white/40" />}
+            startContent={<Search className="w-5 h-5 text-theme-subtle" />}
             size="lg"
             classNames={{
-              input: 'bg-transparent text-white placeholder:text-white/40',
-              inputWrapper: 'bg-white/5 border-white/10 hover:bg-white/10',
+              input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
+              inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
             }}
           />
         </form>
@@ -133,9 +133,9 @@ export function SearchPage() {
             selectedKey={activeTab}
             onSelectionChange={(key) => setActiveTab(key as SearchTab)}
             classNames={{
-              tabList: 'bg-white/5 p-1 rounded-lg',
-              cursor: 'bg-white/10',
-              tab: 'text-white/60 data-[selected=true]:text-white',
+              tabList: 'bg-theme-elevated p-1 rounded-lg',
+              cursor: 'bg-theme-hover',
+              tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
             }}
           >
             <Tab key="all" title={`All (${totalResults})`} />
@@ -150,8 +150,8 @@ export function SearchPage() {
             <div className="space-y-4">
               {[1, 2, 3, 4].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="h-5 bg-white/10 rounded w-1/3 mb-3" />
-                  <div className="h-4 bg-white/10 rounded w-2/3" />
+                  <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
+                  <div className="h-4 bg-theme-hover rounded w-2/3" />
                 </GlassCard>
               ))}
             </div>
@@ -172,8 +172,8 @@ export function SearchPage() {
               {(activeTab === 'all' || activeTab === 'listings') && results.listings.length > 0 && (
                 <section>
                   {activeTab === 'all' && (
-                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <ListTodo className="w-5 h-5 text-indigo-400" />
+                    <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+                      <ListTodo className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                       Listings ({results.listings.length})
                     </h2>
                   )}
@@ -184,13 +184,13 @@ export function SearchPage() {
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full">
                             <span className={`
                               text-xs px-2 py-1 rounded-full
-                              ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}
+                              ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}
                             `}>
                               {listing.type === 'offer' ? 'Offering' : 'Requesting'}
                             </span>
-                            <h3 className="font-semibold text-white mt-2">{listing.title}</h3>
-                            <p className="text-sm text-white/50 line-clamp-2 mt-1">{listing.description}</p>
-                            <div className="flex items-center gap-2 mt-3 text-xs text-white/40">
+                            <h3 className="font-semibold text-theme-primary mt-2">{listing.title}</h3>
+                            <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{listing.description}</p>
+                            <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                               <Clock className="w-3 h-3" />
                               {listing.hours_estimate ?? listing.estimated_hours ?? '—'}h
                             </div>
@@ -206,8 +206,8 @@ export function SearchPage() {
               {(activeTab === 'all' || activeTab === 'users') && results.users.length > 0 && (
                 <section>
                   {activeTab === 'all' && (
-                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <User className="w-5 h-5 text-emerald-400" />
+                    <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+                      <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       Members ({results.users.length})
                     </h2>
                   )}
@@ -221,15 +221,15 @@ export function SearchPage() {
                                 src={resolveAvatarUrl(user.avatar)}
                                 name={user.name}
                                 size="lg"
-                                className="ring-2 ring-white/20"
+                                className="ring-2 ring-theme-default"
                               />
                               <div>
-                                <h3 className="font-semibold text-white">{user.name}</h3>
+                                <h3 className="font-semibold text-theme-primary">{user.name}</h3>
                                 {user.tagline && (
-                                  <p className="text-sm text-white/50">{user.tagline}</p>
+                                  <p className="text-sm text-theme-subtle">{user.tagline}</p>
                                 )}
                                 {user.location && (
-                                  <p className="text-xs text-white/40 flex items-center gap-1 mt-1">
+                                  <p className="text-xs text-theme-subtle flex items-center gap-1 mt-1">
                                     <MapPin className="w-3 h-3" />
                                     {user.location}
                                   </p>
@@ -248,8 +248,8 @@ export function SearchPage() {
               {(activeTab === 'all' || activeTab === 'events') && results.events.length > 0 && (
                 <section>
                   {activeTab === 'all' && (
-                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-amber-400" />
+                    <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+                      <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                       Events ({results.events.length})
                     </h2>
                   )}
@@ -258,9 +258,9 @@ export function SearchPage() {
                       <motion.div key={event.id} variants={itemVariants}>
                         <Link to={`/events/${event.id}`}>
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform">
-                            <h3 className="font-semibold text-white">{event.title}</h3>
-                            <p className="text-sm text-white/50 line-clamp-2 mt-1">{event.description}</p>
-                            <div className="flex items-center gap-4 mt-3 text-xs text-white/40">
+                            <h3 className="font-semibold text-theme-primary">{event.title}</h3>
+                            <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{event.description}</p>
+                            <div className="flex items-center gap-4 mt-3 text-xs text-theme-subtle">
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-3 h-3" />
                                 {new Date(event.start_date).toLocaleDateString()}
@@ -284,8 +284,8 @@ export function SearchPage() {
               {(activeTab === 'all' || activeTab === 'groups') && results.groups.length > 0 && (
                 <section>
                   {activeTab === 'all' && (
-                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-purple-400" />
+                    <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+                      <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                       Groups ({results.groups.length})
                     </h2>
                   )}
@@ -294,9 +294,9 @@ export function SearchPage() {
                       <motion.div key={group.id} variants={itemVariants}>
                         <Link to={`/groups/${group.id}`}>
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform">
-                            <h3 className="font-semibold text-white">{group.name}</h3>
-                            <p className="text-sm text-white/50 line-clamp-2 mt-1">{group.description}</p>
-                            <div className="flex items-center gap-2 mt-3 text-xs text-white/40">
+                            <h3 className="font-semibold text-theme-primary">{group.name}</h3>
+                            <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{group.description}</p>
+                            <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                               <Users className="w-3 h-3" />
                               {group.members_count} members
                             </div>
@@ -315,9 +315,9 @@ export function SearchPage() {
       {/* Initial State */}
       {!hasSearched && (
         <GlassCard className="p-12 text-center">
-          <Search className="w-16 h-16 text-white/20 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">Start searching</h3>
-          <p className="text-white/50">
+          <Search className="w-16 h-16 text-theme-subtle mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-theme-primary mb-2">Start searching</h3>
+          <p className="text-theme-subtle">
             Enter a search term to find listings, members, events, and groups
           </p>
         </GlassCard>

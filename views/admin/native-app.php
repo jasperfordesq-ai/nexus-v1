@@ -284,7 +284,7 @@ require __DIR__ . '/../layouts/modern/header.php';
         </div>
         <div class="admin-section-body">
             <form class="test-form" id="testPushForm">
-                <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::getToken() ?>">
+                <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                 <div>
                     <label for="pushTitle">Title</label>
                     <input type="text" id="pushTitle" name="title" value="Test Notification" required>

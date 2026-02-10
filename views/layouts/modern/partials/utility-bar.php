@@ -15,6 +15,12 @@ $protocol = $isSecure ? 'https://' : 'http://';
 ?>
 <nav class="nexus-utility-bar">
     <div class="left-utils">
+        <!-- Try New Frontend Button -->
+        <a href="https://app.project-nexus.ie/" class="try-new-frontend-btn" target="_blank" rel="noopener" title="Try our new React-powered frontend">
+            <i class="fa-solid fa-sparkles sparkle-icon"></i>
+            <span class="btn-text">Try new front end</span>
+        </a>
+
         <?php if ($showPlatform): ?>
             <div class="htb-dropdown">
                 <button class="util-link platform-dropdown-btn">Platform <span class="htb-arrow">▾</span></button>

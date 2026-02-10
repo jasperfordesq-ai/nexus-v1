@@ -79,6 +79,51 @@ class UsersApiController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/users/{id}/listings
+     *
+     * Get a user's public listings.
+     *
+     * Query Parameters:
+     * - limit: int (default 20, max 100)
+     * - offset: int (default 0)
+     * - type: 'offer'|'request' (optional filter)
+     *
+     * Response: 200 OK with paginated listings
+     */
+    public function listings(int $id): void
+    {
+        $this->rateLimit('user_listings', 30, 60);
+
+        // Get filters from query params
+        $limit = min((int) ($this->input('limit') ?? 20), 100);
+        $offset = (int) ($this->input('offset') ?? 0);
+        $type = $this->input('type');
+
+        $filters = [
+            'user_id' => $id,
+            'limit' => $limit,
+        ];
+
+        if ($type && in_array($type, ['offer', 'request'])) {
+            $filters['type'] = $type;
+        }
+
+        // Use cursor-based pagination from ListingService::getAll()
+        $cursor = $this->input('cursor');
+        if ($cursor) {
+            $filters['cursor'] = $cursor;
+        }
+
+        $result = \Nexus\Services\ListingService::getAll($filters);
+
+        $this->respondWithData($result['items'], [
+            'cursor' => $result['cursor'],
+            'has_more' => $result['has_more'],
+            'limit' => $limit,
+        ]);
+    }
+
+    /**
      * PUT /api/v2/users/me
      *
      * Update the authenticated user's profile.
@@ -244,5 +289,122 @@ class UsersApiController extends BaseApiController
         }
 
         $this->respondWithData(['message' => 'Password updated successfully']);
+    }
+
+    /**
+     * DELETE /api/v2/users/me
+     * Delete the current user's account
+     */
+    public function deleteAccount(): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('delete_account', 1, 60);
+
+        $success = UserService::deleteAccount($userId);
+
+        if (!$success) {
+            $errors = UserService::getErrors();
+            $this->respondWithErrors($errors, 400);
+        }
+
+        $this->respondWithData(['message' => 'Account deleted successfully']);
+    }
+
+    /**
+     * GET /api/v2/users/me/notifications
+     * Get the user's notification preferences
+     */
+    public function notificationPreferences(): void
+    {
+        $userId = $this->getUserId();
+
+        $prefs = \Nexus\Models\User::getNotificationPreferences($userId);
+
+        $this->respondWithData([
+            'email_messages' => (bool) ($prefs['email_messages'] ?? true),
+            'email_listings' => (bool) ($prefs['email_listings'] ?? true),
+            'email_digest' => (bool) ($prefs['email_digest'] ?? false),
+            'push_enabled' => (bool) ($prefs['push_enabled'] ?? true),
+        ]);
+    }
+
+    /**
+     * PUT /api/v2/users/me/notifications
+     * Update the user's notification preferences
+     */
+    public function updateNotificationPreferences(): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('update_notifications', 10, 60);
+
+        $data = $this->getAllInput();
+
+        $prefs = [];
+        $allowedKeys = ['email_messages', 'email_listings', 'email_digest', 'push_enabled'];
+
+        foreach ($allowedKeys as $key) {
+            if (isset($data[$key])) {
+                $prefs[$key] = (bool) $data[$key];
+            }
+        }
+
+        if (empty($prefs)) {
+            $this->respondWithError('VALIDATION_ERROR', 'No valid preferences provided', null, 400);
+        }
+
+        $success = \Nexus\Models\User::updateNotificationPreferences($userId, $prefs);
+
+        if (!$success) {
+            $this->respondWithError('UPDATE_FAILED', 'Failed to update preferences', null, 500);
+        }
+
+        $this->respondWithData(['message' => 'Notification preferences updated']);
+    }
+
+    /**
+     * PUT /api/v2/users/me/theme
+     *
+     * Update the user's theme preference.
+     *
+     * Request Body (JSON):
+     * {
+     *   "theme": "light"|"dark"|"system"
+     * }
+     *
+     * Response: 200 OK with success message
+     */
+    public function updateTheme(): void
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('theme_update', 30, 60);
+
+        $data = $this->getAllInput();
+        $theme = $data['theme'] ?? null;
+
+        $validThemes = ['light', 'dark', 'system'];
+        if (!$theme || !in_array($theme, $validThemes)) {
+            $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid theme. Must be one of: light, dark, system',
+                'theme',
+                400
+            );
+        }
+
+        $success = \Nexus\Core\Database::query(
+            "UPDATE users SET preferred_theme = ? WHERE id = ?",
+            [$theme, $userId]
+        );
+
+        if (!$success) {
+            $this->respondWithError('UPDATE_FAILED', 'Failed to update theme preference', null, 500);
+        }
+
+        $this->respondWithData([
+            'message' => 'Theme preference updated',
+            'theme' => $theme
+        ]);
     }
 }

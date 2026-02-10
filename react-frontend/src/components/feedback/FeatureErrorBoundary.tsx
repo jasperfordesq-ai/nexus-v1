@@ -63,15 +63,15 @@ export class FeatureErrorBoundary extends Component<
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 mb-4">
               <AlertTriangle className="w-6 h-6 text-amber-400" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
+            <h3 className="text-lg font-semibold text-theme-primary mb-2">
               Something went wrong
             </h3>
-            <p className="text-white/60 text-sm mb-4">
+            <p className="text-theme-muted text-sm mb-4">
               We couldn&apos;t load {this.props.featureName}. This section may be temporarily unavailable.
             </p>
             <Button
               variant="flat"
-              className="bg-white/10 text-white"
+              className="bg-theme-elevated text-theme-primary"
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={this.handleRetry}
             >

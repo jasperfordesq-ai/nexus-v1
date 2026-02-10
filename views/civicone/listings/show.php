@@ -90,6 +90,31 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 </dd>
             </div>
             <?php endif; ?>
+
+            <?php if (!empty($riskTag)): ?>
+            <?php
+            // GOV.UK tag color mapping for risk levels
+            $riskTagColors = [
+                'critical' => 'govuk-tag--red',
+                'high' => 'govuk-tag--orange',
+                'medium' => 'govuk-tag--yellow',
+                'low' => 'govuk-tag--grey'
+            ];
+            $riskColor = $riskTagColors[$riskTag['risk_level']] ?? 'govuk-tag--grey';
+            ?>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Safety notice</dt>
+                <dd class="govuk-summary-list__value">
+                    <span class="govuk-tag <?= $riskColor ?>">
+                        <i class="fa-solid fa-triangle-exclamation govuk-!-margin-right-1" aria-hidden="true"></i>
+                        <?= ucfirst(htmlspecialchars($riskTag['risk_level'])) ?> risk
+                    </span>
+                    <?php if (!empty($riskTag['notes'])): ?>
+                    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0"><?= htmlspecialchars($riskTag['notes']) ?></p>
+                    <?php endif; ?>
+                </dd>
+            </div>
+            <?php endif; ?>
         </dl>
 
         <!-- Image -->

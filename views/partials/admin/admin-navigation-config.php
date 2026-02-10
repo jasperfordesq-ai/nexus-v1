@@ -68,6 +68,7 @@ function getAdminNavigationModules(): array
                     'title' => 'Smart Systems',
                     'items' => [
                         ['label' => 'Smart Matching', 'url' => '/admin/smart-match-users', 'icon' => 'fa-users-between-lines'],
+                        ['label' => 'Match Approvals', 'url' => '/admin/match-approvals', 'icon' => 'fa-clipboard-check', 'badge' => 'NEW'],
                         ['label' => 'Recommendations', 'url' => '/admin/groups/recommendations', 'icon' => 'fa-sparkles'],
                         ['label' => 'Match Monitoring', 'url' => '/admin/smart-match-monitoring', 'icon' => 'fa-chart-line'],
                         ['label' => 'Geocoding', 'url' => '/admin/geocode-groups', 'icon' => 'fa-map-location-dot'],

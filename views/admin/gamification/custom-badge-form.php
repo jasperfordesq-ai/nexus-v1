@@ -33,7 +33,7 @@ require dirname(__DIR__, 2) . '/layouts/admin/header.php';
             <div class="card">
                 <div class="card-body">
                     <form method="POST" action="<?= $basePath ?>/admin/custom-badges/<?= $isEdit ? 'update' : 'store' ?>">
-                        <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::getToken() ?>">
+                        <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                         <?php if ($isEdit): ?>
                             <input type="hidden" name="id" value="<?= $badge['id'] ?>">
                         <?php endif; ?>

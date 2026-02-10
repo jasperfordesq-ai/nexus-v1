@@ -185,6 +185,7 @@ $router->add('POST', '/api/listings/delete', 'Nexus\Controllers\ListingControlle
 // ============================================
 $router->add('GET', '/api/v2/tenant/bootstrap', 'Nexus\Controllers\Api\TenantBootstrapController@bootstrap');
 $router->add('GET', '/api/v2/tenants', 'Nexus\Controllers\Api\TenantBootstrapController@list');
+$router->add('GET', '/api/v2/platform/stats', 'Nexus\Controllers\Api\TenantBootstrapController@platformStats');
 
 // ============================================
 // LISTINGS API v2 - RESTful CRUD
@@ -232,7 +233,7 @@ $router->add('GET', '/api/v2/users', function () {
         $params[] = "%$search%";
     }
 
-    $sql = "SELECT u.id, u.name, u.avatar_url as avatar, u.bio as tagline, u.location, u.created_at
+    $sql = "SELECT u.id, u.name, u.first_name, u.last_name, u.avatar_url as avatar, u.bio as tagline, u.location, u.created_at
             FROM users u
             WHERE $whereClause
             ORDER BY $orderBy
@@ -244,9 +245,14 @@ $router->add('GET', '/api/v2/users', function () {
 $router->add('GET', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@me');
 $router->add('PUT', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@update');
 $router->add('PUT', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@updatePreferences');
-$router->add('PUT', '/api/v2/users/me/avatar', 'Nexus\Controllers\Api\UsersApiController@updateAvatar');
-$router->add('PUT', '/api/v2/users/me/password', 'Nexus\Controllers\Api\UsersApiController@updatePassword');
+$router->add('PUT', '/api/v2/users/me/theme', 'Nexus\Controllers\Api\UsersApiController@updateTheme');
+$router->add('POST', '/api/v2/users/me/avatar', 'Nexus\Controllers\Api\UsersApiController@updateAvatar');
+$router->add('POST', '/api/v2/users/me/password', 'Nexus\Controllers\Api\UsersApiController@updatePassword');
+$router->add('DELETE', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@deleteAccount');
 $router->add('GET', '/api/v2/users/{id}', 'Nexus\Controllers\Api\UsersApiController@show');
+$router->add('GET', '/api/v2/users/{id}/listings', 'Nexus\Controllers\Api\UsersApiController@listings');
+$router->add('GET', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@notificationPreferences');
+$router->add('PUT', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@updateNotificationPreferences');
 
 // ============================================
 // API V2 - MESSAGES (RESTful Messaging)
@@ -256,9 +262,29 @@ $router->add('GET', '/api/v2/messages/unread-count', 'Nexus\Controllers\Api\Mess
 $router->add('POST', '/api/v2/messages', 'Nexus\Controllers\Api\MessagesApiController@send');
 $router->add('POST', '/api/v2/messages/typing', 'Nexus\Controllers\Api\MessagesApiController@typing');
 $router->add('POST', '/api/v2/messages/upload-voice', 'Nexus\Controllers\Api\MessagesApiController@uploadVoice');
+$router->add('POST', '/api/v2/messages/voice', 'Nexus\Controllers\Api\MessagesApiController@sendVoice');
+$router->add('DELETE', '/api/v2/messages/conversations/{id}', 'Nexus\Controllers\Api\MessagesApiController@archiveConversation');
 $router->add('GET', '/api/v2/messages/{id}', 'Nexus\Controllers\Api\MessagesApiController@show');
 $router->add('PUT', '/api/v2/messages/{id}/read', 'Nexus\Controllers\Api\MessagesApiController@markRead');
-$router->add('DELETE', '/api/v2/messages/{id}', 'Nexus\Controllers\Api\MessagesApiController@archive');
+$router->add('POST', '/api/v2/messages/{id}/reactions', 'Nexus\Controllers\Api\MessagesApiController@toggleReaction');
+$router->add('PUT', '/api/v2/messages/{id}', 'Nexus\Controllers\Api\MessagesApiController@update');
+$router->add('DELETE', '/api/v2/messages/{id}', 'Nexus\Controllers\Api\MessagesApiController@deleteMessage');
+$router->add('DELETE', '/api/v2/conversations/{id}', 'Nexus\Controllers\Api\MessagesApiController@archive');
+$router->add('POST', '/api/v2/messages/conversations/{id}/restore', 'Nexus\Controllers\Api\MessagesApiController@restoreConversation');
+
+// ============================================
+// API V2 - EXCHANGES (Exchange Workflow System)
+// ============================================
+$router->add('GET', '/api/v2/exchanges/config', 'Nexus\Controllers\Api\ExchangesApiController@config');
+$router->add('GET', '/api/v2/exchanges', 'Nexus\Controllers\Api\ExchangesApiController@index');
+$router->add('POST', '/api/v2/exchanges', 'Nexus\Controllers\Api\ExchangesApiController@store');
+$router->add('GET', '/api/v2/exchanges/{id}', 'Nexus\Controllers\Api\ExchangesApiController@show');
+$router->add('POST', '/api/v2/exchanges/{id}/accept', 'Nexus\Controllers\Api\ExchangesApiController@accept');
+$router->add('POST', '/api/v2/exchanges/{id}/decline', 'Nexus\Controllers\Api\ExchangesApiController@decline');
+$router->add('POST', '/api/v2/exchanges/{id}/start', 'Nexus\Controllers\Api\ExchangesApiController@start');
+$router->add('POST', '/api/v2/exchanges/{id}/complete', 'Nexus\Controllers\Api\ExchangesApiController@complete');
+$router->add('POST', '/api/v2/exchanges/{id}/confirm', 'Nexus\Controllers\Api\ExchangesApiController@confirm');
+$router->add('DELETE', '/api/v2/exchanges/{id}', 'Nexus\Controllers\Api\ExchangesApiController@cancel');
 
 // ============================================
 // API V2 - EVENTS (RESTful Event Management)
@@ -313,6 +339,7 @@ $router->add('GET', '/api/v2/wallet/transactions/{id}', 'Nexus\Controllers\Api\W
 $router->add('POST', '/api/v2/wallet/transfer', 'Nexus\Controllers\Api\WalletApiController@transferV2');
 $router->add('DELETE', '/api/v2/wallet/transactions/{id}', 'Nexus\Controllers\Api\WalletApiController@destroyTransaction');
 $router->add('GET', '/api/v2/wallet/user-search', 'Nexus\Controllers\Api\WalletApiController@userSearchV2');
+$router->add('GET', '/api/v2/wallet/pending-count', 'Nexus\Controllers\Api\WalletApiController@pendingCount');
 
 // ============================================
 // API V2 - FEED (Social Feed with Cursor Pagination)
@@ -320,6 +347,15 @@ $router->add('GET', '/api/v2/wallet/user-search', 'Nexus\Controllers\Api\WalletA
 $router->add('GET', '/api/v2/feed', 'Nexus\Controllers\Api\SocialApiController@feedV2');
 $router->add('POST', '/api/v2/feed/posts', 'Nexus\Controllers\Api\SocialApiController@createPostV2');
 $router->add('POST', '/api/v2/feed/like', 'Nexus\Controllers\Api\SocialApiController@likeV2');
+
+// ============================================
+// API V2 - REALTIME (Pusher Configuration)
+// ============================================
+$router->add('GET', '/api/v2/realtime/config', function () {
+    header('Content-Type: application/json');
+    $config = \Nexus\Services\RealtimeService::getFrontendConfig();
+    echo json_encode(['data' => $config]);
+});
 
 // ============================================
 // API V2 - NOTIFICATIONS (Cursor Paginated)
@@ -744,6 +780,19 @@ $router->add('GET', '/listings/{id}', 'Nexus\Controllers\ListingController@show'
 $router->add('POST', '/listings/{id}', 'Nexus\Controllers\ListingController@show'); // AJAX actions (likes/comments)
 
 // --------------------------------------------------------------------------
+// 2b. EXCHANGES (Broker-controlled exchange workflow)
+// --------------------------------------------------------------------------
+$router->add('GET', '/exchanges', 'Nexus\Controllers\ExchangesController@index');
+$router->add('GET', '/exchanges/request/{listingId}', 'Nexus\Controllers\ExchangesController@create');
+$router->add('POST', '/exchanges', 'Nexus\Controllers\ExchangesController@store');
+$router->add('GET', '/exchanges/{id}', 'Nexus\Controllers\ExchangesController@show');
+$router->add('POST', '/exchanges/{id}/accept', 'Nexus\Controllers\ExchangesController@accept');
+$router->add('POST', '/exchanges/{id}/decline', 'Nexus\Controllers\ExchangesController@decline');
+$router->add('POST', '/exchanges/{id}/start', 'Nexus\Controllers\ExchangesController@start');
+$router->add('POST', '/exchanges/{id}/confirm', 'Nexus\Controllers\ExchangesController@confirm');
+$router->add('POST', '/exchanges/{id}/cancel', 'Nexus\Controllers\ExchangesController@cancel');
+
+// --------------------------------------------------------------------------
 // 3. GROUPS (Community Hubs)
 // --------------------------------------------------------------------------
 // HUBS (Admin-curated geographic communities)
@@ -1132,6 +1181,47 @@ $router->add('POST', '/admin/smart-matching/clear-cache', 'Nexus\Controllers\Adm
 $router->add('POST', '/admin/smart-matching/warmup-cache', 'Nexus\Controllers\Admin\SmartMatchingController@warmupCache');
 $router->add('POST', '/admin/smart-matching/run-geocoding', 'Nexus\Controllers\Admin\SmartMatchingController@runGeocoding');
 $router->add('GET', '/admin/smart-matching/api/stats', 'Nexus\Controllers\Admin\SmartMatchingController@apiStats');
+
+// --------------------------------------------------------------------------
+// 10.8.1. ADMIN > MATCH APPROVALS (Broker Workflow)
+// --------------------------------------------------------------------------
+$router->add('GET', '/admin/match-approvals', 'Nexus\Controllers\Admin\MatchApprovalsController@index');
+$router->add('GET', '/admin/match-approvals/history', 'Nexus\Controllers\Admin\MatchApprovalsController@history');
+$router->add('GET', '/admin/match-approvals/{id}', 'Nexus\Controllers\Admin\MatchApprovalsController@show');
+$router->add('POST', '/admin/match-approvals/approve', 'Nexus\Controllers\Admin\MatchApprovalsController@approve');
+$router->add('POST', '/admin/match-approvals/reject', 'Nexus\Controllers\Admin\MatchApprovalsController@reject');
+$router->add('GET', '/admin/match-approvals/api/stats', 'Nexus\Controllers\Admin\MatchApprovalsController@apiStats');
+
+// --------------------------------------------------------------------------
+// 10.8.2. ADMIN > BROKER CONTROLS
+// --------------------------------------------------------------------------
+$router->add('GET', '/admin/broker-controls', 'Nexus\Controllers\Admin\BrokerControlsController@index');
+$router->add('GET', '/admin/broker-controls/configuration', 'Nexus\Controllers\Admin\BrokerControlsController@configuration');
+$router->add('POST', '/admin/broker-controls/configuration', 'Nexus\Controllers\Admin\BrokerControlsController@configuration');
+
+// Broker Controls - Exchanges
+$router->add('GET', '/admin/broker-controls/exchanges', 'Nexus\Controllers\Admin\BrokerControlsController@exchanges');
+$router->add('GET', '/admin/broker-controls/exchanges/{id}', 'Nexus\Controllers\Admin\BrokerControlsController@showExchange');
+$router->add('POST', '/admin/broker-controls/exchanges/{id}/approve', 'Nexus\Controllers\Admin\BrokerControlsController@approveExchange');
+$router->add('POST', '/admin/broker-controls/exchanges/{id}/reject', 'Nexus\Controllers\Admin\BrokerControlsController@rejectExchange');
+
+// Broker Controls - Risk Tags
+$router->add('GET', '/admin/broker-controls/risk-tags', 'Nexus\Controllers\Admin\BrokerControlsController@riskTags');
+$router->add('GET', '/admin/broker-controls/risk-tags/{listingId}', 'Nexus\Controllers\Admin\BrokerControlsController@tagListing');
+$router->add('POST', '/admin/broker-controls/risk-tags/{listingId}', 'Nexus\Controllers\Admin\BrokerControlsController@tagListing');
+$router->add('POST', '/admin/broker-controls/risk-tags/{listingId}/remove', 'Nexus\Controllers\Admin\BrokerControlsController@removeTag');
+
+// Broker Controls - Messages
+$router->add('GET', '/admin/broker-controls/messages', 'Nexus\Controllers\Admin\BrokerControlsController@messages');
+$router->add('POST', '/admin/broker-controls/messages/{id}/review', 'Nexus\Controllers\Admin\BrokerControlsController@reviewMessage');
+$router->add('POST', '/admin/broker-controls/messages/{id}/flag', 'Nexus\Controllers\Admin\BrokerControlsController@flagMessage');
+
+// Broker Controls - User Monitoring
+$router->add('GET', '/admin/broker-controls/monitoring', 'Nexus\Controllers\Admin\BrokerControlsController@userMonitoring');
+$router->add('POST', '/admin/broker-controls/monitoring/{userId}', 'Nexus\Controllers\Admin\BrokerControlsController@setMonitoring');
+
+// Broker Controls - Statistics
+$router->add('GET', '/admin/broker-controls/stats', 'Nexus\Controllers\Admin\BrokerControlsController@stats');
 
 // --------------------------------------------------------------------------
 // 10.9. ADMIN > SEED GENERATOR

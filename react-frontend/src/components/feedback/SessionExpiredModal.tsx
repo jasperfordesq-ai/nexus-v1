@@ -37,7 +37,7 @@ export function SessionExpiredModal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
+            className="fixed inset-0 bg-black/50 dark:bg-black/60 backdrop-blur-sm z-[9998]"
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
@@ -53,20 +53,20 @@ export function SessionExpiredModal() {
             aria-labelledby="session-expired-title"
             aria-describedby="session-expired-description"
           >
-            <div className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <div className="bg-white dark:bg-gray-900/95 backdrop-blur-xl border border-theme-default rounded-2xl p-6 max-w-sm w-full shadow-2xl">
               {/* Icon */}
               <div className="flex justify-center mb-4">
                 <div className="p-4 rounded-full bg-amber-500/20">
-                  <Clock className="w-8 h-8 text-amber-400" />
+                  <Clock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
 
               {/* Content */}
               <div className="text-center mb-6">
-                <h2 id="session-expired-title" className="text-xl font-semibold text-white mb-2">
+                <h2 id="session-expired-title" className="text-xl font-semibold text-theme-primary mb-2">
                   Session Expired
                 </h2>
-                <p id="session-expired-description" className="text-white/60">
+                <p id="session-expired-description" className="text-theme-muted">
                   Your session has expired due to inactivity. Please log in again to continue.
                 </p>
               </div>
@@ -75,7 +75,7 @@ export function SessionExpiredModal() {
               <div className="flex gap-3">
                 <Button
                   variant="flat"
-                  className="flex-1 bg-white/5 text-white"
+                  className="flex-1 bg-theme-elevated text-theme-primary"
                   onClick={() => setIsOpen(false)}
                 >
                   Dismiss

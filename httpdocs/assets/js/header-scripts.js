@@ -25,6 +25,12 @@
     // GLOBAL ERROR HANDLER
     // =============================================================================
     window.onerror = function(msg, url, lineNo, columnNo, error) {
+        // Ignore cross-origin "Script error" with no useful info (third-party scripts)
+        if (msg === 'Script error.' && !url && lineNo === 0 && columnNo === 0) {
+            console.debug('[ErrorTrap] Ignoring cross-origin script error (no details available)');
+            return true;
+        }
+
         var errorMsg = 'ERROR TRAPPED!\n\n' +
             'Message: ' + msg + '\n' +
             'URL: ' + url + '\n' +

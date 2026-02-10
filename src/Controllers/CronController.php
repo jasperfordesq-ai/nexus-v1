@@ -279,6 +279,8 @@ class CronController
                         $subject = "New Discussion: " . substr(strip_tags($item['content_snippet']), 0, 50) . "...";
                     } elseif ($item['activity_type'] === 'new_reply') {
                         $subject = "New Reply to Discussion";
+                    } elseif ($item['activity_type'] === 'new_message') {
+                        $subject = "💬 New Message";
                     } elseif ($item['activity_type'] === 'hot_match') {
                         $subject = "🔥 Hot Match Found!";
                     } elseif ($item['activity_type'] === 'mutual_match') {
@@ -696,6 +698,14 @@ class CronController
                 $subject = "New Discussion: " . substr(strip_tags($item['content_snippet']), 0, 50) . "...";
             } elseif ($item['activity_type'] === 'new_reply') {
                 $subject = "New Reply to Discussion";
+            } elseif ($item['activity_type'] === 'new_message') {
+                $subject = "💬 New Message";
+            } elseif ($item['activity_type'] === 'hot_match') {
+                $subject = "🔥 Hot Match Found!";
+            } elseif ($item['activity_type'] === 'mutual_match') {
+                $subject = "🤝 Mutual Match Opportunity";
+            } elseif ($item['activity_type'] === 'match_digest') {
+                $subject = "📊 Your Match Digest";
             }
 
             $body = $item['email_body'] ?? nl2br($item['content_snippet']);

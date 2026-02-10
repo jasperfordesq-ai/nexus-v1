@@ -574,4 +574,75 @@ class UserService
 
         return true;
     }
+
+    /**
+     * Delete user account permanently
+     *
+     * @param int $userId
+     * @return bool
+     */
+    public static function deleteAccount(int $userId): bool
+    {
+        self::$errors = [];
+        $tenantId = TenantContext::getId();
+
+        // Verify user exists
+        $user = User::findById($userId);
+        if (!$user) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+            return false;
+        }
+
+        try {
+            Database::beginTransaction();
+
+            // Soft-delete approach: anonymize rather than hard delete
+            // This preserves transaction history integrity
+
+            // Anonymize user data
+            $anonymizedEmail = 'deleted_' . $userId . '_' . time() . '@deleted.local';
+            $anonymizedName = 'Deleted User';
+
+            Database::query(
+                "UPDATE users SET
+                    email = ?,
+                    first_name = ?,
+                    last_name = '',
+                    password = '',
+                    bio = NULL,
+                    location = NULL,
+                    phone = NULL,
+                    avatar = NULL,
+                    status = 'deleted',
+                    deleted_at = NOW(),
+                    updated_at = NOW()
+                WHERE id = ? AND tenant_id = ?",
+                [$anonymizedEmail, $anonymizedName, $userId, $tenantId]
+            );
+
+            // Delete sensitive data
+            Database::query("DELETE FROM user_sessions WHERE user_id = ?", [$userId]);
+            Database::query("DELETE FROM user_tokens WHERE user_id = ?", [$userId]);
+            Database::query("DELETE FROM password_resets WHERE user_id = ?", [$userId]);
+
+            // Anonymize messages (keep for other party's history)
+            Database::query(
+                "UPDATE messages SET sender_id = NULL WHERE sender_id = ?",
+                [$userId]
+            );
+
+            // Remove from groups and connections
+            Database::query("DELETE FROM group_members WHERE user_id = ?", [$userId]);
+            Database::query("DELETE FROM connections WHERE user_id = ? OR connected_user_id = ?", [$userId, $userId]);
+
+            Database::commit();
+
+            return true;
+        } catch (\Exception $e) {
+            Database::rollback();
+            error_log("Failed to delete account for user $userId: " . $e->getMessage());
+            self::$errors[] = ['code' => 'DELETE_FAILED', 'message' => 'Failed to delete account'];
+            return false;
+        }
+    }
 }

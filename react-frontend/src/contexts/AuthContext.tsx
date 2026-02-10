@@ -107,8 +107,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await api.get<User>('/v2/users/me');
 
       if (response.success && response.data) {
-        // Ensure tenant ID is synced from user data
-        if (response.data.tenant_id) {
+        // Only set tenant ID from user data if no tenant was pre-selected
+        // This allows super admins to access any tenant they selected at login
+        if (response.data.tenant_id && !tokenManager.getTenantId()) {
           tokenManager.setTenantId(response.data.tenant_id);
         }
         setState({
@@ -184,8 +185,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (loginData.refresh_token) {
       tokenManager.setRefreshToken(loginData.refresh_token);
     }
-    // Store tenant ID from user data so X-Tenant-ID header matches JWT
-    if (loginData.user?.tenant_id) {
+    // Only set tenant ID from user data if no tenant was pre-selected at login
+    // This allows super admins to access any tenant they selected
+    if (loginData.user?.tenant_id && !tokenManager.getTenantId()) {
       tokenManager.setTenantId(loginData.user.tenant_id);
     }
 
@@ -255,8 +257,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (data.refresh_token) {
       tokenManager.setRefreshToken(data.refresh_token);
     }
-    // Store tenant ID from user data so X-Tenant-ID header matches JWT
-    if (data.user?.tenant_id) {
+    // Only set tenant ID from user data if no tenant was pre-selected at login
+    // This allows super admins to access any tenant they selected
+    if (data.user?.tenant_id && !tokenManager.getTenantId()) {
       tokenManager.setTenantId(data.user.tenant_id);
     }
 
@@ -315,8 +318,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (responseData.refresh_token) {
       tokenManager.setRefreshToken(responseData.refresh_token);
     }
-    // Store tenant ID from user data so X-Tenant-ID header matches JWT
-    if (responseData.user?.tenant_id) {
+    // Only set tenant ID from user data if no tenant was pre-selected
+    if (responseData.user?.tenant_id && !tokenManager.getTenantId()) {
       tokenManager.setTenantId(responseData.user.tenant_id);
     }
 
@@ -355,8 +358,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       logWarn('Logout request failed - proceeding with local logout');
     }
 
-    // Always clear local tokens regardless of server response
-    tokenManager.clearTokens();
+    // Always clear ALL local data (tokens AND tenant ID) regardless of server response
+    tokenManager.clearAll();
 
     setState({
       user: null,

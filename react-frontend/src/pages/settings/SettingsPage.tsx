@@ -2,9 +2,24 @@
  * Settings Page - User account settings
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Switch, Avatar, Tabs, Tab } from '@heroui/react';
+import {
+  Button,
+  Input,
+  Textarea,
+  Switch,
+  Avatar,
+  Tabs,
+  Tab,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from '@heroui/react';
 import {
   User,
   Bell,
@@ -18,11 +33,15 @@ import {
   LogOut,
   Trash2,
   Settings,
+  AlertTriangle,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
-import { useAuth } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 
 interface ProfileFormData {
   name: string;
@@ -40,10 +59,32 @@ interface NotificationSettings {
 }
 
 export function SettingsPage() {
-  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { user, logout, refreshUser } = useAuth();
+  const toast = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState('profile');
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Modal states
+  const passwordModal = useDisclosure();
+  const deleteModal = useDisclosure();
+
+  // Password form
+  const [passwordData, setPasswordData] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: '',
+  });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  // Delete confirmation
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Profile form
   const [profileData, setProfileData] = useState<ProfileFormData>({
@@ -121,6 +162,115 @@ export function SettingsPage() {
     }
   }
 
+  // Avatar upload handler
+  async function handleAvatarUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Invalid file type', 'Please upload an image file (JPG, PNG, or GIF)');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File too large', 'Please upload an image smaller than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await api.upload<{ avatar_url: string }>('/v2/users/me/avatar', formData);
+
+      if (response.success && response.data) {
+        setProfileData((prev) => ({ ...prev, avatar: response.data!.avatar_url }));
+        if (refreshUser) await refreshUser();
+        toast.success('Avatar updated', 'Your profile photo has been updated');
+      } else {
+        toast.error('Upload failed', 'Failed to upload avatar. Please try again.');
+      }
+    } catch (error) {
+      logError('Failed to upload avatar', error);
+      toast.error('Upload failed', 'Failed to upload avatar. Please try again.');
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  }
+
+  // Password change handler
+  async function handleChangePassword() {
+    // Validate
+    if (!passwordData.current_password || !passwordData.new_password || !passwordData.confirm_password) {
+      toast.error('Missing fields', 'Please fill in all password fields');
+      return;
+    }
+
+    if (passwordData.new_password.length < 8) {
+      toast.error('Password too short', 'New password must be at least 8 characters');
+      return;
+    }
+
+    if (passwordData.new_password !== passwordData.confirm_password) {
+      toast.error('Passwords don\'t match', 'New password and confirmation must match');
+      return;
+    }
+
+    try {
+      setIsChangingPassword(true);
+      const response = await api.post('/v2/users/me/password', {
+        current_password: passwordData.current_password,
+        new_password: passwordData.new_password,
+      });
+
+      if (response.success) {
+        toast.success('Password changed', 'Your password has been updated successfully');
+        passwordModal.onClose();
+        setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
+      } else {
+        toast.error('Password change failed', response.error || 'Failed to change password');
+      }
+    } catch (error) {
+      logError('Failed to change password', error);
+      toast.error('Password change failed', 'Current password may be incorrect');
+    } finally {
+      setIsChangingPassword(false);
+    }
+  }
+
+  // Delete account handler
+  async function handleDeleteAccount() {
+    if (deleteConfirmation !== 'DELETE') {
+      toast.error('Confirmation required', 'Please type DELETE to confirm');
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      const response = await api.delete('/v2/users/me');
+
+      if (response.success) {
+        toast.success('Account deleted', 'Your account has been permanently deleted');
+        await logout();
+        navigate('/');
+      } else {
+        toast.error('Delete failed', 'Failed to delete account. Please try again.');
+      }
+    } catch (error) {
+      logError('Failed to delete account', error);
+      toast.error('Delete failed', 'Failed to delete account. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -143,11 +293,11 @@ export function SettingsPage() {
     >
       {/* Header */}
       <motion.div variants={itemVariants}>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-          <Settings className="w-7 h-7 text-indigo-400" />
+        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+          <Settings className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
           Settings
         </h1>
-        <p className="text-white/60 mt-1">Manage your account preferences</p>
+        <p className="text-theme-muted mt-1">Manage your account preferences</p>
       </motion.div>
 
       {/* Success Message */}
@@ -167,9 +317,9 @@ export function SettingsPage() {
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
           classNames={{
-            tabList: 'bg-white/5 p-1 rounded-lg',
-            cursor: 'bg-white/10',
-            tab: 'text-white/60 data-[selected=true]:text-white',
+            tabList: 'bg-theme-elevated p-1 rounded-lg',
+            cursor: 'bg-theme-hover',
+            tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
           }}
         >
           <Tab
@@ -206,23 +356,39 @@ export function SettingsPage() {
       <motion.div variants={itemVariants}>
         {activeTab === 'profile' && (
           <GlassCard className="p-6">
-            <h2 className="text-lg font-semibold text-white mb-6">Profile Information</h2>
+            <h2 className="text-lg font-semibold text-theme-primary mb-6">Profile Information</h2>
 
             {/* Avatar */}
             <div className="flex items-center gap-6 mb-8">
               <div className="relative">
                 <Avatar
-                  src={profileData.avatar || undefined}
+                  src={resolveAvatarUrl(profileData.avatar)}
                   name={profileData.name}
-                  className="w-20 h-20 ring-4 ring-white/20"
+                  className="w-20 h-20 ring-4 ring-theme-default"
                 />
-                <button className="absolute bottom-0 right-0 p-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 transition-colors">
-                  <Camera className="w-4 h-4" />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  aria-label="Upload profile photo"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="absolute bottom-0 right-0 p-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 transition-colors disabled:opacity-50"
+                >
+                  {isUploading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Camera className="w-4 h-4" />
+                  )}
                 </button>
               </div>
               <div>
-                <p className="text-white font-medium">Profile Photo</p>
-                <p className="text-white/50 text-sm">JPG, PNG or GIF. Max 5MB.</p>
+                <p className="text-theme-primary font-medium">Profile Photo</p>
+                <p className="text-theme-subtle text-sm">JPG, PNG or GIF. Max 5MB.</p>
               </div>
             </div>
 
@@ -233,9 +399,9 @@ export function SettingsPage() {
                 value={profileData.name}
                 onChange={(e) => setProfileData((prev) => ({ ...prev, name: e.target.value }))}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
 
@@ -245,9 +411,9 @@ export function SettingsPage() {
                 value={profileData.tagline}
                 onChange={(e) => setProfileData((prev) => ({ ...prev, tagline: e.target.value }))}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
 
@@ -258,9 +424,9 @@ export function SettingsPage() {
                 onChange={(e) => setProfileData((prev) => ({ ...prev, bio: e.target.value }))}
                 minRows={4}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
 
@@ -270,9 +436,9 @@ export function SettingsPage() {
                 value={profileData.location}
                 onChange={(e) => setProfileData((prev) => ({ ...prev, location: e.target.value }))}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
 
@@ -290,11 +456,11 @@ export function SettingsPage() {
 
         {activeTab === 'notifications' && (
           <GlassCard className="p-6">
-            <h2 className="text-lg font-semibold text-white mb-6">Notification Preferences</h2>
+            <h2 className="text-lg font-semibold text-theme-primary mb-6">Notification Preferences</h2>
 
             <div className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-sm font-medium text-white/80 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                   <Mail className="w-4 h-4" />
                   Email Notifications
                 </h3>
@@ -321,8 +487,8 @@ export function SettingsPage() {
                 />
               </div>
 
-              <div className="pt-4 border-t border-white/10 space-y-4">
-                <h3 className="text-sm font-medium text-white/80 flex items-center gap-2">
+              <div className="pt-4 border-t border-theme-default space-y-4">
+                <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                   <Smartphone className="w-4 h-4" />
                   Push Notifications
                 </h3>
@@ -350,54 +516,57 @@ export function SettingsPage() {
         {activeTab === 'security' && (
           <div className="space-y-6">
             <GlassCard className="p-6">
-              <h2 className="text-lg font-semibold text-white mb-6">Security Settings</h2>
+              <h2 className="text-lg font-semibold text-theme-primary mb-6">Security Settings</h2>
 
               <div className="space-y-4">
-                <button className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-left">
+                <button
+                  onClick={passwordModal.onOpen}
+                  className="w-full flex items-center justify-between p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors text-left"
+                >
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-indigo-500/20">
-                      <Lock className="w-5 h-5 text-indigo-400" />
+                      <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <div>
-                      <p className="font-medium text-white">Change Password</p>
-                      <p className="text-sm text-white/50">Update your account password</p>
+                      <p className="font-medium text-theme-primary">Change Password</p>
+                      <p className="text-sm text-theme-subtle">Update your account password</p>
                     </div>
                   </div>
                 </button>
 
-                <button className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-left">
+                <div className="w-full flex items-center justify-between p-4 rounded-lg bg-theme-elevated opacity-50 cursor-not-allowed text-left">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-emerald-500/20">
-                      <Key className="w-5 h-5 text-emerald-400" />
+                      <Key className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <div>
-                      <p className="font-medium text-white">Two-Factor Authentication</p>
-                      <p className="text-sm text-white/50">Add an extra layer of security</p>
+                      <p className="font-medium text-theme-primary">Two-Factor Authentication</p>
+                      <p className="text-sm text-theme-subtle">Coming soon</p>
                     </div>
                   </div>
-                </button>
+                </div>
 
-                <button className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-left">
+                <div className="w-full flex items-center justify-between p-4 rounded-lg bg-theme-elevated opacity-50 cursor-not-allowed text-left">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-amber-500/20">
-                      <Smartphone className="w-5 h-5 text-amber-400" />
+                      <Smartphone className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                     </div>
                     <div>
-                      <p className="font-medium text-white">Active Sessions</p>
-                      <p className="text-sm text-white/50">Manage devices where you're logged in</p>
+                      <p className="font-medium text-theme-primary">Active Sessions</p>
+                      <p className="text-sm text-theme-subtle">Coming soon</p>
                     </div>
                   </div>
-                </button>
+                </div>
               </div>
             </GlassCard>
 
             <GlassCard className="p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">Account Actions</h2>
+              <h2 className="text-lg font-semibold text-theme-primary mb-4">Account Actions</h2>
 
               <div className="space-y-3">
                 <Button
                   variant="flat"
-                  className="w-full justify-start bg-white/5 text-white"
+                  className="w-full justify-start bg-theme-elevated text-theme-primary"
                   startContent={<LogOut className="w-4 h-4" />}
                   onClick={handleLogout}
                 >
@@ -408,6 +577,7 @@ export function SettingsPage() {
                   variant="flat"
                   className="w-full justify-start bg-red-500/10 text-red-400"
                   startContent={<Trash2 className="w-4 h-4" />}
+                  onClick={deleteModal.onOpen}
                 >
                   Delete Account
                 </Button>
@@ -416,6 +586,137 @@ export function SettingsPage() {
           </div>
         )}
       </motion.div>
+
+      {/* Change Password Modal */}
+      <Modal
+        isOpen={passwordModal.isOpen}
+        onClose={passwordModal.onClose}
+        classNames={{
+          base: 'bg-theme-card border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">Change Password</ModalHeader>
+          <ModalBody>
+            <div className="space-y-4">
+              <Input
+                type={showCurrentPassword ? 'text' : 'password'}
+                label="Current Password"
+                value={passwordData.current_password}
+                onChange={(e) => setPasswordData((prev) => ({ ...prev, current_password: e.target.value }))}
+                endContent={
+                  <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
+                    {showCurrentPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" /> : <Eye className="w-4 h-4 text-theme-subtle" />}
+                  </button>
+                }
+                classNames={{
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
+                }}
+              />
+              <Input
+                type={showNewPassword ? 'text' : 'password'}
+                label="New Password"
+                value={passwordData.new_password}
+                onChange={(e) => setPasswordData((prev) => ({ ...prev, new_password: e.target.value }))}
+                endContent={
+                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)}>
+                    {showNewPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" /> : <Eye className="w-4 h-4 text-theme-subtle" />}
+                  </button>
+                }
+                classNames={{
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
+                }}
+              />
+              <Input
+                type="password"
+                label="Confirm New Password"
+                value={passwordData.confirm_password}
+                onChange={(e) => setPasswordData((prev) => ({ ...prev, confirm_password: e.target.value }))}
+                classNames={{
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
+                }}
+              />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onClick={passwordModal.onClose}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              onClick={handleChangePassword}
+              isLoading={isChangingPassword}
+            >
+              Change Password
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Account Modal */}
+      <Modal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.onClose}
+        classNames={{
+          base: 'bg-theme-card border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-red-600 dark:text-red-400 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5" />
+            Delete Account
+          </ModalHeader>
+          <ModalBody>
+            <div className="space-y-4">
+              <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                <p className="text-red-600 dark:text-red-400 font-medium">Warning: This action cannot be undone</p>
+                <p className="text-theme-muted text-sm mt-1">
+                  All your data, including listings, messages, and transaction history will be permanently deleted.
+                </p>
+              </div>
+              <div>
+                <p className="text-theme-muted mb-2">
+                  Type <span className="font-mono text-red-600 dark:text-red-400">DELETE</span> to confirm:
+                </p>
+                <Input
+                  value={deleteConfirmation}
+                  onChange={(e) => setDeleteConfirmation(e.target.value)}
+                  placeholder="DELETE"
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary font-mono',
+                    inputWrapper: 'bg-theme-elevated border-theme-default',
+                  }}
+                />
+              </div>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onClick={deleteModal.onClose}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-red-500 text-white"
+              onClick={handleDeleteAccount}
+              isLoading={isDeleting}
+              isDisabled={deleteConfirmation !== 'DELETE'}
+            >
+              Delete My Account
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </motion.div>
   );
 }
@@ -429,10 +730,10 @@ interface SettingToggleProps {
 
 function SettingToggle({ label, description, checked, onChange }: SettingToggleProps) {
   return (
-    <div className="flex items-center justify-between p-4 rounded-lg bg-white/5">
+    <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated">
       <div>
-        <p className="font-medium text-white">{label}</p>
-        <p className="text-sm text-white/50">{description}</p>
+        <p className="font-medium text-theme-primary">{label}</p>
+        <p className="text-sm text-theme-subtle">{description}</p>
       </div>
       <Switch
         isSelected={checked}

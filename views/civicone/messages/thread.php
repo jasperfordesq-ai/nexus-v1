@@ -33,6 +33,23 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
     </div>
 </div>
 
+<?php if (!empty($isMonitored)): ?>
+<!-- Broker Monitoring Notice - GOV.UK Design System compliant -->
+<div class="govuk-notification-banner govuk-!-margin-bottom-6" role="region" aria-labelledby="monitoring-notice-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="monitoring-notice-title">
+            Important
+        </h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">
+            <i class="fa-solid fa-shield-halved govuk-!-margin-right-1" aria-hidden="true"></i>
+            This conversation may be reviewed by a coordinator for safeguarding purposes.
+        </p>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-card-bordered-simple" role="log" aria-label="Message conversation with <?= htmlspecialchars($otherUser['name']) ?>">
 
     <!-- Messages Area -->

@@ -157,6 +157,16 @@ function isNavItemActive(string $itemUrl, string $currentPath, string $basePath)
                     </li>
                     <?php endif; ?>
 
+                    <!-- Try New Frontend Button -->
+                    <li class="govuk-service-navigation__item govuk-service-navigation__item--right">
+                        <a class="civicone-try-new-frontend"
+                           href="https://app.project-nexus.ie/"
+                           target="_blank"
+                           rel="noopener">
+                            <span class="btn-text">Try new front end</span>
+                        </a>
+                    </li>
+
                     <!-- Account Links (right-aligned via CSS) -->
                     <?php if ($isLoggedIn): ?>
                     <li class="govuk-service-navigation__item govuk-service-navigation__item--right">

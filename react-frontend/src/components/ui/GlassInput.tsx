@@ -44,7 +44,7 @@ export const GlassInput = forwardRef<HTMLInputElement, GlassInputProps>(
           <p
             id={`${inputId}-error`}
             className="mt-2 text-sm"
-            style={{ color: '#ef4444' }}
+            style={{ color: 'var(--color-error)' }}
             role="alert"
           >
             {error}

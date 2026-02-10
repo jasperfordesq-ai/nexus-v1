@@ -1,5 +1,6 @@
 /**
  * Dashboard Page - Main user dashboard
+ * Theme-aware styling for light and dark modes
  */
 
 import { useState, useEffect } from 'react';
@@ -54,9 +55,11 @@ export function DashboardPage() {
 
   async function loadDashboardData() {
     try {
-      const [walletRes, listingsRes] = await Promise.all([
+      const [walletRes, listingsRes, messagesRes, pendingRes] = await Promise.all([
         api.get<WalletBalance>('/v2/wallet/balance').catch(() => null),
         api.get<Listing[]>('/v2/listings?limit=5&sort=-created_at').catch(() => null),
+        api.get<{ count: number }>('/v2/messages/unread-count').catch(() => null),
+        api.get<{ count: number }>('/v2/wallet/pending-count').catch(() => null),
       ]);
 
       // Get total count from meta if available, otherwise use data length
@@ -68,8 +71,8 @@ export function DashboardPage() {
         walletBalance: walletRes?.success ? walletRes.data ?? null : null,
         recentListings: listingsRes?.success ? listingsRes.data ?? [] : [],
         activeListingsCount: listingsCount,
-        unreadMessages: 0, // TODO: fetch from messages endpoint
-        pendingTransactions: 0,
+        unreadMessages: messagesRes?.success ? messagesRes.data?.count ?? 0 : 0,
+        pendingTransactions: pendingRes?.success ? pendingRes.data?.count ?? 0 : 0,
       });
     } catch (error) {
       logError('Failed to load dashboard data', error);
@@ -109,10 +112,10 @@ export function DashboardPage() {
         <GlassCard className="p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-theme-primary">
                 Welcome back, {user?.first_name || user?.name?.split(' ')[0] || 'there'}!
               </h1>
-              <p className="text-white/60 mt-1">
+              <p className="text-theme-muted mt-1">
                 Here's what's happening in your {branding.name} community
               </p>
             </div>
@@ -175,11 +178,11 @@ export function DashboardPage() {
         <motion.div variants={itemVariants} className="lg:col-span-2">
           <GlassCard className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <ListTodo className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
+                <ListTodo className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                 Recent Listings
               </h2>
-              <Link to="/listings" className="text-indigo-400 hover:text-indigo-300 text-sm flex items-center gap-1">
+              <Link to="/listings" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1">
                 View all <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -188,7 +191,7 @@ export function DashboardPage() {
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="h-16 bg-white/5 rounded-lg" />
+                    <div className="h-16 bg-theme-elevated rounded-lg" />
                   </div>
                 ))}
               </div>
@@ -198,16 +201,16 @@ export function DashboardPage() {
                   <Link
                     key={listing.id}
                     to={`/listings/${listing.id}`}
-                    className="block p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    className="block p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h3 className="font-medium text-white">{listing.title}</h3>
-                        <p className="text-sm text-white/60 line-clamp-1">{listing.description}</p>
+                        <h3 className="font-medium text-theme-primary">{listing.title}</h3>
+                        <p className="text-sm text-theme-muted line-clamp-1">{listing.description}</p>
                       </div>
                       <span className={`
                         text-xs px-2 py-1 rounded-full whitespace-nowrap
-                        ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}
+                        ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}
                       `}>
                         {listing.type === 'offer' ? 'Offering' : 'Requesting'}
                       </span>
@@ -216,10 +219,10 @@ export function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-white/40">
+              <div className="text-center py-8 text-theme-subtle">
                 <ListTodo className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No recent listings</p>
-                <Link to="/listings/create" className="text-indigo-400 hover:underline text-sm mt-2 inline-block">
+                <Link to="/listings/create" className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm mt-2 inline-block">
                   Create your first listing
                 </Link>
               </div>
@@ -231,7 +234,7 @@ export function DashboardPage() {
         <motion.div variants={itemVariants} className="space-y-6">
           {/* Quick Actions */}
           <GlassCard className="p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+            <h2 className="text-lg font-semibold text-theme-primary mb-4">Quick Actions</h2>
             <div className="space-y-2">
               <QuickActionLink to="/listings/create" icon={<Plus />} label="Create Listing" />
               <QuickActionLink to="/messages" icon={<MessageSquare />} label="Messages" />
@@ -247,23 +250,23 @@ export function DashboardPage() {
           {/* Gamification Preview */}
           {hasGamification && (
             <GlassCard className="p-6">
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-amber-400" />
+              <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                 Your Progress
               </h2>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-white/60">Level Progress</span>
-                    <span className="text-white">75%</span>
+                    <span className="text-theme-muted">Level Progress</span>
+                    <span className="text-theme-primary">75%</span>
                   </div>
-                  <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-2 bg-theme-elevated rounded-full overflow-hidden">
                     <div className="h-full w-3/4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" />
                   </div>
                 </div>
                 <Link
                   to="/achievements"
-                  className="block text-center text-indigo-400 hover:text-indigo-300 text-sm"
+                  className="block text-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm"
                 >
                   View Achievements →
                 </Link>
@@ -288,10 +291,10 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps) {
   const colorClasses = {
-    indigo: 'from-indigo-500/20 to-purple-500/20 text-indigo-400',
-    emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-400',
-    amber: 'from-amber-500/20 to-orange-500/20 text-amber-400',
-    rose: 'from-rose-500/20 to-pink-500/20 text-rose-400',
+    indigo: 'from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400',
+    emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400',
+    amber: 'from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400',
+    rose: 'from-rose-500/20 to-pink-500/20 text-rose-600 dark:text-rose-400',
   };
 
   return (
@@ -300,11 +303,11 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
         <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-3`}>
           {icon}
         </div>
-        <div className="text-white/60 text-sm">{label}</div>
+        <div className="text-theme-muted text-sm">{label}</div>
         {isLoading ? (
-          <div className="h-8 w-16 bg-white/10 rounded animate-pulse mt-1" />
+          <div className="h-8 w-16 bg-theme-elevated rounded animate-pulse mt-1" />
         ) : (
-          <div className="text-2xl font-bold text-white">{value}</div>
+          <div className="text-2xl font-bold text-theme-primary">{value}</div>
         )}
       </GlassCard>
     </Link>
@@ -321,9 +324,9 @@ function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
   return (
     <Link
       to={to}
-      className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/80 hover:text-white"
+      className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors text-theme-secondary hover:text-theme-primary"
     >
-      <span className="text-indigo-400">{icon}</span>
+      <span className="text-indigo-600 dark:text-indigo-400">{icon}</span>
       <span>{label}</span>
     </Link>
   );

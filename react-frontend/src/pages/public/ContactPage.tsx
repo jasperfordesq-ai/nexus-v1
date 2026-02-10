@@ -32,10 +32,10 @@ export function ContactPage() {
         <GlassCard className="p-8">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-              <MessageSquare className="w-8 h-8 text-indigo-400" />
+              <MessageSquare className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h1 className="text-2xl font-bold text-white">Contact Us</h1>
-            <p className="text-white/60 mt-2">
+            <h1 className="text-2xl font-bold text-theme-primary">Contact Us</h1>
+            <p className="text-theme-muted mt-2">
               Have a question about {branding.name}? We&apos;d love to hear from you.
             </p>
           </div>
@@ -45,8 +45,8 @@ export function ContactPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
                 <Mail className="w-8 h-8 text-green-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white mb-2">Message Sent!</h2>
-              <p className="text-white/60">
+              <h2 className="text-xl font-semibold text-theme-primary mb-2">Message Sent!</h2>
+              <p className="text-theme-muted">
                 We&apos;ll get back to you as soon as possible.
               </p>
             </div>
@@ -58,8 +58,8 @@ export function ContactPage() {
                 isRequired
                 classNames={{
                   inputWrapper: 'glass-card border-glass-border',
-                  label: 'text-white/70',
-                  input: 'text-white placeholder:text-white/30',
+                  label: 'text-theme-muted',
+                  input: 'text-theme-primary placeholder:text-theme-subtle',
                 }}
               />
 
@@ -70,8 +70,8 @@ export function ContactPage() {
                 isRequired
                 classNames={{
                   inputWrapper: 'glass-card border-glass-border',
-                  label: 'text-white/70',
-                  input: 'text-white placeholder:text-white/30',
+                  label: 'text-theme-muted',
+                  input: 'text-theme-primary placeholder:text-theme-subtle',
                 }}
               />
 
@@ -82,8 +82,8 @@ export function ContactPage() {
                 isRequired
                 classNames={{
                   inputWrapper: 'glass-card border-glass-border',
-                  label: 'text-white/70',
-                  input: 'text-white placeholder:text-white/30',
+                  label: 'text-theme-muted',
+                  input: 'text-theme-primary placeholder:text-theme-subtle',
                 }}
               />
 

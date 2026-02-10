@@ -1,0 +1,162 @@
+# =============================================================================
+# Project NEXUS - Production PHP Dockerfile
+# =============================================================================
+# Apache + PHP 8.2 optimized for production
+# =============================================================================
+
+FROM php:8.2-apache
+
+# Build arguments
+ARG DEBIAN_FRONTEND=noninteractive
+
+# =============================================================================
+# System Dependencies
+# =============================================================================
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Build tools
+    libpng-dev \
+    libjpeg-dev \
+    libwebp-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    libzip-dev \
+    libonig-dev \
+    libxml2-dev \
+    libcurl4-openssl-dev \
+    # Utilities
+    curl \
+    unzip \
+    # Clean up
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# =============================================================================
+# PHP Extensions
+# =============================================================================
+RUN docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg \
+        --with-webp \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_mysql \
+        gd \
+        intl \
+        zip \
+        mbstring \
+        bcmath \
+        opcache \
+        xml \
+        curl \
+        fileinfo
+
+# Redis extension
+RUN pecl install redis && docker-php-ext-enable redis
+
+# =============================================================================
+# Apache Configuration
+# =============================================================================
+RUN a2enmod rewrite headers expires deflate ssl
+
+# Set document root
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/httpdocs
+
+# Update Apache config
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Allow .htaccess overrides
+RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+
+# Environment passthrough
+RUN echo 'PassEnv DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_TYPE REDIS_HOST REDIS_PORT APP_ENV APP_DEBUG APP_URL APP_KEY JWT_SECRET PUSHER_APP_KEY PUSHER_APP_SECRET PUSHER_APP_ID PUSHER_APP_CLUSTER OPENAI_API_KEY' >> /etc/apache2/conf-available/passenv.conf \
+    && a2enconf passenv
+
+# Security: Hide Apache version
+RUN echo 'ServerTokens Prod' >> /etc/apache2/conf-available/security.conf \
+    && echo 'ServerSignature Off' >> /etc/apache2/conf-available/security.conf \
+    && a2enconf security
+
+# =============================================================================
+# PHP Configuration (Production)
+# =============================================================================
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+# Custom PHP settings for production
+RUN echo "\n\
+; Project NEXUS Production Settings\n\
+display_errors = Off\n\
+display_startup_errors = Off\n\
+error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT\n\
+log_errors = On\n\
+error_log = /var/log/php_errors.log\n\
+\n\
+; Performance\n\
+memory_limit = 256M\n\
+max_execution_time = 60\n\
+max_input_time = 60\n\
+max_input_vars = 3000\n\
+\n\
+; File uploads\n\
+upload_max_filesize = 50M\n\
+post_max_size = 55M\n\
+max_file_uploads = 20\n\
+\n\
+; Sessions\n\
+session.gc_maxlifetime = 7200\n\
+session.cookie_httponly = 1\n\
+session.cookie_secure = 1\n\
+session.cookie_samesite = Lax\n\
+session.use_strict_mode = 1\n\
+\n\
+; Timezone\n\
+date.timezone = UTC\n\
+\n\
+; OPcache (aggressive for production)\n\
+opcache.enable = 1\n\
+opcache.memory_consumption = 128\n\
+opcache.interned_strings_buffer = 16\n\
+opcache.max_accelerated_files = 10000\n\
+opcache.validate_timestamps = 0\n\
+opcache.revalidate_freq = 0\n\
+opcache.save_comments = 1\n\
+opcache.enable_cli = 0\n\
+\n\
+; Security\n\
+expose_php = Off\n\
+allow_url_fopen = On\n\
+allow_url_include = Off\n\
+" >> "$PHP_INI_DIR/php.ini"
+
+# =============================================================================
+# Working Directory
+# =============================================================================
+WORKDIR /var/www/html
+
+# =============================================================================
+# Health Check Endpoint
+# =============================================================================
+RUN mkdir -p /var/www/html/httpdocs && \
+    echo '<?php header("Content-Type: application/json"); echo json_encode(["status" => "healthy", "timestamp" => date("c")]);' \
+    > /var/www/html/httpdocs/health.php
+
+# =============================================================================
+# Create upload directories
+# =============================================================================
+RUN mkdir -p /var/www/html/httpdocs/uploads \
+    && chown -R www-data:www-data /var/www/html
+
+# =============================================================================
+# Expose Port
+# =============================================================================
+EXPOSE 80
+
+# =============================================================================
+# Health Check
+# =============================================================================
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost/health.php || exit 1
+
+# =============================================================================
+# Default Command
+# =============================================================================
+CMD ["apache2-foreground"]

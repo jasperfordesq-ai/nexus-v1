@@ -140,7 +140,7 @@ export function CreateGroupPage() {
       {/* Back Button */}
       <Link
         to="/groups"
-        className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to groups
@@ -148,8 +148,8 @@ export function CreateGroupPage() {
 
       {/* Form */}
       <GlassCard className="p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-          <Users className="w-7 h-7 text-purple-400" />
+        <h1 className="text-2xl font-bold text-theme-primary mb-6 flex items-center gap-3">
+          <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" />
           {isEditing ? 'Edit Group' : 'Create New Group'}
         </h1>
 
@@ -163,11 +163,11 @@ export function CreateGroupPage() {
               onChange={(e) => updateField('name', e.target.value)}
               isInvalid={!!errors.name}
               errorMessage={errors.name}
-              startContent={<FileText className="w-4 h-4 text-white/40" />}
+              startContent={<FileText className="w-4 h-4 text-theme-subtle" />}
               classNames={{
-                input: 'bg-transparent text-white',
-                inputWrapper: 'bg-white/5 border-white/10',
-                label: 'text-white/80',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
               }}
             />
           </div>
@@ -183,27 +183,27 @@ export function CreateGroupPage() {
               isInvalid={!!errors.description}
               errorMessage={errors.description}
               classNames={{
-                input: 'bg-transparent text-white',
-                inputWrapper: 'bg-white/5 border-white/10',
-                label: 'text-white/80',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
               }}
             />
           </div>
 
           {/* Privacy Setting */}
-          <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+          <div className="p-4 rounded-lg bg-theme-elevated border border-theme-default">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {formData.is_private ? (
-                  <Lock className="w-5 h-5 text-amber-400" />
+                  <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 ) : (
-                  <Globe className="w-5 h-5 text-emerald-400" />
+                  <Globe className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 )}
                 <div>
-                  <p className="font-medium text-white">
+                  <p className="font-medium text-theme-primary">
                     {formData.is_private ? 'Private Group' : 'Public Group'}
                   </p>
-                  <p className="text-sm text-white/50">
+                  <p className="text-sm text-theme-subtle">
                     {formData.is_private
                       ? 'Only approved members can see posts and join'
                       : 'Anyone can see posts and join this group'}
@@ -234,7 +234,7 @@ export function CreateGroupPage() {
               <Button
                 type="button"
                 variant="flat"
-                className="bg-white/5 text-white"
+                className="bg-theme-elevated text-theme-primary"
               >
                 Cancel
               </Button>

@@ -1,5 +1,6 @@
 /**
  * Login Page with 2FA Support and Tenant Selection
+ * Theme-aware styling for light and dark modes
  */
 
 import { useState, useEffect, type FormEvent } from 'react';
@@ -182,10 +183,10 @@ export function LoginPage() {
                     animate={{ scale: 1 }}
                     className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
                   >
-                    <Mail className="w-8 h-8 text-indigo-400" />
+                    <Mail className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
                   </motion.div>
-                  <h1 className="text-2xl font-bold text-white">Welcome Back</h1>
-                  <p className="text-white/60 mt-2">
+                  <h1 className="text-2xl font-bold text-theme-primary">Welcome Back</h1>
+                  <p className="text-theme-muted mt-2">
                     Sign in to continue to NEXUS
                   </p>
                 </div>
@@ -195,7 +196,7 @@ export function LoginPage() {
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm"
+                    className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm"
                   >
                     {error}
                   </motion.div>
@@ -210,13 +211,13 @@ export function LoginPage() {
                       placeholder="Select your community"
                       selectedKeys={selectedTenantId ? new Set([selectedTenantId]) : new Set()}
                       onSelectionChange={handleTenantChange}
-                      startContent={<Building2 className="w-4 h-4 text-white/40" />}
+                      startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
                       isRequired
                       classNames={{
-                        trigger: 'glass-card border-glass-border hover:border-glass-border-hover',
-                        label: 'text-white/70',
-                        value: 'text-white',
-                        popoverContent: 'bg-gray-900 border border-white/10',
+                        trigger: 'bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10',
+                        label: 'text-theme-muted',
+                        value: 'text-theme-primary',
+                        popoverContent: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
                       }}
                     >
                       {tenants.map((tenant) => (
@@ -224,13 +225,13 @@ export function LoginPage() {
                           key={String(tenant.id)}
                           textValue={tenant.name}
                           classNames={{
-                            base: 'text-white data-[hover=true]:bg-white/10',
+                            base: 'text-gray-900 dark:text-white data-[hover=true]:bg-gray-100 dark:data-[hover=true]:bg-white/10',
                           }}
                         >
                           <div className="flex flex-col">
-                            <span className="text-white">{tenant.name}</span>
+                            <span className="text-gray-900 dark:text-white">{tenant.name}</span>
                             {tenant.tagline && (
-                              <span className="text-white/50 text-xs">{tenant.tagline}</span>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs">{tenant.tagline}</span>
                             )}
                           </div>
                         </SelectItem>
@@ -240,13 +241,13 @@ export function LoginPage() {
 
                   {/* Show selected tenant if only one */}
                   {!tenantsLoading && tenants.length === 1 && (
-                    <div className="p-3 rounded-xl glass-card border-glass-border">
+                    <div className="p-3 rounded-xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10">
                       <div className="flex items-center gap-3">
-                        <Building2 className="w-5 h-5 text-indigo-400" />
+                        <Building2 className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                         <div>
-                          <p className="text-white font-medium">{tenants[0].name}</p>
+                          <p className="text-gray-900 dark:text-white font-medium">{tenants[0].name}</p>
                           {tenants[0].tagline && (
-                            <p className="text-white/50 text-xs">{tenants[0].tagline}</p>
+                            <p className="text-gray-500 dark:text-gray-400 text-xs">{tenants[0].tagline}</p>
                           )}
                         </div>
                       </div>
@@ -259,13 +260,13 @@ export function LoginPage() {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    startContent={<Mail className="w-4 h-4 text-white/40" />}
+                    startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
                     isRequired
                     autoComplete="email"
                     classNames={{
-                      inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
-                      label: 'text-white/70',
-                      input: 'text-white placeholder:text-white/30',
+                      inputWrapper: 'glass-card',
+                      label: 'text-theme-muted',
+                      input: 'text-theme-primary placeholder:text-theme-subtle',
                     }}
                   />
 
@@ -275,12 +276,12 @@ export function LoginPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    startContent={<Lock className="w-4 h-4 text-white/40" />}
+                    startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
                     endContent={
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="text-white/40 hover:text-white/70 transition-colors"
+                        className="text-theme-subtle hover:text-theme-muted transition-colors"
                       >
                         {showPassword ? (
                           <EyeOff className="w-4 h-4" />
@@ -292,9 +293,9 @@ export function LoginPage() {
                     isRequired
                     autoComplete="current-password"
                     classNames={{
-                      inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
-                      label: 'text-white/70',
-                      input: 'text-white placeholder:text-white/30',
+                      inputWrapper: 'glass-card',
+                      label: 'text-theme-muted',
+                      input: 'text-theme-primary placeholder:text-theme-subtle',
                     }}
                   />
 
@@ -304,7 +305,7 @@ export function LoginPage() {
                       onValueChange={setRemember}
                       size="sm"
                       classNames={{
-                        label: 'text-white/60 text-sm',
+                        label: 'text-theme-muted text-sm',
                       }}
                     >
                       Remember me
@@ -312,7 +313,7 @@ export function LoginPage() {
 
                     <Link
                       to="/password/forgot"
-                      className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+                      className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"
                     >
                       Forgot password?
                     </Link>
@@ -331,14 +332,14 @@ export function LoginPage() {
                 </form>
 
                 {/* Divider */}
-                <Divider className="my-6 bg-white/10" />
+                <Divider className="my-6" style={{ backgroundColor: 'var(--border-default)' }} />
 
                 {/* Register Link */}
-                <p className="text-center text-white/60 text-sm">
+                <p className="text-center text-theme-muted text-sm">
                   Don&apos;t have an account?{' '}
                   <Link
                     to="/register"
-                    className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors"
                   >
                     Create one
                   </Link>
@@ -359,12 +360,12 @@ export function LoginPage() {
                     animate={{ scale: 1 }}
                     className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
                   >
-                    <Shield className="w-8 h-8 text-indigo-400" />
+                    <Shield className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
                   </motion.div>
-                  <h1 className="text-2xl font-bold text-white">
+                  <h1 className="text-2xl font-bold text-theme-primary">
                     Two-Factor Authentication
                   </h1>
-                  <p className="text-white/60 mt-2">
+                  <p className="text-theme-muted mt-2">
                     Enter the code from your authenticator app
                   </p>
                 </div>
@@ -374,7 +375,7 @@ export function LoginPage() {
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm"
+                    className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm"
                   >
                     {error}
                   </motion.div>
@@ -388,13 +389,13 @@ export function LoginPage() {
                     placeholder={useBackupCode ? 'XXXX-XXXX' : '000000'}
                     value={twoFactorCode}
                     onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, useBackupCode ? 8 : 6))}
-                    startContent={<Shield className="w-4 h-4 text-white/40" />}
+                    startContent={<Shield className="w-4 h-4 text-theme-subtle" />}
                     isRequired
                     autoComplete="one-time-code"
                     classNames={{
-                      inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
-                      label: 'text-white/70',
-                      input: 'text-white placeholder:text-white/30 text-center text-xl tracking-widest',
+                      inputWrapper: 'glass-card',
+                      label: 'text-theme-muted',
+                      input: 'text-theme-primary placeholder:text-theme-subtle text-center text-xl tracking-widest',
                     }}
                   />
 
@@ -408,7 +409,7 @@ export function LoginPage() {
                         }}
                         size="sm"
                         classNames={{
-                          label: 'text-white/60 text-sm',
+                          label: 'text-theme-muted text-sm',
                         }}
                       >
                         Use backup code instead
@@ -420,7 +421,7 @@ export function LoginPage() {
                       onValueChange={setTrustDevice}
                       size="sm"
                       classNames={{
-                        label: 'text-white/60 text-sm',
+                        label: 'text-theme-muted text-sm',
                       }}
                     >
                       Trust this device for 30 days
@@ -432,7 +433,7 @@ export function LoginPage() {
                       type="button"
                       variant="flat"
                       onPress={handleBack2FA}
-                      className="flex-1 bg-white/5 text-white/70 hover:bg-white/10"
+                      className="flex-1 bg-theme-elevated text-theme-muted hover:bg-theme-hover"
                       startContent={<ArrowLeft className="w-4 h-4" />}
                     >
                       Back
@@ -451,7 +452,7 @@ export function LoginPage() {
                 </form>
 
                 {/* Help text */}
-                <p className="mt-6 text-center text-white/40 text-xs">
+                <p className="mt-6 text-center text-theme-subtle text-xs">
                   Lost access to your authenticator? Contact support for help recovering your account.
                 </p>
               </motion.div>
@@ -468,7 +469,7 @@ export function LoginPage() {
         >
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-white/50 hover:text-white/80 text-sm transition-colors"
+            className="inline-flex items-center gap-2 text-theme-subtle hover:text-theme-secondary text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to home

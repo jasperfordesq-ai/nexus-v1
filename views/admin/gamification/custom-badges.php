@@ -101,7 +101,7 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form method="POST" action="<?= $basePath ?>/admin/custom-badges/award">
-                <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::getToken() ?>">
+                <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                 <input type="hidden" name="badge_id" id="awardBadgeId">
 
                 <div class="modal-header">
@@ -144,7 +144,7 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="POST" action="<?= $basePath ?>/admin/custom-badges/delete">
-                <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::getToken() ?>">
+                <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                 <input type="hidden" name="id" id="deleteId">
 
                 <div class="modal-header">

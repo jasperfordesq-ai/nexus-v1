@@ -25,8 +25,8 @@ export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps
             <Construction className="w-10 h-10 text-amber-400" />
           </div>
 
-          <h1 className="text-2xl font-bold text-white mb-2">Coming Soon</h1>
-          <p className="text-white/60 mb-8">
+          <h1 className="text-2xl font-bold text-theme-primary mb-2">Coming Soon</h1>
+          <p className="text-theme-muted mb-8">
             {feature} is currently under development. Check back soon!
           </p>
 
@@ -45,7 +45,7 @@ export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps
             >
               <Button
                 variant="flat"
-                className="w-full bg-white/5 text-white/80"
+                className="w-full bg-theme-elevated text-theme-muted"
                 startContent={<ArrowLeft className="w-4 h-4" />}
               >
                 Go Back

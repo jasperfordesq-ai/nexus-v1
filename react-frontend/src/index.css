@@ -22,3 +22,33 @@
 @import "./styles/tokens.css";
 @import "./styles/glass.css";
 @import "./styles/background.css";
+
+/* ─────────────────────────────────────────────
+   THEME-AWARE UTILITY CLASSES
+   Use these instead of hardcoded text-white, etc.
+   ───────────────────────────────────────────── */
+
+/* Text colors */
+.text-theme-primary { color: var(--text-primary); }
+.text-theme-secondary { color: var(--text-secondary); }
+.text-theme-muted { color: var(--text-muted); }
+.text-theme-subtle { color: var(--text-subtle); }
+.text-theme-inverse { color: var(--text-inverse); }
+
+/* Surface/background colors */
+.bg-theme-base { background-color: var(--surface-base); }
+.bg-theme-elevated { background-color: var(--surface-elevated); }
+.bg-theme-overlay { background-color: var(--surface-overlay); }
+.bg-theme-hover { background-color: var(--surface-hover); }
+.bg-theme-active { background-color: var(--surface-active); }
+
+/* Border colors */
+.border-theme-default { border-color: var(--border-default); }
+.border-theme-hover { border-color: var(--border-hover); }
+.border-theme-focus { border-color: var(--border-focus); }
+
+/* Hover states */
+.hover\:bg-theme-hover:hover { background-color: var(--surface-hover); }
+.hover\:bg-theme-active:hover { background-color: var(--surface-active); }
+.hover\:text-theme-primary:hover { color: var(--text-primary); }
+.hover\:border-theme-hover:hover { border-color: var(--border-hover); }

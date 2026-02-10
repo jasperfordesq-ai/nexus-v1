@@ -347,15 +347,20 @@ class CoreApiController extends BaseApiController
                 $stmt = $db->prepare("SELECT name FROM users WHERE id = ?");
                 $stmt->execute([$userId]);
                 $sender = $stmt->fetch();
+                $senderName = $sender['name'] ?? 'Someone';
 
                 if ($sender && class_exists('Nexus\Models\Notification')) {
                     \Nexus\Models\Notification::create(
                         $receiverId,
-                        "New message from " . $sender['name'],
+                        "New message from " . $senderName,
                         TenantContext::getBasePath() . "/messages/" . $userId,
                         'message'
                     );
                 }
+
+                // Send email notification (respects user preferences)
+                $preview = mb_strlen($body) > 50 ? mb_substr($body, 0, 47) . '...' : $body;
+                \Nexus\Models\Message::sendEmailNotification($receiverId, $senderName, $preview, $userId);
             } catch (\Exception $e) {
                 error_log("Message notification failed: " . $e->getMessage());
             }

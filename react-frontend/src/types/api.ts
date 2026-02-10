@@ -295,23 +295,25 @@ export interface Category {
 
 export interface Conversation {
   id: number;
-  participant: {
-    id: number;
-    first_name: string;
-    last_name: string;
-    name?: string;  // Computed name (frontend compatibility)
-    avatar?: string | null;
-    is_online?: boolean;
-    last_seen_at?: string;
-  };
-  // Alias for participant (frontend compatibility)
-  other_user?: {
+  // Backend returns other_user (this is the primary field)
+  other_user: {
     id: number;
     name: string;
     first_name?: string;
     last_name?: string;
+    avatar_url?: string | null;
+    avatar?: string | null;  // Alias for avatar_url
+    is_online?: boolean;
+  };
+  // Alias for other_user (deprecated, prefer other_user)
+  participant?: {
+    id: number;
+    first_name?: string;
+    last_name?: string;
+    name?: string;
     avatar?: string | null;
     is_online?: boolean;
+    last_seen_at?: string;
   };
   last_message?: Message;
   unread_count: number;
@@ -320,18 +322,32 @@ export interface Conversation {
     title: string;
     status?: string;
   };
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Message {
   id: number;
-  content: string;
+  body: string;           // Backend returns 'body' (primary field)
+  content?: string;       // Alias for body (deprecated)
   sender_id: number;
-  sent_at: string;
-  created_at: string;  // Alias for sent_at (frontend compatibility)
+  is_own?: boolean;       // True if current user sent this message
+  is_voice?: boolean;     // True if voice message
+  audio_url?: string;
+  audio_duration?: number;
+  sender?: {
+    id: number;
+    name: string;
+    avatar_url?: string;
+  };
+  is_read?: boolean;
+  sent_at?: string;
+  created_at: string;
   read_at?: string | null;
   attachments?: MessageAttachment[];
+  reactions?: Record<string, number>;  // { emoji: count }
+  is_edited?: boolean;
+  is_deleted?: boolean;
 }
 
 export interface MessageAttachment {
@@ -499,31 +515,66 @@ export type MembershipStatus = 'active' | 'pending' | 'rejected' | null;
 export interface Group {
   id: number;
   name: string;
-  slug: string;
+  slug?: string;
   description: string;
-  cover_image?: string | null;
+  image_url?: string | null;        // Backend returns image_url
+  cover_image?: string | null;      // Alias for cover_image_url
+  cover_image_url?: string | null;  // Backend returns cover_image_url
   category_id?: number;
   category_name?: string;
-  members_count: number;
+  member_count?: number;            // Backend returns member_count
+  members_count: number;            // Alias (deprecated)
   posts_count?: number;
   is_member?: boolean;
   is_admin?: boolean;
   membership_status?: MembershipStatus;
   visibility: GroupVisibility;
   rules?: string;
+  location?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  parent_id?: number | null;
+  owner?: {
+    id: number;
+    name?: string;
+    avatar_url?: string | null;
+  };
   admins?: Array<{
     id: number;
-    first_name: string;
-    last_name: string;
+    first_name?: string;
+    last_name?: string;
+    name?: string;
     avatar?: string | null;
+    avatar_url?: string | null;
   }>;
   recent_members?: Array<{
     id: number;
-    name?: string;  // Computed name (frontend compatibility)
+    name?: string;
     first_name?: string;
     last_name?: string;
     avatar?: string | null;
+    avatar_url?: string | null;
   }>;
+  // Sub-groups (returned by backend for parent groups)
+  sub_groups?: Array<{
+    id: number;
+    name: string;
+    member_count: number;
+  }>;
+  // Viewer's membership info (when authenticated)
+  viewer_membership?: {
+    status: 'none' | 'active' | 'pending';
+    role: string | null;
+    is_admin: boolean;
+  };
+  type?: {
+    id: number;
+    name?: string;
+    icon?: string;
+    color?: string;
+  };
+  is_featured?: boolean;
+  federated_visibility?: 'none' | 'listed' | 'joinable';
   created_at: string;
 }
 
@@ -732,6 +783,8 @@ export interface TenantFeatures {
   resources: boolean;
   reviews: boolean;
   search: boolean;
+  exchange_workflow: boolean;
+  direct_messaging: boolean;
 }
 
 export interface TenantModules {
@@ -865,4 +918,85 @@ export interface ReviewStats {
     4: number;
     5: number;
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Exchange Types (Broker Controls)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type ExchangeStatus =
+  | 'pending_provider'
+  | 'pending_broker'
+  | 'accepted'
+  | 'in_progress'
+  | 'pending_confirmation'
+  | 'completed'
+  | 'disputed'
+  | 'cancelled';
+
+export interface Exchange {
+  id: number;
+  listing_id: number;
+  requester_id: number;
+  provider_id: number;
+  proposed_hours: number;
+  status: ExchangeStatus;
+  requester_confirmed_at?: string | null;
+  requester_confirmed_hours?: number | null;
+  provider_confirmed_at?: string | null;
+  provider_confirmed_hours?: number | null;
+  final_hours?: number | null;
+  transaction_id?: number | null;
+  broker_id?: number | null;
+  broker_notes?: string | null;
+  message?: string;
+  created_at: string;
+  updated_at?: string;
+
+  // Nested relations
+  listing?: {
+    id: number;
+    title: string;
+    type: ListingType;
+    description?: string;
+    hours?: number;
+  };
+  requester?: {
+    id: number;
+    name: string;
+    first_name?: string;
+    last_name?: string;
+    avatar?: string | null;
+  };
+  provider?: {
+    id: number;
+    name: string;
+    first_name?: string;
+    last_name?: string;
+    avatar?: string | null;
+  };
+}
+
+export interface ExchangeConfig {
+  exchange_workflow_enabled: boolean;
+  direct_messaging_enabled: boolean;
+  require_broker_approval: boolean;
+  confirmation_deadline_hours: number;
+}
+
+export interface ExchangeCreateRequest {
+  listing_id: number;
+  proposed_hours: number;
+  message?: string;
+}
+
+export interface ExchangeConfirmRequest {
+  hours: number;
+}
+
+export interface ExchangeFilters {
+  status?: ExchangeStatus | 'active';
+  role?: 'requester' | 'provider';
+  cursor?: string;
+  per_page?: number;
 }

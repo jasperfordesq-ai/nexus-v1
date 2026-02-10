@@ -169,7 +169,7 @@ export function CreateListingPage() {
       {/* Back Button */}
       <Link
         to="/listings"
-        className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to listings
@@ -177,14 +177,14 @@ export function CreateListingPage() {
 
       {/* Form */}
       <GlassCard className="p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-white mb-6">
+        <h1 className="text-2xl font-bold text-theme-primary mb-6">
           {isEditing ? 'Edit Listing' : 'Create New Listing'}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Type Selection */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-3">
+            <label className="block text-sm font-medium text-theme-muted mb-3">
               What would you like to do?
             </label>
             <RadioGroup
@@ -195,25 +195,25 @@ export function CreateListingPage() {
               <Radio
                 value="offer"
                 classNames={{
-                  base: 'p-4 border border-white/10 rounded-lg data-[selected=true]:border-emerald-500',
-                  label: 'text-white',
+                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-emerald-500',
+                  label: 'text-theme-primary',
                 }}
               >
                 <div>
                   <div className="font-medium">Offer a Service</div>
-                  <div className="text-xs text-white/50">I want to help others</div>
+                  <div className="text-xs text-theme-subtle">I want to help others</div>
                 </div>
               </Radio>
               <Radio
                 value="request"
                 classNames={{
-                  base: 'p-4 border border-white/10 rounded-lg data-[selected=true]:border-amber-500',
-                  label: 'text-white',
+                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-amber-500',
+                  label: 'text-theme-primary',
                 }}
               >
                 <div>
                   <div className="font-medium">Request Help</div>
-                  <div className="text-xs text-white/50">I need assistance</div>
+                  <div className="text-xs text-theme-subtle">I need assistance</div>
                 </div>
               </Radio>
             </RadioGroup>
@@ -228,11 +228,11 @@ export function CreateListingPage() {
               onChange={(e) => updateField('title', e.target.value)}
               isInvalid={!!errors.title}
               errorMessage={errors.title}
-              startContent={<FileText className="w-4 h-4 text-white/40" />}
+              startContent={<FileText className="w-4 h-4 text-theme-subtle" />}
               classNames={{
-                input: 'bg-transparent text-white',
-                inputWrapper: 'bg-white/5 border-white/10',
-                label: 'text-white/80',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
               }}
             />
           </div>
@@ -248,9 +248,9 @@ export function CreateListingPage() {
               isInvalid={!!errors.description}
               errorMessage={errors.description}
               classNames={{
-                input: 'bg-transparent text-white',
-                inputWrapper: 'bg-white/5 border-white/10',
-                label: 'text-white/80',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
               }}
             />
           </div>
@@ -264,11 +264,11 @@ export function CreateListingPage() {
               onChange={(e) => updateField('category_id', e.target.value)}
               isInvalid={!!errors.category_id}
               errorMessage={errors.category_id}
-              startContent={<Tag className="w-4 h-4 text-white/40" />}
+              startContent={<Tag className="w-4 h-4 text-theme-subtle" />}
               classNames={{
-                trigger: 'bg-white/5 border-white/10',
-                value: 'text-white',
-                label: 'text-white/80',
+                trigger: 'bg-theme-elevated border-theme-default',
+                value: 'text-theme-primary',
+                label: 'text-theme-muted',
               }}
             >
               {categories.map((cat) => (
@@ -291,11 +291,11 @@ export function CreateListingPage() {
                 step={0.5}
                 isInvalid={!!errors.hours_estimate}
                 errorMessage={errors.hours_estimate}
-                startContent={<Clock className="w-4 h-4 text-white/40" />}
+                startContent={<Clock className="w-4 h-4 text-theme-subtle" />}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
             </div>
@@ -306,11 +306,11 @@ export function CreateListingPage() {
                 placeholder="e.g., Online, Dublin, Cork..."
                 value={formData.location}
                 onChange={(e) => updateField('location', e.target.value)}
-                startContent={<MapPin className="w-4 h-4 text-white/40" />}
+                startContent={<MapPin className="w-4 h-4 text-theme-subtle" />}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
             </div>
@@ -330,7 +330,7 @@ export function CreateListingPage() {
               <Button
                 type="button"
                 variant="flat"
-                className="bg-white/5 text-white"
+                className="bg-theme-elevated text-theme-primary"
               >
                 Cancel
               </Button>

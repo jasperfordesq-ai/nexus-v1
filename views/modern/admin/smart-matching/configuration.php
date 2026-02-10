@@ -49,6 +49,9 @@ $thresholds = [
 // Is enabled
 $enabled = $config['enabled'] ?? true;
 
+// Broker approval (defaults to true - approval required)
+$brokerApprovalEnabled = $config['broker_approval_enabled'] ?? true;
+
 // Flash messages
 $flashSuccess = $_SESSION['flash_success'] ?? null;
 $flashError = $_SESSION['flash_error'] ?? null;
@@ -115,6 +118,38 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                     <input type="checkbox" name="enabled" <?= $enabled ? 'checked' : '' ?>>
                     <span class="config-toggle-slider"></span>
                 </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Broker Approval Card -->
+    <div class="admin-glass-card" style="max-width: 1100px;">
+        <div class="admin-card-header">
+            <div class="admin-card-header-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <div class="admin-card-header-content">
+                <h3 class="admin-card-title">Broker Approval Workflow</h3>
+                <p class="admin-card-subtitle">Require coordinator approval before matches are shown to members</p>
+            </div>
+            <a href="<?= $basePath ?>/admin/match-approvals" class="admin-btn admin-btn-secondary" style="margin-left: auto;">
+                <i class="fa-solid fa-inbox"></i> View Pending
+            </a>
+        </div>
+        <div class="admin-card-body">
+            <div class="config-toggle-row">
+                <div class="config-toggle-info">
+                    <strong>Require Broker Approval</strong>
+                    <p>When enabled, all matches go through a broker/coordinator review process before being shown to members. This ensures member suitability (mobility, mental health considerations) and that activities are covered by your insurance scheme.</p>
+                </div>
+                <label class="config-toggle">
+                    <input type="checkbox" name="broker_approval_enabled" <?= $brokerApprovalEnabled ? 'checked' : '' ?>>
+                    <span class="config-toggle-slider"></span>
+                </label>
+            </div>
+            <div class="config-info-box" style="margin-top: 1rem; background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); color: #fbbf24;">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Recommended for timebanks with safeguarding or insurance requirements. When disabled, matches are shown to members immediately.</span>
             </div>
         </div>
     </div>

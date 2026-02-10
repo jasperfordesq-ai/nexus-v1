@@ -33,8 +33,8 @@ export function ResetPasswordPage() {
           className="w-full max-w-md"
         >
           <GlassCard className="p-8 text-center">
-            <h1 className="text-2xl font-bold text-white mb-4">Invalid reset link</h1>
-            <p className="text-white/60 mb-6">
+            <h1 className="text-2xl font-bold text-theme-primary mb-4">Invalid reset link</h1>
+            <p className="text-theme-muted mb-6">
               This password reset link is invalid or has expired. Please request a new one.
             </p>
             <Link to="/password/forgot">
@@ -64,7 +64,7 @@ export function ResetPasswordPage() {
 
     try {
       setIsLoading(true);
-      await api.post('/v2/auth/password/reset', {
+      await api.post('/auth/reset-password', {
         token,
         password,
         password_confirmation: confirmPassword,
@@ -89,8 +89,8 @@ export function ResetPasswordPage() {
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-emerald-400" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Password reset successful</h1>
-            <p className="text-white/60 mb-6">
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">Password reset successful</h1>
+            <p className="text-theme-muted mb-6">
               Your password has been updated. You can now sign in with your new password.
             </p>
             <Link to="/login">
@@ -114,7 +114,7 @@ export function ResetPasswordPage() {
         {/* Back to login */}
         <Link
           to="/login"
-          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-6"
+          className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to login
@@ -123,8 +123,8 @@ export function ResetPasswordPage() {
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white mb-2">Set new password</h1>
-            <p className="text-white/60">
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">Set new password</h1>
+            <p className="text-theme-muted">
               Enter your new password below.
             </p>
           </div>
@@ -144,20 +144,20 @@ export function ResetPasswordPage() {
               placeholder="At least 8 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              startContent={<Lock className="w-4 h-4 text-white/40" />}
+              startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
               endContent={
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-white/40 hover:text-white"
+                  className="text-theme-subtle hover:text-theme-primary"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               }
               classNames={{
-                input: 'bg-transparent text-white',
-                inputWrapper: 'bg-white/5 border-white/10',
-                label: 'text-white/80',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
               }}
               isRequired
             />
@@ -168,11 +168,11 @@ export function ResetPasswordPage() {
               placeholder="Re-enter your password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              startContent={<Lock className="w-4 h-4 text-white/40" />}
+              startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
               classNames={{
-                input: 'bg-transparent text-white',
-                inputWrapper: 'bg-white/5 border-white/10',
-                label: 'text-white/80',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
               }}
               isRequired
             />
@@ -189,7 +189,7 @@ export function ResetPasswordPage() {
         </GlassCard>
 
         {/* Branding */}
-        <p className="text-center text-white/30 text-sm mt-6">
+        <p className="text-center text-theme-subtle text-sm mt-6">
           {branding.name}
         </p>
       </motion.div>

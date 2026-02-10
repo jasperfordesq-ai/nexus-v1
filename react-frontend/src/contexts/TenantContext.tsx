@@ -6,6 +6,7 @@
  * - Feature flags
  * - Tenant branding
  * - Module configuration
+ * - Automatic tenant detection from subdomain/hostname
  */
 
 import {
@@ -18,6 +19,53 @@ import {
 } from 'react';
 import { api, tokenManager, fetchCsrfToken } from '@/lib/api';
 import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding } from '@/types';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tenant Detection from URL/Subdomain
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Detect tenant from current hostname
+ *
+ * Examples:
+ * - hour-timebank.project-nexus.ie → 'hour-timebank'
+ * - app.project-nexus.ie → null (use default/bootstrap)
+ * - localhost:5173 → null (development)
+ * - project-nexus.ie → null (root domain)
+ *
+ * The backend will resolve the tenant based on:
+ * 1. X-Tenant-ID header (from localStorage, set during login)
+ * 2. Hostname/domain lookup in tenants table
+ * 3. Default tenant if nothing matches
+ */
+function detectTenantFromHostname(): string | null {
+  const hostname = window.location.hostname;
+
+  // Skip detection for localhost (development)
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return null;
+  }
+
+  // Known "app" subdomains that aren't tenant-specific
+  const appSubdomains = ['app', 'www', 'api', 'admin'];
+
+  // Parse subdomain from hostname
+  // e.g., "hour-timebank.project-nexus.ie" → ["hour-timebank", "project-nexus", "ie"]
+  const parts = hostname.split('.');
+
+  // Need at least 3 parts for a subdomain (sub.domain.tld)
+  if (parts.length >= 3) {
+    const subdomain = parts[0];
+
+    // If it's not a reserved subdomain, it might be a tenant slug
+    if (!appSubdomains.includes(subdomain.toLowerCase())) {
+      return subdomain;
+    }
+  }
+
+  // No tenant detected from subdomain
+  return null;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -54,6 +102,8 @@ const defaultFeatures: TenantFeatures = {
   resources: false,
   reviews: false,
   search: true,     // Always enabled
+  exchange_workflow: false, // Broker control feature
+  direct_messaging: true,   // Can be disabled by broker
 };
 
 // Default modules (all enabled)
@@ -100,6 +150,9 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     error: null,
   });
 
+  // Detect tenant from subdomain if not explicitly provided
+  const effectiveTenantSlug = tenantSlug || detectTenantFromHostname();
+
   /**
    * Fetch tenant bootstrap data
    */
@@ -109,8 +162,8 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     try {
       // Build endpoint with optional tenant slug
       let endpoint = '/v2/tenant/bootstrap';
-      if (tenantSlug) {
-        endpoint += `?slug=${encodeURIComponent(tenantSlug)}`;
+      if (effectiveTenantSlug) {
+        endpoint += `?slug=${encodeURIComponent(effectiveTenantSlug)}`;
       }
 
       const response = await api.get<TenantConfig>(endpoint, { skipAuth: true });
@@ -118,8 +171,10 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       if (response.success && response.data) {
         const tenant = response.data;
 
-        // Store tenant ID for future requests
-        if (tenant.id) {
+        // Only set tenant ID if no tenant was pre-selected (e.g., during login)
+        // This allows users to access tenants other than their "home" tenant
+        const existingTenantId = tokenManager.getTenantId();
+        if (tenant.id && !existingTenantId) {
           tokenManager.setTenantId(tenant.id);
         }
 
@@ -147,11 +202,11 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     }
   };
 
-  // Fetch tenant on mount
+  // Fetch tenant on mount or when slug changes
   useEffect(() => {
     refreshTenant();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tenantSlug]);
+  }, [effectiveTenantSlug]);
 
   /**
    * Get features with fallback to defaults

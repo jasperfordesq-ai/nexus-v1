@@ -32,7 +32,8 @@ class ListingService
      *
      * @param array $filters Associative array of filters:
      *   - type: string|array ('offer', 'request', or both)
-     *   - category_id: int
+     *   - category_id: int (filter by category ID)
+     *   - category_slug: string (filter by category slug, alternative to category_id)
      *   - search: string (search term)
      *   - cursor: string (base64-encoded ID for cursor pagination)
      *   - limit: int (default 20, max 100)
@@ -81,10 +82,13 @@ class ListingService
             }
         }
 
-        // Category filter
+        // Category filter (by ID or slug)
         if (!empty($filters['category_id'])) {
             $sql .= " AND l.category_id = ?";
             $params[] = (int)$filters['category_id'];
+        } elseif (!empty($filters['category_slug'])) {
+            $sql .= " AND c.slug = ?";
+            $params[] = $filters['category_slug'];
         }
 
         // User filter

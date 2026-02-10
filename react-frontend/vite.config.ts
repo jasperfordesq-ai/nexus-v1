@@ -20,6 +20,10 @@ export default defineConfig({
         target: process.env.VITE_API_URL || 'http://localhost:8090',
         changeOrigin: true,
         secure: false,
+        headers: {
+          // Ensure headers are forwarded
+          'X-Forwarded-Proto': 'http',
+        },
       },
       // Proxy health check
       '/health.php': {

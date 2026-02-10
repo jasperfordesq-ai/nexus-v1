@@ -137,10 +137,33 @@ services:
     environment:
       - NODE_ENV=development
       - VITE_API_URL=http://app:80
+      - VITE_DEFAULT_TENANT_ID=2
     depends_on:
       - app
     networks:
       - nexus-internal
+
+  # ---------------------------------------------------------------------------
+  # Sales Site (project-nexus.ie) - Marketing/Landing Page
+  # ---------------------------------------------------------------------------
+  sales:
+    build:
+      context: ./sales-site
+      dockerfile: Dockerfile
+    container_name: nexus-sales-site
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    volumes:
+      # Mount public folder for development hot reload
+      - ./sales-site/public:/usr/share/nginx/html:cached
+    networks:
+      - nexus-internal
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ---------------------------------------------------------------------------
   # phpMyAdmin (Development only)

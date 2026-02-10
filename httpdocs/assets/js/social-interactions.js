@@ -95,6 +95,14 @@
         return div.innerHTML;
     }
 
+    /**
+     * Get CSRF token from meta tag
+     */
+    function getCsrfToken() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
     function getColor(type) {
         const cfg = SocialInteractions.config;
         if (cfg.useCssVariables) {
@@ -333,7 +341,8 @@
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': getCsrfToken()
             },
             body: JSON.stringify({
                 target_type: type,
@@ -601,7 +610,8 @@
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': getCsrfToken()
             },
             body: JSON.stringify({
                 action: 'submit',
@@ -662,7 +672,8 @@
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': getCsrfToken()
             },
             body: JSON.stringify({
                 comment_id: commentId,
@@ -706,7 +717,8 @@
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': getCsrfToken()
             },
             body: JSON.stringify({
                 target_type: SocialInteractions.state.currentCommentTargetType,
@@ -743,7 +755,8 @@
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': getCsrfToken()
             },
             body: JSON.stringify({
                 comment_id: commentId,
@@ -775,7 +788,8 @@
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': getCsrfToken()
             },
             body: JSON.stringify({
                 comment_id: commentId
@@ -818,7 +832,8 @@
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': getCsrfToken()
             },
             body: JSON.stringify({
                 parent_id: id,
@@ -858,7 +873,8 @@
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': getCsrfToken()
             },
             body: JSON.stringify({
                 target_type: type,
@@ -1529,7 +1545,8 @@
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': getCsrfToken()
             },
             body: JSON.stringify({
                 content: content,

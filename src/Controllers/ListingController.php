@@ -8,6 +8,7 @@ use Nexus\Core\View;
 use Nexus\Core\DatabaseWrapper; // Security Fix
 use Nexus\Services\ListingRankingService; // MatchRank algorithm
 use Nexus\Services\SmartMatchingEngine; // Smart Matching cache
+use Nexus\Services\ListingRiskTagService; // Broker risk tags
 use Nexus\Middleware\TenantModuleMiddleware;
 
 class ListingController
@@ -173,9 +174,18 @@ class ListingController
         // Get Attributes
         $attributes = \Nexus\Models\Attribute::getForListing($id);
 
+        // Get Risk Tag (if any) for broker controls display
+        $riskTag = null;
+        try {
+            $riskTag = ListingRiskTagService::getTagForListing($id);
+        } catch (\Exception $e) {
+            // Risk tag service may not be available - continue without it
+        }
+
         View::render('listings/show', [
             'listing' => $listing,
-            'attributes' => $attributes
+            'attributes' => $attributes,
+            'riskTag' => $riskTag
         ]);
     }
 

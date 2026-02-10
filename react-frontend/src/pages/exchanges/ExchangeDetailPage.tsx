@@ -1,0 +1,539 @@
+/**
+ * Exchange Detail Page - View and manage a single exchange
+ */
+
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  Button,
+  Avatar,
+  Chip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+  Textarea,
+} from '@heroui/react';
+import {
+  ArrowLeft,
+  ArrowRightLeft,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  MessageSquare,
+  Play,
+  Check,
+  X,
+} from 'lucide-react';
+import { GlassCard } from '@/components/ui';
+import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { useAuth } from '@/contexts';
+import { useToast } from '@/contexts';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
+import type { Exchange, ExchangeStatus } from '@/types/api';
+
+const STATUS_CONFIG: Record<ExchangeStatus, { label: string; color: string; description: string }> = {
+  pending_provider: {
+    label: 'Awaiting Provider Response',
+    color: 'warning',
+    description: 'Waiting for the service provider to accept or decline this request.',
+  },
+  pending_broker: {
+    label: 'Awaiting Broker Approval',
+    color: 'secondary',
+    description: 'This exchange requires broker approval before it can proceed.',
+  },
+  accepted: {
+    label: 'Accepted',
+    color: 'primary',
+    description: 'The exchange has been accepted. The provider can start when ready.',
+  },
+  in_progress: {
+    label: 'In Progress',
+    color: 'primary',
+    description: 'The service is currently being provided.',
+  },
+  pending_confirmation: {
+    label: 'Confirm Hours',
+    color: 'warning',
+    description: 'Both parties need to confirm the hours worked to complete the exchange.',
+  },
+  completed: {
+    label: 'Completed',
+    color: 'success',
+    description: 'The exchange has been completed and credits have been transferred.',
+  },
+  disputed: {
+    label: 'Disputed',
+    color: 'danger',
+    description: 'There is a disagreement about the hours. A broker will review this.',
+  },
+  cancelled: {
+    label: 'Cancelled',
+    color: 'default',
+    description: 'This exchange was cancelled.',
+  },
+};
+
+export function ExchangeDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const toast = useToast();
+
+  const [exchange, setExchange] = useState<Exchange | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Modal states
+  const [showDeclineModal, setShowDeclineModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [declineReason, setDeclineReason] = useState('');
+  const [confirmHours, setConfirmHours] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    loadExchange();
+  }, [id]);
+
+  async function loadExchange() {
+    if (!id) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await api.get<Exchange>(`/v2/exchanges/${id}`);
+      if (response.success && response.data) {
+        setExchange(response.data);
+        setConfirmHours(response.data.proposed_hours.toString());
+      } else {
+        setError('Exchange not found');
+      }
+    } catch (err) {
+      setError('Exchange not found');
+      logError('Failed to load exchange', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const isRequester = exchange?.requester_id === user?.id;
+  const isProvider = exchange?.provider_id === user?.id;
+
+  async function handleAccept() {
+    if (!exchange) return;
+
+    try {
+      setIsSubmitting(true);
+      await api.post(`/v2/exchanges/${exchange.id}/accept`);
+      toast.success('Exchange accepted!');
+      loadExchange();
+    } catch (err) {
+      toast.error('Failed to accept exchange');
+      logError('Failed to accept exchange', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleDecline() {
+    if (!exchange) return;
+
+    try {
+      setIsSubmitting(true);
+      await api.post(`/v2/exchanges/${exchange.id}/decline`, { reason: declineReason });
+      toast.success('Exchange declined');
+      setShowDeclineModal(false);
+      loadExchange();
+    } catch (err) {
+      toast.error('Failed to decline exchange');
+      logError('Failed to decline exchange', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleStart() {
+    if (!exchange) return;
+
+    try {
+      setIsSubmitting(true);
+      await api.post(`/v2/exchanges/${exchange.id}/start`);
+      toast.success('Exchange started!');
+      loadExchange();
+    } catch (err) {
+      toast.error('Failed to start exchange');
+      logError('Failed to start exchange', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleComplete() {
+    if (!exchange) return;
+
+    try {
+      setIsSubmitting(true);
+      await api.post(`/v2/exchanges/${exchange.id}/complete`);
+      toast.success('Exchange marked as complete. Please confirm hours.');
+      loadExchange();
+    } catch (err) {
+      toast.error('Failed to complete exchange');
+      logError('Failed to complete exchange', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleConfirm() {
+    if (!exchange) return;
+
+    const hours = parseFloat(confirmHours);
+    if (isNaN(hours) || hours <= 0) {
+      toast.error('Please enter valid hours');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await api.post(`/v2/exchanges/${exchange.id}/confirm`, { hours });
+      toast.success('Hours confirmed!');
+      setShowConfirmModal(false);
+      loadExchange();
+    } catch (err) {
+      toast.error('Failed to confirm hours');
+      logError('Failed to confirm hours', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleCancel() {
+    if (!exchange || !window.confirm('Are you sure you want to cancel this exchange?')) return;
+
+    try {
+      setIsSubmitting(true);
+      await api.delete(`/v2/exchanges/${exchange.id}`);
+      toast.success('Exchange cancelled');
+      navigate('/exchanges');
+    } catch (err) {
+      toast.error('Failed to cancel exchange');
+      logError('Failed to cancel exchange', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  if (isLoading) {
+    return <LoadingScreen message="Loading exchange..." />;
+  }
+
+  if (error || !exchange) {
+    return (
+      <EmptyState
+        icon={<AlertTriangle className="w-12 h-12" />}
+        title="Exchange Not Found"
+        description={error || 'The exchange you are looking for does not exist'}
+        action={
+          <Link to="/exchanges">
+            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+              View My Exchanges
+            </Button>
+          </Link>
+        }
+      />
+    );
+  }
+
+  const statusConfig = STATUS_CONFIG[exchange.status];
+
+  // Determine which actions are available
+  const canAccept = isProvider && exchange.status === 'pending_provider';
+  const canDecline = isProvider && exchange.status === 'pending_provider';
+  const canStart = isProvider && exchange.status === 'accepted';
+  const canComplete = isProvider && exchange.status === 'in_progress';
+  const canConfirm =
+    exchange.status === 'pending_confirmation' &&
+    ((isRequester && !exchange.requester_confirmed_at) ||
+      (isProvider && !exchange.provider_confirmed_at));
+  const canCancel =
+    isRequester &&
+    ['pending_provider', 'pending_broker', 'accepted'].includes(exchange.status);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-3xl mx-auto space-y-6"
+    >
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to exchanges
+      </button>
+
+      {/* Status Card */}
+      <GlassCard className="p-6">
+        <div className="flex items-center gap-4 mb-4">
+          <div className={`
+            w-12 h-12 rounded-full flex items-center justify-center
+            ${statusConfig.color === 'success' ? 'bg-emerald-500/20 text-emerald-400' :
+              statusConfig.color === 'warning' ? 'bg-amber-500/20 text-amber-400' :
+              statusConfig.color === 'danger' ? 'bg-red-500/20 text-red-400' :
+              statusConfig.color === 'primary' ? 'bg-indigo-500/20 text-indigo-400' :
+              'bg-gray-500/20 text-gray-400'}
+          `}>
+            <ArrowRightLeft className="w-6 h-6" />
+          </div>
+          <div>
+            <Chip
+              color={statusConfig.color as 'warning' | 'primary' | 'success' | 'danger' | 'secondary' | 'default'}
+              variant="flat"
+              size="lg"
+            >
+              {statusConfig.label}
+            </Chip>
+            <p className="text-sm text-theme-muted mt-1">{statusConfig.description}</p>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* Exchange Details */}
+      <GlassCard className="p-6">
+        <h2 className="text-xl font-semibold text-theme-primary mb-4">
+          Exchange Details
+        </h2>
+
+        {/* Listing */}
+        <div className="mb-6">
+          <h3 className="text-sm font-medium text-theme-muted mb-2">Service</h3>
+          <Link to={`/listings/${exchange.listing_id}`} className="hover:underline">
+            <p className="text-lg font-semibold text-theme-primary">
+              {exchange.listing?.title || 'Service Exchange'}
+            </p>
+          </Link>
+        </div>
+
+        {/* Parties */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          <div>
+            <h3 className="text-sm font-medium text-theme-muted mb-2">Requester</h3>
+            <div className="flex items-center gap-3">
+              <Avatar
+                src={resolveAvatarUrl(exchange.requester?.avatar)}
+                name={exchange.requester?.name || 'Unknown'}
+                size="sm"
+              />
+              <div>
+                <p className="font-medium text-theme-primary">
+                  {exchange.requester?.name || 'Unknown'}
+                  {isRequester && ' (You)'}
+                </p>
+                {exchange.requester_confirmed_at && (
+                  <p className="text-xs text-emerald-400 flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
+                    Confirmed {exchange.requester_confirmed_hours}h
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium text-theme-muted mb-2">Provider</h3>
+            <div className="flex items-center gap-3">
+              <Avatar
+                src={resolveAvatarUrl(exchange.provider?.avatar)}
+                name={exchange.provider?.name || 'Unknown'}
+                size="sm"
+              />
+              <div>
+                <p className="font-medium text-theme-primary">
+                  {exchange.provider?.name || 'Unknown'}
+                  {isProvider && ' (You)'}
+                </p>
+                {exchange.provider_confirmed_at && (
+                  <p className="text-xs text-emerald-400 flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
+                    Confirmed {exchange.provider_confirmed_hours}h
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Hours */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+          <div className="bg-theme-elevated rounded-lg p-4">
+            <p className="text-sm text-theme-muted">Proposed Hours</p>
+            <p className="text-2xl font-bold text-theme-primary">{exchange.proposed_hours}</p>
+          </div>
+          {exchange.final_hours && (
+            <div className="bg-emerald-500/10 rounded-lg p-4">
+              <p className="text-sm text-emerald-400">Final Hours</p>
+              <p className="text-2xl font-bold text-emerald-400">{exchange.final_hours}</p>
+            </div>
+          )}
+          <div className="bg-theme-elevated rounded-lg p-4">
+            <p className="text-sm text-theme-muted">Created</p>
+            <p className="text-sm font-medium text-theme-primary">
+              {new Date(exchange.created_at).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+
+        {/* Message */}
+        {exchange.message && (
+          <div className="bg-theme-elevated rounded-lg p-4 mb-6">
+            <h3 className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              Message from requester
+            </h3>
+            <p className="text-theme-primary">{exchange.message}</p>
+          </div>
+        )}
+
+        {/* Broker Notes */}
+        {exchange.broker_notes && (
+          <div className="bg-amber-500/10 rounded-lg p-4 mb-6">
+            <h3 className="text-sm font-medium text-amber-400 mb-2">Broker Notes</h3>
+            <p className="text-theme-primary">{exchange.broker_notes}</p>
+          </div>
+        )}
+
+        {/* Actions */}
+        {(canAccept || canDecline || canStart || canComplete || canConfirm || canCancel) && (
+          <div className="flex flex-wrap gap-3 pt-4 border-t border-theme-border">
+            {canAccept && (
+              <Button
+                color="success"
+                startContent={<Check className="w-4 h-4" />}
+                onClick={handleAccept}
+                isLoading={isSubmitting}
+              >
+                Accept Request
+              </Button>
+            )}
+            {canDecline && (
+              <Button
+                color="danger"
+                variant="flat"
+                startContent={<X className="w-4 h-4" />}
+                onClick={() => setShowDeclineModal(true)}
+              >
+                Decline
+              </Button>
+            )}
+            {canStart && (
+              <Button
+                color="primary"
+                startContent={<Play className="w-4 h-4" />}
+                onClick={handleStart}
+                isLoading={isSubmitting}
+              >
+                Start Exchange
+              </Button>
+            )}
+            {canComplete && (
+              <Button
+                color="success"
+                startContent={<CheckCircle className="w-4 h-4" />}
+                onClick={handleComplete}
+                isLoading={isSubmitting}
+              >
+                Mark Complete
+              </Button>
+            )}
+            {canConfirm && (
+              <Button
+                color="warning"
+                startContent={<CheckCircle className="w-4 h-4" />}
+                onClick={() => setShowConfirmModal(true)}
+              >
+                Confirm Hours
+              </Button>
+            )}
+            {canCancel && (
+              <Button
+                color="danger"
+                variant="flat"
+                startContent={<XCircle className="w-4 h-4" />}
+                onClick={handleCancel}
+                isLoading={isSubmitting}
+              >
+                Cancel Exchange
+              </Button>
+            )}
+          </div>
+        )}
+      </GlassCard>
+
+      {/* Decline Modal */}
+      <Modal isOpen={showDeclineModal} onClose={() => setShowDeclineModal(false)}>
+        <ModalContent>
+          <ModalHeader>Decline Exchange Request</ModalHeader>
+          <ModalBody>
+            <Textarea
+              label="Reason (optional)"
+              placeholder="Let them know why you're declining..."
+              value={declineReason}
+              onChange={(e) => setDeclineReason(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onClick={() => setShowDeclineModal(false)}>
+              Cancel
+            </Button>
+            <Button color="danger" onClick={handleDecline} isLoading={isSubmitting}>
+              Decline Request
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Confirm Hours Modal */}
+      <Modal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)}>
+        <ModalContent>
+          <ModalHeader>Confirm Hours Worked</ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted mb-4">
+              How many hours were actually worked for this exchange?
+            </p>
+            <Input
+              type="number"
+              label="Hours"
+              placeholder="Enter hours"
+              value={confirmHours}
+              onChange={(e) => setConfirmHours(e.target.value)}
+              min="0.5"
+              step="0.5"
+              endContent={<span className="text-theme-muted">hours</span>}
+            />
+            <p className="text-xs text-theme-muted mt-2">
+              Originally proposed: {exchange?.proposed_hours} hours
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onClick={() => setShowConfirmModal(false)}>
+              Cancel
+            </Button>
+            <Button color="success" onClick={handleConfirm} isLoading={isSubmitting}>
+              Confirm Hours
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </motion.div>
+  );
+}
+
+export default ExchangeDetailPage;

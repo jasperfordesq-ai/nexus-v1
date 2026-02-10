@@ -66,14 +66,14 @@ export function EmptyState({
       role="status"
       aria-label={title}
     >
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/5 border border-white/10 mb-6" aria-hidden="true">
-        {icon || <Inbox className="w-10 h-10 text-white/30" />}
+      <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-theme-elevated border border-theme-default mb-6" aria-hidden="true">
+        {icon || <Inbox className="w-10 h-10 text-theme-subtle" />}
       </div>
 
-      <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
+      <h3 className="text-xl font-semibold text-theme-primary mb-2">{title}</h3>
 
       {displayMessage && (
-        <p className="text-white/50 max-w-sm mb-6">{displayMessage}</p>
+        <p className="text-theme-subtle max-w-sm mb-6">{displayMessage}</p>
       )}
 
       {action}

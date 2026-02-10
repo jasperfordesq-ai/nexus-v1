@@ -36,9 +36,9 @@ export function LoadingScreen({ message = 'Loading...' }: LoadingScreenProps) {
           className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
           aria-hidden="true"
         >
-          <Loader2 className="w-8 h-8 text-indigo-400" />
+          <Loader2 className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
         </motion.div>
-        <p className="text-white/60">{message}</p>
+        <p className="text-theme-muted">{message}</p>
         <span className="sr-only">{message}</span>
       </motion.div>
     </div>
