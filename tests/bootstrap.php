@@ -60,6 +60,21 @@ if (!$isDocker) {
             break;
         }
     }
+} else {
+    // In Docker, ensure DB_DATABASE is set from DB_NAME for compatibility
+    if (!getenv('DB_DATABASE') && getenv('DB_NAME')) {
+        putenv('DB_DATABASE=' . getenv('DB_NAME'));
+        $_ENV['DB_DATABASE'] = getenv('DB_NAME');
+    }
+    // Map DB_USER to DB_USERNAME and DB_PASS to DB_PASSWORD
+    if (!getenv('DB_USERNAME') && getenv('DB_USER')) {
+        putenv('DB_USERNAME=' . getenv('DB_USER'));
+        $_ENV['DB_USERNAME'] = getenv('DB_USER');
+    }
+    if (!getenv('DB_PASSWORD') && getenv('DB_PASS')) {
+        putenv('DB_PASSWORD=' . getenv('DB_PASS'));
+        $_ENV['DB_PASSWORD'] = getenv('DB_PASS');
+    }
 }
 
 // Set default testing environment variables

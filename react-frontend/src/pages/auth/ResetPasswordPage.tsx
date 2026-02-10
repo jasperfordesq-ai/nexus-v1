@@ -6,10 +6,11 @@ import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input } from '@heroui/react';
-import { Lock, ArrowLeft, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { Lock, ArrowLeft, CheckCircle, Eye, EyeOff, Check, X } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
+import { validatePassword, PASSWORD_REQUIREMENTS } from '@/lib/validation';
 
 export function ResetPasswordPage() {
   const { branding } = useTenant();
@@ -52,9 +53,10 @@ export function ResetPasswordPage() {
     e.preventDefault();
     setError('');
 
-    // Validation
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+    // Validation - must match backend requirements (PasswordResetApiController)
+    const passwordErrors = validatePassword(password);
+    if (passwordErrors.length > 0) {
+      setError(passwordErrors[0]);
       return;
     }
     if (password !== confirmPassword) {
@@ -138,29 +140,54 @@ export function ResetPasswordPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            <Input
-              type={showPassword ? 'text' : 'password'}
-              label="New password"
-              placeholder="At least 8 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
-              endContent={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-theme-subtle hover:text-theme-primary"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              }
-              classNames={{
-                input: 'bg-transparent text-theme-primary',
-                inputWrapper: 'bg-theme-elevated border-theme-default',
-                label: 'text-theme-muted',
-              }}
-              isRequired
-            />
+            <div>
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                label="New password"
+                placeholder="Enter a strong password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
+                endContent={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-theme-subtle hover:text-theme-primary"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                }
+                classNames={{
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
+                }}
+                isRequired
+              />
+              {/* Password requirements checklist */}
+              {password && (
+                <ul className="mt-2 space-y-1 text-xs">
+                  {PASSWORD_REQUIREMENTS.map((req) => {
+                    const passed = req.test(password);
+                    return (
+                      <li
+                        key={req.id}
+                        className={`flex items-center gap-1.5 ${
+                          passed ? 'text-emerald-400' : 'text-theme-subtle'
+                        }`}
+                      >
+                        {passed ? (
+                          <Check className="w-3 h-3" />
+                        ) : (
+                          <X className="w-3 h-3" />
+                        )}
+                        {req.label}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
 
             <Input
               type={showPassword ? 'text' : 'password'}

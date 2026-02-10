@@ -1,15 +1,37 @@
 /**
  * Registration Page
+ *
+ * Full registration form matching PHP version with:
+ * - Profile type (individual/organisation)
+ * - Location with autocomplete
+ * - Phone number
+ * - Password validation (12 chars + complexity)
+ * - Terms acceptance
+ * - Newsletter opt-in
  */
 
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
+import { Button, Input, Checkbox, Divider, Select, SelectItem, Textarea } from '@heroui/react';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Eye, EyeOff, ArrowLeft, Loader2, Building2 } from 'lucide-react';
+import {
+  User,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  Loader2,
+  Building2,
+  MapPin,
+  Phone,
+  Check,
+  X,
+} from 'lucide-react';
 import { useAuth, useTenant } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { api, tokenManager } from '@/lib/api';
+import { PASSWORD_REQUIREMENTS, isPasswordValid } from '@/lib/validation';
 
 interface Tenant {
   id: number;
@@ -20,28 +42,41 @@ interface Tenant {
   logo_url?: string;
 }
 
+type ProfileType = 'individual' | 'organisation';
+
 export function RegisterPage() {
   const navigate = useNavigate();
   const { register, isAuthenticated, isLoading, error, clearError } = useAuth();
   const { tenant } = useTenant();
+
+  // Bot protection
+  const [formStartTime] = useState(() => Date.now());
+  const honeypotRef = useRef<HTMLInputElement>(null);
 
   // Tenant state
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [selectedTenantId, setSelectedTenantId] = useState<string>('');
   const [tenantsLoading, setTenantsLoading] = useState(true);
 
-  // Form state
+  // Form state - Basic
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Validation state
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  // Form state - Profile
+  const [profileType, setProfileType] = useState<ProfileType>('individual');
+  const [organizationName, setOrganizationName] = useState('');
+
+  // Form state - Contact
+  const [location, setLocation] = useState('');
+  const [phone, setPhone] = useState('');
+
+  // Form state - Consents
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
 
   // Fetch available tenants on mount
   useEffect(() => {
@@ -75,6 +110,16 @@ export function RegisterPage() {
     }
   };
 
+  // Handle profile type selection
+  const handleProfileTypeChange = (keys: unknown) => {
+    const selectedKeys = keys as Set<string>;
+    const type = Array.from(selectedKeys)[0] as ProfileType || 'individual';
+    setProfileType(type);
+    if (type === 'individual') {
+      setOrganizationName('');
+    }
+  };
+
   // Redirect after successful registration
   useEffect(() => {
     if (isAuthenticated) {
@@ -87,44 +132,36 @@ export function RegisterPage() {
     if (error) {
       clearError();
     }
-  }, [firstName, lastName, email, password, passwordConfirm]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Validate password (OWASP compliant)
-  useEffect(() => {
-    const errors: string[] = [];
-    if (password.length > 0) {
-      if (password.length < 8) {
-        errors.push('At least 8 characters');
-      }
-      if (!/[A-Z]/.test(password)) {
-        errors.push('One uppercase letter');
-      }
-      if (!/[a-z]/.test(password)) {
-        errors.push('One lowercase letter');
-      }
-      if (!/[0-9]/.test(password)) {
-        errors.push('One number');
-      }
-      if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
-        errors.push('One special character');
-      }
-      if (passwordConfirm && password !== passwordConfirm) {
-        errors.push('Passwords must match');
-      }
-    }
-    setPasswordErrors(errors);
-  }, [password, passwordConfirm]);
+  }, [firstName, lastName, email, password, passwordConfirm, location, phone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (passwordErrors.length > 0) {
+    // Bot protection checks
+    const honeypotValue = honeypotRef.current?.value;
+    if (honeypotValue) {
+      // Bot detected - silently fail
       return;
     }
 
-    // Get selected tenant slug
-    const selectedTenant = tenants.find(t => String(t.id) === selectedTenantId);
-    const tenantSlug = selectedTenant?.slug || tenant?.slug || import.meta.env.VITE_DEFAULT_TENANT_SLUG || 'default';
+    const timeTaken = Date.now() - formStartTime;
+    if (timeTaken < 3000) {
+      // Form submitted too fast (< 3 seconds) - likely a bot
+      return;
+    }
+
+    // Password validation
+    if (!isPasswordValid(password)) {
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      return;
+    }
+
+    // Get selected tenant
+    const selectedTenant = tenants.find((t) => String(t.id) === selectedTenantId);
+    const tenantId = selectedTenant?.id || parseInt(selectedTenantId) || undefined;
 
     const success = await register({
       first_name: firstName,
@@ -132,7 +169,11 @@ export function RegisterPage() {
       email,
       password,
       password_confirmation: passwordConfirm,
-      tenant_slug: tenantSlug,
+      tenant_id: tenantId,
+      profile_type: profileType,
+      organization_name: profileType === 'organisation' ? organizationName : undefined,
+      location: location || undefined,
+      phone: phone || undefined,
       terms_accepted: termsAccepted,
       newsletter_opt_in: newsletterOptIn,
     });
@@ -142,6 +183,9 @@ export function RegisterPage() {
     }
   };
 
+  const passwordValid = isPasswordValid(password);
+  const passwordsMatch = password === passwordConfirm;
+
   const isFormValid =
     firstName.trim() &&
     lastName.trim() &&
@@ -149,7 +193,9 @@ export function RegisterPage() {
     password.trim() &&
     passwordConfirm.trim() &&
     termsAccepted &&
-    passwordErrors.length === 0 &&
+    passwordValid &&
+    passwordsMatch &&
+    (profileType === 'individual' || organizationName.trim()) &&
     (tenants.length === 0 || selectedTenantId);
 
   return (
@@ -196,6 +242,19 @@ export function RegisterPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Honeypot - hidden from users, visible to bots */}
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="website">Website</label>
+              <input
+                ref={honeypotRef}
+                type="text"
+                name="website"
+                id="website"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+
             {/* Tenant Selector - Only show if multiple tenants */}
             {!tenantsLoading && tenants.length > 1 && (
               <Select
@@ -206,10 +265,12 @@ export function RegisterPage() {
                 startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
                 isRequired
                 classNames={{
-                  trigger: 'bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10',
+                  trigger:
+                    'bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10',
                   label: 'text-theme-muted',
                   value: 'text-theme-primary',
-                  popoverContent: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
+                  popoverContent:
+                    'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
                 }}
               >
                 {tenants.map((t) => (
@@ -246,6 +307,61 @@ export function RegisterPage() {
               </div>
             )}
 
+            {/* Profile Type */}
+            <Select
+              label="Profile Type"
+              placeholder="Select profile type"
+              selectedKeys={new Set([profileType])}
+              onSelectionChange={handleProfileTypeChange}
+              isRequired
+              classNames={{
+                trigger:
+                  'bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10',
+                label: 'text-theme-muted',
+                value: 'text-theme-primary',
+                popoverContent:
+                  'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
+              }}
+            >
+              <SelectItem
+                key="individual"
+                textValue="Individual"
+                classNames={{
+                  base: 'text-gray-900 dark:text-white data-[hover=true]:bg-gray-100 dark:data-[hover=true]:bg-white/10',
+                }}
+              >
+                Individual
+              </SelectItem>
+              <SelectItem
+                key="organisation"
+                textValue="Organisation"
+                classNames={{
+                  base: 'text-gray-900 dark:text-white data-[hover=true]:bg-gray-100 dark:data-[hover=true]:bg-white/10',
+                }}
+              >
+                Organisation
+              </SelectItem>
+            </Select>
+
+            {/* Organisation Name - Only show for organisations */}
+            {profileType === 'organisation' && (
+              <Input
+                type="text"
+                label="Organisation Name"
+                placeholder="e.g. Acme Corp"
+                value={organizationName}
+                onChange={(e) => setOrganizationName(e.target.value)}
+                startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
+                isRequired
+                classNames={{
+                  inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
+                  label: 'text-theme-muted',
+                  input: 'text-theme-primary placeholder:text-theme-subtle',
+                }}
+              />
+            )}
+
+            {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               <Input
                 type="text"
@@ -270,14 +386,51 @@ export function RegisterPage() {
                 onChange={(e) => setLastName(e.target.value)}
                 isRequired
                 autoComplete="family-name"
+                description={profileType === 'organisation' ? 'Only visible to admins' : undefined}
                 classNames={{
                   inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
+                  description: 'text-theme-subtle text-xs',
                 }}
               />
             </div>
 
+            {/* Location */}
+            <Input
+              type="text"
+              label="Location"
+              placeholder="Your town or city"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              startContent={<MapPin className="w-4 h-4 text-theme-subtle" />}
+              autoComplete="address-level2"
+              classNames={{
+                inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
+                label: 'text-theme-muted',
+                input: 'text-theme-primary placeholder:text-theme-subtle',
+              }}
+            />
+
+            {/* Phone */}
+            <Input
+              type="tel"
+              label="Phone Number"
+              placeholder="e.g. 087 123 4567"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              startContent={<Phone className="w-4 h-4 text-theme-subtle" />}
+              autoComplete="tel"
+              description="Only visible to administrators"
+              classNames={{
+                inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
+                label: 'text-theme-muted',
+                input: 'text-theme-primary placeholder:text-theme-subtle',
+                description: 'text-theme-subtle text-xs',
+              }}
+            />
+
+            {/* Email */}
             <Input
               type="email"
               label="Email"
@@ -294,74 +447,66 @@ export function RegisterPage() {
               }}
             />
 
-            <Input
-              type={showPassword ? 'text' : 'password'}
-              label="Password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
-              endContent={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-theme-subtle hover:text-theme-muted transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              }
-              isRequired
-              autoComplete="new-password"
-              classNames={{
-                inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
-                label: 'text-theme-muted',
-                input: 'text-theme-primary placeholder:text-theme-subtle',
-              }}
-            />
+            {/* Password */}
+            <div>
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                label="Password"
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
+                endContent={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-theme-subtle hover:text-theme-muted transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                }
+                isRequired
+                autoComplete="new-password"
+                classNames={{
+                  inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
+                  label: 'text-theme-muted',
+                  input: 'text-theme-primary placeholder:text-theme-subtle',
+                }}
+              />
 
-            {/* Password requirements */}
-            {password.length > 0 && (
-              <div className="space-y-1 text-xs">
-                {['At least 8 characters', 'One uppercase letter', 'One number'].map((req) => {
-                  const isMet =
-                    (req === 'At least 8 characters' && password.length >= 8) ||
-                    (req === 'One uppercase letter' && /[A-Z]/.test(password)) ||
-                    (req === 'One number' && /[0-9]/.test(password));
-
-                  return (
-                    <div
-                      key={req}
-                      className={`flex items-center gap-2 ${
-                        isMet ? 'text-green-600 dark:text-green-400' : 'text-theme-subtle'
-                      }`}
-                    >
-                      <div
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          isMet ? 'bg-green-600 dark:bg-green-400' : 'bg-theme-elevated'
+              {/* Password requirements checklist */}
+              {password && (
+                <ul className="mt-2 space-y-1 text-xs">
+                  {PASSWORD_REQUIREMENTS.map((req) => {
+                    const passed = req.test(password);
+                    return (
+                      <li
+                        key={req.id}
+                        className={`flex items-center gap-1.5 ${
+                          passed ? 'text-emerald-500 dark:text-emerald-400' : 'text-theme-subtle'
                         }`}
-                      />
-                      {req}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                      >
+                        {passed ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                        {req.label}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
 
+            {/* Confirm Password */}
             <Input
               type={showPassword ? 'text' : 'password'}
               label="Confirm Password"
-              placeholder="••••••••"
+              placeholder="Re-enter your password"
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
               startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
               isRequired
               autoComplete="new-password"
-              isInvalid={passwordConfirm.length > 0 && password !== passwordConfirm}
-              errorMessage={passwordConfirm.length > 0 && password !== passwordConfirm ? 'Passwords must match' : ''}
+              isInvalid={passwordConfirm.length > 0 && !passwordsMatch}
+              errorMessage={passwordConfirm.length > 0 && !passwordsMatch ? 'Passwords must match' : ''}
               classNames={{
                 inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
@@ -369,6 +514,7 @@ export function RegisterPage() {
               }}
             />
 
+            {/* Consents */}
             <div className="space-y-3 pt-2">
               <Checkbox
                 isSelected={termsAccepted}
@@ -378,14 +524,23 @@ export function RegisterPage() {
                   label: 'text-theme-muted text-sm',
                 }}
               >
-                I agree to the{' '}
-                <Link to="/terms" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link to="/privacy" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                  Privacy Policy
-                </Link>
+                <span>
+                  I agree to the{' '}
+                  <Link
+                    to="/terms"
+                    className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    to="/privacy"
+                    className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    Privacy Policy
+                  </Link>
+                  , and I am 18 years of age or older.
+                </span>
               </Checkbox>
 
               <Checkbox
@@ -398,6 +553,21 @@ export function RegisterPage() {
               >
                 Send me occasional updates and tips
               </Checkbox>
+            </div>
+
+            {/* Data Protection Notice */}
+            <div className="p-3 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-xs text-theme-muted space-y-2">
+              <p className="font-medium text-theme-primary">Data Protection Notice</p>
+              <p>
+                By clicking "Create Account," you are entering into a membership agreement. We
+                collect your personal data solely to administer your account, facilitate safe
+                exchanges between members, and send you essential community updates.
+              </p>
+              <p>
+                <Link to="/privacy" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                  View our full Privacy Policy
+                </Link>
+              </p>
             </div>
 
             <Button

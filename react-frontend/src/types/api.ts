@@ -141,7 +141,12 @@ export interface RegisterRequest {
   password_confirmation: string;
   first_name: string;
   last_name: string;
-  tenant_slug: string;
+  tenant_id?: number;
+  tenant_slug?: string;
+  profile_type?: 'individual' | 'organisation';
+  organization_name?: string;
+  location?: string;
+  phone?: string;
   terms_accepted: boolean;
   newsletter_opt_in?: boolean;
 }

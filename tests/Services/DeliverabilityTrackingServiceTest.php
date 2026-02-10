@@ -7,7 +7,7 @@ use Nexus\Services\DeliverabilityTrackingService;
 use Nexus\Models\Deliverable;
 use Nexus\Models\DeliverableMilestone;
 use Nexus\Core\TenantContext;
-use Tests\DatabaseTestCase;
+use Nexus\Tests\DatabaseTestCase;
 
 class DeliverabilityTrackingServiceTest extends DatabaseTestCase
 {
@@ -198,7 +198,7 @@ class DeliverabilityTrackingServiceTest extends DatabaseTestCase
      */
     private function createTestUser($email = 'service_test@example.com')
     {
-        $this->insertTestData('users', [
+        return $this->insertTestData('users', [
             'tenant_id' => $this->testTenantId,
             'email' => $email,
             'first_name' => 'Service',
@@ -207,11 +207,6 @@ class DeliverabilityTrackingServiceTest extends DatabaseTestCase
             'role' => 'member',
             'balance' => 0
         ]);
-
-        $user = $this->db->query("SELECT * FROM users WHERE email = '{$email}' AND tenant_id = {$this->testTenantId}")
-            ->fetch(\PDO::FETCH_ASSOC);
-
-        return $user['id'];
     }
 
     protected function tearDown(): void
