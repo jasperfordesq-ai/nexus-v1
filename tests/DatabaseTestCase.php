@@ -40,9 +40,9 @@ abstract class DatabaseTestCase extends TestCase
     protected static function createConnection(): PDO
     {
         $host = getenv('DB_HOST') ?: 'localhost';
-        $database = getenv('DB_DATABASE') ?: 'nexus_test';
-        $username = getenv('DB_USERNAME') ?: 'root';
-        $password = getenv('DB_PASSWORD') ?: '';
+        $database = getenv('DB_DATABASE') ?: getenv('DB_NAME') ?: 'nexus';
+        $username = getenv('DB_USERNAME') ?: getenv('DB_USER') ?: 'root';
+        $password = getenv('DB_PASSWORD') ?: getenv('DB_PASS') ?: '';
 
         $dsn = "mysql:host={$host};dbname={$database};charset=utf8mb4";
 

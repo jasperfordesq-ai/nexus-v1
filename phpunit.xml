@@ -37,7 +37,8 @@
     </testsuites>
     <php>
         <env name="APP_ENV" value="testing"/>
-        <env name="DB_DATABASE" value="nexus_test"/>
+        <!-- DB_DATABASE: defaults to nexus; tests use transactions for isolation -->
+        <env name="DB_DATABASE" value="nexus" force="false"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

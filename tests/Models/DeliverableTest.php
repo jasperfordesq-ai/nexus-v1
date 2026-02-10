@@ -5,7 +5,7 @@ namespace Tests\Models;
 use PHPUnit\Framework\TestCase;
 use Nexus\Models\Deliverable;
 use Nexus\Core\TenantContext;
-use Tests\DatabaseTestCase;
+use Nexus\Tests\DatabaseTestCase;
 
 class DeliverableTest extends DatabaseTestCase
 {
@@ -289,7 +289,7 @@ class DeliverableTest extends DatabaseTestCase
      */
     private function createTestUser($email = 'test@example.com')
     {
-        $this->insertTestData('users', [
+        return $this->insertTestData('users', [
             'tenant_id' => $this->testTenantId,
             'email' => $email,
             'first_name' => 'Test',
@@ -298,11 +298,6 @@ class DeliverableTest extends DatabaseTestCase
             'role' => 'member',
             'balance' => 0
         ]);
-
-        $user = $this->db->query("SELECT * FROM users WHERE email = '{$email}' AND tenant_id = {$this->testTenantId}")
-            ->fetch(\PDO::FETCH_ASSOC);
-
-        return $user['id'];
     }
 
     protected function tearDown(): void
