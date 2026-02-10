@@ -50,34 +50,60 @@ class Mailer
     }
 
     /**
-     * Load values directly from .env file (fallback when $_ENV not populated)
+     * Load values from .env file with fallback to environment variables (for Docker)
      */
     private function loadEnvValues()
     {
+        $values = [];
+
+        // First try to load from .env file
         $envPath = __DIR__ . '/../../.env';
-        if (!file_exists($envPath)) {
-            return [];
+        if (file_exists($envPath)) {
+            $content = file_get_contents($envPath);
+            $lines = explode("\n", $content);
+
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line) || strpos($line, '#') === 0) {
+                    continue;
+                }
+                if (strpos($line, '=') !== false) {
+                    list($key, $value) = explode('=', $line, 2);
+                    $key = trim($key);
+                    $value = trim($value);
+                    // Remove surrounding quotes (both single and double)
+                    if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+                        (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+                        $value = substr($value, 1, -1);
+                    }
+                    $values[$key] = $value;
+                }
+            }
         }
 
-        $values = [];
-        $content = file_get_contents($envPath);
-        $lines = explode("\n", $content);
+        // Fallback to environment variables (Docker/container environments)
+        // These take precedence if .env file doesn't exist or doesn't have the key
+        $envKeys = [
+            'USE_GMAIL_API',
+            'GMAIL_CLIENT_ID',
+            'GMAIL_CLIENT_SECRET',
+            'GMAIL_REFRESH_TOKEN',
+            'GMAIL_SENDER_EMAIL',
+            'GMAIL_SENDER_NAME',
+            'SMTP_HOST',
+            'SMTP_PORT',
+            'SMTP_USER',
+            'SMTP_PASS',
+            'SMTP_ENCRYPTION',
+            'SMTP_FROM_EMAIL',
+            'SMTP_FROM_NAME',
+        ];
 
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (empty($line) || strpos($line, '#') === 0) {
-                continue;
-            }
-            if (strpos($line, '=') !== false) {
-                list($key, $value) = explode('=', $line, 2);
-                $key = trim($key);
-                $value = trim($value);
-                // Remove surrounding quotes (both single and double)
-                if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
-                    (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
-                    $value = substr($value, 1, -1);
-                }
-                $values[$key] = $value;
+        foreach ($envKeys as $key) {
+            $envValue = getenv($key);
+            // Environment variables take precedence over .env file (for Docker)
+            if ($envValue !== false) {
+                $values[$key] = $envValue;
             }
         }
 
@@ -122,7 +148,9 @@ class Mailer
                 ],
                 CURLOPT_POSTFIELDS => json_encode(['raw' => $encodedEmail]),
                 CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_SSL_VERIFYPEER => true
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_TIMEOUT => 10, // 10 second timeout to prevent blocking
+                CURLOPT_CONNECTTIMEOUT => 5, // 5 second connection timeout
             ]);
 
             $response = curl_exec($ch);
@@ -182,7 +210,9 @@ class Mailer
             CURLOPT_POSTFIELDS => $postData,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
-            CURLOPT_SSL_VERIFYPEER => true
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_TIMEOUT => 10, // 10 second timeout
+            CURLOPT_CONNECTTIMEOUT => 5, // 5 second connection timeout
         ]);
 
         $response = curl_exec($ch);
@@ -297,8 +327,12 @@ class Mailer
         if (!$this->socket) {
             throw new \Exception("Could not connect to SMTP host: $errstr ($errno)");
         }
+
+        // Use HTTP_HOST or fallback to a safe default for CLI context
+        $ehloHost = $_SERVER['HTTP_HOST'] ?? 'api.project-nexus.ie';
+
         $this->read(); // Greeting
-        $this->write("EHLO " . $_SERVER['HTTP_HOST']); // Handshake
+        $this->write("EHLO " . $ehloHost); // Handshake
         $this->read();
 
         // Handle TLS (Port 587 usually) via STARTTLS
@@ -306,7 +340,7 @@ class Mailer
             $this->write("STARTTLS");
             $this->read();
             stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-            $this->write("EHLO " . $_SERVER['HTTP_HOST']);
+            $this->write("EHLO " . $ehloHost);
             $this->read();
         }
     }

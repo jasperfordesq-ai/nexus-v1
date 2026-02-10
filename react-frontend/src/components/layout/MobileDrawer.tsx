@@ -24,6 +24,7 @@ import {
   Medal,
   Target,
   Hexagon,
+  ArrowRightLeft,
 } from 'lucide-react';
 import { useAuth, useTenant, useNotifications } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -43,6 +44,7 @@ const mainNavItems = [
 ];
 
 const communityNavItems = [
+  { label: 'Exchanges', href: '/exchanges', icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
   { label: 'Members', href: '/members', icon: Users, feature: 'connections' as const },
   { label: 'Events', href: '/events', icon: Calendar, feature: 'events' as const },
   { label: 'Groups', href: '/groups', icon: Users, feature: 'groups' as const },

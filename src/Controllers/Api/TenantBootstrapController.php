@@ -4,6 +4,7 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\TenantContext;
 use Nexus\Services\RedisCache;
+use Nexus\Services\BrokerControlConfigService;
 use Nexus\Helpers\UrlHelper;
 
 /**
@@ -201,10 +202,11 @@ class TenantBootstrapController extends BaseApiController
             'resources' => false,
             'goals' => false,
             'polls' => false,
+            'exchange_workflow' => false,
         ];
 
         if ($features === null) {
-            return $defaults;
+            $features = [];
         }
 
         // Merge with defaults (explicit false should override default true)
@@ -216,6 +218,12 @@ class TenantBootstrapController extends BaseApiController
                 $result[$key] = $defaultValue;
             }
         }
+
+        // Check broker control config for exchange workflow
+        $result['exchange_workflow'] = BrokerControlConfigService::isExchangeWorkflowEnabled();
+
+        // Check if direct messaging is enabled (separate from exchange workflow)
+        $result['direct_messaging'] = BrokerControlConfigService::isDirectMessagingEnabled();
 
         return $result;
     }
@@ -385,6 +393,61 @@ class TenantBootstrapController extends BaseApiController
 
             $data[] = $item;
         }
+
+        // Cache for 5 minutes
+        RedisCache::set($cacheKey, $data, 300);
+
+        $this->respondWithData($data);
+    }
+
+    /**
+     * GET /api/v2/platform/stats
+     *
+     * Returns platform-wide statistics (across all tenants).
+     * This is a PUBLIC endpoint for the landing page.
+     *
+     * Response: 200 OK with platform stats
+     */
+    public function platformStats(): void
+    {
+        // Try to get from cache first (cache for 5 minutes)
+        $cacheKey = 'platform_stats_public';
+        $cached = RedisCache::get($cacheKey);
+
+        if ($cached !== null) {
+            $this->respondWithData($cached);
+            return;
+        }
+
+        $db = \Nexus\Core\Database::getConnection();
+
+        // Active members (across all tenants)
+        $stmt = $db->query("SELECT COUNT(*) FROM users WHERE status = 'active'");
+        $activeMembers = (int) $stmt->fetchColumn();
+
+        // Total hours exchanged (completed transactions)
+        $stmt = $db->query("SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE status = 'completed'");
+        $hoursExchanged = (int) $stmt->fetchColumn();
+
+        // Active listings
+        $stmt = $db->query("SELECT COUNT(*) FROM listings WHERE status = 'active'");
+        $activeListings = (int) $stmt->fetchColumn();
+
+        // Distinct skills/categories
+        $stmt = $db->query("SELECT COUNT(DISTINCT category_id) FROM listings WHERE status = 'active' AND category_id IS NOT NULL");
+        $skillsListed = (int) $stmt->fetchColumn();
+
+        // Active communities (tenants)
+        $stmt = $db->query("SELECT COUNT(*) FROM tenants WHERE is_active = 1 AND id > 1");
+        $communities = (int) $stmt->fetchColumn();
+
+        $data = [
+            'members' => $activeMembers,
+            'hours_exchanged' => $hoursExchanged,
+            'listings' => $activeListings,
+            'skills' => $skillsListed,
+            'communities' => $communities,
+        ];
 
         // Cache for 5 minutes
         RedisCache::set($cacheKey, $data, 300);

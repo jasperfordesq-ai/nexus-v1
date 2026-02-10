@@ -5,6 +5,7 @@ namespace Nexus\Controllers\Api;
 use Nexus\Services\ListingService;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ImageUploader;
+use Nexus\Helpers\UrlHelper;
 
 /**
  * ListingsApiController - RESTful API for listings
@@ -32,7 +33,8 @@ class ListingsApiController extends BaseApiController
      *
      * Query Parameters:
      * - type: string ('offer' or 'request') or comma-separated for multiple
-     * - category_id: int
+     * - category_id: int (filter by category ID)
+     * - category: string (filter by category slug, alternative to category_id)
      * - q: string (search term)
      * - cursor: string (pagination cursor)
      * - per_page: int (default 20, max 100)
@@ -56,6 +58,9 @@ class ListingsApiController extends BaseApiController
 
         if ($this->query('category_id')) {
             $filters['category_id'] = $this->queryInt('category_id');
+        } elseif ($this->query('category')) {
+            // Support category by slug - look up the ID
+            $filters['category_slug'] = $this->query('category');
         }
 
         if ($this->query('q')) {

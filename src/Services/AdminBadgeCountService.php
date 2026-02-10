@@ -45,6 +45,12 @@ class AdminBadgeCountService
             // 404 errors (recent, unresolved)
             $counts['404_errors'] = self::count404Errors($tenantId);
 
+            // Broker Controls - Pending exchange approvals
+            $counts['pending_exchanges'] = self::countPendingExchanges($tenantId);
+
+            // Broker Controls - Unreviewed message copies
+            $counts['unreviewed_messages'] = self::countUnreviewedMessages($tenantId);
+
         } catch (\Exception $e) {
             error_log("AdminBadgeCountService error: " . $e->getMessage());
             // Return empty counts on error
@@ -161,6 +167,42 @@ class AdminBadgeCountService
             )->fetch();
             return (int) ($result['count'] ?? 0);
         } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Count pending exchange approvals (broker controls)
+     */
+    private static function countPendingExchanges(int $tenantId): int
+    {
+        try {
+            $result = Database::query(
+                "SELECT COUNT(*) as count FROM exchange_requests
+                 WHERE tenant_id = ? AND status = 'pending_broker'",
+                [$tenantId]
+            )->fetch();
+            return (int) ($result['count'] ?? 0);
+        } catch (\Exception $e) {
+            // Table may not exist yet
+            return 0;
+        }
+    }
+
+    /**
+     * Count unreviewed broker message copies
+     */
+    private static function countUnreviewedMessages(int $tenantId): int
+    {
+        try {
+            $result = Database::query(
+                "SELECT COUNT(*) as count FROM broker_message_copies
+                 WHERE tenant_id = ? AND reviewed_at IS NULL",
+                [$tenantId]
+            )->fetch();
+            return (int) ($result['count'] ?? 0);
+        } catch (\Exception $e) {
+            // Table may not exist yet
             return 0;
         }
     }

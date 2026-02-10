@@ -82,11 +82,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   <AlertTriangle className="w-8 h-8 text-red-400" />
                 </div>
 
-                <h1 className="text-2xl font-bold text-white mb-2">
+                <h1 className="text-2xl font-bold text-theme-primary mb-2">
                   Something went wrong
                 </h1>
 
-                <p className="text-white/60 mb-6">
+                <p className="text-theme-muted mb-6">
                   An unexpected error occurred. Please try again or go back to the home page.
                 </p>
 
@@ -98,10 +98,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                     </p>
                     {this.state.errorInfo?.componentStack && (
                       <details className="mt-2">
-                        <summary className="text-white/40 text-xs cursor-pointer">
+                        <summary className="text-theme-subtle text-xs cursor-pointer">
                           Component Stack
                         </summary>
-                        <pre className="text-white/30 text-xs mt-2 overflow-auto max-h-40">
+                        <pre className="text-theme-subtle/70 text-xs mt-2 overflow-auto max-h-40">
                           {this.state.errorInfo.componentStack}
                         </pre>
                       </details>
@@ -121,7 +121,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   <Button
                     onPress={this.handleGoHome}
                     variant="flat"
-                    className="flex-1 bg-white/5 text-white/80"
+                    className="flex-1 bg-theme-elevated text-theme-muted"
                     startContent={<Home className="w-4 h-4" />}
                   >
                     Go Home

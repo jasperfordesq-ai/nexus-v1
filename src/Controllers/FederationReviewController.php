@@ -252,7 +252,7 @@ class FederationReviewController
         $receiverName = htmlspecialchars($receiver['first_name'] ?? $receiver['name'] ?? 'Member');
         $amount = number_format((float)($transaction['amount'] ?? 0), 2);
         $description = htmlspecialchars($transaction['description'] ?? 'Time exchange');
-        $csrfToken = \Nexus\Core\Csrf::getToken();
+        $csrfToken = \Nexus\Core\Csrf::token();
         $basePath = TenantContext::getBasePath();
 
         return <<<HTML

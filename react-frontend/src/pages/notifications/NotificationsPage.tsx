@@ -107,8 +107,8 @@ export function NotificationsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-            <Bell className="w-7 h-7 text-indigo-400" />
+          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+            <Bell className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
             Notifications
             {unreadCount > 0 && (
               <span className="text-sm px-2 py-1 rounded-full bg-indigo-500 text-white font-medium">
@@ -116,7 +116,7 @@ export function NotificationsPage() {
               </span>
             )}
           </h1>
-          <p className="text-white/60 mt-1">Stay updated with your activity</p>
+          <p className="text-theme-muted mt-1">Stay updated with your activity</p>
         </div>
 
         <div className="flex gap-2">
@@ -124,7 +124,7 @@ export function NotificationsPage() {
             <Button
               variant="flat"
               size="sm"
-              className="bg-white/5 text-white"
+              className="bg-theme-elevated text-theme-primary"
               startContent={<CheckCheck className="w-4 h-4" />}
               onClick={markAllAsRead}
             >
@@ -135,7 +135,7 @@ export function NotificationsPage() {
             <Button
               variant="flat"
               size="sm"
-              className="bg-white/5 text-white"
+              className="bg-theme-elevated text-theme-primary"
               isIconOnly
             >
               <Settings className="w-4 h-4" />
@@ -149,7 +149,7 @@ export function NotificationsPage() {
         <Button
           size="sm"
           variant={filter === 'all' ? 'solid' : 'flat'}
-          className={filter === 'all' ? 'bg-white/10 text-white' : 'bg-white/5 text-white/60'}
+          className={filter === 'all' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
           onClick={() => setFilter('all')}
         >
           All
@@ -157,7 +157,7 @@ export function NotificationsPage() {
         <Button
           size="sm"
           variant={filter === 'unread' ? 'solid' : 'flat'}
-          className={filter === 'unread' ? 'bg-white/10 text-white' : 'bg-white/5 text-white/60'}
+          className={filter === 'unread' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
           onClick={() => setFilter('unread')}
         >
           Unread ({unreadCount})
@@ -170,10 +170,10 @@ export function NotificationsPage() {
           {[1, 2, 3, 4, 5].map((i) => (
             <GlassCard key={i} className="p-4 animate-pulse">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-white/10" />
+                <div className="w-10 h-10 rounded-full bg-theme-hover" />
                 <div className="flex-1">
-                  <div className="h-4 bg-white/10 rounded w-2/3 mb-2" />
-                  <div className="h-3 bg-white/10 rounded w-1/3" />
+                  <div className="h-4 bg-theme-hover rounded w-2/3 mb-2" />
+                  <div className="h-3 bg-theme-hover rounded w-1/3" />
                 </div>
               </div>
             </GlassCard>
@@ -229,14 +229,14 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
   const { icon, color } = iconMap[notification.type] || { icon: <Bell className="w-5 h-5" />, color: 'gray' };
 
   const colorClasses: Record<string, string> = {
-    indigo: 'bg-indigo-500/20 text-indigo-400',
-    emerald: 'bg-emerald-500/20 text-emerald-400',
-    amber: 'bg-amber-500/20 text-amber-400',
-    purple: 'bg-purple-500/20 text-purple-400',
-    rose: 'bg-rose-500/20 text-rose-400',
-    teal: 'bg-teal-500/20 text-teal-400',
-    orange: 'bg-orange-500/20 text-orange-400',
-    gray: 'bg-white/20 text-white/60',
+    indigo: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
+    emerald: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
+    amber: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
+    purple: 'bg-purple-500/20 text-purple-600 dark:text-purple-400',
+    rose: 'bg-rose-500/20 text-rose-600 dark:text-rose-400',
+    teal: 'bg-teal-500/20 text-teal-600 dark:text-teal-400',
+    orange: 'bg-orange-500/20 text-orange-600 dark:text-orange-400',
+    gray: 'bg-theme-elevated text-theme-muted',
   };
 
   return (
@@ -247,10 +247,10 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className={`${isUnread ? 'text-white font-medium' : 'text-white/80'}`}>
+          <p className={`${isUnread ? 'text-theme-primary font-medium' : 'text-theme-muted'}`}>
             {notification.message || notification.body}
           </p>
-          <p className="text-xs text-white/40 mt-1">
+          <p className="text-xs text-theme-subtle mt-1">
             {formatRelativeTime(notification.created_at)}
           </p>
         </div>
@@ -261,7 +261,7 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
               isIconOnly
               variant="flat"
               size="sm"
-              className="bg-white/5 text-white/60 hover:text-white"
+              className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
               onClick={onMarkRead}
             >
               <Check className="w-4 h-4" />
@@ -271,7 +271,7 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
             isIconOnly
             variant="flat"
             size="sm"
-            className="bg-white/5 text-white/60 hover:text-red-400"
+            className="bg-theme-elevated text-theme-muted hover:text-red-500 dark:hover:text-red-400"
             onClick={onDelete}
           >
             <Trash2 className="w-4 h-4" />

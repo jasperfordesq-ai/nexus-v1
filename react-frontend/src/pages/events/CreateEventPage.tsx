@@ -180,7 +180,7 @@ export function CreateEventPage() {
       {/* Back Button */}
       <Link
         to="/events"
-        className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to events
@@ -188,8 +188,8 @@ export function CreateEventPage() {
 
       {/* Form */}
       <GlassCard className="p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-          <Calendar className="w-7 h-7 text-amber-400" />
+        <h1 className="text-2xl font-bold text-theme-primary mb-6 flex items-center gap-3">
+          <Calendar className="w-7 h-7 text-amber-600 dark:text-amber-400" />
           {isEditing ? 'Edit Event' : 'Create New Event'}
         </h1>
 
@@ -203,11 +203,11 @@ export function CreateEventPage() {
               onChange={(e) => updateField('title', e.target.value)}
               isInvalid={!!errors.title}
               errorMessage={errors.title}
-              startContent={<FileText className="w-4 h-4 text-white/40" />}
+              startContent={<FileText className="w-4 h-4 text-theme-subtle" />}
               classNames={{
-                input: 'bg-transparent text-white',
-                inputWrapper: 'bg-white/5 border-white/10',
-                label: 'text-white/80',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
               }}
             />
           </div>
@@ -223,9 +223,9 @@ export function CreateEventPage() {
               isInvalid={!!errors.description}
               errorMessage={errors.description}
               classNames={{
-                input: 'bg-transparent text-white',
-                inputWrapper: 'bg-white/5 border-white/10',
-                label: 'text-white/80',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
               }}
             />
           </div>
@@ -240,11 +240,11 @@ export function CreateEventPage() {
                 onChange={(e) => updateField('start_date', e.target.value)}
                 isInvalid={!!errors.start_date}
                 errorMessage={errors.start_date}
-                startContent={<Calendar className="w-4 h-4 text-white/40" />}
+                startContent={<Calendar className="w-4 h-4 text-theme-subtle" />}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
             </div>
@@ -257,11 +257,11 @@ export function CreateEventPage() {
                 onChange={(e) => updateField('start_time', e.target.value)}
                 isInvalid={!!errors.start_time}
                 errorMessage={errors.start_time}
-                startContent={<Clock className="w-4 h-4 text-white/40" />}
+                startContent={<Clock className="w-4 h-4 text-theme-subtle" />}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
             </div>
@@ -275,11 +275,11 @@ export function CreateEventPage() {
                 label="End Date (optional)"
                 value={formData.end_date}
                 onChange={(e) => updateField('end_date', e.target.value)}
-                startContent={<Calendar className="w-4 h-4 text-white/40" />}
+                startContent={<Calendar className="w-4 h-4 text-theme-subtle" />}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
             </div>
@@ -290,11 +290,11 @@ export function CreateEventPage() {
                 label="End Time (optional)"
                 value={formData.end_time}
                 onChange={(e) => updateField('end_time', e.target.value)}
-                startContent={<Clock className="w-4 h-4 text-white/40" />}
+                startContent={<Clock className="w-4 h-4 text-theme-subtle" />}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
             </div>
@@ -308,11 +308,11 @@ export function CreateEventPage() {
                 placeholder="e.g., Online, Community Center..."
                 value={formData.location}
                 onChange={(e) => updateField('location', e.target.value)}
-                startContent={<MapPin className="w-4 h-4 text-white/40" />}
+                startContent={<MapPin className="w-4 h-4 text-theme-subtle" />}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
             </div>
@@ -328,11 +328,11 @@ export function CreateEventPage() {
                 max={10000}
                 isInvalid={!!errors.max_attendees}
                 errorMessage={errors.max_attendees}
-                startContent={<Users className="w-4 h-4 text-white/40" />}
+                startContent={<Users className="w-4 h-4 text-theme-subtle" />}
                 classNames={{
-                  input: 'bg-transparent text-white',
-                  inputWrapper: 'bg-white/5 border-white/10',
-                  label: 'text-white/80',
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
                 }}
               />
             </div>
@@ -352,7 +352,7 @@ export function CreateEventPage() {
               <Button
                 type="button"
                 variant="flat"
-                className="bg-white/5 text-white"
+                className="bg-theme-elevated text-theme-primary"
               >
                 Cancel
               </Button>

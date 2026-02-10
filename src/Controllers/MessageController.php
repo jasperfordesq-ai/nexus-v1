@@ -9,6 +9,8 @@ use Nexus\Core\Mailer;
 use Nexus\Core\EmailTemplate;
 use Nexus\Services\RealtimeService;
 use Nexus\Helpers\UrlHelper;
+use Nexus\Services\BrokerControlConfigService;
+use Nexus\Services\BrokerMessageVisibilityService;
 
 class MessageController
 {
@@ -110,6 +112,19 @@ class MessageController
                     require $baseDir . 'modern/messages/messages_thread_partial.php';
                 }
                 exit; // Stop further rendering
+            }
+
+            // Check if this conversation is being monitored by broker
+            $isMonitored = false;
+            try {
+                if (BrokerControlConfigService::isBrokerVisibilityEnabled()) {
+                    $isMonitored = BrokerMessageVisibilityService::isUserUnderMonitoring($userId) ||
+                                   BrokerMessageVisibilityService::isUserUnderMonitoring($otherUserId) ||
+                                   BrokerMessageVisibilityService::isNewMember($userId) ||
+                                   BrokerMessageVisibilityService::isNewMember($otherUserId);
+                }
+            } catch (\Exception $e) {
+                // Broker services may not be available - continue without monitoring info
             }
 
             $pageTitle = 'Chat with ' . $otherUser['name'];

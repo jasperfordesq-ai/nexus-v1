@@ -1,0 +1,121 @@
+/**
+ * Risk Badge Component
+ * Displays risk level badges on listings when flagged by broker
+ *
+ * Usage:
+ *   <span class="glass-risk-badge risk-badge--critical">
+ *       <i class="fa-solid fa-triangle-exclamation"></i>
+ *       Critical Risk
+ *   </span>
+ */
+
+/* Base Risk Badge */
+.glass-risk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    border: 1px solid;
+    margin-left: var(--space-2);
+}
+
+.glass-risk-badge i {
+    font-size: 0.875em;
+}
+
+/* Critical Risk - Red */
+.risk-badge--critical {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15));
+    color: var(--color-danger);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+[data-theme="dark"] .risk-badge--critical {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.2));
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* High Risk - Orange */
+.risk-badge--high {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 88, 12, 0.15));
+    color: #c2410c;
+    border-color: rgba(249, 115, 22, 0.4);
+}
+
+[data-theme="dark"] .risk-badge--high {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(234, 88, 12, 0.2));
+    color: #fdba74;
+    border-color: rgba(249, 115, 22, 0.5);
+}
+
+/* Medium Risk - Yellow/Amber */
+.risk-badge--medium {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.15));
+    color: #b45309;
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
+[data-theme="dark"] .risk-badge--medium {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.2));
+    color: #fcd34d;
+    border-color: rgba(245, 158, 11, 0.5);
+}
+
+/* Low Risk - Gray */
+.risk-badge--low {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.15), rgba(75, 85, 99, 0.1));
+    color: var(--color-gray-600);
+    border-color: rgba(107, 114, 128, 0.3);
+}
+
+[data-theme="dark"] .risk-badge--low {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.2), rgba(75, 85, 99, 0.15));
+    color: var(--color-gray-400);
+    border-color: rgba(107, 114, 128, 0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .glass-risk-badge {
+        padding: var(--space-1) var(--space-2);
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* Chat Monitoring Notice - For message threads */
+.chat-monitoring-notice {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    margin: var(--space-3) 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.08));
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: var(--radius-md);
+    color: var(--color-info);
+    font-size: var(--font-size-sm);
+}
+
+.chat-monitoring-notice i {
+    font-size: 1.25em;
+    color: var(--color-info);
+}
+
+.chat-monitoring-notice span {
+    flex: 1;
+}
+
+[data-theme="dark"] .chat-monitoring-notice {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.12));
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #93c5fd;
+}
+
+[data-theme="dark"] .chat-monitoring-notice i {
+    color: #93c5fd;
+}

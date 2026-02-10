@@ -19,8 +19,10 @@ const REFRESH_TOKEN_KEY = 'nexus_refresh_token';
 const TENANT_ID_KEY = 'nexus_tenant_id';
 const CSRF_TOKEN_KEY = 'nexus_csrf_token';
 
-// Default tenant ID for development (will be overwritten by tenant bootstrap)
-const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || '1';
+// Default tenant ID - only used if nothing is in localStorage
+// In production, tenant is detected from subdomain during bootstrap
+// This fallback is for development only
+const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || null;
 
 // Custom events
 export const SESSION_EXPIRED_EVENT = 'nexus:session_expired';
@@ -101,7 +103,13 @@ export const tokenManager = {
   },
 
   getTenantId(): string | null {
-    return localStorage.getItem(TENANT_ID_KEY) || DEFAULT_TENANT_ID;
+    // First check localStorage (set during login or tenant bootstrap)
+    const storedTenantId = localStorage.getItem(TENANT_ID_KEY);
+    if (storedTenantId) {
+      return storedTenantId;
+    }
+    // Fall back to environment variable (development only)
+    return DEFAULT_TENANT_ID;
   },
 
   setTenantId(id: string | number): void {

@@ -1,13 +1,25 @@
 /**
  * Home Page - Landing page with hero section
+ * Theme-aware styling for light and dark modes
  */
 
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { ArrowRight, Clock, Users, Zap, ChevronDown } from 'lucide-react';
 import { useTenant, useAuth } from '@/contexts';
 import { PageMeta } from '@/components/seo';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
+
+interface PlatformStats {
+  members: number;
+  hours_exchanged: number;
+  listings: number;
+  skills: number;
+  communities: number;
+}
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -40,12 +52,16 @@ const features = [
   },
 ];
 
-const stats = [
-  { value: '10K+', label: 'Active Users' },
-  { value: '50K+', label: 'Hours Exchanged' },
-  { value: '500+', label: 'Skills Listed' },
-  { value: '98%', label: 'Satisfaction Rate' },
-];
+// Format number with appropriate suffix (K, M, etc.)
+function formatStatNumber(num: number): string {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M+';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K+';
+  }
+  return num.toString();
+}
 
 const coreValues = [
   {
@@ -71,6 +87,37 @@ const coreValues = [
 export function HomePage() {
   const { branding } = useTenant();
   const { isAuthenticated } = useAuth();
+  const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
+
+  useEffect(() => {
+    // Fetch platform-wide stats for the landing page
+    async function loadStats() {
+      try {
+        const response = await api.get<PlatformStats>('/v2/platform/stats');
+        if (response.success && response.data) {
+          setPlatformStats(response.data);
+        }
+      } catch (error) {
+        logError('Failed to load platform stats', error);
+        // Stats will show defaults on error
+      }
+    }
+    loadStats();
+  }, []);
+
+  const stats = platformStats
+    ? [
+        { value: formatStatNumber(platformStats.members), label: 'Active Members' },
+        { value: formatStatNumber(platformStats.hours_exchanged), label: 'Hours Exchanged' },
+        { value: formatStatNumber(platformStats.listings), label: 'Active Listings' },
+        { value: formatStatNumber(platformStats.communities), label: 'Communities' },
+      ]
+    : [
+        { value: '—', label: 'Active Members' },
+        { value: '—', label: 'Hours Exchanged' },
+        { value: '—', label: 'Active Listings' },
+        { value: '—', label: 'Communities' },
+      ];
 
   const scrollToSection = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
@@ -94,8 +141,8 @@ export function HomePage() {
           >
             {/* Badge */}
             <motion.div variants={fadeInUp} className="mb-6">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-white/70">
-                <span className="text-indigo-400">✨</span>
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm text-theme-muted">
+                <span className="text-indigo-500 dark:text-indigo-400">✨</span>
                 <span>The Future of Time Banking</span>
               </span>
             </motion.div>
@@ -105,7 +152,7 @@ export function HomePage() {
               variants={fadeInUp}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight"
             >
-              <span className="text-white">Exchange Skills,</span>
+              <span className="text-theme-primary">Exchange Skills,</span>
               <br />
               <span className="text-gradient">Build Community</span>
             </motion.h1>
@@ -113,7 +160,7 @@ export function HomePage() {
             {/* Subheadline */}
             <motion.p
               variants={fadeInUp}
-              className="mt-6 text-lg sm:text-xl text-white/60 max-w-2xl mx-auto"
+              className="mt-6 text-lg sm:text-xl text-theme-muted max-w-2xl mx-auto"
             >
               {branding.name} is a modern time banking platform where every hour of service
               is valued equally. Trade your skills, earn time credits, and connect
@@ -150,7 +197,7 @@ export function HomePage() {
                     <Button
                       size="lg"
                       variant="bordered"
-                      className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10"
+                      className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                     >
                       Learn More
                     </Button>
@@ -170,14 +217,14 @@ export function HomePage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
-                  className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm"
+                  className="flex items-center gap-3 p-4 rounded-2xl glass-card"
                 >
                   <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-indigo-400" />
+                    <feature.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-white">{feature.title}</p>
-                    <p className="text-sm text-white/50">{feature.description}</p>
+                    <p className="font-medium text-theme-primary">{feature.title}</p>
+                    <p className="text-sm text-theme-subtle">{feature.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -200,7 +247,7 @@ export function HomePage() {
                   >
                     {stat.value}
                   </motion.p>
-                  <p className="mt-1 text-sm text-white/50">{stat.label}</p>
+                  <p className="mt-1 text-sm text-theme-subtle">{stat.label}</p>
                 </div>
               ))}
             </motion.div>
@@ -216,7 +263,7 @@ export function HomePage() {
         >
           <Button
             variant="light"
-            className="text-white/50 hover:text-white animate-bounce"
+            className="text-theme-subtle hover:text-theme-primary animate-bounce"
             onPress={scrollToSection}
             isIconOnly
             aria-label="Scroll down"
@@ -244,7 +291,7 @@ export function HomePage() {
                 transition={{ delay: index * 0.1 }}
                 className="relative group"
               >
-                <div className="p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+                <div className="p-8 rounded-2xl glass-card-hover">
                   <div
                     className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-6`}
                   >
@@ -252,10 +299,10 @@ export function HomePage() {
                       {index + 1}
                     </span>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-3">
+                  <h3 className="text-xl font-semibold text-theme-primary mb-3">
                     {feature.title}
                   </h3>
-                  <p className="text-white/60">{feature.description}</p>
+                  <p className="text-theme-muted">{feature.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -271,12 +318,12 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-12 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-white/10"
+              className="p-12 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-theme-default"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">
                 Ready to get started?
               </h2>
-              <p className="text-white/60 mb-8 max-w-xl mx-auto">
+              <p className="text-theme-muted mb-8 max-w-xl mx-auto">
                 Join thousands of community members who are already exchanging
                 skills and building meaningful connections.
               </p>

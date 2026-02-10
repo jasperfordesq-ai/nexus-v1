@@ -1,15 +1,30 @@
 /**
  * Development Notice Modal
  * Shows a one-time notice to users about the site being in preview mode
+ * On mobile: Always shows with prompt to try new React frontend
+ * On desktop: Shows once per version
  */
 
 (function() {
     'use strict';
 
     const STORAGE_KEY = 'dev_notice_dismissed';
-    const STORAGE_VERSION = '2.1'; // Increment to show again to all users
+    const STORAGE_VERSION = '2.3'; // Increment to show again to all users
+
+    function isMobileDevice() {
+        // Check for mobile via user agent or screen width
+        const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isMobileWidth = window.innerWidth <= 768;
+        // Check if running in Capacitor native app
+        const isNativeApp = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+        return isMobileUA || isMobileWidth || isNativeApp;
+    }
 
     function hasSeenNotice() {
+        // On mobile, always show the notice
+        if (isMobileDevice()) {
+            return false;
+        }
         try {
             // Use localStorage for persistence across app restarts (mobile apps clear sessionStorage)
             const dismissed = localStorage.getItem(STORAGE_KEY);
@@ -21,12 +36,30 @@
     }
 
     function markNoticeSeen() {
+        // On mobile, use sessionStorage so it shows again next visit
+        if (isMobileDevice()) {
+            try {
+                sessionStorage.setItem(STORAGE_KEY + '_session', '1');
+            } catch (e) {
+                // Ignore
+            }
+            return;
+        }
         try {
             // Use localStorage for persistence across app restarts (mobile apps clear sessionStorage)
             localStorage.setItem(STORAGE_KEY, STORAGE_VERSION);
         } catch (e) {
             // localStorage not available, ignore
             console.warn('Could not save dev notice preference');
+        }
+    }
+
+    function hasSeenThisSession() {
+        // For mobile, check if already shown this session
+        try {
+            return sessionStorage.getItem(STORAGE_KEY + '_session') === '1';
+        } catch (e) {
+            return false;
         }
     }
 
@@ -37,33 +70,65 @@
         overlay.setAttribute('aria-modal', 'true');
         overlay.setAttribute('aria-labelledby', 'dev-notice-title');
 
-        overlay.innerHTML = `
-            <div class="dev-notice-modal">
-                <div class="dev-notice-header">
-                    <div class="dev-notice-icon">🚧</div>
-                    <h2 id="dev-notice-title">Preview Mode</h2>
-                </div>
-                <div class="dev-notice-body">
-                    <p><strong>Welcome!</strong> This site is still under active development and you're viewing it in preview mode.</p>
+        const isMobile = isMobileDevice();
 
-                    <div class="dev-notice-highlight">
-                        <strong>Currently Working On:</strong> We're actively improving the mobile experience. If you're on a phone or tablet, you may notice some layout changes and improvements rolling out.
+        if (isMobile) {
+            // Mobile-specific content with new frontend prompt
+            overlay.innerHTML = `
+                <div class="dev-notice-modal">
+                    <div class="dev-notice-header">
+                        <div class="dev-notice-icon">📱</div>
+                        <h2 id="dev-notice-title">Better Mobile Experience Available!</h2>
                     </div>
+                    <div class="dev-notice-body">
+                        <p><strong>Great news!</strong> We've built a brand new mobile-optimised version of the platform that works much better on phones and tablets.</p>
 
-                    <p>Your feedback is invaluable! If you notice any issues, please use the <strong>bug report link</strong> at the bottom of the page. It helps us track and fix problems much faster.</p>
+                        <div class="dev-notice-highlight">
+                            <strong>Try our new app:</strong> Faster loading, smoother navigation, and designed specifically for mobile devices. Give it a try at <strong>app.project-nexus.ie</strong>
+                        </div>
 
-                    <p>Thank you for your patience and support as we continue improving the platform!</p>
+                        <p>The current site you're viewing is still under development for mobile. For the best experience, we recommend switching to our new frontend.</p>
+                    </div>
+                    <div class="dev-notice-footer">
+                        <a href="https://app.project-nexus.ie/" class="dev-notice-btn dev-notice-btn-primary" id="dev-notice-try-new">
+                            <i class="fa-solid fa-sparkles" style="margin-right: 6px;"></i> Try New Mobile App
+                        </a>
+                        <button class="dev-notice-btn dev-notice-btn-secondary" id="dev-notice-continue">
+                            Continue with Current Site
+                        </button>
+                    </div>
                 </div>
-                <div class="dev-notice-footer">
-                    <button class="dev-notice-btn dev-notice-btn-primary" id="dev-notice-continue">
-                        Continue to Site
-                    </button>
-                    <button class="dev-notice-btn dev-notice-btn-secondary" id="dev-notice-report">
-                        View Bug Report Link
-                    </button>
+            `;
+        } else {
+            // Desktop content (original)
+            overlay.innerHTML = `
+                <div class="dev-notice-modal">
+                    <div class="dev-notice-header">
+                        <div class="dev-notice-icon">🚧</div>
+                        <h2 id="dev-notice-title">Preview Mode</h2>
+                    </div>
+                    <div class="dev-notice-body">
+                        <p><strong>Welcome!</strong> This site is still under active development and you're viewing it in preview mode.</p>
+
+                        <div class="dev-notice-highlight">
+                            <strong>New Frontend Available:</strong> We're working on a brand new frontend with a better experience. Try it out at <a href="https://app.project-nexus.ie/" style="color: var(--color-primary-400); font-weight: 600;">app.project-nexus.ie</a>
+                        </div>
+
+                        <p>Your feedback is invaluable! If you notice any issues, please use the <strong>bug report link</strong> at the bottom of the page. It helps us track and fix problems much faster.</p>
+
+                        <p>Thank you for your patience and support as we continue improving the platform!</p>
+                    </div>
+                    <div class="dev-notice-footer">
+                        <button class="dev-notice-btn dev-notice-btn-primary" id="dev-notice-continue">
+                            Continue to Site
+                        </button>
+                        <button class="dev-notice-btn dev-notice-btn-secondary" id="dev-notice-report">
+                            View Bug Report Link
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
 
         return overlay;
     }
@@ -100,8 +165,13 @@
     }
 
     function showDevNotice() {
-        // Check if user has already seen this version of the notice
-        if (hasSeenNotice()) {
+        // For mobile: check if already shown this session
+        if (isMobileDevice() && hasSeenThisSession()) {
+            return;
+        }
+
+        // For desktop: check if user has already seen this version of the notice
+        if (!isMobileDevice() && hasSeenNotice()) {
             return;
         }
 
@@ -132,15 +202,27 @@
         // Event listeners
         const continueBtn = overlay.querySelector('#dev-notice-continue');
         const reportBtn = overlay.querySelector('#dev-notice-report');
+        const tryNewBtn = overlay.querySelector('#dev-notice-try-new');
 
-        continueBtn.addEventListener('click', () => {
-            closeModal(overlay);
-        });
+        if (continueBtn) {
+            continueBtn.addEventListener('click', () => {
+                closeModal(overlay);
+            });
+        }
 
-        reportBtn.addEventListener('click', () => {
-            closeModal(overlay);
-            setTimeout(() => scrollToBugReport(), 300);
-        });
+        if (reportBtn) {
+            reportBtn.addEventListener('click', () => {
+                closeModal(overlay);
+                setTimeout(() => scrollToBugReport(), 300);
+            });
+        }
+
+        // "Try New Mobile App" link - just let it navigate, but mark as seen
+        if (tryNewBtn) {
+            tryNewBtn.addEventListener('click', () => {
+                markNoticeSeen();
+            });
+        }
 
         // Close on overlay click (but not on modal click)
         overlay.addEventListener('click', (e) => {

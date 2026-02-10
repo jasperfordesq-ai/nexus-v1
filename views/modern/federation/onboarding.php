@@ -381,7 +381,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': '<?= \Nexus\Core\Csrf::getToken() ?>'
+                    'X-CSRF-Token': '<?= \Nexus\Core\Csrf::token() ?>'
                 },
                 body: JSON.stringify(data)
             });

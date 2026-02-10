@@ -89,11 +89,11 @@ export function EventsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Calendar className="w-7 h-7 text-amber-400" />
             Events
           </h1>
-          <p className="text-white/60 mt-1">Discover and join community events</p>
+          <p className="text-theme-muted mt-1">Discover and join community events</p>
         </div>
         {isAuthenticated && (
           <Link to="/events/create">
@@ -115,10 +115,10 @@ export function EventsPage() {
               placeholder="Search events..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-white/40" />}
+              startContent={<Search className="w-4 h-4 text-theme-subtle" />}
               classNames={{
-                input: 'bg-transparent text-white placeholder:text-white/40',
-                inputWrapper: 'bg-white/5 border-white/10 hover:bg-white/10',
+                input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               }}
             />
           </div>
@@ -129,10 +129,10 @@ export function EventsPage() {
             onChange={(e) => setFilter(e.target.value as EventFilter)}
             className="w-40"
             classNames={{
-              trigger: 'bg-white/5 border-white/10 hover:bg-white/10',
-              value: 'text-white',
+              trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              value: 'text-theme-primary',
             }}
-            startContent={<Filter className="w-4 h-4 text-white/40" />}
+            startContent={<Filter className="w-4 h-4 text-theme-subtle" />}
           >
             <SelectItem key="upcoming">Upcoming</SelectItem>
             <SelectItem key="past">Past</SelectItem>
@@ -147,11 +147,11 @@ export function EventsPage() {
           {[1, 2, 3].map((i) => (
             <GlassCard key={i} className="p-5 animate-pulse">
               <div className="flex gap-4">
-                <div className="w-16 h-20 rounded-lg bg-white/10" />
+                <div className="w-16 h-20 rounded-lg bg-theme-hover" />
                 <div className="flex-1">
-                  <div className="h-5 bg-white/10 rounded w-1/2 mb-2" />
-                  <div className="h-4 bg-white/10 rounded w-3/4 mb-3" />
-                  <div className="h-3 bg-white/10 rounded w-1/4" />
+                  <div className="h-5 bg-theme-hover rounded w-1/2 mb-2" />
+                  <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
+                  <div className="h-3 bg-theme-hover rounded w-1/4" />
                 </div>
               </div>
             </GlassCard>
@@ -181,7 +181,7 @@ export function EventsPage() {
         >
           {Object.entries(groupedEvents).map(([month, monthEvents]) => (
             <section key={month}>
-              <h2 className="text-lg font-semibold text-white/80 mb-4 flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-theme-secondary mb-4 flex items-center gap-2">
                 <CalendarDays className="w-5 h-5 text-amber-400" />
                 {month}
               </h2>
@@ -218,10 +218,10 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
               <div className="text-amber-400 text-xs font-medium uppercase">
                 {startDate.toLocaleString('default', { month: 'short' })}
               </div>
-              <div className="text-white text-2xl font-bold">
+              <div className="text-theme-primary text-2xl font-bold">
                 {startDate.getDate()}
               </div>
-              <div className="text-white/50 text-xs">
+              <div className="text-theme-subtle text-xs">
                 {startDate.toLocaleString('default', { weekday: 'short' })}
               </div>
             </div>
@@ -229,10 +229,10 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
 
           {/* Event Details */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-white text-lg">{event.title}</h3>
-            <p className="text-white/60 text-sm line-clamp-2 mt-1">{event.description}</p>
+            <h3 className="font-semibold text-theme-primary text-lg">{event.title}</h3>
+            <p className="text-theme-muted text-sm line-clamp-2 mt-1">{event.description}</p>
 
-            <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-white/50">
+            <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-theme-subtle">
               <span className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
                 {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -252,7 +252,7 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
 
           {/* Arrow */}
           <div className="flex-shrink-0 self-center">
-            <ChevronRight className="w-5 h-5 text-white/30" />
+            <ChevronRight className="w-5 h-5 text-theme-subtle" />
           </div>
         </div>
       </GlassCard>

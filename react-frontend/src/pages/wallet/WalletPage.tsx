@@ -14,9 +14,12 @@ import {
   Calendar,
   User,
   Download,
+  Send,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { TransferModal } from '@/components/wallet';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { WalletBalance, Transaction } from '@/types/api';
@@ -28,6 +31,8 @@ export function WalletPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<TransactionFilter>('all');
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     loadWalletData();
@@ -54,6 +59,26 @@ export function WalletPage() {
     }
   }
 
+  // Handle successful transfer
+  function handleTransferComplete(transaction: Transaction) {
+    // Add the new transaction to the list
+    setTransactions((prev) => [transaction, ...prev]);
+
+    // Update balance
+    if (balance) {
+      setBalance({
+        ...balance,
+        balance: balance.balance - transaction.amount,
+        total_spent: balance.total_spent + transaction.amount,
+      });
+    }
+
+    toast.success(
+      'Transfer successful',
+      `Sent ${transaction.amount} hours to ${transaction.other_user?.name || 'recipient'}`
+    );
+  }
+
   const filteredTransactions = transactions.filter((tx) => {
     if (filter === 'all') return true;
     if (filter === 'earned') return tx.type === 'credit';
@@ -73,6 +98,43 @@ export function WalletPage() {
       .filter((tx) => tx.status === 'pending')
       .reduce((sum, tx) => sum + tx.amount, 0),
   };
+
+  // Export transactions to CSV
+  function handleExport() {
+    if (transactions.length === 0) {
+      toast.info('No data', 'No transactions to export');
+      return;
+    }
+
+    // Create CSV content
+    const headers = ['Date', 'Type', 'Amount', 'Description', 'Other Party', 'Status'];
+    const rows = transactions.map((tx) => [
+      new Date(tx.created_at).toLocaleDateString(),
+      tx.type === 'credit' ? 'Received' : 'Sent',
+      tx.amount.toString(),
+      tx.description || '',
+      tx.other_user?.name || tx.other_party?.name || '',
+      tx.status,
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')),
+    ].join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `transactions_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success('Exported', 'Transactions exported to CSV');
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -96,11 +158,11 @@ export function WalletPage() {
     >
       {/* Header */}
       <motion.div variants={itemVariants}>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Wallet className="w-7 h-7 text-amber-400" />
           Wallet
         </h1>
-        <p className="text-white/60 mt-1">Track your time credits and transactions</p>
+        <p className="text-theme-muted mt-1">Track your time credits and transactions</p>
       </motion.div>
 
       {/* Balance Card */}
@@ -114,23 +176,34 @@ export function WalletPage() {
 
           <div className="relative z-10">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-              <Wallet className="w-8 h-8 text-indigo-400" />
+              <Wallet className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
             </div>
 
-            <p className="text-white/60 text-sm mb-2">Your Balance</p>
+            <p className="text-theme-muted text-sm mb-2">Your Balance</p>
 
             {isLoading ? (
-              <div className="h-12 w-32 mx-auto bg-white/10 rounded animate-pulse" />
+              <div className="h-12 w-32 mx-auto bg-theme-elevated rounded animate-pulse" />
             ) : (
-              <h1 className="text-5xl font-bold text-white mb-2">
+              <h1 className="text-5xl font-bold text-theme-primary mb-2">
                 {balance?.balance ?? 0}
-                <span className="text-2xl text-white/60 ml-2">hours</span>
+                <span className="text-2xl text-theme-muted ml-2">hours</span>
               </h1>
             )}
 
-            <p className="text-white/40 text-sm">
+            <p className="text-theme-subtle text-sm mb-4">
               {balance?.pending_in ? `+${balance.pending_in}h pending` : 'No pending transactions'}
             </p>
+
+            {/* Send Credits Button */}
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium px-8"
+              size="lg"
+              startContent={<Send className="w-5 h-5" />}
+              onClick={() => setIsTransferModalOpen(true)}
+              isDisabled={isLoading || !balance || balance.balance <= 0}
+            >
+              Send Credits
+            </Button>
           </div>
         </GlassCard>
       </motion.div>
@@ -164,16 +237,18 @@ export function WalletPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-indigo-400" />
+            <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               Transaction History
             </h2>
 
             <Button
               variant="flat"
               size="sm"
-              className="bg-white/5 text-white/60"
+              className="bg-theme-elevated text-theme-muted"
               startContent={<Download className="w-4 h-4" />}
+              onClick={handleExport}
+              isDisabled={transactions.length === 0}
             >
               Export
             </Button>
@@ -184,9 +259,9 @@ export function WalletPage() {
             selectedKey={filter}
             onSelectionChange={(key) => setFilter(key as TransactionFilter)}
             classNames={{
-              tabList: 'bg-white/5 p-1 rounded-lg',
-              cursor: 'bg-white/10',
-              tab: 'text-white/60 data-[selected=true]:text-white',
+              tabList: 'bg-theme-elevated p-1 rounded-lg',
+              cursor: 'bg-theme-hover',
+              tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
             }}
           >
             <Tab key="all" title="All" />
@@ -199,12 +274,12 @@ export function WalletPage() {
           <div className="mt-6 space-y-3">
             {isLoading ? (
               [1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="animate-pulse p-4 rounded-lg bg-white/5">
+                <div key={i} className="animate-pulse p-4 rounded-lg bg-theme-elevated">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-white/10" />
+                    <div className="w-10 h-10 rounded-full bg-theme-hover" />
                     <div className="flex-1">
-                      <div className="h-4 bg-white/10 rounded w-1/3 mb-2" />
-                      <div className="h-3 bg-white/10 rounded w-1/4" />
+                      <div className="h-4 bg-theme-hover rounded w-1/3 mb-2" />
+                      <div className="h-3 bg-theme-hover rounded w-1/4" />
                     </div>
                   </div>
                 </div>
@@ -223,6 +298,14 @@ export function WalletPage() {
           </div>
         </GlassCard>
       </motion.div>
+
+      {/* Transfer Modal */}
+      <TransferModal
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+        currentBalance={balance?.balance ?? 0}
+        onTransferComplete={handleTransferComplete}
+      />
     </motion.div>
   );
 }
@@ -247,11 +330,11 @@ function StatCard({ icon, label, value, color, isLoading }: StatCardProps) {
       <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-2`}>
         {icon}
       </div>
-      <div className="text-white/50 text-xs mb-1">{label}</div>
+      <div className="text-theme-subtle text-xs mb-1">{label}</div>
       {isLoading ? (
-        <div className="h-6 w-12 mx-auto bg-white/10 rounded animate-pulse" />
+        <div className="h-6 w-12 mx-auto bg-theme-hover rounded animate-pulse" />
       ) : (
-        <div className="text-xl font-bold text-white">{value}</div>
+        <div className="text-xl font-bold text-theme-primary">{value}</div>
       )}
     </GlassCard>
   );
@@ -265,7 +348,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
   const isCredit = transaction.type === 'credit';
 
   return (
-    <div className="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+    <div className="p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors">
       <div className="flex items-center gap-4">
         <div className={`
           p-2.5 rounded-full
@@ -280,14 +363,14 @@ function TransactionCard({ transaction }: TransactionCardProps) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="font-medium text-white truncate">{transaction.description}</h4>
+            <h4 className="font-medium text-theme-primary truncate">{transaction.description}</h4>
             {transaction.status === 'pending' && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
                 Pending
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 text-sm text-white/50 mt-1">
+          <div className="flex items-center gap-3 text-sm text-theme-subtle mt-1">
             {transaction.other_user && (
               <span className="flex items-center gap-1">
                 <User className="w-3 h-3" />

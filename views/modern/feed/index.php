@@ -433,22 +433,24 @@ try {
         try {
             const formData = new FormData();
             formData.append('content', content);
+            formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
 
-            const response = await fetch(NEXUS_BASE + '/api/feed/create', {
+            const response = await fetch(NEXUS_BASE + '/feed/store', {
                 method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                }
+                body: formData
             });
 
-            const data = await response.json();
-
-            if (data.success) {
+            // The store endpoint redirects on success, so check for that
+            if (response.redirected || response.ok) {
                 closeComposeModal();
                 window.location.reload();
             } else {
-                alert('Error: ' + (data.error || 'Failed to create post'));
+                const text = await response.text();
+                if (text.includes('403') || text.includes('CSRF')) {
+                    alert('Session expired. Please refresh the page and try again.');
+                } else {
+                    alert('Error: Failed to create post. Please try again.');
+                }
             }
         } catch (err) {
             alert('Network error. Please try again.');

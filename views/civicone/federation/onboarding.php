@@ -306,7 +306,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
 <script>
     window.federationOnboardingConfig = {
         basePath: '<?= $basePath ?>',
-        csrfToken: '<?= \Nexus\Core\Csrf::getToken() ?>'
+        csrfToken: '<?= \Nexus\Core\Csrf::token() ?>'
     };
 </script>
 

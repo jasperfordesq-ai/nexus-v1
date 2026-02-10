@@ -58,9 +58,14 @@ class TenantContext
                 self::$tokenTenantId = $tokenTenantId;
 
                 // Check for mismatch: header and token must agree if both present
+                // EXCEPTION: Super admins can access any tenant (cross-tenant access)
                 if ($tokenTenantId !== $headerTenantId) {
-                    self::respondWithTenantMismatchError();
-                    return;
+                    // Check if user is a super admin before rejecting
+                    if (!self::isTokenUserSuperAdmin()) {
+                        self::respondWithTenantMismatchError();
+                        return;
+                    }
+                    // Super admin accessing different tenant - this is allowed
                 }
             }
 
@@ -187,6 +192,8 @@ class TenantContext
             'password',
             'settings', // User Settings
             'dev', // Development tools (component library, storybook, etc.)
+            'consent-required', // GDPR consent re-acceptance
+            'consent', // GDPR consent accept/decline actions
         ];
 
         if (!empty($firstSegment) && !in_array($firstSegment, $reserved)) {
@@ -562,6 +569,47 @@ class TenantContext
             ]]
         ]);
         exit;
+    }
+
+    /**
+     * Check if the user from the Bearer token is a super admin
+     * Super admins can access any tenant regardless of their home tenant
+     *
+     * @return bool True if user is a super admin
+     */
+    private static function isTokenUserSuperAdmin(): bool
+    {
+        // Get Authorization header
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        if (empty($authHeader) || !preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
+            return false;
+        }
+
+        $token = $matches[1];
+
+        try {
+            // Decode the JWT to check claims
+            // Use the TokenService if available, otherwise decode manually
+            if (class_exists('\\Nexus\\Services\\TokenService')) {
+                $payload = \Nexus\Services\TokenService::validateToken($token);
+                if ($payload && isset($payload['sub'])) {
+                    // Look up user to check super admin status
+                    $db = Database::getConnection();
+                    $stmt = $db->prepare("SELECT is_super_admin, is_tenant_super_admin FROM users WHERE id = ?");
+                    $stmt->execute([$payload['sub']]);
+                    $user = $stmt->fetch();
+
+                    if ($user) {
+                        return !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Token validation failed - not a super admin
+            return false;
+        }
+
+        return false;
     }
 
     /**

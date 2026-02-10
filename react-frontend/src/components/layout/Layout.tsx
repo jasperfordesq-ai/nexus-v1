@@ -3,7 +3,7 @@
  * Wraps all pages with navigation, footer, and background
  */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
@@ -35,6 +35,10 @@ export function Layout({
 }: LayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Memoize callbacks to prevent unnecessary re-renders in MobileDrawer
+  const handleMobileMenuOpen = useCallback(() => setIsMobileMenuOpen(true), []);
+  const handleMobileMenuClose = useCallback(() => setIsMobileMenuOpen(false), []);
+
   // Listen for API errors and display toast notifications
   useApiErrorHandler();
 
@@ -50,10 +54,10 @@ export function Layout({
       {/* Navigation */}
       {showNavbar && (
         <>
-          <Navbar onMobileMenuOpen={() => setIsMobileMenuOpen(true)} />
+          <Navbar onMobileMenuOpen={handleMobileMenuOpen} />
           <MobileDrawer
             isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
+            onClose={handleMobileMenuClose}
           />
         </>
       )}

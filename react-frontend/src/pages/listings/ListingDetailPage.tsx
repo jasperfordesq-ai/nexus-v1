@@ -19,6 +19,7 @@ import {
   Edit,
   Trash2,
   AlertCircle,
+  ArrowRightLeft,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
@@ -26,7 +27,7 @@ import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import type { Listing } from '@/types/api';
+import type { Listing, ExchangeConfig } from '@/types/api';
 
 export function ListingDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -37,10 +38,23 @@ export function ListingDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [exchangeConfig, setExchangeConfig] = useState<ExchangeConfig | null>(null);
 
   useEffect(() => {
     loadListing();
+    loadExchangeConfig();
   }, [id]);
+
+  async function loadExchangeConfig() {
+    try {
+      const response = await api.get<ExchangeConfig>('/v2/exchanges/config');
+      if (response.success && response.data) {
+        setExchangeConfig(response.data);
+      }
+    } catch {
+      // Exchange workflow may not be enabled
+    }
+  }
 
   async function loadListing() {
     if (!id) return;
@@ -107,7 +121,7 @@ export function ListingDetailPage() {
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to listings
@@ -125,7 +139,7 @@ export function ListingDetailPage() {
               {listing.type === 'offer' ? 'Offering' : 'Requesting'}
             </span>
             {(listing.category || listing.category_name) && (
-              <span className="text-sm px-3 py-1.5 rounded-full bg-white/10 text-white/60 flex items-center gap-1">
+              <span className="text-sm px-3 py-1.5 rounded-full bg-theme-hover text-theme-muted flex items-center gap-1">
                 <Tag className="w-3 h-3" />
                 {listing.category?.name || listing.category_name}
               </span>
@@ -138,7 +152,7 @@ export function ListingDetailPage() {
                 <Button
                   size="sm"
                   variant="flat"
-                  className="bg-white/5 text-white"
+                  className="bg-theme-elevated text-theme-primary"
                   startContent={<Edit className="w-4 h-4" />}
                 >
                   Edit
@@ -159,84 +173,95 @@ export function ListingDetailPage() {
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl font-bold text-white mb-4">{listing.title}</h1>
+        <h1 className="text-3xl font-bold text-theme-primary mb-4">{listing.title}</h1>
 
         {/* Meta Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="flex items-center gap-3 text-white/60">
+          <div className="flex items-center gap-3 text-theme-muted">
             <div className="p-2 rounded-lg bg-indigo-500/20">
-              <Clock className="w-5 h-5 text-indigo-400" />
+              <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
-              <div className="text-xs text-white/40">Duration</div>
-              <div className="text-white">{listing.hours_estimate ?? listing.estimated_hours ?? '—'} hours</div>
+              <div className="text-xs text-theme-subtle">Duration</div>
+              <div className="text-theme-primary">{listing.hours_estimate ?? listing.estimated_hours ?? '—'} hours</div>
             </div>
           </div>
 
           {listing.location && (
-            <div className="flex items-center gap-3 text-white/60">
+            <div className="flex items-center gap-3 text-theme-muted">
               <div className="p-2 rounded-lg bg-emerald-500/20">
-                <MapPin className="w-5 h-5 text-emerald-400" />
+                <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
-                <div className="text-xs text-white/40">Location</div>
-                <div className="text-white truncate">{listing.location}</div>
+                <div className="text-xs text-theme-subtle">Location</div>
+                <div className="text-theme-primary truncate">{listing.location}</div>
               </div>
             </div>
           )}
 
-          <div className="flex items-center gap-3 text-white/60">
+          <div className="flex items-center gap-3 text-theme-muted">
             <div className="p-2 rounded-lg bg-amber-500/20">
-              <Calendar className="w-5 h-5 text-amber-400" />
+              <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <div className="text-xs text-white/40">Posted</div>
-              <div className="text-white">
+              <div className="text-xs text-theme-subtle">Posted</div>
+              <div className="text-theme-primary">
                 {new Date(listing.created_at).toLocaleDateString()}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-white/60">
+          <div className="flex items-center gap-3 text-theme-muted">
             <div className="p-2 rounded-lg bg-purple-500/20">
-              <Tag className="w-5 h-5 text-purple-400" />
+              <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <div className="text-xs text-white/40">Status</div>
-              <div className="text-white capitalize">{listing.status}</div>
+              <div className="text-xs text-theme-subtle">Status</div>
+              <div className="text-theme-primary capitalize">{listing.status}</div>
             </div>
           </div>
         </div>
 
         {/* Description */}
         <div className="mb-8">
-          <h2 className="text-lg font-semibold text-white mb-3">Description</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-3">Description</h2>
           <div className="prose prose-invert max-w-none">
-            <p className="text-white/70 whitespace-pre-wrap">{listing.description}</p>
+            <p className="text-theme-muted whitespace-pre-wrap">{listing.description}</p>
           </div>
         </div>
 
         {/* Action Buttons */}
         {isAuthenticated && !isOwner && (
-          <div className="flex flex-wrap gap-3 pt-6 border-t border-white/10">
-            <Link to={`/messages?to=${listing.user_id}&listing=${listing.id}`} className="flex-1 sm:flex-none">
-              <Button
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<MessageSquare className="w-4 h-4" />}
-              >
-                Send Message
-              </Button>
-            </Link>
+          <div className="flex flex-wrap gap-3 pt-6 border-t border-theme-default">
+            {exchangeConfig?.exchange_workflow_enabled ? (
+              <Link to={`/listings/${listing.id}/request-exchange`} className="flex-1 sm:flex-none">
+                <Button
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
+                  startContent={<ArrowRightLeft className="w-4 h-4" />}
+                >
+                  Request Exchange
+                </Button>
+              </Link>
+            ) : (
+              <Link to={`/messages?to=${listing.user_id}&listing=${listing.id}`} className="flex-1 sm:flex-none">
+                <Button
+                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  startContent={<MessageSquare className="w-4 h-4" />}
+                >
+                  Send Message
+                </Button>
+              </Link>
+            )}
             <Button
               variant="flat"
-              className="flex-1 sm:flex-none bg-white/5 text-white"
+              className="flex-1 sm:flex-none bg-theme-elevated text-theme-primary"
               startContent={<Heart className="w-4 h-4" />}
             >
               Save
             </Button>
             <Button
               variant="flat"
-              className="flex-1 sm:flex-none bg-white/5 text-white"
+              className="flex-1 sm:flex-none bg-theme-elevated text-theme-primary"
               startContent={<Share2 className="w-4 h-4" />}
             >
               Share
@@ -248,8 +273,8 @@ export function ListingDetailPage() {
       {/* User Card */}
       {(listing.user || listing.author_name) && (
         <GlassCard className="p-6">
-          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <User className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+            <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             {listing.type === 'offer' ? 'Offered by' : 'Requested by'}
           </h2>
 
@@ -261,18 +286,18 @@ export function ListingDetailPage() {
               className="ring-2 ring-white/20"
             />
             <div className="flex-1">
-              <h3 className="font-semibold text-white">
+              <h3 className="font-semibold text-theme-primary">
                 {listing.user?.name || listing.author_name || `${listing.user?.first_name ?? ''} ${listing.user?.last_name ?? ''}`.trim()}
               </h3>
               {listing.user?.tagline && (
-                <p className="text-white/60 text-sm">{listing.user.tagline}</p>
+                <p className="text-theme-muted text-sm">{listing.user.tagline}</p>
               )}
             </div>
             {listing.user && (
               <Link to={`/profile/${listing.user.id}`}>
                 <Button
                   variant="flat"
-                  className="bg-white/5 text-white"
+                  className="bg-theme-elevated text-theme-primary"
                 >
                   View Profile
                 </Button>

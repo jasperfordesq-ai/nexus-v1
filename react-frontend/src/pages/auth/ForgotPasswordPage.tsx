@@ -25,7 +25,7 @@ export function ForgotPasswordPage() {
     try {
       setIsLoading(true);
       setError('');
-      await api.post('/v2/auth/password/forgot', { email });
+      await api.post('/auth/forgot-password', { email });
       setIsSubmitted(true);
     } catch (err) {
       // Don't reveal if email exists or not for security
@@ -47,26 +47,26 @@ export function ForgotPasswordPage() {
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-emerald-400" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Check your email</h1>
-            <p className="text-white/60 mb-6">
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">Check your email</h1>
+            <p className="text-theme-muted mb-6">
               If an account exists with that email address,
               we've sent instructions to reset your password.
             </p>
-            <p className="text-white/40 text-sm mb-6">
+            <p className="text-theme-subtle text-sm mb-6">
               Didn't receive the email? Check your spam folder or try again.
             </p>
             <div className="flex flex-col gap-3">
               <Button
                 onClick={() => setIsSubmitted(false)}
                 variant="flat"
-                className="bg-white/5 text-white"
+                className="bg-theme-elevated text-theme-primary"
               >
                 Try another email
               </Button>
               <Link to="/login">
                 <Button
                   variant="flat"
-                  className="w-full bg-white/5 text-white"
+                  className="w-full bg-theme-elevated text-theme-primary"
                   startContent={<ArrowLeft className="w-4 h-4" />}
                 >
                   Back to login
@@ -89,7 +89,7 @@ export function ForgotPasswordPage() {
         {/* Back to login */}
         <Link
           to="/login"
-          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-6"
+          className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to login
@@ -98,8 +98,8 @@ export function ForgotPasswordPage() {
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white mb-2">Reset your password</h1>
-            <p className="text-white/60">
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">Reset your password</h1>
+            <p className="text-theme-muted">
               Enter your email and we'll send you instructions to reset your password.
             </p>
           </div>
@@ -119,11 +119,11 @@ export function ForgotPasswordPage() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              startContent={<Mail className="w-4 h-4 text-white/40" />}
+              startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
               classNames={{
-                input: 'bg-transparent text-white',
-                inputWrapper: 'bg-white/5 border-white/10',
-                label: 'text-white/80',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
               }}
               isRequired
             />
@@ -139,16 +139,16 @@ export function ForgotPasswordPage() {
           </form>
 
           {/* Footer */}
-          <div className="mt-6 text-center text-sm text-white/50">
+          <div className="mt-6 text-center text-sm text-theme-subtle">
             Remember your password?{' '}
-            <Link to="/login" className="text-indigo-400 hover:underline">
+            <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:underline">
               Sign in
             </Link>
           </div>
         </GlassCard>
 
         {/* Branding */}
-        <p className="text-center text-white/30 text-sm mt-6">
+        <p className="text-center text-theme-subtle text-sm mt-6">
           {branding.name}
         </p>
       </motion.div>

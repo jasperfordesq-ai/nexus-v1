@@ -79,11 +79,11 @@ export function GroupsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-            <Users className="w-7 h-7 text-purple-400" />
+          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+            <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" />
             Groups
           </h1>
-          <p className="text-white/60 mt-1">Join groups to connect with like-minded community members</p>
+          <p className="text-theme-muted mt-1">Join groups to connect with like-minded community members</p>
         </div>
         {isAuthenticated && (
           <Link to="/groups/create">
@@ -105,10 +105,10 @@ export function GroupsPage() {
               placeholder="Search groups..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-white/40" />}
+              startContent={<Search className="w-4 h-4 text-theme-subtle" />}
               classNames={{
-                input: 'bg-transparent text-white placeholder:text-white/40',
-                inputWrapper: 'bg-white/5 border-white/10 hover:bg-white/10',
+                input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               }}
             />
           </div>
@@ -119,10 +119,10 @@ export function GroupsPage() {
             onChange={(e) => setFilter(e.target.value as GroupFilter)}
             className="w-40"
             classNames={{
-              trigger: 'bg-white/5 border-white/10 hover:bg-white/10',
-              value: 'text-white',
+              trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              value: 'text-theme-primary',
             }}
-            startContent={<Filter className="w-4 h-4 text-white/40" />}
+            startContent={<Filter className="w-4 h-4 text-theme-subtle" />}
           >
             <SelectItem key="all">All Groups</SelectItem>
             {isAuthenticated ? <SelectItem key="joined">My Groups</SelectItem> : null}
@@ -137,10 +137,10 @@ export function GroupsPage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-5 bg-white/10 rounded w-2/3 mb-3" />
-              <div className="h-4 bg-white/10 rounded w-full mb-2" />
-              <div className="h-4 bg-white/10 rounded w-3/4 mb-4" />
-              <div className="h-3 bg-white/10 rounded w-1/3" />
+              <div className="h-5 bg-theme-hover rounded w-2/3 mb-3" />
+              <div className="h-4 bg-theme-hover rounded w-full mb-2" />
+              <div className="h-4 bg-theme-hover rounded w-3/4 mb-4" />
+              <div className="h-3 bg-theme-hover rounded w-1/3" />
             </GlassCard>
           ))}
         </div>
@@ -184,7 +184,7 @@ const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
     <Link to={`/groups/${group.id}`}>
       <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full flex flex-col">
         <div className="flex items-start justify-between gap-3 mb-3">
-          <h3 className="font-semibold text-white text-lg">{group.name}</h3>
+          <h3 className="font-semibold text-theme-primary text-lg">{group.name}</h3>
           {group.visibility === 'private' ? (
             <span className="flex-shrink-0 p-1.5 rounded-full bg-amber-500/20">
               <Lock className="w-4 h-4 text-amber-400" />
@@ -196,16 +196,16 @@ const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
           )}
         </div>
 
-        <p className="text-white/60 text-sm line-clamp-2 flex-1 mb-4">
+        <p className="text-theme-muted text-sm line-clamp-2 flex-1 mb-4">
           {group.description || 'No description provided'}
         </p>
 
         {/* Group Stats */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4 text-sm text-white/50">
+          <div className="flex items-center gap-4 text-sm text-theme-subtle">
             <span className="flex items-center gap-1">
               <Users className="w-4 h-4" />
-              {group.members_count}
+              {group.member_count ?? group.members_count}
             </span>
             {group.posts_count !== undefined && (
               <span className="flex items-center gap-1">
@@ -220,7 +220,7 @@ const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
               {group.recent_members.map((member) => (
                 <Avatar
                   key={member.id}
-                  src={resolveAvatarUrl(member.avatar)}
+                  src={resolveAvatarUrl(member.avatar_url || member.avatar)}
                   name={member.name || `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()}
                   className="ring-2 ring-black/50"
                 />
@@ -230,9 +230,9 @@ const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
         </div>
 
         {/* Member Status */}
-        {group.is_member && (
-          <div className="mt-4 pt-4 border-t border-white/10">
-            <span className="text-xs px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-400">
+        {(group.is_member || group.viewer_membership?.status === 'active') && (
+          <div className="mt-4 pt-4 border-t border-theme-default">
+            <span className="text-xs px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
               Member
             </span>
           </div>

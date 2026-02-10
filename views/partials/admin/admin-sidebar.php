@@ -5,9 +5,13 @@
  */
 
 use Nexus\Core\TenantContext;
+use Nexus\Services\AdminBadgeCountService;
 
 // Load navigation config
 $adminNavigation = require __DIR__ . '/../../../config/admin-navigation.php';
+
+// Load badge counts for sidebar
+$badgeCounts = AdminBadgeCountService::getCounts();
 
 $basePath = TenantContext::getBasePath();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
@@ -70,6 +74,21 @@ function isSectionActive($section, $currentPath, $basePath) {
         }
     }
     return false;
+}
+
+/**
+ * Render badge HTML if count > 0
+ */
+function renderAdminBadge($badgeKey, $badgeCounts) {
+    if (empty($badgeKey) || !isset($badgeCounts[$badgeKey])) {
+        return '';
+    }
+    $count = (int) $badgeCounts[$badgeKey];
+    if ($count <= 0) {
+        return '';
+    }
+    $displayCount = $count > 99 ? '99+' : $count;
+    return '<span class="admin-sidebar-badge">' . $displayCount . '</span>';
 }
 ?>
 <!-- Sidebar Backdrop (mobile) -->
@@ -160,6 +179,7 @@ function isSectionActive($section, $currentPath, $basePath) {
                                 aria-expanded="<?= $sectionActive ? 'true' : 'false' ?>">
                             <i class="fa-solid <?= $section['icon'] ?>"></i>
                             <span class="admin-sidebar-section-label"><?= htmlspecialchars($section['label']) ?></span>
+                            <?= renderAdminBadge($section['badge'] ?? null, $badgeCounts) ?>
                             <i class="fa-solid fa-chevron-down admin-sidebar-section-chevron"></i>
                         </button>
 
@@ -174,6 +194,7 @@ function isSectionActive($section, $currentPath, $basePath) {
                                        <?= $itemActive ? 'aria-current="page"' : '' ?>>
                                         <i class="fa-solid <?= $item['icon'] ?>" aria-hidden="true"></i>
                                         <span class="admin-sidebar-item-label"><?= htmlspecialchars($item['label']) ?></span>
+                                        <?= renderAdminBadge($item['badge'] ?? null, $badgeCounts) ?>
                                     </a>
                                 <?php endforeach; ?>
                             </div>
@@ -190,6 +211,7 @@ function isSectionActive($section, $currentPath, $basePath) {
                                        <?= $itemActive ? 'aria-current="page"' : '' ?>>
                                         <i class="fa-solid <?= $item['icon'] ?>" aria-hidden="true"></i>
                                         <span class="admin-sidebar-item-label"><?= htmlspecialchars($item['label']) ?></span>
+                                        <?= renderAdminBadge($item['badge'] ?? null, $badgeCounts) ?>
                                     </a>
                                 <?php endforeach; ?>
                             </div>

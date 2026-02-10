@@ -938,10 +938,17 @@ class SmartMatchingEngine
     /**
      * Check for new matches and send notifications
      * Uses the specialized dispatch methods for proper email templates
+     *
+     * NOTE: If broker approval is enabled (default), matches are submitted
+     * to the approval queue instead of being sent directly to users.
+     * Brokers review and approve/reject matches before users see them.
      */
     public static function notifyNewMatches(int $userId): int
     {
         $notified = 0;
+
+        // Check if broker approval workflow is enabled (default: enabled)
+        $requiresApproval = self::isBrokerApprovalEnabled();
 
         // Get hot matches (85%+)
         $hotMatches = self::getHotMatches($userId, 10);
@@ -953,8 +960,20 @@ class SmartMatchingEngine
             // Add recipient user ID for email template
             $match['recipient_user_id'] = $userId;
 
-            // Use the specialized hot match dispatcher
-            NotificationDispatcher::dispatchHotMatch($userId, $match);
+            if ($requiresApproval) {
+                // Submit to broker approval queue instead of direct notification
+                $matchData = [
+                    'match_score' => $match['match_score'] ?? 0,
+                    'match_type' => $match['match_type'] ?? 'one_way',
+                    'match_reasons' => $match['match_reasons'] ?? [],
+                    'distance_km' => $match['distance_km'] ?? null,
+                ];
+                MatchApprovalWorkflowService::submitForApproval($userId, $match['id'], $matchData);
+            } else {
+                // Direct notification (approval disabled)
+                NotificationDispatcher::dispatchHotMatch($userId, $match);
+            }
+
             self::markMatchNotified($userId, $match['id']);
             $notified++;
         }
@@ -969,19 +988,57 @@ class SmartMatchingEngine
             // Add recipient user ID for email template
             $match['recipient_user_id'] = $userId;
 
-            // Build reciprocal info from match data
-            $reciprocalInfo = [
-                'they_offer' => $match['title'] ?? 'a skill you need',
-                'you_offer' => $match['reciprocal_title'] ?? 'something they need'
-            ];
+            if ($requiresApproval) {
+                // Submit to broker approval queue instead of direct notification
+                $matchData = [
+                    'match_score' => $match['match_score'] ?? 0,
+                    'match_type' => 'mutual',
+                    'match_reasons' => $match['match_reasons'] ?? [],
+                    'distance_km' => $match['distance_km'] ?? null,
+                ];
+                MatchApprovalWorkflowService::submitForApproval($userId, $match['id'], $matchData);
+            } else {
+                // Direct notification (approval disabled)
+                $reciprocalInfo = [
+                    'they_offer' => $match['title'] ?? 'a skill you need',
+                    'you_offer' => $match['reciprocal_title'] ?? 'something they need'
+                ];
+                NotificationDispatcher::dispatchMutualMatch($userId, $match, $reciprocalInfo);
+            }
 
-            // Use the specialized mutual match dispatcher
-            NotificationDispatcher::dispatchMutualMatch($userId, $match, $reciprocalInfo);
             self::markMatchNotified($userId, $match['id']);
             $notified++;
         }
 
         return $notified;
+    }
+
+    /**
+     * Check if broker approval workflow is enabled for matches
+     *
+     * @return bool True if matches require broker approval
+     */
+    public static function isBrokerApprovalEnabled(): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            // Check tenant configuration
+            $tenant = Database::query(
+                "SELECT configuration FROM tenants WHERE id = ?",
+                [$tenantId]
+            )->fetch();
+
+            if ($tenant && $tenant['configuration']) {
+                $config = json_decode($tenant['configuration'], true);
+                // Default to enabled if not explicitly set
+                return $config['algorithms']['smart_matching']['broker_approval_enabled'] ?? true;
+            }
+        } catch (\Exception $e) {
+            // Default to enabled on error
+        }
+
+        return true; // Default: require broker approval
     }
 
     /**

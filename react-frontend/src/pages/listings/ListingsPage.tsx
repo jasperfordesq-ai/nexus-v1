@@ -134,11 +134,11 @@ export function ListingsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-              <ListTodo className="w-7 h-7 text-emerald-400" />
+            <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+              <ListTodo className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
               Listings
             </h1>
-            <p className="text-white/60 mt-1">Browse services and requests from the community</p>
+            <p className="text-theme-muted mt-1">Browse services and requests from the community</p>
           </div>
         {isAuthenticated && (
           <Link to="/listings/create">
@@ -160,10 +160,10 @@ export function ListingsPage() {
               placeholder="Search listings..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-white/40" />}
+              startContent={<Search className="w-4 h-4 text-theme-subtle" />}
               classNames={{
-                input: 'bg-transparent text-white placeholder:text-white/40',
-                inputWrapper: 'bg-white/5 border-white/10 hover:bg-white/10',
+                input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               }}
             />
           </div>
@@ -175,10 +175,10 @@ export function ListingsPage() {
               onChange={(e) => setSelectedType(e.target.value as ListingType)}
               className="w-36"
               classNames={{
-                trigger: 'bg-white/5 border-white/10 hover:bg-white/10',
-                value: 'text-white',
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
               }}
-              startContent={<Filter className="w-4 h-4 text-white/40" />}
+              startContent={<Filter className="w-4 h-4 text-theme-subtle" />}
             >
               <SelectItem key="all">All Types</SelectItem>
               <SelectItem key="offer">Offers</SelectItem>
@@ -191,29 +191,29 @@ export function ListingsPage() {
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="w-44"
               classNames={{
-                trigger: 'bg-white/5 border-white/10 hover:bg-white/10',
-                value: 'text-white',
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
               }}
-              startContent={<Tag className="w-4 h-4 text-white/40" />}
+              startContent={<Tag className="w-4 h-4 text-theme-subtle" />}
               items={[{ slug: '', name: 'All Categories' }, ...categories]}
             >
               {(cat) => <SelectItem key={cat.slug}>{cat.name}</SelectItem>}
             </Select>
 
-            <div className="flex rounded-lg overflow-hidden border border-white/10">
+            <div className="flex rounded-lg overflow-hidden border border-theme-default">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`p-2 ${viewMode === 'grid' ? 'bg-white/10' : 'bg-white/5 hover:bg-white/10'}`}
+                className={`p-2 ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated hover:bg-theme-hover'}`}
               >
-                <Grid className="w-4 h-4 text-white" />
+                <Grid className="w-4 h-4 text-theme-primary" />
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`p-2 ${viewMode === 'list' ? 'bg-white/10' : 'bg-white/5 hover:bg-white/10'}`}
+                className={`p-2 ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated hover:bg-theme-hover'}`}
               >
-                <List className="w-4 h-4 text-white" />
+                <List className="w-4 h-4 text-theme-primary" />
               </button>
             </div>
           </div>
@@ -225,9 +225,9 @@ export function ListingsPage() {
         <div className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <GlassCard key={i} className="p-6 animate-pulse">
-              <div className="h-4 bg-white/10 rounded w-3/4 mb-3" />
-              <div className="h-3 bg-white/10 rounded w-full mb-2" />
-              <div className="h-3 bg-white/10 rounded w-2/3" />
+              <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
+              <div className="h-3 bg-theme-hover rounded w-full mb-2" />
+              <div className="h-3 bg-theme-hover rounded w-2/3" />
             </GlassCard>
           ))}
         </div>
@@ -266,7 +266,7 @@ export function ListingsPage() {
             <div className="text-center pt-4">
               <Button
                 variant="flat"
-                className="bg-white/5 text-white"
+                className="bg-theme-elevated text-theme-primary"
                 onClick={() => loadListings()}
                 isLoading={isLoading}
               >
@@ -302,18 +302,18 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
               {listing.type === 'offer' ? 'Offering' : 'Requesting'}
             </span>
             {listing.category_name && (
-              <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-white/60">
+              <span className="text-xs px-2 py-1 rounded-full bg-theme-hover text-theme-muted">
                 {listing.category_name}
               </span>
             )}
           </div>
 
           {/* Title & Description */}
-          <h3 className="font-semibold text-white text-lg mb-2">{listing.title}</h3>
-          <p className="text-white/60 text-sm line-clamp-2 mb-4">{listing.description}</p>
+          <h3 className="font-semibold text-theme-primary text-lg mb-2">{listing.title}</h3>
+          <p className="text-theme-muted text-sm line-clamp-2 mb-4">{listing.description}</p>
 
           {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-white/50">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-theme-subtle">
             {listing.author_name && (
               <div className="flex items-center gap-1">
                 <User className="w-4 h-4" />

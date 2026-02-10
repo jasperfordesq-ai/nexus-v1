@@ -784,6 +784,27 @@ abstract class BaseApiController
         return $intVal;
     }
 
+    /**
+     * Get a boolean query parameter from the URL
+     *
+     * Interprets these values as true: "1", "true", "yes", "on"
+     * All other values (including empty string) are false.
+     *
+     * @param string $key Parameter key
+     * @param bool $default Default value if parameter is not present
+     * @return bool
+     */
+    protected function queryBool(string $key, bool $default = false): bool
+    {
+        $value = $this->query($key);
+
+        if ($value === null) {
+            return $default;
+        }
+
+        return in_array(strtolower((string) $value), ['1', 'true', 'yes', 'on'], true);
+    }
+
     // ============================================
     // URL HELPERS
     // ============================================

@@ -12,17 +12,52 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Load testing environment variables
-$envFile = __DIR__ . '/../.env.testing';
-if (file_exists($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+// Try multiple env files in order of preference
+$envFiles = [
+    __DIR__ . '/../.env.testing',   // Testing-specific env
+    __DIR__ . '/../.env.docker',    // Docker environment
+    __DIR__ . '/../.env',           // Default env
+];
+
+$loadEnvFile = function($filePath) {
+    if (!file_exists($filePath)) {
+        return false;
+    }
+    $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) {
+        // Skip comments and empty lines
+        $line = trim($line);
+        if (empty($line) || strpos($line, '#') === 0) {
             continue;
         }
+        // Remove Windows line endings
+        $line = str_replace("\r", '', $line);
         if (strpos($line, '=') !== false) {
-            putenv(trim($line));
             [$key, $value] = explode('=', $line, 2);
-            $_ENV[trim($key)] = trim($value);
+            $key = trim($key);
+            $value = trim($value);
+            // Remove quotes from value
+            if (preg_match('/^["\'].*["\']$/', $value)) {
+                $value = substr($value, 1, -1);
+            }
+            putenv("$key=$value");
+            $_ENV[$key] = $value;
+        }
+    }
+    return true;
+};
+
+// Only load env file if not running in Docker (Docker injects env vars directly)
+// Check if DB_HOST is already set to a Docker service name
+$loaded = false;
+$dockerDbHost = getenv('DB_HOST');
+$isDocker = ($dockerDbHost && $dockerDbHost !== 'localhost' && $dockerDbHost !== '127.0.0.1');
+
+if (!$isDocker) {
+    foreach ($envFiles as $envFile) {
+        if ($loadEnvFile($envFile)) {
+            $loaded = true;
+            break;
         }
     }
 }

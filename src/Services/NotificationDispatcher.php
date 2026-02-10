@@ -432,4 +432,288 @@ HTML;
 </div>
 HTML;
     }
+
+    // =========================================================================
+    // MATCH APPROVAL WORKFLOW NOTIFICATIONS
+    // =========================================================================
+
+    /**
+     * Dispatch notification to brokers/admins when a match needs approval
+     *
+     * @param int $brokerId The broker/admin user ID
+     * @param string $userName Name of user who would receive the match
+     * @param string $listingTitle Title of the listing
+     * @param int $requestId The approval request ID
+     */
+    public static function dispatchMatchApprovalRequest($brokerId, $userName, $listingTitle, $requestId)
+    {
+        $content = "📋 Match needs approval: {$userName} matched with \"{$listingTitle}\"";
+        $link = "/admin/match-approvals";
+
+        // Create in-app notification
+        Notification::create($brokerId, $content, $link, 'match_approval_request');
+
+        // Queue email (instant for admins)
+        $htmlContent = self::buildMatchApprovalRequestEmail($userName, $listingTitle, $requestId);
+        self::queueNotification($brokerId, 'match_approval_request', $content, $link, 'instant', $htmlContent);
+    }
+
+    /**
+     * Dispatch notification to user when their match is approved
+     *
+     * @param int $userId The user receiving the notification
+     * @param string $listingTitle Title of the listing
+     * @param int $listingId The listing ID
+     * @param float $matchScore The match score
+     */
+    public static function dispatchMatchApproved($userId, $listingTitle, $listingId, $matchScore = 0)
+    {
+        $content = "✅ Great news! You've been matched with \"{$listingTitle}\"";
+        $link = "/listings/{$listingId}";
+
+        // Create in-app notification
+        Notification::create($userId, $content, $link, 'match_approved');
+
+        // Queue email
+        $htmlContent = self::buildMatchApprovedEmail($listingTitle, $listingId, $matchScore);
+        self::queueNotification($userId, 'match_approved', $content, $link, 'instant', $htmlContent);
+    }
+
+    /**
+     * Dispatch notification to user when their match is rejected
+     *
+     * @param int $userId The user receiving the notification
+     * @param string $listingTitle Title of the listing
+     * @param string $reason The rejection reason
+     */
+    public static function dispatchMatchRejected($userId, $listingTitle, $reason = '')
+    {
+        $content = "ℹ️ Match update: \"{$listingTitle}\" wasn't suitable at this time";
+        if (!empty($reason)) {
+            $content .= ". Reason: {$reason}";
+        }
+        $link = "/matches";
+
+        // Create in-app notification
+        Notification::create($userId, $content, $link, 'match_rejected');
+
+        // Queue email
+        $htmlContent = self::buildMatchRejectedEmail($listingTitle, $reason);
+        self::queueNotification($userId, 'match_rejected', $content, $link, 'instant', $htmlContent);
+    }
+
+    /**
+     * Build HTML email for match approval request (sent to brokers)
+     */
+    private static function buildMatchApprovalRequestEmail($userName, $listingTitle, $requestId)
+    {
+        $tenant = \Nexus\Core\TenantContext::get();
+        $tenantName = $tenant['name'] ?? 'Community';
+        $basePath = \Nexus\Core\TenantContext::getBasePath();
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">📋 Match Needs Approval</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
+    </div>
+    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">A new match is waiting for your approval:</p>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">Member:</p>
+            <p style="color: #1e293b; font-weight: 600; margin: 0 0 16px; font-size: 18px;">{$userName}</p>
+            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">Matched with listing:</p>
+            <p style="color: #6366f1; font-weight: 600; margin: 0; font-size: 18px;">{$listingTitle}</p>
+        </div>
+        <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
+            Please review this match to ensure the member is suitable (mobility, health considerations) and the activity is within insurance coverage.
+        </p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$basePath}/admin/match-approvals" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Review Match</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    /**
+     * Build HTML email for match approved (sent to user)
+     */
+    private static function buildMatchApprovedEmail($listingTitle, $listingId, $matchScore)
+    {
+        $tenant = \Nexus\Core\TenantContext::get();
+        $tenantName = $tenant['name'] ?? 'Community';
+        $basePath = \Nexus\Core\TenantContext::getBasePath();
+        $scoreText = $matchScore > 0 ? " ({$matchScore}% match)" : "";
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #22c55e, #16a34a); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">✅ You've Been Matched!</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
+    </div>
+    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Great news! A coordinator has approved a match for you:</p>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: center;">
+            <p style="color: #22c55e; font-weight: 600; margin: 0; font-size: 20px;">{$listingTitle}</p>
+            <p style="color: #64748b; margin: 8px 0 0; font-size: 14px;">{$scoreText}</p>
+        </div>
+        <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
+            Click below to view the listing and get in touch with the member.
+        </p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$basePath}/listings/{$listingId}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">View Match</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    /**
+     * Build HTML email for match rejected (sent to user)
+     */
+    private static function buildMatchRejectedEmail($listingTitle, $reason)
+    {
+        $tenant = \Nexus\Core\TenantContext::get();
+        $tenantName = $tenant['name'] ?? 'Community';
+        $basePath = \Nexus\Core\TenantContext::getBasePath();
+
+        $reasonHtml = '';
+        if (!empty($reason)) {
+            $reasonHtml = <<<HTML
+<div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 16px; margin: 16px 0;">
+    <p style="color: #dc2626; font-weight: 600; margin: 0 0 8px; font-size: 14px;">Reason:</p>
+    <p style="color: #7f1d1d; margin: 0; font-size: 14px; line-height: 1.5;">{$reason}</p>
+</div>
+HTML;
+        }
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">Match Update</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
+    </div>
+    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Unfortunately, a coordinator has determined that the following match wasn't suitable at this time:</p>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: center;">
+            <p style="color: #64748b; font-weight: 600; margin: 0; font-size: 18px;">{$listingTitle}</p>
+        </div>
+        {$reasonHtml}
+        <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
+            Don't worry - there are plenty of other opportunities in your community! Browse more matches to find a good fit.
+        </p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$basePath}/matches" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Browse Matches</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    // =========================================================================
+    // SIMPLE NOTIFICATION METHODS (for broker control services)
+    // =========================================================================
+
+    /**
+     * Send a simple notification to a user
+     * Simplified interface for broker control services
+     *
+     * @param int $userId Target user ID
+     * @param string $type Notification type (e.g., 'exchange_request_received')
+     * @param array $data Notification data
+     */
+    public static function send(int $userId, string $type, array $data = []): void
+    {
+        // Build content and link based on notification type
+        $content = self::buildNotificationContent($type, $data);
+        $link = self::buildNotificationLink($type, $data);
+
+        // Create in-app notification
+        Notification::create($userId, $content, $link, $type);
+
+        // Queue email notification
+        self::queueNotification($userId, $type, $content, $link, 'instant');
+    }
+
+    /**
+     * Notify all admins/brokers of the current tenant
+     *
+     * @param string $type Notification type
+     * @param array $data Notification data
+     * @param string $message Optional custom message
+     */
+    public static function notifyAdmins(string $type, array $data = [], string $message = ''): void
+    {
+        $tenantId = \Nexus\Core\TenantContext::getId();
+
+        // Get all admin users for this tenant
+        $stmt = Database::query(
+            "SELECT id FROM users WHERE tenant_id = ? AND role IN ('admin', 'broker', 'coordinator') AND status = 'active'",
+            [$tenantId]
+        );
+
+        while ($admin = $stmt->fetch()) {
+            $content = $message ?: self::buildNotificationContent($type, $data);
+            $link = self::buildNotificationLink($type, $data);
+
+            Notification::create($admin['id'], $content, $link, $type);
+            self::queueNotification($admin['id'], $type, $content, $link, 'instant');
+        }
+    }
+
+    /**
+     * Build notification content based on type
+     */
+    private static function buildNotificationContent(string $type, array $data): string
+    {
+        switch ($type) {
+            case 'exchange_request_received':
+                return "📥 New exchange request for your listing";
+            case 'exchange_request_declined':
+                $reason = !empty($data['reason']) ? ": {$data['reason']}" : '';
+                return "❌ Your exchange request was declined{$reason}";
+            case 'exchange_approved':
+                return "✅ Your exchange has been approved! You can now begin.";
+            case 'exchange_rejected':
+                $reason = !empty($data['reason']) ? ": {$data['reason']}" : '';
+                return "❌ Exchange was not approved{$reason}";
+            case 'exchange_completed':
+                $hours = $data['hours'] ?? 0;
+                return "🎉 Exchange completed! {$hours} hours transferred.";
+            case 'exchange_cancelled':
+                return "⚠️ Exchange was cancelled";
+            case 'exchange_disputed':
+                return "⚠️ Exchange has conflicting hour confirmations - broker review needed";
+            case 'listing_risk_tagged':
+                $level = $data['risk_level'] ?? 'unknown';
+                $title = $data['listing_title'] ?? 'Listing';
+                return "⚠️ Listing '{$title}' tagged as {$level} risk";
+            default:
+                return "Notification: {$type}";
+        }
+    }
+
+    /**
+     * Build notification link based on type
+     */
+    private static function buildNotificationLink(string $type, array $data): string
+    {
+        switch ($type) {
+            case 'exchange_request_received':
+            case 'exchange_approved':
+            case 'exchange_rejected':
+            case 'exchange_completed':
+            case 'exchange_cancelled':
+            case 'exchange_disputed':
+                $exchangeId = $data['exchange_id'] ?? 0;
+                return "/exchanges/{$exchangeId}";
+            case 'exchange_request_declined':
+                return "/exchanges";
+            case 'listing_risk_tagged':
+                return "/admin/broker-controls/risk-tags";
+            default:
+                return "/notifications";
+        }
+    }
 }

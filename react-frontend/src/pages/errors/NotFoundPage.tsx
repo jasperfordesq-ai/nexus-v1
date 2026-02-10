@@ -21,8 +21,8 @@ export function NotFoundPage() {
             <span className="text-5xl font-bold text-gradient">404</span>
           </div>
 
-          <h1 className="text-2xl font-bold text-white mb-2">Page Not Found</h1>
-          <p className="text-white/60 mb-8">
+          <h1 className="text-2xl font-bold text-theme-primary mb-2">Page Not Found</h1>
+          <p className="text-theme-muted mb-8">
             The page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
 
@@ -38,7 +38,7 @@ export function NotFoundPage() {
             <Link to="/search" className="flex-1">
               <Button
                 variant="flat"
-                className="w-full bg-white/5 text-white/80"
+                className="w-full bg-theme-elevated text-theme-muted"
                 startContent={<Search className="w-4 h-4" />}
               >
                 Search
@@ -48,7 +48,7 @@ export function NotFoundPage() {
 
           <button
             onClick={() => window.history.back()}
-            className="mt-6 inline-flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors"
+            className="mt-6 inline-flex items-center gap-2 text-theme-subtle hover:text-theme-primary text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Go back

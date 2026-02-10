@@ -4,10 +4,106 @@ namespace Nexus\Models;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Core\Mailer;
 use Nexus\Services\RealtimeService;
 
 class Message
 {
+    /**
+     * Send an email notification for a new message
+     * Sends immediately for 'instant' frequency, queues for 'daily' digest
+     * Respects user's notification preferences
+     *
+     * Made public so it can be called from MessageService for V2 API messages
+     */
+    public static function sendEmailNotification(int $receiverId, string $senderName, string $messagePreview, int $senderId): void
+    {
+        try {
+            $db = Database::getConnection();
+
+            // Get receiver's email notification preferences
+            $prefStmt = $db->prepare("
+                SELECT frequency FROM notification_settings
+                WHERE user_id = ? AND context_type = 'global' AND context_id = 0
+            ");
+            $prefStmt->execute([$receiverId]);
+            $pref = $prefStmt->fetch();
+
+            // Default to 'instant' for messages if no preference set, 'off' means no email
+            $frequency = $pref['frequency'] ?? 'instant';
+
+            if ($frequency === 'off') {
+                return; // User has disabled email notifications
+            }
+
+            // Get receiver info for email
+            $receiverStmt = $db->prepare("SELECT email, first_name FROM users WHERE id = ?");
+            $receiverStmt->execute([$receiverId]);
+            $receiver = $receiverStmt->fetch();
+
+            if (!$receiver || empty($receiver['email'])) {
+                return;
+            }
+
+            // Build email content
+            $content = "{$senderName} sent you a message: {$messagePreview}";
+            $link = "/messages/{$senderId}";
+
+            // Build HTML email body
+            $receiverName = $receiver['first_name'] ?? 'there';
+            $tenant = TenantContext::get();
+            $tenantName = $tenant['name'] ?? 'Project NEXUS';
+            $baseUrl = TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
+
+            $htmlBody = <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">💬 New Message</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">You have a new message from {$senderName}</p>
+    </div>
+    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #64748b; margin: 0 0 8px;">Hi {$receiverName},</p>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+            <p style="color: #1e293b; margin: 0; font-style: italic;">"{$messagePreview}"</p>
+        </div>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$baseUrl}{$link}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Read Message
+            </a>
+        </div>
+    </div>
+    <div style="text-align: center; padding: 16px; color: #94a3b8; font-size: 12px;">
+        <p>You received this because you have a {$tenantName} account.</p>
+        <p><a href="{$baseUrl}/settings?tab=notifications" style="color: #6366f1;">Manage notification preferences</a></p>
+    </div>
+</div>
+HTML;
+
+            // For instant: send immediately. For daily: queue for digest.
+            if ($frequency === 'instant') {
+                // Send email immediately - no cron needed
+                $mailer = new Mailer();
+                $result = $mailer->send($receiver['email'], "💬 New Message from {$senderName}", $htmlBody);
+                if ($result) {
+                    error_log("[Message] Email sent successfully to {$receiver['email']} from {$senderName}");
+                } else {
+                    error_log("[Message] Email FAILED to send to {$receiver['email']} from {$senderName}");
+                }
+            } else {
+                // Queue for daily digest
+                $insertStmt = $db->prepare("
+                    INSERT INTO notification_queue (user_id, activity_type, content_snippet, link, frequency, email_body, created_at, status)
+                    VALUES (?, 'new_message', ?, ?, ?, ?, NOW(), 'pending')
+                ");
+                $insertStmt->execute([$receiverId, substr($content, 0, 250), $link, $frequency, $htmlBody]);
+            }
+
+        } catch (\Exception $e) {
+            // Log error but don't fail message creation
+            error_log('[Message] Email notification failed: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Create a new message
      */
@@ -43,6 +139,9 @@ class Message
             "/messages/{$senderId}",
             'message'
         );
+
+        // Queue email notification based on user preferences
+        self::sendEmailNotification($receiverId, $senderName, $preview, $senderId);
 
         return $messageId;
     }
@@ -84,6 +183,9 @@ class Message
             "/messages/{$senderId}",
             'message'
         );
+
+        // Queue email notification based on user preferences
+        self::sendEmailNotification($receiverId, $senderName, '🎤 Voice message', $senderId);
 
         return $messageId;
     }

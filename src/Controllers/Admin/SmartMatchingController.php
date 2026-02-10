@@ -121,6 +121,7 @@ class SmartMatchingController
             $config['algorithms'] = $config['algorithms'] ?? [];
             $config['algorithms']['smart_matching'] = [
                 'enabled' => isset($_POST['enabled']),
+                'broker_approval_enabled' => isset($_POST['broker_approval_enabled']),
                 'max_distance_km' => (int) ($_POST['max_distance_km'] ?? 50),
                 'min_match_score' => (int) ($_POST['min_match_score'] ?? 40),
                 'hot_match_threshold' => (int) ($_POST['hot_match_threshold'] ?? 80),

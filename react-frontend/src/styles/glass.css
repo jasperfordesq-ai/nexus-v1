@@ -28,7 +28,7 @@
 .glass-card-hover:hover {
   background: var(--glass-highlight);
   border-color: var(--glass-border-hover);
-  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 8px 32px var(--glow-primary-subtle);
 }
 
 /* ─────────────────────────────────────────────
@@ -76,22 +76,22 @@
   background-size: 200% 100%;
   border: none;
   color: white;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 15px var(--glow-primary-subtle);
 }
 
 .glass-button-primary:hover:not(:disabled) {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), 0 4px 20px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 20px var(--glow-primary), 0 4px 20px var(--glow-primary);
 }
 
 .glass-button-accent {
   background: linear-gradient(to right, var(--color-secondary), var(--color-accent));
   border: none;
   color: white;
-  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+  box-shadow: 0 4px 15px var(--glow-accent-subtle);
 }
 
 .glass-button-accent:hover:not(:disabled) {
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3), 0 4px 20px rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 20px var(--glow-accent), 0 4px 20px var(--glow-accent);
 }
 
 .glass-button-ghost {
@@ -99,7 +99,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--glass-border);
-  color: white;
+  color: var(--text-primary);
 }
 
 .glass-button-ghost:hover:not(:disabled) {
@@ -158,11 +158,11 @@
 }
 
 .glass-input-error {
-  border-color: #ef4444;
+  border-color: var(--color-error);
 }
 
 .glass-input-error:focus {
-  border-color: #ef4444;
+  border-color: var(--color-error);
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
 }
 
@@ -188,49 +188,49 @@
    Matches nexus-modern-frontend glow intensities
    ───────────────────────────────────────────── */
 .glow-primary {
-  box-shadow: 0 0 20px var(--glow-primary), 0 0 40px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 20px var(--glow-primary), 0 0 40px var(--glow-primary-subtle);
 }
 
 .glow-primary-intense {
-  box-shadow: 0 0 30px var(--glow-primary), 0 0 60px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 30px var(--glow-primary), 0 0 60px var(--glow-primary);
 }
 
 .glow-secondary {
-  box-shadow: 0 0 20px var(--glow-secondary), 0 0 40px rgba(168, 85, 247, 0.2);
+  box-shadow: 0 0 20px var(--glow-secondary), 0 0 40px var(--glow-secondary-subtle);
 }
 
 .glow-secondary-intense {
-  box-shadow: 0 0 30px var(--glow-secondary), 0 0 60px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 30px var(--glow-secondary), 0 0 60px var(--glow-secondary);
 }
 
 .glow-accent {
-  box-shadow: 0 0 20px var(--glow-accent), 0 0 40px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 20px var(--glow-accent), 0 0 40px var(--glow-accent-subtle);
 }
 
 .glow-accent-intense {
-  box-shadow: 0 0 30px var(--glow-accent), 0 0 60px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 30px var(--glow-accent), 0 0 60px var(--glow-accent);
 }
 
-/* Hover glow variants (matches nexus-modern-frontend) */
+/* Hover glow variants */
 .hover-glow-primary {
   transition: box-shadow var(--transition-slow);
 }
 .hover-glow-primary:hover {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 30px var(--glow-primary);
 }
 
 .hover-glow-secondary {
   transition: box-shadow var(--transition-slow);
 }
 .hover-glow-secondary:hover {
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 30px var(--glow-secondary);
 }
 
 .hover-glow-accent {
   transition: box-shadow var(--transition-slow);
 }
 .hover-glow-accent:hover {
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 30px var(--glow-accent);
 }
 
 /* ─────────────────────────────────────────────

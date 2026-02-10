@@ -63,6 +63,14 @@ $onlineStatusText = $isOtherUserOnline ? 'Active now' : 'Offline';
         </a>
     </header>
 
+    <?php if (!empty($isMonitored)): ?>
+    <!-- Broker Monitoring Notice -->
+    <div class="chat-monitoring-notice">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>This conversation may be reviewed by a coordinator for safeguarding purposes.</span>
+    </div>
+    <?php endif; ?>
+
     <!-- Messages -->
     <div class="chat-messages" id="chatMessages">
         <?php if (empty($messages)): ?>
@@ -392,11 +400,13 @@ function playVoiceMessage(btn) {
 
             const data = await res.json();
 
-            if (data.success && data.message) {
+            // API returns: { success: true, data: { message: {...} } }
+            const msg = data.data?.message || data.message;
+            if (data.success && msg) {
                 // Update temp message with real ID
-                bubble.dataset.id = data.message.id;
+                bubble.dataset.id = msg.id;
                 bubble.id = '';
-                lastMessageId = data.message.id;
+                lastMessageId = msg.id;
 
                 // Update check icon
                 const check = bubble.querySelector('.chat-check');

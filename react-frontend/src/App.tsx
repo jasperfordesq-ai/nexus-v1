@@ -13,7 +13,7 @@ import { HeroUIProvider } from '@heroui/react';
 import { HelmetProvider } from 'react-helmet-async';
 
 // Contexts
-import { AuthProvider, TenantProvider, ToastProvider } from '@/contexts';
+import { AuthProvider, TenantProvider, ToastProvider, NotificationsProvider, ThemeProvider, PusherProvider } from '@/contexts';
 
 // Layout Components
 import { Layout, AuthLayout } from '@/components/layout';
@@ -45,6 +45,9 @@ const GroupDetailPage = lazy(() => import('@/pages/groups/GroupDetailPage'));
 const CreateGroupPage = lazy(() => import('@/pages/groups/CreateGroupPage'));
 const NotFoundPage = lazy(() => import('@/pages/errors/NotFoundPage'));
 const ComingSoonPage = lazy(() => import('@/pages/errors/ComingSoonPage'));
+const ExchangesPage = lazy(() => import('@/pages/exchanges/ExchangesPage'));
+const ExchangeDetailPage = lazy(() => import('@/pages/exchanges/ExchangeDetailPage'));
+const RequestExchangePage = lazy(() => import('@/pages/exchanges/RequestExchangePage'));
 
 // Static Pages
 const AboutPage = lazy(() => import('@/pages/public/AboutPage'));
@@ -56,11 +59,14 @@ function App() {
   return (
     <ErrorBoundary>
       <HelmetProvider>
-        <HeroUIProvider>
-          <BrowserRouter>
-            <ToastProvider>
-              <TenantProvider>
-                <AuthProvider>
+        <ThemeProvider>
+          <HeroUIProvider>
+            <BrowserRouter>
+              <ToastProvider>
+                <TenantProvider>
+                  <AuthProvider>
+                    <NotificationsProvider>
+                      <PusherProvider>
               <Suspense fallback={<LoadingScreen message="Loading..." />}>
                 <Routes>
                   {/* Auth Routes (no navbar/footer) */}
@@ -98,6 +104,9 @@ function App() {
                       <Route path="/settings" element={<SettingsPage />} />
                       <Route path="/search" element={<SearchPage />} />
                       <Route path="/notifications" element={<NotificationsPage />} />
+                      <Route path="/exchanges" element={<ExchangesPage />} />
+                      <Route path="/exchanges/:id" element={<ExchangeDetailPage />} />
+                      <Route path="/listings/:id/request-exchange" element={<RequestExchangePage />} />
 
                       {/* Feature-gated: Members/Connections */}
                       <Route
@@ -221,11 +230,14 @@ function App() {
                   </Route>
                 </Routes>
               </Suspense>
-                </AuthProvider>
-              </TenantProvider>
-            </ToastProvider>
-          </BrowserRouter>
-        </HeroUIProvider>
+                      </PusherProvider>
+                    </NotificationsProvider>
+                  </AuthProvider>
+                </TenantProvider>
+              </ToastProvider>
+            </BrowserRouter>
+          </HeroUIProvider>
+        </ThemeProvider>
       </HelmetProvider>
     </ErrorBoundary>
   );

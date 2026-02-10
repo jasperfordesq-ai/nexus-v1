@@ -85,7 +85,7 @@ $pageSpecificCSS = [
     // Messages thread (detail view)
     'messages-thread' => [
         'condition' => preg_match('#/messages/(\d+|thread/)#', $normPath),
-        'files' => ['messages-thread.css']
+        'files' => ['messages-thread.css', 'components/risk-badge.css']
     ],
 
     // Notifications
@@ -157,7 +157,13 @@ $pageSpecificCSS = [
     // Listings show (detail view)
     'listings-show' => [
         'condition' => preg_match('/\/listings\/\d+$/', $normPath),
-        'files' => ['listings-show.css']
+        'files' => ['listings-show.css', 'components/risk-badge.css']
+    ],
+
+    // Exchanges (broker-controlled workflow)
+    'exchanges' => [
+        'condition' => strpos($normPath, '/exchanges') !== false,
+        'files' => ['exchanges.css']
     ],
 
     // Federation - Core (always load for all federation routes)
