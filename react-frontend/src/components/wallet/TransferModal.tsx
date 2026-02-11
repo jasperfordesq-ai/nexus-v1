@@ -58,6 +58,7 @@ export function TransferModal({
   // Refs
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -289,7 +290,13 @@ export function TransferModal({
                         value={searchQuery}
                         onChange={(e) => handleSearchChange(e.target.value)}
                         onFocus={() => searchResults.length > 0 && setShowResults(true)}
-                        onBlur={() => setTimeout(() => setShowResults(false), 200)}
+                        onBlur={(e) => {
+                          // Only hide results if focus moved outside the results container
+                          const relatedTarget = e.relatedTarget as HTMLElement | null;
+                          if (!resultsRef.current?.contains(relatedTarget)) {
+                            setShowResults(false);
+                          }
+                        }}
                         startContent={
                           isSearching ? (
                             <Spinner size="sm" color="current" />
@@ -307,6 +314,7 @@ export function TransferModal({
                       <AnimatePresence>
                         {showResults && searchResults.length > 0 && (
                           <motion.div
+                            ref={resultsRef}
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
