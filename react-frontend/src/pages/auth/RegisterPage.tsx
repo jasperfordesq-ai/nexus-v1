@@ -12,7 +12,7 @@
 
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Input, Checkbox, Divider, Select, SelectItem, Textarea } from '@heroui/react';
+import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
 import { motion } from 'framer-motion';
 import {
   User,
