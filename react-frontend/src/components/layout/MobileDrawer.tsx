@@ -137,8 +137,8 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
       size="sm"
       hideCloseButton
       classNames={{
-        base: 'bg-theme-card border-l border-theme-default',
-        header: 'border-b border-theme-default p-4',
+        base: 'bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-white/10 shadow-2xl',
+        header: 'border-b border-gray-200 dark:border-white/10 p-4',
         body: 'p-0',
       }}
     >
@@ -163,7 +163,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         <DrawerBody>
           {/* User Section */}
           {isAuthenticated && user && (
-            <div className="p-4 border-b border-theme-default">
+            <div className="p-4 border-b border-gray-200 dark:border-white/10">
               <Link
                 to="/profile"
                 className="flex items-center gap-3"
@@ -282,13 +282,14 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                     <Settings className="w-5 h-5" aria-hidden="true" />
                     <span>Settings</span>
                   </NavLink>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 transition-all w-full"
+                  <Button
+                    variant="light"
+                    onPress={handleLogout}
+                    className="flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-base font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 transition-all w-full h-auto"
                   >
                     <LogOut className="w-5 h-5" aria-hidden="true" />
                     <span>Log Out</span>
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
