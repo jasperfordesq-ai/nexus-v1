@@ -287,6 +287,27 @@ class CronController
                         $subject = "🤝 Mutual Match Opportunity";
                     } elseif ($item['activity_type'] === 'match_digest') {
                         $subject = "📊 Your Match Digest";
+                    } elseif ($item['activity_type'] === 'match_approval_request') {
+                        $subject = "📋 Match Needs Approval";
+                    } elseif ($item['activity_type'] === 'match_approved') {
+                        $subject = "✅ You've Been Matched!";
+                    } elseif ($item['activity_type'] === 'match_rejected') {
+                        $subject = "Match Update";
+                    // Exchange workflow notifications
+                    } elseif ($item['activity_type'] === 'exchange_request_received') {
+                        $subject = "📥 New Exchange Request";
+                    } elseif ($item['activity_type'] === 'exchange_request_declined') {
+                        $subject = "Exchange Request Declined";
+                    } elseif ($item['activity_type'] === 'exchange_approved') {
+                        $subject = "✅ Exchange Approved - Ready to Begin!";
+                    } elseif ($item['activity_type'] === 'exchange_rejected') {
+                        $subject = "Exchange Not Approved";
+                    } elseif ($item['activity_type'] === 'exchange_completed') {
+                        $subject = "🎉 Exchange Completed!";
+                    } elseif ($item['activity_type'] === 'exchange_cancelled') {
+                        $subject = "Exchange Cancelled";
+                    } elseif ($item['activity_type'] === 'exchange_disputed') {
+                        $subject = "⚠️ Exchange Dispute - Broker Review Needed";
                     }
 
                     $body = $item['email_body'] ?? nl2br($item['content_snippet']);
@@ -301,6 +322,11 @@ class CronController
                     // Replace {{LISTING_URL}} placeholder (for hot/mutual match emails)
                     if (!empty($item['link']) && strpos($item['link'], '/listings/') !== false) {
                         $body = str_replace('{{LISTING_URL}}', $baseUrl . $basePath . $item['link'], $body);
+                    }
+
+                    // Replace {{EXCHANGE_URL}} placeholder (for exchange notifications)
+                    if (!empty($item['link']) && strpos($item['link'], '/exchanges/') !== false) {
+                        $body = str_replace('{{EXCHANGE_URL}}', $baseUrl . $basePath . $item['link'], $body);
                     }
 
                     if ($mailer->send($item['email'], $subject, $body)) {

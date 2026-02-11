@@ -632,8 +632,8 @@ HTML;
         // Create in-app notification
         Notification::create($userId, $content, $link, $type);
 
-        // Queue email notification
-        self::queueNotification($userId, $type, $content, $link, 'instant');
+        // Send email immediately for exchange notifications (truly instant)
+        self::sendExchangeEmailImmediately($userId, $type, $data, $content, $link);
     }
 
     /**
@@ -658,7 +658,9 @@ HTML;
             $link = self::buildNotificationLink($type, $data);
 
             Notification::create($admin['id'], $content, $link, $type);
-            self::queueNotification($admin['id'], $type, $content, $link, 'instant');
+
+            // Send email immediately for exchange notifications (truly instant)
+            self::sendExchangeEmailImmediately($admin['id'], $type, $data, $content, $link);
         }
     }
 
@@ -685,6 +687,15 @@ HTML;
                 return "⚠️ Exchange was cancelled";
             case 'exchange_disputed':
                 return "⚠️ Exchange has conflicting hour confirmations - broker review needed";
+            case 'exchange_accepted':
+                return "✅ Your exchange request was accepted! You can now coordinate the service.";
+            case 'exchange_pending_broker':
+                return "⏳ Exchange accepted - awaiting coordinator approval";
+            case 'exchange_started':
+                return "🚀 Exchange has started! Service is now in progress.";
+            case 'exchange_ready_confirmation':
+                $hours = $data['proposed_hours'] ?? 0;
+                return "✋ Exchange complete - please confirm {$hours} hours worked";
             case 'listing_risk_tagged':
                 $level = $data['risk_level'] ?? 'unknown';
                 $title = $data['listing_title'] ?? 'Listing';
@@ -706,8 +717,14 @@ HTML;
             case 'exchange_completed':
             case 'exchange_cancelled':
             case 'exchange_disputed':
+            case 'exchange_accepted':
+            case 'exchange_started':
+            case 'exchange_ready_confirmation':
                 $exchangeId = $data['exchange_id'] ?? 0;
                 return "/exchanges/{$exchangeId}";
+            case 'exchange_pending_broker':
+                $exchangeId = $data['exchange_id'] ?? 0;
+                return "/admin/broker-controls/exchanges/{$exchangeId}";
             case 'exchange_request_declined':
                 return "/exchanges";
             case 'listing_risk_tagged':
@@ -715,5 +732,620 @@ HTML;
             default:
                 return "/notifications";
         }
+    }
+
+    /**
+     * Send exchange email immediately (no cron delay)
+     */
+    private static function sendExchangeEmailImmediately(int $userId, string $type, array $data, string $content, string $link): void
+    {
+        // Only send for exchange notifications
+        if (strpos($type, 'exchange_') !== 0) {
+            return;
+        }
+
+        try {
+            // Get user email
+            $user = Database::query(
+                "SELECT email, name, first_name FROM users WHERE id = ?",
+                [$userId]
+            )->fetch();
+
+            if (!$user || empty($user['email'])) {
+                return;
+            }
+
+            // Build full URL
+            $baseUrl = \Nexus\Core\TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
+            $basePath = \Nexus\Core\TenantContext::getBasePath();
+            $fullUrl = $baseUrl . $basePath . $link;
+
+            // Get exchange details for richer email content
+            $exchangeDetails = self::getExchangeDetailsForEmail($data['exchange_id'] ?? 0);
+
+            // Build the rich HTML email
+            $emailBody = self::buildRichExchangeEmail($type, $data, $user, $exchangeDetails, $fullUrl);
+
+            // Get subject line
+            $subject = self::getExchangeEmailSubject($type, $exchangeDetails);
+
+            // Send immediately via Mailer
+            $mailer = new \Nexus\Core\Mailer();
+            $mailer->send($user['email'], $subject, $emailBody);
+
+        } catch (\Exception $e) {
+            error_log("NotificationDispatcher: Failed to send exchange email - " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get exchange details for email content
+     */
+    private static function getExchangeDetailsForEmail(int $exchangeId): array
+    {
+        if ($exchangeId <= 0) {
+            return [];
+        }
+
+        try {
+            $stmt = Database::query(
+                "SELECT e.*,
+                        l.title as listing_title, l.type as listing_type, l.description as listing_description,
+                        req.name as requester_name, req.first_name as requester_first_name, req.avatar_url as requester_avatar,
+                        prov.name as provider_name, prov.first_name as provider_first_name, prov.avatar_url as provider_avatar
+                 FROM exchange_requests e
+                 JOIN listings l ON e.listing_id = l.id
+                 JOIN users req ON e.requester_id = req.id
+                 JOIN users prov ON e.provider_id = prov.id
+                 WHERE e.id = ?",
+                [$exchangeId]
+            );
+            return $stmt->fetch() ?: [];
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get email subject for exchange notifications
+     */
+    private static function getExchangeEmailSubject(string $type, array $details): string
+    {
+        $listingTitle = $details['listing_title'] ?? 'your listing';
+        $shortTitle = strlen($listingTitle) > 30 ? substr($listingTitle, 0, 30) . '...' : $listingTitle;
+
+        $subjects = [
+            'exchange_request_received' => "📥 New exchange request for \"{$shortTitle}\"",
+            'exchange_request_declined' => "Exchange request declined",
+            'exchange_approved' => "✅ Exchange approved by coordinator - Ready to begin!",
+            'exchange_rejected' => "Exchange not approved",
+            'exchange_completed' => "🎉 Exchange completed - Hours transferred!",
+            'exchange_cancelled' => "Exchange cancelled",
+            'exchange_disputed' => "⚠️ Exchange needs broker review",
+            // New notification types
+            'exchange_accepted' => "✅ Your exchange request was accepted!",
+            'exchange_pending_broker' => "⏳ Exchange accepted - Awaiting coordinator approval",
+            'exchange_started' => "🚀 Exchange started - Service in progress",
+            'exchange_ready_confirmation' => "✋ Action needed: Confirm your exchange hours",
+        ];
+
+        return $subjects[$type] ?? "Exchange update";
+    }
+
+    /**
+     * Build rich HTML email for exchange notifications
+     */
+    private static function buildRichExchangeEmail(string $type, array $data, array $user, array $details, string $actionUrl): string
+    {
+        $tenant = \Nexus\Core\TenantContext::get();
+        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantColor = $tenant['primary_color'] ?? '#6366f1';
+
+        $userName = $user['first_name'] ?? $user['name'] ?? 'there';
+        $listingTitle = $details['listing_title'] ?? 'Service Exchange';
+        $listingType = $details['listing_type'] ?? 'offer';
+        $proposedHours = $details['proposed_hours'] ?? $data['hours'] ?? 0;
+        $requesterName = $details['requester_first_name'] ?? $details['requester_name'] ?? 'A member';
+        $providerName = $details['provider_first_name'] ?? $details['provider_name'] ?? 'Provider';
+
+        // Get type-specific content
+        $emailConfig = self::getExchangeEmailConfig($type, $data, $details);
+
+        $year = date('Y');
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$emailConfig['title']}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: {$emailConfig['gradient']}; padding: 32px 24px; text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 12px;">{$emailConfig['icon']}</div>
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;">{$emailConfig['title']}</h1>
+                            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName}</p>
+                        </td>
+                    </tr>
+
+                    <!-- Greeting -->
+                    <tr>
+                        <td style="padding: 32px 24px 16px;">
+                            <p style="margin: 0; font-size: 18px; color: #111827;">Hi {$userName},</p>
+                        </td>
+                    </tr>
+
+                    <!-- Main Message -->
+                    <tr>
+                        <td style="padding: 0 24px 24px;">
+                            <p style="margin: 0; font-size: 16px; color: #374151; line-height: 1.6;">
+                                {$emailConfig['message']}
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Exchange Details Card -->
+                    <tr>
+                        <td style="padding: 0 24px 24px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
+                                                    <p style="margin: 0 0 4px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Service</p>
+                                                    <p style="margin: 0; font-size: 18px; color: #111827; font-weight: 600;">{$listingTitle}</p>
+                                                    <span style="display: inline-block; margin-top: 8px; padding: 4px 12px; font-size: 12px; font-weight: 500; border-radius: 999px; background-color: {$emailConfig['typeColor']}; color: {$emailConfig['typeText']};">
+                                                        {$emailConfig['typeBadge']}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top: 16px;">
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                                        <tr>
+                                                            <td width="50%" style="vertical-align: top;">
+                                                                <p style="margin: 0 0 4px; font-size: 12px; color: #6b7280;">Requester</p>
+                                                                <p style="margin: 0; font-size: 14px; color: #111827; font-weight: 500;">{$requesterName}</p>
+                                                            </td>
+                                                            <td width="50%" style="vertical-align: top;">
+                                                                <p style="margin: 0 0 4px; font-size: 12px; color: #6b7280;">Provider</p>
+                                                                <p style="margin: 0; font-size: 14px; color: #111827; font-weight: 500;">{$providerName}</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            {$emailConfig['extraDetails']}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {$emailConfig['alertBox']}
+
+                    <!-- CTA Button -->
+                    <tr>
+                        <td style="padding: 0 24px 32px; text-align: center;">
+                            <a href="{$actionUrl}" style="display: inline-block; background: {$emailConfig['gradient']}; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+                                {$emailConfig['buttonText']}
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Help Text -->
+                    <tr>
+                        <td style="padding: 0 24px 24px;">
+                            <p style="margin: 0; font-size: 14px; color: #6b7280; text-align: center;">
+                                {$emailConfig['helpText']}
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9fafb; padding: 24px; border-top: 1px solid #e5e7eb;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <p style="margin: 0 0 8px; font-size: 14px; color: #6b7280;">
+                                            This email was sent by {$tenantName}
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                                            © {$year} Project NEXUS. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+HTML;
+    }
+
+    /**
+     * Get configuration for each exchange email type
+     */
+    private static function getExchangeEmailConfig(string $type, array $data, array $details): array
+    {
+        $hours = $details['proposed_hours'] ?? $data['hours'] ?? 0;
+        $finalHours = $details['final_hours'] ?? $data['hours'] ?? $hours;
+        $reason = $data['reason'] ?? '';
+        $listingType = $details['listing_type'] ?? 'offer';
+        $requesterName = $details['requester_first_name'] ?? $details['requester_name'] ?? 'A member';
+        $providerName = $details['provider_first_name'] ?? $details['provider_name'] ?? 'the provider';
+
+        // Type badge styling
+        $typeColor = $listingType === 'offer' ? '#dcfce7' : '#fef3c7';
+        $typeText = $listingType === 'offer' ? '#166534' : '#92400e';
+        $typeBadge = $listingType === 'offer' ? 'Offering' : 'Requesting';
+
+        $configs = [
+            'exchange_request_received' => [
+                'gradient' => 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                'icon' => '📥',
+                'title' => 'New Exchange Request',
+                'message' => "<strong>{$requesterName}</strong> would like to exchange services with you! They've proposed <strong>{$hours} hour(s)</strong> for this exchange.",
+                'buttonText' => 'Review Request',
+                'helpText' => 'You can accept or decline this request from your exchanges dashboard.',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => $hours > 0 ? "
+                    <tr>
+                        <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Proposed Hours</p>
+                            <p style=\"margin: 0; font-size: 24px; color: #6366f1; font-weight: 700;\">{$hours}h</p>
+                        </td>
+                    </tr>
+                " : '',
+                'alertBox' => '',
+            ],
+            'exchange_request_declined' => [
+                'gradient' => 'linear-gradient(135deg, #ef4444, #dc2626)',
+                'icon' => '❌',
+                'title' => 'Request Declined',
+                'message' => "Unfortunately, <strong>{$providerName}</strong> has declined your exchange request." . ($reason ? " They provided this reason: <em>\"{$reason}\"</em>" : ''),
+                'buttonText' => 'Browse Other Listings',
+                'helpText' => "Don't worry - there are plenty of other members who might be a great match!",
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => '',
+                'alertBox' => $reason ? "
+                    <tr>
+                        <td style=\"padding: 0 24px 24px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;\">
+                                <tr>
+                                    <td style=\"padding: 16px;\">
+                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #991b1b; font-weight: 600;\">Reason provided:</p>
+                                        <p style=\"margin: 0; font-size: 14px; color: #7f1d1d;\">{$reason}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                " : '',
+            ],
+            'exchange_approved' => [
+                'gradient' => 'linear-gradient(135deg, #10b981, #059669)',
+                'icon' => '✅',
+                'title' => 'Exchange Approved!',
+                'message' => "Great news! Your exchange has been approved by a coordinator. You can now begin the service exchange.",
+                'buttonText' => 'Start Exchange',
+                'helpText' => 'Once you begin, remember to confirm the hours when the service is complete.',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => "
+                    <tr>
+                        <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Approved Hours</p>
+                            <p style=\"margin: 0; font-size: 24px; color: #10b981; font-weight: 700;\">{$hours}h</p>
+                        </td>
+                    </tr>
+                ",
+                'alertBox' => "
+                    <tr>
+                        <td style=\"padding: 0 24px 24px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #ecfdf5; border-radius: 8px; border-left: 4px solid #10b981;\">
+                                <tr>
+                                    <td style=\"padding: 16px;\">
+                                        <p style=\"margin: 0; font-size: 14px; color: #065f46;\">
+                                            💡 <strong>Next step:</strong> Contact the other party to arrange when and where the service will take place.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                ",
+            ],
+            'exchange_rejected' => [
+                'gradient' => 'linear-gradient(135deg, #ef4444, #dc2626)',
+                'icon' => '❌',
+                'title' => 'Exchange Not Approved',
+                'message' => "A coordinator has reviewed this exchange and was unable to approve it at this time." . ($reason ? " Reason: <em>\"{$reason}\"</em>" : ''),
+                'buttonText' => 'View Details',
+                'helpText' => 'If you have questions about this decision, please contact your community coordinator.',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => '',
+                'alertBox' => $reason ? "
+                    <tr>
+                        <td style=\"padding: 0 24px 24px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;\">
+                                <tr>
+                                    <td style=\"padding: 16px;\">
+                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #991b1b; font-weight: 600;\">Coordinator's note:</p>
+                                        <p style=\"margin: 0; font-size: 14px; color: #7f1d1d;\">{$reason}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                " : '',
+            ],
+            'exchange_completed' => [
+                'gradient' => 'linear-gradient(135deg, #10b981, #059669)',
+                'icon' => '🎉',
+                'title' => 'Exchange Completed!',
+                'message' => "Congratulations! Your exchange has been completed successfully. <strong>{$finalHours} hour(s)</strong> have been transferred.",
+                'buttonText' => 'View in Wallet',
+                'helpText' => 'Thank you for being an active member of our time-sharing community!',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => "
+                    <tr>
+                        <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Hours Transferred</p>
+                            <p style=\"margin: 0; font-size: 32px; color: #10b981; font-weight: 700;\">{$finalHours}h</p>
+                        </td>
+                    </tr>
+                ",
+                'alertBox' => "
+                    <tr>
+                        <td style=\"padding: 0 24px 24px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #ecfdf5; border-radius: 8px; border-left: 4px solid #10b981;\">
+                                <tr>
+                                    <td style=\"padding: 16px;\">
+                                        <p style=\"margin: 0; font-size: 14px; color: #065f46;\">
+                                            🌟 <strong>Well done!</strong> Your time credit balance has been updated. Consider leaving a review for the other member!
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                ",
+            ],
+            'exchange_cancelled' => [
+                'gradient' => 'linear-gradient(135deg, #f59e0b, #d97706)',
+                'icon' => '⚠️',
+                'title' => 'Exchange Cancelled',
+                'message' => "This exchange has been cancelled." . ($reason ? " Reason: <em>\"{$reason}\"</em>" : ''),
+                'buttonText' => 'View Details',
+                'helpText' => 'No time credits have been transferred.',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => '',
+                'alertBox' => '',
+            ],
+            'exchange_disputed' => [
+                'gradient' => 'linear-gradient(135deg, #ef4444, #dc2626)',
+                'icon' => '⚠️',
+                'title' => 'Exchange Needs Review',
+                'message' => "There's a discrepancy in the hours confirmed by both parties. A coordinator will review this exchange and help resolve the difference.",
+                'buttonText' => 'View Exchange',
+                'helpText' => 'A coordinator will be in touch to help resolve this. No action is needed from you right now.',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => !empty($data['requester_hours']) && !empty($data['provider_hours']) ? "
+                    <tr>
+                        <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">
+                                <tr>
+                                    <td width=\"50%\" style=\"text-align: center; padding: 8px;\">
+                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Requester confirmed</p>
+                                        <p style=\"margin: 0; font-size: 20px; color: #ef4444; font-weight: 700;\">{$data['requester_hours']}h</p>
+                                    </td>
+                                    <td width=\"50%\" style=\"text-align: center; padding: 8px;\">
+                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Provider confirmed</p>
+                                        <p style=\"margin: 0; font-size: 20px; color: #ef4444; font-weight: 700;\">{$data['provider_hours']}h</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                " : '',
+                'alertBox' => "
+                    <tr>
+                        <td style=\"padding: 0 24px 24px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;\">
+                                <tr>
+                                    <td style=\"padding: 16px;\">
+                                        <p style=\"margin: 0; font-size: 14px; color: #7f1d1d;\">
+                                            ⏳ <strong>Under review:</strong> A coordinator will review the confirmed hours and make a fair decision.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                ",
+            ],
+            // NEW: Provider accepted (no broker needed)
+            'exchange_accepted' => [
+                'gradient' => 'linear-gradient(135deg, #10b981, #059669)',
+                'icon' => '✅',
+                'title' => 'Request Accepted!',
+                'message' => "Great news! <strong>{$providerName}</strong> has accepted your exchange request. You can now coordinate when and where the service will take place.",
+                'buttonText' => 'View Exchange',
+                'helpText' => 'Contact the provider to arrange the details of your exchange.',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => "
+                    <tr>
+                        <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Agreed Hours</p>
+                            <p style=\"margin: 0; font-size: 24px; color: #10b981; font-weight: 700;\">{$hours}h</p>
+                        </td>
+                    </tr>
+                ",
+                'alertBox' => "
+                    <tr>
+                        <td style=\"padding: 0 24px 24px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #ecfdf5; border-radius: 8px; border-left: 4px solid #10b981;\">
+                                <tr>
+                                    <td style=\"padding: 16px;\">
+                                        <p style=\"margin: 0; font-size: 14px; color: #065f46;\">
+                                            💡 <strong>Next step:</strong> Message {$providerName} to arrange when and where the service will happen.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                ",
+            ],
+            // NEW: Pending broker approval
+            'exchange_pending_broker' => [
+                'gradient' => 'linear-gradient(135deg, #f59e0b, #d97706)',
+                'icon' => '⏳',
+                'title' => 'Awaiting Coordinator Approval',
+                'message' => "The provider has accepted your request! Before you can begin, a community coordinator needs to review and approve this exchange.",
+                'buttonText' => 'View Exchange',
+                'helpText' => 'You\'ll receive another notification once the coordinator has reviewed your exchange.',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => "
+                    <tr>
+                        <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Proposed Hours</p>
+                            <p style=\"margin: 0; font-size: 24px; color: #f59e0b; font-weight: 700;\">{$hours}h</p>
+                        </td>
+                    </tr>
+                ",
+                'alertBox' => "
+                    <tr>
+                        <td style=\"padding: 0 24px 24px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #fffbeb; border-radius: 8px; border-left: 4px solid #f59e0b;\">
+                                <tr>
+                                    <td style=\"padding: 16px;\">
+                                        <p style=\"margin: 0; font-size: 14px; color: #92400e;\">
+                                            🔍 <strong>Why approval?</strong> Some exchanges require coordinator review to ensure safety and suitability for all members.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                ",
+            ],
+            // NEW: Work has started
+            'exchange_started' => [
+                'gradient' => 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                'icon' => '🚀',
+                'title' => 'Exchange Started!',
+                'message' => "The exchange is now in progress! The service is being provided.",
+                'buttonText' => 'View Exchange',
+                'helpText' => 'When the service is complete, both parties will need to confirm the hours worked.',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => "
+                    <tr>
+                        <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Expected Hours</p>
+                            <p style=\"margin: 0; font-size: 24px; color: #3b82f6; font-weight: 700;\">{$hours}h</p>
+                        </td>
+                    </tr>
+                ",
+                'alertBox' => "
+                    <tr>
+                        <td style=\"padding: 0 24px 24px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #eff6ff; border-radius: 8px; border-left: 4px solid #3b82f6;\">
+                                <tr>
+                                    <td style=\"padding: 16px;\">
+                                        <p style=\"margin: 0; font-size: 14px; color: #1e40af;\">
+                                            📝 <strong>Remember:</strong> When the service is complete, mark it as done and confirm the actual hours worked.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                ",
+            ],
+            // NEW: Ready for hour confirmation
+            'exchange_ready_confirmation' => [
+                'gradient' => 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                'icon' => '✋',
+                'title' => 'Confirm Your Hours',
+                'message' => "The exchange has been marked as complete! Please confirm the number of hours worked so the time credits can be transferred.",
+                'buttonText' => 'Confirm Hours',
+                'helpText' => 'Both parties need to confirm the hours before credits are transferred.',
+                'typeColor' => $typeColor,
+                'typeText' => $typeText,
+                'typeBadge' => $typeBadge,
+                'extraDetails' => "
+                    <tr>
+                        <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Proposed Hours</p>
+                            <p style=\"margin: 0; font-size: 24px; color: #8b5cf6; font-weight: 700;\">{$hours}h</p>
+                        </td>
+                    </tr>
+                ",
+                'alertBox' => "
+                    <tr>
+                        <td style=\"padding: 0 24px 24px;\">
+                            <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #f5f3ff; border-radius: 8px; border-left: 4px solid #8b5cf6;\">
+                                <tr>
+                                    <td style=\"padding: 16px;\">
+                                        <p style=\"margin: 0; font-size: 14px; color: #5b21b6;\">
+                                            ⏰ <strong>Action needed:</strong> Please confirm the hours as soon as possible so the other party receives their time credits.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                ",
+            ],
+        ];
+
+        return $configs[$type] ?? [
+            'gradient' => 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+            'icon' => '📋',
+            'title' => 'Exchange Update',
+            'message' => 'There has been an update to your exchange.',
+            'buttonText' => 'View Exchange',
+            'helpText' => 'Visit your dashboard to see the latest details.',
+            'typeColor' => $typeColor,
+            'typeText' => $typeText,
+            'typeBadge' => $typeBadge,
+            'extraDetails' => '',
+            'alertBox' => '',
+        ];
     }
 }

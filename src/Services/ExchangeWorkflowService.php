@@ -138,7 +138,32 @@ class ExchangeWorkflowService
         $needsBrokerApproval = self::needsBrokerApproval($exchange['listing_id'], $exchange['proposed_hours']);
         $newStatus = $needsBrokerApproval ? self::STATUS_PENDING_BROKER : self::STATUS_ACCEPTED;
 
-        return self::updateStatus($exchangeId, $newStatus, $providerId, 'provider', 'Provider accepted request');
+        $success = self::updateStatus($exchangeId, $newStatus, $providerId, 'provider', 'Provider accepted request');
+
+        if ($success) {
+            if ($newStatus === self::STATUS_PENDING_BROKER) {
+                // Notify brokers that approval is needed
+                NotificationDispatcher::notifyAdmins('exchange_pending_broker', [
+                    'exchange_id' => $exchangeId,
+                    'requester_name' => $exchange['requester_name'] ?? 'A member',
+                    'provider_name' => $exchange['provider_name'] ?? 'Provider',
+                    'listing_title' => $exchange['listing_title'] ?? 'Service',
+                    'proposed_hours' => $exchange['proposed_hours'] ?? 0,
+                ], "Exchange needs broker approval: {$exchange['requester_name']} ↔ {$exchange['provider_name']}");
+
+                // Notify requester that approval is pending
+                NotificationDispatcher::send($exchange['requester_id'], 'exchange_pending_broker', [
+                    'exchange_id' => $exchangeId,
+                ]);
+            } else {
+                // Notify requester that exchange is accepted (no broker needed)
+                NotificationDispatcher::send($exchange['requester_id'], 'exchange_accepted', [
+                    'exchange_id' => $exchangeId,
+                ]);
+            }
+        }
+
+        return $success;
     }
 
     /**
@@ -263,8 +288,20 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $role = ($exchange['requester_id'] === $userId) ? 'requester' : 'provider';
-        return self::updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, $role, 'Work started');
+        $isRequester = $exchange['requester_id'] === $userId;
+        $role = $isRequester ? 'requester' : 'provider';
+        $success = self::updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, $role, 'Work started');
+
+        if ($success) {
+            // Notify the other party that work has started
+            $notifyUserId = $isRequester ? $exchange['provider_id'] : $exchange['requester_id'];
+            NotificationDispatcher::send($notifyUserId, 'exchange_started', [
+                'exchange_id' => $exchangeId,
+                'started_by' => $role,
+            ]);
+        }
+
+        return $success;
     }
 
     /**
@@ -282,8 +319,25 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $role = ($exchange['requester_id'] === $userId) ? 'requester' : 'provider';
-        return self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $role, 'Work completed, pending confirmation');
+        $isRequester = $exchange['requester_id'] === $userId;
+        $role = $isRequester ? 'requester' : 'provider';
+        $success = self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $role, 'Work completed, pending confirmation');
+
+        if ($success) {
+            // Notify both parties to confirm hours
+            NotificationDispatcher::send($exchange['requester_id'], 'exchange_ready_confirmation', [
+                'exchange_id' => $exchangeId,
+                'marked_by' => $role,
+                'proposed_hours' => $exchange['proposed_hours'] ?? 0,
+            ]);
+            NotificationDispatcher::send($exchange['provider_id'], 'exchange_ready_confirmation', [
+                'exchange_id' => $exchangeId,
+                'marked_by' => $role,
+                'proposed_hours' => $exchange['proposed_hours'] ?? 0,
+            ]);
+        }
+
+        return $success;
     }
 
     /**
