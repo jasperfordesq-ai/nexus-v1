@@ -69,6 +69,13 @@ export function TransferModal({
       // Focus search input after animation
       setTimeout(() => searchInputRef.current?.focus(), 100);
     }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
   }, [isOpen]);
 
   // Debounced user search
@@ -211,7 +218,7 @@ export function TransferModal({
             aria-modal="true"
             aria-labelledby="transfer-modal-title"
           >
-            <div className="bg-white dark:bg-gray-900/95 backdrop-blur-xl border border-theme-default rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="bg-theme-card backdrop-blur-xl border border-theme-default rounded-2xl w-full max-w-md shadow-2xl">
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-theme-default">
                 <h2
@@ -303,12 +310,15 @@ export function TransferModal({
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-theme-default rounded-lg shadow-xl overflow-hidden z-10 max-h-60 overflow-y-auto"
+                            className="absolute top-full left-0 right-0 mt-2 bg-theme-card border border-theme-default rounded-lg shadow-xl overflow-hidden z-10 max-h-60 overflow-y-auto"
+                            role="listbox"
+                            aria-label="Search results"
                           >
                             {searchResults.map((user) => (
                               <button
                                 key={user.id}
                                 type="button"
+                                role="option"
                                 onClick={() => handleSelectRecipient(user)}
                                 className="w-full flex items-center gap-3 p-3 hover:bg-theme-hover transition-colors text-left"
                               >
@@ -335,8 +345,8 @@ export function TransferModal({
 
                       {/* No results message */}
                       {showResults && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-theme-default rounded-lg p-4 text-center">
-                          <User className="w-8 h-8 text-theme-subtle mx-auto mb-2" />
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-theme-card border border-theme-default rounded-lg p-4 text-center">
+                          <User className="w-8 h-8 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
                           <p className="text-theme-muted text-sm">No members found</p>
                         </div>
                       )}
