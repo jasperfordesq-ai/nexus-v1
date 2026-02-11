@@ -69,32 +69,34 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b border-theme-default glass-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Mobile Menu Toggle */}
-          <div className="flex items-center gap-4 lg:hidden">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          {/* Left Section: Mobile Menu + Brand */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Mobile Menu Toggle */}
             <Button
               isIconOnly
               variant="light"
-              className="text-theme-muted hover:text-theme-primary"
+              size="sm"
+              className="lg:hidden text-theme-muted hover:text-theme-primary"
               onPress={onMobileMenuOpen}
               aria-label="Open menu"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5" aria-hidden="true" />
             </Button>
-          </div>
 
-          {/* Brand */}
-          <Link to="/" className="flex items-center gap-2">
-            <motion.div
-              whileHover={{ rotate: 180 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Hexagon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
-            </motion.div>
-            <span className="font-bold text-xl text-gradient hidden sm:inline">
-              {branding.name}
-            </span>
-          </Link>
+            {/* Brand */}
+            <Link to="/" className="flex items-center gap-2">
+              <motion.div
+                whileHover={{ rotate: 180 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Hexagon className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+              </motion.div>
+              <span className="font-bold text-lg sm:text-xl text-gradient hidden min-[480px]:inline">
+                {branding.name}
+              </span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
@@ -110,7 +112,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                   }`
                 }
               >
-                <item.icon className="w-4 h-4" />
+                <item.icon className="w-4 h-4" aria-hidden="true" />
                 <span>{item.label}</span>
                 {item.badge && unreadCount > 0 && isAuthenticated && (
                   <span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full">
@@ -134,7 +136,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                     }`
                   }
                 >
-                  <item.icon className="w-4 h-4" />
+                  <item.icon className="w-4 h-4" aria-hidden="true" />
                   <span>{item.label}</span>
                 </NavLink>
               ) : null
@@ -142,7 +144,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
           </nav>
 
           {/* User Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {isAuthenticated ? (
               <>
                 {/* Theme Toggle */}
@@ -176,10 +178,11 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                   <DropdownTrigger>
                     <Button
                       isIconOnly
+                      size="sm"
                       className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                       aria-label="Create"
                     >
-                      <Plus className="w-5 h-5" />
+                      <Plus className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
@@ -218,11 +221,12 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                   <Button
                     isIconOnly
                     variant="light"
+                    size="sm"
                     className={`text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
                     onPress={() => navigate('/notifications')}
                     aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
                   >
-                    <Bell className="w-5 h-5" />
+                    <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
                   </Button>
                 </Badge>
 
@@ -234,7 +238,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                       name={`${user?.first_name} ${user?.last_name}`}
                       src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
                       size="sm"
-                      className="cursor-pointer ring-2 ring-border-default hover:ring-indigo-500/50 transition-all"
+                      className="cursor-pointer ring-2 ring-border-default hover:ring-indigo-500/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
                       showFallback
                     />
                   </DropdownTrigger>
