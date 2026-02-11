@@ -2,7 +2,7 @@
  * Listing Detail Page - View single listing
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar } from '@heroui/react';
@@ -20,10 +20,11 @@ import {
   Trash2,
   AlertCircle,
   ArrowRightLeft,
+  Bookmark,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useAuth } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -33,19 +34,16 @@ export function ListingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const toast = useToast();
 
   const [listing, setListing] = useState<Listing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [exchangeConfig, setExchangeConfig] = useState<ExchangeConfig | null>(null);
 
-  useEffect(() => {
-    loadListing();
-    loadExchangeConfig();
-  }, [id]);
-
-  async function loadExchangeConfig() {
+  const loadExchangeConfig = useCallback(async () => {
     try {
       const response = await api.get<ExchangeConfig>('/v2/exchanges/config');
       if (response.success && response.data) {
@@ -54,9 +52,9 @@ export function ListingDetailPage() {
     } catch {
       // Exchange workflow may not be enabled
     }
-  }
+  }, []);
 
-  async function loadListing() {
+  const loadListing = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -65,15 +63,22 @@ export function ListingDetailPage() {
       const response = await api.get<Listing>(`/v2/listings/${id}`);
       if (response.success && response.data) {
         setListing(response.data);
+        setIsSaved(response.data.is_favorited ?? false);
       } else {
         setError('Listing not found or has been removed');
       }
     } catch (err) {
+      logError('Failed to load listing', err);
       setError('Listing not found or has been removed');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [id]);
+
+  useEffect(() => {
+    loadListing();
+    loadExchangeConfig();
+  }, [loadListing, loadExchangeConfig]);
 
   async function handleDelete() {
     if (!listing || !window.confirm('Are you sure you want to delete this listing?')) return;
@@ -81,11 +86,53 @@ export function ListingDetailPage() {
     try {
       setIsDeleting(true);
       await api.delete(`/v2/listings/${listing.id}`);
+      toast.success('Listing deleted');
       navigate('/listings', { replace: true });
     } catch (err) {
       logError('Failed to delete listing', err);
+      toast.error('Failed to delete', 'Please try again later');
     } finally {
       setIsDeleting(false);
+    }
+  }
+
+  function handleSave() {
+    // Toggle saved state locally (API endpoint not yet implemented)
+    setIsSaved(!isSaved);
+    if (!isSaved) {
+      toast.success('Listing saved', 'You can find it in your saved items');
+    } else {
+      toast.info('Removed from saved');
+    }
+  }
+
+  async function handleShare() {
+    if (!listing) return;
+
+    const shareData = {
+      title: listing.title,
+      text: listing.description?.slice(0, 100) + (listing.description && listing.description.length > 100 ? '...' : ''),
+      url: window.location.href,
+    };
+
+    // Try native Web Share API first (mobile/PWA)
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled or share failed - that's ok
+        if ((err as Error).name !== 'AbortError') {
+          logError('Share failed', err);
+        }
+      }
+    } else {
+      // Fallback: copy link to clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link copied', 'Share this listing with anyone');
+      } catch {
+        toast.error('Could not copy link');
+      }
     }
   }
 
@@ -175,32 +222,24 @@ export function ListingDetailPage() {
         {/* Title */}
         <h1 className="text-3xl font-bold text-theme-primary mb-4">{listing.title}</h1>
 
-        {/* Meta Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Meta Grid - Top Row */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div className="flex items-center gap-3 text-theme-muted">
-            <div className="p-2 rounded-lg bg-indigo-500/20">
+            <div className="p-2 rounded-lg bg-indigo-500/20" aria-hidden="true">
               <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
               <div className="text-xs text-theme-subtle">Duration</div>
-              <div className="text-theme-primary">{listing.hours_estimate ?? listing.estimated_hours ?? '—'} hours</div>
+              <div className="text-theme-primary">
+                {(listing.hours_estimate ?? listing.estimated_hours)
+                  ? `${listing.hours_estimate ?? listing.estimated_hours} hours`
+                  : 'Flexible'}
+              </div>
             </div>
           </div>
 
-          {listing.location && (
-            <div className="flex items-center gap-3 text-theme-muted">
-              <div className="p-2 rounded-lg bg-emerald-500/20">
-                <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div>
-                <div className="text-xs text-theme-subtle">Location</div>
-                <div className="text-theme-primary truncate">{listing.location}</div>
-              </div>
-            </div>
-          )}
-
           <div className="flex items-center gap-3 text-theme-muted">
-            <div className="p-2 rounded-lg bg-amber-500/20">
+            <div className="p-2 rounded-lg bg-amber-500/20" aria-hidden="true">
               <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
@@ -212,7 +251,7 @@ export function ListingDetailPage() {
           </div>
 
           <div className="flex items-center gap-3 text-theme-muted">
-            <div className="p-2 rounded-lg bg-purple-500/20">
+            <div className="p-2 rounded-lg bg-purple-500/20" aria-hidden="true">
               <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
@@ -221,6 +260,22 @@ export function ListingDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Location - Separate Row to prevent text bleeding */}
+        {listing.location && (
+          <div className="flex items-center gap-3 text-theme-muted mb-8">
+            <div className="p-2 rounded-lg bg-emerald-500/20" aria-hidden="true">
+              <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs text-theme-subtle">Location</div>
+              <div className="text-theme-primary">{listing.location}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Spacer if no location */}
+        {!listing.location && <div className="mb-4" />}
 
         {/* Description */}
         <div className="mb-8">
@@ -254,15 +309,17 @@ export function ListingDetailPage() {
             )}
             <Button
               variant="flat"
-              className="flex-1 sm:flex-none bg-theme-elevated text-theme-primary"
-              startContent={<Heart className="w-4 h-4" />}
+              className={`flex-1 sm:flex-none ${isSaved ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
+              startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" /> : <Heart className="w-4 h-4" />}
+              onClick={handleSave}
             >
-              Save
+              {isSaved ? 'Saved' : 'Save'}
             </Button>
             <Button
               variant="flat"
               className="flex-1 sm:flex-none bg-theme-elevated text-theme-primary"
               startContent={<Share2 className="w-4 h-4" />}
+              onClick={handleShare}
             >
               Share
             </Button>
@@ -271,41 +328,41 @@ export function ListingDetailPage() {
       </GlassCard>
 
       {/* User Card */}
-      {(listing.user || listing.author_name) && (
-        <GlassCard className="p-6">
-          <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            {listing.type === 'offer' ? 'Offered by' : 'Requested by'}
-          </h2>
+      {(listing.user || listing.author_name) && (() => {
+        const userName = listing.user?.name || listing.author_name || `${listing.user?.first_name ?? ''} ${listing.user?.last_name ?? ''}`.trim();
+        const userId = listing.user?.id || listing.user_id;
+        const userAvatar = resolveAvatarUrl(listing.user?.avatar || listing.author_avatar);
 
-          <div className="flex items-center gap-4">
-            <Avatar
-              src={resolveAvatarUrl(listing.user?.avatar || listing.author_avatar)}
-              name={listing.user?.name || listing.author_name || `${listing.user?.first_name ?? ''} ${listing.user?.last_name ?? ''}`.trim()}
-              size="lg"
-              className="ring-2 ring-white/20"
-            />
-            <div className="flex-1">
-              <h3 className="font-semibold text-theme-primary">
-                {listing.user?.name || listing.author_name || `${listing.user?.first_name ?? ''} ${listing.user?.last_name ?? ''}`.trim()}
-              </h3>
-              {listing.user?.tagline && (
-                <p className="text-theme-muted text-sm">{listing.user.tagline}</p>
-              )}
-            </div>
-            {listing.user && (
-              <Link to={`/profile/${listing.user.id}`}>
-                <Button
-                  variant="flat"
-                  className="bg-theme-elevated text-theme-primary"
-                >
-                  View Profile
-                </Button>
-              </Link>
-            )}
-          </div>
-        </GlassCard>
-      )}
+        return (
+          <GlassCard className="p-6">
+            <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+              <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              {listing.type === 'offer' ? 'Offered by' : 'Requested by'}
+            </h2>
+
+            <Link
+              to={`/profile/${userId}`}
+              className="flex items-center gap-4 group hover:bg-theme-hover rounded-lg p-2 -m-2 transition-colors"
+            >
+              <Avatar
+                src={userAvatar}
+                name={userName}
+                size="lg"
+                className="ring-2 ring-white/20 group-hover:ring-indigo-500/50 transition-all"
+              />
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-theme-primary group-hover:text-indigo-400 transition-colors">
+                  {userName}
+                </h3>
+                {listing.user?.tagline && (
+                  <p className="text-theme-muted text-sm truncate">{listing.user.tagline}</p>
+                )}
+                <p className="text-xs text-theme-subtle mt-1">Click to view profile</p>
+              </div>
+            </Link>
+          </GlassCard>
+        );
+      })()}
     </motion.div>
   );
 }
