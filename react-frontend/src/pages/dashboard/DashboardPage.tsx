@@ -3,7 +3,7 @@
  * Theme-aware styling for light and dark modes
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
@@ -18,6 +18,8 @@ import {
   Bell,
   ArrowRight,
   Plus,
+  AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -48,13 +50,11 @@ export function DashboardPage() {
     pendingTransactions: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  async function loadDashboardData() {
+  const loadDashboardData = useCallback(async () => {
     try {
+      setError(null);
       const [walletRes, listingsRes, messagesRes, pendingRes] = await Promise.all([
         api.get<WalletBalance>('/v2/wallet/balance').catch(() => null),
         api.get<Listing[]>('/v2/listings?limit=5&sort=-created_at').catch(() => null),
@@ -74,12 +74,17 @@ export function DashboardPage() {
         unreadMessages: messagesRes?.success ? messagesRes.data?.count ?? 0 : 0,
         pendingTransactions: pendingRes?.success ? pendingRes.data?.count ?? 0 : 0,
       });
-    } catch (error) {
-      logError('Failed to load dashboard data', error);
+    } catch (err) {
+      logError('Failed to load dashboard data', err);
+      setError('Failed to load dashboard data. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -93,6 +98,30 @@ export function DashboardPage() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
+  if (error) {
+    return (
+      <>
+        <PageMeta
+          title="Dashboard"
+          description="Your personal dashboard. View your balance, listings, and activity."
+          noIndex
+        />
+        <GlassCard className="p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Dashboard</h2>
+          <p className="text-theme-muted mb-4">{error}</p>
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => loadDashboardData()}
+          >
+            Try Again
+          </Button>
+        </GlassCard>
+      </>
+    );
+  }
 
   return (
     <>
@@ -123,7 +152,7 @@ export function DashboardPage() {
               <Link to="/listings/create">
                 <Button
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                  startContent={<Plus className="w-4 h-4" />}
+                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 >
                   New Listing
                 </Button>
@@ -139,7 +168,7 @@ export function DashboardPage() {
         className="grid grid-cols-2 lg:grid-cols-4 gap-4"
       >
         <StatCard
-          icon={<Wallet className="w-5 h-5" />}
+          icon={<Wallet className="w-5 h-5" aria-hidden="true" />}
           label="Balance"
           value={stats.walletBalance ? `${stats.walletBalance.balance}h` : '—'}
           color="indigo"
@@ -147,7 +176,7 @@ export function DashboardPage() {
           isLoading={isLoading}
         />
         <StatCard
-          icon={<ListTodo className="w-5 h-5" />}
+          icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}
           label="Active Listings"
           value={stats.activeListingsCount.toString()}
           color="emerald"
@@ -155,7 +184,7 @@ export function DashboardPage() {
           isLoading={isLoading}
         />
         <StatCard
-          icon={<MessageSquare className="w-5 h-5" />}
+          icon={<MessageSquare className="w-5 h-5" aria-hidden="true" />}
           label="Messages"
           value={stats.unreadMessages > 0 ? stats.unreadMessages.toString() : '0'}
           color="amber"
@@ -163,7 +192,7 @@ export function DashboardPage() {
           isLoading={isLoading}
         />
         <StatCard
-          icon={<Clock className="w-5 h-5" />}
+          icon={<Clock className="w-5 h-5" aria-hidden="true" />}
           label="Pending"
           value={stats.pendingTransactions.toString()}
           color="rose"
@@ -179,11 +208,11 @@ export function DashboardPage() {
           <GlassCard className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                <ListTodo className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
+                <ListTodo className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                 Recent Listings
               </h2>
               <Link to="/listings" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1">
-                View all <ArrowRight className="w-4 h-4" />
+                View all <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>
             </div>
 
@@ -198,29 +227,31 @@ export function DashboardPage() {
             ) : stats.recentListings.length > 0 ? (
               <div className="space-y-3">
                 {stats.recentListings.map((listing) => (
-                  <Link
-                    key={listing.id}
-                    to={`/listings/${listing.id}`}
-                    className="block p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="font-medium text-theme-primary">{listing.title}</h3>
-                        <p className="text-sm text-theme-muted line-clamp-1">{listing.description}</p>
+                  <article key={listing.id}>
+                    <Link
+                      to={`/listings/${listing.id}`}
+                      className="block p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
+                      aria-label={`${listing.title} - ${listing.type === 'offer' ? 'Offering' : 'Requesting'}`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="font-medium text-theme-primary">{listing.title}</h3>
+                          <p className="text-sm text-theme-muted line-clamp-1">{listing.description}</p>
+                        </div>
+                        <span className={`
+                          text-xs px-2 py-1 rounded-full whitespace-nowrap
+                          ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}
+                        `}>
+                          {listing.type === 'offer' ? 'Offering' : 'Requesting'}
+                        </span>
                       </div>
-                      <span className={`
-                        text-xs px-2 py-1 rounded-full whitespace-nowrap
-                        ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}
-                      `}>
-                        {listing.type === 'offer' ? 'Offering' : 'Requesting'}
-                      </span>
-                    </div>
-                  </Link>
+                    </Link>
+                  </article>
                 ))}
               </div>
             ) : (
               <div className="text-center py-8 text-theme-subtle">
-                <ListTodo className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <ListTodo className="w-12 h-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
                 <p>No recent listings</p>
                 <Link to="/listings/create" className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm mt-2 inline-block">
                   Create your first listing
@@ -236,14 +267,14 @@ export function DashboardPage() {
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-4">Quick Actions</h2>
             <div className="space-y-2">
-              <QuickActionLink to="/listings/create" icon={<Plus />} label="Create Listing" />
-              <QuickActionLink to="/messages" icon={<MessageSquare />} label="Messages" />
-              <QuickActionLink to="/wallet" icon={<Wallet />} label="View Wallet" />
-              <QuickActionLink to="/members" icon={<Users />} label="Find Members" />
+              <QuickActionLink to="/listings/create" icon={<Plus aria-hidden="true" />} label="Create Listing" />
+              <QuickActionLink to="/messages" icon={<MessageSquare aria-hidden="true" />} label="Messages" />
+              <QuickActionLink to="/wallet" icon={<Wallet aria-hidden="true" />} label="View Wallet" />
+              <QuickActionLink to="/members" icon={<Users aria-hidden="true" />} label="Find Members" />
               {hasEvents && (
-                <QuickActionLink to="/events" icon={<Calendar />} label="Browse Events" />
+                <QuickActionLink to="/events" icon={<Calendar aria-hidden="true" />} label="Browse Events" />
               )}
-              <QuickActionLink to="/notifications" icon={<Bell />} label="Notifications" />
+              <QuickActionLink to="/notifications" icon={<Bell aria-hidden="true" />} label="Notifications" />
             </div>
           </GlassCard>
 
@@ -251,7 +282,7 @@ export function DashboardPage() {
           {hasGamification && (
             <GlassCard className="p-6">
               <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+                <TrendingUp className="w-5 h-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
                 Your Progress
               </h2>
               <div className="space-y-4">
@@ -298,7 +329,7 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
   };
 
   return (
-    <Link to={href}>
+    <Link to={href} aria-label={`${label}: ${isLoading ? 'Loading' : value}`}>
       <GlassCard className="p-4 hover:scale-[1.02] transition-transform">
         <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-3`}>
           {icon}
