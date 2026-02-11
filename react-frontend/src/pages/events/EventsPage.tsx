@@ -306,14 +306,14 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
     <Link to={`/events/${event.id}`} aria-label={`${event.title} on ${startDate.toLocaleDateString()}`}>
       <article>
         <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${isPast ? 'opacity-60' : ''}`}>
-          <div className="flex gap-4">
+          <div className="flex gap-3 sm:gap-4">
             {/* Date Box */}
-            <div className="flex-shrink-0 w-16 text-center">
+            <div className="flex-shrink-0 w-14 sm:w-16 text-center">
               <time dateTime={event.start_date} className="block bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-lg p-2">
                 <span className="text-amber-400 text-xs font-medium uppercase block">
                   {startDate.toLocaleString('default', { month: 'short' })}
                 </span>
-                <span className="text-theme-primary text-2xl font-bold block">
+                <span className="text-theme-primary text-xl sm:text-2xl font-bold block">
                   {startDate.getDate()}
                 </span>
                 <span className="text-theme-subtle text-xs block">

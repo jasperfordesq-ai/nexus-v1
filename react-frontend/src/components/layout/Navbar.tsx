@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import {
   Button,
   Avatar,
+  Badge,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
@@ -207,7 +208,13 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                 </Dropdown>
 
                 {/* Notifications */}
-                <div className="relative">
+                <Badge
+                  content={unreadCount > 99 ? '99+' : unreadCount}
+                  color="danger"
+                  size="sm"
+                  isInvisible={unreadCount === 0}
+                  placement="top-right"
+                >
                   <Button
                     isIconOnly
                     variant="light"
@@ -217,12 +224,7 @@ export function Navbar({ onMobileMenuOpen }: NavbarProps) {
                   >
                     <Bell className="w-5 h-5" />
                   </Button>
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full pointer-events-none animate-pulse">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
-                </div>
+                </Badge>
 
                 {/* User Dropdown */}
                 <Dropdown placement="bottom-end">
