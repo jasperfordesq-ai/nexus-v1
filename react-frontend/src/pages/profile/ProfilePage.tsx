@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Tabs, Tab } from '@heroui/react';
 import {
@@ -19,6 +19,9 @@ import {
   ListTodo,
   Award,
   Settings,
+  ArrowLeft,
+  RefreshCw,
+  AlertTriangle,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
@@ -32,6 +35,7 @@ type ConnectionStatus = 'none' | 'pending_sent' | 'pending_received' | 'connecte
 
 export function ProfilePage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user: currentUser, isAuthenticated } = useAuth();
   const hasGamification = useFeature('gamification');
   const toast = useToast();
@@ -39,6 +43,7 @@ export function ProfilePage() {
   const [profile, setProfile] = useState<UserType | null>(null);
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('about');
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('none');
   const [connectionId, setConnectionId] = useState<number | null>(null);
@@ -47,24 +52,22 @@ export function ProfilePage() {
   const isOwnProfile = !id || (currentUser && id === currentUser.id.toString());
   const profileId = id || currentUser?.id?.toString();
 
-  useEffect(() => {
-    if (profileId) {
-      loadProfile(profileId);
-    }
-  }, [profileId]);
+  const loadProfile = useCallback(async () => {
+    if (!profileId) return;
 
-  async function loadProfile(userId: string) {
     try {
       setIsLoading(true);
+      setError(null);
+
       const requests: Promise<unknown>[] = [
-        api.get<UserType>(`/v2/users/${userId}`),
-        api.get<Listing[]>(`/v2/users/${userId}/listings?limit=6`),
+        api.get<UserType>(`/v2/users/${profileId}`),
+        api.get<Listing[]>(`/v2/users/${profileId}/listings?limit=6`),
       ];
 
       // Check connection status if viewing another user's profile
-      if (isAuthenticated && currentUser && userId !== currentUser.id.toString()) {
+      if (isAuthenticated && currentUser && profileId !== currentUser.id.toString()) {
         requests.push(
-          api.get<{ status: ConnectionStatus; connection_id?: number }>(`/v2/connections/status/${userId}`)
+          api.get<{ status: ConnectionStatus; connection_id?: number }>(`/v2/connections/status/${profileId}`)
         );
       }
 
@@ -77,6 +80,9 @@ export function ProfilePage() {
 
       if (profileRes.success && profileRes.data) {
         setProfile(profileRes.data);
+      } else {
+        setError('Profile not found');
+        return;
       }
       if (listingsRes.success && listingsRes.data) {
         setListings(listingsRes.data);
@@ -85,12 +91,17 @@ export function ProfilePage() {
         setConnectionStatus(connectionRes.data.status);
         setConnectionId(connectionRes.data.connection_id ?? null);
       }
-    } catch (error) {
-      logError('Failed to load profile', error);
+    } catch (err) {
+      logError('Failed to load profile', err);
+      setError('Failed to load profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [profileId, isAuthenticated, currentUser]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
 
   const handleConnect = useCallback(async () => {
     if (!profile?.id) return;
@@ -142,12 +153,53 @@ export function ProfilePage() {
     return <LoadingScreen message="Loading profile..." />;
   }
 
+  // Error state with retry
+  if (error && !profile) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <GlassCard className="p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Profile</h2>
+          <p className="text-theme-muted mb-4">{error}</p>
+          <div className="flex justify-center gap-3">
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => navigate(-1)}
+            >
+              Go Back
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => loadProfile()}
+            >
+              Try Again
+            </Button>
+          </div>
+        </GlassCard>
+      </div>
+    );
+  }
+
+  // Profile not found
   if (!profile) {
     return (
       <EmptyState
-        icon={<User className="w-12 h-12" />}
+        icon={<User className="w-12 h-12" aria-hidden="true" />}
         title="Profile not found"
         description="This user profile does not exist or has been removed"
+        action={
+          <Button
+            variant="flat"
+            className="bg-theme-elevated text-theme-primary"
+            startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => navigate(-1)}
+          >
+            Go Back
+          </Button>
+        }
       />
     );
   }
@@ -201,20 +253,23 @@ export function ProfilePage() {
               <div className="flex flex-wrap justify-center sm:justify-start gap-4 mt-4 text-sm text-theme-subtle">
                 {profile.location && (
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
+                    <MapPin className="w-4 h-4" aria-hidden="true" />
                     {profile.location}
                   </span>
                 )}
                 {profile.created_at && (
                   <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    <Calendar className="w-4 h-4" aria-hidden="true" />
+                    Joined{' '}
+                    <time dateTime={profile.created_at}>
+                      {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    </time>
                   </span>
                 )}
                 {profile.rating && (
-                  <span className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-amber-400" />
-                    {profile.rating.toFixed(1)}
+                  <span className="flex items-center gap-1" aria-label={`Rating: ${profile.rating.toFixed(1)} out of 5`}>
+                    <Star className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                    <span aria-hidden="true">{profile.rating.toFixed(1)}</span>
                   </span>
                 )}
               </div>
@@ -226,7 +281,7 @@ export function ProfilePage() {
                     <Link to="/settings">
                       <Button
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        startContent={<Edit className="w-4 h-4" />}
+                        startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
                       >
                         Edit Profile
                       </Button>
@@ -235,7 +290,7 @@ export function ProfilePage() {
                       <Button
                         variant="flat"
                         className="bg-theme-elevated text-theme-primary"
-                        startContent={<Settings className="w-4 h-4" />}
+                        startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
                       >
                         Settings
                       </Button>
@@ -246,7 +301,7 @@ export function ProfilePage() {
                     <Link to={`/messages?to=${profile.id}`}>
                       <Button
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        startContent={<MessageSquare className="w-4 h-4" />}
+                        startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
                       >
                         Send Message
                       </Button>
@@ -265,16 +320,16 @@ export function ProfilePage() {
                         }
                         startContent={
                           connectionStatus === 'connected' ? (
-                            <UserCheck className="w-4 h-4" />
+                            <UserCheck className="w-4 h-4" aria-hidden="true" />
                           ) : connectionStatus === 'pending_sent' ? (
-                            <Clock className="w-4 h-4" />
+                            <Clock className="w-4 h-4" aria-hidden="true" />
                           ) : connectionStatus === 'pending_received' ? (
-                            <UserPlus className="w-4 h-4" />
+                            <UserPlus className="w-4 h-4" aria-hidden="true" />
                           ) : (
-                            <UserPlus className="w-4 h-4" />
+                            <UserPlus className="w-4 h-4" aria-hidden="true" />
                           )
                         }
-                        onClick={handleConnect}
+                        onPress={handleConnect}
                         isLoading={isConnecting}
                       >
                         {connectionStatus === 'connected'
@@ -315,6 +370,7 @@ export function ProfilePage() {
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
+          aria-label="Profile sections"
           classNames={{
             tabList: 'bg-theme-elevated p-1 rounded-lg',
             cursor: 'bg-theme-hover',
@@ -323,18 +379,20 @@ export function ProfilePage() {
         >
           <Tab
             key="about"
+            aria-label="About this user"
             title={
               <span className="flex items-center gap-2">
-                <User className="w-4 h-4" />
+                <User className="w-4 h-4" aria-hidden="true" />
                 About
               </span>
             }
           />
           <Tab
             key="listings"
+            aria-label="User listings"
             title={
               <span className="flex items-center gap-2">
-                <ListTodo className="w-4 h-4" />
+                <ListTodo className="w-4 h-4" aria-hidden="true" />
                 Listings
               </span>
             }
@@ -342,9 +400,10 @@ export function ProfilePage() {
           {hasGamification && (
             <Tab
               key="achievements"
+              aria-label="User achievements"
               title={
                 <span className="flex items-center gap-2">
-                  <Award className="w-4 h-4" />
+                  <Award className="w-4 h-4" aria-hidden="true" />
                   Achievements
                 </span>
               }
@@ -381,32 +440,38 @@ export function ProfilePage() {
           )}
 
           {activeTab === 'listings' && (
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4" role="list" aria-label="User listings">
               {listings.length > 0 ? (
                 listings.map((listing) => (
-                  <Link key={listing.id} to={`/listings/${listing.id}`}>
-                    <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className={`
-                          text-xs px-2 py-1 rounded-full
-                          ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}
-                        `}>
-                          {listing.type === 'offer' ? 'Offering' : 'Requesting'}
-                        </span>
-                      </div>
-                      <h3 className="font-medium text-theme-primary mb-1">{listing.title}</h3>
-                      <p className="text-sm text-theme-subtle line-clamp-2">{listing.description}</p>
-                      <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
-                        <Clock className="w-3 h-3" />
-                        {listing.hours_estimate ?? listing.estimated_hours ?? '—'}h
-                      </div>
-                    </GlassCard>
+                  <Link
+                    key={listing.id}
+                    to={`/listings/${listing.id}`}
+                    aria-label={`${listing.type === 'offer' ? 'Offering' : 'Requesting'}: ${listing.title}`}
+                  >
+                    <article role="listitem">
+                      <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`
+                            text-xs px-2 py-1 rounded-full
+                            ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}
+                          `}>
+                            {listing.type === 'offer' ? 'Offering' : 'Requesting'}
+                          </span>
+                        </div>
+                        <h3 className="font-medium text-theme-primary mb-1">{listing.title}</h3>
+                        <p className="text-sm text-theme-subtle line-clamp-2">{listing.description}</p>
+                        <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
+                          <Clock className="w-3 h-3" aria-hidden="true" />
+                          {listing.hours_estimate ?? listing.estimated_hours ?? '—'}h
+                        </div>
+                      </GlassCard>
+                    </article>
                   </Link>
                 ))
               ) : (
                 <div className="col-span-2">
                   <EmptyState
-                    icon={<ListTodo className="w-12 h-12" />}
+                    icon={<ListTodo className="w-12 h-12" aria-hidden="true" />}
                     title="No listings"
                     description={isOwnProfile ? "You haven't created any listings yet" : "This user hasn't created any listings"}
                     action={
@@ -427,7 +492,7 @@ export function ProfilePage() {
           {activeTab === 'achievements' && (
             <GlassCard className="p-6">
               <EmptyState
-                icon={<Award className="w-12 h-12" />}
+                icon={<Award className="w-12 h-12" aria-hidden="true" />}
                 title="Achievements coming soon"
                 description="Check back later to see badges and achievements"
               />
