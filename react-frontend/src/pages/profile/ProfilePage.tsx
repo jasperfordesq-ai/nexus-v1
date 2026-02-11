@@ -347,17 +347,17 @@ export function ProfilePage() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-3 gap-2 sm:gap-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-theme-primary">{profile.total_hours_given ?? 0}</div>
+                <div className="text-xl sm:text-2xl font-bold text-theme-primary">{profile.total_hours_given ?? 0}</div>
                 <div className="text-xs text-theme-subtle">Hours Given</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-theme-primary">{profile.total_hours_received ?? 0}</div>
+                <div className="text-xl sm:text-2xl font-bold text-theme-primary">{profile.total_hours_received ?? 0}</div>
                 <div className="text-xs text-theme-subtle">Hours Received</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-theme-primary">{listings.length}</div>
+                <div className="text-xl sm:text-2xl font-bold text-theme-primary">{listings.length}</div>
                 <div className="text-xs text-theme-subtle">Listings</div>
               </div>
             </div>

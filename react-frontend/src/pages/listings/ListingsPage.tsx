@@ -168,12 +168,12 @@ export function ListingsPage() {
             />
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
             <Select
               placeholder="Type"
               selectedKeys={selectedType ? [selectedType] : []}
               onChange={(e) => setSelectedType(e.target.value as ListingType)}
-              className="w-36"
+              className="w-full sm:w-36"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
@@ -189,7 +189,7 @@ export function ListingsPage() {
               placeholder="Category"
               selectedKeys={selectedCategory ? [selectedCategory] : []}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-44"
+              className="w-full sm:w-44"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',

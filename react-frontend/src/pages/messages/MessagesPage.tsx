@@ -9,7 +9,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Input, Avatar, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab } from '@heroui/react';
+import { Input, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab } from '@heroui/react';
 import { Search, MessageSquare, Circle, Plus, Loader2, Archive, RotateCcw, AlertTriangle, ArrowRightLeft, RefreshCw } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
@@ -567,22 +567,20 @@ function ConversationCard({ conversation }: ConversationCardProps) {
     >
       <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
         <div className="flex items-center gap-4">
-          <div className="relative">
+          <Badge
+            content={unread_count > 9 ? '9+' : unread_count}
+            color="primary"
+            size="sm"
+            isInvisible={unread_count === 0}
+            placement="top-right"
+          >
             <Avatar
               src={resolveAvatarUrl(other_user.avatar)}
               name={other_user.name}
               size="lg"
               className="ring-2 ring-theme-default"
             />
-            {unread_count > 0 && (
-              <span
-                className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center text-xs text-white font-medium"
-                aria-hidden="true"
-              >
-                {unread_count > 9 ? '9+' : unread_count}
-              </span>
-            )}
-          </div>
+          </Badge>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">

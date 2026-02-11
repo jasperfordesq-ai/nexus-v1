@@ -12,7 +12,7 @@
 
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
+import { Button, Input, Checkbox, Divider, Select, SelectItem, Progress } from '@heroui/react';
 import { motion } from 'framer-motion';
 import {
   User,
@@ -31,7 +31,7 @@ import {
 import { useAuth, useTenant } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { api, tokenManager } from '@/lib/api';
-import { PASSWORD_REQUIREMENTS, isPasswordValid } from '@/lib/validation';
+import { PASSWORD_REQUIREMENTS, isPasswordValid, getPasswordStrength } from '@/lib/validation';
 
 interface Tenant {
   id: number;
@@ -474,24 +474,32 @@ export function RegisterPage() {
                 }}
               />
 
-              {/* Password requirements checklist */}
+              {/* Password strength indicator */}
               {password && (
-                <ul className="mt-2 space-y-1 text-xs">
-                  {PASSWORD_REQUIREMENTS.map((req) => {
-                    const passed = req.test(password);
-                    return (
-                      <li
-                        key={req.id}
-                        className={`flex items-center gap-1.5 ${
-                          passed ? 'text-emerald-500 dark:text-emerald-400' : 'text-theme-subtle'
-                        }`}
-                      >
-                        {passed ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                        {req.label}
-                      </li>
-                    );
-                  })}
-                </ul>
+                <div className="mt-2 space-y-2">
+                  <Progress
+                    value={getPasswordStrength(password)}
+                    color={getPasswordStrength(password) < 40 ? 'danger' : getPasswordStrength(password) < 80 ? 'warning' : 'success'}
+                    size="sm"
+                    aria-label="Password strength"
+                  />
+                  <ul className="space-y-1 text-xs">
+                    {PASSWORD_REQUIREMENTS.map((req) => {
+                      const passed = req.test(password);
+                      return (
+                        <li
+                          key={req.id}
+                          className={`flex items-center gap-1.5 ${
+                            passed ? 'text-emerald-500 dark:text-emerald-400' : 'text-theme-subtle'
+                          }`}
+                        >
+                          {passed ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          {req.label}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               )}
             </div>
 
