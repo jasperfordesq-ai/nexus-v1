@@ -328,7 +328,8 @@ export function ConversationPage() {
    * Only fetches messages newer than the last known message
    */
   async function pollForNewMessages() {
-    if (!id || !lastMessageIdRef.current) return;
+    // Only poll for existing conversations (not new ones started via user ID)
+    if (!id || isNewConversationRoute || !lastMessageIdRef.current) return;
 
     try {
       // Use the last message ID as cursor to get only newer messages
@@ -1226,8 +1227,9 @@ export function ConversationPage() {
                     type="button"
                     onClick={() => removeAttachment(index)}
                     className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label={`Remove ${item.file.name}`}
                   >
-                    <X className="w-2.5 h-2.5 text-white" />
+                    <X className="w-2.5 h-2.5 text-white" aria-hidden="true" />
                   </button>
                 </div>
               ))}
@@ -1314,7 +1316,7 @@ export function ConversationPage() {
         isOpen={showArchiveModal}
         onOpenChange={setShowArchiveModal}
         classNames={{
-          base: 'bg-white dark:bg-gray-900 border border-theme-default',
+          base: 'bg-theme-card border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -1458,7 +1460,7 @@ function MessageBubble({
             inline-block px-4 py-2 rounded-2xl relative
             ${isOwn
               ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-md'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-bl-md'
+              : 'bg-theme-elevated text-theme-primary rounded-bl-md'
             }
           `}
         >
@@ -1546,7 +1548,8 @@ function MessageBubble({
               {/* Reaction button */}
               <button
                 onClick={() => setShowReactionPicker(!showReactionPicker)}
-                className="w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full border border-theme-default hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="w-5 h-5 flex items-center justify-center bg-theme-elevated rounded-full border border-theme-default hover:bg-theme-hover"
+                aria-label="Add reaction"
               >
                 <SmilePlus className="w-3 h-3 text-theme-muted" />
               </button>
@@ -1555,7 +1558,8 @@ function MessageBubble({
               {isOwn && !isVoiceMessage && (
                 <button
                   onClick={() => setShowMessageMenu(!showMessageMenu)}
-                  className="w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full border border-theme-default hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="w-5 h-5 flex items-center justify-center bg-theme-elevated rounded-full border border-theme-default hover:bg-theme-hover"
+                  aria-label="Message options"
                 >
                   <MoreVertical className="w-3 h-3 text-theme-muted" />
                 </button>
@@ -1569,7 +1573,7 @@ function MessageBubble({
               ref={reactionPickerRef}
               className={`
                 absolute ${isOwn ? 'left-0' : 'right-0'} -top-10
-                flex gap-1 p-1.5 bg-white dark:bg-gray-800 rounded-full border border-theme-default
+                flex gap-1 p-1.5 bg-theme-card rounded-full border border-theme-default
                 shadow-lg z-10
               `}
               role="menu"
@@ -1582,7 +1586,7 @@ function MessageBubble({
                     onReact?.(message.id, emoji);
                     setShowReactionPicker(false);
                   }}
-                  className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
+                  className="w-7 h-7 flex items-center justify-center hover:bg-theme-hover rounded-full transition-colors"
                   aria-label={`React with ${emoji}`}
                 >
                   {emoji}
@@ -1597,7 +1601,7 @@ function MessageBubble({
               ref={messageMenuRef}
               className={`
                 absolute ${isOwn ? 'left-0' : 'right-0'} -top-16
-                flex flex-col p-1 bg-white dark:bg-gray-800 rounded-lg border border-theme-default
+                flex flex-col p-1 bg-theme-card rounded-lg border border-theme-default
                 shadow-lg z-10 min-w-[100px]
               `}
               role="menu"
@@ -1608,7 +1612,7 @@ function MessageBubble({
                   onEdit?.(message);
                   setShowMessageMenu(false);
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-theme-muted hover:bg-gray-100 dark:hover:bg-white/10 rounded"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-theme-muted hover:bg-theme-hover rounded"
                 role="menuitem"
               >
                 <Pencil className="w-3 h-3" aria-hidden="true" />
@@ -1619,7 +1623,7 @@ function MessageBubble({
                   onDelete?.(message.id);
                   setShowMessageMenu(false);
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-white/10 rounded"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-theme-hover rounded"
                 role="menuitem"
               >
                 <Trash2 className="w-3 h-3" aria-hidden="true" />
@@ -1636,7 +1640,8 @@ function MessageBubble({
               <button
                 key={emoji}
                 onClick={() => onReact?.(message.id, emoji)}
-                className="flex items-center gap-0.5 px-1.5 py-0.5 bg-gray-100 dark:bg-white/5 rounded-full text-xs hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+                className="flex items-center gap-0.5 px-1.5 py-0.5 bg-theme-elevated rounded-full text-xs hover:bg-theme-hover transition-colors"
+                aria-label={`${emoji} reaction, click to toggle`}
               >
                 <span>{emoji}</span>
                 {typeof count === 'number' && count > 1 && (

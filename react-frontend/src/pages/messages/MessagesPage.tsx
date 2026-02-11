@@ -64,6 +64,7 @@ export function MessagesPage() {
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userSearchResults, setUserSearchResults] = useState<User[]>([]);
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
+  const [userSearchError, setUserSearchError] = useState<string | null>(null);
 
   // Check for new conversation params
   const toUserId = searchParams.get('to');
@@ -153,12 +154,24 @@ export function MessagesPage() {
     loadConversations();
   }, [loadConversations]);
 
+  // Memoize startNewConversation
+  const startNewConversation = useCallback((userId: number, _listing?: number) => {
+    // Find existing conversation or create new
+    const existing = conversations.find((c) => getOtherUser(c).id === userId);
+    if (existing) {
+      navigate(`/messages/${existing.id}`, { replace: true });
+    } else {
+      // Navigate with "new" prefix to indicate this is a user ID, not conversation ID
+      navigate(`/messages/new/${userId}`, { replace: true });
+    }
+  }, [conversations, navigate]);
+
   // Handle new conversation params separately
   useEffect(() => {
     if (toUserId && conversations.length > 0) {
       startNewConversation(parseInt(toUserId), listingId ? parseInt(listingId) : undefined);
     }
-  }, [toUserId, listingId, conversations.length]);
+  }, [toUserId, listingId, conversations.length, startNewConversation]);
 
   // Debounced user search
   useEffect(() => {
@@ -215,14 +228,18 @@ export function MessagesPage() {
   async function searchUsers(query: string) {
     try {
       setIsSearchingUsers(true);
+      setUserSearchError(null);
       const response = await api.get<User[]>(`/v2/users?q=${encodeURIComponent(query)}&limit=10`);
       if (response.success && response.data) {
         // Filter out current user from results
         const filtered = response.data.filter(u => u.id !== currentUser?.id);
         setUserSearchResults(filtered);
+      } else {
+        setUserSearchError('Failed to search members');
       }
     } catch (error) {
       logError('Failed to search users', error);
+      setUserSearchError('Failed to search members. Please try again.');
     } finally {
       setIsSearchingUsers(false);
     }
@@ -243,16 +260,6 @@ export function MessagesPage() {
     setUserSearchResults([]);
   }
 
-  function startNewConversation(userId: number, _listing?: number) {
-    // Find existing conversation or create new
-    const existing = conversations.find((c) => getOtherUser(c).id === userId);
-    if (existing) {
-      navigate(`/messages/${existing.id}`, { replace: true });
-    } else {
-      // Navigate with "new" prefix to indicate this is a user ID, not conversation ID
-      navigate(`/messages/new/${userId}`, { replace: true });
-    }
-  }
 
   const filteredConversations = conversations.filter((conv) => {
     const otherUser = getOtherUser(conv);
@@ -391,7 +398,19 @@ export function MessagesPage() {
 
             {/* Search Results */}
             <div className="mt-4 space-y-2 max-h-64 overflow-y-auto">
-              {userSearchResults.length > 0 ? (
+              {userSearchError ? (
+                <div className="text-center py-4">
+                  <p className="text-red-500 dark:text-red-400 text-sm">{userSearchError}</p>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    className="mt-2 bg-theme-elevated text-theme-muted"
+                    onPress={() => searchUsers(userSearchQuery)}
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              ) : userSearchResults.length > 0 ? (
                 userSearchResults.map((user) => (
                   <button
                     key={user.id}
