@@ -361,6 +361,10 @@
         },
 
         checkAndShowPrompt() {
+            // DISABLED: Mobile app install popup is disabled
+            // To re-enable, remove this return statement
+            return;
+
             // Check visit count
             const visits = parseInt(localStorage.getItem('nexus-visit-count') || '0');
             localStorage.setItem('nexus-visit-count', (visits + 1).toString());
