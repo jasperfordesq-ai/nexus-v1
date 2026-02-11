@@ -41,6 +41,7 @@
 .bg-theme-overlay { background-color: var(--surface-overlay); }
 .bg-theme-hover { background-color: var(--surface-hover); }
 .bg-theme-active { background-color: var(--surface-active); }
+.bg-theme-card { background-color: var(--card-bg); }
 
 /* Border colors */
 .border-theme-default { border-color: var(--border-default); }
