@@ -94,6 +94,8 @@ export function CreateGroupPage() {
       newErrors.description = 'Description is required';
     } else if (formData.description.length < 20) {
       newErrors.description = 'Description must be at least 20 characters';
+    } else if (formData.description.length > 2000) {
+      newErrors.description = 'Description must be less than 2000 characters';
     }
 
     setErrors(newErrors);
@@ -257,6 +259,7 @@ export function CreateGroupPage() {
                 </div>
               </div>
               <Switch
+                aria-label={formData.is_private ? 'Make group public' : 'Make group private'}
                 isSelected={formData.is_private}
                 onValueChange={(checked) => updateField('is_private', checked)}
                 classNames={{
@@ -276,15 +279,14 @@ export function CreateGroupPage() {
             >
               {isEditing ? 'Update Group' : 'Create Group'}
             </Button>
-            <Link to="/groups">
-              <Button
-                type="button"
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-              >
-                Cancel
-              </Button>
-            </Link>
+            <Button
+              type="button"
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              onPress={() => navigate('/groups')}
+            >
+              Cancel
+            </Button>
           </div>
         </form>
       </GlassCard>
