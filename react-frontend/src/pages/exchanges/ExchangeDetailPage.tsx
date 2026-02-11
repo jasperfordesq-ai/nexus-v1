@@ -2,7 +2,7 @@
  * Exchange Detail Page - View and manage a single exchange
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -21,64 +21,21 @@ import {
   ArrowLeft,
   ArrowRightLeft,
   CheckCircle,
-  XCircle,
-  AlertTriangle,
   MessageSquare,
   Play,
   Check,
   X,
+  XCircle,
+  AlertTriangle,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useAuth } from '@/contexts';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import type { Exchange, ExchangeStatus } from '@/types/api';
-
-const STATUS_CONFIG: Record<ExchangeStatus, { label: string; color: string; description: string }> = {
-  pending_provider: {
-    label: 'Awaiting Provider Response',
-    color: 'warning',
-    description: 'Waiting for the service provider to accept or decline this request.',
-  },
-  pending_broker: {
-    label: 'Awaiting Broker Approval',
-    color: 'secondary',
-    description: 'This exchange requires broker approval before it can proceed.',
-  },
-  accepted: {
-    label: 'Accepted',
-    color: 'primary',
-    description: 'The exchange has been accepted. The provider can start when ready.',
-  },
-  in_progress: {
-    label: 'In Progress',
-    color: 'primary',
-    description: 'The service is currently being provided.',
-  },
-  pending_confirmation: {
-    label: 'Confirm Hours',
-    color: 'warning',
-    description: 'Both parties need to confirm the hours worked to complete the exchange.',
-  },
-  completed: {
-    label: 'Completed',
-    color: 'success',
-    description: 'The exchange has been completed and credits have been transferred.',
-  },
-  disputed: {
-    label: 'Disputed',
-    color: 'danger',
-    description: 'There is a disagreement about the hours. A broker will review this.',
-  },
-  cancelled: {
-    label: 'Cancelled',
-    color: 'default',
-    description: 'This exchange was cancelled.',
-  },
-};
+import { EXCHANGE_STATUS_CONFIG, MAX_EXCHANGE_HOURS, getStatusIconBgClass } from '@/lib/exchange-status';
+import type { Exchange } from '@/types/api';
 
 export function ExchangeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -93,15 +50,12 @@ export function ExchangeDetailPage() {
   // Modal states
   const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [declineReason, setDeclineReason] = useState('');
   const [confirmHours, setConfirmHours] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    loadExchange();
-  }, [id]);
-
-  async function loadExchange() {
+  const loadExchange = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -120,7 +74,11 @@ export function ExchangeDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [id]);
+
+  useEffect(() => {
+    loadExchange();
+  }, [loadExchange]);
 
   const isRequester = exchange?.requester_id === user?.id;
   const isProvider = exchange?.provider_id === user?.id;
@@ -199,6 +157,11 @@ export function ExchangeDetailPage() {
       return;
     }
 
+    if (hours > MAX_EXCHANGE_HOURS) {
+      toast.error(`Maximum ${MAX_EXCHANGE_HOURS} hours per exchange`);
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/confirm`, { hours });
@@ -214,12 +177,13 @@ export function ExchangeDetailPage() {
   }
 
   async function handleCancel() {
-    if (!exchange || !window.confirm('Are you sure you want to cancel this exchange?')) return;
+    if (!exchange) return;
 
     try {
       setIsSubmitting(true);
       await api.delete(`/v2/exchanges/${exchange.id}`);
       toast.success('Exchange cancelled');
+      setShowCancelModal(false);
       navigate('/exchanges');
     } catch (err) {
       toast.error('Failed to cancel exchange');
@@ -250,7 +214,7 @@ export function ExchangeDetailPage() {
     );
   }
 
-  const statusConfig = STATUS_CONFIG[exchange.status];
+  const statusConfig = EXCHANGE_STATUS_CONFIG[exchange.status];
 
   // Determine which actions are available
   const canAccept = isProvider && exchange.status === 'pending_provider';
@@ -275,27 +239,21 @@ export function ExchangeDetailPage() {
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
+        aria-label="Go back to exchanges list"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         Back to exchanges
       </button>
 
       {/* Status Card */}
       <GlassCard className="p-6">
         <div className="flex items-center gap-4 mb-4">
-          <div className={`
-            w-12 h-12 rounded-full flex items-center justify-center
-            ${statusConfig.color === 'success' ? 'bg-emerald-500/20 text-emerald-400' :
-              statusConfig.color === 'warning' ? 'bg-amber-500/20 text-amber-400' :
-              statusConfig.color === 'danger' ? 'bg-red-500/20 text-red-400' :
-              statusConfig.color === 'primary' ? 'bg-indigo-500/20 text-indigo-400' :
-              'bg-gray-500/20 text-gray-400'}
-          `}>
-            <ArrowRightLeft className="w-6 h-6" />
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getStatusIconBgClass(statusConfig.color)}`}>
+            <ArrowRightLeft className="w-6 h-6" aria-hidden="true" />
           </div>
           <div>
             <Chip
-              color={statusConfig.color as 'warning' | 'primary' | 'success' | 'danger' | 'secondary' | 'default'}
+              color={statusConfig.color}
               variant="flat"
               size="lg"
             >
@@ -339,7 +297,7 @@ export function ExchangeDetailPage() {
                 </p>
                 {exchange.requester_confirmed_at && (
                   <p className="text-xs text-emerald-400 flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" />
+                    <CheckCircle className="w-3 h-3" aria-hidden="true" />
                     Confirmed {exchange.requester_confirmed_hours}h
                   </p>
                 )}
@@ -362,7 +320,7 @@ export function ExchangeDetailPage() {
                 </p>
                 {exchange.provider_confirmed_at && (
                   <p className="text-xs text-emerald-400 flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" />
+                    <CheckCircle className="w-3 h-3" aria-hidden="true" />
                     Confirmed {exchange.provider_confirmed_hours}h
                   </p>
                 )}
@@ -386,7 +344,9 @@ export function ExchangeDetailPage() {
           <div className="bg-theme-elevated rounded-lg p-4">
             <p className="text-sm text-theme-muted">Created</p>
             <p className="text-sm font-medium text-theme-primary">
-              {new Date(exchange.created_at).toLocaleDateString()}
+              <time dateTime={exchange.created_at}>
+                {new Date(exchange.created_at).toLocaleDateString()}
+              </time>
             </p>
           </div>
         </div>
@@ -395,7 +355,7 @@ export function ExchangeDetailPage() {
         {exchange.message && (
           <div className="bg-theme-elevated rounded-lg p-4 mb-6">
             <h3 className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
+              <MessageSquare className="w-4 h-4" aria-hidden="true" />
               Message from requester
             </h3>
             <p className="text-theme-primary">{exchange.message}</p>
@@ -412,11 +372,11 @@ export function ExchangeDetailPage() {
 
         {/* Actions */}
         {(canAccept || canDecline || canStart || canComplete || canConfirm || canCancel) && (
-          <div className="flex flex-wrap gap-3 pt-4 border-t border-theme-border">
+          <div className="flex flex-wrap gap-3 pt-4 border-t border-theme-default">
             {canAccept && (
               <Button
                 color="success"
-                startContent={<Check className="w-4 h-4" />}
+                startContent={<Check className="w-4 h-4" aria-hidden="true" />}
                 onClick={handleAccept}
                 isLoading={isSubmitting}
               >
@@ -427,7 +387,7 @@ export function ExchangeDetailPage() {
               <Button
                 color="danger"
                 variant="flat"
-                startContent={<X className="w-4 h-4" />}
+                startContent={<X className="w-4 h-4" aria-hidden="true" />}
                 onClick={() => setShowDeclineModal(true)}
               >
                 Decline
@@ -436,7 +396,7 @@ export function ExchangeDetailPage() {
             {canStart && (
               <Button
                 color="primary"
-                startContent={<Play className="w-4 h-4" />}
+                startContent={<Play className="w-4 h-4" aria-hidden="true" />}
                 onClick={handleStart}
                 isLoading={isSubmitting}
               >
@@ -446,7 +406,7 @@ export function ExchangeDetailPage() {
             {canComplete && (
               <Button
                 color="success"
-                startContent={<CheckCircle className="w-4 h-4" />}
+                startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
                 onClick={handleComplete}
                 isLoading={isSubmitting}
               >
@@ -456,7 +416,7 @@ export function ExchangeDetailPage() {
             {canConfirm && (
               <Button
                 color="warning"
-                startContent={<CheckCircle className="w-4 h-4" />}
+                startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
                 onClick={() => setShowConfirmModal(true)}
               >
                 Confirm Hours
@@ -466,9 +426,8 @@ export function ExchangeDetailPage() {
               <Button
                 color="danger"
                 variant="flat"
-                startContent={<XCircle className="w-4 h-4" />}
-                onClick={handleCancel}
-                isLoading={isSubmitting}
+                startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
+                onClick={() => setShowCancelModal(true)}
               >
                 Cancel Exchange
               </Button>
@@ -478,19 +437,36 @@ export function ExchangeDetailPage() {
       </GlassCard>
 
       {/* Decline Modal */}
-      <Modal isOpen={showDeclineModal} onClose={() => setShowDeclineModal(false)}>
+      <Modal
+        isOpen={showDeclineModal}
+        onClose={() => setShowDeclineModal(false)}
+        classNames={{
+          base: 'bg-theme-card border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
         <ModalContent>
-          <ModalHeader>Decline Exchange Request</ModalHeader>
+          <ModalHeader className="text-theme-primary">Decline Exchange Request</ModalHeader>
           <ModalBody>
             <Textarea
               label="Reason (optional)"
               placeholder="Let them know why you're declining..."
               value={declineReason}
               onChange={(e) => setDeclineReason(e.target.value)}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onClick={() => setShowDeclineModal(false)}>
+            <Button
+              variant="flat"
+              onClick={() => setShowDeclineModal(false)}
+              className="bg-theme-elevated text-theme-primary"
+            >
               Cancel
             </Button>
             <Button color="danger" onClick={handleDecline} isLoading={isSubmitting}>
@@ -501,9 +477,18 @@ export function ExchangeDetailPage() {
       </Modal>
 
       {/* Confirm Hours Modal */}
-      <Modal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)}>
+      <Modal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        classNames={{
+          base: 'bg-theme-card border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
         <ModalContent>
-          <ModalHeader>Confirm Hours Worked</ModalHeader>
+          <ModalHeader className="text-theme-primary">Confirm Hours Worked</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted mb-4">
               How many hours were actually worked for this exchange?
@@ -515,19 +500,61 @@ export function ExchangeDetailPage() {
               value={confirmHours}
               onChange={(e) => setConfirmHours(e.target.value)}
               min="0.5"
+              max={MAX_EXCHANGE_HOURS}
               step="0.5"
               endContent={<span className="text-theme-muted">hours</span>}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
             />
             <p className="text-xs text-theme-muted mt-2">
-              Originally proposed: {exchange?.proposed_hours} hours
+              Originally proposed: {exchange?.proposed_hours} hours (max: {MAX_EXCHANGE_HOURS})
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onClick={() => setShowConfirmModal(false)}>
+            <Button
+              variant="flat"
+              onClick={() => setShowConfirmModal(false)}
+              className="bg-theme-elevated text-theme-primary"
+            >
               Cancel
             </Button>
             <Button color="success" onClick={handleConfirm} isLoading={isSubmitting}>
               Confirm Hours
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Cancel Confirmation Modal */}
+      <Modal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        classNames={{
+          base: 'bg-theme-card border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">Cancel Exchange?</ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted">
+              Are you sure you want to cancel this exchange? This action cannot be undone.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              onClick={() => setShowCancelModal(false)}
+              className="bg-theme-elevated text-theme-primary"
+            >
+              Keep Exchange
+            </Button>
+            <Button color="danger" onClick={handleCancel} isLoading={isSubmitting}>
+              Cancel Exchange
             </Button>
           </ModalFooter>
         </ModalContent>

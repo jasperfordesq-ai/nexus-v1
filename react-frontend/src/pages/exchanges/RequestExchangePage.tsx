@@ -2,7 +2,7 @@
  * Request Exchange Page - Create a new exchange request for a listing
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Input, Textarea } from '@heroui/react';
@@ -16,11 +16,11 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useAuth } from '@/contexts';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { MAX_EXCHANGE_HOURS } from '@/lib/exchange-status';
 import type { Listing, ExchangeConfig } from '@/types/api';
 
 export function RequestExchangePage() {
@@ -38,11 +38,7 @@ export function RequestExchangePage() {
   const [proposedHours, setProposedHours] = useState('');
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    loadData();
-  }, [id]);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -78,7 +74,11 @@ export function RequestExchangePage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [id]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -88,6 +88,11 @@ export function RequestExchangePage() {
     const hours = parseFloat(proposedHours);
     if (isNaN(hours) || hours <= 0) {
       toast.error('Please enter valid hours');
+      return;
+    }
+
+    if (hours > MAX_EXCHANGE_HOURS) {
+      toast.error(`Maximum ${MAX_EXCHANGE_HOURS} hours per exchange`);
       return;
     }
 
@@ -160,15 +165,16 @@ export function RequestExchangePage() {
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
+        aria-label="Go back to listing"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         Back to listing
       </button>
 
       {/* Header */}
       <div className="text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 mb-4">
-          <ArrowRightLeft className="w-8 h-8 text-emerald-400" />
+          <ArrowRightLeft className="w-8 h-8 text-emerald-400" aria-hidden="true" />
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">
           Request Exchange
@@ -192,17 +198,17 @@ export function RequestExchangePage() {
             </h2>
             <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-theme-muted">
               <span className="flex items-center gap-1">
-                <User className="w-4 h-4" />
+                <User className="w-4 h-4" aria-hidden="true" />
                 {listing.user?.name || 'Unknown'}
               </span>
               {listing.category_name && (
                 <span className="flex items-center gap-1">
-                  <Tag className="w-4 h-4" />
+                  <Tag className="w-4 h-4" aria-hidden="true" />
                   {listing.category_name}
                 </span>
               )}
               <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
+                <Clock className="w-4 h-4" aria-hidden="true" />
                 ~{listing.hours_estimate || listing.estimated_hours || '?'} hours
               </span>
             </div>
@@ -227,10 +233,15 @@ export function RequestExchangePage() {
               value={proposedHours}
               onChange={(e) => setProposedHours(e.target.value)}
               min="0.5"
+              max={MAX_EXCHANGE_HOURS}
               step="0.5"
               isRequired
               endContent={<span className="text-theme-muted">hours</span>}
-              description="The estimated time for this service"
+              description={`The estimated time for this service (max: ${MAX_EXCHANGE_HOURS})`}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
             />
           </div>
 
@@ -243,6 +254,10 @@ export function RequestExchangePage() {
               minRows={3}
               maxRows={6}
               description="Explain your needs or ask any questions"
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
             />
           </div>
 
@@ -259,7 +274,7 @@ export function RequestExchangePage() {
             <Button
               type="button"
               variant="flat"
-              className="flex-1"
+              className="flex-1 bg-theme-elevated text-theme-primary"
               onClick={() => navigate(-1)}
             >
               Cancel
@@ -267,7 +282,7 @@ export function RequestExchangePage() {
             <Button
               type="submit"
               className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
-              startContent={<Send className="w-4 h-4" />}
+              startContent={<Send className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting}
             >
               Send Request
