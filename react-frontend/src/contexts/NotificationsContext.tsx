@@ -109,17 +109,23 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     if (!isAuthenticated) return;
 
     try {
-      // API returns counts directly: { total: N, messages: N, ... }
-      const response = await api.get<NotificationCounts>('/v2/notifications/counts');
+      // Fetch both notification counts and unread message count in parallel
+      const [notifResponse, messagesResponse] = await Promise.all([
+        api.get<NotificationCounts>('/v2/notifications/counts'),
+        api.get<{ count: number }>('/v2/messages/unread-count').catch(() => null),
+      ]);
 
-      if (response.success && response.data) {
-        const counts = response.data;
+      if (notifResponse.success && notifResponse.data) {
+        const counts = notifResponse.data;
+        // Use actual unread message count from Messages API (not notification count)
+        const unreadMessages = messagesResponse?.success ? messagesResponse.data?.count ?? 0 : 0;
+
         setState((prev) => ({
           ...prev,
           unreadCount: counts.total ?? 0,
           counts: {
             total: counts.total ?? 0,
-            messages: counts.messages ?? 0,
+            messages: unreadMessages, // Use actual unread messages, not notification count
             listings: counts.listings ?? 0,
             transactions: counts.transactions ?? 0,
             connections: counts.connections ?? 0,

@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
-import { useAuth, useTenant, useFeature } from '@/contexts';
+import { useAuth, useTenant, useFeature, useNotifications } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { WalletBalance, Listing } from '@/types/api';
@@ -32,13 +32,13 @@ interface DashboardStats {
   walletBalance: WalletBalance | null;
   recentListings: Listing[];
   activeListingsCount: number;
-  unreadMessages: number;
   pendingTransactions: number;
 }
 
 export function DashboardPage() {
   const { user } = useAuth();
   const { branding } = useTenant();
+  const { counts: notificationCounts } = useNotifications();
   const hasGamification = useFeature('gamification');
   const hasEvents = useFeature('events');
 
@@ -46,7 +46,6 @@ export function DashboardPage() {
     walletBalance: null,
     recentListings: [],
     activeListingsCount: 0,
-    unreadMessages: 0,
     pendingTransactions: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -55,10 +54,9 @@ export function DashboardPage() {
   const loadDashboardData = useCallback(async () => {
     try {
       setError(null);
-      const [walletRes, listingsRes, messagesRes, pendingRes] = await Promise.all([
+      const [walletRes, listingsRes, pendingRes] = await Promise.all([
         api.get<WalletBalance>('/v2/wallet/balance').catch(() => null),
         api.get<Listing[]>('/v2/listings?limit=5&sort=-created_at').catch(() => null),
-        api.get<{ count: number }>('/v2/messages/unread-count').catch(() => null),
         api.get<{ count: number }>('/v2/wallet/pending-count').catch(() => null),
       ]);
 
@@ -71,7 +69,6 @@ export function DashboardPage() {
         walletBalance: walletRes?.success ? walletRes.data ?? null : null,
         recentListings: listingsRes?.success ? listingsRes.data ?? [] : [],
         activeListingsCount: listingsCount,
-        unreadMessages: messagesRes?.success ? messagesRes.data?.count ?? 0 : 0,
         pendingTransactions: pendingRes?.success ? pendingRes.data?.count ?? 0 : 0,
       });
     } catch (err) {
@@ -186,7 +183,7 @@ export function DashboardPage() {
         <StatCard
           icon={<MessageSquare className="w-5 h-5" aria-hidden="true" />}
           label="Messages"
-          value={stats.unreadMessages > 0 ? stats.unreadMessages.toString() : '0'}
+          value={notificationCounts.messages.toString()}
           color="amber"
           href="/messages"
           isLoading={isLoading}
