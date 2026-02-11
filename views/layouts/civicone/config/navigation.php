@@ -149,14 +149,6 @@ class Navigation {
                 'order' => 7,
                 'separator_before' => true
             ],
-            'get_app' => [
-                'label' => 'Get App',
-                'url' => \Nexus\Services\LayoutHelper::preserveLayoutInUrl($basePath . '/mobile-download'),
-                'icon' => 'fa-solid fa-mobile-screen-button',
-                'color' => 'var(--civic-brand-primary)',
-                'order' => 8,
-                'separator_before' => true
-            ]
         ];
     }
 
