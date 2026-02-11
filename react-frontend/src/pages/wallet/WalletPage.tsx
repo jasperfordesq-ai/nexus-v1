@@ -2,7 +2,7 @@
  * Wallet Page - Time credit balance and transactions
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Tabs, Tab } from '@heroui/react';
 import {
@@ -15,6 +15,8 @@ import {
   User,
   Download,
   Send,
+  AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
@@ -30,17 +32,15 @@ export function WalletPage() {
   const [balance, setBalance] = useState<WalletBalance | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<TransactionFilter>('all');
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const toast = useToast();
 
-  useEffect(() => {
-    loadWalletData();
-  }, []);
-
-  async function loadWalletData() {
+  const loadWalletData = useCallback(async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const [balanceRes, transactionsRes] = await Promise.all([
         api.get<WalletBalance>('/v2/wallet/balance'),
         api.get<Transaction[]>('/v2/wallet/transactions?limit=50'),
@@ -48,16 +48,24 @@ export function WalletPage() {
 
       if (balanceRes.success && balanceRes.data) {
         setBalance(balanceRes.data);
+      } else {
+        setError('Failed to load wallet balance');
+        return;
       }
       if (transactionsRes.success && transactionsRes.data) {
         setTransactions(transactionsRes.data);
       }
-    } catch (error) {
-      logError('Failed to load wallet data', error);
+    } catch (err) {
+      logError('Failed to load wallet data', err);
+      setError('Failed to load wallet data. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    loadWalletData();
+  }, [loadWalletData]);
 
   // Handle successful transfer
   function handleTransferComplete(transaction: Transaction) {
@@ -79,15 +87,17 @@ export function WalletPage() {
     );
   }
 
-  const filteredTransactions = transactions.filter((tx) => {
-    if (filter === 'all') return true;
-    if (filter === 'earned') return tx.type === 'credit';
-    if (filter === 'spent') return tx.type === 'debit';
-    if (filter === 'pending') return tx.status === 'pending';
-    return true;
-  });
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((tx) => {
+      if (filter === 'all') return true;
+      if (filter === 'earned') return tx.type === 'credit';
+      if (filter === 'spent') return tx.type === 'debit';
+      if (filter === 'pending') return tx.status === 'pending';
+      return true;
+    });
+  }, [transactions, filter]);
 
-  const stats = {
+  const stats = useMemo(() => ({
     earned: transactions
       .filter((tx) => tx.type === 'credit' && tx.status === 'completed')
       .reduce((sum, tx) => sum + tx.amount, 0),
@@ -97,7 +107,19 @@ export function WalletPage() {
     pending: transactions
       .filter((tx) => tx.status === 'pending')
       .reduce((sum, tx) => sum + tx.amount, 0),
-  };
+  }), [transactions]);
+
+  /**
+   * Sanitize cell value to prevent CSV injection
+   * Prefixes dangerous characters with a single quote
+   */
+  function sanitizeCsvCell(value: string): string {
+    // If the cell starts with =, +, -, @, tab, or carriage return, prefix with single quote
+    if (/^[=+\-@\t\r]/.test(value)) {
+      return `'${value}`;
+    }
+    return value;
+  }
 
   // Export transactions to CSV
   function handleExport() {
@@ -112,8 +134,8 @@ export function WalletPage() {
       new Date(tx.created_at).toLocaleDateString(),
       tx.type === 'credit' ? 'Received' : 'Sent',
       tx.amount.toString(),
-      tx.description || '',
-      tx.other_user?.name || tx.other_party?.name || '',
+      sanitizeCsvCell(tx.description || ''),
+      sanitizeCsvCell(tx.other_user?.name || tx.other_party?.name || ''),
       tx.status,
     ]);
 
@@ -165,7 +187,26 @@ export function WalletPage() {
         <p className="text-theme-muted mt-1">Track your time credits and transactions</p>
       </motion.div>
 
+      {/* Error State */}
+      {error && (
+        <motion.div variants={itemVariants}>
+          <GlassCard className="p-8 text-center">
+            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Wallet</h3>
+            <p className="text-theme-muted mb-4">{error}</p>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<RefreshCw className="w-4 h-4" />}
+              onPress={() => loadWalletData()}
+            >
+              Try Again
+            </Button>
+          </GlassCard>
+        </motion.div>
+      )}
+
       {/* Balance Card */}
+      {!error && (
       <motion.div variants={itemVariants}>
         <GlassCard className="p-8 text-center relative overflow-hidden">
           {/* Background decoration */}
@@ -207,33 +248,37 @@ export function WalletPage() {
           </div>
         </GlassCard>
       </motion.div>
+      )}
 
       {/* Stats Grid */}
+      {!error && (
       <motion.div variants={itemVariants} className="grid grid-cols-3 gap-4">
         <StatCard
-          icon={<ArrowDownLeft className="w-5 h-5" />}
+          icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
           label="Earned"
           value={`+${stats.earned}h`}
           color="emerald"
           isLoading={isLoading}
         />
         <StatCard
-          icon={<ArrowUpRight className="w-5 h-5" />}
+          icon={<ArrowUpRight className="w-5 h-5" aria-hidden="true" />}
           label="Spent"
           value={`-${stats.spent}h`}
           color="rose"
           isLoading={isLoading}
         />
         <StatCard
-          icon={<Clock className="w-5 h-5" />}
+          icon={<Clock className="w-5 h-5" aria-hidden="true" />}
           label="Pending"
           value={`${stats.pending}h`}
           color="amber"
           isLoading={isLoading}
         />
       </motion.div>
+      )}
 
       {/* Transactions */}
+      {!error && (
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -246,9 +291,10 @@ export function WalletPage() {
               variant="flat"
               size="sm"
               className="bg-theme-elevated text-theme-muted"
-              startContent={<Download className="w-4 h-4" />}
+              startContent={<Download className="w-4 h-4" aria-hidden="true" />}
               onClick={handleExport}
               isDisabled={transactions.length === 0}
+              aria-label="Export transactions to CSV"
             >
               Export
             </Button>
@@ -298,6 +344,7 @@ export function WalletPage() {
           </div>
         </GlassCard>
       </motion.div>
+      )}
 
       {/* Transfer Modal */}
       <TransferModal
