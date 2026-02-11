@@ -209,15 +209,6 @@ $userId = $_SESSION['user_id'] ?? null;
                 </div>
             </a>
 
-            <a href="<?= $basePath ?>/mobile-download" class="mega-menu-item">
-                <div class="mega-menu-item-icon mega-icon--mobile-app">
-                    <i class="fa-solid fa-mobile-screen-button"></i>
-                </div>
-                <div class="mega-menu-item-content">
-                    <span class="mega-menu-item-label">Get Mobile App</span>
-                    <span class="mega-menu-item-desc">Download for iOS & Android</span>
-                </div>
-            </a>
         </div>
 
     </div>
