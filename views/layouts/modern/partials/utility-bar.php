@@ -18,7 +18,7 @@ $protocol = $isSecure ? 'https://' : 'http://';
         <!-- Try New Frontend Button -->
         <a href="https://app.project-nexus.ie/" class="try-new-frontend-btn" target="_blank" rel="noopener" title="Try our new React-powered frontend">
             <i class="fa-solid fa-sparkles sparkle-icon"></i>
-            <span class="btn-text">Try new front end</span>
+            <span class="btn-text">Try the New Experience</span>
         </a>
 
         <?php if ($showPlatform): ?>

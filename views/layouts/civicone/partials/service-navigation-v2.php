@@ -163,7 +163,7 @@ function isNavItemActive(string $itemUrl, string $currentPath, string $basePath)
                            href="https://app.project-nexus.ie/"
                            target="_blank"
                            rel="noopener">
-                            <span class="btn-text">Try new front end</span>
+                            <span class="btn-text">Try the New Experience</span>
                         </a>
                     </li>
 
