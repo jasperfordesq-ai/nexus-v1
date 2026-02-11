@@ -2,10 +2,19 @@
  * Event Detail Page - Single event view
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, AvatarGroup } from '@heroui/react';
+import {
+  Button,
+  Avatar,
+  AvatarGroup,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from '@heroui/react';
 import {
   ArrowLeft,
   Calendar,
@@ -19,10 +28,11 @@ import {
   UserMinus,
   ExternalLink,
   AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useAuth } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -32,19 +42,18 @@ export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const toast = useToast();
 
   const [event, setEvent] = useState<Event | null>(null);
   const [attendees, setAttendees] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAttending, setIsAttending] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  useEffect(() => {
-    loadEvent();
-  }, [id]);
-
-  async function loadEvent() {
+  const loadEvent = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -65,11 +74,16 @@ export function EventDetailPage() {
         setAttendees(attendeesRes.data);
       }
     } catch (err) {
-      setError('Event not found or has been removed');
+      logError('Failed to load event', err);
+      setError('Failed to load event. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [id]);
+
+  useEffect(() => {
+    loadEvent();
+  }, [loadEvent]);
 
   async function handleRsvp() {
     if (!event || !isAuthenticated) return;
@@ -77,18 +91,50 @@ export function EventDetailPage() {
     try {
       setIsSubmitting(true);
       if (isAttending) {
-        await api.delete(`/v2/events/${event.id}/rsvp`);
-        setIsAttending(false);
-        setEvent((prev) => prev ? { ...prev, attendees_count: (prev.attendees_count ?? 1) - 1 } : null);
+        const response = await api.delete(`/v2/events/${event.id}/rsvp`);
+        if (response.success) {
+          setIsAttending(false);
+          setEvent((prev) => prev ? { ...prev, attendees_count: (prev.attendees_count ?? 1) - 1 } : null);
+          toast.success('RSVP cancelled');
+        } else {
+          toast.error('Failed to cancel RSVP');
+        }
       } else {
-        await api.post(`/v2/events/${event.id}/rsvp`);
-        setIsAttending(true);
-        setEvent((prev) => prev ? { ...prev, attendees_count: (prev.attendees_count ?? 0) + 1 } : null);
+        const response = await api.post(`/v2/events/${event.id}/rsvp`);
+        if (response.success) {
+          setIsAttending(true);
+          setEvent((prev) => prev ? { ...prev, attendees_count: (prev.attendees_count ?? 0) + 1 } : null);
+          toast.success("You're attending!");
+        } else {
+          toast.error('Failed to RSVP');
+        }
       }
     } catch (err) {
       logError('Failed to update RSVP', err);
+      toast.error('Something went wrong');
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!event) return;
+
+    try {
+      setIsDeleting(true);
+      const response = await api.delete(`/v2/events/${event.id}`);
+      if (response.success) {
+        toast.success('Event deleted');
+        navigate('/events');
+      } else {
+        toast.error('Failed to delete event');
+      }
+    } catch (err) {
+      logError('Failed to delete event', err);
+      toast.error('Something went wrong');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   }
 
@@ -98,12 +144,41 @@ export function EventDetailPage() {
     return <LoadingScreen message="Loading event..." />;
   }
 
-  if (error || !event) {
+  if (error && !event) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <GlassCard className="p-8 text-center">
+          <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Event</h2>
+          <p className="text-theme-muted mb-4">{error}</p>
+          <div className="flex justify-center gap-3">
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => navigate(-1)}
+            >
+              Go Back
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => loadEvent()}
+            >
+              Try Again
+            </Button>
+          </div>
+        </GlassCard>
+      </div>
+    );
+  }
+
+  if (!event) {
     return (
       <EmptyState
-        icon={<AlertCircle className="w-12 h-12" />}
+        icon={<AlertCircle className="w-12 h-12" aria-hidden="true" />}
         title="Event Not Found"
-        description={error || 'The event you are looking for does not exist'}
+        description="The event you are looking for does not exist"
         action={
           <Link to="/events">
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
@@ -129,8 +204,9 @@ export function EventDetailPage() {
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
+        aria-label="Go back to events"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         Back to events
       </button>
 
@@ -158,19 +234,22 @@ export function EventDetailPage() {
 
           {isOrganizer && (
             <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-                startContent={<Edit className="w-4 h-4" />}
-              >
-                Edit
-              </Button>
+              <Link to={`/events/${event.id}/edit`}>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="bg-theme-elevated text-theme-primary"
+                  startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
+                >
+                  Edit
+                </Button>
+              </Link>
               <Button
                 size="sm"
                 variant="flat"
                 className="bg-red-500/10 text-red-400"
-                startContent={<Trash2 className="w-4 h-4" />}
+                startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                onPress={() => setShowDeleteModal(true)}
               >
                 Delete
               </Button>
@@ -185,25 +264,34 @@ export function EventDetailPage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           <div className="flex items-center gap-3 text-theme-muted">
             <div className="p-2 rounded-lg bg-amber-500/20">
-              <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
             </div>
             <div>
               <div className="text-xs text-theme-subtle">Date</div>
-              <div className="text-theme-primary">
+              <time dateTime={event.start_date} className="text-theme-primary block">
                 {startDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-              </div>
+              </time>
             </div>
           </div>
 
           <div className="flex items-center gap-3 text-theme-muted">
             <div className="p-2 rounded-lg bg-indigo-500/20">
-              <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
             </div>
             <div>
               <div className="text-xs text-theme-subtle">Time</div>
               <div className="text-theme-primary">
-                {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                {endDate && ` - ${endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                <time dateTime={event.start_date}>
+                  {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </time>
+                {endDate && (
+                  <>
+                    {' - '}
+                    <time dateTime={event.end_date!}>
+                      {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </time>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -211,7 +299,7 @@ export function EventDetailPage() {
           {event.location && (
             <div className="flex items-center gap-3 text-theme-muted">
               <div className="p-2 rounded-lg bg-emerald-500/20">
-                <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               </div>
               <div>
                 <div className="text-xs text-theme-subtle">Location</div>
@@ -232,7 +320,7 @@ export function EventDetailPage() {
         {/* Attendees */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
             Attendees ({event.attendees_count ?? 0})
           </h2>
 
@@ -268,8 +356,8 @@ export function EventDetailPage() {
                 ? 'bg-theme-hover text-theme-primary'
                 : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
               }
-              startContent={isAttending ? <UserMinus className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-              onClick={handleRsvp}
+              startContent={isAttending ? <UserMinus className="w-4 h-4" aria-hidden="true" /> : <UserPlus className="w-4 h-4" aria-hidden="true" />}
+              onPress={handleRsvp}
               isLoading={isSubmitting}
             >
               {isAttending ? 'Cancel RSVP' : 'RSVP'}
@@ -277,7 +365,7 @@ export function EventDetailPage() {
             <Button
               variant="flat"
               className="bg-theme-elevated text-theme-primary"
-              startContent={<Share2 className="w-4 h-4" />}
+              startContent={<Share2 className="w-4 h-4" aria-hidden="true" />}
             >
               Share
             </Button>
@@ -286,7 +374,7 @@ export function EventDetailPage() {
                 <Button
                   variant="flat"
                   className="bg-theme-elevated text-theme-primary"
-                  startContent={<ExternalLink className="w-4 h-4" />}
+                  startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
                 >
                   Event Link
                 </Button>
@@ -295,6 +383,43 @@ export function EventDetailPage() {
           </div>
         )}
       </GlassCard>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        classNames={{
+          base: 'bg-theme-card border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">Delete Event</ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted">
+              Are you sure you want to delete "{event.title}"? This action cannot be undone.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              onPress={() => setShowDeleteModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-red-500 text-white"
+              onPress={handleDelete}
+              isLoading={isDeleting}
+            >
+              Delete Event
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </motion.div>
   );
 }
