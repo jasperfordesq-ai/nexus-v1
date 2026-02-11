@@ -2,7 +2,7 @@
  * Group Detail Page - Single group view
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Tabs, Tab } from '@heroui/react';
@@ -19,10 +19,11 @@ import {
   AlertCircle,
   FolderTree,
   ChevronRight,
+  RefreshCw,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useAuth } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -60,6 +61,7 @@ export function GroupDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const toast = useToast();
 
   const [group, setGroup] = useState<GroupDetails | null>(null);
   const [members, setMembers] = useState<User[]>([]);
@@ -70,11 +72,7 @@ export function GroupDetailPage() {
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadGroup();
-  }, [id]);
-
-  async function loadGroup() {
+  const loadGroup = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -91,13 +89,18 @@ export function GroupDetailPage() {
         setError('Group not found or has been removed');
       }
     } catch (err) {
-      setError('Group not found or has been removed');
+      logError('Failed to load group', err);
+      setError('Failed to load group. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [id]);
 
-  async function loadMembers() {
+  useEffect(() => {
+    loadGroup();
+  }, [loadGroup]);
+
+  const loadMembers = useCallback(async () => {
     if (!id || membersLoaded || membersLoading) return;
 
     try {
@@ -112,14 +115,14 @@ export function GroupDetailPage() {
       setMembersLoading(false);
       setMembersLoaded(true);
     }
-  }
+  }, [id, membersLoaded, membersLoading]);
 
   // Load members when tab changes to members
   useEffect(() => {
     if (activeTab === 'members' && !membersLoaded) {
       loadMembers();
     }
-  }, [activeTab, membersLoaded]);
+  }, [activeTab, membersLoaded, loadMembers]);
 
   async function handleJoinLeave() {
     if (!group || !isAuthenticated) return;
@@ -128,26 +131,37 @@ export function GroupDetailPage() {
       setIsJoining(true);
       const memberCount = getMemberCount(group);
       if (isMember(group)) {
-        await api.delete(`/v2/groups/${group.id}/membership`);
-        setGroup((prev) => prev ? {
-          ...prev,
-          is_member: false,
-          viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'none' } : undefined,
-          member_count: memberCount - 1,
-          members_count: memberCount - 1,
-        } : null);
+        const response = await api.delete(`/v2/groups/${group.id}/membership`);
+        if (response.success) {
+          setGroup((prev) => prev ? {
+            ...prev,
+            is_member: false,
+            viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'none' } : undefined,
+            member_count: memberCount - 1,
+            members_count: memberCount - 1,
+          } : null);
+          toast.success('Left the group');
+        } else {
+          toast.error('Failed to leave group');
+        }
       } else {
-        await api.post(`/v2/groups/${group.id}/join`);
-        setGroup((prev) => prev ? {
-          ...prev,
-          is_member: true,
-          viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'active' } : { status: 'active', role: 'member', is_admin: false },
-          member_count: memberCount + 1,
-          members_count: memberCount + 1,
-        } : null);
+        const response = await api.post(`/v2/groups/${group.id}/join`);
+        if (response.success) {
+          setGroup((prev) => prev ? {
+            ...prev,
+            is_member: true,
+            viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'active' } : { status: 'active', role: 'member', is_admin: false },
+            member_count: memberCount + 1,
+            members_count: memberCount + 1,
+          } : null);
+          toast.success('Joined the group!');
+        } else {
+          toast.error('Failed to join group');
+        }
       }
     } catch (err) {
       logError('Failed to update membership', err);
+      toast.error('Something went wrong');
     } finally {
       setIsJoining(false);
     }
@@ -163,18 +177,31 @@ export function GroupDetailPage() {
 
   if (error || !group) {
     return (
-      <EmptyState
-        icon={<AlertCircle className="w-12 h-12" />}
-        title="Group Not Found"
-        description={error || 'The group you are looking for does not exist'}
-        action={
-          <Link to="/groups">
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              Browse Groups
+      <div className="max-w-4xl mx-auto">
+        <GlassCard className="p-8 text-center">
+          <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Group</h2>
+          <p className="text-theme-muted mb-4">{error || 'The group you are looking for does not exist'}</p>
+          <div className="flex justify-center gap-3">
+            <Link to="/groups">
+              <Button
+                variant="flat"
+                className="bg-theme-elevated text-theme-primary"
+                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              >
+                Browse Groups
+              </Button>
+            </Link>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => loadGroup()}
+            >
+              Try Again
             </Button>
-          </Link>
-        }
-      />
+          </div>
+        </GlassCard>
+      </div>
     );
   }
 
@@ -188,8 +215,9 @@ export function GroupDetailPage() {
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
+        aria-label="Go back to groups"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         Back to groups
       </button>
 
@@ -198,19 +226,20 @@ export function GroupDetailPage() {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
             <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-              <Users className="w-8 h-8 text-purple-400" />
+              <Users className="w-8 h-8 text-purple-400" aria-hidden="true" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-bold text-theme-primary">{group.name}</h1>
                 {group.visibility === 'private' ? (
-                  <Lock className="w-5 h-5 text-amber-400" />
+                  <Lock className="w-5 h-5 text-amber-400" aria-hidden="true" />
                 ) : (
-                  <Globe className="w-5 h-5 text-emerald-400" />
+                  <Globe className="w-5 h-5 text-emerald-400" aria-hidden="true" />
                 )}
               </div>
               <p className="text-theme-muted text-sm mt-1">
-                {getMemberCount(group)} members • Created {new Date(group.created_at).toLocaleDateString()}
+                {getMemberCount(group)} members • Created{' '}
+                <time dateTime={group.created_at}>{new Date(group.created_at).toLocaleDateString()}</time>
               </p>
             </div>
           </div>
@@ -220,7 +249,7 @@ export function GroupDetailPage() {
               <Button
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
-                startContent={<Settings className="w-4 h-4" />}
+                startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
               >
                 Settings
               </Button>
@@ -231,8 +260,8 @@ export function GroupDetailPage() {
                   ? 'bg-theme-hover text-theme-primary'
                   : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
                 }
-                startContent={userIsMember ? <UserMinus className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-                onClick={handleJoinLeave}
+                startContent={userIsMember ? <UserMinus className="w-4 h-4" aria-hidden="true" /> : <UserPlus className="w-4 h-4" aria-hidden="true" />}
+                onPress={handleJoinLeave}
                 isLoading={isJoining}
               >
                 {userIsMember ? 'Leave Group' : 'Join Group'}
@@ -249,18 +278,18 @@ export function GroupDetailPage() {
         {/* Quick Stats */}
         <div className="flex flex-wrap gap-6">
           <div className="flex items-center gap-2 text-theme-muted">
-            <Users className="w-5 h-5" />
+            <Users className="w-5 h-5" aria-hidden="true" />
             <span>{getMemberCount(group)} members</span>
           </div>
           {group.posts_count !== undefined && (
             <div className="flex items-center gap-2 text-theme-muted">
-              <MessageSquare className="w-5 h-5" />
+              <MessageSquare className="w-5 h-5" aria-hidden="true" />
               <span>{group.posts_count} posts</span>
             </div>
           )}
           <div className="flex items-center gap-2 text-theme-muted">
-            <Calendar className="w-5 h-5" />
-            <span>Created {new Date(group.created_at).toLocaleDateString()}</span>
+            <Calendar className="w-5 h-5" aria-hidden="true" />
+            <span>Created <time dateTime={group.created_at}>{new Date(group.created_at).toLocaleDateString()}</time></span>
           </div>
         </div>
       </GlassCard>
@@ -279,7 +308,7 @@ export function GroupDetailPage() {
           key="discussion"
           title={
             <span className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
+              <MessageSquare className="w-4 h-4" aria-hidden="true" />
               Discussion
             </span>
           }
@@ -288,7 +317,7 @@ export function GroupDetailPage() {
           key="members"
           title={
             <span className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
+              <Users className="w-4 h-4" aria-hidden="true" />
               Members
             </span>
           }
@@ -298,7 +327,7 @@ export function GroupDetailPage() {
             key="subgroups"
             title={
               <span className="flex items-center gap-2">
-                <FolderTree className="w-4 h-4" />
+                <FolderTree className="w-4 h-4" aria-hidden="true" />
                 Subgroups ({group.sub_groups?.length})
               </span>
             }
@@ -323,9 +352,9 @@ export function GroupDetailPage() {
                         />
                         <div>
                           <p className="font-medium text-theme-primary">{post.author?.name}</p>
-                          <p className="text-xs text-theme-subtle">
+                          <time dateTime={post.created_at} className="text-xs text-theme-subtle block">
                             {new Date(post.created_at).toLocaleDateString()}
-                          </p>
+                          </time>
                         </div>
                       </div>
                       <p className="text-theme-muted">{post.content}</p>
@@ -334,21 +363,21 @@ export function GroupDetailPage() {
                 </div>
               ) : (
                 <EmptyState
-                  icon={<MessageSquare className="w-12 h-12" />}
+                  icon={<MessageSquare className="w-12 h-12" aria-hidden="true" />}
                   title="No posts yet"
                   description="Be the first to start a discussion in this group"
                 />
               )
             ) : (
               <EmptyState
-                icon={<Lock className="w-12 h-12" />}
+                icon={<Lock className="w-12 h-12" aria-hidden="true" />}
                 title="Join to see discussion"
                 description="You need to be a member to view and participate in discussions"
                 action={
                   isAuthenticated && (
                     <Button
                       className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                      onClick={handleJoinLeave}
+                      onPress={handleJoinLeave}
                       isLoading={isJoining}
                     >
                       Join Group
@@ -394,7 +423,7 @@ export function GroupDetailPage() {
               </div>
             ) : (
               <EmptyState
-                icon={<Users className="w-12 h-12" />}
+                icon={<Users className="w-12 h-12" aria-hidden="true" />}
                 title="No members yet"
                 description="Be the first to join this group"
               />
@@ -410,7 +439,7 @@ export function GroupDetailPage() {
                   <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors">
                     <div className="flex items-center gap-4">
                       <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-                        <Users className="w-5 h-5 text-purple-400" />
+                        <Users className="w-5 h-5 text-purple-400" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="font-medium text-theme-primary">{subGroup.name}</p>
@@ -419,7 +448,7 @@ export function GroupDetailPage() {
                         </p>
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-theme-subtle" />
+                    <ChevronRight className="w-5 h-5 text-theme-subtle" aria-hidden="true" />
                   </div>
                 </Link>
               ))}
