@@ -2,7 +2,7 @@
  * Create/Edit Group Page
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Switch } from '@heroui/react';
@@ -14,9 +14,12 @@ import {
   Lock,
   Globe,
   CheckCircle,
+  AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { Group } from '@/types/api';
@@ -36,24 +39,21 @@ const initialFormData: FormData = {
 export function CreateGroupPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
   const isEditing = !!id;
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
-  useEffect(() => {
-    if (isEditing) {
-      loadGroup();
-    }
-  }, [id]);
-
-  async function loadGroup() {
+  const loadGroup = useCallback(async () => {
     if (!id) return;
 
     try {
       setIsLoading(true);
+      setLoadError(null);
       const response = await api.get<Group>(`/v2/groups/${id}`);
       if (response.success && response.data) {
         const group = response.data;
@@ -62,14 +62,22 @@ export function CreateGroupPage() {
           description: group.description || '',
           is_private: group.visibility === 'private' || group.visibility === 'secret',
         });
+      } else {
+        setLoadError('Group not found');
       }
     } catch (error) {
       logError('Failed to load group', error);
-      navigate('/groups');
+      setLoadError('Failed to load group. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [id]);
+
+  useEffect(() => {
+    if (isEditing) {
+      loadGroup();
+    }
+  }, [isEditing, loadGroup]);
 
   function validateForm(): boolean {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
@@ -106,15 +114,22 @@ export function CreateGroupPage() {
         is_private: formData.is_private,
       };
 
+      let response;
       if (isEditing) {
-        await api.put(`/v2/groups/${id}`, payload);
+        response = await api.put(`/v2/groups/${id}`, payload);
       } else {
-        await api.post('/v2/groups', payload);
+        response = await api.post('/v2/groups', payload);
       }
 
-      navigate('/groups');
+      if (response.success) {
+        toast.success(isEditing ? 'Group updated' : 'Group created');
+        navigate('/groups');
+      } else {
+        toast.error(response.error || 'Failed to save group');
+      }
     } catch (error) {
       logError('Failed to save group', error);
+      toast.error('Something went wrong');
     } finally {
       setIsSubmitting(false);
     }
@@ -131,6 +146,36 @@ export function CreateGroupPage() {
     return <LoadingScreen message="Loading group..." />;
   }
 
+  if (loadError) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <GlassCard className="p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Group</h2>
+          <p className="text-theme-muted mb-4">{loadError}</p>
+          <div className="flex justify-center gap-3">
+            <Link to="/groups">
+              <Button
+                variant="flat"
+                className="bg-theme-elevated text-theme-primary"
+                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              >
+                Back to Groups
+              </Button>
+            </Link>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => loadGroup()}
+            >
+              Try Again
+            </Button>
+          </div>
+        </GlassCard>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -141,15 +186,16 @@ export function CreateGroupPage() {
       <Link
         to="/groups"
         className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
+        aria-label="Go back to groups"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         Back to groups
       </Link>
 
       {/* Form */}
       <GlassCard className="p-6 sm:p-8">
         <h1 className="text-2xl font-bold text-theme-primary mb-6 flex items-center gap-3">
-          <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+          <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" aria-hidden="true" />
           {isEditing ? 'Edit Group' : 'Create New Group'}
         </h1>
 
@@ -163,7 +209,7 @@ export function CreateGroupPage() {
               onChange={(e) => updateField('name', e.target.value)}
               isInvalid={!!errors.name}
               errorMessage={errors.name}
-              startContent={<FileText className="w-4 h-4 text-theme-subtle" />}
+              startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -195,9 +241,9 @@ export function CreateGroupPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {formData.is_private ? (
-                  <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
                 ) : (
-                  <Globe className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <Globe className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                 )}
                 <div>
                   <p className="font-medium text-theme-primary">
@@ -225,7 +271,7 @@ export function CreateGroupPage() {
             <Button
               type="submit"
               className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={isEditing ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+              startContent={isEditing ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting}
             >
               {isEditing ? 'Update Group' : 'Create Group'}
