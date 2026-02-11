@@ -15,8 +15,8 @@ import {
   RefreshCw,
   AlertTriangle,
 } from 'lucide-react';
-import { GlassCard } from '@/components/ui';
-import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { GlassCard, ExchangeCardSkeleton } from '@/components/ui';
+import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -230,7 +230,11 @@ export function ExchangesPage() {
       {!error && (
         <>
           {isLoading ? (
-            <LoadingScreen message="Loading exchanges..." />
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <ExchangeCardSkeleton key={i} />
+              ))}
+            </div>
           ) : exchanges.length === 0 ? (
             <EmptyState
               icon={<ArrowRightLeft className="w-12 h-12" />}

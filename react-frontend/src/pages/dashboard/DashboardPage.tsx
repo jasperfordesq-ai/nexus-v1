@@ -165,7 +165,7 @@ export function DashboardPage() {
       {/* Stats Grid */}
       <motion.div
         variants={itemVariants}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
       >
         <StatCard
           icon={<Wallet className="w-5 h-5" aria-hidden="true" />}
