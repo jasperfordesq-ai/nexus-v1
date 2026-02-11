@@ -3,7 +3,7 @@
  * Theme-aware styling for light and dark modes
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
@@ -89,21 +89,21 @@ export function HomePage() {
   const { isAuthenticated } = useAuth();
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
 
-  useEffect(() => {
-    // Fetch platform-wide stats for the landing page
-    async function loadStats() {
-      try {
-        const response = await api.get<PlatformStats>('/v2/platform/stats');
-        if (response.success && response.data) {
-          setPlatformStats(response.data);
-        }
-      } catch (error) {
-        logError('Failed to load platform stats', error);
-        // Stats will show defaults on error
+  const loadStats = useCallback(async () => {
+    try {
+      const response = await api.get<PlatformStats>('/v2/platform/stats');
+      if (response.success && response.data) {
+        setPlatformStats(response.data);
       }
+    } catch (error) {
+      logError('Failed to load platform stats', error);
+      // Stats will show defaults on error
     }
-    loadStats();
   }, []);
+
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
   const stats = platformStats
     ? [
@@ -177,7 +177,7 @@ export function HomePage() {
                   <Button
                     size="lg"
                     className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
-                    endContent={<ArrowRight className="w-5 h-5" />}
+                    endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                   >
                     Go to Dashboard
                   </Button>
@@ -188,7 +188,7 @@ export function HomePage() {
                     <Button
                       size="lg"
                       className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
-                      endContent={<ArrowRight className="w-5 h-5" />}
+                      endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                     >
                       Get Started Free
                     </Button>
@@ -220,7 +220,7 @@ export function HomePage() {
                   className="flex items-center gap-3 p-4 rounded-2xl glass-card"
                 >
                   <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
+                    <feature.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-theme-primary">{feature.title}</p>
@@ -268,7 +268,7 @@ export function HomePage() {
             isIconOnly
             aria-label="Scroll down"
           >
-            <ChevronDown className="w-6 h-6" />
+            <ChevronDown className="w-6 h-6" aria-hidden="true" />
           </Button>
         </motion.div>
       </section>
@@ -283,7 +283,7 @@ export function HomePage() {
             className="grid md:grid-cols-3 gap-8"
           >
             {coreValues.map((feature, index) => (
-              <motion.div
+              <motion.article
                 key={feature.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -294,6 +294,7 @@ export function HomePage() {
                 <div className="p-8 rounded-2xl glass-card-hover">
                   <div
                     className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-6`}
+                    aria-hidden="true"
                   >
                     <span className="text-2xl font-bold text-white">
                       {index + 1}
@@ -304,7 +305,7 @@ export function HomePage() {
                   </h3>
                   <p className="text-theme-muted">{feature.description}</p>
                 </div>
-              </motion.div>
+              </motion.article>
             ))}
           </motion.div>
         </div>
@@ -331,7 +332,7 @@ export function HomePage() {
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-10"
-                  endContent={<ArrowRight className="w-5 h-5" />}
+                  endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                 >
                   Create Your Free Account
                 </Button>
