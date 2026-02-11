@@ -6,11 +6,11 @@
  * - New message notifications in conversation list
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Input, Avatar, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab } from '@heroui/react';
-import { Search, MessageSquare, Circle, Plus, Loader2, Archive, RotateCcw, AlertTriangle, ArrowRightLeft } from 'lucide-react';
+import { Search, MessageSquare, Circle, Plus, Loader2, Archive, RotateCcw, AlertTriangle, ArrowRightLeft, RefreshCw } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, usePusherOptional, useToast, useTenant } from '@/contexts';
@@ -54,8 +54,10 @@ export function MessagesPage() {
   const [archivedConversations, setArchivedConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingArchived, setIsLoadingArchived] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox');
+  const archivedLoadedRef = useRef(false);
 
   // New message modal state
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
@@ -108,6 +110,25 @@ export function MessagesPage() {
     });
   }, []);
 
+  // Memoize loadConversations to use in effects
+  const loadConversations = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await api.get<Conversation[]>('/v2/messages');
+      if (response.success && response.data) {
+        setConversations(response.data);
+      } else {
+        setError('Failed to load conversations');
+      }
+    } catch (err) {
+      logError('Failed to load conversations', err);
+      setError('Failed to load conversations. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   // Subscribe to Pusher for real-time updates
   useEffect(() => {
     if (!pusher) return;
@@ -125,16 +146,19 @@ export function MessagesPage() {
       unsubMessage();
       unsubUnread();
     };
-  }, [pusher, handleNewMessage]);
+  }, [pusher, handleNewMessage, loadConversations]);
 
+  // Load conversations on mount and when query params change
   useEffect(() => {
     loadConversations();
+  }, [loadConversations]);
 
-    // If we have params to start a new conversation, handle that
-    if (toUserId) {
+  // Handle new conversation params separately
+  useEffect(() => {
+    if (toUserId && conversations.length > 0) {
       startNewConversation(parseInt(toUserId), listingId ? parseInt(listingId) : undefined);
     }
-  }, []);
+  }, [toUserId, listingId, conversations.length]);
 
   // Debounced user search
   useEffect(() => {
@@ -150,33 +174,20 @@ export function MessagesPage() {
     return () => clearTimeout(timer);
   }, [userSearchQuery]);
 
-  async function loadConversations() {
-    try {
-      setIsLoading(true);
-      const response = await api.get<Conversation[]>('/v2/messages');
-      if (response.success && response.data) {
-        setConversations(response.data);
-      }
-    } catch (error) {
-      logError('Failed to load conversations', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function loadArchivedConversations() {
+  const loadArchivedConversations = useCallback(async () => {
     try {
       setIsLoadingArchived(true);
       const response = await api.get<Conversation[]>('/v2/messages?archived=true');
       if (response.success && response.data) {
         setArchivedConversations(response.data);
       }
-    } catch (error) {
-      logError('Failed to load archived conversations', error);
+    } catch (err) {
+      logError('Failed to load archived conversations', err);
     } finally {
       setIsLoadingArchived(false);
+      archivedLoadedRef.current = true;
     }
-  }
+  }, []);
 
   async function restoreConversation(conversationId: number) {
     try {
@@ -194,12 +205,12 @@ export function MessagesPage() {
     }
   }
 
-  // Load archived conversations when tab changes
+  // Load archived conversations when tab changes (only once)
   useEffect(() => {
-    if (activeTab === 'archived' && archivedConversations.length === 0) {
+    if (activeTab === 'archived' && !archivedLoadedRef.current) {
       loadArchivedConversations();
     }
-  }, [activeTab]);
+  }, [activeTab, loadArchivedConversations]);
 
   async function searchUsers(query: string) {
     try {
@@ -221,25 +232,25 @@ export function MessagesPage() {
     // Check if we already have a conversation with this user
     const existing = conversations.find((c) => getOtherUser(c).id === user.id);
     if (existing) {
-      // Navigate to existing conversation
+      // Navigate to existing conversation using conversation ID
       navigate(`/messages/${existing.id}`);
     } else {
-      // Navigate to new conversation (using user ID as conversation ID)
-      navigate(`/messages/${user.id}`);
+      // Navigate to new conversation - use "new" prefix to indicate user ID
+      navigate(`/messages/new/${user.id}`);
     }
     setIsNewMessageOpen(false);
     setUserSearchQuery('');
     setUserSearchResults([]);
   }
 
-  async function startNewConversation(userId: number, _listing?: number) {
+  function startNewConversation(userId: number, _listing?: number) {
     // Find existing conversation or create new
     const existing = conversations.find((c) => getOtherUser(c).id === userId);
     if (existing) {
-      navigate(`/messages/${existing.id}`);
+      navigate(`/messages/${existing.id}`, { replace: true });
     } else {
-      // Navigate directly - the ConversationPage will handle new conversations
-      navigate(`/messages/${userId}`);
+      // Navigate with "new" prefix to indicate this is a user ID, not conversation ID
+      navigate(`/messages/new/${userId}`, { replace: true });
     }
   }
 
@@ -416,7 +427,20 @@ export function MessagesPage() {
       {/* Conversations List */}
       {activeTab === 'inbox' ? (
         // Inbox view
-        isLoading ? (
+        error ? (
+          <GlassCard className="p-8 text-center">
+            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Messages</h3>
+            <p className="text-theme-muted mb-4">{error}</p>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<RefreshCw className="w-4 h-4" />}
+              onPress={() => loadConversations()}
+            >
+              Try Again
+            </Button>
+          </GlassCard>
+        ) : isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3, 4, 5].map((i) => (
               <GlassCard key={i} className="p-4 animate-pulse">
@@ -518,7 +542,10 @@ function ConversationCard({ conversation }: ConversationCardProps) {
   const { last_message, unread_count } = conversation;
 
   return (
-    <Link to={`/messages/${conversation.id}`}>
+    <Link
+      to={`/messages/${conversation.id}`}
+      aria-label={`Conversation with ${other_user.name}${unread_count > 0 ? `, ${unread_count} unread message${unread_count > 1 ? 's' : ''}` : ''}`}
+    >
       <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -529,7 +556,10 @@ function ConversationCard({ conversation }: ConversationCardProps) {
               className="ring-2 ring-theme-default"
             />
             {unread_count > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center text-xs text-white font-medium">
+              <span
+                className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center text-xs text-white font-medium"
+                aria-hidden="true"
+              >
                 {unread_count > 9 ? '9+' : unread_count}
               </span>
             )}
@@ -555,7 +585,7 @@ function ConversationCard({ conversation }: ConversationCardProps) {
           </div>
 
           {unread_count > 0 && (
-            <Circle className="w-3 h-3 fill-indigo-500 text-indigo-500 flex-shrink-0" />
+            <Circle className="w-3 h-3 fill-indigo-500 text-indigo-500 flex-shrink-0" aria-hidden="true" />
           )}
         </div>
       </GlassCard>

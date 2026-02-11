@@ -97,6 +97,7 @@ function App() {
                       <Route path="/listings/create" element={<CreateListingPage />} />
                       <Route path="/listings/edit/:id" element={<CreateListingPage />} />
                       <Route path="/messages" element={<MessagesPage />} />
+                      <Route path="/messages/new/:userId" element={<ConversationPage />} />
                       <Route path="/messages/:id" element={<ConversationPage />} />
                       <Route path="/wallet" element={<WalletPage />} />
                       <Route path="/profile" element={<ProfilePage />} />

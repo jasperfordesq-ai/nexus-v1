@@ -52,7 +52,7 @@ interface PaginationState {
 }
 
 export function ConversationPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id, userId } = useParams<{ id?: string; userId?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const toast = useToast();
@@ -63,6 +63,12 @@ export function ConversationPage() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const lastMessageIdRef = useRef<number | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+
+  // Determine if this is a new conversation (user ID) or existing (conversation ID)
+  const isNewConversationRoute = !!userId;
+  const targetId = userId || id;
 
   const [conversation, setConversation] = useState<ConversationData | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -73,6 +79,7 @@ export function ConversationPage() {
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
+  const [isDocumentVisible, setIsDocumentVisible] = useState(true);
   // Voice recording state
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -98,13 +105,34 @@ export function ConversationPage() {
   // Edit/delete state
   const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState('');
-  const [, setDeletingMessageId] = useState<number | null>(null);
+
+  // Track document visibility for polling optimization
+  useEffect(() => {
+    function handleVisibilityChange() {
+      setIsDocumentVisible(!document.hidden);
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  // Debounced typing indicator sender
+  const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sendTypingIndicator = useCallback((otherUserId: number, isTyping: boolean) => {
+    if (typingDebounceRef.current) {
+      clearTimeout(typingDebounceRef.current);
+    }
+    typingDebounceRef.current = setTimeout(() => {
+      if (pusher) {
+        pusher.sendTyping(otherUserId, isTyping);
+      }
+    }, 500);
+  }, [pusher]);
 
   // Subscribe to Pusher channel for real-time updates
   useEffect(() => {
-    if (!id || !pusher) return;
+    if (!targetId || !pusher) return;
 
-    const otherUserId = parseInt(id, 10);
+    const otherUserId = parseInt(targetId, 10);
     pusher.subscribeToConversation(otherUserId);
 
     // Listen for new messages
@@ -147,14 +175,14 @@ export function ConversationPage() {
       if (event.user_id === otherUserId) {
         setIsOtherUserTyping(event.is_typing);
 
-        // Auto-clear typing after 3 seconds (in case stop event is missed)
+        // Auto-clear typing after 5 seconds (in case stop event is missed)
         if (event.is_typing) {
           if (typingTimeoutRef.current) {
             clearTimeout(typingTimeoutRef.current);
           }
           typingTimeoutRef.current = setTimeout(() => {
             setIsOtherUserTyping(false);
-          }, 3000);
+          }, 5000);
         }
       }
     });
@@ -167,42 +195,24 @@ export function ConversationPage() {
         clearTimeout(typingTimeoutRef.current);
       }
     };
-  }, [id, pusher]);
+  }, [targetId, pusher]);
 
-  // Load initial conversation and set up polling (fallback when Pusher not available)
-  useEffect(() => {
-    loadConversation();
-
-    // Poll for new messages every 5 seconds (only if Pusher not connected)
-    const interval = setInterval(() => {
-      if (!isNewConversation && lastMessageIdRef.current && !pusher?.isConnected) {
-        pollForNewMessages();
-      }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [id, isNewConversation, pusher?.isConnected]);
-
-  // Scroll to bottom when messages change (only for new messages, not history)
-  useEffect(() => {
-    // Only auto-scroll if we're near the bottom already
-    const container = messagesContainerRef.current;
-    if (container) {
-      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
-      if (isNearBottom) {
-        scrollToBottom();
-      }
-    }
-  }, [conversation?.messages.length]);
-
-  async function loadConversation() {
-    if (!id) return;
+  // Memoize loadConversation
+  const loadConversation = useCallback(async () => {
+    if (!targetId) return;
 
     try {
       setIsLoading(true);
       setIsNewConversation(false);
 
+      // If this is a new conversation route, load user profile directly
+      if (isNewConversationRoute) {
+        await loadUserForNewConversation(parseInt(targetId, 10));
+        return;
+      }
+
       // API returns messages as data with conversation info in meta
-      const response = await api.get<Message[]>(`/v2/messages/${id}`);
+      const response = await api.get<Message[]>(`/v2/messages/${targetId}`);
       if (response.success && response.data && response.meta?.conversation) {
         const messages = response.data;
         setConversation({
@@ -228,26 +238,68 @@ export function ConversationPage() {
       } else {
         // No existing conversation - this might be a new conversation
         // Try to fetch the user's profile to show their info
-        await loadUserForNewConversation(parseInt(id, 10));
+        await loadUserForNewConversation(parseInt(targetId, 10));
       }
     } catch (error) {
       // API returned error (e.g., 404) - try to start a new conversation
       logError('Failed to load conversation, trying new conversation', error);
-      await loadUserForNewConversation(parseInt(id, 10));
+      await loadUserForNewConversation(parseInt(targetId, 10));
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [targetId, isNewConversationRoute]);
 
-  async function loadUserForNewConversation(userId: number) {
+  // Load initial conversation
+  useEffect(() => {
+    loadConversation();
+  }, [loadConversation]);
+
+  // Set up polling (fallback when Pusher not available) - pause when tab hidden
+  useEffect(() => {
+    // Clear any existing interval
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+
+    // Only poll if: document visible, not new conversation, have messages, and Pusher not connected
+    if (!isDocumentVisible || isNewConversation || !lastMessageIdRef.current || pusher?.isConnected) {
+      return;
+    }
+
+    pollingIntervalRef.current = setInterval(() => {
+      pollForNewMessages();
+    }, 5000);
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
+  }, [targetId, isNewConversation, pusher?.isConnected, isDocumentVisible]);
+
+  // Scroll to bottom when messages change (only for new messages, not history)
+  useEffect(() => {
+    // Only auto-scroll if we're near the bottom already
+    const container = messagesContainerRef.current;
+    if (container) {
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+      if (isNearBottom) {
+        scrollToBottom();
+      }
+    }
+  }, [conversation?.messages.length]);
+
+  async function loadUserForNewConversation(userIdToLoad: number) {
     try {
-      const response = await api.get<User>(`/v2/users/${userId}`);
+      const response = await api.get<User>(`/v2/users/${userIdToLoad}`);
       if (response.success && response.data) {
         const userData = response.data;
         // Create a mock conversation with the user
         setConversation({
           meta: {
-            id: userId,
+            id: userIdToLoad,
             other_user: {
               id: userData.id,
               name: userData.name || `${userData.first_name || ''} ${userData.last_name || ''}`.trim(),
@@ -406,12 +458,31 @@ export function ConversationPage() {
     }
   }
 
+  // Cleanup voice recording on unmount
+  useEffect(() => {
+    return () => {
+      // Stop any active recording
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      // Release microphone
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      }
+      // Clear recording interval
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
+    };
+  }, []);
+
   /**
    * Start voice recording
    */
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -423,10 +494,11 @@ export function ConversationPage() {
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        setAudioBlob(audioBlob);
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setAudioBlob(blob);
         // Stop all tracks to release the microphone
         stream.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
       };
 
       mediaRecorder.start();
@@ -817,7 +889,6 @@ export function ConversationPage() {
             ),
           };
         });
-        setDeletingMessageId(null);
         toast.success('Message deleted', 'Your message has been deleted.');
       }
     } catch (error) {
@@ -1192,21 +1263,22 @@ export function ConversationPage() {
                 value={newMessage}
                 onChange={(e) => {
                   setNewMessage(e.target.value);
-                  // Send typing indicator
-                  if (pusher && id) {
-                    pusher.sendTyping(parseInt(id, 10), e.target.value.length > 0);
+                  // Send debounced typing indicator
+                  if (targetId) {
+                    sendTypingIndicator(parseInt(targetId, 10), e.target.value.length > 0);
                   }
                 }}
                 onBlur={() => {
                   // Stop typing indicator when input loses focus
-                  if (pusher && id) {
-                    pusher.sendTyping(parseInt(id, 10), false);
+                  if (pusher && targetId) {
+                    pusher.sendTyping(parseInt(targetId, 10), false);
                   }
                 }}
                 classNames={{
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 }}
+                aria-label="Message input"
               />
               {/* Voice recording button - show when no text and no attachments */}
               {!newMessage.trim() && attachments.length === 0 && (
@@ -1324,8 +1396,27 @@ function MessageBubble({
 }: MessageBubbleProps) {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [showMessageMenu, setShowMessageMenu] = useState(false);
+  const reactionPickerRef = useRef<HTMLDivElement>(null);
+  const messageMenuRef = useRef<HTMLDivElement>(null);
   const isVoiceMessage = message.is_voice || message.audio_url;
   const isDeleted = message.is_deleted;
+
+  // Close popups when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (showReactionPicker && reactionPickerRef.current && !reactionPickerRef.current.contains(event.target as Node)) {
+        setShowReactionPicker(false);
+      }
+      if (showMessageMenu && messageMenuRef.current && !messageMenuRef.current.contains(event.target as Node)) {
+        setShowMessageMenu(false);
+      }
+    }
+
+    if (showReactionPicker || showMessageMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showReactionPicker, showMessageMenu]);
 
   // Parse reactions from message (format: { emoji: count, ... } or array)
   const reactions = message.reactions || {};
@@ -1475,11 +1566,14 @@ function MessageBubble({
           {/* Reaction picker */}
           {showReactionPicker && (
             <div
+              ref={reactionPickerRef}
               className={`
                 absolute ${isOwn ? 'left-0' : 'right-0'} -top-10
                 flex gap-1 p-1.5 bg-white dark:bg-gray-800 rounded-full border border-theme-default
                 shadow-lg z-10
               `}
+              role="menu"
+              aria-label="Add reaction"
             >
               {REACTION_EMOJIS.map((emoji) => (
                 <button
@@ -1489,6 +1583,7 @@ function MessageBubble({
                     setShowReactionPicker(false);
                   }}
                   className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
+                  aria-label={`React with ${emoji}`}
                 >
                   {emoji}
                 </button>
@@ -1499,11 +1594,14 @@ function MessageBubble({
           {/* Message menu (edit/delete) */}
           {showMessageMenu && isOwn && (
             <div
+              ref={messageMenuRef}
               className={`
                 absolute ${isOwn ? 'left-0' : 'right-0'} -top-16
                 flex flex-col p-1 bg-white dark:bg-gray-800 rounded-lg border border-theme-default
                 shadow-lg z-10 min-w-[100px]
               `}
+              role="menu"
+              aria-label="Message options"
             >
               <button
                 onClick={() => {
@@ -1511,8 +1609,9 @@ function MessageBubble({
                   setShowMessageMenu(false);
                 }}
                 className="flex items-center gap-2 px-3 py-1.5 text-sm text-theme-muted hover:bg-gray-100 dark:hover:bg-white/10 rounded"
+                role="menuitem"
               >
-                <Pencil className="w-3 h-3" />
+                <Pencil className="w-3 h-3" aria-hidden="true" />
                 Edit
               </button>
               <button
@@ -1521,8 +1620,9 @@ function MessageBubble({
                   setShowMessageMenu(false);
                 }}
                 className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-white/10 rounded"
+                role="menuitem"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-3 h-3" aria-hidden="true" />
                 Delete
               </button>
             </div>
