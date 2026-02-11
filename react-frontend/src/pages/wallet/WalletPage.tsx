@@ -32,6 +32,8 @@ export function WalletPage() {
   const [balance, setBalance] = useState<WalletBalance | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreTransactions, setHasMoreTransactions] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<TransactionFilter>('all');
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
@@ -54,6 +56,8 @@ export function WalletPage() {
       }
       if (transactionsRes.success && transactionsRes.data) {
         setTransactions(transactionsRes.data);
+        // If we got fewer than 50, there are no more to load
+        setHasMoreTransactions(transactionsRes.data.length >= 50);
       }
     } catch (err) {
       logError('Failed to load wallet data', err);
@@ -66,6 +70,29 @@ export function WalletPage() {
   useEffect(() => {
     loadWalletData();
   }, [loadWalletData]);
+
+  // Load more transactions (pagination)
+  const loadMoreTransactions = useCallback(async () => {
+    if (isLoadingMore || !hasMoreTransactions || transactions.length === 0) return;
+
+    try {
+      setIsLoadingMore(true);
+      const offset = transactions.length;
+      const response = await api.get<Transaction[]>(`/v2/wallet/transactions?limit=50&offset=${offset}`);
+
+      if (response.success && response.data) {
+        if (response.data.length > 0) {
+          setTransactions((prev) => [...prev, ...response.data!]);
+        }
+        setHasMoreTransactions(response.data.length >= 50);
+      }
+    } catch (err) {
+      logError('Failed to load more transactions', err);
+      toast.error('Error', 'Failed to load more transactions');
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, hasMoreTransactions, transactions.length, toast]);
 
   // Handle successful transfer
   function handleTransferComplete(transaction: Transaction) {
@@ -337,9 +364,24 @@ export function WalletPage() {
                 description="Your transaction history will appear here"
               />
             ) : (
-              filteredTransactions.map((transaction) => (
-                <TransactionCard key={transaction.id} transaction={transaction} />
-              ))
+              <>
+                {filteredTransactions.map((transaction) => (
+                  <TransactionCard key={transaction.id} transaction={transaction} />
+                ))}
+                {/* Load More Button */}
+                {hasMoreTransactions && filter === 'all' && (
+                  <div className="pt-4 text-center">
+                    <Button
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-muted"
+                      onClick={loadMoreTransactions}
+                      isLoading={isLoadingMore}
+                    >
+                      Load More
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </GlassCard>
@@ -393,18 +435,22 @@ interface TransactionCardProps {
 
 function TransactionCard({ transaction }: TransactionCardProps) {
   const isCredit = transaction.type === 'credit';
+  const otherPartyName = transaction.other_user?.name || transaction.other_party?.name;
 
   return (
-    <div className="p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors">
+    <article
+      className="p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
+      aria-label={`${isCredit ? 'Received' : 'Sent'} ${transaction.amount} hours ${otherPartyName ? (isCredit ? 'from' : 'to') + ' ' + otherPartyName : ''}`}
+    >
       <div className="flex items-center gap-4">
         <div className={`
           p-2.5 rounded-full
           ${isCredit ? 'bg-emerald-500/20' : 'bg-rose-500/20'}
         `}>
           {isCredit ? (
-            <ArrowDownLeft className="w-5 h-5 text-emerald-400" />
+            <ArrowDownLeft className="w-5 h-5 text-emerald-400" aria-hidden="true" />
           ) : (
-            <ArrowUpRight className="w-5 h-5 text-rose-400" />
+            <ArrowUpRight className="w-5 h-5 text-rose-400" aria-hidden="true" />
           )}
         </div>
 
@@ -420,13 +466,15 @@ function TransactionCard({ transaction }: TransactionCardProps) {
           <div className="flex items-center gap-3 text-sm text-theme-subtle mt-1">
             {transaction.other_user && (
               <span className="flex items-center gap-1">
-                <User className="w-3 h-3" />
+                <User className="w-3 h-3" aria-hidden="true" />
                 {transaction.other_user.name}
               </span>
             )}
             <span className="flex items-center gap-1">
-              <Calendar className="w-3 h-3" />
-              {new Date(transaction.created_at).toLocaleDateString()}
+              <Calendar className="w-3 h-3" aria-hidden="true" />
+              <time dateTime={transaction.created_at}>
+                {new Date(transaction.created_at).toLocaleDateString()}
+              </time>
             </span>
           </div>
         </div>
@@ -435,7 +483,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
           {isCredit ? '+' : '-'}{transaction.amount}h
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
