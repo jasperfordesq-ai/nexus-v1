@@ -2,7 +2,7 @@
  * Settings Page - User account settings
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -66,7 +66,6 @@ export function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   // Modal states
   const passwordModal = useDisclosure();
@@ -86,6 +85,12 @@ export function SettingsPage() {
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Logout modal
+  const logoutModal = useDisclosure();
+
+  // Error state for notification settings
+  const [notificationError, setNotificationError] = useState<string | null>(null);
+
   // Profile form
   const [profileData, setProfileData] = useState<ProfileFormData>({
     name: '',
@@ -103,6 +108,21 @@ export function SettingsPage() {
     push_enabled: true,
   });
 
+  const loadNotificationSettings = useCallback(async () => {
+    try {
+      setNotificationError(null);
+      const response = await api.get<NotificationSettings>('/v2/users/me/notifications');
+      if (response.success && response.data) {
+        setNotifications(response.data);
+      } else {
+        setNotificationError('Failed to load notification settings');
+      }
+    } catch (error) {
+      logError('Failed to load notification settings', error);
+      setNotificationError('Failed to load notification settings');
+    }
+  }, []);
+
   useEffect(() => {
     if (user) {
       setProfileData({
@@ -114,52 +134,46 @@ export function SettingsPage() {
       });
     }
     loadNotificationSettings();
-  }, [user]);
+  }, [user, loadNotificationSettings]);
 
-  async function loadNotificationSettings() {
+  const saveProfile = useCallback(async () => {
     try {
-      const response = await api.get<NotificationSettings>('/v2/users/me/notifications');
-      if (response.success && response.data) {
-        setNotifications(response.data);
+      setIsSaving(true);
+      const response = await api.put('/v2/users/me', profileData);
+      if (response.success) {
+        toast.success('Profile updated successfully');
+        if (refreshUser) await refreshUser();
+      } else {
+        toast.error(response.error || 'Failed to save profile');
       }
     } catch (error) {
-      logError('Failed to load notification settings', error);
-    }
-  }
-
-  async function saveProfile() {
-    try {
-      setIsSaving(true);
-      await api.put('/v2/users/me', profileData);
-      showSuccess('Profile updated successfully');
-    } catch (error) {
       logError('Failed to save profile', error);
+      toast.error('Failed to save profile');
     } finally {
       setIsSaving(false);
     }
-  }
+  }, [profileData, refreshUser, toast]);
 
-  async function saveNotifications() {
+  const saveNotifications = useCallback(async () => {
     try {
       setIsSaving(true);
-      await api.put('/v2/users/me/notifications', notifications);
-      showSuccess('Notification settings saved');
+      const response = await api.put('/v2/users/me/notifications', notifications);
+      if (response.success) {
+        toast.success('Notification settings saved');
+      } else {
+        toast.error(response.error || 'Failed to save notifications');
+      }
     } catch (error) {
       logError('Failed to save notifications', error);
+      toast.error('Failed to save notifications');
     } finally {
       setIsSaving(false);
     }
-  }
-
-  function showSuccess(message: string) {
-    setSuccessMessage(message);
-    setTimeout(() => setSuccessMessage(''), 3000);
-  }
+  }, [notifications, toast]);
 
   function handleLogout() {
-    if (window.confirm('Are you sure you want to log out?')) {
-      logout();
-    }
+    logout();
+    logoutModal.onClose();
   }
 
   // Avatar upload handler
@@ -294,22 +308,11 @@ export function SettingsPage() {
       {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <Settings className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
+          <Settings className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
           Settings
         </h1>
         <p className="text-theme-muted mt-1">Manage your account preferences</p>
       </motion.div>
-
-      {/* Success Message */}
-      {successMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400"
-        >
-          {successMessage}
-        </motion.div>
-      )}
 
       {/* Tabs */}
       <motion.div variants={itemVariants}>
@@ -326,7 +329,7 @@ export function SettingsPage() {
             key="profile"
             title={
               <span className="flex items-center gap-2">
-                <User className="w-4 h-4" />
+                <User className="w-4 h-4" aria-hidden="true" />
                 Profile
               </span>
             }
@@ -335,7 +338,7 @@ export function SettingsPage() {
             key="notifications"
             title={
               <span className="flex items-center gap-2">
-                <Bell className="w-4 h-4" />
+                <Bell className="w-4 h-4" aria-hidden="true" />
                 Notifications
               </span>
             }
@@ -344,7 +347,7 @@ export function SettingsPage() {
             key="security"
             title={
               <span className="flex items-center gap-2">
-                <Shield className="w-4 h-4" />
+                <Shield className="w-4 h-4" aria-hidden="true" />
                 Security
               </span>
             }
@@ -377,12 +380,13 @@ export function SettingsPage() {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
+                  aria-label="Change profile photo"
                   className="absolute bottom-0 right-0 p-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 transition-colors disabled:opacity-50"
                 >
                   {isUploading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" />
                   ) : (
-                    <Camera className="w-4 h-4" />
+                    <Camera className="w-4 h-4" aria-hidden="true" />
                   )}
                 </button>
               </div>
@@ -443,9 +447,9 @@ export function SettingsPage() {
               />
 
               <Button
-                onClick={saveProfile}
+                onPress={saveProfile}
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Save className="w-4 h-4" />}
+                startContent={<Save className="w-4 h-4" aria-hidden="true" />}
                 isLoading={isSaving}
               >
                 Save Changes
@@ -458,10 +462,22 @@ export function SettingsPage() {
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-6">Notification Preferences</h2>
 
+            {notificationError ? (
+              <div className="text-center py-8">
+                <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+                <p className="text-theme-muted mb-4">{notificationError}</p>
+                <Button
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  onPress={loadNotificationSettings}
+                >
+                  Try Again
+                </Button>
+              </div>
+            ) : (
             <div className="space-y-6">
               <div className="space-y-4">
                 <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
+                  <Mail className="w-4 h-4" aria-hidden="true" />
                   Email Notifications
                 </h3>
 
@@ -489,7 +505,7 @@ export function SettingsPage() {
 
               <div className="pt-4 border-t border-theme-default space-y-4">
                 <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
-                  <Smartphone className="w-4 h-4" />
+                  <Smartphone className="w-4 h-4" aria-hidden="true" />
                   Push Notifications
                 </h3>
 
@@ -502,14 +518,15 @@ export function SettingsPage() {
               </div>
 
               <Button
-                onClick={saveNotifications}
+                onPress={saveNotifications}
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Save className="w-4 h-4" />}
+                startContent={<Save className="w-4 h-4" aria-hidden="true" />}
                 isLoading={isSaving}
               >
                 Save Preferences
               </Button>
             </div>
+            )}
           </GlassCard>
         )}
 
@@ -525,7 +542,7 @@ export function SettingsPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-indigo-500/20">
-                      <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="font-medium text-theme-primary">Change Password</p>
@@ -534,10 +551,10 @@ export function SettingsPage() {
                   </div>
                 </button>
 
-                <div className="w-full flex items-center justify-between p-4 rounded-lg bg-theme-elevated opacity-50 cursor-not-allowed text-left">
+                <div className="w-full flex items-center justify-between p-4 rounded-lg bg-theme-elevated opacity-50 cursor-not-allowed text-left" aria-disabled="true">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-emerald-500/20">
-                      <Key className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      <Key className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="font-medium text-theme-primary">Two-Factor Authentication</p>
@@ -546,10 +563,10 @@ export function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="w-full flex items-center justify-between p-4 rounded-lg bg-theme-elevated opacity-50 cursor-not-allowed text-left">
+                <div className="w-full flex items-center justify-between p-4 rounded-lg bg-theme-elevated opacity-50 cursor-not-allowed text-left" aria-disabled="true">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-amber-500/20">
-                      <Smartphone className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                      <Smartphone className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="font-medium text-theme-primary">Active Sessions</p>
@@ -567,8 +584,8 @@ export function SettingsPage() {
                 <Button
                   variant="flat"
                   className="w-full justify-start bg-theme-elevated text-theme-primary"
-                  startContent={<LogOut className="w-4 h-4" />}
-                  onClick={handleLogout}
+                  startContent={<LogOut className="w-4 h-4" aria-hidden="true" />}
+                  onPress={logoutModal.onOpen}
                 >
                   Log Out
                 </Button>
@@ -576,8 +593,8 @@ export function SettingsPage() {
                 <Button
                   variant="flat"
                   className="w-full justify-start bg-red-500/10 text-red-400"
-                  startContent={<Trash2 className="w-4 h-4" />}
-                  onClick={deleteModal.onOpen}
+                  startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                  onPress={deleteModal.onOpen}
                 >
                   Delete Account
                 </Button>
@@ -608,8 +625,12 @@ export function SettingsPage() {
                 value={passwordData.current_password}
                 onChange={(e) => setPasswordData((prev) => ({ ...prev, current_password: e.target.value }))}
                 endContent={
-                  <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
-                    {showCurrentPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" /> : <Eye className="w-4 h-4 text-theme-subtle" />}
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
+                  >
+                    {showCurrentPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : <Eye className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                   </button>
                 }
                 classNames={{
@@ -624,8 +645,12 @@ export function SettingsPage() {
                 value={passwordData.new_password}
                 onChange={(e) => setPasswordData((prev) => ({ ...prev, new_password: e.target.value }))}
                 endContent={
-                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)}>
-                    {showNewPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" /> : <Eye className="w-4 h-4 text-theme-subtle" />}
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                  >
+                    {showNewPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : <Eye className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                   </button>
                 }
                 classNames={{
@@ -648,15 +673,47 @@ export function SettingsPage() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onClick={passwordModal.onClose}>
+            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={passwordModal.onClose}>
               Cancel
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              onClick={handleChangePassword}
+              onPress={handleChangePassword}
               isLoading={isChangingPassword}
             >
               Change Password
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        isOpen={logoutModal.isOpen}
+        onClose={logoutModal.onClose}
+        classNames={{
+          base: 'bg-theme-card border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">Log Out</ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted">
+              Are you sure you want to log out of your account?
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={logoutModal.onClose}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              onPress={handleLogout}
+            >
+              Log Out
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -675,7 +732,7 @@ export function SettingsPage() {
       >
         <ModalContent>
           <ModalHeader className="text-red-600 dark:text-red-400 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" />
+            <AlertTriangle className="w-5 h-5" aria-hidden="true" />
             Delete Account
           </ModalHeader>
           <ModalBody>
@@ -703,12 +760,12 @@ export function SettingsPage() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onClick={deleteModal.onClose}>
+            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={deleteModal.onClose}>
               Cancel
             </Button>
             <Button
               className="bg-red-500 text-white"
-              onClick={handleDeleteAccount}
+              onPress={handleDeleteAccount}
               isLoading={isDeleting}
               isDisabled={deleteConfirmation !== 'DELETE'}
             >
@@ -736,6 +793,7 @@ function SettingToggle({ label, description, checked, onChange }: SettingToggleP
         <p className="text-sm text-theme-subtle">{description}</p>
       </div>
       <Switch
+        aria-label={label}
         isSelected={checked}
         onValueChange={onChange}
         classNames={{
