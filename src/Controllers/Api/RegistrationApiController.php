@@ -576,22 +576,4 @@ class RegistrationApiController extends BaseApiController
             error_log('[Registration] Failed to send verification email: ' . $e->getMessage());
         }
     }
-
-    /**
-     * Get boolean input value
-     */
-    private function inputBool(string $key, bool $default = false): bool
-    {
-        $value = $this->input($key, $default);
-
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        if (is_string($value)) {
-            return in_array(strtolower($value), ['true', '1', 'yes', 'on'], true);
-        }
-
-        return (bool) $value;
-    }
 }
