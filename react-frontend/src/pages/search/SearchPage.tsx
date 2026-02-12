@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Input, Tabs, Tab, Avatar } from '@heroui/react';
+import { Button, Input, Tabs, Tab, Avatar } from '@heroui/react';
 import {
   Search,
   ListTodo,
@@ -14,12 +14,15 @@ import {
   Users,
   Clock,
   MapPin,
+  AlertTriangle,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { usePageTitle } from '@/hooks';
 import type { Listing, User as UserType, Event, Group } from '@/types/api';
 
 interface SearchResults {
@@ -32,6 +35,8 @@ interface SearchResults {
 type SearchTab = 'all' | 'listings' | 'users' | 'events' | 'groups';
 
 export function SearchPage() {
+  usePageTitle('Search');
+  const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [activeTab, setActiveTab] = useState<SearchTab>('all');
@@ -43,27 +48,32 @@ export function SearchPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const performSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults({ listings: [], users: [], events: [], groups: [] });
       setHasSearched(false);
+      setSearchError(null);
       return;
     }
 
     try {
       setIsLoading(true);
       setHasSearched(true);
+      setSearchError(null);
       const response = await api.get<SearchResults>(`/v2/search?q=${encodeURIComponent(searchQuery)}`);
       if (response.success && response.data) {
         setResults(response.data);
       }
     } catch (error) {
       logError('Search failed', error);
+      setSearchError('Search failed. Please try again.');
+      toast.error('Search failed');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     const initialQuery = searchParams.get('q');
@@ -102,7 +112,7 @@ export function SearchPage() {
       {/* Search Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <Search className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
+          <Search className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
           Search
         </h1>
         <p className="text-theme-muted mt-1">Find listings, members, events, and groups</p>
@@ -146,7 +156,19 @@ export function SearchPage() {
           </Tabs>
 
           {/* Results Content */}
-          {isLoading ? (
+          {searchError ? (
+            <GlassCard className="p-8 text-center">
+              <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+              <h2 className="text-lg font-semibold text-theme-primary mb-2">Search Error</h2>
+              <p className="text-theme-muted mb-4">{searchError}</p>
+              <Button
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                onPress={() => performSearch(query)}
+              >
+                Try Again
+              </Button>
+            </GlassCard>
+          ) : isLoading ? (
             <div className="space-y-4">
               {[1, 2, 3, 4].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
@@ -173,7 +195,7 @@ export function SearchPage() {
                 <section>
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                      <ListTodo className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      <ListTodo className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                       Listings ({results.listings.length})
                     </h2>
                   )}
@@ -191,7 +213,7 @@ export function SearchPage() {
                             <h3 className="font-semibold text-theme-primary mt-2">{listing.title}</h3>
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{listing.description}</p>
                             <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
-                              <Clock className="w-3 h-3" />
+                              <Clock className="w-3 h-3" aria-hidden="true" />
                               {listing.hours_estimate ?? listing.estimated_hours ?? '—'}h
                             </div>
                           </GlassCard>
@@ -207,7 +229,7 @@ export function SearchPage() {
                 <section>
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                      <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                       Members ({results.users.length})
                     </h2>
                   )}
@@ -230,7 +252,7 @@ export function SearchPage() {
                                 )}
                                 {user.location && (
                                   <p className="text-xs text-theme-subtle flex items-center gap-1 mt-1">
-                                    <MapPin className="w-3 h-3" />
+                                    <MapPin className="w-3 h-3" aria-hidden="true" />
                                     {user.location}
                                   </p>
                                 )}
@@ -249,7 +271,7 @@ export function SearchPage() {
                 <section>
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                      <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
                       Events ({results.events.length})
                     </h2>
                   )}
@@ -262,12 +284,12 @@ export function SearchPage() {
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{event.description}</p>
                             <div className="flex items-center gap-4 mt-3 text-xs text-theme-subtle">
                               <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
+                                <Calendar className="w-3 h-3" aria-hidden="true" />
                                 {new Date(event.start_date).toLocaleDateString()}
                               </span>
                               {event.location && (
                                 <span className="flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" />
+                                  <MapPin className="w-3 h-3" aria-hidden="true" />
                                   {event.location}
                                 </span>
                               )}
@@ -285,7 +307,7 @@ export function SearchPage() {
                 <section>
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                      <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
                       Groups ({results.groups.length})
                     </h2>
                   )}
@@ -297,7 +319,7 @@ export function SearchPage() {
                             <h3 className="font-semibold text-theme-primary">{group.name}</h3>
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{group.description}</p>
                             <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
-                              <Users className="w-3 h-3" />
+                              <Users className="w-3 h-3" aria-hidden="true" />
                               {group.members_count} members
                             </div>
                           </GlassCard>

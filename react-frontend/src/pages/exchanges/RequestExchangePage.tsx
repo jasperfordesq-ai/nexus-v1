@@ -7,7 +7,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Input, Textarea } from '@heroui/react';
 import {
-  ArrowLeft,
   ArrowRightLeft,
   Clock,
   User,
@@ -15,8 +14,10 @@ import {
   Send,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -24,9 +25,11 @@ import { MAX_EXCHANGE_HOURS } from '@/lib/exchange-status';
 import type { Listing, ExchangeConfig } from '@/types/api';
 
 export function RequestExchangePage() {
+  usePageTitle('Request Exchange');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   const [listing, setListing] = useState<Listing | null>(null);
@@ -106,7 +109,7 @@ export function RequestExchangePage() {
 
       if (response.success && response.data) {
         toast.success('Exchange request sent!');
-        navigate(`/exchanges/${response.data.id}`);
+        navigate(tenantPath(`/exchanges/${response.data.id}`));
       }
     } catch (err) {
       toast.error('Failed to create exchange request');
@@ -127,7 +130,7 @@ export function RequestExchangePage() {
         title={error || 'Cannot Request Exchange'}
         description="This listing is not available for exchange requests."
         action={
-          <Link to="/listings">
+          <Link to={tenantPath("/listings")}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
               Browse Listings
             </Button>
@@ -145,7 +148,7 @@ export function RequestExchangePage() {
         title="This is Your Listing"
         description="You cannot request an exchange for your own listing."
         action={
-          <Link to={`/listings/${listing.id}`}>
+          <Link to={tenantPath(`/listings/${listing.id}`)}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
               View Listing
             </Button>
@@ -161,15 +164,12 @@ export function RequestExchangePage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
-        aria-label="Go back to listing"
-      >
-        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-        Back to listing
-      </button>
+      {/* Breadcrumbs */}
+      <Breadcrumbs items={[
+        { label: 'Listings', href: tenantPath('/listings') },
+        { label: listing?.title || 'Listing', href: id ? tenantPath(`/listings/${id}`) : tenantPath('/listings') },
+        { label: 'Request Exchange' },
+      ]} />
 
       {/* Header */}
       <div className="text-center">
@@ -275,7 +275,7 @@ export function RequestExchangePage() {
               type="button"
               variant="flat"
               className="flex-1 bg-theme-elevated text-theme-primary"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(id ? `/listings/${id}` : '/listings')}
             >
               Cancel
             </Button>

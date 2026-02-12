@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Tabs, Tab } from '@heroui/react';
 import {
@@ -24,11 +25,14 @@ import { TransferModal } from '@/components/wallet';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { usePageTitle } from '@/hooks';
 import type { WalletBalance, Transaction } from '@/types/api';
 
 type TransactionFilter = 'all' | 'earned' | 'spent' | 'pending';
 
 export function WalletPage() {
+  usePageTitle('Wallet');
+  const [searchParams, setSearchParams] = useSearchParams();
   const [balance, setBalance] = useState<WalletBalance | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +42,9 @@ export function WalletPage() {
   const [filter, setFilter] = useState<TransactionFilter>('all');
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const toast = useToast();
+
+  // Check for ?to=userId URL param to auto-open transfer modal
+  const prefilledRecipientId = searchParams.get('to') ? parseInt(searchParams.get('to')!, 10) : null;
 
   const loadWalletData = useCallback(async () => {
     try {
@@ -70,6 +77,17 @@ export function WalletPage() {
   useEffect(() => {
     loadWalletData();
   }, [loadWalletData]);
+
+  // Auto-open transfer modal when ?to=userId is present and data is loaded
+  useEffect(() => {
+    if (prefilledRecipientId && !isLoading && balance && !isTransferModalOpen) {
+      setIsTransferModalOpen(true);
+      // Clear the URL param so it doesn't reopen on subsequent renders
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('to');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [prefilledRecipientId, isLoading, balance]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load more transactions (pagination)
   const loadMoreTransactions = useCallback(async () => {
@@ -394,6 +412,7 @@ export function WalletPage() {
         onClose={() => setIsTransferModalOpen(false)}
         currentBalance={balance?.balance ?? 0}
         onTransferComplete={handleTransferComplete}
+        initialRecipientId={prefilledRecipientId}
       />
     </motion.div>
   );

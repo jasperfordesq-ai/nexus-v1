@@ -12,11 +12,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
-import { ArrowLeft, Send, Info, Loader2, MoreVertical, Trash2, Mic, Square, Play, Pause, SmilePlus, Check, CheckCheck, Search, Paperclip, X, FileText, Pencil } from 'lucide-react';
+import { ArrowLeft, Send, Info, Loader2, MoreVertical, Trash2, Mic, Square, Play, Pause, SmilePlus, Check, CheckCheck, Search, Paperclip, X, FileText, Pencil, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, usePusherOptional, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import type { NewMessageEvent, TypingEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -52,12 +53,13 @@ interface PaginationState {
 }
 
 export function ConversationPage() {
+  usePageTitle('Messages');
   const { id, userId } = useParams<{ id?: string; userId?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const toast = useToast();
   const pusher = usePusherOptional();
-  const { hasFeature } = useTenant();
+  const { hasFeature, tenantPath } = useTenant();
   const isDirectMessagingEnabled = hasFeature('direct_messaging');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -105,6 +107,9 @@ export function ConversationPage() {
   // Edit/delete state
   const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState('');
+
+  // Safeguarding notice state (reappears on reload)
+  const [isSafeguardingDismissed, setIsSafeguardingDismissed] = useState(false);
 
   // Track document visibility for polling optimization
   useEffect(() => {
@@ -315,11 +320,11 @@ export function ConversationPage() {
         setIsNewConversation(true);
       } else {
         // User not found - go back to messages
-        navigate('/messages');
+        navigate(tenantPath('/messages'));
       }
     } catch (error) {
       logError('Failed to load user for new conversation', error);
-      navigate('/messages');
+      navigate(tenantPath('/messages'));
     }
   }
 
@@ -446,7 +451,7 @@ export function ConversationPage() {
 
       if (response.success) {
         toast.success('Conversation archived', 'This conversation has been moved to your archive.');
-        navigate('/messages');
+        navigate(tenantPath('/messages'));
       } else {
         throw new Error(response.error || 'Failed to archive conversation');
       }
@@ -459,7 +464,7 @@ export function ConversationPage() {
     }
   }
 
-  // Cleanup voice recording on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       // Stop any active recording
@@ -474,6 +479,12 @@ export function ConversationPage() {
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
       }
+      // Clear typing debounce timeout
+      if (typingDebounceRef.current) {
+        clearTimeout(typingDebounceRef.current);
+      }
+      // Revoke any remaining blob URLs
+      attachmentPreviews.forEach((a) => { if (a.preview) URL.revokeObjectURL(a.preview); });
     };
   }, []);
 
@@ -915,14 +926,18 @@ export function ConversationPage() {
       <GlassCard className="p-4 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/messages')}
-              className="text-theme-muted hover:text-theme-primary transition-colors"
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              className="text-theme-muted"
+              onPress={() => navigate(tenantPath('/messages'))}
+              aria-label="Back to messages"
             >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
+              <ArrowLeft className="w-5 h-5" aria-hidden="true" />
+            </Button>
 
-            <Link to={`/profile/${other_user.id}`} className="flex items-center gap-3">
+            <Link to={tenantPath(`/profile/${other_user.id}`)} className="flex items-center gap-3">
               <Avatar
                 src={resolveAvatarUrl(other_user.avatar_url || other_user.avatar)}
                 name={other_user.name}
@@ -950,7 +965,7 @@ export function ConversationPage() {
               <Search className="w-4 h-4" />
             </Button>
 
-            <Link to={`/profile/${other_user.id}`}>
+            <Link to={tenantPath(`/profile/${other_user.id}`)}>
               <Button
                 isIconOnly
                 variant="flat"
@@ -1052,6 +1067,26 @@ export function ConversationPage() {
         </GlassCard>
       )}
 
+      {/* Safeguarding / Broker Monitoring Notice */}
+      {!isSafeguardingDismissed && (
+        <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg" role="alert">
+          <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-amber-700 dark:text-amber-300 text-sm flex-1">
+            This conversation may be reviewed by a coordinator for safeguarding purposes.
+          </p>
+          <Button
+            isIconOnly
+            size="sm"
+            variant="light"
+            className="text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 flex-shrink-0 -mt-0.5"
+            onPress={() => setIsSafeguardingDismissed(true)}
+            aria-label="Dismiss safeguarding notice"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+
       {/* Messages */}
       <GlassCard className="flex-1 overflow-hidden flex flex-col">
         <div
@@ -1069,12 +1104,14 @@ export function ConversationPage() {
           {/* "Load more" indicator when there are older messages */}
           {pagination.hasOlderMessages && !isLoadingOlder && (
             <div className="flex justify-center py-2">
-              <button
-                onClick={loadOlderMessages}
-                className="text-sm text-theme-subtle hover:text-theme-muted transition-colors"
+              <Button
+                variant="light"
+                size="sm"
+                className="text-sm text-theme-subtle"
+                onPress={loadOlderMessages}
               >
                 Scroll up or tap to load older messages
-              </button>
+              </Button>
             </div>
           )}
 
@@ -1145,7 +1182,7 @@ export function ConversationPage() {
               <Button
                 size="sm"
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                onPress={() => navigate('/exchanges')}
+                onPress={() => navigate(tenantPath('/exchanges'))}
               >
                 Exchanges
               </Button>
@@ -1223,14 +1260,15 @@ export function ConversationPage() {
                       </span>
                     </div>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => removeAttachment(index)}
-                    className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    className="absolute -top-1 -right-1 w-4 h-4 min-w-0 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onPress={() => removeAttachment(index)}
                     aria-label={`Remove ${item.file.name}`}
                   >
                     <X className="w-2.5 h-2.5 text-white" aria-hidden="true" />
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -1546,23 +1584,29 @@ function MessageBubble({
           {!isEditing && !isDeleted && (
             <div className={`absolute -bottom-2 ${isOwn ? '-left-12' : '-right-12'} flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
               {/* Reaction button */}
-              <button
-                onClick={() => setShowReactionPicker(!showReactionPicker)}
-                className="w-5 h-5 flex items-center justify-center bg-theme-elevated rounded-full border border-theme-default hover:bg-theme-hover"
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
+                onPress={() => setShowReactionPicker(!showReactionPicker)}
                 aria-label="Add reaction"
               >
-                <SmilePlus className="w-3 h-3 text-theme-muted" />
-              </button>
+                <SmilePlus className="w-3 h-3 text-theme-muted" aria-hidden="true" />
+              </Button>
 
               {/* Edit/Delete button (only for own messages) */}
               {isOwn && !isVoiceMessage && (
-                <button
-                  onClick={() => setShowMessageMenu(!showMessageMenu)}
-                  className="w-5 h-5 flex items-center justify-center bg-theme-elevated rounded-full border border-theme-default hover:bg-theme-hover"
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
+                  onPress={() => setShowMessageMenu(!showMessageMenu)}
                   aria-label="Message options"
                 >
-                  <MoreVertical className="w-3 h-3 text-theme-muted" />
-                </button>
+                  <MoreVertical className="w-3 h-3 text-theme-muted" aria-hidden="true" />
+                </Button>
               )}
             </div>
           )}
@@ -1580,17 +1624,20 @@ function MessageBubble({
               aria-label="Add reaction"
             >
               {REACTION_EMOJIS.map((emoji) => (
-                <button
+                <Button
                   key={emoji}
-                  onClick={() => {
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  className="w-7 h-7 min-w-0 rounded-full"
+                  onPress={() => {
                     onReact?.(message.id, emoji);
                     setShowReactionPicker(false);
                   }}
-                  className="w-7 h-7 flex items-center justify-center hover:bg-theme-hover rounded-full transition-colors"
                   aria-label={`React with ${emoji}`}
                 >
                   {emoji}
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -1607,28 +1654,32 @@ function MessageBubble({
               role="menu"
               aria-label="Message options"
             >
-              <button
-                onClick={() => {
+              <Button
+                variant="light"
+                size="sm"
+                className="justify-start text-sm text-theme-muted"
+                startContent={<Pencil className="w-3 h-3" aria-hidden="true" />}
+                onPress={() => {
                   onEdit?.(message);
                   setShowMessageMenu(false);
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-theme-muted hover:bg-theme-hover rounded"
                 role="menuitem"
               >
-                <Pencil className="w-3 h-3" aria-hidden="true" />
                 Edit
-              </button>
-              <button
-                onClick={() => {
+              </Button>
+              <Button
+                variant="light"
+                size="sm"
+                className="justify-start text-sm text-red-600 dark:text-red-400"
+                startContent={<Trash2 className="w-3 h-3" aria-hidden="true" />}
+                onPress={() => {
                   onDelete?.(message.id);
                   setShowMessageMenu(false);
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-theme-hover rounded"
                 role="menuitem"
               >
-                <Trash2 className="w-3 h-3" aria-hidden="true" />
                 Delete
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -1637,17 +1688,19 @@ function MessageBubble({
         {hasReactions && (
           <div className={`flex gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'} px-2`}>
             {Object.entries(reactions).map(([emoji, count]) => (
-              <button
+              <Button
                 key={emoji}
-                onClick={() => onReact?.(message.id, emoji)}
-                className="flex items-center gap-0.5 px-1.5 py-0.5 bg-theme-elevated rounded-full text-xs hover:bg-theme-hover transition-colors"
+                size="sm"
+                variant="light"
+                className="min-w-0 h-auto px-1.5 py-0.5 bg-theme-elevated rounded-full text-xs gap-0.5"
+                onPress={() => onReact?.(message.id, emoji)}
                 aria-label={`${emoji} reaction, click to toggle`}
               >
                 <span>{emoji}</span>
                 {typeof count === 'number' && count > 1 && (
                   <span className="text-theme-subtle">{count}</span>
                 )}
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -1744,16 +1797,20 @@ function VoiceMessagePlayer({ audioUrl, audioBlob }: VoiceMessagePlayerProps) {
 
   return (
     <div className="flex items-center gap-3 min-w-[150px]">
-      <button
-        onClick={togglePlay}
-        className="w-8 h-8 flex items-center justify-center bg-black/20 dark:bg-white/20 rounded-full hover:bg-black/30 dark:hover:bg-white/30 transition-colors"
+      <Button
+        isIconOnly
+        size="sm"
+        variant="light"
+        className="w-8 h-8 min-w-0 bg-black/20 dark:bg-white/20 rounded-full"
+        onPress={togglePlay}
+        aria-label={isPlaying ? 'Pause' : 'Play'}
       >
         {isPlaying ? (
-          <Pause className="w-4 h-4" />
+          <Pause className="w-4 h-4" aria-hidden="true" />
         ) : (
-          <Play className="w-4 h-4 ml-0.5" />
+          <Play className="w-4 h-4 ml-0.5" aria-hidden="true" />
         )}
-      </button>
+      </Button>
       <div className="flex-1">
         <div className="h-1 bg-black/20 dark:bg-white/20 rounded-full overflow-hidden">
           <div

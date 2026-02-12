@@ -7,7 +7,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Select, SelectItem, Radio, RadioGroup } from '@heroui/react';
 import {
-  ArrowLeft,
   Save,
   Clock,
   MapPin,
@@ -16,9 +15,12 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { usePageTitle } from '@/hooks';
 import type { Listing, Category } from '@/types/api';
 
 interface FormData {
@@ -40,8 +42,11 @@ const initialFormData: FormData = {
 };
 
 export function CreateListingPage() {
+  usePageTitle('Create Listing');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
+  const toast = useToast();
   const isEditing = !!id;
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -87,7 +92,7 @@ export function CreateListingPage() {
       }
     } catch (error) {
       logError('Failed to load listing', error);
-      navigate('/listings');
+      navigate(tenantPath('/listings'));
     } finally {
       setIsLoading(false);
     }
@@ -141,9 +146,10 @@ export function CreateListingPage() {
         await api.post('/v2/listings', payload);
       }
 
-      navigate('/listings');
+      navigate(tenantPath('/listings'));
     } catch (error) {
       logError('Failed to save listing', error);
+      toast.error('Failed to save listing', 'Please check your information and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -166,14 +172,11 @@ export function CreateListingPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
-      {/* Back Button */}
-      <Link
-        to="/listings"
-        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to listings
-      </Link>
+      {/* Breadcrumbs */}
+      <Breadcrumbs items={[
+        { label: 'Listings', href: tenantPath('/listings') },
+        { label: isEditing ? 'Edit Listing' : 'New Listing' },
+      ]} />
 
       {/* Form */}
       <GlassCard className="p-6 sm:p-8">
@@ -326,7 +329,7 @@ export function CreateListingPage() {
             >
               {isEditing ? 'Update Listing' : 'Create Listing'}
             </Button>
-            <Link to="/listings">
+            <Link to={tenantPath("/listings")}>
               <Button
                 type="button"
                 variant="flat"

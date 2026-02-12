@@ -19,10 +19,11 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useAuth } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { usePageTitle } from '@/hooks';
 import type { Group } from '@/types/api';
 
 type GroupFilter = 'all' | 'joined' | 'public' | 'private';
@@ -31,7 +32,10 @@ const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
 export function GroupsPage() {
+  usePageTitle('Groups');
   const { isAuthenticated } = useAuth();
+  const { tenantPath } = useTenant();
+  const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [groups, setGroups] = useState<Group[]>([]);
@@ -94,6 +98,8 @@ export function GroupsPage() {
       logError('Failed to load groups', err);
       if (!append) {
         setError('Failed to load groups. Please try again.');
+      } else {
+        toast.error('Failed to load more groups');
       }
     } finally {
       setIsLoading(false);
@@ -144,7 +150,7 @@ export function GroupsPage() {
           <p className="text-theme-muted mt-1">Join groups to connect with like-minded community members</p>
         </div>
         {isAuthenticated && (
-          <Link to="/groups/create">
+          <Link to={tenantPath('/groups/create')}>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
@@ -229,7 +235,7 @@ export function GroupsPage() {
               description="Start a new group or try a different search"
               action={
                 isAuthenticated && (
-                  <Link to="/groups/create">
+                  <Link to={tenantPath('/groups/create')}>
                     <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
                       Create Group
                     </Button>
@@ -278,10 +284,11 @@ interface GroupCardProps {
 }
 
 const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
+  const { tenantPath } = useTenant();
   const memberCount = group.member_count ?? group.members_count ?? 0;
 
   return (
-    <Link to={`/groups/${group.id}`} aria-label={`${group.name} - ${memberCount} members`}>
+    <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${memberCount} members`}>
       <article>
         <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full flex flex-col">
           <div className="flex items-start justify-between gap-3 mb-3">

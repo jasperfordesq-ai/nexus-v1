@@ -14,6 +14,7 @@ import { Search, MessageSquare, Circle, Plus, Loader2, Archive, RotateCcw, Alert
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, usePusherOptional, useToast, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import type { NewMessageEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
@@ -43,12 +44,13 @@ function getOtherUser(conv: Conversation) {
 }
 
 export function MessagesPage() {
+  usePageTitle('Messages');
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const toast = useToast();
   const pusher = usePusherOptional();
-  const { hasFeature } = useTenant();
+  const { hasFeature, tenantPath } = useTenant();
   const isDirectMessagingEnabled = hasFeature('direct_messaging');
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [archivedConversations, setArchivedConversations] = useState<Conversation[]>([]);
@@ -159,12 +161,12 @@ export function MessagesPage() {
     // Find existing conversation or create new
     const existing = conversations.find((c) => getOtherUser(c).id === userId);
     if (existing) {
-      navigate(`/messages/${existing.id}`, { replace: true });
+      navigate(tenantPath(`/messages/${existing.id}`), { replace: true });
     } else {
       // Navigate with "new" prefix to indicate this is a user ID, not conversation ID
-      navigate(`/messages/new/${userId}`, { replace: true });
+      navigate(tenantPath(`/messages/new/${userId}`), { replace: true });
     }
-  }, [conversations, navigate]);
+  }, [conversations, navigate, tenantPath]);
 
   // Handle new conversation params separately
   useEffect(() => {
@@ -250,10 +252,10 @@ export function MessagesPage() {
     const existing = conversations.find((c) => getOtherUser(c).id === user.id);
     if (existing) {
       // Navigate to existing conversation using conversation ID
-      navigate(`/messages/${existing.id}`);
+      navigate(tenantPath(`/messages/${existing.id}`));
     } else {
       // Navigate to new conversation - use "new" prefix to indicate user ID
-      navigate(`/messages/new/${user.id}`);
+      navigate(tenantPath(`/messages/new/${user.id}`));
     }
     setIsNewMessageOpen(false);
     setUserSearchQuery('');
@@ -295,7 +297,7 @@ export function MessagesPage() {
                 size="sm"
                 className="mt-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<ArrowRightLeft className="w-4 h-4" />}
-                onPress={() => navigate('/exchanges')}
+                onPress={() => navigate(tenantPath('/exchanges'))}
               >
                 Go to Exchanges
               </Button>
@@ -412,10 +414,11 @@ export function MessagesPage() {
                 </div>
               ) : userSearchResults.length > 0 ? (
                 userSearchResults.map((user) => (
-                  <button
+                  <Button
                     key={user.id}
-                    onClick={() => handleSelectUser(user)}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors text-left"
+                    variant="light"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg bg-theme-elevated h-auto text-left justify-start"
+                    onPress={() => handleSelectUser(user)}
                   >
                     <Avatar
                       src={resolveAvatarUrl(user.avatar_url || user.avatar)}
@@ -429,7 +432,7 @@ export function MessagesPage() {
                         <p className="text-sm text-theme-subtle truncate">{user.tagline}</p>
                       )}
                     </div>
-                  </button>
+                  </Button>
                 ))
               ) : userSearchQuery.trim() && !isSearchingUsers ? (
                 <p className="text-center text-theme-subtle py-4">No members found</p>
@@ -557,12 +560,13 @@ interface ConversationCardProps {
 }
 
 function ConversationCard({ conversation }: ConversationCardProps) {
+  const { tenantPath } = useTenant();
   const other_user = getOtherUser(conversation);
   const { last_message, unread_count } = conversation;
 
   return (
     <Link
-      to={`/messages/${conversation.id}`}
+      to={tenantPath(`/messages/${conversation.id}`)}
       aria-label={`Conversation with ${other_user.name}${unread_count > 0 ? `, ${unread_count} unread message${unread_count > 1 ? 's' : ''}` : ''}`}
     >
       <GlassCard className="p-4 hover:bg-theme-hover transition-colors">

@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Input, Select, SelectItem, Avatar, Button } from '@heroui/react';
+import { Input, Select, SelectItem, Avatar, Button, Chip } from '@heroui/react';
 import {
   Search,
   Users,
@@ -17,22 +17,27 @@ import {
   List,
   RefreshCw,
   AlertTriangle,
+  Sparkles,
+  TrendingUp,
 } from 'lucide-react';
 import { GlassCard, MemberCardSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { usePageTitle } from '@/hooks';
 import type { User } from '@/types/api';
 
 type SortOption = 'name' | 'joined' | 'rating' | 'hours_given';
 type ViewMode = 'grid' | 'list';
+type QuickFilter = 'all' | 'new' | 'active';
 
 const ITEMS_PER_PAGE = 24;
 const SEARCH_DEBOUNCE_MS = 300;
 
 export function MembersPage() {
+  usePageTitle('Members');
   const [searchParams, setSearchParams] = useSearchParams();
   const toast = useToast();
 
@@ -42,6 +47,9 @@ export function MembersPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [totalCount, setTotalCount] = useState<number | null>(null);
+
+  // Quick filter state
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -78,6 +86,29 @@ export function MembersPage() {
     localStorage.setItem('members_view_mode', viewMode);
   }, [viewMode]);
 
+  // Handle quick filter selection
+  const handleQuickFilter = useCallback((filter: QuickFilter) => {
+    setQuickFilter(filter);
+    if (filter === 'new') {
+      setSortBy('joined');
+    } else if (filter === 'active') {
+      setSortBy('hours_given');
+    } else {
+      setSortBy('name');
+    }
+  }, []);
+
+  // Sync quickFilter when sortBy changes from the Select dropdown
+  useEffect(() => {
+    if (sortBy === 'joined') {
+      setQuickFilter('new');
+    } else if (sortBy === 'hours_given') {
+      setQuickFilter('active');
+    } else {
+      setQuickFilter('all');
+    }
+  }, [sortBy]);
+
   // Load members
   const loadMembers = useCallback(async (append = false) => {
     try {
@@ -91,6 +122,10 @@ export function MembersPage() {
       const params = new URLSearchParams();
       if (debouncedQuery) params.set('q', debouncedQuery);
       params.set('sort', sortBy);
+      // Quick filters imply descending order for joined and hours_given
+      if (sortBy === 'joined' || sortBy === 'hours_given') {
+        params.set('order', 'desc');
+      }
       params.set('limit', ITEMS_PER_PAGE.toString());
 
       if (append && members.length > 0) {
@@ -176,16 +211,68 @@ export function MembersPage() {
           </h1>
           <p className="text-theme-muted mt-1">
             Connect with members of the community
-            {totalCount !== null && !isLoading && (
-              <span className="text-theme-subtle ml-2">
-                ({totalCount.toLocaleString()} total)
-              </span>
-            )}
           </p>
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Quick Filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          size="sm"
+          variant={quickFilter === 'all' ? 'solid' : 'flat'}
+          className={
+            quickFilter === 'all'
+              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+              : 'bg-theme-elevated text-theme-muted'
+          }
+          startContent={<Users className="w-3.5 h-3.5" aria-hidden="true" />}
+          onPress={() => handleQuickFilter('all')}
+          aria-pressed={quickFilter === 'all'}
+        >
+          All Members
+        </Button>
+        <Button
+          size="sm"
+          variant={quickFilter === 'new' ? 'solid' : 'flat'}
+          className={
+            quickFilter === 'new'
+              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+              : 'bg-theme-elevated text-theme-muted'
+          }
+          startContent={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
+          onPress={() => handleQuickFilter('new')}
+          aria-pressed={quickFilter === 'new'}
+        >
+          New Members
+        </Button>
+        <Button
+          size="sm"
+          variant={quickFilter === 'active' ? 'solid' : 'flat'}
+          className={
+            quickFilter === 'active'
+              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+              : 'bg-theme-elevated text-theme-muted'
+          }
+          startContent={<TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />}
+          onPress={() => handleQuickFilter('active')}
+          aria-pressed={quickFilter === 'active'}
+        >
+          Most Active
+        </Button>
+
+        {/* Member count */}
+        {totalCount !== null && !isLoading && (
+          <Chip
+            variant="flat"
+            size="sm"
+            className="bg-theme-elevated text-theme-muted ml-auto"
+          >
+            Showing {members.length.toLocaleString()} of {totalCount.toLocaleString()} members
+          </Chip>
+        )}
+      </div>
+
+      {/* Search & Sort Filters */}
       <GlassCard className="p-4">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
@@ -222,24 +309,28 @@ export function MembersPage() {
             </Select>
 
             <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label="View mode">
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                className={`p-2 ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated hover:bg-theme-hover'}`}
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className={`rounded-none ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
                 aria-label="Grid view"
                 aria-pressed={viewMode === 'grid'}
+                onPress={() => setViewMode('grid')}
               >
                 <Grid className="w-4 h-4 text-theme-primary" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                className={`p-2 ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated hover:bg-theme-hover'}`}
+              </Button>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className={`rounded-none ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
                 aria-label="List view"
                 aria-pressed={viewMode === 'list'}
+                onPress={() => setViewMode('list')}
               >
                 <List className="w-4 h-4 text-theme-primary" aria-hidden="true" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -278,12 +369,12 @@ export function MembersPage() {
             />
           ) : (
             <>
-              {/* Results count */}
+              {/* Results count with search context */}
               {debouncedQuery && (
                 <p className="text-sm text-theme-muted">
-                  Showing {members.length.toLocaleString()}
+                  {members.length.toLocaleString()}
                   {totalCount !== null && ` of ${totalCount.toLocaleString()}`} members
-                  {debouncedQuery && ` matching "${debouncedQuery}"`}
+                  {` matching "${debouncedQuery}"`}
                 </p>
               )}
 
@@ -327,6 +418,7 @@ interface MemberCardProps {
 }
 
 const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProps) {
+  const { tenantPath } = useTenant();
   // Handle empty names gracefully - fallback to "Member" or first_name/last_name
   const displayName = member.name?.trim()
     || `${member.first_name || ''} ${member.last_name || ''}`.trim()
@@ -334,7 +426,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
 
   if (viewMode === 'list') {
     return (
-      <Link to={`/profile/${member.id}`}>
+      <Link to={tenantPath(`/profile/${member.id}`)}>
         <article aria-label={`${displayName}'s profile`}>
           <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
             <div className="flex items-center gap-4">
@@ -376,7 +468,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
   }
 
   return (
-    <Link to={`/profile/${member.id}`}>
+    <Link to={tenantPath(`/profile/${member.id}`)}>
       <article aria-label={`${displayName}'s profile`}>
         <GlassCard className="p-5 hover:scale-[1.02] transition-transform text-center">
           <Avatar

@@ -7,8 +7,12 @@ import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { Home, ArrowLeft, Search } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 
 export function NotFoundPage() {
+  const { tenantPath } = useTenant();
+  usePageTitle('Page Not Found');
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <motion.div
@@ -27,7 +31,7 @@ export function NotFoundPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/" className="flex-1">
+            <Link to={tenantPath('/')} className="flex-1">
               <Button
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<Home className="w-4 h-4" />}
@@ -35,7 +39,7 @@ export function NotFoundPage() {
                 Go Home
               </Button>
             </Link>
-            <Link to="/search" className="flex-1">
+            <Link to={tenantPath('/search')} className="flex-1">
               <Button
                 variant="flat"
                 className="w-full bg-theme-elevated text-theme-muted"
@@ -46,13 +50,15 @@ export function NotFoundPage() {
             </Link>
           </div>
 
-          <button
-            onClick={() => window.history.back()}
-            className="mt-6 inline-flex items-center gap-2 text-theme-subtle hover:text-theme-primary text-sm transition-colors"
+          <Button
+            variant="light"
+            size="sm"
+            className="mt-6 text-theme-subtle"
+            startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => window.history.back()}
           >
-            <ArrowLeft className="w-4 h-4" />
             Go back
-          </button>
+          </Button>
         </GlassCard>
       </motion.div>
     </div>

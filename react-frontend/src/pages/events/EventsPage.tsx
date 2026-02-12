@@ -1,11 +1,11 @@
 /**
- * Events Page - Community events listing
+ * Events Page - Community events listing with category filtering
  */
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Select, SelectItem } from '@heroui/react';
+import { Button, Input, Select, SelectItem, Chip } from '@heroui/react';
 import {
   Search,
   Calendar,
@@ -18,12 +18,15 @@ import {
   ChevronRight,
   RefreshCw,
   AlertTriangle,
+  Tag,
+  Star,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useAuth } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { usePageTitle } from '@/hooks';
 import type { Event } from '@/types/api';
 
 type EventFilter = 'upcoming' | 'past' | 'all';
@@ -31,8 +34,23 @@ type EventFilter = 'upcoming' | 'past' | 'all';
 const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
+/** Hardcoded event categories with display metadata */
+const EVENT_CATEGORIES = [
+  { id: 'all', name: 'All', icon: Star, color: 'default' as const },
+  { id: 'workshop', name: 'Workshop', icon: Tag, color: 'secondary' as const },
+  { id: 'social', name: 'Social', icon: Users, color: 'success' as const },
+  { id: 'outdoor', name: 'Outdoor', icon: MapPin, color: 'warning' as const },
+  { id: 'online', name: 'Online', icon: CalendarDays, color: 'primary' as const },
+  { id: 'meeting', name: 'Meeting', icon: Calendar, color: 'danger' as const },
+  { id: 'training', name: 'Training', icon: Clock, color: 'secondary' as const },
+  { id: 'other', name: 'Other', icon: Filter, color: 'default' as const },
+] as const;
+
 export function EventsPage() {
+  usePageTitle('Events');
   const { isAuthenticated } = useAuth();
+  const { tenantPath } = useTenant();
+  const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [events, setEvents] = useState<Event[]>([]);
@@ -43,6 +61,7 @@ export function EventsPage() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [filter, setFilter] = useState<EventFilter>('upcoming');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -77,6 +96,9 @@ export function EventsPage() {
       params.set('filter', filter);
       params.set('limit', String(ITEMS_PER_PAGE));
       params.set('offset', String(offset));
+      if (selectedCategory && selectedCategory !== 'all') {
+        params.set('category', selectedCategory);
+      }
 
       const response = await api.get<Event[]>(`/v2/events?${params}`);
       if (response.success && response.data) {
@@ -95,25 +117,28 @@ export function EventsPage() {
       logError('Failed to load events', err);
       if (!append) {
         setError('Failed to load events. Please try again.');
+      } else {
+        toast.error('Failed to load more events');
       }
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, filter, events.length]);
+  }, [debouncedQuery, filter, selectedCategory, events.length]);
 
-  // Load events when filter or debounced query changes
+  // Load events when filter, category, or debounced query changes
   useEffect(() => {
     loadEvents();
     setHasMore(true);
-  }, [debouncedQuery, filter]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, filter, selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update URL params
   useEffect(() => {
     const params = new URLSearchParams();
     if (searchQuery) params.set('q', searchQuery);
+    if (selectedCategory && selectedCategory !== 'all') params.set('category', selectedCategory);
     setSearchParams(params, { replace: true });
-  }, [searchQuery, setSearchParams]);
+  }, [searchQuery, selectedCategory, setSearchParams]);
 
   const loadMoreEvents = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
@@ -154,7 +179,7 @@ export function EventsPage() {
           <p className="text-theme-muted mt-1">Discover and join community events</p>
         </div>
         {isAuthenticated && (
-          <Link to="/events/create">
+          <Link to={tenantPath('/events/create')}>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
@@ -165,7 +190,7 @@ export function EventsPage() {
         )}
       </div>
 
-      {/* Filters */}
+      {/* Search & Time Filter */}
       <GlassCard className="p-4">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
@@ -200,6 +225,31 @@ export function EventsPage() {
           </Select>
         </div>
       </GlassCard>
+
+      {/* Category Filter Chips */}
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+        {EVENT_CATEGORIES.map((cat) => {
+          const isSelected = selectedCategory === cat.id;
+          const IconComp = cat.icon;
+          return (
+            <Chip
+              key={cat.id}
+              variant={isSelected ? 'solid' : 'flat'}
+              color={isSelected ? 'primary' : 'default'}
+              className={
+                isSelected
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
+                  : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
+              }
+              startContent={<IconComp className="w-3.5 h-3.5" aria-hidden="true" />}
+              onClick={() => setSelectedCategory(cat.id)}
+              aria-pressed={isSelected}
+            >
+              {cat.name}
+            </Chip>
+          );
+        })}
+      </div>
 
       {/* Error State */}
       {error && !isLoading && (
@@ -239,10 +289,16 @@ export function EventsPage() {
             <EmptyState
               icon={<Calendar className="w-12 h-12" aria-hidden="true" />}
               title="No events found"
-              description={filter === 'upcoming' ? "No upcoming events scheduled" : "No events match your search"}
+              description={
+                selectedCategory !== 'all'
+                  ? `No events in the "${EVENT_CATEGORIES.find((c) => c.id === selectedCategory)?.name}" category`
+                  : filter === 'upcoming'
+                    ? 'No upcoming events scheduled'
+                    : 'No events match your search'
+              }
               action={
                 isAuthenticated && (
-                  <Link to="/events/create">
+                  <Link to={tenantPath('/events/create')}>
                     <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
                       Create Event
                     </Button>
@@ -299,11 +355,12 @@ interface EventCardProps {
 }
 
 const EventCard = memo(function EventCard({ event }: EventCardProps) {
+  const { tenantPath } = useTenant();
   const startDate = new Date(event.start_date);
   const isPast = startDate < new Date();
 
   return (
-    <Link to={`/events/${event.id}`} aria-label={`${event.title} on ${startDate.toLocaleDateString()}`}>
+    <Link to={tenantPath(`/events/${event.id}`)} aria-label={`${event.title} on ${startDate.toLocaleDateString()}`}>
       <article>
         <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${isPast ? 'opacity-60' : ''}`}>
           <div className="flex gap-3 sm:gap-4">
@@ -324,7 +381,14 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
 
             {/* Event Details */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-theme-primary text-lg">{event.title}</h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-semibold text-theme-primary text-lg">{event.title}</h3>
+                {event.category_name && (
+                  <Chip size="sm" variant="flat" color="secondary" className="text-xs">
+                    {event.category_name}
+                  </Chip>
+                )}
+              </div>
               <p className="text-theme-muted text-sm line-clamp-2 mt-1">{event.description}</p>
 
               <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-theme-subtle">
@@ -342,7 +406,10 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                 )}
                 <span className="flex items-center gap-1">
                   <Users className="w-4 h-4" aria-hidden="true" />
-                  {event.attendees_count ?? 0} attending
+                  {event.attendees_count ?? 0} going
+                  {(event.interested_count ?? 0) > 0 && (
+                    <span className="text-theme-subtle">&middot; {event.interested_count} interested</span>
+                  )}
                 </span>
               </div>
             </div>

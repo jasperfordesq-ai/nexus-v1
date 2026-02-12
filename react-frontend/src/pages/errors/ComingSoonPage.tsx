@@ -7,12 +7,16 @@ import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { Home, ArrowLeft, Construction } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 
 interface ComingSoonPageProps {
   feature?: string;
 }
 
 export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps) {
+  const { tenantPath } = useTenant();
+  usePageTitle('Coming Soon');
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <motion.div
@@ -31,7 +35,7 @@ export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/dashboard" className="flex-1">
+            <Link to={tenantPath('/dashboard')} className="flex-1">
               <Button
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<Home className="w-4 h-4" />}
@@ -39,18 +43,14 @@ export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps
                 Dashboard
               </Button>
             </Link>
-            <button
-              onClick={() => window.history.back()}
-              className="flex-1"
+            <Button
+              variant="flat"
+              className="w-full bg-theme-elevated text-theme-muted flex-1"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => window.history.back()}
             >
-              <Button
-                variant="flat"
-                className="w-full bg-theme-elevated text-theme-muted"
-                startContent={<ArrowLeft className="w-4 h-4" />}
-              >
-                Go Back
-              </Button>
-            </button>
+              Go Back
+            </Button>
           </div>
         </GlassCard>
       </motion.div>
