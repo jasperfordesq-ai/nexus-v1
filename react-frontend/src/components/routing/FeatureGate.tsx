@@ -1,32 +1,43 @@
 /**
  * Feature Gate Component
- * Conditionally renders content based on tenant feature flags
+ * Conditionally renders content based on tenant feature flags or module flags
+ *
+ * Supports two modes:
+ * - feature: checks TenantFeatures (optional add-ons like gamification, goals)
+ * - module: checks TenantModules (core modules like listings, wallet, messages)
+ *
+ * Provide one of feature or module (not both).
  */
 
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useTenant } from '@/contexts';
-import type { TenantFeatures } from '@/types';
+import type { TenantFeatures, TenantModules } from '@/types';
 
 interface FeatureGateProps {
   /**
-   * The feature flag to check
+   * The feature flag to check (optional add-on features)
    */
-  feature: keyof TenantFeatures;
+  feature?: keyof TenantFeatures;
 
   /**
-   * Content to render if feature is enabled
+   * The module flag to check (core platform modules)
+   */
+  module?: keyof TenantModules;
+
+  /**
+   * Content to render if feature/module is enabled
    */
   children: ReactNode;
 
   /**
-   * Content to render if feature is disabled (optional)
+   * Content to render if feature/module is disabled (optional)
    * If not provided and redirect is not set, nothing is rendered
    */
   fallback?: ReactNode;
 
   /**
-   * Path to redirect to if feature is disabled (optional)
+   * Path to redirect to if feature/module is disabled (optional)
    * Takes precedence over fallback
    */
   redirect?: string;
@@ -34,22 +45,29 @@ interface FeatureGateProps {
 
 export function FeatureGate({
   feature,
+  module,
   children,
   fallback = null,
   redirect,
 }: FeatureGateProps) {
-  const { hasFeature, isLoading } = useTenant();
+  const { hasFeature, hasModule, isLoading, tenantPath } = useTenant();
 
-  // While loading tenant config, render nothing or children
-  // (children might have their own loading state)
+  // While loading tenant config, show children (assume enabled by default)
+  // to avoid layout flash — the gate will re-evaluate once config loads
   if (isLoading) {
-    return null;
+    return <>{children}</>;
   }
 
-  // Check if feature is enabled
-  if (!hasFeature(feature)) {
+  // Check if feature or module is enabled
+  const isEnabled = feature
+    ? hasFeature(feature)
+    : module
+      ? hasModule(module)
+      : true;
+
+  if (!isEnabled) {
     if (redirect) {
-      return <Navigate to={redirect} replace />;
+      return <Navigate to={tenantPath(redirect)} replace />;
     }
     return <>{fallback}</>;
   }
