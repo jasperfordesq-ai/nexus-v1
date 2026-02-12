@@ -275,7 +275,7 @@ export function RequestExchangePage() {
               type="button"
               variant="flat"
               className="flex-1 bg-theme-elevated text-theme-primary"
-              onClick={() => navigate(id ? `/listings/${id}` : '/listings')}
+              onClick={() => navigate(tenantPath(id ? `/listings/${id}` : '/listings'))}
             >
               Cancel
             </Button>
