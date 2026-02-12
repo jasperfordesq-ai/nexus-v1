@@ -9,10 +9,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { LogIn, Clock } from 'lucide-react';
 import { SESSION_EXPIRED_EVENT } from '@/lib/api';
+import { useTenant } from '@/contexts';
 
 export function SessionExpiredModal() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
 
   useEffect(() => {
     function handleSessionExpired() {
@@ -25,7 +27,7 @@ export function SessionExpiredModal() {
 
   function handleLogin() {
     setIsOpen(false);
-    navigate('/login');
+    navigate(tenantPath('/login'));
   }
 
   return (

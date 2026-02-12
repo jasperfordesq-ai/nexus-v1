@@ -32,22 +32,33 @@ import {
   Target,
   Hexagon,
   ArrowRightLeft,
+  Newspaper,
+  BookOpen,
+  FolderOpen,
+  Heart,
+  Building2,
+  Search,
+  Shield,
+  ToggleRight,
+  Globe,
 } from 'lucide-react';
 import { useAuth, useTenant, useNotifications } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import type { TenantFeatures } from '@/types/api';
+import type { TenantFeatures, TenantModules } from '@/types/api';
 
 interface MobileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  onSearchOpen?: () => void;
 }
 
 const mainNavItems = [
   { label: 'Home', href: '/', icon: Home },
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, auth: true },
-  { label: 'Listings', href: '/listings', icon: ListTodo },
-  { label: 'Messages', href: '/messages', icon: MessageSquare, auth: true },
-  { label: 'Wallet', href: '/wallet', icon: Wallet, auth: true },
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
+  { label: 'Feed', href: '/feed', icon: Newspaper, auth: true, module: 'feed' as keyof TenantModules },
+  { label: 'Listings', href: '/listings', icon: ListTodo, module: 'listings' as keyof TenantModules },
+  { label: 'Messages', href: '/messages', icon: MessageSquare, auth: true, module: 'messages' as keyof TenantModules },
+  { label: 'Wallet', href: '/wallet', icon: Wallet, auth: true, module: 'wallet' as keyof TenantModules },
 ];
 
 const communityNavItems = [
@@ -55,6 +66,10 @@ const communityNavItems = [
   { label: 'Members', href: '/members', icon: Users, feature: 'connections' as const },
   { label: 'Events', href: '/events', icon: Calendar, feature: 'events' as const },
   { label: 'Groups', href: '/groups', icon: Users, feature: 'groups' as const },
+  { label: 'Blog', href: '/blog', icon: BookOpen, feature: 'blog' as const },
+  { label: 'Volunteering', href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
+  { label: 'Organisations', href: '/organisations', icon: Building2, feature: 'volunteering' as const },
+  { label: 'Resources', href: '/resources', icon: FolderOpen, feature: 'resources' as const },
 ];
 
 const exploreNavItems = [
@@ -63,16 +78,25 @@ const exploreNavItems = [
   { label: 'Goals', href: '/goals', icon: Target, feature: 'goals' as const },
 ];
 
+const federationNavItems = [
+  { label: 'Federation Hub', href: '/federation', icon: Globe, feature: 'federation' as keyof TenantFeatures },
+  { label: 'Partner Communities', href: '/federation/partners', icon: Building2, feature: 'federation' as keyof TenantFeatures },
+  { label: 'Federated Members', href: '/federation/members', icon: Users, feature: 'federation' as keyof TenantFeatures },
+  { label: 'Federated Messages', href: '/federation/messages', icon: MessageSquare, feature: 'federation' as keyof TenantFeatures },
+  { label: 'Federated Listings', href: '/federation/listings', icon: ListTodo, feature: 'federation' as keyof TenantFeatures },
+  { label: 'Federated Events', href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
+];
+
 const supportNavItems = [
   { label: 'Help Center', href: '/help', icon: HelpCircle },
   { label: 'Contact', href: '/contact', icon: MessageSquare },
 ];
 
-export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
+export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
-  const { branding, hasFeature } = useTenant();
+  const { branding, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
 
   // Track previous pathname to only close on actual navigation
@@ -89,7 +113,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const handleLogout = async () => {
     await logout();
     onClose();
-    navigate('/login');
+    navigate(tenantPath('/login'));
   };
 
   const renderNavLink = (item: {
@@ -98,9 +122,15 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
     icon: React.ComponentType<{ className?: string }>;
     auth?: boolean;
     feature?: keyof TenantFeatures;
+    module?: keyof TenantModules;
   }) => {
     // Check feature flag
     if (item.feature && !hasFeature(item.feature)) {
+      return null;
+    }
+
+    // Check module flag
+    if (item.module && !hasModule(item.module)) {
       return null;
     }
 
@@ -110,11 +140,12 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
     }
 
     const Icon = item.icon;
+    const resolvedHref = tenantPath(item.href);
 
     return (
       <NavLink
         key={item.href}
-        to={item.href}
+        to={resolvedHref}
         className={({ isActive }) =>
           `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
             isActive
@@ -145,7 +176,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
       <DrawerContent>
         {/* Header */}
         <DrawerHeader className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to={tenantPath('/')} className="flex items-center gap-2">
             <Hexagon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
             <span className="font-bold text-xl text-gradient">{branding.name}</span>
           </Link>
@@ -161,11 +192,27 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         </DrawerHeader>
 
         <DrawerBody>
+          {/* Search Button */}
+          {onSearchOpen && (
+            <div className="px-4 pt-3 pb-1">
+              <Button
+                variant="flat"
+                fullWidth
+                className="flex items-center justify-start gap-3 px-4 py-2.5 rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default text-sm text-theme-subtle h-auto"
+                onPress={() => { onClose(); onSearchOpen(); }}
+                aria-label="Open search"
+              >
+                <Search className="w-4 h-4" aria-hidden="true" />
+                <span>Search...</span>
+              </Button>
+            </div>
+          )}
+
           {/* User Section */}
           {isAuthenticated && user && (
             <div className="p-4 border-b border-gray-200 dark:border-white/10">
               <Link
-                to="/profile"
+                to={tenantPath('/profile')}
                 className="flex items-center gap-3"
               >
                 <Avatar
@@ -185,7 +232,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               {/* Quick Stats */}
               <div className="grid grid-cols-3 gap-4 mt-4">
                 <Link
-                  to="/wallet"
+                  to={tenantPath('/wallet')}
                   className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors"
                 >
                   <p className="text-lg font-bold text-theme-primary">
@@ -194,7 +241,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                   <p className="text-xs text-theme-subtle">Credits</p>
                 </Link>
                 <Link
-                  to="/messages"
+                  to={tenantPath('/messages')}
                   className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative"
                 >
                   <p className="text-lg font-bold text-theme-primary">
@@ -206,7 +253,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                   )}
                 </Link>
                 <Link
-                  to="/notifications"
+                  to={tenantPath('/notifications')}
                   className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative"
                 >
                   <p className="text-lg font-bold text-theme-primary">
@@ -229,7 +276,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
             </div>
 
             {/* Community */}
-            {(hasFeature('connections') || hasFeature('events') || hasFeature('groups') || hasFeature('exchange_workflow')) && (
+            {communityNavItems.filter(item => !item.feature || hasFeature(item.feature)).length > 0 && (
               <div>
                 <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
                   Community
@@ -252,6 +299,19 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               </div>
             )}
 
+            {/* Federation */}
+            {hasFeature('federation') && isAuthenticated && (
+              <div>
+                <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider flex items-center gap-2">
+                  <Globe className="w-3 h-3" aria-hidden="true" />
+                  Federation
+                </p>
+                <div className="space-y-1">
+                  {federationNavItems.map(renderNavLink)}
+                </div>
+              </div>
+            )}
+
             {/* Support */}
             <div>
               <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
@@ -262,6 +322,33 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               </div>
             </div>
 
+            {/* Admin Tools */}
+            {isAuthenticated && user && (user.role === 'admin' || user.is_admin) && (
+              <div>
+                <Divider className="bg-theme-default mb-4" />
+                <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider flex items-center gap-2">
+                  <Shield className="w-3 h-3" aria-hidden="true" />
+                  Admin Tools
+                </p>
+                <div className="space-y-1">
+                  <a
+                    href="/admin/dashboard"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
+                  >
+                    <LayoutDashboard className="w-5 h-5" aria-hidden="true" />
+                    <span>Admin Dashboard</span>
+                  </a>
+                  <a
+                    href="/admin/tenant-features"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
+                  >
+                    <ToggleRight className="w-5 h-5" aria-hidden="true" />
+                    <span>Tenant Features</span>
+                  </a>
+                </div>
+              </div>
+            )}
+
             {/* Account */}
             {isAuthenticated && (
               <div>
@@ -270,7 +357,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                 </p>
                 <div className="space-y-1">
                   <NavLink
-                    to="/settings"
+                    to={tenantPath('/settings')}
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
                         isActive
@@ -298,7 +385,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
             {!isAuthenticated && (
               <div className="space-y-2 pt-4">
                 <Divider className="bg-theme-default" />
-                <Link to="/login">
+                <Link to={tenantPath('/login')}>
                   <Button
                     variant="flat"
                     className="w-full bg-theme-elevated text-theme-secondary"
@@ -306,7 +393,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                     Log In
                   </Button>
                 </Link>
-                <Link to="/register">
+                <Link to={tenantPath('/register')}>
                   <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium">
                     Sign Up
                   </Button>
