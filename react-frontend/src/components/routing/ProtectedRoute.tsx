@@ -1,10 +1,11 @@
 /**
  * Protected Route Component
- * Redirects to login if user is not authenticated
+ * Redirects to login if user is not authenticated.
+ * Preserves tenant slug prefix in the redirect URL.
  */
 
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
-import { useAuth } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
 
 interface ProtectedRouteProps {
@@ -13,6 +14,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, status } = useAuth();
+  const { tenantPath } = useTenant();
   const location = useLocation();
 
   // Show loading while checking auth status
@@ -20,9 +22,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <LoadingScreen message="Checking authentication..." />;
   }
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated, preserving tenant slug prefix
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    return <Navigate to={tenantPath('/login')} state={{ from: location.pathname }} replace />;
   }
 
   // Render children or outlet
