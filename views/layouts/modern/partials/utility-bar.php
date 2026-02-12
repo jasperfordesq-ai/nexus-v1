@@ -16,7 +16,11 @@ $protocol = $isSecure ? 'https://' : 'http://';
 <nav class="nexus-utility-bar">
     <div class="left-utils">
         <!-- Try New Frontend Button -->
-        <a href="https://app.project-nexus.ie/" class="try-new-frontend-btn" target="_blank" rel="noopener" title="Try our new React-powered frontend">
+        <?php
+        $reactSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
+        $reactPath = $reactSlug ? ('/' . $reactSlug . '/dashboard') : '/';
+        ?>
+        <a href="https://app.project-nexus.ie<?= $reactPath ?>" class="try-new-frontend-btn" target="_blank" rel="noopener" title="Try our new React-powered frontend">
             <i class="fa-solid fa-sparkles sparkle-icon"></i>
             <span class="btn-text">Try the New Experience</span>
         </a>

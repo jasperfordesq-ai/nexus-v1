@@ -17,12 +17,15 @@ class CorsHelper
     private static array $defaultOrigins = [
         'https://project-nexus.ie',
         'https://www.project-nexus.ie',
-        'https://hour-timebank.ie',
-        'https://www.hour-timebank.ie',
+        'https://app.project-nexus.ie',
         'http://staging.timebank.local',
         'http://localhost:5173',
+        'http://localhost:8090',
         'http://127.0.0.1:5173',
     ];
+
+    /** Cached tenant domain origins (null = not loaded yet) */
+    private static ?array $tenantDomainOrigins = null;
 
     private static ?array $allowedOrigins = null;
 
@@ -110,6 +113,7 @@ class CorsHelper
 
     /**
      * Check if an origin is in the allowed list.
+     * Checks static allowlist, subdomain patterns, AND dynamic tenant custom domains.
      *
      * @param string $origin Origin to check
      * @param array $allowedOrigins List of allowed origins
@@ -121,31 +125,101 @@ class CorsHelper
             $allowedOrigins = self::getConfiguredOrigins();
         }
 
-        // Direct match
+        // Direct match against static list
         if (in_array($origin, $allowedOrigins, true)) {
             return true;
         }
 
-        // Parse origin to check subdomains
+        // Parse origin to check subdomains and dynamic domains
         $originHost = parse_url($origin, PHP_URL_HOST);
         if ($originHost === null) {
             return false;
         }
 
+        $originScheme = parse_url($origin, PHP_URL_SCHEME) ?: 'https';
+
         // Check subdomain matches (e.g., https://tenant.project-nexus.ie)
         foreach ($allowedOrigins as $allowed) {
             $allowedHost = parse_url($allowed, PHP_URL_HOST);
             if ($allowedHost && str_ends_with($originHost, '.' . $allowedHost)) {
-                // Ensure scheme matches
                 $allowedScheme = parse_url($allowed, PHP_URL_SCHEME);
-                $originScheme = parse_url($origin, PHP_URL_SCHEME);
                 if ($allowedScheme === $originScheme) {
                     return true;
                 }
             }
         }
 
+        // Dynamic check: is this a tenant's custom domain?
+        // Covers origins like https://hour-timebank.ie from tenants with custom domains.
+        $tenantDomains = self::getTenantDomainOrigins();
+        if (in_array($origin, $tenantDomains, true)) {
+            return true;
+        }
+
         return false;
+    }
+
+    /**
+     * Get HTTPS origins for all active tenant custom domains.
+     * Results are cached in Redis for 10 minutes to avoid per-request DB queries.
+     *
+     * @return array List of origins like ['https://hour-timebank.ie', 'https://www.hour-timebank.ie', ...]
+     */
+    private static function getTenantDomainOrigins(): array
+    {
+        if (self::$tenantDomainOrigins !== null) {
+            return self::$tenantDomainOrigins;
+        }
+
+        $cacheKey = 'cors:tenant_domain_origins';
+        $cacheTtl = 600; // 10 minutes
+
+        // Try Redis cache first
+        try {
+            if (class_exists('\Nexus\Services\RedisCache') && \Nexus\Services\RedisCache::has($cacheKey, null)) {
+                $cached = \Nexus\Services\RedisCache::get($cacheKey, null);
+                if (is_array($cached)) {
+                    self::$tenantDomainOrigins = $cached;
+                    return $cached;
+                }
+            }
+        } catch (\Exception $e) {
+            // Redis unavailable - fall through to DB
+        }
+
+        // Query all active tenant custom domains
+        $origins = [];
+        try {
+            $db = \Nexus\Core\Database::getConnection();
+            $stmt = $db->query(
+                "SELECT domain FROM tenants WHERE domain IS NOT NULL AND domain != '' AND is_active = 1"
+            );
+            $rows = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+            foreach ($rows as $domain) {
+                $domain = trim($domain);
+                if (empty($domain)) continue;
+                // Add both with and without www
+                $origins[] = 'https://' . $domain;
+                if (!str_starts_with($domain, 'www.')) {
+                    $origins[] = 'https://www.' . $domain;
+                }
+            }
+        } catch (\Exception $e) {
+            // Database unavailable - return empty
+        }
+
+        // Cache the result
+        try {
+            if (class_exists('\Nexus\Services\RedisCache')) {
+                \Nexus\Services\RedisCache::set($cacheKey, $origins, $cacheTtl, null);
+            }
+        } catch (\Exception $e) {
+            // Cache write failure is non-fatal
+        }
+
+        self::$tenantDomainOrigins = $origins;
+        return $origins;
     }
 
     /**
