@@ -1,11 +1,12 @@
 /**
  * Create/Edit Group Page
+ * Includes image upload, location, and privacy settings
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Switch } from '@heroui/react';
+import { Button, Input, Textarea, Switch, Avatar } from '@heroui/react';
 import {
   ArrowLeft,
   Save,
@@ -16,29 +17,39 @@ import {
   CheckCircle,
   AlertTriangle,
   RefreshCw,
+  ImagePlus,
+  MapPin,
+  X,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAssetUrl } from '@/lib/helpers';
 import type { Group } from '@/types/api';
 
 interface FormData {
   name: string;
   description: string;
   is_private: boolean;
+  location: string;
 }
 
 const initialFormData: FormData = {
   name: '',
   description: '',
   is_private: false,
+  location: '',
 };
 
 export function CreateGroupPage() {
+  usePageTitle('Create Group');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const toast = useToast();
   const isEditing = !!id;
 
@@ -47,6 +58,13 @@ export function CreateGroupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+
+  // Image upload state
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [existingImage, setExistingImage] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadGroup = useCallback(async () => {
     if (!id) return;
@@ -61,7 +79,13 @@ export function CreateGroupPage() {
           name: group.name,
           description: group.description || '',
           is_private: group.visibility === 'private' || group.visibility === 'secret',
+          location: group.location || '',
         });
+        // Set existing image for preview
+        const imgUrl = group.image_url || group.cover_image_url || group.cover_image;
+        if (imgUrl) {
+          setExistingImage(resolveAssetUrl(imgUrl));
+        }
       } else {
         setLoadError('Group not found');
       }
@@ -78,6 +102,74 @@ export function CreateGroupPage() {
       loadGroup();
     }
   }, [isEditing, loadGroup]);
+
+  // Clean up object URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
+
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Please select a valid image (JPEG, PNG, GIF, or WebP)');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5MB');
+      return;
+    }
+
+    // Revoke old preview URL
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setExistingImage(null);
+  }
+
+  function clearImage() {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImageFile(null);
+    setImagePreview(null);
+    setExistingImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }
+
+  async function uploadGroupImage(groupId: number | string): Promise<boolean> {
+    if (!imageFile) return true; // No image to upload is not a failure
+
+    try {
+      setIsUploadingImage(true);
+      const response = await api.upload(`/v2/groups/${groupId}/image`, imageFile, 'image');
+      if (response.success) {
+        return true;
+      }
+      toast.warning('Group saved but image upload failed. You can try again from group settings.');
+      return false;
+    } catch (err) {
+      logError('Failed to upload group image', err);
+      toast.warning('Group saved but image upload failed');
+      return false;
+    } finally {
+      setIsUploadingImage(false);
+    }
+  }
 
   function validateForm(): boolean {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
@@ -114,18 +206,24 @@ export function CreateGroupPage() {
         name: formData.name,
         description: formData.description,
         is_private: formData.is_private,
+        location: formData.location || undefined,
       };
 
       let response;
       if (isEditing) {
         response = await api.put(`/v2/groups/${id}`, payload);
       } else {
-        response = await api.post('/v2/groups', payload);
+        response = await api.post<{ id: number }>('/v2/groups', payload);
       }
 
       if (response.success) {
+        // Upload image if one was selected
+        const groupId = isEditing ? id! : (response.data as { id: number })?.id;
+        if (imageFile && groupId) {
+          await uploadGroupImage(groupId);
+        }
         toast.success(isEditing ? 'Group updated' : 'Group created');
-        navigate('/groups');
+        navigate(tenantPath('/groups'));
       } else {
         toast.error(response.error || 'Failed to save group');
       }
@@ -144,6 +242,8 @@ export function CreateGroupPage() {
     }
   }
 
+  const displayImage = imagePreview || existingImage;
+
   if (isLoading) {
     return <LoadingScreen message="Loading group..." />;
   }
@@ -156,7 +256,7 @@ export function CreateGroupPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Group</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <div className="flex justify-center gap-3">
-            <Link to="/groups">
+            <Link to={tenantPath("/groups")}>
               <Button
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
@@ -184,15 +284,11 @@ export function CreateGroupPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
-      {/* Back Button */}
-      <Link
-        to="/groups"
-        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
-        aria-label="Go back to groups"
-      >
-        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-        Back to groups
-      </Link>
+      {/* Breadcrumbs */}
+      <Breadcrumbs items={[
+        { label: 'Groups', href: tenantPath('/groups') },
+        { label: isEditing ? 'Edit Group' : 'New Group' },
+      ]} />
 
       {/* Form */}
       <GlassCard className="p-6 sm:p-8">
@@ -202,6 +298,61 @@ export function CreateGroupPage() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Group Image Upload */}
+          <div>
+            <label className="block text-sm font-medium text-theme-muted mb-2">
+              Group Image
+            </label>
+            <div className="flex items-center gap-4">
+              {displayImage ? (
+                <div className="relative">
+                  <Avatar
+                    src={displayImage}
+                    className="w-20 h-20 ring-2 ring-white/20"
+                    radius="lg"
+                    alt="Group image preview"
+                  />
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="flat"
+                    className="absolute -top-2 -right-2 bg-red-500/80 text-white rounded-full min-w-6 w-6 h-6"
+                    aria-label="Remove image"
+                    onPress={clearImage}
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="w-20 h-20 rounded-xl bg-theme-elevated border-2 border-dashed border-theme-default flex items-center justify-center">
+                  <ImagePlus className="w-8 h-8 text-theme-subtle" aria-hidden="true" />
+                </div>
+              )}
+              <div className="flex-1">
+                <Button
+                  variant="flat"
+                  className="bg-theme-elevated text-theme-primary"
+                  startContent={<ImagePlus className="w-4 h-4" aria-hidden="true" />}
+                  onPress={() => fileInputRef.current?.click()}
+                >
+                  {displayImage ? 'Change Image' : 'Upload Image'}
+                </Button>
+                <p className="text-xs text-theme-subtle mt-1">
+                  JPEG, PNG, GIF, or WebP. Max 5MB.
+                </p>
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  className="hidden"
+                  onChange={handleImageSelect}
+                  aria-label="Upload group image"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Group Name */}
           <div>
             <Input
@@ -230,6 +381,22 @@ export function CreateGroupPage() {
               minRows={4}
               isInvalid={!!errors.description}
               errorMessage={errors.description}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
+              }}
+            />
+          </div>
+
+          {/* Location */}
+          <div>
+            <Input
+              label="Location"
+              placeholder="e.g., Dublin, Ireland (optional)"
+              value={formData.location}
+              onChange={(e) => updateField('location', e.target.value)}
+              startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -275,15 +442,15 @@ export function CreateGroupPage() {
               type="submit"
               className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={isEditing ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
-              isLoading={isSubmitting}
+              isLoading={isSubmitting || isUploadingImage}
             >
-              {isEditing ? 'Update Group' : 'Create Group'}
+              {isUploadingImage ? 'Uploading image...' : isEditing ? 'Update Group' : 'Create Group'}
             </Button>
             <Button
               type="button"
               variant="flat"
               className="bg-theme-elevated text-theme-primary"
-              onPress={() => navigate('/groups')}
+              onPress={() => navigate(tenantPath('/groups'))}
             >
               Cancel
             </Button>

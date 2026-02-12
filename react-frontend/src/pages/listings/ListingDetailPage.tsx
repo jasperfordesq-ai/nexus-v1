@@ -7,7 +7,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar } from '@heroui/react';
 import {
-  ArrowLeft,
   Clock,
   MapPin,
   Calendar,
@@ -23,17 +22,21 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Listing, ExchangeConfig } from '@/types/api';
 
 export function ListingDetailPage() {
+  usePageTitle('Listing');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   const [listing, setListing] = useState<Listing | null>(null);
@@ -87,7 +90,7 @@ export function ListingDetailPage() {
       setIsDeleting(true);
       await api.delete(`/v2/listings/${listing.id}`);
       toast.success('Listing deleted');
-      navigate('/listings', { replace: true });
+      navigate(tenantPath('/listings'), { replace: true });
     } catch (err) {
       logError('Failed to delete listing', err);
       toast.error('Failed to delete', 'Please try again later');
@@ -149,7 +152,7 @@ export function ListingDetailPage() {
         title="Listing Not Found"
         description={error || 'The listing you are looking for does not exist'}
         action={
-          <Link to="/listings">
+          <Link to={tenantPath('/listings')}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
               Browse Listings
             </Button>
@@ -165,14 +168,11 @@ export function ListingDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-4xl mx-auto space-y-6"
     >
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to listings
-      </button>
+      {/* Breadcrumbs */}
+      <Breadcrumbs items={[
+        { label: 'Listings', href: '/listings' },
+        { label: listing?.title || 'Listing' },
+      ]} />
 
       {/* Main Content */}
       <GlassCard className="p-6 sm:p-8">
@@ -187,7 +187,7 @@ export function ListingDetailPage() {
             </span>
             {(listing.category || listing.category_name) && (
               <span className="text-sm px-3 py-1.5 rounded-full bg-theme-hover text-theme-muted flex items-center gap-1">
-                <Tag className="w-3 h-3" />
+                <Tag className="w-3 h-3" aria-hidden="true" />
                 {listing.category?.name || listing.category_name}
               </span>
             )}
@@ -195,12 +195,12 @@ export function ListingDetailPage() {
 
           {isOwner && (
             <div className="flex gap-2">
-              <Link to={`/listings/edit/${listing.id}`}>
+              <Link to={tenantPath(`/listings/edit/${listing.id}`)}>
                 <Button
                   size="sm"
                   variant="flat"
                   className="bg-theme-elevated text-theme-primary"
-                  startContent={<Edit className="w-4 h-4" />}
+                  startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
                 >
                   Edit
                 </Button>
@@ -209,7 +209,7 @@ export function ListingDetailPage() {
                 size="sm"
                 variant="flat"
                 className="bg-red-500/10 text-red-400"
-                startContent={<Trash2 className="w-4 h-4" />}
+                startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                 onClick={handleDelete}
                 isLoading={isDeleting}
               >
@@ -289,19 +289,19 @@ export function ListingDetailPage() {
         {isAuthenticated && !isOwner && (
           <div className="flex flex-wrap gap-3 pt-6 border-t border-theme-default">
             {exchangeConfig?.exchange_workflow_enabled ? (
-              <Link to={`/listings/${listing.id}/request-exchange`} className="flex-1 sm:flex-none">
+              <Link to={tenantPath(`/listings/${listing.id}/request-exchange`)} className="flex-1 sm:flex-none">
                 <Button
                   className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
-                  startContent={<ArrowRightLeft className="w-4 h-4" />}
+                  startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
                 >
                   Request Exchange
                 </Button>
               </Link>
             ) : (
-              <Link to={`/messages?to=${listing.user_id}&listing=${listing.id}`} className="flex-1 sm:flex-none">
+              <Link to={tenantPath(`/messages?to=${listing.user_id}&listing=${listing.id}`)} className="flex-1 sm:flex-none">
                 <Button
                   className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                  startContent={<MessageSquare className="w-4 h-4" />}
+                  startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
                 >
                   Send Message
                 </Button>
@@ -310,7 +310,7 @@ export function ListingDetailPage() {
             <Button
               variant="flat"
               className={`flex-1 sm:flex-none ${isSaved ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
-              startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" /> : <Heart className="w-4 h-4" />}
+              startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" aria-hidden="true" /> : <Heart className="w-4 h-4" aria-hidden="true" />}
               onClick={handleSave}
             >
               {isSaved ? 'Saved' : 'Save'}
@@ -318,7 +318,7 @@ export function ListingDetailPage() {
             <Button
               variant="flat"
               className="flex-1 sm:flex-none bg-theme-elevated text-theme-primary"
-              startContent={<Share2 className="w-4 h-4" />}
+              startContent={<Share2 className="w-4 h-4" aria-hidden="true" />}
               onClick={handleShare}
             >
               Share
@@ -341,7 +341,7 @@ export function ListingDetailPage() {
             </h2>
 
             <Link
-              to={`/profile/${userId}`}
+              to={tenantPath(`/profile/${userId}`)}
               className="flex items-center gap-4 group hover:bg-theme-hover rounded-lg p-2 -m-2 transition-colors"
             >
               <Avatar

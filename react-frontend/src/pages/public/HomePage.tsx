@@ -7,9 +7,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
-import { ArrowRight, Clock, Users, Zap, ChevronDown } from 'lucide-react';
+import {
+  ArrowRight,
+  Clock,
+  Users,
+  Zap,
+  ChevronDown,
+  UserPlus,
+  Search,
+  Handshake,
+  Coins,
+} from 'lucide-react';
+import { GlassCard } from '@/components/ui';
 import { useTenant, useAuth } from '@/contexts';
 import { PageMeta } from '@/components/seo';
+import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -84,8 +96,36 @@ const coreValues = [
   },
 ];
 
+const howItWorks = [
+  {
+    icon: UserPlus,
+    title: 'Sign Up Free',
+    description: 'Create your profile in minutes and list the skills you can offer.',
+    color: 'from-indigo-500 to-blue-500',
+  },
+  {
+    icon: Search,
+    title: 'Browse & Connect',
+    description: 'Find services you need and connect with local community members.',
+    color: 'from-purple-500 to-pink-500',
+  },
+  {
+    icon: Handshake,
+    title: 'Exchange Services',
+    description: 'Arrange skill exchanges and help each other out.',
+    color: 'from-cyan-500 to-teal-500',
+  },
+  {
+    icon: Coins,
+    title: 'Earn Credits',
+    description: 'Get one time credit for every hour you give. Spend them freely.',
+    color: 'from-amber-500 to-orange-500',
+  },
+];
+
 export function HomePage() {
-  const { branding } = useTenant();
+  usePageTitle('Home');
+  const { branding, tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
 
@@ -173,7 +213,7 @@ export function HomePage() {
               className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
             >
               {isAuthenticated ? (
-                <Link to="/dashboard">
+                <Link to={tenantPath("/dashboard")}>
                   <Button
                     size="lg"
                     className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
@@ -184,7 +224,7 @@ export function HomePage() {
                 </Link>
               ) : (
                 <>
-                  <Link to="/register">
+                  <Link to={tenantPath("/register")}>
                     <Button
                       size="lg"
                       className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
@@ -193,7 +233,7 @@ export function HomePage() {
                       Get Started Free
                     </Button>
                   </Link>
-                  <Link to="/about">
+                  <Link to={tenantPath("/about")}>
                     <Button
                       size="lg"
                       variant="bordered"
@@ -273,9 +313,65 @@ export function HomePage() {
         </motion.div>
       </section>
 
-      {/* Features Section */}
+      {/* How It Works Section */}
       <section id="features" className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
+              How It Works
+            </h2>
+            <p className="text-theme-muted max-w-lg mx-auto">
+              Get started in four simple steps
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {howItWorks.map((step, index) => (
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <GlassCard className="p-6 h-full text-center relative group hover:scale-[1.02] transition-transform">
+                  <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                    {index + 1}
+                  </div>
+                  <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${step.color} mb-4`}>
+                    <step.icon className="w-7 h-7 text-white" aria-hidden="true" />
+                  </div>
+                  <h3 className="font-semibold text-theme-primary mb-2">{step.title}</h3>
+                  <p className="text-sm text-theme-muted">{step.description}</p>
+                </GlassCard>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Core Values Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
         <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
+              Why Time Banking?
+            </h2>
+            <p className="text-theme-muted max-w-lg mx-auto">
+              The core principles that make our community work
+            </p>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -328,7 +424,7 @@ export function HomePage() {
                 Join thousands of community members who are already exchanging
                 skills and building meaningful connections.
               </p>
-              <Link to="/register">
+              <Link to={tenantPath("/register")}>
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-10"

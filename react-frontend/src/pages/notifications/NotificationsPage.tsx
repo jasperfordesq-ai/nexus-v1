@@ -22,14 +22,19 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { formatRelativeTime } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
+import { usePageTitle } from '@/hooks';
 import type { Notification } from '@/types/api';
 
 type NotificationFilter = 'all' | 'unread';
 
 export function NotificationsPage() {
+  usePageTitle('Notifications');
+  const { tenantPath } = useTenant();
+  const toast = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<NotificationFilter>('all');
@@ -60,6 +65,7 @@ export function NotificationsPage() {
       );
     } catch (error) {
       logError('Failed to mark as read', error);
+      toast.error('Failed to mark notification as read');
     }
   }
 
@@ -69,8 +75,10 @@ export function NotificationsPage() {
       setNotifications((prev) =>
         prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
       );
+      toast.success('All notifications marked as read');
     } catch (error) {
       logError('Failed to mark all as read', error);
+      toast.error('Failed to mark all as read');
     }
   }
 
@@ -80,6 +88,7 @@ export function NotificationsPage() {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     } catch (error) {
       logError('Failed to delete notification', error);
+      toast.error('Failed to delete notification');
     }
   }
 
@@ -108,7 +117,7 @@ export function NotificationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Bell className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
+            <Bell className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
             Notifications
             {unreadCount > 0 && (
               <span className="text-sm px-2 py-1 rounded-full bg-indigo-500 text-white font-medium">
@@ -125,20 +134,21 @@ export function NotificationsPage() {
               variant="flat"
               size="sm"
               className="bg-theme-elevated text-theme-primary"
-              startContent={<CheckCheck className="w-4 h-4" />}
+              startContent={<CheckCheck className="w-4 h-4" aria-hidden="true" />}
               onClick={markAllAsRead}
             >
               Mark all read
             </Button>
           )}
-          <Link to="/settings">
+          <Link to={tenantPath("/settings")}>
             <Button
               variant="flat"
               size="sm"
               className="bg-theme-elevated text-theme-primary"
               isIconOnly
+              aria-label="Notification settings"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-4 h-4" aria-hidden="true" />
             </Button>
           </Link>
         </div>
@@ -263,8 +273,9 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
               size="sm"
               className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
               onClick={onMarkRead}
+              aria-label="Mark as read"
             >
-              <Check className="w-4 h-4" />
+              <Check className="w-4 h-4" aria-hidden="true" />
             </Button>
           )}
           <Button
@@ -273,8 +284,9 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
             size="sm"
             className="bg-theme-elevated text-theme-muted hover:text-red-500 dark:hover:text-red-400"
             onClick={onDelete}
+            aria-label="Delete notification"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-4 h-4" aria-hidden="true" />
           </Button>
         </div>
       </div>

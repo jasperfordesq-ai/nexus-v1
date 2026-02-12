@@ -1,5 +1,12 @@
 /**
  * Exchange Detail Page - View and manage a single exchange
+ *
+ * Features:
+ * - Status card with current exchange status
+ * - Exchange details (listing, parties, hours)
+ * - Timeline of status changes with stagger animation
+ * - Message link to other party
+ * - Action buttons for exchange workflow
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -18,7 +25,6 @@ import {
   Textarea,
 } from '@heroui/react';
 import {
-  ArrowLeft,
   ArrowRightLeft,
   CheckCircle,
   MessageSquare,
@@ -27,20 +33,112 @@ import {
   X,
   XCircle,
   AlertTriangle,
+  Clock,
+  Circle,
+  Ban,
+  UserCheck,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { EXCHANGE_STATUS_CONFIG, MAX_EXCHANGE_HOURS, getStatusIconBgClass } from '@/lib/exchange-status';
-import type { Exchange } from '@/types/api';
+import type { Exchange, ExchangeHistoryEntry } from '@/types/api';
+
+/* ───────────────────────── Timeline Helpers ───────────────────────── */
+
+interface TimelineEntry {
+  icon: React.ReactNode;
+  colorClass: string;
+  label: string;
+  actor?: string | null;
+  timestamp: string;
+  notes?: string | null;
+}
+
+function getTimelineIcon(action: string, newStatus?: string | null): React.ReactNode {
+  const iconClass = 'w-4 h-4';
+  if (action === 'created' || newStatus === 'pending_provider' || newStatus === 'pending_broker') {
+    return <Circle className={iconClass} />;
+  }
+  if (action === 'accepted' || newStatus === 'accepted') {
+    return <Check className={iconClass} />;
+  }
+  if (action === 'declined' || newStatus === 'cancelled') {
+    return <Ban className={iconClass} />;
+  }
+  if (action === 'started' || newStatus === 'in_progress') {
+    return <Play className={iconClass} />;
+  }
+  if (action === 'completed' || newStatus === 'completed') {
+    return <CheckCircle className={iconClass} />;
+  }
+  if (action === 'confirmed' || newStatus === 'pending_confirmation') {
+    return <UserCheck className={iconClass} />;
+  }
+  if (newStatus === 'disputed') {
+    return <AlertTriangle className={iconClass} />;
+  }
+  return <Clock className={iconClass} />;
+}
+
+function getTimelineColor(action: string, newStatus?: string | null): string {
+  // Green for positive actions
+  if (
+    action === 'accepted' || action === 'confirmed' || action === 'completed' ||
+    newStatus === 'accepted' || newStatus === 'completed'
+  ) {
+    return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+  }
+  // Red for negative actions
+  if (
+    action === 'declined' || action === 'cancelled' ||
+    newStatus === 'cancelled' || newStatus === 'disputed'
+  ) {
+    return 'bg-red-500/20 text-red-400 border-red-500/30';
+  }
+  // Blue for neutral actions
+  return 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30';
+}
+
+function getTimelineLabel(action: string, newStatus?: string | null): string {
+  if (action === 'created') return 'Exchange Created';
+  if (action === 'accepted' || newStatus === 'accepted') return 'Exchange Accepted';
+  if (action === 'declined') return 'Exchange Declined';
+  if (action === 'started' || newStatus === 'in_progress') return 'Exchange Started';
+  if (action === 'completed' || newStatus === 'completed') return 'Exchange Completed';
+  if (action === 'confirmed') return 'Hours Confirmed';
+  if (action === 'cancelled' || newStatus === 'cancelled') return 'Exchange Cancelled';
+  if (newStatus === 'pending_confirmation') return 'Awaiting Confirmation';
+  if (newStatus === 'pending_broker') return 'Sent to Broker';
+  if (newStatus === 'disputed') return 'Exchange Disputed';
+  // Fallback: capitalize the action
+  return action.charAt(0).toUpperCase() + action.slice(1).replace(/_/g, ' ');
+}
+
+function buildTimeline(history: ExchangeHistoryEntry[]): TimelineEntry[] {
+  return history.map((entry) => ({
+    icon: getTimelineIcon(entry.action, entry.new_status),
+    colorClass: getTimelineColor(entry.action, entry.new_status),
+    label: getTimelineLabel(entry.action, entry.new_status),
+    actor: entry.actor_name,
+    timestamp: entry.created_at,
+    notes: entry.notes,
+  }));
+}
+
+/* ───────────────────────── Main Component ───────────────────────── */
 
 export function ExchangeDetailPage() {
+  usePageTitle('Exchange Details');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   const [exchange, setExchange] = useState<Exchange | null>(null);
@@ -82,6 +180,15 @@ export function ExchangeDetailPage() {
 
   const isRequester = exchange?.requester_id === user?.id;
   const isProvider = exchange?.provider_id === user?.id;
+
+  // Determine the other party for messaging
+  const otherParty = isRequester ? exchange?.provider : exchange?.requester;
+  const otherPartyId = isRequester ? exchange?.provider_id : exchange?.requester_id;
+
+  // Exchange is "active" (not completed or cancelled) — show message link
+  const isActive = exchange
+    ? !['completed', 'cancelled'].includes(exchange.status)
+    : false;
 
   async function handleAccept() {
     if (!exchange) return;
@@ -184,7 +291,7 @@ export function ExchangeDetailPage() {
       await api.delete(`/v2/exchanges/${exchange.id}`);
       toast.success('Exchange cancelled');
       setShowCancelModal(false);
-      navigate('/exchanges');
+      navigate(tenantPath('/exchanges'));
     } catch (err) {
       toast.error('Failed to cancel exchange');
       logError('Failed to cancel exchange', err);
@@ -204,7 +311,7 @@ export function ExchangeDetailPage() {
         title="Exchange Not Found"
         description={error || 'The exchange you are looking for does not exist'}
         action={
-          <Link to="/exchanges">
+          <Link to={tenantPath("/exchanges")}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
               View My Exchanges
             </Button>
@@ -229,21 +336,20 @@ export function ExchangeDetailPage() {
     isRequester &&
     ['pending_provider', 'pending_broker', 'accepted'].includes(exchange.status);
 
+  // Build timeline from status_history
+  const timeline = exchange.status_history ? buildTimeline(exchange.status_history) : [];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="max-w-3xl mx-auto space-y-6"
     >
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
-        aria-label="Go back to exchanges list"
-      >
-        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-        Back to exchanges
-      </button>
+      {/* Breadcrumbs */}
+      <Breadcrumbs items={[
+        { label: 'Exchanges', href: tenantPath('/exchanges') },
+        { label: exchange?.listing?.title || 'Exchange' },
+      ]} />
 
       {/* Status Card */}
       <GlassCard className="p-6">
@@ -273,7 +379,7 @@ export function ExchangeDetailPage() {
         {/* Listing */}
         <div className="mb-6">
           <h3 className="text-sm font-medium text-theme-muted mb-2">Service</h3>
-          <Link to={`/listings/${exchange.listing_id}`} className="hover:underline">
+          <Link to={tenantPath(`/listings/${exchange.listing_id}`)} className="hover:underline">
             <p className="text-lg font-semibold text-theme-primary">
               {exchange.listing?.title || 'Service Exchange'}
             </p>
@@ -328,6 +434,21 @@ export function ExchangeDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Message Other Party */}
+        {isActive && otherParty && otherPartyId && (
+          <div className="mb-6">
+            <Link to={tenantPath(`/messages/new/${otherPartyId}`)}>
+              <Button
+                variant="flat"
+                className="bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
+                startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+              >
+                Message {otherParty.name || 'Other Party'}
+              </Button>
+            </Link>
+          </div>
+        )}
 
         {/* Hours */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
@@ -435,6 +556,81 @@ export function ExchangeDetailPage() {
           </div>
         )}
       </GlassCard>
+
+      {/* Exchange Timeline */}
+      {timeline.length > 0 && (
+        <GlassCard className="p-6">
+          <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-3">
+            <Clock className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+            Exchange Timeline
+          </h2>
+
+          <div className="relative">
+            {/* Vertical connector line */}
+            <div
+              className="absolute left-[17px] top-3 bottom-3 w-0.5 bg-theme-default"
+              aria-hidden="true"
+            />
+
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.1 },
+                },
+              }}
+              className="space-y-0"
+            >
+              {timeline.map((entry, index) => (
+                <motion.div
+                  key={index}
+                  variants={{
+                    hidden: { opacity: 0, x: -20 },
+                    visible: { opacity: 1, x: 0 },
+                  }}
+                  className="relative flex items-start gap-4 pb-6 last:pb-0"
+                >
+                  {/* Icon circle */}
+                  <div
+                    className={`relative z-10 w-9 h-9 rounded-full flex items-center justify-center border-2 flex-shrink-0 ${entry.colorClass}`}
+                  >
+                    {entry.icon}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0 pt-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-sm text-theme-primary">
+                        {entry.label}
+                      </span>
+                      {entry.actor && (
+                        <Chip size="sm" variant="flat" className="text-xs bg-theme-elevated text-theme-muted">
+                          {entry.actor}
+                        </Chip>
+                      )}
+                    </div>
+                    <p className="text-xs text-theme-subtle mt-0.5">
+                      <time dateTime={entry.timestamp}>
+                        {formatRelativeTime(entry.timestamp)}
+                        {' \u00b7 '}
+                        {new Date(entry.timestamp).toLocaleString()}
+                      </time>
+                    </p>
+                    {entry.notes && (
+                      <p className="text-sm text-theme-muted mt-1 bg-theme-elevated rounded-lg px-3 py-2">
+                        {entry.notes}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </GlassCard>
+      )}
 
       {/* Decline Modal */}
       <Modal

@@ -17,7 +17,8 @@ import {
 } from 'lucide-react';
 import { GlassCard, ExchangeCardSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -27,7 +28,9 @@ import type { Exchange, ExchangeConfig } from '@/types/api';
 const ITEMS_PER_PAGE = 20;
 
 export function ExchangesPage() {
+  usePageTitle('Exchanges');
   const { user } = useAuth();
+  const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -155,7 +158,7 @@ export function ExchangesPage() {
         title="Exchange Workflow Not Enabled"
         description="The exchange workflow system is not enabled for this community. Contact your coordinator for more information."
         action={
-          <Link to="/listings">
+          <Link to={tenantPath("/listings")}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
               Browse Listings
             </Button>
@@ -181,7 +184,7 @@ export function ExchangesPage() {
             Track your service exchange requests and confirmations
           </p>
         </div>
-        <Link to="/listings">
+        <Link to={tenantPath("/listings")}>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
@@ -245,7 +248,7 @@ export function ExchangesPage() {
                   : "No exchanges match this filter."
               }
               action={
-                <Link to="/listings">
+                <Link to={tenantPath("/listings")}>
                   <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
                     Browse Listings
                   </Button>
@@ -260,7 +263,7 @@ export function ExchangesPage() {
                 const other = otherParty(exchange);
 
                 return (
-                  <Link key={exchange.id} to={`/exchanges/${exchange.id}`}>
+                  <Link key={exchange.id} to={tenantPath(`/exchanges/${exchange.id}`)}>
                     <article
                       className="block"
                       aria-label={`Exchange: ${exchange.listing?.title || 'Service Exchange'} - ${statusConfig.label}`}
