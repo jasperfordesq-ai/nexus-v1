@@ -159,8 +159,12 @@ function isNavItemActive(string $itemUrl, string $currentPath, string $basePath)
 
                     <!-- Try New Frontend Button -->
                     <li class="govuk-service-navigation__item govuk-service-navigation__item--right">
+                        <?php
+                        $reactSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
+                        $reactPath = $reactSlug ? ('/' . $reactSlug . '/dashboard') : '/';
+                        ?>
                         <a class="civicone-try-new-frontend"
-                           href="https://app.project-nexus.ie/"
+                           href="https://app.project-nexus.ie<?= $reactPath ?>"
                            target="_blank"
                            rel="noopener">
                             <span class="btn-text">Try the New Experience</span>
