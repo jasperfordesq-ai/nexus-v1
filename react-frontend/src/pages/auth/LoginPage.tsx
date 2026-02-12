@@ -4,13 +4,14 @@
  */
 
 import { useState, useEffect, type FormEvent } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2 } from 'lucide-react';
-import { useAuth } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
+import { usePageTitle } from '@/hooks';
 import { api, tokenManager } from '@/lib/api';
 
 interface Tenant {
@@ -23,6 +24,7 @@ interface Tenant {
 }
 
 export function LoginPage() {
+  usePageTitle('Sign In');
   const navigate = useNavigate();
   const location = useLocation();
   const {
@@ -35,6 +37,8 @@ export function LoginPage() {
     cancel2FA,
     twoFactorMethods,
   } = useAuth();
+  const { branding, tenantSlug, tenantPath } = useTenant();
+  const [searchParams] = useSearchParams();
 
   // Tenant state
   const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -52,18 +56,27 @@ export function LoginPage() {
   const [useBackupCode, setUseBackupCode] = useState(false);
   const [trustDevice, setTrustDevice] = useState(false);
 
-  // Redirect after successful login
-  const from = (location.state as { from?: string })?.from || '/dashboard';
+  // Redirect after successful login (preserve tenant slug prefix)
+  const from = (location.state as { from?: string })?.from || tenantPath('/dashboard');
 
-  // Fetch available tenants on mount
+  // Fetch available tenants on mount, with ?tenant= hint support (TRS-001 Phase 0)
   useEffect(() => {
     const fetchTenants = async () => {
       try {
         const response = await api.get<Tenant[]>('/v2/tenants', { skipAuth: true, skipTenant: true });
         if (response.success && response.data) {
           setTenants(response.data);
-          // If only one tenant, auto-select it
-          if (response.data.length === 1) {
+
+          // Priority: URL slug prefix > ?tenant= query param > auto-select single
+          const tenantHint = tenantSlug || searchParams.get('tenant');
+          const hintMatch = tenantHint
+            ? response.data.find((t) => t.slug === tenantHint)
+            : null;
+
+          if (hintMatch) {
+            setSelectedTenantId(String(hintMatch.id));
+            tokenManager.setTenantId(hintMatch.id);
+          } else if (response.data.length === 1) {
             setSelectedTenantId(String(response.data[0].id));
             tokenManager.setTenantId(response.data[0].id);
           }
@@ -75,7 +88,7 @@ export function LoginPage() {
       }
     };
     fetchTenants();
-  }, []);
+  }, [tenantSlug, searchParams]);
 
   // Handle tenant selection
   const handleTenantChange = (keys: unknown) => {
@@ -187,7 +200,7 @@ export function LoginPage() {
                   </motion.div>
                   <h1 className="text-2xl font-bold text-theme-primary">Welcome Back</h1>
                   <p className="text-theme-muted mt-2">
-                    Sign in to continue to NEXUS
+                    Sign in to continue to {branding.name}
                   </p>
                 </div>
 
@@ -278,17 +291,20 @@ export function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
                     endContent={
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="text-theme-subtle hover:text-theme-muted transition-colors"
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
+                        onPress={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
                         {showPassword ? (
-                          <EyeOff className="w-4 h-4" />
+                          <EyeOff className="w-4 h-4" aria-hidden="true" />
                         ) : (
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-4 h-4" aria-hidden="true" />
                         )}
-                      </button>
+                      </Button>
                     }
                     isRequired
                     autoComplete="current-password"
@@ -312,7 +328,7 @@ export function LoginPage() {
                     </Checkbox>
 
                     <Link
-                      to="/password/forgot"
+                      to={tenantPath('/password/forgot')}
                       className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"
                     >
                       Forgot password?
@@ -338,7 +354,7 @@ export function LoginPage() {
                 <p className="text-center text-theme-muted text-sm">
                   Don&apos;t have an account?{' '}
                   <Link
-                    to="/register"
+                    to={tenantPath('/register')}
                     className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors"
                   >
                     Create one
@@ -468,7 +484,7 @@ export function LoginPage() {
           className="mt-6 text-center"
         >
           <Link
-            to="/"
+            to={tenantPath('/')}
             className="inline-flex items-center gap-2 text-theme-subtle hover:text-theme-secondary text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />

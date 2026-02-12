@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useRef, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Input, Checkbox, Divider, Select, SelectItem, Progress } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -31,6 +31,7 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { useAuth, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
 import { api, tokenManager } from '@/lib/api';
 import { PASSWORD_REQUIREMENTS, isPasswordValid, getPasswordStrength } from '@/lib/validation';
@@ -54,9 +55,11 @@ const STEPS = [
 ];
 
 export function RegisterPage() {
+  usePageTitle('Create Account');
   const navigate = useNavigate();
   const { register, isAuthenticated, isLoading, error, clearError } = useAuth();
-  const { tenant } = useTenant();
+  const { tenant, tenantSlug, tenantPath } = useTenant();
+  const [searchParams] = useSearchParams();
 
   // Step state (1-4)
   const [currentStep, setCurrentStep] = useState(1);
@@ -99,15 +102,24 @@ export function RegisterPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Fetch available tenants on mount
+  // Fetch available tenants on mount, with ?tenant= hint support (TRS-001 Phase 0)
   useEffect(() => {
     const fetchTenants = async () => {
       try {
         const response = await api.get<Tenant[]>('/v2/tenants', { skipAuth: true, skipTenant: true });
         if (response.success && response.data) {
           setTenants(response.data);
-          // If only one tenant, auto-select it
-          if (response.data.length === 1) {
+
+          // Priority: URL slug prefix > ?tenant= query param > auto-select single
+          const tenantHint = tenantSlug || searchParams.get('tenant');
+          const hintMatch = tenantHint
+            ? response.data.find((t) => t.slug === tenantHint)
+            : null;
+
+          if (hintMatch) {
+            setSelectedTenantId(String(hintMatch.id));
+            tokenManager.setTenantId(hintMatch.id);
+          } else if (response.data.length === 1) {
             setSelectedTenantId(String(response.data[0].id));
             tokenManager.setTenantId(response.data[0].id);
           }
@@ -119,7 +131,7 @@ export function RegisterPage() {
       }
     };
     fetchTenants();
-  }, []);
+  }, [tenantSlug, searchParams]);
 
   // Handle tenant selection
   const handleTenantChange = (keys: unknown) => {
@@ -144,7 +156,7 @@ export function RegisterPage() {
   // Redirect after successful registration
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+      navigate(tenantPath('/dashboard'), { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -209,6 +221,7 @@ export function RegisterPage() {
     const timeTaken = Date.now() - formStartTime;
     if (timeTaken < 3000) {
       // Form submitted too fast (< 3 seconds) - likely a bot
+      clearError();
       return;
     }
 
@@ -241,7 +254,7 @@ export function RegisterPage() {
     });
 
     if (success) {
-      navigate('/dashboard', { replace: true });
+      navigate(tenantPath('/dashboard'), { replace: true });
     }
   };
 
@@ -502,10 +515,12 @@ export function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 startContent={<Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                 endContent={
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-theme-subtle hover:text-theme-muted transition-colors"
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
+                    onPress={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? (
@@ -513,7 +528,7 @@ export function RegisterPage() {
                     ) : (
                       <Eye className="w-4 h-4" aria-hidden="true" />
                     )}
-                  </button>
+                  </Button>
                 }
                 isRequired
                 autoComplete="new-password"
@@ -606,14 +621,14 @@ export function RegisterPage() {
                 <span>
                   I agree to the{' '}
                   <Link
-                    to="/terms"
+                    to={tenantPath('/terms')}
                     className="text-indigo-600 dark:text-indigo-400 hover:underline"
                   >
                     Terms of Service
                   </Link>{' '}
                   and{' '}
                   <Link
-                    to="/privacy"
+                    to={tenantPath('/privacy')}
                     className="text-indigo-600 dark:text-indigo-400 hover:underline"
                   >
                     Privacy Policy
@@ -644,7 +659,7 @@ export function RegisterPage() {
               </p>
               <p>
                 <Link
-                  to="/privacy"
+                  to={tenantPath('/privacy')}
                   className="text-indigo-600 dark:text-indigo-400 hover:underline"
                 >
                   View our full Privacy Policy
@@ -732,18 +747,19 @@ export function RegisterPage() {
           {/* Step dots */}
           <div className="flex justify-between mt-2">
             {STEPS.map((step) => (
-              <button
+              <Button
                 key={step.id}
-                type="button"
-                onClick={() => step.id < currentStep && setCurrentStep(step.id)}
-                disabled={step.id > currentStep}
-                className={`flex flex-col items-center transition-colors ${
+                variant="light"
+                size="sm"
+                className={`flex flex-col items-center min-w-0 h-auto p-1 gap-0 ${
                   step.id === currentStep
                     ? 'text-indigo-600 dark:text-indigo-400'
                     : step.id < currentStep
-                      ? 'text-theme-muted cursor-pointer hover:text-theme-primary'
-                      : 'text-theme-subtle cursor-not-allowed'
+                      ? 'text-theme-muted'
+                      : 'text-theme-subtle'
                 }`}
+                onPress={() => step.id < currentStep && setCurrentStep(step.id)}
+                isDisabled={step.id > currentStep}
                 aria-label={`Go to step ${step.id}: ${step.title}`}
               >
                 <div
@@ -756,7 +772,7 @@ export function RegisterPage() {
                   }`}
                 />
                 <span className="text-[10px] mt-1 hidden xs:block">{step.shortTitle}</span>
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -866,7 +882,7 @@ export function RegisterPage() {
           <p className="text-center text-theme-muted text-sm">
             Already have an account?{' '}
             <Link
-              to="/login"
+              to={tenantPath('/login')}
               className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors"
             >
               Sign in
@@ -882,7 +898,7 @@ export function RegisterPage() {
           className="mt-6 text-center"
         >
           <Link
-            to="/"
+            to={tenantPath('/')}
             className="inline-flex items-center gap-2 text-theme-subtle hover:text-theme-muted text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
