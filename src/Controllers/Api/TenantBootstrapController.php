@@ -47,11 +47,50 @@ class TenantBootstrapController extends BaseApiController
      * Headers:
      *   X-Tenant-ID: (optional) - Explicit tenant ID
      *
+     * Query Parameters:
+     *   slug: (optional) - Tenant slug for explicit lookup (takes priority)
+     *
      * Response: 200 OK with tenant data
      */
     public function bootstrap(): void
     {
-        // TenantContext already resolved by index.php
+        // Check for explicit slug query parameter (used by React frontend for tenant switching)
+        $slug = isset($_GET['slug']) ? trim($_GET['slug']) : null;
+
+        if ($slug !== null && $slug !== '') {
+            // Look up tenant by slug
+            $db = \Nexus\Core\Database::getConnection();
+            $stmt = $db->prepare("SELECT * FROM tenants WHERE slug = ? AND is_active = 1 LIMIT 1");
+            $stmt->execute([$slug]);
+            $slugTenant = $stmt->fetch();
+
+            if (!$slugTenant) {
+                // TRS-001 fail-closed: unknown slug MUST 404, never fall back to master tenant
+                $this->respondWithError(
+                    'TENANT_NOT_FOUND',
+                    "Community '{$slug}' was not found or is inactive.",
+                    null,
+                    404
+                );
+                return;
+            }
+
+            $tenantId = (int) $slugTenant['id'];
+
+            // Try cache first
+            $cached = RedisCache::get(self::CACHE_KEY, $tenantId);
+            if ($cached !== null) {
+                $this->respondWithData($cached);
+                return;
+            }
+
+            $data = $this->buildBootstrapData($slugTenant);
+            RedisCache::set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
+            $this->respondWithData($data);
+            return;
+        }
+
+        // Default: use TenantContext resolved by index.php (header/domain/token/fallback)
         $tenantId = TenantContext::getId();
 
         // Try to get from cache first
@@ -114,8 +153,11 @@ class TenantBootstrapController extends BaseApiController
         // Branding section
         $data['branding'] = $this->buildBrandingData($tenant, $config);
 
-        // Feature flags (what modules are enabled)
+        // Feature flags (optional features that can be toggled per tenant)
         $data['features'] = $this->buildFeaturesData($features);
+
+        // Module configuration (core modules that can be disabled per tenant)
+        $data['modules'] = $this->buildModulesData($config);
 
         // SEO metadata
         $data['seo'] = $this->buildSeoData($tenant);
@@ -224,6 +266,41 @@ class TenantBootstrapController extends BaseApiController
 
         // Check if direct messaging is enabled (separate from exchange workflow)
         $result['direct_messaging'] = BrokerControlConfigService::isDirectMessagingEnabled();
+
+        return $result;
+    }
+
+    /**
+     * Build module configuration (core modules that can be disabled per tenant)
+     *
+     * Modules differ from features: modules are core platform functionality
+     * (listings, wallet, messages) while features are optional add-ons
+     * (gamification, goals, federation).
+     *
+     * Module config is read from tenants.configuration JSON → "modules" key.
+     */
+    private function buildModulesData(?array $config): array
+    {
+        $defaults = [
+            'feed' => true,
+            'listings' => true,
+            'messages' => true,
+            'wallet' => true,
+            'notifications' => true,
+            'profile' => true,
+            'settings' => true,
+            'dashboard' => true,
+        ];
+
+        $modules = [];
+        if ($config !== null && isset($config['modules']) && is_array($config['modules'])) {
+            $modules = $config['modules'];
+        }
+
+        $result = [];
+        foreach ($defaults as $key => $defaultValue) {
+            $result[$key] = array_key_exists($key, $modules) ? (bool) $modules[$key] : $defaultValue;
+        }
 
         return $result;
     }
