@@ -6,7 +6,11 @@
  * - Feature flags
  * - Tenant branding
  * - Module configuration
- * - Automatic tenant detection from subdomain/hostname
+ * - Automatic tenant detection from URL (subdomain or path slug)
+ * - Tenant slug for URL-scoped navigation
+ *
+ * Implements TRS-001 resolution rules R1-R4.
+ * @see docs/TRS-001-TENANT-RESOLUTION-SPEC.md
  */
 
 import {
@@ -15,57 +19,12 @@ import {
   useState,
   useEffect,
   useMemo,
+  useCallback,
   type ReactNode,
 } from 'react';
 import { api, tokenManager, fetchCsrfToken } from '@/lib/api';
+import { detectTenantFromUrl, tenantPath as buildTenantPath } from '@/lib/tenant-routing';
 import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding } from '@/types';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Tenant Detection from URL/Subdomain
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Detect tenant from current hostname
- *
- * Examples:
- * - hour-timebank.project-nexus.ie → 'hour-timebank'
- * - app.project-nexus.ie → null (use default/bootstrap)
- * - localhost:5173 → null (development)
- * - project-nexus.ie → null (root domain)
- *
- * The backend will resolve the tenant based on:
- * 1. X-Tenant-ID header (from localStorage, set during login)
- * 2. Hostname/domain lookup in tenants table
- * 3. Default tenant if nothing matches
- */
-function detectTenantFromHostname(): string | null {
-  const hostname = window.location.hostname;
-
-  // Skip detection for localhost (development)
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return null;
-  }
-
-  // Known "app" subdomains that aren't tenant-specific
-  const appSubdomains = ['app', 'www', 'api', 'admin'];
-
-  // Parse subdomain from hostname
-  // e.g., "hour-timebank.project-nexus.ie" → ["hour-timebank", "project-nexus", "ie"]
-  const parts = hostname.split('.');
-
-  // Need at least 3 parts for a subdomain (sub.domain.tld)
-  if (parts.length >= 3) {
-    const subdomain = parts[0];
-
-    // If it's not a reserved subdomain, it might be a tenant slug
-    if (!appSubdomains.includes(subdomain.toLowerCase())) {
-      return subdomain;
-    }
-  }
-
-  // No tenant detected from subdomain
-  return null;
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -75,6 +34,8 @@ interface TenantState {
   tenant: TenantConfig | null;
   isLoading: boolean;
   error: string | null;
+  /** Slug that was NOT found (bootstrap returned error). Used for soft 404. */
+  notFoundSlug: string | null;
 }
 
 interface TenantContextValue extends TenantState {
@@ -84,26 +45,30 @@ interface TenantContextValue extends TenantState {
   hasFeature: (feature: keyof TenantFeatures) => boolean;
   hasModule: (module: keyof TenantModules) => boolean;
   refreshTenant: () => Promise<void>;
+  /** The current tenant slug from URL (path or subdomain). Null if no slug in URL. */
+  tenantSlug: string | null;
+  /** Build a path with the tenant slug prefix (if present). */
+  tenantPath: (path: string) => string;
 }
 
-// Default features (all disabled)
+// Default features — synced with PHP TenantBootstrapController::buildFeaturesData() defaults
 const defaultFeatures: TenantFeatures = {
   gamification: false,
-  groups: false,
-  events: false,
+  groups: true,
+  events: true,
   marketplace: false,
-  messaging: true,  // Always enabled
+  messaging: true,
   volunteering: false,
-  connections: false,
+  connections: true,
   polls: false,
   goals: false,
   federation: false,
-  blog: false,
+  blog: true,
   resources: false,
-  reviews: false,
-  search: true,     // Always enabled
-  exchange_workflow: false, // Broker control feature
-  direct_messaging: true,   // Can be disabled by broker
+  reviews: true,
+  search: true,
+  exchange_workflow: false,
+  direct_messaging: true,
 };
 
 // Default modules (all enabled)
@@ -140,7 +105,8 @@ const TenantContext = createContext<TenantContextValue | null>(null);
 
 interface TenantProviderProps {
   children: ReactNode;
-  tenantSlug?: string;  // Can be passed from URL or environment
+  /** Tenant slug from route param (/:tenantSlug prefix). Takes priority over URL detection. */
+  tenantSlug?: string;
 }
 
 export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
@@ -148,19 +114,22 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     tenant: null,
     isLoading: true,
     error: null,
+    notFoundSlug: null,
   });
 
-  // Detect tenant from subdomain if not explicitly provided
-  const effectiveTenantSlug = tenantSlug || detectTenantFromHostname();
+  // Determine effective slug: route param > URL detection (subdomain/path)
+  const detected = useMemo(() => detectTenantFromUrl(), []);
+  const effectiveTenantSlug = tenantSlug || detected.slug;
 
   /**
    * Fetch tenant bootstrap data
    */
-  const refreshTenant = async () => {
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
+  const refreshTenant = useCallback(async () => {
+    setState((prev) => ({ ...prev, isLoading: true, error: null, notFoundSlug: null }));
 
     try {
       // Build endpoint with optional tenant slug
+      // Per TRS-001: NO ?domain= parameter. Slug only.
       let endpoint = '/v2/tenant/bootstrap';
       if (effectiveTenantSlug) {
         endpoint += `?slug=${encodeURIComponent(effectiveTenantSlug)}`;
@@ -171,10 +140,16 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       if (response.success && response.data) {
         const tenant = response.data;
 
-        // Only set tenant ID if no tenant was pre-selected (e.g., during login)
-        // This allows users to access tenants other than their "home" tenant
-        const existingTenantId = tokenManager.getTenantId();
-        if (tenant.id && !existingTenantId) {
+        // TRS-001: Stale localStorage override
+        // If URL resolved a tenant and it differs from stored value, override.
+        const storedTenantId = tokenManager.getTenantId();
+        if (tenant.id) {
+          if (storedTenantId && String(storedTenantId) !== String(tenant.id)) {
+            console.warn(
+              `[TenantContext] Overriding stale localStorage tenant_id. ` +
+              `Stored: ${storedTenantId}, URL-resolved: ${tenant.id}`
+            );
+          }
           tokenManager.setTenantId(tenant.id);
         }
 
@@ -185,12 +160,15 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
           tenant,
           isLoading: false,
           error: null,
+          notFoundSlug: null,
         });
       } else {
+        // Bootstrap failed — if we had a slug, this is an unknown tenant (soft 404)
         setState({
           tenant: null,
           isLoading: false,
           error: response.error ?? 'Failed to load tenant configuration',
+          notFoundSlug: effectiveTenantSlug || null,
         });
       }
     } catch (err) {
@@ -198,15 +176,15 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
         tenant: null,
         isLoading: false,
         error: err instanceof Error ? err.message : 'Failed to load tenant configuration',
+        notFoundSlug: null,
       });
     }
-  };
+  }, [effectiveTenantSlug]);
 
   // Fetch tenant on mount or when slug changes
   useEffect(() => {
     refreshTenant();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectiveTenantSlug]);
+  }, [refreshTenant]);
 
   /**
    * Get features with fallback to defaults
@@ -241,16 +219,24 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   /**
    * Check if feature is enabled
    */
-  const hasFeature = (feature: keyof TenantFeatures): boolean => {
+  const hasFeature = useCallback((feature: keyof TenantFeatures): boolean => {
     return features[feature] ?? false;
-  };
+  }, [features]);
 
   /**
    * Check if module is enabled
    */
-  const hasModule = (module: keyof TenantModules): boolean => {
-    return modules[module] ?? true;
-  };
+  const hasModule = useCallback((module: keyof TenantModules): boolean => {
+    return modules[module] ?? false;
+  }, [modules]);
+
+  /**
+   * Build a path with the current tenant slug prefix.
+   * Preserves the slug in all internal navigation.
+   */
+  const tenantPath = useCallback((path: string): string => {
+    return buildTenantPath(path, effectiveTenantSlug);
+  }, [effectiveTenantSlug]);
 
   const value = useMemo<TenantContextValue>(
     () => ({
@@ -261,8 +247,10 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       hasFeature,
       hasModule,
       refreshTenant,
+      tenantSlug: effectiveTenantSlug || null,
+      tenantPath,
     }),
-    [state, features, modules, branding]
+    [state, features, modules, branding, hasFeature, hasModule, refreshTenant, effectiveTenantSlug, tenantPath]
   );
 
   return (
