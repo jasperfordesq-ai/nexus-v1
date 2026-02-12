@@ -9,11 +9,13 @@ import { Button, Input } from '@heroui/react';
 import { Lock, ArrowLeft, CheckCircle, Eye, EyeOff, Check, X } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { validatePassword, PASSWORD_REQUIREMENTS } from '@/lib/validation';
 
 export function ResetPasswordPage() {
-  const { branding } = useTenant();
+  usePageTitle('Set New Password');
+  const { branding, tenantPath } = useTenant();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
@@ -38,7 +40,7 @@ export function ResetPasswordPage() {
             <p className="text-theme-muted mb-6">
               This password reset link is invalid or has expired. Please request a new one.
             </p>
-            <Link to="/password/forgot">
+            <Link to={tenantPath('/password/forgot')}>
               <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
                 Request new link
               </Button>
@@ -95,7 +97,7 @@ export function ResetPasswordPage() {
             <p className="text-theme-muted mb-6">
               Your password has been updated. You can now sign in with your new password.
             </p>
-            <Link to="/login">
+            <Link to={tenantPath('/login')}>
               <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
                 Sign in
               </Button>
@@ -115,7 +117,7 @@ export function ResetPasswordPage() {
       >
         {/* Back to login */}
         <Link
-          to="/login"
+          to={tenantPath('/login')}
           className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -149,13 +151,16 @@ export function ResetPasswordPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
                 endContent={
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-theme-subtle hover:text-theme-primary"
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
+                    onPress={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+                    {showPassword ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
+                  </Button>
                 }
                 classNames={{
                   input: 'bg-transparent text-theme-primary',
@@ -196,6 +201,8 @@ export function ResetPasswordPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
+              isInvalid={confirmPassword.length > 0 && password !== confirmPassword}
+              errorMessage={confirmPassword.length > 0 && password !== confirmPassword ? 'Passwords do not match' : ''}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',

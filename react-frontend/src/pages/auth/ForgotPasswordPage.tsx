@@ -9,10 +9,12 @@ import { Button, Input } from '@heroui/react';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 
 export function ForgotPasswordPage() {
-  const { branding } = useTenant();
+  usePageTitle('Reset Password');
+  const { branding, tenantPath } = useTenant();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -63,7 +65,7 @@ export function ForgotPasswordPage() {
               >
                 Try another email
               </Button>
-              <Link to="/login">
+              <Link to={tenantPath('/login')}>
                 <Button
                   variant="flat"
                   className="w-full bg-theme-elevated text-theme-primary"
@@ -88,7 +90,7 @@ export function ForgotPasswordPage() {
       >
         {/* Back to login */}
         <Link
-          to="/login"
+          to={tenantPath('/login')}
           className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -141,7 +143,7 @@ export function ForgotPasswordPage() {
           {/* Footer */}
           <div className="mt-6 text-center text-sm text-theme-subtle">
             Remember your password?{' '}
-            <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+            <Link to={tenantPath('/login')} className="text-indigo-600 dark:text-indigo-400 hover:underline">
               Sign in
             </Link>
           </div>
