@@ -22,16 +22,16 @@ class TransactionTest extends TestCase
 
         // Create test sender
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, 'test_sender@test.com', 'Test', 'Sender', ?, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, 'test_sender@test.com', 'Test', 'Sender', 'Test Sender', ?, 1, NOW())",
             [self::$testTenantId, self::$initialBalance]
         );
         self::$testSenderId = Database::getInstance()->lastInsertId();
 
         // Create test receiver
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, 'test_receiver@test.com', 'Test', 'Receiver', 0, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, 'test_receiver@test.com', 'Test', 'Receiver', 'Test Receiver', 0, 1, NOW())",
             [self::$testTenantId]
         );
         self::$testReceiverId = Database::getInstance()->lastInsertId();

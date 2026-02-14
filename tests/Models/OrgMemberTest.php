@@ -25,29 +25,29 @@ class OrgMemberTest extends TestCase
 
         // Create test users
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Test', 'Owner', 0, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Test', 'Owner', 'Test Owner', 0, 1, NOW())",
             [self::$testTenantId, "member_owner_{$timestamp}@test.com"]
         );
         self::$testOwnerId = Database::getInstance()->lastInsertId();
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Test', 'Admin', 0, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Test', 'Admin', 'Test Admin', 0, 1, NOW())",
             [self::$testTenantId, "member_admin_{$timestamp}@test.com"]
         );
         self::$testAdminId = Database::getInstance()->lastInsertId();
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Test', 'Member', 0, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Test', 'Member', 'Test Member', 0, 1, NOW())",
             [self::$testTenantId, "member_member_{$timestamp}@test.com"]
         );
         self::$testMemberId = Database::getInstance()->lastInsertId();
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Non', 'Member', 0, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Non', 'Member', 'Non Member', 0, 1, NOW())",
             [self::$testTenantId, "member_nonmember_{$timestamp}@test.com"]
         );
         self::$testNonMemberId = Database::getInstance()->lastInsertId();

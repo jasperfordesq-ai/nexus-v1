@@ -31,16 +31,16 @@ class WalletApiControllerTest extends TestCase
 
         // Create test sender with username
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, 'test_wallet_sender@test.com', ?, 'Wallet', 'Sender', ?, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, 'test_wallet_sender@test.com', ?, 'Wallet', 'Sender', 'Wallet Sender', ?, 1, NOW())",
             [self::$testTenantId, self::$testSenderUsername, self::$initialBalance]
         );
         self::$testSenderId = Database::getInstance()->lastInsertId();
 
         // Create test receiver with username
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, 'test_wallet_receiver@test.com', ?, 'Wallet', 'Receiver', 0, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, 'test_wallet_receiver@test.com', ?, 'Wallet', 'Receiver', 'Wallet Receiver', 0, 1, NOW())",
             [self::$testTenantId, self::$testReceiverUsername]
         );
         self::$testReceiverId = Database::getInstance()->lastInsertId();

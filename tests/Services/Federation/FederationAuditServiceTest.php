@@ -30,9 +30,9 @@ class FederationAuditServiceTest extends DatabaseTestCase
         // Create test user
         $timestamp = time();
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$tenant1Id, "audit_test_{$timestamp}@test.com", "audit_test_{$timestamp}", 'Audit', 'Test', 100]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$tenant1Id, "audit_test_{$timestamp}@test.com", "audit_test_{$timestamp}", 'Audit', 'Test', 'Audit Test', 100]
         );
         self::$testUserId = (int)Database::getInstance()->lastInsertId();
 

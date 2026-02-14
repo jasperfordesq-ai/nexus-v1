@@ -36,15 +36,15 @@ class MatchingServiceTest extends TestCase
 
         // Create test users
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, location, latitude, longitude, is_approved, status, created_at)
-             VALUES (?, ?, 'Match', 'TestUser', 'Test Location', 51.5074, -0.1278, 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, location, latitude, longitude, is_approved, status, created_at)
+             VALUES (?, ?, 'Match', 'TestUser', 'Match TestUser', 'Test Location', 51.5074, -0.1278, 1, 'active', NOW())",
             [self::$testTenantId, 'match_service_test_' . $timestamp . '@test.com']
         );
         self::$testUserId = Database::getInstance()->lastInsertId();
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, location, latitude, longitude, is_approved, status, created_at)
-             VALUES (?, ?, 'Match', 'TestUser2', 'Test Location 2', 51.5200, -0.1000, 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, location, latitude, longitude, is_approved, status, created_at)
+             VALUES (?, ?, 'Match', 'TestUser2', 'Match TestUser2', 'Test Location 2', 51.5200, -0.1000, 1, 'active', NOW())",
             [self::$testTenantId, 'match_service_test2_' . $timestamp . '@test.com']
         );
         self::$testUser2Id = Database::getInstance()->lastInsertId();
@@ -354,8 +354,8 @@ class MatchingServiceTest extends TestCase
         // Create a user with no listings (won't have matches)
         $timestamp = time() . rand(1000, 9999);
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, is_approved, status, created_at)
-             VALUES (?, ?, 'No', 'Matches', 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, is_approved, status, created_at)
+             VALUES (?, ?, 'No', 'Matches', 'No Matches', 1, 'active', NOW())",
             [self::$testTenantId, 'no_matches_' . $timestamp . '@test.com']
         );
         $noMatchUserId = Database::getInstance()->lastInsertId();

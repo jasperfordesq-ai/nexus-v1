@@ -20,8 +20,8 @@ class GamificationServiceTest extends TestCase
         // Create a test user with unique email
         $uniqueEmail = 'test_gamification_' . time() . '@test.com';
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, xp, level, is_approved, created_at)
-             VALUES (?, ?, 'Test', 'GamificationUser', 0, 1, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, xp, level, is_approved, created_at)
+             VALUES (?, ?, 'Test', 'GamificationUser', 'Test GamificationUser', 0, 1, 1, NOW())",
             [self::$testTenantId, $uniqueEmail]
         );
         self::$testUserId = Database::getInstance()->lastInsertId();

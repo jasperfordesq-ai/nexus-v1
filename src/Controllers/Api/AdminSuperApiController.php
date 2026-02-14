@@ -51,6 +51,44 @@ class AdminSuperApiController extends BaseApiController
     }
 
     /**
+     * Override requireSuperAdmin to also sync JWT context to $_SESSION.
+     *
+     * SuperPanelAccess::getAccess() reads from $_SESSION to determine visibility scope.
+     * When using Bearer token auth (stateless), $_SESSION is empty. This method bridges
+     * the gap by populating $_SESSION with the JWT user's data so TenantVisibilityService
+     * and other session-dependent services work correctly with API requests.
+     */
+    protected function requireSuperAdmin(): int
+    {
+        $userId = parent::requireSuperAdmin();
+
+        // Sync JWT context to session for SuperPanelAccess compatibility
+        if (session_status() === PHP_SESSION_NONE) {
+            @session_start();
+        }
+
+        if (empty($_SESSION['user_id'])) {
+            $user = Database::query(
+                "SELECT id, tenant_id, role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
+                [$userId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            if ($user) {
+                $_SESSION['user_id'] = (int) $user['id'];
+                $_SESSION['tenant_id'] = (int) $user['tenant_id'];
+                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['is_super_admin'] = (int) $user['is_super_admin'];
+                $_SESSION['is_tenant_super_admin'] = (int) $user['is_tenant_super_admin'];
+
+                // Reset cached access so it re-evaluates with session data
+                \Nexus\Middleware\SuperPanelAccess::reset();
+            }
+        }
+
+        return $userId;
+    }
+
+    /**
      * Require god role (is_god flag in DB). Uses the authenticated user ID from JWT.
      */
     private function requireGod(int $userId): void
@@ -126,7 +164,7 @@ class AdminSuperApiController extends BaseApiController
 
         $tenant = TenantVisibilityService::getTenant($tenantId);
         if (!$tenant) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Tenant not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Tenant not found', null, 404);
         }
 
         $children = Tenant::getChildren($tenantId);
@@ -338,7 +376,7 @@ class AdminSuperApiController extends BaseApiController
         $user = User::findById($userId, false);
 
         if (!$user) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
         $tenant = Tenant::find($user['tenant_id']);
@@ -420,7 +458,7 @@ class AdminSuperApiController extends BaseApiController
         $user = User::findById($targetUserId, false);
 
         if (!$user) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
         $input = $this->getAllInput();
@@ -465,7 +503,7 @@ class AdminSuperApiController extends BaseApiController
         $user = User::findById($targetUserId, false);
 
         if (!$user) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
         // Tenant must allow sub-tenants
@@ -501,7 +539,7 @@ class AdminSuperApiController extends BaseApiController
         $user = User::findById($targetUserId, false);
 
         if (!$user) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
         // Cannot revoke from a global super admin unless caller is god
@@ -537,7 +575,7 @@ class AdminSuperApiController extends BaseApiController
         $user = User::findById($targetUserId, false);
 
         if (!$user) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
         Database::query(
@@ -562,7 +600,7 @@ class AdminSuperApiController extends BaseApiController
         $user = User::findById($targetUserId, false);
 
         if (!$user) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
         // Cannot revoke from yourself
@@ -593,7 +631,7 @@ class AdminSuperApiController extends BaseApiController
         $user = User::findById($targetUserId, false);
 
         if (!$user) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
         $input = $this->getAllInput();
@@ -648,7 +686,7 @@ class AdminSuperApiController extends BaseApiController
         $user = User::findById($targetUserId, false);
 
         if (!$user) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
         $input = $this->getAllInput();
@@ -732,7 +770,7 @@ class AdminSuperApiController extends BaseApiController
 
         $targetTenant = Tenant::find($targetTenantId);
         if (!$targetTenant) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Target tenant not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Target tenant not found', null, 404);
         }
 
         if ($grantSuperAdmin && !$targetTenant['allows_subtenants']) {
@@ -1211,7 +1249,7 @@ class AdminSuperApiController extends BaseApiController
 
         $tenant = Tenant::find($tenantId);
         if (!$tenant) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Tenant not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Tenant not found', null, 404);
         }
 
         $features = FederationFeatureService::getAllTenantFeatures($tenantId);

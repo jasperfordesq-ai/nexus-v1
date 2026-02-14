@@ -41,14 +41,15 @@ class TotpControllerTest extends DatabaseTestCase
 
         // Create test user with 2FA enabled
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, password_hash, balance, is_approved, totp_enabled, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 0, 1, 0, NOW())",
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, password_hash, balance, is_approved, totp_enabled, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 0, 1, 0, NOW())",
             [
                 self::$testTenantId,
                 "totp_controller_test_{$timestamp}@test.com",
                 "totp_controller_test_{$timestamp}",
                 'Controller',
                 'TestUser',
+                'Controller TestUser',
                 password_hash('TestPassword123!', PASSWORD_DEFAULT)
             ]
         );

@@ -36,14 +36,15 @@ class UserTest extends DatabaseTestCase
 
         // Create primary test user
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, bio, location, phone, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?, NOW())",
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, bio, location, phone, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, NOW())",
             [
                 self::$testTenantId,
                 "user_model_test_{$timestamp}@test.com",
                 "user_model_test_{$timestamp}",
                 'Test',
                 'User',
+                'Test User',
                 100,
                 'Test bio for user model tests',
                 'Dublin, Ireland',
@@ -54,14 +55,15 @@ class UserTest extends DatabaseTestCase
 
         // Create secondary test user for search/comparison tests
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, avatar_url, location, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, NOW())",
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, avatar_url, location, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, NOW())",
             [
                 self::$testTenantId,
                 "user_model_test2_{$timestamp}@test.com",
                 "user_model_test2_{$timestamp}",
                 'Jane',
                 'Doe',
+                'Jane Doe',
                 50,
                 '/uploads/test-avatar.jpg',
                 'Cork, Ireland'

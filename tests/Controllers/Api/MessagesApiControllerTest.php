@@ -35,14 +35,15 @@ class MessagesApiControllerTest extends ApiTestCase
         // Create a recipient user for message tests
         $timestamp = time();
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
             [
                 self::$testTenantId,
                 "recipient_{$timestamp}@test.com",
                 "recipient_{$timestamp}",
                 'Recipient',
                 'User',
+                'Recipient User',
                 100
             ]
         );

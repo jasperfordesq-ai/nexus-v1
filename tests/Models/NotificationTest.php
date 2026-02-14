@@ -34,9 +34,9 @@ class NotificationTest extends DatabaseTestCase
         $timestamp = time();
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$testTenantId, "notif_model_test_{$timestamp}@test.com", "notif_model_test_{$timestamp}", 'Notif', 'Model', 100]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$testTenantId, "notif_model_test_{$timestamp}@test.com", "notif_model_test_{$timestamp}", 'Notif', 'Model', 'Notif Model', 100]
         );
         self::$testUserId = (int)Database::getInstance()->lastInsertId();
     }

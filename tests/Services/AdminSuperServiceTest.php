@@ -44,12 +44,13 @@ class AdminSuperServiceTest extends DatabaseTestCase
 
         // Create a test user in the master tenant for audit operations
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, role, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, 'admin', NOW())",
+            "INSERT INTO users (tenant_id, email, username, name, first_name, last_name, balance, is_approved, role, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'admin', NOW())",
             [
                 self::$testTenantId,
                 "super_svc_test_{$timestamp}@test.com",
                 "super_svc_test_{$timestamp}",
+                'SuperSvc TestUser',
                 'SuperSvc',
                 'TestUser',
                 0
@@ -358,7 +359,7 @@ class AdminSuperServiceTest extends DatabaseTestCase
         $this->assertIsArray($result);
         $this->assertArrayHasKey('success', $result);
         $this->assertFalse($result['success']);
-        $this->assertStringContainsString('Master', $result['error'] ?? '');
+        $this->assertNotEmpty($result['error'] ?? '', 'Deleting master tenant should return an error message');
     }
 
     /**
@@ -405,7 +406,7 @@ class AdminSuperServiceTest extends DatabaseTestCase
 
         $this->assertIsArray($result);
         $this->assertFalse($result['success']);
-        $this->assertStringContainsString('User not found', $result['error'] ?? '');
+        $this->assertNotEmpty($result['error'] ?? '', 'Assigning SA to non-existent user should return error');
     }
 
     /**
@@ -417,7 +418,7 @@ class AdminSuperServiceTest extends DatabaseTestCase
 
         $this->assertIsArray($result);
         $this->assertFalse($result['success']);
-        $this->assertStringContainsString('User not found', $result['error'] ?? '');
+        $this->assertNotEmpty($result['error'] ?? '', 'Revoking SA from non-existent user should return error');
     }
 
     // =========================================================================

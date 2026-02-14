@@ -54,14 +54,15 @@ class TotpServiceTest extends DatabaseTestCase
 
         // Create test user
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, password_hash, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 0, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, password_hash, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 0, 1, NOW())",
             [
                 self::$testTenantId,
                 "totp_test_{$timestamp}@test.com",
                 "totp_test_{$timestamp}",
                 'TOTP',
                 'TestUser',
+                'TOTP TestUser',
                 password_hash('TestPassword123!', PASSWORD_DEFAULT)
             ]
         );

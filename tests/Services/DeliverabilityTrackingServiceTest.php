@@ -203,6 +203,7 @@ class DeliverabilityTrackingServiceTest extends DatabaseTestCase
             'email' => $email,
             'first_name' => 'Service',
             'last_name' => 'Test',
+            'name' => 'Service Test',
             'password_hash' => password_hash('password', PASSWORD_DEFAULT),
             'role' => 'member',
             'balance' => 0

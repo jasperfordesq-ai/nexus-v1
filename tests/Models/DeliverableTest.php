@@ -292,6 +292,7 @@ class DeliverableTest extends DatabaseTestCase
         return $this->insertTestData('users', [
             'tenant_id' => $this->testTenantId,
             'email' => $email,
+            'name' => 'Test User',
             'first_name' => 'Test',
             'last_name' => 'User',
             'password_hash' => password_hash('password', PASSWORD_DEFAULT),

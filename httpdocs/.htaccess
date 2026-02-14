@@ -165,8 +165,9 @@ RewriteCond %{REQUEST_URI} r57\.php [NC]
 RewriteRule ^.*$ - [F,L]
 
 # 3. Allow download.php and emergency files to execute directly
+# Note: emergency- condition limited to .php files to avoid blocking API routes
 RewriteCond %{REQUEST_URI} download\.php [NC,OR]
-RewriteCond %{REQUEST_URI} emergency- [NC]
+RewriteCond %{REQUEST_URI} emergency-[^/]*\.php [NC]
 RewriteRule ^ - [L]
 
 # 3.5. Pass Authorization header to PHP (Apache often strips it)

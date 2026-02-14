@@ -46,12 +46,13 @@ abstract class ApiTestCase extends DatabaseTestCase
         self::$testUserEmail = "api_test_user_{$timestamp}@test.com";
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, username, name, first_name, last_name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
             [
                 self::$testTenantId,
                 self::$testUserEmail,
                 "api_test_user_{$timestamp}",
+                'API TestUser',
                 'API',
                 'TestUser',
                 100
@@ -207,12 +208,13 @@ abstract class ApiTestCase extends DatabaseTestCase
         $data = array_merge($defaults, $attributes);
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+            "INSERT INTO users (tenant_id, email, username, name, first_name, last_name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
             [
                 $data['tenant_id'],
                 $data['email'],
                 $data['username'],
+                $data['first_name'] . ' ' . $data['last_name'],
                 $data['first_name'],
                 $data['last_name'],
                 $data['balance'],
