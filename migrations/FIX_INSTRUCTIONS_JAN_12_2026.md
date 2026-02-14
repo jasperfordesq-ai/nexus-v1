@@ -66,12 +66,11 @@ SHOW TABLES LIKE 'org_balance_alerts';
 ### Step 3: Test the Application
 
 1. Restart Apache (XAMPP Control Panel > Apache > Restart)
-2. Visit the following pages to test:
-   - `/hour-timebank/profile/[user_id]` - Test profile pages
-   - `/hour-timebank/resources` - Test SmartMatchingEngine
-   - `/hour-timebank/matches` - Test matches page
-   - `/hour-timebank/leaderboard` - Test gamification
-   - `/hour-timebank/achievements` - Test badges
+2. Visit the following pages to test (via the React frontend at `http://localhost:5173` or `https://app.project-nexus.ie`):
+   - `/profile/[user_id]` - Test profile pages
+   - `/listings` - Test listings and SmartMatchingEngine
+   - `/leaderboard` - Test gamification
+   - `/achievements` - Test badges
 
 3. Check the Apache error log for any remaining errors:
    - Location: `C:\xampp\apache\logs\error.log`
