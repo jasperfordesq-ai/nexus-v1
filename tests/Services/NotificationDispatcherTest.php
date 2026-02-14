@@ -34,9 +34,9 @@ class NotificationDispatcherTest extends DatabaseTestCase
         $timestamp = time();
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$testTenantId, "notif_test_{$timestamp}@test.com", "notif_test_{$timestamp}", 'Notif', 'Test', 100]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$testTenantId, "notif_test_{$timestamp}@test.com", "notif_test_{$timestamp}", 'Notif', 'Test', 'Notif Test', 100]
         );
         self::$testUserId = (int)Database::getInstance()->lastInsertId();
     }

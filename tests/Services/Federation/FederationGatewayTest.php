@@ -40,17 +40,17 @@ class FederationGatewayTest extends DatabaseTestCase
 
         // User in tenant 1
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$tenant1Id, "fed_test_user1_{$timestamp}@test.com", "fed_test_user1_{$timestamp}", 'Fed', 'User1', 100]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$tenant1Id, "fed_test_user1_{$timestamp}@test.com", "fed_test_user1_{$timestamp}", 'Fed', 'User1', 'Fed User1', 100]
         );
         self::$user1Id = (int)Database::getInstance()->lastInsertId();
 
         // User in tenant 2
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$tenant2Id, "fed_test_user2_{$timestamp}@test.com", "fed_test_user2_{$timestamp}", 'Fed', 'User2', 100]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$tenant2Id, "fed_test_user2_{$timestamp}@test.com", "fed_test_user2_{$timestamp}", 'Fed', 'User2', 'Fed User2', 100]
         );
         self::$user2Id = (int)Database::getInstance()->lastInsertId();
     }

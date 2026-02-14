@@ -28,29 +28,29 @@ class OrgTransferRequestTest extends TestCase
 
         // Create test users
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Request', 'Owner', 100, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Request', 'Owner', 'Request Owner', 100, 1, NOW())",
             [self::$testTenantId, "request_owner_{$timestamp}@test.com"]
         );
         self::$testOwnerId = Database::getInstance()->lastInsertId();
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Request', 'Admin', 100, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Request', 'Admin', 'Request Admin', 100, 1, NOW())",
             [self::$testTenantId, "request_admin_{$timestamp}@test.com"]
         );
         self::$testAdminId = Database::getInstance()->lastInsertId();
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Request', 'Member', 100, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Request', 'Member', 'Request Member', 100, 1, NOW())",
             [self::$testTenantId, "request_member_{$timestamp}@test.com"]
         );
         self::$testMemberId = Database::getInstance()->lastInsertId();
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Request', 'Recipient', 0, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Request', 'Recipient', 'Request Recipient', 0, 1, NOW())",
             [self::$testTenantId, "request_recipient_{$timestamp}@test.com"]
         );
         self::$testRecipientId = Database::getInstance()->lastInsertId();

@@ -38,8 +38,8 @@ class MatchControllerTest extends TestCase
 
         // Create test user
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, location, latitude, longitude, is_approved, status, created_at)
-             VALUES (?, ?, 'Controller', 'TestUser', 'Test City', 51.5074, -0.1278, 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, location, latitude, longitude, is_approved, status, created_at)
+             VALUES (?, ?, 'Controller', 'TestUser', 'Controller TestUser', 'Test City', 51.5074, -0.1278, 1, 'active', NOW())",
             [self::$testTenantId, 'controller_test_' . $timestamp . '@test.com']
         );
         self::$testUserId = Database::getInstance()->lastInsertId();

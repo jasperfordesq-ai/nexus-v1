@@ -36,9 +36,9 @@ class TransactionLimitServiceTest extends DatabaseTestCase
 
         // Create test user
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$testTenantId, "limit_test_{$timestamp}@test.com", "limit_test_{$timestamp}", 'Limit', 'Test', 1000]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$testTenantId, "limit_test_{$timestamp}@test.com", "limit_test_{$timestamp}", 'Limit', 'Test', 'Limit Test', 1000]
         );
         self::$testUserId = (int)Database::getInstance()->lastInsertId();
 

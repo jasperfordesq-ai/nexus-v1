@@ -197,6 +197,24 @@ jobs:
           DB_PASSWORD: testing
           REDIS_HOST: 127.0.0.1
 
+      - name: Run Controller Tests
+        run: vendor/bin/phpunit --testsuite=Controllers
+        env:
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: nexus_test
+          DB_USERNAME: root
+          DB_PASSWORD: testing
+          REDIS_HOST: 127.0.0.1
+
+      - name: Run Service Tests
+        run: vendor/bin/phpunit --testsuite=Services
+        env:
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: nexus_test
+          DB_USERNAME: root
+          DB_PASSWORD: testing
+          REDIS_HOST: 127.0.0.1
+
   # ─────────────────────────────────────────────────────────────────
   # Stage 5: Build Assets
   # ─────────────────────────────────────────────────────────────────
@@ -226,6 +244,12 @@ jobs:
           name: build-assets
           path: httpdocs/assets/dist/
           if-no-files-found: ignore
+
+      - name: Build React Frontend
+        working-directory: react-frontend
+        run: |
+          npm ci || npm install
+          npm run build
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 6: Build Docker Image

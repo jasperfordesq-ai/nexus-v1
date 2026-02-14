@@ -40,24 +40,24 @@ class SmartMatchingEngineTest extends TestCase
         // Create test users with coordinates
         // User 1: Has offers, located in city center
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, location, latitude, longitude, is_approved, status, created_at)
-             VALUES (?, ?, 'Test', 'User1', 'City Center', 51.5074, -0.1278, 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, location, latitude, longitude, is_approved, status, created_at)
+             VALUES (?, ?, 'Test', 'User1', 'Test User1', 'City Center', 51.5074, -0.1278, 1, 'active', NOW())",
             [self::$testTenantId, 'test_match_user1_' . $timestamp . '@test.com']
         );
         self::$testUser1Id = Database::getInstance()->lastInsertId();
 
         // User 2: Has requests, located nearby (5km away)
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, location, latitude, longitude, is_approved, status, created_at)
-             VALUES (?, ?, 'Test', 'User2', 'Nearby Town', 51.5200, -0.1000, 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, location, latitude, longitude, is_approved, status, created_at)
+             VALUES (?, ?, 'Test', 'User2', 'Test User2', 'Nearby Town', 51.5200, -0.1000, 1, 'active', NOW())",
             [self::$testTenantId, 'test_match_user2_' . $timestamp . '@test.com']
         );
         self::$testUser2Id = Database::getInstance()->lastInsertId();
 
         // User 3: Has both offers and requests (for mutual matching), located far (50km)
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, location, latitude, longitude, is_approved, status, created_at)
-             VALUES (?, ?, 'Test', 'User3', 'Far City', 52.0000, 0.0000, 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, location, latitude, longitude, is_approved, status, created_at)
+             VALUES (?, ?, 'Test', 'User3', 'Test User3', 'Far City', 52.0000, 0.0000, 1, 'active', NOW())",
             [self::$testTenantId, 'test_match_user3_' . $timestamp . '@test.com']
         );
         self::$testUser3Id = Database::getInstance()->lastInsertId();

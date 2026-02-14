@@ -29,16 +29,16 @@ class MatchApprovalWorkflowServiceTest extends TestCase
 
         // Create test user (member who will receive match)
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, role, is_approved, status, created_at)
-             VALUES (?, ?, 'Test', 'Member', 'member', 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, role, is_approved, status, created_at)
+             VALUES (?, ?, 'Test', 'Member', 'Test Member', 'member', 1, 'active', NOW())",
             [self::$testTenantId, 'test_approval_user_' . $timestamp . '@test.com']
         );
         self::$testUserId = Database::getInstance()->lastInsertId();
 
         // Create test admin (broker who will review matches)
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, role, is_approved, status, created_at)
-             VALUES (?, ?, 'Test', 'Broker', 'broker', 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, role, is_approved, status, created_at)
+             VALUES (?, ?, 'Test', 'Broker', 'Test Broker', 'broker', 1, 'active', NOW())",
             [self::$testTenantId, 'test_approval_admin_' . $timestamp . '@test.com']
         );
         self::$testAdminId = Database::getInstance()->lastInsertId();

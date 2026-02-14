@@ -38,17 +38,17 @@ class FederatedTransactionServiceTest extends DatabaseTestCase
 
         // Sender user in tenant 1 with sufficient balance
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$tenant1Id, "fed_sender_{$timestamp}@test.com", "fed_sender_{$timestamp}", 'Sender', 'User', 100]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$tenant1Id, "fed_sender_{$timestamp}@test.com", "fed_sender_{$timestamp}", 'Sender', 'User', 'Sender User', 100]
         );
         self::$senderUserId = (int)Database::getInstance()->lastInsertId();
 
         // Receiver user in tenant 2
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$tenant2Id, "fed_receiver_{$timestamp}@test.com", "fed_receiver_{$timestamp}", 'Receiver', 'User', 50]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$tenant2Id, "fed_receiver_{$timestamp}@test.com", "fed_receiver_{$timestamp}", 'Receiver', 'User', 'Receiver User', 50]
         );
         self::$receiverUserId = (int)Database::getInstance()->lastInsertId();
     }
@@ -156,9 +156,9 @@ class FederatedTransactionServiceTest extends DatabaseTestCase
         // Create user with zero balance
         $timestamp = time();
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$tenant1Id, "broke_user_{$timestamp}@test.com", "broke_user_{$timestamp}", 'Broke', 'User', 0]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$tenant1Id, "broke_user_{$timestamp}@test.com", "broke_user_{$timestamp}", 'Broke', 'User', 'Broke User', 0]
         );
         $brokeUserId = (int)Database::getInstance()->lastInsertId();
 

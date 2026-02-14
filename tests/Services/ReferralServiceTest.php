@@ -37,17 +37,17 @@ class ReferralServiceTest extends DatabaseTestCase
 
         // Create referrer user
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, xp, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, 0, 1, NOW())",
-            [self::$testTenantId, "referrer_{$timestamp}@test.com", "referrer_{$timestamp}", 'Test', 'Referrer']
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, xp, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, 0, 1, NOW())",
+            [self::$testTenantId, "referrer_{$timestamp}@test.com", "referrer_{$timestamp}", 'Test', 'Referrer', 'Test Referrer']
         );
         self::$testReferrerId = (int)Database::getInstance()->lastInsertId();
 
         // Create referred user (no referral code yet)
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, xp, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, 0, 1, NOW())",
-            [self::$testTenantId, "referred_{$timestamp}@test.com", "referred_{$timestamp}", 'Test', 'Referred']
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, xp, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, 0, 1, NOW())",
+            [self::$testTenantId, "referred_{$timestamp}@test.com", "referred_{$timestamp}", 'Test', 'Referred', 'Test Referred']
         );
         self::$testReferredId = (int)Database::getInstance()->lastInsertId();
 

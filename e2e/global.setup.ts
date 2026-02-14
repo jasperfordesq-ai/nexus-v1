@@ -95,6 +95,150 @@ async function dismissDevNoticeModal(page: any): Promise<void> {
   }
 }
 
+/**
+ * Authenticate admin user via the React SPA API (JWT-based).
+ *
+ * The React admin panel uses JWT tokens stored in localStorage,
+ * not session cookies. This function calls the auth API directly,
+ * then injects the JWT tokens into the browser's localStorage
+ * via the storage state file.
+ */
+async function authenticateViaApi(
+  authContext: any,
+  authPage: any,
+  credentials: { email: string; password: string; theme: string },
+  authDir: string
+): Promise<void> {
+  // The PHP API is accessible at the same BASE_URL for local dev (proxied)
+  // or via the API_BASE_URL env var for CI/production
+  const apiBaseUrl = process.env.E2E_API_URL || BASE_URL;
+
+  console.log(`   Authenticating admin via API at ${apiBaseUrl}/api/auth/login...`);
+
+  // Call the auth API directly to get JWT tokens
+  const loginResponse = await authPage.request.post(`${apiBaseUrl}/api/auth/login`, {
+    data: {
+      email: credentials.email,
+      password: credentials.password,
+      tenant_slug: TENANT_SLUG,
+    },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Tenant-ID': TENANT_SLUG,
+    },
+  });
+
+  if (!loginResponse.ok()) {
+    const body = await loginResponse.text();
+    throw new Error(`API login failed (${loginResponse.status()}): ${body}`);
+  }
+
+  const loginData = await loginResponse.json();
+
+  // Extract tokens from response — API returns {success, data: {access_token, refresh_token, user, tenant_id}}
+  const accessToken = loginData?.data?.access_token || loginData?.access_token;
+  const refreshToken = loginData?.data?.refresh_token || loginData?.refresh_token;
+  const tenantId = loginData?.data?.tenant_id || loginData?.tenant_id;
+
+  if (!accessToken) {
+    throw new Error('No access_token in login response: ' + JSON.stringify(loginData));
+  }
+
+  console.log('   JWT tokens obtained, injecting into localStorage...');
+
+  // Navigate to the React app origin so we can set localStorage
+  // Use the React frontend URL (may differ from API URL in Docker setup)
+  const reactUrl = process.env.E2E_REACT_URL || BASE_URL;
+  await authPage.goto(`${reactUrl}/login`, { waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {
+    // If /login redirects or fails, try the root
+    return authPage.goto(reactUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
+  });
+
+  // Inject JWT tokens into localStorage
+  await authPage.evaluate(
+    ({ accessToken, refreshToken, tenantId }: { accessToken: string; refreshToken?: string; tenantId?: string | number }) => {
+      localStorage.setItem('nexus_access_token', accessToken);
+      if (refreshToken) {
+        localStorage.setItem('nexus_refresh_token', refreshToken);
+      }
+      if (tenantId) {
+        localStorage.setItem('nexus_tenant_id', String(tenantId));
+      }
+      // Dismiss dev notice
+      localStorage.setItem('dev_notice_dismissed', '2.1');
+    },
+    { accessToken, refreshToken, tenantId: tenantId ? String(tenantId) : undefined }
+  );
+
+  // Save storage state (includes localStorage with JWT tokens)
+  const storagePath = path.join(authDir, 'admin.json');
+  await authContext.storageState({ path: storagePath });
+}
+
+/**
+ * Authenticate user via the legacy PHP form login (session-based).
+ * Used for modern/civicone test users that browse legacy PHP pages.
+ */
+async function authenticateViaForm(
+  authContext: any,
+  authPage: any,
+  credentials: { email: string; password: string; theme: string },
+  userType: string,
+  authDir: string
+): Promise<void> {
+  // Navigate to login page with retry
+  const loginAccessible = await checkServerWithRetry(
+    authPage,
+    `${BASE_URL}/${TENANT_SLUG}/login`,
+    2
+  );
+
+  if (!loginAccessible) {
+    throw new Error('Login page not accessible');
+  }
+
+  // Wait a moment for any modals to appear
+  await authPage.waitForTimeout(500);
+
+  // Check if dev notice modal appeared
+  const devNoticeBtn = authPage.locator('#dev-notice-continue');
+  if (await devNoticeBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
+    console.log('   Dismissing dev notice modal...');
+    await devNoticeBtn.click();
+    await authPage.waitForTimeout(300);
+  }
+
+  // Wait for form to be ready
+  await authPage.waitForSelector('input[name="email"], input[type="email"]', { timeout: 5000 });
+
+  // Fill login form
+  const emailInput = authPage.locator('form input[name="email"], form input[type="email"]').first();
+  const passwordInput = authPage.locator('form input[name="password"], form input[type="password"]').first();
+
+  await emailInput.fill(credentials.email);
+  await passwordInput.fill(credentials.password);
+
+  // Submit form
+  const loginForm = authPage.locator('form:has(input[name="password"])').first();
+  const submitBtn = loginForm.locator('button[type="submit"], input[type="submit"]').first();
+  await submitBtn.click();
+
+  // Wait for navigation
+  await authPage.waitForURL(/\/(dashboard|home|feed|login|\/)/, { timeout: 15000 });
+
+  // Check if login was successful
+  const currentUrl = authPage.url();
+  if (currentUrl.includes('/login')) {
+    const errorMessage = await authPage.locator('.error, .alert-danger').textContent().catch(() => '');
+    throw new Error(`Login failed: ${errorMessage || 'Invalid credentials'}`);
+  }
+
+  // Save storage state
+  const storageName = userType === 'modern' ? 'user-modern' : userType === 'civicone' ? 'user-civicone' : userType;
+  const storagePath = path.join(authDir, `${storageName}.json`);
+  await authContext.storageState({ path: storagePath });
+}
+
 async function globalSetup(config: FullConfig) {
   console.log('\n🚀 Starting E2E Global Setup...\n');
 
@@ -154,56 +298,13 @@ async function globalSetup(config: FullConfig) {
         await dismissDevNoticeModal(authPage);
 
         try {
-          // Navigate to login page with retry
-          const loginAccessible = await checkServerWithRetry(
-            authPage,
-            `${BASE_URL}/${TENANT_SLUG}/login`,
-            2
-          );
-
-          if (!loginAccessible) {
-            throw new Error('Login page not accessible');
+          // Admin users authenticate via the React SPA API (JWT-based)
+          // Other users use the legacy PHP form login
+          if (userType === 'admin') {
+            await authenticateViaApi(authContext, authPage, credentials, authDir);
+          } else {
+            await authenticateViaForm(authContext, authPage, credentials, userType, authDir);
           }
-
-          // Wait a moment for any modals to appear
-          await authPage.waitForTimeout(500);
-
-          // Check if dev notice modal appeared despite our localStorage setting
-          const devNoticeBtn = authPage.locator('#dev-notice-continue');
-          if (await devNoticeBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-            console.log('   Dismissing dev notice modal...');
-            await devNoticeBtn.click();
-            await authPage.waitForTimeout(300);
-          }
-
-          // Wait for form to be ready
-          await authPage.waitForSelector('input[name="email"], input[type="email"]', { timeout: 5000 });
-
-          // Fill login form - be more specific with selectors to avoid search forms
-          const emailInput = authPage.locator('form input[name="email"], form input[type="email"]').first();
-          const passwordInput = authPage.locator('form input[name="password"], form input[type="password"]').first();
-
-          await emailInput.fill(credentials.email);
-          await passwordInput.fill(credentials.password);
-
-          // Submit form - find the submit button within the same form as our inputs
-          const loginForm = authPage.locator('form:has(input[name="password"])').first();
-          const submitBtn = loginForm.locator('button[type="submit"], input[type="submit"]').first();
-          await submitBtn.click();
-
-          // Wait for navigation to dashboard or home (or error)
-          await authPage.waitForURL(/\/(dashboard|home|feed|login|\/)/, { timeout: 15000 });
-
-          // Check if login was successful (not still on login page with error)
-          const currentUrl = authPage.url();
-          if (currentUrl.includes('/login')) {
-            const errorMessage = await authPage.locator('.error, .alert-danger').textContent().catch(() => '');
-            throw new Error(`Login failed: ${errorMessage || 'Invalid credentials'}`);
-          }
-
-          // Save storage state
-          const storagePath = path.join(authDir, `${userType === 'modern' ? 'user-modern' : userType === 'civicone' ? 'user-civicone' : userType}.json`);
-          await authContext.storageState({ path: storagePath });
 
           console.log(`✅ Auth session saved for ${userType}\n`);
         } catch (error) {

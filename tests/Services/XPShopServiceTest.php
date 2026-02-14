@@ -37,9 +37,9 @@ class XPShopServiceTest extends DatabaseTestCase
 
         // Create test user with XP
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, xp, level, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, 1, NOW())",
-            [self::$testTenantId, "xpshop_user_{$timestamp}@test.com", "xpshop_user_{$timestamp}", 'XP', 'Shopper', self::$initialXp]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, xp, level, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1, NOW())",
+            [self::$testTenantId, "xpshop_user_{$timestamp}@test.com", "xpshop_user_{$timestamp}", 'XP', 'Shopper', 'XP Shopper', self::$initialXp]
         );
         self::$testUserId = (int)Database::getInstance()->lastInsertId();
 

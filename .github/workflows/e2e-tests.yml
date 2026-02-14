@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [chromium-modern, unauthenticated]
+        project: [chromium-modern, unauthenticated, admin]
 
     steps:
       - name: Checkout repository
@@ -83,42 +83,6 @@ jobs:
           name: e2e-screenshots-${{ matrix.project }}
           path: e2e/screenshots/
           retention-days: 7
-
-  e2e-admin:
-    name: Admin E2E Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: e2e-tests
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install chromium --with-deps
-
-      - name: Run Admin E2E tests
-        run: npx playwright test --project=admin
-        continue-on-error: true
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report-admin
-          path: |
-            e2e/reports/
-            e2e/test-results/
-          retention-days: 30
 
   e2e-cross-browser:
     name: Cross-Browser E2E Tests

@@ -66,14 +66,15 @@ abstract class HttpIntegrationTestCase extends DatabaseTestCase
         self::$testUserEmail = "http_test_user_{$timestamp}@test.com";
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, password, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, password, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())",
             [
                 self::$testTenantId,
                 self::$testUserEmail,
                 "http_test_user_{$timestamp}",
                 'HTTP',
                 'TestUser',
+                'HTTP TestUser',
                 password_hash('TestPassword123!', PASSWORD_DEFAULT),
                 100
             ]
@@ -505,14 +506,15 @@ abstract class HttpIntegrationTestCase extends DatabaseTestCase
         $data = array_merge($defaults, $attributes);
 
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, password, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, password, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
             [
                 $data['tenant_id'],
                 $data['email'],
                 $data['username'],
                 $data['first_name'],
                 $data['last_name'],
+                $data['first_name'] . ' ' . $data['last_name'],
                 $data['password'],
                 $data['balance'],
                 $data['is_approved']

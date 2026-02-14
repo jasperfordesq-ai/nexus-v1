@@ -27,16 +27,16 @@ class OrgWalletTest extends TestCase
 
         // Create test owner
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Org', 'Owner', ?, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Org', 'Owner', 'Org Owner', ?, 1, NOW())",
             [self::$testTenantId, "org_owner_{$timestamp}@test.com", self::$initialUserBalance]
         );
         self::$testOwnerId = Database::getInstance()->lastInsertId();
 
         // Create test member
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, 'Org', 'Member', ?, 1, NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, 'Org', 'Member', 'Org Member', ?, 1, NOW())",
             [self::$testTenantId, "org_member_{$timestamp}@test.com", self::$initialUserBalance]
         );
         self::$testMemberId = Database::getInstance()->lastInsertId();

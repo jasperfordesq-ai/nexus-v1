@@ -37,17 +37,17 @@ class WalletServiceTest extends DatabaseTestCase
 
         // Create test requester user
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$testTenantId, "wallet_requester_{$timestamp}@test.com", "wallet_requester_{$timestamp}", 'Wallet', 'Requester', 100]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$testTenantId, "wallet_requester_{$timestamp}@test.com", "wallet_requester_{$timestamp}", 'Wallet', 'Requester', 'Wallet Requester', 100]
         );
         self::$testUserId = (int)Database::getInstance()->lastInsertId();
 
         // Create test recipient user
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$testTenantId, "wallet_recipient_{$timestamp}@test.com", "wallet_recipient_{$timestamp}", 'Wallet', 'Recipient', 50]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$testTenantId, "wallet_recipient_{$timestamp}@test.com", "wallet_recipient_{$timestamp}", 'Wallet', 'Recipient', 'Wallet Recipient', 50]
         );
         self::$testRecipientId = (int)Database::getInstance()->lastInsertId();
 
@@ -353,9 +353,9 @@ class WalletServiceTest extends DatabaseTestCase
         // Create a non-member user
         $timestamp = time();
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$testTenantId, "nonmember_{$timestamp}@test.com", "nonmember_{$timestamp}", 'Non', 'Member', 0]
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [self::$testTenantId, "nonmember_{$timestamp}@test.com", "nonmember_{$timestamp}", 'Non', 'Member', 'Non Member', 0]
         );
         $nonMemberId = (int)Database::getInstance()->lastInsertId();
 

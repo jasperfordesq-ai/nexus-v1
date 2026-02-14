@@ -27,8 +27,8 @@ class GeocodingServiceTest extends TestCase
 
         // Create test user with location but no coordinates
         Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, location, latitude, longitude, is_approved, status, created_at)
-             VALUES (?, ?, 'Geo', 'TestUser', 'London, UK', NULL, NULL, 1, 'active', NOW())",
+            "INSERT INTO users (tenant_id, email, first_name, last_name, name, location, latitude, longitude, is_approved, status, created_at)
+             VALUES (?, ?, 'Geo', 'TestUser', 'Geo TestUser', 'London, UK', NULL, NULL, 1, 'active', NOW())",
             [self::$testTenantId, 'geocoding_test_' . $timestamp . '@test.com']
         );
         self::$testUserId = Database::getInstance()->lastInsertId();
