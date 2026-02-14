@@ -82,6 +82,7 @@ const ContactPage = lazy(() => import('@/pages/public/ContactPage'));
 const TermsPage = lazy(() => import('@/pages/public/TermsPage'));
 const PrivacyPage = lazy(() => import('@/pages/public/PrivacyPage'));
 const AccessibilityPage = lazy(() => import('@/pages/public/AccessibilityPage'));
+const CookiesPage = lazy(() => import('@/pages/public/CookiesPage'));
 const HelpCenterPage = lazy(() => import('@/pages/help/HelpCenterPage'));
 
 /**
@@ -109,6 +110,7 @@ function AppRoutes() {
         <Route path="terms" element={<TermsPage />} />
         <Route path="privacy" element={<PrivacyPage />} />
         <Route path="accessibility" element={<AccessibilityPage />} />
+        <Route path="cookies" element={<CookiesPage />} />
 
         {/* Public: Blog (feature-gated) */}
         <Route path="blog" element={

@@ -64,7 +64,7 @@ export function BrokerDashboard() {
     try {
       const res = await adminBroker.getDashboard();
       if (res.success && res.data) {
-        setStats(res.data as unknown as BrokerDashboardStats);
+        setStats(res.data);
       }
     } catch {
       // Silently handle — stats will show as loading

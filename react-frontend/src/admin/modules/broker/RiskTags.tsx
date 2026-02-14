@@ -35,13 +35,8 @@ export function RiskTagsPage() {
       const res = await adminBroker.getRiskTags({
         risk_level: riskLevel === 'all' ? undefined : riskLevel,
       });
-      if (res.success && res.data) {
-        const data = res.data as unknown;
-        if (Array.isArray(data)) {
-          setItems(data);
-        } else if (data && typeof data === 'object' && 'data' in (data as Record<string, unknown>)) {
-          setItems((data as { data: RiskTag[] }).data || []);
-        }
+      if (res.success && Array.isArray(res.data)) {
+        setItems(res.data);
       }
     } catch {
       // Silently handle

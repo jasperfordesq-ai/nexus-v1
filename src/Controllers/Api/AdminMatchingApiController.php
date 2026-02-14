@@ -229,7 +229,7 @@ class AdminMatchingApiController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $notes = trim($input['notes'] ?? '');
 
         $success = MatchApprovalWorkflowService::approveMatch($id, $adminId, $notes);
@@ -254,12 +254,12 @@ class AdminMatchingApiController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $reason = trim($input['reason'] ?? '');
 
         if (empty($reason)) {
             $this->respondWithError(
-                ApiErrorCodes::VALIDATION_FAILED,
+                ApiErrorCodes::VALIDATION_ERROR,
                 'Rejection reason is required',
                 'reason',
                 422
@@ -338,7 +338,7 @@ class AdminMatchingApiController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $tenantId = TenantContext::getId();
 
         // Get current tenant configuration
@@ -439,7 +439,7 @@ class AdminMatchingApiController extends BaseApiController
                 'entries_cleared' => $deleted,
             ]);
         } catch (\Exception $e) {
-            $this->error('Failed to clear cache: ' . $e->getMessage(), 500);
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to clear cache: ' . $e->getMessage(), null, 500);
         }
     }
 
@@ -504,7 +504,7 @@ class AdminMatchingApiController extends BaseApiController
                 'approval_rate' => $approvalRate,
             ]);
         } catch (\Exception $e) {
-            $this->error('Failed to load matching stats: ' . $e->getMessage(), 500);
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to load matching stats: ' . $e->getMessage(), null, 500);
         }
     }
 }

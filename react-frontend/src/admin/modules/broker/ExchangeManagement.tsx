@@ -52,16 +52,10 @@ export function ExchangeManagement() {
         page,
         status: status === 'all' ? undefined : status,
       });
-      if (res.success && res.data) {
-        const data = res.data as unknown;
-        if (Array.isArray(data)) {
-          setItems(data);
-          setTotal(data.length);
-        } else if (data && typeof data === 'object') {
-          const pd = data as { data: ExchangeRequest[]; meta?: { total: number } };
-          setItems(pd.data || []);
-          setTotal(pd.meta?.total || 0);
-        }
+      if (res.success && Array.isArray(res.data)) {
+        setItems(res.data as ExchangeRequest[]);
+        const meta = res.meta as Record<string, unknown> | undefined;
+        setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
       // Silently handle

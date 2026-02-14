@@ -196,6 +196,31 @@ class AdminUsersApiController extends BaseApiController
             $status = 'banned';
         }
 
+        // Fetch user badges
+        $badges = [];
+        try {
+            $badgeRows = Database::query(
+                "SELECT ub.id, ub.badge_key, ub.awarded_at, ub.badge_name, ub.badge_description, ub.badge_icon
+                 FROM user_badges ub
+                 WHERE ub.user_id = ?
+                 ORDER BY ub.awarded_at DESC",
+                [$id]
+            )->fetchAll();
+
+            $badges = array_map(function ($b) {
+                return [
+                    'id' => (int) $b['id'],
+                    'name' => $b['badge_name'] ?? $b['badge_key'] ?? '',
+                    'slug' => $b['badge_key'] ?? '',
+                    'description' => $b['badge_description'] ?? '',
+                    'icon' => $b['badge_icon'] ?? null,
+                    'awarded_at' => $b['awarded_at'] ?? '',
+                ];
+            }, $badgeRows);
+        } catch (\Throwable $e) {
+            // user_badges table may not exist or have different schema
+        }
+
         $this->respondWithData([
             'id' => (int) $user['id'],
             'name' => trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')),
@@ -205,13 +230,16 @@ class AdminUsersApiController extends BaseApiController
             'avatar_url' => $user['avatar_url'] ?? null,
             'location' => $user['location'] ?? null,
             'bio' => $user['bio'] ?? null,
+            'tagline' => $user['tagline'] ?? null,
             'phone' => $user['phone'] ?? null,
             'role' => $user['role'] ?? 'member',
             'status' => $status,
             'is_super_admin' => (bool) ($user['is_super_admin'] ?? false),
+            'is_admin' => in_array($user['role'] ?? '', ['admin', 'tenant_admin']),
             'balance' => (float) ($user['balance'] ?? 0),
             'profile_type' => $user['profile_type'] ?? 'individual',
             'organization_name' => $user['organization_name'] ?? null,
+            'badges' => $badges,
             'created_at' => $user['created_at'],
             'last_active_at' => $user['last_active_at'] ?? null,
         ]);
@@ -235,6 +263,11 @@ class AdminUsersApiController extends BaseApiController
         $password = $input['password'] ?? '';
         $role = $input['role'] ?? 'member';
         $location = trim($input['location'] ?? '');
+
+        // Auto-generate password if not provided
+        if (empty($password)) {
+            $password = bin2hex(random_bytes(12));
+        }
 
         // Validation
         $errors = [];
@@ -337,6 +370,21 @@ class AdminUsersApiController extends BaseApiController
         if (isset($input['bio'])) {
             $updates[] = 'bio = ?';
             $params[] = trim($input['bio']);
+        }
+        if (isset($input['tagline'])) {
+            $updates[] = 'tagline = ?';
+            $params[] = trim($input['tagline']);
+        }
+        if (isset($input['status'])) {
+            $allowedStatuses = ['active', 'suspended', 'banned'];
+            if (in_array($input['status'], $allowedStatuses)) {
+                $updates[] = 'status = ?';
+                $params[] = $input['status'];
+                // Also update is_approved for active status
+                if ($input['status'] === 'active') {
+                    $updates[] = 'is_approved = 1';
+                }
+            }
         }
 
         if (empty($updates)) {
