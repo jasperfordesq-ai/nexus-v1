@@ -592,15 +592,18 @@ class TenantContext
             // Use the TokenService if available, otherwise decode manually
             if (class_exists('\\Nexus\\Services\\TokenService')) {
                 $payload = \Nexus\Services\TokenService::validateToken($token);
-                if ($payload && isset($payload['sub'])) {
+                $userId = $payload['user_id'] ?? $payload['sub'] ?? null;
+                if ($payload && $userId) {
                     // Look up user to check super admin status
                     $db = Database::getConnection();
-                    $stmt = $db->prepare("SELECT is_super_admin, is_tenant_super_admin FROM users WHERE id = ?");
-                    $stmt->execute([$payload['sub']]);
+                    $stmt = $db->prepare("SELECT is_super_admin, is_tenant_super_admin, role FROM users WHERE id = ?");
+                    $stmt->execute([$userId]);
                     $user = $stmt->fetch();
 
                     if ($user) {
-                        return !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']);
+                        return !empty($user['is_super_admin'])
+                            || !empty($user['is_tenant_super_admin'])
+                            || in_array($user['role'] ?? '', ['tenant_admin', 'admin'], true);
                     }
                 }
             }
