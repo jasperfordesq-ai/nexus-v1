@@ -70,6 +70,7 @@ if ($suite !== 'all') {
         'ai' => 'tests/Controllers/Api/AiApiControllerTest.php',
         'push' => 'tests/Controllers/Api/PushApiControllerTest.php',
         'webauthn' => 'tests/Controllers/Api/WebAuthnApiControllerTest.php',
+        'super-admin' => 'tests/Controllers/Api/AdminSuperApiControllerTest.php',
         'api-all' => 'tests/Controllers/Api/',
     ];
 
@@ -186,6 +187,7 @@ AVAILABLE TEST SUITES:
     ai                   AI-powered features (chat, generation)
     push                 Push notifications
     webauthn             WebAuthn passwordless authentication
+    super-admin          Super Admin Panel endpoints
     api-all              All API controller tests
 
 EXAMPLES:

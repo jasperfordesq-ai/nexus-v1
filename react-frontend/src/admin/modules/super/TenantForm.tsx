@@ -91,13 +91,7 @@ export function TenantForm() {
     try {
       const res = await adminSuper.getTenant(Number(id));
       if (res.success && res.data) {
-        let tenant: SuperAdminTenantDetail;
-        const d = res.data as unknown;
-        if (d && typeof d === 'object' && 'data' in d) {
-          tenant = (d as { data: SuperAdminTenantDetail }).data;
-        } else {
-          tenant = d as SuperAdminTenantDetail;
-        }
+        const tenant = res.data as SuperAdminTenantDetail;
         setForm({
           name: tenant.name || '',
           slug: tenant.slug || '',
@@ -140,12 +134,7 @@ export function TenantForm() {
     try {
       const res = await adminSuper.listTenants({ hub: true });
       if (res.success && res.data) {
-        const d = res.data as unknown;
-        if (Array.isArray(d)) {
-          setParentTenants(d);
-        } else if (d && typeof d === 'object' && 'data' in d) {
-          setParentTenants((d as { data: SuperAdminTenant[] }).data);
-        }
+        setParentTenants(Array.isArray(res.data) ? res.data : []);
       }
     } catch {
       // Non-critical

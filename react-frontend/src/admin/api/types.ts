@@ -833,7 +833,9 @@ export interface BulkUpdateTenantsPayload {
 
 export interface BulkOperationResult {
   success: boolean;
+  moved_count?: number;
   updated_count: number;
+  total_requested: number;
   errors: string[];
 }
 

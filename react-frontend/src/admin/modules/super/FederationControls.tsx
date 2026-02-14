@@ -19,7 +19,7 @@ export function FederationControls() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [lockdownConfirm, setLockdownConfirm] = useState(false);
-  const [lockdownReason, _setLockdownReason] = useState('');
+  const [lockdownReason, setLockdownReason] = useState('');
   const [addTenantId, setAddTenantId] = useState('');
   const [partnerAction, setPartnerAction] = useState<{ type: 'suspend' | 'terminate'; id: number } | null>(null);
 
@@ -30,9 +30,9 @@ export function FederationControls() {
       adminSuper.getWhitelist(),
       adminSuper.getFederationPartnerships(),
     ]);
-    if (ctrlRes.success && ctrlRes.data) setControls(ctrlRes.data as unknown as FederationSystemControls);
-    if (wlRes.success && wlRes.data) setWhitelist(Array.isArray(wlRes.data) ? wlRes.data as FederationWhitelistEntry[] : []);
-    if (pRes.success && pRes.data) setPartnerships(Array.isArray(pRes.data) ? pRes.data as FederationPartnership[] : []);
+    if (ctrlRes.success && ctrlRes.data) setControls(ctrlRes.data);
+    if (wlRes.success && wlRes.data) setWhitelist(Array.isArray(wlRes.data) ? wlRes.data : []);
+    if (pRes.success && pRes.data) setPartnerships(Array.isArray(pRes.data) ? pRes.data : []);
     setLoading(false);
   }, []);
 
@@ -88,7 +88,11 @@ export function FederationControls() {
 
   if (loading || !controls) return <div className="p-8 text-center text-default-400">Loading federation controls...</div>;
 
-  const featureToggles = [
+  type BooleanControlKey = Exclude<{
+    [K in keyof FederationSystemControls]: FederationSystemControls[K] extends boolean ? K : never;
+  }[keyof FederationSystemControls], undefined>;
+
+  const featureToggles: Array<{ key: BooleanControlKey; label: string }> = [
     { key: 'cross_tenant_profiles_enabled', label: 'Cross-Tenant Profiles' },
     { key: 'cross_tenant_messaging_enabled', label: 'Cross-Tenant Messaging' },
     { key: 'cross_tenant_transactions_enabled', label: 'Cross-Tenant Transactions' },
@@ -145,7 +149,7 @@ export function FederationControls() {
             {featureToggles.map(({ key, label }) => (
               <div key={key} className="flex items-center justify-between">
                 <span className="text-sm">{label}</span>
-                <Switch size="sm" isSelected={(controls as unknown as Record<string, unknown>)[key] as boolean}
+                <Switch size="sm" isSelected={controls[key]}
                   isDisabled={saving}
                   onValueChange={(v) => updateControl(key, v)} />
               </div>
@@ -202,12 +206,22 @@ export function FederationControls() {
         </Card>
       </div>
 
-      <ConfirmModal isOpen={lockdownConfirm} onClose={() => setLockdownConfirm(false)}
+      <ConfirmModal isOpen={lockdownConfirm} onClose={() => { setLockdownConfirm(false); setLockdownReason(''); }}
         onConfirm={handleLockdown}
         title={controls.is_locked_down ? 'Lift Lockdown' : 'Emergency Lockdown'}
         message={controls.is_locked_down ? 'Lift the emergency lockdown?' : 'This will immediately disable ALL federation features.'}
         confirmLabel={controls.is_locked_down ? 'Lift' : 'Activate Lockdown'}
-        confirmColor={controls.is_locked_down ? 'primary' : 'danger'} />
+        confirmColor={controls.is_locked_down ? 'primary' : 'danger'}>
+        {!controls.is_locked_down && (
+          <Input
+            label="Lockdown Reason"
+            placeholder="Describe reason for emergency lockdown..."
+            value={lockdownReason}
+            onValueChange={setLockdownReason}
+            className="mt-3"
+          />
+        )}
+      </ConfirmModal>
 
       <ConfirmModal isOpen={!!partnerAction} onClose={() => setPartnerAction(null)}
         onConfirm={handlePartnerAction}

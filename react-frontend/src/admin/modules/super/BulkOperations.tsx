@@ -7,7 +7,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
-import type { SuperAdminTenant, SuperAdminUser } from '../../api/types';
+import type { SuperAdminTenant, SuperAdminUser, BulkOperationResult } from '../../api/types';
 
 export function BulkOperations() {
   usePageTitle('Super Admin - Bulk Operations');
@@ -58,8 +58,8 @@ export function BulkOperations() {
       grant_super_admin: grantSA,
     });
     if (res?.success) {
-      const data = res.data as unknown as { updated_count?: number };
-      toast.success(`Moved ${data?.updated_count || selectedUserIds.size} user(s)`);
+      const result = res.data as BulkOperationResult | undefined;
+      toast.success(`Moved ${result?.updated_count || selectedUserIds.size} user(s)`);
       setSelectedUserIds(new Set());
       loadUsersForTenant(sourceTenant);
     } else {
@@ -76,8 +76,8 @@ export function BulkOperations() {
       action: bulkAction as 'activate' | 'deactivate' | 'enable_hub' | 'disable_hub',
     });
     if (res?.success) {
-      const data = res.data as unknown as { updated_count?: number };
-      toast.success(`Updated ${data?.updated_count || selectedTenantIds.size} tenant(s)`);
+      const result = res.data as BulkOperationResult | undefined;
+      toast.success(`Updated ${result?.updated_count || selectedTenantIds.size} tenant(s)`);
       setSelectedTenantIds(new Set());
       loadTenants();
     } else {

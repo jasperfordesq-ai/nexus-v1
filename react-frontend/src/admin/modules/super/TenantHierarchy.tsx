@@ -111,12 +111,7 @@ export function TenantHierarchy() {
     try {
       const res = await adminSuper.getHierarchy();
       if (res.success && res.data) {
-        const d = res.data as unknown;
-        if (Array.isArray(d)) {
-          setHierarchy(d);
-        } else if (d && typeof d === 'object' && 'data' in d) {
-          setHierarchy((d as { data: TenantHierarchyNode[] }).data);
-        }
+        setHierarchy(Array.isArray(res.data) ? res.data : []);
       }
     } catch {
       toast.error('Failed to load hierarchy');

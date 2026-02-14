@@ -38,7 +38,7 @@ export function SuperUserForm() {
     setLoading(true);
     const res = await adminSuper.getUser(Number(id));
     if (res.success && res.data) {
-      const u = res.data as unknown as SuperAdminUserDetail;
+      const u = res.data as SuperAdminUserDetail;
       setForm({
         tenant_id: String(u.tenant_id), first_name: u.first_name, last_name: u.last_name,
         email: u.email, password: '', role: u.role, location: u.location || '',

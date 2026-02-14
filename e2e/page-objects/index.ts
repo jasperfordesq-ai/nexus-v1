@@ -19,3 +19,4 @@ export {
   AdminSettingsPage,
   AdminTimebankingPage,
 } from './AdminPage';
+export { SuperAdminPage } from './SuperAdminPage';
