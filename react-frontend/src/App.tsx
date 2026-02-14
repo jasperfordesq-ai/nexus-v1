@@ -27,6 +27,11 @@ import { LoadingScreen, ErrorBoundary } from '@/components/feedback';
 // Auth Pages (not lazy loaded - critical path)
 import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from '@/pages/auth';
 
+// Admin Panel
+import { AdminLayout } from '@/admin/AdminLayout';
+import { AdminRoute } from '@/admin/AdminRoute';
+import { AdminRoutes } from '@/admin/routes';
+
 // Lazy-loaded Pages
 const HomePage = lazy(() => import('@/pages/public/HomePage'));
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
@@ -356,6 +361,13 @@ function AppRoutes() {
 
         {/* 404 Fallback */}
         <Route path="*" element={<NotFoundPage />} />
+      </Route>
+
+      {/* Admin Panel (separate layout, no main navbar/footer) */}
+      <Route path="admin" element={<AdminRoute />}>
+        <Route element={<AdminLayout />}>
+          {AdminRoutes()}
+        </Route>
       </Route>
     </>
   );

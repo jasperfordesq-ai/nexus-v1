@@ -20,16 +20,16 @@ project-nexus/
 │       ├── MatchApprovalWorkflowService.php      [NEW] Approval logic
 │       └── SmartMatchingEngine.php               [MODIFIED] +approval integration
 │
-├── views/
+├── views/                                          (legacy PHP admin panel — being migrated to React)
 │   ├── modern/
 │   │   └── admin/
 │   │       └── match-approvals/
-│   │           └── index.php                     [NEW] Modern dashboard
+│   │           └── index.php                     [NEW] Admin panel dashboard (PHP)
 │   │
 │   └── civicone/
 │       └── admin/
 │           └── match-approvals/
-│               └── index.php                     [NEW] CivicOne dashboard
+│               └── index.php                     [NEW] Admin panel dashboard (PHP)
 │
 ├── httpdocs/
 │   └── routes.php                                [MODIFIED] +approval & theme routes
@@ -64,8 +64,8 @@ project-nexus/
 | `migrations/2026_02_07_match_approval_workflow.sql` | 55 | Database schema for approvals + theme column |
 | `src/Services/MatchApprovalWorkflowService.php` | ~500 | Core approval workflow service |
 | `src/Controllers/Admin/MatchApprovalsController.php` | ~220 | Admin dashboard controller |
-| `views/modern/admin/match-approvals/index.php` | ~450 | Modern theme admin view |
-| `views/civicone/admin/match-approvals/index.php` | ~150 | CivicOne theme admin view |
+| `views/modern/admin/match-approvals/index.php` | ~450 | Admin panel view (PHP — being migrated to React) |
+| `views/civicone/admin/match-approvals/index.php` | ~150 | Admin panel view (PHP — being migrated to React) |
 | `react-frontend/src/contexts/ThemeContext.tsx` | ~180 | React theme context |
 | `docs/FEATURE_IMPLEMENTATION_2026-02-07.md` | ~350 | Feature documentation |
 

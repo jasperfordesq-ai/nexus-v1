@@ -14,7 +14,6 @@ The E2E test suite provides comprehensive coverage of:
 - Wallet/Time credit transfers
 - Member directory and profiles
 - Admin panel operations
-- Theme testing (Modern and CivicOne)
 - Mobile responsiveness
 - Accessibility compliance
 
@@ -71,8 +70,7 @@ npm run test:e2e:ui
 npm run test:e2e:debug
 
 # Run specific test projects
-npm run test:e2e:chrome      # Chrome with Modern theme
-npm run test:e2e:civicone    # Chrome with CivicOne theme
+npm run test:e2e:chrome      # Chrome
 npm run test:e2e:firefox     # Firefox
 npm run test:e2e:mobile      # Mobile Chrome
 npm run test:e2e:auth        # Authentication tests only
@@ -129,9 +127,8 @@ The test suite is configured with multiple projects:
 
 | Project | Description |
 |---------|-------------|
-| `chromium-modern` | Chrome with Modern theme (default) |
-| `chromium-civicone` | Chrome with CivicOne (GOV.UK) theme |
-| `firefox-modern` | Firefox with Modern theme |
+| `chromium` | Chrome (React frontend) |
+| `firefox` | Firefox (React frontend) |
 | `mobile-chrome` | Mobile Chrome (Pixel 5) |
 | `mobile-safari` | Mobile Safari (iPhone 12) |
 | `admin` | Admin panel tests with admin auth |
@@ -247,7 +244,7 @@ Set these in your repository settings:
 - Wait for network idle after actions
 - Check for both success states and error handling
 - Test accessibility basics (headings, labels, focus)
-- Test both themes when making UI changes
+- Test light and dark mode when making UI changes
 
 ### Don'ts
 
@@ -324,7 +321,7 @@ When adding new tests:
 2. Add Page Objects for new pages
 3. Update this documentation
 4. Ensure tests pass locally before pushing
-5. Consider theme compatibility
+5. Test in both light and dark mode
 
 ## Resources
 
