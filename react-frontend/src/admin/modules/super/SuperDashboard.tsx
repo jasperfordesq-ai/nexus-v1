@@ -42,21 +42,11 @@ export function SuperDashboard() {
       ]);
 
       if (dashRes.success && dashRes.data) {
-        const d = dashRes.data as unknown;
-        if (d && typeof d === 'object' && 'data' in d) {
-          setStats((d as { data: SuperAdminDashboardStats }).data);
-        } else {
-          setStats(d as SuperAdminDashboardStats);
-        }
+        setStats(dashRes.data);
       }
 
       if (tenantsRes.success && tenantsRes.data) {
-        const t = tenantsRes.data as unknown;
-        if (Array.isArray(t)) {
-          setTenants(t);
-        } else if (t && typeof t === 'object' && 'data' in t) {
-          setTenants((t as { data: SuperAdminTenant[] }).data);
-        }
+        setTenants(Array.isArray(tenantsRes.data) ? tenantsRes.data : []);
       }
     } catch {
       toast.error('Failed to load dashboard data');

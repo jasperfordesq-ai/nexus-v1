@@ -22,6 +22,7 @@ interface ConfirmModalProps {
   confirmLabel?: string;
   confirmColor?: 'danger' | 'warning' | 'primary';
   isLoading?: boolean;
+  children?: React.ReactNode;
 }
 
 export function ConfirmModal({
@@ -33,6 +34,7 @@ export function ConfirmModal({
   confirmLabel = 'Confirm',
   confirmColor = 'danger',
   isLoading = false,
+  children,
 }: ConfirmModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
@@ -43,6 +45,7 @@ export function ConfirmModal({
         </ModalHeader>
         <ModalBody>
           <p className="text-default-600">{message}</p>
+          {children}
         </ModalBody>
         <ModalFooter>
           <Button variant="flat" onPress={onClose} isDisabled={isLoading}>
