@@ -716,6 +716,55 @@ $router->add('PUT', '/api/v2/admin/deliverability/{id}', 'Nexus\Controllers\Api\
 $router->add('DELETE', '/api/v2/admin/deliverability/{id}', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@deleteDeliverable');
 $router->add('POST', '/api/v2/admin/deliverability/{id}/comments', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@addComment');
 
+// Super Admin Panel (requires super_admin or god role)
+// Dashboard
+$router->add('GET', '/api/v2/admin/super/dashboard', 'Nexus\Controllers\Api\AdminSuperApiController@dashboard');
+
+// Tenants
+$router->add('GET', '/api/v2/admin/super/tenants', 'Nexus\Controllers\Api\AdminSuperApiController@tenantList');
+$router->add('GET', '/api/v2/admin/super/tenants/hierarchy', 'Nexus\Controllers\Api\AdminSuperApiController@tenantHierarchy');
+$router->add('POST', '/api/v2/admin/super/tenants', 'Nexus\Controllers\Api\AdminSuperApiController@tenantCreate');
+$router->add('GET', '/api/v2/admin/super/tenants/{id}', 'Nexus\Controllers\Api\AdminSuperApiController@tenantShow');
+$router->add('PUT', '/api/v2/admin/super/tenants/{id}', 'Nexus\Controllers\Api\AdminSuperApiController@tenantUpdate');
+$router->add('DELETE', '/api/v2/admin/super/tenants/{id}', 'Nexus\Controllers\Api\AdminSuperApiController@tenantDelete');
+$router->add('POST', '/api/v2/admin/super/tenants/{id}/reactivate', 'Nexus\Controllers\Api\AdminSuperApiController@tenantReactivate');
+$router->add('POST', '/api/v2/admin/super/tenants/{id}/toggle-hub', 'Nexus\Controllers\Api\AdminSuperApiController@tenantToggleHub');
+$router->add('POST', '/api/v2/admin/super/tenants/{id}/move', 'Nexus\Controllers\Api\AdminSuperApiController@tenantMove');
+
+// Users (Cross-Tenant)
+$router->add('GET', '/api/v2/admin/super/users', 'Nexus\Controllers\Api\AdminSuperApiController@userList');
+$router->add('POST', '/api/v2/admin/super/users', 'Nexus\Controllers\Api\AdminSuperApiController@userCreate');
+$router->add('GET', '/api/v2/admin/super/users/{id}', 'Nexus\Controllers\Api\AdminSuperApiController@userShow');
+$router->add('PUT', '/api/v2/admin/super/users/{id}', 'Nexus\Controllers\Api\AdminSuperApiController@userUpdate');
+$router->add('POST', '/api/v2/admin/super/users/{id}/grant-super-admin', 'Nexus\Controllers\Api\AdminSuperApiController@userGrantSuperAdmin');
+$router->add('POST', '/api/v2/admin/super/users/{id}/revoke-super-admin', 'Nexus\Controllers\Api\AdminSuperApiController@userRevokeSuperAdmin');
+$router->add('POST', '/api/v2/admin/super/users/{id}/grant-global-super-admin', 'Nexus\Controllers\Api\AdminSuperApiController@userGrantGlobalSuperAdmin');
+$router->add('POST', '/api/v2/admin/super/users/{id}/revoke-global-super-admin', 'Nexus\Controllers\Api\AdminSuperApiController@userRevokeGlobalSuperAdmin');
+$router->add('POST', '/api/v2/admin/super/users/{id}/move-tenant', 'Nexus\Controllers\Api\AdminSuperApiController@userMoveTenant');
+$router->add('POST', '/api/v2/admin/super/users/{id}/move-and-promote', 'Nexus\Controllers\Api\AdminSuperApiController@userMoveAndPromote');
+
+// Bulk Operations
+$router->add('POST', '/api/v2/admin/super/bulk/move-users', 'Nexus\Controllers\Api\AdminSuperApiController@bulkMoveUsers');
+$router->add('POST', '/api/v2/admin/super/bulk/update-tenants', 'Nexus\Controllers\Api\AdminSuperApiController@bulkUpdateTenants');
+
+// Audit
+$router->add('GET', '/api/v2/admin/super/audit', 'Nexus\Controllers\Api\AdminSuperApiController@audit');
+
+// Federation Controls
+$router->add('GET', '/api/v2/admin/super/federation', 'Nexus\Controllers\Api\AdminSuperApiController@federationOverview');
+$router->add('GET', '/api/v2/admin/super/federation/system-controls', 'Nexus\Controllers\Api\AdminSuperApiController@federationGetSystemControls');
+$router->add('PUT', '/api/v2/admin/super/federation/system-controls', 'Nexus\Controllers\Api\AdminSuperApiController@federationUpdateSystemControls');
+$router->add('POST', '/api/v2/admin/super/federation/emergency-lockdown', 'Nexus\Controllers\Api\AdminSuperApiController@federationEmergencyLockdown');
+$router->add('POST', '/api/v2/admin/super/federation/lift-lockdown', 'Nexus\Controllers\Api\AdminSuperApiController@federationLiftLockdown');
+$router->add('GET', '/api/v2/admin/super/federation/whitelist', 'Nexus\Controllers\Api\AdminSuperApiController@federationGetWhitelist');
+$router->add('POST', '/api/v2/admin/super/federation/whitelist', 'Nexus\Controllers\Api\AdminSuperApiController@federationAddToWhitelist');
+$router->add('DELETE', '/api/v2/admin/super/federation/whitelist/{tenantId}', 'Nexus\Controllers\Api\AdminSuperApiController@federationRemoveFromWhitelist');
+$router->add('GET', '/api/v2/admin/super/federation/partnerships', 'Nexus\Controllers\Api\AdminSuperApiController@federationPartnerships');
+$router->add('POST', '/api/v2/admin/super/federation/partnerships/{id}/suspend', 'Nexus\Controllers\Api\AdminSuperApiController@federationSuspendPartnership');
+$router->add('POST', '/api/v2/admin/super/federation/partnerships/{id}/terminate', 'Nexus\Controllers\Api\AdminSuperApiController@federationTerminatePartnership');
+$router->add('GET', '/api/v2/admin/super/federation/tenant/{id}/features', 'Nexus\Controllers\Api\AdminSuperApiController@federationGetTenantFeatures');
+$router->add('PUT', '/api/v2/admin/super/federation/tenant/{id}/features', 'Nexus\Controllers\Api\AdminSuperApiController@federationUpdateTenantFeature');
+
 // ============================================
 // MASTER PLATFORM SOCIAL MEDIA MODULE API (Legacy V1)
 // Unified social interactions for ALL layouts

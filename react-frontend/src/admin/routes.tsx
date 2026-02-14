@@ -118,6 +118,17 @@ const DeliverabilityAnalytics = lazy(() => import('./modules/deliverability/Deli
 const MatchingDiagnostic = lazy(() => import('./modules/diagnostics/MatchingDiagnostic'));
 const NexusScoreAnalytics = lazy(() => import('./modules/diagnostics/NexusScoreAnalytics'));
 
+// Super Admin module
+const SuperDashboard = lazy(() => import('./modules/super/SuperDashboard'));
+const TenantListAdmin = lazy(() => import('./modules/super/TenantList'));
+const TenantForm = lazy(() => import('./modules/super/TenantForm'));
+const TenantHierarchy = lazy(() => import('./modules/super/TenantHierarchy'));
+const SuperUserList = lazy(() => import('./modules/super/SuperUserList'));
+const SuperUserForm = lazy(() => import('./modules/super/SuperUserForm'));
+const BulkOperations = lazy(() => import('./modules/super/BulkOperations'));
+const SuperAuditLog = lazy(() => import('./modules/super/SuperAuditLog'));
+const FederationControls = lazy(() => import('./modules/super/FederationControls'));
+
 // Content module
 const PagesAdmin = lazy(() => import('./modules/content/PagesAdmin'));
 const PageBuilder = lazy(() => import('./modules/content/PageBuilder'));
@@ -286,6 +297,19 @@ export function AdminRoutes() {
 
       {/* ─── NEXUS SCORE ─── */}
       <Route path="nexus-score/analytics" element={<Lazy><NexusScoreAnalytics /></Lazy>} />
+
+      {/* ─── SUPER ADMIN (requires super admin role) ─── */}
+      <Route path="super" element={<Lazy><SuperDashboard /></Lazy>} />
+      <Route path="super/tenants" element={<Lazy><TenantListAdmin /></Lazy>} />
+      <Route path="super/tenants/create" element={<Lazy><TenantForm /></Lazy>} />
+      <Route path="super/tenants/:id/edit" element={<Lazy><TenantForm /></Lazy>} />
+      <Route path="super/tenants/hierarchy" element={<Lazy><TenantHierarchy /></Lazy>} />
+      <Route path="super/users" element={<Lazy><SuperUserList /></Lazy>} />
+      <Route path="super/users/create" element={<Lazy><SuperUserForm /></Lazy>} />
+      <Route path="super/users/:id/edit" element={<Lazy><SuperUserForm /></Lazy>} />
+      <Route path="super/bulk" element={<Lazy><BulkOperations /></Lazy>} />
+      <Route path="super/audit" element={<Lazy><SuperAuditLog /></Lazy>} />
+      <Route path="super/federation" element={<Lazy><FederationControls /></Lazy>} />
     </>
   );
 }

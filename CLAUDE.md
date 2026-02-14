@@ -1,5 +1,31 @@
 # Project NEXUS - AI Assistant Guide
 
+## 🔴 Agent Teams (Swarm Mode) — ENABLED
+
+This project uses **Claude Opus 4.6 Agent Teams** (swarm mode) for large, multi-step tasks. Configuration:
+
+```json
+{ "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1", "teammateMode": "in-process" }
+```
+
+**Rules for team/swarm mode:**
+
+- **Use teams for large tasks**: When a task involves 3+ independent workstreams (e.g., multiple API controllers, multiple React modules, research + implementation), spawn teammate agents to work in parallel
+- **Autonomous operation**: The user may be away or sleeping — work autonomously, make decisions, and complete tasks without waiting for confirmation on routine choices
+- **Spawn as many agents as needed**: There is no artificial limit — create teammates for each independent workstream (e.g., one agent per API controller, one per React module)
+- **Agent types**: Use the right agent for the job — `general-purpose` for implementation, `Explore` for codebase research, `Plan` for architecture, `feature-dev:code-reviewer` for reviews
+- **Coordinate via task lists**: Use TeamCreate → TaskCreate → assign tasks to teammates → teammates mark complete
+- **Quality over speed**: Each agent should follow all project conventions (tenant scoping, HeroUI components, TypeScript strict mode, etc.)
+- **Report results**: When all agents complete, summarize what was done, what succeeded, and any issues found
+
+**When NOT to use teams:**
+
+- Single-file edits or small bug fixes
+- Tasks that are inherently sequential (each step depends on the previous)
+- Simple research questions
+
+---
+
 ## Quick Reference
 
 | Item | Value |

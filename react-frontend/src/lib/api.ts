@@ -59,9 +59,13 @@ export interface PaginationMeta {
   per_page: number;
   has_more: boolean;
   cursor?: string;
+  next_cursor?: string;
+  previous_cursor?: string;
   current_page?: number;
   total_items?: number;
   total_pages?: number;
+  has_next_page?: boolean;
+  has_previous_page?: boolean;
   // Messages API returns conversation details in meta
   conversation?: {
     id: number;
