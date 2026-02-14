@@ -230,10 +230,10 @@ export const adminAttributes = {
   list: () =>
     api.get<AdminAttribute[]>('/v2/admin/attributes'),
 
-  create: (data: { name: string; type: string; options?: string[] }) =>
+  create: (data: { name: string; type?: string; category_id?: number | null }) =>
     api.post<AdminAttribute>('/v2/admin/attributes', data),
 
-  update: (id: number, data: { name?: string; type?: string; options?: string[] }) =>
+  update: (id: number, data: { name?: string; type?: string; category_id?: number | null; is_active?: boolean }) =>
     api.put<AdminAttribute>(`/v2/admin/attributes/${id}`, data),
 
   delete: (id: number) =>

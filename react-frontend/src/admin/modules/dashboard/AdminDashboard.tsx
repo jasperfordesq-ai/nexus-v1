@@ -108,8 +108,8 @@ export function AdminDashboard() {
           loading={loading}
         />
         <StatCard
-          label="Total Volume (hours)"
-          value={stats?.total_volume ?? '—'}
+          label="Hours Exchanged"
+          value={stats?.total_hours_exchanged ?? '—'}
           icon={Clock}
           color="warning"
           loading={loading}
@@ -184,10 +184,10 @@ export function AdminDashboard() {
                   <div key={t.month} className="flex items-center justify-between">
                     <span className="text-sm text-default-600">{t.month}</span>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm font-medium">{t.volume} hrs</span>
+                      <span className="text-sm font-medium">{t.hours} hrs</span>
                       <div
                         className="h-2 rounded-full bg-primary"
-                        style={{ width: `${Math.min(100, (t.volume / Math.max(...trends.map((x) => x.volume || 1))) * 100)}px` }}
+                        style={{ width: `${Math.min(100, (t.hours / Math.max(...trends.map((x) => x.hours || 1))) * 100)}px` }}
                       />
                     </div>
                   </div>

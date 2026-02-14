@@ -166,7 +166,7 @@ class AdminToolsApiController extends BaseApiController
             )->fetch();
 
             if (!$redirect) {
-                $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Redirect not found', 'id', 404);
+                $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Redirect not found', 'id', 404);
                 return;
             }
 
@@ -177,7 +177,7 @@ class AdminToolsApiController extends BaseApiController
 
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Redirect not found or table does not exist', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Redirect not found or table does not exist', 'id', 404);
         }
     }
 
@@ -252,7 +252,7 @@ class AdminToolsApiController extends BaseApiController
             )->fetch();
 
             if (!$error) {
-                $this->respondWithError(ApiErrorCodes::NOT_FOUND, '404 error entry not found', 'id', 404);
+                $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, '404 error entry not found', 'id', 404);
                 return;
             }
 
@@ -263,7 +263,7 @@ class AdminToolsApiController extends BaseApiController
 
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, '404 error entry not found or table does not exist', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, '404 error entry not found or table does not exist', 'id', 404);
         }
     }
 

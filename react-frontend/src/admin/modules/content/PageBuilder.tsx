@@ -155,7 +155,6 @@ export function PageBuilder() {
           >
             <SelectItem key="draft">Draft</SelectItem>
             <SelectItem key="published">Published</SelectItem>
-            <SelectItem key="archived">Archived</SelectItem>
           </Select>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="flat" onPress={() => navigate('../pages')}>Cancel</Button>

@@ -25,13 +25,8 @@ export function UserMonitoring() {
     setLoading(true);
     try {
       const res = await adminBroker.getMonitoring();
-      if (res.success && res.data) {
-        const data = res.data as unknown;
-        if (Array.isArray(data)) {
-          setItems(data);
-        } else if (data && typeof data === 'object' && 'data' in (data as Record<string, unknown>)) {
-          setItems((data as { data: MonitoredUser[] }).data || []);
-        }
+      if (res.success && Array.isArray(res.data)) {
+        setItems(res.data);
       }
     } catch {
       // Silently handle

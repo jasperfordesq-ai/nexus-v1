@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem, Switch, Button, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Textarea, Switch, Button, Spinner } from '@heroui/react';
 import { CreditCard, ArrowLeft, Save } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
@@ -19,8 +19,10 @@ interface PlanFormData {
   price_monthly: string;
   price_yearly: string;
   tier_level: string;
-  billing_period: string;
-  max_members: string;
+  max_menus: string;
+  max_menu_items: string;
+  features: string;
+  allowed_layouts: string;
   is_active: boolean;
 }
 
@@ -37,8 +39,10 @@ export function PlanForm() {
     price_monthly: '',
     price_yearly: '',
     tier_level: '1',
-    billing_period: 'monthly',
-    max_members: '',
+    max_menus: '',
+    max_menu_items: '',
+    features: '',
+    allowed_layouts: '',
     is_active: true,
   });
   const [loading, setLoading] = useState(isEdit);
@@ -53,11 +57,13 @@ export function PlanForm() {
             setFormData({
               name: (plan.name as string) || '',
               description: (plan.description as string) || '',
-              price_monthly: plan.price_monthly !== undefined ? String(plan.price_monthly) : '',
-              price_yearly: plan.price_yearly !== undefined ? String(plan.price_yearly) : '',
+              price_monthly: plan.price_monthly !== undefined && plan.price_monthly !== null ? String(plan.price_monthly) : '',
+              price_yearly: plan.price_yearly !== undefined && plan.price_yearly !== null ? String(plan.price_yearly) : '',
               tier_level: plan.tier_level !== undefined ? String(plan.tier_level) : '1',
-              billing_period: (plan.billing_period as string) || 'monthly',
-              max_members: plan.max_members !== undefined ? String(plan.max_members) : '',
+              max_menus: plan.max_menus !== undefined && plan.max_menus !== null ? String(plan.max_menus) : '',
+              max_menu_items: plan.max_menu_items !== undefined && plan.max_menu_items !== null ? String(plan.max_menu_items) : '',
+              features: Array.isArray(plan.features) ? (plan.features as string[]).join(', ') : '',
+              allowed_layouts: Array.isArray(plan.allowed_layouts) ? (plan.allowed_layouts as string[]).join(', ') : '',
               is_active: plan.is_active !== false,
             });
           }
@@ -77,14 +83,25 @@ export function PlanForm() {
       return;
     }
     setSaving(true);
+
+    // Parse comma-separated strings into arrays
+    const featuresArr = formData.features.trim()
+      ? formData.features.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+    const layoutsArr = formData.allowed_layouts.trim()
+      ? formData.allowed_layouts.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+
     const payload = {
       name: formData.name,
       description: formData.description || undefined,
       price_monthly: formData.price_monthly ? Number(formData.price_monthly) : undefined,
       price_yearly: formData.price_yearly ? Number(formData.price_yearly) : undefined,
       tier_level: formData.tier_level ? Number(formData.tier_level) : undefined,
-      billing_period: formData.billing_period,
-      max_members: formData.max_members ? Number(formData.max_members) : undefined,
+      max_menus: formData.max_menus ? Number(formData.max_menus) : undefined,
+      max_menu_items: formData.max_menu_items ? Number(formData.max_menu_items) : undefined,
+      features: featuresArr,
+      allowed_layouts: layoutsArr,
       is_active: formData.is_active,
     };
     try {
@@ -168,36 +185,50 @@ export function PlanForm() {
               onValueChange={(v) => handleChange('price_yearly', v)}
             />
           </div>
+          <Input
+            label="Tier Level"
+            type="number"
+            placeholder="1"
+            variant="bordered"
+            description="Higher tier = more features (0 = free, 1 = basic, 2 = pro, etc.)"
+            value={formData.tier_level}
+            onValueChange={(v) => handleChange('tier_level', v)}
+          />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
-              label="Tier Level"
+              label="Max Menus"
               type="number"
-              placeholder="1"
+              placeholder="e.g., 10"
               variant="bordered"
-              value={formData.tier_level}
-              onValueChange={(v) => handleChange('tier_level', v)}
+              description="Maximum navigation menus allowed"
+              value={formData.max_menus}
+              onValueChange={(v) => handleChange('max_menus', v)}
             />
-            <Select
-              label="Billing Period"
+            <Input
+              label="Max Menu Items"
+              type="number"
+              placeholder="e.g., 50"
               variant="bordered"
-              selectedKeys={[formData.billing_period]}
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0] as string;
-                if (selected) handleChange('billing_period', selected);
-              }}
-            >
-              <SelectItem key="monthly">Monthly</SelectItem>
-              <SelectItem key="annual">Annual</SelectItem>
-              <SelectItem key="lifetime">Lifetime</SelectItem>
-            </Select>
+              description="Maximum menu items allowed"
+              value={formData.max_menu_items}
+              onValueChange={(v) => handleChange('max_menu_items', v)}
+            />
           </div>
           <Input
-            label="Max Members"
-            type="number"
-            placeholder="Unlimited"
+            label="Features"
+            placeholder="e.g., events, groups, gamification"
             variant="bordered"
-            value={formData.max_members}
-            onValueChange={(v) => handleChange('max_members', v)}
+            description="Comma-separated list of feature slugs included in this plan"
+            value={formData.features}
+            onValueChange={(v) => handleChange('features', v)}
+          />
+          <Input
+            label="Allowed Layouts"
+            placeholder="e.g., modern, civicone"
+            variant="bordered"
+            description="Comma-separated list of layout/theme slugs available to this plan"
+            value={formData.allowed_layouts}
+            onValueChange={(v) => handleChange('allowed_layouts', v)}
           />
           <div className="flex items-center justify-between">
             <div>

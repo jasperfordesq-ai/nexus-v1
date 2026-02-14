@@ -495,7 +495,7 @@ class AdminConfigApiController extends BaseApiController
         $jobIndex = $numericId - 1;
 
         if (!isset($jobs[$jobIndex])) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Cron job not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Cron job not found', 'id', 404);
             return;
         }
 
@@ -811,7 +811,7 @@ class AdminConfigApiController extends BaseApiController
         )->fetch();
 
         if (!$tenant) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Tenant not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Tenant not found', null, 404);
             return;
         }
 

@@ -86,12 +86,19 @@ class AdminDashboardApiController extends BaseApiController
             [$tenantId]
         )->fetch()['cnt'];
 
+        // Pending listings
+        $pendingListings = (int) Database::query(
+            "SELECT COUNT(*) as cnt FROM listings WHERE tenant_id = ? AND status = 'pending'",
+            [$tenantId]
+        )->fetch()['cnt'];
+
         $this->respondWithData([
             'total_users' => $totalUsers,
             'active_users' => $activeUsers,
             'pending_users' => $pendingUsers,
             'total_listings' => $totalListings,
             'active_listings' => $activeListings,
+            'pending_listings' => $pendingListings,
             'total_transactions' => $totalTransactions,
             'total_hours_exchanged' => round($totalHoursExchanged, 1),
             'new_users_this_month' => $newUsersThisMonth,

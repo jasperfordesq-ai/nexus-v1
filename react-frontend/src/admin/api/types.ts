@@ -9,19 +9,23 @@
 
 export interface AdminDashboardStats {
   total_users: number;
-  total_listings: number;
-  total_transactions: number;
-  total_volume: number;
+  active_users: number;
   pending_users: number;
-  pending_listings: number;
-  active_sessions: number;
+  total_listings: number;
+  active_listings: number;
+  pending_listings?: number;
+  total_transactions: number;
+  total_hours_exchanged: number;
+  new_users_this_month: number;
+  new_listings_this_month: number;
 }
 
 export interface MonthlyTrend {
   month: string;
-  volume: number;
+  users: number;
+  listings: number;
   transactions: number;
-  new_users: number;
+  hours: number;
 }
 
 export interface ActivityLogEntry {
@@ -51,28 +55,29 @@ export interface AdminUser {
   avatar_url?: string | null;
   role: 'member' | 'admin' | 'moderator' | 'tenant_admin' | 'super_admin';
   status: 'active' | 'inactive' | 'suspended' | 'pending' | 'banned';
-  tenant_id: number;
+  tenant_id?: number;
   balance: number;
-  total_earned: number;
-  total_spent: number;
+  total_earned?: number;
+  total_spent?: number;
   has_2fa_enabled: boolean;
   is_super_admin: boolean;
-  is_admin: boolean;
-  level: number;
-  badges_count: number;
+  is_admin?: boolean;
+  listing_count?: number;
+  profile_type?: string;
+  level?: number;
+  badges_count?: number;
   created_at: string;
-  last_login_at: string | null;
+  last_active_at?: string | null;
 }
 
 export interface AdminUserDetail extends AdminUser {
   bio?: string;
   tagline?: string;
   location?: string;
-  skills?: string[];
-  interests?: string[];
+  phone?: string;
+  organization_name?: string;
   badges: AdminBadge[];
   permissions?: string[];
-  notification_preferences?: Record<string, boolean>;
 }
 
 export interface AdminBadge {
@@ -146,14 +151,18 @@ export interface BackgroundJob {
 export interface AdminListing {
   id: number;
   title: string;
-  type: 'listing' | 'event' | 'poll' | 'goal' | 'resource' | 'volunteer';
+  description?: string;
+  type: string;
   status: 'active' | 'pending' | 'inactive' | 'archived';
   user_id: number;
   user_name: string;
-  tenant_id: number;
-  tenant_name?: string;
-  category?: string;
+  user_email?: string;
+  user_avatar?: string | null;
+  category_id?: number | null;
+  category_name?: string | null;
+  hours_estimated?: number | null;
   created_at: string;
+  updated_at?: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -175,8 +184,11 @@ export interface AdminAttribute {
   name: string;
   slug: string;
   type: string;
-  options?: string[];
-  created_at: string;
+  options?: string[] | null;
+  category_id: number | null;
+  category_name: string | null;
+  is_active: boolean;
+  target_type: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -650,10 +662,12 @@ export interface GroupModerationItem {
 export interface PaginatedResponse<T> {
   data: T[];
   meta: {
-    current_page: number;
-    last_page: number;
+    page: number;
+    total_pages: number;
     per_page: number;
     total: number;
+    has_more: boolean;
+    base_url?: string;
   };
 }
 

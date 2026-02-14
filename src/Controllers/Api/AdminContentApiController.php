@@ -98,7 +98,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$page) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Page not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Page not found', 'id', 404);
             return;
         }
 
@@ -186,7 +186,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$existing) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Page not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Page not found', 'id', 404);
             return;
         }
 
@@ -281,7 +281,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$existing) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Page not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Page not found', 'id', 404);
             return;
         }
 
@@ -350,7 +350,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$menu) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Menu not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Menu not found', 'id', 404);
             return;
         }
 
@@ -437,7 +437,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$existing) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Menu not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Menu not found', 'id', 404);
             return;
         }
 
@@ -532,7 +532,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$existing) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Menu not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Menu not found', 'id', 404);
             return;
         }
 
@@ -573,7 +573,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$menu) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Menu not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Menu not found', 'id', 404);
             return;
         }
 
@@ -611,7 +611,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$menu) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Menu not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Menu not found', 'id', 404);
             return;
         }
 
@@ -687,7 +687,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$existing) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Menu item not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Menu item not found', 'id', 404);
             return;
         }
 
@@ -799,7 +799,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$existing) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Menu item not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Menu item not found', 'id', 404);
             return;
         }
 
@@ -838,7 +838,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$menu) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Menu not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Menu not found', 'id', 404);
             return;
         }
 
@@ -931,7 +931,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$plan) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Plan not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Plan not found', 'id', 404);
             return;
         }
 
@@ -1044,7 +1044,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$existing) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Plan not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Plan not found', 'id', 404);
             return;
         }
 
@@ -1162,7 +1162,7 @@ class AdminContentApiController extends BaseApiController
         )->fetch();
 
         if (!$existing) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Plan not found', 'id', 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Plan not found', 'id', 404);
             return;
         }
 

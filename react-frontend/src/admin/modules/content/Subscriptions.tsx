@@ -16,9 +16,11 @@ interface SubscriptionItem {
   id: number;
   tenant_name: string;
   plan_name: string;
+  plan_tier_level: number;
   status: string;
-  started_at: string;
+  starts_at: string;
   expires_at: string;
+  trial_ends_at: string | null;
 }
 
 export function Subscriptions() {
@@ -72,12 +74,18 @@ export function Subscriptions() {
       render: (item) => <StatusBadge status={item.status || 'inactive'} />,
     },
     {
-      key: 'started_at',
+      key: 'plan_tier_level',
+      label: 'Tier',
+      sortable: true,
+      render: (item) => <span className="text-sm text-default-500">{item.plan_tier_level ?? '--'}</span>,
+    },
+    {
+      key: 'starts_at',
       label: 'Started',
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
-          {item.started_at ? new Date(item.started_at).toLocaleDateString() : '--'}
+          {item.starts_at ? new Date(item.starts_at).toLocaleDateString() : '--'}
         </span>
       ),
     },
@@ -88,6 +96,16 @@ export function Subscriptions() {
       render: (item) => (
         <span className="text-sm text-default-500">
           {item.expires_at ? new Date(item.expires_at).toLocaleDateString() : '--'}
+        </span>
+      ),
+    },
+    {
+      key: 'trial_ends_at',
+      label: 'Trial Ends',
+      sortable: true,
+      render: (item) => (
+        <span className="text-sm text-default-500">
+          {item.trial_ends_at ? new Date(item.trial_ends_at).toLocaleDateString() : '--'}
         </span>
       ),
     },
