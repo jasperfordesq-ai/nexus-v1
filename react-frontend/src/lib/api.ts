@@ -248,12 +248,18 @@ class ApiClient {
     }
 
     try {
+      const refreshHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+      const tenantId = tokenManager.getTenantId();
+      if (tenantId) {
+        refreshHeaders['X-Tenant-ID'] = tenantId;
+      }
+
       const response = await fetch(`${this.baseUrl}/auth/refresh-token`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: refreshHeaders,
         body: JSON.stringify({ refresh_token: refreshToken }),
         credentials: 'include',
       });
