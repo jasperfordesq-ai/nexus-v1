@@ -482,12 +482,28 @@ $router->add('POST', '/api/v2/admin/users/{id}/suspend', 'Nexus\Controllers\Api\
 $router->add('POST', '/api/v2/admin/users/{id}/ban', 'Nexus\Controllers\Api\AdminUsersApiController@ban');
 $router->add('POST', '/api/v2/admin/users/{id}/reactivate', 'Nexus\Controllers\Api\AdminUsersApiController@reactivate');
 $router->add('POST', '/api/v2/admin/users/{id}/reset-2fa', 'Nexus\Controllers\Api\AdminUsersApiController@reset2fa');
+$router->add('POST', '/api/v2/admin/users/badges/recheck-all', 'Nexus\Controllers\Api\AdminGamificationApiController@recheckAll');
+$router->add('POST', '/api/v2/admin/users/{id}/badges', 'Nexus\Controllers\Api\AdminUsersApiController@addBadge');
+$router->add('DELETE', '/api/v2/admin/users/{id}/badges/{badgeId}', 'Nexus\Controllers\Api\AdminUsersApiController@removeBadge');
+$router->add('POST', '/api/v2/admin/users/{id}/impersonate', 'Nexus\Controllers\Api\AdminUsersApiController@impersonate');
 
 // Admin Listings/Content
 $router->add('GET', '/api/v2/admin/listings', 'Nexus\Controllers\Api\AdminListingsApiController@index');
 $router->add('GET', '/api/v2/admin/listings/{id}', 'Nexus\Controllers\Api\AdminListingsApiController@show');
 $router->add('POST', '/api/v2/admin/listings/{id}/approve', 'Nexus\Controllers\Api\AdminListingsApiController@approve');
 $router->add('DELETE', '/api/v2/admin/listings/{id}', 'Nexus\Controllers\Api\AdminListingsApiController@destroy');
+
+// Admin Categories
+$router->add('GET', '/api/v2/admin/categories', 'Nexus\Controllers\Api\AdminCategoriesApiController@index');
+$router->add('POST', '/api/v2/admin/categories', 'Nexus\Controllers\Api\AdminCategoriesApiController@store');
+$router->add('PUT', '/api/v2/admin/categories/{id}', 'Nexus\Controllers\Api\AdminCategoriesApiController@update');
+$router->add('DELETE', '/api/v2/admin/categories/{id}', 'Nexus\Controllers\Api\AdminCategoriesApiController@destroy');
+
+// Admin Attributes
+$router->add('GET', '/api/v2/admin/attributes', 'Nexus\Controllers\Api\AdminCategoriesApiController@listAttributes');
+$router->add('POST', '/api/v2/admin/attributes', 'Nexus\Controllers\Api\AdminCategoriesApiController@storeAttribute');
+$router->add('PUT', '/api/v2/admin/attributes/{id}', 'Nexus\Controllers\Api\AdminCategoriesApiController@updateAttribute');
+$router->add('DELETE', '/api/v2/admin/attributes/{id}', 'Nexus\Controllers\Api\AdminCategoriesApiController@destroyAttribute');
 
 // Admin Config (Features & Modules)
 $router->add('GET', '/api/v2/admin/config', 'Nexus\Controllers\Api\AdminConfigApiController@getConfig');
@@ -501,6 +517,204 @@ $router->add('POST', '/api/v2/admin/cache/clear', 'Nexus\Controllers\Api\AdminCo
 // Admin Background Jobs
 $router->add('GET', '/api/v2/admin/jobs', 'Nexus\Controllers\Api\AdminConfigApiController@getJobs');
 $router->add('POST', '/api/v2/admin/jobs/{id}/run', 'Nexus\Controllers\Api\AdminConfigApiController@runJob');
+
+// Admin Settings (General Tenant Settings)
+$router->add('GET', '/api/v2/admin/settings', 'Nexus\Controllers\Api\AdminConfigApiController@getSettings');
+$router->add('PUT', '/api/v2/admin/settings', 'Nexus\Controllers\Api\AdminConfigApiController@updateSettings');
+
+// Admin Config - AI
+$router->add('GET', '/api/v2/admin/config/ai', 'Nexus\Controllers\Api\AdminConfigApiController@getAiConfig');
+$router->add('PUT', '/api/v2/admin/config/ai', 'Nexus\Controllers\Api\AdminConfigApiController@updateAiConfig');
+
+// Admin Config - Feed Algorithm
+$router->add('GET', '/api/v2/admin/config/feed-algorithm', 'Nexus\Controllers\Api\AdminConfigApiController@getFeedAlgorithmConfig');
+$router->add('PUT', '/api/v2/admin/config/feed-algorithm', 'Nexus\Controllers\Api\AdminConfigApiController@updateFeedAlgorithmConfig');
+
+// Admin Config - Images
+$router->add('GET', '/api/v2/admin/config/images', 'Nexus\Controllers\Api\AdminConfigApiController@getImageConfig');
+$router->add('PUT', '/api/v2/admin/config/images', 'Nexus\Controllers\Api\AdminConfigApiController@updateImageConfig');
+
+// Admin Config - SEO
+$router->add('GET', '/api/v2/admin/config/seo', 'Nexus\Controllers\Api\AdminConfigApiController@getSeoConfig');
+$router->add('PUT', '/api/v2/admin/config/seo', 'Nexus\Controllers\Api\AdminConfigApiController@updateSeoConfig');
+
+// Admin Config - Native App / PWA
+$router->add('GET', '/api/v2/admin/config/native-app', 'Nexus\Controllers\Api\AdminConfigApiController@getNativeAppConfig');
+$router->add('PUT', '/api/v2/admin/config/native-app', 'Nexus\Controllers\Api\AdminConfigApiController@updateNativeAppConfig');
+
+// Admin System - Cron Jobs
+$router->add('GET', '/api/v2/admin/system/cron-jobs', 'Nexus\Controllers\Api\AdminConfigApiController@getCronJobs');
+$router->add('POST', '/api/v2/admin/system/cron-jobs/{id}/run', 'Nexus\Controllers\Api\AdminConfigApiController@runCronJob');
+
+// Admin System - Activity Log
+$router->add('GET', '/api/v2/admin/system/activity-log', 'Nexus\Controllers\Api\AdminDashboardApiController@activity');
+
+// Admin Matching - Config, Stats, Cache
+$router->add('GET', '/api/v2/admin/matching/config', 'Nexus\Controllers\Api\AdminMatchingApiController@getConfig');
+$router->add('PUT', '/api/v2/admin/matching/config', 'Nexus\Controllers\Api\AdminMatchingApiController@updateConfig');
+$router->add('POST', '/api/v2/admin/matching/cache/clear', 'Nexus\Controllers\Api\AdminMatchingApiController@clearCache');
+$router->add('GET', '/api/v2/admin/matching/stats', 'Nexus\Controllers\Api\AdminMatchingApiController@getStats');
+
+// Admin Matching - Approvals
+$router->add('GET', '/api/v2/admin/matching/approvals', 'Nexus\Controllers\Api\AdminMatchingApiController@index');
+$router->add('GET', '/api/v2/admin/matching/approvals/stats', 'Nexus\Controllers\Api\AdminMatchingApiController@approvalStats');
+$router->add('GET', '/api/v2/admin/matching/approvals/{id}', 'Nexus\Controllers\Api\AdminMatchingApiController@show');
+$router->add('POST', '/api/v2/admin/matching/approvals/{id}/approve', 'Nexus\Controllers\Api\AdminMatchingApiController@approve');
+$router->add('POST', '/api/v2/admin/matching/approvals/{id}/reject', 'Nexus\Controllers\Api\AdminMatchingApiController@reject');
+
+// Admin Blog
+$router->add('GET', '/api/v2/admin/blog', 'Nexus\Controllers\Api\AdminBlogApiController@index');
+$router->add('POST', '/api/v2/admin/blog', 'Nexus\Controllers\Api\AdminBlogApiController@store');
+$router->add('GET', '/api/v2/admin/blog/{id}', 'Nexus\Controllers\Api\AdminBlogApiController@show');
+$router->add('PUT', '/api/v2/admin/blog/{id}', 'Nexus\Controllers\Api\AdminBlogApiController@update');
+$router->add('DELETE', '/api/v2/admin/blog/{id}', 'Nexus\Controllers\Api\AdminBlogApiController@destroy');
+$router->add('POST', '/api/v2/admin/blog/{id}/toggle-status', 'Nexus\Controllers\Api\AdminBlogApiController@toggleStatus');
+
+// Admin Gamification
+$router->add('GET', '/api/v2/admin/gamification/stats', 'Nexus\Controllers\Api\AdminGamificationApiController@stats');
+$router->add('GET', '/api/v2/admin/gamification/badges', 'Nexus\Controllers\Api\AdminGamificationApiController@badges');
+$router->add('POST', '/api/v2/admin/gamification/badges', 'Nexus\Controllers\Api\AdminGamificationApiController@createBadge');
+$router->add('DELETE', '/api/v2/admin/gamification/badges/{id}', 'Nexus\Controllers\Api\AdminGamificationApiController@deleteBadge');
+$router->add('GET', '/api/v2/admin/gamification/campaigns', 'Nexus\Controllers\Api\AdminGamificationApiController@campaigns');
+$router->add('POST', '/api/v2/admin/gamification/campaigns', 'Nexus\Controllers\Api\AdminGamificationApiController@createCampaign');
+$router->add('PUT', '/api/v2/admin/gamification/campaigns/{id}', 'Nexus\Controllers\Api\AdminGamificationApiController@updateCampaign');
+$router->add('DELETE', '/api/v2/admin/gamification/campaigns/{id}', 'Nexus\Controllers\Api\AdminGamificationApiController@deleteCampaign');
+$router->add('POST', '/api/v2/admin/gamification/recheck-all', 'Nexus\Controllers\Api\AdminGamificationApiController@recheckAll');
+$router->add('POST', '/api/v2/admin/gamification/bulk-award', 'Nexus\Controllers\Api\AdminGamificationApiController@bulkAward');
+
+// Admin Groups
+$router->add('GET', '/api/v2/admin/groups', 'Nexus\Controllers\Api\AdminGroupsApiController@index');
+$router->add('GET', '/api/v2/admin/groups/analytics', 'Nexus\Controllers\Api\AdminGroupsApiController@analytics');
+$router->add('GET', '/api/v2/admin/groups/approvals', 'Nexus\Controllers\Api\AdminGroupsApiController@approvals');
+$router->add('POST', '/api/v2/admin/groups/approvals/{id}/approve', 'Nexus\Controllers\Api\AdminGroupsApiController@approveMember');
+$router->add('POST', '/api/v2/admin/groups/approvals/{id}/reject', 'Nexus\Controllers\Api\AdminGroupsApiController@rejectMember');
+$router->add('GET', '/api/v2/admin/groups/moderation', 'Nexus\Controllers\Api\AdminGroupsApiController@moderation');
+$router->add('DELETE', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@deleteGroup');
+
+// Admin Timebanking
+$router->add('GET', '/api/v2/admin/timebanking/stats', 'Nexus\Controllers\Api\AdminTimebankingApiController@stats');
+$router->add('GET', '/api/v2/admin/timebanking/alerts', 'Nexus\Controllers\Api\AdminTimebankingApiController@alerts');
+$router->add('PUT', '/api/v2/admin/timebanking/alerts/{id}', 'Nexus\Controllers\Api\AdminTimebankingApiController@updateAlert');
+$router->add('POST', '/api/v2/admin/timebanking/adjust-balance', 'Nexus\Controllers\Api\AdminTimebankingApiController@adjustBalance');
+$router->add('GET', '/api/v2/admin/timebanking/org-wallets', 'Nexus\Controllers\Api\AdminTimebankingApiController@orgWallets');
+$router->add('GET', '/api/v2/admin/timebanking/user-report', 'Nexus\Controllers\Api\AdminTimebankingApiController@userReport');
+
+// Admin Enterprise
+$router->add('GET', '/api/v2/admin/enterprise/dashboard', 'Nexus\Controllers\Api\AdminEnterpriseApiController@dashboard');
+$router->add('GET', '/api/v2/admin/enterprise/roles', 'Nexus\Controllers\Api\AdminEnterpriseApiController@roles');
+$router->add('POST', '/api/v2/admin/enterprise/roles', 'Nexus\Controllers\Api\AdminEnterpriseApiController@createRole');
+$router->add('GET', '/api/v2/admin/enterprise/roles/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@showRole');
+$router->add('PUT', '/api/v2/admin/enterprise/roles/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@updateRole');
+$router->add('DELETE', '/api/v2/admin/enterprise/roles/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@deleteRole');
+$router->add('GET', '/api/v2/admin/enterprise/permissions', 'Nexus\Controllers\Api\AdminEnterpriseApiController@permissions');
+$router->add('GET', '/api/v2/admin/enterprise/gdpr/dashboard', 'Nexus\Controllers\Api\AdminEnterpriseApiController@gdprDashboard');
+$router->add('GET', '/api/v2/admin/enterprise/gdpr/requests', 'Nexus\Controllers\Api\AdminEnterpriseApiController@gdprRequests');
+$router->add('PUT', '/api/v2/admin/enterprise/gdpr/requests/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@updateGdprRequest');
+$router->add('GET', '/api/v2/admin/enterprise/gdpr/consents', 'Nexus\Controllers\Api\AdminEnterpriseApiController@gdprConsents');
+$router->add('GET', '/api/v2/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Api\AdminEnterpriseApiController@gdprBreaches');
+$router->add('GET', '/api/v2/admin/enterprise/gdpr/audit', 'Nexus\Controllers\Api\AdminEnterpriseApiController@gdprAudit');
+$router->add('GET', '/api/v2/admin/enterprise/monitoring', 'Nexus\Controllers\Api\AdminEnterpriseApiController@monitoring');
+$router->add('GET', '/api/v2/admin/enterprise/monitoring/health', 'Nexus\Controllers\Api\AdminEnterpriseApiController@healthCheck');
+$router->add('GET', '/api/v2/admin/enterprise/monitoring/logs', 'Nexus\Controllers\Api\AdminEnterpriseApiController@logs');
+$router->add('GET', '/api/v2/admin/enterprise/config', 'Nexus\Controllers\Api\AdminEnterpriseApiController@config');
+$router->add('PUT', '/api/v2/admin/enterprise/config', 'Nexus\Controllers\Api\AdminEnterpriseApiController@updateConfig');
+$router->add('GET', '/api/v2/admin/enterprise/config/secrets', 'Nexus\Controllers\Api\AdminEnterpriseApiController@secrets');
+$router->add('GET', '/api/v2/admin/legal-documents', 'Nexus\Controllers\Api\AdminEnterpriseApiController@legalDocs');
+$router->add('POST', '/api/v2/admin/legal-documents', 'Nexus\Controllers\Api\AdminEnterpriseApiController@createLegalDoc');
+$router->add('GET', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@showLegalDoc');
+$router->add('PUT', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@updateLegalDoc');
+$router->add('DELETE', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@deleteLegalDoc');
+
+// Admin Broker Controls
+$router->add('GET', '/api/v2/admin/broker/dashboard', 'Nexus\Controllers\Api\AdminBrokerApiController@dashboard');
+$router->add('GET', '/api/v2/admin/broker/exchanges', 'Nexus\Controllers\Api\AdminBrokerApiController@exchanges');
+$router->add('POST', '/api/v2/admin/broker/exchanges/{id}/approve', 'Nexus\Controllers\Api\AdminBrokerApiController@approveExchange');
+$router->add('POST', '/api/v2/admin/broker/exchanges/{id}/reject', 'Nexus\Controllers\Api\AdminBrokerApiController@rejectExchange');
+$router->add('GET', '/api/v2/admin/broker/risk-tags', 'Nexus\Controllers\Api\AdminBrokerApiController@riskTags');
+$router->add('GET', '/api/v2/admin/broker/messages', 'Nexus\Controllers\Api\AdminBrokerApiController@messages');
+$router->add('POST', '/api/v2/admin/broker/messages/{id}/review', 'Nexus\Controllers\Api\AdminBrokerApiController@reviewMessage');
+$router->add('GET', '/api/v2/admin/broker/monitoring', 'Nexus\Controllers\Api\AdminBrokerApiController@monitoring');
+
+// Admin Newsletters
+$router->add('GET', '/api/v2/admin/newsletters', 'Nexus\Controllers\Api\AdminNewsletterApiController@index');
+$router->add('POST', '/api/v2/admin/newsletters', 'Nexus\Controllers\Api\AdminNewsletterApiController@store');
+$router->add('GET', '/api/v2/admin/newsletters/subscribers', 'Nexus\Controllers\Api\AdminNewsletterApiController@subscribers');
+$router->add('GET', '/api/v2/admin/newsletters/segments', 'Nexus\Controllers\Api\AdminNewsletterApiController@segments');
+$router->add('GET', '/api/v2/admin/newsletters/templates', 'Nexus\Controllers\Api\AdminNewsletterApiController@templates');
+$router->add('GET', '/api/v2/admin/newsletters/analytics', 'Nexus\Controllers\Api\AdminNewsletterApiController@analytics');
+$router->add('GET', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@show');
+$router->add('PUT', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@update');
+$router->add('DELETE', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@destroy');
+
+// Admin Volunteering
+$router->add('GET', '/api/v2/admin/volunteering', 'Nexus\Controllers\Api\AdminVolunteeringApiController@index');
+$router->add('GET', '/api/v2/admin/volunteering/approvals', 'Nexus\Controllers\Api\AdminVolunteeringApiController@approvals');
+$router->add('GET', '/api/v2/admin/volunteering/organizations', 'Nexus\Controllers\Api\AdminVolunteeringApiController@organizations');
+
+// Admin Federation
+$router->add('GET', '/api/v2/admin/federation/settings', 'Nexus\Controllers\Api\AdminFederationApiController@settings');
+$router->add('GET', '/api/v2/admin/federation/partnerships', 'Nexus\Controllers\Api\AdminFederationApiController@partnerships');
+$router->add('GET', '/api/v2/admin/federation/directory', 'Nexus\Controllers\Api\AdminFederationApiController@directory');
+$router->add('GET', '/api/v2/admin/federation/directory/profile', 'Nexus\Controllers\Api\AdminFederationApiController@profile');
+$router->add('GET', '/api/v2/admin/federation/analytics', 'Nexus\Controllers\Api\AdminFederationApiController@analytics');
+$router->add('GET', '/api/v2/admin/federation/api-keys', 'Nexus\Controllers\Api\AdminFederationApiController@apiKeys');
+$router->add('POST', '/api/v2/admin/federation/api-keys', 'Nexus\Controllers\Api\AdminFederationApiController@createApiKey');
+$router->add('GET', '/api/v2/admin/federation/data', 'Nexus\Controllers\Api\AdminFederationApiController@dataManagement');
+
+// Admin Pages
+$router->add('GET', '/api/v2/admin/pages', 'Nexus\Controllers\Api\AdminContentApiController@getPages');
+$router->add('POST', '/api/v2/admin/pages', 'Nexus\Controllers\Api\AdminContentApiController@createPage');
+$router->add('GET', '/api/v2/admin/pages/{id}', 'Nexus\Controllers\Api\AdminContentApiController@getPage');
+$router->add('PUT', '/api/v2/admin/pages/{id}', 'Nexus\Controllers\Api\AdminContentApiController@updatePage');
+$router->add('DELETE', '/api/v2/admin/pages/{id}', 'Nexus\Controllers\Api\AdminContentApiController@deletePage');
+
+// Admin Menus
+$router->add('GET', '/api/v2/admin/menus', 'Nexus\Controllers\Api\AdminContentApiController@getMenus');
+$router->add('POST', '/api/v2/admin/menus', 'Nexus\Controllers\Api\AdminContentApiController@createMenu');
+$router->add('GET', '/api/v2/admin/menus/{id}', 'Nexus\Controllers\Api\AdminContentApiController@getMenu');
+$router->add('PUT', '/api/v2/admin/menus/{id}', 'Nexus\Controllers\Api\AdminContentApiController@updateMenu');
+$router->add('DELETE', '/api/v2/admin/menus/{id}', 'Nexus\Controllers\Api\AdminContentApiController@deleteMenu');
+$router->add('GET', '/api/v2/admin/menus/{id}/items', 'Nexus\Controllers\Api\AdminContentApiController@getMenuItems');
+$router->add('POST', '/api/v2/admin/menus/{id}/items', 'Nexus\Controllers\Api\AdminContentApiController@createMenuItem');
+$router->add('POST', '/api/v2/admin/menus/{id}/items/reorder', 'Nexus\Controllers\Api\AdminContentApiController@reorderMenuItems');
+
+// Admin Menu Items (direct item operations)
+$router->add('PUT', '/api/v2/admin/menu-items/{id}', 'Nexus\Controllers\Api\AdminContentApiController@updateMenuItem');
+$router->add('DELETE', '/api/v2/admin/menu-items/{id}', 'Nexus\Controllers\Api\AdminContentApiController@deleteMenuItem');
+
+// Admin Plans & Subscriptions
+$router->add('GET', '/api/v2/admin/plans', 'Nexus\Controllers\Api\AdminContentApiController@getPlans');
+$router->add('POST', '/api/v2/admin/plans', 'Nexus\Controllers\Api\AdminContentApiController@createPlan');
+$router->add('GET', '/api/v2/admin/plans/{id}', 'Nexus\Controllers\Api\AdminContentApiController@getPlan');
+$router->add('PUT', '/api/v2/admin/plans/{id}', 'Nexus\Controllers\Api\AdminContentApiController@updatePlan');
+$router->add('DELETE', '/api/v2/admin/plans/{id}', 'Nexus\Controllers\Api\AdminContentApiController@deletePlan');
+$router->add('GET', '/api/v2/admin/subscriptions', 'Nexus\Controllers\Api\AdminContentApiController@getSubscriptions');
+
+// Admin Tools - SEO & Redirects
+$router->add('GET', '/api/v2/admin/tools/redirects', 'Nexus\Controllers\Api\AdminToolsApiController@getRedirects');
+$router->add('POST', '/api/v2/admin/tools/redirects', 'Nexus\Controllers\Api\AdminToolsApiController@createRedirect');
+$router->add('DELETE', '/api/v2/admin/tools/redirects/{id}', 'Nexus\Controllers\Api\AdminToolsApiController@deleteRedirect');
+
+// Admin Tools - 404 Error Tracking
+$router->add('GET', '/api/v2/admin/tools/404-errors', 'Nexus\Controllers\Api\AdminToolsApiController@get404Errors');
+$router->add('DELETE', '/api/v2/admin/tools/404-errors/{id}', 'Nexus\Controllers\Api\AdminToolsApiController@delete404Error');
+
+// Admin Tools - Health Check, WebP, Seed, Blog Backups
+$router->add('POST', '/api/v2/admin/tools/health-check', 'Nexus\Controllers\Api\AdminToolsApiController@runHealthCheck');
+$router->add('GET', '/api/v2/admin/tools/webp-stats', 'Nexus\Controllers\Api\AdminToolsApiController@getWebpStats');
+$router->add('POST', '/api/v2/admin/tools/webp-convert', 'Nexus\Controllers\Api\AdminToolsApiController@runWebpConversion');
+$router->add('POST', '/api/v2/admin/tools/seed', 'Nexus\Controllers\Api\AdminToolsApiController@runSeedGenerator');
+$router->add('GET', '/api/v2/admin/tools/blog-backups', 'Nexus\Controllers\Api\AdminToolsApiController@getBlogBackups');
+
+// Admin Deliverability
+$router->add('GET', '/api/v2/admin/deliverability/dashboard', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@getDashboard');
+$router->add('GET', '/api/v2/admin/deliverability/analytics', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@getAnalytics');
+$router->add('GET', '/api/v2/admin/deliverability', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@getDeliverables');
+$router->add('POST', '/api/v2/admin/deliverability', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@createDeliverable');
+$router->add('GET', '/api/v2/admin/deliverability/{id}', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@getDeliverable');
+$router->add('PUT', '/api/v2/admin/deliverability/{id}', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@updateDeliverable');
+$router->add('DELETE', '/api/v2/admin/deliverability/{id}', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@deleteDeliverable');
+$router->add('POST', '/api/v2/admin/deliverability/{id}/comments', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@addComment');
 
 // ============================================
 // MASTER PLATFORM SOCIAL MEDIA MODULE API (Legacy V1)

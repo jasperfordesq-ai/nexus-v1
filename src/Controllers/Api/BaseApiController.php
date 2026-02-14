@@ -630,6 +630,25 @@ abstract class BaseApiController
         return $userId;
     }
 
+    /**
+     * Require super admin role
+     * Only allows super_admin or god roles
+     *
+     * @return int User ID
+     */
+    protected function requireSuperAdmin(): int
+    {
+        $userId = $this->requireAuth();
+
+        $role = $this->getAuthenticatedUserRole() ?? 'member';
+
+        if (!in_array($role, ['super_admin', 'god'])) {
+            $this->error('Super admin access required', 403, ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS);
+        }
+
+        return $userId;
+    }
+
     // ============================================
     // SECURITY METHODS
     // ============================================
