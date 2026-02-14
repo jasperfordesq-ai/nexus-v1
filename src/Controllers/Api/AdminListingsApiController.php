@@ -94,7 +94,7 @@ class AdminListingsApiController extends BaseApiController
         // Paginated results
         $items = Database::query(
             "SELECT l.id, l.title, l.description, l.type, l.status, l.created_at, l.updated_at,
-                    l.user_id, l.category_id, l.hours_estimated,
+                    l.user_id, l.category_id, l.price,
                     CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
                     u.email as user_email, u.avatar_url as user_avatar,
                     c.name as category_name
@@ -121,7 +121,7 @@ class AdminListingsApiController extends BaseApiController
                 'user_avatar' => $row['user_avatar'] ?? null,
                 'category_id' => $row['category_id'] ? (int) $row['category_id'] : null,
                 'category_name' => $row['category_name'] ?? null,
-                'hours_estimated' => $row['hours_estimated'] ? (float) $row['hours_estimated'] : null,
+                'price' => $row['price'] ? (float) $row['price'] : null,
                 'created_at' => $row['created_at'],
                 'updated_at' => $row['updated_at'] ?? null,
             ];
@@ -167,7 +167,7 @@ class AdminListingsApiController extends BaseApiController
             'user_avatar' => $item['user_avatar'] ?? null,
             'category_id' => $item['category_id'] ? (int) $item['category_id'] : null,
             'category_name' => $item['category_name'] ?? null,
-            'hours_estimated' => $item['hours_estimated'] ? (float) $item['hours_estimated'] : null,
+            'price' => $item['price'] ? (float) $item['price'] : null,
             'location' => $item['location'] ?? null,
             'created_at' => $item['created_at'],
             'updated_at' => $item['updated_at'] ?? null,

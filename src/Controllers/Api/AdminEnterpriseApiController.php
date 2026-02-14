@@ -165,7 +165,8 @@ class AdminEnterpriseApiController extends BaseApiController
 
         $redisConnected = false;
         try {
-            $redisConnected = \Nexus\Services\RedisCache::isConnected();
+            $stats = \Nexus\Services\RedisCache::getStats();
+            $redisConnected = !empty($stats['enabled']);
         } catch (\Exception $e) {
             // Redis not available
         }
@@ -401,7 +402,7 @@ class AdminEnterpriseApiController extends BaseApiController
         $consents = 0;
         try {
             $stmt = Database::query(
-                "SELECT COUNT(*) as cnt FROM gdpr_consents WHERE tenant_id = ?",
+                "SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ?",
                 [$tenantId]
             );
             $consents = (int) ($stmt->fetch()['cnt'] ?? 0);
@@ -412,7 +413,7 @@ class AdminEnterpriseApiController extends BaseApiController
         $breaches = 0;
         try {
             $stmt = Database::query(
-                "SELECT COUNT(*) as cnt FROM gdpr_breaches WHERE tenant_id = ?",
+                "SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ?",
                 [$tenantId]
             );
             $breaches = (int) ($stmt->fetch()['cnt'] ?? 0);
@@ -523,11 +524,11 @@ class AdminEnterpriseApiController extends BaseApiController
 
         try {
             $stmt = Database::query(
-                "SELECT gc.*, u.name as user_name
-                 FROM gdpr_consents gc
-                 LEFT JOIN users u ON u.id = gc.user_id
-                 WHERE gc.tenant_id = ?
-                 ORDER BY gc.created_at DESC
+                "SELECT uc.*, u.name as user_name
+                 FROM user_consents uc
+                 LEFT JOIN users u ON u.id = uc.user_id
+                 WHERE uc.tenant_id = ?
+                 ORDER BY uc.created_at DESC
                  LIMIT 100",
                 [$tenantId]
             );
@@ -548,7 +549,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
         try {
             $stmt = Database::query(
-                "SELECT * FROM gdpr_breaches WHERE tenant_id = ? ORDER BY reported_at DESC LIMIT 100",
+                "SELECT * FROM data_breach_log WHERE tenant_id = ? ORDER BY detected_at DESC LIMIT 100",
                 [$tenantId]
             );
             $breaches = $stmt->fetchAll();
@@ -631,9 +632,10 @@ class AdminEnterpriseApiController extends BaseApiController
         $redisConnected = false;
         $redisMemory = 'N/A';
         try {
-            $redisConnected = \Nexus\Services\RedisCache::isConnected();
+            $stats = \Nexus\Services\RedisCache::getStats();
+            $redisConnected = !empty($stats['enabled']);
             if ($redisConnected) {
-                $redisMemory = \Nexus\Services\RedisCache::getMemoryUsage() ?? 'N/A';
+                $redisMemory = $stats['memory_used'] ?? 'N/A';
             }
         } catch (\Exception $e) {
             // Ignore
@@ -670,7 +672,8 @@ class AdminEnterpriseApiController extends BaseApiController
 
         $redisOk = false;
         try {
-            $redisOk = \Nexus\Services\RedisCache::isConnected();
+            $stats = \Nexus\Services\RedisCache::getStats();
+            $redisOk = !empty($stats['enabled']);
         } catch (\Exception $e) {
             // Redis unavailable
         }

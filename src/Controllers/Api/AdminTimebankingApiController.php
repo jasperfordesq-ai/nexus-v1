@@ -55,7 +55,7 @@ class AdminTimebankingApiController extends BaseApiController
                     CONCAT(u.first_name, ' ', u.last_name) as user_name,
                     COALESCE(SUM(t.amount), 0) as amount
              FROM transactions t
-             JOIN users u ON t.recipient_id = u.id
+             JOIN users u ON t.receiver_id = u.id
              WHERE t.tenant_id = ? AND t.status = 'completed'
              GROUP BY u.id
              ORDER BY amount DESC
@@ -306,13 +306,13 @@ class AdminTimebankingApiController extends BaseApiController
         $absAmount = abs($amount);
         if ($amount > 0) {
             Database::query(
-                "INSERT INTO transactions (tenant_id, sender_id, recipient_id, amount, description, status, created_at)
+                "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at)
                  VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
                 [$tenantId, $adminId, $userId, $absAmount, '[Admin Adjustment] ' . $reason]
             );
         } else {
             Database::query(
-                "INSERT INTO transactions (tenant_id, sender_id, recipient_id, amount, description, status, created_at)
+                "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at)
                  VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
                 [$tenantId, $userId, $adminId, $absAmount, '[Admin Adjustment] ' . $reason]
             );
@@ -457,11 +457,11 @@ class AdminTimebankingApiController extends BaseApiController
                     COALESCE(earned.cnt, 0) + COALESCE(spent.cnt, 0) as transaction_count
              FROM users u
              LEFT JOIN (
-                 SELECT recipient_id, SUM(amount) as total, COUNT(*) as cnt
+                 SELECT receiver_id, SUM(amount) as total, COUNT(*) as cnt
                  FROM transactions
                  WHERE tenant_id = ? AND status = 'completed'
-                 GROUP BY recipient_id
-             ) earned ON earned.recipient_id = u.id
+                 GROUP BY receiver_id
+             ) earned ON earned.receiver_id = u.id
              LEFT JOIN (
                  SELECT sender_id, SUM(amount) as total, COUNT(*) as cnt
                  FROM transactions

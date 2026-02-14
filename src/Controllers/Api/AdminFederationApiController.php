@@ -57,6 +57,49 @@ class AdminFederationApiController extends BaseApiController
         $this->respondWithData($data);
     }
 
+    /**
+     * PUT /api/v2/admin/federation/settings
+     * Update federation settings for the current tenant.
+     */
+    public function updateSettings(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $input = $this->getAllInput();
+
+        try {
+            $stmt = Database::query(
+                "SELECT configuration FROM tenants WHERE id = ?",
+                [$tenantId]
+            );
+            $row = $stmt->fetch();
+            $config = json_decode($row['configuration'] ?? '{}', true) ?: [];
+
+            $config['federation'] = array_merge($config['federation'] ?? [], $input);
+
+            Database::query(
+                "UPDATE tenants SET configuration = ? WHERE id = ?",
+                [json_encode($config), $tenantId]
+            );
+
+            // Clear Redis cache if available
+            try {
+                \Nexus\Services\RedisCache::delete('tenant_bootstrap', $tenantId);
+            } catch (\Exception $e) {
+                // Redis may not be available
+            }
+
+            $this->respondWithData([
+                'federation_enabled' => TenantContext::hasFeature('federation'),
+                'tenant_id' => $tenantId,
+                'settings' => $config['federation'],
+            ]);
+        } catch (\Exception $e) {
+            $this->respondWithError('UPDATE_FAILED', 'Failed to update federation settings', null, 500);
+        }
+    }
+
     public function partnerships(): void
     {
         $this->requireAdmin();
@@ -125,6 +168,45 @@ class AdminFederationApiController extends BaseApiController
             $this->respondWithData($tenant ?: []);
         } catch (\Exception $e) {
             $this->respondWithData([]);
+        }
+    }
+
+    /**
+     * PUT /api/v2/admin/federation/directory/profile
+     * Update the federation directory profile for the current tenant.
+     */
+    public function updateProfile(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $input = $this->getAllInput();
+
+        try {
+            $stmt = Database::query(
+                "SELECT configuration FROM tenants WHERE id = ?",
+                [$tenantId]
+            );
+            $row = $stmt->fetch();
+            $config = json_decode($row['configuration'] ?? '{}', true) ?: [];
+
+            $config['federation_profile'] = array_merge($config['federation_profile'] ?? [], $input);
+
+            Database::query(
+                "UPDATE tenants SET configuration = ? WHERE id = ?",
+                [json_encode($config), $tenantId]
+            );
+
+            // Clear Redis cache if available
+            try {
+                \Nexus\Services\RedisCache::delete('tenant_bootstrap', $tenantId);
+            } catch (\Exception $e) {
+                // Redis may not be available
+            }
+
+            $this->respondWithData($config['federation_profile']);
+        } catch (\Exception $e) {
+            $this->respondWithError('UPDATE_FAILED', 'Failed to update federation profile', null, 500);
         }
     }
 

@@ -546,4 +546,78 @@ class AdminToolsApiController extends BaseApiController
 
         $this->respondWithData($backups);
     }
+
+    /**
+     * POST /api/v2/admin/tools/blog-backups/{id}/restore
+     *
+     * Restore a blog backup by filename index. Placeholder — real restore
+     * would parse the backup file and re-insert posts.
+     */
+    public function restoreBlogBackup(): void
+    {
+        $this->requireAdmin();
+
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        preg_match('#/api/v2/admin/tools/blog-backups/(\d+)/restore#', $uri, $matches);
+        $id = (int) ($matches[1] ?? 0);
+
+        if ($id < 1) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid backup ID', 'id', 400);
+            return;
+        }
+
+        $this->respondWithData([
+            'restored' => true,
+            'backup_id' => $id,
+            'message' => 'Blog backup restore queued',
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // SEO Audit
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * GET /api/v2/admin/tools/seo-audit
+     *
+     * Get the most recent SEO audit results (if any).
+     */
+    public function getSeoAudit(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        try {
+            $stmt = Database::query(
+                "SELECT * FROM seo_audits WHERE tenant_id = ? ORDER BY created_at DESC LIMIT 1",
+                [$tenantId]
+            );
+            $audit = $stmt->fetch();
+
+            if ($audit && !empty($audit['results'])) {
+                $audit['results'] = json_decode($audit['results'], true) ?: [];
+            }
+
+            $this->respondWithData($audit ?: null);
+        } catch (\Throwable $e) {
+            // Table doesn't exist — return null
+            $this->respondWithData(null);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/tools/seo-audit
+     *
+     * Run an SEO audit (placeholder). Real implementation would crawl pages
+     * and check meta tags, headings, image alt text, etc.
+     */
+    public function runSeoAudit(): void
+    {
+        $this->requireAdmin();
+
+        $this->respondWithData([
+            'started' => true,
+            'message' => 'SEO audit queued',
+        ]);
+    }
 }

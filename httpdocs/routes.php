@@ -653,9 +653,11 @@ $router->add('GET', '/api/v2/admin/volunteering/organizations', 'Nexus\Controlle
 
 // Admin Federation
 $router->add('GET', '/api/v2/admin/federation/settings', 'Nexus\Controllers\Api\AdminFederationApiController@settings');
+$router->add('PUT', '/api/v2/admin/federation/settings', 'Nexus\Controllers\Api\AdminFederationApiController@updateSettings');
 $router->add('GET', '/api/v2/admin/federation/partnerships', 'Nexus\Controllers\Api\AdminFederationApiController@partnerships');
 $router->add('GET', '/api/v2/admin/federation/directory', 'Nexus\Controllers\Api\AdminFederationApiController@directory');
 $router->add('GET', '/api/v2/admin/federation/directory/profile', 'Nexus\Controllers\Api\AdminFederationApiController@profile');
+$router->add('PUT', '/api/v2/admin/federation/directory/profile', 'Nexus\Controllers\Api\AdminFederationApiController@updateProfile');
 $router->add('GET', '/api/v2/admin/federation/analytics', 'Nexus\Controllers\Api\AdminFederationApiController@analytics');
 $router->add('GET', '/api/v2/admin/federation/api-keys', 'Nexus\Controllers\Api\AdminFederationApiController@apiKeys');
 $router->add('POST', '/api/v2/admin/federation/api-keys', 'Nexus\Controllers\Api\AdminFederationApiController@createApiKey');
@@ -705,6 +707,11 @@ $router->add('GET', '/api/v2/admin/tools/webp-stats', 'Nexus\Controllers\Api\Adm
 $router->add('POST', '/api/v2/admin/tools/webp-convert', 'Nexus\Controllers\Api\AdminToolsApiController@runWebpConversion');
 $router->add('POST', '/api/v2/admin/tools/seed', 'Nexus\Controllers\Api\AdminToolsApiController@runSeedGenerator');
 $router->add('GET', '/api/v2/admin/tools/blog-backups', 'Nexus\Controllers\Api\AdminToolsApiController@getBlogBackups');
+$router->add('POST', '/api/v2/admin/tools/blog-backups/{id}/restore', 'Nexus\Controllers\Api\AdminToolsApiController@restoreBlogBackup');
+
+// Admin Tools - SEO Audit
+$router->add('GET', '/api/v2/admin/tools/seo-audit', 'Nexus\Controllers\Api\AdminToolsApiController@getSeoAudit');
+$router->add('POST', '/api/v2/admin/tools/seo-audit', 'Nexus\Controllers\Api\AdminToolsApiController@runSeoAudit');
 
 // Admin Deliverability
 $router->add('GET', '/api/v2/admin/deliverability/dashboard', 'Nexus\Controllers\Api\AdminDeliverabilityApiController@getDashboard');

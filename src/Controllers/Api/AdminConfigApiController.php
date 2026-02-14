@@ -663,30 +663,6 @@ class AdminConfigApiController extends BaseApiController
         ]);
     }
 
-    /**
-     * Get authenticated user ID from JWT or session
-     */
-    private function getAuthenticatedUserId(): ?int
-    {
-        // Try JWT first
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        if (preg_match('/Bearer\s+(\S+)/', $authHeader, $m)) {
-            try {
-                $payload = \Nexus\Services\TokenService::validateAccessToken($m[1]);
-                return (int)($payload['user_id'] ?? $payload['sub'] ?? 0) ?: null;
-            } catch (\Exception $e) {
-                // Fall through to session
-            }
-        }
-
-        // Try session
-        if (session_status() !== PHP_SESSION_NONE && isset($_SESSION['user_id'])) {
-            return (int)$_SESSION['user_id'];
-        }
-
-        return null;
-    }
-
     // ─────────────────────────────────────────────────────────────────────────
     // Tenant Settings (General)
     // ─────────────────────────────────────────────────────────────────────────

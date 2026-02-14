@@ -61,7 +61,7 @@ export function SuperDashboard() {
 
   const quickActions = [
     { label: 'Create Tenant', href: tenantPath('/admin/super/tenants/create'), icon: Plus },
-    { label: 'View Hierarchy', href: tenantPath('/admin/super/hierarchy'), icon: Network },
+    { label: 'View Hierarchy', href: tenantPath('/admin/super/tenants/hierarchy'), icon: Network },
     { label: 'Bulk Operations', href: tenantPath('/admin/super/bulk'), icon: ListChecks },
     { label: 'Cross-Tenant Users', href: tenantPath('/admin/super/users'), icon: Users },
     { label: 'Audit Log', href: tenantPath('/admin/super/audit'), icon: Activity },
