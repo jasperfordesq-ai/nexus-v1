@@ -20,7 +20,9 @@ export interface User {
   tagline?: string;
   location?: string;
   skills?: string[];
-  role?: 'member' | 'admin' | 'moderator';
+  role?: 'member' | 'admin' | 'moderator' | 'tenant_admin' | 'super_admin';
+  is_super_admin?: boolean;
+  is_admin?: boolean;
   status?: 'active' | 'inactive' | 'suspended' | 'pending';
   tenant_id?: number;
   tenant_slug?: string;
