@@ -5,7 +5,8 @@
 | Item | Value |
 |------|-------|
 | **Project** | Project NEXUS - Timebanking Platform |
-| **PHP Version** | 8.2+ |
+| **Frontend Stack** | React 18 + TypeScript + HeroUI + Tailwind CSS 4 |
+| **PHP Version** | 8.2+ (API backend only) |
 | **Database** | MariaDB 10.11 (MySQL compatible) |
 | **Cache** | Redis 7+ |
 | **Production Server** | Azure VM `20.224.171.253` |
@@ -29,7 +30,7 @@
 # Start everything
 docker compose up -d
 
-# Stop XAMPP first if running - Docker is the primary dev environment
+# Docker is the only dev environment
 ```
 
 See [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) for full setup guide.
@@ -38,70 +39,65 @@ See [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) for full setup guide.
 
 ## MANDATORY RULES
 
-### 🔴 CIVICONE ULTIMATE SOURCE OF TRUTH - CRITICAL
+### 🔴 REACT FRONTEND IS THE PRIMARY UI - CRITICAL
 
-#### FOR ALL CIVICONE COMPONENTS/PAGES: GOV.UK Frontend GitHub Repository is the ONLY source of truth
+**The React frontend (`react-frontend/`) is the ONLY active frontend.** The legacy PHP views (`views/modern/`, `views/civicone/`) are being decommissioned and kept for reference only.
 
-- **Repository:** <https://github.com/alphagov/govuk-frontend>
-- **Components:** <https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components>
-- **Design System:** <https://design-system.service.gov.uk/>
+**Rules:**
 
-**Mandatory process when working on ANY CivicOne file:**
+- **ALL new UI work** goes in the React frontend — never create new PHP views
+- **UI stack**: React 18 + TypeScript + **HeroUI** (component library) + **Tailwind CSS 4** + Framer Motion
+- **Icons**: Lucide React (`lucide-react`)
+- Use HeroUI components (`@heroui/react`) as the primary building blocks — buttons, inputs, modals, cards, tables, dropdowns, etc.
+- Use Tailwind CSS utility classes for layout, spacing, and custom styling
+- Use CSS tokens in `react-frontend/src/styles/tokens.css` for light/dark theme variables
+- **Do NOT** create custom CSS component files — use Tailwind utilities and HeroUI theming instead
+- **Do NOT** build new pages or features in the legacy PHP frontend
+- Legacy PHP views may still be referenced for business logic understanding, but should not be modified for UI purposes
 
-1. Search GOV.UK Frontend GitHub for the component
-2. Extract exact CSS/HTML/patterns from official source
-3. Implement using official GOV.UK styles (no custom interpretations)
-4. Document GitHub source in code comments
-5. Test WCAG 2.1 AA compliance
+### React Frontend Styling Rules
 
-**This rule overrides all other guidance for CivicOne.** When in doubt, always check the GOV.UK Frontend GitHub repository first.
+```tsx
+// CORRECT — use HeroUI components + Tailwind classes
+import { Button, Card, Input } from "@heroui/react";
 
-See: `docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md` for full specification.
+<Card className="p-4 gap-3">
+  <Input label="Email" variant="bordered" />
+  <Button color="primary" className="mt-2">Submit</Button>
+</Card>
 
----
+// CORRECT — use Tailwind utilities for layout
+<div className="flex items-center gap-4 px-6 py-3">
 
-### CSS Rules - CRITICAL
+// CORRECT — use design tokens for theme-aware colors
+<div className="bg-[var(--color-surface)] text-[var(--color-text)]">
 
-- **NEVER** write inline `<style>` blocks in PHP/HTML files
-- **NEVER** use inline `style=""` attributes except for truly dynamic values (e.g., calculated widths)
-- All CSS must go in `/httpdocs/assets/css/` with clear file names
-- Create new CSS files for new components (e.g., `component-name.css`)
-- CSS must be loaded via layout headers (`views/layouts/*/header.php`)
-- Add new CSS files to `purgecss.config.js`
+// WRONG — do NOT use inline styles
+<div style={{ padding: '16px' }}>
 
-### Color Variables - MANDATORY
-
-Always use CSS variables from `design-tokens.css` instead of hardcoded hex colors:
-
-```css
-/* CORRECT */
-color: var(--color-primary-500);
-background: var(--color-warning);
-border-color: var(--color-gray-500);
-
-/* WRONG - never use hardcoded colors in new code */
-color: #6366f1;
-background: #fbbf24;
+// WRONG — do NOT create separate .css files for components
+// (use Tailwind classes or tokens.css instead)
 ```
-
-See `/httpdocs/assets/css/design-tokens.css` for full palette.
-
-> **Note**: Legacy files have hardcoded colors - do NOT mass-replace (risk of regressions).
-
-### JavaScript Rules - CRITICAL
-
-- **NEVER** write large inline `<script>` blocks in PHP files
-- Extract JS to `/httpdocs/assets/js/` files
-- Small event handlers (1-2 lines) in `onclick` are acceptable
-- Anything more complex goes in external JS files
 
 ### Theme System - CRITICAL
 
-- Theme is determined by **user preference** (not tenant or URL)
+**React frontend (light/dark mode) — PRIMARY:**
+
+- `ThemeContext` manages `light`, `dark`, or `system` preference
+- CSS tokens in `react-frontend/src/styles/tokens.css`
+- HeroUI dark mode via `@custom-variant dark (&:is(.dark *))` in `index.css`
+- Persists to `users.preferred_theme` via `PUT /api/v2/users/me/theme`
+- Toggle in Navbar (sun/moon icon)
+
+<details>
+<summary>Legacy PHP themes (reference only — being decommissioned)</summary>
+
+- Theme determined by **user preference** (not tenant or URL)
 - Stored in `users.preferred_layout` column and `nexus_active_layout` session key
 - Default theme is `modern`, alternative is `civicone`
-- **Both themes must be kept in sync** - if you edit `views/modern/X.php`, check if `views/civicone/X.php` exists and needs the same change
-- Before making changes to theme files, **always test on both themes**
+- CivicOne follows GOV.UK Design System (WCAG 2.1 AA)
+
+</details>
 
 ### General Principles
 
@@ -109,6 +105,7 @@ See `/httpdocs/assets/css/design-tokens.css` for full palette.
 - Prioritize maintainability and organization over speed
 - Follow existing patterns in the codebase
 - Ask if unsure about where code should live
+- **Default to React frontend** for any UI work — legacy PHP views are reference only
 
 ---
 
@@ -146,22 +143,25 @@ Project NEXUS is an enterprise multi-tenant community platform with many modules
 - **Federation**: Multi-community network with partnerships
 - **PWA & Mobile**: Service worker, Capacitor Android app
 - **Notifications**: In-app, email digests, and push notifications
-- **React Frontend**: New SPA frontend (in development) at `react-frontend/`
+- **React Frontend**: Primary UI — React 18 + HeroUI + Tailwind CSS 4 SPA at `react-frontend/`
+- **Real-Time**: Pusher WebSockets for live updates, FCM for mobile push
+- **Light/Dark Theme**: React frontend supports light/dark/system modes via `ThemeContext`, stored in `users.preferred_theme`, API: `PUT /api/v2/users/me/theme`
 
 ## Directory Structure
 
 ```text
 project-nexus/
-├── react-frontend/               # React 18 SPA (NEW)
+├── react-frontend/               # React 18 + HeroUI + Tailwind CSS 4 SPA (PRIMARY UI)
 │   ├── src/
 │   │   ├── components/           # Reusable UI components
-│   │   ├── contexts/             # React contexts (Auth, Tenant, Toast)
-│   │   ├── pages/                # Page components
+│   │   ├── contexts/             # React contexts (Auth, Tenant, Toast, Theme, Notifications, Pusher)
+│   │   ├── pages/                # Page components (27+ pages)
 │   │   ├── lib/                  # API client, helpers
-│   │   ├── hooks/                # Custom React hooks
+│   │   ├── hooks/                # Custom React hooks (useApi, usePageTitle, etc.)
+│   │   ├── styles/               # CSS tokens (light/dark themes)
 │   │   └── types/                # TypeScript types
 │   ├── Dockerfile                # Frontend container
-│   └── package.json              # Dependencies (Vite, HeroUI, etc.)
+│   └── package.json              # Dependencies (Vite, HeroUI, Tailwind CSS 4, etc.)
 ├── src/                          # PHP source (PSR-4: Nexus\)
 │   ├── Config/                   # Configuration
 │   ├── Controllers/              # Request handlers
@@ -172,7 +172,7 @@ project-nexus/
 │   ├── Models/                   # Data models (59+ files)
 │   ├── Services/                 # Business logic (100+ services)
 │   └── helpers.php               # Global functions
-├── views/                        # PHP templates (legacy)
+├── views/                        # PHP templates (LEGACY - reference only, being decommissioned)
 │   ├── civicone/                 # GOV.UK-based theme (WCAG 2.1 AA)
 │   ├── modern/                   # Modern responsive theme
 │   └── admin/                    # Admin panel views
@@ -383,9 +383,12 @@ $token = Csrf::token();
 Csrf::verify($_POST['csrf_token'] ?? '');
 ```
 
-### View Rendering
+### View Rendering (Legacy — reference only)
 
-Use PHP templates with layout detection:
+> **Note:** New UI work goes in the React frontend, not PHP views. This section is kept for reference when maintaining legacy code.
+
+<details>
+<summary>Legacy PHP view patterns (click to expand)</summary>
 
 ```php
 // In controller
@@ -405,7 +408,14 @@ require __DIR__ . '/../../views/' . layout() . '/page.php';
 <?= webp_avatar($user['avatar'], $user['name'], 40) ?>
 ```
 
-## JavaScript Conventions
+</details>
+
+## JavaScript Conventions (Legacy PHP files)
+
+> **Note:** These rules apply to legacy JS in `/httpdocs/assets/js/`. For React frontend, use TypeScript and follow React/HeroUI patterns.
+
+<details>
+<summary>Legacy JS rules (click to expand)</summary>
 
 ### NO Inline Styles
 
@@ -440,20 +450,41 @@ function handler(_event) {
 }
 ```
 
+</details>
+
 ## CSS Architecture
 
-### Two Themes
+### React Frontend (Primary)
 
-1. **CivicOne** (`views/civicone/`, `httpdocs/assets/css/civicone/`)
-   - GOV.UK Design System based
-   - WCAG 2.1 AA compliant
-   - Accessibility-first approach
+The React frontend uses **Tailwind CSS 4** with the **HeroUI theme plugin**:
 
-2. **Modern** (`views/modern/`, `httpdocs/assets/css/modern/`)
-   - Contemporary responsive design
-   - Feature-rich UI
+- **Entry point**: `react-frontend/src/index.css` — imports Tailwind, HeroUI plugin, and design tokens
+- **Design tokens**: `react-frontend/src/styles/tokens.css` — CSS custom properties for light/dark themes
+- **HeroUI plugin**: `react-frontend/src/hero.ts` — HeroUI Tailwind plugin configuration
+- **Dark mode**: `@custom-variant dark (&:is(.dark *))` — class-based dark mode for HeroUI
 
-### File Organization
+```tsx
+// Use Tailwind utilities for layout and spacing
+<div className="flex items-center gap-4 p-6">
+
+// Use HeroUI component props for component-level theming
+<Button color="primary" variant="bordered" size="lg">
+
+// Use CSS tokens for theme-aware custom values
+<div className="bg-[var(--color-surface)] text-[var(--color-text)]">
+```
+
+### Legacy PHP CSS (reference only — being decommissioned)
+
+<details>
+<summary>Legacy CSS architecture (click to expand)</summary>
+
+**Two Themes:**
+
+1. **CivicOne** (`views/civicone/`, `httpdocs/assets/css/civicone/`) — GOV.UK Design System, WCAG 2.1 AA
+2. **Modern** (`views/modern/`, `httpdocs/assets/css/modern/`) — Contemporary responsive design
+
+**File Organization:**
 
 | Type | Location |
 |------|----------|
@@ -463,43 +494,18 @@ function handler(_event) {
 | Partials | `/views/{theme}/partials/` |
 | Layouts | `/views/layouts/{theme}/` |
 
-### CSS Design Tokens
-
-Use design tokens for consistency:
+**Legacy CSS Design Tokens** (for PHP views, not React):
 
 ```css
-/* Colors */
 color: var(--color-text);
 background: var(--color-background);
-border-color: var(--color-border);
-color: var(--color-primary-500);
-background: var(--color-warning);
-
-/* Spacing */
 padding: var(--space-4);
-margin: var(--space-2);
-gap: var(--space-3);
-
-/* Typography */
 font-size: var(--font-size-body);
-font-weight: var(--font-weight-bold);
 ```
 
-### Tracking New CSS Files
+See `/httpdocs/assets/css/design-tokens.css` for full palette.
 
-When creating new CSS files, ensure they're included in the build pipeline:
-
-```bash
-# Check if your new CSS file is tracked
-npm run css:discover
-
-# Auto-add all missing CSS files to purgecss.config.js
-npm run css:auto-config
-```
-
-**Why this matters:** CSS files not in `purgecss.config.js` won't be optimized for production, leading to missing styles in deployed builds.
-
-### Build Commands
+**Legacy Build Commands:**
 
 ```bash
 npm run build:css        # Build all CSS (includes validation)
@@ -512,27 +518,9 @@ npm run css:auto-config  # Auto-add CSS to purgecss config
 npm run validate:design-tokens  # Check design tokens aren't corrupted
 ```
 
-### ⚠️ CRITICAL: Design Tokens Protection
+**Design Tokens Protection:** Design token files are EXCLUDED from PurgeCSS. NEVER add `design-tokens.css` back to `purgecss.config.js`.
 
-**Design token files are EXCLUDED from PurgeCSS** because PurgeCSS removes CSS variables (it thinks they're unused classes).
-
-**Files protected:**
-
-- `design-tokens.css` / `design-tokens.min.css`
-- `desktop-design-tokens.css` / `desktop-design-tokens.min.css`
-- `mobile-design-tokens.css` / `mobile-design-tokens.min.css`
-
-**NEVER add these back to purgecss.config.js!**
-
-See [CSS_BUILD_RULES.md](CSS_BUILD_RULES.md) for full details.
-
-If styling breaks site-wide, check if design-tokens.min.css is corrupted:
-
-```bash
-npm run validate:design-tokens
-# If corrupted, rebuild with:
-npm run minify:css
-```
+</details>
 
 ## Testing
 
@@ -584,9 +572,9 @@ class ExampleServiceTest extends TestCase
 
 ## Local Development
 
-### Docker (Primary Environment)
+### Docker (Only Environment)
 
-**Use Docker for all development.** Stop XAMPP if it's running.
+**Use Docker for all development.**
 
 ```bash
 # Start the stack
@@ -603,9 +591,9 @@ docker compose restart app
 
 | Service | URL | Purpose |
 |---------|-----|---------|
-| React Frontend | http://localhost:5173 | New SPA |
+| React Frontend | http://localhost:5173 | Primary UI (HeroUI + Tailwind) |
 | PHP API | http://localhost:8090 | Backend API |
-| Legacy PHP | http://localhost:8090/{tenant}/ | Traditional views |
+| Legacy PHP | http://localhost:8090/{tenant}/ | Legacy views (reference only) |
 | phpMyAdmin | http://localhost:8091 | DB admin (needs `--profile tools`) |
 
 ### Database Access
@@ -619,14 +607,19 @@ docker compose --profile tools up -d
 # Then visit http://localhost:8091
 ```
 
-### Theme Testing (Legacy PHP Views)
+### Theme Testing
 
-To test both themes:
+**React frontend (primary):** Toggle light/dark mode via the sun/moon icon in the Navbar, or set `theme` in browser DevTools to test `light`, `dark`, and `system` preferences.
+
+<details>
+<summary>Legacy PHP theme testing (reference only)</summary>
+
+To test both legacy themes:
 
 1. Change your user's `preferred_layout` in the database, OR
 2. Switch via the UI theme toggle
 
-**Important**: Always test changes on both themes before committing.
+</details>
 
 ---
 
@@ -743,9 +736,19 @@ CREATE INDEX idx_users_email ON users(email);
 php scripts/safe_migrate.php
 ```
 
-## React Frontend
+## React Frontend (Primary UI)
 
-The new React frontend is in `react-frontend/`. It's a Vite + React 18 + TypeScript SPA.
+The React frontend is in `react-frontend/`. It's the **primary and only active UI**, built with:
+
+- **Vite** — build tool and dev server
+- **React 18** + **TypeScript** — UI framework
+- **HeroUI** (`@heroui/react`) — component library (buttons, inputs, modals, cards, tables, etc.)
+- **Tailwind CSS 4** (`tailwindcss` + `@tailwindcss/vite`) — utility-first CSS
+- **Framer Motion** — animations (also HeroUI dependency)
+- **Lucide React** — icon library
+- **Lexical** — rich text editor
+- **Recharts** — data visualization/charts
+- **React Router v6** — client-side routing with tenant slug support
 
 ### 🔴 CRITICAL: Deployment Warning
 
@@ -772,54 +775,280 @@ See [docs/REACT_DEPLOYMENT.md](docs/REACT_DEPLOYMENT.md) for full instructions.
 
 | File | Purpose |
 |------|---------|
-| `src/lib/api.ts` | API client with token refresh |
-| `src/contexts/AuthContext.tsx` | Authentication state |
-| `src/contexts/TenantContext.tsx` | Tenant config/features |
-| `src/App.tsx` | Routes and providers |
+| `src/App.tsx` | Routes, providers, feature/module gates |
+| `src/lib/api.ts` | API client with token refresh & interceptors |
+| `src/types/api.ts` | TypeScript interfaces for API responses |
+| `src/index.css` | Tailwind CSS 4 entry point, HeroUI plugin, design token imports |
+| `src/hero.ts` | HeroUI Tailwind plugin configuration |
+| `src/styles/tokens.css` | CSS custom properties for light/dark themes |
 
-### Running Tests
+### React Contexts
+
+| Context | File | Purpose |
+|---------|------|---------|
+| `AuthContext` | `src/contexts/AuthContext.tsx` | Authentication state, login/logout, user data |
+| `TenantContext` | `src/contexts/TenantContext.tsx` | Tenant config, `hasFeature()`, `hasModule()` |
+| `ToastContext` | `src/contexts/ToastContext.tsx` | Toast notifications (success/error/info) |
+| `ThemeContext` | `src/contexts/ThemeContext.tsx` | Light/dark/system mode, persists to `users.preferred_theme` |
+| `NotificationsContext` | `src/contexts/NotificationsContext.tsx` | Real-time notification state & unread counts |
+| `PusherContext` | `src/contexts/PusherContext.tsx` | Pusher WebSocket connection for real-time events |
+
+### React Hooks
+
+| Hook | File | Purpose |
+|------|------|---------|
+| `useApi` | `src/hooks/useApi.ts` | GET requests with loading/error states |
+| `useMutation` | `src/hooks/useMutation.ts` | POST/PUT/DELETE with loading/error |
+| `usePaginatedApi` | `src/hooks/usePaginatedApi.ts` | Cursor-based pagination helper |
+| `usePageTitle` | `src/hooks/usePageTitle.ts` | Sets `document.title` to "Page - Tenant" (all 41 pages) |
+| `useToast` | via ToastContext | `showToast('message', 'success')` |
+| `useAuth` | via AuthContext | Current user, `isAuthenticated` |
+| `useTenant` | via TenantContext | `hasFeature()`, `hasModule()`, tenant settings |
+| `useTheme` | via ThemeContext | `theme`, `setTheme('light' / 'dark' / 'system')` |
+| `useNotifications` | via NotificationsContext | Notification list, unread count, mark-read |
+
+### Key React Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `Layout` | `src/components/layout/Layout.tsx` | Main page wrapper (Navbar + Footer + BackToTop + OfflineIndicator) |
+| `Navbar` | `src/components/layout/Navbar.tsx` | Desktop nav with dropdowns, search overlay (Cmd+K) |
+| `MobileDrawer` | `src/components/layout/MobileDrawer.tsx` | Mobile slide-out menu with search entry point |
+| `Footer` | `src/components/layout/Footer.tsx` | Site footer |
+| `FeatureGate` | `src/components/routing/FeatureGate.tsx` | Conditional render by `feature` or `module` prop |
+| `ScrollToTop` | `src/components/routing/ScrollToTop.tsx` | Auto-scroll on route change (SPA fix) |
+| `Breadcrumbs` | `src/components/navigation/Breadcrumbs.tsx` | Breadcrumb nav (used on 8+ detail/create pages) |
+| `BackToTop` | `src/components/ui/BackToTop.tsx` | Floating scroll-to-top button (appears after 400px) |
+| `OfflineIndicator` | `src/components/feedback/OfflineIndicator.tsx` | Offline/online status banner |
+| `TransferModal` | `src/components/wallet/TransferModal.tsx` | Time credit transfer dialog |
+
+### Feature & Module Gating
+
+The platform uses two gating mechanisms, both controlled per-tenant:
+
+- **Features** (`tenants.features` JSON): Optional add-ons — `events`, `groups`, `gamification`, `goals`, `blog`, `resources`, `volunteering`, `exchange_workflow`, etc.
+- **Modules** (`tenants.configuration.modules` JSON): Core platform functionality — `listings`, `wallet`, `messages`, `dashboard`, `feed`, etc.
+
+```tsx
+// In React components
+const { hasFeature, hasModule } = useTenant();
+if (hasFeature('gamification')) { /* show gamification UI */ }
+if (hasModule('wallet')) { /* show wallet nav item */ }
+
+// In App.tsx route definitions
+<FeatureGate feature="events"><EventsPage /></FeatureGate>
+<FeatureGate module="wallet"><WalletPage /></FeatureGate>
+```
+
+```php
+// In PHP backend
+if (TenantContext::hasFeature('gamification')) { /* ... */ }
+```
+
+Admin UI: `/admin/tenant-features` — toggle switches for all features & modules per tenant. Clears Redis bootstrap cache on save.
+
+### React Pages
+
+All pages use `usePageTitle()` and are feature/module gated in `App.tsx`:
+
+| Page | Route | Gate |
+|------|-------|------|
+| Dashboard | `/dashboard` | Module: `dashboard` |
+| Listings | `/listings`, `/listings/:id` | Module: `listings` |
+| Create Listing | `/listings/new`, `/listings/:id/edit` | Module: `listings` |
+| Messages | `/messages`, `/messages/:id` | Module: `messages` |
+| Wallet | `/wallet` | Module: `wallet` |
+| Feed | `/feed` | Module: `feed` |
+| Events | `/events`, `/events/:id` | Feature: `events` |
+| Groups | `/groups`, `/groups/:id` | Feature: `groups` |
+| Members | `/members` | — (protected) |
+| Profile | `/profile/:id` | — (public) |
+| Exchanges | `/exchanges`, `/exchanges/:id` | Feature: `exchange_workflow` |
+| Request Exchange | `/listings/:id/request-exchange` | Feature: `exchange_workflow` |
+| Notifications | `/notifications` | — (protected) |
+| Settings | `/settings` | — (protected) |
+| Search | `/search` | — (public) |
+| Leaderboard | `/leaderboard` | Feature: `gamification` |
+| Achievements | `/achievements` | Feature: `gamification` |
+| Goals | `/goals` | Feature: `goals` |
+| Volunteering | `/volunteering` | Feature: `volunteering` |
+| Blog | `/blog`, `/blog/:slug` | Feature: `blog` |
+| Resources | `/resources` | Feature: `resources` |
+| Organisations | `/organisations`, `/organisations/:id` | Feature: `organisations` |
+| Federation | `/federation/*` | Feature: `federation` |
+| Help Center | `/help` | — (public) |
+| About | `/about` | — (public) |
+| Contact | `/contact` | — (public) |
+| Home | `/` | — (public) |
+
+### Running Tests & Building
 
 ```bash
 cd react-frontend
 npm test           # Run Vitest tests
 npm run lint       # TypeScript check
+npm run build      # Production build (Vite)
+npm run dev        # Dev server (http://localhost:5173)
 ```
 
 ### API Endpoints (V2)
 
-The React frontend uses V2 API endpoints at `/api/v2/*`:
+The React frontend uses V2 API endpoints at `/api/v2/*`. Grouped by feature:
+
+**Core & Auth:**
 
 | Endpoint | Controller |
 |----------|------------|
 | `/api/v2/tenant/bootstrap` | TenantBootstrapController |
-| `/api/v2/listings` | ListingsApiController |
-| `/api/v2/messages` | MessagesApiController |
-| `/api/v2/users/me` | UsersApiController |
-| `/api/v2/events` | EventsApiController |
-| `/api/v2/groups` | GroupsApiController |
+| `/api/v2/tenants` | TenantBootstrapController |
+| `/api/v2/platform/stats` | TenantBootstrapController |
+| `/api/v2/categories` | CoreApiController |
+| `/api/v2/realtime/config` | PusherAuthController |
 | `/api/auth/login` | (existing auth) |
 | `/api/auth/logout` | (existing auth) |
 
-See `httpdocs/routes.php` for full V2 route definitions.
+**Users & Profiles:**
+
+| Endpoint | Controller |
+|----------|------------|
+| `/api/v2/users/me` | UsersApiController |
+| `/api/v2/users/me/preferences` | UsersApiController |
+| `/api/v2/users/me/theme` | UsersApiController |
+| `/api/v2/users/me/avatar` | UsersApiController |
+| `/api/v2/users/me/password` | UsersApiController |
+| `/api/v2/users/me/notifications` | UsersApiController |
+| `/api/v2/users/{id}` | UsersApiController |
+| `/api/v2/users/{id}/listings` | UsersApiController |
+| `/api/v2/connections` | ConnectionsApiController |
+
+**Content & Social:**
+
+| Endpoint | Controller |
+|----------|------------|
+| `/api/v2/listings` | ListingsApiController |
+| `/api/v2/messages` | MessagesApiController |
+| `/api/v2/events` | EventsApiController |
+| `/api/v2/groups` | GroupsApiController |
+| `/api/v2/feed` | SocialApiController |
+| `/api/v2/blog` | BlogApiController |
+| `/api/v2/resources` | ResourcesV2ApiController |
+| `/api/v2/comments` | CommentsV2ApiController |
+| `/api/v2/polls` | PollsApiController |
+| `/api/v2/search` | SearchApiController |
+| `/api/v2/notifications` | NotificationsApiController |
+
+**Wallet & Exchanges:**
+
+| Endpoint | Controller |
+|----------|------------|
+| `/api/v2/wallet/balance` | WalletApiController |
+| `/api/v2/wallet/transactions` | WalletApiController |
+| `/api/v2/wallet/transfer` | WalletApiController |
+| `/api/v2/exchanges` | ExchangesApiController |
+| `/api/v2/reviews` | ReviewsApiController |
+
+**Gamification & Goals:**
+
+| Endpoint | Controller |
+|----------|------------|
+| `/api/v2/gamification/profile` | GamificationV2ApiController |
+| `/api/v2/gamification/badges` | GamificationV2ApiController |
+| `/api/v2/gamification/leaderboard` | GamificationV2ApiController |
+| `/api/v2/gamification/challenges` | GamificationV2ApiController |
+| `/api/v2/goals` | GoalsApiController |
+| `/api/v2/volunteering` | VolunteerApiController |
+
+**Federation:**
+
+| Endpoint | Controller |
+|----------|------------|
+| `/api/v2/federation/*` | FederationV2ApiController |
+
+See `httpdocs/routes.php` for full V2 route definitions (50+ endpoints).
 
 ## Key Services Reference
+
+120+ services in `src/Services/`. Most important ones by category:
+
+**Core Platform:**
+
+| Service | Purpose |
+|---------|---------|
+| `ListingService` | Listings CRUD & search |
+| `MessageService` | Messages CRUD & conversations |
+| `UserService` | User profiles & preferences |
+| `WalletService` | Time credit transactions & balance |
+| `TokenService` | JWT token management |
+| `EventService` | Events CRUD & RSVPs |
+| `GroupService` | Groups CRUD & membership |
+| `FeedService` | Social feed posts & timeline |
+| `CommentService` | Threaded comments (V2) |
+| `ConnectionService` | User connections/friendships |
+| `ReviewService` | Member reviews & ratings |
+| `PollService` | Polls creation & voting |
+| `GoalService` | Personal & community goals |
+| `VolunteerService` | Volunteer opportunities & hours |
+| `UploadService` | File uploads & media |
+
+**Matching & Exchanges:**
+
+| Service | Purpose |
+|---------|---------|
+| `SmartMatchingEngine` | AI-powered user/listing matching |
+| `MatchApprovalWorkflowService` | Broker approval workflow for matches |
+| `MatchLearningService` | ML feedback loop for match quality |
+| `ExchangeWorkflowService` | Exchange lifecycle (request → complete) |
+| `ListingRankingService` | Listing search ranking algorithm |
+
+**Gamification:**
 
 | Service | Purpose |
 |---------|---------|
 | `GamificationService` | XP, badges, levels, achievements |
-| `MatchingService` | User/listing matching algorithm |
-| `WalletService` | Time credit transactions |
-| `FederationGateway` | Multi-community federation |
-| `PusherService` | Real-time notifications |
-| `WebPushService` | Push notifications |
-| `DigestService` | Email digests |
+| `LeaderboardService` | Leaderboard rankings |
+| `LeaderboardSeasonService` | Seasonal leaderboard management |
+| `StreakService` | Daily login/activity streaks |
+| `DailyRewardService` | Daily reward claims |
+| `XPShopService` | XP shop purchases |
+| `ChallengeService` | Challenges & campaigns |
+
+**Federation:**
+
+| Service | Purpose |
+|---------|---------|
+| `FederationGateway` | Multi-community federation core |
+| `FederationPartnershipService` | Partner community management |
+| `FederationDirectoryService` | Cross-community directory |
+| `FederationJwtService` | Federation JWT auth |
+| `FederatedMessageService` | Cross-community messaging |
+| `FederatedTransactionService` | Cross-community transactions |
+
+**Notifications & Communication:**
+
+| Service | Purpose |
+|---------|---------|
+| `NotificationDispatcher` | Central notification routing |
+| `NotificationService` | In-app notifications |
+| `PusherService` | Real-time WebSocket events |
+| `WebPushService` | Browser push notifications |
+| `FCMPushService` | Firebase Cloud Messaging (mobile) |
+| `DigestService` | Email digest scheduling |
+| `EmailTemplateBuilder` | Email template rendering |
+
+**Admin & Security:**
+
+| Service | Purpose |
+|---------|---------|
 | `AuditLogService` | Action logging |
-| `TokenService` | JWT token management (NEW) |
-| `ListingService` | Listings CRUD (V2 API) |
-| `MessageService` | Messages CRUD (V2 API) |
-| `UserService` | User profiles (V2 API) |
+| `AbuseDetectionService` | Content moderation |
+| `TenantHierarchyService` | Multi-tenant hierarchy |
+| `GroupApprovalWorkflowService` | Group membership approval |
+| `TotpService` | TOTP two-factor auth |
+| `RedisCache` | Redis caching layer |
 
 ## Key Models Reference
+
+59+ models in `src/Models/`. Most important ones:
 
 | Model | Table | Purpose |
 |-------|-------|---------|
@@ -829,8 +1058,25 @@ See `httpdocs/routes.php` for full V2 route definitions.
 | `FeedPost` | `feed_posts` | Social feed content |
 | `Group` | `groups` | Community groups |
 | `Event` | `events` | Events and RSVPs |
+| `EventRsvp` | `event_rsvps` | Event attendance tracking |
 | `Badge` | `user_badges` | Earned badges |
 | `Tenant` | `tenants` | Tenant/community data |
+| `Connection` | `connections` | User friendships/connections |
+| `Notification` | `notifications` | In-app notifications |
+| `Review` | `reviews` | Member reviews/ratings |
+| `Poll` | `polls` | Polls and voting |
+| `Goal` | `goals` | Personal/community goals |
+| `Post` | `posts` | Blog posts |
+| `Page` | `pages` | CMS pages |
+| `Category` | `categories` | Content categorization |
+| `ResourceItem` | `resource_items` | Shared resource files |
+| `Gamification` | `gamification_*` | XP, levels, challenges |
+| `Report` | `reports` | Content/user reports |
+| `ActivityLog` | `activity_log` | User activity tracking |
+| `VolOpportunity` | `vol_opportunities` | Volunteer opportunities |
+| `VolApplication` | `vol_applications` | Volunteer applications |
+| `VolLog` | `vol_logs` | Volunteer hours logged |
+| `OrgWallet` | `org_wallets` | Organisation wallets |
 
 ## Common Tasks
 
@@ -847,12 +1093,13 @@ See `httpdocs/routes.php` for full V2 route definitions.
 3. Always scope by tenant
 4. Add unit tests
 
-### Add a New View
+### Add a New Page (React Frontend)
 
-1. Create in `views/civicone/` AND `views/modern/`
-2. Or use layout detection: `views/' . layout() . '/page.php`
-3. Use design tokens for styling
-4. Ensure WCAG compliance
+1. Create page component in `react-frontend/src/pages/`
+2. Use HeroUI components and Tailwind CSS for UI
+3. Add route in `react-frontend/src/App.tsx` (with tenant slug support and FeatureGate if needed)
+4. Add `usePageTitle()` hook for document title
+5. Use `tenantPath()` for all internal links
 
 ### Add a Database Migration
 
@@ -872,14 +1119,15 @@ See `httpdocs/routes.php` for full V2 route definitions.
 
 ## Accessibility (WCAG 2.1 AA)
 
-The CivicOne theme follows GOV.UK Design System standards:
+All frontend work should meet WCAG 2.1 AA standards:
 
 - Minimum 4.5:1 contrast ratio for text
-- Focus indicators on all interactive elements
+- Focus indicators on all interactive elements (HeroUI provides these by default)
 - Semantic HTML structure
 - ARIA labels where needed
 - Keyboard navigation support
 - Screen reader compatibility
+- Use HeroUI's built-in accessibility props (`aria-label`, `aria-describedby`, etc.)
 
 ## Environment Variables
 
@@ -923,24 +1171,31 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ## Useful Commands
 
 ```bash
-# Development
-composer install          # Install PHP dependencies
-npm install              # Install Node dependencies
-npm run build            # Full build (CSS, JS, images)
-npm run lint             # Run all linters
+# React Frontend Development
+cd react-frontend
+npm install              # Install dependencies
+npm run dev              # Dev server (localhost:5173)
+npm run build            # Production build
+npm test                 # Run Vitest tests
+npm run lint             # TypeScript check
 
-# Testing
+# PHP Backend
+composer install          # Install PHP dependencies
 vendor/bin/phpunit       # Run all tests
 php tests/run-api-tests.php  # API tests
+
+# Legacy CSS/JS (for legacy PHP views only)
+npm run build            # Full build (CSS, JS, images)
+npm run lint             # Run all linters
 
 # Database
 php scripts/backup_database.php    # Backup
 php scripts/safe_migrate.php       # Run migrations
 php scripts/seed_database.php      # Seed data
 
-# Deployment
-npm run deploy:preview   # Dry run
-npm run deploy           # Deploy last commit
+# Deployment (Azure)
+scripts\deploy-production.bat          # Full deployment
+scripts\deploy-production.bat quick    # Code sync + restart only
 ```
 
 ## Troubleshooting
