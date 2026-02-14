@@ -549,4 +549,128 @@ class AdminUsersApiController extends BaseApiController
 
         $this->respondWithData(['reset' => true, 'id' => $id]);
     }
+
+    /**
+     * POST /api/v2/admin/users/{id}/badges
+     *
+     * Award a badge to a user.
+     * Body: { badge_slug }
+     */
+    public function addBadge(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $user = User::findById($id);
+        if (!$user || $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        $input = $this->getAllInput();
+        $badgeSlug = trim($input['badge_slug'] ?? '');
+
+        if (empty($badgeSlug)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Badge slug is required', 'badge_slug', 422);
+            return;
+        }
+
+        try {
+            \Nexus\Services\GamificationService::awardBadgeByKey($id, $badgeSlug);
+
+            ActivityLog::log($adminId, 'admin_award_badge', "Awarded badge '{$badgeSlug}' to user #{$id}");
+
+            $this->respondWithData([
+                'awarded' => true,
+                'user_id' => $id,
+                'badge_slug' => $badgeSlug,
+            ], null, 201);
+        } catch (\Throwable $e) {
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to award badge: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
+     * DELETE /api/v2/admin/users/{id}/badges/{badgeId}
+     *
+     * Remove a badge from a user.
+     */
+    public function removeBadge(int $id, int $badgeId): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $user = User::findById($id);
+        if (!$user || $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        try {
+            $badge = Database::query(
+                "SELECT * FROM user_badges WHERE id = ? AND user_id = ?",
+                [$badgeId, $id]
+            )->fetch();
+
+            if (!$badge) {
+                $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Badge not found for this user', null, 404);
+                return;
+            }
+
+            Database::query("DELETE FROM user_badges WHERE id = ? AND user_id = ?", [$badgeId, $id]);
+
+            ActivityLog::log($adminId, 'admin_remove_badge', "Removed badge #{$badgeId} from user #{$id}");
+
+            $this->respondWithData(['removed' => true, 'user_id' => $id, 'badge_id' => $badgeId]);
+        } catch (\Throwable $e) {
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to remove badge: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/users/{id}/impersonate
+     *
+     * Generate an impersonation token to view the platform as a specific user.
+     * Returns a short-lived JWT token for the target user.
+     */
+    public function impersonate(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $user = User::findById($id);
+        if (!$user || $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Prevent impersonating super admins (security measure)
+        if (!empty($user['is_super_admin'])) {
+            $this->respondWithError(ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 'Cannot impersonate a super admin', null, 403);
+            return;
+        }
+
+        // Prevent self-impersonation
+        if ($id === $adminId) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Cannot impersonate yourself', null, 422);
+            return;
+        }
+
+        try {
+            // Generate an access token for the target user with impersonation claim
+            $token = \Nexus\Services\TokenService::generateToken($id, $tenantId, [
+                'impersonated_by' => $adminId,
+            ]);
+
+            ActivityLog::log($adminId, 'admin_impersonate', "Impersonated user #{$id} ({$user['email']})");
+
+            $this->respondWithData([
+                'token' => $token,
+                'user_id' => $id,
+                'user_name' => trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')),
+            ]);
+        } catch (\Throwable $e) {
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to generate impersonation token', null, 500);
+        }
+    }
 }
