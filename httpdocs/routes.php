@@ -462,6 +462,47 @@ $router->add('POST', '/api/v2/volunteering/reviews', 'Nexus\Controllers\Api\Volu
 $router->add('GET', '/api/v2/volunteering/reviews/{type}/{id}', 'Nexus\Controllers\Api\VolunteerApiController@getReviews');
 
 // ============================================
+// API V2 - ADMIN (React Admin Panel)
+// Dashboard, Users, Listings, Config, Cache, Jobs
+// ============================================
+
+// Admin Dashboard
+$router->add('GET', '/api/v2/admin/dashboard/stats', 'Nexus\Controllers\Api\AdminDashboardApiController@stats');
+$router->add('GET', '/api/v2/admin/dashboard/trends', 'Nexus\Controllers\Api\AdminDashboardApiController@trends');
+$router->add('GET', '/api/v2/admin/dashboard/activity', 'Nexus\Controllers\Api\AdminDashboardApiController@activity');
+
+// Admin Users
+$router->add('GET', '/api/v2/admin/users', 'Nexus\Controllers\Api\AdminUsersApiController@index');
+$router->add('POST', '/api/v2/admin/users', 'Nexus\Controllers\Api\AdminUsersApiController@store');
+$router->add('GET', '/api/v2/admin/users/{id}', 'Nexus\Controllers\Api\AdminUsersApiController@show');
+$router->add('PUT', '/api/v2/admin/users/{id}', 'Nexus\Controllers\Api\AdminUsersApiController@update');
+$router->add('DELETE', '/api/v2/admin/users/{id}', 'Nexus\Controllers\Api\AdminUsersApiController@destroy');
+$router->add('POST', '/api/v2/admin/users/{id}/approve', 'Nexus\Controllers\Api\AdminUsersApiController@approve');
+$router->add('POST', '/api/v2/admin/users/{id}/suspend', 'Nexus\Controllers\Api\AdminUsersApiController@suspend');
+$router->add('POST', '/api/v2/admin/users/{id}/ban', 'Nexus\Controllers\Api\AdminUsersApiController@ban');
+$router->add('POST', '/api/v2/admin/users/{id}/reactivate', 'Nexus\Controllers\Api\AdminUsersApiController@reactivate');
+$router->add('POST', '/api/v2/admin/users/{id}/reset-2fa', 'Nexus\Controllers\Api\AdminUsersApiController@reset2fa');
+
+// Admin Listings/Content
+$router->add('GET', '/api/v2/admin/listings', 'Nexus\Controllers\Api\AdminListingsApiController@index');
+$router->add('GET', '/api/v2/admin/listings/{id}', 'Nexus\Controllers\Api\AdminListingsApiController@show');
+$router->add('POST', '/api/v2/admin/listings/{id}/approve', 'Nexus\Controllers\Api\AdminListingsApiController@approve');
+$router->add('DELETE', '/api/v2/admin/listings/{id}', 'Nexus\Controllers\Api\AdminListingsApiController@destroy');
+
+// Admin Config (Features & Modules)
+$router->add('GET', '/api/v2/admin/config', 'Nexus\Controllers\Api\AdminConfigApiController@getConfig');
+$router->add('PUT', '/api/v2/admin/config/features', 'Nexus\Controllers\Api\AdminConfigApiController@updateFeature');
+$router->add('PUT', '/api/v2/admin/config/modules', 'Nexus\Controllers\Api\AdminConfigApiController@updateModule');
+
+// Admin Cache
+$router->add('GET', '/api/v2/admin/cache/stats', 'Nexus\Controllers\Api\AdminConfigApiController@cacheStats');
+$router->add('POST', '/api/v2/admin/cache/clear', 'Nexus\Controllers\Api\AdminConfigApiController@clearCache');
+
+// Admin Background Jobs
+$router->add('GET', '/api/v2/admin/jobs', 'Nexus\Controllers\Api\AdminConfigApiController@getJobs');
+$router->add('POST', '/api/v2/admin/jobs/{id}/run', 'Nexus\Controllers\Api\AdminConfigApiController@runJob');
+
+// ============================================
 // MASTER PLATFORM SOCIAL MEDIA MODULE API (Legacy V1)
 // Unified social interactions for ALL layouts
 // ============================================
