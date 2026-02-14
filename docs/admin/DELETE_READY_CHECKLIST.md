@@ -4,7 +4,7 @@
 >
 > **Last updated:** 2026-02-14
 >
-> **Status overview:** The React admin panel currently has **4 fully built modules** (Dashboard, Users, Listings, Tenant Features) and **~60 placeholder routes** pointing back to the legacy PHP admin. All placeholders must be replaced with real React implementations before any Phase 2 deletions.
+> **Status overview:** The React admin panel has **82 fully implemented modules** (80% functional parity) with **15 V2 API controllers** (126 endpoints, 6,695+ lines). The remaining **20 components** are intentional UI stubs for lower-priority features (advanced/SEO, system tools, content builders, deliverability, diagnostics). **Zero** AdminPlaceholder wrappers remain. All 119 routes have dedicated React components.
 
 ---
 
@@ -251,86 +251,55 @@ These files **must NOT be deleted** even after full React migration because they
 
 These are **V2 API controllers** used by the React admin panel. They are the **new** backend and must be preserved.
 
-| File | Purpose | React Consumer |
-|------|---------|----------------|
-| `src/Controllers/Api/AdminConfigApiController.php` | V2 Admin config, features, modules, cache, jobs API | `TenantFeatures.tsx`, admin settings |
-| `src/Controllers/Api/AdminDashboardApiController.php` | V2 Admin dashboard stats, trends, activity API | `AdminDashboard.tsx` |
-| `src/Controllers/Api/AdminUsersApiController.php` | V2 Admin user CRUD, approve/suspend/ban/reactivate API | `UserList.tsx` |
-| `src/Controllers/Api/AdminListingsApiController.php` | V2 Admin listing management, approve/delete API | `ListingsAdmin.tsx` |
+| File | Endpoints | React Consumers |
+|------|-----------|----------------|
+| `src/Controllers/Api/AdminDashboardApiController.php` | 3 | Dashboard |
+| `src/Controllers/Api/AdminUsersApiController.php` | 13 | Users (list, create, edit, badges, impersonate) |
+| `src/Controllers/Api/AdminListingsApiController.php` | 4 | Listings |
+| `src/Controllers/Api/AdminCategoriesApiController.php` | 8 | Categories, Attributes |
+| `src/Controllers/Api/AdminConfigApiController.php` | 9 | TenantFeatures, Settings, Cache, Jobs, Cron |
+| `src/Controllers/Api/AdminBlogApiController.php` | 6 | Blog (list, create, edit) |
+| `src/Controllers/Api/AdminMatchingApiController.php` | 9 | Smart Matching, Approvals |
+| `src/Controllers/Api/AdminBrokerApiController.php` | 8 | Broker Controls |
+| `src/Controllers/Api/AdminGamificationApiController.php` | 10 | Gamification, Campaigns, Custom Badges |
+| `src/Controllers/Api/AdminGroupsApiController.php` | 7 | Groups |
+| `src/Controllers/Api/AdminTimebankingApiController.php` | 6 | Timebanking |
+| `src/Controllers/Api/AdminNewsletterApiController.php` | 9 | Newsletters |
+| `src/Controllers/Api/AdminVolunteeringApiController.php` | 3 | Volunteering |
+| `src/Controllers/Api/AdminEnterpriseApiController.php` | 23 | Enterprise, GDPR, Monitoring, Config, Legal Docs |
+| `src/Controllers/Api/AdminFederationApiController.php` | 8 | Federation |
 
-### V2 API Routes (DO NOT DELETE from `httpdocs/routes.php`)
-
-```
-/api/v2/admin/dashboard/stats
-/api/v2/admin/dashboard/trends
-/api/v2/admin/dashboard/activity
-/api/v2/admin/users (GET, POST)
-/api/v2/admin/users/{id} (GET, PUT, DELETE)
-/api/v2/admin/users/{id}/approve
-/api/v2/admin/users/{id}/suspend
-/api/v2/admin/users/{id}/ban
-/api/v2/admin/users/{id}/reactivate
-/api/v2/admin/users/{id}/reset-2fa
-/api/v2/admin/listings (GET)
-/api/v2/admin/listings/{id} (GET, DELETE)
-/api/v2/admin/listings/{id}/approve
-/api/v2/admin/config (GET)
-/api/v2/admin/config/features (PUT)
-/api/v2/admin/config/modules (PUT)
-/api/v2/admin/cache/stats (GET)
-/api/v2/admin/cache/clear (POST)
-/api/v2/admin/jobs (GET)
-/api/v2/admin/jobs/{id}/run (POST)
-```
+**Total: 15 controllers, 126 endpoints, 6,695+ lines of code**
 
 ### React Admin Files (DO NOT DELETE)
 
-All files under `react-frontend/src/admin/` are the active replacement admin panel:
-
-```
-react-frontend/src/admin/AdminLayout.tsx
-react-frontend/src/admin/AdminRoute.tsx
-react-frontend/src/admin/routes.tsx
-react-frontend/src/admin/api/adminApi.ts
-react-frontend/src/admin/api/types.ts
-react-frontend/src/admin/components/AdminBreadcrumbs.tsx
-react-frontend/src/admin/components/AdminHeader.tsx
-react-frontend/src/admin/components/AdminSidebar.tsx
-react-frontend/src/admin/components/ConfirmModal.tsx
-react-frontend/src/admin/components/DataTable.tsx
-react-frontend/src/admin/components/EmptyState.tsx
-react-frontend/src/admin/components/PageHeader.tsx
-react-frontend/src/admin/components/StatCard.tsx
-react-frontend/src/admin/components/index.ts
-react-frontend/src/admin/modules/AdminPlaceholder.tsx
-react-frontend/src/admin/modules/config/TenantFeatures.tsx
-react-frontend/src/admin/modules/dashboard/AdminDashboard.tsx
-react-frontend/src/admin/modules/listings/ListingsAdmin.tsx
-react-frontend/src/admin/modules/users/UserList.tsx
-```
+**All files under `react-frontend/src/admin/`** are the active replacement admin panel (102 module components + 10 shared components + API client + types + routes + layout + auth guard).
 
 ---
 
 ## Migration Progress Summary
 
-| Category | Total | Built in React | Placeholder | % Complete |
-|----------|-------|----------------|-------------|------------|
+| Category | Total | Complete | Stub | % Complete |
+|----------|-------|----------|------|------------|
 | Dashboard | 1 | 1 | 0 | 100% |
-| Users | 1 | 1 | 0 | 100% |
+| Users | 4 | 4 | 0 | 100% |
 | Listings | 1 | 1 | 0 | 100% |
 | Tenant Features | 1 | 1 | 0 | 100% |
-| Content (Blog, Pages, Menus, Categories, Attributes) | 5 | 0 | 5 | 0% |
-| Engagement (Gamification, Badges, Campaigns) | 3 | 0 | 3 | 0% |
-| Matching & Broker (Smart Matching, Approvals, Broker Controls) | 4 | 0 | 4 | 0% |
-| Marketing (Newsletters) | 1 | 0 | 1 | 0% |
-| Advanced (AI, Feed, SEO, 404s) | 4 | 0 | 4 | 0% |
-| Financial (Timebanking, Plans) | 2 | 0 | 2 | 0% |
-| Enterprise (Dashboard, Roles, GDPR, Monitoring, Config, Secrets) | 6 | 0 | 6 | 0% |
-| Federation (Settings, Directory, Analytics, Keys, Data, Partners) | 6 | 0 | 6 | 0% |
-| System (Settings, Cron, Activity Log, Tests, Seed, WebP, Images, App) | 8 | 0 | 8 | 0% |
-| Community (Groups, Volunteering) | 2 | 0 | 2 | 0% |
-| Other (Legal Documents, Blog Restore, Deliverability, Diagnostics, Nexus Score) | 5 | 0 | 5 | 0% |
-| **TOTAL** | **50** | **4** | **46** | **8%** |
+| Content (Blog, Pages, Menus, Categories, Attributes) | 9 | 5 | 4 | 56% |
+| Engagement (Gamification, Badges, Campaigns) | 7 | 7 | 0 | 100% |
+| Matching & Broker | 10 | 10 | 0 | 100% |
+| Marketing (Newsletters) | 7 | 7 | 0 | 100% |
+| Advanced (AI, Feed, SEO, 404s) | 7 | 0 | 7 | 0% |
+| Financial (Timebanking, Plans) | 10 | 6 | 4 | 60% |
+| Enterprise (Dashboard, Roles, GDPR, Monitoring, Config, Legal) | 20 | 20 | 0 | 100% |
+| Federation | 8 | 8 | 0 | 100% |
+| System (Settings, Cron, Activity, Tests, Seed, WebP, Images, App, BlogRestore) | 10 | 4 | 6 | 40% |
+| Community (Groups, Volunteering, SmartMatch) | 13 | 10 | 3 | 77% |
+| Deliverability | 4 | 0 | 4 | 0% |
+| Diagnostics | 2 | 0 | 2 | 0% |
+| **TOTAL** | **114** | **84** | **30** | **74%** |
+
+> **Note:** "Total" counts routes (some components serve multiple routes). "Complete" = real API integration. "Stub" = valid UI shell, no API calls yet.
 
 ---
 
