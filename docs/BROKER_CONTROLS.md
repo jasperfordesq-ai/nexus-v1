@@ -305,8 +305,8 @@ source migrations/2026_02_08_broker_control_features.sql
 | Message Service | `src/Services/BrokerMessageVisibilityService.php` |
 | Admin Controller | `src/Controllers/Admin/BrokerControlsController.php` |
 | API Controller | `src/Controllers/Api/ExchangesApiController.php` |
-| Modern Views | `views/modern/admin/broker-controls/` |
-| CivicOne Views | `views/civicone/admin/broker-controls/` |
+| Admin Views (Modern PHP) | `views/modern/admin/broker-controls/` (legacy PHP admin panel — being migrated to React) |
+| Admin Views (CivicOne PHP) | `views/civicone/admin/broker-controls/` (legacy PHP admin panel — being migrated to React) |
 | CSS | `httpdocs/assets/css/admin/broker-controls.css` |
 | Migration | `migrations/2026_02_08_broker_control_features.sql` |
 | Tests | `tests/Services/*BrokerControl*Test.php` |

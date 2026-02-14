@@ -85,8 +85,8 @@ Brokers/coordinators need to approve matches before members connect to ensure:
 | `migrations/2026_02_07_match_approval_workflow.sql` | Database migration |
 | `src/Services/MatchApprovalWorkflowService.php` | Core approval logic |
 | `src/Controllers/Admin/MatchApprovalsController.php` | Admin dashboard controller |
-| `views/modern/admin/match-approvals/index.php` | Modern theme dashboard |
-| `views/civicone/admin/match-approvals/index.php` | CivicOne theme dashboard |
+| `views/modern/admin/match-approvals/index.php` | Admin panel dashboard (Modern PHP theme — admin panel still uses PHP while being migrated to React) |
+| `views/civicone/admin/match-approvals/index.php` | Admin panel dashboard (CivicOne PHP theme — admin panel still uses PHP while being migrated to React) |
 
 ### Files Modified
 
@@ -355,7 +355,7 @@ redis-cli FLUSHDB
 - [ ] Reject a match with reason - verify user receives notification with reason
 - [ ] Test bulk approve/reject with multiple selections
 - [ ] Verify statistics update correctly
-- [ ] Test on both modern and civicone themes
+- [ ] Test admin panel views (admin panel is still PHP while being migrated to React)
 
 ### Light/Dark Mode Toggle
 
