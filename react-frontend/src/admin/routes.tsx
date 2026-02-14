@@ -7,22 +7,130 @@
 import { Suspense, lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { LoadingScreen } from '@/components/feedback';
-import { AdminPlaceholder } from './modules/AdminPlaceholder';
 
 // Lazy-loaded admin pages
 const AdminDashboard = lazy(() => import('./modules/dashboard/AdminDashboard'));
 const UserList = lazy(() => import('./modules/users/UserList'));
 const TenantFeatures = lazy(() => import('./modules/config/TenantFeatures'));
+const UserCreate = lazy(() => import('./modules/users/UserCreate'));
+const UserEdit = lazy(() => import('./modules/users/UserEdit'));
 const ListingsAdmin = lazy(() => import('./modules/listings/ListingsAdmin'));
+const ActivityLog = lazy(() => import('./modules/system/ActivityLog'));
+const CategoriesAdmin = lazy(() => import('./modules/categories/CategoriesAdmin'));
+const CronJobs = lazy(() => import('./modules/system/CronJobs'));
+const BlogAdmin = lazy(() => import('./modules/blog/BlogAdmin'));
+const BlogPostForm = lazy(() => import('./modules/blog/BlogPostForm'));
+const SmartMatchingOverview = lazy(() => import('./modules/matching/SmartMatchingOverview'));
+const MatchingConfig = lazy(() => import('./modules/matching/MatchingConfig'));
+const MatchingAnalytics = lazy(() => import('./modules/matching/MatchingAnalytics'));
+const MatchApprovals = lazy(() => import('./modules/matching/MatchApprovals'));
+const MatchDetail = lazy(() => import('./modules/matching/MatchDetail'));
+const TimebankingDashboard = lazy(() => import('./modules/timebanking/TimebankingDashboard'));
+const FraudAlerts = lazy(() => import('./modules/timebanking/FraudAlerts'));
+const OrgWallets = lazy(() => import('./modules/timebanking/OrgWallets'));
+const UserReport = lazy(() => import('./modules/timebanking/UserReport'));
+const BrokerDashboard = lazy(() => import('./modules/broker/BrokerDashboard'));
+const ExchangeManagement = lazy(() => import('./modules/broker/ExchangeManagement'));
+const RiskTags = lazy(() => import('./modules/broker/RiskTags'));
+const MessageReview = lazy(() => import('./modules/broker/MessageReview'));
+const UserMonitoring = lazy(() => import('./modules/broker/UserMonitoring'));
+const GamificationHub = lazy(() => import('./modules/gamification/GamificationHub'));
+const CampaignList = lazy(() => import('./modules/gamification/CampaignList'));
+const CampaignForm = lazy(() => import('./modules/gamification/CampaignForm'));
+const GamificationAnalytics = lazy(() => import('./modules/gamification/GamificationAnalytics'));
+const CustomBadges = lazy(() => import('./modules/gamification/CustomBadges'));
+const CreateBadge = lazy(() => import('./modules/gamification/CreateBadge'));
+const GroupList = lazy(() => import('./modules/groups/GroupList'));
+const GroupAnalytics = lazy(() => import('./modules/groups/GroupAnalytics'));
+const GroupApprovals = lazy(() => import('./modules/groups/GroupApprovals'));
+const GroupModeration = lazy(() => import('./modules/groups/GroupModeration'));
+
+// Enterprise module
+const EnterpriseDashboard = lazy(() => import('./modules/enterprise/EnterpriseDashboard'));
+const RoleList = lazy(() => import('./modules/enterprise/RoleList'));
+const RoleForm = lazy(() => import('./modules/enterprise/RoleForm'));
+const PermissionBrowser = lazy(() => import('./modules/enterprise/PermissionBrowser'));
+const GdprDashboard = lazy(() => import('./modules/enterprise/GdprDashboard'));
+const GdprRequests = lazy(() => import('./modules/enterprise/GdprRequests'));
+const GdprConsents = lazy(() => import('./modules/enterprise/GdprConsents'));
+const GdprBreaches = lazy(() => import('./modules/enterprise/GdprBreaches'));
+const GdprAuditLog = lazy(() => import('./modules/enterprise/GdprAuditLog'));
+const SystemMonitoring = lazy(() => import('./modules/enterprise/SystemMonitoring'));
+const HealthCheck = lazy(() => import('./modules/enterprise/HealthCheck'));
+const ErrorLogs = lazy(() => import('./modules/enterprise/ErrorLogs'));
+const SystemConfig = lazy(() => import('./modules/enterprise/SystemConfig'));
+const SecretsVault = lazy(() => import('./modules/enterprise/SecretsVault'));
+const LegalDocList = lazy(() => import('./modules/enterprise/LegalDocList'));
+const LegalDocForm = lazy(() => import('./modules/enterprise/LegalDocForm'));
+
+// Newsletter module
+const NewsletterList = lazy(() => import('./modules/newsletters/NewsletterList'));
+const NewsletterForm = lazy(() => import('./modules/newsletters/NewsletterForm'));
+const Subscribers = lazy(() => import('./modules/newsletters/Subscribers'));
+const Segments = lazy(() => import('./modules/newsletters/Segments'));
+const Templates = lazy(() => import('./modules/newsletters/Templates'));
+const NewsletterAnalytics = lazy(() => import('./modules/newsletters/NewsletterAnalytics'));
+
+// Volunteering module
+const VolunteeringOverview = lazy(() => import('./modules/volunteering/VolunteeringOverview'));
+const VolunteerApprovals = lazy(() => import('./modules/volunteering/VolunteerApprovals'));
+const VolunteerOrganizations = lazy(() => import('./modules/volunteering/VolunteerOrganizations'));
+
+// Federation module
+const FederationSettings = lazy(() => import('./modules/federation/FederationSettings'));
+const Partnerships = lazy(() => import('./modules/federation/Partnerships'));
+const PartnerDirectory = lazy(() => import('./modules/federation/PartnerDirectory'));
+const MyProfile = lazy(() => import('./modules/federation/MyProfile'));
+const FederationAnalytics = lazy(() => import('./modules/federation/FederationAnalytics'));
+const ApiKeys = lazy(() => import('./modules/federation/ApiKeys'));
+const CreateApiKey = lazy(() => import('./modules/federation/CreateApiKey'));
+const DataManagement = lazy(() => import('./modules/federation/DataManagement'));
+
+// Advanced/SEO module
+const AiSettings = lazy(() => import('./modules/advanced/AiSettings'));
+const FeedAlgorithm = lazy(() => import('./modules/advanced/FeedAlgorithm'));
+const AlgorithmSettings = lazy(() => import('./modules/advanced/AlgorithmSettings'));
+const SeoOverview = lazy(() => import('./modules/advanced/SeoOverview'));
+const SeoAudit = lazy(() => import('./modules/advanced/SeoAudit'));
+const Redirects = lazy(() => import('./modules/advanced/Redirects'));
+const Error404Tracking = lazy(() => import('./modules/advanced/Error404Tracking'));
+
+// System tools
+const AdminSettings = lazy(() => import('./modules/system/AdminSettings'));
+const TestRunner = lazy(() => import('./modules/system/TestRunner'));
+const SeedGenerator = lazy(() => import('./modules/system/SeedGenerator'));
+const WebpConverter = lazy(() => import('./modules/system/WebpConverter'));
+const ImageSettings = lazy(() => import('./modules/system/ImageSettings'));
+const NativeApp = lazy(() => import('./modules/system/NativeApp'));
+const BlogRestore = lazy(() => import('./modules/system/BlogRestore'));
+
+// Community tools
+const SmartMatchUsers = lazy(() => import('./modules/community/SmartMatchUsers'));
+const SmartMatchMonitoring = lazy(() => import('./modules/community/SmartMatchMonitoring'));
+
+// Deliverability module
+const DeliverabilityDashboard = lazy(() => import('./modules/deliverability/DeliverabilityDashboard'));
+const DeliverablesList = lazy(() => import('./modules/deliverability/DeliverablesList'));
+const CreateDeliverable = lazy(() => import('./modules/deliverability/CreateDeliverable'));
+const DeliverabilityAnalytics = lazy(() => import('./modules/deliverability/DeliverabilityAnalytics'));
+
+// Diagnostics module
+const MatchingDiagnostic = lazy(() => import('./modules/diagnostics/MatchingDiagnostic'));
+const NexusScoreAnalytics = lazy(() => import('./modules/diagnostics/NexusScoreAnalytics'));
+
+// Content module
+const PagesAdmin = lazy(() => import('./modules/content/PagesAdmin'));
+const PageBuilder = lazy(() => import('./modules/content/PageBuilder'));
+const MenusAdmin = lazy(() => import('./modules/content/MenusAdmin'));
+const MenuBuilder = lazy(() => import('./modules/content/MenuBuilder'));
+const AttributesAdmin = lazy(() => import('./modules/content/AttributesAdmin'));
+const PlansAdmin = lazy(() => import('./modules/content/PlansAdmin'));
+const PlanForm = lazy(() => import('./modules/content/PlanForm'));
+const SubscriptionsAdmin = lazy(() => import('./modules/content/Subscriptions'));
 
 // Wrap lazy components in Suspense
 function Lazy({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<LoadingScreen message="Loading..." />}>{children}</Suspense>;
-}
-
-// Placeholder helpers for modules in migration
-function P({ title, description, path }: { title: string; description?: string; path?: string }) {
-  return <AdminPlaceholder title={title} description={description} legacyPath={path} />;
 }
 
 /**
@@ -37,147 +145,147 @@ export function AdminRoutes() {
 
       {/* ─── USERS ─── */}
       <Route path="users" element={<Lazy><UserList /></Lazy>} />
-      <Route path="users/create" element={<P title="Create User" path="/admin/users/create" />} />
-      <Route path="users/:id/edit" element={<P title="Edit User" path="/admin/users/edit" />} />
-      <Route path="users/:id/permissions" element={<P title="User Permissions" path="/admin/enterprise/permissions" />} />
+      <Route path="users/create" element={<Lazy><UserCreate /></Lazy>} />
+      <Route path="users/:id/edit" element={<Lazy><UserEdit /></Lazy>} />
+      <Route path="users/:id/permissions" element={<Lazy><PermissionBrowser /></Lazy>} />
 
       {/* ─── LISTINGS ─── */}
       <Route path="listings" element={<Lazy><ListingsAdmin /></Lazy>} />
 
       {/* ─── CONTENT ─── */}
-      <Route path="blog" element={<P title="Blog Posts" description="Create and manage blog posts" path="/admin/blog" />} />
-      <Route path="blog/create" element={<P title="Create Blog Post" path="/admin/blog/create" />} />
-      <Route path="blog/edit/:id" element={<P title="Edit Blog Post" path="/admin/blog/edit" />} />
-      <Route path="pages" element={<P title="Pages" description="Manage CMS pages" path="/admin/pages" />} />
-      <Route path="pages/builder/:id" element={<P title="Page Builder" path="/admin/pages/builder" />} />
-      <Route path="menus" element={<P title="Menus" description="Manage navigation menus" path="/admin/menus" />} />
-      <Route path="menus/builder/:id" element={<P title="Menu Builder" path="/admin/menus/builder" />} />
-      <Route path="categories" element={<P title="Categories" description="Content categories" path="/admin/categories" />} />
-      <Route path="categories/create" element={<P title="Create Category" path="/admin/categories/create" />} />
-      <Route path="categories/edit/:id" element={<P title="Edit Category" path="/admin/categories/edit" />} />
-      <Route path="attributes" element={<P title="Attributes" description="Listing attributes" path="/admin/attributes" />} />
+      <Route path="blog" element={<Lazy><BlogAdmin /></Lazy>} />
+      <Route path="blog/create" element={<Lazy><BlogPostForm /></Lazy>} />
+      <Route path="blog/edit/:id" element={<Lazy><BlogPostForm /></Lazy>} />
+      <Route path="pages" element={<Lazy><PagesAdmin /></Lazy>} />
+      <Route path="pages/builder/:id" element={<Lazy><PageBuilder /></Lazy>} />
+      <Route path="menus" element={<Lazy><MenusAdmin /></Lazy>} />
+      <Route path="menus/builder/:id" element={<Lazy><MenuBuilder /></Lazy>} />
+      <Route path="categories" element={<Lazy><CategoriesAdmin /></Lazy>} />
+      <Route path="categories/create" element={<Lazy><CategoriesAdmin /></Lazy>} />
+      <Route path="categories/edit/:id" element={<Lazy><CategoriesAdmin /></Lazy>} />
+      <Route path="attributes" element={<Lazy><AttributesAdmin /></Lazy>} />
 
       {/* ─── ENGAGEMENT ─── */}
-      <Route path="gamification" element={<P title="Gamification Hub" description="Badges, achievements, and XP" path="/admin/gamification" />} />
-      <Route path="gamification/campaigns" element={<P title="Campaigns" path="/admin/gamification/campaigns" />} />
-      <Route path="gamification/campaigns/create" element={<P title="Create Campaign" path="/admin/gamification/campaigns/create" />} />
-      <Route path="gamification/campaigns/edit/:id" element={<P title="Edit Campaign" path="/admin/gamification/campaigns/edit" />} />
-      <Route path="gamification/analytics" element={<P title="Gamification Analytics" path="/admin/gamification/analytics" />} />
-      <Route path="custom-badges" element={<P title="Custom Badges" path="/admin/custom-badges" />} />
-      <Route path="custom-badges/create" element={<P title="Create Badge" path="/admin/custom-badges/create" />} />
+      <Route path="gamification" element={<Lazy><GamificationHub /></Lazy>} />
+      <Route path="gamification/campaigns" element={<Lazy><CampaignList /></Lazy>} />
+      <Route path="gamification/campaigns/create" element={<Lazy><CampaignForm /></Lazy>} />
+      <Route path="gamification/campaigns/edit/:id" element={<Lazy><CampaignForm /></Lazy>} />
+      <Route path="gamification/analytics" element={<Lazy><GamificationAnalytics /></Lazy>} />
+      <Route path="custom-badges" element={<Lazy><CustomBadges /></Lazy>} />
+      <Route path="custom-badges/create" element={<Lazy><CreateBadge /></Lazy>} />
 
       {/* ─── MATCHING & BROKER ─── */}
-      <Route path="smart-matching" element={<P title="Smart Matching" description="Algorithm configuration and analytics" path="/admin/smart-matching" />} />
-      <Route path="smart-matching/analytics" element={<P title="Matching Analytics" path="/admin/smart-matching/analytics" />} />
-      <Route path="smart-matching/configuration" element={<P title="Matching Configuration" path="/admin/smart-matching/configuration" />} />
-      <Route path="match-approvals" element={<P title="Match Approvals" description="Review and approve matches" path="/admin/match-approvals" />} />
-      <Route path="match-approvals/:id" element={<P title="Match Detail" path="/admin/match-approvals" />} />
-      <Route path="broker-controls" element={<P title="Broker Controls" description="Exchange management and monitoring" path="/admin/broker-controls" />} />
-      <Route path="broker-controls/exchanges" element={<P title="Exchange Management" path="/admin/broker-controls/exchanges" />} />
-      <Route path="broker-controls/risk-tags" element={<P title="Risk Tags" path="/admin/broker-controls/risk-tags" />} />
-      <Route path="broker-controls/messages" element={<P title="Message Review" path="/admin/broker-controls/messages" />} />
-      <Route path="broker-controls/monitoring" element={<P title="User Monitoring" path="/admin/broker-controls/monitoring" />} />
+      <Route path="smart-matching" element={<Lazy><SmartMatchingOverview /></Lazy>} />
+      <Route path="smart-matching/analytics" element={<Lazy><MatchingAnalytics /></Lazy>} />
+      <Route path="smart-matching/configuration" element={<Lazy><MatchingConfig /></Lazy>} />
+      <Route path="match-approvals" element={<Lazy><MatchApprovals /></Lazy>} />
+      <Route path="match-approvals/:id" element={<Lazy><MatchDetail /></Lazy>} />
+      <Route path="broker-controls" element={<Lazy><BrokerDashboard /></Lazy>} />
+      <Route path="broker-controls/exchanges" element={<Lazy><ExchangeManagement /></Lazy>} />
+      <Route path="broker-controls/risk-tags" element={<Lazy><RiskTags /></Lazy>} />
+      <Route path="broker-controls/messages" element={<Lazy><MessageReview /></Lazy>} />
+      <Route path="broker-controls/monitoring" element={<Lazy><UserMonitoring /></Lazy>} />
 
       {/* ─── MARKETING ─── */}
-      <Route path="newsletters" element={<P title="Newsletters" description="Email campaign management" path="/admin/newsletters" />} />
-      <Route path="newsletters/create" element={<P title="Create Newsletter" path="/admin/newsletters/create" />} />
-      <Route path="newsletters/edit/:id" element={<P title="Edit Newsletter" path="/admin/newsletters/edit" />} />
-      <Route path="newsletters/subscribers" element={<P title="Subscribers" path="/admin/newsletters/subscribers" />} />
-      <Route path="newsletters/segments" element={<P title="Segments" path="/admin/newsletters/segments" />} />
-      <Route path="newsletters/templates" element={<P title="Templates" path="/admin/newsletters/templates" />} />
-      <Route path="newsletters/analytics" element={<P title="Newsletter Analytics" path="/admin/newsletters/analytics" />} />
+      <Route path="newsletters" element={<Lazy><NewsletterList /></Lazy>} />
+      <Route path="newsletters/create" element={<Lazy><NewsletterForm /></Lazy>} />
+      <Route path="newsletters/edit/:id" element={<Lazy><NewsletterForm /></Lazy>} />
+      <Route path="newsletters/subscribers" element={<Lazy><Subscribers /></Lazy>} />
+      <Route path="newsletters/segments" element={<Lazy><Segments /></Lazy>} />
+      <Route path="newsletters/templates" element={<Lazy><Templates /></Lazy>} />
+      <Route path="newsletters/analytics" element={<Lazy><NewsletterAnalytics /></Lazy>} />
 
       {/* ─── ADVANCED ─── */}
-      <Route path="ai-settings" element={<P title="AI Settings" description="Configure AI providers" path="/admin/ai-settings" />} />
-      <Route path="feed-algorithm" element={<P title="Feed Algorithm" path="/admin/feed-algorithm" />} />
-      <Route path="algorithm-settings" element={<P title="Algorithm Settings" path="/admin/algorithm-settings" />} />
-      <Route path="seo" element={<P title="SEO Overview" description="Search engine optimization" path="/admin/seo" />} />
-      <Route path="seo/audit" element={<P title="SEO Audit" path="/admin/seo/audit" />} />
-      <Route path="seo/redirects" element={<P title="Redirects" path="/admin/seo/redirects" />} />
-      <Route path="404-errors" element={<P title="404 Error Tracking" path="/admin/404-errors" />} />
+      <Route path="ai-settings" element={<Lazy><AiSettings /></Lazy>} />
+      <Route path="feed-algorithm" element={<Lazy><FeedAlgorithm /></Lazy>} />
+      <Route path="algorithm-settings" element={<Lazy><AlgorithmSettings /></Lazy>} />
+      <Route path="seo" element={<Lazy><SeoOverview /></Lazy>} />
+      <Route path="seo/audit" element={<Lazy><SeoAudit /></Lazy>} />
+      <Route path="seo/redirects" element={<Lazy><Redirects /></Lazy>} />
+      <Route path="404-errors" element={<Lazy><Error404Tracking /></Lazy>} />
 
       {/* ─── FINANCIAL ─── */}
-      <Route path="timebanking" element={<P title="Timebanking" description="Transaction analytics and abuse detection" path="/admin/timebanking" />} />
-      <Route path="timebanking/alerts" element={<P title="Fraud Alerts" path="/admin/timebanking/alerts" />} />
-      <Route path="timebanking/user-report" element={<P title="User Report" path="/admin/timebanking/user-report" />} />
-      <Route path="timebanking/user-report/:id" element={<P title="User Report" path="/admin/timebanking/user-report" />} />
-      <Route path="timebanking/org-wallets" element={<P title="Organization Wallets" path="/admin/timebanking/org-wallets" />} />
-      <Route path="timebanking/create-org" element={<P title="Create Organization" path="/admin/timebanking/create-org" />} />
-      <Route path="plans" element={<P title="Plans & Pricing" path="/admin/plans" />} />
-      <Route path="plans/create" element={<P title="Create Plan" path="/admin/plans/create" />} />
-      <Route path="plans/edit/:id" element={<P title="Edit Plan" path="/admin/plans/edit" />} />
-      <Route path="plans/subscriptions" element={<P title="Subscriptions" path="/admin/plans/subscriptions" />} />
+      <Route path="timebanking" element={<Lazy><TimebankingDashboard /></Lazy>} />
+      <Route path="timebanking/alerts" element={<Lazy><FraudAlerts /></Lazy>} />
+      <Route path="timebanking/user-report" element={<Lazy><UserReport /></Lazy>} />
+      <Route path="timebanking/user-report/:id" element={<Lazy><UserReport /></Lazy>} />
+      <Route path="timebanking/org-wallets" element={<Lazy><OrgWallets /></Lazy>} />
+      <Route path="timebanking/create-org" element={<Lazy><OrgWallets /></Lazy>} />
+      <Route path="plans" element={<Lazy><PlansAdmin /></Lazy>} />
+      <Route path="plans/create" element={<Lazy><PlanForm /></Lazy>} />
+      <Route path="plans/edit/:id" element={<Lazy><PlanForm /></Lazy>} />
+      <Route path="plans/subscriptions" element={<Lazy><SubscriptionsAdmin /></Lazy>} />
 
       {/* ─── ENTERPRISE ─── */}
-      <Route path="enterprise" element={<P title="Enterprise Dashboard" path="/admin/enterprise" />} />
-      <Route path="enterprise/roles" element={<P title="Roles & Permissions" description="RBAC management" path="/admin/enterprise/roles" />} />
-      <Route path="enterprise/roles/create" element={<P title="Create Role" path="/admin/enterprise/roles/create" />} />
-      <Route path="enterprise/roles/:id" element={<P title="View Role" path="/admin/enterprise/roles" />} />
-      <Route path="enterprise/roles/:id/edit" element={<P title="Edit Role" path="/admin/enterprise/roles" />} />
-      <Route path="enterprise/permissions" element={<P title="Permission Browser" path="/admin/enterprise/permissions" />} />
-      <Route path="enterprise/gdpr" element={<P title="GDPR Dashboard" description="Data protection compliance" path="/admin/enterprise/gdpr" />} />
-      <Route path="enterprise/gdpr/requests" element={<P title="Data Requests" path="/admin/enterprise/gdpr/requests" />} />
-      <Route path="enterprise/gdpr/consents" element={<P title="Consent Records" path="/admin/enterprise/gdpr/consents" />} />
-      <Route path="enterprise/gdpr/breaches" element={<P title="Data Breaches" path="/admin/enterprise/gdpr/breaches" />} />
-      <Route path="enterprise/gdpr/audit" element={<P title="GDPR Audit Log" path="/admin/enterprise/gdpr/audit" />} />
-      <Route path="enterprise/monitoring" element={<P title="System Monitoring" path="/admin/enterprise/monitoring" />} />
-      <Route path="enterprise/monitoring/health" element={<P title="Health Check" path="/admin/enterprise/monitoring/health" />} />
-      <Route path="enterprise/monitoring/logs" element={<P title="Error Logs" path="/admin/enterprise/monitoring/logs" />} />
-      <Route path="enterprise/config" element={<P title="System Configuration" path="/admin/enterprise/config" />} />
-      <Route path="enterprise/config/secrets" element={<P title="Secrets Vault" path="/admin/enterprise/config/secrets" />} />
-      <Route path="legal-documents" element={<P title="Legal Documents" description="Document versioning and compliance" path="/admin/legal-documents" />} />
-      <Route path="legal-documents/create" element={<P title="Create Legal Document" path="/admin/legal-documents/create" />} />
-      <Route path="legal-documents/:id" element={<P title="View Legal Document" path="/admin/legal-documents" />} />
-      <Route path="legal-documents/:id/edit" element={<P title="Edit Legal Document" path="/admin/legal-documents" />} />
+      <Route path="enterprise" element={<Lazy><EnterpriseDashboard /></Lazy>} />
+      <Route path="enterprise/roles" element={<Lazy><RoleList /></Lazy>} />
+      <Route path="enterprise/roles/create" element={<Lazy><RoleForm /></Lazy>} />
+      <Route path="enterprise/roles/:id" element={<Lazy><RoleForm /></Lazy>} />
+      <Route path="enterprise/roles/:id/edit" element={<Lazy><RoleForm /></Lazy>} />
+      <Route path="enterprise/permissions" element={<Lazy><PermissionBrowser /></Lazy>} />
+      <Route path="enterprise/gdpr" element={<Lazy><GdprDashboard /></Lazy>} />
+      <Route path="enterprise/gdpr/requests" element={<Lazy><GdprRequests /></Lazy>} />
+      <Route path="enterprise/gdpr/consents" element={<Lazy><GdprConsents /></Lazy>} />
+      <Route path="enterprise/gdpr/breaches" element={<Lazy><GdprBreaches /></Lazy>} />
+      <Route path="enterprise/gdpr/audit" element={<Lazy><GdprAuditLog /></Lazy>} />
+      <Route path="enterprise/monitoring" element={<Lazy><SystemMonitoring /></Lazy>} />
+      <Route path="enterprise/monitoring/health" element={<Lazy><HealthCheck /></Lazy>} />
+      <Route path="enterprise/monitoring/logs" element={<Lazy><ErrorLogs /></Lazy>} />
+      <Route path="enterprise/config" element={<Lazy><SystemConfig /></Lazy>} />
+      <Route path="enterprise/config/secrets" element={<Lazy><SecretsVault /></Lazy>} />
+      <Route path="legal-documents" element={<Lazy><LegalDocList /></Lazy>} />
+      <Route path="legal-documents/create" element={<Lazy><LegalDocForm /></Lazy>} />
+      <Route path="legal-documents/:id" element={<Lazy><LegalDocForm /></Lazy>} />
+      <Route path="legal-documents/:id/edit" element={<Lazy><LegalDocForm /></Lazy>} />
 
       {/* ─── FEDERATION ─── */}
-      <Route path="federation" element={<P title="Federation Settings" path="/admin/federation" />} />
-      <Route path="federation/partnerships" element={<P title="Partnerships" path="/admin/federation/partnerships" />} />
-      <Route path="federation/directory" element={<P title="Partner Directory" path="/admin/federation/directory" />} />
-      <Route path="federation/directory/profile" element={<P title="My Listing" path="/admin/federation/directory/profile" />} />
-      <Route path="federation/analytics" element={<P title="Federation Analytics" path="/admin/federation/analytics" />} />
-      <Route path="federation/api-keys" element={<P title="API Keys" path="/admin/federation/api-keys" />} />
-      <Route path="federation/api-keys/create" element={<P title="Create API Key" path="/admin/federation/api-keys/create" />} />
-      <Route path="federation/data" element={<P title="Data Management" path="/admin/federation/data" />} />
+      <Route path="federation" element={<Lazy><FederationSettings /></Lazy>} />
+      <Route path="federation/partnerships" element={<Lazy><Partnerships /></Lazy>} />
+      <Route path="federation/directory" element={<Lazy><PartnerDirectory /></Lazy>} />
+      <Route path="federation/directory/profile" element={<Lazy><MyProfile /></Lazy>} />
+      <Route path="federation/analytics" element={<Lazy><FederationAnalytics /></Lazy>} />
+      <Route path="federation/api-keys" element={<Lazy><ApiKeys /></Lazy>} />
+      <Route path="federation/api-keys/create" element={<Lazy><CreateApiKey /></Lazy>} />
+      <Route path="federation/data" element={<Lazy><DataManagement /></Lazy>} />
 
       {/* ─── SYSTEM ─── */}
-      <Route path="settings" element={<P title="Admin Settings" description="Global platform settings" path="/admin/settings" />} />
+      <Route path="settings" element={<Lazy><AdminSettings /></Lazy>} />
       <Route path="tenant-features" element={<Lazy><TenantFeatures /></Lazy>} />
-      <Route path="cron-jobs" element={<P title="Cron Jobs" description="Scheduled task management" path="/admin/cron-jobs" />} />
-      <Route path="activity-log" element={<P title="Activity Log" description="Admin action audit trail" path="/admin/activity-log" />} />
-      <Route path="tests" element={<P title="API Test Runner" path="/admin/tests" />} />
-      <Route path="seed-generator" element={<P title="Seed Generator" path="/admin/seed-generator" />} />
-      <Route path="webp-converter" element={<P title="WebP Converter" path="/admin/webp-converter" />} />
-      <Route path="image-settings" element={<P title="Image Settings" path="/admin/image-settings" />} />
-      <Route path="native-app" element={<P title="Native App" path="/admin/native-app" />} />
-      <Route path="blog-restore" element={<P title="Blog Restore" path="/admin/blog-restore" />} />
+      <Route path="cron-jobs" element={<Lazy><CronJobs /></Lazy>} />
+      <Route path="activity-log" element={<Lazy><ActivityLog /></Lazy>} />
+      <Route path="tests" element={<Lazy><TestRunner /></Lazy>} />
+      <Route path="seed-generator" element={<Lazy><SeedGenerator /></Lazy>} />
+      <Route path="webp-converter" element={<Lazy><WebpConverter /></Lazy>} />
+      <Route path="image-settings" element={<Lazy><ImageSettings /></Lazy>} />
+      <Route path="native-app" element={<Lazy><NativeApp /></Lazy>} />
+      <Route path="blog-restore" element={<Lazy><BlogRestore /></Lazy>} />
 
       {/* ─── COMMUNITY TOOLS ─── */}
-      <Route path="groups" element={<P title="Groups" path="/admin/groups" />} />
-      <Route path="groups/analytics" element={<P title="Group Analytics" path="/admin/groups/analytics" />} />
-      <Route path="groups/approvals" element={<P title="Group Approvals" path="/admin/groups/approvals" />} />
-      <Route path="groups/moderation" element={<P title="Content Moderation" path="/admin/groups/moderation" />} />
-      <Route path="group-types" element={<P title="Group Types" path="/admin/group-types" />} />
-      <Route path="group-ranking" element={<P title="Group Ranking" path="/admin/group-ranking" />} />
-      <Route path="group-locations" element={<P title="Group Locations" path="/admin/group-locations" />} />
-      <Route path="geocode-groups" element={<P title="Geocoding" path="/admin/geocode-groups" />} />
-      <Route path="smart-match-users" element={<P title="Smart Match Users" path="/admin/smart-match-users" />} />
-      <Route path="smart-match-monitoring" element={<P title="Match Monitoring" path="/admin/smart-match-monitoring" />} />
-      <Route path="volunteering" element={<P title="Volunteering" path="/admin/volunteering" />} />
-      <Route path="volunteering/approvals" element={<P title="Volunteer Approvals" path="/admin/volunteering/approvals" />} />
-      <Route path="volunteering/organizations" element={<P title="Organizations" path="/admin/volunteering/organizations" />} />
+      <Route path="groups" element={<Lazy><GroupList /></Lazy>} />
+      <Route path="groups/analytics" element={<Lazy><GroupAnalytics /></Lazy>} />
+      <Route path="groups/approvals" element={<Lazy><GroupApprovals /></Lazy>} />
+      <Route path="groups/moderation" element={<Lazy><GroupModeration /></Lazy>} />
+      <Route path="group-types" element={<Lazy><GroupList /></Lazy>} />
+      <Route path="group-ranking" element={<Lazy><GroupList /></Lazy>} />
+      <Route path="group-locations" element={<Lazy><GroupList /></Lazy>} />
+      <Route path="geocode-groups" element={<Lazy><GroupList /></Lazy>} />
+      <Route path="smart-match-users" element={<Lazy><SmartMatchUsers /></Lazy>} />
+      <Route path="smart-match-monitoring" element={<Lazy><SmartMatchMonitoring /></Lazy>} />
+      <Route path="volunteering" element={<Lazy><VolunteeringOverview /></Lazy>} />
+      <Route path="volunteering/approvals" element={<Lazy><VolunteerApprovals /></Lazy>} />
+      <Route path="volunteering/organizations" element={<Lazy><VolunteerOrganizations /></Lazy>} />
 
       {/* ─── DELIVERABILITY ─── */}
-      <Route path="deliverability" element={<P title="Deliverability Dashboard" path="/admin/deliverability" />} />
-      <Route path="deliverability/list" element={<P title="All Deliverables" path="/admin/deliverability/list" />} />
-      <Route path="deliverability/create" element={<P title="Create Deliverable" path="/admin/deliverability/create" />} />
-      <Route path="deliverability/analytics" element={<P title="Deliverability Analytics" path="/admin/deliverability/analytics" />} />
+      <Route path="deliverability" element={<Lazy><DeliverabilityDashboard /></Lazy>} />
+      <Route path="deliverability/list" element={<Lazy><DeliverablesList /></Lazy>} />
+      <Route path="deliverability/create" element={<Lazy><CreateDeliverable /></Lazy>} />
+      <Route path="deliverability/analytics" element={<Lazy><DeliverabilityAnalytics /></Lazy>} />
 
       {/* ─── MATCHING DIAGNOSTIC ─── */}
-      <Route path="matching-diagnostic" element={<P title="Matching Diagnostic" path="/admin/matching-diagnostic" />} />
+      <Route path="matching-diagnostic" element={<Lazy><MatchingDiagnostic /></Lazy>} />
 
       {/* ─── NEXUS SCORE ─── */}
-      <Route path="nexus-score/analytics" element={<P title="Nexus Score Analytics" path="/admin/nexus-score/analytics" />} />
+      <Route path="nexus-score/analytics" element={<Lazy><NexusScoreAnalytics /></Lazy>} />
     </>
   );
 }

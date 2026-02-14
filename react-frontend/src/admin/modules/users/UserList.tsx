@@ -27,7 +27,9 @@ import {
   Edit,
   Shield,
   KeyRound,
+  LogIn,
 } from 'lucide-react';
+import { useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminUsers } from '../../api/adminApi';
@@ -38,6 +40,8 @@ export function UserList() {
   usePageTitle('Admin - Users');
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { user: currentUser } = useAuth();
+  const isSuperAdmin = (currentUser as Record<string, unknown> | null)?.is_super_admin === true || (currentUser?.role as string) === 'super_admin';
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -50,7 +54,7 @@ export function UserList() {
 
   // Confirm modal state
   const [confirmAction, setConfirmAction] = useState<{
-    type: 'approve' | 'suspend' | 'ban' | 'reactivate' | 'delete' | 'reset2fa';
+    type: 'approve' | 'suspend' | 'ban' | 'reactivate' | 'delete' | 'reset2fa' | 'impersonate';
     user: AdminUser;
   } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -120,6 +124,9 @@ export function UserList() {
       case 'reset2fa':
         res = await adminUsers.reset2fa(user.id, 'Admin reset');
         break;
+      case 'impersonate':
+        res = await adminUsers.impersonate(user.id);
+        break;
     }
 
     if (res?.success) {
@@ -140,10 +147,11 @@ export function UserList() {
     reactivate: { title: 'Reactivate User', message: 'This user will regain access to the platform.', label: 'Reactivate' },
     delete: { title: 'Delete User', message: 'This user and all their data will be permanently deleted. This cannot be undone.', label: 'Delete' },
     reset2fa: { title: 'Reset 2FA', message: 'This will remove the user\'s two-factor authentication. They will need to set it up again.', label: 'Reset 2FA' },
+    impersonate: { title: 'Impersonate User', message: 'You will be logged in as this user. Your admin session will be preserved so you can return.', label: 'Impersonate' },
   };
 
   function UserActionsMenu({ user }: { user: AdminUser }) {
-    type ActionKey = 'edit' | 'approve' | 'suspend' | 'ban' | 'reactivate' | 'reset2fa' | 'permissions';
+    type ActionKey = 'edit' | 'approve' | 'suspend' | 'ban' | 'reactivate' | 'reset2fa' | 'permissions' | 'impersonate';
 
     const items: { key: ActionKey; label: string; icon: React.ReactNode; color?: 'success' | 'warning' | 'danger'; className?: string }[] = [
       { key: 'edit', label: 'Edit', icon: <Edit size={14} /> },
@@ -165,6 +173,10 @@ export function UserList() {
       items.push({ key: 'reset2fa', label: 'Reset 2FA', icon: <KeyRound size={14} /> });
     }
     items.push({ key: 'permissions', label: 'Permissions', icon: <Shield size={14} /> });
+    // Super admins can impersonate other users (but not other super admins)
+    if (isSuperAdmin && !user.is_super_admin && user.id !== currentUser?.id) {
+      items.push({ key: 'impersonate', label: 'Impersonate', icon: <LogIn size={14} /> });
+    }
 
     const handleMenuAction = (key: React.Key) => {
       const action = key as ActionKey;
@@ -172,6 +184,8 @@ export function UserList() {
         navigate(tenantPath(`/admin/users/${user.id}/edit`));
       } else if (action === 'permissions') {
         navigate(tenantPath(`/admin/users/${user.id}/permissions`));
+      } else if (action === 'impersonate') {
+        setConfirmAction({ type: 'impersonate', user });
       } else {
         setConfirmAction({ type: action, user });
       }
@@ -229,9 +243,20 @@ export function UserList() {
       label: 'Role',
       sortable: true,
       render: (user) => (
-        <Chip size="sm" variant="flat" color={user.role === 'admin' ? 'primary' : 'default'}>
-          {user.role}
-        </Chip>
+        <div className="flex items-center gap-1">
+          <Chip
+            size="sm"
+            variant="flat"
+            color={user.is_super_admin || user.role === 'super_admin' ? 'secondary' : user.role === 'admin' || user.role === 'tenant_admin' ? 'primary' : 'default'}
+          >
+            {user.role}
+          </Chip>
+          {user.is_super_admin && (
+            <Chip size="sm" variant="flat" color="warning" startContent={<Shield size={10} />}>
+              SA
+            </Chip>
+          )}
+        </div>
       ),
     },
     {
