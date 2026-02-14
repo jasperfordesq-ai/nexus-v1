@@ -57,6 +57,25 @@ import type {
   ErrorLogEntry,
   SecretEntry,
   LegalDocument,
+  SuperAdminDashboardStats,
+  SuperAdminTenant,
+  SuperAdminTenantDetail,
+  CreateTenantPayload,
+  UpdateTenantPayload,
+  TenantHierarchyNode,
+  SuperAdminUser,
+  SuperAdminUserDetail,
+  CreateSuperUserPayload,
+  SuperUserListParams,
+  BulkMoveUsersPayload,
+  BulkUpdateTenantsPayload,
+  BulkOperationResult,
+  SuperAuditEntry,
+  SuperAuditParams,
+  FederationSystemControls,
+  FederationWhitelistEntry,
+  FederationPartnership,
+  FederationStatusOverview,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -705,6 +724,126 @@ export const adminTools = {
     api.post('/v2/admin/tools/seed', data),
 
   getBlogBackups: () => api.get<Array<{ id: number; filename: string; created_at: string; size: string }>>('/v2/admin/tools/blog-backups'),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Super Admin (Tenant CRUD, Cross-Tenant Users, Bulk, Audit, Federation Controls)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminSuper = {
+  // Dashboard
+  getDashboard: () =>
+    api.get<SuperAdminDashboardStats>('/v2/admin/super/dashboard'),
+
+  // Tenants
+  listTenants: (params: { search?: string; is_active?: boolean; hub?: boolean } = {}) =>
+    api.get<SuperAdminTenant[]>(`/v2/admin/super/tenants${buildQuery(params)}`),
+
+  getTenant: (id: number) =>
+    api.get<SuperAdminTenantDetail>(`/v2/admin/super/tenants/${id}`),
+
+  getHierarchy: () =>
+    api.get<TenantHierarchyNode[]>('/v2/admin/super/tenants/hierarchy'),
+
+  createTenant: (data: CreateTenantPayload) =>
+    api.post<{ tenant_id: number }>('/v2/admin/super/tenants', data),
+
+  updateTenant: (id: number, data: UpdateTenantPayload) =>
+    api.put('/v2/admin/super/tenants/' + id, data),
+
+  deleteTenant: (id: number, hardDelete = false) =>
+    api.delete(`/v2/admin/super/tenants/${id}${hardDelete ? '?hard=1' : ''}`),
+
+  reactivateTenant: (id: number) =>
+    api.post(`/v2/admin/super/tenants/${id}/reactivate`),
+
+  toggleHub: (id: number, enable: boolean) =>
+    api.post(`/v2/admin/super/tenants/${id}/toggle-hub`, { enable }),
+
+  moveTenant: (id: number, newParentId: number) =>
+    api.post(`/v2/admin/super/tenants/${id}/move`, { new_parent_id: newParentId }),
+
+  // Users (Cross-Tenant)
+  listUsers: (params: SuperUserListParams = {}) =>
+    api.get<SuperAdminUser[]>(`/v2/admin/super/users${buildQuery(params)}`),
+
+  getUser: (id: number) =>
+    api.get<SuperAdminUserDetail>(`/v2/admin/super/users/${id}`),
+
+  createUser: (data: CreateSuperUserPayload) =>
+    api.post<{ user_id: number }>('/v2/admin/super/users', data),
+
+  updateUser: (id: number, data: Record<string, unknown>) =>
+    api.put(`/v2/admin/super/users/${id}`, data),
+
+  grantSuperAdmin: (userId: number) =>
+    api.post(`/v2/admin/super/users/${userId}/grant-super-admin`),
+
+  revokeSuperAdmin: (userId: number) =>
+    api.post(`/v2/admin/super/users/${userId}/revoke-super-admin`),
+
+  grantGlobalSuperAdmin: (userId: number) =>
+    api.post(`/v2/admin/super/users/${userId}/grant-global-super-admin`),
+
+  revokeGlobalSuperAdmin: (userId: number) =>
+    api.post(`/v2/admin/super/users/${userId}/revoke-global-super-admin`),
+
+  moveUserTenant: (userId: number, newTenantId: number) =>
+    api.post(`/v2/admin/super/users/${userId}/move-tenant`, { new_tenant_id: newTenantId }),
+
+  moveAndPromote: (userId: number, targetTenantId: number) =>
+    api.post(`/v2/admin/super/users/${userId}/move-and-promote`, { target_tenant_id: targetTenantId }),
+
+  // Bulk Operations
+  bulkMoveUsers: (data: BulkMoveUsersPayload) =>
+    api.post<BulkOperationResult>('/v2/admin/super/bulk/move-users', data),
+
+  bulkUpdateTenants: (data: BulkUpdateTenantsPayload) =>
+    api.post<BulkOperationResult>('/v2/admin/super/bulk/update-tenants', data),
+
+  // Audit
+  getAudit: (params: SuperAuditParams = {}) =>
+    api.get<SuperAuditEntry[]>(`/v2/admin/super/audit${buildQuery(params)}`),
+
+  // Federation Controls
+  getFederationStatus: () =>
+    api.get<FederationStatusOverview>('/v2/admin/super/federation'),
+
+  getSystemControls: () =>
+    api.get<FederationSystemControls>('/v2/admin/super/federation/system-controls'),
+
+  updateSystemControls: (data: Partial<FederationSystemControls>) =>
+    api.put('/v2/admin/super/federation/system-controls', data),
+
+  emergencyLockdown: (reason: string) =>
+    api.post('/v2/admin/super/federation/emergency-lockdown', { reason }),
+
+  liftLockdown: () =>
+    api.post('/v2/admin/super/federation/lift-lockdown'),
+
+  getWhitelist: () =>
+    api.get<FederationWhitelistEntry[]>('/v2/admin/super/federation/whitelist'),
+
+  addToWhitelist: (tenantId: number, notes?: string) =>
+    api.post('/v2/admin/super/federation/whitelist', { tenant_id: tenantId, notes }),
+
+  removeFromWhitelist: (tenantId: number) =>
+    api.delete(`/v2/admin/super/federation/whitelist/${tenantId}`),
+
+  getFederationPartnerships: () =>
+    api.get<FederationPartnership[]>('/v2/admin/super/federation/partnerships'),
+
+  suspendPartnership: (id: number, reason: string) =>
+    api.post(`/v2/admin/super/federation/partnerships/${id}/suspend`, { reason }),
+
+  terminatePartnership: (id: number, reason: string) =>
+    api.post(`/v2/admin/super/federation/partnerships/${id}/terminate`, { reason }),
+
+  getTenantFederationFeatures: (tenantId: number) =>
+    api.get(`/v2/admin/super/federation/tenant/${tenantId}/features`),
+
+  updateTenantFederationFeature: (tenantId: number, feature: string, enabled: boolean) =>
+    api.put(`/v2/admin/super/federation/tenant/${tenantId}/features`, { feature, enabled }),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

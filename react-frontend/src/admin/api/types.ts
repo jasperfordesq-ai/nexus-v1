@@ -658,6 +658,259 @@ export interface PaginatedResponse<T> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Super Admin — Tenants
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface SuperAdminDashboardStats {
+  total_tenants: number;
+  active_tenants: number;
+  total_users: number;
+  total_listings: number;
+  hub_tenants: number;
+  inactive_tenants: number;
+}
+
+export interface SuperAdminTenant {
+  id: number;
+  name: string;
+  slug: string;
+  domain: string;
+  tagline?: string;
+  description?: string;
+  parent_id: number | null;
+  parent_name?: string;
+  is_active: boolean;
+  allows_subtenants: boolean;
+  max_depth: number;
+  user_count?: number;
+  listing_count?: number;
+  contact_email?: string;
+  contact_phone?: string;
+  address?: string;
+  meta_title?: string;
+  meta_description?: string;
+  h1_headline?: string;
+  hero_intro?: string;
+  og_image_url?: string;
+  robots_directive?: string;
+  location_name?: string;
+  country_code?: string;
+  service_area?: string;
+  latitude?: string;
+  longitude?: string;
+  social_facebook?: string;
+  social_twitter?: string;
+  social_instagram?: string;
+  social_linkedin?: string;
+  social_youtube?: string;
+  features?: Record<string, boolean>;
+  configuration?: Record<string, unknown>;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface SuperAdminTenantDetail extends SuperAdminTenant {
+  children: SuperAdminTenant[];
+  admins: SuperAdminUser[];
+  breadcrumb: Array<{ id: number; name: string }>;
+}
+
+export interface CreateTenantPayload {
+  parent_id: number;
+  name: string;
+  slug: string;
+  domain?: string;
+  tagline?: string;
+  description?: string;
+  allows_subtenants?: boolean;
+  max_depth?: number;
+  is_active?: boolean;
+}
+
+export interface UpdateTenantPayload {
+  name?: string;
+  slug?: string;
+  domain?: string;
+  tagline?: string;
+  description?: string;
+  is_active?: boolean;
+  allows_subtenants?: boolean;
+  max_depth?: number;
+  contact_email?: string;
+  contact_phone?: string;
+  address?: string;
+  meta_title?: string;
+  meta_description?: string;
+  h1_headline?: string;
+  hero_intro?: string;
+  og_image_url?: string;
+  robots_directive?: string;
+  location_name?: string;
+  country_code?: string;
+  service_area?: string;
+  latitude?: string;
+  longitude?: string;
+  social_facebook?: string;
+  social_twitter?: string;
+  social_instagram?: string;
+  social_linkedin?: string;
+  social_youtube?: string;
+  features?: Record<string, boolean>;
+}
+
+export interface TenantHierarchyNode {
+  id: number;
+  name: string;
+  slug: string;
+  is_active: boolean;
+  allows_subtenants: boolean;
+  user_count: number;
+  children: TenantHierarchyNode[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Super Admin — Cross-Tenant Users
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface SuperAdminUser {
+  id: number;
+  first_name: string;
+  last_name: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  tenant_id: number;
+  tenant_name?: string;
+  is_super_admin: boolean;
+  is_tenant_super_admin: boolean;
+  created_at: string;
+  last_login_at?: string | null;
+}
+
+export interface SuperAdminUserDetail extends SuperAdminUser {
+  location?: string;
+  phone?: string;
+  avatar?: string | null;
+  balance?: number;
+}
+
+export interface CreateSuperUserPayload {
+  tenant_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  role?: string;
+  location?: string;
+  phone?: string;
+  is_tenant_super_admin?: boolean;
+}
+
+export interface SuperUserListParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  tenant_id?: number;
+  role?: string;
+  super_admins?: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Super Admin — Bulk Operations
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface BulkMoveUsersPayload {
+  user_ids: number[];
+  target_tenant_id: number;
+  grant_super_admin?: boolean;
+}
+
+export interface BulkUpdateTenantsPayload {
+  tenant_ids: number[];
+  action: 'activate' | 'deactivate' | 'enable_hub' | 'disable_hub';
+}
+
+export interface BulkOperationResult {
+  success: boolean;
+  updated_count: number;
+  errors: string[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Super Admin — Audit
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface SuperAuditEntry {
+  id: number;
+  action_type: string;
+  target_type: string;
+  target_id: number | null;
+  target_label: string;
+  actor_id: number;
+  actor_name?: string;
+  old_value?: Record<string, unknown> | null;
+  new_value?: Record<string, unknown> | null;
+  description: string;
+  created_at: string;
+}
+
+export interface SuperAuditParams {
+  action_type?: string;
+  target_type?: string;
+  search?: string;
+  date_from?: string;
+  date_to?: string;
+  limit?: number;
+  offset?: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Super Admin — Federation Controls
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface FederationSystemControls {
+  federation_enabled: boolean;
+  whitelist_mode_enabled: boolean;
+  max_federation_level: number;
+  cross_tenant_profiles_enabled: boolean;
+  cross_tenant_messaging_enabled: boolean;
+  cross_tenant_transactions_enabled: boolean;
+  cross_tenant_listings_enabled: boolean;
+  cross_tenant_events_enabled: boolean;
+  cross_tenant_groups_enabled: boolean;
+  is_locked_down: boolean;
+  lockdown_reason?: string;
+  updated_at?: string;
+}
+
+export interface FederationWhitelistEntry {
+  tenant_id: number;
+  tenant_name: string;
+  tenant_domain?: string;
+  added_by: number;
+  added_at: string;
+  notes?: string;
+}
+
+export interface FederationPartnership {
+  id: number;
+  tenant_1_id: number;
+  tenant_1_name: string;
+  tenant_2_id: number;
+  tenant_2_name: string;
+  status: 'pending' | 'active' | 'suspended' | 'terminated';
+  created_at: string;
+}
+
+export interface FederationStatusOverview {
+  system_controls: FederationSystemControls;
+  partnership_stats: { total: number; active: number; pending: number; suspended: number };
+  whitelisted_count: number;
+  recent_audit: SuperAuditEntry[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Navigation
 // ─────────────────────────────────────────────────────────────────────────────
 

@@ -1,854 +1,725 @@
-# API Endpoint Map -- React Admin Migration
+# Admin V2 API Endpoint Map
 
-> **Purpose**: Complete map of all API endpoints needed for the React admin panel, with status of each (existing vs needed). This is the definitive reference for backend work required to support the React admin migration.
->
-> **Generated**: 2026-02-14
->
-> **Base URL**: `/api/v2/admin/` (all new endpoints follow this pattern)
->
-> **Auth**: All endpoints require `Authorization: Bearer <token>` with admin role verification via `ApiAuth::authenticate()` + role check in `BaseApiController::requireAdmin()`
+> **Generated:** 2026-02-14
+> **Source of truth:** `httpdocs/routes.php` lines 470-717 (180 route definitions)
+> **Controllers:** 18 files in `src/Controllers/Api/Admin*ApiController.php`
+> **Base class:** `BaseApiController` (862 lines) in `src/Controllers/Api/BaseApiController.php`
 
 ---
 
-## Status Legend
+## Table of Contents
 
-| Status | Meaning |
-|--------|---------|
-| **EXISTING** | V2 API endpoint already exists and is wired in `routes.php` |
-| **EXISTING_UNWIRED** | V2 API controller exists but route is NOT registered in `routes.php` |
-| **PHP_SESSION** | Only accessible via PHP session auth (admin views), needs V2 API wrapper |
-| **NEEDED** | Endpoint does not exist yet, must be created from scratch |
-| **INTERNAL_API** | Exists as `/admin/api/*` (session-based), needs V2 migration |
-
----
-
-## Existing V2 Admin API Endpoints
-
-> **Note**: The `AdminConfigApiController` exists at `src/Controllers/Api/AdminConfigApiController.php` but its routes are **NOT registered** in `routes.php`. Routes must be added before these work.
-
-| Status | Method | Path | Controller Method | Purpose |
-|--------|--------|------|-------------------|---------|
-| EXISTING_UNWIRED | GET | `/api/v2/admin/config` | `AdminConfigApiController@getConfig` | Get features & modules config |
-| EXISTING_UNWIRED | PUT | `/api/v2/admin/config/features` | `AdminConfigApiController@updateFeature` | Toggle a feature flag |
-| EXISTING_UNWIRED | PUT | `/api/v2/admin/config/modules` | `AdminConfigApiController@updateModule` | Toggle a module |
-| EXISTING_UNWIRED | GET | `/api/v2/admin/cache/stats` | `AdminConfigApiController@cacheStats` | Get Redis cache statistics |
-| EXISTING_UNWIRED | POST | `/api/v2/admin/cache/clear` | `AdminConfigApiController@clearCache` | Clear Redis cache |
-| EXISTING_UNWIRED | GET | `/api/v2/admin/jobs` | `AdminConfigApiController@getJobs` | List background jobs |
-| EXISTING_UNWIRED | POST | `/api/v2/admin/jobs/{id}/run` | `AdminConfigApiController@runJob` | Trigger a background job |
-
-### Action Required
-
-Add these routes to `httpdocs/routes.php`:
-
-```php
-// Admin Config API (V2)
-$router->add('GET', '/api/v2/admin/config', 'Nexus\Controllers\Api\AdminConfigApiController@getConfig');
-$router->add('PUT', '/api/v2/admin/config/features', 'Nexus\Controllers\Api\AdminConfigApiController@updateFeature');
-$router->add('PUT', '/api/v2/admin/config/modules', 'Nexus\Controllers\Api\AdminConfigApiController@updateModule');
-$router->add('GET', '/api/v2/admin/cache/stats', 'Nexus\Controllers\Api\AdminConfigApiController@cacheStats');
-$router->add('POST', '/api/v2/admin/cache/clear', 'Nexus\Controllers\Api\AdminConfigApiController@clearCache');
-$router->add('GET', '/api/v2/admin/jobs', 'Nexus\Controllers\Api\AdminConfigApiController@getJobs');
-$router->add('POST', '/api/v2/admin/jobs/{id}/run', 'Nexus\Controllers\Api\AdminConfigApiController@runJob');
-```
+1. [Auth Level Summary](#auth-level-summary)
+2. [Response Envelope](#response-envelope)
+3. [Complete Endpoint Table](#complete-endpoint-table)
+4. [Endpoint-to-React-Page Mapping](#endpoint-to-react-page-mapping)
+5. [React Pages Without Dedicated API](#react-pages-without-dedicated-api)
+6. [Controller Summary](#controller-summary)
 
 ---
 
-## Existing Internal Admin APIs (Session-Based)
+## Auth Level Summary
 
-These endpoints exist at `/admin/api/*` paths using PHP session auth. They need V2 wrappers with token auth.
+All admin endpoints use one of two authorization methods from `BaseApiController`:
 
-| Status | Method | Current Path | Purpose | Migrate To |
-|--------|--------|-------------|---------|-----------|
-| INTERNAL_API | GET | `/admin/smart-matching/api/stats` | Smart matching stats | `/api/v2/admin/smart-matching/stats` |
-| INTERNAL_API | GET | `/admin/match-approvals/api/stats` | Match approval stats | `/api/v2/admin/match-approvals/stats` |
-| INTERNAL_API | GET | `/admin/cron-jobs/api/stats` | Cron job stats | `/api/v2/admin/cron-jobs/stats` |
-| INTERNAL_API | GET | `/admin/404-errors/api/list` | 404 error list | `/api/v2/admin/404-errors` |
-| INTERNAL_API | GET | `/admin/404-errors/api/top` | Top 404 errors | `/api/v2/admin/404-errors/top` |
-| INTERNAL_API | GET | `/admin/404-errors/api/stats` | 404 error stats | `/api/v2/admin/404-errors/stats` |
-| INTERNAL_API | GET | `/admin/api/search` | Admin command palette | `/api/v2/admin/search` |
-| INTERNAL_API | GET | `/admin/api/realtime` | Real-time SSE stream | `/api/v2/admin/realtime/stream` |
-| INTERNAL_API | GET | `/admin/api/realtime/poll` | Real-time polling | `/api/v2/admin/realtime/poll` |
-| INTERNAL_API | GET | `/admin/api/permissions/check` | Check permission | `/api/v2/admin/permissions/check` |
-| INTERNAL_API | GET | `/admin/api/permissions` | List all permissions | `/api/v2/admin/permissions` |
-| INTERNAL_API | GET | `/admin/api/roles` | List all roles | `/api/v2/admin/roles` |
-| INTERNAL_API | GET | `/admin/api/roles/{id}/permissions` | Role permissions | `/api/v2/admin/roles/{id}/permissions` |
-| INTERNAL_API | GET | `/admin/api/users/{id}/permissions` | User permissions | `/api/v2/admin/users/{id}/permissions` |
-| INTERNAL_API | GET | `/admin/api/users/{id}/roles` | User roles | `/api/v2/admin/users/{id}/roles` |
-| INTERNAL_API | GET | `/admin/api/users/{id}/effective-permissions` | Effective perms | `/api/v2/admin/users/{id}/effective-permissions` |
-| INTERNAL_API | POST | `/admin/api/users/{id}/roles` | Assign role | `/api/v2/admin/users/{id}/roles` |
-| INTERNAL_API | DELETE | `/admin/api/users/{id}/roles/{roleId}` | Revoke role | `/api/v2/admin/users/{id}/roles/{roleId}` |
-| INTERNAL_API | POST | `/admin/api/users/{id}/permissions` | Grant permission | `/api/v2/admin/users/{id}/permissions` |
-| INTERNAL_API | DELETE | `/admin/api/users/{id}/permissions/{permId}` | Revoke permission | `/api/v2/admin/users/{id}/permissions/{permId}` |
-| INTERNAL_API | GET | `/admin/api/audit/permissions` | Permission audit log | `/api/v2/admin/audit/permissions` |
-| INTERNAL_API | GET | `/admin/api/stats/permissions` | Permission stats | `/api/v2/admin/permissions/stats` |
-| INTERNAL_API | GET | `/api/admin/users/search` | User search (timebanking) | `/api/v2/admin/users/search` |
-| INTERNAL_API | POST | `/admin/api/pages/{id}/blocks` | Save page blocks | `/api/v2/admin/pages/{id}/blocks` |
-| INTERNAL_API | GET | `/admin/api/pages/{id}/blocks` | Get page blocks | `/api/v2/admin/pages/{id}/blocks` |
-| INTERNAL_API | POST | `/admin/api/blocks/preview` | Preview block | `/api/v2/admin/blocks/preview` |
-| INTERNAL_API | POST | `/admin/api/pages/{id}/settings` | Save page settings | `/api/v2/admin/pages/{id}/settings` |
+| Method | Allowed Roles | Usage |
+|--------|--------------|-------|
+| `requireAdmin()` | `admin`, `super_admin`, `god` | **ALL 180 endpoints** |
+| `requireSuperAdmin()` | `super_admin`, `god` | **0 endpoints** (not used by any admin controller) |
+
+**Key finding:** Every admin endpoint uses `requireAdmin()`. No endpoint restricts to super-admin only. This means any user with `admin` role has full access to every admin API endpoint, including enterprise config, secrets vault, GDPR management, and legal documents.
 
 ---
 
-## Endpoints Needed -- By Module
+## Response Envelope
 
-### 1. Dashboard
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/dashboard/stats` | -- | `{ users_count, listings_count, transactions_count, transaction_volume, pending_users_count }` | Replaces DB queries in `AdminController@index` |
-| NEEDED | GET | `/api/v2/admin/dashboard/activity` | `?limit=20` | `{ data: [{ type, user, action, created_at }] }` | Recent activity log |
-| NEEDED | GET | `/api/v2/admin/dashboard/trends` | `?months=6` | `{ data: [{ month, volume, users, listings }] }` | Monthly stats chart data |
-| NEEDED | GET | `/api/v2/admin/dashboard/pending-users` | -- | `{ data: [User] }` | Users awaiting approval |
-| NEEDED | GET | `/api/v2/admin/dashboard/recent-listings` | `?limit=10` | `{ data: [Listing] }` | Recent listings |
-| NEEDED | GET | `/api/v2/admin/dashboard/recent-transactions` | `?limit=10` | `{ data: [Transaction] }` | Recent transactions |
-
----
-
-### 2. User Management
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/users` | `?status=active&role=member&q=search&page=1&per_page=25` | `{ data: [User], meta: { total, page, per_page } }` | Filterable user list |
-| NEEDED | GET | `/api/v2/admin/users/{id}` | -- | `{ data: { ...user, badges, permissions, login_history } }` | Full user detail |
-| NEEDED | POST | `/api/v2/admin/users` | `{ name, email, role, ... }` | `{ data: User }` | Create user |
-| NEEDED | PUT | `/api/v2/admin/users/{id}` | `{ name, email, role, ... }` | `{ data: User }` | Update user |
-| NEEDED | DELETE | `/api/v2/admin/users/{id}` | -- | `{ success: true }` | Delete user |
-| NEEDED | POST | `/api/v2/admin/users/{id}/approve` | -- | `{ data: User }` | Approve pending user (sends email) |
-| NEEDED | POST | `/api/v2/admin/users/{id}/suspend` | `{ reason? }` | `{ data: User }` | Suspend user |
-| NEEDED | POST | `/api/v2/admin/users/{id}/ban` | `{ reason? }` | `{ data: User }` | Ban user |
-| NEEDED | POST | `/api/v2/admin/users/{id}/reactivate` | -- | `{ data: User }` | Reactivate user |
-| NEEDED | POST | `/api/v2/admin/users/{id}/reset-2fa` | -- | `{ success: true }` | Reset 2FA |
-| NEEDED | POST | `/api/v2/admin/users/{id}/badges` | `{ badge_key }` | `{ data: Badge }` | Award badge |
-| NEEDED | DELETE | `/api/v2/admin/users/{id}/badges/{badgeKey}` | -- | `{ success: true }` | Remove badge |
-| NEEDED | POST | `/api/v2/admin/users/badges/recheck-all` | -- | `{ checked: N, awarded: N }` | Recheck all user badges |
-| NEEDED | POST | `/api/v2/admin/users/badges/bulk-award` | `{ badge_key, user_ids[] }` | `{ awarded: N }` | Bulk award badge |
-| NEEDED | POST | `/api/v2/admin/users/{id}/impersonate` | -- | `{ token, redirect_url }` | Impersonate user |
-| NEEDED | GET | `/api/v2/admin/users/search` | `?q=term&limit=10` | `{ data: [{ id, name, email }] }` | Quick user search (autocomplete) |
-
----
-
-### 3. Content -- Blog
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/blog` | `?status=published&page=1` | `{ data: [Post], meta }` | Blog list with filters |
-| NEEDED | GET | `/api/v2/admin/blog/{id}` | -- | `{ data: Post }` | Blog detail with builder content |
-| NEEDED | POST | `/api/v2/admin/blog` | `{ title, slug, content, status, seo_* }` | `{ data: Post }` | Create blog post |
-| NEEDED | PUT | `/api/v2/admin/blog/{id}` | `{ title, slug, content, status, seo_* }` | `{ data: Post }` | Update blog post |
-| NEEDED | DELETE | `/api/v2/admin/blog/{id}` | -- | `{ success: true }` | Delete blog post |
-| NEEDED | POST | `/api/v2/admin/blog/{id}/builder` | `{ blocks: [...] }` | `{ data: Post }` | Save GrapesJS builder content |
-| NEEDED | GET | `/api/v2/admin/blog/{id}/builder` | -- | `{ data: { blocks } }` | Get builder content |
-| NEEDED | POST | `/api/v2/admin/blog/{id}/duplicate` | -- | `{ data: Post }` | Duplicate post |
-
----
-
-### 4. Content -- Pages (CMS)
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/pages` | `?status=published&page=1` | `{ data: [Page], meta }` | Page list |
-| NEEDED | GET | `/api/v2/admin/pages/{id}` | -- | `{ data: Page }` | Page detail |
-| NEEDED | POST | `/api/v2/admin/pages` | `{ title, slug, status }` | `{ data: Page }` | Create page |
-| NEEDED | PUT | `/api/v2/admin/pages/{id}` | `{ title, slug, status }` | `{ data: Page }` | Update page |
-| NEEDED | DELETE | `/api/v2/admin/pages/{id}` | -- | `{ success: true }` | Delete page |
-| INTERNAL_API | GET | `/api/v2/admin/pages/{id}/blocks` | -- | `{ data: { blocks } }` | Get page blocks |
-| INTERNAL_API | POST | `/api/v2/admin/pages/{id}/blocks` | `{ blocks: [...] }` | `{ success: true }` | Save page blocks |
-| INTERNAL_API | POST | `/api/v2/admin/pages/{id}/settings` | `{ seo_*, schedule_* }` | `{ success: true }` | Save page settings |
-| NEEDED | GET | `/api/v2/admin/pages/{id}/versions` | -- | `{ data: [Version] }` | Version history |
-| NEEDED | POST | `/api/v2/admin/pages/{id}/versions/{vId}/restore` | -- | `{ data: Page }` | Restore version |
-| NEEDED | POST | `/api/v2/admin/pages/{id}/duplicate` | -- | `{ data: Page }` | Duplicate page |
-| NEEDED | POST | `/api/v2/admin/pages/reorder` | `{ ids: [1,2,3] }` | `{ success: true }` | Reorder pages |
-
----
-
-### 5. Content -- Menus
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/menus` | -- | `{ data: [Menu] }` | Menu list |
-| NEEDED | GET | `/api/v2/admin/menus/{id}` | -- | `{ data: { ...menu, items: [...] } }` | Menu with items |
-| NEEDED | POST | `/api/v2/admin/menus` | `{ name, slug, location }` | `{ data: Menu }` | Create menu |
-| NEEDED | PUT | `/api/v2/admin/menus/{id}` | `{ name, slug, location }` | `{ data: Menu }` | Update menu |
-| NEEDED | DELETE | `/api/v2/admin/menus/{id}` | -- | `{ success: true }` | Delete menu |
-| NEEDED | POST | `/api/v2/admin/menus/{id}/toggle` | -- | `{ data: { active: bool } }` | Toggle active |
-| NEEDED | POST | `/api/v2/admin/menus/{id}/items` | `{ label, url, type, parent_id? }` | `{ data: MenuItem }` | Add menu item |
-| NEEDED | PUT | `/api/v2/admin/menus/{id}/items/{itemId}` | `{ label, url }` | `{ data: MenuItem }` | Update item |
-| NEEDED | DELETE | `/api/v2/admin/menus/{id}/items/{itemId}` | -- | `{ success: true }` | Delete item |
-| NEEDED | POST | `/api/v2/admin/menus/{id}/items/reorder` | `{ items: [{ id, order, parent_id }] }` | `{ success: true }` | Reorder items |
-| NEEDED | POST | `/api/v2/admin/menus/cache/clear` | -- | `{ success: true }` | Clear menu cache |
-
----
-
-### 6. Categories
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/categories` | `?type=listing` | `{ data: [Category] }` | List categories |
-| NEEDED | GET | `/api/v2/admin/categories/{id}` | -- | `{ data: Category }` | Category detail |
-| NEEDED | POST | `/api/v2/admin/categories` | `{ name, type, icon?, color? }` | `{ data: Category }` | Create category |
-| NEEDED | PUT | `/api/v2/admin/categories/{id}` | `{ name, type, icon?, color? }` | `{ data: Category }` | Update category |
-| NEEDED | DELETE | `/api/v2/admin/categories/{id}` | -- | `{ success: true }` | Delete category |
-
----
-
-### 7. Attributes
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/attributes` | -- | `{ data: [Attribute] }` | List attributes |
-| NEEDED | POST | `/api/v2/admin/attributes` | `{ name, type, options? }` | `{ data: Attribute }` | Create attribute |
-| NEEDED | PUT | `/api/v2/admin/attributes/{id}` | `{ name, type, options? }` | `{ data: Attribute }` | Update attribute |
-| NEEDED | DELETE | `/api/v2/admin/attributes/{id}` | -- | `{ success: true }` | Delete attribute |
-
----
-
-### 8. Listings Admin
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/listings` | `?status=pending&type=listing&page=1` | `{ data: [Listing], meta }` | Unified content directory |
-| NEEDED | POST | `/api/v2/admin/listings/{id}/approve` | -- | `{ data: Listing }` | Approve listing |
-| NEEDED | DELETE | `/api/v2/admin/listings/{id}` | -- | `{ success: true }` | Delete listing |
-
----
-
-### 9. Gamification Admin
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/gamification/stats` | -- | `{ total_badges, total_xp, active_campaigns, ... }` | Dashboard stats |
-| NEEDED | POST | `/api/v2/admin/gamification/recheck-all` | -- | `{ checked, awarded }` | Recheck all badges |
-| NEEDED | POST | `/api/v2/admin/gamification/bulk-award` | `{ badge_key, user_ids[] }` | `{ awarded: N }` | Bulk award |
-| NEEDED | POST | `/api/v2/admin/gamification/award-all` | `{ badge_key }` | `{ awarded: N }` | Award to all |
-| NEEDED | POST | `/api/v2/admin/gamification/reset-xp` | `{ user_id }` | `{ success: true }` | Reset user XP |
-| NEEDED | POST | `/api/v2/admin/gamification/clear-badges` | `{ user_id }` | `{ success: true }` | Clear user badges |
-| NEEDED | GET | `/api/v2/admin/gamification/analytics` | `?period=30d` | `{ data: { badges_awarded, xp_earned, ... } }` | Analytics |
-| NEEDED | GET | `/api/v2/admin/gamification/campaigns` | -- | `{ data: [Campaign] }` | Campaign list |
-| NEEDED | GET | `/api/v2/admin/gamification/campaigns/{id}` | -- | `{ data: Campaign }` | Campaign detail |
-| NEEDED | POST | `/api/v2/admin/gamification/campaigns` | `{ name, type, rules, ... }` | `{ data: Campaign }` | Create campaign |
-| NEEDED | PUT | `/api/v2/admin/gamification/campaigns/{id}` | `{ name, type, rules, ... }` | `{ data: Campaign }` | Update campaign |
-| NEEDED | DELETE | `/api/v2/admin/gamification/campaigns/{id}` | -- | `{ success: true }` | Delete campaign |
-| NEEDED | POST | `/api/v2/admin/gamification/campaigns/{id}/activate` | -- | `{ data: Campaign }` | Activate |
-| NEEDED | POST | `/api/v2/admin/gamification/campaigns/{id}/pause` | -- | `{ data: Campaign }` | Pause |
-| NEEDED | POST | `/api/v2/admin/gamification/campaigns/{id}/run` | -- | `{ results: { ... } }` | Execute campaign |
-| NEEDED | POST | `/api/v2/admin/gamification/campaigns/{id}/preview-audience` | -- | `{ count: N, sample: [User] }` | Preview audience |
-
-**Custom Badges:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/custom-badges` | -- | `{ data: [Badge] }` | List custom badges |
-| NEEDED | GET | `/api/v2/admin/custom-badges/{id}` | -- | `{ data: Badge }` | Badge detail with awardees |
-| NEEDED | POST | `/api/v2/admin/custom-badges` | `{ name, key, icon, description, criteria }` | `{ data: Badge }` | Create badge |
-| NEEDED | PUT | `/api/v2/admin/custom-badges/{id}` | `{ name, icon, description }` | `{ data: Badge }` | Update badge |
-| NEEDED | DELETE | `/api/v2/admin/custom-badges/{id}` | -- | `{ success: true }` | Delete badge |
-| NEEDED | POST | `/api/v2/admin/custom-badges/{id}/award` | `{ user_id }` | `{ success: true }` | Award to user |
-| NEEDED | POST | `/api/v2/admin/custom-badges/{id}/revoke` | `{ user_id }` | `{ success: true }` | Revoke from user |
-
----
-
-### 10. Smart Matching Admin
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| INTERNAL_API | GET | `/api/v2/admin/smart-matching/stats` | -- | `{ total_matches, avg_score, cache_size }` | Migrate from `/admin/smart-matching/api/stats` |
-| NEEDED | GET | `/api/v2/admin/smart-matching/analytics` | `?period=30d` | `{ data: { matches_by_day, quality_scores } }` | Analytics |
-| NEEDED | GET | `/api/v2/admin/smart-matching/config` | -- | `{ data: { weights, thresholds, ... } }` | Get config |
-| NEEDED | PUT | `/api/v2/admin/smart-matching/config` | `{ weights, thresholds, ... }` | `{ data: Config }` | Update config |
-| NEEDED | POST | `/api/v2/admin/smart-matching/clear-cache` | -- | `{ success: true }` | Clear match cache |
-| NEEDED | POST | `/api/v2/admin/smart-matching/warmup-cache` | -- | `{ success: true, processed: N }` | Warmup cache |
-| NEEDED | POST | `/api/v2/admin/smart-matching/run-geocoding` | -- | `{ success: true, geocoded: N }` | Run geocoding |
-
----
-
-### 11. Match Approvals
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| INTERNAL_API | GET | `/api/v2/admin/match-approvals/stats` | -- | `{ pending, approved, rejected }` | Migrate from `/admin/match-approvals/api/stats` |
-| NEEDED | GET | `/api/v2/admin/match-approvals` | `?status=pending&page=1` | `{ data: [Match], meta }` | Approval queue |
-| NEEDED | GET | `/api/v2/admin/match-approvals/history` | `?page=1` | `{ data: [Match], meta }` | History |
-| NEEDED | GET | `/api/v2/admin/match-approvals/{id}` | -- | `{ data: Match }` | Match detail |
-| NEEDED | POST | `/api/v2/admin/match-approvals/{id}/approve` | `{ notes? }` | `{ data: Match }` | Approve |
-| NEEDED | POST | `/api/v2/admin/match-approvals/{id}/reject` | `{ reason }` | `{ data: Match }` | Reject |
-| NEEDED | POST | `/api/v2/admin/match-approvals/bulk-approve` | `{ ids: [...] }` | `{ approved: N }` | Bulk approve |
-| NEEDED | POST | `/api/v2/admin/match-approvals/bulk-reject` | `{ ids: [...], reason }` | `{ rejected: N }` | Bulk reject |
-
----
-
-### 12. Broker Controls
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/broker/stats` | -- | `{ exchanges_pending, flagged_messages, monitored_users }` | Dashboard stats |
-| NEEDED | GET | `/api/v2/admin/broker/config` | -- | `{ data: Config }` | Get broker config |
-| NEEDED | PUT | `/api/v2/admin/broker/config` | `{ ... }` | `{ data: Config }` | Update config |
-| NEEDED | GET | `/api/v2/admin/broker/exchanges` | `?status=pending` | `{ data: [Exchange], meta }` | Exchange queue |
-| NEEDED | GET | `/api/v2/admin/broker/exchanges/{id}` | -- | `{ data: Exchange }` | Exchange detail |
-| NEEDED | POST | `/api/v2/admin/broker/exchanges/{id}/approve` | -- | `{ data: Exchange }` | Approve exchange |
-| NEEDED | POST | `/api/v2/admin/broker/exchanges/{id}/reject` | `{ reason }` | `{ data: Exchange }` | Reject exchange |
-| NEEDED | GET | `/api/v2/admin/broker/risk-tags` | -- | `{ data: [TaggedListing] }` | Risk-tagged listings |
-| NEEDED | POST | `/api/v2/admin/broker/risk-tags/{listingId}` | `{ tags: [...] }` | `{ data: Tags }` | Apply risk tags |
-| NEEDED | DELETE | `/api/v2/admin/broker/risk-tags/{listingId}/{tag}` | -- | `{ success: true }` | Remove tag |
-| NEEDED | GET | `/api/v2/admin/broker/messages` | `?flagged=true` | `{ data: [Message], meta }` | Message review queue |
-| NEEDED | POST | `/api/v2/admin/broker/messages/{id}/review` | -- | `{ data: Message }` | Mark reviewed |
-| NEEDED | POST | `/api/v2/admin/broker/messages/{id}/flag` | `{ reason }` | `{ data: Message }` | Flag message |
-| NEEDED | GET | `/api/v2/admin/broker/monitoring` | -- | `{ data: [MonitoredUser] }` | Monitored users |
-| NEEDED | PUT | `/api/v2/admin/broker/monitoring/{userId}` | `{ level, reason }` | `{ data: MonitoredUser }` | Set monitoring |
-
----
-
-### 13. Timebanking Analytics
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/timebanking/stats` | -- | `{ data: { total_hours, active_users, alerts_count } }` | Dashboard |
-| NEEDED | GET | `/api/v2/admin/timebanking/alerts` | `?status=open&page=1` | `{ data: [Alert], meta }` | Abuse alerts |
-| NEEDED | GET | `/api/v2/admin/timebanking/alerts/{id}` | -- | `{ data: Alert }` | Alert detail |
-| NEEDED | PUT | `/api/v2/admin/timebanking/alerts/{id}` | `{ status }` | `{ data: Alert }` | Update alert status |
-| NEEDED | POST | `/api/v2/admin/timebanking/run-detection` | -- | `{ alerts_generated: N }` | Run abuse detection |
-| NEEDED | GET | `/api/v2/admin/timebanking/user-report/{id}` | -- | `{ data: UserReport }` | User activity report |
-| NEEDED | POST | `/api/v2/admin/timebanking/adjust-balance` | `{ user_id, amount, reason }` | `{ data: { new_balance } }` | Admin balance adjust |
-| NEEDED | GET | `/api/v2/admin/timebanking/org-wallets` | -- | `{ data: [OrgWallet] }` | Org wallets |
-| NEEDED | POST | `/api/v2/admin/timebanking/org-wallets/{id}/initialize` | -- | `{ data: OrgWallet }` | Init wallet |
-| NEEDED | POST | `/api/v2/admin/timebanking/org-wallets/initialize-all` | -- | `{ initialized: N }` | Init all |
-| NEEDED | GET | `/api/v2/admin/timebanking/org-wallets/{id}/members` | -- | `{ data: [Member] }` | Org members |
-| NEEDED | POST | `/api/v2/admin/timebanking/org-wallets/{id}/members` | `{ user_id, role }` | `{ data: Member }` | Add member |
-| NEEDED | PUT | `/api/v2/admin/timebanking/org-wallets/{id}/members/{userId}` | `{ role }` | `{ data: Member }` | Update role |
-| NEEDED | DELETE | `/api/v2/admin/timebanking/org-wallets/{id}/members/{userId}` | -- | `{ success: true }` | Remove member |
-| NEEDED | POST | `/api/v2/admin/timebanking/org-wallets` | `{ name, org_id? }` | `{ data: OrgWallet }` | Create org wallet |
-
----
-
-### 14. Volunteering Admin
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/volunteering/stats` | -- | `{ orgs_count, opps_count, pending_approvals }` | Overview |
-| NEEDED | GET | `/api/v2/admin/volunteering/approvals` | -- | `{ data: [Org] }` | Pending org approvals |
-| NEEDED | GET | `/api/v2/admin/volunteering/organizations` | -- | `{ data: [Org] }` | All organizations |
-| NEEDED | POST | `/api/v2/admin/volunteering/organizations/{id}/approve` | -- | `{ data: Org }` | Approve org (sends email) |
-| NEEDED | POST | `/api/v2/admin/volunteering/organizations/{id}/decline` | `{ reason? }` | `{ data: Org }` | Decline (sends email) |
-| NEEDED | DELETE | `/api/v2/admin/volunteering/organizations/{id}` | -- | `{ success: true }` | Delete org |
-
----
-
-### 15. Newsletters
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/newsletters` | `?status=sent&page=1` | `{ data: [Newsletter], meta }` | List newsletters |
-| NEEDED | GET | `/api/v2/admin/newsletters/{id}` | -- | `{ data: Newsletter }` | Newsletter detail |
-| NEEDED | POST | `/api/v2/admin/newsletters` | `{ subject, body, template_id?, segment_id? }` | `{ data: Newsletter }` | Create newsletter |
-| NEEDED | PUT | `/api/v2/admin/newsletters/{id}` | `{ subject, body, ... }` | `{ data: Newsletter }` | Update newsletter |
-| NEEDED | DELETE | `/api/v2/admin/newsletters/{id}` | -- | `{ success: true }` | Delete newsletter |
-| NEEDED | GET | `/api/v2/admin/newsletters/{id}/preview` | -- | `{ data: { html } }` | Preview HTML |
-| NEEDED | POST | `/api/v2/admin/newsletters/{id}/send` | `{ schedule_at? }` | `{ data: Newsletter }` | Send/schedule |
-| NEEDED | POST | `/api/v2/admin/newsletters/{id}/send-test` | `{ email }` | `{ success: true }` | Send test |
-| NEEDED | POST | `/api/v2/admin/newsletters/{id}/duplicate` | -- | `{ data: Newsletter }` | Duplicate |
-| NEEDED | GET | `/api/v2/admin/newsletters/{id}/stats` | -- | `{ opens, clicks, bounces, unsubscribes }` | Stats |
-| NEEDED | GET | `/api/v2/admin/newsletters/{id}/activity` | -- | `{ data: [Activity] }` | Activity log |
-| NEEDED | GET | `/api/v2/admin/newsletters/analytics` | `?period=30d` | `{ data: AnalyticsData }` | Aggregate analytics |
-| NEEDED | POST | `/api/v2/admin/newsletters/{id}/select-winner` | -- | `{ data: Newsletter }` | A/B test winner |
-| NEEDED | POST | `/api/v2/admin/newsletters/recipient-count` | `{ segment_id?, filters? }` | `{ count: N }` | Live count |
-| NEEDED | POST | `/api/v2/admin/newsletters/preview-recipients` | `{ segment_id? }` | `{ data: [{ email, name }] }` | Preview recipients |
-
-**Subscribers:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/newsletters/subscribers` | `?page=1&q=search` | `{ data: [Subscriber], meta }` | List |
-| NEEDED | POST | `/api/v2/admin/newsletters/subscribers` | `{ email, name }` | `{ data: Subscriber }` | Add subscriber |
-| NEEDED | DELETE | `/api/v2/admin/newsletters/subscribers/{id}` | -- | `{ success: true }` | Remove |
-| NEEDED | POST | `/api/v2/admin/newsletters/subscribers/sync` | -- | `{ synced: N }` | Sync members |
-| NEEDED | GET | `/api/v2/admin/newsletters/subscribers/export` | -- | CSV download | Export |
-| NEEDED | POST | `/api/v2/admin/newsletters/subscribers/import` | multipart file | `{ imported: N }` | Import |
-
-**Segments:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/newsletters/segments` | -- | `{ data: [Segment] }` | List segments |
-| NEEDED | GET | `/api/v2/admin/newsletters/segments/{id}` | -- | `{ data: Segment }` | Segment detail |
-| NEEDED | POST | `/api/v2/admin/newsletters/segments` | `{ name, rules }` | `{ data: Segment }` | Create segment |
-| NEEDED | PUT | `/api/v2/admin/newsletters/segments/{id}` | `{ name, rules }` | `{ data: Segment }` | Update segment |
-| NEEDED | DELETE | `/api/v2/admin/newsletters/segments/{id}` | -- | `{ success: true }` | Delete segment |
-| NEEDED | POST | `/api/v2/admin/newsletters/segments/{id}/preview` | -- | `{ count: N, sample: [...] }` | Preview |
-| NEEDED | GET | `/api/v2/admin/newsletters/segments/suggestions` | -- | `{ data: [Suggestion] }` | Smart suggestions |
-
-**Templates:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/newsletters/templates` | -- | `{ data: [Template] }` | List |
-| NEEDED | GET | `/api/v2/admin/newsletters/templates/{id}` | -- | `{ data: Template }` | Detail |
-| NEEDED | POST | `/api/v2/admin/newsletters/templates` | `{ name, html, category }` | `{ data: Template }` | Create |
-| NEEDED | PUT | `/api/v2/admin/newsletters/templates/{id}` | `{ name, html }` | `{ data: Template }` | Update |
-| NEEDED | DELETE | `/api/v2/admin/newsletters/templates/{id}` | -- | `{ success: true }` | Delete |
-| NEEDED | POST | `/api/v2/admin/newsletters/templates/{id}/duplicate` | -- | `{ data: Template }` | Duplicate |
-| NEEDED | GET | `/api/v2/admin/newsletters/templates/{id}/preview` | -- | `{ data: { html } }` | Preview |
-| NEEDED | POST | `/api/v2/admin/newsletters/save-as-template` | `{ newsletter_id, name }` | `{ data: Template }` | Save from newsletter |
-
-**Bounces:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/newsletters/bounces` | `?page=1` | `{ data: [Bounce], meta }` | Bounce list |
-| NEEDED | POST | `/api/v2/admin/newsletters/bounces/{id}/unsuppress` | -- | `{ success: true }` | Unsuppress |
-| NEEDED | POST | `/api/v2/admin/newsletters/bounces/{id}/suppress` | -- | `{ success: true }` | Suppress |
-
-**Resend & Optimization:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | POST | `/api/v2/admin/newsletters/{id}/resend` | `{ subject? }` | `{ data: Newsletter }` | Resend to non-openers |
-| NEEDED | GET | `/api/v2/admin/newsletters/{id}/resend-info` | -- | `{ non_openers: N }` | Resend info |
-| NEEDED | GET | `/api/v2/admin/newsletters/send-time` | -- | `{ data: { recommendations, heatmap } }` | Optimal send time |
-| NEEDED | GET | `/api/v2/admin/newsletters/{id}/client-preview` | -- | `{ data: { previews } }` | Email client previews |
-
-**Diagnostics:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/newsletters/diagnostics` | -- | `{ data: DiagnosticResults }` | Run diagnostics |
-| NEEDED | POST | `/api/v2/admin/newsletters/repair` | -- | `{ repaired: N }` | Repair issues |
-
----
-
-### 16. Federation Admin
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/federation/stats` | -- | `{ partnerships, active_users, transactions }` | Dashboard |
-| NEEDED | GET | `/api/v2/admin/federation/config` | -- | `{ data: Config }` | Settings |
-| NEEDED | PUT | `/api/v2/admin/federation/config` | `{ ... }` | `{ data: Config }` | Update settings |
-| NEEDED | POST | `/api/v2/admin/federation/toggle` | `{ enabled: bool }` | `{ success: true }` | Enable/disable |
-| NEEDED | POST | `/api/v2/admin/federation/features/{key}` | `{ enabled: bool }` | `{ data: Feature }` | Toggle feature |
-
-**Partnerships:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/federation/partnerships` | -- | `{ data: [Partnership] }` | List |
-| NEEDED | POST | `/api/v2/admin/federation/partnerships` | `{ target_tenant_id }` | `{ data: Partnership }` | Request |
-| NEEDED | POST | `/api/v2/admin/federation/partnerships/{id}/approve` | -- | `{ data: Partnership }` | Approve |
-| NEEDED | POST | `/api/v2/admin/federation/partnerships/{id}/reject` | -- | `{ data: Partnership }` | Reject |
-| NEEDED | PUT | `/api/v2/admin/federation/partnerships/{id}/permissions` | `{ permissions }` | `{ data: Partnership }` | Update permissions |
-| NEEDED | DELETE | `/api/v2/admin/federation/partnerships/{id}` | -- | `{ success: true }` | Terminate |
-| NEEDED | POST | `/api/v2/admin/federation/partnerships/{id}/counter-propose` | `{ terms }` | `{ data: Partnership }` | Counter-propose |
-
-**Directory:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/federation/directory` | -- | `{ data: [Tenant] }` | Federation directory |
-| NEEDED | GET | `/api/v2/admin/federation/directory/{id}` | -- | `{ data: Tenant }` | Tenant detail |
-| NEEDED | GET | `/api/v2/admin/federation/directory/profile` | -- | `{ data: Profile }` | Own profile |
-| NEEDED | PUT | `/api/v2/admin/federation/directory/profile` | `{ ... }` | `{ data: Profile }` | Update profile |
-
-**Analytics:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/federation/analytics` | `?period=30d` | `{ data: Analytics }` | Analytics |
-| NEEDED | GET | `/api/v2/admin/federation/analytics/export` | -- | CSV download | Export |
-
-**API Keys:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/federation/api-keys` | -- | `{ data: [ApiKey] }` | List |
-| NEEDED | POST | `/api/v2/admin/federation/api-keys` | `{ name, permissions }` | `{ data: ApiKey }` | Create (returns key once) |
-| NEEDED | GET | `/api/v2/admin/federation/api-keys/{id}` | -- | `{ data: ApiKey }` | Detail |
-| NEEDED | POST | `/api/v2/admin/federation/api-keys/{id}/suspend` | -- | `{ data: ApiKey }` | Suspend |
-| NEEDED | POST | `/api/v2/admin/federation/api-keys/{id}/activate` | -- | `{ data: ApiKey }` | Activate |
-| NEEDED | DELETE | `/api/v2/admin/federation/api-keys/{id}` | -- | `{ success: true }` | Revoke |
-| NEEDED | POST | `/api/v2/admin/federation/api-keys/{id}/regenerate` | -- | `{ data: ApiKey }` | Regenerate |
-
-**Data Import/Export:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/federation/export/users` | -- | CSV | Export users |
-| NEEDED | GET | `/api/v2/admin/federation/export/partnerships` | -- | CSV | Export partnerships |
-| NEEDED | GET | `/api/v2/admin/federation/export/transactions` | -- | CSV | Export transactions |
-| NEEDED | GET | `/api/v2/admin/federation/export/audit` | -- | CSV | Export audit log |
-| NEEDED | GET | `/api/v2/admin/federation/export/all` | -- | ZIP | Export all |
-| NEEDED | POST | `/api/v2/admin/federation/import/users` | multipart file | `{ imported: N }` | Import users |
-| NEEDED | GET | `/api/v2/admin/federation/import/template` | -- | CSV template | Download template |
-
-**External Partners:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/federation/external-partners` | -- | `{ data: [Partner] }` | List |
-| NEEDED | POST | `/api/v2/admin/federation/external-partners` | `{ name, url, ... }` | `{ data: Partner }` | Create |
-| NEEDED | GET | `/api/v2/admin/federation/external-partners/{id}` | -- | `{ data: Partner }` | Detail |
-| NEEDED | PUT | `/api/v2/admin/federation/external-partners/{id}` | `{ ... }` | `{ data: Partner }` | Update |
-| NEEDED | POST | `/api/v2/admin/federation/external-partners/{id}/test` | -- | `{ success, latency }` | Test connection |
-| NEEDED | POST | `/api/v2/admin/federation/external-partners/{id}/suspend` | -- | `{ data: Partner }` | Suspend |
-| NEEDED | POST | `/api/v2/admin/federation/external-partners/{id}/activate` | -- | `{ data: Partner }` | Activate |
-| NEEDED | DELETE | `/api/v2/admin/federation/external-partners/{id}` | -- | `{ success: true }` | Delete |
-
----
-
-### 17. Enterprise (GDPR, Monitoring, Config)
-
-**GDPR Requests:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/stats` | -- | `{ pending, in_progress, completed }` | Dashboard |
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/requests` | `?status=pending&page=1` | `{ data: [Request], meta }` | List |
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/requests/{id}` | -- | `{ data: Request }` | Detail |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/requests` | `{ user_id, type, notes }` | `{ data: Request }` | Create |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/requests/{id}/process` | -- | `{ data: Request }` | Start processing |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/requests/{id}/complete` | -- | `{ data: Request }` | Complete |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/requests/{id}/reject` | `{ reason }` | `{ data: Request }` | Reject |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/requests/{id}/assign` | `{ admin_id }` | `{ data: Request }` | Assign |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/requests/{id}/notes` | `{ note }` | `{ data: Request }` | Add note |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/requests/{id}/export` | -- | `{ data: { download_url } }` | Generate export |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/requests/bulk-process` | `{ ids: [...], action }` | `{ processed: N }` | Bulk process |
-
-**GDPR Consents:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/consents` | -- | `{ data: [ConsentType] }` | List types |
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/consents/{id}` | -- | `{ data: ConsentType }` | Detail |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/consents/types` | `{ name, description }` | `{ data: ConsentType }` | Create type |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/consents/backfill` | `{ type_id }` | `{ backfilled: N }` | Backfill |
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/consents/export` | -- | CSV download | Export |
-
-**GDPR Breaches:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/breaches` | -- | `{ data: [Breach] }` | List |
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/breaches/{id}` | -- | `{ data: Breach }` | Detail |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/breaches` | `{ description, severity, ... }` | `{ data: Breach }` | Report |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/breaches/{id}/escalate` | -- | `{ data: Breach }` | Escalate |
-
-**GDPR Audit:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/audit` | `?page=1` | `{ data: [AuditEntry], meta }` | Audit log |
-| NEEDED | GET | `/api/v2/admin/enterprise/gdpr/audit/export` | -- | CSV download | Export |
-| NEEDED | POST | `/api/v2/admin/enterprise/gdpr/compliance-report` | -- | `{ data: Report }` | Generate report |
-
-**Monitoring:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/enterprise/monitoring/health` | -- | `{ data: HealthCheck }` | System health |
-| NEEDED | GET | `/api/v2/admin/enterprise/monitoring/requirements` | -- | `{ data: [Requirement] }` | System requirements |
-| NEEDED | GET | `/api/v2/admin/enterprise/monitoring/logs` | `?level=error&page=1` | `{ data: [LogEntry], meta }` | Log viewer |
-| NEEDED | GET | `/api/v2/admin/enterprise/monitoring/logs/{filename}` | -- | `{ data: LogContent }` | View log file |
-| NEEDED | POST | `/api/v2/admin/enterprise/monitoring/logs/clear` | -- | `{ success: true }` | Clear logs |
-| NEEDED | GET | `/api/v2/admin/enterprise/monitoring/logs/download` | -- | File download | Download logs |
-
-**Configuration:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/enterprise/config` | -- | `{ data: Config }` | Full config |
-| NEEDED | PUT | `/api/v2/admin/enterprise/config/{group}/{key}` | `{ value }` | `{ data: Setting }` | Update setting |
-| NEEDED | GET | `/api/v2/admin/enterprise/config/export` | -- | JSON download | Export config |
-| NEEDED | POST | `/api/v2/admin/enterprise/config/cache/clear` | -- | `{ success: true }` | Clear cache |
-| NEEDED | GET | `/api/v2/admin/enterprise/config/validate` | -- | `{ data: ValidationResults }` | Validate config |
-| NEEDED | PATCH | `/api/v2/admin/enterprise/config/features/{key}` | `{ enabled }` | `{ data: Feature }` | Toggle feature |
-
-**Secrets:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/enterprise/secrets` | -- | `{ data: [{ key, created_at, last_rotated }] }` | List (no values!) |
-| NEEDED | POST | `/api/v2/admin/enterprise/secrets` | `{ key, value }` | `{ success: true }` | Store secret |
-| NEEDED | POST | `/api/v2/admin/enterprise/secrets/{key}/view` | -- | `{ data: { value } }` | View (audit logged) |
-| NEEDED | POST | `/api/v2/admin/enterprise/secrets/{key}/rotate` | `{ value }` | `{ success: true }` | Rotate |
-| NEEDED | DELETE | `/api/v2/admin/enterprise/secrets/{key}` | -- | `{ success: true }` | Delete |
-
-**Roles & Permissions:**
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| INTERNAL_API | GET | `/api/v2/admin/roles` | -- | `{ data: [Role] }` | Migrate from `/admin/api/roles` |
-| INTERNAL_API | GET | `/api/v2/admin/permissions` | -- | `{ data: [Permission] }` | Migrate from `/admin/api/permissions` |
-| NEEDED | GET | `/api/v2/admin/roles/{id}` | -- | `{ data: Role }` | Role detail |
-| NEEDED | POST | `/api/v2/admin/roles` | `{ name, permissions[] }` | `{ data: Role }` | Create role |
-| NEEDED | PUT | `/api/v2/admin/roles/{id}` | `{ name, permissions[] }` | `{ data: Role }` | Update role |
-| NEEDED | DELETE | `/api/v2/admin/roles/{id}` | -- | `{ success: true }` | Delete role |
-| INTERNAL_API | GET | `/api/v2/admin/users/{id}/permissions` | -- | `{ data: [Permission] }` | Migrate |
-| INTERNAL_API | GET | `/api/v2/admin/users/{id}/roles` | -- | `{ data: [Role] }` | Migrate |
-| INTERNAL_API | GET | `/api/v2/admin/users/{id}/effective-permissions` | -- | `{ data: [Permission] }` | Migrate |
-| INTERNAL_API | POST | `/api/v2/admin/users/{id}/roles` | `{ role_id }` | `{ success: true }` | Migrate |
-| INTERNAL_API | DELETE | `/api/v2/admin/users/{id}/roles/{roleId}` | -- | `{ success: true }` | Migrate |
-| INTERNAL_API | GET | `/api/v2/admin/permissions/check` | `?permission=X&user_id=Y` | `{ allowed: bool }` | Migrate |
-| INTERNAL_API | GET | `/api/v2/admin/audit/permissions` | `?page=1` | `{ data: [AuditEntry] }` | Migrate |
-
----
-
-### 18. Legal Documents
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/legal-documents` | -- | `{ data: [Document] }` | List |
-| NEEDED | GET | `/api/v2/admin/legal-documents/{id}` | -- | `{ data: Document }` | Detail |
-| NEEDED | POST | `/api/v2/admin/legal-documents` | `{ type, title }` | `{ data: Document }` | Create |
-| NEEDED | PUT | `/api/v2/admin/legal-documents/{id}` | `{ title, ... }` | `{ data: Document }` | Update |
-| NEEDED | GET | `/api/v2/admin/legal-documents/compliance` | -- | `{ data: ComplianceDashboard }` | Compliance stats |
-| NEEDED | GET | `/api/v2/admin/legal-documents/{id}/versions` | -- | `{ data: [Version] }` | Version list |
-| NEEDED | POST | `/api/v2/admin/legal-documents/{id}/versions` | `{ content, changes_summary }` | `{ data: Version }` | Create version |
-| NEEDED | GET | `/api/v2/admin/legal-documents/{id}/versions/{vId}` | -- | `{ data: Version }` | Version detail |
-| NEEDED | PUT | `/api/v2/admin/legal-documents/{id}/versions/{vId}` | `{ content }` | `{ data: Version }` | Update version |
-| NEEDED | POST | `/api/v2/admin/legal-documents/{id}/versions/{vId}/publish` | -- | `{ data: Version }` | Publish |
-| NEEDED | DELETE | `/api/v2/admin/legal-documents/{id}/versions/{vId}` | -- | `{ success: true }` | Delete version |
-| NEEDED | POST | `/api/v2/admin/legal-documents/{id}/versions/{vId}/notify` | -- | `{ notified: N }` | Notify users |
-| NEEDED | GET | `/api/v2/admin/legal-documents/{id}/versions/{vId}/acceptances` | -- | `{ data: [Acceptance] }` | Acceptance tracking |
-| NEEDED | GET | `/api/v2/admin/legal-documents/{id}/compare` | `?v1=X&v2=Y` | `{ data: Diff }` | Version comparison |
-| NEEDED | GET | `/api/v2/admin/legal-documents/{id}/export` | -- | CSV download | Export acceptances |
-
----
-
-### 19. SEO
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/seo/settings` | -- | `{ data: SeoSettings }` | Global SEO settings |
-| NEEDED | PUT | `/api/v2/admin/seo/settings` | `{ ... }` | `{ data: SeoSettings }` | Update settings |
-| NEEDED | GET | `/api/v2/admin/seo/audit` | -- | `{ data: { score, issues } }` | SEO audit |
-| NEEDED | GET | `/api/v2/admin/seo/bulk/{type}` | -- | `{ data: [{ id, title, seo_title, seo_description }] }` | Bulk edit data |
-| NEEDED | PUT | `/api/v2/admin/seo/bulk` | `{ items: [{ id, seo_title, seo_description }] }` | `{ updated: N }` | Bulk save |
-| NEEDED | GET | `/api/v2/admin/seo/redirects` | -- | `{ data: [Redirect] }` | Redirect list |
-| NEEDED | POST | `/api/v2/admin/seo/redirects` | `{ from, to, code }` | `{ data: Redirect }` | Create redirect |
-| NEEDED | DELETE | `/api/v2/admin/seo/redirects/{id}` | -- | `{ success: true }` | Delete redirect |
-| NEEDED | GET | `/api/v2/admin/seo/organization` | -- | `{ data: OrgSchema }` | Organization schema |
-| NEEDED | PUT | `/api/v2/admin/seo/organization` | `{ ... }` | `{ data: OrgSchema }` | Update org schema |
-| NEEDED | POST | `/api/v2/admin/seo/ping-sitemaps` | -- | `{ success: true }` | Ping search engines |
-
----
-
-### 20. 404 Error Tracking
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| INTERNAL_API | GET | `/api/v2/admin/404-errors` | `?page=1&resolved=false` | `{ data: [Error], meta }` | Migrate from `/admin/404-errors/api/list` |
-| INTERNAL_API | GET | `/api/v2/admin/404-errors/top` | -- | `{ data: [TopError] }` | Migrate from `/admin/404-errors/api/top` |
-| INTERNAL_API | GET | `/api/v2/admin/404-errors/stats` | -- | `{ total, resolved, ... }` | Migrate from `/admin/404-errors/api/stats` |
-| NEEDED | POST | `/api/v2/admin/404-errors/{id}/resolve` | -- | `{ success: true }` | Mark resolved |
-| NEEDED | POST | `/api/v2/admin/404-errors/{id}/unresolve` | -- | `{ success: true }` | Mark unresolved |
-| NEEDED | DELETE | `/api/v2/admin/404-errors/{id}` | -- | `{ success: true }` | Delete error |
-| NEEDED | POST | `/api/v2/admin/404-errors/{id}/redirect` | `{ target_url }` | `{ data: Redirect }` | Create redirect |
-| NEEDED | POST | `/api/v2/admin/404-errors/bulk-redirect` | `{ ids: [...], target_url }` | `{ redirected: N }` | Bulk redirect |
-| NEEDED | POST | `/api/v2/admin/404-errors/clean-old` | `{ days: 30 }` | `{ deleted: N }` | Clean old errors |
-
----
-
-### 21. Plans & Pricing
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/plans` | -- | `{ data: [Plan] }` | List plans |
-| NEEDED | GET | `/api/v2/admin/plans/{id}` | -- | `{ data: Plan }` | Plan detail |
-| NEEDED | POST | `/api/v2/admin/plans` | `{ name, price, features }` | `{ data: Plan }` | Create plan |
-| NEEDED | PUT | `/api/v2/admin/plans/{id}` | `{ name, price, features }` | `{ data: Plan }` | Update plan |
-| NEEDED | DELETE | `/api/v2/admin/plans/{id}` | -- | `{ success: true }` | Delete plan |
-| NEEDED | GET | `/api/v2/admin/plans/subscriptions` | -- | `{ data: [Subscription] }` | List subscriptions |
-| NEEDED | POST | `/api/v2/admin/plans/assign` | `{ user_id, plan_id }` | `{ data: Subscription }` | Assign plan |
-| NEEDED | GET | `/api/v2/admin/plans/comparison` | -- | `{ data: ComparisonTable }` | Plan comparison |
-
----
-
-### 22. Cron Job Manager
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| INTERNAL_API | GET | `/api/v2/admin/cron-jobs/stats` | -- | `{ total, running, failed }` | Migrate from `/admin/cron-jobs/api/stats` |
-| NEEDED | GET | `/api/v2/admin/cron-jobs` | -- | `{ data: [Job] }` | List jobs |
-| NEEDED | POST | `/api/v2/admin/cron-jobs/{id}/run` | -- | `{ data: Job }` | Trigger job |
-| NEEDED | POST | `/api/v2/admin/cron-jobs/{id}/toggle` | -- | `{ data: Job }` | Enable/disable |
-| NEEDED | GET | `/api/v2/admin/cron-jobs/logs` | `?job_id=X&page=1` | `{ data: [Log], meta }` | Job logs |
-| NEEDED | POST | `/api/v2/admin/cron-jobs/logs/clear` | -- | `{ deleted: N }` | Clear logs |
-| NEEDED | GET | `/api/v2/admin/cron-jobs/settings` | -- | `{ data: Settings }` | Settings |
-| NEEDED | PUT | `/api/v2/admin/cron-jobs/settings` | `{ ... }` | `{ data: Settings }` | Update settings |
-
----
-
-### 23. AI Settings
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/ai/settings` | -- | `{ data: { provider, model, api_key_set } }` | Get config |
-| NEEDED | PUT | `/api/v2/admin/ai/settings` | `{ provider, model, api_key }` | `{ data: Settings }` | Update config |
-| NEEDED | POST | `/api/v2/admin/ai/test` | -- | `{ success: true, latency_ms }` | Test connection |
-| NEEDED | POST | `/api/v2/admin/ai/initialize` | -- | `{ success: true }` | Initialize AI |
-
----
-
-### 24. Settings
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/settings` | -- | `{ data: TenantSettings }` | Get all settings |
-| NEEDED | PUT | `/api/v2/admin/settings` | `{ key: value, ... }` | `{ data: TenantSettings }` | Update settings |
-| NEEDED | PUT | `/api/v2/admin/settings/tenant` | `{ name, logo, domain, ... }` | `{ data: Tenant }` | Update tenant branding |
-| NEEDED | POST | `/api/v2/admin/settings/test-gmail` | -- | `{ success: true }` | Test Gmail API |
-
----
-
-### 25. Groups Admin
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/groups` | `?page=1&type=hub` | `{ data: [Group], meta }` | List groups |
-| NEEDED | GET | `/api/v2/admin/groups/analytics` | -- | `{ data: Analytics }` | Analytics |
-| NEEDED | GET | `/api/v2/admin/groups/recommendations` | -- | `{ data: Recommendations }` | Recommendations config |
-| NEEDED | GET | `/api/v2/admin/groups/settings` | -- | `{ data: Settings }` | Group system settings |
-| NEEDED | PUT | `/api/v2/admin/groups/settings` | `{ ... }` | `{ data: Settings }` | Update settings |
-| NEEDED | GET | `/api/v2/admin/groups/policies` | -- | `{ data: Policies }` | Group policies |
-| NEEDED | PUT | `/api/v2/admin/groups/policies` | `{ ... }` | `{ data: Policies }` | Update policies |
-| NEEDED | GET | `/api/v2/admin/groups/moderation` | `?page=1` | `{ data: [Flag], meta }` | Moderation queue |
-| NEEDED | POST | `/api/v2/admin/groups/moderation/{flagId}` | `{ action }` | `{ data: Flag }` | Process flag |
-| NEEDED | GET | `/api/v2/admin/groups/approvals` | -- | `{ data: [Approval] }` | Pending approvals |
-| NEEDED | POST | `/api/v2/admin/groups/approvals/{id}` | `{ action }` | `{ data: Approval }` | Process approval |
-| NEEDED | POST | `/api/v2/admin/groups/{id}/toggle-featured` | -- | `{ data: Group }` | Toggle featured |
-| NEEDED | DELETE | `/api/v2/admin/groups/{id}` | -- | `{ success: true }` | Delete group |
-| NEEDED | GET | `/api/v2/admin/groups/export` | -- | CSV download | Export groups |
-
----
-
-### 26. Activity Log
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| NEEDED | GET | `/api/v2/admin/activity-log` | `?user_id=X&type=Y&page=1` | `{ data: [Entry], meta }` | Activity log with filters |
-
----
-
-### 27. Search (Admin Command Palette)
-
-| Status | Method | Path | Request | Response | Notes |
-|--------|--------|------|---------|----------|-------|
-| INTERNAL_API | GET | `/api/v2/admin/search` | `?q=term` | `{ data: { users, pages, settings } }` | Migrate from `/admin/api/search` |
-
----
-
-## Summary Statistics
-
-| Category | Count |
-|----------|-------|
-| **EXISTING_UNWIRED** (controller exists, route missing) | 7 |
-| **INTERNAL_API** (session-based, needs V2 migration) | 27 |
-| **NEEDED** (must create from scratch) | ~290 |
-| **Total V2 endpoints for full admin** | ~324 |
-
----
-
-## Implementation Strategy
-
-### Phase 1: Foundation (Wire existing + Dashboard + Users)
-1. Wire `AdminConfigApiController` routes in `routes.php`
-2. Create `AdminDashboardApiController` -- dashboard stats, trends, activity
-3. Create `AdminUsersApiController` -- full user CRUD + status actions + badges
-4. Create `AdminSettingsApiController` -- tenant settings
-
-**Estimated endpoints: ~30**
-
-### Phase 2: Content Management
-1. Create `AdminBlogApiController` -- blog CRUD + builder
-2. Create `AdminPagesApiController` -- page CRUD + builder + versions
-3. Create `AdminMenusApiController` -- menu CRUD + items
-4. Create `AdminCategoriesApiController` -- category CRUD
-5. Create `AdminListingsApiController` -- unified content directory
-
-**Estimated endpoints: ~40**
-
-### Phase 3: Platform Management
-1. Create `AdminGamificationApiController` -- stats, badges, campaigns
-2. Create `AdminTimebankingApiController` -- analytics, alerts, org wallets
-3. Create `AdminSmartMatchingApiController` -- config, analytics, cache
-4. Create `AdminBrokerApiController` -- exchanges, risk tags, monitoring
-5. Create `AdminMatchApprovalsApiController` -- approval queue
-
-**Estimated endpoints: ~70**
-
-### Phase 4: Communication & Content
-1. Create `AdminNewslettersApiController` -- full newsletter suite
-2. Create `AdminVolunteeringApiController` -- org approvals
-3. Create `AdminGroupsApiController` -- group management
-
-**Estimated endpoints: ~80**
-
-### Phase 5: Enterprise & Advanced
-1. Create `AdminGdprApiController` -- requests, consents, breaches, audit
-2. Create `AdminMonitoringApiController` -- health, logs
-3. Create `AdminEnterpriseConfigApiController` -- config, secrets
-4. Create `AdminRolesApiController` -- roles & permissions (migrate internal APIs)
-5. Create `AdminFederationApiController` -- full federation admin suite
-
-**Estimated endpoints: ~100**
-
-### Phase 6: Utilities
-1. Create `AdminSeoApiController` -- SEO settings, audit, redirects
-2. Create `AdminError404ApiController` -- error tracking (migrate internal APIs)
-3. Create `AdminCronJobsApiController` -- job management
-4. Create `AdminPlansApiController` -- subscription plans
-5. Create `AdminAiApiController` -- AI settings
-6. Create `AdminLegalDocsApiController` -- legal document management
-
-**Estimated endpoints: ~50**
-
----
-
-## Conventions for New Endpoints
-
-### Controller Pattern
-
-All new admin API controllers should extend `BaseApiController` and follow this pattern:
-
-```php
-namespace Nexus\Controllers\Api;
-
-class AdminUsersApiController extends BaseApiController
-{
-    protected bool $isV2Api = true;
-
-    public function index(): void
-    {
-        $this->requireAdmin();  // Token-based admin check
-        // ... implementation
-        $this->respondWithData($data);
-    }
-}
-```
-
-### Response Format
+All admin controllers set `$isV2Api = true`, which wraps responses in the V2 envelope:
 
 ```json
-{
-    "data": { ... },
-    "meta": {
-        "total": 100,
-        "page": 1,
-        "per_page": 25,
-        "last_page": 4
-    }
-}
+// Success
+{ "data": { ... }, "meta": { ... } }
+
+// Error
+{ "error": { "message": "...", "code": 400 } }
+
+// Paginated
+{ "data": [...], "meta": { "current_page": 1, "last_page": 5, "per_page": 20, "total": 100 } }
 ```
 
-### Error Format
+**Response helpers used:**
+- `respondWithData($data)` -- single object or array
+- `respondWithError($message, $code)` -- error responses
+- `respondWithCollection($items)` -- array of items
+- `respondWithPaginatedCollection($items, $total, $page, $perPage)` -- paginated list
 
-```json
-{
-    "error": {
-        "code": "VALIDATION_ERROR",
-        "message": "Name is required",
-        "field": "name"
-    }
-}
-```
+---
 
-### Auth
+## Complete Endpoint Table
 
-All endpoints use `$this->requireAdmin()` which calls `ApiAuth::authenticate()` + checks admin role. Super admin endpoints additionally check `is_super_admin` flag.
+### Dashboard (3 endpoints)
+
+**Controller:** `AdminDashboardApiController` (237 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 1 | GET | `/api/v2/admin/dashboard/stats` | `stats` | Dashboard stats (users, listings, transactions, sessions) |
+| 2 | GET | `/api/v2/admin/dashboard/trends` | `trends` | Monthly trend data (volume, transactions, new users) |
+| 3 | GET | `/api/v2/admin/dashboard/activity` | `activity` | Recent activity log (paginated) |
+
+---
+
+### Users (15 endpoints)
+
+**Controller:** `AdminUsersApiController` (677 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 4 | GET | `/api/v2/admin/users` | `index` | List users (paginated, filterable by status/role/search) |
+| 5 | POST | `/api/v2/admin/users` | `store` | Create new user |
+| 6 | GET | `/api/v2/admin/users/{id}` | `show` | Get user detail with badges |
+| 7 | PUT | `/api/v2/admin/users/{id}` | `update` | Update user fields |
+| 8 | DELETE | `/api/v2/admin/users/{id}` | `destroy` | Delete user (prevents self/super-admin deletion) |
+| 9 | POST | `/api/v2/admin/users/{id}/approve` | `approve` | Approve pending user |
+| 10 | POST | `/api/v2/admin/users/{id}/suspend` | `suspend` | Suspend user (with reason) |
+| 11 | POST | `/api/v2/admin/users/{id}/ban` | `ban` | Ban user (with reason) |
+| 12 | POST | `/api/v2/admin/users/{id}/reactivate` | `reactivate` | Reactivate suspended/banned user |
+| 13 | POST | `/api/v2/admin/users/{id}/reset-2fa` | `reset2fa` | Reset user's 2FA (with reason) |
+| 14 | POST | `/api/v2/admin/users/badges/recheck-all` | `recheckAll`* | Recheck all user badges |
+| 15 | POST | `/api/v2/admin/users/{id}/badges` | `addBadge` | Award badge to user |
+| 16 | DELETE | `/api/v2/admin/users/{id}/badges/{badgeId}` | `removeBadge` | Remove badge from user |
+| 17 | POST | `/api/v2/admin/users/{id}/impersonate` | `impersonate` | Impersonate user (returns new token) |
+
+*Note: Route 14 maps to `AdminGamificationApiController@recheckAll`, not `AdminUsersApiController`.
+
+---
+
+### Listings (4 endpoints)
+
+**Controller:** `AdminListingsApiController` (233 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 18 | GET | `/api/v2/admin/listings` | `index` | List all listings (paginated, filterable) |
+| 19 | GET | `/api/v2/admin/listings/{id}` | `show` | Get listing detail |
+| 20 | POST | `/api/v2/admin/listings/{id}/approve` | `approve` | Approve pending listing |
+| 21 | DELETE | `/api/v2/admin/listings/{id}` | `destroy` | Delete listing |
+
+---
+
+### Categories (4 endpoints)
+
+**Controller:** `AdminCategoriesApiController` (448 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 22 | GET | `/api/v2/admin/categories` | `index` | List categories (filterable by type) |
+| 23 | POST | `/api/v2/admin/categories` | `store` | Create category |
+| 24 | PUT | `/api/v2/admin/categories/{id}` | `update` | Update category |
+| 25 | DELETE | `/api/v2/admin/categories/{id}` | `destroy` | Delete category |
+
+---
+
+### Attributes (4 endpoints)
+
+**Controller:** `AdminCategoriesApiController` (same file, 448 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 26 | GET | `/api/v2/admin/attributes` | `listAttributes` | List all attributes |
+| 27 | POST | `/api/v2/admin/attributes` | `storeAttribute` | Create attribute |
+| 28 | PUT | `/api/v2/admin/attributes/{id}` | `updateAttribute` | Update attribute |
+| 29 | DELETE | `/api/v2/admin/attributes/{id}` | `destroyAttribute` | Delete attribute |
+
+---
+
+### Config & Features (6 endpoints)
+
+**Controller:** `AdminConfigApiController` (1565 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 30 | GET | `/api/v2/admin/config` | `getConfig` | Get tenant features & modules |
+| 31 | PUT | `/api/v2/admin/config/features` | `updateFeature` | Toggle a feature flag |
+| 32 | PUT | `/api/v2/admin/config/modules` | `updateModule` | Toggle a module |
+
+---
+
+### Cache (2 endpoints)
+
+**Controller:** `AdminConfigApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 33 | GET | `/api/v2/admin/cache/stats` | `cacheStats` | Redis cache statistics |
+| 34 | POST | `/api/v2/admin/cache/clear` | `clearCache` | Clear tenant or all cache |
+
+---
+
+### Background Jobs (2 endpoints)
+
+**Controller:** `AdminConfigApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 35 | GET | `/api/v2/admin/jobs` | `getJobs` | List background jobs |
+| 36 | POST | `/api/v2/admin/jobs/{id}/run` | `runJob` | Execute a background job |
+
+---
+
+### Admin Settings (2 endpoints)
+
+**Controller:** `AdminConfigApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 37 | GET | `/api/v2/admin/settings` | `getSettings` | Get all tenant settings |
+| 38 | PUT | `/api/v2/admin/settings` | `updateSettings` | Update tenant settings |
+
+---
+
+### AI Config (2 endpoints)
+
+**Controller:** `AdminConfigApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 39 | GET | `/api/v2/admin/config/ai` | `getAiConfig` | Get AI/OpenAI settings |
+| 40 | PUT | `/api/v2/admin/config/ai` | `updateAiConfig` | Update AI config (encrypted key) |
+
+---
+
+### Feed Algorithm Config (2 endpoints)
+
+**Controller:** `AdminConfigApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 41 | GET | `/api/v2/admin/config/feed-algorithm` | `getFeedAlgorithmConfig` | Get feed algorithm weights |
+| 42 | PUT | `/api/v2/admin/config/feed-algorithm` | `updateFeedAlgorithmConfig` | Update feed algorithm weights |
+
+---
+
+### Image Config (2 endpoints)
+
+**Controller:** `AdminConfigApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 43 | GET | `/api/v2/admin/config/images` | `getImageConfig` | Get image processing settings |
+| 44 | PUT | `/api/v2/admin/config/images` | `updateImageConfig` | Update image settings |
+
+---
+
+### SEO Config (2 endpoints)
+
+**Controller:** `AdminConfigApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 45 | GET | `/api/v2/admin/config/seo` | `getSeoConfig` | Get SEO metadata settings |
+| 46 | PUT | `/api/v2/admin/config/seo` | `updateSeoConfig` | Update SEO settings |
+
+---
+
+### Native App Config (2 endpoints)
+
+**Controller:** `AdminConfigApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 47 | GET | `/api/v2/admin/config/native-app` | `getNativeAppConfig` | Get Capacitor/PWA settings |
+| 48 | PUT | `/api/v2/admin/config/native-app` | `updateNativeAppConfig` | Update native app settings |
+
+---
+
+### System / Cron Jobs (2 endpoints)
+
+**Controller:** `AdminConfigApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 49 | GET | `/api/v2/admin/system/cron-jobs` | `getCronJobs` | List cron job definitions (20 jobs) |
+| 50 | POST | `/api/v2/admin/system/cron-jobs/{id}/run` | `runCronJob` | Execute a cron job |
+
+---
+
+### System / Activity Log (1 endpoint)
+
+**Controller:** `AdminDashboardApiController` (reuses `activity` method)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 51 | GET | `/api/v2/admin/system/activity-log` | `activity` | Activity log (alias of dashboard/activity) |
+
+---
+
+### Matching (5 endpoints)
+
+**Controller:** `AdminMatchingApiController` (511 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 52 | GET | `/api/v2/admin/matching/config` | `getConfig` | Get smart matching config |
+| 53 | PUT | `/api/v2/admin/matching/config` | `updateConfig` | Update matching weights/settings |
+| 54 | POST | `/api/v2/admin/matching/cache/clear` | `clearCache` | Clear match cache |
+| 55 | GET | `/api/v2/admin/matching/stats` | `getStats` | Matching statistics & distributions |
+
+---
+
+### Match Approvals (5 endpoints)
+
+**Controller:** `AdminMatchingApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 56 | GET | `/api/v2/admin/matching/approvals` | `index` | List match approvals (paginated) |
+| 57 | GET | `/api/v2/admin/matching/approvals/stats` | `approvalStats` | Approval rate & timing stats |
+| 58 | GET | `/api/v2/admin/matching/approvals/{id}` | `show` | Get approval detail |
+| 59 | POST | `/api/v2/admin/matching/approvals/{id}/approve` | `approve` | Approve a match |
+| 60 | POST | `/api/v2/admin/matching/approvals/{id}/reject` | `reject` | Reject a match (with reason) |
+
+---
+
+### Blog (6 endpoints)
+
+**Controller:** `AdminBlogApiController` (367 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 61 | GET | `/api/v2/admin/blog` | `index` | List blog posts (paginated) |
+| 62 | POST | `/api/v2/admin/blog` | `store` | Create blog post |
+| 63 | GET | `/api/v2/admin/blog/{id}` | `show` | Get blog post detail |
+| 64 | PUT | `/api/v2/admin/blog/{id}` | `update` | Update blog post |
+| 65 | DELETE | `/api/v2/admin/blog/{id}` | `destroy` | Delete blog post |
+| 66 | POST | `/api/v2/admin/blog/{id}/toggle-status` | `toggleStatus` | Toggle draft/published |
+
+---
+
+### Gamification (10 endpoints)
+
+**Controller:** `AdminGamificationApiController` (499 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 67 | GET | `/api/v2/admin/gamification/stats` | `stats` | Gamification overview stats |
+| 68 | GET | `/api/v2/admin/gamification/badges` | `badges` | List badge definitions |
+| 69 | POST | `/api/v2/admin/gamification/badges` | `createBadge` | Create custom badge |
+| 70 | DELETE | `/api/v2/admin/gamification/badges/{id}` | `deleteBadge` | Delete custom badge |
+| 71 | GET | `/api/v2/admin/gamification/campaigns` | `campaigns` | List campaigns |
+| 72 | POST | `/api/v2/admin/gamification/campaigns` | `createCampaign` | Create campaign |
+| 73 | PUT | `/api/v2/admin/gamification/campaigns/{id}` | `updateCampaign` | Update campaign |
+| 74 | DELETE | `/api/v2/admin/gamification/campaigns/{id}` | `deleteCampaign` | Delete campaign |
+| 75 | POST | `/api/v2/admin/gamification/recheck-all` | `recheckAll` | Re-evaluate all badge eligibility |
+| 76 | POST | `/api/v2/admin/gamification/bulk-award` | `bulkAward` | Award badge to multiple users |
+
+---
+
+### Groups (7 endpoints)
+
+**Controller:** `AdminGroupsApiController` (456 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 77 | GET | `/api/v2/admin/groups` | `index` | List groups (paginated) |
+| 78 | GET | `/api/v2/admin/groups/analytics` | `analytics` | Group analytics (totals, most active) |
+| 79 | GET | `/api/v2/admin/groups/approvals` | `approvals` | Pending membership approvals |
+| 80 | POST | `/api/v2/admin/groups/approvals/{id}/approve` | `approveMember` | Approve membership |
+| 81 | POST | `/api/v2/admin/groups/approvals/{id}/reject` | `rejectMember` | Reject membership |
+| 82 | GET | `/api/v2/admin/groups/moderation` | `moderation` | Reported/flagged groups |
+| 83 | DELETE | `/api/v2/admin/groups/{id}` | `deleteGroup` | Delete group |
+
+---
+
+### Timebanking (6 endpoints)
+
+**Controller:** `AdminTimebankingApiController` (496 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 84 | GET | `/api/v2/admin/timebanking/stats` | `stats` | Transaction stats, top earners/spenders |
+| 85 | GET | `/api/v2/admin/timebanking/alerts` | `alerts` | Fraud alerts (paginated, filterable) |
+| 86 | PUT | `/api/v2/admin/timebanking/alerts/{id}` | `updateAlert` | Update alert status |
+| 87 | POST | `/api/v2/admin/timebanking/adjust-balance` | `adjustBalance` | Manual balance adjustment |
+| 88 | GET | `/api/v2/admin/timebanking/org-wallets` | `orgWallets` | Organization wallet list |
+| 89 | GET | `/api/v2/admin/timebanking/user-report` | `userReport` | User financial report (paginated) |
+
+---
+
+### Enterprise (22 endpoints)
+
+**Controller:** `AdminEnterpriseApiController` (1029 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 90 | GET | `/api/v2/admin/enterprise/dashboard` | `dashboard` | Enterprise overview stats |
+| 91 | GET | `/api/v2/admin/enterprise/roles` | `roles` | List roles with user counts |
+| 92 | POST | `/api/v2/admin/enterprise/roles` | `createRole` | Create custom role |
+| 93 | GET | `/api/v2/admin/enterprise/roles/{id}` | `showRole` | Get role detail |
+| 94 | PUT | `/api/v2/admin/enterprise/roles/{id}` | `updateRole` | Update role & permissions |
+| 95 | DELETE | `/api/v2/admin/enterprise/roles/{id}` | `deleteRole` | Delete role (prevents system role deletion) |
+| 96 | GET | `/api/v2/admin/enterprise/permissions` | `permissions` | List all permission categories |
+| 97 | GET | `/api/v2/admin/enterprise/gdpr/dashboard` | `gdprDashboard` | GDPR overview stats |
+| 98 | GET | `/api/v2/admin/enterprise/gdpr/requests` | `gdprRequests` | List GDPR requests (paginated) |
+| 99 | PUT | `/api/v2/admin/enterprise/gdpr/requests/{id}` | `updateGdprRequest` | Update GDPR request status |
+| 100 | GET | `/api/v2/admin/enterprise/gdpr/consents` | `gdprConsents` | List consent records |
+| 101 | GET | `/api/v2/admin/enterprise/gdpr/breaches` | `gdprBreaches` | List data breaches |
+| 102 | GET | `/api/v2/admin/enterprise/gdpr/audit` | `gdprAudit` | GDPR audit log |
+| 103 | GET | `/api/v2/admin/enterprise/monitoring` | `monitoring` | System health overview |
+| 104 | GET | `/api/v2/admin/enterprise/monitoring/health` | `healthCheck` | Detailed health check |
+| 105 | GET | `/api/v2/admin/enterprise/monitoring/logs` | `logs` | Error/activity logs (paginated) |
+| 106 | GET | `/api/v2/admin/enterprise/config` | `config` | System configuration |
+| 107 | PUT | `/api/v2/admin/enterprise/config` | `updateConfig` | Update system config |
+| 108 | GET | `/api/v2/admin/enterprise/config/secrets` | `secrets` | List secrets (masked values) |
+| 109 | GET | `/api/v2/admin/legal-documents` | `legalDocs` | List legal documents |
+| 110 | POST | `/api/v2/admin/legal-documents` | `createLegalDoc` | Create legal document |
+| 111 | GET | `/api/v2/admin/legal-documents/{id}` | `showLegalDoc` | Get legal document |
+| 112 | PUT | `/api/v2/admin/legal-documents/{id}` | `updateLegalDoc` | Update legal document |
+| 113 | DELETE | `/api/v2/admin/legal-documents/{id}` | `deleteLegalDoc` | Delete legal document |
+
+---
+
+### Broker Controls (8 endpoints)
+
+**Controller:** `AdminBrokerApiController` (400 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 114 | GET | `/api/v2/admin/broker/dashboard` | `dashboard` | Broker overview (pending, unreviewed, risks) |
+| 115 | GET | `/api/v2/admin/broker/exchanges` | `exchanges` | List exchange requests (paginated) |
+| 116 | POST | `/api/v2/admin/broker/exchanges/{id}/approve` | `approveExchange` | Approve exchange |
+| 117 | POST | `/api/v2/admin/broker/exchanges/{id}/reject` | `rejectExchange` | Reject exchange (with reason) |
+| 118 | GET | `/api/v2/admin/broker/risk-tags` | `riskTags` | List risk-tagged listings |
+| 119 | GET | `/api/v2/admin/broker/messages` | `messages` | List broker-relevant messages |
+| 120 | POST | `/api/v2/admin/broker/messages/{id}/review` | `reviewMessage` | Mark message as reviewed |
+| 121 | GET | `/api/v2/admin/broker/monitoring` | `monitoring` | List monitored users |
+
+---
+
+### Newsletters (9 endpoints)
+
+**Controller:** `AdminNewsletterApiController` (292 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 122 | GET | `/api/v2/admin/newsletters` | `index` | List newsletters (paginated) |
+| 123 | POST | `/api/v2/admin/newsletters` | `store` | Create newsletter |
+| 124 | GET | `/api/v2/admin/newsletters/subscribers` | `subscribers` | List subscribers |
+| 125 | GET | `/api/v2/admin/newsletters/segments` | `segments` | List segments |
+| 126 | GET | `/api/v2/admin/newsletters/templates` | `templates` | List templates |
+| 127 | GET | `/api/v2/admin/newsletters/analytics` | `analytics` | Newsletter analytics |
+| 128 | GET | `/api/v2/admin/newsletters/{id}` | `show` | Get newsletter detail |
+| 129 | PUT | `/api/v2/admin/newsletters/{id}` | `update` | Update newsletter |
+| 130 | DELETE | `/api/v2/admin/newsletters/{id}` | `destroy` | Delete newsletter |
+
+---
+
+### Volunteering (3 endpoints)
+
+**Controller:** `AdminVolunteeringApiController` (154 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 131 | GET | `/api/v2/admin/volunteering` | `index` | Overview stats + recent opportunities |
+| 132 | GET | `/api/v2/admin/volunteering/approvals` | `approvals` | Pending volunteer applications |
+| 133 | GET | `/api/v2/admin/volunteering/organizations` | `organizations` | Volunteer organizations |
+
+---
+
+### Federation (8 endpoints)
+
+**Controller:** `AdminFederationApiController` (253 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 134 | GET | `/api/v2/admin/federation/settings` | `settings` | Federation configuration |
+| 135 | GET | `/api/v2/admin/federation/partnerships` | `partnerships` | List partner communities |
+| 136 | GET | `/api/v2/admin/federation/directory` | `directory` | Federation directory |
+| 137 | GET | `/api/v2/admin/federation/directory/profile` | `profile` | Own community profile |
+| 138 | GET | `/api/v2/admin/federation/analytics` | `analytics` | Federation analytics |
+| 139 | GET | `/api/v2/admin/federation/api-keys` | `apiKeys` | List API keys |
+| 140 | POST | `/api/v2/admin/federation/api-keys` | `createApiKey` | Generate new API key |
+| 141 | GET | `/api/v2/admin/federation/data` | `dataManagement` | Data management overview |
+
+---
+
+### Content - Pages (5 endpoints)
+
+**Controller:** `AdminContentApiController` (1298 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 142 | GET | `/api/v2/admin/pages` | `getPages` | List CMS pages |
+| 143 | POST | `/api/v2/admin/pages` | `createPage` | Create page (auto-slug) |
+| 144 | GET | `/api/v2/admin/pages/{id}` | `getPage` | Get page detail |
+| 145 | PUT | `/api/v2/admin/pages/{id}` | `updatePage` | Update page |
+| 146 | DELETE | `/api/v2/admin/pages/{id}` | `deletePage` | Delete page |
+
+---
+
+### Content - Menus (5 endpoints)
+
+**Controller:** `AdminContentApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 147 | GET | `/api/v2/admin/menus` | `getMenus` | List menus with item counts |
+| 148 | POST | `/api/v2/admin/menus` | `createMenu` | Create menu (auto-slug) |
+| 149 | GET | `/api/v2/admin/menus/{id}` | `getMenu` | Get menu with nested items |
+| 150 | PUT | `/api/v2/admin/menus/{id}` | `updateMenu` | Update menu |
+| 151 | DELETE | `/api/v2/admin/menus/{id}` | `deleteMenu` | Delete menu and all items |
+
+---
+
+### Content - Menu Items (5 endpoints)
+
+**Controller:** `AdminContentApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 152 | GET | `/api/v2/admin/menus/{id}/items` | `getMenuItems` | List items for a menu |
+| 153 | POST | `/api/v2/admin/menus/{id}/items` | `createMenuItem` | Add item to menu |
+| 154 | POST | `/api/v2/admin/menus/{id}/items/reorder` | `reorderMenuItems` | Reorder + re-parent items |
+| 155 | PUT | `/api/v2/admin/menu-items/{id}` | `updateMenuItem` | Update a menu item |
+| 156 | DELETE | `/api/v2/admin/menu-items/{id}` | `deleteMenuItem` | Delete a menu item |
+
+---
+
+### Content - Plans (6 endpoints)
+
+**Controller:** `AdminContentApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 157 | GET | `/api/v2/admin/plans` | `getPlans` | List subscription plans |
+| 158 | POST | `/api/v2/admin/plans` | `createPlan` | Create plan (auto-slug) |
+| 159 | GET | `/api/v2/admin/plans/{id}` | `getPlan` | Get plan detail |
+| 160 | PUT | `/api/v2/admin/plans/{id}` | `updatePlan` | Update plan |
+| 161 | DELETE | `/api/v2/admin/plans/{id}` | `deletePlan` | Delete plan |
+| 162 | GET | `/api/v2/admin/subscriptions` | `getSubscriptions` | List active subscriptions |
+
+---
+
+### Tools - SEO Redirects (3 endpoints)
+
+**Controller:** `AdminToolsApiController` (550 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 163 | GET | `/api/v2/admin/tools/redirects` | `getRedirects` | List SEO redirects |
+| 164 | POST | `/api/v2/admin/tools/redirects` | `createRedirect` | Create redirect rule |
+| 165 | DELETE | `/api/v2/admin/tools/redirects/{id}` | `deleteRedirect` | Delete redirect |
+
+---
+
+### Tools - 404 Errors (2 endpoints)
+
+**Controller:** `AdminToolsApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 166 | GET | `/api/v2/admin/tools/404-errors` | `get404Errors` | List tracked 404 errors |
+| 167 | DELETE | `/api/v2/admin/tools/404-errors/{id}` | `delete404Error` | Delete 404 entry |
+
+---
+
+### Tools - Health & Utilities (5 endpoints)
+
+**Controller:** `AdminToolsApiController`
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 168 | POST | `/api/v2/admin/tools/health-check` | `runHealthCheck` | Run system health checks |
+| 169 | GET | `/api/v2/admin/tools/webp-stats` | `getWebpStats` | WebP conversion statistics |
+| 170 | POST | `/api/v2/admin/tools/webp-convert` | `runWebpConversion` | Convert images to WebP |
+| 171 | POST | `/api/v2/admin/tools/seed` | `runSeedGenerator` | Generate seed data |
+| 172 | GET | `/api/v2/admin/tools/blog-backups` | `getBlogBackups` | List blog backup files |
+
+---
+
+### Deliverability (8 endpoints)
+
+**Controller:** `AdminDeliverabilityApiController` (935 lines)
+
+| # | Method | Path | Action | Description |
+|---|--------|------|--------|-------------|
+| 173 | GET | `/api/v2/admin/deliverability/dashboard` | `getDashboard` | Deliverability overview with stats |
+| 174 | GET | `/api/v2/admin/deliverability/analytics` | `getAnalytics` | Analytics: priority/status/assignee breakdowns |
+| 175 | GET | `/api/v2/admin/deliverability` | `getDeliverables` | List deliverables (paginated, filterable) |
+| 176 | POST | `/api/v2/admin/deliverability` | `createDeliverable` | Create deliverable with history |
+| 177 | GET | `/api/v2/admin/deliverability/{id}` | `getDeliverable` | Get deliverable with comments & history |
+| 178 | PUT | `/api/v2/admin/deliverability/{id}` | `updateDeliverable` | Update deliverable (tracks changes) |
+| 179 | DELETE | `/api/v2/admin/deliverability/{id}` | `deleteDeliverable` | Delete deliverable |
+| 180 | POST | `/api/v2/admin/deliverability/{id}/comments` | `addComment` | Add comment to deliverable |
+
+---
+
+## Endpoint-to-React-Page Mapping
+
+Maps each React admin page to the API endpoints it consumes. All paths below are prefixed with `/api/v2/admin`.
+
+| React Route | Component | API Endpoints Used |
+|-------------|-----------|-------------------|
+| `/admin` (index) | `AdminDashboard` | `GET /dashboard/stats`, `GET /dashboard/trends`, `GET /dashboard/activity` |
+| `/admin/users` | `UserList` | `GET /users` |
+| `/admin/users/create` | `UserCreate` | `POST /users` |
+| `/admin/users/:id/edit` | `UserEdit` | `GET /users/{id}`, `PUT /users/{id}`, `POST .../approve`, `POST .../suspend`, `POST .../ban`, `POST .../reactivate`, `POST .../reset-2fa`, `POST .../badges`, `DELETE .../badges/{badgeId}`, `POST .../impersonate` |
+| `/admin/users/:id/permissions` | `PermissionBrowser` | `GET /enterprise/permissions` |
+| `/admin/listings` | `ListingsAdmin` | `GET /listings`, `POST /listings/{id}/approve`, `DELETE /listings/{id}` |
+| `/admin/blog` | `BlogAdmin` | `GET /blog`, `DELETE /blog/{id}`, `POST /blog/{id}/toggle-status` |
+| `/admin/blog/create` | `BlogPostForm` | `POST /blog` |
+| `/admin/blog/edit/:id` | `BlogPostForm` | `GET /blog/{id}`, `PUT /blog/{id}` |
+| `/admin/pages` | `PagesAdmin` | `GET /pages`, `DELETE /pages/{id}` |
+| `/admin/pages/builder/:id` | `PageBuilder` | `GET /pages/{id}`, `POST /pages`, `PUT /pages/{id}` |
+| `/admin/menus` | `MenusAdmin` | `GET /menus`, `POST /menus`, `DELETE /menus/{id}` |
+| `/admin/menus/builder/:id` | `MenuBuilder` | `GET /menus/{id}`, `GET /menus/{id}/items`, `POST /menus/{id}/items`, `POST .../items/reorder`, `PUT /menu-items/{id}`, `DELETE /menu-items/{id}` |
+| `/admin/categories` | `CategoriesAdmin` | `GET /categories`, `POST /categories`, `PUT /categories/{id}`, `DELETE /categories/{id}` |
+| `/admin/attributes` | `AttributesAdmin` | `GET /attributes`, `POST /attributes`, `PUT /attributes/{id}`, `DELETE /attributes/{id}` |
+| `/admin/gamification` | `GamificationHub` | `GET /gamification/stats`, `GET /gamification/badges` |
+| `/admin/gamification/campaigns` | `CampaignList` | `GET /gamification/campaigns`, `DELETE /gamification/campaigns/{id}` |
+| `/admin/gamification/campaigns/create` | `CampaignForm` | `POST /gamification/campaigns` |
+| `/admin/gamification/campaigns/edit/:id` | `CampaignForm` | `PUT /gamification/campaigns/{id}` |
+| `/admin/gamification/analytics` | `GamificationAnalytics` | `GET /gamification/stats` |
+| `/admin/custom-badges` | `CustomBadges` | `GET /gamification/badges`, `DELETE /gamification/badges/{id}` |
+| `/admin/custom-badges/create` | `CreateBadge` | `POST /gamification/badges` |
+| `/admin/smart-matching` | `SmartMatchingOverview` | `GET /matching/stats` |
+| `/admin/smart-matching/analytics` | `MatchingAnalytics` | `GET /matching/stats` |
+| `/admin/smart-matching/configuration` | `MatchingConfig` | `GET /matching/config`, `PUT /matching/config`, `POST /matching/cache/clear` |
+| `/admin/match-approvals` | `MatchApprovals` | `GET /matching/approvals`, `GET /matching/approvals/stats`, `POST .../approve`, `POST .../reject` |
+| `/admin/match-approvals/:id` | `MatchDetail` | `GET /matching/approvals/{id}`, `POST .../approve`, `POST .../reject` |
+| `/admin/broker-controls` | `BrokerDashboard` | `GET /broker/dashboard` |
+| `/admin/broker-controls/exchanges` | `ExchangeManagement` | `GET /broker/exchanges`, `POST .../approve`, `POST .../reject` |
+| `/admin/broker-controls/risk-tags` | `RiskTags` | `GET /broker/risk-tags` |
+| `/admin/broker-controls/messages` | `MessageReview` | `GET /broker/messages`, `POST .../review` |
+| `/admin/broker-controls/monitoring` | `UserMonitoring` | `GET /broker/monitoring` |
+| `/admin/newsletters` | `NewsletterList` | `GET /newsletters` |
+| `/admin/newsletters/create` | `NewsletterForm` | `POST /newsletters` |
+| `/admin/newsletters/edit/:id` | `NewsletterForm` | `GET /newsletters/{id}`, `PUT /newsletters/{id}` |
+| `/admin/newsletters/subscribers` | `Subscribers` | `GET /newsletters/subscribers` |
+| `/admin/newsletters/segments` | `Segments` | `GET /newsletters/segments` |
+| `/admin/newsletters/templates` | `Templates` | `GET /newsletters/templates` |
+| `/admin/newsletters/analytics` | `NewsletterAnalytics` | `GET /newsletters/analytics` |
+| `/admin/ai-settings` | `AiSettings` | `GET /config/ai`, `PUT /config/ai` |
+| `/admin/feed-algorithm` | `FeedAlgorithm` | `GET /config/feed-algorithm`, `PUT /config/feed-algorithm` |
+| `/admin/algorithm-settings` | `AlgorithmSettings` | `GET /config/feed-algorithm` |
+| `/admin/seo` | `SeoOverview` | `GET /config/seo` |
+| `/admin/seo/audit` | `SeoAudit` | `GET /config/seo` |
+| `/admin/seo/redirects` | `Redirects` | `GET /tools/redirects`, `POST /tools/redirects`, `DELETE /tools/redirects/{id}` |
+| `/admin/404-errors` | `Error404Tracking` | `GET /tools/404-errors`, `DELETE /tools/404-errors/{id}` |
+| `/admin/timebanking` | `TimebankingDashboard` | `GET /timebanking/stats` |
+| `/admin/timebanking/alerts` | `FraudAlerts` | `GET /timebanking/alerts`, `PUT /timebanking/alerts/{id}` |
+| `/admin/timebanking/user-report` | `UserReport` | `GET /timebanking/user-report` |
+| `/admin/timebanking/org-wallets` | `OrgWallets` | `GET /timebanking/org-wallets` |
+| `/admin/plans` | `PlansAdmin` | `GET /plans`, `DELETE /plans/{id}` |
+| `/admin/plans/create` | `PlanForm` | `POST /plans` |
+| `/admin/plans/edit/:id` | `PlanForm` | `GET /plans/{id}`, `PUT /plans/{id}` |
+| `/admin/plans/subscriptions` | `Subscriptions` | `GET /subscriptions` |
+| `/admin/enterprise` | `EnterpriseDashboard` | `GET /enterprise/dashboard` |
+| `/admin/enterprise/roles` | `RoleList` | `GET /enterprise/roles` |
+| `/admin/enterprise/roles/create` | `RoleForm` | `POST /enterprise/roles`, `GET /enterprise/permissions` |
+| `/admin/enterprise/roles/:id` | `RoleForm` | `GET /enterprise/roles/{id}`, `PUT /enterprise/roles/{id}`, `GET /enterprise/permissions` |
+| `/admin/enterprise/permissions` | `PermissionBrowser` | `GET /enterprise/permissions` |
+| `/admin/enterprise/gdpr` | `GdprDashboard` | `GET /enterprise/gdpr/dashboard` |
+| `/admin/enterprise/gdpr/requests` | `GdprRequests` | `GET /enterprise/gdpr/requests`, `PUT .../requests/{id}` |
+| `/admin/enterprise/gdpr/consents` | `GdprConsents` | `GET /enterprise/gdpr/consents` |
+| `/admin/enterprise/gdpr/breaches` | `GdprBreaches` | `GET /enterprise/gdpr/breaches` |
+| `/admin/enterprise/gdpr/audit` | `GdprAuditLog` | `GET /enterprise/gdpr/audit` |
+| `/admin/enterprise/monitoring` | `SystemMonitoring` | `GET /enterprise/monitoring` |
+| `/admin/enterprise/monitoring/health` | `HealthCheck` | `GET /enterprise/monitoring/health` |
+| `/admin/enterprise/monitoring/logs` | `ErrorLogs` | `GET /enterprise/monitoring/logs` |
+| `/admin/enterprise/config` | `SystemConfig` | `GET /enterprise/config`, `PUT /enterprise/config` |
+| `/admin/enterprise/config/secrets` | `SecretsVault` | `GET /enterprise/config/secrets` |
+| `/admin/legal-documents` | `LegalDocList` | `GET /legal-documents` |
+| `/admin/legal-documents/create` | `LegalDocForm` | `POST /legal-documents` |
+| `/admin/legal-documents/:id` | `LegalDocForm` | `GET /legal-documents/{id}`, `PUT /legal-documents/{id}` |
+| `/admin/federation` | `FederationSettings` | `GET /federation/settings` |
+| `/admin/federation/partnerships` | `Partnerships` | `GET /federation/partnerships` |
+| `/admin/federation/directory` | `PartnerDirectory` | `GET /federation/directory` |
+| `/admin/federation/directory/profile` | `MyProfile` | `GET /federation/directory/profile` |
+| `/admin/federation/analytics` | `FederationAnalytics` | `GET /federation/analytics` |
+| `/admin/federation/api-keys` | `ApiKeys` | `GET /federation/api-keys` |
+| `/admin/federation/api-keys/create` | `CreateApiKey` | `POST /federation/api-keys` |
+| `/admin/federation/data` | `DataManagement` | `GET /federation/data` |
+| `/admin/settings` | `AdminSettings` | `GET /settings`, `PUT /settings` |
+| `/admin/tenant-features` | `TenantFeatures` | `GET /config`, `PUT /config/features`, `PUT /config/modules` |
+| `/admin/cron-jobs` | `CronJobs` | `GET /system/cron-jobs`, `POST /system/cron-jobs/{id}/run` |
+| `/admin/activity-log` | `ActivityLog` | `GET /system/activity-log` |
+| `/admin/seed-generator` | `SeedGenerator` | `POST /tools/seed` |
+| `/admin/webp-converter` | `WebpConverter` | `GET /tools/webp-stats`, `POST /tools/webp-convert` |
+| `/admin/image-settings` | `ImageSettings` | `GET /config/images`, `PUT /config/images` |
+| `/admin/native-app` | `NativeApp` | `GET /config/native-app`, `PUT /config/native-app` |
+| `/admin/blog-restore` | `BlogRestore` | `GET /tools/blog-backups` |
+| `/admin/groups` | `GroupList` | `GET /groups` |
+| `/admin/groups/analytics` | `GroupAnalytics` | `GET /groups/analytics` |
+| `/admin/groups/approvals` | `GroupApprovals` | `GET /groups/approvals`, `POST .../approve`, `POST .../reject` |
+| `/admin/groups/moderation` | `GroupModeration` | `GET /groups/moderation`, `DELETE /groups/{id}` |
+| `/admin/volunteering` | `VolunteeringOverview` | `GET /volunteering` |
+| `/admin/volunteering/approvals` | `VolunteerApprovals` | `GET /volunteering/approvals` |
+| `/admin/volunteering/organizations` | `VolunteerOrganizations` | `GET /volunteering/organizations` |
+| `/admin/deliverability` | `DeliverabilityDashboard` | `GET /deliverability/dashboard` |
+| `/admin/deliverability/list` | `DeliverablesList` | `GET /deliverability`, `DELETE /deliverability/{id}` |
+| `/admin/deliverability/create` | `CreateDeliverable` | `POST /deliverability` |
+| `/admin/deliverability/analytics` | `DeliverabilityAnalytics` | `GET /deliverability/analytics` |
+| `/admin/matching-diagnostic` | `MatchingDiagnostic` | `GET /matching/stats` (with user_id/listing_id params) |
+| `/admin/nexus-score/analytics` | `NexusScoreAnalytics` | `GET /gamification/stats` |
+| `/admin/smart-match-users` | `SmartMatchUsers` | `GET /matching/stats` |
+| `/admin/smart-match-monitoring` | `SmartMatchMonitoring` | `GET /matching/stats` |
+| `/admin/tests` | `TestRunner` | No dedicated API (client-side only) |
+
+---
+
+## React Pages Without Dedicated API
+
+These React admin pages exist but either reuse other endpoints or have no backend API:
+
+| React Route | Component | Notes |
+|-------------|-----------|-------|
+| `/admin/tests` | `TestRunner` | Client-side test runner, no backend endpoint |
+| `/admin/group-types` | `GroupList` (reused) | Shares route with `/admin/groups` |
+| `/admin/group-ranking` | `GroupList` (reused) | Shares route with `/admin/groups` |
+| `/admin/group-locations` | `GroupList` (reused) | Shares route with `/admin/groups` |
+| `/admin/geocode-groups` | `GroupList` (reused) | Shares route with `/admin/groups` |
+| `/admin/smart-match-users` | `SmartMatchUsers` | Reuses `GET /matching/stats` |
+| `/admin/smart-match-monitoring` | `SmartMatchMonitoring` | Reuses `GET /matching/stats` |
+| `/admin/matching-diagnostic` | `MatchingDiagnostic` | Reuses `GET /matching/stats` with params |
+| `/admin/nexus-score/analytics` | `NexusScoreAnalytics` | Reuses `GET /gamification/stats` |
+| `/admin/algorithm-settings` | `AlgorithmSettings` | Reuses `GET /config/feed-algorithm` |
+| `/admin/seo/audit` | `SeoAudit` | Reuses `GET /config/seo` |
+| `/admin/timebanking/create-org` | `OrgWallets` (reused) | Shares route with `/admin/timebanking/org-wallets` |
+
+---
+
+## Controller Summary
+
+| Controller | File | Lines | Endpoints | Key Dependencies |
+|-----------|------|-------|-----------|------------------|
+| `AdminDashboardApiController` | `src/Controllers/Api/AdminDashboardApiController.php` | 237 | 3 | Direct DB queries |
+| `AdminUsersApiController` | `src/Controllers/Api/AdminUsersApiController.php` | 677 | 14 | `UserService`, `GamificationService`, `TokenService` |
+| `AdminListingsApiController` | `src/Controllers/Api/AdminListingsApiController.php` | 233 | 4 | Direct DB queries |
+| `AdminCategoriesApiController` | `src/Controllers/Api/AdminCategoriesApiController.php` | 448 | 8 | Direct DB queries |
+| `AdminConfigApiController` | `src/Controllers/Api/AdminConfigApiController.php` | 1565 | 20 | `RedisCache`, `AiSettings`, `TenantContext` |
+| `AdminMatchingApiController` | `src/Controllers/Api/AdminMatchingApiController.php` | 511 | 10 | `SmartMatchingEngine`, `MatchApprovalWorkflowService`, `SmartMatchingAnalyticsService` |
+| `AdminBlogApiController` | `src/Controllers/Api/AdminBlogApiController.php` | 367 | 6 | Direct DB queries |
+| `AdminGamificationApiController` | `src/Controllers/Api/AdminGamificationApiController.php` | 499 | 10 | `GamificationService`, `AchievementCampaignService` |
+| `AdminGroupsApiController` | `src/Controllers/Api/AdminGroupsApiController.php` | 456 | 7 | `GroupApprovalWorkflowService` |
+| `AdminTimebankingApiController` | `src/Controllers/Api/AdminTimebankingApiController.php` | 496 | 6 | `AbuseDetectionService`, `WalletService`, `AuditLogService` |
+| `AdminEnterpriseApiController` | `src/Controllers/Api/AdminEnterpriseApiController.php` | 1029 | 22 | Direct DB queries, Redis |
+| `AdminBrokerApiController` | `src/Controllers/Api/AdminBrokerApiController.php` | 400 | 8 | Direct DB queries |
+| `AdminNewsletterApiController` | `src/Controllers/Api/AdminNewsletterApiController.php` | 292 | 9 | `tableExists()` helper |
+| `AdminVolunteeringApiController` | `src/Controllers/Api/AdminVolunteeringApiController.php` | 154 | 3 | `tableExists()` helper |
+| `AdminFederationApiController` | `src/Controllers/Api/AdminFederationApiController.php` | 253 | 8 | `FederationGateway` |
+| `AdminContentApiController` | `src/Controllers/Api/AdminContentApiController.php` | 1298 | 21 | Direct DB queries, slug helpers |
+| `AdminToolsApiController` | `src/Controllers/Api/AdminToolsApiController.php` | 550 | 10 | Direct DB queries, file system |
+| `AdminDeliverabilityApiController` | `src/Controllers/Api/AdminDeliverabilityApiController.php` | 935 | 8 | Direct DB queries, history tracking |
+| **TOTAL** | | **9,950** | **180** | |
+
+---
+
+## Notes
+
+1. **All endpoints are tenant-scoped** via `TenantContext::getId()` -- no cross-tenant data leakage.
+2. **Graceful degradation:** `AdminVolunteeringApiController` and `AdminNewsletterApiController` use `tableExists()` to handle missing tables gracefully.
+3. **Route alias:** `/api/v2/admin/system/activity-log` is an alias for `/api/v2/admin/dashboard/activity` (same controller method).
+4. **Cross-controller routing:** `POST /api/v2/admin/users/badges/recheck-all` routes to `AdminGamificationApiController@recheckAll`, not `AdminUsersApiController`.
+5. **Config controller is largest:** `AdminConfigApiController` at 1565 lines handles 20 endpoints spanning features, modules, cache, jobs, settings, AI, feed algorithm, images, SEO, native app, and cron jobs.
+6. **No rate limiting** on admin endpoints -- all rely solely on `requireAdmin()` auth check.
+7. **Enterprise controller defines 13 permission categories** as a PHP constant but does not enforce per-endpoint permissions -- all admin endpoints are accessible to any admin user regardless of their specific permissions.

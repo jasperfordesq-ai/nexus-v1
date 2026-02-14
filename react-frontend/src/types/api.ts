@@ -33,6 +33,9 @@ export interface User {
   total_hours_received?: number;
   rating?: number;
   level?: number;
+  phone?: string;
+  profile_type?: 'individual' | 'organisation';
+  organization_name?: string;
   has_2fa_enabled?: boolean;
   preferred_layout?: 'modern' | 'civicone';
   email_verified_at?: string | null;
@@ -484,6 +487,8 @@ export interface Event {
   maybe_count?: number;
   max_attendees?: number;
   is_full?: boolean;
+  category_name?: string;
+  interested_count?: number;
   rsvp_status?: RsvpStatus | null;
   can_edit?: boolean;
   recent_attendees?: Array<{
@@ -982,6 +987,17 @@ export interface Exchange {
     last_name?: string;
     avatar?: string | null;
   };
+
+  // Status history for timeline
+  status_history?: ExchangeHistoryEntry[];
+}
+
+export interface ExchangeHistoryEntry {
+  action: string;
+  new_status?: string;
+  actor_name?: string;
+  notes?: string;
+  created_at: string;
 }
 
 export interface ExchangeConfig {
@@ -1006,4 +1022,144 @@ export interface ExchangeFilters {
   role?: 'requester' | 'provider';
   cursor?: string;
   per_page?: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Federation Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface FederationPartner {
+  id: number;
+  name: string;
+  logo?: string | null;
+  tagline?: string;
+  location?: string;
+  country?: string;
+  member_count: number;
+  federation_level: number;
+  federation_level_name?: string;
+  permissions?: string[];
+  partnership_since?: string;
+}
+
+export interface FederatedEvent {
+  id: number;
+  title: string;
+  description: string;
+  start_date: string;
+  end_date?: string;
+  location?: string;
+  is_online?: boolean;
+  online_url?: string;
+  cover_image?: string | null;
+  attendees_count: number;
+  max_attendees?: number;
+  organizer?: {
+    id: number;
+    name: string;
+    avatar?: string | null;
+  };
+  timebank: {
+    id: number;
+    name: string;
+  };
+  created_at?: string;
+}
+
+export interface FederatedListing {
+  id: number;
+  title: string;
+  description: string;
+  type: 'offer' | 'request';
+  category_name?: string;
+  image_url?: string | null;
+  estimated_hours?: number;
+  location?: string;
+  author?: {
+    id: number;
+    name: string;
+    avatar?: string | null;
+  };
+  timebank: {
+    id: number;
+    name: string;
+  };
+  created_at?: string;
+}
+
+export interface FederatedMember {
+  id: number;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
+  avatar?: string | null;
+  bio?: string;
+  skills?: string[];
+  location?: string;
+  service_reach?: string;
+  messaging_enabled?: boolean;
+  timebank: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface FederatedMessage {
+  id: number;
+  subject: string;
+  body: string;
+  direction: 'inbound' | 'outbound';
+  status: 'unread' | 'delivered' | 'read';
+  read_at?: string | null;
+  created_at: string;
+  sender: {
+    id: number;
+    name: string;
+    avatar?: string | null;
+    tenant_id: number;
+    tenant_name: string;
+  };
+  receiver: {
+    id: number;
+    name: string;
+    avatar?: string | null;
+    tenant_id: number;
+    tenant_name: string;
+  };
+  reference_message_id?: number;
+}
+
+export interface FederationStatus {
+  enabled: boolean;
+  tenant_federation_enabled?: boolean;
+  partnerships_count?: number;
+  federation_optin?: boolean;
+}
+
+export interface FederationActivityItem {
+  id: number;
+  type: 'message_received' | 'message_sent' | 'transaction_received' | 'transaction_sent' | 'partnership_approved' | 'member_joined';
+  title: string;
+  description: string;
+  created_at: string;
+  actor?: {
+    id?: number;
+    name: string;
+    avatar?: string | null;
+    tenant_name?: string;
+  };
+}
+
+export interface FederationSettings {
+  profile_visible_federated?: boolean;
+  appear_in_federated_search?: boolean;
+  show_skills_federated?: boolean;
+  show_location_federated?: boolean;
+  show_reviews_federated?: boolean;
+  messaging_enabled_federated?: boolean;
+  transactions_enabled_federated?: boolean;
+  email_notifications?: boolean;
+  service_reach: 'local_only' | 'remote_ok' | 'travel_ok';
+  travel_radius_km?: number;
+  federation_optin?: boolean;
 }

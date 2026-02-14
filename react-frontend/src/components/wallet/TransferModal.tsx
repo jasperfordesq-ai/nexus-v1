@@ -20,6 +20,7 @@ interface TransferModalProps {
   onClose: () => void;
   currentBalance: number;
   onTransferComplete: (transaction: Transaction) => void;
+  initialRecipientId?: number | null;
 }
 
 interface TransferFormData {
