@@ -579,11 +579,17 @@ export const adminVolunteering = {
 export const adminFederation = {
   getSettings: () => api.get('/v2/admin/federation/settings'),
 
+  updateSettings: (data: Record<string, unknown>) =>
+    api.put('/v2/admin/federation/settings', data),
+
   getPartnerships: () => api.get('/v2/admin/federation/partnerships'),
 
   getDirectory: () => api.get('/v2/admin/federation/directory'),
 
   getProfile: () => api.get('/v2/admin/federation/directory/profile'),
+
+  updateProfile: (data: Record<string, unknown>) =>
+    api.put('/v2/admin/federation/directory/profile', data),
 
   getAnalytics: () => api.get('/v2/admin/federation/analytics'),
 
@@ -724,6 +730,15 @@ export const adminTools = {
     api.post('/v2/admin/tools/seed', data),
 
   getBlogBackups: () => api.get<Array<{ id: number; filename: string; created_at: string; size: string }>>('/v2/admin/tools/blog-backups'),
+
+  restoreBlogBackup: (backupId: number) =>
+    api.post<{ restored_count: number }>(`/v2/admin/tools/blog-backups/${backupId}/restore`),
+
+  runSeoAudit: () =>
+    api.post<Array<{ name: string; description: string; status: 'pass' | 'warning' | 'fail'; details?: string }>>('/v2/admin/tools/seo-audit'),
+
+  getSeoAudit: () =>
+    api.get<{ checks: Array<{ name: string; description: string; status: 'pass' | 'warning' | 'fail'; details?: string }>; last_run_at: string | null }>('/v2/admin/tools/seo-audit'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

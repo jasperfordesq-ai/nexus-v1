@@ -1,77 +1,122 @@
 /**
  * SEO Audit
  * Run and display SEO audit results for the platform.
+ * Fetches real audit data from the API and supports triggering new audits.
  */
 
-import { useState } from 'react';
-import { Card, CardBody, CardHeader, Button, Chip } from '@heroui/react';
-import { ClipboardCheck, Play } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
+import { ClipboardCheck, Play, RefreshCw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
+import { adminTools } from '../../api/adminApi';
 
 interface AuditCheck {
   name: string;
   description: string;
-  status: 'pass' | 'warning' | 'fail' | 'not_run';
+  status: 'pass' | 'warning' | 'fail';
+  details?: string;
 }
-
-const INITIAL_AUDIT_CHECKS: AuditCheck[] = [
-  { name: 'Meta Titles', description: 'All pages have unique meta titles', status: 'not_run' },
-  { name: 'Meta Descriptions', description: 'All pages have meta descriptions', status: 'not_run' },
-  { name: 'Heading Structure', description: 'Proper H1-H6 hierarchy', status: 'not_run' },
-  { name: 'Image Alt Tags', description: 'All images have alt text', status: 'not_run' },
-  { name: 'Sitemap', description: 'Sitemap.xml is accessible', status: 'not_run' },
-  { name: 'Robots.txt', description: 'Robots.txt is configured', status: 'not_run' },
-  { name: 'SSL/HTTPS', description: 'Site served over HTTPS', status: 'not_run' },
-  { name: 'Mobile Responsive', description: 'Pages pass mobile-friendly test', status: 'not_run' },
-  { name: 'Page Speed', description: 'Core Web Vitals within targets', status: 'not_run' },
-  { name: 'Broken Links', description: 'No internal broken links found', status: 'not_run' },
-];
 
 const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   pass: 'success',
   warning: 'warning',
   fail: 'danger',
-  not_run: 'default',
 };
 
 export function SeoAudit() {
   usePageTitle('Admin - SEO Audit');
   const toast = useToast();
-  const [checks, setChecks] = useState<AuditCheck[]>(INITIAL_AUDIT_CHECKS);
+
+  const [checks, setChecks] = useState<AuditCheck[]>([]);
+  const [lastRunAt, setLastRunAt] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
 
-  const handleRunAudit = async () => {
+  /** Load the most recent audit results from the API */
+  const loadAudit = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await adminTools.getSeoAudit();
+      if (res.success && res.data) {
+        const payload = res.data as unknown;
+        if (payload && typeof payload === 'object') {
+          const d = payload as { checks?: AuditCheck[]; last_run_at?: string | null; data?: { checks?: AuditCheck[]; last_run_at?: string | null } };
+          // Handle both direct and wrapped responses
+          const resolved = d.data ?? d;
+          setChecks(resolved.checks ?? []);
+          setLastRunAt(resolved.last_run_at ?? null);
+        }
+      }
+    } catch {
+      // No previous audit results available - that is fine
+      setChecks([]);
+      setLastRunAt(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAudit();
+  }, [loadAudit]);
+
+  /** Trigger a new SEO audit via the API */
+  const handleRunAudit = useCallback(async () => {
     setRunning(true);
-    // Mark all as running state (shown via default chip)
-    setChecks(prev => prev.map(c => ({ ...c, status: 'not_run' as const })));
+    try {
+      const res = await adminTools.runSeoAudit();
+      if (res.success && res.data) {
+        const payload = res.data as unknown;
+        let newChecks: AuditCheck[] = [];
+        if (Array.isArray(payload)) {
+          newChecks = payload;
+        } else if (payload && typeof payload === 'object') {
+          const d = payload as { checks?: AuditCheck[]; data?: AuditCheck[] };
+          newChecks = d.checks ?? d.data ?? [];
+        }
+        setChecks(newChecks);
+        setLastRunAt(new Date().toISOString());
 
-    // Simulate a brief processing delay since there is no dedicated audit API yet
-    await new Promise(resolve => setTimeout(resolve, 1500));
+        const passCount = newChecks.filter(c => c.status === 'pass').length;
+        const warnCount = newChecks.filter(c => c.status === 'warning').length;
+        const failCount = newChecks.filter(c => c.status === 'fail').length;
 
-    // Show hardcoded results (placeholder until a dedicated audit API is created)
-    setChecks([
-      { name: 'Meta Titles', description: 'All pages have unique meta titles', status: 'pass' },
-      { name: 'Meta Descriptions', description: 'All pages have meta descriptions', status: 'pass' },
-      { name: 'Heading Structure', description: 'Proper H1-H6 hierarchy', status: 'pass' },
-      { name: 'Image Alt Tags', description: 'All images have alt text', status: 'warning' },
-      { name: 'Sitemap', description: 'Sitemap.xml is accessible', status: 'pass' },
-      { name: 'Robots.txt', description: 'Robots.txt is configured', status: 'pass' },
-      { name: 'SSL/HTTPS', description: 'Site served over HTTPS', status: 'pass' },
-      { name: 'Mobile Responsive', description: 'Pages pass mobile-friendly test', status: 'pass' },
-      { name: 'Page Speed', description: 'Core Web Vitals within targets', status: 'warning' },
-      { name: 'Broken Links', description: 'No internal broken links found', status: 'pass' },
-    ]);
+        const parts: string[] = [];
+        if (passCount > 0) parts.push(`${passCount} passed`);
+        if (warnCount > 0) parts.push(`${warnCount} warning${warnCount !== 1 ? 's' : ''}`);
+        if (failCount > 0) parts.push(`${failCount} failed`);
 
-    setRunning(false);
-    toast.success('SEO audit complete', '8 checks passed, 2 warnings found.');
-  };
+        toast.success('SEO audit complete', parts.join(', ') + '.');
+      } else {
+        toast.error('SEO audit failed', 'The server did not return results.');
+      }
+    } catch {
+      toast.error('SEO audit failed', 'An error occurred while running the audit.');
+    } finally {
+      setRunning(false);
+    }
+  }, [toast]);
 
   const passCount = checks.filter(c => c.status === 'pass').length;
   const warnCount = checks.filter(c => c.status === 'warning').length;
   const failCount = checks.filter(c => c.status === 'fail').length;
-  const hasResults = checks.some(c => c.status !== 'not_run');
+  const hasResults = checks.length > 0;
+
+  if (loading) {
+    return (
+      <div>
+        <PageHeader
+          title="SEO Audit"
+          description="Automated SEO health check for your platform"
+        />
+        <div className="flex h-64 items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -79,17 +124,39 @@ export function SeoAudit() {
         title="SEO Audit"
         description="Automated SEO health check for your platform"
         actions={
-          <Button color="primary" startContent={<Play size={16} />} onPress={handleRunAudit} isLoading={running}>
-            Run Audit
-          </Button>
+          <div className="flex items-center gap-2">
+            {hasResults && (
+              <Button
+                variant="flat"
+                startContent={<RefreshCw size={16} />}
+                onPress={loadAudit}
+                size="sm"
+              >
+                Reload Results
+              </Button>
+            )}
+            <Button
+              color="primary"
+              startContent={!running ? <Play size={16} /> : undefined}
+              onPress={handleRunAudit}
+              isLoading={running}
+            >
+              Run Audit
+            </Button>
+          </div>
         }
       />
 
       {hasResults && (
-        <div className="flex gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           {passCount > 0 && <Chip color="success" variant="flat">{passCount} passed</Chip>}
           {warnCount > 0 && <Chip color="warning" variant="flat">{warnCount} warnings</Chip>}
           {failCount > 0 && <Chip color="danger" variant="flat">{failCount} failed</Chip>}
+          {lastRunAt && (
+            <span className="text-xs text-default-400 ml-2">
+              Last run: {new Date(lastRunAt).toLocaleString()}
+            </span>
+          )}
         </div>
       )}
 
@@ -100,19 +167,35 @@ export function SeoAudit() {
           </h3>
         </CardHeader>
         <CardBody>
-          <div className="space-y-3">
-            {checks.map((check) => (
-              <div key={check.name} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
-                <div>
-                  <p className="font-medium">{check.name}</p>
-                  <p className="text-xs text-default-400">{check.description}</p>
+          {!hasResults ? (
+            <div className="flex flex-col items-center py-8 text-default-400">
+              <ClipboardCheck size={40} className="mb-2" />
+              <p className="font-medium">No audit results yet</p>
+              <p className="text-sm mt-1">Click "Run Audit" to perform an SEO health check on your platform.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {checks.map((check) => (
+                <div key={check.name} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium">{check.name}</p>
+                    <p className="text-xs text-default-400">{check.description}</p>
+                    {check.details && (
+                      <p className="text-xs text-default-500 mt-1">{check.details}</p>
+                    )}
+                  </div>
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color={statusColorMap[check.status] ?? 'default'}
+                    className="capitalize shrink-0 ml-3"
+                  >
+                    {check.status}
+                  </Chip>
                 </div>
-                <Chip size="sm" variant="flat" color={statusColorMap[check.status]} className="capitalize">
-                  {check.status === 'not_run' ? 'Not Run' : check.status}
-                </Chip>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardBody>
       </Card>
     </div>
