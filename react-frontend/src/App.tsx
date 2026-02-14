@@ -358,9 +358,6 @@ function AppRoutes() {
             </FeatureGate>
           } />
         </Route>
-
-        {/* 404 Fallback */}
-        <Route path="*" element={<NotFoundPage />} />
       </Route>
 
       {/* Admin Panel (separate layout, no main navbar/footer) */}
@@ -368,6 +365,11 @@ function AppRoutes() {
         <Route element={<AdminLayout />}>
           {AdminRoutes()}
         </Route>
+      </Route>
+
+      {/* 404 Fallback (must be after admin to avoid catching /admin paths) */}
+      <Route element={<Layout />}>
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </>
   );

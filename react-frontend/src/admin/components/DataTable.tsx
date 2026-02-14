@@ -241,10 +241,11 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  const color = statusColorMap[status.toLowerCase()] || 'default';
+  const safeStatus = status || 'unknown';
+  const color = statusColorMap[safeStatus.toLowerCase()] || 'default';
   return (
     <Chip size="sm" variant="flat" color={color} className="capitalize">
-      {status}
+      {safeStatus}
     </Chip>
   );
 }
