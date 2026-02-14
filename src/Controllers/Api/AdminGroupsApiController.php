@@ -46,10 +46,11 @@ class AdminGroupsApiController extends BaseApiController
             $conditions = ['g.tenant_id = ?'];
             $params = [$tenantId];
 
-            // Status filter
-            if ($status && in_array($status, ['active', 'inactive', 'archived', 'pending'], true)) {
-                $conditions[] = 'g.status = ?';
-                $params[] = $status;
+            // Status filter (groups use is_active column, not status)
+            if ($status === 'active') {
+                $conditions[] = 'g.is_active = 1';
+            } elseif ($status === 'inactive') {
+                $conditions[] = 'g.is_active = 0';
             }
 
             // Search filter
@@ -73,7 +74,7 @@ class AdminGroupsApiController extends BaseApiController
                 "SELECT g.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as creator_name,
                     (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'approved') as member_count
                  FROM `groups` g
-                 LEFT JOIN users u ON g.user_id = u.id
+                 LEFT JOIN users u ON g.owner_id = u.id
                  WHERE {$where}
                  ORDER BY g.created_at DESC
                  LIMIT ? OFFSET ?",
@@ -88,7 +89,7 @@ class AdminGroupsApiController extends BaseApiController
                     'description' => $row['description'] ?? '',
                     'image_url' => $row['image_url'] ?: null,
                     'visibility' => $row['visibility'] ?? 'public',
-                    'status' => $row['status'] ?? 'active',
+                    'status' => !empty($row['is_active']) ? 'active' : 'inactive',
                     'creator_name' => trim($row['creator_name'] ?? ''),
                     'member_count' => (int) ($row['member_count'] ?? 0),
                     'created_at' => $row['created_at'],
@@ -134,9 +135,9 @@ class AdminGroupsApiController extends BaseApiController
             // Average members per group
             $avgMembers = $totalGroups > 0 ? round($totalMembers / $totalGroups, 1) : 0;
 
-            // Active groups (groups with status = active)
+            // Active groups (groups with is_active = 1)
             $activeGroups = (int) Database::query(
-                "SELECT COUNT(*) as cnt FROM `groups` WHERE tenant_id = ? AND status = 'active'",
+                "SELECT COUNT(*) as cnt FROM `groups` WHERE tenant_id = ? AND is_active = 1",
                 [$tenantId]
             )->fetch()['cnt'];
 
@@ -357,22 +358,21 @@ class AdminGroupsApiController extends BaseApiController
 
             try {
                 $items = Database::query(
-                    "SELECT g.id, g.name, g.status, g.created_at,
+                    "SELECT g.id, g.name, g.is_active, g.created_at,
                         COUNT(r.id) as report_count
                      FROM `groups` g
                      INNER JOIN reports r ON r.content_type = 'group' AND r.content_id = g.id
                      WHERE g.tenant_id = ? AND r.status = 'pending'
-                     GROUP BY g.id, g.name, g.status, g.created_at
+                     GROUP BY g.id, g.name, g.is_active, g.created_at
                      ORDER BY report_count DESC",
                     [$tenantId]
                 )->fetchAll();
             } catch (\Exception $e) {
-                // If the reports table or columns don't exist, return groups
-                // flagged by status instead
+                // If the reports table or columns don't exist, return inactive groups
                 $items = Database::query(
-                    "SELECT g.id, g.name, g.status, g.created_at, 0 as report_count
+                    "SELECT g.id, g.name, g.is_active, g.created_at, 0 as report_count
                      FROM `groups` g
-                     WHERE g.tenant_id = ? AND g.status IN ('flagged', 'suspended', 'under_review')
+                     WHERE g.tenant_id = ? AND g.is_active = 0
                      ORDER BY g.created_at DESC",
                     [$tenantId]
                 )->fetchAll();
@@ -382,7 +382,7 @@ class AdminGroupsApiController extends BaseApiController
                 return [
                     'id' => (int) $row['id'],
                     'name' => $row['name'] ?? '',
-                    'status' => $row['status'] ?? 'active',
+                    'status' => !empty($row['is_active']) ? 'active' : 'inactive',
                     'report_count' => (int) ($row['report_count'] ?? 0),
                     'created_at' => $row['created_at'],
                 ];

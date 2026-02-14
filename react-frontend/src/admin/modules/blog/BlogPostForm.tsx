@@ -17,6 +17,7 @@ import {
   Textarea,
   Spinner,
 } from '@heroui/react';
+import { RichTextEditor } from '../../components';
 import { ArrowLeft, Save } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -251,13 +252,11 @@ export function BlogPostForm() {
             />
 
             {/* Content */}
-            <Textarea
+            <RichTextEditor
               label="Content"
               placeholder="Write the blog post content..."
               value={content}
-              onValueChange={setContent}
-              minRows={10}
-              maxRows={30}
+              onChange={setContent}
               isDisabled={submitting}
             />
 

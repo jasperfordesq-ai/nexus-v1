@@ -60,13 +60,20 @@ class AdminContentApiController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $pages = Database::query(
-            "SELECT id, tenant_id, title, slug, content, meta_description, status, sort_order, created_at, updated_at
+        $rows = Database::query(
+            "SELECT id, tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, publish_at, created_at, updated_at
              FROM pages
              WHERE tenant_id = ?
              ORDER BY sort_order ASC, created_at DESC",
             [$tenantId]
         )->fetchAll();
+
+        // Map is_published to status for frontend consistency
+        $pages = array_map(function ($row) {
+            $row['status'] = $row['is_published'] ? 'published' : 'draft';
+            unset($row['is_published']);
+            return $row;
+        }, $rows);
 
         $this->respondWithData($pages);
     }
@@ -90,19 +97,22 @@ class AdminContentApiController extends BaseApiController
             return;
         }
 
-        $page = Database::query(
-            "SELECT id, tenant_id, title, slug, content, meta_description, status, sort_order, created_at, updated_at
+        $row = Database::query(
+            "SELECT id, tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, publish_at, created_at, updated_at
              FROM pages
              WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         )->fetch();
 
-        if (!$page) {
+        if (!$row) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Page not found', 'id', 404);
             return;
         }
 
-        $this->respondWithData($page);
+        $row['status'] = $row['is_published'] ? 'published' : 'draft';
+        unset($row['is_published']);
+
+        $this->respondWithData($row);
     }
 
     /**
@@ -111,7 +121,7 @@ class AdminContentApiController extends BaseApiController
      * Create a new page. Required: title. Auto-generates slug from title.
      * Default status is 'draft'.
      *
-     * Body: { "title": "About Us", "content": "...", "meta_description": "...", "status": "draft", "sort_order": 0 }
+     * Body: { "title": "About Us", "content": "...", "status": "draft", "sort_order": 0 }
      */
     public function createPage(): void
     {
@@ -128,9 +138,10 @@ class AdminContentApiController extends BaseApiController
 
         $slug = $this->generateSlug($title);
         $content = $input['content'] ?? '';
-        $metaDescription = $input['meta_description'] ?? '';
         $status = $input['status'] ?? 'draft';
         $sortOrder = (int)($input['sort_order'] ?? 0);
+        $showInMenu = (int)($input['show_in_menu'] ?? 0);
+        $menuLocation = $input['menu_location'] ?? 'about';
 
         // Validate status
         if (!in_array($status, ['draft', 'published'], true)) {
@@ -138,24 +149,29 @@ class AdminContentApiController extends BaseApiController
             return;
         }
 
+        $isPublished = ($status === 'published') ? 1 : 0;
+
         // Ensure slug is unique within tenant
         $slug = $this->ensureUniqueSlug('pages', $slug, $tenantId);
 
         Database::query(
-            "INSERT INTO pages (tenant_id, title, slug, content, meta_description, status, sort_order, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
-            [$tenantId, $title, $slug, $content, $metaDescription, $status, $sortOrder]
+            "INSERT INTO pages (tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+            [$tenantId, $title, $slug, $content, $isPublished, $sortOrder, $showInMenu, $menuLocation]
         );
 
         $newId = Database::lastInsertId();
 
-        $page = Database::query(
-            "SELECT id, tenant_id, title, slug, content, meta_description, status, sort_order, created_at, updated_at
+        $row = Database::query(
+            "SELECT id, tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, publish_at, created_at, updated_at
              FROM pages WHERE id = ?",
             [$newId]
         )->fetch();
 
-        $this->respondWithData($page, null, 201);
+        $row['status'] = $row['is_published'] ? 'published' : 'draft';
+        unset($row['is_published']);
+
+        $this->respondWithData($row, null, 201);
     }
 
     /**
@@ -163,7 +179,7 @@ class AdminContentApiController extends BaseApiController
      *
      * Update a page by ID.
      *
-     * Body: { "title": "...", "slug": "...", "content": "...", "meta_description": "...", "status": "...", "sort_order": 0 }
+     * Body: { "title": "...", "slug": "...", "content": "...", "status": "draft|published", "sort_order": 0, "show_in_menu": 0, "menu_location": "about" }
      */
     public function updatePage(): void
     {
@@ -216,21 +232,25 @@ class AdminContentApiController extends BaseApiController
             $updates[] = 'content = ?';
             $params[] = $input['content'];
         }
-        if (array_key_exists('meta_description', $input)) {
-            $updates[] = 'meta_description = ?';
-            $params[] = $input['meta_description'];
-        }
         if (isset($input['status'])) {
             if (!in_array($input['status'], ['draft', 'published'], true)) {
                 $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Status must be draft or published', 'status', 422);
                 return;
             }
-            $updates[] = 'status = ?';
-            $params[] = $input['status'];
+            $updates[] = 'is_published = ?';
+            $params[] = ($input['status'] === 'published') ? 1 : 0;
         }
         if (isset($input['sort_order'])) {
             $updates[] = 'sort_order = ?';
             $params[] = (int)$input['sort_order'];
+        }
+        if (isset($input['show_in_menu'])) {
+            $updates[] = 'show_in_menu = ?';
+            $params[] = (int)$input['show_in_menu'];
+        }
+        if (isset($input['menu_location'])) {
+            $updates[] = 'menu_location = ?';
+            $params[] = $input['menu_location'];
         }
 
         if (empty($updates)) {
@@ -247,13 +267,16 @@ class AdminContentApiController extends BaseApiController
             $params
         );
 
-        $page = Database::query(
-            "SELECT id, tenant_id, title, slug, content, meta_description, status, sort_order, created_at, updated_at
+        $row = Database::query(
+            "SELECT id, tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, publish_at, created_at, updated_at
              FROM pages WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         )->fetch();
 
-        $this->respondWithData($page);
+        $row['status'] = $row['is_published'] ? 'published' : 'draft';
+        unset($row['is_published']);
+
+        $this->respondWithData($row);
     }
 
     /**

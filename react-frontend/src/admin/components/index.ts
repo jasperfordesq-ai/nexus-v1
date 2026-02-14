@@ -6,3 +6,4 @@ export { DataTable, StatusBadge, type Column } from './DataTable';
 export { ConfirmModal } from './ConfirmModal';
 export { EmptyState } from './EmptyState';
 export { PageHeader } from './PageHeader';
+export { RichTextEditor } from './RichTextEditor';

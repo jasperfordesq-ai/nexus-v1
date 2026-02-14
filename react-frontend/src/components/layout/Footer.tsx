@@ -66,6 +66,7 @@ export function Footer({ children, copyright }: FooterProps) {
               <div>
                 <h3 className="text-sm font-semibold text-theme-primary mb-3">Legal</h3>
                 <ul className="space-y-2">
+                  <li><FooterLink href={tenantPath('/legal')}>Legal Hub</FooterLink></li>
                   <li><FooterLink href={tenantPath('/terms')}>Terms of Service</FooterLink></li>
                   <li><FooterLink href={tenantPath('/privacy')}>Privacy Policy</FooterLink></li>
                   <li><FooterLink href={tenantPath('/accessibility')}>Accessibility</FooterLink></li>
