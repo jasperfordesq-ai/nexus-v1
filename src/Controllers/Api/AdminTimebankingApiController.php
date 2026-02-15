@@ -19,6 +19,7 @@ use Nexus\Services\AbuseDetectionService;
  * - POST /api/v2/admin/timebanking/adjust-balance  - Admin balance adjustment
  * - GET  /api/v2/admin/timebanking/org-wallets     - Organization wallets list
  * - GET  /api/v2/admin/timebanking/user-report     - User financial overview
+ * - GET  /api/v2/admin/timebanking/user-statement  - User transaction statement (JSON or CSV)
  */
 class AdminTimebankingApiController extends BaseApiController
 {
@@ -491,5 +492,143 @@ class AdminTimebankingApiController extends BaseApiController
         }, $users);
 
         $this->respondWithPaginatedCollection($formatted, $total, $page, $perPage);
+    }
+
+    /**
+     * GET /api/v2/admin/timebanking/user-statement
+     *
+     * Export user transaction statement as JSON or CSV download.
+     * Query params: user_id (required), start_date, end_date, format (json|csv)
+     */
+    public function userStatement(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $userId = $this->queryInt('user_id');
+        if (!$userId) {
+            $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id', 400);
+            return;
+        }
+
+        $startDate = $this->query('start_date', date('Y-m-01', strtotime('-12 months')));
+        $endDate = $this->query('end_date', date('Y-m-d'));
+        $format = $this->query('format', 'json');
+
+        // Get user info
+        $user = Database::query(
+            "SELECT id, first_name, last_name, email, balance FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        )->fetch();
+
+        if (!$user) {
+            $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return;
+        }
+
+        // Get transactions in date range
+        $transactions = Database::query(
+            "SELECT t.*,
+                    sender.first_name as sender_first_name, sender.last_name as sender_last_name,
+                    receiver.first_name as receiver_first_name, receiver.last_name as receiver_last_name,
+                    l.title as listing_title
+             FROM transactions t
+             LEFT JOIN users sender ON sender.id = t.sender_id
+             LEFT JOIN users receiver ON receiver.id = t.receiver_id
+             LEFT JOIN listings l ON l.id = t.listing_id
+             WHERE t.tenant_id = ?
+               AND (t.sender_id = ? OR t.receiver_id = ?)
+               AND t.created_at BETWEEN ? AND ?
+             ORDER BY t.created_at DESC",
+            [$tenantId, $userId, $userId, $startDate . ' 00:00:00', $endDate . ' 23:59:59']
+        )->fetchAll();
+
+        // Calculate summary
+        $earned = 0;
+        $spent = 0;
+        foreach ($transactions as $t) {
+            if ((int) $t['receiver_id'] === $userId) {
+                $earned += (float) $t['amount'];
+            }
+            if ((int) $t['sender_id'] === $userId) {
+                $spent += (float) $t['amount'];
+            }
+        }
+
+        $statement = [
+            'user' => [
+                'id' => (int) $user['id'],
+                'first_name' => $user['first_name'],
+                'last_name' => $user['last_name'],
+                'email' => $user['email'],
+                'balance' => (float) ($user['balance'] ?? 0),
+            ],
+            'period' => ['start' => $startDate, 'end' => $endDate],
+            'summary' => [
+                'total_transactions' => count($transactions),
+                'hours_earned' => round($earned, 2),
+                'hours_spent' => round($spent, 2),
+                'net_change' => round($earned - $spent, 2),
+                'current_balance' => (float) ($user['balance'] ?? 0),
+            ],
+            'transactions' => $transactions,
+        ];
+
+        if ($format === 'csv') {
+            $this->sendCsvStatement($statement);
+            return;
+        }
+
+        $this->respondWithData($statement);
+    }
+
+    /**
+     * Send statement as CSV download.
+     */
+    private function sendCsvStatement(array $statement): void
+    {
+        $filename = 'statement_' . $statement['user']['id'] . '_' . date('Y-m-d') . '.csv';
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+
+        // UTF-8 BOM for Excel
+        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+        // Header info
+        fputcsv($output, ['Transaction Statement']);
+        fputcsv($output, ['Member', $statement['user']['first_name'] . ' ' . $statement['user']['last_name']]);
+        fputcsv($output, ['Email', $statement['user']['email']]);
+        fputcsv($output, ['Period', $statement['period']['start'] . ' to ' . $statement['period']['end']]);
+        fputcsv($output, ['Current Balance', $statement['summary']['current_balance'] . ' hours']);
+        fputcsv($output, ['Hours Earned', $statement['summary']['hours_earned']]);
+        fputcsv($output, ['Hours Spent', $statement['summary']['hours_spent']]);
+        fputcsv($output, []);
+
+        // Transaction headers
+        fputcsv($output, ['Date', 'Type', 'Other Party', 'Listing', 'Hours', 'Description', 'Status']);
+
+        $userId = $statement['user']['id'];
+        foreach ($statement['transactions'] as $t) {
+            $isEarned = (int) $t['receiver_id'] === $userId;
+            $otherParty = $isEarned
+                ? trim(($t['sender_first_name'] ?? '') . ' ' . ($t['sender_last_name'] ?? ''))
+                : trim(($t['receiver_first_name'] ?? '') . ' ' . ($t['receiver_last_name'] ?? ''));
+
+            fputcsv($output, [
+                $t['created_at'],
+                $isEarned ? 'Earned' : 'Spent',
+                $otherParty,
+                $t['listing_title'] ?? '',
+                $t['amount'],
+                $t['description'] ?? '',
+                $t['status'] ?? 'completed',
+            ]);
+        }
+
+        fclose($output);
+        exit;
     }
 }

@@ -6,7 +6,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, Button, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Divider } from '@heroui/react';
 import {
   ArrowLeftRight,
   MessageSquareWarning,
@@ -14,12 +14,16 @@ import {
   Eye,
   RefreshCw,
   ChevronRight,
+  ShieldCheck,
+  Clock,
+  AlertTriangle,
+  Activity,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
-import type { BrokerDashboardStats } from '../../api/types';
+import type { BrokerDashboardStats, BrokerActivityEntry } from '../../api/types';
 
 const quickLinks = [
   {
@@ -49,6 +53,13 @@ const quickLinks = [
     icon: Eye,
     color: 'secondary' as const,
     path: '/admin/broker-controls/monitoring',
+  },
+  {
+    title: 'Vetting Records',
+    description: 'Manage DBS checks, insurance, and member vetting',
+    icon: ShieldCheck,
+    color: 'success' as const,
+    path: '/admin/broker-controls/vetting',
   },
 ];
 
@@ -125,6 +136,27 @@ export function BrokerDashboard() {
           color="secondary"
           loading={loading}
         />
+        <StatCard
+          label="Vetting Pending"
+          value={stats?.vetting_pending ?? '—'}
+          icon={ShieldCheck}
+          color="success"
+          loading={loading}
+        />
+        <StatCard
+          label="Expiring Soon"
+          value={stats?.vetting_expiring ?? '—'}
+          icon={Clock}
+          color="warning"
+          loading={loading}
+        />
+        <StatCard
+          label="Safeguarding Alerts"
+          value={stats?.safeguarding_alerts ?? '—'}
+          icon={AlertTriangle}
+          color="danger"
+          loading={loading}
+        />
       </div>
 
       {/* Quick Links */}
@@ -149,13 +181,104 @@ export function BrokerDashboard() {
         })}
       </div>
 
-      {loading && !stats && (
+      {/* Recent Activity */}
+      <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">Recent Activity</h2>
+      {loading && !stats ? (
         <div className="flex items-center justify-center py-12">
           <Spinner size="lg" />
         </div>
+      ) : stats?.recent_activity && stats.recent_activity.length > 0 ? (
+        <Card shadow="sm">
+          <CardHeader className="flex items-center gap-2 pb-0">
+            <Activity size={18} className="text-default-500" />
+            <span className="text-sm font-semibold text-foreground">Broker Actions</span>
+          </CardHeader>
+          <Divider className="my-2" />
+          <CardBody className="p-0">
+            <ul className="divide-y divide-divider">
+              {stats.recent_activity.map((entry: BrokerActivityEntry) => (
+                <li key={entry.id} className="flex items-center gap-3 px-4 py-3">
+                  <ActivityChip actionType={entry.action_type} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-foreground">
+                      <span className="font-medium">{entry.first_name} {entry.last_name}</span>
+                      {' '}{formatActionLabel(entry.action_type)}
+                    </p>
+                    {entry.details && (
+                      <p className="text-xs text-default-400 truncate">{entry.details}</p>
+                    )}
+                  </div>
+                  <span className="shrink-0 text-xs text-default-400">
+                    {formatTimeAgo(entry.created_at)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </CardBody>
+        </Card>
+      ) : (
+        <Card shadow="sm">
+          <CardBody className="flex flex-col items-center justify-center py-10 text-center">
+            <Activity size={40} className="text-default-300 mb-3" />
+            <p className="text-default-500 font-medium">No recent broker activity</p>
+            <p className="text-sm text-default-400 mt-1">Actions will appear here as brokers review exchanges and messages</p>
+          </CardBody>
+        </Card>
       )}
     </div>
   );
+}
+
+function ActivityChip({ actionType }: { actionType: string }) {
+  const config = actionChipConfig[actionType] || { label: actionType, color: 'default' as const };
+  return (
+    <Chip size="sm" variant="flat" color={config.color} className="shrink-0">
+      {config.label}
+    </Chip>
+  );
+}
+
+const actionChipConfig: Record<string, { label: string; color: 'success' | 'danger' | 'primary' | 'warning' | 'secondary' | 'default' }> = {
+  exchange_approved: { label: 'Approved', color: 'success' },
+  exchange_rejected: { label: 'Rejected', color: 'danger' },
+  message_reviewed: { label: 'Reviewed', color: 'primary' },
+  risk_tag_added: { label: 'Risk Tag', color: 'warning' },
+  user_monitored: { label: 'Monitored', color: 'secondary' },
+  vetting_verified: { label: 'Verified', color: 'success' },
+  vetting_rejected: { label: 'Vet Rejected', color: 'danger' },
+  user_banned: { label: 'Banned', color: 'danger' },
+  user_unbanned: { label: 'Unbanned', color: 'success' },
+  balance_adjusted: { label: 'Balance', color: 'primary' },
+};
+
+function formatActionLabel(actionType: string): string {
+  const labels: Record<string, string> = {
+    exchange_approved: 'approved an exchange',
+    exchange_rejected: 'rejected an exchange',
+    message_reviewed: 'reviewed a message',
+    risk_tag_added: 'added a risk tag',
+    user_monitored: 'placed a user under monitoring',
+    vetting_verified: 'verified a vetting record',
+    vetting_rejected: 'rejected a vetting record',
+    user_banned: 'banned a user',
+    user_unbanned: 'unbanned a user',
+    balance_adjusted: 'adjusted a balance',
+  };
+  return labels[actionType] || actionType.replace(/_/g, ' ');
+}
+
+function formatTimeAgo(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
 }
 
 export default BrokerDashboard;

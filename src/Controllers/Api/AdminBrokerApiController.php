@@ -87,11 +87,64 @@ class AdminBrokerApiController extends BaseApiController
             // Table may not exist
         }
 
+        // Vetting summary (pending/expiring counts)
+        $vettingPending = 0;
+        $vettingExpiring = 0;
+        try {
+            $row = Database::query(
+                "SELECT
+                    SUM(CASE WHEN status IN ('pending', 'submitted') THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN status = 'verified' AND expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as expiring
+                 FROM vetting_records WHERE tenant_id = ?",
+                [$tenantId]
+            )->fetch();
+            $vettingPending = (int) ($row['pending'] ?? 0);
+            $vettingExpiring = (int) ($row['expiring'] ?? 0);
+        } catch (\Exception $e) {
+            // Table may not exist
+        }
+
+        // Safeguarding alerts count
+        $safeguardingAlerts = 0;
+        try {
+            $row = Database::query(
+                "SELECT COUNT(*) as cnt FROM abuse_alerts WHERE tenant_id = ? AND status = 'open'",
+                [$tenantId]
+            )->fetch();
+            $safeguardingAlerts = (int) ($row['cnt'] ?? 0);
+        } catch (\Exception $e) {
+            // Table may not exist
+        }
+
+        // Recent broker activity (last 20 actions)
+        $recentActivity = [];
+        try {
+            $recentActivity = Database::query(
+                "SELECT al.*, u.first_name, u.last_name
+                 FROM activity_logs al
+                 LEFT JOIN users u ON u.id = al.user_id
+                 WHERE al.tenant_id = ? AND al.action_type IN (
+                     'exchange_approved', 'exchange_rejected', 'message_reviewed',
+                     'risk_tag_added', 'user_monitored', 'vetting_verified', 'vetting_rejected',
+                     'user_banned', 'user_unbanned', 'balance_adjusted'
+                 )
+                 ORDER BY al.created_at DESC
+                 LIMIT 20",
+                [$tenantId]
+            )->fetchAll();
+        } catch (\Exception $e) {
+            // Table may not exist
+        }
+
         $this->respondWithData([
             'pending_exchanges' => $pendingExchanges,
             'unreviewed_messages' => $unreviewedMessages,
             'high_risk_listings' => $highRiskListings,
             'monitored_users' => $monitoredUsers,
+            'vetting_pending' => $vettingPending,
+            'vetting_expiring' => $vettingExpiring,
+            'safeguarding_alerts' => $safeguardingAlerts,
+            'recent_activity' => $recentActivity,
         ]);
     }
 

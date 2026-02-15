@@ -141,6 +141,26 @@ try {
             ['name' => 'reports.*', 'display_name' => 'All Report Permissions', 'description' => 'Full reporting access', 'dangerous' => false],
         ],
 
+        // SAFEGUARDING (8 permissions)
+        'safeguarding' => [
+            ['name' => 'safeguarding.view', 'display_name' => 'View Safeguarding Data', 'description' => 'View safeguarding flags and vetting records', 'dangerous' => false],
+            ['name' => 'safeguarding.edit', 'display_name' => 'Edit Safeguarding Data', 'description' => 'Update safeguarding flags and vetting records', 'dangerous' => true],
+            ['name' => 'safeguarding.vetting.view', 'display_name' => 'View Vetting Records', 'description' => 'View DBS/Garda vetting records', 'dangerous' => false],
+            ['name' => 'safeguarding.vetting.manage', 'display_name' => 'Manage Vetting Records', 'description' => 'Create, verify, reject vetting records', 'dangerous' => true],
+            ['name' => 'safeguarding.alerts.view', 'display_name' => 'View Safeguarding Alerts', 'description' => 'View safeguarding alert dashboard', 'dangerous' => false],
+            ['name' => 'safeguarding.alerts.manage', 'display_name' => 'Manage Safeguarding Alerts', 'description' => 'Create and resolve safeguarding alerts', 'dangerous' => true],
+            ['name' => 'safeguarding.incidents.view', 'display_name' => 'View Incident Reports', 'description' => 'View safeguarding incident reports', 'dangerous' => false],
+            ['name' => 'safeguarding.incidents.manage', 'display_name' => 'Manage Incident Reports', 'description' => 'Create and manage incident reports', 'dangerous' => true],
+        ],
+
+        // VETTING (4 permissions)
+        'vetting' => [
+            ['name' => 'vetting.view', 'display_name' => 'View Vetting Records', 'description' => 'View DBS/Garda vetting status', 'dangerous' => false],
+            ['name' => 'vetting.manage', 'display_name' => 'Manage Vetting', 'description' => 'Create and update vetting records', 'dangerous' => true],
+            ['name' => 'vetting.verify', 'display_name' => 'Verify Vetting', 'description' => 'Verify and approve vetting documents', 'dangerous' => true],
+            ['name' => 'vetting.export', 'display_name' => 'Export Vetting Data', 'description' => 'Export vetting records for compliance', 'dangerous' => false],
+        ],
+
         // SUPER ADMIN (wildcard)
         'admin' => [
             ['name' => '*', 'display_name' => 'Super Admin (All Permissions)', 'description' => 'Unrestricted access to all features', 'dangerous' => true],
@@ -248,6 +268,26 @@ try {
             ],
         ],
 
+        // Level 55 - Timebank Broker (TOL2 Standard)
+        [
+            'name' => 'broker',
+            'display_name' => 'Timebank Broker',
+            'description' => 'Manages exchanges, monitors transactions, and mediates disputes. Required for TOL2 Timebanking UK compliance. Full broker dashboard access.',
+            'level' => 55,
+            'is_system' => true,
+            'permissions' => [
+                'transactions.view', 'transactions.create', 'transactions.edit', 'transactions.export',
+                'users.view', 'users.view.sensitive', 'users.edit', 'users.balance.view',
+                'users.ban', 'users.unban', 'users.verify',
+                'content.view', 'messages.view', 'messages.delete',
+                'reports.view', 'reports.export',
+                'gdpr.requests.view', 'gdpr.breaches.view',
+                'safeguarding.view', 'safeguarding.vetting.view', 'safeguarding.vetting.manage',
+                'safeguarding.alerts.view',
+                'vetting.view', 'vetting.manage', 'vetting.verify',
+            ],
+        ],
+
         // Level 50 - User Manager
         [
             'name' => 'user_manager',
@@ -272,6 +312,23 @@ try {
             'permissions' => [
                 'content.*', 'messages.view', 'messages.delete', 'users.view',
                 'users.ban', 'users.unban', 'reports.view'
+            ],
+        ],
+
+        // Level 35 - Community Coordinator (Limited Broker)
+        [
+            'name' => 'coordinator',
+            'display_name' => 'Community Coordinator',
+            'description' => 'Supports broker with member communication, monitoring, and basic oversight. Limited permissions — cannot delete or manage balances.',
+            'level' => 35,
+            'is_system' => true,
+            'permissions' => [
+                'users.view', 'users.edit', 'users.ban', 'users.unban',
+                'content.view', 'messages.view',
+                'transactions.view', 'reports.view',
+                'safeguarding.view', 'safeguarding.vetting.view',
+                'safeguarding.alerts.view',
+                'vetting.view',
             ],
         ],
 

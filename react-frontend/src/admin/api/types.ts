@@ -553,6 +553,20 @@ export interface BrokerDashboardStats {
   unreviewed_messages: number;
   high_risk_listings: number;
   monitored_users: number;
+  vetting_pending: number;
+  vetting_expiring: number;
+  safeguarding_alerts: number;
+  recent_activity: BrokerActivityEntry[];
+}
+
+export interface BrokerActivityEntry {
+  id: number;
+  user_id: number;
+  first_name: string;
+  last_name: string;
+  action_type: string;
+  details: string;
+  created_at: string;
 }
 
 export interface ExchangeRequest {
@@ -926,6 +940,14 @@ export interface FederationStatusOverview {
   recent_audit: SuperAuditEntry[];
 }
 
+export interface TenantFederationFeatures {
+  tenant_id: number;
+  tenant_name: string;
+  is_whitelisted: boolean;
+  features: Record<string, boolean>;
+  partnerships: FederationPartnership[];
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigation
 // ─────────────────────────────────────────────────────────────────────────────
@@ -945,4 +967,41 @@ export interface AdminNavSection {
   items?: AdminNavItem[];
   href?: string;
   condition?: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vetting Records (TOL2 compliance)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface VettingRecord {
+  id: number;
+  user_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  avatar?: string;
+  vetting_type: 'dbs_basic' | 'dbs_standard' | 'dbs_enhanced' | 'garda_vetting' | 'access_ni' | 'pvg_scotland' | 'international' | 'other';
+  status: 'pending' | 'submitted' | 'verified' | 'expired' | 'rejected' | 'revoked';
+  reference_number: string | null;
+  issue_date: string | null;
+  expiry_date: string | null;
+  verified_by: number | null;
+  verifier_first_name: string | null;
+  verifier_last_name: string | null;
+  verified_at: string | null;
+  document_url: string | null;
+  notes: string | null;
+  works_with_children: boolean;
+  works_with_vulnerable_adults: boolean;
+  requires_enhanced_check: boolean;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export interface VettingStats {
+  total: number;
+  pending: number;
+  verified: number;
+  expired: number;
+  expiring_soon: number;
 }

@@ -6,7 +6,7 @@
 
 import { useState, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import {
   LayoutDashboard,
   Users,
@@ -47,6 +47,12 @@ import {
   Cog,
   Timer,
   Activity,
+  Crown,
+  Network,
+  ScrollText,
+  Mail,
+  Wrench,
+  Stethoscope,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -72,6 +78,13 @@ interface NavSection {
 
 function useAdminNav(): NavSection[] {
   const { hasFeature } = useTenant();
+  const { user } = useAuth();
+
+  const userRecord = user as Record<string, unknown> | null;
+  const isSuperAdmin =
+    (user?.role as string) === 'super_admin' ||
+    userRecord?.is_super_admin === true ||
+    userRecord?.is_tenant_super_admin === true;
 
   return useMemo(() => {
     const sections: NavSection[] = [
@@ -129,6 +142,16 @@ function useAdminNav(): NavSection[] {
           { label: 'Smart Matching', href: '/admin/smart-matching', icon: Brain },
           { label: 'Match Approvals', href: '/admin/match-approvals', icon: UserCheck, badge: 'NEW' },
           { label: 'Broker Controls', href: '/admin/broker-controls', icon: Shield },
+          { label: 'Vetting Records', href: '/admin/broker-controls/vetting', icon: ShieldCheck },
+        ],
+      },
+      {
+        key: 'community',
+        label: 'Community',
+        icon: Users,
+        items: [
+          { label: 'Groups', href: '/admin/groups', icon: Users },
+          { label: 'Volunteering', href: '/admin/volunteering', icon: Heart },
         ],
       },
       {
@@ -139,6 +162,16 @@ function useAdminNav(): NavSection[] {
           { label: 'Newsletters', href: '/admin/newsletters', icon: Megaphone },
           { label: 'Subscribers', href: '/admin/newsletters/subscribers', icon: Users },
           { label: 'Templates', href: '/admin/newsletters/templates', icon: FileText },
+          { label: 'Deliverability', href: '/admin/deliverability', icon: Mail },
+        ],
+      },
+      {
+        key: 'analytics',
+        label: 'Analytics & Reporting',
+        icon: BarChart3,
+        items: [
+          { label: 'Community Analytics', href: '/admin/community-analytics', icon: BarChart3 },
+          { label: 'Impact Report', href: '/admin/impact-report', icon: FileText },
         ],
       },
       {
@@ -150,6 +183,7 @@ function useAdminNav(): NavSection[] {
           { label: 'Feed Algorithm', href: '/admin/feed-algorithm', icon: Sparkles },
           { label: 'SEO Overview', href: '/admin/seo', icon: Search },
           { label: '404 Tracking', href: '/admin/404-errors', icon: AlertTriangle },
+          { label: 'Diagnostics', href: '/admin/matching-diagnostic', icon: Stethoscope },
         ],
       },
       {
@@ -185,6 +219,7 @@ function useAdminNav(): NavSection[] {
           { label: 'Tenant Features', href: '/admin/tenant-features', icon: Cog },
           { label: 'Cron Jobs', href: '/admin/cron-jobs', icon: Timer },
           { label: 'Activity Log', href: '/admin/activity-log', icon: Activity },
+          { label: 'Tools', href: '/admin/seed-generator', icon: Wrench },
         ],
       },
     ];
@@ -205,8 +240,26 @@ function useAdminNav(): NavSection[] {
       });
     }
 
+    // Super Admin section — only visible to super admins
+    if (isSuperAdmin) {
+      sections.push({
+        key: 'super-admin',
+        label: 'Super Admin',
+        icon: Crown,
+        items: [
+          { label: 'Dashboard', href: '/admin/super', icon: Crown },
+          { label: 'Tenants', href: '/admin/super/tenants', icon: Building2 },
+          { label: 'Hierarchy', href: '/admin/super/tenants/hierarchy', icon: Network },
+          { label: 'Cross-Tenant Users', href: '/admin/super/users', icon: Users },
+          { label: 'Bulk Operations', href: '/admin/super/bulk', icon: ListChecks },
+          { label: 'Audit Log', href: '/admin/super/audit', icon: ScrollText },
+          { label: 'Federation Controls', href: '/admin/super/federation', icon: Globe },
+        ],
+      });
+    }
+
     return sections;
-  }, [hasFeature]);
+  }, [hasFeature, isSuperAdmin]);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -294,6 +347,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
             const sectionActive = section.href
               ? isActive(section.href)
               : section.items?.some((item) => isActive(item.href));
+            const isSuperSection = section.key === 'super-admin';
 
             // Single-link section (like Dashboard)
             if (section.href && !section.items) {
@@ -315,57 +369,62 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
               );
             }
 
-            // Collapsible section
+            // Collapsible section (with super-admin visual distinction)
             return (
               <li key={section.key}>
-                <button
-                  onClick={() => toggleSection(section.key)}
-                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    sectionActive
-                      ? 'text-primary'
-                      : 'text-default-600 hover:bg-default-100 hover:text-foreground'
-                  }`}
-                  title={collapsed ? section.label : undefined}
-                >
-                  <Icon size={20} className="shrink-0" />
-                  {!collapsed && (
-                    <>
-                      <span className="flex-1 text-left">{section.label}</span>
-                      {isExpanded ? (
-                        <ChevronDown size={16} className="shrink-0" />
-                      ) : (
-                        <ChevronRight size={16} className="shrink-0" />
-                      )}
-                    </>
-                  )}
-                </button>
-                {!collapsed && isExpanded && section.items && (
-                  <ul className="ml-4 mt-1 space-y-0.5 border-l border-divider pl-3">
-                    {section.items.map((item) => {
-                      const ItemIcon = item.icon;
-                      return (
-                        <li key={item.href}>
-                          <Link
-                            to={tenantPath(item.href)}
-                            className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
-                              isActive(item.href)
-                                ? 'bg-primary/10 text-primary font-medium'
-                                : 'text-default-500 hover:bg-default-100 hover:text-foreground'
-                            }`}
-                          >
-                            <ItemIcon size={16} className="shrink-0" />
-                            <span>{item.label}</span>
-                            {item.badge && (
-                              <span className="ml-auto rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
-                                {item.badge}
-                              </span>
-                            )}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                {isSuperSection && !collapsed && (
+                  <div className="my-2 border-t border-warning/30" />
                 )}
+                <div className={isSuperSection ? 'rounded-lg bg-primary/5 py-1 px-1' : ''}>
+                  <button
+                    onClick={() => toggleSection(section.key)}
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                      sectionActive
+                        ? 'text-primary'
+                        : 'text-default-600 hover:bg-default-100 hover:text-foreground'
+                    }`}
+                    title={collapsed ? section.label : undefined}
+                  >
+                    <Icon size={20} className="shrink-0" />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1 text-left">{section.label}</span>
+                        {isExpanded ? (
+                          <ChevronDown size={16} className="shrink-0" />
+                        ) : (
+                          <ChevronRight size={16} className="shrink-0" />
+                        )}
+                      </>
+                    )}
+                  </button>
+                  {!collapsed && isExpanded && section.items && (
+                    <ul className="ml-4 mt-1 space-y-0.5 border-l border-divider pl-3">
+                      {section.items.map((item) => {
+                        const ItemIcon = item.icon;
+                        return (
+                          <li key={item.href}>
+                            <Link
+                              to={tenantPath(item.href)}
+                              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                                isActive(item.href)
+                                  ? 'bg-primary/10 text-primary font-medium'
+                                  : 'text-default-500 hover:bg-default-100 hover:text-foreground'
+                              }`}
+                            >
+                              <ItemIcon size={16} className="shrink-0" />
+                              <span>{item.label}</span>
+                              {item.badge && (
+                                <span className="ml-auto rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
               </li>
             );
           })}
