@@ -491,7 +491,7 @@ function updateProgress() {
 
 async function processBatch() {
     try {
-        const response = await fetch(`<?= $basePath ?>/admin/geocode-groups?action=geocode_batch&offset=${offset}`);
+        const response = await fetch(`<?= $basePath ?>/admin-legacy/geocode-groups?action=geocode_batch&offset=${offset}`);
         const data = await response.json();
 
         for (const result of data.batch) {

@@ -26,7 +26,7 @@ $scoreLabel = $score >= 80 ? 'Excellent' : ($score >= 50 ? 'Needs Work' : 'Criti
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/seo" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/seo" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             SEO Health Audit

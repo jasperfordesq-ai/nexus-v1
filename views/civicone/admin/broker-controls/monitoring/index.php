@@ -2,7 +2,7 @@
 /**
  * User Monitoring Dashboard - CivicOne Theme (GOV.UK)
  * Manage user messaging restrictions and monitoring flags
- * Path: views/civicone/admin/broker-controls/monitoring/index.php
+ * Path: views/civicone/admin-legacy/broker-controls/monitoring/index.php
  */
 
 use Nexus\Core\TenantContext;
@@ -27,7 +27,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
-        <a href="<?= $basePath ?>/admin/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
 
         <h1 class="govuk-heading-xl">User Monitoring</h1>
         <p class="govuk-body-l">Manage user messaging restrictions and monitoring.</p>
@@ -148,14 +148,14 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                         <?= $user['first_contact_count'] ?? 0 ?>
                     </td>
                     <td class="govuk-table__cell">
-                        <a href="<?= $basePath ?>/admin/users/<?= $user['id'] ?>" class="govuk-link">View profile</a>
+                        <a href="<?= $basePath ?>/admin-legacy/users/<?= $user['id'] ?>" class="govuk-link">View profile</a>
                         <br>
                         <details class="govuk-details govuk-!-margin-top-2" data-module="govuk-details">
                             <summary class="govuk-details__summary">
                                 <span class="govuk-details__summary-text">Set monitoring</span>
                             </summary>
                             <div class="govuk-details__text">
-                                <form action="<?= $basePath ?>/admin/broker-controls/monitoring/<?= $user['id'] ?>" method="POST">
+                                <form action="<?= $basePath ?>/admin-legacy/broker-controls/monitoring/<?= $user['id'] ?>" method="POST">
                                     <?= Csrf::input() ?>
                                     <div class="govuk-checkboxes govuk-checkboxes--small govuk-!-margin-bottom-2">
                                         <div class="govuk-checkboxes__item">

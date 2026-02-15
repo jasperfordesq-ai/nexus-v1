@@ -18,7 +18,7 @@ $sanitizedContent = \Nexus\Helpers\HtmlSanitizer::sanitize($page['content'] ?? '
     <!-- Admin Edit Link (Optional) -->
     <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
         <div style="margin-bottom: 20px; text-align: right;">
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/pages/builder?id=<?= (int)$page['id'] ?>" class="htb-btn htb-btn-secondary" style="font-size: 0.8rem;">Edit Page</a>
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages/builder?id=<?= (int)$page['id'] ?>" class="htb-btn htb-btn-secondary" style="font-size: 0.8rem;">Edit Page</a>
         </div>
     <?php endif; ?>
 

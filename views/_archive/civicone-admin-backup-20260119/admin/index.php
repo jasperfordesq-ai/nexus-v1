@@ -52,7 +52,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                                 <strong><?= htmlspecialchars($pUser['name']) ?></strong><br>
                                 <span style="font-size: 0.85rem; color: var(--civic-text-secondary, #4B5563);"><?= htmlspecialchars($pUser['email']) ?></span>
                             </div>
-                            <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/approve-user" method="POST" style="margin: 0;">
+                            <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/approve-user" method="POST" style="margin: 0;">
                                 <?= Nexus\Core\Csrf::input() ?>
                                 <input type="hidden" name="user_id" value="<?= $pUser['id'] ?>">
                                 <button type="submit" class="civic-btn" style="padding: 5px 10px; font-size: 0.8rem;">Approve</button>
@@ -63,7 +63,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             <?php endif; ?>
 
             <div style="margin-top: 15px; text-align: right;">
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/users" style="font-size: 0.9rem; color: var(--skin-primary); font-weight: bold;">Manage All Users &rarr;</a>
+                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/users" style="font-size: 0.9rem; color: var(--skin-primary); font-weight: bold;">Manage All Users &rarr;</a>
             </div>
         </div>
 
@@ -71,8 +71,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <div class="civic-card" style="align-self: start;">
             <h2 style="margin: 0 0 20px 0; font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 10px; color: #333;">Admin Actions</h2>
             <div style="display: grid; gap: 10px;">
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/users" class="civic-btn" style="text-align: center; background: #555;">Manage Users</a>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/settings" class="civic-btn" style="text-align: center; background: #555;">System Settings</a>
+                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/users" class="civic-btn" style="text-align: center; background: #555;">Manage Users</a>
+                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/settings" class="civic-btn" style="text-align: center; background: #555;">System Settings</a>
             </div>
         </div>
 

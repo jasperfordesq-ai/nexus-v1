@@ -2,7 +2,7 @@
 /**
  * Admin Gold Standard Header Component - Modern Theme
  * STANDALONE admin interface - does NOT use main site header/footer
- * Uses shared navigation configuration from views/partials/admin/
+ * Uses shared navigation configuration from views/partials/admin-legacy/
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -12,7 +12,7 @@ if (session_status() === PHP_SESSION_NONE) {
 use Nexus\Core\TenantContext;
 
 // Include shared navigation configuration
-require_once dirname(__DIR__, 3) . '/partials/admin/admin-navigation-config.php';
+require_once dirname(__DIR__, 3) . '/partials/admin-legacy/admin-navigation-config.php';
 
 $basePath = TenantContext::getBasePath();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
@@ -63,9 +63,9 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
     <!-- Admin Menu Index - Extracted inline styles -->
     <link rel="stylesheet" href="/assets/css/admin-menu-index.css?v=<?= time() ?>">
     <!-- Federation External Partners -->
-    <link rel="stylesheet" href="/assets/css/admin/federation-external-partners.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/assets/css/admin-legacy/federation-external-partners.css?v=<?= time() ?>">
     <!-- Broker Controls -->
-    <link rel="stylesheet" href="/assets/css/admin/broker-controls.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/assets/css/admin-legacy/broker-controls.css?v=<?= time() ?>">
 </head>
 <body class="admin-page">
 <div class="admin-gold-wrapper">
@@ -101,46 +101,46 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
 
                 <div class="admin-search-section" id="adminQuickNav">
                     <div class="admin-search-section-title">Quick Navigation</div>
-                    <a href="<?= $basePath ?>/admin/users" class="admin-search-item" data-search="users members people">
+                    <a href="<?= $basePath ?>/admin-legacy/users" class="admin-search-item" data-search="users members people">
                         <i class="fa-solid fa-users"></i>
                         <span>Users</span>
                         <kbd>Alt+U</kbd>
                     </a>
-                    <a href="<?= $basePath ?>/admin/listings" class="admin-search-item" data-search="listings services offers">
+                    <a href="<?= $basePath ?>/admin-legacy/listings" class="admin-search-item" data-search="listings services offers">
                         <i class="fa-solid fa-rectangle-list"></i>
                         <span>Listings</span>
                         <kbd>Alt+L</kbd>
                     </a>
-                    <a href="<?= $basePath ?>/admin/settings" class="admin-search-item" data-search="settings configuration options">
+                    <a href="<?= $basePath ?>/admin-legacy/settings" class="admin-search-item" data-search="settings configuration options">
                         <i class="fa-solid fa-gear"></i>
                         <span>Settings</span>
                         <kbd>Alt+S</kbd>
                     </a>
-                    <a href="<?= $basePath ?>/admin/newsletters" class="admin-search-item" data-search="newsletters email campaigns">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters" class="admin-search-item" data-search="newsletters email campaigns">
                         <i class="fa-solid fa-envelope"></i>
                         <span>Newsletters</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/blog" class="admin-search-item" data-search="blog posts articles news">
+                    <a href="<?= $basePath ?>/admin-legacy/blog" class="admin-search-item" data-search="blog posts articles news">
                         <i class="fa-solid fa-blog"></i>
                         <span>Blog Posts</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/activity-log" class="admin-search-item" data-search="activity log audit events">
+                    <a href="<?= $basePath ?>/admin-legacy/activity-log" class="admin-search-item" data-search="activity log audit events">
                         <i class="fa-solid fa-list-ul"></i>
                         <span>Activity Log</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/categories" class="admin-search-item" data-search="categories taxonomy tags">
+                    <a href="<?= $basePath ?>/admin-legacy/categories" class="admin-search-item" data-search="categories taxonomy tags">
                         <i class="fa-solid fa-folder-tree"></i>
                         <span>Categories</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/pages" class="admin-search-item" data-search="pages content cms">
+                    <a href="<?= $basePath ?>/admin-legacy/pages" class="admin-search-item" data-search="pages content cms">
                         <i class="fa-solid fa-file-lines"></i>
                         <span>Pages</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/enterprise/gdpr" class="admin-search-item" data-search="gdpr privacy compliance consent">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr" class="admin-search-item" data-search="gdpr privacy compliance consent">
                         <i class="fa-solid fa-shield-halved"></i>
                         <span>GDPR Compliance</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="admin-search-item" data-search="monitoring logs errors system health">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-search-item" data-search="monitoring logs errors system health">
                         <i class="fa-solid fa-chart-line"></i>
                         <span>System Monitoring</span>
                     </a>
@@ -156,7 +156,7 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
 
 <!-- Sidebar Layout -->
 <div class="admin-layout">
-    <?php require dirname(__DIR__, 3) . '/partials/admin/admin-sidebar.php'; ?>
+    <?php require dirname(__DIR__, 3) . '/partials/admin-legacy/admin-sidebar.php'; ?>
 
     <!-- Main Content Area -->
     <main class="admin-main-content">

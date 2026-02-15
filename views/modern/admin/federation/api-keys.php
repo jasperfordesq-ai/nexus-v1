@@ -420,7 +420,7 @@ $recentActivity = $recentActivity ?? [];
 
     <div class="api-header">
         <h2><i class="fa-solid fa-key"></i> API Keys</h2>
-        <a href="/admin/federation/api-keys/create" class="create-key-btn">
+        <a href="/admin-legacy/federation/api-keys/create" class="create-key-btn">
             <i class="fa-solid fa-plus"></i> Create New Key
         </a>
     </div>
@@ -505,18 +505,18 @@ $recentActivity = $recentActivity ?? [];
                     </td>
                     <td>
                         <div class="key-actions">
-                            <a href="/admin/federation/api-keys/<?= $key['id'] ?>" class="key-action-btn view">
+                            <a href="/admin-legacy/federation/api-keys/<?= $key['id'] ?>" class="key-action-btn view">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
                             <?php if ($key['status'] === 'active'): ?>
-                            <form method="POST" action="/admin/federation/api-keys/<?= $key['id'] ?>/suspend" style="display:inline;">
+                            <form method="POST" action="/admin-legacy/federation/api-keys/<?= $key['id'] ?>/suspend" style="display:inline;">
                                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                                 <button type="submit" class="key-action-btn suspend" onclick="return confirm('Suspend this API key?')">
                                     <i class="fa-solid fa-pause"></i>
                                 </button>
                             </form>
                             <?php elseif ($key['status'] === 'suspended'): ?>
-                            <form method="POST" action="/admin/federation/api-keys/<?= $key['id'] ?>/activate" style="display:inline;">
+                            <form method="POST" action="/admin-legacy/federation/api-keys/<?= $key['id'] ?>/activate" style="display:inline;">
                                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                                 <button type="submit" class="key-action-btn activate">
                                     <i class="fa-solid fa-play"></i>
@@ -524,7 +524,7 @@ $recentActivity = $recentActivity ?? [];
                             </form>
                             <?php endif; ?>
                             <?php if ($key['status'] !== 'revoked'): ?>
-                            <form method="POST" action="/admin/federation/api-keys/<?= $key['id'] ?>/revoke" style="display:inline;">
+                            <form method="POST" action="/admin-legacy/federation/api-keys/<?= $key['id'] ?>/revoke" style="display:inline;">
                                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                                 <button type="submit" class="key-action-btn revoke" onclick="return confirm('Permanently revoke this API key? This cannot be undone.')">
                                     <i class="fa-solid fa-trash"></i>

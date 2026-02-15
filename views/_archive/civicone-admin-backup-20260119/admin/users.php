@@ -13,7 +13,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin" style="color: var(--civic-text-secondary, #4B5563); text-decoration: none;">&larr; Back to Dashboard</a>
             </div>
         </div>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/users/export" class="civic-btn" style="background: #555; font-size: 0.9rem;">Export CSV</a>
+        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/users/export" class="civic-btn" style="background: #555; font-size: 0.9rem;">Export CSV</a>
     </div>
 
     <div class="civic-card">
@@ -52,9 +52,9 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             <?= date('M j, Y', strtotime($u['created_at'])) ?>
                         </td>
                         <td style="padding: 12px; text-align: right;">
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/users/<?= $u['id'] ?>/edit" style="color: var(--skin-primary); font-weight: bold; text-decoration: none; margin-right: 10px;">Edit</a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/users/<?= $u['id'] ?>/edit" style="color: var(--skin-primary); font-weight: bold; text-decoration: none; margin-right: 10px;">Edit</a>
                             <?php if (!$u['is_approved']): ?>
-                                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/approve-user" method="POST" style="display: inline;">
+                                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/approve-user" method="POST" style="display: inline;">
                                     <?= Nexus\Core\Csrf::input() ?>
                                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                                     <button type="submit" style="background: none; border: none; color: #166534; font-weight: bold; cursor: pointer; text-decoration: underline;">Approve</button>

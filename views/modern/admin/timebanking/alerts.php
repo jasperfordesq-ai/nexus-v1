@@ -35,11 +35,11 @@ $page = $page ?? 1;
         <p class="admin-page-subtitle">Real-time fraud detection and security monitoring</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/timebanking" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/timebanking" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             <span>Back to TimeBanking</span>
         </a>
-        <form action="<?= $basePath ?>/admin/timebanking/run-detection" method="POST" style="display: inline-block; margin: 0;">
+        <form action="<?= $basePath ?>/admin-legacy/timebanking/run-detection" method="POST" style="display: inline-block; margin: 0;">
             <?= Csrf::input() ?>
             <button type="submit" class="admin-btn admin-btn-primary">
                 <i class="fa-solid fa-radar"></i>
@@ -52,7 +52,7 @@ $page = $page ?? 1;
 <!-- Alert Statistics Grid -->
 <div class="admin-stats-grid alerts-stats-grid">
     <!-- All Alerts -->
-    <a href="<?= $basePath ?>/admin/timebanking/alerts" class="admin-stat-card <?= !$currentStatus ? 'admin-stat-active' : '' ?>">
+    <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts" class="admin-stat-card <?= !$currentStatus ? 'admin-stat-active' : '' ?>">
         <div class="admin-stat-icon">
             <i class="fa-solid fa-shield-halved"></i>
         </div>
@@ -66,7 +66,7 @@ $page = $page ?? 1;
     </a>
 
     <!-- New Alerts -->
-    <a href="<?= $basePath ?>/admin/timebanking/alerts?status=new" class="admin-stat-card admin-stat-red <?= $currentStatus === 'new' ? 'admin-stat-active' : '' ?>">
+    <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts?status=new" class="admin-stat-card admin-stat-red <?= $currentStatus === 'new' ? 'admin-stat-active' : '' ?>">
         <div class="admin-stat-icon">
             <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
@@ -83,7 +83,7 @@ $page = $page ?? 1;
     </a>
 
     <!-- Reviewing Alerts -->
-    <a href="<?= $basePath ?>/admin/timebanking/alerts?status=reviewing" class="admin-stat-card admin-stat-orange <?= $currentStatus === 'reviewing' ? 'admin-stat-active' : '' ?>">
+    <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts?status=reviewing" class="admin-stat-card admin-stat-orange <?= $currentStatus === 'reviewing' ? 'admin-stat-active' : '' ?>">
         <div class="admin-stat-icon">
             <i class="fa-solid fa-magnifying-glass-chart"></i>
         </div>
@@ -100,7 +100,7 @@ $page = $page ?? 1;
     </a>
 
     <!-- Resolved Alerts -->
-    <a href="<?= $basePath ?>/admin/timebanking/alerts?status=resolved" class="admin-stat-card admin-stat-green <?= $currentStatus === 'resolved' ? 'admin-stat-active' : '' ?>">
+    <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts?status=resolved" class="admin-stat-card admin-stat-green <?= $currentStatus === 'resolved' ? 'admin-stat-active' : '' ?>">
         <div class="admin-stat-icon">
             <i class="fa-solid fa-circle-check"></i>
         </div>
@@ -115,7 +115,7 @@ $page = $page ?? 1;
     </a>
 
     <!-- Dismissed Alerts -->
-    <a href="<?= $basePath ?>/admin/timebanking/alerts?status=dismissed" class="admin-stat-card admin-stat-slate <?= $currentStatus === 'dismissed' ? 'admin-stat-active' : '' ?>">
+    <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts?status=dismissed" class="admin-stat-card admin-stat-slate <?= $currentStatus === 'dismissed' ? 'admin-stat-active' : '' ?>">
         <div class="admin-stat-icon">
             <i class="fa-solid fa-ban"></i>
         </div>
@@ -149,7 +149,7 @@ $page = $page ?? 1;
             </p>
         </div>
         <?php if ($currentStatus): ?>
-        <a href="<?= $basePath ?>/admin/timebanking/alerts" class="admin-btn admin-btn-secondary admin-btn-sm">
+        <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts" class="admin-btn admin-btn-secondary admin-btn-sm">
             <i class="fa-solid fa-filter-circle-xmark"></i>
             <span>Clear Filter</span>
         </a>
@@ -174,11 +174,11 @@ $page = $page ?? 1;
                 <?php endif; ?>
             </p>
             <?php if ($currentStatus): ?>
-            <a href="<?= $basePath ?>/admin/timebanking/alerts" class="admin-btn admin-btn-primary" style="margin-top: 1.5rem;">
+            <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts" class="admin-btn admin-btn-primary" style="margin-top: 1.5rem;">
                 <i class="fa-solid fa-list"></i> View All Alerts
             </a>
             <?php else: ?>
-            <form action="<?= $basePath ?>/admin/timebanking/run-detection" method="POST" style="margin-top: 1.5rem;">
+            <form action="<?= $basePath ?>/admin-legacy/timebanking/run-detection" method="POST" style="margin-top: 1.5rem;">
                 <?= Csrf::input() ?>
                 <button type="submit" class="admin-btn admin-btn-secondary">
                     <i class="fa-solid fa-radar"></i> Run Manual Detection
@@ -318,14 +318,14 @@ $page = $page ?? 1;
                         <!-- Actions -->
                         <td style="text-align: right;">
                             <div class="admin-action-buttons">
-                                <a href="<?= $basePath ?>/admin/timebanking/alert/<?= $alert['id'] ?>"
+                                <a href="<?= $basePath ?>/admin-legacy/timebanking/alert/<?= $alert['id'] ?>"
                                    class="admin-btn admin-btn-primary admin-btn-sm"
                                    title="View alert details">
                                     <i class="fa-solid fa-eye"></i>
                                     <span class="hide-mobile">View</span>
                                 </a>
                                 <?php if (($alert['status'] ?? '') === 'new'): ?>
-                                <form action="<?= $basePath ?>/admin/timebanking/alert/<?= $alert['id'] ?>/status" method="POST" style="display: inline;">
+                                <form action="<?= $basePath ?>/admin-legacy/timebanking/alert/<?= $alert['id'] ?>/status" method="POST" style="display: inline;">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="status" value="dismissed">
                                     <button type="submit"

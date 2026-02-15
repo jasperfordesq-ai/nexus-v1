@@ -32,7 +32,7 @@ if (!empty($campaign['audience_config'])) {
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/gamification/campaigns" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/gamification/campaigns" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <?= $campaign ? 'Edit Campaign' : 'Create Campaign' ?>
@@ -53,7 +53,7 @@ if (!empty($campaign['audience_config'])) {
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/gamification/campaigns/save" method="POST" id="campaignForm">
+        <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/save" method="POST" id="campaignForm">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
             <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?? '' ?>">
 
@@ -156,7 +156,7 @@ if (!empty($campaign['audience_config'])) {
             </div>
 
             <div class="form-actions">
-                <a href="<?= $basePath ?>/admin/gamification/campaigns" class="admin-btn admin-btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/gamification/campaigns" class="admin-btn admin-btn-secondary">
                     <i class="fa-solid fa-times"></i> Cancel
                 </a>
                 <button type="submit" class="admin-btn admin-btn-primary">
@@ -352,7 +352,7 @@ function previewAudience() {
     var form = document.getElementById('campaignForm');
     if (!form) return;
     var formData = new FormData(form);
-    fetch(basePath + '/admin/gamification/campaigns/preview-audience', {
+    fetch(basePath + '/admin-legacy/gamification/campaigns/preview-audience', {
         method: 'POST',
         body: formData
     })

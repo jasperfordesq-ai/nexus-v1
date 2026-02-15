@@ -17,7 +17,7 @@ class FederationExportController
 {
     /**
      * Export/Import dashboard
-     * GET /admin/federation/data
+     * GET /admin-legacy/federation/data
      */
     public function index(): void
     {
@@ -89,7 +89,7 @@ class FederationExportController
 
     /**
      * Export federated users
-     * GET /admin/federation/export/users
+     * GET /admin-legacy/federation/export/users
      */
     public function exportUsers(): void
     {
@@ -151,7 +151,7 @@ class FederationExportController
 
     /**
      * Export partnerships
-     * GET /admin/federation/export/partnerships
+     * GET /admin-legacy/federation/export/partnerships
      */
     public function exportPartnerships(): void
     {
@@ -208,7 +208,7 @@ class FederationExportController
 
     /**
      * Export federated transactions
-     * GET /admin/federation/export/transactions
+     * GET /admin-legacy/federation/export/transactions
      */
     public function exportTransactions(): void
     {
@@ -263,7 +263,7 @@ class FederationExportController
 
     /**
      * Export audit logs
-     * GET /admin/federation/export/audit
+     * GET /admin-legacy/federation/export/audit
      */
     public function exportAudit(): void
     {
@@ -317,7 +317,7 @@ class FederationExportController
 
     /**
      * Export all federation data as ZIP
-     * GET /admin/federation/export/all
+     * GET /admin-legacy/federation/export/all
      */
     public function exportAll(): void
     {

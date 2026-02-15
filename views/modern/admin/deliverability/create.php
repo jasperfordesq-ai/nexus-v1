@@ -8,7 +8,7 @@ $adminPageTitle = 'Create Deliverable';
 $adminPageSubtitle = 'Deliverability Tracking';
 $adminPageIcon = 'fa-plus';
 
-require dirname(dirname(__DIR__)) . '/admin/partials/admin-header.php';
+require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-header.php';
 
 $users = $users ?? [];
 $groups = $groups ?? [];
@@ -24,7 +24,7 @@ $groups = $groups ?? [];
         <p class="admin-page-subtitle">Define a new project deliverable</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/deliverability/list" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability/list" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to List
         </a>
     </div>
@@ -42,7 +42,7 @@ $groups = $groups ?? [];
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/deliverability/store" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/deliverability/store" method="POST">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
 
             <!-- Title -->
@@ -202,7 +202,7 @@ $groups = $groups ?? [];
 
             <!-- Form Actions - Enhanced with gradients -->
             <div class="form-actions" style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(99,102,241,0.15);">
-                <a href="<?= $basePath ?>/admin/deliverability/list"
+                <a href="<?= $basePath ?>/admin-legacy/deliverability/list"
                    class="admin-btn admin-btn-secondary"
                    style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); transition: all 0.25s ease;"
                    onmouseover="this.style.background='rgba(255, 255, 255, 0.12)'; this.style.borderColor='rgba(99, 102, 241, 0.4)';"
@@ -262,4 +262,4 @@ $groups = $groups ?? [];
     </div>
 </div>
 
-<?php require dirname(dirname(__DIR__)) . '/admin/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-footer.php'; ?>

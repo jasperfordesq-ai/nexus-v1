@@ -1,6 +1,6 @@
 <?php
 // CivicOne View: Admin Page Manager
-// Path: views/civicone/admin/pages/index.php
+// Path: views/civicone/admin-legacy/pages/index.php
 
 $hTitle = 'Page Manager';
 $hSubtitle = 'CMS & Content';
@@ -22,7 +22,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                     </div>
                 </div>
                 <!-- Action Button styled for CivicOne -->
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/pages/create?confirm=1" style="background:var(--civic-brand, #00796B); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:600;">
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages/create?confirm=1" style="background:var(--civic-brand, #00796B); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:600;">
                     + New Page
                 </a>
             </header>
@@ -56,10 +56,10 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                                             /page/<?= htmlspecialchars($p['slug']) ?>
                                         </td>
                                         <td style="padding:15px 20px; text-align:right;">
-                                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/pages/builder/<?= $p['id'] ?>" style="display:inline-block; margin-right:5px; padding:4px 10px; background:#e0e7ff; color:#4338ca; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:600;">Design</a>
+                                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages/builder/<?= $p['id'] ?>" style="display:inline-block; margin-right:5px; padding:4px 10px; background:#e0e7ff; color:#4338ca; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:600;">Design</a>
                                             <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/page/<?= $p['slug'] ?>" target="_blank" style="display:inline-block; margin-right:5px; padding:4px 10px; background:#f3f4f6; color:#374151; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:600;">View</a>
 
-                                            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/pages/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this page?');">
+                                            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this page?');">
                                                 <?= \Nexus\Core\Csrf::input() ?>
                                                 <input type="hidden" name="page_id" value="<?= $p['id'] ?>">
                                                 <button type="submit" style="background:none; border:none; padding:0 5px; color:#ef4444; font-weight:bold; cursor:pointer; font-size:1.1rem;">&times;</button>

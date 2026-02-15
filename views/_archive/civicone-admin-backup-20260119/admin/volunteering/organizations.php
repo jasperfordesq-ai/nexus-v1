@@ -28,7 +28,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">View and manage all registered organizations</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/volunteering/approvals" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/volunteering/approvals" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-clipboard-check"></i> Review Pending
         </a>
     </div>
@@ -113,7 +113,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                                 <a href="<?= $basePath ?>/volunteering/org/edit/<?= $org['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                                     <i class="fa-solid fa-pen"></i> Edit
                                 </a>
-                                <form action="<?= $basePath ?>/admin/volunteering/delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this organization? This cannot be undone.');">
+                                <form action="<?= $basePath ?>/admin-legacy/volunteering/delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this organization? This cannot be undone.');">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">

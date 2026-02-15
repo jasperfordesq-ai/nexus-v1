@@ -117,7 +117,7 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
         aria-label="Mobile navigation"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-gray-200 dark:border-white/10">
+        <div className="bg-[var(--glass-bg)] backdrop-blur-xl border-t border-[var(--border-default)]">
           <div className="flex items-center justify-around px-2 h-16">
             {visibleTabs.map((tab) => {
               const Icon = tab.icon;

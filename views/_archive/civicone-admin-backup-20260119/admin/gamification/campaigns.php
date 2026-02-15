@@ -42,7 +42,7 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
         <p class="admin-page-subtitle">Create and manage bulk badge and XP award campaigns</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/gamification" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/gamification" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back
         </a>
@@ -50,7 +50,7 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
             <i class="fa-solid fa-rotate"></i>
             Refresh
         </button>
-        <a href="<?= $basePath ?>/admin/gamification/campaigns/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/gamification/campaigns/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i>
             New Campaign
         </a>
@@ -205,7 +205,7 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
                     </div>
                     <h4 class="admin-empty-title">No Campaigns Yet</h4>
                     <p>Create your first campaign to award badges or XP to multiple users at once.</p>
-                    <a href="<?= $basePath ?>/admin/gamification/campaigns/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+                    <a href="<?= $basePath ?>/admin-legacy/gamification/campaigns/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                         <i class="fa-solid fa-plus"></i> Create First Campaign
                     </a>
                 </div>
@@ -286,7 +286,7 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
 
                             <div class="campaign-actions">
                                 <?php if (($campaign['status'] ?? '') === 'draft'): ?>
-                                <form action="<?= $basePath ?>/admin/gamification/campaigns/activate" method="POST">
+                                <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/activate" method="POST">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-success admin-btn-sm">
@@ -294,14 +294,14 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
                                     </button>
                                 </form>
                                 <?php elseif (($campaign['status'] ?? '') === 'active'): ?>
-                                <form action="<?= $basePath ?>/admin/gamification/campaigns/run" method="POST">
+                                <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/run" method="POST">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-primary admin-btn-sm">
                                         <i class="fa-solid fa-bolt"></i> Run Now
                                     </button>
                                 </form>
-                                <form action="<?= $basePath ?>/admin/gamification/campaigns/pause" method="POST">
+                                <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/pause" method="POST">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-warning admin-btn-sm">
@@ -309,7 +309,7 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
                                     </button>
                                 </form>
                                 <?php elseif (($campaign['status'] ?? '') === 'paused'): ?>
-                                <form action="<?= $basePath ?>/admin/gamification/campaigns/activate" method="POST">
+                                <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/activate" method="POST">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-success admin-btn-sm">
@@ -318,11 +318,11 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
                                 </form>
                                 <?php endif; ?>
 
-                                <a href="<?= $basePath ?>/admin/gamification/campaigns/edit/<?= $campaign['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Edit Campaign">
+                                <a href="<?= $basePath ?>/admin-legacy/gamification/campaigns/edit/<?= $campaign['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Edit Campaign">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
 
-                                <form action="<?= $basePath ?>/admin/gamification/campaigns/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this campaign? This action cannot be undone.');">
+                                <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this campaign? This action cannot be undone.');">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm" title="Delete Campaign">
@@ -356,25 +356,25 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
             </div>
             <div class="admin-card-body">
                 <div class="admin-quick-actions">
-                    <a href="<?= $basePath ?>/admin/gamification/campaigns/create" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/gamification/campaigns/create" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-purple">
                             <i class="fa-solid fa-plus"></i>
                         </div>
                         <span>New Campaign</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/gamification/analytics" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/gamification/analytics" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-blue">
                             <i class="fa-solid fa-chart-line"></i>
                         </div>
                         <span>Analytics</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/cron-jobs" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-orange">
                             <i class="fa-solid fa-clock"></i>
                         </div>
                         <span>Cron Jobs</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/gamification" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/gamification" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-pink">
                             <i class="fa-solid fa-trophy"></i>
                         </div>
@@ -484,7 +484,7 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
 </div>
 
 <div class="admin-modules-grid">
-    <a href="<?= $basePath ?>/admin/gamification" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/gamification" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-purple">
             <i class="fa-solid fa-trophy"></i>
         </div>
@@ -495,7 +495,7 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/gamification/analytics" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/gamification/analytics" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-cyan">
             <i class="fa-solid fa-chart-line"></i>
         </div>
@@ -506,7 +506,7 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/gamification/campaigns" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/gamification/campaigns" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-pink">
             <i class="fa-solid fa-bullhorn"></i>
         </div>
@@ -517,7 +517,7 @@ $recentCampaigns = array_slice($campaigns, 0, 5);
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/cron-jobs" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-orange">
             <i class="fa-solid fa-clock"></i>
         </div>

@@ -19,10 +19,12 @@ import {
   Plus,
   MoreVertical,
   Edit,
+  Eye,
   Trash2,
   Shield,
   ToggleLeft,
   ToggleRight,
+  Network,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -127,14 +129,16 @@ export function TenantList() {
   };
 
   function TenantActionsMenu({ tenant }: { tenant: SuperAdminTenant }) {
-    type ActionKey = 'edit' | 'toggle-hub' | 'deactivate' | 'reactivate' | 'delete';
+    type ActionKey = 'view' | 'edit' | 'toggle-hub' | 'deactivate' | 'reactivate' | 'delete';
 
     const handleMenuAction = (key: React.Key) => {
       const action = key as ActionKey;
-      if (action === 'edit') {
+      if (action === 'view') {
+        navigate(tenantPath(`/admin/super/tenants/${tenant.id}`));
+      } else if (action === 'edit') {
         navigate(tenantPath(`/admin/super/tenants/${tenant.id}/edit`));
       } else {
-        setConfirmAction({ type: action, tenant });
+        setConfirmAction({ type: action as 'delete' | 'deactivate' | 'reactivate' | 'toggle-hub', tenant });
       }
     };
 
@@ -146,6 +150,9 @@ export function TenantList() {
           </Button>
         </DropdownTrigger>
         <DropdownMenu aria-label="Tenant actions" onAction={handleMenuAction}>
+          <DropdownItem key="view" startContent={<Eye size={14} />}>
+            View
+          </DropdownItem>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
             Edit
           </DropdownItem>
@@ -177,7 +184,7 @@ export function TenantList() {
       render: (tenant) => (
         <div>
           <Link
-            to={tenantPath(`/admin/super/tenants/${tenant.id}/edit`)}
+            to={tenantPath(`/admin/super/tenants/${tenant.id}`)}
             className="font-medium text-foreground hover:text-primary"
           >
             {tenant.name}
@@ -247,17 +254,33 @@ export function TenantList() {
 
   return (
     <div>
+      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <span>/</span>
+        <span className="text-foreground">Tenants</span>
+      </nav>
       <PageHeader
         title="Tenants"
         description="Manage all platform tenants"
         actions={
-          <Button
-            color="primary"
-            startContent={<Plus size={16} />}
-            onPress={() => navigate(tenantPath('/admin/super/tenants/create'))}
-          >
-            Create Tenant
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              as={Link}
+              to={tenantPath('/admin/super/tenants/hierarchy')}
+              variant="flat"
+              startContent={<Network size={16} />}
+              size="sm"
+            >
+              View Hierarchy
+            </Button>
+            <Button
+              color="primary"
+              startContent={<Plus size={16} />}
+              onPress={() => navigate(tenantPath('/admin/super/tenants/create'))}
+            >
+              Create Tenant
+            </Button>
+          </div>
         }
       />
 

@@ -6,4 +6,4 @@
  * the Modern admin header to ensure feature parity and consistency.
  */
 
-require dirname(__DIR__, 3) . '/modern/admin/partials/admin-header.php';
+require dirname(__DIR__, 3) . '/modern/admin-legacy/partials/admin-header.php';

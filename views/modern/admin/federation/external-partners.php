@@ -3,7 +3,7 @@
  * External Federation Partners - List View
  * Admin interface for managing external federation server connections
  *
- * Styles: /httpdocs/assets/css/admin/federation-external-partners.css
+ * Styles: /httpdocs/assets/css/admin-legacy/federation-external-partners.css
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -63,7 +63,7 @@ $statusColors = [
 
     <div class="page-header">
         <h2><i class="fa-solid fa-globe"></i> External Partners</h2>
-        <a href="/admin/federation/external-partners/create" class="add-partner-btn">
+        <a href="/admin-legacy/federation/external-partners/create" class="add-partner-btn">
             <i class="fa-solid fa-plus"></i> Add External Partner
         </a>
     </div>
@@ -76,7 +76,7 @@ $statusColors = [
             Connect to other timebank platforms to expand your federation network.
             You'll need their API URL and an API key they provide.
         </p>
-        <a href="/admin/federation/external-partners/create" class="add-partner-btn">
+        <a href="/admin-legacy/federation/external-partners/create" class="add-partner-btn">
             <i class="fa-solid fa-plus"></i> Add Your First Partner
         </a>
     </div>
@@ -131,10 +131,10 @@ $statusColors = [
             </div>
 
             <div class="partner-actions">
-                <a href="/admin/federation/external-partners/<?= $partner['id'] ?>" class="partner-action-btn view">
+                <a href="/admin-legacy/federation/external-partners/<?= $partner['id'] ?>" class="partner-action-btn view">
                     <i class="fa-solid fa-eye"></i> View Details
                 </a>
-                <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/test" class="test-connection-form">
+                <form method="POST" action="/admin-legacy/federation/external-partners/<?= $partner['id'] ?>/test" class="test-connection-form">
                     <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                     <button type="submit" class="partner-action-btn test">
                         <i class="fa-solid fa-plug"></i> Test

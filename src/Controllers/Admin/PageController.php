@@ -63,7 +63,7 @@ class PageController
         // Only create pages via POST request or confirmed GET to prevent accidental drafts
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             if (!isset($_GET['confirm']) || $_GET['confirm'] !== '1') {
-                header('Location: ' . TenantContext::getBasePath() . '/admin/pages');
+                header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
                 exit;
             }
         }
@@ -91,7 +91,7 @@ class PageController
         // Initialize SEO
         \Nexus\Models\SeoMetadata::save('page', $id, ['meta_title' => '', 'meta_description' => '', 'noindex' => 0]);
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/pages/builder/' . $id);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages/builder/' . $id);
     }
 
     public function builder($id)
@@ -102,7 +102,7 @@ class PageController
         $page = Database::query("SELECT * FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
 
         if (!$page) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/pages');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
             exit;
         }
 
@@ -438,7 +438,7 @@ class PageController
         // Verify page ownership
         $page = Database::query("SELECT * FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
         if (!$page) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/pages');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
             exit;
         }
 
@@ -557,7 +557,7 @@ class PageController
         // Get original page
         $original = Database::query("SELECT * FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
         if (!$original) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/pages');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
             exit;
         }
 
@@ -590,7 +590,7 @@ class PageController
             ]);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/pages/builder/' . $newId);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages/builder/' . $newId);
     }
 
     public function reorder()
@@ -631,7 +631,7 @@ class PageController
 
         $id = $_POST['page_id'] ?? null;
         if (!$id) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/pages');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
             exit;
         }
 
@@ -651,7 +651,7 @@ class PageController
             Database::query("DELETE FROM seo_metadata WHERE entity_type = 'page' AND entity_id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/pages');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
     }
 
     /**

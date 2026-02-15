@@ -22,7 +22,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/seo" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/seo" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Organization Schema
@@ -38,7 +38,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 </div>
 <?php endif; ?>
 
-<form action="<?= $basePath ?>/admin/seo/organization/save" method="POST">
+<form action="<?= $basePath ?>/admin-legacy/seo/organization/save" method="POST">
     <?= Csrf::input() ?>
 
     <!-- Organization Details -->
@@ -412,7 +412,7 @@ document.getElementById('pingSitemapBtn').addEventListener('click', function() {
     const formData = new FormData();
     formData.append('csrf_token', '<?= Csrf::generate() ?>');
 
-    fetch('<?= $basePath ?>/admin/seo/ping-sitemaps', {
+    fetch('<?= $basePath ?>/admin-legacy/seo/ping-sitemaps', {
         method: 'POST',
         body: formData
     })

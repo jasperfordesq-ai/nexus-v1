@@ -29,14 +29,14 @@ $settings = $settings ?? [];
         <p class="admin-page-subtitle">Control how your timebank appears to others</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/federation/directory" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-compass"></i>
             View Directory
         </a>
     </div>
 </div>
 
-<form action="<?= $basePath ?>/admin/federation/directory-my-profile" method="POST" enctype="multipart/form-data">
+<form action="<?= $basePath ?>/admin-legacy/federation/directory-my-profile" method="POST" enctype="multipart/form-data">
     <?= Csrf::input() ?>
 
     <div class="fed-grid-2">

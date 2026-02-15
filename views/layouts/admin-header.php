@@ -31,7 +31,7 @@ $adminModules = [
     'dashboard' => [
         'label' => 'Dashboard',
         'icon' => 'fa-gauge-high',
-        'url' => '/admin',
+        'url' => '/admin-legacy',
         'single' => true,
     ],
 
@@ -40,8 +40,8 @@ $adminModules = [
         'label' => 'Users',
         'icon' => 'fa-users',
         'items' => [
-            ['label' => 'All Users', 'url' => '/admin/users', 'icon' => 'fa-users', 'desc' => 'Manage all platform users'],
-            ['label' => 'Pending Approvals', 'url' => '/admin/users?filter=pending', 'icon' => 'fa-user-clock', 'desc' => 'Review pending user accounts'],
+            ['label' => 'All Users', 'url' => '/admin-legacy/users', 'icon' => 'fa-users', 'desc' => 'Manage all platform users'],
+            ['label' => 'Pending Approvals', 'url' => '/admin-legacy/users?filter=pending', 'icon' => 'fa-user-clock', 'desc' => 'Review pending user accounts'],
         ],
     ],
 
@@ -49,8 +49,8 @@ $adminModules = [
         'label' => 'Listings',
         'icon' => 'fa-rectangle-list',
         'items' => [
-            ['label' => 'All Listings', 'url' => '/admin/listings', 'icon' => 'fa-list', 'desc' => 'View all listings'],
-            ['label' => 'Pending Review', 'url' => '/admin/listings?status=pending', 'icon' => 'fa-clock', 'desc' => 'Approve new listings'],
+            ['label' => 'All Listings', 'url' => '/admin-legacy/listings', 'icon' => 'fa-list', 'desc' => 'View all listings'],
+            ['label' => 'Pending Review', 'url' => '/admin-legacy/listings?status=pending', 'icon' => 'fa-clock', 'desc' => 'Approve new listings'],
         ],
     ],
 
@@ -63,27 +63,27 @@ $adminModules = [
             [
                 'title' => 'Groups',
                 'items' => [
-                    ['label' => 'All Groups', 'url' => '/admin/groups', 'icon' => 'fa-users-rectangle'],
-                    ['label' => 'Group Types', 'url' => '/admin/group-types', 'icon' => 'fa-layer-group'],
-                    ['label' => 'Group Ranking', 'url' => '/admin/group-ranking', 'icon' => 'fa-star'],
-                    ['label' => 'Group Analytics', 'url' => '/admin/groups/analytics', 'icon' => 'fa-chart-bar'],
+                    ['label' => 'All Groups', 'url' => '/admin-legacy/groups', 'icon' => 'fa-users-rectangle'],
+                    ['label' => 'Group Types', 'url' => '/admin-legacy/group-types', 'icon' => 'fa-layer-group'],
+                    ['label' => 'Group Ranking', 'url' => '/admin-legacy/group-ranking', 'icon' => 'fa-star'],
+                    ['label' => 'Group Analytics', 'url' => '/admin-legacy/groups/analytics', 'icon' => 'fa-chart-bar'],
                 ],
             ],
             [
                 'title' => 'Organizations',
                 'items' => [
-                    ['label' => 'All Organizations', 'url' => '/admin/volunteering/organizations', 'icon' => 'fa-building'],
-                    ['label' => 'Pending Approvals', 'url' => '/admin/volunteering/approvals', 'icon' => 'fa-hands-helping'],
+                    ['label' => 'All Organizations', 'url' => '/admin-legacy/volunteering/organizations', 'icon' => 'fa-building'],
+                    ['label' => 'Pending Approvals', 'url' => '/admin-legacy/volunteering/approvals', 'icon' => 'fa-hands-helping'],
                 ],
             ],
             [
                 'title' => 'Smart Systems',
                 'items' => [
-                    ['label' => 'Smart Matching', 'url' => '/admin/smart-match-users', 'icon' => 'fa-users-between-lines'],
-                    ['label' => 'Recommendations', 'url' => '/admin/groups/recommendations', 'icon' => 'fa-sparkles'],
-                    ['label' => 'Match Monitoring', 'url' => '/admin/smart-match-monitoring', 'icon' => 'fa-chart-line'],
-                    ['label' => 'Geocoding', 'url' => '/admin/geocode-groups', 'icon' => 'fa-map-location-dot'],
-                    ['label' => 'Locations', 'url' => '/admin/group-locations', 'icon' => 'fa-location-dot'],
+                    ['label' => 'Smart Matching', 'url' => '/admin-legacy/smart-match-users', 'icon' => 'fa-users-between-lines'],
+                    ['label' => 'Recommendations', 'url' => '/admin-legacy/groups/recommendations', 'icon' => 'fa-sparkles'],
+                    ['label' => 'Match Monitoring', 'url' => '/admin-legacy/smart-match-monitoring', 'icon' => 'fa-chart-line'],
+                    ['label' => 'Geocoding', 'url' => '/admin-legacy/geocode-groups', 'icon' => 'fa-map-location-dot'],
+                    ['label' => 'Locations', 'url' => '/admin-legacy/group-locations', 'icon' => 'fa-location-dot'],
                 ],
             ],
         ],
@@ -94,11 +94,11 @@ $adminModules = [
         'label' => 'Content',
         'icon' => 'fa-newspaper',
         'items' => [
-            ['label' => 'Blog Posts', 'url' => '/admin/blog', 'icon' => 'fa-blog'],
-            ['label' => 'Pages', 'url' => '/admin/pages', 'icon' => 'fa-file-lines'],
-            ['label' => 'Menus', 'url' => '/admin/menus', 'icon' => 'fa-bars'],
-            ['label' => 'Categories', 'url' => '/admin/categories', 'icon' => 'fa-folder'],
-            ['label' => 'Attributes', 'url' => '/admin/attributes', 'icon' => 'fa-tags'],
+            ['label' => 'Blog Posts', 'url' => '/admin-legacy/blog', 'icon' => 'fa-blog'],
+            ['label' => 'Pages', 'url' => '/admin-legacy/pages', 'icon' => 'fa-file-lines'],
+            ['label' => 'Menus', 'url' => '/admin-legacy/menus', 'icon' => 'fa-bars'],
+            ['label' => 'Categories', 'url' => '/admin-legacy/categories', 'icon' => 'fa-folder'],
+            ['label' => 'Attributes', 'url' => '/admin-legacy/attributes', 'icon' => 'fa-tags'],
         ],
     ],
 
@@ -107,10 +107,10 @@ $adminModules = [
         'label' => 'Engagement',
         'icon' => 'fa-trophy',
         'items' => [
-            ['label' => 'Gamification Hub', 'url' => '/admin/gamification', 'icon' => 'fa-gamepad'],
-            ['label' => 'Campaigns', 'url' => '/admin/gamification/campaigns', 'icon' => 'fa-bullhorn'],
-            ['label' => 'Custom Badges', 'url' => '/admin/custom-badges', 'icon' => 'fa-medal'],
-            ['label' => 'Analytics', 'url' => '/admin/gamification/analytics', 'icon' => 'fa-chart-bar'],
+            ['label' => 'Gamification Hub', 'url' => '/admin-legacy/gamification', 'icon' => 'fa-gamepad'],
+            ['label' => 'Campaigns', 'url' => '/admin-legacy/gamification/campaigns', 'icon' => 'fa-bullhorn'],
+            ['label' => 'Custom Badges', 'url' => '/admin-legacy/custom-badges', 'icon' => 'fa-medal'],
+            ['label' => 'Analytics', 'url' => '/admin-legacy/gamification/analytics', 'icon' => 'fa-chart-bar'],
         ],
     ],
 
@@ -119,10 +119,10 @@ $adminModules = [
         'label' => 'Marketing',
         'icon' => 'fa-megaphone',
         'items' => [
-            ['label' => 'Newsletters', 'url' => '/admin/newsletters', 'icon' => 'fa-envelopes-bulk'],
-            ['label' => 'Subscribers', 'url' => '/admin/newsletters/subscribers', 'icon' => 'fa-user-plus'],
-            ['label' => 'Segments', 'url' => '/admin/newsletters/segments', 'icon' => 'fa-layer-group'],
-            ['label' => 'Templates', 'url' => '/admin/newsletters/templates', 'icon' => 'fa-palette'],
+            ['label' => 'Newsletters', 'url' => '/admin-legacy/newsletters', 'icon' => 'fa-envelopes-bulk'],
+            ['label' => 'Subscribers', 'url' => '/admin-legacy/newsletters/subscribers', 'icon' => 'fa-user-plus'],
+            ['label' => 'Segments', 'url' => '/admin-legacy/newsletters/segments', 'icon' => 'fa-layer-group'],
+            ['label' => 'Templates', 'url' => '/admin-legacy/newsletters/templates', 'icon' => 'fa-palette'],
         ],
     ],
 
@@ -135,20 +135,20 @@ $adminModules = [
             [
                 'title' => 'AI & Automation',
                 'items' => [
-                    ['label' => 'AI Settings', 'url' => '/admin/ai-settings', 'icon' => 'fa-microchip'],
-                    ['label' => 'Smart Matching', 'url' => '/admin/smart-matching', 'icon' => 'fa-wand-magic-sparkles'],
-                    ['label' => 'Feed Algorithm', 'url' => '/admin/feed-algorithm', 'icon' => 'fa-rss'],
-                    ['label' => 'Algorithm Settings', 'url' => '/admin/algorithm-settings', 'icon' => 'fa-scale-balanced'],
+                    ['label' => 'AI Settings', 'url' => '/admin-legacy/ai-settings', 'icon' => 'fa-microchip'],
+                    ['label' => 'Smart Matching', 'url' => '/admin-legacy/smart-matching', 'icon' => 'fa-wand-magic-sparkles'],
+                    ['label' => 'Feed Algorithm', 'url' => '/admin-legacy/feed-algorithm', 'icon' => 'fa-rss'],
+                    ['label' => 'Algorithm Settings', 'url' => '/admin-legacy/algorithm-settings', 'icon' => 'fa-scale-balanced'],
                 ],
             ],
             [
                 'title' => 'SEO & Optimization',
                 'items' => [
-                    ['label' => 'SEO Overview', 'url' => '/admin/seo', 'icon' => 'fa-chart-line'],
-                    ['label' => 'SEO Audit', 'url' => '/admin/seo/audit', 'icon' => 'fa-clipboard-check'],
-                    ['label' => 'Bulk Edit', 'url' => '/admin/seo/bulk/listing', 'icon' => 'fa-pen-to-square'],
-                    ['label' => 'Redirects', 'url' => '/admin/seo/redirects', 'icon' => 'fa-arrow-right-arrow-left'],
-                    ['label' => '404 Error Tracking', 'url' => '/admin/404-errors', 'icon' => 'fa-exclamation-triangle', 'badge' => 'NEW'],
+                    ['label' => 'SEO Overview', 'url' => '/admin-legacy/seo', 'icon' => 'fa-chart-line'],
+                    ['label' => 'SEO Audit', 'url' => '/admin-legacy/seo/audit', 'icon' => 'fa-clipboard-check'],
+                    ['label' => 'Bulk Edit', 'url' => '/admin-legacy/seo/bulk/listing', 'icon' => 'fa-pen-to-square'],
+                    ['label' => 'Redirects', 'url' => '/admin-legacy/seo/redirects', 'icon' => 'fa-arrow-right-arrow-left'],
+                    ['label' => '404 Error Tracking', 'url' => '/admin-legacy/404-errors', 'icon' => 'fa-exclamation-triangle', 'badge' => 'NEW'],
                 ],
             ],
         ],
@@ -159,11 +159,11 @@ $adminModules = [
         'label' => 'Financial',
         'icon' => 'fa-coins',
         'items' => [
-            ['label' => 'Timebanking', 'url' => '/admin/timebanking', 'icon' => 'fa-clock-rotate-left'],
-            ['label' => 'Fraud Alerts', 'url' => '/admin/timebanking/alerts', 'icon' => 'fa-triangle-exclamation'],
-            ['label' => 'Org Wallets', 'url' => '/admin/timebanking/org-wallets', 'icon' => 'fa-wallet'],
-            ['label' => 'Plans & Pricing', 'url' => '/admin/plans', 'icon' => 'fa-credit-card'],
-            ['label' => 'Subscriptions', 'url' => '/admin/plans/subscriptions', 'icon' => 'fa-users'],
+            ['label' => 'Timebanking', 'url' => '/admin-legacy/timebanking', 'icon' => 'fa-clock-rotate-left'],
+            ['label' => 'Fraud Alerts', 'url' => '/admin-legacy/timebanking/alerts', 'icon' => 'fa-triangle-exclamation'],
+            ['label' => 'Org Wallets', 'url' => '/admin-legacy/timebanking/org-wallets', 'icon' => 'fa-wallet'],
+            ['label' => 'Plans & Pricing', 'url' => '/admin-legacy/plans', 'icon' => 'fa-credit-card'],
+            ['label' => 'Subscriptions', 'url' => '/admin-legacy/plans/subscriptions', 'icon' => 'fa-users'],
         ],
     ],
 
@@ -176,37 +176,37 @@ $adminModules = [
             [
                 'title' => 'Overview',
                 'items' => [
-                    ['label' => 'Enterprise Dashboard', 'url' => '/admin/enterprise', 'icon' => 'fa-building-shield'],
-                    ['label' => 'Roles & Permissions', 'url' => '/admin/enterprise/roles', 'icon' => 'fa-user-tag'],
-                    ['label' => 'Permission Browser', 'url' => '/admin/enterprise/permissions', 'icon' => 'fa-key'],
-                    ['label' => 'Permissions Audit', 'url' => '/admin/enterprise/audit/permissions', 'icon' => 'fa-clipboard-list'],
+                    ['label' => 'Enterprise Dashboard', 'url' => '/admin-legacy/enterprise', 'icon' => 'fa-building-shield'],
+                    ['label' => 'Roles & Permissions', 'url' => '/admin-legacy/enterprise/roles', 'icon' => 'fa-user-tag'],
+                    ['label' => 'Permission Browser', 'url' => '/admin-legacy/enterprise/permissions', 'icon' => 'fa-key'],
+                    ['label' => 'Permissions Audit', 'url' => '/admin-legacy/enterprise/audit/permissions', 'icon' => 'fa-clipboard-list'],
                 ],
             ],
             [
                 'title' => 'GDPR Compliance',
                 'items' => [
-                    ['label' => 'GDPR Dashboard', 'url' => '/admin/enterprise/gdpr', 'icon' => 'fa-user-shield'],
-                    ['label' => 'Data Requests', 'url' => '/admin/enterprise/gdpr/requests', 'icon' => 'fa-file-contract'],
-                    ['label' => 'Consent Records', 'url' => '/admin/enterprise/gdpr/consents', 'icon' => 'fa-check-double'],
-                    ['label' => 'Data Breaches', 'url' => '/admin/enterprise/gdpr/breaches', 'icon' => 'fa-triangle-exclamation'],
-                    ['label' => 'GDPR Audit Log', 'url' => '/admin/enterprise/gdpr/audit', 'icon' => 'fa-scroll'],
+                    ['label' => 'GDPR Dashboard', 'url' => '/admin-legacy/enterprise/gdpr', 'icon' => 'fa-user-shield'],
+                    ['label' => 'Data Requests', 'url' => '/admin-legacy/enterprise/gdpr/requests', 'icon' => 'fa-file-contract'],
+                    ['label' => 'Consent Records', 'url' => '/admin-legacy/enterprise/gdpr/consents', 'icon' => 'fa-check-double'],
+                    ['label' => 'Data Breaches', 'url' => '/admin-legacy/enterprise/gdpr/breaches', 'icon' => 'fa-triangle-exclamation'],
+                    ['label' => 'GDPR Audit Log', 'url' => '/admin-legacy/enterprise/gdpr/audit', 'icon' => 'fa-scroll'],
                 ],
             ],
             [
                 'title' => 'System Health',
                 'items' => [
-                    ['label' => 'Monitoring Dashboard', 'url' => '/admin/enterprise/monitoring', 'icon' => 'fa-heart-pulse'],
-                    ['label' => 'Health Check', 'url' => '/admin/enterprise/monitoring/health', 'icon' => 'fa-stethoscope'],
-                    ['label' => 'Requirements', 'url' => '/admin/enterprise/monitoring/requirements', 'icon' => 'fa-list-check'],
-                    ['label' => 'Error Logs', 'url' => '/admin/enterprise/monitoring/logs', 'icon' => 'fa-file-lines'],
+                    ['label' => 'Monitoring Dashboard', 'url' => '/admin-legacy/enterprise/monitoring', 'icon' => 'fa-heart-pulse'],
+                    ['label' => 'Health Check', 'url' => '/admin-legacy/enterprise/monitoring/health', 'icon' => 'fa-stethoscope'],
+                    ['label' => 'Requirements', 'url' => '/admin-legacy/enterprise/monitoring/requirements', 'icon' => 'fa-list-check'],
+                    ['label' => 'Error Logs', 'url' => '/admin-legacy/enterprise/monitoring/logs', 'icon' => 'fa-file-lines'],
                 ],
             ],
             [
                 'title' => 'Configuration',
                 'items' => [
-                    ['label' => 'System Config', 'url' => '/admin/enterprise/config', 'icon' => 'fa-gears'],
-                    ['label' => 'Feature Flags', 'url' => '/admin/enterprise/config#features', 'icon' => 'fa-toggle-on'],
-                    ['label' => 'Secrets Vault', 'url' => '/admin/enterprise/config/secrets', 'icon' => 'fa-vault'],
+                    ['label' => 'System Config', 'url' => '/admin-legacy/enterprise/config', 'icon' => 'fa-gears'],
+                    ['label' => 'Feature Flags', 'url' => '/admin-legacy/enterprise/config#features', 'icon' => 'fa-toggle-on'],
+                    ['label' => 'Secrets Vault', 'url' => '/admin-legacy/enterprise/config/secrets', 'icon' => 'fa-vault'],
                 ],
             ],
         ],
@@ -217,13 +217,13 @@ $adminModules = [
         'label' => 'System',
         'icon' => 'fa-gear',
         'items' => [
-            ['label' => 'Settings', 'url' => '/admin/settings', 'icon' => 'fa-sliders'],
-            ['label' => 'Seed Generator', 'url' => '/admin/seed-generator', 'icon' => 'fa-seedling', 'desc' => 'Generate database seeding scripts'],
-            ['label' => 'Blog Restore', 'url' => '/admin/blog-restore', 'icon' => 'fa-rotate-left', 'desc' => 'Import/Export blog posts', 'badge' => 'NEW'],
-            ['label' => 'Cron Jobs', 'url' => '/admin/cron-jobs', 'icon' => 'fa-clock'],
-            ['label' => 'Activity Log', 'url' => '/admin/activity-log', 'icon' => 'fa-list-ul'],
-            ['label' => 'API Test Runner', 'url' => '/admin/tests', 'icon' => 'fa-flask', 'desc' => 'Run automated API tests'],
-            ['label' => 'Native App', 'url' => '/admin/native-app', 'icon' => 'fa-mobile-screen'],
+            ['label' => 'Settings', 'url' => '/admin-legacy/settings', 'icon' => 'fa-sliders'],
+            ['label' => 'Seed Generator', 'url' => '/admin-legacy/seed-generator', 'icon' => 'fa-seedling', 'desc' => 'Generate database seeding scripts'],
+            ['label' => 'Blog Restore', 'url' => '/admin-legacy/blog-restore', 'icon' => 'fa-rotate-left', 'desc' => 'Import/Export blog posts', 'badge' => 'NEW'],
+            ['label' => 'Cron Jobs', 'url' => '/admin-legacy/cron-jobs', 'icon' => 'fa-clock'],
+            ['label' => 'Activity Log', 'url' => '/admin-legacy/activity-log', 'icon' => 'fa-list-ul'],
+            ['label' => 'API Test Runner', 'url' => '/admin-legacy/tests', 'icon' => 'fa-flask', 'desc' => 'Run automated API tests'],
+            ['label' => 'Native App', 'url' => '/admin-legacy/native-app', 'icon' => 'fa-mobile-screen'],
         ],
     ],
 
@@ -232,10 +232,10 @@ $adminModules = [
         'label' => 'Deliverability',
         'icon' => 'fa-tasks-alt',
         'items' => [
-            ['label' => 'Dashboard', 'url' => '/admin/deliverability', 'icon' => 'fa-gauge-high'],
-            ['label' => 'All Deliverables', 'url' => '/admin/deliverability/list', 'icon' => 'fa-list'],
-            ['label' => 'Create New', 'url' => '/admin/deliverability/create', 'icon' => 'fa-plus'],
-            ['label' => 'Analytics', 'url' => '/admin/deliverability/analytics', 'icon' => 'fa-chart-line'],
+            ['label' => 'Dashboard', 'url' => '/admin-legacy/deliverability', 'icon' => 'fa-gauge-high'],
+            ['label' => 'All Deliverables', 'url' => '/admin-legacy/deliverability/list', 'icon' => 'fa-list'],
+            ['label' => 'Create New', 'url' => '/admin-legacy/deliverability/create', 'icon' => 'fa-plus'],
+            ['label' => 'Analytics', 'url' => '/admin-legacy/deliverability/analytics', 'icon' => 'fa-chart-line'],
         ],
     ],
 ];
@@ -245,7 +245,7 @@ if (!function_exists('isAdminNavActive')) {
         $fullUrl = $basePath . $itemUrl;
         $currentClean = strtok($currentPath, '?');
         if ($currentClean === $fullUrl) return true;
-        if ($itemUrl === '/admin') return $currentClean === $fullUrl;
+        if ($itemUrl === '/admin-legacy') return $currentClean === $fullUrl;
         return strpos($currentClean, $fullUrl) === 0;
     }
 }
@@ -274,14 +274,14 @@ if (!function_exists('getActiveAdminModule')) {
 
 if (!function_exists('generateAdminBreadcrumbs')) {
     function generateAdminBreadcrumbs($modules, $currentPath, $basePath, $pageTitle = '') {
-        $breadcrumbs = [['label' => 'Admin', 'url' => $basePath . '/admin', 'icon' => 'fa-gauge-high']];
+        $breadcrumbs = [['label' => 'Admin', 'url' => $basePath . '/admin-legacy', 'icon' => 'fa-gauge-high']];
         $currentClean = strtok($currentPath, '?');
 
         // Find matching module and item
         foreach ($modules as $key => $module) {
             if (isset($module['single']) && $module['single']) {
                 if (isAdminNavActive($module['url'], $currentPath, $basePath)) {
-                    if ($module['url'] !== '/admin') {
+                    if ($module['url'] !== '/admin-legacy') {
                         $breadcrumbs[] = ['label' => $module['label'], 'url' => $basePath . $module['url'], 'icon' => $module['icon']];
                     }
                     break;
@@ -1769,46 +1769,46 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
 
                 <div class="admin-search-section" id="adminQuickNav">
                     <div class="admin-search-section-title">Quick Navigation</div>
-                    <a href="<?= $basePath ?>/admin/users" class="admin-search-item" data-search="users members people">
+                    <a href="<?= $basePath ?>/admin-legacy/users" class="admin-search-item" data-search="users members people">
                         <i class="fa-solid fa-users"></i>
                         <span>Users</span>
                         <kbd>Alt+U</kbd>
                     </a>
-                    <a href="<?= $basePath ?>/admin/listings" class="admin-search-item" data-search="listings services offers">
+                    <a href="<?= $basePath ?>/admin-legacy/listings" class="admin-search-item" data-search="listings services offers">
                         <i class="fa-solid fa-rectangle-list"></i>
                         <span>Listings</span>
                         <kbd>Alt+L</kbd>
                     </a>
-                    <a href="<?= $basePath ?>/admin/settings" class="admin-search-item" data-search="settings configuration options">
+                    <a href="<?= $basePath ?>/admin-legacy/settings" class="admin-search-item" data-search="settings configuration options">
                         <i class="fa-solid fa-gear"></i>
                         <span>Settings</span>
                         <kbd>Alt+S</kbd>
                     </a>
-                    <a href="<?= $basePath ?>/admin/newsletters" class="admin-search-item" data-search="newsletters email campaigns">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters" class="admin-search-item" data-search="newsletters email campaigns">
                         <i class="fa-solid fa-envelope"></i>
                         <span>Newsletters</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/blog" class="admin-search-item" data-search="blog posts articles news">
+                    <a href="<?= $basePath ?>/admin-legacy/blog" class="admin-search-item" data-search="blog posts articles news">
                         <i class="fa-solid fa-blog"></i>
                         <span>Blog Posts</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/activity-log" class="admin-search-item" data-search="activity log audit events">
+                    <a href="<?= $basePath ?>/admin-legacy/activity-log" class="admin-search-item" data-search="activity log audit events">
                         <i class="fa-solid fa-list-ul"></i>
                         <span>Activity Log</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/categories" class="admin-search-item" data-search="categories taxonomy tags">
+                    <a href="<?= $basePath ?>/admin-legacy/categories" class="admin-search-item" data-search="categories taxonomy tags">
                         <i class="fa-solid fa-folder-tree"></i>
                         <span>Categories</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/pages" class="admin-search-item" data-search="pages content cms">
+                    <a href="<?= $basePath ?>/admin-legacy/pages" class="admin-search-item" data-search="pages content cms">
                         <i class="fa-solid fa-file-lines"></i>
                         <span>Pages</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/enterprise/gdpr" class="admin-search-item" data-search="gdpr privacy compliance consent">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr" class="admin-search-item" data-search="gdpr privacy compliance consent">
                         <i class="fa-solid fa-shield-halved"></i>
                         <span>GDPR Compliance</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="admin-search-item" data-search="monitoring logs errors system health">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-search-item" data-search="monitoring logs errors system health">
                         <i class="fa-solid fa-chart-line"></i>
                         <span>System Monitoring</span>
                     </a>
@@ -2031,7 +2031,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var pageUrl = window.location.pathname;
 
         // Don't track the main dashboard
-        if (pageUrl === basePath + '/admin' || pageUrl === basePath + '/admin/') return;
+        if (pageUrl === basePath + '/admin-legacy' || pageUrl === basePath + '/admin-legacy/') return;
 
         var recent = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
 
@@ -2077,7 +2077,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         isSearching = true;
 
-        fetch(basePath + '/admin/api/search?q=' + encodeURIComponent(query))
+        fetch(basePath + '/admin-legacy/api/search?q=' + encodeURIComponent(query))
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 isSearching = false;
@@ -2338,11 +2338,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Alt+shortcuts for quick navigation (only when not in input)
         if (e.altKey && !e.target.matches('input, textarea, select')) {
             var shortcutMap = {
-                'u': basePath + '/admin/users',
-                'l': basePath + '/admin/listings',
-                's': basePath + '/admin/settings',
-                'd': basePath + '/admin',
-                'n': basePath + '/admin/newsletters'
+                'u': basePath + '/admin-legacy/users',
+                'l': basePath + '/admin-legacy/listings',
+                's': basePath + '/admin-legacy/settings',
+                'd': basePath + '/admin-legacy',
+                'n': basePath + '/admin-legacy/newsletters'
             };
             var key = e.key.toLowerCase();
             if (shortcutMap[key]) {

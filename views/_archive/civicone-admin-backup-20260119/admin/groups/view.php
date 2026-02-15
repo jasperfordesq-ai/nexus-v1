@@ -1,7 +1,7 @@
 <?php
 /**
  * Group Detail View
- * Path: views/modern/admin/groups/view.php
+ * Path: views/modern/admin-legacy/groups/view.php
  */
 
 use Nexus\Core\TenantContext;
@@ -10,7 +10,7 @@ $basePath = TenantContext::getBasePath();
 $group = $group ?? null;
 
 if (!$group) {
-    header("Location: $basePath/admin/groups");
+    header("Location: $basePath/admin-legacy/groups");
     exit;
 }
 
@@ -31,7 +31,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Group Details & Management</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/groups" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/groups" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back
         </a>
         <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>/analytics" class="admin-btn admin-btn-secondary">
@@ -103,7 +103,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <td><span class="admin-badge admin-badge-<?= $member['role'] === 'owner' ? 'danger' : 'secondary' ?>"><?= htmlspecialchars($member['role']) ?></span></td>
                             <td><?= date('M j, Y', strtotime($member['joined_at'])) ?></td>
                             <td>
-                                <a href="<?= $basePath ?>/admin/users/view?id=<?= $member['user_id'] ?>" class="admin-btn admin-btn-sm admin-btn-secondary">
+                                <a href="<?= $basePath ?>/admin-legacy/users/view?id=<?= $member['user_id'] ?>" class="admin-btn admin-btn-sm admin-btn-secondary">
                                     <i class="fa-solid fa-user"></i> View
                                 </a>
                             </td>

@@ -24,7 +24,7 @@ $colors = ['blue', 'green', 'red', 'yellow', 'purple', 'pink', 'indigo', 'gray']
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/categories" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/categories" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Edit Category
@@ -45,7 +45,7 @@ $colors = ['blue', 'green', 'red', 'yellow', 'purple', 'pink', 'indigo', 'gray']
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/categories/update" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/categories/update" method="POST">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
             <input type="hidden" name="id" value="<?= $category['id'] ?>">
 
@@ -87,7 +87,7 @@ $colors = ['blue', 'green', 'red', 'yellow', 'purple', 'pink', 'indigo', 'gray']
             </div>
 
             <div class="form-actions">
-                <a href="<?= $basePath ?>/admin/categories" class="admin-btn admin-btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/categories" class="admin-btn admin-btn-secondary">
                     <i class="fa-solid fa-times"></i> Cancel
                 </a>
                 <button type="submit" class="admin-btn admin-btn-primary">

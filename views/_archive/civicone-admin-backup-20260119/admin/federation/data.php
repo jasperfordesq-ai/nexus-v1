@@ -73,7 +73,7 @@ $dataStats = $dataStats ?? [];
                 Export your federation data for backup or analysis purposes.
             </p>
 
-            <form action="<?= $basePath ?>/admin/federation/data/export" method="POST">
+            <form action="<?= $basePath ?>/admin-legacy/federation/data/export" method="POST">
                 <?= Csrf::input() ?>
 
                 <div class="admin-form-group">
@@ -116,7 +116,7 @@ $dataStats = $dataStats ?? [];
             Configure how long federation data is retained before automatic cleanup.
         </p>
 
-        <form action="<?= $basePath ?>/admin/federation/data/retention" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/federation/data/retention" method="POST">
             <?= Csrf::input() ?>
 
             <div class="admin-form-row">

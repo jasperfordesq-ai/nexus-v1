@@ -346,7 +346,7 @@ textarea.form-control {
                 </div>
 
                 <div class="form-actions">
-                    <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests" class="nexus-btn nexus-btn-outline">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests" class="nexus-btn nexus-btn-outline">
                         <i class="fa-solid fa-arrow-left"></i> Cancel
                     </a>
                     <button type="submit" class="nexus-btn nexus-btn-primary">
@@ -377,7 +377,7 @@ document.getElementById('createRequestForm').addEventListener('submit', async fu
     }
 
     try {
-        const response = await fetch(basePath + '/admin/enterprise/gdpr/requests', {
+        const response = await fetch(basePath + '/admin-legacy/enterprise/gdpr/requests', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -392,7 +392,7 @@ document.getElementById('createRequestForm').addEventListener('submit', async fu
         if (data.success) {
             alertContainer.innerHTML = '<div class="alert alert-success"><i class="fa-solid fa-check-circle"></i><span>Request created successfully! Redirecting...</span></div>';
             setTimeout(() => {
-                window.location.href = basePath + '/admin/enterprise/gdpr/requests/' + data.id;
+                window.location.href = basePath + '/admin-legacy/enterprise/gdpr/requests/' + data.id;
             }, 1500);
         } else {
             alertContainer.innerHTML = '<div class="alert alert-danger"><i class="fa-solid fa-exclamation-circle"></i><span>' + (data.error || 'Failed to create request') + '</span></div>';

@@ -29,7 +29,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/broker-controls" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Risk Tags
@@ -37,7 +37,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         <p class="admin-page-subtitle">Manage risk assessments for listings</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/listings" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/listings" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-list"></i> Browse Listings
         </a>
     </div>
@@ -83,7 +83,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
             <i class="fa-solid fa-shield-check"></i>
             <h3>No Tagged Listings</h3>
             <p>No listings have been tagged with this risk level.</p>
-            <a href="<?= $basePath ?>/admin/listings" class="admin-btn admin-btn-primary">
+            <a href="<?= $basePath ?>/admin-legacy/listings" class="admin-btn admin-btn-primary">
                 <i class="fa-solid fa-list"></i> Browse Listings to Tag
             </a>
         </div>
@@ -142,11 +142,11 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                         <td><?= isset($listing['created_at']) ? date('M j, Y', strtotime($listing['created_at'])) : '-' ?></td>
                         <td>
                             <div class="action-buttons">
-                                <a href="<?= $basePath ?>/admin/broker-controls/risk-tags/<?= $listing['listing_id'] ?>"
+                                <a href="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags/<?= $listing['listing_id'] ?>"
                                    class="admin-btn admin-btn-secondary admin-btn-sm" title="Edit Tag">
                                     <i class="fa-solid fa-edit"></i>
                                 </a>
-                                <form action="<?= $basePath ?>/admin/broker-controls/risk-tags/<?= $listing['listing_id'] ?>/remove" method="POST" style="display:inline;"
+                                <form action="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags/<?= $listing['listing_id'] ?>/remove" method="POST" style="display:inline;"
                                       onsubmit="return confirm('Remove risk tag from this listing?');">
                                     <?= Csrf::input() ?>
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm" title="Remove Tag">

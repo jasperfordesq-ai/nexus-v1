@@ -433,7 +433,7 @@ export function GoalsPage() {
   };
 
   const modalClasses = {
-    base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
+    base: 'bg-content1 border border-theme-default',
   };
 
   const inputClasses = {

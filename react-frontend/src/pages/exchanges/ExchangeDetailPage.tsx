@@ -568,7 +568,7 @@ export function ExchangeDetailPage() {
           <div className="relative">
             {/* Vertical connector line */}
             <div
-              className="absolute left-[17px] top-3 bottom-3 w-0.5 bg-theme-default"
+              className="absolute left-[17px] top-3 bottom-3 w-0.5 bg-theme-elevated"
               aria-hidden="true"
             />
 
@@ -637,7 +637,7 @@ export function ExchangeDetailPage() {
         isOpen={showDeclineModal}
         onClose={() => setShowDeclineModal(false)}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -677,7 +677,7 @@ export function ExchangeDetailPage() {
         isOpen={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -728,7 +728,7 @@ export function ExchangeDetailPage() {
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',

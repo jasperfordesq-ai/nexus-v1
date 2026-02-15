@@ -184,7 +184,7 @@ class AiSettingsController
             $_SESSION['flash_error'] = 'Failed to save settings. Please inspect error logs.';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/ai-settings');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/ai-settings');
         exit;
     }
 
@@ -273,7 +273,7 @@ class AiSettingsController
         AiSettings::initializeDefaults($tenantId);
 
         $_SESSION['flash_success'] = 'AI settings initialized with defaults.';
-        header('Location: ' . TenantContext::getBasePath() . '/admin/ai-settings');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/ai-settings');
         exit;
     }
 }

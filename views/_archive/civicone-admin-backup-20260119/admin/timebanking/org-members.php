@@ -22,7 +22,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/timebanking/org-wallets" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/timebanking/org-wallets" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <?= htmlspecialchars($org['name']) ?>
@@ -44,7 +44,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
         </div>
         <div class="admin-card-body">
-            <form action="<?= $basePath ?>/admin/timebanking/org-members/add" method="POST" class="add-member-form">
+            <form action="<?= $basePath ?>/admin-legacy/timebanking/org-members/add" method="POST" class="add-member-form">
                 <?= Csrf::input() ?>
                 <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
 
@@ -114,7 +114,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <div class="member-actions">
                     <?php if ($member['role'] !== 'owner'): ?>
                     <!-- Change Role -->
-                    <form action="<?= $basePath ?>/admin/timebanking/org-members/update-role" method="POST" class="inline-form">
+                    <form action="<?= $basePath ?>/admin-legacy/timebanking/org-members/update-role" method="POST" class="inline-form">
                         <?= Csrf::input() ?>
                         <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                         <input type="hidden" name="user_id" value="<?= $member['user_id'] ?>">
@@ -126,7 +126,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     </form>
 
                     <!-- Remove -->
-                    <form action="<?= $basePath ?>/admin/timebanking/org-members/remove" method="POST" class="inline-form" onsubmit="return confirm('Remove this member from the organization?');">
+                    <form action="<?= $basePath ?>/admin-legacy/timebanking/org-members/remove" method="POST" class="inline-form" onsubmit="return confirm('Remove this member from the organization?');">
                         <?= Csrf::input() ?>
                         <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                         <input type="hidden" name="user_id" value="<?= $member['user_id'] ?>">

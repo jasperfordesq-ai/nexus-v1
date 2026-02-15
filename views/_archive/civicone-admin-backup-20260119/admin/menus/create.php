@@ -21,7 +21,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/menus" class="admin-back-link">
+            <a href="<?= $basePath ?>/admin-legacy/menus" class="admin-back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Create New Menu
@@ -42,7 +42,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
     </div>
     <div class="admin-card-body">
-        <form method="POST" action="<?= $basePath ?>/admin/menus/create">
+        <form method="POST" action="<?= $basePath ?>/admin-legacy/menus/create">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
 
             <div class="form-group">
@@ -89,7 +89,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <?php endif; ?>
 
             <div class="form-actions" style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <a href="<?= $basePath ?>/admin/menus" class="admin-btn admin-btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/menus" class="admin-btn admin-btn-secondary">
                     <i class="fa-solid fa-times"></i> Cancel
                 </a>
                 <button type="submit" class="admin-btn admin-btn-primary">

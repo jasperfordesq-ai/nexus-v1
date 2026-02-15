@@ -16,10 +16,10 @@ $isPending = ($currentStatus ?? '') === 'pending';
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <!-- Status Filter Tabs -->
             <div style="display: flex; gap: 4px; background: rgba(99, 102, 241, 0.1); padding: 4px; border-radius: 8px;">
-                <a href="/admin/listings" style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; <?= !$isPending ? 'background: #6366f1; color: white;' : 'color: var(--text-muted);' ?>">
+                <a href="/admin-legacy/listings" style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; <?= !$isPending ? 'background: #6366f1; color: white;' : 'color: var(--text-muted);' ?>">
                     All Content
                 </a>
-                <a href="/admin/listings?status=pending" style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; <?= $isPending ? 'background: #f59e0b; color: white;' : 'color: var(--text-muted);' ?>">
+                <a href="/admin-legacy/listings?status=pending" style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; <?= $isPending ? 'background: #f59e0b; color: white;' : 'color: var(--text-muted);' ?>">
                     <i class="fa-solid fa-clock" style="margin-right: 4px;"></i> Pending Review
                 </a>
             </div>
@@ -119,14 +119,14 @@ $isPending = ($currentStatus ?? '') === 'pending';
                             <td style="padding: 12px 16px; text-align: right;">
                                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
                                     <?php if ($isPending && $row['content_type'] === 'listing'): ?>
-                                        <form method="POST" action="/admin/listings/approve/<?= $row['id'] ?>" style="margin: 0;">
+                                        <form method="POST" action="/admin-legacy/listings/approve/<?= $row['id'] ?>" style="margin: 0;">
                                             <button type="submit" class="fds-btn-primary" style="background: #10b981; border-color: #10b981; padding: 4px 10px; font-size: 13px;">
                                                 <i class="fa-solid fa-check" style="margin-right: 4px;"></i> Approve
                                             </button>
                                         </form>
                                     <?php endif; ?>
                                     <a href="<?= $editUrl ?>" class="fds-btn-secondary" style="padding: 4px 10px; font-size: 13px; text-decoration: none;">Edit</a>
-                                    <form method="POST" action="/admin/listings/delete/<?= $row['id'] ?>?type=<?= $row['content_type'] ?>" onsubmit="return confirm('Are you sure you want to delete this item?');" style="margin: 0;">
+                                    <form method="POST" action="/admin-legacy/listings/delete/<?= $row['id'] ?>?type=<?= $row['content_type'] ?>" onsubmit="return confirm('Are you sure you want to delete this item?');" style="margin: 0;">
                                         <button type="submit" class="fds-btn-primary" style="background: #ef4444; border-color: #ef4444; padding: 4px 10px; font-size: 13px;">Delete</button>
                                     </form>
                                 </div>

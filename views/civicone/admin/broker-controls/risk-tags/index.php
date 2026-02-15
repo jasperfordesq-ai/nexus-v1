@@ -2,7 +2,7 @@
 /**
  * Risk Tags List - CivicOne Theme (GOV.UK)
  * View and manage risk-tagged listings
- * Path: views/civicone/admin/broker-controls/risk-tags/index.php
+ * Path: views/civicone/admin-legacy/broker-controls/risk-tags/index.php
  */
 
 use Nexus\Core\TenantContext;
@@ -26,7 +26,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
-        <a href="<?= $basePath ?>/admin/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
@@ -34,7 +34,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                 <p class="govuk-body-l">Manage risk assessments for listings.</p>
             </div>
             <div class="govuk-grid-column-one-third" style="text-align: right;">
-                <a href="<?= $basePath ?>/admin/listings" class="govuk-button govuk-button--secondary">
+                <a href="<?= $basePath ?>/admin-legacy/listings" class="govuk-button govuk-button--secondary">
                     Browse listings
                 </a>
             </div>
@@ -122,10 +122,10 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                     <td class="govuk-table__cell"><?= htmlspecialchars($listing['risk_category'] ?? '-') ?></td>
                     <td class="govuk-table__cell"><?= htmlspecialchars($listing['tagged_by_name'] ?? 'Unknown') ?></td>
                     <td class="govuk-table__cell">
-                        <a href="<?= $basePath ?>/admin/broker-controls/risk-tags/<?= $listing['listing_id'] ?>" class="govuk-link">
+                        <a href="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags/<?= $listing['listing_id'] ?>" class="govuk-link">
                             Edit
                         </a>
-                        <form action="<?= $basePath ?>/admin/broker-controls/risk-tags/<?= $listing['listing_id'] ?>/remove" method="POST" style="display:inline;"
+                        <form action="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags/<?= $listing['listing_id'] ?>/remove" method="POST" style="display:inline;"
                               onsubmit="return confirm('Remove this risk tag?');">
                             <?= Csrf::input() ?>
                             <button type="submit" class="govuk-link" style="background: none; border: none; color: #d4351c; cursor: pointer; margin-left: 10px;">

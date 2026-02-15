@@ -24,7 +24,7 @@ class MonitoringController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring
+     * GET /admin-legacy/enterprise/monitoring
      * System monitoring dashboard
      */
     public function dashboard(): void
@@ -38,7 +38,7 @@ class MonitoringController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/requirements
+     * GET /admin-legacy/enterprise/monitoring/requirements
      * Platform requirements checker
      */
     public function requirements(): void
@@ -52,7 +52,7 @@ class MonitoringController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/health
+     * GET /admin-legacy/enterprise/monitoring/health
      * Health check endpoint
      */
     public function healthCheck(): void
@@ -133,7 +133,7 @@ class MonitoringController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/logs
+     * GET /admin-legacy/enterprise/monitoring/logs
      * View application logs
      */
     public function logs(): void
@@ -165,7 +165,7 @@ class MonitoringController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/logs/{filename}
+     * GET /admin-legacy/enterprise/monitoring/logs/{filename}
      * View specific log file
      */
     public function logView(string $filename): void
@@ -197,7 +197,7 @@ class MonitoringController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/logs/download
+     * GET /admin-legacy/enterprise/monitoring/logs/download
      * Download log file(s)
      */
     public function logsDownload(): void
@@ -244,7 +244,7 @@ class MonitoringController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/monitoring/logs/clear
+     * POST /admin-legacy/enterprise/monitoring/logs/clear
      * Clear a log file
      */
     public function logsClear(): void
@@ -435,7 +435,7 @@ class MonitoringController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/api/realtime
+     * GET /admin-legacy/api/realtime
      * Server-Sent Events endpoint (disabled - use polling instead)
      */
     public function realtimeStream(): void
@@ -444,14 +444,14 @@ class MonitoringController extends BaseEnterpriseController
         http_response_code(503);
         echo json_encode([
             'error' => 'Real-time streaming disabled',
-            'message' => 'SSE endpoint is disabled. Using polling endpoint at /admin/api/realtime/poll',
+            'message' => 'SSE endpoint is disabled. Using polling endpoint at /admin-legacy/api/realtime/poll',
             'use_polling' => true,
-            'polling_endpoint' => '/admin/api/realtime/poll'
+            'polling_endpoint' => '/admin-legacy/api/realtime/poll'
         ]);
     }
 
     /**
-     * GET /admin/api/realtime/poll
+     * GET /admin-legacy/api/realtime/poll
      * Polling endpoint for real-time dashboard updates
      */
     public function realtimePoll(): void

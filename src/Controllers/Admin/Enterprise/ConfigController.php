@@ -24,7 +24,7 @@ class ConfigController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/config
+     * GET /admin-legacy/enterprise/config
      * System configuration dashboard
      */
     public function dashboard(): void
@@ -43,7 +43,7 @@ class ConfigController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/settings/{group}/{key}
+     * POST /admin-legacy/enterprise/config/settings/{group}/{key}
      * Update a configuration setting
      */
     public function updateSetting(string $group, string $key): void
@@ -79,7 +79,7 @@ class ConfigController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/config/export
+     * GET /admin-legacy/enterprise/config/export
      * Export current configuration
      */
     public function export(): void
@@ -97,7 +97,7 @@ class ConfigController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/cache/clear
+     * POST /admin-legacy/enterprise/config/cache/clear
      * Clear configuration cache
      */
     public function clearCache(): void
@@ -116,7 +116,7 @@ class ConfigController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/config/validate
+     * GET /admin-legacy/enterprise/config/validate
      * Validate current configuration
      */
     public function validate(): void
@@ -163,7 +163,7 @@ class ConfigController extends BaseEnterpriseController
     }
 
     /**
-     * PATCH /admin/enterprise/config/features/{key}
+     * PATCH /admin-legacy/enterprise/config/features/{key}
      * Toggle a feature flag
      */
     public function toggleFeature(string $key): void
@@ -191,7 +191,7 @@ class ConfigController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/features/reset
+     * POST /admin-legacy/enterprise/config/features/reset
      * Reset all feature flags to defaults
      */
     public function resetFeatures(): void

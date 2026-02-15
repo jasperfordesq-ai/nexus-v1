@@ -36,7 +36,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         <p class="admin-page-subtitle">Configure notifications & monitoring</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/cron-jobs" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Jobs
         </a>
@@ -58,7 +58,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 </div>
 <?php endif; ?>
 
-<form action="<?= $basePath ?>/admin/cron-jobs/settings" method="POST">
+<form action="<?= $basePath ?>/admin-legacy/cron-jobs/settings" method="POST">
     <?= Csrf::input() ?>
 
     <!-- Global Notification Settings -->
@@ -205,7 +205,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
             <?php endif; ?>
         </div>
         <div class="admin-card-footer">
-            <a href="<?= $basePath ?>/admin/cron-jobs" class="admin-btn admin-btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="admin-btn admin-btn-secondary">
                 Cancel
             </a>
             <button type="submit" class="admin-btn admin-btn-primary">

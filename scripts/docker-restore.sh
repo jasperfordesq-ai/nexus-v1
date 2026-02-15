@@ -9,7 +9,7 @@
 set -e
 
 # Configuration
-CONTAINER="nexus-mysql-db"
+CONTAINER="nexus-php-db"
 DB_NAME="nexus"
 DB_USER="root"
 DB_PASS="nexus_root_secret"

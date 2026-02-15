@@ -18,9 +18,9 @@ require dirname(__DIR__, 2) . '/partials/admin-header.php';
 
 <!-- Breadcrumb -->
 <nav class="admin-breadcrumb">
-    <a href="<?= $basePath ?>/admin/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
     <span>/</span>
-    <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
     <span>/</span>
     <span>Compare Versions</span>
 </nav>
@@ -57,12 +57,12 @@ require dirname(__DIR__, 2) . '/partials/admin-header.php';
             </div>
             <h3 class="admin-empty-title">Not Enough Versions</h3>
             <p class="admin-empty-text">You need at least two published versions to compare. Currently there are <?= count($versions) ?> version(s).</p>
-            <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-plus"></i> Create New Version
             </a>
         </div>
         <?php else: ?>
-        <form action="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/compare" method="GET" class="compare-form">
+        <form action="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/compare" method="GET" class="compare-form">
             <div class="compare-selectors">
                 <div class="compare-selector">
                     <label>Version A (Older)</label>
@@ -117,7 +117,7 @@ require dirname(__DIR__, 2) . '/partials/admin-header.php';
                     $sortedVersions = array_values($publishedVersions);
                     usort($sortedVersions, fn($a, $b) => version_compare($b['version_number'], $a['version_number']));
                 ?>
-                <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/compare?a=<?= $sortedVersions[1]['id'] ?>&b=<?= $sortedVersions[0]['id'] ?>" class="quick-compare-card">
+                <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/compare?a=<?= $sortedVersions[1]['id'] ?>&b=<?= $sortedVersions[0]['id'] ?>" class="quick-compare-card">
                     <div class="quick-compare-icon">
                         <i class="fa-solid fa-clock-rotate-left"></i>
                     </div>

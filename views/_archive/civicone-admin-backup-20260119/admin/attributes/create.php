@@ -24,7 +24,7 @@ $categories = $categories ?? [];
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/attributes" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/attributes" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Create New Attribute
@@ -45,7 +45,7 @@ $categories = $categories ?? [];
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/attributes/store" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/attributes/store" method="POST">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
 
             <div class="form-group">
@@ -92,7 +92,7 @@ $categories = $categories ?? [];
             </div>
 
             <div class="form-actions">
-                <a href="<?= $basePath ?>/admin/attributes" class="admin-btn admin-btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/attributes" class="admin-btn admin-btn-secondary">
                     <i class="fa-solid fa-times"></i> Cancel
                 </a>
                 <button type="submit" class="admin-btn admin-btn-primary">

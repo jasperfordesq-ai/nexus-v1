@@ -681,7 +681,7 @@ function CommentItem({
                       initial={{ opacity: 0, scale: 0.9, y: -4 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.9, y: -4 }}
-                      className="absolute bottom-full left-0 mb-1 flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-xl px-2 py-1.5 shadow-lg z-20"
+                      className="absolute bottom-full left-0 mb-1 flex gap-1 bg-content1 border border-theme-default rounded-xl px-2 py-1.5 shadow-lg z-20"
                     >
                       {REACTION_EMOJIS.map((r) => {
                         const IconComp = r.icon;

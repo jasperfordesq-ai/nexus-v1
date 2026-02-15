@@ -79,7 +79,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
     </div>
     <div class="page-hero-actions">
-        <a href="<?= $basePath ?>/admin/group-types/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/group-types/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> Create Type
         </a>
     </div>
@@ -155,7 +155,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
             <h3 class="admin-empty-title">No Group Types Yet</h3>
             <p class="admin-empty-text">Create your first group type to start organizing groups into categories.</p>
-            <a href="<?= $basePath ?>/admin/group-types/create" class="admin-btn admin-btn-primary">
+            <a href="<?= $basePath ?>/admin-legacy/group-types/create" class="admin-btn admin-btn-primary">
                 <i class="fa-solid fa-plus"></i> Create First Type
             </a>
         </div>
@@ -197,7 +197,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     </form>
                 </div>
                 <div class="type-actions">
-                    <a href="<?= $basePath ?>/admin/group-types/edit/<?= $type['id'] ?>" class="action-btn" title="Edit">
+                    <a href="<?= $basePath ?>/admin-legacy/group-types/edit/<?= $type['id'] ?>" class="action-btn" title="Edit">
                         <i class="fa-solid fa-pen"></i>
                     </a>
                     <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this type? Groups will not be deleted, only uncategorized.');">

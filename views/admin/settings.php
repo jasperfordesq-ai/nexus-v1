@@ -44,7 +44,7 @@ if (!isset($notifications)) {
                     </div>
                 <?php endif; ?>
 
-                <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/settings/save-tenant" method="POST">
+                <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/settings/save-tenant" method="POST">
                     <?= \Nexus\Core\Csrf::input() ?>
 
                     <h3 style="font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Theme & Layout</h3>
@@ -171,7 +171,7 @@ if (!isset($notifications)) {
                 <?php if (!empty($isSuper)): ?>
                     <hr style="border: 0; border-top: 1px solid #eee; margin: 40px 0;">
 
-                    <form action="/admin/settings/update" method="POST">
+                    <form action="/admin-legacy/settings/update" method="POST">
                         <?= \Nexus\Core\Csrf::input() ?>
 
                         <div style="/* Super Admin Section Style */ background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 25px;">
@@ -349,7 +349,7 @@ if (!isset($notifications)) {
         var resultSpan = document.getElementById('gmail_test_result');
         resultSpan.innerHTML = '<span style="color: #6b7280;">Testing...</span>';
 
-        fetch('/admin/settings/test-gmail', {
+        fetch('/admin-legacy/settings/test-gmail', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

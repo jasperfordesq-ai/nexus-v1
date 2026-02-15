@@ -456,10 +456,10 @@ $timelineOther = array_map(fn($d) => ($d['profile'] ?? 0) + ($d['listing'] ?? 0)
                 Export
             </button>
             <div class="dropdown-menu" style="position: absolute; right: 0; top: 100%; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; min-width: 160px; z-index: 100;">
-                <a href="<?= $basePath ?>/admin/federation/analytics/export?type=activity&days=<?= $days ?>" class="dropdown-item" style="display: block; padding: 0.5rem 1rem; text-decoration: none; color: inherit;">
+                <a href="<?= $basePath ?>/admin-legacy/federation/analytics/export?type=activity&days=<?= $days ?>" class="dropdown-item" style="display: block; padding: 0.5rem 1rem; text-decoration: none; color: inherit;">
                     <i class="fa-solid fa-calendar"></i> Activity Timeline
                 </a>
-                <a href="<?= $basePath ?>/admin/federation/analytics/export?type=partners&days=<?= $days ?>" class="dropdown-item" style="display: block; padding: 0.5rem 1rem; text-decoration: none; color: inherit;">
+                <a href="<?= $basePath ?>/admin-legacy/federation/analytics/export?type=partners&days=<?= $days ?>" class="dropdown-item" style="display: block; padding: 0.5rem 1rem; text-decoration: none; color: inherit;">
                     <i class="fa-solid fa-users"></i> Partner Activity
                 </a>
             </div>
@@ -704,7 +704,7 @@ $timelineOther = array_map(fn($d) => ($d['profile'] ?? 0) + ($d['listing'] ?? 0)
             </div>
 
             <div style="margin-top: 1.5rem;">
-                <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-primary" style="width: 100%; justify-content: center;">
+                <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-primary" style="width: 100%; justify-content: center;">
                     <i class="fa-solid fa-arrow-right"></i>
                     Manage Partnerships
                 </a>
@@ -719,7 +719,7 @@ $timelineOther = array_map(fn($d) => ($d['profile'] ?? 0) + ($d['listing'] ?? 0)
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 Recent Activity
             </h3>
-            <a href="<?= $basePath ?>/admin/federation/audit" class="admin-btn admin-btn-sm admin-btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/federation/audit" class="admin-btn admin-btn-sm admin-btn-secondary">
                 View All
             </a>
         </div>

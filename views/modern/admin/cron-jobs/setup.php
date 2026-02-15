@@ -26,7 +26,7 @@ $appUrl = $appUrl ?? $basePath;
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/cron-jobs" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Cron Job Setup Guide

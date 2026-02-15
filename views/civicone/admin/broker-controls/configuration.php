@@ -2,7 +2,7 @@
 /**
  * Broker Controls Configuration - CivicOne Theme (GOV.UK)
  * Configure broker control features per tenant
- * Path: views/civicone/admin/broker-controls/configuration.php
+ * Path: views/civicone/admin-legacy/broker-controls/configuration.php
  */
 
 use Nexus\Core\TenantContext;
@@ -26,7 +26,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
-        <a href="<?= $basePath ?>/admin/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
 
         <h1 class="govuk-heading-xl">Broker Controls Configuration</h1>
         <p class="govuk-body-l">Configure broker oversight features for your community.</p>
@@ -51,7 +51,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="<?= $basePath ?>/admin/broker-controls/configuration">
+        <form method="POST" action="<?= $basePath ?>/admin-legacy/broker-controls/configuration">
             <?= Csrf::input() ?>
 
             <!-- Messaging Settings -->
@@ -254,7 +254,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                 <button type="submit" class="govuk-button" data-module="govuk-button">
                     Save configuration
                 </button>
-                <a href="<?= $basePath ?>/admin/broker-controls" class="govuk-link">Cancel</a>
+                <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="govuk-link">Cancel</a>
             </div>
 
         </form>

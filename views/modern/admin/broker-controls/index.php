@@ -41,7 +41,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         <p class="admin-page-subtitle">Manage exchange workflows, risk tagging, and message oversight</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/broker-controls/configuration" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls/configuration" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-sliders"></i> Configuration
         </a>
     </div>
@@ -65,7 +65,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 <!-- Quick Stats -->
 <div class="broker-stats-grid">
     <!-- Pending Exchanges -->
-    <a href="<?= $basePath ?>/admin/broker-controls/exchanges" class="admin-glass-card broker-stat-card">
+    <a href="<?= $basePath ?>/admin-legacy/broker-controls/exchanges" class="admin-glass-card broker-stat-card">
         <div class="broker-stat-icon broker-stat-icon--warning">
             <i class="fa-solid fa-handshake"></i>
         </div>
@@ -79,7 +79,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
     </a>
 
     <!-- Unreviewed Messages -->
-    <a href="<?= $basePath ?>/admin/broker-controls/messages" class="admin-glass-card broker-stat-card">
+    <a href="<?= $basePath ?>/admin-legacy/broker-controls/messages" class="admin-glass-card broker-stat-card">
         <div class="broker-stat-icon broker-stat-icon--info">
             <i class="fa-solid fa-envelope-open-text"></i>
         </div>
@@ -93,7 +93,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
     </a>
 
     <!-- High Risk Listings -->
-    <a href="<?= $basePath ?>/admin/broker-controls/risk-tags?level=high" class="admin-glass-card broker-stat-card">
+    <a href="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags?level=high" class="admin-glass-card broker-stat-card">
         <div class="broker-stat-icon broker-stat-icon--danger">
             <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
@@ -104,7 +104,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
     </a>
 
     <!-- Users Under Monitoring -->
-    <a href="<?= $basePath ?>/admin/broker-controls/monitoring" class="admin-glass-card broker-stat-card">
+    <a href="<?= $basePath ?>/admin-legacy/broker-controls/monitoring" class="admin-glass-card broker-stat-card">
         <div class="broker-stat-icon broker-stat-icon--purple">
             <i class="fa-solid fa-user-shield"></i>
         </div>
@@ -205,7 +205,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                     <?php endif; ?>
                 </div>
             </div>
-            <a href="<?= $basePath ?>/admin/broker-controls/risk-tags" class="admin-btn admin-btn-secondary admin-btn-sm" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags" class="admin-btn admin-btn-secondary admin-btn-sm" style="margin-top: 1rem;">
                 <i class="fa-solid fa-eye"></i> View All Tags
             </a>
         </div>
@@ -233,7 +233,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                     <?php endif; ?>
                 </div>
             </div>
-            <a href="<?= $basePath ?>/admin/broker-controls/messages" class="admin-btn admin-btn-secondary admin-btn-sm" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls/messages" class="admin-btn admin-btn-secondary admin-btn-sm" style="margin-top: 1rem;">
                 <i class="fa-solid fa-inbox"></i> Review Messages
             </a>
         </div>
@@ -287,7 +287,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                         </td>
                         <td><?= date('M j, Y', strtotime($activity['created_at'])) ?></td>
                         <td>
-                            <a href="<?= $basePath ?>/admin/broker-controls/exchanges/<?= $activity['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                            <a href="<?= $basePath ?>/admin-legacy/broker-controls/exchanges/<?= $activity['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
                         </td>

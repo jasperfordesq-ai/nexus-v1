@@ -64,14 +64,14 @@ class BlogController
         // Initialize SEO (empty)
         \Nexus\Models\SeoMetadata::save('post', $id, ['meta_title' => '', 'meta_description' => '', 'noindex' => 0]);
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/news/builder/' . $id);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/news/builder/' . $id);
     }
 
     public function edit($id)
     {
         $this->checkAdmin();
         // Redirect to builder (unified interface)
-        header('Location: ' . TenantContext::getBasePath() . '/admin/news/builder/' . $id);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/news/builder/' . $id);
         exit;
     }
 
@@ -94,7 +94,7 @@ class BlogController
             [$title, $slug, $content, $status, $id, $tenantId]
         );
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/news');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/news');
     }
 
     public function delete($id)
@@ -102,7 +102,7 @@ class BlogController
         $this->checkAdmin();
         $tenantId = TenantContext::getId();
         Database::query("DELETE FROM posts WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-        header('Location: ' . TenantContext::getBasePath() . '/admin/news');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/news');
     }
 
     public function builder($id)
@@ -112,7 +112,7 @@ class BlogController
         $post = Database::query("SELECT * FROM posts WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
 
         if (!$post) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/news');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/news');
             exit;
         }
 

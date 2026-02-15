@@ -10,9 +10,9 @@ $pageTitle = 'GDPR Request #' . $request['id'];
     <div class="page-header mb-4">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-2">
-                <li class="breadcrumb-item"><a href="/admin/enterprise">Enterprise</a></li>
-                <li class="breadcrumb-item"><a href="/admin/enterprise/gdpr">GDPR</a></li>
-                <li class="breadcrumb-item"><a href="/admin/enterprise/gdpr/requests">Requests</a></li>
+                <li class="breadcrumb-item"><a href="/admin-legacy/enterprise">Enterprise</a></li>
+                <li class="breadcrumb-item"><a href="/admin-legacy/enterprise/gdpr">GDPR</a></li>
+                <li class="breadcrumb-item"><a href="/admin-legacy/enterprise/gdpr/requests">Requests</a></li>
                 <li class="breadcrumb-item active">#<?= $request['id'] ?></li>
             </ol>
         </nav>
@@ -88,7 +88,7 @@ $pageTitle = 'GDPR Request #' . $request['id'];
                                 <?php if ($request['user_id']): ?>
                                     <dt>Linked User Account</dt>
                                     <dd>
-                                        <a href="/admin/users/<?= $request['user_id'] ?>">
+                                        <a href="/admin-legacy/users/<?= $request['user_id'] ?>">
                                             User #<?= $request['user_id'] ?>
                                             <?php if (!empty($user)): ?>
                                                 (<?= htmlspecialchars($user['username']) ?>)
@@ -379,7 +379,7 @@ $pageTitle = 'GDPR Request #' . $request['id'];
                     <div class="card-body p-0">
                         <div class="list-group list-group-flush">
                             <?php foreach ($relatedRequests as $related): ?>
-                                <a href="/admin/enterprise/gdpr/requests/<?= $related['id'] ?>" class="list-group-item list-group-item-action">
+                                <a href="/admin-legacy/enterprise/gdpr/requests/<?= $related['id'] ?>" class="list-group-item list-group-item-action">
                                     <div class="d-flex justify-content-between">
                                         <span>#<?= $related['id'] ?> - <?= formatType($related['request_type']) ?></span>
                                         <span class="badge badge-<?= getStatusBadge($related['status']) ?>">
@@ -405,7 +405,7 @@ $pageTitle = 'GDPR Request #' . $request['id'];
                 <h5 class="modal-title">Assign Request</h5>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form action="/admin/enterprise/gdpr/requests/<?= $request['id'] ?>/assign" method="POST">
+            <form action="/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>/assign" method="POST">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Assign To</label>
@@ -436,7 +436,7 @@ $pageTitle = 'GDPR Request #' . $request['id'];
                 <h5 class="modal-title">Add Note</h5>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form action="/admin/enterprise/gdpr/requests/<?= $request['id'] ?>/notes" method="POST">
+            <form action="/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>/notes" method="POST">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Note</label>
@@ -505,7 +505,7 @@ $pageTitle = 'GDPR Request #' . $request['id'];
 <script>
 function processRequest() {
     if (confirm('Start processing this request?')) {
-        fetch('/admin/enterprise/gdpr/requests/<?= $request['id'] ?>/process', {method: 'POST'})
+        fetch('/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>/process', {method: 'POST'})
             .then(r => r.json())
             .then(data => {
                 if (data.success) location.reload();
@@ -516,7 +516,7 @@ function processRequest() {
 
 function completeRequest() {
     if (confirm('Mark this request as completed?')) {
-        fetch('/admin/enterprise/gdpr/requests/<?= $request['id'] ?>/complete', {method: 'POST'})
+        fetch('/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>/complete', {method: 'POST'})
             .then(r => r.json())
             .then(data => {
                 if (data.success) location.reload();
@@ -528,7 +528,7 @@ function completeRequest() {
 function rejectRequest() {
     const reason = prompt('Enter rejection reason:');
     if (reason) {
-        fetch('/admin/enterprise/gdpr/requests/<?= $request['id'] ?>/reject', {
+        fetch('/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>/reject', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({reason: reason})
@@ -541,7 +541,7 @@ function generateExport() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating...';
 
-    fetch('/admin/enterprise/gdpr/requests/<?= $request['id'] ?>/generate-export', {method: 'POST'})
+    fetch('/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>/generate-export', {method: 'POST'})
         .then(r => r.json())
         .then(data => {
             if (data.success) {

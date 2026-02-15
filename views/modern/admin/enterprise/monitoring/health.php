@@ -575,7 +575,7 @@ $currentPage = 'health';
         <p class="health-page-subtitle">Real-time health monitoring and diagnostics</p>
     </div>
     <div class="health-page-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Monitoring
         </a>
         <button onclick="runHealthCheck()" class="admin-btn admin-btn-success" id="runCheckBtn">
@@ -754,7 +754,7 @@ async function runHealthCheck() {
     updateStatusBanner('loading', 'Running Health Check...', 'Please wait while we check all services');
 
     try {
-        const response = await fetch(basePath + '/admin/enterprise/monitoring/health', {
+        const response = await fetch(basePath + '/admin-legacy/enterprise/monitoring/health', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

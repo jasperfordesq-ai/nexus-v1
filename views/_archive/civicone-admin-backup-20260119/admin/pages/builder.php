@@ -464,7 +464,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <div class="mobile-warning-icon">💻</div>
             <h2>Desktop Recommended</h2>
             <p>The visual page builder works best on a desktop or laptop computer.</p>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/pages" class="btn-back">&larr; Back to Pages</a>
+            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages" class="btn-back">&larr; Back to Pages</a>
             <button onclick="document.getElementById('mobile-warning').style.display='none'" class="btn-continue">Continue Anyway</button>
         </div>
     </div>
@@ -481,16 +481,16 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
         <div class="panel__right">
             <div class="panel-top">
-                <a href="<?= $basePath ?>/admin/pages" class="back-link">
+                <a href="<?= $basePath ?>/admin-legacy/pages" class="back-link">
                     <i class="fa-solid fa-arrow-left"></i> Back
                 </a>
                 <div class="unsaved-dot" id="unsaved-dot" title="Unsaved changes"></div>
                 <div class="toolbar-spacer"></div>
-                <a href="<?= $basePath ?>/admin/pages/preview/<?= $page['id'] ?>" target="_blank" class="toolbar-btn" title="Preview">
+                <a href="<?= $basePath ?>/admin-legacy/pages/preview/<?= $page['id'] ?>" target="_blank" class="toolbar-btn" title="Preview">
                     <i class="fa-solid fa-eye"></i>
                 </a>
                 <?php if (($versionCount ?? 0) > 0): ?>
-                <a href="<?= $basePath ?>/admin/pages/versions/<?= $page['id'] ?>" class="toolbar-btn" title="Version History">
+                <a href="<?= $basePath ?>/admin-legacy/pages/versions/<?= $page['id'] ?>" class="toolbar-btn" title="Version History">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span class="version-badge"><?= $versionCount ?></span>
                 </a>
@@ -6737,7 +6737,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
             }
 
-            fetch(basePath + '/admin/pages/save', {
+            fetch(basePath + '/admin-legacy/pages/save', {
                 method: 'POST',
                 credentials: 'include',
                 body: formData

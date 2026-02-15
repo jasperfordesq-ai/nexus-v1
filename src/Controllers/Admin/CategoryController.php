@@ -53,7 +53,7 @@ class CategoryController
         ];
 
         Category::create($data);
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/categories');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/categories');
         exit;
     }
 
@@ -76,7 +76,7 @@ class CategoryController
         ];
 
         Category::update($id, $data);
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/categories');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/categories');
         exit;
     }
 
@@ -84,7 +84,7 @@ class CategoryController
     {
         $this->requireAdmin();
         Category::delete($id);
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/categories');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/categories');
         exit;
     }
 

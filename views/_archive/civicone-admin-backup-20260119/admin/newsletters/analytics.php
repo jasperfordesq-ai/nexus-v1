@@ -33,15 +33,15 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Performance metrics and insights across all campaigns</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/newsletters" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back
         </a>
-        <a href="<?= $basePath ?>/admin/newsletters/send-time" class="admin-btn admin-btn-success">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/send-time" class="admin-btn admin-btn-success">
             <i class="fa-solid fa-clock"></i>
             Send Time Optimization
         </a>
-        <a href="<?= $basePath ?>/admin/newsletters/bounces" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/bounces" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-shield-halved"></i>
             Bounces
         </a>
@@ -214,7 +214,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <?php endif; ?>
                         </td>
                         <td>
-                            <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>" class="newsletter-link">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>" class="newsletter-link">
                                 <?= htmlspecialchars(strlen($newsletter['subject']) > 50 ? substr($newsletter['subject'], 0, 50) . '...' : $newsletter['subject']) ?>
                             </a>
                         </td>
@@ -248,7 +248,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
         <h3 class="admin-empty-title">No analytics data yet</h3>
         <p class="admin-empty-text">Send your first newsletter to start seeing performance metrics.</p>
-        <a href="<?= $basePath ?>/admin/newsletters/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
             <i class="fa-solid fa-plus"></i>
             Create Newsletter
         </a>

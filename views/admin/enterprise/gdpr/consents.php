@@ -11,8 +11,8 @@ $pageTitle = 'Consent Management';
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="/admin/enterprise">Enterprise</a></li>
-                    <li class="breadcrumb-item"><a href="/admin/enterprise/gdpr">GDPR</a></li>
+                    <li class="breadcrumb-item"><a href="/admin-legacy/enterprise">Enterprise</a></li>
+                    <li class="breadcrumb-item"><a href="/admin-legacy/enterprise/gdpr">GDPR</a></li>
                     <li class="breadcrumb-item active">Consents</li>
                 </ol>
             </nav>
@@ -334,7 +334,7 @@ $pageTitle = 'Consent Management';
                 <h5 class="modal-title">Create Consent Type</h5>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form action="/admin/enterprise/gdpr/consents/types" method="POST">
+            <form action="/admin-legacy/enterprise/gdpr/consents/types" method="POST">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
@@ -504,24 +504,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function viewConsentDetail(id) {
     $('#consentDetailModal').modal('show');
-    fetch('/admin/enterprise/gdpr/consents/' + id)
+    fetch('/admin-legacy/enterprise/gdpr/consents/' + id)
         .then(r => r.text())
         .then(html => document.getElementById('consentDetailContent').innerHTML = html);
 }
 
 function editConsentType(id) {
-    window.location.href = '/admin/enterprise/gdpr/consents/types/' + id + '/edit';
+    window.location.href = '/admin-legacy/enterprise/gdpr/consents/types/' + id + '/edit';
 }
 
 function deleteConsentType(id) {
     if (confirm('Delete this consent type? This cannot be undone.')) {
-        fetch('/admin/enterprise/gdpr/consents/types/' + id, {method: 'DELETE'})
+        fetch('/admin-legacy/enterprise/gdpr/consents/types/' + id, {method: 'DELETE'})
             .then(() => location.reload());
     }
 }
 
 function exportConsents() {
-    window.location.href = '/admin/enterprise/gdpr/consents/export?' + new URLSearchParams(window.location.search);
+    window.location.href = '/admin-legacy/enterprise/gdpr/consents/export?' + new URLSearchParams(window.location.search);
 }
 </script>
 

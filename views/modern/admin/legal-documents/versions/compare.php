@@ -41,9 +41,9 @@ $wordDiff = $wordCountB - $wordCountA;
 
 <!-- Breadcrumb -->
 <nav class="admin-breadcrumb">
-    <a href="<?= $basePath ?>/admin/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
     <span>/</span>
-    <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
     <span>/</span>
     <span>Compare v<?= htmlspecialchars($versionA['version_number']) ?> → v<?= htmlspecialchars($versionB['version_number']) ?></span>
 </nav>
@@ -60,7 +60,7 @@ $wordDiff = $wordCountB - $wordCountA;
         </p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/compare" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/compare" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrows-rotate"></i> Compare Different Versions
         </a>
     </div>

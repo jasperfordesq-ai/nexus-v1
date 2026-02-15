@@ -389,7 +389,7 @@ require dirname(__DIR__) . '/partials/nav.php';
 </style>
 
 <div class="report-container">
-    <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches" class="back-link">
+    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches" class="back-link">
         <i class="fa-solid fa-arrow-left"></i>
         Back to Breaches
     </a>
@@ -512,7 +512,7 @@ require dirname(__DIR__) . '/partials/nav.php';
                         <i class="fa-solid fa-shield-exclamation"></i>
                         Submit Breach Report
                     </button>
-                    <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches" class="cyber-btn cyber-btn-outline">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches" class="cyber-btn cyber-btn-outline">
                         Cancel
                     </a>
                 </div>
@@ -540,7 +540,7 @@ function submitBreachReport(e) {
         return;
     }
 
-    fetch('<?= $basePath ?>/admin/enterprise/gdpr/breaches', {
+    fetch('<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -551,7 +551,7 @@ function submitBreachReport(e) {
     .then(result => {
         if (result.success) {
             alert(result.message || 'Breach reported successfully');
-            window.location.href = '<?= $basePath ?>/admin/enterprise/gdpr/breaches';
+            window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches';
         } else {
             alert('Error: ' + (result.error || 'Failed to submit report'));
         }

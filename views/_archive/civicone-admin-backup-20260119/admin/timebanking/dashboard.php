@@ -28,16 +28,16 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Monitor transactions, alerts, and user activity</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/timebanking/alerts" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-bell"></i> Alerts
             <?php if (($alertCounts['new'] ?? 0) > 0): ?>
             <span class="alert-count"><?= $alertCounts['new'] ?></span>
             <?php endif; ?>
         </a>
-        <a href="<?= $basePath ?>/admin/timebanking/org-wallets" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/timebanking/org-wallets" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-building"></i> Org Wallets
         </a>
-        <form action="<?= $basePath ?>/admin/timebanking/run-detection" method="POST" style="display: inline;">
+        <form action="<?= $basePath ?>/admin-legacy/timebanking/run-detection" method="POST" style="display: inline;">
             <?= Csrf::input() ?>
             <button type="submit" class="admin-btn admin-btn-primary">
                 <i class="fa-solid fa-radar"></i> Run Detection
@@ -112,7 +112,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     <?php endif; ?>
                 </p>
             </div>
-            <a href="<?= $basePath ?>/admin/timebanking/alerts" class="admin-btn admin-btn-secondary admin-btn-sm">View all</a>
+            <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts" class="admin-btn admin-btn-secondary admin-btn-sm">View all</a>
         </div>
         <div class="admin-card-body" style="padding: 0;">
             <?php if (empty($recentAlerts)): ?>
@@ -126,7 +126,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <?php else: ?>
             <div class="tb-alerts-list">
                 <?php foreach ($recentAlerts as $alert): ?>
-                <a href="<?= $basePath ?>/admin/timebanking/alert/<?= $alert['id'] ?>" class="tb-alert-item">
+                <a href="<?= $basePath ?>/admin-legacy/timebanking/alert/<?= $alert['id'] ?>" class="tb-alert-item">
                     <div class="tb-alert-icon <?= $alert['severity'] ?>">
                         <?php if ($alert['alert_type'] === 'large_transfer'): ?>
                             <i class="fa-solid fa-dollar-sign"></i>
@@ -288,7 +288,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <h3 class="admin-card-title">Organization Wallets Overview</h3>
             <p class="admin-card-subtitle">Aggregate organization balances</p>
         </div>
-        <a href="<?= $basePath ?>/admin/timebanking/org-wallets" class="admin-btn admin-btn-secondary admin-btn-sm">View all</a>
+        <a href="<?= $basePath ?>/admin-legacy/timebanking/org-wallets" class="admin-btn admin-btn-secondary admin-btn-sm">View all</a>
     </div>
     <div class="admin-card-body">
         <div class="tb-org-stats">
@@ -307,7 +307,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
         <?php if (($pendingRequests ?? 0) > 0): ?>
         <div style="text-align: center; margin-top: 1rem;">
-            <a href="<?= $basePath ?>/admin/timebanking/org-wallets" class="admin-btn admin-btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/timebanking/org-wallets" class="admin-btn admin-btn-secondary">
                 <i class="fa-solid fa-clock"></i> <?= $pendingRequests ?> Pending Transfer Requests
             </a>
         </div>

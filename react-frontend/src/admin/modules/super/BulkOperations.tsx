@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Card, CardBody, CardHeader, Button, Select, SelectItem, Switch, Divider, Chip, Checkbox,
 } from '@heroui/react';
 import { Users, Building2, ArrowRight } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminTenant, SuperAdminUser, BulkOperationResult } from '../../api/types';
@@ -12,6 +13,7 @@ import type { SuperAdminTenant, SuperAdminUser, BulkOperationResult } from '../.
 export function BulkOperations() {
   usePageTitle('Super Admin - Bulk Operations');
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   const [tenants, setTenants] = useState<SuperAdminTenant[]>([]);
   const [users, setUsers] = useState<SuperAdminUser[]>([]);
@@ -105,13 +107,24 @@ export function BulkOperations() {
 
   return (
     <div>
+      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <span>/</span>
+        <span className="text-foreground">Bulk Operations</span>
+      </nav>
       <PageHeader title="Bulk Operations" description="Move users and update tenants in bulk" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bulk Move Users */}
         <Card>
-          <CardHeader className="flex gap-2 items-center">
-            <Users size={20} /> <h3 className="text-lg font-semibold">Bulk Move Users</h3>
+          <CardHeader className="flex flex-col items-start gap-1">
+            <div className="flex gap-2 items-center">
+              <Users size={20} /> <h3 className="text-lg font-semibold">Bulk Move Users</h3>
+            </div>
+            <p className="text-xs text-default-400">
+              Select users from one tenant and move them to another.{' '}
+              <Link to={tenantPath('/admin/super/users')} className="text-primary hover:underline">Manage individual users</Link>
+            </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
             <Select label="Source Tenant" selectedKeys={sourceTenant ? [sourceTenant] : []}
@@ -157,8 +170,14 @@ export function BulkOperations() {
 
         {/* Bulk Update Tenants */}
         <Card>
-          <CardHeader className="flex gap-2 items-center">
-            <Building2 size={20} /> <h3 className="text-lg font-semibold">Bulk Update Tenants</h3>
+          <CardHeader className="flex flex-col items-start gap-1">
+            <div className="flex gap-2 items-center">
+              <Building2 size={20} /> <h3 className="text-lg font-semibold">Bulk Update Tenants</h3>
+            </div>
+            <p className="text-xs text-default-400">
+              Activate, deactivate, or toggle hub status for multiple tenants at once.{' '}
+              <Link to={tenantPath('/admin/super/tenants')} className="text-primary hover:underline">Manage individual tenants</Link>
+            </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
             <div className="max-h-48 overflow-y-auto border rounded-lg p-2">

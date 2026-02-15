@@ -19,9 +19,9 @@ require dirname(__DIR__, 2) . '/partials/admin-header.php';
 
 <!-- Breadcrumb -->
 <nav class="admin-breadcrumb">
-    <a href="<?= $basePath ?>/admin/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
     <span>/</span>
-    <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
     <span>/</span>
     <span>Version <?= htmlspecialchars($version['version_number']) ?></span>
 </nav>
@@ -47,21 +47,21 @@ require dirname(__DIR__, 2) . '/partials/admin-header.php';
     </div>
     <div class="admin-page-header-actions">
         <?php if ($version['is_draft']): ?>
-        <form action="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/publish" method="POST" style="display: inline;">
+        <form action="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/publish" method="POST" style="display: inline;">
             <?= Csrf::input() ?>
             <button type="submit" class="admin-btn admin-btn-success" onclick="return confirm('Publish this version? It will become the current active version.')">
                 <i class="fa-solid fa-rocket"></i> Publish
             </button>
         </form>
-        <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/edit" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/edit" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-pen"></i> Edit
         </a>
         <?php else: ?>
-        <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/acceptances" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/acceptances" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-user-check"></i> View Acceptances (<?= number_format($acceptanceCount) ?>)
         </a>
         <?php if ($version['is_current']): ?>
-        <form action="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/notify" method="POST" style="display: inline;">
+        <form action="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/notify" method="POST" style="display: inline;">
             <?= Csrf::input() ?>
             <button type="submit" class="admin-btn admin-btn-warning" onclick="return confirm('Send email notifications to all users who haven\\'t accepted this version yet?')">
                 <i class="fa-solid fa-envelope"></i> Notify Users

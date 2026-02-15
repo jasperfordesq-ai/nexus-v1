@@ -225,7 +225,7 @@ class AdminController
             [$firstName, $lastName, $email, $role, $status, $location, $phone, $id]
         );
 
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/users');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/users');
     }
 
     public function deleteUser()
@@ -247,7 +247,7 @@ class AdminController
         }
 
         Database::query("DELETE FROM users WHERE id = ?", [$id]);
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/users');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/users');
     }
 
     // -----------------------
@@ -301,7 +301,7 @@ class AdminController
             }
         }
 
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy');
     }
 
     public function deleteListing()
@@ -317,7 +317,7 @@ class AdminController
             Database::query("DELETE FROM listings WHERE id = ?", [$id]);
         }
 
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy');
     }
 
     public function settings()
@@ -420,7 +420,7 @@ class AdminController
         }
 
         file_put_contents($envPath, $envContent);
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/settings?saved=true');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/settings?saved=true');
     }
 
     public function saveTenantSettings()
@@ -504,7 +504,7 @@ class AdminController
         );
 
         // Force refresh context if needed, but page reload will handle it
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/settings?saved_tenant=true');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/settings?saved_tenant=true');
     }
 
     public function activityLogs()
@@ -704,13 +704,13 @@ class AdminController
         if ($allPassed) {
             echo "<p><span class='pass'>✓✓✓ ALL TESTS PASSED ✓✓✓</span></p>";
             echo "<p>The smart match system should work. Try accessing:</p>";
-            echo "<p><a href='/admin/smart-match-users?action=match_batch&offset=0' style='color:#60a5fa;'>/admin/smart-match-users?action=match_batch&offset=0</a></p>";
+            echo "<p><a href='/admin-legacy/smart-match-users?action=match_batch&offset=0' style='color:#60a5fa;'>/admin-legacy/smart-match-users?action=match_batch&offset=0</a></p>";
         } else {
             echo "<p><span class='fail'>✗ SOME TESTS FAILED</span></p>";
             echo "<p>Fix the failed tests above before running smart matching.</p>";
         }
 
-        echo "<p><a href='/admin/smart-match-users' style='color:#60a5fa;'>← Back to Smart Match Users</a></p>";
+        echo "<p><a href='/admin-legacy/smart-match-users' style='color:#60a5fa;'>← Back to Smart Match Users</a></p>";
         echo "</body></html>";
         exit;
     }
@@ -1319,7 +1319,7 @@ class AdminController
             \Nexus\Services\FeedRankingService::clearCache();
         }
 
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/feed-algorithm?saved=true');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/feed-algorithm?saved=true');
     }
 
     /**
@@ -1441,7 +1441,7 @@ class AdminController
                 break;
 
             default:
-                header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/algorithm-settings?error=invalid_type');
+                header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/algorithm-settings?error=invalid_type');
                 return;
         }
 
@@ -1461,7 +1461,7 @@ class AdminController
             \Nexus\Services\RankingService::clearAllCaches();
         }
 
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/algorithm-settings?saved=' . $algorithmType);
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/algorithm-settings?saved=' . $algorithmType);
     }
 
     /**
@@ -1504,9 +1504,9 @@ class AdminController
                     'title' => $name . $status,
                     'subtitle' => $user['email'],
                     'icon' => 'fa-user',
-                    'url' => $basePath . '/admin/users/edit/' . $user['id'],
+                    'url' => $basePath . '/admin-legacy/users/edit/' . $user['id'],
                     'actions' => [
-                        ['label' => 'Edit', 'url' => $basePath . '/admin/users/edit/' . $user['id'], 'icon' => 'fa-pen'],
+                        ['label' => 'Edit', 'url' => $basePath . '/admin-legacy/users/edit/' . $user['id'], 'icon' => 'fa-pen'],
                         ['label' => 'View Profile', 'url' => $basePath . '/member/' . $user['id'], 'icon' => 'fa-eye'],
                     ]
                 ];
@@ -1535,9 +1535,9 @@ class AdminController
                     'title' => $listing['title'] . $statusBadge,
                     'subtitle' => 'by ' . $author . ' • ' . ucfirst($listing['type'] ?? 'offer'),
                     'icon' => 'fa-rectangle-list',
-                    'url' => $basePath . '/admin/listings/edit/' . $listing['id'],
+                    'url' => $basePath . '/admin-legacy/listings/edit/' . $listing['id'],
                     'actions' => [
-                        ['label' => 'Edit', 'url' => $basePath . '/admin/listings/edit/' . $listing['id'], 'icon' => 'fa-pen'],
+                        ['label' => 'Edit', 'url' => $basePath . '/admin-legacy/listings/edit/' . $listing['id'], 'icon' => 'fa-pen'],
                         ['label' => 'View', 'url' => $basePath . '/listing/' . $listing['id'], 'icon' => 'fa-eye'],
                     ]
                 ];
@@ -1565,9 +1565,9 @@ class AdminController
                     'title' => $post['title'],
                     'subtitle' => 'Blog Post',
                     'icon' => 'fa-blog',
-                    'url' => $basePath . '/admin/blog/edit/' . $post['id'],
+                    'url' => $basePath . '/admin-legacy/blog/edit/' . $post['id'],
                     'actions' => [
-                        ['label' => 'Edit', 'url' => $basePath . '/admin/blog/edit/' . $post['id'], 'icon' => 'fa-pen'],
+                        ['label' => 'Edit', 'url' => $basePath . '/admin-legacy/blog/edit/' . $post['id'], 'icon' => 'fa-pen'],
                     ]
                 ];
             }
@@ -1719,7 +1719,7 @@ class AdminController
 
     /**
      * Cron endpoint for automated updates
-     * Call this daily: /admin/cron/update-featured-groups?key=YOUR_SECRET_KEY
+     * Call this daily: /admin-legacy/cron/update-featured-groups?key=YOUR_SECRET_KEY
      */
     public function cronUpdateFeaturedGroups()
     {
@@ -1900,10 +1900,10 @@ class AdminController
 
         if ($deliverable) {
             $_SESSION['flash_success'] = 'Deliverable created successfully!';
-            header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/deliverability/view/' . $deliverable['id']);
+            header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability/view/' . $deliverable['id']);
         } else {
             $_SESSION['flash_error'] = 'Failed to create deliverable.';
-            header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/deliverability/create');
+            header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability/create');
         }
         exit;
     }
@@ -1918,7 +1918,7 @@ class AdminController
 
         $deliverable = \Nexus\Models\Deliverable::findById($id);
         if (!$deliverable) {
-            header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/deliverability');
+            header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability');
             exit;
         }
 
@@ -1951,7 +1951,7 @@ class AdminController
 
         $deliverable = \Nexus\Models\Deliverable::findById($id);
         if (!$deliverable) {
-            header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/deliverability');
+            header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability');
             exit;
         }
 
@@ -2009,7 +2009,7 @@ class AdminController
             $_SESSION['flash_error'] = 'Failed to update deliverable.';
         }
 
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/deliverability/view/' . $id);
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability/view/' . $id);
         exit;
     }
 
@@ -2030,7 +2030,7 @@ class AdminController
             $_SESSION['flash_error'] = 'Failed to delete deliverable.';
         }
 
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/deliverability');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability');
         exit;
     }
 
@@ -2155,7 +2155,7 @@ class AdminController
     public function webpConverter()
     {
         $this->checkAdmin();
-        require __DIR__ . '/../../views/admin/webp-converter.php';
+        require __DIR__ . '/../../views/admin-legacy/webp-converter.php';
     }
 
     /**
@@ -2280,7 +2280,7 @@ class AdminController
     public function imageSettings()
     {
         $this->checkAdmin();
-        require __DIR__ . '/../../views/admin/image-settings.php';
+        require __DIR__ . '/../../views/admin-legacy/image-settings.php';
     }
 
     /**
@@ -2316,6 +2316,6 @@ class AdminController
             [json_encode($configArr), $tenantId]
         );
 
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/image-settings?saved=true');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/image-settings?saved=true');
     }
 }

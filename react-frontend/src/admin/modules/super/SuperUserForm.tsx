@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
   Card, CardBody, Button, Input, Select, SelectItem, Switch, Divider,
 } from '@heroui/react';
@@ -70,7 +70,12 @@ export function SuperUserForm() {
     }
     if (res?.success) {
       toast.success(isEditing ? 'User updated' : 'User created');
-      navigate(tenantPath('/admin/super/users'));
+      if (isEditing) {
+        navigate(tenantPath(`/admin/super/users/${id}`));
+      } else {
+        const newId = (res as { data?: { id?: number } }).data?.id;
+        navigate(tenantPath(newId ? `/admin/super/users/${newId}` : '/admin/super/users'));
+      }
     } else {
       toast.error(res?.error || 'Failed to save user');
     }
@@ -83,12 +88,19 @@ export function SuperUserForm() {
 
   return (
     <div>
+      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <span>/</span>
+        <Link to={tenantPath('/admin/super/users')} className="hover:text-primary">Users</Link>
+        <span>/</span>
+        <span className="text-foreground">{isEditing ? 'Edit' : 'Create'}</span>
+      </nav>
       <PageHeader
         title={isEditing ? 'Edit User' : 'Create User'}
         description={isEditing ? 'Edit user details across tenants' : 'Create a new user in any tenant'}
         actions={
           <Button variant="light" startContent={<ArrowLeft size={16} />}
-            onPress={() => navigate(tenantPath('/admin/super/users'))}>
+            onPress={() => navigate(tenantPath(isEditing ? `/admin/super/users/${id}` : '/admin/super/users'))}>
             Back
           </Button>
         }

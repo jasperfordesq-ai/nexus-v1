@@ -26,11 +26,11 @@ require __DIR__ . '/../partials/admin-header.php';
         <p class="admin-page-subtitle">Connect with other timebanks to expand your community</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/federation/directory" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-compass"></i>
             Find Partners
         </a>
-        <a href="<?= $basePath ?>/admin/federation" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-sliders"></i>
             Settings
         </a>
@@ -521,7 +521,7 @@ document.getElementById('requestPartnershipForm')?.addEventListener('submit', fu
         return;
     }
 
-    fetch(basePath + '/admin/federation/request-partnership', {
+    fetch(basePath + '/admin-legacy/federation/request-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -547,7 +547,7 @@ document.getElementById('requestPartnershipForm')?.addEventListener('submit', fu
 function approvePartnership(id) {
     if (!confirm('Approve this partnership request?')) return;
 
-    fetch(basePath + '/admin/federation/approve-partnership', {
+    fetch(basePath + '/admin-legacy/federation/approve-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -568,7 +568,7 @@ function approvePartnership(id) {
 function rejectPartnership(id) {
     const reason = prompt('Reason for rejection (optional):');
 
-    fetch(basePath + '/admin/federation/reject-partnership', {
+    fetch(basePath + '/admin-legacy/federation/reject-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -592,7 +592,7 @@ function terminatePartnership(id) {
 
     if (!confirm('Are you sure you want to end this partnership?')) return;
 
-    fetch(basePath + '/admin/federation/terminate-partnership', {
+    fetch(basePath + '/admin-legacy/federation/terminate-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -659,7 +659,7 @@ function savePermissions() {
         permissions[input.dataset.permission] = input.checked;
     });
 
-    fetch(basePath + '/admin/federation/update-partnership-permissions', {
+    fetch(basePath + '/admin-legacy/federation/update-partnership-permissions', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -695,7 +695,7 @@ function submitCounterProposal() {
     const level = document.getElementById('counterProposalLevel').value;
     const message = document.getElementById('counterProposalMessage').value;
 
-    fetch(basePath + '/admin/federation/counter-propose', {
+    fetch(basePath + '/admin-legacy/federation/counter-propose', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -722,7 +722,7 @@ function submitCounterProposal() {
 function acceptCounterProposal(id) {
     if (!confirm('Accept this counter-proposal and activate the partnership?')) return;
 
-    fetch(basePath + '/admin/federation/accept-counter-proposal', {
+    fetch(basePath + '/admin-legacy/federation/accept-counter-proposal', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -744,7 +744,7 @@ function acceptCounterProposal(id) {
 function withdrawRequest(id) {
     if (!confirm('Withdraw this partnership request?')) return;
 
-    fetch(basePath + '/admin/federation/withdraw-request', {
+    fetch(basePath + '/admin-legacy/federation/withdraw-request', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

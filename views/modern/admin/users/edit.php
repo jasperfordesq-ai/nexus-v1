@@ -35,7 +35,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     </div>
     <div class="admin-page-header-actions">
         <?php if ($user['id'] !== $_SESSION['user_id']): ?>
-        <form action="<?= $basePath ?>/admin/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" style="display:inline;">
+        <form action="<?= $basePath ?>/admin-legacy/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" style="display:inline;">
             <?= Csrf::input() ?>
             <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
             <button type="submit" class="admin-btn admin-btn-warning">
@@ -43,10 +43,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </button>
         </form>
         <?php endif; ?>
-        <a href="<?= $basePath ?>/admin/users/<?= $user['id'] ?>/permissions" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/users/<?= $user['id'] ?>/permissions" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-key"></i> Permissions
         </a>
-        <a href="<?= $basePath ?>/admin/users" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/users" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to Users
         </a>
     </div>
@@ -138,7 +138,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
         </div>
 
-        <form action="<?= $basePath ?>/admin/users/update" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/users/update" method="POST">
             <?= Csrf::input() ?>
             <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
 
@@ -238,7 +238,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
             <!-- Form Actions -->
             <div class="admin-form-actions">
-                <a href="<?= $basePath ?>/admin/users" class="admin-btn admin-btn-secondary">Cancel</a>
+                <a href="<?= $basePath ?>/admin-legacy/users" class="admin-btn admin-btn-secondary">Cancel</a>
                 <button type="submit" class="admin-btn admin-btn-primary">
                     <i class="fa-solid fa-save"></i> Save Changes
                 </button>
@@ -268,7 +268,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         <div class="badge-item">
                             <span class="badge-icon"><?= $badge['icon'] ?></span>
                             <span class="badge-name"><?= htmlspecialchars($badge['name']) ?></span>
-                            <form action="<?= $basePath ?>/admin/users/badges/remove" method="POST" style="margin: 0;">
+                            <form action="<?= $basePath ?>/admin-legacy/users/badges/remove" method="POST" style="margin: 0;">
                                 <?= Csrf::input() ?>
                                 <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                                 <input type="hidden" name="badge_key" value="<?= $badge['badge_key'] ?>">
@@ -298,7 +298,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         }
                     }
                     ?>
-                    <form action="<?= $basePath ?>/admin/users/badges/add" method="POST">
+                    <form action="<?= $basePath ?>/admin-legacy/users/badges/add" method="POST">
                         <?= Csrf::input() ?>
                         <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                         <input type="hidden" name="badge_name" value="<?= $def['name'] ?>">
@@ -320,7 +320,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <!-- Manual Badge Award -->
         <div class="badges-section">
             <h4 class="badges-section-title">Award Manual Badge</h4>
-            <form action="<?= $basePath ?>/admin/users/badges/add" method="POST" class="manual-badge-form">
+            <form action="<?= $basePath ?>/admin-legacy/users/badges/add" method="POST" class="manual-badge-form">
                 <?= Csrf::input() ?>
                 <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                 <div class="manual-badge-inputs">
@@ -337,7 +337,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <div class="badges-section">
             <h4 class="badges-section-title">Auto-Award Badges</h4>
             <p class="badges-section-desc">Scan this user's activity and automatically award any badges they qualify for but haven't received yet.</p>
-            <form action="<?= $basePath ?>/admin/users/badges/recheck" method="POST">
+            <form action="<?= $basePath ?>/admin-legacy/users/badges/recheck" method="POST">
                 <?= Csrf::input() ?>
                 <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                 <button type="submit" class="admin-btn admin-btn-cyan">

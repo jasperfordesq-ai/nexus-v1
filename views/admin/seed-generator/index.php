@@ -332,7 +332,7 @@
 </head>
 <body>
 
-<?php require __DIR__ . '/../../modern/admin/partials/admin-header.php'; ?>
+<?php require __DIR__ . '/../../modern/admin-legacy/partials/admin-header.php'; ?>
 
 <div class="seed-generator-container">
 
@@ -412,7 +412,7 @@
             Run comprehensive verification checks to prove the generator can see your entire database
             and contains ZERO dangerous operations (no DELETE, UPDATE, or DROP queries).
         </p>
-        <a href="/admin/seed-generator/verification"
+        <a href="/admin-legacy/seed-generator/verification"
            style="display: inline-block; background: white; color: #059669; padding: 16px 32px; border-radius: 8px;
                   font-weight: 700; font-size: 16px; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                   transition: transform 0.2s;"
@@ -459,15 +459,15 @@
                 </ul>
 
                 <div class="btn-group">
-                    <a href="/admin/seed-generator/download?type=production&format=sql" class="btn btn-primary">
+                    <a href="/admin-legacy/seed-generator/download?type=production&format=sql" class="btn btn-primary">
                         <span>📄</span>
                         Download SQL
                     </a>
-                    <a href="/admin/seed-generator/download?type=production&format=php" class="btn btn-secondary">
+                    <a href="/admin-legacy/seed-generator/download?type=production&format=php" class="btn btn-secondary">
                         <span>🐘</span>
                         Download PHP
                     </a>
-                    <a href="/admin/seed-generator/preview?type=production" class="btn btn-secondary" target="_blank">
+                    <a href="/admin-legacy/seed-generator/preview?type=production" class="btn btn-secondary" target="_blank">
                         <span>👁️</span>
                         Preview
                     </a>
@@ -491,15 +491,15 @@
                 </ul>
 
                 <div class="btn-group">
-                    <a href="/admin/seed-generator/download?type=demo&format=sql" class="btn btn-primary">
+                    <a href="/admin-legacy/seed-generator/download?type=demo&format=sql" class="btn btn-primary">
                         <span>📄</span>
                         Download SQL
                     </a>
-                    <a href="/admin/seed-generator/download?type=demo&format=php" class="btn btn-secondary">
+                    <a href="/admin-legacy/seed-generator/download?type=demo&format=php" class="btn btn-secondary">
                         <span>🐘</span>
                         Download PHP
                     </a>
-                    <a href="/admin/seed-generator/preview?type=demo" class="btn btn-secondary" target="_blank">
+                    <a href="/admin-legacy/seed-generator/preview?type=demo" class="btn btn-secondary" target="_blank">
                         <span>👁️</span>
                         Preview
                     </a>

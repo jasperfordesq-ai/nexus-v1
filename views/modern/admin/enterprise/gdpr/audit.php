@@ -65,10 +65,10 @@ function formatAction($action) {
 
 function getEntityLink($basePath, $type, $id) {
     $links = [
-        'user' => '/admin/users/',
-        'request' => '/admin/enterprise/gdpr/requests/',
-        'consent' => '/admin/enterprise/gdpr/consents/',
-        'breach' => '/admin/enterprise/gdpr/breaches/',
+        'user' => '/admin-legacy/users/',
+        'request' => '/admin-legacy/enterprise/gdpr/requests/',
+        'consent' => '/admin-legacy/enterprise/gdpr/consents/',
+        'breach' => '/admin-legacy/enterprise/gdpr/breaches/',
     ];
     return $basePath . ($links[$type] ?? '#') . $id;
 }
@@ -540,7 +540,7 @@ function getEntityLink($basePath, $type, $id) {
         <p class="admin-page-subtitle">Complete compliance activity trail</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> GDPR
         </a>
         <button type="button" class="admin-btn admin-btn-primary" onclick="exportAuditLog()">
@@ -623,7 +623,7 @@ function getEntityLink($basePath, $type, $id) {
                 <button type="submit" class="cyber-btn cyber-btn-primary cyber-btn-sm">
                     <i class="fa-solid fa-search"></i> Filter
                 </button>
-                <a href="<?= $basePath ?>/admin/enterprise/gdpr/audit" class="cyber-btn cyber-btn-outline cyber-btn-sm">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/audit" class="cyber-btn cyber-btn-outline cyber-btn-sm">
                     <i class="fa-solid fa-times"></i>
                 </a>
             </div>
@@ -704,7 +704,7 @@ function getEntityLink($basePath, $type, $id) {
                                 </td>
                                 <td>
                                     <?php if ($log['user_id']): ?>
-                                        <a href="<?= $basePath ?>/admin/users/<?= $log['user_id'] ?>" style="color: var(--audit-primary); text-decoration: none;">
+                                        <a href="<?= $basePath ?>/admin-legacy/users/<?= $log['user_id'] ?>" style="color: var(--audit-primary); text-decoration: none;">
                                             <?= htmlspecialchars($log['user_email'] ?? 'User #' . $log['user_id']) ?>
                                         </a>
                                     <?php else: ?>
@@ -798,7 +798,7 @@ function getEntityLink($basePath, $type, $id) {
 function exportAuditLog() {
     const params = new URLSearchParams(window.location.search);
     params.set('export', 'csv');
-    window.location.href = '<?= $basePath ?>/admin/enterprise/gdpr/audit/export?' + params.toString();
+    window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/gdpr/audit/export?' + params.toString();
 }
 
 function showMetadata(metadata) {

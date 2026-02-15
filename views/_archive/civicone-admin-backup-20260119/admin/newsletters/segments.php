@@ -51,11 +51,11 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Create targeted audience groups for your newsletters</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/newsletters" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back
         </a>
-        <a href="<?= $basePath ?>/admin/newsletters/segments/create" class="admin-btn admin-btn-success">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/segments/create" class="admin-btn admin-btn-success">
             <i class="fa-solid fa-plus"></i>
             Create Segment
         </a>
@@ -103,7 +103,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
         <h3 class="admin-empty-title">No Segments Yet</h3>
         <p class="admin-empty-text">Create segments to target specific groups of members with your newsletters based on location, groups, activity, and more.</p>
-        <a href="<?= $basePath ?>/admin/newsletters/segments/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/segments/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
             <i class="fa-solid fa-plus"></i>
             Create Your First Segment
         </a>
@@ -197,10 +197,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         </td>
                         <td style="text-align: right;">
                             <div class="admin-action-buttons">
-                                <a href="<?= $basePath ?>/admin/newsletters/segments/edit/<?= $segment['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                                <a href="<?= $basePath ?>/admin-legacy/newsletters/segments/edit/<?= $segment['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                                     <i class="fa-solid fa-pen"></i> Edit
                                 </a>
-                                <form action="<?= $basePath ?>/admin/newsletters/segments/delete" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Delete this segment?')">
+                                <form action="<?= $basePath ?>/admin-legacy/newsletters/segments/delete" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Delete this segment?')">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="id" value="<?= $segment['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">

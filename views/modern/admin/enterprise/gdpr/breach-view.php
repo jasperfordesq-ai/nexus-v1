@@ -368,7 +368,7 @@ require dirname(__DIR__, 4) . '/layouts/admin-page-header.php';
 <script>
 function escalateBreach(id) {
     if (confirm('Escalate this breach to the incident response team?')) {
-        fetch(`<?= $basePath ?>/admin/enterprise/gdpr/breaches/${id}/escalate`, {
+        fetch(`<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches/${id}/escalate`, {
             method: 'POST'
         })
         .then(r => r.json())

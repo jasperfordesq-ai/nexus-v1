@@ -426,7 +426,7 @@ $recentUsers = $db->query("
         <p class="admin-page-subtitle">Complete activity trail for compliance and security</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/roles" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/roles" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-user-tag"></i> Manage Roles
         </a>
         <button type="button" class="admin-btn admin-btn-primary" onclick="exportAuditLog()">
@@ -539,7 +539,7 @@ $recentUsers = $db->query("
             <button type="submit" class="admin-btn admin-btn-primary">
                 <i class="fas fa-filter"></i> Apply Filters
             </button>
-            <a href="<?= TenantContext::getBasePath() ?>/admin/enterprise/audit/permissions" class="admin-btn admin-btn-secondary">
+            <a href="<?= TenantContext::getBasePath() ?>/admin-legacy/enterprise/audit/permissions" class="admin-btn admin-btn-secondary">
                 <i class="fas fa-times"></i> Clear
             </a>
         </div>
@@ -684,7 +684,7 @@ function exportAuditLog() {
     params.set('export', 'csv');
 
     // TODO: Implement CSV export endpoint
-    alert('CSV export coming soon! This will download audit logs with current filters.\n\nAPI endpoint: GET /admin/api/audit/permissions?' + params.toString());
+    alert('CSV export coming soon! This will download audit logs with current filters.\n\nAPI endpoint: GET /admin-legacy/api/audit/permissions?' + params.toString());
 }
 </script>
 

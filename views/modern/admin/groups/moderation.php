@@ -1,7 +1,7 @@
 <?php
 /**
  * Groups Moderation Dashboard
- * Path: views/modern/admin/groups/moderation.php
+ * Path: views/modern/admin-legacy/groups/moderation.php
  */
 
 use Nexus\Core\TenantContext;
@@ -24,7 +24,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Review and moderate flagged content</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/groups" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/groups" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back
         </a>
     </div>
@@ -81,7 +81,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                                 <p><strong>Details:</strong> <?= htmlspecialchars($flag['description']) ?></p>
                             <?php endif; ?>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/groups/moderate-flag" class="admin-moderation-actions">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/groups/moderate-flag" class="admin-moderation-actions">
                             <?= Csrf::input() ?>
                             <input type="hidden" name="flag_id" value="<?= $flag['id'] ?>">
                             <textarea name="notes" class="admin-form-control admin-form-control-sm" placeholder="Moderation notes..."></textarea>

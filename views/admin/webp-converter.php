@@ -16,7 +16,7 @@ $adminPageSubtitle = 'System';
 $adminPageIcon = 'fa-image';
 
 // Include standalone admin header
-require __DIR__ . '/../modern/admin/partials/admin-header.php';
+require __DIR__ . '/../modern/admin-legacy/partials/admin-header.php';
 
 // Initialize converter
 $converter = new WebPConverter();
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         <p class="admin-page-subtitle">Convert images to WebP format for 25-35% smaller file sizes and faster page loads</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/settings" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/settings" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-gear"></i> Settings
         </a>
     </div>
@@ -337,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </div>
         <div class="admin-card-body">
             <div class="quick-actions-list">
-                <a href="<?= $basePath ?>/admin/image-settings" class="quick-action-item">
+                <a href="<?= $basePath ?>/admin-legacy/image-settings" class="quick-action-item">
                     <div class="quick-action-icon quick-action-settings">
                         <i class="fa-solid fa-gear"></i>
                     </div>
@@ -1608,7 +1608,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         try {
             // Step 1: Get list of pending images
             batchStatusText.textContent = 'Scanning for images...';
-            const pendingResponse = await fetch('<?= $basePath ?>/admin/webp-converter/convert', {
+            const pendingResponse = await fetch('<?= $basePath ?>/admin-legacy/webp-converter/convert', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `csrf_token=${encodeURIComponent(csrfToken)}&action=get_pending`
@@ -1642,7 +1642,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 batchProgressBar.style.width = `${((i + 1) / total) * 100}%`;
 
                 try {
-                    const convertResponse = await fetch('<?= $basePath ?>/admin/webp-converter/convert', {
+                    const convertResponse = await fetch('<?= $basePath ?>/admin-legacy/webp-converter/convert', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: `csrf_token=${encodeURIComponent(csrfToken)}&action=convert_single&image_path=${encodeURIComponent(imagePath)}`
@@ -1714,7 +1714,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         try {
             // Step 1: Get list of oversized images
             resizeStatusText.textContent = 'Scanning for oversized images...';
-            const oversizedResponse = await fetch('<?= $basePath ?>/admin/webp-converter/convert', {
+            const oversizedResponse = await fetch('<?= $basePath ?>/admin-legacy/webp-converter/convert', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `csrf_token=${encodeURIComponent(csrfToken)}&action=get_oversized&max_dimension=1920`
@@ -1748,7 +1748,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 resizeProgressBar.style.width = `${((i + 1) / total) * 100}%`;
 
                 try {
-                    const resizeResponse = await fetch('<?= $basePath ?>/admin/webp-converter/convert', {
+                    const resizeResponse = await fetch('<?= $basePath ?>/admin-legacy/webp-converter/convert', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: `csrf_token=${encodeURIComponent(csrfToken)}&action=resize_single&image_path=${encodeURIComponent(img.path)}&max_dimension=1920`
@@ -1794,4 +1794,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 })();
 </script>
 
-<?php require __DIR__ . '/../modern/admin/partials/admin-footer.php'; ?>
+<?php require __DIR__ . '/../modern/admin-legacy/partials/admin-footer.php'; ?>

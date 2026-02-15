@@ -40,7 +40,7 @@ class RolesController
     }
 
     /**
-     * GET /admin/enterprise/roles
+     * GET /admin-legacy/enterprise/roles
      * Role management dashboard
      */
     public function index(): void
@@ -56,7 +56,7 @@ class RolesController
     }
 
     /**
-     * GET /admin/enterprise/audit/permissions
+     * GET /admin-legacy/enterprise/audit/permissions
      * Permission audit log viewer
      */
     public function auditLog(): void
@@ -72,7 +72,7 @@ class RolesController
     }
 
     /**
-     * GET /admin/enterprise/permissions
+     * GET /admin-legacy/enterprise/permissions
      * Permissions browser
      */
     public function permissions(): void
@@ -87,7 +87,7 @@ class RolesController
     }
 
     /**
-     * GET /admin/enterprise/roles/{id}
+     * GET /admin-legacy/enterprise/roles/{id}
      * View role details
      */
     public function show(int $id): void
@@ -152,7 +152,7 @@ class RolesController
     }
 
     /**
-     * GET /admin/enterprise/roles/create
+     * GET /admin-legacy/enterprise/roles/create
      * Show create role form
      */
     public function create(): void
@@ -167,7 +167,7 @@ class RolesController
     }
 
     /**
-     * POST /admin/enterprise/roles
+     * POST /admin-legacy/enterprise/roles
      * Store new role
      */
     public function store(): void
@@ -225,7 +225,7 @@ class RolesController
     }
 
     /**
-     * GET /admin/enterprise/roles/{id}/edit
+     * GET /admin-legacy/enterprise/roles/{id}/edit
      * Show edit role form
      */
     public function edit(int $id): void
@@ -255,7 +255,7 @@ class RolesController
     }
 
     /**
-     * PATCH /admin/enterprise/roles/{id}
+     * PATCH /admin-legacy/enterprise/roles/{id}
      * Update role
      */
     public function update(int $id): void
@@ -334,7 +334,7 @@ class RolesController
     }
 
     /**
-     * DELETE /admin/enterprise/roles/{id}
+     * DELETE /admin-legacy/enterprise/roles/{id}
      * Delete role
      */
     public function destroy(int $id): void
@@ -377,7 +377,7 @@ class RolesController
     }
 
     /**
-     * POST /admin/enterprise/roles/{id}/users/{userId}
+     * POST /admin-legacy/enterprise/roles/{id}/users/{userId}
      * Assign role to user
      */
     public function assignToUser(int $roleId, int $userId): void
@@ -417,7 +417,7 @@ class RolesController
     }
 
     /**
-     * DELETE /admin/enterprise/roles/{id}/users/{userId}
+     * DELETE /admin-legacy/enterprise/roles/{id}/users/{userId}
      * Revoke role from user
      */
     public function revokeFromUser(int $roleId, int $userId): void

@@ -1,5 +1,5 @@
 <?php
-// views/admin/partials/analytics_chart.php
+// views/admin-legacy/partials/analytics_chart.php
 
 // Data expected: $monthly_stats (array of ['month' => '2023-10', 'volume' => 120])
 $data = $monthly_stats ?? [];

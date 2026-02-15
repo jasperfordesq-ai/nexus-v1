@@ -174,14 +174,14 @@ class MenuController
 
         if (!$validation['allowed']) {
             $_SESSION['error'] = $validation['reason'];
-            header('Location: ' . TenantContext::getBasePath() . '/admin/menus');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/menus');
             exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Csrf::verify()) {
                 $_SESSION['error'] = 'Invalid CSRF token';
-                header('Location: ' . TenantContext::getBasePath() . '/admin/menus');
+                header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/menus');
                 exit;
             }
 
@@ -201,7 +201,7 @@ class MenuController
             MenuManager::clearCache($tenantId);
 
             $_SESSION['success'] = 'Menu created successfully';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/menus/builder/' . $menuId);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/menus/builder/' . $menuId);
             exit;
         }
 

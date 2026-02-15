@@ -29,7 +29,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="page-hero">
     <div class="page-hero-content">
         <h1>
-            <a href="<?= $basePath ?>/admin/plans" class="admin-back-link">
+            <a href="<?= $basePath ?>/admin-legacy/plans" class="admin-back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <?= $pageTitle ?>
@@ -39,7 +39,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 </div>
 
 <div class="admin-glass-card" style="max-width: 900px;">
-    <form method="POST" action="<?= $basePath ?>/admin/plans/<?= $isEdit ? 'edit/' . $plan['id'] : 'create' ?>">
+    <form method="POST" action="<?= $basePath ?>/admin-legacy/plans/<?= $isEdit ? 'edit/' . $plan['id'] : 'create' ?>">
         <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
 
         <div class="form-section">
@@ -169,7 +169,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
 
         <div class="form-actions">
-            <a href="<?= $basePath ?>/admin/plans" class="admin-btn admin-btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/plans" class="admin-btn admin-btn-secondary">
                 <i class="fa-solid fa-times"></i> Cancel
             </a>
             <button type="submit" class="admin-btn admin-btn-primary">

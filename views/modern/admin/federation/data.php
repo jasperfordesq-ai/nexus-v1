@@ -482,7 +482,7 @@ unset($_SESSION['import_results']);
                             <span><?= number_format($stats['users'] ?? 0) ?> users opted in</span>
                         </div>
                     </div>
-                    <a href="/admin/federation/export/users" class="export-btn">
+                    <a href="/admin-legacy/federation/export/users" class="export-btn">
                         <i class="fa-solid fa-download"></i> Export
                     </a>
                 </div>
@@ -495,7 +495,7 @@ unset($_SESSION['import_results']);
                             <span><?= number_format($stats['partnerships'] ?? 0) ?> active partnerships</span>
                         </div>
                     </div>
-                    <a href="/admin/federation/export/partnerships" class="export-btn">
+                    <a href="/admin-legacy/federation/export/partnerships" class="export-btn">
                         <i class="fa-solid fa-download"></i> Export
                     </a>
                 </div>
@@ -508,7 +508,7 @@ unset($_SESSION['import_results']);
                             <span><?= number_format($stats['transactions'] ?? 0) ?> federated transactions</span>
                         </div>
                     </div>
-                    <a href="/admin/federation/export/transactions" class="export-btn">
+                    <a href="/admin-legacy/federation/export/transactions" class="export-btn">
                         <i class="fa-solid fa-download"></i> Export
                     </a>
                 </div>
@@ -521,14 +521,14 @@ unset($_SESSION['import_results']);
                             <span><?= number_format($stats['audit_logs'] ?? 0) ?> log entries</span>
                         </div>
                     </div>
-                    <a href="/admin/federation/export/audit" class="export-btn">
+                    <a href="/admin-legacy/federation/export/audit" class="export-btn">
                         <i class="fa-solid fa-download"></i> Export
                     </a>
                 </div>
             </div>
 
             <div class="full-backup-section">
-                <a href="/admin/federation/export/all" class="full-backup-btn">
+                <a href="/admin-legacy/federation/export/all" class="full-backup-btn">
                     <i class="fa-solid fa-file-zipper"></i>
                     Download Full Backup (ZIP)
                 </a>
@@ -557,7 +557,7 @@ unset($_SESSION['import_results']);
             <h2><i class="fa-solid fa-upload"></i> Import Users</h2>
             <p class="description">Bulk enroll users in federation from a CSV file.</p>
 
-            <form method="POST" action="/admin/federation/import/users" enctype="multipart/form-data" class="import-form">
+            <form method="POST" action="/admin-legacy/federation/import/users" enctype="multipart/form-data" class="import-form">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
 
                 <div class="form-group">
@@ -572,7 +572,7 @@ unset($_SESSION['import_results']);
                     </div>
                     <p class="hint">
                         CSV must contain "email" or "username" column.
-                        <a href="/admin/federation/import/template" style="color: #8b5cf6;">Download template</a>
+                        <a href="/admin-legacy/federation/import/template" style="color: #8b5cf6;">Download template</a>
                     </p>
                 </div>
 
@@ -610,7 +610,7 @@ unset($_SESSION['import_results']);
                     <button type="submit" class="btn btn-primary">
                         <i class="fa-solid fa-upload"></i> Import Users
                     </button>
-                    <a href="/admin/federation/import/template" class="btn btn-secondary">
+                    <a href="/admin-legacy/federation/import/template" class="btn btn-secondary">
                         <i class="fa-solid fa-file-csv"></i> Download Template
                     </a>
                 </div>

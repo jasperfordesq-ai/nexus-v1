@@ -28,7 +28,7 @@ $apiKeys = $apiKeys ?? [];
         <p class="admin-page-subtitle">Manage API keys for external integrations</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/federation/api-keys/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/api-keys/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i>
             Create API Key
         </a>
@@ -59,7 +59,7 @@ $apiKeys = $apiKeys ?? [];
                 <td colspan="6" class="admin-empty-state">
                     <i class="fa-solid fa-key"></i>
                     <p>No API keys created yet</p>
-                    <a href="<?= $basePath ?>/admin/federation/api-keys/create" class="admin-btn admin-btn-primary">
+                    <a href="<?= $basePath ?>/admin-legacy/federation/api-keys/create" class="admin-btn admin-btn-primary">
                         Create Your First Key
                     </a>
                 </td>
@@ -94,7 +94,7 @@ $apiKeys = $apiKeys ?? [];
                     <?= date('M j, Y', strtotime($key['created_at'])) ?>
                 </td>
                 <td>
-                    <a href="<?= $basePath ?>/admin/federation/api-keys/<?= $key['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="View">
+                    <a href="<?= $basePath ?>/admin-legacy/federation/api-keys/<?= $key['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="View">
                         <i class="fa-solid fa-eye"></i>
                     </a>
                     <button onclick="revokeApiKey(<?= $key['id'] ?>)" class="admin-btn admin-btn-danger admin-btn-sm" title="Revoke">
@@ -112,7 +112,7 @@ $apiKeys = $apiKeys ?? [];
 function revokeApiKey(id) {
     if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) return;
 
-    fetch('<?= $basePath ?>/admin/federation/api-keys/' + id + '/revoke', {
+    fetch('<?= $basePath ?>/admin-legacy/federation/api-keys/' + id + '/revoke', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

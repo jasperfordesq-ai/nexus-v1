@@ -6,8 +6,8 @@ $layout = layout(); // Fixed: centralized detection
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 $isEdit = isset($segment);
 $action = $isEdit
-    ? $basePath . "/admin/newsletters/segments/update/" . $segment['id']
-    : $basePath . "/admin/newsletters/segments/store";
+    ? $basePath . "/admin-legacy/newsletters/segments/update/" . $segment['id']
+    : $basePath . "/admin-legacy/newsletters/segments/store";
 
 $fields = $fields ?? [];
 $groups = $groups ?? [];
@@ -43,7 +43,7 @@ else {
 
     <!-- Navigation -->
     <div style="margin-bottom: 24px;">
-        <a href="<?= $basePath ?>/admin/newsletters/segments" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/segments" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
             <i class="fa-solid fa-arrow-left"></i> Back to Segments
         </a>
     </div>
@@ -148,7 +148,7 @@ else {
             <button type="submit" class="nexus-btn" style="background: #6366f1; color: white;">
                 <?= $isEdit ? 'Update Segment' : 'Create Segment' ?>
             </button>
-            <a href="<?= $basePath ?>/admin/newsletters/segments" class="nexus-btn" style="background: #e5e7eb; color: #374151;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/segments" class="nexus-btn" style="background: #e5e7eb; color: #374151;">
                 Cancel
             </a>
         </div>
@@ -618,7 +618,7 @@ document.getElementById('preview-btn').addEventListener('click', function() {
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking...';
     result.innerHTML = '<span style="color: #6b7280;"><i class="fa-solid fa-spinner fa-spin"></i> Calculating...</span>';
 
-    fetch('<?= $basePath ?>/admin/newsletters/segments/preview', {
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/segments/preview', {
         method: 'POST',
         body: formData
     })
@@ -699,7 +699,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadSmartSuggestions() {
     const container = document.getElementById('suggestions-container');
 
-    fetch('<?= $basePath ?>/admin/newsletters/segments/suggestions')
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/segments/suggestions')
         .then(response => response.json())
         .then(data => {
             if (!data.success || !data.suggestions || data.suggestions.length === 0) {
@@ -777,7 +777,7 @@ function createFromSuggestion(suggestionId, buttonElement) {
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
     }
 
-    fetch('<?= $basePath ?>/admin/newsletters/segments/from-suggestion', {
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/segments/from-suggestion', {
         method: 'POST',
         body: formData
     })

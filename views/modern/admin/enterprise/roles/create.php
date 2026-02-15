@@ -382,7 +382,7 @@ function getCategoryIcon($category) {
         <p class="admin-page-subtitle">Define a new role with specific permissions</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/roles" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/roles" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to Roles
         </a>
     </div>
@@ -533,7 +533,7 @@ function getCategoryIcon($category) {
     <!-- Form Actions -->
     <div class="form-section">
         <div class="form-actions">
-            <button type="button" class="btn-cancel" onclick="window.location.href='<?= $basePath ?>/admin/enterprise/roles'">
+            <button type="button" class="btn-cancel" onclick="window.location.href='<?= $basePath ?>/admin-legacy/enterprise/roles'">
                 <i class="fa-solid fa-times"></i> Cancel
             </button>
             <button type="submit" class="btn-create">
@@ -594,7 +594,7 @@ document.getElementById('createRoleForm').addEventListener('submit', async funct
     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
 
     try {
-        const response = await fetch('<?= $basePath ?>/admin/enterprise/roles', {
+        const response = await fetch('<?= $basePath ?>/admin-legacy/enterprise/roles', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -614,7 +614,7 @@ document.getElementById('createRoleForm').addEventListener('submit', async funct
 
             // Redirect to role detail page
             setTimeout(() => {
-                window.location.href = '<?= $basePath ?>/admin/enterprise/roles/' + result.id;
+                window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/roles/' + result.id;
             }, 1000);
         } else {
             throw new Error(result.error || 'Failed to create role');

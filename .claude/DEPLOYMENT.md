@@ -16,12 +16,12 @@
 
 ### Deploy a single file
 ```bash
-scp -i ~/.ssh/id_ed25519 "local/path/file.php" jasper@35.205.239.67:/var/www/vhosts/project-nexus.ie/path/file.php
+scp -i ~/.ssh/id_ed25519 "project-root/path/file.php" jasper@35.205.239.67:/var/www/vhosts/project-nexus.ie/path/file.php
 ```
 
 ### Common deploy paths
-| Local | Remote |
-|-------|--------|
+| Project Directory | Remote |
+|-------------------|--------|
 | `httpdocs/` | `/var/www/vhosts/project-nexus.ie/httpdocs/` |
 | `views/` | `/var/www/vhosts/project-nexus.ie/views/` |
 | `src/` | `/var/www/vhosts/project-nexus.ie/src/` |
@@ -41,7 +41,7 @@ ssh -i ~/.ssh/id_ed25519 jasper@35.205.239.67 "tail -50 /var/www/vhosts/project-
 
 ### Commit and push
 ```bash
-cd c:/xampp/htdocs/staging
+# Navigate to project root
 git add -A
 git commit -m "Your message
 
@@ -66,7 +66,7 @@ When user says "commit then push then check local files for changes and deploy":
 
 ### Build APK
 ```bash
-cd c:/xampp/htdocs/staging/capacitor
+cd capacitor
 npx cap sync android
 cd android && .\gradlew.bat assembleDebug && cd ..
 node scripts/copy-apk.js
@@ -76,7 +76,7 @@ APK output: `httpdocs/downloads/nexus-latest.apk`
 
 ### Deploy APK
 ```bash
-scp -i ~/.ssh/id_ed25519 "c:/xampp/htdocs/staging/capacitor/httpdocs/downloads/nexus-latest.apk" jasper@35.205.239.67:/var/www/vhosts/project-nexus.ie/httpdocs/downloads/
+scp -i ~/.ssh/id_ed25519 "project-root/capacitor/httpdocs/downloads/nexus-latest.apk" jasper@35.205.239.67:/var/www/vhosts/project-nexus.ie/httpdocs/downloads/
 ```
 
 ### Key Android files
@@ -97,7 +97,7 @@ scp -i ~/.ssh/id_ed25519 "c:/xampp/htdocs/staging/capacitor/httpdocs/downloads/n
 
 ## Notes
 
-- Local server: XAMPP at c:\xampp\htdocs\staging
+- Development environment: Docker containers (React on :5173, PHP on :8090)
 - Always deploy via SCP (not git pull on server)
 - Check `git status` before deploying to catch all changes
 - The `.env` file is NOT deployed - it exists separately on the server

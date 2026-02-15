@@ -19,49 +19,49 @@ $navSections = [
     'dashboard' => [
         'label' => 'Overview',
         'icon' => 'fa-gauge-high',
-        'url' => '/admin/enterprise',
+        'url' => '/admin-legacy/enterprise',
         'pages' => []
     ],
     'roles' => [
         'label' => 'Access',
         'icon' => 'fa-user-shield',
-        'url' => '/admin/enterprise/roles',
+        'url' => '/admin-legacy/enterprise/roles',
         'pages' => [
-            'dashboard' => ['label' => 'Roles', 'icon' => 'fa-user-tag', 'url' => '/admin/enterprise/roles'],
-            'permissions' => ['label' => 'Permissions', 'icon' => 'fa-key', 'url' => '/admin/enterprise/permissions'],
-            'audit' => ['label' => 'Audit', 'icon' => 'fa-clipboard-list', 'url' => '/admin/enterprise/audit/permissions'],
+            'dashboard' => ['label' => 'Roles', 'icon' => 'fa-user-tag', 'url' => '/admin-legacy/enterprise/roles'],
+            'permissions' => ['label' => 'Permissions', 'icon' => 'fa-key', 'url' => '/admin-legacy/enterprise/permissions'],
+            'audit' => ['label' => 'Audit', 'icon' => 'fa-clipboard-list', 'url' => '/admin-legacy/enterprise/audit/permissions'],
         ]
     ],
     'gdpr' => [
         'label' => 'GDPR',
         'icon' => 'fa-shield-halved',
-        'url' => '/admin/enterprise/gdpr',
+        'url' => '/admin-legacy/enterprise/gdpr',
         'pages' => [
-            'dashboard' => ['label' => 'Dashboard', 'icon' => 'fa-gauge', 'url' => '/admin/enterprise/gdpr'],
-            'requests' => ['label' => 'Requests', 'icon' => 'fa-inbox', 'url' => '/admin/enterprise/gdpr/requests'],
-            'breaches' => ['label' => 'Breaches', 'icon' => 'fa-triangle-exclamation', 'url' => '/admin/enterprise/gdpr/breaches'],
-            'consents' => ['label' => 'Consents', 'icon' => 'fa-clipboard-check', 'url' => '/admin/enterprise/gdpr/consents'],
-            'audit' => ['label' => 'Audit Log', 'icon' => 'fa-clock-rotate-left', 'url' => '/admin/enterprise/gdpr/audit'],
+            'dashboard' => ['label' => 'Dashboard', 'icon' => 'fa-gauge', 'url' => '/admin-legacy/enterprise/gdpr'],
+            'requests' => ['label' => 'Requests', 'icon' => 'fa-inbox', 'url' => '/admin-legacy/enterprise/gdpr/requests'],
+            'breaches' => ['label' => 'Breaches', 'icon' => 'fa-triangle-exclamation', 'url' => '/admin-legacy/enterprise/gdpr/breaches'],
+            'consents' => ['label' => 'Consents', 'icon' => 'fa-clipboard-check', 'url' => '/admin-legacy/enterprise/gdpr/consents'],
+            'audit' => ['label' => 'Audit Log', 'icon' => 'fa-clock-rotate-left', 'url' => '/admin-legacy/enterprise/gdpr/audit'],
         ]
     ],
     'monitoring' => [
         'label' => 'Monitoring',
         'icon' => 'fa-chart-line',
-        'url' => '/admin/enterprise/monitoring',
+        'url' => '/admin-legacy/enterprise/monitoring',
         'pages' => [
-            'dashboard' => ['label' => 'Dashboard', 'icon' => 'fa-gauge', 'url' => '/admin/enterprise/monitoring'],
-            'health' => ['label' => 'Health', 'icon' => 'fa-heartbeat', 'url' => '/admin/enterprise/monitoring/health'],
-            'requirements' => ['label' => 'Requirements', 'icon' => 'fa-list-check', 'url' => '/admin/enterprise/monitoring/requirements'],
-            'logs' => ['label' => 'Logs', 'icon' => 'fa-file-lines', 'url' => '/admin/enterprise/monitoring/logs'],
+            'dashboard' => ['label' => 'Dashboard', 'icon' => 'fa-gauge', 'url' => '/admin-legacy/enterprise/monitoring'],
+            'health' => ['label' => 'Health', 'icon' => 'fa-heartbeat', 'url' => '/admin-legacy/enterprise/monitoring/health'],
+            'requirements' => ['label' => 'Requirements', 'icon' => 'fa-list-check', 'url' => '/admin-legacy/enterprise/monitoring/requirements'],
+            'logs' => ['label' => 'Logs', 'icon' => 'fa-file-lines', 'url' => '/admin-legacy/enterprise/monitoring/logs'],
         ]
     ],
     'config' => [
         'label' => 'Config',
         'icon' => 'fa-sliders',
-        'url' => '/admin/enterprise/config',
+        'url' => '/admin-legacy/enterprise/config',
         'pages' => [
-            'dashboard' => ['label' => 'Settings', 'icon' => 'fa-gear', 'url' => '/admin/enterprise/config'],
-            'secrets' => ['label' => 'Secrets', 'icon' => 'fa-vault', 'url' => '/admin/enterprise/config/secrets'],
+            'dashboard' => ['label' => 'Settings', 'icon' => 'fa-gear', 'url' => '/admin-legacy/enterprise/config'],
+            'secrets' => ['label' => 'Secrets', 'icon' => 'fa-vault', 'url' => '/admin-legacy/enterprise/config/secrets'],
         ]
     ],
 ];
@@ -326,7 +326,7 @@ $navSections = [
 
         <!-- Quick Actions -->
         <div class="enterprise-nav-actions">
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches/report" class="nav-action-btn primary" title="Report Breach">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches/report" class="nav-action-btn primary" title="Report Breach">
                 <i class="fa-solid fa-plus"></i>
             </a>
             <button type="button" class="nav-action-btn" onclick="refreshPage()" title="Refresh">

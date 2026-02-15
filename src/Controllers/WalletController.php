@@ -173,7 +173,7 @@ class WalletController
                                     <p><strong>Description:</strong> $description</p>
                                 ",
                                 "View Logs",
-                                (isset($_SERVER['HTTPS']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . \Nexus\Core\TenantContext::getBasePath() . "/admin/logs",
+                                (isset($_SERVER['HTTPS']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . \Nexus\Core\TenantContext::getBasePath() . "/admin-legacy/logs",
                                 "Project NEXUS Admin"
                             );
 

@@ -39,11 +39,11 @@ else {
         <!-- Action Bar -->
         <div class="nexus-card" style="margin-bottom: 24px; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <a href="<?= $basePath ?>/admin/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
                 </a>
             </div>
-            <a href="<?= $basePath ?>/admin/newsletters/templates/create" class="nexus-btn" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/create" class="nexus-btn" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-plus"></i> Create Template
             </a>
         </div>
@@ -63,7 +63,7 @@ else {
                 <div class="nexus-card" style="padding: 0; overflow: hidden; transition: all 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.1)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
                     <!-- Preview Area -->
                     <div style="height: 160px; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-                        <iframe src="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" style="width: 200%; height: 200%; transform: scale(0.5); transform-origin: top left; pointer-events: none; border: none; position: absolute; top: 0; left: 0;"></iframe>
+                        <iframe src="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" style="width: 200%; height: 200%; transform: scale(0.5); transform-origin: top left; pointer-events: none; border: none; position: absolute; top: 0; left: 0;"></iframe>
                         <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.1));"></div>
                     </div>
 
@@ -77,10 +77,10 @@ else {
                             <?= htmlspecialchars($template['description'] ?? 'Ready-to-use template') ?>
                         </p>
                         <div style="display: flex; gap: 8px;">
-                            <a href="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" target="_blank" style="flex: 1; background: #f3f4f6; color: #374151; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 500; text-align: center;">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" target="_blank" style="flex: 1; background: #f3f4f6; color: #374151; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 500; text-align: center;">
                                 <i class="fa-solid fa-eye"></i> Preview
                             </a>
-                            <a href="<?= $basePath ?>/admin/newsletters/templates/duplicate/<?= $template['id'] ?>" style="flex: 1; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 500; text-align: center;">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/duplicate/<?= $template['id'] ?>" style="flex: 1; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 500; text-align: center;">
                                 <i class="fa-solid fa-copy"></i> Use
                             </a>
                         </div>
@@ -105,7 +105,7 @@ else {
                 <?php foreach ($grouped['saved'] as $template): ?>
                 <div class="nexus-card" style="padding: 0; overflow: hidden; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
                     <div style="height: 140px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-                        <iframe src="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" style="width: 200%; height: 200%; transform: scale(0.5); transform-origin: top left; pointer-events: none; border: none; position: absolute; top: 0; left: 0;"></iframe>
+                        <iframe src="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" style="width: 200%; height: 200%; transform: scale(0.5); transform-origin: top left; pointer-events: none; border: none; position: absolute; top: 0; left: 0;"></iframe>
                     </div>
                     <div style="padding: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
@@ -118,9 +118,9 @@ else {
                         </p>
                         <?php endif; ?>
                         <div style="display: flex; gap: 6px;">
-                            <a href="<?= $basePath ?>/admin/newsletters/templates/edit/<?= $template['id'] ?>" style="flex: 1; background: #f3f4f6; color: #374151; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; text-align: center;">Edit</a>
-                            <a href="<?= $basePath ?>/admin/newsletters/templates/duplicate/<?= $template['id'] ?>" style="flex: 1; background: #6366f1; color: white; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; text-align: center;">Use</a>
-                            <form action="<?= $basePath ?>/admin/newsletters/templates/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this template?')">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/edit/<?= $template['id'] ?>" style="flex: 1; background: #f3f4f6; color: #374151; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; text-align: center;">Edit</a>
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/duplicate/<?= $template['id'] ?>" style="flex: 1; background: #6366f1; color: white; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; text-align: center;">Use</a>
+                            <form action="<?= $basePath ?>/admin-legacy/newsletters/templates/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this template?')">
                                 <?= \Nexus\Core\Csrf::input() ?>
                                 <input type="hidden" name="id" value="<?= $template['id'] ?>">
                                 <button type="submit" style="background: #fee2e2; color: #dc2626; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;"><i class="fa-solid fa-trash"></i></button>
@@ -147,7 +147,7 @@ else {
                 <?php foreach ($grouped['custom'] as $template): ?>
                 <div class="nexus-card" style="padding: 0; overflow: hidden; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
                     <div style="height: 140px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-                        <iframe src="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" style="width: 200%; height: 200%; transform: scale(0.5); transform-origin: top left; pointer-events: none; border: none; position: absolute; top: 0; left: 0;"></iframe>
+                        <iframe src="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" style="width: 200%; height: 200%; transform: scale(0.5); transform-origin: top left; pointer-events: none; border: none; position: absolute; top: 0; left: 0;"></iframe>
                     </div>
                     <div style="padding: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
@@ -160,9 +160,9 @@ else {
                         </p>
                         <?php endif; ?>
                         <div style="display: flex; gap: 6px;">
-                            <a href="<?= $basePath ?>/admin/newsletters/templates/edit/<?= $template['id'] ?>" style="flex: 1; background: #f3f4f6; color: #374151; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; text-align: center;">Edit</a>
-                            <a href="<?= $basePath ?>/admin/newsletters/templates/duplicate/<?= $template['id'] ?>" style="flex: 1; background: #16a34a; color: white; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; text-align: center;">Use</a>
-                            <form action="<?= $basePath ?>/admin/newsletters/templates/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this template?')">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/edit/<?= $template['id'] ?>" style="flex: 1; background: #f3f4f6; color: #374151; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; text-align: center;">Edit</a>
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/duplicate/<?= $template['id'] ?>" style="flex: 1; background: #16a34a; color: white; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; text-align: center;">Use</a>
+                            <form action="<?= $basePath ?>/admin-legacy/newsletters/templates/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this template?')">
                                 <?= \Nexus\Core\Csrf::input() ?>
                                 <input type="hidden" name="id" value="<?= $template['id'] ?>">
                                 <button type="submit" style="background: #fee2e2; color: #dc2626; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;"><i class="fa-solid fa-trash"></i></button>
@@ -183,7 +183,7 @@ else {
             </div>
             <h3 style="margin: 0 0 10px 0; font-size: 1.25rem; color: #111827;">No templates yet</h3>
             <p style="color: #6b7280; margin-bottom: 24px;">Create your first template or run the migration to load starter templates.</p>
-            <a href="<?= $basePath ?>/admin/newsletters/templates/create" class="nexus-btn" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/create" class="nexus-btn" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600;">
                 <i class="fa-solid fa-plus"></i> Create Template
             </a>
         </div>

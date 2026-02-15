@@ -530,7 +530,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     <div class="sendtime-container">
 
         <!-- Back Link -->
-        <a href="<?= $basePath ?>/admin/newsletters" class="back-link">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
         </a>
 
@@ -556,7 +556,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <?php endforeach; ?>
             </div>
 
-            <a href="<?= $basePath ?>/admin/newsletters/create" class="btn-create">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/create" class="btn-create">
                 <i class="fa-solid fa-plus"></i> Create Your First Newsletter
             </a>
         </div>

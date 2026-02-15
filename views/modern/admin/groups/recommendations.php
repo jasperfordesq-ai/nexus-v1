@@ -31,7 +31,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <i class="fa-solid fa-rotate"></i>
             Refresh
         </button>
-        <a href="<?= $basePath ?>/admin/groups" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/groups" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Groups
         </a>

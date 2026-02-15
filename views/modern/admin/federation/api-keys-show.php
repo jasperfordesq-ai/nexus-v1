@@ -353,7 +353,7 @@ unset($_SESSION['new_signing_secret']);
 </style>
 
 <div class="key-detail-page">
-    <a href="/admin/federation/api-keys" class="back-link">
+    <a href="/admin-legacy/federation/api-keys" class="back-link">
         <i class="fa-solid fa-arrow-left"></i> Back to API Keys
     </a>
 
@@ -478,7 +478,7 @@ unset($_SESSION['new_signing_secret']);
 
         <?php if ($apiKey['status'] !== 'revoked'): ?>
         <div class="key-actions">
-            <form method="POST" action="/admin/federation/api-keys/<?= $apiKey['id'] ?>/regenerate" style="display:inline;">
+            <form method="POST" action="/admin-legacy/federation/api-keys/<?= $apiKey['id'] ?>/regenerate" style="display:inline;">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn regenerate" onclick="return confirm('Regenerate this API key? The old key will stop working immediately.')">
                     <i class="fa-solid fa-rotate"></i> Regenerate Key
@@ -486,14 +486,14 @@ unset($_SESSION['new_signing_secret']);
             </form>
 
             <?php if ($apiKey['status'] === 'active'): ?>
-            <form method="POST" action="/admin/federation/api-keys/<?= $apiKey['id'] ?>/suspend" style="display:inline;">
+            <form method="POST" action="/admin-legacy/federation/api-keys/<?= $apiKey['id'] ?>/suspend" style="display:inline;">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn suspend">
                     <i class="fa-solid fa-pause"></i> Suspend
                 </button>
             </form>
             <?php else: ?>
-            <form method="POST" action="/admin/federation/api-keys/<?= $apiKey['id'] ?>/activate" style="display:inline;">
+            <form method="POST" action="/admin-legacy/federation/api-keys/<?= $apiKey['id'] ?>/activate" style="display:inline;">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn activate">
                     <i class="fa-solid fa-play"></i> Reactivate
@@ -501,7 +501,7 @@ unset($_SESSION['new_signing_secret']);
             </form>
             <?php endif; ?>
 
-            <form method="POST" action="/admin/federation/api-keys/<?= $apiKey['id'] ?>/revoke" style="display:inline;">
+            <form method="POST" action="/admin-legacy/federation/api-keys/<?= $apiKey['id'] ?>/revoke" style="display:inline;">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn revoke" onclick="return confirm('Permanently revoke this API key? This cannot be undone.')">
                     <i class="fa-solid fa-trash"></i> Revoke

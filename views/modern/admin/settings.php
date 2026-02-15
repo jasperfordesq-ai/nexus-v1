@@ -54,7 +54,7 @@ if (!isset($configJson)) {
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/settings/save-tenant" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/settings/save-tenant" method="POST">
             <?= Csrf::input() ?>
 
             <!-- Theme & Layout Section -->
@@ -301,7 +301,7 @@ if (!isset($configJson)) {
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/settings/update" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/settings/update" method="POST">
             <?= Csrf::input() ?>
 
             <div class="settings-section">
@@ -473,7 +473,7 @@ function regenerateMinifiedCSS() {
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
     resultSpan.innerHTML = '';
 
-    fetch('<?= $basePath ?>/admin/settings/regenerate-css', {
+    fetch('<?= $basePath ?>/admin-legacy/settings/regenerate-css', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -516,7 +516,7 @@ function testGmailConnection() {
     var resultSpan = document.getElementById('gmail_test_result');
     resultSpan.innerHTML = '<span style="color: rgba(255,255,255,0.6);">Testing...</span>';
 
-    fetch('<?= $basePath ?>/admin/settings/test-gmail', {
+    fetch('<?= $basePath ?>/admin-legacy/settings/test-gmail', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardBody, Button, Chip, Spinner } from '@heroui/react';
 import {
   ChevronRight,
@@ -13,6 +13,8 @@ import {
   Users,
   RefreshCw,
   Network,
+  Plus,
+  List,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -124,24 +126,51 @@ export function TenantHierarchy() {
   }, [loadHierarchy]);
 
   const handleNavigate = (tenantId: number) => {
-    navigate(tenantPath(`/admin/super/tenants/${tenantId}/edit`));
+    navigate(tenantPath(`/admin/super/tenants/${tenantId}`));
   };
 
   return (
     <div>
+      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <span>/</span>
+        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">Tenants</Link>
+        <span>/</span>
+        <span className="text-foreground">Hierarchy</span>
+      </nav>
       <PageHeader
         title="Tenant Hierarchy"
         description="Visual tree of parent-child tenant relationships"
         actions={
-          <Button
-            variant="flat"
-            startContent={<RefreshCw size={16} />}
-            onPress={loadHierarchy}
-            isLoading={loading}
-            size="sm"
-          >
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              as={Link}
+              to={tenantPath('/admin/super/tenants')}
+              variant="flat"
+              startContent={<List size={16} />}
+              size="sm"
+            >
+              View All Tenants
+            </Button>
+            <Button
+              as={Link}
+              to={tenantPath('/admin/super/tenants/create')}
+              color="primary"
+              startContent={<Plus size={16} />}
+              size="sm"
+            >
+              Create Tenant
+            </Button>
+            <Button
+              variant="flat"
+              startContent={<RefreshCw size={16} />}
+              onPress={loadHierarchy}
+              isLoading={loading}
+              size="sm"
+            >
+              Refresh
+            </Button>
+          </div>
         }
       />
 

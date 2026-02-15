@@ -1,6 +1,6 @@
 <?php
 // CivicOne View: Admin Category Manager
-// Path: views/civicone/admin/categories/index.php
+// Path: views/civicone/admin-legacy/categories/index.php
 
 $hTitle = 'Category Manager';
 $hSubtitle = 'Organize Listings & Opportunities';
@@ -22,7 +22,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                     </div>
                 </div>
                 <!-- Action Button styled for CivicOne -->
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/categories/create" style="background:var(--civic-brand, #00796B); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:600;">
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/categories/create" style="background:var(--civic-brand, #00796B); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:600;">
                     + New Category
                 </a>
             </header>
@@ -66,9 +66,9 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                                             </div>
                                         </td>
                                         <td style="padding:15px 20px; text-align:right;">
-                                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/categories/edit/<?= $cat['id'] ?>" style="display:inline-block; margin-right:5px; padding:4px 10px; background:#f3f4f6; color:#374151; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:600;">Edit</a>
+                                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/categories/edit/<?= $cat['id'] ?>" style="display:inline-block; margin-right:5px; padding:4px 10px; background:#f3f4f6; color:#374151; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:600;">Edit</a>
 
-                                            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/categories/delete" method="POST" onsubmit="return confirm('Delete this category?');" style="display:inline;">
+                                            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/categories/delete" method="POST" onsubmit="return confirm('Delete this category?');" style="display:inline;">
                                                 <?= \Nexus\Core\Csrf::input() ?>
                                                 <input type="hidden" name="id" value="<?= $cat['id'] ?>">
                                                 <button type="submit" style="background:none; border:none; padding:0 5px; color:#ef4444; font-weight:bold; cursor:pointer; font-size:1.1rem;">&times;</button>

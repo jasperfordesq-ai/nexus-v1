@@ -28,7 +28,7 @@
         var pageUrl = window.location.pathname;
 
         // Don't track the main dashboard
-        if (pageUrl === basePath + '/admin' || pageUrl === basePath + '/admin/') return;
+        if (pageUrl === basePath + '/admin-legacy' || pageUrl === basePath + '/admin-legacy/') return;
 
         var recent = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
 
@@ -74,7 +74,7 @@
 
         isSearching = true;
 
-        fetch(basePath + '/admin/api/search?q=' + encodeURIComponent(query))
+        fetch(basePath + '/admin-legacy/api/search?q=' + encodeURIComponent(query))
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 isSearching = false;
@@ -339,11 +339,11 @@
         // Alt+shortcuts for quick navigation (only when not in input)
         if (e.altKey && !e.target.matches('input, textarea, select')) {
             var shortcutMap = {
-                'u': basePath + '/admin/users',
-                'l': basePath + '/admin/listings',
-                's': basePath + '/admin/settings',
-                'd': basePath + '/admin',
-                'n': basePath + '/admin/newsletters'
+                'u': basePath + '/admin-legacy/users',
+                'l': basePath + '/admin-legacy/listings',
+                's': basePath + '/admin-legacy/settings',
+                'd': basePath + '/admin-legacy',
+                'n': basePath + '/admin-legacy/newsletters'
             };
             var key = e.key.toLowerCase();
             if (shortcutMap[key]) {

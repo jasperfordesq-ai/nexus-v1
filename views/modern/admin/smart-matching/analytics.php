@@ -32,7 +32,7 @@ $user_engagement = $user_engagement ?? [];
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/smart-matching" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Smart Matching Analytics
@@ -40,7 +40,7 @@ $user_engagement = $user_engagement ?? [];
         <p class="admin-page-subtitle">Deep performance insights and metrics</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/smart-matching/configuration" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/smart-matching/configuration" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-gear"></i> Configure
         </a>
     </div>

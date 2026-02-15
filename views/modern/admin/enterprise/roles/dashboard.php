@@ -46,10 +46,10 @@ foreach ($permissions as $category => $perms) {
         <p class="admin-page-subtitle">Manage access control and permission assignments</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Enterprise Hub
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/permissions" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/permissions" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-key"></i> Permissions
         </a>
     </div>
@@ -542,15 +542,15 @@ foreach ($permissions as $category => $perms) {
 
 <script>
 function createNewRole() {
-    window.location.href = '<?= $basePath ?>/admin/enterprise/roles/create';
+    window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/roles/create';
 }
 
 function viewRole(roleId) {
-    window.location.href = '<?= $basePath ?>/admin/enterprise/roles/' + roleId;
+    window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/roles/' + roleId;
 }
 
 function editRole(roleId) {
-    window.location.href = '<?= $basePath ?>/admin/enterprise/roles/' + roleId + '/edit';
+    window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/roles/' + roleId + '/edit';
 }
 
 async function deleteRole(roleId, roleName) {
@@ -565,7 +565,7 @@ async function deleteRole(roleId, roleName) {
     if (!confirmed) return;
 
     try {
-        const response = await fetch(`<?= $basePath ?>/admin/api/roles/${roleId}`, {
+        const response = await fetch(`<?= $basePath ?>/admin-legacy/api/roles/${roleId}`, {
             method: 'DELETE',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -587,7 +587,7 @@ async function deleteRole(roleId, roleName) {
 }
 
 function viewCategory(category) {
-    window.location.href = '<?= $basePath ?>/admin/enterprise/permissions?category=' + category;
+    window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/permissions?category=' + category;
 }
 </script>
 

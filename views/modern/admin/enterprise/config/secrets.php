@@ -581,7 +581,7 @@ function getSecretsCategoryBadgeClass($category) {
         <p class="admin-page-subtitle">HashiCorp Vault integration & environment secrets</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/config" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/config" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Configuration
         </a>
         <button class="admin-btn admin-btn-primary" onclick="openAddModal()">
@@ -790,7 +790,7 @@ function filterByCategory(category) {
 }
 
 function viewSecret(key) {
-    fetch('<?= $basePath ?>/admin/enterprise/config/secrets/' + key + '/value', { method: 'POST' })
+    fetch('<?= $basePath ?>/admin-legacy/enterprise/config/secrets/' + key + '/value', { method: 'POST' })
         .then(r => r.json())
         .then(data => {
             alert('Secret value for ' + key + ':\n\n' + (data.value || '(empty)'));
@@ -800,7 +800,7 @@ function viewSecret(key) {
 
 function rotateSecret(key) {
     if (confirm('Generate a new value for ' + key + '?\n\nThis will invalidate the current value immediately.')) {
-        fetch('<?= $basePath ?>/admin/enterprise/config/secrets/' + key + '/rotate', { method: 'POST' })
+        fetch('<?= $basePath ?>/admin-legacy/enterprise/config/secrets/' + key + '/rotate', { method: 'POST' })
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
@@ -815,7 +815,7 @@ function rotateSecret(key) {
 
 function deleteSecret(key) {
     if (confirm('Delete secret ' + key + '?\n\nThis cannot be undone.')) {
-        fetch('<?= $basePath ?>/admin/enterprise/config/secrets/' + key, { method: 'DELETE' })
+        fetch('<?= $basePath ?>/admin-legacy/enterprise/config/secrets/' + key, { method: 'DELETE' })
             .then(r => r.json())
             .then(data => {
                 if (data.success) location.reload();
@@ -825,7 +825,7 @@ function deleteSecret(key) {
 }
 
 function testVaultConnection() {
-    fetch('<?= $basePath ?>/admin/enterprise/config/vault/test')
+    fetch('<?= $basePath ?>/admin-legacy/enterprise/config/vault/test')
         .then(r => r.json())
         .then(data => {
             if (data.connected) {

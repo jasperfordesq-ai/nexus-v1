@@ -35,7 +35,7 @@ $breaches = $breaches ?? [];
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/enterprise" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Data Breach Management
@@ -43,7 +43,7 @@ $breaches = $breaches ?? [];
         <p class="admin-page-subtitle">Track, investigate & report security incidents</p>
     </div>
     <div class="admin-page-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches/report" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches/report" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> Report Breach
         </a>
     </div>
@@ -149,7 +149,7 @@ $breaches = $breaches ?? [];
                     <?php foreach ($breaches as $breach): ?>
                     <tr class="<?= $breach['status'] === 'active' ? 'critical-row' : '' ?>">
                         <td>
-                            <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches/<?= $breach['id'] ?>" class="breach-id">
+                            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches/<?= $breach['id'] ?>" class="breach-id">
                                 #<?= $breach['id'] ?>
                             </a>
                         </td>
@@ -169,7 +169,7 @@ $breaches = $breaches ?? [];
                         </td>
                         <td>
                             <div class="table-actions">
-                                <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches/<?= $breach['id'] ?>" class="action-btn" title="View Details">
+                                <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches/<?= $breach['id'] ?>" class="action-btn" title="View Details">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
                                 <?php if ($breach['status'] === 'active'): ?>
@@ -706,7 +706,7 @@ const basePath = '<?= $basePath ?>';
 
 function escalateBreach(id) {
     if (confirm('Escalate this breach to the incident response team?')) {
-        fetch(`${basePath}/admin/enterprise/gdpr/breaches/${id}/escalate`, {
+        fetch(`${basePath}/admin-legacy/enterprise/gdpr/breaches/${id}/escalate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

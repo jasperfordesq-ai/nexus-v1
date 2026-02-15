@@ -236,7 +236,7 @@
 </head>
 <body>
 
-<?php require __DIR__ . '/../../modern/admin/partials/admin-header.php'; ?>
+<?php require __DIR__ . '/../../modern/admin-legacy/partials/admin-header.php'; ?>
 
 <div class="verification-container">
 
@@ -557,13 +557,13 @@ public function <?= htmlspecialchars($method) ?>()
             </p>
 
             <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                <a href="/admin/seed-generator" class="btn btn-success">
+                <a href="/admin-legacy/seed-generator" class="btn btn-success">
                     ← Back to Generator
                 </a>
-                <a href="/admin/seed-generator/preview?type=production" class="btn btn-primary" target="_blank">
+                <a href="/admin-legacy/seed-generator/preview?type=production" class="btn btn-primary" target="_blank">
                     Preview Production Script
                 </a>
-                <a href="/admin/seed-generator/preview?type=demo" class="btn btn-primary" target="_blank">
+                <a href="/admin-legacy/seed-generator/preview?type=demo" class="btn btn-primary" target="_blank">
                     Preview Demo Script
                 </a>
             </div>

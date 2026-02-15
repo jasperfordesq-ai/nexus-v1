@@ -29,7 +29,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     </div>
     <div class="admin-page-header-actions">
         <span class="admin-badge admin-badge-primary"><?= count($users ?? []) ?> Members</span>
-        <a href="<?= $basePath ?>/admin/users/create" class="admin-btn admin-btn-success">
+        <a href="<?= $basePath ?>/admin-legacy/users/create" class="admin-btn admin-btn-success">
             <i class="fa-solid fa-user-plus"></i> Create User
         </a>
     </div>
@@ -112,7 +112,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         <td style="text-align: right;">
                             <div class="admin-action-buttons">
                                 <?php if ($user['id'] !== $_SESSION['user_id']): ?>
-                                <form action="<?= $basePath ?>/admin/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" style="display:inline;">
+                                <form action="<?= $basePath ?>/admin-legacy/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" style="display:inline;">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-warning admin-btn-sm" title="Login as this user">
@@ -120,10 +120,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                                     </button>
                                 </form>
                                 <?php endif; ?>
-                                <a href="<?= $basePath ?>/admin/users/edit/<?= $user['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                                <a href="<?= $basePath ?>/admin-legacy/users/edit/<?= $user['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                                     <i class="fa-solid fa-pen"></i> Edit
                                 </a>
-                                <form action="<?= $basePath ?>/admin/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');" style="display:inline;">
+                                <form action="<?= $basePath ?>/admin-legacy/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');" style="display:inline;">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">

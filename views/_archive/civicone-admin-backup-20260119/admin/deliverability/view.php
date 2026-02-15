@@ -8,7 +8,7 @@ $adminPageTitle = htmlspecialchars($deliverable['title'] ?? 'View Deliverable');
 $adminPageSubtitle = 'Deliverability Tracking';
 $adminPageIcon = 'fa-eye';
 
-require dirname(dirname(__DIR__)) . '/admin/partials/admin-header.php';
+require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-header.php';
 
 $deliverable = $deliverable ?? [];
 $milestones = $milestones ?? [];
@@ -31,10 +31,10 @@ $users = $users ?? [];
         </p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/deliverability/list" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability/list" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-list"></i> All Deliverables
         </a>
-        <a href="<?= $basePath ?>/admin/deliverability/edit/<?= $deliverable['id'] ?>" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability/edit/<?= $deliverable['id'] ?>" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-pen"></i> Edit
         </a>
     </div>
@@ -355,7 +355,7 @@ $users = $users ?? [];
 <script>
 // Complete milestone via AJAX
 async function completeMilestone(milestoneId) {
-    const response = await fetch('<?= $basePath ?>/admin/deliverability/ajax/complete-milestone', {
+    const response = await fetch('<?= $basePath ?>/admin-legacy/deliverability/ajax/complete-milestone', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
@@ -378,7 +378,7 @@ document.getElementById('comment-form').addEventListener('submit', async functio
     e.preventDefault();
 
     const formData = new FormData(this);
-    const response = await fetch('<?= $basePath ?>/admin/deliverability/ajax/add-comment', {
+    const response = await fetch('<?= $basePath ?>/admin-legacy/deliverability/ajax/add-comment', {
         method: 'POST',
         body: new URLSearchParams(formData)
     });
@@ -393,4 +393,4 @@ document.getElementById('comment-form').addEventListener('submit', async functio
 });
 </script>
 
-<?php require dirname(dirname(__DIR__)) . '/admin/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-footer.php'; ?>

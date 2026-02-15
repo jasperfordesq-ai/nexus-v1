@@ -36,7 +36,7 @@ $riskCategories = [
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/broker-controls/risk-tags" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <?= $isEdit ? 'Edit' : 'Add' ?> Risk Tag
@@ -96,7 +96,7 @@ $riskCategories = [
             <h2 class="admin-card-title"><i class="fa-solid fa-shield-halved"></i> Risk Assessment</h2>
         </div>
         <div class="admin-card-body">
-            <form action="<?= $basePath ?>/admin/broker-controls/risk-tags/<?= $listing['id'] ?? '' ?>" method="POST">
+            <form action="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags/<?= $listing['id'] ?? '' ?>" method="POST">
                 <?= Csrf::input() ?>
 
                 <div class="form-group">
@@ -166,7 +166,7 @@ $riskCategories = [
                 </div>
 
                 <div class="form-actions">
-                    <a href="<?= $basePath ?>/admin/broker-controls/risk-tags" class="admin-btn admin-btn-secondary">
+                    <a href="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags" class="admin-btn admin-btn-secondary">
                         Cancel
                     </a>
                     <button type="submit" class="admin-btn admin-btn-primary">

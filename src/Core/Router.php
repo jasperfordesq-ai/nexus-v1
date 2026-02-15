@@ -159,7 +159,7 @@ class Router
     {
         try {
             // SAFETY: Prevent infinite loops by skipping admin routes and the 404 tracking page itself
-            if (strpos($uri, '/admin/404-errors') !== false) {
+            if (strpos($uri, '/admin-legacy/404-errors') !== false) {
                 return; // Never log the 404 tracking admin page
             }
 

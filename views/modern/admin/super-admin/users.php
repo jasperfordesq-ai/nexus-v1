@@ -224,7 +224,7 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                                     </button>
                                 </form>
                                 <?php endif; ?>
-                                <a href="<?= $basePath ?>/admin/users/edit/<?= $u['id'] ?>" class="super-admin-btn super-admin-btn-secondary super-admin-btn-sm" style="padding: 4px 10px; text-decoration: none;">
+                                <a href="<?= $basePath ?>/admin-legacy/users/edit/<?= $u['id'] ?>" class="super-admin-btn super-admin-btn-secondary super-admin-btn-sm" style="padding: 4px 10px; text-decoration: none;">
                                     <i class="fa-solid fa-pen"></i> Edit
                                 </a>
                                 <form action="/super-admin/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to PERMANENTLY delete this user? This cannot be undone.');" style="margin: 0;">

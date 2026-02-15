@@ -27,15 +27,15 @@ require __DIR__ . '/../partials/admin-header.php';
     </div>
     <div class="admin-page-header-actions">
         <?php if ($systemEnabled && $isWhitelisted): ?>
-        <a href="<?= $basePath ?>/admin/federation/directory" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-compass"></i>
             Directory
         </a>
-        <a href="<?= $basePath ?>/admin/federation/analytics" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/analytics" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-chart-line"></i>
             Analytics
         </a>
-        <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-handshake"></i>
             Partnerships
         </a>
@@ -184,7 +184,7 @@ require __DIR__ . '/../partials/admin-header.php';
             <i class="fa-solid fa-handshake"></i>
             Active Partnerships
         </h3>
-        <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-secondary admin-btn-sm">
+        <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-secondary admin-btn-sm">
             View All <i class="fa-solid fa-arrow-right"></i>
         </a>
     </div>
@@ -206,7 +206,7 @@ require __DIR__ . '/../partials/admin-header.php';
                 <td colspan="4" class="admin-empty-state">
                     <i class="fa-solid fa-handshake"></i>
                     <p>No active partnerships yet</p>
-                    <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-primary">
+                    <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-primary">
                         Find Partners
                     </a>
                 </td>

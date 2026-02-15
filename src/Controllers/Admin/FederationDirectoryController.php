@@ -91,7 +91,7 @@ class FederationDirectoryController
         $timebankId = (int)$timebankId;
 
         if ($timebankId === $tenantId) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/federation/directory/profile');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/directory/profile');
             exit;
         }
 

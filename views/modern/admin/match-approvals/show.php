@@ -2,7 +2,7 @@
 /**
  * Match Approval Detail View
  * Shows full details for a single match approval request
- * Path: views/modern/admin/match-approvals/show.php
+ * Path: views/modern/admin-legacy/match-approvals/show.php
  */
 
 use Nexus\Core\TenantContext;
@@ -25,7 +25,7 @@ if (!$request):
         <i class="fa-solid fa-exclamation-triangle"></i>
         <h3>Request Not Found</h3>
         <p>This match approval request could not be found.</p>
-        <a href="<?= $basePath ?>/admin/match-approvals" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/match-approvals" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-arrow-left"></i> Back to Approvals
         </a>
     </div>
@@ -35,7 +35,7 @@ if (!$request):
 <div class="admin-page-header">
     <div>
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/match-approvals" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/match-approvals" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Match Approval #<?= $request['id'] ?>
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function submitAction(action, notes) {
-        fetch(basePath + '/admin/match-approvals/' + action, {
+        fetch(basePath + '/admin-legacy/match-approvals/' + action, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                window.location.href = basePath + '/admin/match-approvals';
+                window.location.href = basePath + '/admin-legacy/match-approvals';
             } else {
                 alert('Error: ' + (data.error || 'Unknown error'));
             }
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php endif; ?>
 
 <!-- Match Approvals CSS loaded from external file (CLAUDE.md compliant) -->
-<link rel="stylesheet" href="/assets/css/admin/match-approvals.css">
+<link rel="stylesheet" href="/assets/css/admin-legacy/match-approvals.css">
 
 <?php endif; ?>
 

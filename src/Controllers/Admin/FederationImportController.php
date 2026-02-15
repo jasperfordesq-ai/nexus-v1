@@ -17,7 +17,7 @@ class FederationImportController
 {
     /**
      * Process user import from CSV
-     * POST /admin/federation/import/users
+     * POST /admin-legacy/federation/import/users
      */
     public function importUsers(): void
     {
@@ -27,14 +27,14 @@ class FederationImportController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: /admin/federation/data');
+            header('Location: /admin-legacy/federation/data');
             exit;
         }
 
         // Check file upload
         if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
             $_SESSION['flash_error'] = 'Please select a valid CSV file to upload.';
-            header('Location: /admin/federation/data');
+            header('Location: /admin-legacy/federation/data');
             exit;
         }
 
@@ -45,7 +45,7 @@ class FederationImportController
         $mimeType = $finfo->file($file['tmp_name']);
         if (!in_array($mimeType, ['text/csv', 'text/plain', 'application/csv'])) {
             $_SESSION['flash_error'] = 'Invalid file type. Please upload a CSV file.';
-            header('Location: /admin/federation/data');
+            header('Location: /admin-legacy/federation/data');
             exit;
         }
 
@@ -53,7 +53,7 @@ class FederationImportController
         $handle = fopen($file['tmp_name'], 'r');
         if (!$handle) {
             $_SESSION['flash_error'] = 'Could not read the uploaded file.';
-            header('Location: /admin/federation/data');
+            header('Location: /admin-legacy/federation/data');
             exit;
         }
 
@@ -67,7 +67,7 @@ class FederationImportController
         if (!$headers) {
             fclose($handle);
             $_SESSION['flash_error'] = 'CSV file is empty or invalid.';
-            header('Location: /admin/federation/data');
+            header('Location: /admin-legacy/federation/data');
             exit;
         }
 
@@ -83,7 +83,7 @@ class FederationImportController
         if ($emailCol === false && $usernameCol === false) {
             fclose($handle);
             $_SESSION['flash_error'] = 'CSV must contain either "email" or "username" column.';
-            header('Location: /admin/federation/data');
+            header('Location: /admin-legacy/federation/data');
             exit;
         }
 
@@ -255,7 +255,7 @@ class FederationImportController
         $_SESSION['import_results'] = $results;
         $_SESSION['flash_success'] = "Import complete: {$results['enrolled']} users enrolled in federation.";
 
-        header('Location: /admin/federation/data');
+        header('Location: /admin-legacy/federation/data');
         exit;
     }
 
@@ -312,7 +312,7 @@ class FederationImportController
 
     /**
      * Download import template
-     * GET /admin/federation/import/template
+     * GET /admin-legacy/federation/import/template
      */
     public function downloadTemplate(): void
     {

@@ -25,7 +25,7 @@ class GdprBreachController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/breaches
+     * GET /admin-legacy/enterprise/gdpr/breaches
      * Data breach log
      */
     public function index(): void
@@ -74,7 +74,7 @@ class GdprBreachController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/breaches/{id}
+     * GET /admin-legacy/enterprise/gdpr/breaches/{id}
      * View single breach details
      */
     public function show(int $id): void
@@ -86,7 +86,7 @@ class GdprBreachController extends BaseEnterpriseController
 
         if (!$breach) {
             $_SESSION['flash_error'] = 'Breach not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/breaches');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/breaches');
             exit;
         }
 
@@ -97,7 +97,7 @@ class GdprBreachController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/breaches/report
+     * GET /admin-legacy/enterprise/gdpr/breaches/report
      * Show breach report form
      */
     public function create(): void
@@ -108,7 +108,7 @@ class GdprBreachController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/breaches
+     * POST /admin-legacy/enterprise/gdpr/breaches
      * Report a new data breach
      */
     public function store(): void
@@ -132,7 +132,7 @@ class GdprBreachController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/breaches/{id}/escalate
+     * POST /admin-legacy/enterprise/gdpr/breaches/{id}/escalate
      * Escalate a breach to incident response team
      */
     public function escalate(int $id): void

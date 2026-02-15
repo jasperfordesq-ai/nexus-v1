@@ -39,7 +39,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
-import { useAuth } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -94,6 +94,7 @@ const PERMISSION_META: Record<string, { label: string; icon: typeof Globe }> = {
 export function FederationPartnersPage() {
   usePageTitle('Partner Communities');
   const { isAuthenticated } = useAuth();
+  const { tenantPath } = useTenant();
 
   const [partners, setPartners] = useState<FederationPartner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -235,8 +236,9 @@ export function FederationPartnersPage() {
         isOpen={isDetailOpen}
         onOpenChange={(open) => { if (!open) closeDetail(); }}
         size="2xl"
+        backdrop="blur"
         classNames={{
-          base: 'bg-theme-elevated border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-4',
           footer: 'border-t border-theme-default',
@@ -341,7 +343,7 @@ export function FederationPartnersPage() {
               <ModalFooter className="flex gap-2">
                 {isAuthenticated && (
                   <>
-                    <Link to={`/federation/members?partner_id=${selectedPartner.id}`}>
+                    <Link to={tenantPath(`/federation/members?partner_id=${selectedPartner.id}`)}>
                       <Button
                         variant="flat"
                         className="bg-theme-elevated text-theme-primary"
@@ -351,7 +353,7 @@ export function FederationPartnersPage() {
                         Browse Members
                       </Button>
                     </Link>
-                    <Link to={`/federation/listings?partner_id=${selectedPartner.id}`}>
+                    <Link to={tenantPath(`/federation/listings?partner_id=${selectedPartner.id}`)}>
                       <Button
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                         startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}

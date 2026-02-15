@@ -19,10 +19,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="user-report-container">
     <!-- Navigation -->
     <div class="nav-bar">
-        <a href="<?= $basePath ?>/admin/timebanking/user-report" class="back-link">
+        <a href="<?= $basePath ?>/admin-legacy/timebanking/user-report" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Search
         </a>
-        <a href="<?= $basePath ?>/admin/users/edit/<?= $user['id'] ?>" class="edit-link">
+        <a href="<?= $basePath ?>/admin-legacy/users/edit/<?= $user['id'] ?>" class="edit-link">
             <i class="fa-solid fa-user-pen"></i> Edit User Profile
         </a>
     </div>
@@ -175,7 +175,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <?php else: ?>
                 <div class="alerts-list">
                     <?php foreach ($alerts as $alert): ?>
-                    <a href="<?= $basePath ?>/admin/timebanking/alerts/<?= $alert['id'] ?>" class="alert-item">
+                    <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts/<?= $alert['id'] ?>" class="alert-item">
                         <div class="alert-type <?= $alert['status'] ?? 'pending' ?>">
                             <i class="fa-solid fa-<?= $alert['status'] === 'resolved' ? 'check' : 'exclamation' ?>"></i>
                         </div>
@@ -202,7 +202,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </div>
 
                 <div class="action-buttons">
-                    <a href="<?= $basePath ?>/admin/users/edit/<?= $user['id'] ?>" class="action-btn edit">
+                    <a href="<?= $basePath ?>/admin-legacy/users/edit/<?= $user['id'] ?>" class="action-btn edit">
                         <i class="fa-solid fa-user-pen"></i>
                         Edit Profile
                     </a>
@@ -227,7 +227,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <h3><i class="fa-solid fa-scale-balanced"></i> Adjust Balance</h3>
             <button type="button" class="modal" role="dialog" aria-modal="true"-close" onclick="closeBalanceModal()">&times;</button>
         </div>
-        <form action="<?= $basePath ?>/admin/timebanking/adjust-balance" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/timebanking/adjust-balance" method="POST">
             <?= \Nexus\Core\Csrf::input() ?>
             <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
 

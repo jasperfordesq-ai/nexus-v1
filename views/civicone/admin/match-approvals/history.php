@@ -2,7 +2,7 @@
 /**
  * Match Approval History - CivicOne Theme (GOV.UK)
  * Shows approved/rejected matches
- * Path: views/civicone/admin/match-approvals/history.php
+ * Path: views/civicone/admin-legacy/match-approvals/history.php
  */
 
 use Nexus\Core\TenantContext;
@@ -19,7 +19,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
 <div class="govuk-width-container">
-    <a href="<?= $basePath ?>/admin/match-approvals" class="govuk-back-link">Back to pending approvals</a>
+    <a href="<?= $basePath ?>/admin-legacy/match-approvals" class="govuk-back-link">Back to pending approvals</a>
 
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
@@ -29,7 +29,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                 <p class="govuk-body-l">View past match approval decisions.</p>
             </div>
             <div class="govuk-grid-column-one-third" style="text-align: right;">
-                <a href="<?= $basePath ?>/admin/match-approvals" class="govuk-button">
+                <a href="<?= $basePath ?>/admin-legacy/match-approvals" class="govuk-button">
                     Pending approvals
                 </a>
             </div>
@@ -45,7 +45,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     <option value="rejected" <?= $filter_status === 'rejected' ? 'selected' : '' ?>>Rejected only</option>
                 </select>
                 <?php if ($filter_status): ?>
-                    <a href="<?= $basePath ?>/admin/match-approvals/history" class="govuk-link govuk-!-margin-left-2">Clear filter</a>
+                    <a href="<?= $basePath ?>/admin-legacy/match-approvals/history" class="govuk-link govuk-!-margin-left-2">Clear filter</a>
                 <?php endif; ?>
             </form>
         </div>
@@ -69,7 +69,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     <?php foreach ($history as $item): ?>
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell">
-                                <a href="<?= $basePath ?>/admin/match-approvals/<?= $item['id'] ?>" class="govuk-link">
+                                <a href="<?= $basePath ?>/admin-legacy/match-approvals/<?= $item['id'] ?>" class="govuk-link">
                                     #<?= $item['id'] ?>
                                 </a>
                             </td>

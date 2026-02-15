@@ -8,7 +8,7 @@ $adminPageTitle = 'Deliverability Analytics';
 $adminPageSubtitle = 'Performance & Insights';
 $adminPageIcon = 'fa-chart-line';
 
-require dirname(dirname(__DIR__)) . '/admin/partials/admin-header.php';
+require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-header.php';
 
 $analytics = $analytics ?? [];
 $report = $report ?? [];
@@ -25,10 +25,10 @@ $filters = $filters ?? [];
         <p class="admin-page-subtitle">Performance metrics and insights</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/deliverability" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-gauge-high"></i> Dashboard
         </a>
-        <a href="<?= $basePath ?>/admin/deliverability/list" class="admin-btn admin-btn-info">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability/list" class="admin-btn admin-btn-info">
             <i class="fa-solid fa-list"></i> All Deliverables
         </a>
     </div>
@@ -239,7 +239,7 @@ $filters = $filters ?? [];
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <?php foreach (array_slice($analytics['blocked_deliverables'], 0, 5) as $item): ?>
                 <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 6px; border-left: 3px solid #f59e0b;">
-                    <a href="<?= $basePath ?>/admin/deliverability/view/<?= $item['id'] ?>"
+                    <a href="<?= $basePath ?>/admin-legacy/deliverability/view/<?= $item['id'] ?>"
                        style="color: #fff; text-decoration: none; font-weight: 500;">
                         <?= htmlspecialchars($item['title']) ?>
                     </a>
@@ -272,7 +272,7 @@ $filters = $filters ?? [];
                 <?php foreach (array_slice($analytics['upcoming_deadlines'], 0, 5) as $item): ?>
                 <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 6px; border-left: 3px solid #06b6d4;">
                     <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <a href="<?= $basePath ?>/admin/deliverability/view/<?= $item['id'] ?>"
+                        <a href="<?= $basePath ?>/admin-legacy/deliverability/view/<?= $item['id'] ?>"
                            style="color: #fff; text-decoration: none; font-weight: 500; flex: 1;">
                             <?= htmlspecialchars($item['title']) ?>
                         </a>
@@ -365,4 +365,4 @@ new Chart(statusCtx, {
 });
 </script>
 
-<?php require dirname(dirname(__DIR__)) . '/admin/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-footer.php'; ?>

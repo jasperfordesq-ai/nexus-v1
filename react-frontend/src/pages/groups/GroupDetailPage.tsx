@@ -1372,7 +1372,7 @@ export function GroupDetailPage() {
         isOpen={showNewDiscussion}
         onOpenChange={setShowNewDiscussion}
         classNames={{
-          base: 'bg-theme-surface border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           footer: 'border-t border-theme-default',
         }}
@@ -1434,7 +1434,7 @@ export function GroupDetailPage() {
         onOpenChange={setShowSettingsModal}
         size="lg"
         classNames={{
-          base: 'bg-theme-surface border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           footer: 'border-t border-theme-default',
         }}
@@ -1524,7 +1524,7 @@ export function GroupDetailPage() {
         isOpen={showDeleteModal}
         onOpenChange={setShowDeleteModal}
         classNames={{
-          base: 'bg-theme-surface border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           footer: 'border-t border-theme-default',
         }}

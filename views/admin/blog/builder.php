@@ -58,7 +58,7 @@
         </div>
         <div class="panel__right">
             <div class="panel-top">
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/blog" style="color:#ccc; text-decoration:none; margin-right:auto;">&larr; Back</a>
+                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/blog" style="color:#ccc; text-decoration:none; margin-right:auto;">&larr; Back</a>
                 <button class="btn-save" onclick="savePage()">Save Article</button>
             </div>
 
@@ -291,7 +291,7 @@
             const btn = document.querySelector('.btn-save');
             btn.innerText = 'Saving...';
 
-            fetch(basePath + '/admin/blog/save-builder', {
+            fetch(basePath + '/admin-legacy/blog/save-builder', {
                     method: 'POST',
                     body: formData
                 })

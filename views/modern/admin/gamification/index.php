@@ -28,10 +28,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Manage badges, XP, and achievements for your community</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/gamification/campaigns" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/gamification/campaigns" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-bullhorn"></i> Campaigns
         </a>
-        <a href="<?= $basePath ?>/admin/gamification/analytics" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/gamification/analytics" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-chart-line"></i> Analytics
         </a>
     </div>
@@ -132,7 +132,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <div class="gam-action-section">
                     <h4 class="gam-action-title"><i class="fa-solid fa-rotate"></i> Recheck All Badges</h4>
                     <p class="gam-action-desc">Scan all users' activity and automatically award any badges they qualify for but haven't received yet.</p>
-                    <form action="<?= $basePath ?>/admin/gamification/recheck-all" method="POST">
+                    <form action="<?= $basePath ?>/admin-legacy/gamification/recheck-all" method="POST">
                         <?= Csrf::input() ?>
                         <button type="submit" class="admin-btn admin-btn-primary" onclick="return confirm('This will scan all users. Continue?')">
                             <i class="fa-solid fa-rotate"></i> Recheck All Users
@@ -144,7 +144,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <div class="gam-action-section">
                     <h4 class="gam-action-title"><i class="fa-solid fa-gift"></i> Award Badge to All Users</h4>
                     <p class="gam-action-desc">Award a specific badge to all users at once. Great for commemorative badges.</p>
-                    <form action="<?= $basePath ?>/admin/gamification/award-all" method="POST">
+                    <form action="<?= $basePath ?>/admin-legacy/gamification/award-all" method="POST">
                         <?= Csrf::input() ?>
                         <select name="badge_key" required class="admin-select">
                             <option value="">-- Select Badge --</option>
@@ -289,10 +289,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
             <div class="admin-card-body">
                 <div class="quick-links">
-                    <a href="<?= $basePath ?>/admin/cron-jobs" class="quick-link">
+                    <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="quick-link">
                         <i class="fa-solid fa-clock"></i> Cron Jobs
                     </a>
-                    <a href="<?= $basePath ?>/admin/custom-badges" class="quick-link">
+                    <a href="<?= $basePath ?>/admin-legacy/custom-badges" class="quick-link">
                         <i class="fa-solid fa-certificate"></i> Custom Badges
                     </a>
                     <a href="<?= $basePath ?>/leaderboard" class="quick-link" target="_blank">

@@ -38,11 +38,11 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         <p class="admin-page-subtitle">View and manage execution history</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/cron-jobs" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Manager
         </a>
-        <form action="<?= $basePath ?>/admin/cron-jobs/clear-logs" method="POST" class="admin-clear-form" onsubmit="return confirm('Are you sure you want to clear old logs?');">
+        <form action="<?= $basePath ?>/admin-legacy/cron-jobs/clear-logs" method="POST" class="admin-clear-form" onsubmit="return confirm('Are you sure you want to clear old logs?');">
             <?= Csrf::input() ?>
             <select name="days" class="admin-select">
                 <option value="7">Older than 7 days</option>
@@ -205,7 +205,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
             </div>
             <h3 class="admin-empty-title">No Execution Logs Yet</h3>
             <p class="admin-empty-text">Cron job executions will be logged here once they run.</p>
-            <a href="<?= $basePath ?>/admin/cron-jobs" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-play"></i>
                 Run a Cron Job
             </a>

@@ -23,7 +23,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/seo" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/seo" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Bulk SEO Editor
@@ -32,10 +32,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     </div>
     <div class="admin-page-header-actions">
         <div class="type-tabs">
-            <a href="<?= $basePath ?>/admin/seo/bulk/listing" class="type-tab <?= $type === 'listing' ? 'active' : '' ?>">Listings</a>
-            <a href="<?= $basePath ?>/admin/seo/bulk/event" class="type-tab <?= $type === 'event' ? 'active' : '' ?>">Events</a>
-            <a href="<?= $basePath ?>/admin/seo/bulk/group" class="type-tab <?= $type === 'group' ? 'active' : '' ?>">Groups</a>
-            <a href="<?= $basePath ?>/admin/seo/bulk/post" class="type-tab <?= $type === 'post' ? 'active' : '' ?>">Posts</a>
+            <a href="<?= $basePath ?>/admin-legacy/seo/bulk/listing" class="type-tab <?= $type === 'listing' ? 'active' : '' ?>">Listings</a>
+            <a href="<?= $basePath ?>/admin-legacy/seo/bulk/event" class="type-tab <?= $type === 'event' ? 'active' : '' ?>">Events</a>
+            <a href="<?= $basePath ?>/admin-legacy/seo/bulk/group" class="type-tab <?= $type === 'group' ? 'active' : '' ?>">Groups</a>
+            <a href="<?= $basePath ?>/admin-legacy/seo/bulk/post" class="type-tab <?= $type === 'post' ? 'active' : '' ?>">Posts</a>
         </div>
     </div>
 </div>
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('meta_description', descInput.value);
         formData.append('csrf_token', csrfToken);
 
-        fetch(basePath + '/admin/seo/bulk/save', {
+        fetch(basePath + '/admin-legacy/seo/bulk/save', {
             method: 'POST',
             body: formData
         })

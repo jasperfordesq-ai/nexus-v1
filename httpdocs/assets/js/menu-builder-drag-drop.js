@@ -193,7 +193,7 @@ class MenuBuilderDragDrop {
         formData.append('csrf_token', this.csrfToken);
         formData.append('items', JSON.stringify(orderData));
 
-        fetch(`${this.basePath}/admin/menus/items/reorder`, {
+        fetch(`${this.basePath}/admin-legacy/menus/items/reorder`, {
             method: 'POST',
             body: formData
         })

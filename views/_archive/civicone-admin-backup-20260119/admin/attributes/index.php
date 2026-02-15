@@ -1,6 +1,6 @@
 <?php
 // CivicOne View: Admin Attribute Manager
-// Path: views/civicone/admin/attributes/index.php
+// Path: views/civicone/admin-legacy/attributes/index.php
 
 $hTitle = 'Service Attributes';
 $hSubtitle = 'Tags & Requirements for Listings';
@@ -21,7 +21,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                         <div style="font-size:0.85rem; color: #6b7280;">Manage tags like "Garda Vetted" or "Wheelchair Access"</div>
                     </div>
                 </div>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/attributes/create" style="background:var(--civic-brand, #00796B); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:600;">
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/attributes/create" style="background:var(--civic-brand, #00796B); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:600;">
                     + New Attribute
                 </a>
             </header>
@@ -77,9 +77,9 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                                             <?php endif; ?>
                                         </td>
                                         <td style="padding:15px 20px; text-align:right;">
-                                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/attributes/edit/<?= $attr['id'] ?>" style="display:inline-block; margin-right:5px; padding:4px 10px; background:#f3f4f6; color:#374151; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:600;">Edit</a>
+                                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/attributes/edit/<?= $attr['id'] ?>" style="display:inline-block; margin-right:5px; padding:4px 10px; background:#f3f4f6; color:#374151; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:600;">Edit</a>
 
-                                            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/attributes/delete" method="POST" onsubmit="return confirm('Delete this attribute?');" style="display:inline;">
+                                            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/attributes/delete" method="POST" onsubmit="return confirm('Delete this attribute?');" style="display:inline;">
                                                 <?= \Nexus\Core\Csrf::input() ?>
                                                 <input type="hidden" name="id" value="<?= $attr['id'] ?>">
                                                 <button type="submit" style="background:none; border:none; padding:0 5px; color:#ef4444; font-weight:bold; cursor:pointer; font-size:1.1rem;">&times;</button>

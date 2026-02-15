@@ -558,7 +558,7 @@ input[type="checkbox"] {
             <p>Manage data subject access and deletion requests</p>
         </div>
     </div>
-    <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests/create" class="enterprise-btn enterprise-btn-primary">
+    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests/create" class="enterprise-btn enterprise-btn-primary">
         <i class="fa-solid fa-plus"></i>
         New Request
     </a>
@@ -636,7 +636,7 @@ input[type="checkbox"] {
             <button type="submit" class="enterprise-btn enterprise-btn-primary enterprise-btn-sm">
                 <i class="fa-solid fa-search"></i> Filter
             </button>
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests" class="enterprise-btn enterprise-btn-secondary enterprise-btn-sm">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests" class="enterprise-btn enterprise-btn-secondary enterprise-btn-sm">
                 <i class="fa-solid fa-times"></i> Clear
             </a>
         </div>
@@ -675,7 +675,7 @@ input[type="checkbox"] {
                     <tr class="<?= isRequestOverdue($request['created_at'], $request['status']) ? 'overdue' : '' ?>">
                         <td><input type="checkbox" class="request-checkbox" value="<?= $request['id'] ?>"></td>
                         <td>
-                            <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests/<?= $request['id'] ?>" class="request-id">
+                            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>" class="request-id">
                                 #<?= $request['id'] ?>
                             </a>
                         </td>
@@ -716,7 +716,7 @@ input[type="checkbox"] {
                         </td>
                         <td>
                             <div class="actions-cell">
-                                <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests/<?= $request['id'] ?>" class="action-btn" title="View">
+                                <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>" class="action-btn" title="View">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
                                 <?php if ($request['status'] === 'pending'): ?>
@@ -813,7 +813,7 @@ function clearSelection() {
 
 function processRequest(id) {
     if (confirm('Start processing this request?')) {
-        fetch(basePath + '/admin/enterprise/gdpr/requests/' + id + '/process', { method: 'POST' })
+        fetch(basePath + '/admin-legacy/enterprise/gdpr/requests/' + id + '/process', { method: 'POST' })
             .then(() => location.reload());
     }
 }
@@ -821,7 +821,7 @@ function processRequest(id) {
 function rejectRequest(id) {
     const reason = prompt('Enter rejection reason:');
     if (reason) {
-        fetch(basePath + '/admin/enterprise/gdpr/requests/' + id + '/reject', {
+        fetch(basePath + '/admin-legacy/enterprise/gdpr/requests/' + id + '/reject', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({reason: reason})
@@ -832,7 +832,7 @@ function rejectRequest(id) {
 function bulkProcess() {
     const ids = Array.from(document.querySelectorAll('.request-checkbox:checked')).map(cb => cb.value);
     if (confirm('Process ' + ids.length + ' requests?')) {
-        fetch(basePath + '/admin/enterprise/gdpr/requests/bulk-process', {
+        fetch(basePath + '/admin-legacy/enterprise/gdpr/requests/bulk-process', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ids: ids})
@@ -842,7 +842,7 @@ function bulkProcess() {
 
 function bulkAssign() {
     const ids = Array.from(document.querySelectorAll('.request-checkbox:checked')).map(cb => cb.value);
-    window.location.href = basePath + '/admin/enterprise/gdpr/requests/bulk-assign?ids=' + ids.join(',');
+    window.location.href = basePath + '/admin-legacy/enterprise/gdpr/requests/bulk-assign?ids=' + ids.join(',');
 }
 </script>
 

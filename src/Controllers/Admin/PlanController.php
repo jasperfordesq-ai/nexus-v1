@@ -68,7 +68,7 @@ class PlanController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Csrf::verify()) {
                 $_SESSION['error'] = 'Invalid CSRF token';
-                header('Location: ' . TenantContext::getBasePath() . '/admin/plans');
+                header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
                 exit;
             }
 
@@ -80,7 +80,7 @@ class PlanController
                 $features = json_decode($_POST['features'], true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $_SESSION['error'] = 'Invalid features JSON';
-                    header('Location: ' . TenantContext::getBasePath() . '/admin/plans/create');
+                    header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans/create');
                     exit;
                 }
             }
@@ -112,7 +112,7 @@ class PlanController
             ]);
 
             $_SESSION['success'] = 'Plan created successfully';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/plans');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
             exit;
         }
 
@@ -134,14 +134,14 @@ class PlanController
         $plan = PayPlan::find($id);
         if (!$plan) {
             $_SESSION['error'] = 'Plan not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/plans');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
             exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Csrf::verify()) {
                 $_SESSION['error'] = 'Invalid CSRF token';
-                header('Location: ' . TenantContext::getBasePath() . '/admin/plans');
+                header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
                 exit;
             }
 
@@ -153,7 +153,7 @@ class PlanController
                 $features = json_decode($_POST['features'], true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $_SESSION['error'] = 'Invalid features JSON';
-                    header('Location: ' . TenantContext::getBasePath() . '/admin/plans/edit/' . $id);
+                    header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans/edit/' . $id);
                     exit;
                 }
             }
@@ -187,7 +187,7 @@ class PlanController
             ]);
 
             $_SESSION['success'] = 'Plan updated successfully';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/plans');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
             exit;
         }
 

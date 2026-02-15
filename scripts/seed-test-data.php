@@ -6,7 +6,7 @@
  * Safe to re-run (uses INSERT IGNORE and existence checks).
  *
  * Usage:
- *   Via Docker mysql: docker exec -i nexus-mysql-db mysql -unexus -pnexus_secret nexus < scripts/seed-test-data.sql
+ *   Via Docker mysql: docker exec -i nexus-php-db mysql -unexus -pnexus_secret nexus < scripts/seed-test-data.sql
  *   Via PHP:          docker exec nexus-php-app php scripts/seed-test-data.php
  */
 
@@ -54,4 +54,4 @@ foreach ($statements as $stmt) {
 }
 
 echo "Executed $executed statements ($errors errors)\n";
-echo "\nPreferred method: docker exec -i nexus-mysql-db mysql -unexus -pnexus_secret nexus < scripts/seed-test-data.sql\n";
+echo "\nPreferred method: docker exec -i nexus-php-db mysql -unexus -pnexus_secret nexus < scripts/seed-test-data.sql\n";

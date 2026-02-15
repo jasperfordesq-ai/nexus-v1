@@ -153,7 +153,7 @@ class UserController
             }
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users?created=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?created=1');
         exit;
     }
 
@@ -163,7 +163,7 @@ class UserController
         $user = User::findById($id);
 
         if (!$user) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users');
             exit;
         }
 
@@ -187,7 +187,7 @@ class UserController
         $user = User::findById($id);
 
         if (!$user) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users');
             exit;
         }
 
@@ -203,7 +203,7 @@ class UserController
 
         $user = User::findById($id);
         if (!$user) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users');
             exit;
         }
 
@@ -255,7 +255,7 @@ class UserController
 
         User::updateAdminFields($id, $role, $status, $isSuperAdmin);
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users');
         exit;
     }
 
@@ -268,7 +268,7 @@ class UserController
 
         // Prevent deleting self
         if ($id == $_SESSION['user_id']) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=cannot_delete_self');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=cannot_delete_self');
             exit;
         }
 
@@ -276,18 +276,18 @@ class UserController
         $targetUser = User::findById($id);
 
         if (!$targetUser) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=user_not_found');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=user_not_found');
             exit;
         }
 
         // Check if current user can manage the target user
         if (!AdminAuth::canManageUser($targetUser)) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=insufficient_privileges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=insufficient_privileges');
             exit;
         }
 
         User::delete($id);
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users?deleted=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?deleted=1');
         exit;
     }
 
@@ -342,7 +342,7 @@ class UserController
             }
         }
 
-        $referer = UrlHelper::safeReferer('/admin');
+        $referer = UrlHelper::safeReferer('/admin-legacy');
         header('Location: ' . $referer);
         exit;
     }
@@ -367,7 +367,7 @@ class UserController
                 // Prevent duplicates for Standard Badges if key is provided
                 if (!empty($_POST['badge_key']) && \Nexus\Models\UserBadge::hasBadge($userId, $badgeKey)) {
                     // Already has badge, just redirect back
-                    header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $userId . '/edit?error=already_has_badge');
+                    header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $userId . '/edit?error=already_has_badge');
                     exit;
                 }
 
@@ -402,14 +402,14 @@ class UserController
                 }
             }
 
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $userId . '/edit?badge_added=true');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $userId . '/edit?badge_added=true');
             exit;
         } catch (\Throwable $e) {
             // Log the full error server-side but don't expose to user
             error_log("Add Badge Failed: " . $e->getMessage() . " | File: " . $e->getFile() . " | Line: " . $e->getLine());
             // SECURITY: Use already validated $userId (cast to int above) instead of raw POST data
             $safeUserId = (int)($_POST['user_id'] ?? 0);
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $safeUserId . '/edit?error=badge_failed');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $safeUserId . '/edit?error=badge_failed');
             exit;
         }
     }
@@ -429,7 +429,7 @@ class UserController
             \Nexus\Core\Database::query("DELETE FROM user_badges WHERE user_id = ? AND badge_key = ?", [$userId, $badgeKey]);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $userId . '/edit?badge_removed=true');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $userId . '/edit?badge_removed=true');
         exit;
     }
 
@@ -452,7 +452,7 @@ class UserController
             }
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $userId . '/edit?badges_rechecked=true');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $userId . '/edit?badges_rechecked=true');
         exit;
     }
 
@@ -468,13 +468,13 @@ class UserController
         $badgeKey = $_POST['badge_key'] ?? '';
 
         if (empty($userIds) || empty($badgeKey)) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=missing_data');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=missing_data');
             exit;
         }
 
         $badge = \Nexus\Services\GamificationService::getBadgeByKey($badgeKey);
         if (!$badge) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=invalid_badge');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=invalid_badge');
             exit;
         }
 
@@ -494,7 +494,7 @@ class UserController
             }
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users?bulk_awarded=' . $awarded);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?bulk_awarded=' . $awarded);
         exit;
     }
 
@@ -518,7 +518,7 @@ class UserController
             }
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users?all_rechecked=' . $processed);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?all_rechecked=' . $processed);
         exit;
     }
 
@@ -535,20 +535,20 @@ class UserController
 
         // Prevent suspending self
         if ($id == $_SESSION['user_id']) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=cannot_suspend_self');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=cannot_suspend_self');
             exit;
         }
 
         $targetUser = User::findById($id);
 
         if (!$targetUser) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=user_not_found');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=user_not_found');
             exit;
         }
 
         // Check if current user can manage the target user
         if (!AdminAuth::canManageUser($targetUser)) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=insufficient_privileges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=insufficient_privileges');
             exit;
         }
 
@@ -561,7 +561,7 @@ class UserController
         // Log the action
         \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'suspend_user', "Suspended user #{$id}: {$targetUser['email']}");
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users?suspended=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?suspended=1');
         exit;
     }
 
@@ -578,20 +578,20 @@ class UserController
 
         // Prevent banning self
         if ($id == $_SESSION['user_id']) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=cannot_ban_self');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=cannot_ban_self');
             exit;
         }
 
         $targetUser = User::findById($id);
 
         if (!$targetUser) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=user_not_found');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=user_not_found');
             exit;
         }
 
         // Check if current user can manage the target user
         if (!AdminAuth::canManageUser($targetUser)) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=insufficient_privileges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=insufficient_privileges');
             exit;
         }
 
@@ -604,7 +604,7 @@ class UserController
         // Log the action
         \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'ban_user', "Banned user #{$id}: {$targetUser['email']}");
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users?banned=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?banned=1');
         exit;
     }
 
@@ -621,13 +621,13 @@ class UserController
         $targetUser = User::findById($id);
 
         if (!$targetUser) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=user_not_found');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=user_not_found');
             exit;
         }
 
         // Check if current user can manage the target user
         if (!AdminAuth::canManageUser($targetUser)) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=insufficient_privileges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=insufficient_privileges');
             exit;
         }
 
@@ -640,7 +640,7 @@ class UserController
         // Log the action
         \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'reactivate_user', "Reactivated user #{$id}: {$targetUser['email']}");
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users?reactivated=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?reactivated=1');
         exit;
     }
 
@@ -656,14 +656,14 @@ class UserController
 
         // Prevent revoking own super admin
         if ($id == $_SESSION['user_id']) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=cannot_revoke_self');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=cannot_revoke_self');
             exit;
         }
 
         $targetUser = User::findById($id);
 
         if (!$targetUser) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=user_not_found');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=user_not_found');
             exit;
         }
 
@@ -676,13 +676,13 @@ class UserController
         // Log the action
         \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'revoke_super_admin', "Revoked super admin from user #{$id}: {$targetUser['email']}");
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/users?super_admin_revoked=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?super_admin_revoked=1');
         exit;
     }
 
     /**
      * Reset 2FA for a user who is locked out
-     * POST /admin/users/{id}/reset-2fa
+     * POST /admin-legacy/users/{id}/reset-2fa
      */
     public function reset2fa(int $id): void
     {
@@ -692,20 +692,20 @@ class UserController
         $targetUser = User::findById($id);
 
         if (!$targetUser) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=user_not_found');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=user_not_found');
             exit;
         }
 
         // Check if current user can manage the target user
         if (!AdminAuth::canManageUser($targetUser)) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users?error=insufficient_privileges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?error=insufficient_privileges');
             exit;
         }
 
         $reason = trim($_POST['reason'] ?? '');
 
         if (empty($reason)) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $id . '/edit?error=2fa_reset_reason_required');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $id . '/edit?error=2fa_reset_reason_required');
             exit;
         }
 
@@ -715,9 +715,9 @@ class UserController
             // Log the action
             \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'reset_2fa', "Reset 2FA for user #{$id}: {$targetUser['email']} - Reason: {$reason}");
 
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $id . '/edit?2fa_reset=1');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $id . '/edit?2fa_reset=1');
         } else {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $id . '/edit?error=' . urlencode($result['error'] ?? '2fa_reset_failed'));
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $id . '/edit?error=' . urlencode($result['error'] ?? '2fa_reset_failed'));
         }
         exit;
     }

@@ -1,6 +1,6 @@
 <?php
 // CivicOne View: Admin User Management
-// Path: views/civicone/admin/users/index.php
+// Path: views/civicone/admin-legacy/users/index.php
 
 $hTitle = 'Platform Members';
 $hSubtitle = 'View and manage platform members';
@@ -73,9 +73,9 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
 
                                     <td style="padding: 15px 20px; text-align: right;">
                                         <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/users/edit/<?= $user['id'] ?>" style="background:#f3f4f6; color:#1f2937; padding:4px 10px; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:600;">Edit</a>
+                                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/users/edit/<?= $user['id'] ?>" style="background:#f3f4f6; color:#1f2937; padding:4px 10px; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:600;">Edit</a>
 
-                                            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');" style="display:inline;">
+                                            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');" style="display:inline;">
                                                 <?= \Nexus\Core\Csrf::input() ?>
                                                 <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                                                 <button type="submit" style="background:#fee2e2; color:#991b1b; border:none; padding:4px 10px; border-radius:4px; font-size:0.85rem; font-weight:600; cursor:pointer;">Delete</button>

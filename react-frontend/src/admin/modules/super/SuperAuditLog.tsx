@@ -5,9 +5,11 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Input, Select, SelectItem, Button } from '@heroui/react';
 import { Download, X } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
+import { useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import { DataTable, PageHeader, StatusBadge, type Column } from '../../components';
 import type { SuperAuditEntry } from '../../api/types';
@@ -16,6 +18,7 @@ const PAGE_SIZE = 25;
 
 export function SuperAuditLog() {
   usePageTitle('Super Admin - Audit Log');
+  const { tenantPath } = useTenant();
 
   const [logs, setLogs] = useState<SuperAuditEntry[]>([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -100,16 +103,35 @@ export function SuperAuditLog() {
     },
     {
       key: 'target_label', label: 'Target', sortable: true,
-      render: (entry) => (
-        <div>
-          <span className="font-medium">{entry.target_label}</span>
-          <span className="text-xs text-default-400 ml-2">({entry.target_type})</span>
-        </div>
-      ),
+      render: (entry) => {
+        const targetLink = entry.target_type === 'user' && entry.target_id
+          ? tenantPath(`/admin/super/users/${entry.target_id}`)
+          : entry.target_type === 'tenant' && entry.target_id
+            ? tenantPath(`/admin/super/tenants/${entry.target_id}`)
+            : null;
+        return (
+          <div>
+            {targetLink ? (
+              <Link to={targetLink} className="font-medium text-foreground hover:text-primary">
+                {entry.target_label}
+              </Link>
+            ) : (
+              <span className="font-medium">{entry.target_label}</span>
+            )}
+            <span className="text-xs text-default-400 ml-2">({entry.target_type})</span>
+          </div>
+        );
+      },
     },
     {
       key: 'actor', label: 'Actor',
-      render: (entry) => <span>{entry.actor_name || `User #${entry.actor_id}`}</span>,
+      render: (entry) => entry.actor_id ? (
+        <Link to={tenantPath(`/admin/super/users/${entry.actor_id}`)} className="hover:text-primary">
+          {entry.actor_name || `User #${entry.actor_id}`}
+        </Link>
+      ) : (
+        <span>{entry.actor_name || 'System'}</span>
+      ),
     },
     {
       key: 'description', label: 'Description',
@@ -127,6 +149,11 @@ export function SuperAuditLog() {
 
   return (
     <div>
+      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <span>/</span>
+        <span className="text-foreground">Audit Log</span>
+      </nav>
       <PageHeader
         title="Audit Log"
         description="Cross-tenant action history"

@@ -1,15 +1,15 @@
 <?php
 // Master Admin Dashboard Dispatcher
-// Path: views/admin/dashboard.php
+// Path: views/admin-legacy/dashboard.php
 
 // Force Modern Layout or use Session
 // FIXED: Use consistent session variable order (active_layout first)
 $layout = layout(); // Fixed: centralized detection
 
 // Target Path Resolution
-// Current Dir: views/admin/
-// Target: views/modern/admin/dashboard.php
-$modernView = __DIR__ . '/../modern/admin/dashboard.php';
+// Current Dir: views/admin-legacy/
+// Target: views/modern/admin-legacy/dashboard.php
+$modernView = __DIR__ . '/../modern/admin-legacy/dashboard.php';
 
 if (($layout === 'modern' || $layout === 'high-contrast') && file_exists($modernView)) {
     require $modernView;

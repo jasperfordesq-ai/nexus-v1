@@ -51,10 +51,10 @@ $hostname = gethostname() ?: 'Unknown';
         <p class="admin-page-subtitle">Real-time performance metrics and system health</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Enterprise Hub
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/monitoring/health" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring/health" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-stethoscope"></i> Run Health Check
         </a>
     </div>
@@ -73,7 +73,7 @@ $hostname = gethostname() ?: 'Unknown';
         <p class="health-banner-text">All services are running normally. Last checked: <?= date('F j, Y \a\t g:i:s A') ?></p>
     </div>
     <div class="health-banner-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/monitoring/logs" class="health-btn">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring/logs" class="health-btn">
             <i class="fa-solid fa-file-lines"></i> View Logs
         </a>
     </div>
@@ -271,7 +271,7 @@ $hostname = gethostname() ?: 'Unknown';
         </div>
         <div class="admin-card-body">
             <div class="quick-actions-grid">
-                <a href="<?= $basePath ?>/admin/enterprise/monitoring/logs" class="quick-action-card">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring/logs" class="quick-action-card">
                     <div class="quick-action-icon">
                         <i class="fa-solid fa-file-lines"></i>
                     </div>
@@ -282,7 +282,7 @@ $hostname = gethostname() ?: 'Unknown';
                     <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
                 </a>
 
-                <a href="<?= $basePath ?>/admin/enterprise/monitoring/health" class="quick-action-card">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring/health" class="quick-action-card">
                     <div class="quick-action-icon" style="background: linear-gradient(135deg, #10b981, #34d399);">
                         <i class="fa-solid fa-heartbeat"></i>
                     </div>
@@ -293,7 +293,7 @@ $hostname = gethostname() ?: 'Unknown';
                     <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
                 </a>
 
-                <a href="<?= $basePath ?>/admin/enterprise/config" class="quick-action-card">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/config" class="quick-action-card">
                     <div class="quick-action-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
                         <i class="fa-solid fa-gears"></i>
                     </div>
@@ -304,7 +304,7 @@ $hostname = gethostname() ?: 'Unknown';
                     <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
                 </a>
 
-                <a href="<?= $basePath ?>/admin/cron-jobs" class="quick-action-card">
+                <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="quick-action-card">
                     <div class="quick-action-icon" style="background: linear-gradient(135deg, #ec4899, #f472b6);">
                         <i class="fa-solid fa-clock-rotate-left"></i>
                     </div>
@@ -315,7 +315,7 @@ $hostname = gethostname() ?: 'Unknown';
                     <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
                 </a>
 
-                <a href="<?= $basePath ?>/admin/activity-log" class="quick-action-card">
+                <a href="<?= $basePath ?>/admin-legacy/activity-log" class="quick-action-card">
                     <div class="quick-action-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
                         <i class="fa-solid fa-list-ul"></i>
                     </div>
@@ -326,7 +326,7 @@ $hostname = gethostname() ?: 'Unknown';
                     <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
                 </a>
 
-                <a href="<?= $basePath ?>/admin/enterprise" class="quick-action-card">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise" class="quick-action-card">
                     <div class="quick-action-icon" style="background: linear-gradient(135deg, #64748b, #94a3b8);">
                         <i class="fa-solid fa-arrow-left"></i>
                     </div>

@@ -10,8 +10,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 $isEdit = isset($newsletter);
 
 $action = $isEdit
-    ? $basePath . "/admin/newsletters/update/" . $newsletter['id']
-    : $basePath . "/admin/newsletters/store";
+    ? $basePath . "/admin-legacy/newsletters/update/" . $newsletter['id']
+    : $basePath . "/admin-legacy/newsletters/store";
 
 $eligibleCount = $eligibleCount ?? 0;
 $segments = $segments ?? [];
@@ -51,7 +51,7 @@ else {
 
         <!-- Back Button -->
         <div style="margin-bottom: 20px;">
-            <a href="<?= $basePath ?>/admin/newsletters" style="text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(4px); font-size: 0.9rem; transition: background 0.2s;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters" style="text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(4px); font-size: 0.9rem; transition: background 0.2s;">
                 &larr; Back to Newsletters
             </a>
         </div>
@@ -425,7 +425,7 @@ else {
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
                                     <i class="fa-solid fa-lightbulb" style="color: #16a34a;"></i>
                                     <span style="font-weight: 600; color: #166534; font-size: 0.9rem;">Best Times to Send</span>
-                                    <a href="<?= $basePath ?>/admin/newsletters/send-time" target="_blank" style="margin-left: auto; color: #16a34a; font-size: 0.8rem; text-decoration: none;" title="View full analytics">
+                                    <a href="<?= $basePath ?>/admin-legacy/newsletters/send-time" target="_blank" style="margin-left: auto; color: #16a34a; font-size: 0.8rem; text-decoration: none;" title="View full analytics">
                                         <i class="fa-solid fa-chart-line"></i>
                                     </a>
                                 </div>
@@ -843,7 +843,7 @@ else {
 
                     <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                         <?php if ($isEdit): ?>
-                            <a href="<?= $basePath ?>/admin/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank"
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank"
                                 style="background: #f1f5f9; color: #475569; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
                                 <i class="fa-solid fa-eye"></i> Preview
                             </a>
@@ -856,7 +856,7 @@ else {
                             <?php endif; ?>
                         <?php endif; ?>
 
-                        <a href="<?= $basePath ?>/admin/newsletters"
+                        <a href="<?= $basePath ?>/admin-legacy/newsletters"
                             style="background: #f1f5f9; color: #475569; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
                             Cancel
                         </a>
@@ -886,7 +886,7 @@ else {
 
         <?php if ($isEdit && $newsletter['status'] !== 'sent'): ?>
         <!-- Delete Form (outside main form to avoid nesting) -->
-        <form id="delete-newsletter-form" action="<?= $basePath ?>/admin/newsletters/delete" method="POST" style="display: none;">
+        <form id="delete-newsletter-form" action="<?= $basePath ?>/admin-legacy/newsletters/delete" method="POST" style="display: none;">
             <?= \Nexus\Core\Csrf::input() ?>
             <input type="hidden" name="id" value="<?= $newsletter['id'] ?>">
         </form>
@@ -992,7 +992,7 @@ function loadSendTimeRecommendations() {
     var container = document.getElementById('recommended-times');
     if (!container) return;
 
-    fetch('<?= $basePath ?>/admin/newsletters/send-time-recommendations')
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/send-time-recommendations')
         .then(function(response) { return response.json(); })
         .then(function(data) {
             if (data.success && data.data && data.data.has_data && data.data.recommendations) {
@@ -1280,13 +1280,13 @@ function saveAndSend() {
     // Add flag to indicate we want to send after saving
     formData.append('send_after_save', '1');
 
-    fetch('<?= $basePath ?>/admin/newsletters/update/<?= $newsletter['id'] ?>', {
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/update/<?= $newsletter['id'] ?>', {
         method: 'POST',
         body: formData
     })
     .then(response => {
         // After save, redirect to send endpoint
-        window.location.href = '<?= $basePath ?>/admin/newsletters/send-direct/<?= $newsletter['id'] ?>';
+        window.location.href = '<?= $basePath ?>/admin-legacy/newsletters/send-direct/<?= $newsletter['id'] ?>';
     })
     .catch(error => {
         alert('Error saving: ' + error.message);
@@ -1303,7 +1303,7 @@ function sendTestEmail() {
     const form = document.getElementById('newsletter-form');
     const formData = new FormData(form);
 
-    fetch('<?= $basePath ?>/admin/newsletters/send-test/<?= $newsletter['id'] ?>', {
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/send-test/<?= $newsletter['id'] ?>', {
         method: 'POST',
         body: formData
     })
@@ -1483,7 +1483,7 @@ function loadClientPreview(client) {
     // Show loading state
     frame.contentDocument.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; font-family: sans-serif; color: #6b7280;"><div style="text-align: center;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i><br>Loading ' + client + ' preview...</div></div>';
 
-    fetch('<?= $basePath ?>/admin/newsletters/client-preview/' + newsletterId + '?client=' + client)
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/client-preview/' + newsletterId + '?client=' + client)
         .then(function(response) { return response.json(); })
         .then(function(data) {
             if (data.success && data.html) {
@@ -1837,7 +1837,7 @@ function fetchLiveRecipientCount() {
         formData.append('target_groups[]', cb.value);
     });
 
-    fetch('<?= $basePath ?>/admin/newsletters/get-recipient-count', {
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/get-recipient-count', {
         method: 'POST',
         body: formData
     })
@@ -1986,7 +1986,7 @@ function loadRecipientPreview(offset) {
         formData.append('target_groups[]', cb.value);
     });
 
-    fetch('<?= $basePath ?>/admin/newsletters/preview-recipients', {
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/preview-recipients', {
         method: 'POST',
         body: formData
     })

@@ -540,10 +540,10 @@ foreach ($logFiles as $log) {
         <p class="logs-page-subtitle">Browse and analyze application log files</p>
     </div>
     <div class="logs-page-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Monitoring
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/monitoring/logs/download-all" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring/logs/download-all" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-download"></i> Download All
         </a>
         <button onclick="location.reload()" class="admin-btn admin-btn-primary">
@@ -666,7 +666,7 @@ foreach ($logFiles as $log) {
                 'default' => 'fa-file-lines'
             ];
             ?>
-            <a href="<?= $basePath ?>/admin/enterprise/monitoring/logs/<?= urlencode($filename) ?>"
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring/logs/<?= urlencode($filename) ?>"
                class="log-card"
                data-name="<?= htmlspecialchars(strtolower($filename)) ?>"
                data-type="<?= $filterType ?>">
@@ -745,7 +745,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function downloadLog(filename) {
-    window.location.href = '<?= $basePath ?>/admin/enterprise/monitoring/logs/' + filename + '/download';
+    window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/monitoring/logs/' + filename + '/download';
 }
 </script>
 

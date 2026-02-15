@@ -108,7 +108,7 @@ class TimebankingController
 
         $alert = AbuseDetectionService::getAlert($alertId);
         if (!$alert) {
-            $this->redirect('/admin/timebanking/alerts', 'Alert not found');
+            $this->redirect('/admin-legacy/timebanking/alerts', 'Alert not found');
             return;
         }
 
@@ -133,7 +133,7 @@ class TimebankingController
         $notes = trim($_POST['notes'] ?? '');
 
         if (!in_array($status, ['reviewing', 'resolved', 'dismissed'])) {
-            $this->redirect("/admin/timebanking/alert/$alertId", 'Invalid status', 'error');
+            $this->redirect("/admin-legacy/timebanking/alert/$alertId", 'Invalid status', 'error');
             return;
         }
 
@@ -141,7 +141,7 @@ class TimebankingController
 
         AbuseDetectionService::updateAlertStatus($alertId, $status, $resolvedBy, $notes);
 
-        $this->redirect('/admin/timebanking/alerts', 'Alert status updated', 'success');
+        $this->redirect('/admin-legacy/timebanking/alerts', 'Alert status updated', 'success');
     }
 
     /**
@@ -159,7 +159,7 @@ class TimebankingController
             ? "Detection complete: $totalAlerts new alert(s) created."
             : "Detection complete: No new alerts.";
 
-        $this->redirect('/admin/timebanking/alerts', $message, 'success');
+        $this->redirect('/admin-legacy/timebanking/alerts', $message, 'success');
     }
 
     /**
@@ -186,7 +186,7 @@ class TimebankingController
         )->fetch();
 
         if (!$user) {
-            $this->redirect('/admin/timebanking/user-report', 'User not found', 'error');
+            $this->redirect('/admin-legacy/timebanking/user-report', 'User not found', 'error');
             return;
         }
 
@@ -306,7 +306,7 @@ class TimebankingController
         $orgId = (int) ($_POST['org_id'] ?? 0);
 
         if (!$orgId) {
-            $this->redirect('/admin/timebanking/org-wallets', 'Invalid organization', 'error');
+            $this->redirect('/admin-legacy/timebanking/org-wallets', 'Invalid organization', 'error');
             return;
         }
 
@@ -319,7 +319,7 @@ class TimebankingController
         )->fetch();
 
         if (!$org) {
-            $this->redirect('/admin/timebanking/org-wallets', 'Organization not found', 'error');
+            $this->redirect('/admin-legacy/timebanking/org-wallets', 'Organization not found', 'error');
             return;
         }
 
@@ -339,7 +339,7 @@ class TimebankingController
             [$tenantId, $orgId, $org['user_id']]
         );
 
-        $this->redirect('/admin/timebanking/org-wallets', "Wallet initialized for {$org['name']}", 'success');
+        $this->redirect('/admin-legacy/timebanking/org-wallets', "Wallet initialized for {$org['name']}", 'success');
     }
 
     /**
@@ -382,7 +382,7 @@ class TimebankingController
             $count++;
         }
 
-        $this->redirect('/admin/timebanking/org-wallets', "Initialized wallets for $count organizations", 'success');
+        $this->redirect('/admin-legacy/timebanking/org-wallets', "Initialized wallets for $count organizations", 'success');
     }
 
     /**
@@ -412,7 +412,7 @@ class TimebankingController
         $status = $_POST['status'] ?? 'approved';
 
         if (!$ownerEmail || !$orgName) {
-            $this->redirect('/admin/timebanking/create-org', 'Owner email and organization name are required', 'error');
+            $this->redirect('/admin-legacy/timebanking/create-org', 'Owner email and organization name are required', 'error');
             return;
         }
 
@@ -425,7 +425,7 @@ class TimebankingController
         )->fetch();
 
         if (!$owner) {
-            $this->redirect('/admin/timebanking/create-org', 'No user found with that email', 'error');
+            $this->redirect('/admin-legacy/timebanking/create-org', 'No user found with that email', 'error');
             return;
         }
 
@@ -461,7 +461,7 @@ class TimebankingController
         OrgNotificationService::notifyOrganizationCreatedForYou($owner['id'], $orgId, $orgName, $_SESSION['user_id']);
 
         $ownerName = $owner['first_name'] . ' ' . $owner['last_name'];
-        $this->redirect('/admin/timebanking/org-wallets', "Created '$orgName' for $ownerName", 'success');
+        $this->redirect('/admin-legacy/timebanking/org-wallets', "Created '$orgName' for $ownerName", 'success');
     }
 
     /**
@@ -477,7 +477,7 @@ class TimebankingController
         $role = $_POST['role'] ?? 'member';
 
         if (!$orgId || !$email) {
-            $this->redirect('/admin/timebanking/org-wallets', 'Organization ID and email are required', 'error');
+            $this->redirect('/admin-legacy/timebanking/org-wallets', 'Organization ID and email are required', 'error');
             return;
         }
 
@@ -494,7 +494,7 @@ class TimebankingController
         )->fetch();
 
         if (!$org) {
-            $this->redirect('/admin/timebanking/org-wallets', 'Organization not found', 'error');
+            $this->redirect('/admin-legacy/timebanking/org-wallets', 'Organization not found', 'error');
             return;
         }
 
@@ -505,7 +505,7 @@ class TimebankingController
         )->fetch();
 
         if (!$user) {
-            $this->redirect('/admin/timebanking/org-wallets', 'No user found with that email', 'error');
+            $this->redirect('/admin-legacy/timebanking/org-wallets', 'No user found with that email', 'error');
             return;
         }
 
@@ -521,7 +521,7 @@ class TimebankingController
         OrgNotificationService::notifyAddedToOrganization($user['id'], $orgId, $role, $_SESSION['user_id']);
 
         $userName = $user['first_name'] . ' ' . $user['last_name'];
-        $this->redirect('/admin/timebanking/org-wallets', "Added $userName as $role to {$org['name']}", 'success');
+        $this->redirect('/admin-legacy/timebanking/org-wallets', "Added $userName as $role to {$org['name']}", 'success');
     }
 
     /**
@@ -540,7 +540,7 @@ class TimebankingController
         )->fetch();
 
         if (!$org) {
-            $this->redirect('/admin/timebanking/org-wallets', 'Organization not found', 'error');
+            $this->redirect('/admin-legacy/timebanking/org-wallets', 'Organization not found', 'error');
             return;
         }
 
@@ -575,7 +575,7 @@ class TimebankingController
         $role = $_POST['role'] ?? 'member';
 
         if (!$orgId || !$userId) {
-            $this->redirect('/admin/timebanking/org-wallets', 'Invalid request', 'error');
+            $this->redirect('/admin-legacy/timebanking/org-wallets', 'Invalid request', 'error');
             return;
         }
 
@@ -594,7 +594,7 @@ class TimebankingController
         // Notify the user their role changed
         OrgNotificationService::notifyRoleChanged($userId, $orgId, $role, $_SESSION['user_id']);
 
-        $this->redirect("/admin/timebanking/org-members/$orgId", 'Member role updated', 'success');
+        $this->redirect("/admin-legacy/timebanking/org-members/$orgId", 'Member role updated', 'success');
     }
 
     /**
@@ -609,7 +609,7 @@ class TimebankingController
         $userId = (int) ($_POST['user_id'] ?? 0);
 
         if (!$orgId || !$userId) {
-            $this->redirect('/admin/timebanking/org-wallets', 'Invalid request', 'error');
+            $this->redirect('/admin-legacy/timebanking/org-wallets', 'Invalid request', 'error');
             return;
         }
 
@@ -622,7 +622,7 @@ class TimebankingController
         )->fetch();
 
         if ($member && $member['role'] === 'owner') {
-            $this->redirect("/admin/timebanking/org-members/$orgId", 'Cannot remove the organization owner', 'error');
+            $this->redirect("/admin-legacy/timebanking/org-members/$orgId", 'Cannot remove the organization owner', 'error');
             return;
         }
 
@@ -634,7 +634,7 @@ class TimebankingController
         // Notify the user they were removed
         OrgNotificationService::notifyRemovedFromOrganization($userId, $orgId, $_SESSION['user_id']);
 
-        $this->redirect("/admin/timebanking/org-members/$orgId", 'Member removed', 'success');
+        $this->redirect("/admin-legacy/timebanking/org-members/$orgId", 'Member removed', 'success');
     }
 
     /**
@@ -651,7 +651,7 @@ class TimebankingController
         $reason = trim($_POST['reason'] ?? '');
 
         if (!$userId || $amount <= 0 || !$reason) {
-            $this->redirect('/admin/timebanking/user-report', 'Invalid adjustment request', 'error');
+            $this->redirect('/admin-legacy/timebanking/user-report', 'Invalid adjustment request', 'error');
             return;
         }
 
@@ -668,7 +668,7 @@ class TimebankingController
         )->fetch();
 
         if (!$user) {
-            $this->redirect('/admin/timebanking/user-report', 'User not found', 'error');
+            $this->redirect('/admin-legacy/timebanking/user-report', 'User not found', 'error');
             return;
         }
 
@@ -684,7 +684,7 @@ class TimebankingController
 
             // Prevent negative balance
             if ($newBalance < 0) {
-                $this->redirect("/admin/timebanking/user-report/$userId", 'Cannot reduce balance below zero', 'error');
+                $this->redirect("/admin-legacy/timebanking/user-report/$userId", 'Cannot reduce balance below zero', 'error');
                 return;
             }
         }
@@ -711,7 +711,7 @@ class TimebankingController
 
         $userName = $user['first_name'] . ' ' . $user['last_name'];
         $action = $type === 'add' ? 'added to' : 'subtracted from';
-        $this->redirect("/admin/timebanking/user-report/$userId", "{$amount}h {$action} {$userName}'s balance", 'success');
+        $this->redirect("/admin-legacy/timebanking/user-report/$userId", "{$amount}h {$action} {$userName}'s balance", 'success');
     }
 
     /**

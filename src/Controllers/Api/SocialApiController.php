@@ -163,6 +163,179 @@ class SocialApiController extends BaseApiController
         $this->respondWithData($result);
     }
 
+    /**
+     * POST /api/v2/feed/polls
+     * Create a new poll
+     */
+    public function createPollV2(): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('feed_create_poll', 10, 60);
+
+        $data = $this->getAllInput();
+        $question = trim($data['question'] ?? '');
+        $options = $data['options'] ?? [];
+
+        if (empty($question)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Question is required', 'question', 400);
+            return;
+        }
+
+        if (!is_array($options) || count($options) < 2) {
+            $this->respondWithError('VALIDATION_ERROR', 'At least 2 options are required', 'options', 400);
+            return;
+        }
+
+        $pollData = [
+            'question' => $question,
+            'options' => $options,
+            'expires_at' => $data['expires_at'] ?? null,
+            'visibility' => $data['visibility'] ?? 'public',
+        ];
+
+        $pollId = \Nexus\Services\PollService::create($userId, $pollData);
+
+        if ($pollId === null) {
+            $errors = \Nexus\Services\PollService::getErrors();
+            $this->respondWithErrors($errors, 422);
+            return;
+        }
+
+        $poll = \Nexus\Services\PollService::getById($pollId, $userId);
+        $this->respondWithData($poll, null, 201);
+    }
+
+    /**
+     * POST /api/v2/feed/polls/{id}/vote
+     * Vote on a poll option
+     */
+    public function votePollV2(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('feed_poll_vote', 30, 60);
+
+        $optionId = (int) ($this->input('option_id') ?? 0);
+
+        if (!$optionId) {
+            $this->respondWithError('VALIDATION_ERROR', 'option_id is required', 'option_id', 400);
+            return;
+        }
+
+        $success = \Nexus\Services\PollService::vote($id, $optionId, $userId);
+
+        if (!$success) {
+            $errors = \Nexus\Services\PollService::getErrors();
+            $this->respondWithErrors($errors, 400);
+            return;
+        }
+
+        $poll = \Nexus\Services\PollService::getById($id, $userId);
+        $this->respondWithData($poll);
+    }
+
+    /**
+     * GET /api/v2/feed/polls/{id}
+     * Get poll details
+     */
+    public function getPollV2(int $id): void
+    {
+        $userId = $this->getOptionalUserId();
+        $this->rateLimit('feed_poll_get', 60, 60);
+
+        $poll = \Nexus\Services\PollService::getById($id, $userId);
+
+        if (!$poll) {
+            $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found', null, 404);
+            return;
+        }
+
+        $this->respondWithData($poll);
+    }
+
+    /**
+     * POST /api/v2/feed/posts/{id}/hide
+     * Hide a post from user's feed
+     */
+    public function hidePostV2(int $id): void
+    {
+        $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+
+        Database::query(
+            "INSERT IGNORE INTO feed_hidden (user_id, tenant_id, target_type, target_id, created_at) VALUES (?, ?, 'post', ?, NOW())",
+            [$userId, $tenantId, $id]
+        );
+
+        $this->respondWithData(['hidden' => true, 'post_id' => $id]);
+    }
+
+    /**
+     * POST /api/v2/feed/users/{id}/mute
+     * Mute a user in the feed
+     */
+    public function muteUserV2(int $userId): void
+    {
+        $currentUserId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+
+        Database::query(
+            "INSERT IGNORE INTO feed_muted_users (user_id, tenant_id, muted_user_id, created_at) VALUES (?, ?, ?, NOW())",
+            [$currentUserId, $tenantId, $userId]
+        );
+
+        $this->respondWithData(['muted' => true, 'user_id' => $userId]);
+    }
+
+    /**
+     * POST /api/v2/feed/posts/{id}/report
+     * Report a feed post
+     */
+    public function reportPostV2(int $id): void
+    {
+        $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+        $reason = trim($this->input('reason') ?? '');
+
+        Database::query(
+            "INSERT INTO reports (user_id, tenant_id, target_type, target_id, reason, status, created_at)
+             VALUES (?, ?, 'feed_post', ?, ?, 'pending', NOW())",
+            [$userId, $tenantId, $id, $reason]
+        );
+
+        $this->respondWithData(['reported' => true, 'post_id' => $id]);
+    }
+
+    /**
+     * POST /api/v2/feed/posts/{id}/delete
+     * Delete a feed post (owner only)
+     */
+    public function deletePostV2(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+
+        $post = Database::query(
+            "SELECT id, user_id FROM feed_posts WHERE id = ?",
+            [$id]
+        )->fetch();
+
+        if (!$post) {
+            $this->respondWithError('RESOURCE_NOT_FOUND', 'Post not found', null, 404);
+            return;
+        }
+
+        if ((int) $post['user_id'] !== $userId) {
+            $this->respondWithError('FORBIDDEN', 'You can only delete your own posts', null, 403);
+            return;
+        }
+
+        Database::query("DELETE FROM feed_posts WHERE id = ?", [$id]);
+
+        $this->respondWithData(['deleted' => true, 'id' => $id]);
+    }
+
     // ============================================
     // DEBUG TEST ENDPOINT (LEGACY)
     // ============================================

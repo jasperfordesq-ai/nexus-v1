@@ -464,7 +464,7 @@ class VolunteeringController
         VolOrganization::update($id, $_POST['name'], $_POST['description'], $_POST['email'], $_POST['website'], isset($_POST['auto_pay']));
 
         if ($isAdmin) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/volunteering/organizations?msg=org_updated');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/volunteering/organizations?msg=org_updated');
         } else {
             header('Location: ' . TenantContext::getBasePath() . '/volunteering/dashboard?msg=org_updated');
         }

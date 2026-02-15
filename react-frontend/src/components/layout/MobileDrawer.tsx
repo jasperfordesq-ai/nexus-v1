@@ -40,6 +40,13 @@ import {
   Search,
   Shield,
   Globe,
+  Info,
+  FileText,
+  Handshake,
+  Stethoscope,
+  TrendingUp,
+  BarChart3,
+  Compass,
 } from 'lucide-react';
 import { useAuth, useTenant, useNotifications } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -87,6 +94,17 @@ const federationNavItems = [
   { label: 'Federated Events', href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
 ];
 
+const aboutNavItems = [
+  { label: 'About', href: '/about', icon: Info },
+  { label: 'FAQ', href: '/faq', icon: HelpCircle },
+  { label: 'Timebanking Guide', href: '/timebanking-guide', icon: BookOpen },
+  { label: 'Partner With Us', href: '/partner', icon: Handshake },
+  { label: 'Social Prescribing', href: '/social-prescribing', icon: Stethoscope },
+  { label: 'Our Impact', href: '/impact-summary', icon: TrendingUp },
+  { label: 'Impact Report', href: '/impact-report', icon: BarChart3 },
+  { label: 'Strategic Plan', href: '/strategic-plan', icon: Compass },
+];
+
 const supportNavItems = [
   { label: 'Help Center', href: '/help', icon: HelpCircle },
   { label: 'Contact', href: '/contact', icon: MessageSquare },
@@ -96,7 +114,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
-  const { branding, hasFeature, hasModule, tenantPath } = useTenant();
+  const { tenant, branding, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
 
   // Track previous pathname to only close on actual navigation
@@ -311,6 +329,21 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 </div>
               </div>
             )}
+
+            {/* About */}
+            <div>
+              <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
+                About
+              </p>
+              <div className="space-y-1">
+                {aboutNavItems.map(renderNavLink)}
+                {(tenant?.menu_pages?.about || []).map(p => renderNavLink({
+                  label: p.title,
+                  href: `/${p.slug}`,
+                  icon: FileText,
+                }))}
+              </div>
+            </div>
 
             {/* Support */}
             <div>

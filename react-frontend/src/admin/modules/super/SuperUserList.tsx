@@ -4,7 +4,7 @@ import {
   Button, Avatar, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
   Select, SelectItem,
 } from '@heroui/react';
-import { Plus, MoreVertical, Shield, ArrowRight, UserCheck, UserX } from 'lucide-react';
+import { Plus, MoreVertical, Shield, ArrowRight, Eye, UserCheck, UserX } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
@@ -79,7 +79,7 @@ export function SuperUserList() {
         <div className="flex items-center gap-3">
           <Avatar name={user.name} size="sm" />
           <div>
-            <Link to={tenantPath(`/admin/super/users/${user.id}/edit`)} className="font-medium text-foreground hover:text-primary">
+            <Link to={tenantPath(`/admin/super/users/${user.id}`)} className="font-medium text-foreground hover:text-primary">
               {user.name}
             </Link>
             <p className="text-xs text-default-400">{user.email}</p>
@@ -117,12 +117,14 @@ export function SuperUserList() {
         <Dropdown>
           <DropdownTrigger><Button isIconOnly size="sm" variant="light"><MoreVertical size={16} /></Button></DropdownTrigger>
           <DropdownMenu aria-label="User actions" onAction={(key) => {
-            if (key === 'edit') navigate(tenantPath(`/admin/super/users/${user.id}/edit`));
+            if (key === 'view') navigate(tenantPath(`/admin/super/users/${user.id}`));
+            else if (key === 'edit') navigate(tenantPath(`/admin/super/users/${user.id}/edit`));
             else if (key === 'grant-sa') setConfirmAction({ type: 'grant-sa', user });
             else if (key === 'revoke-sa') setConfirmAction({ type: 'revoke-sa', user });
             else if (key === 'grant-global') setConfirmAction({ type: 'grant-global', user });
             else if (key === 'revoke-global') setConfirmAction({ type: 'revoke-global', user });
           }}>
+            <DropdownItem key="view" startContent={<Eye size={14} />}>View</DropdownItem>
             <DropdownItem key="edit" startContent={<ArrowRight size={14} />}>Edit</DropdownItem>
             {!user.is_tenant_super_admin
               ? <DropdownItem key="grant-sa" startContent={<UserCheck size={14} />} className="text-success">Grant Tenant SA</DropdownItem>
@@ -147,6 +149,11 @@ export function SuperUserList() {
 
   return (
     <div>
+      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <span>/</span>
+        <span className="text-foreground">Users</span>
+      </nav>
       <PageHeader
         title="Cross-Tenant Users"
         description="Manage users across all tenants"

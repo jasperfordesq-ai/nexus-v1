@@ -44,12 +44,12 @@ function isAdminSidebarActive($itemUrl, $currentPath, $basePath) {
     }
 
     // Dashboard is exact match only
-    if ($itemUrl === '/admin') {
+    if ($itemUrl === '/admin-legacy') {
         return $currentClean === $fullUrl;
     }
 
     // Prefix match for child routes - must be followed by / or end of string
-    // This prevents /admin/groups matching /admin/group-ranking
+    // This prevents /admin-legacy/groups matching /admin-legacy/group-ranking
     if (strpos($currentClean, $fullUrlClean) === 0) {
         $remainder = substr($currentClean, strlen($fullUrlClean));
         // Must be exact match, or followed by /

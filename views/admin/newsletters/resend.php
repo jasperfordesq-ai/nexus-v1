@@ -28,7 +28,7 @@ $totalSent = $resendInfo['total_sent'] ?? 0;
 
     <!-- Navigation -->
     <div style="margin-bottom: 24px;">
-        <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
             <i class="fa-solid fa-arrow-left"></i> Back to Analytics
         </a>
     </div>
@@ -91,7 +91,7 @@ $totalSent = $resendInfo['total_sent'] ?? 0;
             "Did you see this?" or "Reminder: [Original Subject]" often work well.
         </div>
 
-        <form action="<?= $basePath ?>/admin/newsletters/resend/<?= $newsletter['id'] ?>" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/newsletters/resend/<?= $newsletter['id'] ?>" method="POST">
             <?= \Nexus\Core\Csrf::input() ?>
 
             <div style="margin-bottom: 20px;">
@@ -125,7 +125,7 @@ $totalSent = $resendInfo['total_sent'] ?? 0;
                     <i class="fa-solid fa-paper-plane"></i>
                     Send to <?= number_format($nonOpenerCount) ?> Non-Openers
                 </button>
-                <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>"
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>"
                    style="padding: 14px 24px; background: #f3f4f6; color: #374151; border-radius: 8px; text-decoration: none; font-weight: 600;">
                     Cancel
                 </a>
@@ -154,7 +154,7 @@ $totalSent = $resendInfo['total_sent'] ?? 0;
             You can resend to <?= number_format($nonOpenerCount) ?> non-openers in <?= $daysRemaining ?> day<?= $daysRemaining !== 1 ? 's' : '' ?>.
             <br>This gives recipients enough time to open the original email.
         </p>
-        <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>"
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>"
            style="display: inline-block; padding: 12px 24px; background: #f3f4f6; color: #374151; border-radius: 8px; text-decoration: none; font-weight: 600;">
             <i class="fa-solid fa-arrow-left"></i> Back to Analytics
         </a>

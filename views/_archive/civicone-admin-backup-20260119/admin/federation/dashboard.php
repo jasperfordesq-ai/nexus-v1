@@ -51,19 +51,19 @@ $topUsers = $topUsers ?? [];
 
     <!-- Quick Actions -->
     <div class="fed-quick-actions">
-        <a href="<?= $basePath ?>/admin/federation" class="fed-quick-action">
+        <a href="<?= $basePath ?>/admin-legacy/federation" class="fed-quick-action">
             <i class="fa-solid fa-sliders"></i>
             Settings
         </a>
-        <a href="<?= $basePath ?>/admin/federation/partnerships" class="fed-quick-action">
+        <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="fed-quick-action">
             <i class="fa-solid fa-handshake"></i>
             Partnerships
         </a>
-        <a href="<?= $basePath ?>/admin/federation/analytics" class="fed-quick-action">
+        <a href="<?= $basePath ?>/admin-legacy/federation/analytics" class="fed-quick-action">
             <i class="fa-solid fa-chart-line"></i>
             Analytics
         </a>
-        <a href="<?= $basePath ?>/admin/federation/directory" class="fed-quick-action">
+        <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="fed-quick-action">
             <i class="fa-solid fa-compass"></i>
             Directory
         </a>
@@ -165,7 +165,7 @@ $topUsers = $topUsers ?? [];
                     <i class="fa-solid fa-handshake"></i>
                     Partnerships
                 </h3>
-                <a href="<?= $basePath ?>/admin/federation/partnerships" class="fed-quick-action">
+                <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="fed-quick-action">
                     View All <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>

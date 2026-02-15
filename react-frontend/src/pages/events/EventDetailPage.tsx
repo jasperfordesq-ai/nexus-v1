@@ -656,7 +656,7 @@ export function EventDetailPage() {
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="6"
-                        className="text-theme-hover"
+                        className="text-theme-muted"
                       />
                       <circle
                         cx="32" cy="32" r="28"
@@ -807,7 +807,7 @@ export function EventDetailPage() {
         isOpen={showDeleteModal}
         onOpenChange={setShowDeleteModal}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',

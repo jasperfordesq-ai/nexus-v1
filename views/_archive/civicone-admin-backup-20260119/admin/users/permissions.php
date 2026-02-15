@@ -416,7 +416,7 @@ foreach ($permsByCategory as $perms) {
         </div>
     </div>
     <div style="display: flex; gap: 0.75rem;">
-        <a href="<?= TenantContext::getBasePath() ?>/admin/users/<?= $userId ?>" class="admin-btn-secondary">
+        <a href="<?= TenantContext::getBasePath() ?>/admin-legacy/users/<?= $userId ?>" class="admin-btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to User
         </a>
     </div>
@@ -793,7 +793,7 @@ async function submitAssignRole() {
     console.log('Assigning role:', data);
 
     try {
-        const url = `<?= TenantContext::getBasePath() ?>/admin/api/users/<?= $userId ?>/roles`;
+        const url = `<?= TenantContext::getBasePath() ?>/admin-legacy/api/users/<?= $userId ?>/roles`;
         console.log('POST to:', url);
 
         const response = await fetch(url, {
@@ -863,7 +863,7 @@ async function submitGrantPermission() {
     console.log('Granting permission:', data);
 
     try {
-        const url = `<?= TenantContext::getBasePath() ?>/admin/api/users/<?= $userId ?>/permissions`;
+        const url = `<?= TenantContext::getBasePath() ?>/admin-legacy/api/users/<?= $userId ?>/permissions`;
         console.log('POST to:', url);
 
         const response = await fetch(url, {
@@ -932,7 +932,7 @@ async function revokeRole(userId, roleId, roleName) {
     }
 
     try {
-        const response = await fetch(`<?= TenantContext::getBasePath() ?>/admin/api/users/${userId}/roles/${roleId}`, {
+        const response = await fetch(`<?= TenantContext::getBasePath() ?>/admin-legacy/api/users/${userId}/roles/${roleId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'

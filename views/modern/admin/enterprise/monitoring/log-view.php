@@ -380,7 +380,7 @@ $logFilename = $filename ?? 'unknown.log';
         <p class="log-viewer-page-subtitle">Last updated: <?= date('Y-m-d H:i:s') ?></p>
     </div>
     <div class="log-viewer-page-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/monitoring/logs" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring/logs" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to Logs
         </a>
         <button onclick="downloadLog()" class="admin-btn admin-btn-primary">
@@ -513,7 +513,7 @@ function toggleAutoRefresh() {
 function downloadLog() {
     const filename = '<?= addslashes($logFilename) ?>';
     const basePath = '<?= $basePath ?>';
-    window.location.href = `${basePath}/admin/enterprise/monitoring/logs/download?file=${encodeURIComponent(filename)}`;
+    window.location.href = `${basePath}/admin-legacy/enterprise/monitoring/logs/download?file=${encodeURIComponent(filename)}`;
 }
 
 function clearLog() {
@@ -524,7 +524,7 @@ function clearLog() {
     const filename = '<?= addslashes($logFilename) ?>';
     const basePath = '<?= $basePath ?>';
 
-    fetch(`${basePath}/admin/enterprise/monitoring/logs/clear`, {
+    fetch(`${basePath}/admin-legacy/enterprise/monitoring/logs/clear`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: filename })

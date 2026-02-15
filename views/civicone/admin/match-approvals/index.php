@@ -2,7 +2,7 @@
 /**
  * Match Approvals Dashboard - CivicOne Theme (GOV.UK)
  * Broker workflow for approving/rejecting matches
- * Path: views/civicone/admin/match-approvals/index.php
+ * Path: views/civicone/admin-legacy/match-approvals/index.php
  */
 
 use Nexus\Core\TenantContext;
@@ -29,7 +29,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                 <p class="govuk-body-l">Review and approve member matches before they connect.</p>
             </div>
             <div class="govuk-grid-column-one-third" style="text-align: right;">
-                <a href="<?= $basePath ?>/admin/match-approvals/history" class="govuk-button govuk-button--secondary">
+                <a href="<?= $basePath ?>/admin-legacy/match-approvals/history" class="govuk-button govuk-button--secondary">
                     View history
                 </a>
             </div>
@@ -114,7 +114,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                         </div>
                     </dl>
 
-                    <form method="POST" action="<?= $basePath ?>/admin/match-approvals/approve" class="govuk-!-margin-top-4" id="form-approve-<?= $request['id'] ?>">
+                    <form method="POST" action="<?= $basePath ?>/admin-legacy/match-approvals/approve" class="govuk-!-margin-top-4" id="form-approve-<?= $request['id'] ?>">
                         <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                         <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
 
@@ -132,7 +132,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                             <button type="button" class="govuk-button govuk-button--warning" onclick="rejectMatch(<?= $request['id'] ?>)">
                                 Reject
                             </button>
-                            <a href="<?= $basePath ?>/admin/match-approvals/<?= $request['id'] ?>" class="govuk-button govuk-button--secondary">
+                            <a href="<?= $basePath ?>/admin-legacy/match-approvals/<?= $request['id'] ?>" class="govuk-button govuk-button--secondary">
                                 View details
                             </a>
                         </div>
@@ -191,7 +191,7 @@ function rejectMatch(id) {
 
     if (confirm('Reject this match? The user will be notified with your reason.')) {
         const form = document.getElementById('form-approve-' + id);
-        form.action = '<?= $basePath ?>/admin/match-approvals/reject';
+        form.action = '<?= $basePath ?>/admin-legacy/match-approvals/reject';
         form.querySelector('[name="notes"]').name = 'reason';
         form.submit();
     }

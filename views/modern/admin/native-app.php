@@ -33,7 +33,7 @@ $fcmConfigured = $fcmConfigured ?? false;
         <p class="admin-page-subtitle">Manage push notifications and view device statistics</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/settings#notifications" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/settings#notifications" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-gear"></i> Settings
         </a>
     </div>
@@ -207,7 +207,7 @@ $fcmConfigured = $fcmConfigured ?? false;
         </div>
         <div class="admin-card-body">
             <div class="quick-actions-list">
-                <a href="<?= $basePath ?>/admin/settings#notifications" class="quick-action-item">
+                <a href="<?= $basePath ?>/admin-legacy/settings#notifications" class="quick-action-item">
                     <div class="quick-action-icon quick-action-settings">
                         <i class="fa-solid fa-gear"></i>
                     </div>
@@ -218,7 +218,7 @@ $fcmConfigured = $fcmConfigured ?? false;
                     <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
                 </a>
 
-                <a href="<?= $basePath ?>/admin/newsletters" class="quick-action-item">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters" class="quick-action-item">
                     <div class="quick-action-icon quick-action-newsletter">
                         <i class="fa-solid fa-envelope"></i>
                     </div>
@@ -1002,7 +1002,7 @@ document.getElementById('testPushForm').addEventListener('submit', async functio
     try {
         const formData = new FormData(this);
 
-        const response = await fetch('<?= $basePath ?>/admin/native-app/test-push', {
+        const response = await fetch('<?= $basePath ?>/admin-legacy/native-app/test-push', {
             method: 'POST',
             body: formData
         });

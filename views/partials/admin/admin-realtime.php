@@ -4,7 +4,7 @@
  * Polling-based live dashboard updates
  *
  * NOTE: SSE (Server-Sent Events) has been disabled due to server hanging issues.
- * This system now uses polling via /admin/api/realtime/poll endpoint.
+ * This system now uses polling via /admin-legacy/api/realtime/poll endpoint.
  */
 ?>
 
@@ -36,7 +36,7 @@ window.AdminRealTime = {
      */
     init: function(config) {
         const defaults = {
-            endpoint: '/admin/api/realtime',
+            endpoint: '/admin-legacy/api/realtime',
             fallbackToPolling: true,
             autoConnect: true,
             debug: false
@@ -83,8 +83,8 @@ window.AdminRealTime = {
         }
 
         try {
-            const basePath = window.location.pathname.includes('/admin')
-                ? window.location.pathname.split('/admin')[0]
+            const basePath = window.location.pathname.includes('/admin-legacy')
+                ? window.location.pathname.split('/admin-legacy')[0]
                 : '';
 
             this.eventSource = new EventSource(basePath + this.config.endpoint);
@@ -203,11 +203,11 @@ window.AdminRealTime = {
      */
     fetchUpdates: async function() {
         try {
-            const basePath = window.location.pathname.includes('/admin')
-                ? window.location.pathname.split('/admin')[0]
+            const basePath = window.location.pathname.includes('/admin-legacy')
+                ? window.location.pathname.split('/admin-legacy')[0]
                 : '';
 
-            const response = await fetch(basePath + '/admin/api/realtime/poll', {
+            const response = await fetch(basePath + '/admin-legacy/api/realtime/poll', {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -349,7 +349,7 @@ window.AdminRealTime = {
 // Auto-initialize on pages that need it
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're on an admin page
-    if (window.location.pathname.includes('/admin')) {
+    if (window.location.pathname.includes('/admin-legacy')) {
         // Initialize with polling only (SSE endpoint is disabled due to server issues)
         AdminRealTime.init({
             fallbackToPolling: true,
@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Subscribe to stats updates (dashboard)
-        if (window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/')) {
+        if (window.location.pathname.endsWith('/admin-legacy') || window.location.pathname.endsWith('/admin-legacy/')) {
             AdminRealTime.on('stats', function(data) {
                 // Update dashboard stats
                 updateDashboardStats(data);

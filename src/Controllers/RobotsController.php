@@ -28,7 +28,7 @@ class RobotsController
 
         // 2. Architectural Restrictions (Global for all tenants)
         // Admin & System Areas
-        echo "Disallow: {$baseUrl}/admin/\n";
+        echo "Disallow: {$baseUrl}/admin-legacy/\n";
         echo "Disallow: {$baseUrl}/super-admin/\n";
         echo "Disallow: {$baseUrl}/cron/\n";
 

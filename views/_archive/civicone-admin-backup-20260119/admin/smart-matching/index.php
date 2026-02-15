@@ -42,11 +42,11 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         <p class="admin-page-subtitle">AI-powered connection intelligence</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/smart-matching/analytics" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/smart-matching/analytics" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-chart-bar"></i>
             Analytics
         </a>
-        <a href="<?= $basePath ?>/admin/smart-matching/configuration" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/smart-matching/configuration" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-cog"></i>
             Configure
         </a>
@@ -331,21 +331,21 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
             </div>
             <div class="admin-card-body" style="padding: 0;">
                 <div class="sm-quick-actions">
-                    <form action="<?= $basePath ?>/admin/smart-matching/clear-cache" method="POST">
+                    <form action="<?= $basePath ?>/admin-legacy/smart-matching/clear-cache" method="POST">
                         <?= Csrf::input() ?>
                         <button type="submit" class="sm-quick-action sm-action-danger" onclick="return confirm('Clear all match cache?');">
                             <div class="sm-action-icon"><i class="fa-solid fa-trash"></i></div>
                             <span>Clear Cache</span>
                         </button>
                     </form>
-                    <form action="<?= $basePath ?>/admin/smart-matching/warmup-cache" method="POST">
+                    <form action="<?= $basePath ?>/admin-legacy/smart-matching/warmup-cache" method="POST">
                         <?= Csrf::input() ?>
                         <button type="submit" class="sm-quick-action sm-action-warning">
                             <div class="sm-action-icon"><i class="fa-solid fa-fire"></i></div>
                             <span>Warm Cache</span>
                         </button>
                     </form>
-                    <form action="<?= $basePath ?>/admin/smart-matching/run-geocoding" method="POST">
+                    <form action="<?= $basePath ?>/admin-legacy/smart-matching/run-geocoding" method="POST">
                         <?= Csrf::input() ?>
                         <button type="submit" class="sm-quick-action sm-action-success">
                             <div class="sm-action-icon"><i class="fa-solid fa-globe"></i></div>
@@ -366,7 +366,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                     <h3 class="admin-card-title">Recent Activity</h3>
                     <p class="admin-card-subtitle">Latest matches</p>
                 </div>
-                <a href="<?= $basePath ?>/admin/smart-matching/analytics" class="sm-card-link">View All</a>
+                <a href="<?= $basePath ?>/admin-legacy/smart-matching/analytics" class="sm-card-link">View All</a>
             </div>
             <div class="admin-card-body" style="padding: 0;">
                 <?php if (empty($recent_activity)): ?>

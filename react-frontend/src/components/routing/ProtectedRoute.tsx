@@ -13,7 +13,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading, status } = useAuth();
+  const { isAuthenticated, isLoading, status, user } = useAuth();
   const { tenantPath } = useTenant();
   const location = useLocation();
 
@@ -25,6 +25,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Redirect to login if not authenticated, preserving tenant slug prefix
   if (!isAuthenticated) {
     return <Navigate to={tenantPath('/login')} state={{ from: location.pathname }} replace />;
+  }
+
+  // Redirect to onboarding if not completed (skip if already on onboarding page)
+  const pathSegments = location.pathname.replace(/\/+$/, '').split('/');
+  const lastSegment = pathSegments[pathSegments.length - 1];
+  if (user && user.onboarding_completed === false && lastSegment !== 'onboarding') {
+    return <Navigate to={tenantPath('/onboarding')} replace />;
   }
 
   // Render children or outlet

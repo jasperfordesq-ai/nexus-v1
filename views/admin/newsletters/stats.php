@@ -39,7 +39,7 @@ $abResults = $abResults ?? null;
 
     <!-- Navigation -->
     <div style="margin-bottom: 24px;">
-        <a href="<?= $basePath ?>/admin/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
             <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
         </a>
     </div>
@@ -67,7 +67,7 @@ $abResults = $abResults ?? null;
                 $nonOpenerCount = $totalSent - $uniqueOpens;
                 if ($nonOpenerCount > 0):
                 ?>
-                <a href="<?= $basePath ?>/admin/newsletters/resend/<?= $newsletter['id'] ?>"
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/resend/<?= $newsletter['id'] ?>"
                    style="display: inline-flex; align-items: center; gap: 6px; background: #f3e8ff; color: #7c3aed; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none;">
                     <i class="fa-solid fa-rotate-right"></i>
                     Resend to <?= number_format($nonOpenerCount) ?> Non-Openers
@@ -97,7 +97,7 @@ $abResults = $abResults ?? null;
         <div style="background: #e0f2fe; color: #0369a1; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
             <strong>Suggested Winner: Subject <?= $abResults['suggested_winner'] ?></strong>
             (<?= number_format($abResults['winning_margin'], 1) ?>% better <?= ($abResults['winner_metric'] ?? 'opens') === 'clicks' ? 'click rate' : 'open rate' ?>)
-            <form action="<?= $basePath ?>/admin/newsletters/select-winner/<?= $newsletter['id'] ?>" method="POST" style="display: inline; margin-left: 15px;">
+            <form action="<?= $basePath ?>/admin-legacy/newsletters/select-winner/<?= $newsletter['id'] ?>" method="POST" style="display: inline; margin-left: 15px;">
                 <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="winner" value="<?= $abResults['suggested_winner'] ?>">
                 <button type="submit" style="background: #0369a1; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">
@@ -420,10 +420,10 @@ $abResults = $abResults ?? null;
     <div class="nexus-card">
         <h3 style="margin: 0 0 15px 0;">Actions</h3>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="<?= $basePath ?>/admin/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" class="nexus-btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" class="nexus-btn-secondary">
                 View Email Content
             </a>
-            <a href="<?= $basePath ?>/admin/newsletters/duplicate/<?= $newsletter['id'] ?>" class="nexus-btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/duplicate/<?= $newsletter['id'] ?>" class="nexus-btn-secondary">
                 Duplicate Newsletter
             </a>
         </div>

@@ -29,7 +29,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/broker-controls" class="broker-back-link">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="broker-back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Exchange Requests
@@ -152,12 +152,12 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                         <td><?= date('M j, Y', strtotime($exchange['created_at'])) ?></td>
                         <td>
                             <div class="broker-action-buttons">
-                                <a href="<?= $basePath ?>/admin/broker-controls/exchanges/<?= $exchange['id'] ?>"
+                                <a href="<?= $basePath ?>/admin-legacy/broker-controls/exchanges/<?= $exchange['id'] ?>"
                                    class="admin-btn admin-btn-secondary admin-btn-sm" title="View Details">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
                                 <?php if ($exchange['status'] === 'pending_broker'): ?>
-                                <form action="<?= $basePath ?>/admin/broker-controls/exchanges/<?= $exchange['id'] ?>/approve" method="POST" style="display:inline;">
+                                <form action="<?= $basePath ?>/admin-legacy/broker-controls/exchanges/<?= $exchange['id'] ?>/approve" method="POST" style="display:inline;">
                                     <?= Csrf::input() ?>
                                     <button type="submit" class="admin-btn admin-btn-success admin-btn-sm" title="Approve">
                                         <i class="fa-solid fa-check"></i>

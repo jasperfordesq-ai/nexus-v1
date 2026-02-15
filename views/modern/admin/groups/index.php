@@ -31,7 +31,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <i class="fa-solid fa-rotate"></i>
             Refresh
         </button>
-        <a href="<?= $basePath ?>/admin/groups/export" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/groups/export" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-download"></i>
             Export
         </a>
@@ -114,7 +114,7 @@ $hasAlerts = $pendingApprovals > 0 || $pendingFlags > 0;
             <div class="admin-alert-title"><?= $pendingApprovals ?> Group<?= $pendingApprovals > 1 ? 's' : '' ?> Pending Approval</div>
             <div class="admin-alert-text">New group creation requests require your review</div>
         </div>
-        <a href="<?= $basePath ?>/admin/groups/approvals" class="admin-btn admin-btn-warning">
+        <a href="<?= $basePath ?>/admin-legacy/groups/approvals" class="admin-btn admin-btn-warning">
             <i class="fa-solid fa-arrow-right"></i> Review
         </a>
     </div>
@@ -129,7 +129,7 @@ $hasAlerts = $pendingApprovals > 0 || $pendingFlags > 0;
             <div class="admin-alert-title"><?= $pendingFlags ?> Flagged Item<?= $pendingFlags > 1 ? 's' : '' ?></div>
             <div class="admin-alert-text">Content flagged by users needs moderation</div>
         </div>
-        <a href="<?= $basePath ?>/admin/groups/moderation" class="admin-btn admin-btn-danger">
+        <a href="<?= $basePath ?>/admin-legacy/groups/moderation" class="admin-btn admin-btn-danger">
             <i class="fa-solid fa-arrow-right"></i> Moderate
         </a>
     </div>
@@ -148,7 +148,7 @@ $hasAlerts = $pendingApprovals > 0 || $pendingFlags > 0;
 
 <div class="admin-modules-grid">
     <!-- Analytics -->
-    <a href="<?= $basePath ?>/admin/groups/analytics" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/groups/analytics" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-cyan">
             <i class="fa-solid fa-chart-line"></i>
         </div>
@@ -160,7 +160,7 @@ $hasAlerts = $pendingApprovals > 0 || $pendingFlags > 0;
     </a>
 
     <!-- Settings -->
-    <a href="<?= $basePath ?>/admin/groups/settings" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/groups/settings" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-indigo">
             <i class="fa-solid fa-gear"></i>
         </div>
@@ -172,7 +172,7 @@ $hasAlerts = $pendingApprovals > 0 || $pendingFlags > 0;
     </a>
 
     <!-- Policies -->
-    <a href="<?= $basePath ?>/admin/groups/policies" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/groups/policies" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-violet">
             <i class="fa-solid fa-file-contract"></i>
         </div>
@@ -184,7 +184,7 @@ $hasAlerts = $pendingApprovals > 0 || $pendingFlags > 0;
     </a>
 
     <!-- Moderation -->
-    <a href="<?= $basePath ?>/admin/groups/moderation" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/groups/moderation" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-red">
             <i class="fa-solid fa-flag"></i>
         </div>
@@ -196,7 +196,7 @@ $hasAlerts = $pendingApprovals > 0 || $pendingFlags > 0;
     </a>
 
     <!-- Approvals -->
-    <a href="<?= $basePath ?>/admin/groups/approvals" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/groups/approvals" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-orange">
             <i class="fa-solid fa-clock"></i>
         </div>
@@ -322,7 +322,7 @@ $hasAlerts = $pendingApprovals > 0 || $pendingFlags > 0;
                             <?php endif; ?>
                         </td>
                         <td class="hide-tablet" style="text-align: center;">
-                            <form action="<?= $basePath ?>/admin/groups/toggle-featured" method="POST" style="display:inline;">
+                            <form action="<?= $basePath ?>/admin-legacy/groups/toggle-featured" method="POST" style="display:inline;">
                                 <?= Csrf::input() ?>
                                 <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                                 <button type="submit" class="admin-toggle-btn" title="<?= $group['is_featured'] ? 'Remove from featured' : 'Mark as featured' ?>">
@@ -339,7 +339,7 @@ $hasAlerts = $pendingApprovals > 0 || $pendingFlags > 0;
                                 <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" target="_blank">
                                     <i class="fa-solid fa-eye"></i> View
                                 </a>
-                                <form action="<?= $basePath ?>/admin/groups/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this group? This action cannot be undone.');" style="display:inline;">
+                                <form action="<?= $basePath ?>/admin-legacy/groups/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this group? This action cannot be undone.');" style="display:inline;">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">

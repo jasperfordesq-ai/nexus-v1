@@ -25,7 +25,7 @@ require __DIR__ . '/../partials/admin-header.php';
         <p class="admin-page-subtitle">Federation Directory Profile</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/federation/directory" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Directory
         </a>
@@ -567,7 +567,7 @@ function submitRequest() {
     const federationLevel = document.getElementById('federationLevel').value;
     const message = document.getElementById('partnershipMessage').value;
 
-    fetch(basePath + '/admin/federation/directory/request-partnership', {
+    fetch(basePath + '/admin-legacy/federation/directory/request-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

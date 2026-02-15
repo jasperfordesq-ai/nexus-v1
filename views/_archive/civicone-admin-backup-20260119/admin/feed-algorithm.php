@@ -200,7 +200,7 @@ $totalModules = 6;
     </div>
 </div>
 
-<form action="<?= $basePath ?>/admin/feed-algorithm/save" method="POST">
+<form action="<?= $basePath ?>/admin-legacy/feed-algorithm/save" method="POST">
     <?= Csrf::input() ?>
 
     <!-- Main Content Grid -->
@@ -664,19 +664,19 @@ $totalModules = 6;
                 </div>
                 <div class="admin-card-body">
                     <div class="admin-quick-actions">
-                        <a href="<?= $basePath ?>/admin/ai-settings" class="admin-quick-action">
+                        <a href="<?= $basePath ?>/admin-legacy/ai-settings" class="admin-quick-action">
                             <div class="admin-quick-action-icon admin-quick-action-icon-purple">
                                 <i class="fa-solid fa-microchip"></i>
                             </div>
                             <span>AI Settings</span>
                         </a>
-                        <a href="<?= $basePath ?>/admin/smart-matching" class="admin-quick-action">
+                        <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="admin-quick-action">
                             <div class="admin-quick-action-icon admin-quick-action-icon-pink">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                             </div>
                             <span>Smart Matching</span>
                         </a>
-                        <a href="<?= $basePath ?>/admin/algorithm-settings" class="admin-quick-action">
+                        <a href="<?= $basePath ?>/admin-legacy/algorithm-settings" class="admin-quick-action">
                             <div class="admin-quick-action-icon admin-quick-action-icon-orange">
                                 <i class="fa-solid fa-gears"></i>
                             </div>
@@ -809,7 +809,7 @@ $totalModules = 6;
 </div>
 
 <div class="admin-modules-grid">
-    <a href="<?= $basePath ?>/admin/ai-settings" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/ai-settings" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-purple">
             <i class="fa-solid fa-microchip"></i>
         </div>
@@ -820,7 +820,7 @@ $totalModules = 6;
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/feed-algorithm" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/feed-algorithm" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-cyan">
             <i class="fa-solid fa-sliders"></i>
         </div>
@@ -831,7 +831,7 @@ $totalModules = 6;
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/smart-matching" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-pink">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
         </div>
@@ -842,7 +842,7 @@ $totalModules = 6;
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/algorithm-settings" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/algorithm-settings" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-emerald">
             <i class="fa-solid fa-gears"></i>
         </div>

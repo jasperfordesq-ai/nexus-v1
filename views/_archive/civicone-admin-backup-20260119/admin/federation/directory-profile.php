@@ -20,7 +20,7 @@ $partnership = $partnership ?? null;
 $stats = $stats ?? [];
 ?>
 
-<a href="<?= $basePath ?>/admin/federation/directory" class="admin-back-link">
+<a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-back-link">
     <i class="fa-solid fa-arrow-left"></i> Back to Directory
 </a>
 
@@ -88,7 +88,7 @@ $stats = $stats ?? [];
                 </div>
                 <?php endif; ?>
             <?php else: ?>
-            <a href="<?= $basePath ?>/admin/federation/partnerships?request=<?= $tenant['id'] ?>" class="admin-btn admin-btn-primary admin-btn-block">
+            <a href="<?= $basePath ?>/admin-legacy/federation/partnerships?request=<?= $tenant['id'] ?>" class="admin-btn admin-btn-primary admin-btn-block">
                 <i class="fa-solid fa-paper-plane"></i>
                 Request Partnership
             </a>

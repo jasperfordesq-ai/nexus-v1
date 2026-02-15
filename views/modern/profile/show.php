@@ -461,7 +461,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
                     if ($canImpersonate):
                     ?>
-                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" class="inline-form">
+                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" class="inline-form">
                             <?= Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                             <button type="submit" class="btn btn--warning">
@@ -521,7 +521,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <?php endif; ?>
 
                     <?php if ((isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/users/<?= $user['id'] ?>/edit" class="btn btn--danger">
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/users/<?= $user['id'] ?>/edit" class="btn btn--danger">
                             <i class="fa-solid fa-shield"></i> Admin
                         </a>
                     <?php endif; ?>
@@ -1584,7 +1584,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </a>
         <?php else: ?>
             <?php if ($canImpersonate): ?>
-            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" class="fab-impersonate-form">
+            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" class="fab-impersonate-form">
                 <?= Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                 <button type="submit" class="profile-fab-item fab-impersonate-btn">

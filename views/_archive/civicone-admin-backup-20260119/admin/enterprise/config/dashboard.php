@@ -40,10 +40,10 @@ $currentPage = 'dashboard';
         <p class="admin-page-subtitle">System environment settings and feature flags</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Enterprise Hub
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/config/secrets" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/config/secrets" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-vault"></i> Secrets Vault
         </a>
     </div>
@@ -353,7 +353,7 @@ $currentPage = 'dashboard';
                 <span class="config-value"><?= $vaultEnabled ? 'Yes' : 'No' ?></span>
             </div>
             <div class="config-item">
-                <a href="<?= $basePath ?>/admin/enterprise/config/secrets" class="cyber-btn cyber-btn-primary" style="width: 100%;">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/config/secrets" class="cyber-btn cyber-btn-primary" style="width: 100%;">
                     <i class="fa-solid fa-key"></i>
                     Manage Secrets
                 </a>
@@ -457,7 +457,7 @@ function toggleFeature(key, element) {
     const isActive = element.classList.contains('active');
     element.style.opacity = '0.5';
 
-    fetch(`<?= $basePath ?>/admin/enterprise/config/features/${key}`, {
+    fetch(`<?= $basePath ?>/admin-legacy/enterprise/config/features/${key}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !isActive })
@@ -481,7 +481,7 @@ function toggleFeature(key, element) {
 function resetFeatures() {
     if (!confirm('Reset all feature flags to their default values?')) return;
 
-    fetch(`<?= $basePath ?>/admin/enterprise/config/features/reset`, {
+    fetch(`<?= $basePath ?>/admin-legacy/enterprise/config/features/reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
     })

@@ -452,7 +452,7 @@ docker compose down -v
 ### Local File Structure
 
 ```
-c:\xampp\htdocs\staging\
+project-root/
 ├── react-frontend/           # React app source
 │   ├── src/
 │   ├── Dockerfile.prod
@@ -862,10 +862,24 @@ If `project-nexus.ie` shows the PHP API instead of sales site:
 
 ---
 
+## Our Containers (project-nexus.ie)
+
+These are the **ONLY** containers this project deploys and manages:
+
+| Container | Port | Purpose |
+|-----------|------|---------|
+| `nexus-php-app` | 8090 | PHP API (Apache) |
+| `nexus-php-db` | Internal | MariaDB |
+| `nexus-php-redis` | Internal | Redis |
+| `nexus-react-prod` | 3000 | React Frontend |
+| `nexus-sales-site` | 3001 | Sales/Marketing Site |
+
+Deploy path: `/opt/nexus-php/`
+
 ## Protected Services (DO NOT TOUCH)
 
-> **CRITICAL**: The Azure server hosts a separate .NET platform.
-> **NEVER modify, stop, or interfere with these services!**
+> **CRITICAL**: The Azure server hosts separate projects.
+> **NEVER modify, stop, or interfere with these services from this project!**
 
 ### Protected Containers
 

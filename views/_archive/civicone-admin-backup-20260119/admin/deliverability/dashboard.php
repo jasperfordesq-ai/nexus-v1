@@ -8,7 +8,7 @@ $adminPageTitle = 'Deliverability Tracking';
 $adminPageSubtitle = 'Projects & Tasks';
 $adminPageIcon = 'fa-tasks-alt';
 
-require dirname(dirname(__DIR__)) . '/admin/partials/admin-header.php';
+require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-header.php';
 
 $analytics = $analytics ?? [];
 $userDashboard = $userDashboard ?? [];
@@ -24,10 +24,10 @@ $userDashboard = $userDashboard ?? [];
         <p class="admin-page-subtitle">Manage project deliverables, milestones, and track progress</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/deliverability/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> New Deliverable
         </a>
-        <a href="<?= $basePath ?>/admin/deliverability/analytics" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability/analytics" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-chart-line"></i> Analytics
         </a>
     </div>
@@ -51,7 +51,7 @@ $userDashboard = $userDashboard ?? [];
 <!-- Stats Grid - Enhanced with hover effects and gradients -->
 <div class="admin-stats-grid" style="margin-bottom: 30px;">
     <div class="admin-stat-card admin-stat-blue" style="transition: all 0.3s ease; cursor: pointer;"
-         onclick="window.location.href='<?= $basePath ?>/admin/deliverability/list';">
+         onclick="window.location.href='<?= $basePath ?>/admin-legacy/deliverability/list';">
         <div class="admin-stat-icon" style="background: linear-gradient(135deg, #3b82f6, #6366f1); box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);">
             <i class="fa-solid fa-tasks"></i>
         </div>
@@ -65,7 +65,7 @@ $userDashboard = $userDashboard ?? [];
     </div>
 
     <div class="admin-stat-card admin-stat-cyan" style="transition: all 0.3s ease; cursor: pointer;"
-         onclick="window.location.href='<?= $basePath ?>/admin/deliverability/list?status=in_progress';">
+         onclick="window.location.href='<?= $basePath ?>/admin-legacy/deliverability/list?status=in_progress';">
         <div class="admin-stat-icon" style="background: linear-gradient(135deg, #06b6d4, #22d3ee); box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);">
             <i class="fa-solid fa-spinner fa-spin"></i>
         </div>
@@ -79,7 +79,7 @@ $userDashboard = $userDashboard ?? [];
     </div>
 
     <div class="admin-stat-card admin-stat-green" style="transition: all 0.3s ease; cursor: pointer;"
-         onclick="window.location.href='<?= $basePath ?>/admin/deliverability/list?status=completed';">
+         onclick="window.location.href='<?= $basePath ?>/admin-legacy/deliverability/list?status=completed';">
         <div class="admin-stat-icon" style="background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);">
             <i class="fa-solid fa-circle-check"></i>
         </div>
@@ -93,7 +93,7 @@ $userDashboard = $userDashboard ?? [];
     </div>
 
     <div class="admin-stat-card admin-stat-orange" style="transition: all 0.3s ease; cursor: pointer;"
-         onclick="window.location.href='<?= $basePath ?>/admin/deliverability/list?status=blocked';">
+         onclick="window.location.href='<?= $basePath ?>/admin-legacy/deliverability/list?status=blocked';">
         <div class="admin-stat-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);">
             <i class="fa-solid fa-circle-exclamation"></i>
         </div>
@@ -136,7 +136,7 @@ $userDashboard = $userDashboard ?? [];
                     </p>
                 </div>
                 <div class="admin-card-header-actions">
-                    <a href="<?= $basePath ?>/admin/deliverability/list?assigned_to=<?= $_SESSION['user_id'] ?>"
+                    <a href="<?= $basePath ?>/admin-legacy/deliverability/list?assigned_to=<?= $_SESSION['user_id'] ?>"
                        class="admin-btn admin-btn-secondary admin-btn-sm"
                        style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(34, 211, 238, 0.1)); border-color: rgba(6, 182, 212, 0.3);">
                         <i class="fa-solid fa-arrow-right"></i> View All
@@ -214,7 +214,7 @@ $userDashboard = $userDashboard ?? [];
                                     </span>
                                 </td>
                                 <td style="text-align: center;">
-                                    <a href="<?= $basePath ?>/admin/deliverability/view/<?= $deliverable['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                                    <a href="<?= $basePath ?>/admin-legacy/deliverability/view/<?= $deliverable['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                                         <i class="fa-solid fa-eye"></i> View
                                     </a>
                                 </td>
@@ -282,7 +282,7 @@ $userDashboard = $userDashboard ?? [];
             </div>
             <div class="admin-card-body">
                 <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
-                    <a href="<?= $basePath ?>/admin/deliverability/create"
+                    <a href="<?= $basePath ?>/admin-legacy/deliverability/create"
                        style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; text-decoration: none; color: #fff; transition: all 0.25s ease;"
                        onmouseover="this.style.transform='translateX(4px)'; this.style.borderColor='rgba(99, 102, 241, 0.5)'; this.style.background='linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.2)';"
                        onmouseout="this.style.transform='translateX(0)'; this.style.borderColor='rgba(99, 102, 241, 0.25)'; this.style.background='linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1)';">
@@ -295,7 +295,7 @@ $userDashboard = $userDashboard ?? [];
                         </div>
                         <i class="fa-solid fa-chevron-right" style="color: rgba(255,255,255,0.3); font-size: 12px;"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/deliverability/list?status=in_progress"
+                    <a href="<?= $basePath ?>/admin-legacy/deliverability/list?status=in_progress"
                        style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(34, 211, 238, 0.1)); border: 1px solid rgba(6, 182, 212, 0.25); border-radius: 10px; text-decoration: none; color: #fff; transition: all 0.25s ease;"
                        onmouseover="this.style.transform='translateX(4px)'; this.style.borderColor='rgba(6, 182, 212, 0.5)'; this.style.background='linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(34, 211, 238, 0.2)';"
                        onmouseout="this.style.transform='translateX(0)'; this.style.borderColor='rgba(6, 182, 212, 0.25)'; this.style.background='linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(34, 211, 238, 0.1)';">
@@ -308,7 +308,7 @@ $userDashboard = $userDashboard ?? [];
                         </div>
                         <i class="fa-solid fa-chevron-right" style="color: rgba(255,255,255,0.3); font-size: 12px;"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/deliverability/list?status=review"
+                    <a href="<?= $basePath ?>/admin-legacy/deliverability/list?status=review"
                        style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 10px; text-decoration: none; color: #fff; transition: all 0.25s ease;"
                        onmouseover="this.style.transform='translateX(4px)'; this.style.borderColor='rgba(139, 92, 246, 0.5)'; this.style.background='linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(168, 85, 247, 0.2)';"
                        onmouseout="this.style.transform='translateX(0)'; this.style.borderColor='rgba(139, 92, 246, 0.25)'; this.style.background='linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(168, 85, 247, 0.1)';">
@@ -321,7 +321,7 @@ $userDashboard = $userDashboard ?? [];
                         </div>
                         <i class="fa-solid fa-chevron-right" style="color: rgba(255,255,255,0.3); font-size: 12px;"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/deliverability/list?status=blocked"
+                    <a href="<?= $basePath ?>/admin-legacy/deliverability/list?status=blocked"
                        style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1)); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; text-decoration: none; color: #fff; transition: all 0.25s ease;"
                        onmouseover="this.style.transform='translateX(4px)'; this.style.borderColor='rgba(245, 158, 11, 0.5)'; this.style.background='linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(251, 191, 36, 0.2)';"
                        onmouseout="this.style.transform='translateX(0)'; this.style.borderColor='rgba(245, 158, 11, 0.25)'; this.style.background='linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1)';">
@@ -334,7 +334,7 @@ $userDashboard = $userDashboard ?? [];
                         </div>
                         <i class="fa-solid fa-chevron-right" style="color: rgba(255,255,255,0.3); font-size: 12px;"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/deliverability/list?overdue=true"
+                    <a href="<?= $basePath ?>/admin-legacy/deliverability/list?overdue=true"
                        style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(251, 113, 133, 0.1)); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 10px; text-decoration: none; color: #fff; transition: all 0.25s ease;"
                        onmouseover="this.style.transform='translateX(4px)'; this.style.borderColor='rgba(244, 63, 94, 0.5)'; this.style.background='linear-gradient(135deg, rgba(244, 63, 94, 0.25), rgba(251, 113, 133, 0.2)';"
                        onmouseout="this.style.transform='translateX(0)'; this.style.borderColor='rgba(244, 63, 94, 0.25)'; this.style.background='linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(251, 113, 133, 0.1)';">
@@ -347,7 +347,7 @@ $userDashboard = $userDashboard ?? [];
                         </div>
                         <i class="fa-solid fa-chevron-right" style="color: rgba(255,255,255,0.3); font-size: 12px;"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/deliverability/analytics"
+                    <a href="<?= $basePath ?>/admin-legacy/deliverability/analytics"
                        style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1)); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; text-decoration: none; color: #fff; transition: all 0.25s ease;"
                        onmouseover="this.style.transform='translateX(4px)'; this.style.borderColor='rgba(16, 185, 129, 0.5)'; this.style.background='linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(52, 211, 153, 0.2)';"
                        onmouseout="this.style.transform='translateX(0)'; this.style.borderColor='rgba(16, 185, 129, 0.25)'; this.style.background='linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1)';">
@@ -446,4 +446,4 @@ $userDashboard = $userDashboard ?? [];
     </div>
 </div>
 
-<?php require dirname(dirname(__DIR__)) . '/admin/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-footer.php'; ?>

@@ -282,7 +282,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     <div class="activity-container">
 
         <!-- Back Link -->
-        <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>" class="back-link">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Stats
         </a>
 
@@ -297,15 +297,15 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </div>
 
                 <div class="filter-tabs">
-                    <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>"
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/activity/<?= $newsletter['id'] ?>"
                        class="filter-tab <?= !$type ? 'active' : '' ?>">
                         All
                     </a>
-                    <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>?type=open"
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/activity/<?= $newsletter['id'] ?>?type=open"
                        class="filter-tab <?= $type === 'open' ? 'active' : '' ?>">
                         <i class="fa-solid fa-envelope-open"></i> Opens
                     </a>
-                    <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>?type=click"
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/activity/<?= $newsletter['id'] ?>?type=click"
                        class="filter-tab <?= $type === 'click' ? 'active' : '' ?>">
                         <i class="fa-solid fa-mouse-pointer"></i> Clicks
                     </a>
@@ -365,7 +365,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         $queryParams = $type ? "type={$type}&" : '';
 
                         if ($page > 1): ?>
-                            <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=<?= $page - 1 ?>">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=<?= $page - 1 ?>">
                                 <i class="fa-solid fa-chevron-left"></i>
                             </a>
                         <?php else: ?>
@@ -378,7 +378,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         $endPage = min($totalPages, $page + 2);
 
                         if ($startPage > 1): ?>
-                            <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=1">1</a>
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=1">1</a>
                             <?php if ($startPage > 2): ?>
                                 <span class="disabled">...</span>
                             <?php endif; ?>
@@ -388,7 +388,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <?php if ($i == $page): ?>
                                 <span class="current"><?= $i ?></span>
                             <?php else: ?>
-                                <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=<?= $i ?>"><?= $i ?></a>
+                                <a href="<?= $basePath ?>/admin-legacy/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=<?= $i ?>"><?= $i ?></a>
                             <?php endif; ?>
                         <?php endfor; ?>
 
@@ -396,11 +396,11 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <?php if ($endPage < $totalPages - 1): ?>
                                 <span class="disabled">...</span>
                             <?php endif; ?>
-                            <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=<?= $totalPages ?>"><?= $totalPages ?></a>
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=<?= $totalPages ?>"><?= $totalPages ?></a>
                         <?php endif; ?>
 
                         <?php if ($page < $totalPages): ?>
-                            <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=<?= $page + 1 ?>">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/activity/<?= $newsletter['id'] ?>?<?= $queryParams ?>page=<?= $page + 1 ?>">
                                 <i class="fa-solid fa-chevron-right"></i>
                             </a>
                         <?php else: ?>

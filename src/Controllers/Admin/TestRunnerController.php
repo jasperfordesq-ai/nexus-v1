@@ -400,7 +400,7 @@ class TestRunnerController
     {
         $runId = $_GET['id'] ?? null;
         if (!$runId) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/tests');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/tests');
             return;
         }
 
@@ -415,7 +415,7 @@ class TestRunnerController
         $run = $stmt->fetch();
 
         if (!$run) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/tests');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/tests');
             return;
         }
 

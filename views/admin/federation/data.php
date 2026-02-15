@@ -1,7 +1,7 @@
 <?php
 // Federation Data Management - View Dispatcher
 $layout = layout();
-$modernView = __DIR__ . '/../../modern/admin/federation/data.php';
+$modernView = __DIR__ . '/../../modern/admin-legacy/federation/data.php';
 
 if (($layout === 'modern' || $layout === 'high-contrast') && file_exists($modernView)) {
     require $modernView;

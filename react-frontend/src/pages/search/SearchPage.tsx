@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -37,6 +37,7 @@ type SearchTab = 'all' | 'listings' | 'users' | 'events' | 'groups';
 export function SearchPage() {
   usePageTitle('Search');
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [activeTab, setActiveTab] = useState<SearchTab>('all');
@@ -202,7 +203,7 @@ export function SearchPage() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     {results.listings.slice(0, activeTab === 'all' ? 4 : undefined).map((listing) => (
                       <motion.div key={listing.id} variants={itemVariants}>
-                        <Link to={`/listings/${listing.id}`}>
+                        <Link to={tenantPath(`/listings/${listing.id}`)}>
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full">
                             <span className={`
                               text-xs px-2 py-1 rounded-full
@@ -236,7 +237,7 @@ export function SearchPage() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     {results.users.slice(0, activeTab === 'all' ? 4 : undefined).map((user) => (
                       <motion.div key={user.id} variants={itemVariants}>
-                        <Link to={`/profile/${user.id}`}>
+                        <Link to={tenantPath(`/profile/${user.id}`)}>
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform">
                             <div className="flex items-center gap-4">
                               <Avatar
@@ -278,7 +279,7 @@ export function SearchPage() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     {results.events.slice(0, activeTab === 'all' ? 4 : undefined).map((event) => (
                       <motion.div key={event.id} variants={itemVariants}>
-                        <Link to={`/events/${event.id}`}>
+                        <Link to={tenantPath(`/events/${event.id}`)}>
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform">
                             <h3 className="font-semibold text-theme-primary">{event.title}</h3>
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{event.description}</p>
@@ -314,7 +315,7 @@ export function SearchPage() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     {results.groups.slice(0, activeTab === 'all' ? 4 : undefined).map((group) => (
                       <motion.div key={group.id} variants={itemVariants}>
-                        <Link to={`/groups/${group.id}`}>
+                        <Link to={tenantPath(`/groups/${group.id}`)}>
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform">
                             <h3 className="font-semibold text-theme-primary">{group.name}</h3>
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{group.description}</p>

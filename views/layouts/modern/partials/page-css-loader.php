@@ -356,7 +356,7 @@ $pageSpecificCSS = [
 
     // Admin pages with extracted styles - Added Phase 1 Template Extraction 2026-01-27
     'admin-extracts' => [
-        'condition' => strpos($normPath, '/admin/') !== false,
+        'condition' => strpos($normPath, '/admin-legacy/') !== false,
         'files' => ['modern-template-extracts.css']
     ],
 

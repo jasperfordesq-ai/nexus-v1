@@ -35,7 +35,7 @@ $errors = $errors ?? [];
         <p class="admin-page-subtitle">Add a new member to the community</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/users" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/users" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to Users
         </a>
     </div>
@@ -68,7 +68,7 @@ $errors = $errors ?? [];
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/users/store" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/users/store" method="POST">
             <?= Csrf::input() ?>
 
             <!-- Personal Details Section -->
@@ -198,7 +198,7 @@ $errors = $errors ?? [];
 
             <!-- Form Actions -->
             <div class="admin-form-actions">
-                <a href="<?= $basePath ?>/admin/users" class="admin-btn admin-btn-secondary">Cancel</a>
+                <a href="<?= $basePath ?>/admin-legacy/users" class="admin-btn admin-btn-secondary">Cancel</a>
                 <button type="submit" class="admin-btn admin-btn-success">
                     <i class="fa-solid fa-user-plus"></i> Create User
                 </button>

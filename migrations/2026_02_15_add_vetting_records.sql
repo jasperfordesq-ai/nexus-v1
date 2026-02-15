@@ -2,15 +2,15 @@
 -- Created: 2026-02-15
 
 CREATE TABLE IF NOT EXISTS vetting_records (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tenant_id INT UNSIGNED NOT NULL,
-    user_id INT UNSIGNED NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tenant_id INT NOT NULL,
+    user_id INT NOT NULL,
     vetting_type ENUM('dbs_basic', 'dbs_standard', 'dbs_enhanced', 'garda_vetting', 'access_ni', 'pvg_scotland', 'international', 'other') NOT NULL DEFAULT 'dbs_basic',
     status ENUM('pending', 'submitted', 'verified', 'expired', 'rejected', 'revoked') NOT NULL DEFAULT 'pending',
     reference_number VARCHAR(100) DEFAULT NULL COMMENT 'DBS certificate number or Garda ref',
     issue_date DATE DEFAULT NULL,
     expiry_date DATE DEFAULT NULL,
-    verified_by INT UNSIGNED DEFAULT NULL COMMENT 'Admin/broker who verified',
+    verified_by INT DEFAULT NULL COMMENT 'Admin/broker who verified',
     verified_at DATETIME DEFAULT NULL,
     document_url VARCHAR(500) DEFAULT NULL COMMENT 'Optional uploaded document path',
     notes TEXT DEFAULT NULL COMMENT 'Internal broker notes',

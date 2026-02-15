@@ -29,7 +29,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/broker-controls" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             User Monitoring
@@ -182,7 +182,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <a href="<?= $basePath ?>/admin/users/<?= $user['id'] ?>"
+                                <a href="<?= $basePath ?>/admin-legacy/users/<?= $user['id'] ?>"
                                    class="admin-btn admin-btn-secondary admin-btn-sm" title="View Profile">
                                     <i class="fa-solid fa-user"></i>
                                 </a>
@@ -276,7 +276,7 @@ function showMonitoringModal(userId, userName, messagingDisabled, underMonitorin
     document.getElementById('messaging_disabled').checked = messagingDisabled;
     document.getElementById('under_monitoring').checked = underMonitoring;
     document.getElementById('restriction_reason').value = '';
-    form.action = '<?= $basePath ?>/admin/broker-controls/monitoring/' + userId;
+    form.action = '<?= $basePath ?>/admin-legacy/broker-controls/monitoring/' + userId;
     modal.style.display = 'flex';
 }
 

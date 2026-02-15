@@ -378,10 +378,10 @@ require __DIR__ . '/../partials/admin-header.php';
         </p>
 
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <a href="/admin/blog-restore/export?tenant=<?= $tenantId ?>&status=all" class="btn btn-primary">
+            <a href="/admin-legacy/blog-restore/export?tenant=<?= $tenantId ?>&status=all" class="btn btn-primary">
                 📥 Export All Posts
             </a>
-            <a href="/admin/blog-restore/export?tenant=<?= $tenantId ?>&status=published" class="btn btn-secondary">
+            <a href="/admin-legacy/blog-restore/export?tenant=<?= $tenantId ?>&status=published" class="btn btn-secondary">
                 📥 Export Published Only
             </a>
         </div>
@@ -421,7 +421,7 @@ let currentImportFile = null;
 function runDiagnostic() {
     openModal('diagnosticModal');
 
-    fetch('/admin/blog-restore/diagnostic')
+    fetch('/admin-legacy/blog-restore/diagnostic')
         .then(r => r.json())
         .then(data => {
             let html = '';
@@ -522,7 +522,7 @@ function executeImport() {
     formData.append('filename', currentImportFile);
     formData.append('csrf_token', '<?= \Nexus\Core\Csrf::generate() ?>');
 
-    fetch('/admin/blog-restore/import', {
+    fetch('/admin-legacy/blog-restore/import', {
         method: 'POST',
         body: formData
     })
@@ -554,7 +554,7 @@ function executeImport() {
                 <button class="btn btn-primary" onclick="location.reload()">
                     🔄 Refresh Page
                 </button>
-                <a href="/admin/news" class="btn btn-secondary">
+                <a href="/admin-legacy/news" class="btn btn-secondary">
                     📝 View Blog Posts
                 </a>
             </div>`;
@@ -632,7 +632,7 @@ function handleFileUpload(file) {
     formData.append('sql_file', file);
     formData.append('csrf_token', '<?= \Nexus\Core\Csrf::generate() ?>');
 
-    fetch('/admin/blog-restore/upload', {
+    fetch('/admin-legacy/blog-restore/upload', {
         method: 'POST',
         body: formData
     })

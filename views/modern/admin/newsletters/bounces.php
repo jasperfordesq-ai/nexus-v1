@@ -55,11 +55,11 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Monitor bounces and manage email suppression list</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/newsletters" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back
         </a>
-        <a href="<?= $basePath ?>/admin/newsletters/analytics" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/analytics" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-chart-line"></i>
             Analytics
         </a>
@@ -158,7 +158,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <?php endif; ?>
                         </td>
                         <td style="text-align: center;">
-                            <form action="<?= $basePath ?>/admin/newsletters/bounces/unsuppress" method="POST" style="display: inline;">
+                            <form action="<?= $basePath ?>/admin-legacy/newsletters/bounces/unsuppress" method="POST" style="display: inline;">
                                 <?= Csrf::input() ?>
                                 <input type="hidden" name="email" value="<?= htmlspecialchars($item['email']) ?>">
                                 <button type="submit" onclick="return confirm('Remove from suppression list?')" class="bounce-restore-btn">
@@ -272,7 +272,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/newsletters/bounces/suppress" method="POST" class="suppress-form">
+        <form action="<?= $basePath ?>/admin-legacy/newsletters/bounces/suppress" method="POST" class="suppress-form">
             <?= Csrf::input() ?>
             <input type="email" name="email" required placeholder="email@example.com" class="admin-input">
             <select name="reason" class="admin-select">

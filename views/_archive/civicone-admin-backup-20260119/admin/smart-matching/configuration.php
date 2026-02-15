@@ -59,7 +59,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/smart-matching" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Algorithm Configuration
@@ -67,10 +67,10 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         <p class="admin-page-subtitle">Fine-tune matching weights and thresholds</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/smart-matching" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-gauge-high"></i> Dashboard
         </a>
-        <a href="<?= $basePath ?>/admin/smart-matching/analytics" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/smart-matching/analytics" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-chart-line"></i> Analytics
         </a>
     </div>
@@ -91,7 +91,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 </div>
 <?php endif; ?>
 
-<form action="<?= $basePath ?>/admin/smart-matching/configuration" method="POST" id="configForm">
+<form action="<?= $basePath ?>/admin-legacy/smart-matching/configuration" method="POST" id="configForm">
     <?= Csrf::input() ?>
 
     <!-- Enable/Disable Card -->

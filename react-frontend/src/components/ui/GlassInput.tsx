@@ -25,8 +25,7 @@ export const GlassInput = forwardRef<HTMLInputElement, GlassInputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium mb-2"
-            style={{ color: 'var(--foreground-muted)' }}
+            className="block text-sm font-medium mb-2 text-theme-muted"
           >
             {label}
           </label>
@@ -43,8 +42,7 @@ export const GlassInput = forwardRef<HTMLInputElement, GlassInputProps>(
         {error && (
           <p
             id={`${inputId}-error`}
-            className="mt-2 text-sm"
-            style={{ color: 'var(--color-error)' }}
+            className="mt-2 text-sm text-red-500 dark:text-red-400"
             role="alert"
           >
             {error}
@@ -53,8 +51,7 @@ export const GlassInput = forwardRef<HTMLInputElement, GlassInputProps>(
         {helperText && !error && (
           <p
             id={`${inputId}-helper`}
-            className="mt-2 text-sm"
-            style={{ color: 'var(--foreground-subtle)' }}
+            className="mt-2 text-sm text-theme-subtle"
           >
             {helperText}
           </p>

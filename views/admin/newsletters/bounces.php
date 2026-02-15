@@ -37,11 +37,11 @@ else {
 
         <!-- Action Bar -->
         <div class="nexus-card" style="margin-bottom: 24px; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-            <a href="<?= $basePath ?>/admin/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
                 <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
             </a>
             <div style="display: flex; gap: 12px;">
-                <a href="<?= $basePath ?>/admin/newsletters/analytics" style="color: #6366f1; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/analytics" style="color: #6366f1; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-chart-line"></i> Analytics
                 </a>
             </div>
@@ -150,7 +150,7 @@ else {
                                     <?php endif; ?>
                                 </td>
                                 <td style="padding: 12px 16px; text-align: center;">
-                                    <form action="<?= $basePath ?>/admin/newsletters/bounces/unsuppress" method="POST" style="display: inline;">
+                                    <form action="<?= $basePath ?>/admin-legacy/newsletters/bounces/unsuppress" method="POST" style="display: inline;">
                                         <?= \Nexus\Core\Csrf::input() ?>
                                         <input type="hidden" name="email" value="<?= htmlspecialchars($item['email']) ?>">
                                         <button type="submit" onclick="return confirm('Remove this email from suppression list?')" style="background: none; border: none; color: #6366f1; cursor: pointer; font-size: 0.8rem; padding: 4px 8px;">
@@ -247,7 +247,7 @@ else {
             <p style="color: #6b7280; font-size: 0.9rem; margin: 0 0 16px 0;">
                 Add an email address to the suppression list to prevent sending newsletters to them.
             </p>
-            <form action="<?= $basePath ?>/admin/newsletters/bounces/suppress" method="POST" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <form action="<?= $basePath ?>/admin-legacy/newsletters/bounces/suppress" method="POST" style="display: flex; gap: 12px; flex-wrap: wrap;">
                 <?= \Nexus\Core\Csrf::input() ?>
                 <input type="email" name="email" required placeholder="email@example.com"
                     style="flex: 1; min-width: 250px; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">

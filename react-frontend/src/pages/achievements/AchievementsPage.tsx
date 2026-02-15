@@ -924,7 +924,7 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
       onClose={onClose}
       size="2xl"
       classNames={{
-        base: 'bg-theme-elevated border border-white/10',
+        base: 'bg-content1 border border-white/10',
         header: 'border-b border-white/10',
         body: 'py-4',
         footer: 'border-t border-white/10',

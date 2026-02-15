@@ -49,6 +49,8 @@ This project uses **Claude Opus 4.6 Agent Teams** (swarm mode) for large, multi-
 | **React Frontend** | http://localhost:5173 |
 | **PHP API** | http://localhost:8090 |
 | **Sales Site** | http://localhost:3001 |
+| **React Admin** | http://localhost:5173/admin |
+| **Legacy PHP Admin** | http://localhost:8090/admin-legacy/ |
 | **Legacy PHP Views** | http://localhost:8090/{tenant}/ |
 | **phpMyAdmin** | http://localhost:8091 (with `--profile tools`) |
 
@@ -201,7 +203,7 @@ project-nexus/
 ├── views/                        # PHP templates (LEGACY - reference only, being decommissioned)
 │   ├── civicone/                 # GOV.UK-based theme (WCAG 2.1 AA)
 │   ├── modern/                   # Modern responsive theme
-│   └── admin/                    # Admin panel views
+│   └── admin/                    # Legacy admin views (served under /admin-legacy/)
 ├── httpdocs/                     # Web root
 │   ├── assets/                   # CSS, JS, images
 │   ├── index.php                 # Main entry point
@@ -395,9 +397,9 @@ if (!Auth::check()) {
     exit;
 }
 
-// Admin authentication
+// Admin authentication (legacy PHP admin)
 if (!AdminAuth::check()) {
-    header('Location: /admin/login');
+    header('Location: /admin-legacy/login');
     exit;
 }
 
@@ -618,7 +620,9 @@ docker compose restart app
 | Service | URL | Purpose |
 |---------|-----|---------|
 | React Frontend | http://localhost:5173 | Primary UI (HeroUI + Tailwind) |
+| React Admin | http://localhost:5173/admin | React admin panel (primary) |
 | PHP API | http://localhost:8090 | Backend API |
+| Legacy PHP Admin | http://localhost:8090/admin-legacy/ | Legacy admin (being decommissioned) |
 | Legacy PHP | http://localhost:8090/{tenant}/ | Legacy views (reference only) |
 | phpMyAdmin | http://localhost:8091 | DB admin (needs `--profile tools`) |
 
@@ -626,7 +630,7 @@ docker compose restart app
 
 ```bash
 # CLI access
-docker exec -it nexus-mysql-db mysql -unexus -pnexus_secret nexus
+docker exec -it nexus-php-db mysql -unexus -pnexus_secret nexus
 
 # Or use phpMyAdmin
 docker compose --profile tools up -d
@@ -695,17 +699,34 @@ ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253
 ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253 "cd /opt/nexus-php && sudo docker compose logs -f app"
 ```
 
-#### ⛔ PROTECTED SERVICES ON AZURE (DO NOT TOUCH)
+#### ⛔ THIS PROJECT'S CONTAINERS vs OTHER PROJECTS
 
-The Azure server hosts a separate .NET platform. **NEVER modify these:**
+**This project (`staging/`) owns ONLY these containers — everything prefixed `nexus-php-*` or `nexus-react-*` or `nexus-sales-*`:**
 
-| Container | Port | Purpose |
-|-----------|------|---------|
-| `nexus-backend-api` | 5080 | .NET Core API |
-| `nexus-frontend-prod` | 5171 | Next.js Frontend |
-| `nexus-backend-db` | 5432 | PostgreSQL |
+| Container | Ours? | Purpose |
+|-----------|-------|---------|
+| `nexus-php-app` | **YES** | PHP API (Apache) |
+| `nexus-php-db` | **YES** | MariaDB |
+| `nexus-php-redis` | **YES** | Redis |
+| `nexus-react-prod` | **YES** | React Frontend |
+| `nexus-sales-site` | **YES** | Sales/Marketing Site |
+| `nexus-phpmyadmin` | **YES** | phpMyAdmin (local only) |
 
-Protected directories: `/opt/nexus-backend/`, `/opt/nexus-modern-frontend/`
+**NEVER deploy to, restart, or modify these — they belong to other projects:**
+
+| Container | Project | Purpose |
+|-----------|---------|---------|
+| `nexus-backend-api` | asp.net-backend | .NET Core API |
+| `nexus-backend-db` | asp.net-backend | PostgreSQL |
+| `nexus-backend-rabbitmq` | asp.net-backend | RabbitMQ |
+| `nexus-backend-llama` | asp.net-backend | Ollama AI |
+| `nexus-frontend-dev` | nexus-modern-frontend | Next.js (IE) |
+| `nexus-frontend-prod` | nexus-modern-frontend | Next.js (IE prod) |
+| `nexus-uk-frontend-dev` | nexus-uk-frontend | Next.js (UK) |
+| `nexus-civic-app` | nexus-civic | Node.js |
+| `nexus-civic-db` | nexus-civic | PostgreSQL |
+
+Protected directories on Azure: `/opt/nexus-backend/`, `/opt/nexus-modern-frontend/`, `/opt/nexus-uk-frontend/`
 
 See [docs/new-production-server.md](docs/new-production-server.md) for full Azure documentation.
 
@@ -871,7 +892,18 @@ if (hasModule('wallet')) { /* show wallet nav item */ }
 if (TenantContext::hasFeature('gamification')) { /* ... */ }
 ```
 
-Admin UI: `/admin/tenant-features` — toggle switches for all features & modules per tenant. Clears Redis bootstrap cache on save.
+Admin UI: `/admin/tenant-features` (React admin) — toggle switches for all features & modules per tenant. Clears Redis bootstrap cache on save.
+
+### Admin Panel Routes
+
+| Route Prefix | Purpose | Stack |
+|--------------|---------|-------|
+| `/admin/*` | React admin panel (primary) | React 18 + HeroUI + Tailwind CSS 4 |
+| `/admin-legacy/*` | Legacy PHP admin (being decommissioned) | PHP controllers + `views/admin/` |
+| `/api/v2/admin/*` | Admin API endpoints (used by React admin) | PHP API controllers |
+| `/super-admin/*` | Super admin PHP views | PHP controllers (unchanged) |
+
+The React admin panel at `/admin` is the primary admin interface. Legacy PHP admin routes have been moved to `/admin-legacy/` and are being decommissioned. `admin-legacy` is a reserved path in `tenant-routing.ts` to prevent slug collision.
 
 ### React Pages
 

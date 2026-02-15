@@ -55,7 +55,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Create, manage, and send email campaigns</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/newsletters/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i>
             Create Newsletter
         </a>
@@ -98,27 +98,27 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="admin-glass-card" style="margin-bottom: 1.5rem;">
     <div class="admin-card-body">
         <div class="admin-quick-actions">
-            <a href="<?= $basePath ?>/admin/newsletters/analytics" class="admin-quick-action">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/analytics" class="admin-quick-action">
                 <i class="fa-solid fa-chart-line"></i>
                 <span>Analytics</span>
             </a>
-            <a href="<?= $basePath ?>/admin/newsletters/templates" class="admin-quick-action">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates" class="admin-quick-action">
                 <i class="fa-solid fa-palette"></i>
                 <span>Templates</span>
             </a>
-            <a href="<?= $basePath ?>/admin/newsletters/segments" class="admin-quick-action">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/segments" class="admin-quick-action">
                 <i class="fa-solid fa-filter"></i>
                 <span>Segments</span>
             </a>
-            <a href="<?= $basePath ?>/admin/newsletters/subscribers" class="admin-quick-action">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/subscribers" class="admin-quick-action">
                 <i class="fa-solid fa-address-book"></i>
                 <span>Subscribers</span>
             </a>
-            <a href="<?= $basePath ?>/admin/newsletters/bounces" class="admin-quick-action">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/bounces" class="admin-quick-action">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Bounces</span>
             </a>
-            <a href="<?= $basePath ?>/admin/newsletters/diagnostics" class="admin-quick-action">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/diagnostics" class="admin-quick-action">
                 <i class="fa-solid fa-wrench"></i>
                 <span>Diagnostics</span>
             </a>
@@ -145,7 +145,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
             <h3 class="admin-empty-title">No newsletters yet</h3>
             <p class="admin-empty-text">Create your first newsletter to start engaging with your community.</p>
-            <a href="<?= $basePath ?>/admin/newsletters/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-plus"></i>
                 Create Your First Newsletter
             </a>
@@ -251,23 +251,23 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         <td style="text-align: right;">
                             <div class="admin-action-buttons">
                                 <?php if ($newsletter['status'] !== 'sent'): ?>
-                                    <a href="<?= $basePath ?>/admin/newsletters/edit/<?= $newsletter['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Edit">
+                                    <a href="<?= $basePath ?>/admin-legacy/newsletters/edit/<?= $newsletter['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Edit">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
                                 <?php endif; ?>
-                                <a href="<?= $basePath ?>/admin/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" class="admin-btn admin-btn-secondary admin-btn-sm" title="Preview">
+                                <a href="<?= $basePath ?>/admin-legacy/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" class="admin-btn admin-btn-secondary admin-btn-sm" title="Preview">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
                                 <?php if ($newsletter['status'] === 'sent'): ?>
-                                    <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">
+                                    <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">
                                         <i class="fa-solid fa-chart-bar"></i> Stats
                                     </a>
                                 <?php endif; ?>
-                                <a href="<?= $basePath ?>/admin/newsletters/duplicate/<?= $newsletter['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Duplicate">
+                                <a href="<?= $basePath ?>/admin-legacy/newsletters/duplicate/<?= $newsletter['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Duplicate">
                                     <i class="fa-solid fa-copy"></i>
                                 </a>
                                 <?php if ($newsletter['status'] !== 'sent'): ?>
-                                    <form action="<?= $basePath ?>/admin/newsletters/delete" method="POST" style="display: inline;" onsubmit="return confirm('Delete this newsletter?');">
+                                    <form action="<?= $basePath ?>/admin-legacy/newsletters/delete" method="POST" style="display: inline;" onsubmit="return confirm('Delete this newsletter?');">
                                         <?= Csrf::input() ?>
                                         <input type="hidden" name="id" value="<?= $newsletter['id'] ?>">
                                         <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm" title="Delete">

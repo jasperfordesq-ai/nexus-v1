@@ -25,7 +25,7 @@ $currentPage = 'breaches';
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Report Security Incident
@@ -33,7 +33,7 @@ $currentPage = 'breaches';
         <p class="admin-page-subtitle">Document a data breach for GDPR compliance</p>
     </div>
     <div class="admin-page-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-times"></i> Cancel
         </a>
     </div>
@@ -753,7 +753,7 @@ $currentPage = 'breaches';
                         <i class="fa-solid fa-shield-exclamation"></i>
                         Submit Breach Report
                     </button>
-                    <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches" class="admin-btn admin-btn-secondary">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches" class="admin-btn admin-btn-secondary">
                         Cancel
                     </a>
                 </div>
@@ -786,7 +786,7 @@ function submitBreachReport(e) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
-    fetch('<?= $basePath ?>/admin/enterprise/gdpr/breaches', {
+    fetch('<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -798,7 +798,7 @@ function submitBreachReport(e) {
         if (result.success) {
             showToast(result.message || 'Breach reported successfully', 'success');
             setTimeout(() => {
-                window.location.href = '<?= $basePath ?>/admin/enterprise/gdpr/breaches';
+                window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches';
             }, 1500);
         } else {
             showToast('Error: ' + (result.error || 'Failed to submit report'), 'error');

@@ -58,7 +58,7 @@ require_once __DIR__ . '/../../layouts/admin-header.php';
     <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="/admin/404-errors" class="row g-3">
+            <form method="GET" action="/admin-legacy/404-errors" class="row g-3">
                 <div class="col-md-3">
                     <label class="form-label">Status</label>
                     <select name="resolved" class="form-select">
@@ -107,7 +107,7 @@ require_once __DIR__ . '/../../layouts/admin-header.php';
                 </button>
             </div>
             <div>
-                <a href="/admin/seo/redirects" class="btn btn-sm btn-secondary">
+                <a href="/admin-legacy/seo/redirects" class="btn btn-sm btn-secondary">
                     <i class="bi bi-arrow-left-right"></i> Manage Redirects
                 </a>
             </div>
@@ -258,7 +258,7 @@ function createRedirectModal(errorId, sourceUrl) {
 function submitRedirect() {
     const formData = new FormData(document.getElementById('redirectForm'));
 
-    fetch('/admin/404-errors/create-redirect', {
+    fetch('/admin-legacy/404-errors/create-redirect', {
         method: 'POST',
         body: formData
     })
@@ -279,7 +279,7 @@ function submitRedirect() {
 function markResolved(id) {
     if (!confirm('Mark this error as resolved?')) return;
 
-    fetch('/admin/404-errors/mark-resolved', {
+    fetch('/admin-legacy/404-errors/mark-resolved', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'id=' + id
@@ -297,7 +297,7 @@ function markResolved(id) {
 function markUnresolved(id) {
     if (!confirm('Mark this error as unresolved?')) return;
 
-    fetch('/admin/404-errors/mark-unresolved', {
+    fetch('/admin-legacy/404-errors/mark-unresolved', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'id=' + id
@@ -315,7 +315,7 @@ function markUnresolved(id) {
 function deleteError(id) {
     if (!confirm('Delete this 404 error log entry?')) return;
 
-    fetch('/admin/404-errors/delete', {
+    fetch('/admin-legacy/404-errors/delete', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'id=' + id
@@ -333,7 +333,7 @@ function deleteError(id) {
 function cleanOldResolved() {
     if (!confirm('This will delete all resolved 404 errors older than 90 days. Continue?')) return;
 
-    fetch('/admin/404-errors/clean-old', {
+    fetch('/admin-legacy/404-errors/clean-old', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'days=90'

@@ -66,7 +66,7 @@ class AttributeController
             Attribute::create($name, $categoryId, $inputType);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/attributes');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/attributes');
     }
 
     public function edit($id)
@@ -101,7 +101,7 @@ class AttributeController
             'is_active' => $isActive
         ]);
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/attributes');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/attributes');
     }
 
     public function delete()
@@ -114,6 +114,6 @@ class AttributeController
             Attribute::delete($id);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/attributes');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/attributes');
     }
 }

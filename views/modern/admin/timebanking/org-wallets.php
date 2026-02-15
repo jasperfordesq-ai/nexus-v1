@@ -22,7 +22,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/timebanking" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/timebanking" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Organization Wallets
@@ -30,7 +30,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Manage organization time banking wallets</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/timebanking/create-org" class="admin-btn admin-btn-success">
+        <a href="<?= $basePath ?>/admin-legacy/timebanking/create-org" class="admin-btn admin-btn-success">
             <i class="fa-solid fa-plus"></i> Create Organization
         </a>
     </div>
@@ -63,7 +63,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <h3 class="admin-card-title">Organizations Without Wallets</h3>
             <p class="admin-card-subtitle"><?= count($orgsWithoutWallets) ?> organization<?= count($orgsWithoutWallets) !== 1 ? 's' : '' ?> need wallet initialization</p>
         </div>
-        <form action="<?= $basePath ?>/admin/timebanking/org-wallets/initialize-all" method="POST" style="margin-left: auto;">
+        <form action="<?= $basePath ?>/admin-legacy/timebanking/org-wallets/initialize-all" method="POST" style="margin-left: auto;">
             <?= Csrf::input() ?>
             <button type="submit" class="admin-btn admin-btn-warning">
                 <i class="fa-solid fa-wand-magic-sparkles"></i> Initialize All
@@ -78,7 +78,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     <div class="org-name"><?= htmlspecialchars($org['name']) ?></div>
                     <div class="org-owner"><?= htmlspecialchars($org['owner_name']) ?></div>
                 </div>
-                <form action="<?= $basePath ?>/admin/timebanking/org-wallets/initialize" method="POST">
+                <form action="<?= $basePath ?>/admin-legacy/timebanking/org-wallets/initialize" method="POST">
                     <?= Csrf::input() ?>
                     <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                     <button type="submit" class="admin-btn admin-btn-sm admin-btn-warning-outline">
@@ -151,7 +151,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     <a href="<?= $basePath ?>/organizations/<?= $wallet['organization_id'] ?>/wallet" class="admin-btn admin-btn-sm admin-btn-secondary">
                         <i class="fa-solid fa-external-link-alt"></i> View Wallet
                     </a>
-                    <a href="<?= $basePath ?>/admin/timebanking/org-members/<?= $wallet['organization_id'] ?>" class="admin-btn admin-btn-sm admin-btn-primary">
+                    <a href="<?= $basePath ?>/admin-legacy/timebanking/org-members/<?= $wallet['organization_id'] ?>" class="admin-btn admin-btn-sm admin-btn-primary">
                         <i class="fa-solid fa-users-cog"></i> Members
                     </a>
                 </div>

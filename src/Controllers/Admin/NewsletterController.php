@@ -133,7 +133,7 @@ class NewsletterController
 
         if (empty($data['subject'])) {
             $_SESSION['flash_error'] = 'Subject is required';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/create');
             exit;
         }
 
@@ -177,11 +177,11 @@ class NewsletterController
             }
 
             $_SESSION['flash_success'] = 'Newsletter created successfully';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/edit/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/edit/' . $id);
         } catch (\Exception $e) {
             error_log("Newsletter create error: " . $e->getMessage());
             $_SESSION['flash_error'] = 'Error creating newsletter';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/create');
         }
         exit;
     }
@@ -255,7 +255,7 @@ class NewsletterController
         // Don't allow editing sent newsletters
         if ($newsletter['status'] === 'sent') {
             $_SESSION['flash_error'] = 'Cannot edit a sent newsletter';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
@@ -339,7 +339,7 @@ class NewsletterController
 
         if (empty($data['subject'])) {
             $_SESSION['flash_error'] = 'Subject is required';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/edit/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/edit/' . $id);
             exit;
         }
 
@@ -351,7 +351,7 @@ class NewsletterController
             $_SESSION['flash_error'] = 'Error updating newsletter';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/edit/' . $id);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/edit/' . $id);
         exit;
     }
 
@@ -392,19 +392,19 @@ class NewsletterController
         $newsletter = Newsletter::findById($id);
         if (!$newsletter) {
             $_SESSION['flash_error'] = 'Newsletter not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
         if ($newsletter['status'] === 'sent') {
             $_SESSION['flash_error'] = 'Newsletter already sent';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
         if (empty(trim($newsletter['content']))) {
             $_SESSION['flash_error'] = 'Cannot send empty newsletter';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/edit/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/edit/' . $id);
             exit;
         }
 
@@ -429,7 +429,7 @@ class NewsletterController
             $_SESSION['flash_error'] = 'Error sending newsletter: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
         exit;
     }
 
@@ -444,19 +444,19 @@ class NewsletterController
         $newsletter = Newsletter::findById($id);
         if (!$newsletter) {
             $_SESSION['flash_error'] = 'Newsletter not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
         if ($newsletter['status'] === 'sent') {
             $_SESSION['flash_error'] = 'Newsletter already sent';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
         if (empty(trim($newsletter['content']))) {
             $_SESSION['flash_error'] = 'Cannot send empty newsletter';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/edit/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/edit/' . $id);
             exit;
         }
 
@@ -476,7 +476,7 @@ class NewsletterController
             $_SESSION['flash_error'] = 'Error sending newsletter: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
         exit;
     }
 
@@ -535,7 +535,7 @@ class NewsletterController
 
         if (!$id) {
             $_SESSION['flash_error'] = 'Invalid newsletter ID';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
@@ -544,14 +544,14 @@ class NewsletterController
 
         if (!$newsletter) {
             $_SESSION['flash_error'] = 'Newsletter not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
         // Don't allow deleting sent newsletters (keep for records)
         if ($newsletter['status'] === 'sent') {
             $_SESSION['flash_error'] = 'Cannot delete sent newsletters';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
@@ -564,7 +564,7 @@ class NewsletterController
             $_SESSION['flash_error'] = 'Error deleting newsletter: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
         exit;
     }
 
@@ -578,7 +578,7 @@ class NewsletterController
         $newsletter = Newsletter::findById($id);
         if (!$newsletter) {
             $_SESSION['flash_error'] = 'Newsletter not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
@@ -592,11 +592,11 @@ class NewsletterController
             ]);
 
             $_SESSION['flash_success'] = 'Newsletter duplicated';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/edit/' . $newId);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/edit/' . $newId);
         } catch (\Exception $e) {
             error_log("Newsletter duplicate error: " . $e->getMessage());
             $_SESSION['flash_error'] = 'Error duplicating newsletter';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
         }
         exit;
     }
@@ -797,7 +797,7 @@ class NewsletterController
             $_SESSION['flash_error'] = $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/stats/' . $id);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/stats/' . $id);
         exit;
     }
 
@@ -846,14 +846,14 @@ class NewsletterController
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['flash_error'] = 'Please enter a valid email address';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/subscribers');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/subscribers');
             exit;
         }
 
         $existing = NewsletterSubscriber::findByEmail($email);
         if ($existing && $existing['status'] === 'active') {
             $_SESSION['flash_error'] = 'This email is already subscribed';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/subscribers');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/subscribers');
             exit;
         }
 
@@ -865,7 +865,7 @@ class NewsletterController
             $_SESSION['flash_error'] = 'Error adding subscriber';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/subscribers');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/subscribers');
         exit;
     }
 
@@ -883,7 +883,7 @@ class NewsletterController
             $_SESSION['flash_success'] = 'Subscriber removed';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/subscribers');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/subscribers');
         exit;
     }
 
@@ -912,7 +912,7 @@ class NewsletterController
             $_SESSION['flash_error'] = 'Error syncing members: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/subscribers');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/subscribers');
         exit;
     }
 
@@ -956,7 +956,7 @@ class NewsletterController
 
         if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
             $_SESSION['flash_error'] = 'Please upload a valid CSV file';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/subscribers');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/subscribers');
             exit;
         }
 
@@ -980,14 +980,14 @@ class NewsletterController
 
         if (empty($subscribers)) {
             $_SESSION['flash_error'] = 'No valid email addresses found in file';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/subscribers');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/subscribers');
             exit;
         }
 
         $result = NewsletterSubscriber::import($subscribers);
         $_SESSION['flash_success'] = "Imported {$result['imported']} subscribers ({$result['skipped']} skipped)";
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/subscribers');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/subscribers');
         exit;
     }
 
@@ -1058,7 +1058,7 @@ class NewsletterController
 
         if (empty($data['name'])) {
             $_SESSION['flash_error'] = 'Segment name is required';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments/create');
             exit;
         }
 
@@ -1069,11 +1069,11 @@ class NewsletterController
             \Nexus\Services\SmartSegmentSuggestionService::clearCache();
 
             $_SESSION['flash_success'] = 'Segment created successfully';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments');
         } catch (\Exception $e) {
             error_log("Segment create error: " . $e->getMessage());
             $_SESSION['flash_error'] = 'Error creating segment';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments/create');
         }
         exit;
     }
@@ -1088,7 +1088,7 @@ class NewsletterController
         $segment = NewsletterSegment::findById($id);
         if (!$segment) {
             $_SESSION['flash_error'] = 'Segment not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments');
             exit;
         }
 
@@ -1118,7 +1118,7 @@ class NewsletterController
         $segment = NewsletterSegment::findById($id);
         if (!$segment) {
             $_SESSION['flash_error'] = 'Segment not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments');
             exit;
         }
 
@@ -1131,7 +1131,7 @@ class NewsletterController
 
         if (empty($data['name'])) {
             $_SESSION['flash_error'] = 'Segment name is required';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments/edit/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments/edit/' . $id);
             exit;
         }
 
@@ -1142,11 +1142,11 @@ class NewsletterController
             \Nexus\Services\SmartSegmentSuggestionService::clearCache();
 
             $_SESSION['flash_success'] = 'Segment updated successfully';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments');
         } catch (\Exception $e) {
             error_log("Segment update error: " . $e->getMessage());
             $_SESSION['flash_error'] = 'Error updating segment';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments/edit/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments/edit/' . $id);
         }
         exit;
     }
@@ -1162,7 +1162,7 @@ class NewsletterController
         $id = $_POST['id'] ?? null;
         if (!$id) {
             $_SESSION['flash_error'] = 'Invalid segment';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments');
             exit;
         }
 
@@ -1177,7 +1177,7 @@ class NewsletterController
             $_SESSION['flash_error'] = 'Error deleting segment';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/segments');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/segments');
         exit;
     }
 
@@ -1321,7 +1321,7 @@ class NewsletterController
             $this->jsonResponse([
                 'success' => true,
                 'segment_id' => $segmentId,
-                'redirect' => TenantContext::getBasePath() . '/admin/newsletters/segments/edit/' . $segmentId
+                'redirect' => TenantContext::getBasePath() . '/admin-legacy/newsletters/segments/edit/' . $segmentId
             ]);
         } catch (\Exception $e) {
             error_log("Create from suggestion error: " . $e->getMessage());
@@ -1475,7 +1475,7 @@ class NewsletterController
 
     /**
      * Database diagnostics and repair tool
-     * GET /admin/newsletters/diagnostics
+     * GET /admin-legacy/newsletters/diagnostics
      */
     public function diagnostics()
     {
@@ -1602,7 +1602,7 @@ class NewsletterController
 
     /**
      * Apply database fixes
-     * POST /admin/newsletters/repair
+     * POST /admin-legacy/newsletters/repair
      */
     public function repair()
     {
@@ -1742,7 +1742,7 @@ class NewsletterController
         }
 
         $_SESSION['flash_' . ($results['success'] ? 'success' : 'error')] = $results['message'];
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/diagnostics');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/diagnostics');
         exit;
     }
 
@@ -1841,14 +1841,14 @@ class NewsletterController
         $template = NewsletterTemplate::findById($id);
         if (!$template) {
             $_SESSION['flash_error'] = 'Template not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates');
             exit;
         }
 
         // Starter templates can't be edited directly - copy first
         if ($template['tenant_id'] == 0) {
             $_SESSION['flash_error'] = 'Starter templates cannot be edited. Use "Duplicate" to create a copy.';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates');
             exit;
         }
 
@@ -1878,17 +1878,17 @@ class NewsletterController
 
         if (empty($data['name'])) {
             $_SESSION['flash_error'] = 'Template name is required';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates/create');
             exit;
         }
 
         try {
             $id = NewsletterTemplate::create($data);
             $_SESSION['flash_success'] = 'Template created successfully';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates');
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Error creating template: ' . $e->getMessage();
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates/create');
         }
         exit;
     }
@@ -1911,17 +1911,17 @@ class NewsletterController
 
         if (empty($data['name'])) {
             $_SESSION['flash_error'] = 'Template name is required';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates/edit/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates/edit/' . $id);
             exit;
         }
 
         try {
             NewsletterTemplate::update($id, $data);
             $_SESSION['flash_success'] = 'Template updated successfully';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates');
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Error updating template: ' . $e->getMessage();
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates/edit/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates/edit/' . $id);
         }
         exit;
     }
@@ -1943,7 +1943,7 @@ class NewsletterController
             $_SESSION['flash_error'] = 'Error deleting template';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates');
         exit;
     }
 
@@ -1957,7 +1957,7 @@ class NewsletterController
         $template = NewsletterTemplate::findById($id);
         if (!$template) {
             $_SESSION['flash_error'] = 'Template not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates');
             exit;
         }
 
@@ -1979,10 +1979,10 @@ class NewsletterController
             }
 
             $_SESSION['flash_success'] = 'Template duplicated successfully';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates/edit/' . $newId);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates/edit/' . $newId);
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Error duplicating template: ' . $e->getMessage();
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/templates');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/templates');
         }
         exit;
     }
@@ -2142,7 +2142,7 @@ class NewsletterController
             $_SESSION['flash_success'] = 'Email removed from suppression list';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/bounces');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/bounces');
         exit;
     }
 
@@ -2164,7 +2164,7 @@ class NewsletterController
             $_SESSION['flash_error'] = 'Invalid email address';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/bounces');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/bounces');
         exit;
     }
 
@@ -2182,13 +2182,13 @@ class NewsletterController
         $newsletter = Newsletter::findById($id);
         if (!$newsletter) {
             $_SESSION['flash_error'] = 'Newsletter not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
         if ($newsletter['status'] !== 'sent') {
             $_SESSION['flash_error'] = 'Can only resend newsletters that have been sent';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/stats/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/stats/' . $id);
             exit;
         }
 
@@ -2212,7 +2212,7 @@ class NewsletterController
         $newsletter = Newsletter::findById($id);
         if (!$newsletter) {
             $_SESSION['flash_error'] = 'Newsletter not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters');
             exit;
         }
 
@@ -2224,10 +2224,10 @@ class NewsletterController
         try {
             $result = NewsletterService::resendToNonOpeners($id, $newSubject);
             $_SESSION['flash_success'] = "Resent newsletter to {$result['recipients']} non-openers";
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/stats/' . $result['newsletter_id']);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/stats/' . $result['newsletter_id']);
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = $e->getMessage();
-            header('Location: ' . TenantContext::getBasePath() . '/admin/newsletters/resend/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/newsletters/resend/' . $id);
         }
         exit;
     }

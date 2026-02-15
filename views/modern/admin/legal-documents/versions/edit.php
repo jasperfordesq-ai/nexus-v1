@@ -24,9 +24,9 @@ unset($_SESSION['form_data'], $_SESSION['form_errors']);
 
 <!-- Breadcrumb -->
 <nav class="admin-breadcrumb">
-    <a href="<?= $basePath ?>/admin/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
     <span>/</span>
-    <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
     <span>/</span>
     <span>Edit Version <?= htmlspecialchars($version['version_number']) ?></span>
 </nav>
@@ -56,7 +56,7 @@ unset($_SESSION['form_data'], $_SESSION['form_errors']);
 </div>
 <?php endif; ?>
 
-<form action="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>" method="POST" class="version-form">
+<form action="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>" method="POST" class="version-form">
     <?= Csrf::input() ?>
     <input type="hidden" name="_method" value="PUT">
 
@@ -144,14 +144,14 @@ unset($_SESSION['form_data'], $_SESSION['form_errors']);
                 <button type="submit" class="admin-btn admin-btn-primary admin-btn-lg admin-btn-full">
                     <i class="fa-solid fa-save"></i> Save Changes
                 </button>
-                <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-full">
+                <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-full">
                     <i class="fa-solid fa-times"></i> Cancel
                 </a>
             </div>
 
             <!-- Delete Draft -->
             <div class="delete-section" style="margin-top: 2rem;">
-                <form action="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/delete" method="POST"
+                <form action="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $version['id'] ?>/delete" method="POST"
                       onsubmit="return confirm('Delete this draft version? This cannot be undone.')">
                     <?= Csrf::input() ?>
                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-full">

@@ -1,7 +1,7 @@
 <?php
 // Federation Partnerships - View Dispatcher
 $layout = layout();
-$modernView = __DIR__ . '/../../modern/admin/federation/partnerships.php';
+$modernView = __DIR__ . '/../../modern/admin-legacy/federation/partnerships.php';
 
 if (($layout === 'modern' || $layout === 'high-contrast') && file_exists($modernView)) {
     require $modernView;

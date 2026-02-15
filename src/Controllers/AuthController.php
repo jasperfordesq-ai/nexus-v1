@@ -429,7 +429,7 @@ class AuthController
                     $tenantName = \Nexus\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
 
                     // Admin Link
-                    $adminLink = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . \Nexus\Core\TenantContext::getBasePath() . "/admin/users";
+                    $adminLink = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . \Nexus\Core\TenantContext::getBasePath() . "/admin-legacy/users";
 
                     foreach ($allAdmins as $adminEmail => $adminData) {
                         $adminHtml = \Nexus\Core\EmailTemplate::render(
@@ -690,7 +690,7 @@ class AuthController
         );
 
         // Redirect back to admin users page
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin/users');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/users');
         exit;
     }
 

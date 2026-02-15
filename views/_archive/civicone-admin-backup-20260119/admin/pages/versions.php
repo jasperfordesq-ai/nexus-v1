@@ -24,7 +24,7 @@ $versions = $versions ?? [];
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/pages/builder/<?= $page['id'] ?>" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/pages/builder/<?= $page['id'] ?>" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Version History
@@ -32,7 +32,7 @@ $versions = $versions ?? [];
         <p class="admin-page-subtitle"><?= htmlspecialchars($page['title']) ?> - <?= count($versions) ?> version<?= count($versions) !== 1 ? 's' : '' ?> saved</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/pages/builder/<?= $page['id'] ?>" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/pages/builder/<?= $page['id'] ?>" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-pen-to-square"></i> Back to Editor
         </a>
     </div>
@@ -60,7 +60,7 @@ $versions = $versions ?? [];
             <div class="version-slug"><i class="fa-solid fa-link"></i> /page/<?= htmlspecialchars($page['slug']) ?></div>
         </div>
         <div class="version-actions">
-            <a href="<?= $basePath ?>/admin/pages/preview/<?= $page['id'] ?>" class="admin-btn admin-btn-sm admin-btn-secondary" target="_blank">
+            <a href="<?= $basePath ?>/admin-legacy/pages/preview/<?= $page['id'] ?>" class="admin-btn admin-btn-sm admin-btn-secondary" target="_blank">
                 <i class="fa-solid fa-eye"></i> Preview
             </a>
         </div>
@@ -460,7 +460,7 @@ function previewVersion(versionId) {
     modal.classList.add('active');
     content.innerHTML = '<div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading preview...</span></div>';
 
-    fetch(`${basePath}/admin/pages/version-content/${versionId}`)
+    fetch(`${basePath}/admin-legacy/pages/version-content/${versionId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -494,7 +494,7 @@ function restoreVersion(versionId, versionNumber) {
     formData.append('version_id', versionId);
     formData.append('csrf_token', csrfToken);
 
-    fetch(`${basePath}/admin/pages/restore-version`, {
+    fetch(`${basePath}/admin-legacy/pages/restore-version`, {
         method: 'POST',
         body: formData
     })

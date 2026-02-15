@@ -33,7 +33,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/broker-controls" class="broker-back-link">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="broker-back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Broker Controls Configuration
@@ -41,7 +41,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         <p class="admin-page-subtitle">Configure all broker control features for your community</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/broker-controls" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-gauge-high"></i> Dashboard
         </a>
     </div>
@@ -62,7 +62,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 </div>
 <?php endif; ?>
 
-<form action="<?= $basePath ?>/admin/broker-controls/configuration" method="POST" id="configForm">
+<form action="<?= $basePath ?>/admin-legacy/broker-controls/configuration" method="POST" id="configForm">
     <?= Csrf::input() ?>
 
     <!-- Messaging Controls -->
@@ -334,7 +334,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         <button type="submit" class="admin-btn admin-btn-primary admin-btn-lg">
             <i class="fa-solid fa-save"></i> Save Configuration
         </button>
-        <a href="<?= $basePath ?>/admin/broker-controls" class="admin-btn admin-btn-secondary admin-btn-lg">
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="admin-btn admin-btn-secondary admin-btn-lg">
             Cancel
         </a>
     </div>

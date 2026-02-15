@@ -28,11 +28,11 @@ $profile = $profile ?? [];
         <p class="admin-page-subtitle">Control how your timebank appears to potential partners</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/federation/directory" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-compass"></i>
             Browse Directory
         </a>
-        <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-handshake"></i>
             Partnerships
         </a>
@@ -319,25 +319,25 @@ $profile = $profile ?? [];
             </div>
             <div class="admin-card-body">
                 <div class="admin-quick-actions">
-                    <a href="<?= $basePath ?>/admin/federation/directory" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-purple">
                             <i class="fa-solid fa-compass"></i>
                         </div>
                         <span>Browse Directory</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-blue">
                             <i class="fa-solid fa-handshake"></i>
                         </div>
                         <span>Partnerships</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/federation" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/federation" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-orange">
                             <i class="fa-solid fa-sliders"></i>
                         </div>
                         <span>Settings</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/settings#branding" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/settings#branding" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-pink">
                             <i class="fa-solid fa-image"></i>
                         </div>
@@ -1043,7 +1043,7 @@ document.getElementById('profileForm')?.addEventListener('submit', function(e) {
         show_member_count: document.getElementById('show_member_count').checked,
     };
 
-    fetch(basePath + '/admin/federation/directory/update-profile', {
+    fetch(basePath + '/admin-legacy/federation/directory/update-profile', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

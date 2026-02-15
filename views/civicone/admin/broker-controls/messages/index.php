@@ -2,7 +2,7 @@
 /**
  * Message Review Queue - CivicOne Theme (GOV.UK)
  * Review messages copied for broker visibility
- * Path: views/civicone/admin/broker-controls/messages/index.php
+ * Path: views/civicone/admin-legacy/broker-controls/messages/index.php
  */
 
 use Nexus\Core\TenantContext;
@@ -27,7 +27,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
-        <a href="<?= $basePath ?>/admin/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
 
         <h1 class="govuk-heading-xl">Message Review</h1>
         <p class="govuk-body-l">Review messages copied for broker visibility.</p>
@@ -117,7 +117,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
 
                 <div class="govuk-button-group">
                     <?php if (empty($message['reviewed_at'])): ?>
-                    <form action="<?= $basePath ?>/admin/broker-controls/messages/<?= $message['id'] ?>/review" method="POST" style="display:inline;">
+                    <form action="<?= $basePath ?>/admin-legacy/broker-controls/messages/<?= $message['id'] ?>/review" method="POST" style="display:inline;">
                         <?= Csrf::input() ?>
                         <button type="submit" class="govuk-button govuk-button--secondary">
                             Mark as reviewed
@@ -126,7 +126,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                     <?php endif; ?>
 
                     <?php if (!$message['flagged']): ?>
-                    <form action="<?= $basePath ?>/admin/broker-controls/messages/<?= $message['id'] ?>/flag" method="POST" style="display:inline;"
+                    <form action="<?= $basePath ?>/admin-legacy/broker-controls/messages/<?= $message['id'] ?>/flag" method="POST" style="display:inline;"
                           onsubmit="return confirm('Flag this message for concern?');">
                         <?= Csrf::input() ?>
                         <input type="hidden" name="reason" value="Flagged by broker">

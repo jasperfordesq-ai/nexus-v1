@@ -19,7 +19,7 @@ function initFederationSettings(basePath, csrfToken) {
  * Update a federation feature toggle
  */
 function updateFeature(feature, enabled) {
-    fetch(federationBasePath + '/admin/federation/update-feature', {
+    fetch(federationBasePath + '/admin-legacy/federation/update-feature', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ function updateFeature(feature, enabled) {
 function approvePartnership(id) {
     if (!confirm('Approve this partnership request?')) return;
 
-    fetch(federationBasePath + '/admin/federation/approve-partnership', {
+    fetch(federationBasePath + '/admin-legacy/federation/approve-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ function approvePartnership(id) {
 function rejectPartnership(id) {
     const reason = prompt('Reason for rejection (optional):');
 
-    fetch(federationBasePath + '/admin/federation/reject-partnership', {
+    fetch(federationBasePath + '/admin-legacy/federation/reject-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ function terminatePartnership(id) {
 
     if (!confirm('Are you sure you want to end this partnership?')) return;
 
-    fetch(federationBasePath + '/admin/federation/terminate-partnership', {
+    fetch(federationBasePath + '/admin-legacy/federation/terminate-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ function terminatePartnership(id) {
 function withdrawRequest(id) {
     if (!confirm('Withdraw this partnership request?')) return;
 
-    fetch(federationBasePath + '/admin/federation/withdraw-request', {
+    fetch(federationBasePath + '/admin-legacy/federation/withdraw-request', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ function requestPartnership(targetTenantId, federationLevel, notes) {
         return;
     }
 
-    fetch(federationBasePath + '/admin/federation/request-partnership', {
+    fetch(federationBasePath + '/admin-legacy/federation/request-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -237,7 +237,7 @@ function savePermissions() {
         permissions[input.dataset.permission] = input.checked;
     });
 
-    fetch(federationBasePath + '/admin/federation/update-partnership-permissions', {
+    fetch(federationBasePath + '/admin-legacy/federation/update-partnership-permissions', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -283,7 +283,7 @@ function submitCounterProposal() {
     const level = document.getElementById('counterProposalLevel').value;
     const message = document.getElementById('counterProposalMessage').value;
 
-    fetch(federationBasePath + '/admin/federation/counter-propose', {
+    fetch(federationBasePath + '/admin-legacy/federation/counter-propose', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -313,7 +313,7 @@ function submitCounterProposal() {
 function acceptCounterProposal(id) {
     if (!confirm('Accept this counter-proposal and activate the partnership?')) return;
 
-    fetch(federationBasePath + '/admin/federation/accept-counter-proposal', {
+    fetch(federationBasePath + '/admin-legacy/federation/accept-counter-proposal', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -348,7 +348,7 @@ function toggleFederation(enabled) {
         btn.textContent = 'Processing...';
     }
 
-    fetch(federationBasePath + '/admin/federation/dashboard/toggle', {
+    fetch(federationBasePath + '/admin-legacy/federation/dashboard/toggle', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

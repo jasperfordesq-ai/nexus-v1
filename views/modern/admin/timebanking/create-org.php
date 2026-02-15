@@ -22,7 +22,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/timebanking/org-wallets" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/timebanking/org-wallets" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Create Organization
@@ -43,7 +43,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/timebanking/create-org" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/timebanking/create-org" method="POST">
             <?= Csrf::input() ?>
 
             <div class="form-group">
@@ -88,7 +88,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
 
             <div class="form-actions">
-                <a href="<?= $basePath ?>/admin/timebanking/org-wallets" class="admin-btn admin-btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/timebanking/org-wallets" class="admin-btn admin-btn-secondary">
                     <i class="fa-solid fa-times"></i> Cancel
                 </a>
                 <button type="submit" class="admin-btn admin-btn-success">

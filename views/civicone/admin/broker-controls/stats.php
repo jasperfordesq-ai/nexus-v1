@@ -2,7 +2,7 @@
 /**
  * Broker Statistics - CivicOne Theme (GOV.UK)
  * Analytics and metrics for broker control features
- * Path: views/civicone/admin/broker-controls/stats.php
+ * Path: views/civicone/admin-legacy/broker-controls/stats.php
  */
 
 use Nexus\Core\TenantContext;
@@ -18,7 +18,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
-        <a href="<?= $basePath ?>/admin/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">

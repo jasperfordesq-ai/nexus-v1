@@ -2,7 +2,7 @@
 /**
  * Match Approvals Dashboard
  * Broker workflow for approving/rejecting matches
- * Path: views/modern/admin/match-approvals/index.php
+ * Path: views/modern/admin-legacy/match-approvals/index.php
  */
 
 use Nexus\Core\TenantContext;
@@ -32,10 +32,10 @@ $csrf_token = $csrf_token ?? Csrf::token();
         <p class="admin-page-subtitle">Review and approve member matches before they connect</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/match-approvals/history" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/match-approvals/history" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-history"></i> History
         </a>
-        <a href="<?= $basePath ?>/admin/smart-matching" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-bolt"></i> Smart Matching
         </a>
     </div>
@@ -192,7 +192,7 @@ $csrf_token = $csrf_token ?? Csrf::token();
                                     <button type="button" class="admin-btn admin-btn-danger btn-reject" data-id="<?= $request['id'] ?>">
                                         <i class="fa-solid fa-times"></i> Reject
                                     </button>
-                                    <a href="<?= $basePath ?>/admin/match-approvals/<?= $request['id'] ?>" class="admin-btn admin-btn-secondary">
+                                    <a href="<?= $basePath ?>/admin-legacy/match-approvals/<?= $request['id'] ?>" class="admin-btn admin-btn-secondary">
                                         <i class="fa-solid fa-eye"></i> Details
                                     </a>
                                 </div>
@@ -226,7 +226,7 @@ $csrf_token = $csrf_token ?? Csrf::token();
 </div>
 
 <!-- Match Approvals CSS loaded from external file (CLAUDE.md compliant) -->
-<link rel="stylesheet" href="/assets/css/admin/match-approvals.css">
+<link rel="stylesheet" href="/assets/css/admin-legacy/match-approvals.css">
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('reason', notes);
         }
 
-        fetch(basePath + '/admin/match-approvals/' + action, {
+        fetch(basePath + '/admin-legacy/match-approvals/' + action, {
             method: 'POST',
             body: formData
         })

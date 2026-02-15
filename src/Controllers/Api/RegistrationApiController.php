@@ -475,7 +475,7 @@ class RegistrationApiController extends BaseApiController
     {
         try {
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-            $adminLink = TenantContext::getDomain() . '/admin/users/' . $userId;
+            $adminLink = TenantContext::getDomain() . '/admin-legacy/users/' . $userId;
 
             // Get all admins for this tenant
             $db = Database::getConnection();

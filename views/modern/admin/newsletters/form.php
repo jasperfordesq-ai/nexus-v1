@@ -11,8 +11,8 @@ $basePath = TenantContext::getBasePath();
 $isEdit = isset($newsletter);
 
 $action = $isEdit
-    ? $basePath . "/admin/newsletters/update/" . $newsletter['id']
-    : $basePath . "/admin/newsletters/store";
+    ? $basePath . "/admin-legacy/newsletters/update/" . $newsletter['id']
+    : $basePath . "/admin-legacy/newsletters/store";
 
 $eligibleCount = $eligibleCount ?? 0;
 $segments = $segments ?? [];
@@ -1104,7 +1104,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     <div class="form-container">
 
         <!-- Back Link -->
-        <a href="<?= $basePath ?>/admin/newsletters" class="back-link">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
         </a>
 
@@ -1729,7 +1729,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
                     <div class="actions-buttons">
                         <?php if ($isEdit): ?>
-                            <a href="<?= $basePath ?>/admin/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" class="btn-secondary">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" class="btn-secondary">
                                 <i class="fa-solid fa-eye"></i> Preview
                             </a>
 
@@ -1740,7 +1740,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <?php endif; ?>
                         <?php endif; ?>
 
-                        <a href="<?= $basePath ?>/admin/newsletters" class="btn-secondary">
+                        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="btn-secondary">
                             Cancel
                         </a>
 
@@ -1767,7 +1767,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
         <?php if ($isEdit && $newsletter['status'] !== 'sent'): ?>
         <!-- Delete Form -->
-        <form id="delete-newsletter-form" action="<?= $basePath ?>/admin/newsletters/delete" method="POST" style="display: none;">
+        <form id="delete-newsletter-form" action="<?= $basePath ?>/admin-legacy/newsletters/delete" method="POST" style="display: none;">
             <?= Csrf::input() ?>
             <input type="hidden" name="id" value="<?= $newsletter['id'] ?>">
         </form>
@@ -2097,7 +2097,7 @@ function loadSavedTemplate(templateId) {
     document.querySelectorAll('.template-btn').forEach(btn => btn.classList.remove('active'));
 
     // Fetch template data from server
-    const url = '<?= $basePath ?>/admin/newsletters/load-template/' + templateId;
+    const url = '<?= $basePath ?>/admin-legacy/newsletters/load-template/' + templateId;
     console.log('Loading template from:', url);
 
     fetch(url)
@@ -2300,12 +2300,12 @@ function saveAndSend() {
     const formData = new FormData(form);
     formData.append('send_after_save', '1');
 
-    fetch(`${basePath}/admin/newsletters/update/<?= $newsletter['id'] ?>`, {
+    fetch(`${basePath}/admin-legacy/newsletters/update/<?= $newsletter['id'] ?>`, {
         method: 'POST',
         body: formData
     })
     .then(response => {
-        window.location.href = `${basePath}/admin/newsletters/send-direct/<?= $newsletter['id'] ?>`;
+        window.location.href = `${basePath}/admin-legacy/newsletters/send-direct/<?= $newsletter['id'] ?>`;
     })
     .catch(error => {
         alert('Error saving: ' + error.message);
@@ -2322,7 +2322,7 @@ function sendTestEmail() {
     const form = document.getElementById('newsletter-form');
     const formData = new FormData(form);
 
-    fetch(`${basePath}/admin/newsletters/send-test/<?= $newsletter['id'] ?>`, {
+    fetch(`${basePath}/admin-legacy/newsletters/send-test/<?= $newsletter['id'] ?>`, {
         method: 'POST',
         body: formData
     })

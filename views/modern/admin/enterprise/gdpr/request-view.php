@@ -89,7 +89,7 @@ if ($remaining < 0) {
 <div class="gdpr-page-header">
     <div class="gdpr-page-header-content">
         <h1 class="gdpr-page-title">
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Request #<?= htmlspecialchars($request['id'] ?? '0') ?>
@@ -175,7 +175,7 @@ if ($remaining < 0) {
                         <?php if (!empty($request['user_id'])): ?>
                         <div class="detail-item">
                             <label>Linked User Account</label>
-                            <a href="<?= $basePath ?>/admin/users/<?= $request['user_id'] ?>" class="detail-link">
+                            <a href="<?= $basePath ?>/admin-legacy/users/<?= $request['user_id'] ?>" class="detail-link">
                                 User #<?= $request['user_id'] ?>
                                 <?php if (!empty($user)): ?>
                                     (<?= htmlspecialchars($user['username'] ?? '') ?>)
@@ -515,7 +515,7 @@ if ($remaining < 0) {
             <div class="admin-card-body" style="padding: 0;">
                 <div class="related-list">
                     <?php foreach ($relatedRequests as $related): ?>
-                    <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests/<?= $related['id'] ?>" class="related-item">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests/<?= $related['id'] ?>" class="related-item">
                         <div class="related-info">
                             <span class="related-id">#<?= $related['id'] ?></span>
                             <span class="related-type"><?= gdprFormatType($related['request_type'] ?? '') ?></span>
@@ -543,7 +543,7 @@ if ($remaining < 0) {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form action="<?= $basePath ?>/admin/enterprise/gdpr/requests/<?= $request['id'] ?? 0 ?>/assign" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?? 0 ?>/assign" method="POST">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
             <div class="modal" role="dialog" aria-modal="true"-body">
                 <div class="form-group">
@@ -577,7 +577,7 @@ if ($remaining < 0) {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form action="<?= $basePath ?>/admin/enterprise/gdpr/requests/<?= $request['id'] ?? 0 ?>/notes" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?? 0 ?>/notes" method="POST">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
             <div class="modal" role="dialog" aria-modal="true"-body">
                 <div class="form-group">
@@ -1547,7 +1547,7 @@ const csrfToken = '<?= Csrf::generate() ?>';
 // Process request
 function processRequest() {
     if (confirm('Start processing this request?')) {
-        fetch(basePath + '/admin/enterprise/gdpr/requests/' + requestId + '/process', {
+        fetch(basePath + '/admin-legacy/enterprise/gdpr/requests/' + requestId + '/process', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1566,7 +1566,7 @@ function processRequest() {
 // Complete request
 function completeRequest() {
     if (confirm('Mark this request as completed?')) {
-        fetch(basePath + '/admin/enterprise/gdpr/requests/' + requestId + '/complete', {
+        fetch(basePath + '/admin-legacy/enterprise/gdpr/requests/' + requestId + '/complete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1586,7 +1586,7 @@ function completeRequest() {
 function rejectRequest() {
     const reason = prompt('Enter rejection reason:');
     if (reason) {
-        fetch(basePath + '/admin/enterprise/gdpr/requests/' + requestId + '/reject', {
+        fetch(basePath + '/admin-legacy/enterprise/gdpr/requests/' + requestId + '/reject', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1612,7 +1612,7 @@ function generateExport() {
         categories.push(toggle.dataset.category);
     });
 
-    fetch(basePath + '/admin/enterprise/gdpr/requests/' + requestId + '/generate-export', {
+    fetch(basePath + '/admin-legacy/enterprise/gdpr/requests/' + requestId + '/generate-export', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
