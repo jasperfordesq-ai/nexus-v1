@@ -12,7 +12,9 @@ class NewsletterAnalytics
      */
     public static function recordOpen($newsletterId, $trackingToken, $email, $userAgent = null, $ipAddress = null)
     {
-        $tenantId = TenantContext::getId();
+        // Look up the newsletter's actual tenant_id (tracking requests may arrive
+        // via a different domain than the tenant's, e.g. api.project-nexus.ie)
+        $tenantId = self::getNewsletterTenantId($newsletterId) ?? TenantContext::getId();
 
         // Find the queue entry by tracking token
         $queueId = null;
@@ -32,7 +34,7 @@ class NewsletterAnalytics
         );
 
         // Update newsletter stats
-        self::updateOpenStats($newsletterId);
+        self::updateOpenStats($newsletterId, $tenantId);
 
         return true;
     }
@@ -42,7 +44,9 @@ class NewsletterAnalytics
      */
     public static function recordClick($newsletterId, $trackingToken, $email, $url, $linkId, $userAgent = null, $ipAddress = null)
     {
-        $tenantId = TenantContext::getId();
+        // Look up the newsletter's actual tenant_id (tracking requests may arrive
+        // via a different domain than the tenant's, e.g. api.project-nexus.ie)
+        $tenantId = self::getNewsletterTenantId($newsletterId) ?? TenantContext::getId();
 
         // Find the queue entry by tracking token
         $queueId = null;
@@ -62,7 +66,7 @@ class NewsletterAnalytics
         );
 
         // Update newsletter stats
-        self::updateClickStats($newsletterId);
+        self::updateClickStats($newsletterId, $tenantId);
 
         return true;
     }
@@ -70,9 +74,9 @@ class NewsletterAnalytics
     /**
      * Update open stats on the newsletter
      */
-    private static function updateOpenStats($newsletterId)
+    private static function updateOpenStats($newsletterId, $tenantId = null)
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = $tenantId ?? TenantContext::getId();
 
         // Get total opens
         $total = Database::query(
@@ -95,9 +99,9 @@ class NewsletterAnalytics
     /**
      * Update click stats on the newsletter
      */
-    private static function updateClickStats($newsletterId)
+    private static function updateClickStats($newsletterId, $tenantId = null)
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = $tenantId ?? TenantContext::getId();
 
         // Get total clicks
         $total = Database::query(
@@ -745,5 +749,21 @@ class NewsletterAnalytics
             'max_value' => $maxValue,
             'days' => $dayNames
         ];
+    }
+
+    /**
+     * Get the tenant_id for a newsletter by its ID.
+     * Used by tracking endpoints where TenantContext may resolve to the wrong
+     * tenant (e.g. tracking pixel served via api.project-nexus.ie instead of
+     * the tenant's own domain).
+     */
+    private static function getNewsletterTenantId($newsletterId)
+    {
+        $result = Database::query(
+            "SELECT tenant_id FROM newsletters WHERE id = ? LIMIT 1",
+            [$newsletterId]
+        )->fetch();
+
+        return $result ? (int) $result['tenant_id'] : null;
     }
 }
