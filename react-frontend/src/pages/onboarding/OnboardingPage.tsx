@@ -59,9 +59,19 @@ export function OnboardingPage() {
   const navigate = useNavigate();
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();
-  const { refreshUser } = useAuth();
+  const { user, refreshUser } = useAuth();
 
   const tenantName = tenant?.branding?.name || tenant?.name || 'our community';
+
+  // ── Redirect if already completed ───────────────────────────────────────────
+  // Prevents showing Step 1 again after completion (component remount from
+  // AuthContext change causes fresh state). Also handles browser back button.
+
+  useEffect(() => {
+    if (user?.onboarding_completed === true) {
+      navigate(tenantPath('/dashboard'), { replace: true });
+    }
+  }, [user?.onboarding_completed, navigate, tenantPath]);
 
   // ── State ──────────────────────────────────────────────────────────────────
 
@@ -251,6 +261,11 @@ export function OnboardingPage() {
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
+
+  // Don't render wizard if onboarding is already complete (redirect is pending)
+  if (user?.onboarding_completed === true) {
+    return null;
+  }
 
   return (
     <div className="max-w-2xl mx-auto py-6 space-y-6">
