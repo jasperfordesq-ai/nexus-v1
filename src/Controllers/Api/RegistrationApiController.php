@@ -278,7 +278,8 @@ class RegistrationApiController extends BaseApiController
                 'organization_name' => $organizationName ?: null,
                 'location' => $location ?: null,
                 'tenant_id' => $tenantId,
-                'status' => 'pending'
+                'status' => 'pending',
+                'onboarding_completed' => false,
             ],
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
