@@ -274,7 +274,7 @@ class CronJobController
                 'id' => 'gamification-daily',
                 'name' => 'Gamification Daily Tasks',
                 'description' => 'Processes streak resets, daily bonuses, and badge checks for recently active users.',
-                'endpoint' => '/admin/cron-jobs/run/gamification-daily',
+                'endpoint' => '/admin-legacy/cron-jobs/run/gamification-daily',
                 'frequency' => 'Daily at 3:00 AM',
                 'cron_expression' => '0 3 * * *',
                 'category' => 'gamification',
@@ -287,7 +287,7 @@ class CronJobController
                 'id' => 'gamification-weekly-digest',
                 'name' => 'Gamification Weekly Digest',
                 'description' => 'Sends weekly progress email digests to users who earned XP or badges.',
-                'endpoint' => '/admin/cron-jobs/run/gamification-weekly-digest',
+                'endpoint' => '/admin-legacy/cron-jobs/run/gamification-weekly-digest',
                 'frequency' => 'Weekly (Monday 4:00 AM)',
                 'cron_expression' => '0 4 * * 1',
                 'category' => 'gamification',
@@ -300,7 +300,7 @@ class CronJobController
                 'id' => 'gamification-campaigns',
                 'name' => 'Process Achievement Campaigns',
                 'description' => 'Processes recurring achievement campaigns and awards badges/XP to qualifying users.',
-                'endpoint' => '/admin/cron-jobs/run/gamification-campaigns',
+                'endpoint' => '/admin-legacy/cron-jobs/run/gamification-campaigns',
                 'frequency' => 'Every hour',
                 'cron_expression' => '0 * * * *',
                 'category' => 'gamification',
@@ -313,7 +313,7 @@ class CronJobController
                 'id' => 'gamification-leaderboard',
                 'name' => 'Leaderboard Snapshot',
                 'description' => 'Creates daily leaderboard snapshots and finalizes ended seasons with rewards.',
-                'endpoint' => '/admin/cron-jobs/run/gamification-leaderboard',
+                'endpoint' => '/admin-legacy/cron-jobs/run/gamification-leaderboard',
                 'frequency' => 'Daily at midnight',
                 'cron_expression' => '0 0 * * *',
                 'category' => 'gamification',
@@ -326,7 +326,7 @@ class CronJobController
                 'id' => 'gamification-challenges',
                 'name' => 'Check Challenge Expirations',
                 'description' => 'Expires completed challenges and updates friend challenge statuses.',
-                'endpoint' => '/admin/cron-jobs/run/gamification-challenges',
+                'endpoint' => '/admin-legacy/cron-jobs/run/gamification-challenges',
                 'frequency' => 'Every hour (at :30)',
                 'cron_expression' => '30 * * * *',
                 'category' => 'gamification',
@@ -341,7 +341,7 @@ class CronJobController
                 'id' => 'update-featured-groups',
                 'name' => 'Update Featured Groups',
                 'description' => 'Automatically updates featured groups based on smart ranking algorithms (member count, engagement score, geographic diversity).',
-                'endpoint' => '/admin/cron/update-featured-groups',
+                'endpoint' => '/admin-legacy/cron/update-featured-groups',
                 'frequency' => 'Daily at 8:00 AM',
                 'cron_expression' => '0 8 * * *',
                 'category' => 'groups',
@@ -353,7 +353,7 @@ class CronJobController
                 'id' => 'group-weekly-digest',
                 'name' => 'Group Weekly Digests',
                 'description' => 'Sends weekly analytics digest emails to all group owners with member growth, engagement stats, and top contributors.',
-                'endpoint' => '/admin/cron-jobs/run/group-weekly-digest',
+                'endpoint' => '/admin-legacy/cron-jobs/run/group-weekly-digest',
                 'frequency' => 'Weekly (Monday 9:00 AM)',
                 'cron_expression' => '0 9 * * 1',
                 'category' => 'groups',
@@ -368,7 +368,7 @@ class CronJobController
                 'id' => 'abuse-detection',
                 'name' => 'Timebanking Abuse Detection',
                 'description' => 'Scans transactions for potential abuse patterns and generates alerts for admin review.',
-                'endpoint' => '/admin/cron-jobs/run/abuse-detection',
+                'endpoint' => '/admin-legacy/cron-jobs/run/abuse-detection',
                 'frequency' => 'Daily at 2:00 AM',
                 'cron_expression' => '0 2 * * *',
                 'category' => 'security',
@@ -783,7 +783,7 @@ class CronJobController
                 <div style='background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; white-space: pre-wrap; max-height: 300px; overflow-y: auto;'>" . htmlspecialchars(substr($output, 0, 2000)) . "</div>
 
                 <div style='margin-top: 25px; text-align: center;'>
-                    <a href='{$appUrl}/admin/cron-jobs/logs' style='display: inline-block; background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;'>View Cron Logs</a>
+                    <a href='{$appUrl}/admin-legacy/cron-jobs/logs' style='display: inline-block; background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;'>View Cron Logs</a>
                 </div>
             </div>
             <div style='padding: 20px; text-align: center; color: #64748b; font-size: 12px;'>
@@ -914,7 +914,7 @@ class CronJobController
             $_SESSION['flash_error'] = "Failed to update job status: " . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/cron-jobs');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs');
         exit;
     }
 
@@ -939,7 +939,7 @@ class CronJobController
 
         if (!$job) {
             $_SESSION['flash_error'] = 'Unknown cron job: ' . htmlspecialchars($jobId);
-            header('Location: ' . TenantContext::getBasePath() . '/admin/cron-jobs');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs');
             exit;
         }
 
@@ -947,7 +947,7 @@ class CronJobController
         $jobSettings = $this->getJobSettings();
         if (isset($jobSettings[$jobId]) && !$jobSettings[$jobId]['is_enabled']) {
             $_SESSION['flash_error'] = "Cannot run disabled job: {$job['name']}. Enable it first.";
-            header('Location: ' . TenantContext::getBasePath() . '/admin/cron-jobs');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs');
             exit;
         }
 
@@ -1146,7 +1146,7 @@ class CronJobController
             'duration' => round($duration, 2),
         ];
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/cron-jobs?ran=' . $jobId);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs?ran=' . $jobId);
         exit;
     }
 
@@ -1290,7 +1290,7 @@ class CronJobController
             $_SESSION['flash_error'] = 'Failed to save settings: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/cron-jobs/settings');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs/settings');
         exit;
     }
 
@@ -1331,7 +1331,7 @@ class CronJobController
             $_SESSION['flash_error'] = "Failed to clear logs: " . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/cron-jobs/logs');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs/logs');
         exit;
     }
 

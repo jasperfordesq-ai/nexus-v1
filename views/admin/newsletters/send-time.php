@@ -32,7 +32,7 @@ $maxValue = $heatmap['max_value'] ?? 0;
 
     <!-- Navigation -->
     <div style="margin-bottom: 24px;">
-        <a href="<?= $basePath ?>/admin/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
             <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
         </a>
     </div>
@@ -62,7 +62,7 @@ $maxValue = $heatmap['max_value'] ?? 0;
         </div>
 
         <div style="margin-top: 40px;">
-            <a href="<?= $basePath ?>/admin/newsletters/create"
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/create"
                style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 14px 28px; border-radius: 10px; text-decoration: none; font-weight: 600;">
                 <i class="fa-solid fa-plus"></i> Create Your First Newsletter
             </a>

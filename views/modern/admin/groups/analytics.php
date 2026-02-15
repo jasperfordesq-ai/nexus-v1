@@ -1,7 +1,7 @@
 <?php
 /**
  * Groups Analytics Dashboard
- * Path: views/modern/admin/groups/analytics.php
+ * Path: views/modern/admin-legacy/groups/analytics.php
  */
 
 use Nexus\Core\TenantContext;
@@ -27,11 +27,11 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Growth metrics and performance insights</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/groups" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/groups" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Groups
         </a>
-        <a href="<?= $basePath ?>/admin/groups/export" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/groups/export" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-download"></i>
             Export Data
         </a>

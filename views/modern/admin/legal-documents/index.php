@@ -28,10 +28,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Manage Terms of Service, Privacy Policy, and other legal documents with version control</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/legal-documents/compliance" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/legal-documents/compliance" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-chart-pie"></i> Compliance Dashboard
         </a>
-        <a href="<?= $basePath ?>/admin/legal-documents/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/legal-documents/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> New Document
         </a>
     </div>
@@ -97,7 +97,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
             <h3 class="admin-empty-title">No Legal Documents Yet</h3>
             <p class="admin-empty-text">Create your first legal document to start tracking versions and user acceptances.</p>
-            <a href="<?= $basePath ?>/admin/legal-documents/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/legal-documents/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-plus"></i> Create First Document
             </a>
         </div>
@@ -121,7 +121,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </div>
                 <div class="legal-doc-info">
                     <div class="legal-doc-title-row">
-                        <a href="<?= $basePath ?>/admin/legal-documents/<?= $doc['id'] ?>" class="legal-doc-title">
+                        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $doc['id'] ?>" class="legal-doc-title">
                             <?= htmlspecialchars($doc['title']) ?>
                         </a>
                         <?php if ($doc['is_active']): ?>
@@ -149,13 +149,13 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     </div>
                 </div>
                 <div class="legal-doc-actions">
-                    <a href="<?= $basePath ?>/admin/legal-documents/<?= $doc['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm" title="Manage Versions">
+                    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $doc['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm" title="Manage Versions">
                         <i class="fa-solid fa-code-branch"></i> <span class="btn-text">Versions</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/legal-documents/<?= $doc['id'] ?>/versions/create" class="admin-btn admin-btn-success admin-btn-sm" title="Create New Version">
+                    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $doc['id'] ?>/versions/create" class="admin-btn admin-btn-success admin-btn-sm" title="Create New Version">
                         <i class="fa-solid fa-plus"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/legal-documents/<?= $doc['id'] ?>/edit" class="admin-btn admin-btn-secondary admin-btn-sm" title="Edit Settings">
+                    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $doc['id'] ?>/edit" class="admin-btn admin-btn-secondary admin-btn-sm" title="Edit Settings">
                         <i class="fa-solid fa-cog"></i>
                     </a>
                     <a href="<?= $basePath ?>/<?= $doc['slug'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="View Public Page" target="_blank">

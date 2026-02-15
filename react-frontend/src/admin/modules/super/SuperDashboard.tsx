@@ -88,27 +88,33 @@ export function SuperDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <StatCard
-          label="Total Tenants"
-          value={stats?.total_tenants ?? '---'}
-          icon={Building2}
-          color="primary"
-          loading={loading}
-        />
-        <StatCard
-          label="Active Tenants"
-          value={stats?.active_tenants ?? '---'}
-          icon={Shield}
-          color="success"
-          loading={loading}
-        />
-        <StatCard
-          label="Total Users"
-          value={stats?.total_users ?? '---'}
-          icon={Users}
-          color="secondary"
-          loading={loading}
-        />
+        <Link to={tenantPath('/admin/super/tenants')} className="block">
+          <StatCard
+            label="Total Tenants"
+            value={stats?.total_tenants ?? '---'}
+            icon={Building2}
+            color="primary"
+            loading={loading}
+          />
+        </Link>
+        <Link to={tenantPath('/admin/super/tenants')} className="block">
+          <StatCard
+            label="Active Tenants"
+            value={stats?.active_tenants ?? '---'}
+            icon={Shield}
+            color="success"
+            loading={loading}
+          />
+        </Link>
+        <Link to={tenantPath('/admin/super/users')} className="block">
+          <StatCard
+            label="Total Users"
+            value={stats?.total_users ?? '---'}
+            icon={Users}
+            color="secondary"
+            loading={loading}
+          />
+        </Link>
         <StatCard
           label="Total Listings"
           value={stats?.total_listings ?? '---'}
@@ -161,7 +167,7 @@ export function SuperDashboard() {
               shadow="sm"
               isPressable
               as={Link}
-              to={tenantPath(`/admin/super/tenants/${tenant.id}/edit`)}
+              to={tenantPath(`/admin/super/tenants/${tenant.id}`)}
             >
               <CardBody className="p-4">
                 <div className="flex items-start justify-between mb-2">
@@ -189,6 +195,20 @@ export function SuperDashboard() {
               </CardBody>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* View All Tenants link */}
+      {tenants.length > 0 && (
+        <div className="mt-4 flex justify-center">
+          <Button
+            as={Link}
+            to={tenantPath('/admin/super/tenants')}
+            variant="flat"
+            endContent={<ArrowRight size={16} />}
+          >
+            View All Tenants
+          </Button>
         </div>
       )}
     </div>

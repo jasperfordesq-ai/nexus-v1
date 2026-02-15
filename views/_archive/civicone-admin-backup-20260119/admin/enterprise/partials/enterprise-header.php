@@ -40,7 +40,7 @@ $currentRequiresSuperAdmin = isset($superAdminOnlyPages[$enterpriseSection]) ||
 if ($currentRequiresSuperAdmin && !$isSuperAdmin) {
     header('HTTP/1.0 403 Forbidden');
     echo '<h1>Access Denied</h1><p>This section requires Super Admin privileges.</p>';
-    echo '<p><a href="' . $basePath . '/admin/enterprise">Return to Enterprise Dashboard</a></p>';
+    echo '<p><a href="' . $basePath . '/admin-legacy/enterprise">Return to Enterprise Dashboard</a></p>';
     exit;
 }
 
@@ -51,40 +51,40 @@ $enterpriseNav = [
     'dashboard' => [
         'label' => 'Overview',
         'icon' => 'fa-gauge-high',
-        'url' => '/admin/enterprise',
+        'url' => '/admin-legacy/enterprise',
         'superAdminOnly' => false,
     ],
     'gdpr' => [
         'label' => 'GDPR',
         'icon' => 'fa-shield-halved',
-        'url' => '/admin/enterprise/gdpr',
+        'url' => '/admin-legacy/enterprise/gdpr',
         'superAdminOnly' => false,
         'items' => [
-            ['id' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fa-gauge', 'url' => '/admin/enterprise/gdpr'],
-            ['id' => 'requests', 'label' => 'Requests', 'icon' => 'fa-inbox', 'url' => '/admin/enterprise/gdpr/requests'],
-            ['id' => 'breaches', 'label' => 'Breaches', 'icon' => 'fa-triangle-exclamation', 'url' => '/admin/enterprise/gdpr/breaches'],
-            ['id' => 'consents', 'label' => 'Consents', 'icon' => 'fa-clipboard-check', 'url' => '/admin/enterprise/gdpr/consents'],
-            ['id' => 'audit', 'label' => 'Audit Log', 'icon' => 'fa-clock-rotate-left', 'url' => '/admin/enterprise/gdpr/audit'],
+            ['id' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fa-gauge', 'url' => '/admin-legacy/enterprise/gdpr'],
+            ['id' => 'requests', 'label' => 'Requests', 'icon' => 'fa-inbox', 'url' => '/admin-legacy/enterprise/gdpr/requests'],
+            ['id' => 'breaches', 'label' => 'Breaches', 'icon' => 'fa-triangle-exclamation', 'url' => '/admin-legacy/enterprise/gdpr/breaches'],
+            ['id' => 'consents', 'label' => 'Consents', 'icon' => 'fa-clipboard-check', 'url' => '/admin-legacy/enterprise/gdpr/consents'],
+            ['id' => 'audit', 'label' => 'Audit Log', 'icon' => 'fa-clock-rotate-left', 'url' => '/admin-legacy/enterprise/gdpr/audit'],
         ],
     ],
     'monitoring' => [
         'label' => 'Monitoring',
         'icon' => 'fa-chart-line',
-        'url' => '/admin/enterprise/monitoring',
+        'url' => '/admin-legacy/enterprise/monitoring',
         'superAdminOnly' => false,
         'items' => [
-            ['id' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fa-gauge', 'url' => '/admin/enterprise/monitoring'],
-            ['id' => 'logs', 'label' => 'System Logs', 'icon' => 'fa-file-lines', 'url' => '/admin/enterprise/monitoring/logs', 'superAdminOnly' => true],
+            ['id' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fa-gauge', 'url' => '/admin-legacy/enterprise/monitoring'],
+            ['id' => 'logs', 'label' => 'System Logs', 'icon' => 'fa-file-lines', 'url' => '/admin-legacy/enterprise/monitoring/logs', 'superAdminOnly' => true],
         ],
     ],
     'config' => [
         'label' => 'Config',
         'icon' => 'fa-sliders',
-        'url' => '/admin/enterprise/config',
+        'url' => '/admin-legacy/enterprise/config',
         'superAdminOnly' => true,
         'items' => [
-            ['id' => 'dashboard', 'label' => 'Settings', 'icon' => 'fa-gear', 'url' => '/admin/enterprise/config'],
-            ['id' => 'secrets', 'label' => 'Secrets Vault', 'icon' => 'fa-key', 'url' => '/admin/enterprise/config/secrets'],
+            ['id' => 'dashboard', 'label' => 'Settings', 'icon' => 'fa-gear', 'url' => '/admin-legacy/enterprise/config'],
+            ['id' => 'secrets', 'label' => 'Secrets Vault', 'icon' => 'fa-key', 'url' => '/admin-legacy/enterprise/config/secrets'],
         ],
     ],
 ];
@@ -117,7 +117,7 @@ function isEnterpriseNavActive($url, $currentPath, $basePath) {
     $fullUrl = $basePath . $url;
     $currentClean = strtok($currentPath, '?');
     if ($currentClean === $fullUrl) return true;
-    if ($url !== '/admin/enterprise' && strpos($currentClean, $fullUrl) === 0) return true;
+    if ($url !== '/admin-legacy/enterprise' && strpos($currentClean, $fullUrl) === 0) return true;
     return false;
 }
 ?>
@@ -1037,7 +1037,7 @@ function isEnterpriseNavActive($url, $currentPath, $basePath) {
 
         <div class="enterprise-nav-actions">
             <?php if ($isSuperAdmin): ?>
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests/create" class="enterprise-action-btn primary" title="New GDPR Request">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests/create" class="enterprise-action-btn primary" title="New GDPR Request">
                 <i class="fa-solid fa-plus"></i>
             </a>
             <?php endif; ?>

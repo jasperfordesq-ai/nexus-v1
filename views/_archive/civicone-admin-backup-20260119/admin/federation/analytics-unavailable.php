@@ -26,7 +26,7 @@ require __DIR__ . '/../partials/admin-header.php';
                 <br><?= htmlspecialchars($reason) ?>
                 <?php endif; ?>
             </p>
-            <a href="<?= $basePath ?>/admin/federation" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/federation" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-arrow-left"></i>
                 Back to Federation Settings
             </a>

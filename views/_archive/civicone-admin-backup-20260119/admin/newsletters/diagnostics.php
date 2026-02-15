@@ -526,7 +526,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     <div class="diagnostics-container">
 
         <!-- Back Link -->
-        <a href="<?= $basePath ?>/admin/newsletters" class="back-link">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
         </a>
 
@@ -663,7 +663,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <strong>Fix Newsletter Status</strong>
                             <p>Update newsletters with sent_at date to have 'sent' status</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="fix_sent_status">
                             <button type="submit" class="btn-fix">Run Fix</button>
@@ -676,7 +676,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <strong>Fix Total Sent Counts</strong>
                             <p>Set total_sent from total_recipients for sent newsletters</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="fix_total_sent">
                             <button type="submit" class="btn-fix">Run Fix</button>
@@ -689,7 +689,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <strong>Initialize Tracking Columns</strong>
                             <p>Set NULL tracking columns (opens, clicks) to 0</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="init_tracking_columns">
                             <button type="submit" class="btn-fix">Run Fix</button>
@@ -702,7 +702,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <strong>Create Tracking Tables</strong>
                             <p>Create newsletter_opens and newsletter_clicks tables if missing</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="create_tracking_tables">
                             <button type="submit" class="btn-create">Create Tables</button>
@@ -715,7 +715,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <strong>Add Tracking Columns</strong>
                             <p>Add total_opens, unique_opens, total_clicks, unique_clicks to newsletters table</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="add_tracking_columns">
                             <button type="submit" class="btn-create">Add Columns</button>
@@ -737,7 +737,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                                 </p>
                             <?php endif; ?>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="fix_stuck_sending">
                             <button type="submit" class="btn-fix" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">Fix Stuck</button>
@@ -759,7 +759,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <p class="debug-intro">
                     Check why a group filter might be returning 0 recipients. Enter a group ID to see its members.
                 </p>
-                <form method="GET" action="<?= $basePath ?>/admin/newsletters/diagnostics" class="debug-form">
+                <form method="GET" action="<?= $basePath ?>/admin-legacy/newsletters/diagnostics" class="debug-form">
                     <input type="number" name="debug_group" placeholder="Group ID" value="<?= htmlspecialchars($_GET['debug_group'] ?? '') ?>" class="debug-input">
                     <button type="submit" class="btn-debug">Check Members</button>
                 </form>

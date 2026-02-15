@@ -36,7 +36,7 @@ $statusClass = match($exchange['status'] ?? '') {
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/broker-controls/exchanges" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls/exchanges" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Exchange Request #<?= $exchange['id'] ?? '' ?>
@@ -197,7 +197,7 @@ $statusClass = match($exchange['status'] ?? '') {
             </p>
 
             <div class="broker-action-forms">
-                <form action="<?= $basePath ?>/admin/broker-controls/exchanges/<?= $exchange['id'] ?>/approve" method="POST" class="action-form">
+                <form action="<?= $basePath ?>/admin-legacy/broker-controls/exchanges/<?= $exchange['id'] ?>/approve" method="POST" class="action-form">
                     <?= Csrf::input() ?>
                     <div class="form-group">
                         <label for="approve_notes">Approval Notes (optional)</label>
@@ -208,7 +208,7 @@ $statusClass = match($exchange['status'] ?? '') {
                     </button>
                 </form>
 
-                <form action="<?= $basePath ?>/admin/broker-controls/exchanges/<?= $exchange['id'] ?>/reject" method="POST" class="action-form">
+                <form action="<?= $basePath ?>/admin-legacy/broker-controls/exchanges/<?= $exchange['id'] ?>/reject" method="POST" class="action-form">
                     <?= Csrf::input() ?>
                     <div class="form-group">
                         <label for="reject_reason">Rejection Reason <span class="required">*</span></label>

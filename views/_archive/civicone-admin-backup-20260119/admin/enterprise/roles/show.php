@@ -141,11 +141,11 @@ $basePath = TenantContext::getBasePath();
         </p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/roles" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/roles" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to Roles
         </a>
         <?php if (!$role['is_system']): ?>
-            <a href="<?= $basePath ?>/admin/enterprise/roles/<?= $role['id'] ?>/edit" class="admin-btn admin-btn-primary">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/roles/<?= $role['id'] ?>/edit" class="admin-btn admin-btn-primary">
                 <i class="fa-solid fa-pen"></i> Edit Role
             </a>
         <?php endif; ?>

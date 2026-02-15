@@ -22,7 +22,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/seo" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/seo" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             301 Redirects
@@ -57,7 +57,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/seo/redirects/store" method="POST" class="redirect-form">
+        <form action="<?= $basePath ?>/admin-legacy/seo/redirects/store" method="POST" class="redirect-form">
             <?= Csrf::input() ?>
             <div class="form-group">
                 <label for="source_url">Source URL</label>
@@ -130,7 +130,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         <?= date('M j, Y', strtotime($redirect['created_at'])) ?>
                     </td>
                     <td>
-                        <form action="<?= $basePath ?>/admin/seo/redirects/delete" method="POST" class="inline-form" onsubmit="return confirm('Delete this redirect?');">
+                        <form action="<?= $basePath ?>/admin-legacy/seo/redirects/delete" method="POST" class="inline-form" onsubmit="return confirm('Delete this redirect?');">
                             <?= Csrf::input() ?>
                             <input type="hidden" name="id" value="<?= $redirect['id'] ?>">
                             <button type="submit" class="admin-btn admin-btn-sm admin-btn-danger" title="Delete">

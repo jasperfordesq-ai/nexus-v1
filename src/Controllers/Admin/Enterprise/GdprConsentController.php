@@ -26,7 +26,7 @@ class GdprConsentController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/consents
+     * GET /admin-legacy/enterprise/gdpr/consents
      * Manage consent types with full statistics
      */
     public function index(): void
@@ -169,7 +169,7 @@ class GdprConsentController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/consents/{id}
+     * GET /admin-legacy/enterprise/gdpr/consents/{id}
      * View consent type details and user consents
      */
     public function show(int $id): void
@@ -181,7 +181,7 @@ class GdprConsentController extends BaseEnterpriseController
 
         if (!$consentType) {
             $_SESSION['flash_error'] = 'Consent type not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/consents');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
             exit;
         }
 
@@ -203,7 +203,7 @@ class GdprConsentController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/consents/types
+     * POST /admin-legacy/enterprise/gdpr/consents/types
      * Create or update a consent type
      */
     public function storeType(): void
@@ -272,7 +272,7 @@ class GdprConsentController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/consents/backfill
+     * POST /admin-legacy/enterprise/gdpr/consents/backfill
      * Backfill consent records for existing users
      */
     public function backfill(): void
@@ -283,7 +283,7 @@ class GdprConsentController extends BaseEnterpriseController
 
         if (empty($consentType)) {
             $_SESSION['flash_error'] = 'Please select a consent type to backfill.';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/consents');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
             exit;
         }
 
@@ -325,12 +325,12 @@ class GdprConsentController extends BaseEnterpriseController
             $_SESSION['flash_error'] = 'Backfill failed: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/consents');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
         exit;
     }
 
     /**
-     * GET /admin/enterprise/gdpr/consents/export
+     * GET /admin-legacy/enterprise/gdpr/consents/export
      * Export all consent records
      */
     public function export(): void
@@ -377,7 +377,7 @@ class GdprConsentController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/consents/tenant-version
+     * POST /admin-legacy/enterprise/gdpr/consents/tenant-version
      * Update tenant-specific consent version
      */
     public function updateTenantVersion(): void
@@ -427,7 +427,7 @@ class GdprConsentController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/consents/tenant-versions
+     * GET /admin-legacy/enterprise/gdpr/consents/tenant-versions
      * Get tenant's consent version overrides
      */
     public function getTenantVersions(): void
@@ -457,7 +457,7 @@ class GdprConsentController extends BaseEnterpriseController
     }
 
     /**
-     * DELETE /admin/enterprise/gdpr/consents/tenant-version/{slug}
+     * DELETE /admin-legacy/enterprise/gdpr/consents/tenant-version/{slug}
      * Remove tenant override (revert to global version)
      */
     public function removeTenantVersion(string $slug): void

@@ -49,7 +49,7 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime } from '@/lib/helpers';
@@ -674,7 +674,7 @@ export function FeedPage() {
         onClose={() => { onCreateClose(); resetCreateForm(); }}
         size="lg"
         classNames={{
-          base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
+          base: 'bg-content1 border border-theme-default',
         }}
       >
         <ModalContent>
@@ -855,7 +855,7 @@ export function FeedPage() {
         isOpen={isReportOpen}
         onClose={onReportClose}
         classNames={{
-          base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
+          base: 'bg-content1 border border-theme-default',
         }}
       >
         <ModalContent>
@@ -925,6 +925,7 @@ function FeedCard({
   isAuthenticated,
   currentUserId,
 }: FeedCardProps) {
+  const { tenantPath } = useTenant();
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
@@ -1046,7 +1047,7 @@ function FeedCard({
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <Link to={`/profile/${author.id}`}>
+          <Link to={tenantPath(`/profile/${author.id}`)}>
             <Avatar
               name={author.name}
               src={resolveAvatarUrl(author.avatar)}
@@ -1335,11 +1336,12 @@ interface CommentItemProps {
 }
 
 function CommentItem({ comment }: CommentItemProps) {
+  const { tenantPath } = useTenant();
   const [showReplies, setShowReplies] = useState(false);
 
   return (
     <div className="flex items-start gap-2">
-      <Link to={`/profile/${comment.author.id}`}>
+      <Link to={tenantPath(`/profile/${comment.author.id}`)}>
         <Avatar
           name={comment.author.name}
           src={resolveAvatarUrl(comment.author.avatar)}

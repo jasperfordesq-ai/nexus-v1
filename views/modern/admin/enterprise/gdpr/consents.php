@@ -55,7 +55,7 @@ function getSourceBadgeClass($source) {
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Consent Management
@@ -401,7 +401,7 @@ function getSourceBadgeClass($source) {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form action="<?= $basePath ?>/admin/enterprise/gdpr/consents/types" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/enterprise/gdpr/consents/types" method="POST">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
             <div class=modal-body">
                 <div class="form-row">
@@ -1732,7 +1732,7 @@ function viewConsentDetail(id) {
     document.getElementById('consentDetailModal').classList.add('show');
     document.getElementById('consentDetailContent').innerHTML = '<div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading...</span></div>';
 
-    fetch(basePath + '/admin/enterprise/gdpr/consents/' + id)
+    fetch(basePath + '/admin-legacy/enterprise/gdpr/consents/' + id)
         .then(r => r.text())
         .then(html => document.getElementById('consentDetailContent').innerHTML = html)
         .catch(() => document.getElementById('consentDetailContent').innerHTML = '<p style="color: #ef4444; text-align: center;">Failed to load details</p>');
@@ -1753,16 +1753,16 @@ document.addEventListener('click', function(e) {
 });
 
 function editConsentType(id) {
-    window.location.href = basePath + '/admin/enterprise/gdpr/consents/types/' + id + '/edit';
+    window.location.href = basePath + '/admin-legacy/enterprise/gdpr/consents/types/' + id + '/edit';
 }
 
 function viewConsentHistory(id) {
-    window.location.href = basePath + '/admin/enterprise/gdpr/consents/types/' + id + '/history';
+    window.location.href = basePath + '/admin-legacy/enterprise/gdpr/consents/types/' + id + '/history';
 }
 
 function deleteConsentType(id) {
     if (confirm('Delete this consent type? This cannot be undone.')) {
-        fetch(basePath + '/admin/enterprise/gdpr/consents/types/' + id, {
+        fetch(basePath + '/admin-legacy/enterprise/gdpr/consents/types/' + id, {
             method: 'DELETE',
             headers: { 'X-CSRF-Token': '<?= Csrf::generate() ?>' }
         })
@@ -1771,7 +1771,7 @@ function deleteConsentType(id) {
 }
 
 function exportConsents() {
-    window.location.href = basePath + '/admin/enterprise/gdpr/consents/export?' + new URLSearchParams(window.location.search);
+    window.location.href = basePath + '/admin-legacy/enterprise/gdpr/consents/export?' + new URLSearchParams(window.location.search);
 }
 
 // Close modals on escape
@@ -1800,7 +1800,7 @@ document.querySelectorAll('.modal-overlay').forEach(modal => {
 document.addEventListener('DOMContentLoaded', loadTenantVersions);
 
 function loadTenantVersions() {
-    fetch(basePath + '/admin/enterprise/gdpr/consents/tenant-versions')
+    fetch(basePath + '/admin-legacy/enterprise/gdpr/consents/tenant-versions')
         .then(r => r.json())
         .then(data => {
             renderVersionCards(data.versions || []);
@@ -1901,7 +1901,7 @@ function submitVersionUpdate() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
 
-    fetch(basePath + '/admin/enterprise/gdpr/consents/tenant-version', {
+    fetch(basePath + '/admin-legacy/enterprise/gdpr/consents/tenant-version', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -1937,7 +1937,7 @@ function revertToGlobal(slug) {
         return;
     }
 
-    fetch(basePath + '/admin/enterprise/gdpr/consents/tenant-version/' + slug, {
+    fetch(basePath + '/admin-legacy/enterprise/gdpr/consents/tenant-version/' + slug, {
         method: 'DELETE',
         headers: {
             'X-CSRF-Token': '<?= Csrf::generate() ?>'

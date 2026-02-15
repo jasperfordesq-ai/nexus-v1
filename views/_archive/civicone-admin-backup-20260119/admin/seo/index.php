@@ -52,7 +52,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </div>
             </div>
             <div class="admin-card-body">
-                <form action="<?= $basePath ?>/admin/seo/store" method="POST">
+                <form action="<?= $basePath ?>/admin-legacy/seo/store" method="POST">
                     <?= Csrf::input() ?>
 
                     <!-- Meta Title -->
@@ -122,7 +122,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
             <div class="admin-card-body" style="padding: 0;">
                 <div class="admin-tool-list">
-                    <a href="<?= $basePath ?>/admin/seo/audit" class="admin-tool-item">
+                    <a href="<?= $basePath ?>/admin-legacy/seo/audit" class="admin-tool-item">
                         <div class="admin-tool-icon admin-tool-icon-emerald">
                             <i class="fa-solid fa-stethoscope"></i>
                         </div>
@@ -132,7 +132,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         </div>
                         <i class="fa-solid fa-chevron-right admin-tool-arrow"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/seo/bulk/listing" class="admin-tool-item">
+                    <a href="<?= $basePath ?>/admin-legacy/seo/bulk/listing" class="admin-tool-item">
                         <div class="admin-tool-icon admin-tool-icon-indigo">
                             <i class="fa-solid fa-table-list"></i>
                         </div>
@@ -142,7 +142,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         </div>
                         <i class="fa-solid fa-chevron-right admin-tool-arrow"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/seo/redirects" class="admin-tool-item">
+                    <a href="<?= $basePath ?>/admin-legacy/seo/redirects" class="admin-tool-item">
                         <div class="admin-tool-icon admin-tool-icon-amber">
                             <i class="fa-solid fa-arrow-right-arrow-left"></i>
                         </div>
@@ -152,7 +152,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         </div>
                         <i class="fa-solid fa-chevron-right admin-tool-arrow"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/seo/organization" class="admin-tool-item">
+                    <a href="<?= $basePath ?>/admin-legacy/seo/organization" class="admin-tool-item">
                         <div class="admin-tool-icon admin-tool-icon-pink">
                             <i class="fa-solid fa-building"></i>
                         </div>

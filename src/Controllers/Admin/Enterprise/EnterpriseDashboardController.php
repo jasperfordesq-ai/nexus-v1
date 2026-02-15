@@ -27,7 +27,7 @@ class EnterpriseDashboardController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise
+     * GET /admin-legacy/enterprise
      * Main enterprise dashboard
      */
     public function dashboard(): void

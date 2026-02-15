@@ -402,7 +402,7 @@ input:checked + .toggle-slider:before {
         </p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/custom-badges" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/custom-badges" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to Badges
         </a>
     </div>
@@ -418,7 +418,7 @@ input:checked + .toggle-slider:before {
 <?php endif; ?>
 
 <!-- Form Layout -->
-<form method="POST" action="<?= $basePath ?>/admin/custom-badges/<?= $isEdit ? 'update' : 'store' ?>" id="badgeForm" class="form-layout">
+<form method="POST" action="<?= $basePath ?>/admin-legacy/custom-badges/<?= $isEdit ? 'update' : 'store' ?>" id="badgeForm" class="form-layout">
     <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
     <?php if ($isEdit && $badge): ?>
     <input type="hidden" name="id" value="<?= $badge['id'] ?>">
@@ -564,7 +564,7 @@ input:checked + .toggle-slider:before {
         </div>
 
         <div class="form-actions">
-            <a href="<?= $basePath ?>/admin/custom-badges" class="admin-btn admin-btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/custom-badges" class="admin-btn admin-btn-secondary">
                 <i class="fa-solid fa-times"></i> Cancel
             </a>
             <button type="submit" class="admin-btn admin-btn-primary">

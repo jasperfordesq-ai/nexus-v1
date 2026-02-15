@@ -1,7 +1,7 @@
 <?php
 // External Partners - View Dispatcher
 $layout = layout();
-$modernView = __DIR__ . '/../../modern/admin/federation/external-partners.php';
+$modernView = __DIR__ . '/../../modern/admin-legacy/federation/external-partners.php';
 
 if (($layout === 'modern' || $layout === 'high-contrast') && file_exists($modernView)) {
     require $modernView;

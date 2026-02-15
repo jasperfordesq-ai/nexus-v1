@@ -169,7 +169,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
                     if ($canImpersonate):
                     ?>
-                        <form action="<?= $basePath ?>/admin/impersonate"
+                        <form action="<?= $basePath ?>/admin-legacy/impersonate"
                               method="POST"
                               onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');"
                               class="mte-profile-header--form-inline">
@@ -256,7 +256,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <?php endif; ?>
 
                     <?php if ((isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
-                        <a href="<?= $basePath ?>/admin/users/<?= $user['id'] ?>/edit"
+                        <a href="<?= $basePath ?>/admin-legacy/users/<?= $user['id'] ?>/edit"
                            class="btn btn--danger mte-profile-header--btn-admin"
                            aria-label="Admin: Edit user settings">
                             <i class="fa-solid fa-shield" aria-hidden="true"></i> Admin

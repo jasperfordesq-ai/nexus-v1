@@ -2,7 +2,7 @@
 
 // Admin: Volunteering Approvals
 $pageTitle = "Organization Approvals";
-require __DIR__ . '/../../layouts/admin/header.php';
+require __DIR__ . '/../../layouts/admin-legacy/header.php';
 ?>
 
 <div class="admin-header">
@@ -41,12 +41,12 @@ require __DIR__ . '/../../layouts/admin/header.php';
                             <?= htmlspecialchars(substr($org['description'], 0, 100)) ?>...
                         </td>
                         <td>
-                            <form action="/admin/volunteering/approve" method="POST" style="display:inline-block;">
+                            <form action="/admin-legacy/volunteering/approve" method="POST" style="display:inline-block;">
                                 <?= \Nexus\Core\Csrf::input() ?>
                                 <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                                 <button class="btn btn-sm btn-success">Approve</button>
                             </form>
-                            <form action="/admin/volunteering/decline" method="POST" style="display:inline-block; margin-left: 5px;">
+                            <form action="/admin-legacy/volunteering/decline" method="POST" style="display:inline-block; margin-left: 5px;">
                                 <?= \Nexus\Core\Csrf::input() ?>
                                 <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                                 <button class="btn btn-sm btn-danger" onclick="return confirm('Reject this organization?');">Decline</button>
@@ -59,4 +59,4 @@ require __DIR__ . '/../../layouts/admin/header.php';
     <?php endif; ?>
 </div>
 
-<?php require __DIR__ . '/../../layouts/admin/footer.php'; ?>
+<?php require __DIR__ . '/../../layouts/admin-legacy/footer.php'; ?>

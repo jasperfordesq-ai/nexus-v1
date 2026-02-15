@@ -1,6 +1,6 @@
 <?php
 $basePath = \Nexus\Core\TenantContext::getBasePath();
-require dirname(__DIR__, 2) . '/layouts/admin/header.php';
+require dirname(__DIR__, 2) . '/layouts/admin-legacy/header.php';
 ?>
 
 <div class="container-fluid py-4">
@@ -9,7 +9,7 @@ require dirname(__DIR__, 2) . '/layouts/admin/header.php';
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="<?= $basePath ?>/admin">Admin</a></li>
-                    <li class="breadcrumb-item"><a href="<?= $basePath ?>/admin/custom-badges">Custom Badges</a></li>
+                    <li class="breadcrumb-item"><a href="<?= $basePath ?>/admin-legacy/custom-badges">Custom Badges</a></li>
                     <li class="breadcrumb-item active"><?= $isEdit ? 'Edit' : 'Create' ?> Badge</li>
                 </ol>
             </nav>
@@ -32,7 +32,7 @@ require dirname(__DIR__, 2) . '/layouts/admin/header.php';
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="POST" action="<?= $basePath ?>/admin/custom-badges/<?= $isEdit ? 'update' : 'store' ?>">
+                    <form method="POST" action="<?= $basePath ?>/admin-legacy/custom-badges/<?= $isEdit ? 'update' : 'store' ?>">
                         <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                         <?php if ($isEdit): ?>
                             <input type="hidden" name="id" value="<?= $badge['id'] ?>">
@@ -97,7 +97,7 @@ require dirname(__DIR__, 2) . '/layouts/admin/header.php';
                         <hr>
 
                         <div class="d-flex justify-content-between">
-                            <a href="<?= $basePath ?>/admin/custom-badges" class="btn btn-outline-secondary">
+                            <a href="<?= $basePath ?>/admin-legacy/custom-badges" class="btn btn-outline-secondary">
                                 <i class="fa-solid fa-arrow-left"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-primary">
@@ -183,4 +183,4 @@ document.getElementById('badgeIcon').addEventListener('input', function() {
 });
 </script>
 
-<?php require dirname(__DIR__, 2) . '/layouts/admin/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/admin-legacy/footer.php'; ?>

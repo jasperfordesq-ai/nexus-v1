@@ -423,7 +423,7 @@ export function OrganisationDetailPage() {
                         {Array.from({ length: 5 }, (_, i) => (
                           <Star
                             key={i}
-                            className={`w-3 h-3 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-theme-elevated'}`}
+                            className={`w-3 h-3 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-theme-subtle'}`}
                             aria-hidden="true"
                           />
                         ))}
@@ -445,7 +445,7 @@ export function OrganisationDetailPage() {
 
       {/* Apply Modal */}
       <Modal isOpen={applyModal.isOpen} onClose={applyModal.onClose} size="lg" classNames={{
-        base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
+        base: 'bg-content1 border border-theme-default',
       }}>
         <ModalContent>
           <ModalHeader className="text-theme-primary">

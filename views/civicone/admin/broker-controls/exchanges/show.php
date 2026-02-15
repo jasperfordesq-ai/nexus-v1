@@ -2,7 +2,7 @@
 /**
  * Exchange Request Detail - CivicOne Theme (GOV.UK)
  * View detailed information about a single exchange request
- * Path: views/civicone/admin/broker-controls/exchanges/show.php
+ * Path: views/civicone/admin-legacy/broker-controls/exchanges/show.php
  */
 
 use Nexus\Core\TenantContext;
@@ -32,7 +32,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
-        <a href="<?= $basePath ?>/admin/broker-controls/exchanges" class="govuk-back-link">Back to Exchange Requests</a>
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls/exchanges" class="govuk-back-link">Back to Exchange Requests</a>
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
@@ -193,7 +193,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
 
         <div class="govuk-grid-row govuk-!-margin-bottom-6">
             <div class="govuk-grid-column-one-half">
-                <form action="<?= $basePath ?>/admin/broker-controls/exchanges/<?= $exchange['id'] ?>/approve" method="POST">
+                <form action="<?= $basePath ?>/admin-legacy/broker-controls/exchanges/<?= $exchange['id'] ?>/approve" method="POST">
                     <?= Csrf::input() ?>
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="approve_notes">Approval notes (optional)</label>
@@ -203,7 +203,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                 </form>
             </div>
             <div class="govuk-grid-column-one-half">
-                <form action="<?= $basePath ?>/admin/broker-controls/exchanges/<?= $exchange['id'] ?>/reject" method="POST">
+                <form action="<?= $basePath ?>/admin-legacy/broker-controls/exchanges/<?= $exchange['id'] ?>/reject" method="POST">
                     <?= Csrf::input() ?>
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="reject_reason">Rejection reason</label>

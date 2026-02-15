@@ -77,26 +77,26 @@ else {
         <!-- Action Bar -->
         <div class="nexus-card" style="margin-bottom: 24px; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <a href="<?= $basePath ?>/admin/newsletters/analytics" class="nexus-btn" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/analytics" class="nexus-btn" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);">
                     <i class="fa-solid fa-chart-line"></i> Analytics
                 </a>
-                <a href="<?= $basePath ?>/admin/newsletters/templates" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/templates" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
                     <i class="fa-solid fa-palette"></i> Templates
                 </a>
-                <a href="<?= $basePath ?>/admin/newsletters/segments" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/segments" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
                     <i class="fa-solid fa-filter"></i> Segments
                 </a>
-                <a href="<?= $basePath ?>/admin/newsletters/subscribers" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/subscribers" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
                     <i class="fa-solid fa-address-book"></i> Subscribers
                 </a>
-                <a href="<?= $basePath ?>/admin/newsletters/bounces" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/bounces" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
                     <i class="fa-solid fa-shield-halved"></i> Bounces
                 </a>
-                <a href="<?= $basePath ?>/admin/newsletters/diagnostics" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/diagnostics" class="nexus-btn" style="background: #f3f4f6; color: #374151; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
                     <i class="fa-solid fa-wrench"></i> Diagnostics
                 </a>
             </div>
-            <a href="<?= $basePath ?>/admin/newsletters/create" class="nexus-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4); transition: all 0.2s;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/create" class="nexus-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4); transition: all 0.2s;">
                 <i class="fa-solid fa-plus"></i> Create Newsletter
             </a>
         </div>
@@ -112,7 +112,7 @@ else {
                     <p style="color: #6b7280; margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
                         Create your first newsletter to start engaging with your community members.
                     </p>
-                    <a href="<?= $basePath ?>/admin/newsletters/create" class="nexus-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/create" class="nexus-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-plus"></i> Create Your First Newsletter
                     </a>
                 </div>
@@ -136,7 +136,7 @@ else {
                                             <i class="fa-solid fa-envelope" style="color: #d97706;"></i>
                                         </div>
                                         <div>
-                                            <a href="<?= $basePath ?>/admin/newsletters/edit/<?= $newsletter['id'] ?>" style="font-weight: 600; color: #111827; text-decoration: none; display: block; margin-bottom: 2px;">
+                                            <a href="<?= $basePath ?>/admin-legacy/newsletters/edit/<?= $newsletter['id'] ?>" style="font-weight: 600; color: #111827; text-decoration: none; display: block; margin-bottom: 2px;">
                                                 <?= htmlspecialchars($newsletter['subject']) ?>
                                             </a>
                                             <?php if (!empty($newsletter['ab_test_enabled'])): ?>
@@ -220,23 +220,23 @@ else {
                                 <td style="padding: 20px; text-align: right;">
                                     <div style="display: flex; gap: 8px; justify-content: flex-end;">
                                         <?php if ($newsletter['status'] !== 'sent'): ?>
-                                            <a href="<?= $basePath ?>/admin/newsletters/edit/<?= $newsletter['id'] ?>" style="background: #f1f5f9; color: #475569; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500;">
+                                            <a href="<?= $basePath ?>/admin-legacy/newsletters/edit/<?= $newsletter['id'] ?>" style="background: #f1f5f9; color: #475569; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500;">
                                                 <i class="fa-solid fa-pen"></i>
                                             </a>
                                         <?php endif; ?>
-                                        <a href="<?= $basePath ?>/admin/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" style="background: #f1f5f9; color: #475569; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500;">
+                                        <a href="<?= $basePath ?>/admin-legacy/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" style="background: #f1f5f9; color: #475569; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500;">
                                             <i class="fa-solid fa-eye"></i>
                                         </a>
                                         <?php if ($newsletter['status'] === 'sent'): ?>
-                                            <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                                            <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                                                 <i class="fa-solid fa-chart-bar"></i> Stats
                                             </a>
                                         <?php endif; ?>
-                                        <a href="<?= $basePath ?>/admin/newsletters/duplicate/<?= $newsletter['id'] ?>" style="background: #f1f5f9; color: #475569; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500;" title="Duplicate">
+                                        <a href="<?= $basePath ?>/admin-legacy/newsletters/duplicate/<?= $newsletter['id'] ?>" style="background: #f1f5f9; color: #475569; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500;" title="Duplicate">
                                             <i class="fa-solid fa-copy"></i>
                                         </a>
                                         <?php if ($newsletter['status'] !== 'sent'): ?>
-                                            <form action="<?= $basePath ?>/admin/newsletters/delete" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this newsletter?');">
+                                            <form action="<?= $basePath ?>/admin-legacy/newsletters/delete" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this newsletter?');">
                                                 <?= \Nexus\Core\Csrf::input() ?>
                                                 <input type="hidden" name="id" value="<?= $newsletter['id'] ?>">
                                                 <button type="submit" style="background: #fee2e2; color: #dc2626; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 500;" title="Delete">

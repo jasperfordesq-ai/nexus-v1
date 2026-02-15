@@ -389,7 +389,7 @@ require_once __DIR__ . '/../partials/admin-header.php';
             <i class="fa-solid fa-trash"></i>
             Clean Old Resolved
         </button>
-        <a href="<?= $basePath ?>/admin/seo/redirects" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/seo/redirects" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-arrow-right-arrow-left"></i>
             Manage Redirects
         </a>
@@ -445,7 +445,7 @@ require_once __DIR__ . '/../partials/admin-header.php';
 
 <!-- Filters -->
 <div class="filters-card">
-    <form method="GET" action="<?= $basePath ?>/admin/404-errors">
+    <form method="GET" action="<?= $basePath ?>/admin-legacy/404-errors">
         <div class="filters-grid">
             <div class="filter-group">
                 <label>Status</label>
@@ -759,7 +759,7 @@ function submitBulkRedirect() {
     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
     submitBtn.disabled = true;
 
-    fetch('<?= $basePath ?>/admin/404-errors/bulk-redirect', {
+    fetch('<?= $basePath ?>/admin-legacy/404-errors/bulk-redirect', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -799,7 +799,7 @@ function closeModal() {
 function submitRedirect() {
     const formData = new FormData(document.getElementById('redirectForm'));
 
-    fetch('<?= $basePath ?>/admin/404-errors/create-redirect', {
+    fetch('<?= $basePath ?>/admin-legacy/404-errors/create-redirect', {
         method: 'POST',
         body: formData
     })
@@ -820,7 +820,7 @@ function submitRedirect() {
 function markResolved(id) {
     if (!confirm('Mark this 404 error as resolved?')) return;
 
-    fetch('<?= $basePath ?>/admin/404-errors/mark-resolved', {
+    fetch('<?= $basePath ?>/admin-legacy/404-errors/mark-resolved', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'id=' + id
@@ -838,7 +838,7 @@ function markResolved(id) {
 function markUnresolved(id) {
     if (!confirm('Mark this error as unresolved?')) return;
 
-    fetch('<?= $basePath ?>/admin/404-errors/mark-unresolved', {
+    fetch('<?= $basePath ?>/admin-legacy/404-errors/mark-unresolved', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'id=' + id
@@ -856,7 +856,7 @@ function markUnresolved(id) {
 function deleteError(id) {
     if (!confirm('Delete this 404 error log entry? This cannot be undone.')) return;
 
-    fetch('<?= $basePath ?>/admin/404-errors/delete', {
+    fetch('<?= $basePath ?>/admin-legacy/404-errors/delete', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'id=' + id
@@ -874,7 +874,7 @@ function deleteError(id) {
 function cleanOldResolved() {
     if (!confirm('This will delete all resolved 404 errors older than 90 days. Continue?')) return;
 
-    fetch('<?= $basePath ?>/admin/404-errors/clean-old', {
+    fetch('<?= $basePath ?>/admin-legacy/404-errors/clean-old', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'days=90'

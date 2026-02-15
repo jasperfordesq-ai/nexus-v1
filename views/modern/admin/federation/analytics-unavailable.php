@@ -53,7 +53,7 @@ $isWhitelisted = $isWhitelisted ?? false;
                 <i class="fa-solid fa-arrow-left"></i>
                 Back to Dashboard
             </a>
-            <a href="<?= $basePath ?>/admin/federation" class="admin-btn admin-btn-primary">
+            <a href="<?= $basePath ?>/admin-legacy/federation" class="admin-btn admin-btn-primary">
                 <i class="fa-solid fa-globe"></i>
                 Federation Settings
             </a>

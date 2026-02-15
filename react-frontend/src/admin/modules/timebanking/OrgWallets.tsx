@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@heroui/react';
 import { Building2, ArrowLeft } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { OrgWallet } from '../../api/types';
@@ -17,6 +17,7 @@ import type { OrgWallet } from '../../api/types';
 export function OrgWallets() {
   usePageTitle('Admin - Organization Wallets');
   const { tenantPath } = useTenant();
+  const toast = useToast();
 
   const [wallets, setWallets] = useState<OrgWallet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,11 +35,11 @@ export function OrgWallets() {
         }
       }
     } catch {
-      // Silently handle
+      toast.error('Failed to load organization wallets');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     loadWallets();

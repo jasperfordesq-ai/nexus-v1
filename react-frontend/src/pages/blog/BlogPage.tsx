@@ -28,6 +28,7 @@ import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
+import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 
 /* ───────────────────────── Types ───────────────────────── */
@@ -316,10 +317,11 @@ interface PostCardProps {
 }
 
 function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
+  const { tenantPath } = useTenant();
   const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : null;
 
   return (
-    <Link to={`/blog/${post.slug}`} className="block group mb-6">
+    <Link to={tenantPath(`/blog/${post.slug}`)} className="block group mb-6">
       <GlassCard className="overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Image */}
@@ -376,10 +378,11 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
 /* ───────────────────────── Blog Post Card ───────────────────────── */
 
 function BlogPostCard({ post, categoryColors }: PostCardProps) {
+  const { tenantPath } = useTenant();
   const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : null;
 
   return (
-    <Link to={`/blog/${post.slug}`} className="block group h-full">
+    <Link to={tenantPath(`/blog/${post.slug}`)} className="block group h-full">
       <GlassCard className="overflow-hidden h-full flex flex-col">
         {/* Image */}
         <div className="h-48 bg-gradient-to-br from-blue-500/10 to-indigo-600/10 flex items-center justify-center overflow-hidden">

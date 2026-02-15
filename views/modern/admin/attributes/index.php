@@ -28,7 +28,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Manage tags and service requirements for listings</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/attributes/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/attributes/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i>
             New Attribute
         </a>
@@ -54,7 +54,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
             <h3 class="admin-empty-title">No attributes yet</h3>
             <p class="admin-empty-text">Create your first attribute to enhance listings</p>
-            <a href="<?= $basePath ?>/admin/attributes/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/attributes/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-plus"></i>
                 Create First Attribute
             </a>
@@ -106,10 +106,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         </td>
                         <td style="text-align: right;">
                             <div class="admin-action-buttons">
-                                <a href="<?= $basePath ?>/admin/attributes/edit/<?= $attr['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                                <a href="<?= $basePath ?>/admin-legacy/attributes/edit/<?= $attr['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                                     <i class="fa-solid fa-pen"></i> Edit
                                 </a>
-                                <form action="<?= $basePath ?>/admin/attributes/delete" method="POST" onsubmit="return confirm('Delete this attribute?');" style="display:inline;">
+                                <form action="<?= $basePath ?>/admin-legacy/attributes/delete" method="POST" onsubmit="return confirm('Delete this attribute?');" style="display:inline;">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="id" value="<?= $attr['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">

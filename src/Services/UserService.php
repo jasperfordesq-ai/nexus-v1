@@ -216,7 +216,7 @@ class UserService
     {
         try {
             $badges = Database::query(
-                "SELECT b.name, b.slug, b.icon, b.description, ub.earned_at
+                "SELECT b.name, b.badge_key, b.icon, b.description, ub.earned_at
                  FROM user_badges ub
                  JOIN badges b ON ub.badge_id = b.id
                  WHERE ub.user_id = ?

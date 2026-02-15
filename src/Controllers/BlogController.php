@@ -153,7 +153,7 @@ class BlogController
         if ($id) {
             // Initialize SEO (empty)
             \Nexus\Models\SeoMetadata::save('post', $id, ['meta_title' => '', 'meta_description' => '', 'noindex' => 0]);
-            header("Location: " . TenantContext::getBasePath() . "/admin/blog/builder/$id");
+            header("Location: " . TenantContext::getBasePath() . "/admin-legacy/blog/builder/$id");
             exit;
         } else {
             die("Failed to create draft");
@@ -191,7 +191,7 @@ class BlogController
                 \Nexus\Models\SeoMetadata::save('post', $id, $seoData);
             }
 
-            header("Location: " . TenantContext::getBasePath() . "/admin/blog");
+            header("Location: " . TenantContext::getBasePath() . "/admin-legacy/blog");
         } catch (\Exception $e) {
             echo "Error creating post: " . $e->getMessage();
         }
@@ -241,14 +241,14 @@ class BlogController
         ];
         \Nexus\Models\SeoMetadata::save('post', $id, $seoData);
 
-        header("Location: " . TenantContext::getBasePath() . "/admin/blog");
+        header("Location: " . TenantContext::getBasePath() . "/admin-legacy/blog");
     }
 
     public function delete($id)
     {
         $this->checkAdmin();
         Post::delete($id);
-        header("Location: " . TenantContext::getBasePath() . "/admin/blog");
+        header("Location: " . TenantContext::getBasePath() . "/admin-legacy/blog");
     }
 
     public function builder($id)

@@ -8,7 +8,7 @@ $adminPageTitle = 'Edit Deliverable';
 $adminPageSubtitle = 'Deliverability Tracking';
 $adminPageIcon = 'fa-pen';
 
-require dirname(dirname(__DIR__)) . '/admin/partials/admin-header.php';
+require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-header.php';
 
 $deliverable = $deliverable ?? [];
 $users = $users ?? [];
@@ -30,7 +30,7 @@ $tagsString = !empty($deliverable['tags']) && is_array($deliverable['tags'])
         <p class="admin-page-subtitle"><?= htmlspecialchars($deliverable['title'] ?? '') ?></p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/deliverability/view/<?= $deliverable['id'] ?>" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability/view/<?= $deliverable['id'] ?>" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to View
         </a>
     </div>
@@ -48,7 +48,7 @@ $tagsString = !empty($deliverable['tags']) && is_array($deliverable['tags'])
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/deliverability/update/<?= $deliverable['id'] ?>" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/deliverability/update/<?= $deliverable['id'] ?>" method="POST">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
 
             <!-- Title -->
@@ -229,7 +229,7 @@ $tagsString = !empty($deliverable['tags']) && is_array($deliverable['tags'])
 
             <!-- Form Actions - Enhanced with gradients -->
             <div class="form-actions" style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(6,182,212,0.15);">
-                <a href="<?= $basePath ?>/admin/deliverability/view/<?= $deliverable['id'] ?>"
+                <a href="<?= $basePath ?>/admin-legacy/deliverability/view/<?= $deliverable['id'] ?>"
                    class="admin-btn admin-btn-secondary"
                    style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(6, 182, 212, 0.25); transition: all 0.25s ease;"
                    onmouseover="this.style.background='rgba(255, 255, 255, 0.12)'; this.style.borderColor='rgba(6, 182, 212, 0.4)';"
@@ -284,7 +284,7 @@ $tagsString = !empty($deliverable['tags']) && is_array($deliverable['tags'])
             Deleting this deliverable will permanently remove all associated milestones, comments, and history.
             This action cannot be undone.
         </p>
-        <form action="<?= $basePath ?>/admin/deliverability/delete/<?= $deliverable['id'] ?>" method="POST"
+        <form action="<?= $basePath ?>/admin-legacy/deliverability/delete/<?= $deliverable['id'] ?>" method="POST"
               onsubmit="return confirm('⚠️ Are you absolutely sure?\n\nThis will permanently delete:\n• All milestones\n• All comments\n• Complete history\n\nThis CANNOT be undone!');">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
             <button type="submit"
@@ -298,4 +298,4 @@ $tagsString = !empty($deliverable['tags']) && is_array($deliverable['tags'])
     </div>
 </div>
 
-<?php require dirname(dirname(__DIR__)) . '/admin/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-footer.php'; ?>

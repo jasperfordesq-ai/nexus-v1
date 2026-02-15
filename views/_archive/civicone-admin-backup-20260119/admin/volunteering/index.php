@@ -107,7 +107,7 @@ $activityLogs = $recentActivity->fetchAll();
             <i class="fa-solid fa-rotate"></i>
             Refresh
         </button>
-        <a href="<?= $basePath ?>/admin/volunteering/organizations" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/volunteering/organizations" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-building"></i>
             All Organizations
         </a>
@@ -187,7 +187,7 @@ $activityLogs = $recentActivity->fetchAll();
         <div class="admin-alert-title"><?= $pendingOrgsCount ?> Organization<?= $pendingOrgsCount > 1 ? 's' : '' ?> Pending Approval</div>
         <div class="admin-alert-text">New volunteer organizations require your review before they can post opportunities</div>
     </div>
-    <a href="<?= $basePath ?>/admin/volunteering/approvals" class="admin-btn admin-btn-warning">
+    <a href="<?= $basePath ?>/admin-legacy/volunteering/approvals" class="admin-btn admin-btn-warning">
         Review Now
     </a>
 </div>
@@ -209,7 +209,7 @@ $activityLogs = $recentActivity->fetchAll();
                     <p class="admin-card-subtitle">Organizations awaiting review</p>
                 </div>
                 <?php if ($pendingOrgsCount > 0): ?>
-                <a href="<?= $basePath ?>/admin/volunteering/approvals" class="admin-card-header-action">
+                <a href="<?= $basePath ?>/admin-legacy/volunteering/approvals" class="admin-card-header-action">
                     View All <i class="fa-solid fa-arrow-right"></i>
                 </a>
                 <?php endif; ?>
@@ -235,14 +235,14 @@ $activityLogs = $recentActivity->fetchAll();
                             </div>
                         </div>
                         <div class="admin-activity-actions">
-                            <form action="<?= $basePath ?>/admin/volunteering/approve" method="POST" style="display:inline;">
+                            <form action="<?= $basePath ?>/admin-legacy/volunteering/approve" method="POST" style="display:inline;">
                                 <?= Csrf::input() ?>
                                 <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                                 <button type="submit" class="admin-btn admin-btn-success admin-btn-sm" title="Approve">
                                     <i class="fa-solid fa-check"></i>
                                 </button>
                             </form>
-                            <form action="<?= $basePath ?>/admin/volunteering/decline" method="POST" style="display:inline;">
+                            <form action="<?= $basePath ?>/admin-legacy/volunteering/decline" method="POST" style="display:inline;">
                                 <?= Csrf::input() ?>
                                 <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                                 <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm" title="Decline" onclick="return confirm('Decline this organization?');">
@@ -333,13 +333,13 @@ $activityLogs = $recentActivity->fetchAll();
             </div>
             <div class="admin-card-body">
                 <div class="admin-quick-actions">
-                    <a href="<?= $basePath ?>/admin/volunteering/approvals" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/volunteering/approvals" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-orange">
                             <i class="fa-solid fa-clipboard-check"></i>
                         </div>
                         <span>Review Approvals</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/volunteering/organizations" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/volunteering/organizations" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-green">
                             <i class="fa-solid fa-building"></i>
                         </div>
@@ -351,7 +351,7 @@ $activityLogs = $recentActivity->fetchAll();
                         </div>
                         <span>View Public Page</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/categories" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/categories" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-purple">
                             <i class="fa-solid fa-folder-tree"></i>
                         </div>
@@ -450,7 +450,7 @@ $activityLogs = $recentActivity->fetchAll();
 </div>
 
 <div class="admin-modules-grid">
-    <a href="<?= $basePath ?>/admin/volunteering/approvals" class="admin-module-card <?= $pendingOrgsCount > 0 ? 'admin-module-card-gradient' : '' ?>">
+    <a href="<?= $basePath ?>/admin-legacy/volunteering/approvals" class="admin-module-card <?= $pendingOrgsCount > 0 ? 'admin-module-card-gradient' : '' ?>">
         <div class="admin-module-icon <?= $pendingOrgsCount > 0 ? 'admin-module-icon-gradient-orange' : 'admin-module-icon-orange' ?>">
             <i class="fa-solid fa-clipboard-check"></i>
         </div>
@@ -464,7 +464,7 @@ $activityLogs = $recentActivity->fetchAll();
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/volunteering/organizations" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/volunteering/organizations" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-emerald">
             <i class="fa-solid fa-building"></i>
         </div>
@@ -486,7 +486,7 @@ $activityLogs = $recentActivity->fetchAll();
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/categories" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/categories" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-violet">
             <i class="fa-solid fa-tags"></i>
         </div>

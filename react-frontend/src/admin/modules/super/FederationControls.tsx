@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Card, CardBody, CardHeader, Button, Switch, Chip, Divider, Input,
 } from '@heroui/react';
-import { Globe, Shield, Lock, Unlock, AlertTriangle, Network, Trash2, Plus } from 'lucide-react';
+import { Globe, Shield, Lock, Unlock, AlertTriangle, Network, Trash2, Plus, Activity } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, StatusBadge } from '../../components';
 import type { FederationSystemControls, FederationWhitelistEntry, FederationPartnership } from '../../api/types';
@@ -12,6 +13,7 @@ import type { FederationSystemControls, FederationWhitelistEntry, FederationPart
 export function FederationControls() {
   usePageTitle('Super Admin - Federation Controls');
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   const [controls, setControls] = useState<FederationSystemControls | null>(null);
   const [whitelist, setWhitelist] = useState<FederationWhitelistEntry[]>([]);
@@ -103,7 +105,26 @@ export function FederationControls() {
 
   return (
     <div>
-      <PageHeader title="Federation Control Center" description="System-level federation management" />
+      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <span>/</span>
+        <span className="text-foreground">Federation Controls</span>
+      </nav>
+      <PageHeader
+        title="Federation Control Center"
+        description="System-level federation management"
+        actions={
+          <Button
+            as={Link}
+            to={tenantPath('/admin/super/audit')}
+            variant="flat"
+            size="sm"
+            startContent={<Activity size={16} />}
+          >
+            Federation Audit Log
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* System Status */}
@@ -169,7 +190,12 @@ export function FederationControls() {
             </div>
             {whitelist.map((entry) => (
               <div key={entry.tenant_id} className="flex items-center justify-between py-1">
-                <span>{entry.tenant_name} <span className="text-xs text-default-400">(ID: {entry.tenant_id})</span></span>
+                <span>
+                  <Link to={tenantPath(`/admin/super/tenants/${entry.tenant_id}`)} className="hover:text-primary">
+                    {entry.tenant_name}
+                  </Link>
+                  {' '}<span className="text-xs text-default-400">(ID: {entry.tenant_id})</span>
+                </span>
                 <Button size="sm" variant="light" color="danger" isIconOnly onPress={() => handleRemoveWhitelist(entry.tenant_id)}>
                   <Trash2 size={14} />
                 </Button>
@@ -188,9 +214,13 @@ export function FederationControls() {
             {partnerships.map((p) => (
               <div key={p.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
                 <div>
-                  <span className="font-medium">{p.tenant_1_name}</span>
+                  <Link to={tenantPath(`/admin/super/tenants/${p.tenant_1_id}`)} className="font-medium hover:text-primary">
+                    {p.tenant_1_name}
+                  </Link>
                   <span className="text-default-400 mx-2">&harr;</span>
-                  <span className="font-medium">{p.tenant_2_name}</span>
+                  <Link to={tenantPath(`/admin/super/tenants/${p.tenant_2_id}`)} className="font-medium hover:text-primary">
+                    {p.tenant_2_name}
+                  </Link>
                   <StatusBadge status={p.status} />
                 </div>
                 {p.status === 'active' && (

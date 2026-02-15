@@ -344,6 +344,32 @@ export function DashboardPage() {
         animate="visible"
         className="space-y-6"
       >
+        {/* Onboarding Banner */}
+        {user && user.onboarding_completed === false && (
+          <motion.div variants={itemVariants}>
+            <GlassCard className="p-5 border-l-4 border-l-indigo-500">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <Sparkles className="w-6 h-6 text-indigo-500 flex-shrink-0" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-theme-primary">Complete your profile setup</p>
+                    <p className="text-sm text-theme-muted">Tell us about your interests and skills to get personalized matches</p>
+                  </div>
+                </div>
+                <Link to={tenantPath('/onboarding')}>
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    startContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    Get Started
+                  </Button>
+                </Link>
+              </div>
+            </GlassCard>
+          </motion.div>
+        )}
+
         {/* Welcome Header */}
         <motion.div variants={itemVariants}>
           <GlassCard className="p-6">
@@ -439,7 +465,7 @@ export function DashboardPage() {
                     {stats.recentListings.map((listing) => (
                       <article key={listing.id}>
                         <Link
-                          to={`/listings/${listing.id}`}
+                          to={tenantPath(`/listings/${listing.id}`)}
                           className="block p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
                           aria-label={`${listing.title} - ${listing.type === 'offer' ? 'Offering' : 'Requesting'}`}
                         >
@@ -610,7 +636,7 @@ export function DashboardPage() {
                         {stats.suggestedListings.map((listing) => (
                           <Link
                             key={listing.id}
-                            to={`/listings/${listing.id}`}
+                            to={tenantPath(`/listings/${listing.id}`)}
                             className="block p-3 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors group"
                             aria-label={`${listing.title} - ${listing.type === 'offer' ? 'Offer' : 'Request'}`}
                           >
@@ -678,7 +704,7 @@ export function DashboardPage() {
                       {stats.myGroups.map((group) => (
                         <Link
                           key={group.id}
-                          to={`/groups/${group.id}`}
+                          to={tenantPath(`/groups/${group.id}`)}
                           className="flex items-center gap-3 p-3 rounded-lg hover:bg-theme-hover transition-colors"
                         >
                           {group.image_url ? (
@@ -755,7 +781,7 @@ export function DashboardPage() {
                         return (
                           <Link
                             key={event.id}
-                            to={`/events/${event.id}`}
+                            to={tenantPath(`/events/${event.id}`)}
                             className="flex items-center gap-3 p-3 rounded-lg hover:bg-theme-hover transition-colors"
                           >
                             {/* Date badge */}
@@ -896,6 +922,7 @@ interface StatCardProps {
 }
 
 function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps) {
+  const { tenantPath } = useTenant();
   const colorClasses = {
     indigo: 'from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400',
     emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400',
@@ -904,7 +931,7 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
   };
 
   return (
-    <Link to={href} aria-label={`${label}: ${isLoading ? 'Loading' : value}`}>
+    <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? 'Loading' : value}`}>
       <GlassCard className="p-4 hover:scale-[1.02] transition-transform">
         <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-3`}>
           {icon}

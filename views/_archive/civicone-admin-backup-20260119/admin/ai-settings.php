@@ -131,7 +131,7 @@ $configuredProviders = count(array_filter($providers, fn($p) => $p['configured']
 <?php unset($_SESSION['flash_success']); ?>
 <?php endif; ?>
 
-<form action="<?= $basePath ?>/admin/ai-settings/save" method="POST">
+<form action="<?= $basePath ?>/admin-legacy/ai-settings/save" method="POST">
     <?= Csrf::input() ?>
 
     <!-- Main Content Grid -->
@@ -412,19 +412,19 @@ $configuredProviders = count(array_filter($providers, fn($p) => $p['configured']
                 </div>
                 <div class="admin-card-body">
                     <div class="ai-quick-actions-grid">
-                        <a href="<?= $basePath ?>/admin/smart-matching" class="ai-quick-action-card">
+                        <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="ai-quick-action-card">
                             <div class="ai-quick-action-icon ai-icon-pink">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                             </div>
                             <span>Smart Matching</span>
                         </a>
-                        <a href="<?= $basePath ?>/admin/feed-algorithm" class="ai-quick-action-card">
+                        <a href="<?= $basePath ?>/admin-legacy/feed-algorithm" class="ai-quick-action-card">
                             <div class="ai-quick-action-icon ai-icon-purple">
                                 <i class="fa-solid fa-sliders"></i>
                             </div>
                             <span>Feed Algorithm</span>
                         </a>
-                        <a href="<?= $basePath ?>/admin/algorithm-settings" class="ai-quick-action-card">
+                        <a href="<?= $basePath ?>/admin-legacy/algorithm-settings" class="ai-quick-action-card">
                             <div class="ai-quick-action-icon ai-icon-orange">
                                 <i class="fa-solid fa-gears"></i>
                             </div>
@@ -463,7 +463,7 @@ $configuredProviders = count(array_filter($providers, fn($p) => $p['configured']
 </div>
 
 <div class="admin-modules-grid">
-    <a href="<?= $basePath ?>/admin/ai-settings" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/ai-settings" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-indigo">
             <i class="fa-solid fa-microchip"></i>
         </div>
@@ -474,7 +474,7 @@ $configuredProviders = count(array_filter($providers, fn($p) => $p['configured']
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/smart-matching" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-pink">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
         </div>
@@ -485,7 +485,7 @@ $configuredProviders = count(array_filter($providers, fn($p) => $p['configured']
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/feed-algorithm" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/feed-algorithm" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-cyan">
             <i class="fa-solid fa-sliders"></i>
         </div>
@@ -496,7 +496,7 @@ $configuredProviders = count(array_filter($providers, fn($p) => $p['configured']
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/algorithm-settings" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/algorithm-settings" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-emerald">
             <i class="fa-solid fa-gears"></i>
         </div>
@@ -1363,7 +1363,7 @@ async function testCurrentProvider() {
     const selectedProvider = document.getElementById('providerSelect')?.value || 'gemini';
 
     try {
-        const response = await fetch('<?= $basePath ?>/admin/ai-settings/test', {
+        const response = await fetch('<?= $basePath ?>/admin-legacy/ai-settings/test', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

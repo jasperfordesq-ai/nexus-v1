@@ -29,7 +29,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/broker-controls" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Message Review
@@ -153,7 +153,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 
                     <div class="message-actions">
                         <?php if (empty($message['reviewed_at'])): ?>
-                        <form action="<?= $basePath ?>/admin/broker-controls/messages/<?= $message['id'] ?>/review" method="POST" style="display:inline;">
+                        <form action="<?= $basePath ?>/admin-legacy/broker-controls/messages/<?= $message['id'] ?>/review" method="POST" style="display:inline;">
                             <?= Csrf::input() ?>
                             <button type="submit" class="admin-btn admin-btn-success admin-btn-sm">
                                 <i class="fa-solid fa-check"></i> Mark Reviewed
@@ -167,7 +167,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                         </button>
                         <?php endif; ?>
 
-                        <a href="<?= $basePath ?>/admin/messages/thread/<?= $message['original_message_id'] ?? '' ?>"
+                        <a href="<?= $basePath ?>/admin-legacy/messages/thread/<?= $message['original_message_id'] ?? '' ?>"
                            class="admin-btn admin-btn-secondary admin-btn-sm" target="_blank">
                             <i class="fa-solid fa-external-link"></i> View Thread
                         </a>
@@ -226,7 +226,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 function showFlagModal(messageId) {
     const modal = document.getElementById('flagModal');
     const form = document.getElementById('flagForm');
-    form.action = '<?= $basePath ?>/admin/broker-controls/messages/' + messageId + '/flag';
+    form.action = '<?= $basePath ?>/admin-legacy/broker-controls/messages/' + messageId + '/flag';
     modal.style.display = 'flex';
 }
 

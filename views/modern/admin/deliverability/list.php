@@ -8,7 +8,7 @@ $adminPageTitle = 'All Deliverables';
 $adminPageSubtitle = 'Deliverability Tracking';
 $adminPageIcon = 'fa-list';
 
-require dirname(dirname(__DIR__)) . '/admin/partials/admin-header.php';
+require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-header.php';
 
 $deliverables = $deliverables ?? [];
 $totalCount = $totalCount ?? 0;
@@ -28,10 +28,10 @@ $users = $users ?? [];
         <p class="admin-page-subtitle">Manage and track project deliverables</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/deliverability" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-gauge-high"></i> Dashboard
         </a>
-        <a href="<?= $basePath ?>/admin/deliverability/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/deliverability/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> New Deliverable
         </a>
     </div>
@@ -64,7 +64,7 @@ $users = $users ?? [];
         </div>
     </div>
     <div class="admin-card-body">
-        <form method="GET" action="<?= $basePath ?>/admin/deliverability/list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <form method="GET" action="<?= $basePath ?>/admin-legacy/deliverability/list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
 
             <div class="form-group" style="margin: 0;">
                 <label for="status">Status</label>
@@ -122,7 +122,7 @@ $users = $users ?? [];
                 <button type="submit" class="admin-btn admin-btn-primary" style="flex: 1;">
                     <i class="fa-solid fa-search"></i> Apply Filters
                 </button>
-                <a href="<?= $basePath ?>/admin/deliverability/list" class="admin-btn admin-btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/deliverability/list" class="admin-btn admin-btn-secondary">
                     <i class="fa-solid fa-rotate-left"></i> Clear
                 </a>
             </div>
@@ -170,7 +170,7 @@ $users = $users ?? [];
                     Get started by creating your first deliverable.
                 <?php endif; ?>
             </p>
-            <a href="<?= $basePath ?>/admin/deliverability/create" class="admin-btn admin-btn-primary" style="margin-top: 16px;">
+            <a href="<?= $basePath ?>/admin-legacy/deliverability/create" class="admin-btn admin-btn-primary" style="margin-top: 16px;">
                 <i class="fa-solid fa-plus"></i> Create Deliverable
             </a>
         </div>
@@ -268,11 +268,11 @@ $users = $users ?? [];
                         </td>
                         <td style="text-align: right;">
                             <div class="admin-action-buttons">
-                                <a href="<?= $basePath ?>/admin/deliverability/view/<?= $deliverable['id'] ?>"
+                                <a href="<?= $basePath ?>/admin-legacy/deliverability/view/<?= $deliverable['id'] ?>"
                                    class="admin-btn admin-btn-secondary admin-btn-sm">
                                     <i class="fa-solid fa-eye"></i> View
                                 </a>
-                                <a href="<?= $basePath ?>/admin/deliverability/edit/<?= $deliverable['id'] ?>"
+                                <a href="<?= $basePath ?>/admin-legacy/deliverability/edit/<?= $deliverable['id'] ?>"
                                    class="admin-btn admin-btn-info admin-btn-sm">
                                     <i class="fa-solid fa-pen"></i> Edit
                                 </a>
@@ -288,7 +288,7 @@ $users = $users ?? [];
         <?php if ($totalPages > 1): ?>
         <div style="margin-top: 24px; display: flex; justify-content: center; align-items: center; gap: 8px;">
             <?php if ($page > 1): ?>
-            <a href="<?= $basePath ?>/admin/deliverability/list?page=<?= $page - 1 ?><?= !empty($filters) ? '&' . http_build_query($filters) : '' ?>"
+            <a href="<?= $basePath ?>/admin-legacy/deliverability/list?page=<?= $page - 1 ?><?= !empty($filters) ? '&' . http_build_query($filters) : '' ?>"
                class="admin-btn admin-btn-secondary admin-btn-sm">
                 <i class="fa-solid fa-chevron-left"></i> Previous
             </a>
@@ -299,7 +299,7 @@ $users = $users ?? [];
             </span>
 
             <?php if ($page < $totalPages): ?>
-            <a href="<?= $basePath ?>/admin/deliverability/list?page=<?= $page + 1 ?><?= !empty($filters) ? '&' . http_build_query($filters) : '' ?>"
+            <a href="<?= $basePath ?>/admin-legacy/deliverability/list?page=<?= $page + 1 ?><?= !empty($filters) ? '&' . http_build_query($filters) : '' ?>"
                class="admin-btn admin-btn-secondary admin-btn-sm">
                 Next <i class="fa-solid fa-chevron-right"></i>
             </a>
@@ -310,4 +310,4 @@ $users = $users ?? [];
     </div>
 </div>
 
-<?php require dirname(dirname(__DIR__)) . '/admin/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-footer.php'; ?>

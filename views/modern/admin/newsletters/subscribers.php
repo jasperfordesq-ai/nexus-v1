@@ -50,11 +50,11 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Manage your newsletter mailing list</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/newsletters" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back
         </a>
-        <a href="<?= $basePath ?>/admin/newsletters/subscribers/export" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/subscribers/export" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-download"></i>
             Export
         </a>
@@ -71,7 +71,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
 <!-- Stats Grid -->
 <div class="admin-stats-grid">
-    <a href="<?= $basePath ?>/admin/newsletters/subscribers" class="admin-stat-card admin-stat-indigo <?= !$currentStatus ? 'active' : '' ?>">
+    <a href="<?= $basePath ?>/admin-legacy/newsletters/subscribers" class="admin-stat-card admin-stat-indigo <?= !$currentStatus ? 'active' : '' ?>">
         <div class="admin-stat-icon"><i class="fa-solid fa-users"></i></div>
         <div class="admin-stat-content">
             <div class="admin-stat-value"><?= number_format($stats['total'] ?? 0) ?></div>
@@ -114,7 +114,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     <div class="sync-members-desc">Add all existing platform members to your subscriber list</div>
                 </div>
             </div>
-            <form action="<?= $basePath ?>/admin/newsletters/subscribers/sync" method="POST" style="margin: 0;">
+            <form action="<?= $basePath ?>/admin-legacy/newsletters/subscribers/sync" method="POST" style="margin: 0;">
                 <?= Csrf::input() ?>
                 <button type="submit" class="admin-btn admin-btn-primary">
                     <i class="fa-solid fa-sync"></i> Sync Now
@@ -137,7 +137,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <p class="admin-card-subtitle"><?= count($subscribers) ?> found</p>
         </div>
         <div class="admin-filter-pills">
-            <a href="<?= $basePath ?>/admin/newsletters/subscribers" class="admin-filter-pill <?= !$currentStatus ? 'active' : '' ?>">All</a>
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/subscribers" class="admin-filter-pill <?= !$currentStatus ? 'active' : '' ?>">All</a>
             <a href="?status=active" class="admin-filter-pill <?= $currentStatus === 'active' ? 'active-green' : '' ?>">Active</a>
             <a href="?status=pending" class="admin-filter-pill <?= $currentStatus === 'pending' ? 'active-orange' : '' ?>">Pending</a>
             <a href="?status=unsubscribed" class="admin-filter-pill <?= $currentStatus === 'unsubscribed' ? 'active-red' : '' ?>">Unsubscribed</a>
@@ -202,7 +202,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <span class="subscriber-date"><?= date('M j, Y', strtotime($sub['created_at'])) ?></span>
                         </td>
                         <td style="text-align: right;">
-                            <form action="<?= $basePath ?>/admin/newsletters/subscribers/delete" method="POST" style="display: inline;" onsubmit="return confirm('Remove this subscriber?');">
+                            <form action="<?= $basePath ?>/admin-legacy/newsletters/subscribers/delete" method="POST" style="display: inline;" onsubmit="return confirm('Remove this subscriber?');">
                                 <?= Csrf::input() ?>
                                 <input type="hidden" name="id" value="<?= $sub['id'] ?>">
                                 <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
@@ -281,7 +281,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
         </div>
 
-        <form action="<?= $basePath ?>/admin/newsletters/subscribers/add" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/newsletters/subscribers/add" method="POST">
             <?= Csrf::input() ?>
 
             <div class="admin-form-group">
@@ -325,7 +325,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
         </div>
 
-        <form action="<?= $basePath ?>/admin/newsletters/subscribers/import" method="POST" enctype="multipart/form-data">
+        <form action="<?= $basePath ?>/admin-legacy/newsletters/subscribers/import" method="POST" enctype="multipart/form-data">
             <?= Csrf::input() ?>
 
             <div class="admin-form-group">

@@ -16,7 +16,7 @@ $adminPageSubtitle = 'Optimization';
 $adminPageIcon = 'fa-image';
 
 // Include standalone admin header
-require __DIR__ . '/../modern/admin/partials/admin-header.php';
+require __DIR__ . '/../modern/admin-legacy/partials/admin-header.php';
 
 // Get current tenant configuration
 $tenant = TenantContext::get();
@@ -48,7 +48,7 @@ $saved = isset($_GET['saved']);
         <p class="admin-page-subtitle">Configure WebP conversion, quality settings, and automatic optimization</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/webp-converter" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/webp-converter" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-wand-magic-sparkles"></i> WebP Converter
         </a>
     </div>
@@ -112,7 +112,7 @@ $saved = isset($_GET['saved']);
 </div>
 
 <!-- Settings Form -->
-<form action="<?= $basePath ?>/admin/image-settings/save" method="POST">
+<form action="<?= $basePath ?>/admin-legacy/image-settings/save" method="POST">
     <?= Csrf::input() ?>
 
     <div class="settings-grid" style="max-width: 1200px;">
@@ -305,7 +305,7 @@ $saved = isset($_GET['saved']);
 
     <!-- Submit Button -->
     <div class="form-actions" style="max-width: 1200px;">
-        <a href="<?= $basePath ?>/admin/webp-converter" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/webp-converter" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to Converter
         </a>
         <button type="submit" class="admin-btn admin-btn-primary admin-btn-lg">
@@ -934,4 +934,4 @@ $saved = isset($_GET['saved']);
 })();
 </script>
 
-<?php require __DIR__ . '/../modern/admin/partials/admin-footer.php'; ?>
+<?php require __DIR__ . '/../modern/admin-legacy/partials/admin-footer.php'; ?>

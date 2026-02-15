@@ -29,7 +29,7 @@ $stats = $d['newsletter_stats'] ?? [];
 
         <!-- Navigation -->
         <div style="margin-bottom: 24px;">
-            <a href="<?= $basePath ?>/admin/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
                 <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
             </a>
         </div>
@@ -163,7 +163,7 @@ $stats = $d['newsletter_stats'] ?? [];
                             <strong style="color: #374151;">Fix Newsletter Status</strong>
                             <p style="margin: 4px 0 0; color: #6b7280; font-size: 0.85rem;">Update newsletters with sent_at date to have 'sent' status</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="fix_sent_status">
                             <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;">
@@ -178,7 +178,7 @@ $stats = $d['newsletter_stats'] ?? [];
                             <strong style="color: #374151;">Fix Total Sent Counts</strong>
                             <p style="margin: 4px 0 0; color: #6b7280; font-size: 0.85rem;">Set total_sent from total_recipients for sent newsletters</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="fix_total_sent">
                             <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;">
@@ -193,7 +193,7 @@ $stats = $d['newsletter_stats'] ?? [];
                             <strong style="color: #374151;">Initialize Tracking Columns</strong>
                             <p style="margin: 4px 0 0; color: #6b7280; font-size: 0.85rem;">Set NULL tracking columns (opens, clicks) to 0</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="init_tracking_columns">
                             <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;">
@@ -208,7 +208,7 @@ $stats = $d['newsletter_stats'] ?? [];
                             <strong style="color: #374151;">Create Tracking Tables</strong>
                             <p style="margin: 4px 0 0; color: #6b7280; font-size: 0.85rem;">Create newsletter_opens and newsletter_clicks tables if missing</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="create_tracking_tables">
                             <button type="submit" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;">
@@ -223,7 +223,7 @@ $stats = $d['newsletter_stats'] ?? [];
                             <strong style="color: #374151;">Add Tracking Columns</strong>
                             <p style="margin: 4px 0 0; color: #6b7280; font-size: 0.85rem;">Add total_opens, unique_opens, total_clicks, unique_clicks to newsletters table</p>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="add_tracking_columns">
                             <button type="submit" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;">
@@ -247,7 +247,7 @@ $stats = $d['newsletter_stats'] ?? [];
                                 </p>
                             <?php endif; ?>
                         </div>
-                        <form method="POST" action="<?= $basePath ?>/admin/newsletters/repair" style="margin: 0;">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="fix_stuck_sending">
                             <button type="submit" style="background: #f59e0b; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;">
@@ -271,7 +271,7 @@ $stats = $d['newsletter_stats'] ?? [];
                 <p style="color: #6b7280; margin-bottom: 16px; font-size: 0.9rem;">
                     Check why a group filter might be returning 0 recipients. Enter a group ID to see its members.
                 </p>
-                <form method="GET" action="<?= $basePath ?>/admin/newsletters/diagnostics" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <form method="GET" action="<?= $basePath ?>/admin-legacy/newsletters/diagnostics" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <input type="number" name="debug_group" placeholder="Group ID" value="<?= htmlspecialchars($_GET['debug_group'] ?? '') ?>" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; width: 120px;">
                     <button type="submit" style="background: #8b5cf6; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         Check Members

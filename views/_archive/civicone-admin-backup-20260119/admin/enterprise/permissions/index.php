@@ -301,10 +301,10 @@ $dangerousPerms = $db->query("SELECT COUNT(*) as c FROM permissions WHERE is_dan
         </p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/audit/permissions" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/audit/permissions" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-clipboard-list"></i> Audit Log
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/roles" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/roles" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-user-tag"></i> Manage Roles
         </a>
     </div>
@@ -385,7 +385,7 @@ $dangerousPerms = $db->query("SELECT COUNT(*) as c FROM permissions WHERE is_dan
         <button type="submit" class="admin-btn admin-btn-primary" style="white-space: nowrap;">
             <i class="fas fa-filter"></i> Apply
         </button>
-        <a href="<?= $basePath ?>/admin/enterprise/permissions" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/permissions" class="admin-btn admin-btn-secondary">
             <i class="fas fa-times"></i>
         </a>
     </div>

@@ -1,7 +1,7 @@
 <?php
 /**
  * Groups Policies Management
- * Path: views/modern/admin/groups/policies.php
+ * Path: views/modern/admin-legacy/groups/policies.php
  */
 
 use Nexus\Core\TenantContext;
@@ -24,7 +24,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Manage tenant-specific rules and policies</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/groups" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/groups" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back
         </a>
         <button class="admin-btn admin-btn-primary" onclick="document.getElementById('newPolicyModal').style.display='block'">
@@ -76,7 +76,7 @@ foreach ($categories as $cat => $label):
                         <button class="admin-btn admin-btn-sm admin-btn-secondary" onclick="editPolicy(<?= $policy['id'] ?>)">
                             <i class="fa-solid fa-edit"></i>
                         </button>
-                        <form method="POST" action="<?= $basePath ?>/admin/groups/policies" style="display:inline" onsubmit="return confirm('Delete this policy?')">
+                        <form method="POST" action="<?= $basePath ?>/admin-legacy/groups/policies" style="display:inline" onsubmit="return confirm('Delete this policy?')">
                             <?= Csrf::input() ?>
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="policy_id" value="<?= $policy['id'] ?>">
@@ -99,7 +99,7 @@ foreach ($categories as $cat => $label):
             <h3>Add New Policy</h3>
             <button class="admin-modal-close" onclick="document.getElementById('newPolicyModal').style.display='none'">&times;</button>
         </div>
-        <form method="POST" action="<?= $basePath ?>/admin/groups/policies">
+        <form method="POST" action="<?= $basePath ?>/admin-legacy/groups/policies">
             <?= Csrf::input() ?>
             <input type="hidden" name="action" value="create">
             <div class="admin-modal-body">

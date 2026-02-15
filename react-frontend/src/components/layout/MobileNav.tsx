@@ -120,8 +120,7 @@ export function MobileNavSection({ title, children }: MobileNavSectionProps) {
     <div className="mb-6">
       {title && (
         <h3
-          className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider"
-          style={{ color: 'var(--foreground-subtle)' }}
+          className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-theme-subtle"
         >
           {title}
         </h3>

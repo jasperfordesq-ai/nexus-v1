@@ -44,10 +44,10 @@ $currentPage = 'dashboard';
         <p class="admin-page-subtitle">Data protection & privacy management center</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Enterprise Hub
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> New Request
         </a>
     </div>
@@ -434,7 +434,7 @@ $currentPage = 'dashboard';
             <?php endif; ?>
         </div>
     </div>
-    <a href="<?= $basePath ?>/admin/enterprise/gdpr/<?= $activeBreaches > 0 ? 'breaches' : 'requests' ?>" class="enterprise-btn enterprise-btn-primary" style="flex-shrink: 0;">
+    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/<?= $activeBreaches > 0 ? 'breaches' : 'requests' ?>" class="enterprise-btn enterprise-btn-primary" style="flex-shrink: 0;">
         Review Now
     </a>
 </div>
@@ -514,7 +514,7 @@ $currentPage = 'dashboard';
             </div>
             <div class="mini-stat-footer">
                 <?php if ($activeBreaches > 0): ?>
-                    <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches">Immediate attention required</a>
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches">Immediate attention required</a>
                 <?php else: ?>
                     <span class="text-success">No active incidents</span>
                 <?php endif; ?>
@@ -527,13 +527,13 @@ $currentPage = 'dashboard';
 <div class="gdpr-card">
     <div class="gdpr-card-header">
         <h3><i class="fa-solid fa-bolt"></i> Quick Actions</h3>
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests" class="enterprise-btn enterprise-btn-secondary enterprise-btn-sm">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests" class="enterprise-btn enterprise-btn-secondary enterprise-btn-sm">
             View All Requests
         </a>
     </div>
     <div class="gdpr-card-body">
         <div class="quick-actions-grid">
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests" class="quick-action-card">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests" class="quick-action-card">
                 <div class="quick-action-icon">
                     <i class="fa-solid fa-inbox"></i>
                 </div>
@@ -546,7 +546,7 @@ $currentPage = 'dashboard';
                 <?php endif; ?>
             </a>
 
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/consents" class="quick-action-card">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/consents" class="quick-action-card">
                 <div class="quick-action-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
                     <i class="fa-solid fa-clipboard-check"></i>
                 </div>
@@ -556,7 +556,7 @@ $currentPage = 'dashboard';
                 </div>
             </a>
 
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches" class="quick-action-card">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches" class="quick-action-card">
                 <div class="quick-action-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
                     <i class="fa-solid fa-shield-exclamation"></i>
                 </div>
@@ -569,7 +569,7 @@ $currentPage = 'dashboard';
                 <?php endif; ?>
             </a>
 
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/audit" class="quick-action-card">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/audit" class="quick-action-card">
                 <div class="quick-action-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                 </div>
@@ -587,7 +587,7 @@ $currentPage = 'dashboard';
     <div class="gdpr-card">
         <div class="gdpr-card-header">
             <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h3>
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/audit" class="enterprise-btn enterprise-btn-secondary enterprise-btn-sm">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/audit" class="enterprise-btn enterprise-btn-secondary enterprise-btn-sm">
                 View All
             </a>
         </div>

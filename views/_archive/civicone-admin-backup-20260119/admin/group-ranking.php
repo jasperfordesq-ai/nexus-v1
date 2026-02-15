@@ -621,7 +621,7 @@ function updateFeaturedGroups() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
 
-    fetch('<?= $basePath ?>/admin/group-ranking/update', {
+    fetch('<?= $basePath ?>/admin-legacy/group-ranking/update', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -652,7 +652,7 @@ function togglePin(groupId, button) {
     button.disabled = true;
     button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
-    fetch('<?= $basePath ?>/admin/group-ranking/toggle', {
+    fetch('<?= $basePath ?>/admin-legacy/group-ranking/toggle', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

@@ -38,6 +38,7 @@ export interface User {
   organization_name?: string;
   has_2fa_enabled?: boolean;
   preferred_layout?: 'modern' | 'civicone';
+  onboarding_completed?: boolean;
   email_verified_at?: string | null;
   created_at?: string;
   updated_at?: string;
@@ -797,6 +798,7 @@ export interface TenantFeatures {
   search: boolean;
   exchange_workflow: boolean;
   direct_messaging: boolean;
+  group_exchanges: boolean;
 }
 
 export interface TenantModules {

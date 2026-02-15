@@ -9,7 +9,7 @@ REM ============================================================================
 setlocal enabledelayedexpansion
 
 REM Configuration
-set CONTAINER=nexus-mysql-db
+set CONTAINER=nexus-php-db
 set DB_NAME=nexus
 set DB_USER=root
 set DB_PASS=nexus_root_secret

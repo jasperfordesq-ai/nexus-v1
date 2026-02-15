@@ -377,7 +377,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Building: <?= htmlspecialchars($page['title']) ?></p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/pages" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/pages" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to Pages
         </a>
         <button id="save-btn" class="admin-btn admin-btn-primary">
@@ -737,7 +737,7 @@ document.getElementById('save-btn').addEventListener('click', async () => {
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
     try {
-        const response = await fetch(`${basePath}/admin/api/pages/${pageId}/blocks`, {
+        const response = await fetch(`${basePath}/admin-legacy/api/pages/${pageId}/blocks`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -814,7 +814,7 @@ async function savePageSettings() {
             menu_location: document.getElementById('page-menu-location').value
         };
 
-        const response = await fetch(`${basePath}/admin/api/pages/${pageId}/settings`, {
+        const response = await fetch(`${basePath}/admin-legacy/api/pages/${pageId}/settings`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

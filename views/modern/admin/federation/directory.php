@@ -38,11 +38,11 @@ $activePartners = count(array_filter($timebanks, fn($t) => ($t['partnership_stat
         <p class="admin-page-subtitle">Find timebanks to connect with and expand your community network</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/federation/directory/profile" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/directory/profile" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-user-edit"></i>
             My Listing
         </a>
-        <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-handshake"></i>
             Partnerships
         </a>
@@ -124,7 +124,7 @@ $activePartners = count(array_filter($timebanks, fn($t) => ($t['partnership_stat
         </div>
     </div>
     <div class="admin-card-body">
-        <form method="GET" action="<?= $basePath ?>/admin/federation/directory" class="directory-filters">
+        <form method="GET" action="<?= $basePath ?>/admin-legacy/federation/directory" class="directory-filters">
             <div class="filter-row">
                 <div class="filter-search">
                     <i class="fa-solid fa-search"></i>
@@ -165,7 +165,7 @@ $activePartners = count(array_filter($timebanks, fn($t) => ($t['partnership_stat
                 </button>
 
                 <?php if (!empty($filters['search']) || !empty($filters['region']) || !empty($filters['category']) || ($filters['exclude_partnered'] ?? false)): ?>
-                <a href="<?= $basePath ?>/admin/federation/directory" class="admin-btn admin-btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-btn admin-btn-secondary">
                     <i class="fa-solid fa-times"></i>
                     Clear
                 </a>
@@ -201,7 +201,7 @@ $activePartners = count(array_filter($timebanks, fn($t) => ($t['partnership_stat
                 <?php endif; ?>
             </p>
             <?php if (!empty($filters['search']) || !empty($filters['region']) || !empty($filters['category'])): ?>
-            <a href="<?= $basePath ?>/admin/federation/directory" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-times"></i> Clear Filters
             </a>
             <?php endif; ?>
@@ -295,7 +295,7 @@ $activePartners = count(array_filter($timebanks, fn($t) => ($t['partnership_stat
                 </div>
 
                 <div class="directory-card-actions">
-                    <a href="<?= $basePath ?>/admin/federation/directory/<?= $tb['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/federation/directory/<?= $tb['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                         <i class="fa-solid fa-eye"></i>
                         View
                     </a>
@@ -335,7 +335,7 @@ $activePartners = count(array_filter($timebanks, fn($t) => ($t['partnership_stat
         <div class="admin-alert-title">Your Timebank is Hidden</div>
         <div class="admin-alert-text">Your timebank is not visible in the federation directory. Other timebanks won't be able to find and request partnerships with you.</div>
     </div>
-    <a href="<?= $basePath ?>/admin/federation/directory/profile" class="admin-btn admin-btn-warning">
+    <a href="<?= $basePath ?>/admin-legacy/federation/directory/profile" class="admin-btn admin-btn-warning">
         <i class="fa-solid fa-eye"></i>
         Enable Listing
     </a>
@@ -1174,7 +1174,7 @@ function submitPartnershipRequest() {
     const federationLevel = document.getElementById('federationLevel').value;
     const message = document.getElementById('partnershipMessage').value;
 
-    fetch(basePath + '/admin/federation/directory/request-partnership', {
+    fetch(basePath + '/admin-legacy/federation/directory/request-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

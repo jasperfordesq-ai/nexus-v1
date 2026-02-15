@@ -3,12 +3,12 @@
 $layout = 'default';
 $isEdit = isset($post);
 $basePath = \Nexus\Core\TenantContext::getBasePath();
-$action = $isEdit ? $basePath . "/admin/blog/update/" . $post['id'] : $basePath . "/admin/blog/store";
+$action = $isEdit ? $basePath . "/admin-legacy/blog/update/" . $post['id'] : $basePath . "/admin-legacy/blog/store";
 ?>
 
 <div class="nexus-container" style="max-width: 800px;">
     <div style="margin-bottom: 30px;">
-        <a href="<?= $basePath ?>/admin/blog" class="nexus-link">&larr; Back to Articles</a>
+        <a href="<?= $basePath ?>/admin-legacy/blog" class="nexus-link">&larr; Back to Articles</a>
         <h1 style="margin-top: 10px;"><?= $isEdit ? 'Edit Article' : 'Write New Article' ?></h1>
     </div>
 
@@ -117,10 +117,10 @@ $action = $isEdit ? $basePath . "/admin/blog/update/" . $post['id'] : $basePath 
 
             <div style="display:flex; justify-content: flex-end; gap: 10px;">
                 <?php if ($isEdit): ?>
-                    <button type="button" onclick="if(confirm('Delete this post?')) location.href='<?= $basePath ?>/admin/blog/delete/<?= $post['id'] ?>'" class="nexus-btn-danger" style="margin-right: auto; background:none; color: red; border:none; cursor:pointer;">Delete Post</button>
+                    <button type="button" onclick="if(confirm('Delete this post?')) location.href='<?= $basePath ?>/admin-legacy/blog/delete/<?= $post['id'] ?>'" class="nexus-btn-danger" style="margin-right: auto; background:none; color: red; border:none; cursor:pointer;">Delete Post</button>
                 <?php endif; ?>
 
-                <a href="<?= $basePath ?>/admin/blog" class="nexus-btn-secondary">Cancel</a>
+                <a href="<?= $basePath ?>/admin-legacy/blog" class="nexus-btn-secondary">Cancel</a>
                 <button type="submit" class="nexus-btn-primary"><?= $isEdit ? 'Update Article' : 'Publish Article' ?></button>
             </div>
         </form>

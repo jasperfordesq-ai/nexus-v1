@@ -1,7 +1,7 @@
 <?php
 // Federation API Key Details - View Dispatcher
 $layout = layout();
-$modernView = __DIR__ . '/../../modern/admin/federation/api-keys-show.php';
+$modernView = __DIR__ . '/../../modern/admin-legacy/federation/api-keys-show.php';
 
 if (($layout === 'modern' || $layout === 'high-contrast') && file_exists($modernView)) {
     require $modernView;

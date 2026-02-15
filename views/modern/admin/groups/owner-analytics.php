@@ -1,7 +1,7 @@
 <?php
 /**
  * Admin Groups - Owner Analytics (Gold Standard)
- * Accessed via /admin/groups/view?id=X → Analytics Tab
+ * Accessed via /admin-legacy/groups/view?id=X → Analytics Tab
  */
 
 use Nexus\Core\TenantContext;
@@ -31,7 +31,7 @@ $group = $group ?? [];
         <p class="admin-page-subtitle">Comprehensive analytics dashboard</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/groups/view?id=<?= $group['id'] ?>" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/groups/view?id=<?= $group['id'] ?>" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Group
         </a>

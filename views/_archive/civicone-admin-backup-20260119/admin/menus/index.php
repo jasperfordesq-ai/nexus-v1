@@ -43,7 +43,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
             </ul>
         </details>
         <div style="margin-top: 1rem; display: flex; gap: 1rem;">
-            <a href="<?= $basePath ?>/admin/menus?enable_menu_manager=0" class="admin-btn admin-btn-danger admin-btn-sm">
+            <a href="<?= $basePath ?>/admin-legacy/menus?enable_menu_manager=0" class="admin-btn admin-btn-danger admin-btn-sm">
                 <i class="fa-solid fa-power-off"></i> Disable Menu Manager (Use Original Navigation)
             </a>
             <a href="<?= $basePath ?>/admin" class="admin-btn admin-btn-secondary admin-btn-sm">
@@ -66,7 +66,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
         </p>
         <?php if (!empty($menuManagerConfig['allow_admin_override'])): ?>
         <div style="margin-top: 1rem;">
-            <a href="<?= $basePath ?>/admin/menus?enable_menu_manager=1" class="admin-btn admin-btn-warning admin-btn-sm">
+            <a href="<?= $basePath ?>/admin-legacy/menus?enable_menu_manager=1" class="admin-btn admin-btn-warning admin-btn-sm">
                 <i class="fa-solid fa-flask"></i> Enable Menu Manager (Experimental - Testing Only)
             </a>
             <span style="margin-left: 1rem; color: #f59e0b;">
@@ -92,7 +92,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
     </div>
     <div class="page-hero-actions">
         <?php if ($can_create_more['allowed']): ?>
-            <a href="<?= $basePath ?>/admin/menus/create" class="admin-btn admin-btn-primary">
+            <a href="<?= $basePath ?>/admin-legacy/menus/create" class="admin-btn admin-btn-primary">
                 <i class="fa-solid fa-plus"></i> New Menu
             </a>
         <?php else: ?>
@@ -174,7 +174,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
             <h3 class="admin-empty-title">No Menus Yet</h3>
             <p class="admin-empty-text">Create your first navigation menu to get started.</p>
             <?php if ($can_create_more['allowed']): ?>
-            <a href="<?= $basePath ?>/admin/menus/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/menus/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-plus"></i> Create First Menu
             </a>
             <?php endif; ?>
@@ -226,7 +226,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
                     </div>
                 </div>
                 <div class="menu-actions">
-                    <a href="<?= $basePath ?>/admin/menus/builder/<?= $menu['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/menus/builder/<?= $menu['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                         <i class="fa-solid fa-edit"></i> Edit
                     </a>
                     <?php if ($menu['is_active']): ?>
@@ -560,7 +560,7 @@ function toggleMenuStatus(menuId, menuName, isActivating) {
         return;
     }
 
-    fetch('<?= $basePath ?>/admin/menus/toggle/' + menuId, {
+    fetch('<?= $basePath ?>/admin-legacy/menus/toggle/' + menuId, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -585,7 +585,7 @@ function deleteMenu(menuId, menuName) {
         return;
     }
 
-    fetch('<?= $basePath ?>/admin/menus/delete/' + menuId, {
+    fetch('<?= $basePath ?>/admin-legacy/menus/delete/' + menuId, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'

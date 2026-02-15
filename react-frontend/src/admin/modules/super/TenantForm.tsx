@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Card,
   CardBody,
@@ -174,7 +174,13 @@ export function TenantForm() {
 
       if (res.success) {
         toast.success(`Tenant ${isEdit ? 'updated' : 'created'} successfully`);
-        navigate(tenantPath('/admin/super/tenants'));
+        if (isEdit) {
+          navigate(tenantPath(`/admin/super/tenants/${id}`));
+        } else {
+          // Navigate to the new tenant's show page if ID is returned, otherwise go to list
+          const newId = (res as { data?: { id?: number } }).data?.id;
+          navigate(tenantPath(newId ? `/admin/super/tenants/${newId}` : '/admin/super/tenants'));
+        }
       } else {
         toast.error(res.error || `Failed to ${isEdit ? 'update' : 'create'} tenant`);
       }
@@ -194,6 +200,13 @@ export function TenantForm() {
 
   return (
     <div>
+      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <span>/</span>
+        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">Tenants</Link>
+        <span>/</span>
+        <span className="text-foreground">{isEdit ? 'Edit' : 'Create'}</span>
+      </nav>
       <PageHeader
         title={isEdit ? `Edit Tenant: ${form.name}` : 'Create Tenant'}
         description={isEdit ? 'Update tenant configuration' : 'Set up a new community tenant'}
@@ -202,7 +215,7 @@ export function TenantForm() {
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}
-              onPress={() => navigate(tenantPath('/admin/super/tenants'))}
+              onPress={() => navigate(tenantPath(isEdit ? `/admin/super/tenants/${id}` : '/admin/super/tenants'))}
             >
               Back
             </Button>

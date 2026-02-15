@@ -1,3 +1,3 @@
 <?php
 
-require __DIR__ . '/../../modern/admin/volunteering/organizations.php';
+require __DIR__ . '/../../modern/admin-legacy/volunteering/organizations.php';

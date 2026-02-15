@@ -24,7 +24,7 @@ unset($_SESSION['form_data'], $_SESSION['form_errors']);
 
 <!-- Breadcrumb -->
 <nav class="admin-breadcrumb">
-    <a href="<?= $basePath ?>/admin/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
 </nav>
 
 <!-- Page Header -->
@@ -52,7 +52,7 @@ unset($_SESSION['form_data'], $_SESSION['form_errors']);
 </div>
 <?php endif; ?>
 
-<form action="<?= $basePath ?>/admin/legal-documents" method="POST" class="legal-form">
+<form action="<?= $basePath ?>/admin-legacy/legal-documents" method="POST" class="legal-form">
     <?= Csrf::input() ?>
 
     <div class="admin-form-grid">
@@ -174,7 +174,7 @@ unset($_SESSION['form_data'], $_SESSION['form_errors']);
                 <button type="submit" class="admin-btn admin-btn-primary admin-btn-lg admin-btn-full">
                     <i class="fa-solid fa-save"></i> Create Document
                 </button>
-                <a href="<?= $basePath ?>/admin/legal-documents" class="admin-btn admin-btn-secondary admin-btn-full">
+                <a href="<?= $basePath ?>/admin-legacy/legal-documents" class="admin-btn admin-btn-secondary admin-btn-full">
                     <i class="fa-solid fa-times"></i> Cancel
                 </a>
             </div>

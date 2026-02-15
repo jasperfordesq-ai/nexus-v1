@@ -19,7 +19,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
 <!-- Breadcrumb -->
 <nav class="admin-breadcrumb">
-    <a href="<?= $basePath ?>/admin/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
 </nav>
 
 <!-- Page Header -->
@@ -136,10 +136,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </div>
 
                 <div class="compliance-doc-actions">
-                    <a href="<?= $basePath ?>/admin/legal-documents/<?= $doc['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $doc['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                         <i class="fa-solid fa-eye"></i> View
                     </a>
-                    <a href="<?= $basePath ?>/admin/legal-documents/<?= $doc['id'] ?>/export" class="admin-btn admin-btn-secondary admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $doc['id'] ?>/export" class="admin-btn admin-btn-secondary admin-btn-sm">
                         <i class="fa-solid fa-download"></i> Export
                     </a>
                 </div>
@@ -156,7 +156,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
         <h3 class="admin-empty-title">No Compliance Data Yet</h3>
         <p class="admin-empty-text">Create legal documents and publish versions to start tracking user acceptance.</p>
-        <a href="<?= $basePath ?>/admin/legal-documents/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+        <a href="<?= $basePath ?>/admin-legacy/legal-documents/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
             <i class="fa-solid fa-plus"></i> Create First Document
         </a>
     </div>

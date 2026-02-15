@@ -2,7 +2,7 @@
 /**
  * Risk Tag Form - CivicOne Theme (GOV.UK)
  * Add or edit risk tag for a listing
- * Path: views/civicone/admin/broker-controls/risk-tags/form.php
+ * Path: views/civicone/admin-legacy/broker-controls/risk-tags/form.php
  */
 
 use Nexus\Core\TenantContext;
@@ -33,7 +33,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
-        <a href="<?= $basePath ?>/admin/broker-controls/risk-tags" class="govuk-back-link">Back to Risk Tags</a>
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags" class="govuk-back-link">Back to Risk Tags</a>
 
         <h1 class="govuk-heading-xl"><?= $isEdit ? 'Edit' : 'Add' ?> Risk Tag</h1>
 
@@ -80,7 +80,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
         </div>
 
         <!-- Risk Tag Form -->
-        <form method="POST" action="<?= $basePath ?>/admin/broker-controls/risk-tags/<?= $listing['id'] ?? '' ?>">
+        <form method="POST" action="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags/<?= $listing['id'] ?? '' ?>">
             <?= Csrf::input() ?>
 
             <div class="govuk-form-group">
@@ -159,7 +159,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                 <button type="submit" class="govuk-button" data-module="govuk-button">
                     <?= $isEdit ? 'Update risk tag' : 'Save risk tag' ?>
                 </button>
-                <a href="<?= $basePath ?>/admin/broker-controls/risk-tags" class="govuk-link">Cancel</a>
+                <a href="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags" class="govuk-link">Cancel</a>
             </div>
 
         </form>

@@ -594,7 +594,7 @@ export function FederationMessagesPage() {
                                 className="ring-2 ring-theme-default"
                               />
                               {thread.unreadCount > 0 && (
-                                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-indigo-500 rounded-full border-2 border-theme-card" />
+                                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-indigo-500 rounded-full border-2 border-theme-default" />
                               )}
                             </div>
 
@@ -845,7 +845,7 @@ export function FederationMessagesPage() {
         onClose={closeCompose}
         size="lg"
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-4',
           footer: 'border-t border-theme-default',

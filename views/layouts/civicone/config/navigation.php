@@ -213,7 +213,7 @@ class Navigation {
             ],
             'admin' => [
                 'label' => 'Admin',
-                'url' => \Nexus\Services\LayoutHelper::preserveLayoutInUrl($basePath . '/admin'),
+                'url' => \Nexus\Services\LayoutHelper::preserveLayoutInUrl($basePath . '/admin-legacy'),
                 'icon' => 'fa-solid fa-shield-halved',
                 'dashicon' => 'dashicons-shield',
                 'color' => '#ea580c',

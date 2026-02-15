@@ -47,7 +47,7 @@ class SeoController
         // Clear SEO cache after saving
         \Nexus\Core\SEO::clearCache();
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/seo?saved=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/seo?saved=1');
     }
 
     /**
@@ -254,7 +254,7 @@ class SeoController
             SeoRedirect::create($sourceUrl, $destinationUrl);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/seo/redirects?saved=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/seo/redirects?saved=1');
     }
 
     /**
@@ -270,7 +270,7 @@ class SeoController
             SeoRedirect::delete($id);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/seo/redirects?deleted=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/seo/redirects?deleted=1');
     }
 
     /**
@@ -341,7 +341,7 @@ class SeoController
             $params
         );
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/seo/organization?saved=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/seo/organization?saved=1');
     }
 
     /**

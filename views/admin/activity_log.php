@@ -1,15 +1,15 @@
 <?php
 // Activity Log Dispatcher
-// Path: views/admin/activity_log.php
+// Path: views/admin-legacy/activity_log.php
 
 // Force Modern Layout or use Session
 // FIXED: Use consistent session variable order (active_layout first)
 $layout = layout(); // Fixed: centralized detection
 
 // Target Path Resolution
-// Current Dir: views/admin/
-// Target: views/modern/admin/activity_log.php
-$modernView = __DIR__ . '/../modern/admin/activity_log.php';
+// Current Dir: views/admin-legacy/
+// Target: views/modern/admin-legacy/activity_log.php
+$modernView = __DIR__ . '/../modern/admin-legacy/activity_log.php';
 
 if (($layout === 'modern' || $layout === 'high-contrast') && file_exists($modernView)) {
     require $modernView;

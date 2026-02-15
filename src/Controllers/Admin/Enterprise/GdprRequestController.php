@@ -25,7 +25,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr
+     * GET /admin-legacy/enterprise/gdpr
      * GDPR compliance dashboard
      */
     public function dashboard(): void
@@ -43,7 +43,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/requests
+     * GET /admin-legacy/enterprise/gdpr/requests
      * List all GDPR requests
      */
     public function index(): void
@@ -83,7 +83,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/requests/{id}
+     * GET /admin-legacy/enterprise/gdpr/requests/{id}
      * View single GDPR request
      */
     public function show(int $id): void
@@ -92,7 +92,7 @@ class GdprRequestController extends BaseEnterpriseController
 
         if (!$request) {
             $_SESSION['flash_error'] = 'Request not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/requests');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/requests');
             exit;
         }
 
@@ -103,7 +103,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/requests/new
+     * GET /admin-legacy/enterprise/gdpr/requests/new
      * Form to create a new GDPR request (admin-initiated)
      */
     public function create(): void
@@ -115,7 +115,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests
+     * POST /admin-legacy/enterprise/gdpr/requests
      * Store a new GDPR request
      */
     public function store(): void
@@ -152,7 +152,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/process
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/process
      * Start processing a GDPR request
      */
     public function process(int $id): void
@@ -194,7 +194,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/reject
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/reject
      * Reject a GDPR request
      */
     public function reject(int $id): void
@@ -221,7 +221,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/complete
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/complete
      * Mark a GDPR request as completed
      */
     public function complete(int $id): void
@@ -247,7 +247,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/assign
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/assign
      * Assign a GDPR request to an admin
      */
     public function assign(int $id): void
@@ -279,7 +279,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/notes
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/notes
      * Add a note to a GDPR request
      */
     public function addNote(int $id): void
@@ -314,7 +314,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/generate-export
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/generate-export
      * Generate data export for a user
      */
     public function generateExport(int $id): void
@@ -346,7 +346,7 @@ class GdprRequestController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/bulk-process
+     * POST /admin-legacy/enterprise/gdpr/requests/bulk-process
      * Bulk process multiple GDPR requests
      */
     public function bulkProcess(): void

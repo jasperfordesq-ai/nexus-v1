@@ -1309,7 +1309,7 @@ export function SettingsPage() {
         isOpen={passwordModal.isOpen}
         onClose={passwordModal.onClose}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -1386,7 +1386,7 @@ export function SettingsPage() {
         isOpen={logoutModal.isOpen}
         onClose={logoutModal.onClose}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -1418,7 +1418,7 @@ export function SettingsPage() {
         isOpen={deleteModal.isOpen}
         onClose={deleteModal.onClose}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -1475,7 +1475,7 @@ export function SettingsPage() {
         onClose={twoFactorSetupModal.onClose}
         size="lg"
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -1546,7 +1546,7 @@ export function SettingsPage() {
         isOpen={twoFactorDisableModal.isOpen}
         onClose={twoFactorDisableModal.onClose}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -1596,7 +1596,7 @@ export function SettingsPage() {
         onClose={backupCodesModal.onClose}
         size="lg"
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -1651,7 +1651,7 @@ export function SettingsPage() {
         isOpen={gdprModal.isOpen}
         onClose={gdprModal.onClose}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',

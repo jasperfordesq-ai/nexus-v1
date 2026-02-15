@@ -188,7 +188,7 @@ class ListingController
         Database::query("DELETE FROM `$table` WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         // 4. Redirect back
-        $redirect = UrlHelper::safeReferer('/admin/listings?status=deleted');
+        $redirect = UrlHelper::safeReferer('/admin-legacy/listings?status=deleted');
         header("Location: $redirect");
         exit;
     }
@@ -216,7 +216,7 @@ class ListingController
         );
 
         // Redirect back to pending review
-        $redirect = UrlHelper::safeReferer('/admin/listings?status=pending');
+        $redirect = UrlHelper::safeReferer('/admin-legacy/listings?status=pending');
         header("Location: $redirect");
         exit;
     }

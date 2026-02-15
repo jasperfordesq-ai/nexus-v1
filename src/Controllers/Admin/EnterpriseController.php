@@ -50,7 +50,7 @@ class EnterpriseController
     // =========================================================================
 
     /**
-     * GET /admin/enterprise
+     * GET /admin-legacy/enterprise
      * Main enterprise dashboard
      */
     public function dashboard(): void
@@ -74,7 +74,7 @@ class EnterpriseController
     // =========================================================================
 
     /**
-     * GET /admin/enterprise/gdpr
+     * GET /admin-legacy/enterprise/gdpr
      * GDPR compliance dashboard
      */
     public function gdprDashboard(): void
@@ -94,7 +94,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/requests
+     * GET /admin-legacy/enterprise/gdpr/requests
      * List all GDPR requests
      */
     public function gdprRequests(): void
@@ -137,7 +137,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/requests/{id}
+     * GET /admin-legacy/enterprise/gdpr/requests/{id}
      * View single GDPR request
      */
     public function gdprRequestView(int $id): void
@@ -146,7 +146,7 @@ class EnterpriseController
 
         if (!$request) {
             $_SESSION['flash_error'] = 'Request not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/requests');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/requests');
             exit;
         }
 
@@ -159,7 +159,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/process
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/process
      * Start processing a GDPR request
      */
     public function gdprRequestProcess(int $id): void
@@ -202,7 +202,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/reject
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/reject
      * Reject a GDPR request
      */
     public function gdprRequestReject(int $id): void
@@ -229,7 +229,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/consents
+     * GET /admin-legacy/enterprise/gdpr/consents
      * Manage consent types with full statistics
      */
     public function gdprConsents(): void
@@ -373,7 +373,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/breaches
+     * GET /admin-legacy/enterprise/gdpr/breaches
      * Data breach log
      */
     public function gdprBreaches(): void
@@ -426,7 +426,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/breaches/{id}
+     * GET /admin-legacy/enterprise/gdpr/breaches/{id}
      * View single breach details
      */
     public function gdprBreachView(int $id): void
@@ -438,7 +438,7 @@ class EnterpriseController
 
         if (!$breach) {
             $_SESSION['flash_error'] = 'Breach not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/breaches');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/breaches');
             exit;
         }
 
@@ -451,7 +451,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/breaches/{id}/escalate
+     * POST /admin-legacy/enterprise/gdpr/breaches/{id}/escalate
      * Escalate a breach to incident response team
      */
     public function gdprBreachEscalate(int $id): void
@@ -487,7 +487,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/breaches/report
+     * GET /admin-legacy/enterprise/gdpr/breaches/report
      * Show breach report form
      */
     public function gdprBreachReportForm(): void
@@ -500,7 +500,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/breaches
+     * POST /admin-legacy/enterprise/gdpr/breaches
      * Report a new data breach
      */
     public function gdprBreachReport(): void
@@ -524,7 +524,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/audit
+     * GET /admin-legacy/enterprise/gdpr/audit
      * GDPR audit log
      */
     public function gdprAuditLog(): void
@@ -552,7 +552,7 @@ class EnterpriseController
     // =========================================================================
 
     /**
-     * GET /admin/enterprise/monitoring
+     * GET /admin-legacy/enterprise/monitoring
      * System monitoring dashboard
      */
     public function monitoring(): void
@@ -568,7 +568,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/requirements
+     * GET /admin-legacy/enterprise/monitoring/requirements
      * Platform requirements checker
      */
     public function requirements(): void
@@ -582,7 +582,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/health
+     * GET /admin-legacy/enterprise/monitoring/health
      * Health check endpoint - returns JSON for AJAX, renders view for browser
      */
     public function healthCheck(): void
@@ -667,7 +667,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/logs
+     * GET /admin-legacy/enterprise/monitoring/logs
      * View application logs
      */
     public function logs(): void
@@ -701,7 +701,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/logs/{filename}
+     * GET /admin-legacy/enterprise/monitoring/logs/{filename}
      * View specific log file
      */
     public function logView(string $filename): void
@@ -735,7 +735,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/monitoring/logs/download
+     * GET /admin-legacy/enterprise/monitoring/logs/download
      * Download log file(s)
      */
     public function logsDownload(): void
@@ -784,7 +784,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/monitoring/logs/clear
+     * POST /admin-legacy/enterprise/monitoring/logs/clear
      * Clear a log file
      */
     public function logsClear(): void
@@ -822,7 +822,7 @@ class EnterpriseController
     // =========================================================================
 
     /**
-     * GET /admin/enterprise/config
+     * GET /admin-legacy/enterprise/config
      * System configuration dashboard
      */
     public function config(): void
@@ -843,7 +843,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/config/secrets
+     * GET /admin-legacy/enterprise/config/secrets
      * Secrets management interface
      */
     public function secrets(): void
@@ -864,7 +864,7 @@ class EnterpriseController
     // =========================================================================
 
     /**
-     * GET /admin/enterprise/gdpr/requests/new
+     * GET /admin-legacy/enterprise/gdpr/requests/new
      * Form to create a new GDPR request (admin-initiated)
      */
     public function gdprRequestCreate(): void
@@ -878,7 +878,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests
+     * POST /admin-legacy/enterprise/gdpr/requests
      * Store a new GDPR request
      */
     public function gdprRequestStore(): void
@@ -915,7 +915,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/complete
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/complete
      * Mark a GDPR request as completed
      */
     public function gdprRequestComplete(int $id): void
@@ -941,7 +941,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/assign
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/assign
      * Assign a GDPR request to an admin
      */
     public function gdprRequestAssign(int $id): void
@@ -973,7 +973,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/notes
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/notes
      * Add a note to a GDPR request
      */
     public function gdprRequestAddNote(int $id): void
@@ -1008,7 +1008,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/{id}/generate-export
+     * POST /admin-legacy/enterprise/gdpr/requests/{id}/generate-export
      * Generate data export for a user
      */
     public function gdprGenerateExport(int $id): void
@@ -1040,7 +1040,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/requests/bulk-process
+     * POST /admin-legacy/enterprise/gdpr/requests/bulk-process
      * Bulk process multiple GDPR requests
      */
     public function gdprBulkProcess(): void
@@ -1106,7 +1106,7 @@ class EnterpriseController
     // =========================================================================
 
     /**
-     * POST /admin/enterprise/gdpr/consents/types
+     * POST /admin-legacy/enterprise/gdpr/consents/types
      * Create or update a consent type
      */
     public function gdprConsentTypeStore(): void
@@ -1177,7 +1177,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/consents/backfill
+     * POST /admin-legacy/enterprise/gdpr/consents/backfill
      * Backfill consent records for existing users who don't have them
      * This creates records with consent_given=0, prompting users to accept on next login
      */
@@ -1189,7 +1189,7 @@ class EnterpriseController
 
         if (empty($consentType)) {
             $_SESSION['flash_error'] = 'Please select a consent type to backfill.';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/consents');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
             exit;
         }
 
@@ -1231,12 +1231,12 @@ class EnterpriseController
             $_SESSION['flash_error'] = 'Backfill failed: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/consents');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
         exit;
     }
 
     /**
-     * GET /admin/enterprise/gdpr/consents/{id}
+     * GET /admin-legacy/enterprise/gdpr/consents/{id}
      * View consent type details and user consents
      */
     public function gdprConsentDetail(int $id): void
@@ -1248,7 +1248,7 @@ class EnterpriseController
 
         if (!$consentType) {
             $_SESSION['flash_error'] = 'Consent type not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/consents');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
             exit;
         }
 
@@ -1273,7 +1273,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/consents/export
+     * GET /admin-legacy/enterprise/gdpr/consents/export
      * Export all consent records
      */
     public function gdprConsentsExport(): void
@@ -1320,7 +1320,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/consents/tenant-version
+     * POST /admin-legacy/enterprise/gdpr/consents/tenant-version
      * Update tenant-specific consent version (triggers re-consent for users)
      */
     public function gdprUpdateTenantConsentVersion(): void
@@ -1372,7 +1372,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/consents/tenant-versions
+     * GET /admin-legacy/enterprise/gdpr/consents/tenant-versions
      * Get tenant's consent version overrides
      */
     public function gdprGetTenantConsentVersions(): void
@@ -1403,7 +1403,7 @@ class EnterpriseController
     }
 
     /**
-     * DELETE /admin/enterprise/gdpr/consents/tenant-version/{slug}
+     * DELETE /admin-legacy/enterprise/gdpr/consents/tenant-version/{slug}
      * Remove tenant override (revert to global version)
      */
     public function gdprRemoveTenantConsentVersion(string $slug): void
@@ -1427,7 +1427,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/audit/export
+     * GET /admin-legacy/enterprise/gdpr/audit/export
      * Export GDPR audit log
      */
     public function gdprAuditExport(): void
@@ -1474,7 +1474,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/export-report
+     * POST /admin-legacy/enterprise/gdpr/export-report
      * Generate comprehensive GDPR compliance report
      */
     public function gdprExportReport(): void
@@ -1517,7 +1517,7 @@ class EnterpriseController
     // =========================================================================
 
     /**
-     * POST /admin/enterprise/config/settings/{group}/{key}
+     * POST /admin-legacy/enterprise/config/settings/{group}/{key}
      * Update a configuration setting
      */
     public function configSettingUpdate(string $group, string $key): void
@@ -1555,7 +1555,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/config/export
+     * GET /admin-legacy/enterprise/config/export
      * Export current configuration
      */
     public function configExport(): void
@@ -1573,7 +1573,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/cache/clear
+     * POST /admin-legacy/enterprise/config/cache/clear
      * Clear configuration cache
      */
     public function configCacheClear(): void
@@ -1592,7 +1592,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/config/validate
+     * GET /admin-legacy/enterprise/config/validate
      * Validate current configuration
      */
     public function configValidate(): void
@@ -1639,7 +1639,7 @@ class EnterpriseController
     }
 
     /**
-     * PATCH /admin/enterprise/config/features/{key}
+     * PATCH /admin-legacy/enterprise/config/features/{key}
      * Toggle a feature flag
      */
     public function featureFlagToggle(string $key): void
@@ -1667,7 +1667,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/features/reset
+     * POST /admin-legacy/enterprise/config/features/reset
      * Reset all feature flags to defaults (removes from database)
      */
     public function featureFlagsReset(): void
@@ -1694,7 +1694,7 @@ class EnterpriseController
     // =========================================================================
 
     /**
-     * POST /admin/enterprise/config/secrets
+     * POST /admin-legacy/enterprise/config/secrets
      * Store a new secret (when Vault is available)
      */
     public function secretStore(): void
@@ -1730,7 +1730,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/secrets/{key}/value
+     * POST /admin-legacy/enterprise/config/secrets/{key}/value
      * Retrieve a secret value (requires additional authentication)
      */
     public function secretView(string $key): void
@@ -1756,7 +1756,7 @@ class EnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/secrets/{key}/rotate
+     * POST /admin-legacy/enterprise/config/secrets/{key}/rotate
      * Rotate a secret (generate new value)
      */
     public function secretRotate(string $key): void
@@ -1781,7 +1781,7 @@ class EnterpriseController
     }
 
     /**
-     * DELETE /admin/enterprise/config/secrets/{key}
+     * DELETE /admin-legacy/enterprise/config/secrets/{key}
      * Delete a secret
      */
     public function secretDelete(string $key): void
@@ -1805,7 +1805,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/config/vault/test
+     * GET /admin-legacy/enterprise/config/vault/test
      * Test Vault connectivity
      */
     public function vaultTest(): void
@@ -2972,7 +2972,7 @@ class EnterpriseController
     // =========================================================================
 
     /**
-     * GET /admin/api/realtime
+     * GET /admin-legacy/api/realtime
      * Server-Sent Events endpoint for real-time updates
      *
      * NOTE: SSE endpoint is currently DISABLED due to server hanging issues.
@@ -2984,14 +2984,14 @@ class EnterpriseController
     public function realtimeStream(): void
     {
         // SSE DISABLED: Server-Sent Events were causing server hanging issues
-        // Frontend now uses polling endpoint (/admin/api/realtime/poll) instead
+        // Frontend now uses polling endpoint (/admin-legacy/api/realtime/poll) instead
         header('Content-Type: application/json');
         http_response_code(503);
         echo json_encode([
             'error' => 'Real-time streaming disabled',
-            'message' => 'SSE endpoint is disabled. Using polling endpoint at /admin/api/realtime/poll',
+            'message' => 'SSE endpoint is disabled. Using polling endpoint at /admin-legacy/api/realtime/poll',
             'use_polling' => true,
-            'polling_endpoint' => '/admin/api/realtime/poll'
+            'polling_endpoint' => '/admin-legacy/api/realtime/poll'
         ]);
         return;
 
@@ -3057,7 +3057,7 @@ class EnterpriseController
     }
 
     /**
-     * GET /admin/api/realtime/poll
+     * GET /admin-legacy/api/realtime/poll
      * Polling fallback endpoint for browsers without SSE support
      */
     public function realtimePoll(): void

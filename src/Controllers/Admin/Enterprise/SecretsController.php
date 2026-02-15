@@ -23,7 +23,7 @@ class SecretsController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/config/secrets
+     * GET /admin-legacy/enterprise/config/secrets
      * Secrets management interface
      */
     public function index(): void
@@ -38,7 +38,7 @@ class SecretsController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/secrets
+     * POST /admin-legacy/enterprise/config/secrets
      * Store a new secret (when Vault is available)
      */
     public function store(): void
@@ -71,7 +71,7 @@ class SecretsController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/secrets/{key}/value
+     * POST /admin-legacy/enterprise/config/secrets/{key}/value
      * Retrieve a secret value
      */
     public function view(string $key): void
@@ -96,7 +96,7 @@ class SecretsController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/config/secrets/{key}/rotate
+     * POST /admin-legacy/enterprise/config/secrets/{key}/rotate
      * Rotate a secret
      */
     public function rotate(string $key): void
@@ -119,7 +119,7 @@ class SecretsController extends BaseEnterpriseController
     }
 
     /**
-     * DELETE /admin/enterprise/config/secrets/{key}
+     * DELETE /admin-legacy/enterprise/config/secrets/{key}
      * Delete a secret
      */
     public function delete(string $key): void
@@ -142,7 +142,7 @@ class SecretsController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/config/vault/test
+     * GET /admin-legacy/enterprise/config/vault/test
      * Test Vault connectivity
      */
     public function testVault(): void

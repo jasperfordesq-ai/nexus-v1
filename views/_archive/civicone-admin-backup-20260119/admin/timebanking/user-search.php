@@ -24,7 +24,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <h2>Find User</h2>
         </div>
 
-        <form action="<?= $basePath ?>/admin/timebanking/user-report" method="GET" class="search-form" id="userSearchForm">
+        <form action="<?= $basePath ?>/admin-legacy/timebanking/user-report" method="GET" class="search-form" id="userSearchForm">
             <div class="search-input-wrapper">
                 <i class="fa-solid fa-search search-icon"></i>
                 <input type="text"
@@ -64,7 +64,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
 
         <div class="quick-links-grid">
-            <a href="<?= $basePath ?>/admin/timebanking" class="quick-link">
+            <a href="<?= $basePath ?>/admin-legacy/timebanking" class="quick-link">
                 <div class="quick-link-icon dashboard">
                     <i class="fa-solid fa-chart-line"></i>
                 </div>
@@ -75,7 +75,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
 
-            <a href="<?= $basePath ?>/admin/timebanking/alerts" class="quick-link">
+            <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts" class="quick-link">
                 <div class="quick-link-icon alerts">
                     <i class="fa-solid fa-bell"></i>
                 </div>
@@ -86,7 +86,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
 
-            <a href="<?= $basePath ?>/admin/timebanking/org-wallets" class="quick-link">
+            <a href="<?= $basePath ?>/admin-legacy/timebanking/org-wallets" class="quick-link">
                 <div class="quick-link-icon orgs">
                     <i class="fa-solid fa-building"></i>
                 </div>
@@ -97,7 +97,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
 
-            <a href="<?= $basePath ?>/admin/users" class="quick-link">
+            <a href="<?= $basePath ?>/admin-legacy/users" class="quick-link">
                 <div class="quick-link-icon users">
                     <i class="fa-solid fa-users"></i>
                 </div>
@@ -536,7 +536,7 @@ async function performSearch(query) {
     searchResults.innerHTML = '<div class="search-loading"><i class="fa-solid fa-spinner fa-spin"></i> Searching...</div>';
 
     try {
-        const response = await fetch('<?= $basePath ?>/api/admin/users/search?q=' + encodeURIComponent(query));
+        const response = await fetch('<?= $basePath ?>/api/admin-legacy/users/search?q=' + encodeURIComponent(query));
         const data = await response.json();
 
         if (!data.success || !data.users || data.users.length === 0) {
@@ -554,7 +554,7 @@ async function performSearch(query) {
             const initials = getInitials(user.first_name, user.last_name);
             const balance = parseFloat(user.balance || 0).toFixed(1);
             html += `
-                <a href="<?= $basePath ?>/admin/timebanking/user-report/${user.id}" class="search-result-item">
+                <a href="<?= $basePath ?>/admin-legacy/timebanking/user-report/${user.id}" class="search-result-item">
                     <div class="result-avatar">${initials}</div>
                     <div class="result-info">
                         <div class="result-name">${escapeHtml(user.first_name)} ${escapeHtml(user.last_name)}</div>

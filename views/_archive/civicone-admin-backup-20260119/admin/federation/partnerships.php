@@ -26,11 +26,11 @@ require __DIR__ . '/../partials/admin-header.php';
         <p class="admin-page-subtitle">Connect with other timebanks to expand your community</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/federation/directory" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-compass"></i>
             Find Partners
         </a>
-        <a href="<?= $basePath ?>/admin/federation" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-sliders"></i>
             Settings
         </a>

@@ -7,8 +7,8 @@
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 $isEdit = isset($segment);
 $action = $isEdit
-    ? $basePath . "/admin/newsletters/segments/update/" . $segment['id']
-    : $basePath . "/admin/newsletters/segments/store";
+    ? $basePath . "/admin-legacy/newsletters/segments/update/" . $segment['id']
+    : $basePath . "/admin-legacy/newsletters/segments/store";
 
 $fields = $fields ?? [];
 $groups = $groups ?? [];
@@ -49,7 +49,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
     <!-- Navigation -->
     <div class="nav-bar">
-        <a href="<?= $basePath ?>/admin/newsletters/segments" class="back-link">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/segments" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Segments
         </a>
     </div>
@@ -165,7 +165,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <i class="fa-solid fa-save"></i>
                 <?= $isEdit ? 'Update Segment' : 'Create Segment' ?>
             </button>
-            <a href="<?= $basePath ?>/admin/newsletters/segments" class="btn-cancel">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/segments" class="btn-cancel">
                 Cancel
             </a>
             <?php if ($isEdit): ?>
@@ -188,7 +188,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p>Are you sure you want to delete "<strong><?= htmlspecialchars($segment['name'] ?? '') ?></strong>"? This action cannot be undone.</p>
         <div class="modal" role="dialog" aria-modal="true"-actions">
             <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-            <form action="<?= $basePath ?>/admin/newsletters/segments/delete/<?= $segment['id'] ?>" method="POST" style="display: inline;">
+            <form action="<?= $basePath ?>/admin-legacy/newsletters/segments/delete/<?= $segment['id'] ?>" method="POST" style="display: inline;">
                 <?= \Nexus\Core\Csrf::input() ?>
                 <button type="submit" class="btn-danger">
                     <i class="fa-solid fa-trash"></i> Delete Segment
@@ -1440,7 +1440,7 @@ document.getElementById('preview-btn').addEventListener('click', function() {
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking...';
     result.innerHTML = '<span style="color: rgba(255,255,255,0.5);"><i class="fa-solid fa-spinner fa-spin"></i> Calculating...</span>';
 
-    fetch('<?= $basePath ?>/admin/newsletters/segments/preview', {
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/segments/preview', {
         method: 'POST',
         body: formData
     })
@@ -1538,7 +1538,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadSmartSuggestions() {
     const container = document.getElementById('suggestions-container');
 
-    fetch('<?= $basePath ?>/admin/newsletters/segments/suggestions')
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/segments/suggestions')
         .then(response => response.json())
         .then(data => {
             if (!data.success || !data.suggestions || data.suggestions.length === 0) {
@@ -1604,7 +1604,7 @@ function createFromSuggestion(suggestionId, buttonElement) {
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
     }
 
-    fetch('<?= $basePath ?>/admin/newsletters/segments/from-suggestion', {
+    fetch('<?= $basePath ?>/admin-legacy/newsletters/segments/from-suggestion', {
         method: 'POST',
         body: formData
     })

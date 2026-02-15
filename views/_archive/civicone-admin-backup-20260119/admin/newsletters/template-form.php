@@ -35,17 +35,17 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
     <!-- Action Bar -->
     <div class="action-bar">
-        <a href="<?= $basePath ?>/admin/newsletters/templates" class="back-link">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/templates" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Templates
         </a>
         <?php if ($isEdit): ?>
-        <a href="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" target="_blank" class="preview-link">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" target="_blank" class="preview-link">
             <i class="fa-solid fa-eye"></i> Preview Template
         </a>
         <?php endif; ?>
     </div>
 
-    <form action="<?= $basePath ?>/admin/newsletters/templates/<?= $isEdit ? 'update/' . $template['id'] : 'store' ?>" method="POST" id="templateForm">
+    <form action="<?= $basePath ?>/admin-legacy/newsletters/templates/<?= $isEdit ? 'update/' . $template['id'] : 'store' ?>" method="POST" id="templateForm">
         <?= \Nexus\Core\Csrf::input() ?>
 
         <div class="form-grid">
@@ -187,7 +187,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         </button>
 
                         <?php if ($isEdit): ?>
-                        <a href="<?= $basePath ?>/admin/newsletters/templates/duplicate/<?= $template['id'] ?>" class="btn-secondary">
+                        <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/duplicate/<?= $template['id'] ?>" class="btn-secondary">
                             <i class="fa-solid fa-copy"></i>
                             Duplicate Template
                         </a>
@@ -198,7 +198,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         </button>
                         <?php endif; ?>
 
-                        <a href="<?= $basePath ?>/admin/newsletters/templates" class="btn-cancel">
+                        <a href="<?= $basePath ?>/admin-legacy/newsletters/templates" class="btn-cancel">
                             Cancel
                         </a>
                     </div>
@@ -307,7 +307,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p>Are you sure you want to delete "<strong><?= htmlspecialchars($template['name'] ?? '') ?></strong>"? This action cannot be undone.</p>
         <div class="modal" role="dialog" aria-modal="true"-actions">
             <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-            <form action="<?= $basePath ?>/admin/newsletters/templates/delete/<?= $template['id'] ?>" method="POST" style="display: inline;">
+            <form action="<?= $basePath ?>/admin-legacy/newsletters/templates/delete/<?= $template['id'] ?>" method="POST" style="display: inline;">
                 <?= \Nexus\Core\Csrf::input() ?>
                 <button type="submit" class="btn-danger">
                     <i class="fa-solid fa-trash"></i> Delete Template

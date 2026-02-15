@@ -12,7 +12,7 @@
  */
 
 import { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 import { HelmetProvider } from 'react-helmet-async';
 
@@ -70,11 +70,16 @@ const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage'));
 const FederationHubPage = lazy(() => import('@/pages/federation/FederationHubPage'));
 const FederationPartnersPage = lazy(() => import('@/pages/federation/FederationPartnersPage'));
 const FederationMembersPage = lazy(() => import('@/pages/federation/FederationMembersPage'));
+const FederationMemberProfilePage = lazy(() => import('@/pages/federation/FederationMemberProfilePage'));
 const FederationMessagesPage = lazy(() => import('@/pages/federation/FederationMessagesPage'));
 const FederationListingsPage = lazy(() => import('@/pages/federation/FederationListingsPage'));
 const FederationEventsPage = lazy(() => import('@/pages/federation/FederationEventsPage'));
 const FederationSettingsPage = lazy(() => import('@/pages/federation/FederationSettingsPage'));
 const FederationOnboardingPage = lazy(() => import('@/pages/federation/FederationOnboardingPage'));
+const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
+const GroupExchangesPage = lazy(() => import('@/pages/group-exchanges/GroupExchangesPage'));
+const CreateGroupExchangePage = lazy(() => import('@/pages/group-exchanges/CreateGroupExchangePage'));
+const GroupExchangeDetailPage = lazy(() => import('@/pages/group-exchanges/GroupExchangeDetailPage'));
 
 // Static Pages
 const AboutPage = lazy(() => import('@/pages/public/AboutPage'));
@@ -84,7 +89,16 @@ const PrivacyPage = lazy(() => import('@/pages/public/PrivacyPage'));
 const AccessibilityPage = lazy(() => import('@/pages/public/AccessibilityPage'));
 const CookiesPage = lazy(() => import('@/pages/public/CookiesPage'));
 const LegalHubPage = lazy(() => import('@/pages/public/LegalHubPage'));
+const FaqPage = lazy(() => import('@/pages/public/FaqPage'));
 const HelpCenterPage = lazy(() => import('@/pages/help/HelpCenterPage'));
+
+// About Sub-Pages
+const TimebankingGuidePage = lazy(() => import('@/pages/about/TimebankingGuidePage'));
+const PartnerPage = lazy(() => import('@/pages/about/PartnerPage'));
+const SocialPrescribingPage = lazy(() => import('@/pages/about/SocialPrescribingPage'));
+const ImpactSummaryPage = lazy(() => import('@/pages/about/ImpactSummaryPage'));
+const ImpactReportPage = lazy(() => import('@/pages/about/ImpactReportPage'));
+const StrategicPlanPage = lazy(() => import('@/pages/about/StrategicPlanPage'));
 
 /**
  * All application routes rendered inside TenantShell.
@@ -106,6 +120,7 @@ function AppRoutes() {
         {/* Public Routes */}
         <Route index element={<HomePage />} />
         <Route path="about" element={<AboutPage />} />
+        <Route path="faq" element={<FaqPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="help" element={<HelpCenterPage />} />
         <Route path="terms" element={<TermsPage />} />
@@ -113,6 +128,12 @@ function AppRoutes() {
         <Route path="accessibility" element={<AccessibilityPage />} />
         <Route path="cookies" element={<CookiesPage />} />
         <Route path="legal" element={<LegalHubPage />} />
+        <Route path="timebanking-guide" element={<TimebankingGuidePage />} />
+        <Route path="partner" element={<PartnerPage />} />
+        <Route path="social-prescribing" element={<SocialPrescribingPage />} />
+        <Route path="impact-summary" element={<ImpactSummaryPage />} />
+        <Route path="impact-report" element={<ImpactReportPage />} />
+        <Route path="strategic-plan" element={<StrategicPlanPage />} />
 
         {/* Public: Blog (feature-gated) */}
         <Route path="blog" element={
@@ -199,6 +220,26 @@ function AppRoutes() {
           <Route path="notifications" element={
             <FeatureGate module="notifications" redirect="/dashboard">
               <NotificationsPage />
+            </FeatureGate>
+          } />
+
+          {/* Onboarding Wizard */}
+          <Route path="onboarding" element={<OnboardingPage />} />
+
+          {/* Feature-gated: Group Exchanges */}
+          <Route path="group-exchanges" element={
+            <FeatureGate feature="group_exchanges" fallback={<ComingSoonPage feature="Group Exchanges" />}>
+              <GroupExchangesPage />
+            </FeatureGate>
+          } />
+          <Route path="group-exchanges/create" element={
+            <FeatureGate feature="group_exchanges" redirect="/dashboard">
+              <CreateGroupExchangePage />
+            </FeatureGate>
+          } />
+          <Route path="group-exchanges/:id" element={
+            <FeatureGate feature="group_exchanges" redirect="/dashboard">
+              <GroupExchangeDetailPage />
             </FeatureGate>
           } />
 
@@ -336,6 +377,11 @@ function AppRoutes() {
               <FederationMembersPage />
             </FeatureGate>
           } />
+          <Route path="federation/members/:id" element={
+            <FeatureGate feature="federation" redirect="/dashboard">
+              <FederationMemberProfilePage />
+            </FeatureGate>
+          } />
           <Route path="federation/messages" element={
             <FeatureGate feature="federation" redirect="/dashboard">
               <FederationMessagesPage />
@@ -379,13 +425,28 @@ function AppRoutes() {
   );
 }
 
+/**
+ * HeroUIProvider wrapper that lives inside BrowserRouter so it can
+ * pass React Router's navigate function to HeroUI components.
+ * This enables client-side routing for HeroUI's href prop on
+ * DropdownItem, Link, Breadcrumbs, etc.
+ */
+function HeroUIRouterProvider({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+  return (
+    <HeroUIProvider navigate={navigate}>
+      {children}
+    </HeroUIProvider>
+  );
+}
+
 function App() {
   return (
     <ErrorBoundary>
       <HelmetProvider>
         <ThemeProvider>
-          <HeroUIProvider>
-            <BrowserRouter>
+          <BrowserRouter>
+            <HeroUIRouterProvider>
               <ScrollToTop />
               <ToastProvider>
                 <Suspense fallback={<LoadingScreen message="Loading..." />}>
@@ -402,8 +463,8 @@ function App() {
                   </Routes>
                 </Suspense>
               </ToastProvider>
-            </BrowserRouter>
-          </HeroUIProvider>
+            </HeroUIRouterProvider>
+          </BrowserRouter>
         </ThemeProvider>
       </HelmetProvider>
     </ErrorBoundary>

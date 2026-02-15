@@ -1,3 +1,3 @@
 <?php
 // Dispatcher
-require dirname(__DIR__, 3) . '/modern/admin/legal-documents/versions/compare.php';
+require dirname(__DIR__, 3) . '/modern/admin-legacy/legal-documents/versions/compare.php';

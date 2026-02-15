@@ -87,7 +87,7 @@ $consents = $consents ?? [];
         <p class="admin-page-subtitle">View consent history and permissions</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr/consents" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/consents" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> All Consents
         </a>
     </div>
@@ -100,7 +100,7 @@ $consents = $consents ?? [];
     <div class="nexus-card">
         <div class="nexus-card-header">
             <h3><i class="fa-solid fa-file-contract"></i> Consent Type Details</h3>
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/consents" class="nexus-btn nexus-btn-outline">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/consents" class="nexus-btn nexus-btn-outline">
                 <i class="fa-solid fa-arrow-left"></i> Back
             </a>
         </div>
@@ -187,7 +187,7 @@ $consents = $consents ?? [];
     <div class="nexus-card">
         <div class="nexus-card-header">
             <h3><i class="fa-solid fa-users"></i> User Consent Records</h3>
-            <a href="<?= $basePath ?>/admin/enterprise/gdpr/consents/export?type=<?= urlencode($consentType['slug'] ?? '') ?>" class="nexus-btn nexus-btn-outline">
+            <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/consents/export?type=<?= urlencode($consentType['slug'] ?? '') ?>" class="nexus-btn nexus-btn-outline">
                 <i class="fa-solid fa-download"></i> Export
             </a>
         </div>

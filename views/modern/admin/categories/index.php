@@ -28,7 +28,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Organize listings and opportunities with taxonomies</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/categories/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/categories/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> New Category
         </a>
     </div>
@@ -53,7 +53,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
             <h3 class="admin-empty-title">No categories defined yet</h3>
             <p class="admin-empty-text">Create your first category to organize content.</p>
-            <a href="<?= $basePath ?>/admin/categories/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/categories/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-plus"></i> Create Category
             </a>
         </div>
@@ -100,10 +100,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         </td>
                         <td style="text-align: right;">
                             <div class="admin-action-buttons">
-                                <a href="<?= $basePath ?>/admin/categories/edit/<?= $cat['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                                <a href="<?= $basePath ?>/admin-legacy/categories/edit/<?= $cat['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                                     <i class="fa-solid fa-pen"></i> Edit
                                 </a>
-                                <form action="<?= $basePath ?>/admin/categories/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this category?');">
+                                <form action="<?= $basePath ?>/admin-legacy/categories/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this category?');">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="id" value="<?= $cat['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">

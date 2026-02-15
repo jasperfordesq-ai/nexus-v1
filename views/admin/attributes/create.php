@@ -4,7 +4,7 @@
 $layout = layout(); // Fixed: centralized detection
 
 if ($layout === 'modern' || $layout === 'high-contrast') {
-    $view = __DIR__ . '/../../modern/admin/attributes/create.php';
+    $view = __DIR__ . '/../../modern/admin-legacy/attributes/create.php';
     if (file_exists($view)) {
         require $view;
         return;

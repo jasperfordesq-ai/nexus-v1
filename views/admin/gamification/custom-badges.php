@@ -10,7 +10,7 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
             <p class="text-muted">Create and manage custom badges for your community</p>
         </div>
         <div class="col-md-4 text-end">
-            <a href="<?= $basePath ?>/admin/custom-badges/create" class="btn btn-primary">
+            <a href="<?= $basePath ?>/admin-legacy/custom-badges/create" class="btn btn-primary">
                 <i class="fa-solid fa-plus"></i> Create Badge
             </a>
         </div>
@@ -38,7 +38,7 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
                 <div class="mb-3" style="font-size: 64px;">🏆</div>
                 <h4>No Custom Badges Yet</h4>
                 <p class="text-muted mb-4">Create your first custom badge to reward your community members.</p>
-                <a href="<?= $basePath ?>/admin/custom-badges/create" class="btn btn-primary">
+                <a href="<?= $basePath ?>/admin-legacy/custom-badges/create" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Create Your First Badge
                 </a>
             </div>
@@ -75,7 +75,7 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
                         </div>
 
                         <div class="btn-group w-100">
-                            <a href="<?= $basePath ?>/admin/custom-badges/edit/<?= $badge['id'] ?>" class="btn btn-outline-primary btn-sm">
+                            <a href="<?= $basePath ?>/admin-legacy/custom-badges/edit/<?= $badge['id'] ?>" class="btn btn-outline-primary btn-sm">
                                 <i class="fa-solid fa-edit"></i> Edit
                             </a>
                             <button type="button" class="btn btn-outline-success btn-sm" onclick="showAwardModal(<?= $badge['id'] ?>, '<?= htmlspecialchars($badge['name'], ENT_QUOTES) ?>')">
@@ -100,7 +100,7 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 <div class="modal fade" id="awardModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="POST" action="<?= $basePath ?>/admin/custom-badges/award">
+            <form method="POST" action="<?= $basePath ?>/admin-legacy/custom-badges/award">
                 <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                 <input type="hidden" name="badge_id" id="awardBadgeId">
 
@@ -143,7 +143,7 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="<?= $basePath ?>/admin/custom-badges/delete">
+            <form method="POST" action="<?= $basePath ?>/admin-legacy/custom-badges/delete">
                 <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                 <input type="hidden" name="id" id="deleteId">
 

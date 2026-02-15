@@ -147,7 +147,7 @@ require __DIR__ . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Configure MatchRank for Listings and CommunityRank for Members</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/feed-algorithm" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/feed-algorithm" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-sliders"></i>
             Feed Algorithm
         </a>
@@ -242,7 +242,7 @@ require __DIR__ . '/partials/admin-header.php';
         <!-- SHARED SETTINGS TAB -->
         <!-- ============================================ -->
         <div id="tab-shared" class="algo-tab-content active">
-            <form action="<?= $basePath ?>/admin/algorithm-settings/save" method="POST">
+            <form action="<?= $basePath ?>/admin-legacy/algorithm-settings/save" method="POST">
                 <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="algorithm_type" value="shared">
 
@@ -353,7 +353,7 @@ require __DIR__ . '/partials/admin-header.php';
         <!-- MATCHRANK (LISTINGS) TAB -->
         <!-- ============================================ -->
         <div id="tab-listings" class="algo-tab-content">
-            <form action="<?= $basePath ?>/admin/algorithm-settings/save" method="POST">
+            <form action="<?= $basePath ?>/admin-legacy/algorithm-settings/save" method="POST">
                 <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="algorithm_type" value="listings">
 
@@ -630,7 +630,7 @@ require __DIR__ . '/partials/admin-header.php';
         <!-- COMMUNITYRANK (MEMBERS) TAB -->
         <!-- ============================================ -->
         <div id="tab-members" class="algo-tab-content">
-            <form action="<?= $basePath ?>/admin/algorithm-settings/save" method="POST">
+            <form action="<?= $basePath ?>/admin-legacy/algorithm-settings/save" method="POST">
                 <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="algorithm_type" value="members">
 
@@ -947,28 +947,28 @@ require __DIR__ . '/partials/admin-header.php';
             </div>
             <div class="admin-card-body">
                 <div class="admin-quick-actions-list">
-                    <a href="<?= $basePath ?>/admin/feed-algorithm" class="admin-quick-action-item">
+                    <a href="<?= $basePath ?>/admin-legacy/feed-algorithm" class="admin-quick-action-item">
                         <div class="admin-quick-action-icon admin-quick-action-icon-indigo">
                             <i class="fa-solid fa-sliders"></i>
                         </div>
                         <span>Feed Algorithm</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/smart-matching" class="admin-quick-action-item">
+                    <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="admin-quick-action-item">
                         <div class="admin-quick-action-icon admin-quick-action-icon-pink">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                         </div>
                         <span>Smart Matching</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/ai-settings" class="admin-quick-action-item">
+                    <a href="<?= $basePath ?>/admin-legacy/ai-settings" class="admin-quick-action-item">
                         <div class="admin-quick-action-icon admin-quick-action-icon-purple">
                             <i class="fa-solid fa-microchip"></i>
                         </div>
                         <span>AI Settings</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/listings" class="admin-quick-action-item">
+                    <a href="<?= $basePath ?>/admin-legacy/listings" class="admin-quick-action-item">
                         <div class="admin-quick-action-icon admin-quick-action-icon-green">
                             <i class="fa-solid fa-list"></i>
                         </div>
@@ -1082,7 +1082,7 @@ require __DIR__ . '/partials/admin-header.php';
 </div>
 
 <div class="admin-modules-grid admin-modules-grid-4">
-    <a href="<?= $basePath ?>/admin/feed-algorithm" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/feed-algorithm" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-indigo">
             <i class="fa-solid fa-sliders"></i>
         </div>
@@ -1093,7 +1093,7 @@ require __DIR__ . '/partials/admin-header.php';
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/ai-settings" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/ai-settings" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-indigo">
             <i class="fa-solid fa-microchip"></i>
         </div>
@@ -1104,7 +1104,7 @@ require __DIR__ . '/partials/admin-header.php';
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/smart-matching" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-pink">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
         </div>
@@ -1115,7 +1115,7 @@ require __DIR__ . '/partials/admin-header.php';
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/gamification" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/gamification" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-amber">
             <i class="fa-solid fa-trophy"></i>
         </div>

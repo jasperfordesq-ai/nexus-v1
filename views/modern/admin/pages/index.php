@@ -28,7 +28,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Create and manage custom pages with the visual builder</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/pages/create?confirm=1" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/pages/create?confirm=1" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> New Page
         </a>
     </div>
@@ -53,7 +53,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
             <h3 class="admin-empty-title">No Custom Pages Yet</h3>
             <p class="admin-empty-text">Create your first page using the visual page builder.</p>
-            <a href="<?= $basePath ?>/admin/pages/create?confirm=1" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/pages/create?confirm=1" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-plus"></i> Create First Page
             </a>
         </div>
@@ -98,13 +98,13 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     <div class="page-slug">/page/<?= htmlspecialchars($p['slug']) ?></div>
                 </div>
                 <div class="page-actions">
-                    <a href="<?= $basePath ?>/admin/pages/builder/<?= $p['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm" title="Edit Page">
+                    <a href="<?= $basePath ?>/admin-legacy/pages/builder/<?= $p['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm" title="Edit Page">
                         <i class="fa-solid fa-pen-ruler"></i> <span class="btn-text">Design</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/pages/preview/<?= $p['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Preview Page" target="_blank">
+                    <a href="<?= $basePath ?>/admin-legacy/pages/preview/<?= $p['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Preview Page" target="_blank">
                         <i class="fa-solid fa-eye"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/pages/duplicate/<?= $p['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Duplicate Page" onclick="return confirm('Create a copy of this page?')">
+                    <a href="<?= $basePath ?>/admin-legacy/pages/duplicate/<?= $p['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="Duplicate Page" onclick="return confirm('Create a copy of this page?')">
                         <i class="fa-solid fa-copy"></i>
                     </a>
                     <?php if (!empty($p['is_published'])): ?>
@@ -112,7 +112,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <i class="fa-solid fa-external-link"></i>
                         </a>
                     <?php endif; ?>
-                    <form action="<?= $basePath ?>/admin/pages/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this page? This cannot be undone.');">
+                    <form action="<?= $basePath ?>/admin-legacy/pages/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this page? This cannot be undone.');">
                         <?= Csrf::input() ?>
                         <input type="hidden" name="page_id" value="<?= $p['id'] ?>">
                         <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm" title="Delete Page">
@@ -547,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         formData.append('csrf_token', csrfToken);
 
-        fetch(`${basePath}/admin/pages/reorder`, {
+        fetch(`${basePath}/admin-legacy/pages/reorder`, {
             method: 'POST',
             body: formData
         })

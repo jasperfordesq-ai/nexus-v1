@@ -21,7 +21,7 @@ $period = $period ?? '30';
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/broker-controls" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Broker Statistics

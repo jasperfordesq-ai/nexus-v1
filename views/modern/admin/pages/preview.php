@@ -2,7 +2,7 @@
 /**
  * Page Preview Template
  * Shows a page preview with header banner indicating preview mode
- * Path: views/modern/admin/pages/preview.php
+ * Path: views/modern/admin-legacy/pages/preview.php
  */
 
 use Nexus\Core\HtmlSanitizer;
@@ -336,10 +336,10 @@ $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContex
             <?php endif; ?>
         </div>
         <div class="preview-banner-actions">
-            <a href="<?= $basePath ?>/admin/pages/builder/<?= $page['id'] ?>" class="preview-btn preview-btn-edit">
+            <a href="<?= $basePath ?>/admin-legacy/pages/builder/<?= $page['id'] ?>" class="preview-btn preview-btn-edit">
                 <i class="fas fa-edit"></i> Edit Page
             </a>
-            <a href="<?= $basePath ?>/admin/pages" class="preview-btn preview-btn-close">
+            <a href="<?= $basePath ?>/admin-legacy/pages" class="preview-btn preview-btn-close">
                 <i class="fas fa-times"></i> Close
             </a>
         </div>

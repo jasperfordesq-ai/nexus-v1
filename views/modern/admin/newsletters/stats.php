@@ -623,7 +623,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     <div class="stats-container">
 
         <!-- Back Link -->
-        <a href="<?= $basePath ?>/admin/newsletters" class="back-link">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
         </a>
 
@@ -647,7 +647,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     $nonOpenerCount = $totalSent - $uniqueOpens;
                     if ($nonOpenerCount > 0):
                     ?>
-                    <a href="<?= $basePath ?>/admin/newsletters/resend/<?= $newsletter['id'] ?>" class="btn-resend">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/resend/<?= $newsletter['id'] ?>" class="btn-resend">
                         <i class="fa-solid fa-rotate-right"></i>
                         Resend to <?= number_format($nonOpenerCount) ?> Non-Openers
                     </a>
@@ -678,7 +678,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     <strong>Suggested Winner: Subject <?= $abResults['suggested_winner'] ?></strong>
                     (<?= number_format($abResults['winning_margin'], 1) ?>% better <?= ($abResults['winner_metric'] ?? 'opens') === 'clicks' ? 'click rate' : 'open rate' ?>)
                 </div>
-                <form action="<?= $basePath ?>/admin/newsletters/select-winner/<?= $newsletter['id'] ?>" method="POST" style="margin: 0;">
+                <form action="<?= $basePath ?>/admin-legacy/newsletters/select-winner/<?= $newsletter['id'] ?>" method="POST" style="margin: 0;">
                     <?= Csrf::input() ?>
                     <input type="hidden" name="winner" value="<?= $abResults['suggested_winner'] ?>">
                     <button type="submit" class="btn-confirm">Confirm Winner</button>
@@ -929,7 +929,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <div class="glass-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 class="section-title" style="margin: 0;">Recent Activity</h3>
-                <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>" class="btn-action" style="padding: 6px 12px; font-size: 0.8rem;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/activity/<?= $newsletter['id'] ?>" class="btn-action" style="padding: 6px 12px; font-size: 0.8rem;">
                     <i class="fa-solid fa-list"></i> View All Activity
                 </a>
             </div>
@@ -976,10 +976,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <div class="glass-card">
             <h3 class="section-title">Actions</h3>
             <div class="actions-grid">
-                <a href="<?= $basePath ?>/admin/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" class="btn-action">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/preview/<?= $newsletter['id'] ?>" target="_blank" class="btn-action">
                     <i class="fa-solid fa-eye"></i> View Email Content
                 </a>
-                <a href="<?= $basePath ?>/admin/newsletters/duplicate/<?= $newsletter['id'] ?>" class="btn-action">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/duplicate/<?= $newsletter['id'] ?>" class="btn-action">
                     <i class="fa-solid fa-copy"></i> Duplicate Newsletter
                 </a>
             </div>

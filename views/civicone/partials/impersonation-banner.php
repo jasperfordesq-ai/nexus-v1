@@ -21,7 +21,7 @@ if (!empty($_SESSION['is_impersonating'])):
         </div>
     </div>
     <div class="impersonation-banner-actions">
-        <a href="<?= $basePath ?>/admin/stop-impersonating" class="impersonation-banner-btn impersonation-exit-btn">
+        <a href="<?= $basePath ?>/admin-legacy/stop-impersonating" class="impersonation-banner-btn impersonation-exit-btn">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span>Exit & Return to <?= htmlspecialchars($adminName) ?></span>
         </a>

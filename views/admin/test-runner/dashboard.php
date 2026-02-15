@@ -15,7 +15,7 @@ $adminPageSubtitle = 'Automated testing and API health monitoring';
 $adminPageIcon = 'fa-flask';
 
 // Include the standalone admin header (includes <!DOCTYPE html>, <head>, etc.)
-require __DIR__ . '/../../modern/admin/partials/admin-header.php';
+require __DIR__ . '/../../modern/admin-legacy/partials/admin-header.php';
 ?>
 
 <!-- Dashboard Header -->
@@ -246,7 +246,7 @@ require __DIR__ . '/../../modern/admin/partials/admin-header.php';
                         </span>
                     </td>
                     <td>
-                        <a href="<?= $basePath ?>/admin/tests/view?id=<?= $run['id'] ?>"
+                        <a href="<?= $basePath ?>/admin-legacy/tests/view?id=<?= $run['id'] ?>"
                            class="admin-btn admin-btn-secondary admin-btn-sm">
                             <i class="fa-solid fa-eye"></i>
                         </a>
@@ -370,9 +370,9 @@ jQuery(document).ready(function($) {
         resultDiv.hide();
 
         // Run tests via AJAX
-        console.log('Starting AJAX request to:', '<?= $basePath ?>/admin/tests/run');
+        console.log('Starting AJAX request to:', '<?= $basePath ?>/admin-legacy/tests/run');
         $.ajax({
-            url: '<?= $basePath ?>/admin/tests/run',
+            url: '<?= $basePath ?>/admin-legacy/tests/run',
             method: 'POST',
             data: {
                 suite: suite,
@@ -464,5 +464,5 @@ function closeTestOutput() {
 
 <?php
 // Include admin footer
-require __DIR__ . '/../../modern/admin/partials/admin-footer.php';
+require __DIR__ . '/../../modern/admin-legacy/partials/admin-footer.php';
 ?>

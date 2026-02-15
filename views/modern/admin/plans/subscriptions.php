@@ -19,7 +19,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="page-hero">
     <div class="page-hero-content">
         <h1>
-            <a href="<?= $basePath ?>/admin/plans" class="admin-back-link">
+            <a href="<?= $basePath ?>/admin-legacy/plans" class="admin-back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Tenant Subscriptions
@@ -322,7 +322,7 @@ function submitAssign() {
     const form = document.getElementById('assignForm');
     const formData = new FormData(form);
 
-    fetch('<?= $basePath ?>/admin/plans/assign', {
+    fetch('<?= $basePath ?>/admin-legacy/plans/assign', {
         method: 'POST',
         body: formData
     })

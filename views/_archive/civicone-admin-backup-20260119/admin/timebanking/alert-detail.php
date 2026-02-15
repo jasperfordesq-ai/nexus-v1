@@ -24,7 +24,7 @@ $details = $alert['details_decoded'] ?? [];
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/timebanking/alerts" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/timebanking/alerts" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <?= ucwords(str_replace('_', ' ', $alert['alert_type'])) ?>
@@ -72,7 +72,7 @@ $details = $alert['details_decoded'] ?? [];
                     <h4><?= htmlspecialchars($alert['user_name'] ?? 'Unknown') ?></h4>
                     <p>User ID: <?= $alert['user_id'] ?></p>
                 </div>
-                <a href="<?= $basePath ?>/admin/timebanking/user-report/<?= $alert['user_id'] ?>" class="admin-btn admin-btn-secondary" style="margin-left: auto;">
+                <a href="<?= $basePath ?>/admin-legacy/timebanking/user-report/<?= $alert['user_id'] ?>" class="admin-btn admin-btn-secondary" style="margin-left: auto;">
                     <i class="fa-solid fa-chart-line"></i> View Report
                 </a>
             </div>
@@ -211,7 +211,7 @@ $details = $alert['details_decoded'] ?? [];
             </div>
         </div>
         <div class="admin-card-body">
-            <form action="<?= $basePath ?>/admin/timebanking/alert/<?= $alert['id'] ?>/status" method="POST">
+            <form action="<?= $basePath ?>/admin-legacy/timebanking/alert/<?= $alert['id'] ?>/status" method="POST">
                 <?= Csrf::input() ?>
 
                 <div class="form-group">

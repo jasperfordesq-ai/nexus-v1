@@ -10,7 +10,7 @@ $isSocial = false;
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
         <h1>Custom Pages</h1>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/pages/create?confirm=1" class="htb-btn htb-btn-primary">Create New Page</a>
+        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages/create?confirm=1" class="htb-btn htb-btn-primary">Create New Page</a>
     </div>
 
     <div class="glass-panel">
@@ -43,9 +43,9 @@ $isSocial = false;
                             </td>
                             <td><?= $page['menu_order'] ?></td>
                             <td>
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/pages/builder?id=<?= $page['id'] ?>" class="htb-btn htb-btn-sm">Edit</a>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages/builder?id=<?= $page['id'] ?>" class="htb-btn htb-btn-sm">Edit</a>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/page/<?= $page['slug'] ?>" target="_blank" class="htb-btn htb-btn-sm htb-btn-secondary">View</a>
-                                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/pages/delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
+                                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages/delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
                                     <input type="hidden" name="id" value="<?= $page['id'] ?>">
                                     <button type="submit" class="htb-btn htb-btn-sm" style="background:var(--del-color, #ef4444); padding:4px 8px; font-size:0.8rem;">Del</button>
                                 </form>

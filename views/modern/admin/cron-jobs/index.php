@@ -35,15 +35,15 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         <p class="admin-page-subtitle">Schedule & monitor background tasks</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/cron-jobs/settings" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/cron-jobs/settings" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-cog"></i>
             Settings
         </a>
-        <a href="<?= $basePath ?>/admin/cron-jobs/setup" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/cron-jobs/setup" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-book"></i>
             Setup Guide
         </a>
-        <a href="<?= $basePath ?>/admin/cron-jobs/logs" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/cron-jobs/logs" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-list-ul"></i>
             View Logs
         </a>
@@ -118,7 +118,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
             <div class="admin-stat-sublabel">Last 24 hours</div>
         </div>
     </div>
-    <a href="<?= $basePath ?>/admin/cron-jobs/logs<?= $overallStats['failures_24h'] > 0 ? '?status=error' : '' ?>" class="admin-stat-card admin-stat-red admin-stat-link">
+    <a href="<?= $basePath ?>/admin-legacy/cron-jobs/logs<?= $overallStats['failures_24h'] > 0 ? '?status=error' : '' ?>" class="admin-stat-card admin-stat-red admin-stat-link">
         <div class="admin-stat-icon">
             <i class="fa-solid fa-exclamation-triangle"></i>
         </div>
@@ -191,7 +191,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                                 <?= htmlspecialchars($job['name']) ?>
                                 <span class="admin-job-priority admin-priority-<?= $job['priority'] ?>"><?= $job['priority'] ?></span>
                             </div>
-                            <form action="<?= $basePath ?>/admin/cron-jobs/toggle/<?= $job['id'] ?>" method="POST" class="toggle-form">
+                            <form action="<?= $basePath ?>/admin-legacy/cron-jobs/toggle/<?= $job['id'] ?>" method="POST" class="toggle-form">
                                 <?= Csrf::input() ?>
                                 <input type="hidden" name="enabled" value="<?= $isEnabled ? '0' : '1' ?>">
                                 <label class="admin-toggle" title="<?= $isEnabled ? 'Click to disable' : 'Click to enable' ?>">
@@ -257,7 +257,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                             <code><?= htmlspecialchars($job['endpoint']) ?></code>
                         </div>
 
-                        <form action="<?= $basePath ?>/admin/cron-jobs/run/<?= $job['id'] ?>" method="POST" class="admin-job-actions">
+                        <form action="<?= $basePath ?>/admin-legacy/cron-jobs/run/<?= $job['id'] ?>" method="POST" class="admin-job-actions">
                             <?= Csrf::input() ?>
                             <button type="submit" class="admin-btn admin-btn-run" <?= !$isEnabled ? 'disabled' : '' ?>>
                                 <i class="fa-solid fa-play"></i>
@@ -282,7 +282,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
             <h3 class="admin-card-title">Recent Executions</h3>
             <p class="admin-card-subtitle">Latest cron runs</p>
         </div>
-        <a href="<?= $basePath ?>/admin/cron-jobs/logs" class="admin-btn admin-btn-secondary admin-btn-sm">
+        <a href="<?= $basePath ?>/admin-legacy/cron-jobs/logs" class="admin-btn admin-btn-secondary admin-btn-sm">
             View All <i class="fa-solid fa-arrow-right"></i>
         </a>
     </div>

@@ -30,17 +30,17 @@ else {
 
         <!-- Action Bar -->
         <div class="nexus-card" style="margin-bottom: 24px; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <a href="<?= $basePath ?>/admin/newsletters/templates" style="color: #6b7280; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates" style="color: #6b7280; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
                 <i class="fa-solid fa-arrow-left"></i> Back to Templates
             </a>
             <?php if ($isEdit): ?>
-            <a href="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" target="_blank" style="color: #6366f1; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" target="_blank" style="color: #6366f1; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
                 <i class="fa-solid fa-eye"></i> Preview
             </a>
             <?php endif; ?>
         </div>
 
-        <form action="<?= $basePath ?>/admin/newsletters/templates/<?= $isEdit ? 'update/' . $template['id'] : 'store' ?>" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/newsletters/templates/<?= $isEdit ? 'update/' . $template['id'] : 'store' ?>" method="POST">
             <?= \Nexus\Core\Csrf::input() ?>
 
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
@@ -150,13 +150,13 @@ else {
                             </button>
 
                             <?php if ($isEdit): ?>
-                            <a href="<?= $basePath ?>/admin/newsletters/templates/duplicate/<?= $template['id'] ?>" style="width: 100%; background: #f3f4f6; color: #374151; padding: 12px 20px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box;">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/duplicate/<?= $template['id'] ?>" style="width: 100%; background: #f3f4f6; color: #374151; padding: 12px 20px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box;">
                                 <i class="fa-solid fa-copy"></i>
                                 Duplicate Template
                             </a>
                             <?php endif; ?>
 
-                            <a href="<?= $basePath ?>/admin/newsletters/templates" style="width: 100%; background: transparent; color: #6b7280; padding: 12px 20px; border: 1px solid #d1d5db; border-radius: 8px; font-weight: 500; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box;">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/templates" style="width: 100%; background: transparent; color: #6b7280; padding: 12px 20px; border: 1px solid #d1d5db; border-radius: 8px; font-weight: 500; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box;">
                                 Cancel
                             </a>
                         </div>

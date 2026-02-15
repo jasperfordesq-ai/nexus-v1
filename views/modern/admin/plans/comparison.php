@@ -18,7 +18,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="page-hero">
     <div class="page-hero-content">
         <h1>
-            <a href="<?= $basePath ?>/admin/plans" class="admin-back-link">
+            <a href="<?= $basePath ?>/admin-legacy/plans" class="admin-back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Plan Comparison

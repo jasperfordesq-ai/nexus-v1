@@ -558,7 +558,7 @@ async function processBatch(retryCount = 0) {
     }
 
     try {
-        const response = await fetch(`<?= $basePath ?>/admin/smart-match-users?action=match_batch&offset=${offset}`);
+        const response = await fetch(`<?= $basePath ?>/admin-legacy/smart-match-users?action=match_batch&offset=${offset}`);
 
         // Check if response is ok
         if (!response.ok) {
@@ -673,7 +673,7 @@ async function processBatch(retryCount = 0) {
 
 async function sendCompletionNotification() {
     try {
-        await fetch(`<?= $basePath ?>/admin/smart-match-users?action=notify_complete`, {
+        await fetch(`<?= $basePath ?>/admin-legacy/smart-match-users?action=notify_complete`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({

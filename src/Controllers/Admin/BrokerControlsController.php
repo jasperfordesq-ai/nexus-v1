@@ -184,7 +184,7 @@ class BrokerControlsController
                 $_SESSION['flash_error'] = 'Failed to save configuration.';
             }
 
-            header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/configuration');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/configuration');
             exit;
         }
 
@@ -300,7 +300,7 @@ class BrokerControlsController
 
             if (!$exchange) {
                 $_SESSION['flash_error'] = 'Exchange not found.';
-                header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/exchanges');
+                header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges');
                 exit;
             }
 
@@ -315,7 +315,7 @@ class BrokerControlsController
             )->fetchAll();
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Error loading exchange: ' . $e->getMessage();
-            header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/exchanges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges');
             exit;
         }
 
@@ -364,7 +364,7 @@ class BrokerControlsController
             $_SESSION['flash_error'] = 'Failed to approve exchange.';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/exchanges');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges');
         exit;
     }
 
@@ -381,7 +381,7 @@ class BrokerControlsController
 
         if (empty($reason)) {
             $_SESSION['flash_error'] = 'Please provide a reason for rejection.';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/exchanges/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges/' . $id);
             exit;
         }
 
@@ -410,7 +410,7 @@ class BrokerControlsController
             $_SESSION['flash_error'] = 'Failed to reject exchange.';
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/exchanges');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges');
         exit;
     }
 
@@ -548,7 +548,7 @@ class BrokerControlsController
                 $_SESSION['flash_error'] = 'Failed to save risk tag.';
             }
 
-            header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/risk-tags');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/risk-tags');
             exit;
         }
 
@@ -565,7 +565,7 @@ class BrokerControlsController
 
             if (!$listing) {
                 $_SESSION['flash_error'] = 'Listing not found.';
-                header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/risk-tags');
+                header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/risk-tags');
                 exit;
             }
 
@@ -575,7 +575,7 @@ class BrokerControlsController
             )->fetch();
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Error loading listing: ' . $e->getMessage();
-            header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/risk-tags');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/risk-tags');
             exit;
         }
 
@@ -607,7 +607,7 @@ class BrokerControlsController
             error_log("BrokerControlsController::removeTag - " . $e->getMessage());
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/risk-tags');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/risk-tags');
         exit;
     }
 
@@ -680,7 +680,7 @@ class BrokerControlsController
             error_log("BrokerControlsController::reviewMessage - " . $e->getMessage());
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/messages');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/messages');
         exit;
     }
 
@@ -711,7 +711,7 @@ class BrokerControlsController
             error_log("BrokerControlsController::flagMessage - " . $e->getMessage());
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/messages');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/messages');
         exit;
     }
 
@@ -795,7 +795,7 @@ class BrokerControlsController
             error_log("BrokerControlsController::setMonitoring - " . $e->getMessage());
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/broker-controls/monitoring');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/monitoring');
         exit;
     }
 

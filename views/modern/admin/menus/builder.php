@@ -32,7 +32,7 @@ $additionalJs = [
 <div class="admin-page-header">
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/menus" class="admin-back-link">
+            <a href="<?= $basePath ?>/admin-legacy/menus" class="admin-back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <?= htmlspecialchars($menu['name']) ?>
@@ -575,7 +575,7 @@ function editMenuItem(itemId) {
     validator.clearAllErrors();
 
     // Fetch item data and populate the form
-    fetch(`${basePath}/admin/menus/item/${itemId}`)
+    fetch(`${basePath}/admin-legacy/menus/item/${itemId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success && data.item) {
@@ -645,8 +645,8 @@ function saveMenuItem() {
 
     const itemId = document.getElementById('item_id').value;
     const url = itemId
-        ? `${basePath}/admin/menus/item/update/${itemId}`
-        : `${basePath}/admin/menus/item/add`;
+        ? `${basePath}/admin-legacy/menus/item/update/${itemId}`
+        : `${basePath}/admin-legacy/menus/item/add`;
 
     // Show loading state
     const saveBtn = event.target;
@@ -680,7 +680,7 @@ function deleteMenuItem(itemId) {
         return;
     }
 
-    fetch(`${basePath}/admin/menus/item/delete/${itemId}`, {
+    fetch(`${basePath}/admin-legacy/menus/item/delete/${itemId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -732,7 +732,7 @@ function saveMenuSettings() {
     saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
     saveBtn.disabled = true;
 
-    fetch(`${basePath}/admin/menus/update/${menuId}`, {
+    fetch(`${basePath}/admin-legacy/menus/update/${menuId}`, {
         method: 'POST',
         body: formData
     })

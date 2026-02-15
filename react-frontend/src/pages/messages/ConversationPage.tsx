@@ -1159,12 +1159,12 @@ export function ConversationPage() {
 
         {/* Typing Indicator */}
         {isOtherUserTyping && (
-          <div className="px-4 py-2 border-t border-theme-subtle">
+          <div className="px-4 py-2 border-t border-theme-default">
             <div className="flex items-center gap-2 text-theme-subtle text-sm">
               <div className="flex gap-1">
-                <span className="w-1.5 h-1.5 bg-theme-subtle rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-1.5 h-1.5 bg-theme-subtle rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-1.5 h-1.5 bg-theme-subtle rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="w-1.5 h-1.5 bg-theme-elevated rounded-full animate-bounce" />
+                <span className="w-1.5 h-1.5 bg-theme-elevated rounded-full animate-bounce [animation-delay:150ms]" />
+                <span className="w-1.5 h-1.5 bg-theme-elevated rounded-full animate-bounce [animation-delay:300ms]" />
               </div>
               <span>{other_user.name} is typing...</span>
             </div>
@@ -1354,7 +1354,7 @@ export function ConversationPage() {
         isOpen={showArchiveModal}
         onOpenChange={setShowArchiveModal}
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',

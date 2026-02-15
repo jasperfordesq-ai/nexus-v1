@@ -434,10 +434,10 @@ function getCategoryIcon($category) {
         <p class="admin-page-subtitle">Modify role details and permissions</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/roles/<?= $role['id'] ?>" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/roles/<?= $role['id'] ?>" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-eye"></i> View Role
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/roles" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/roles" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to Roles
         </a>
     </div>
@@ -602,7 +602,7 @@ function getCategoryIcon($category) {
     <!-- Form Actions -->
     <div class="form-section">
         <div class="form-actions">
-            <button type="button" class="btn-cancel" onclick="window.location.href='<?= $basePath ?>/admin/enterprise/roles/<?= $role['id'] ?>'">
+            <button type="button" class="btn-cancel" onclick="window.location.href='<?= $basePath ?>/admin-legacy/enterprise/roles/<?= $role['id'] ?>'">
                 <i class="fa-solid fa-times"></i> Cancel
             </button>
             <button type="submit" class="btn-update">
@@ -667,7 +667,7 @@ document.getElementById('editRoleForm').addEventListener('submit', async functio
     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
 
     try {
-        const response = await fetch('<?= $basePath ?>/admin/enterprise/roles/<?= $role['id'] ?>', {
+        const response = await fetch('<?= $basePath ?>/admin-legacy/enterprise/roles/<?= $role['id'] ?>', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -687,7 +687,7 @@ document.getElementById('editRoleForm').addEventListener('submit', async functio
 
             // Redirect to role detail page
             setTimeout(() => {
-                window.location.href = '<?= $basePath ?>/admin/enterprise/roles/<?= $role['id'] ?>';
+                window.location.href = '<?= $basePath ?>/admin-legacy/enterprise/roles/<?= $role['id'] ?>';
             }, 1000);
         } else {
             throw new Error(result.error || 'Failed to update role');

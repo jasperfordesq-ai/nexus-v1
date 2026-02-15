@@ -55,10 +55,10 @@ $currentPage = '';
         <p class="admin-page-subtitle">GDPR Compliance, System Monitoring & Advanced Configuration</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-shield-halved"></i> GDPR Console
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-chart-line"></i> Monitoring
         </a>
     </div>
@@ -580,7 +580,7 @@ $currentPage = '';
             <?php endif; ?>
         </div>
     </div>
-    <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches" class="enterprise-btn enterprise-btn-primary" style="flex-shrink: 0;">
+    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches" class="enterprise-btn enterprise-btn-primary" style="flex-shrink: 0;">
         <i class="fa-solid fa-eye"></i>
         Review Now
     </a>
@@ -589,7 +589,7 @@ $currentPage = '';
 
 <!-- Stats Overview -->
 <div class="stats-grid">
-    <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests" class="stat-card indigo">
+    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests" class="stat-card indigo">
         <div class="stat-icon">
             <i class="fa-solid fa-clipboard-list"></i>
         </div>
@@ -600,7 +600,7 @@ $currentPage = '';
         </span>
     </a>
 
-    <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches" class="stat-card <?= $activeBreaches > 0 ? 'red' : 'emerald' ?>">
+    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches" class="stat-card <?= $activeBreaches > 0 ? 'red' : 'emerald' ?>">
         <div class="stat-icon">
             <i class="fa-solid fa-shield-<?= $activeBreaches > 0 ? 'exclamation' : 'check' ?>"></i>
         </div>
@@ -611,7 +611,7 @@ $currentPage = '';
         </span>
     </a>
 
-    <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="stat-card emerald">
+    <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="stat-card emerald">
         <div class="stat-icon">
             <i class="fa-solid fa-heartbeat"></i>
         </div>
@@ -628,7 +628,7 @@ $currentPage = '';
     </a>
 
     <?php if ($isSuperAdmin): ?>
-    <a href="<?= $basePath ?>/admin/enterprise/config/secrets" class="stat-card <?= $vaultAvailable ? 'cyan' : 'amber' ?>">
+    <a href="<?= $basePath ?>/admin-legacy/enterprise/config/secrets" class="stat-card <?= $vaultAvailable ? 'cyan' : 'amber' ?>">
         <div class="stat-icon">
             <i class="fa-solid fa-vault"></i>
         </div>
@@ -685,11 +685,11 @@ $currentPage = '';
                 </div>
             </div>
             <div class="module-actions">
-                <a href="<?= $basePath ?>/admin/enterprise/gdpr" class="module-btn module-btn-primary">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr" class="module-btn module-btn-primary">
                     <i class="fa-solid fa-gauge-high"></i>
                     Dashboard
                 </a>
-                <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests" class="module-btn module-btn-outline">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests" class="module-btn module-btn-outline">
                     <i class="fa-solid fa-inbox"></i>
                     Requests
                 </a>
@@ -733,12 +733,12 @@ $currentPage = '';
                 </div>
             </div>
             <div class="module-actions">
-                <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="module-btn module-btn-primary">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="module-btn module-btn-primary">
                     <i class="fa-solid fa-display"></i>
                     Dashboard
                 </a>
                 <?php if ($isSuperAdmin): ?>
-                <a href="<?= $basePath ?>/admin/enterprise/monitoring/logs" class="module-btn module-btn-outline">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring/logs" class="module-btn module-btn-outline">
                     <i class="fa-solid fa-file-lines"></i>
                     Logs
                 </a>
@@ -751,25 +751,25 @@ $currentPage = '';
 <!-- Quick Actions -->
 <div class="quick-actions">
     <div class="quick-actions-grid">
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr/requests/create" class="quick-action-btn">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/requests/create" class="quick-action-btn">
             <div class="quick-action-icon indigo">
                 <i class="fa-solid fa-plus"></i>
             </div>
             <span class="quick-action-label">New GDPR Request</span>
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr/breaches/report" class="quick-action-btn">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/breaches/report" class="quick-action-btn">
             <div class="quick-action-icon red">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <span class="quick-action-label">Report Breach</span>
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr/consents" class="quick-action-btn">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/consents" class="quick-action-btn">
             <div class="quick-action-icon emerald">
                 <i class="fa-solid fa-clipboard-check"></i>
             </div>
             <span class="quick-action-label">Manage Consents</span>
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/gdpr/audit" class="quick-action-btn">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr/audit" class="quick-action-btn">
             <div class="quick-action-icon cyan">
                 <i class="fa-solid fa-clock-rotate-left"></i>
             </div>
@@ -822,11 +822,11 @@ $currentPage = '';
                     </div>
                 </div>
                 <div class="module-actions">
-                    <a href="<?= $basePath ?>/admin/enterprise/config" class="module-btn module-btn-primary">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/config" class="module-btn module-btn-primary">
                         <i class="fa-solid fa-gear"></i>
                         Settings
                     </a>
-                    <a href="<?= $basePath ?>/admin/enterprise/config/secrets" class="module-btn module-btn-outline">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/config/secrets" class="module-btn module-btn-outline">
                         <i class="fa-solid fa-key"></i>
                         Secrets Vault
                     </a>

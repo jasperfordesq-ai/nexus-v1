@@ -40,7 +40,7 @@ class SeedGeneratorVerificationController
             'controller' => $this->verifyControllerCode(),
         ];
 
-        require __DIR__ . '/../../../views/admin/seed-generator/verification.php';
+        require __DIR__ . '/../../../views/admin-legacy/seed-generator/verification.php';
     }
 
     /**

@@ -29,7 +29,7 @@ $filters = $filters ?? [];
         <p class="admin-page-subtitle">Browse timebanks available for partnership</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-handshake"></i>
             My Partnerships
         </a>
@@ -97,7 +97,7 @@ $filters = $filters ?? [];
             <i class="fa-solid fa-clock"></i> Request Pending
         </span>
         <?php else: ?>
-        <a href="<?= $basePath ?>/admin/federation/partnerships?request=<?= $tenant['id'] ?>" class="admin-btn admin-btn-primary admin-btn-block">
+        <a href="<?= $basePath ?>/admin-legacy/federation/partnerships?request=<?= $tenant['id'] ?>" class="admin-btn admin-btn-primary admin-btn-block">
             <i class="fa-solid fa-paper-plane"></i>
             Request Partnership
         </a>

@@ -9,7 +9,7 @@ use Nexus\Core\TenantContext;
 $basePath = TenantContext::getBasePath();
 
 // Pagination
-$baseUrl = $basePath . '/admin/activity-log';
+$baseUrl = $basePath . '/admin-legacy/activity-log';
 $prevPage = $currentPage > 1 ? $currentPage - 1 : null;
 $nextPage = $currentPage < $totalPages ? $currentPage + 1 : null;
 

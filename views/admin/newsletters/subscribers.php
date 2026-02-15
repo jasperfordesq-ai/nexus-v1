@@ -30,11 +30,11 @@ else {
 
         <!-- Back Button & Actions Row -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-            <a href="<?= $basePath ?>/admin/newsletters" style="text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(4px); font-size: 0.9rem; transition: background 0.2s;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters" style="text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(4px); font-size: 0.9rem; transition: background 0.2s;">
                 &larr; Back to Newsletters
             </a>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="<?= $basePath ?>/admin/newsletters/subscribers/export" style="background: rgba(255,255,255,0.15); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(4px);">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/subscribers/export" style="background: rgba(255,255,255,0.15); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(4px);">
                     <i class="fa-solid fa-download"></i> Export CSV
                 </a>
                 <button onclick="document.getElementById('import-modal').style.display='flex'" style="background: rgba(255,255,255,0.15); color: white; padding: 8px 16px; border-radius: 8px; border: none; font-weight: 500; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(4px);">
@@ -69,7 +69,7 @@ else {
 
         <!-- Stats Cards -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px;">
-            <a href="<?= $basePath ?>/admin/newsletters/subscribers" class="nexus-card" style="padding: 24px; text-align: center; text-decoration: none; transition: all 0.2s; border-radius: 16px; <?= !$currentStatus ? 'border: 2px solid #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);' : '' ?>">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/subscribers" class="nexus-card" style="padding: 24px; text-align: center; text-decoration: none; transition: all 0.2s; border-radius: 16px; <?= !$currentStatus ? 'border: 2px solid #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);' : '' ?>">
                 <div style="font-size: 2.5rem; font-weight: 800; color: #111827; line-height: 1;"><?= number_format($stats['total'] ?? 0) ?></div>
                 <div style="color: #6b7280; font-size: 0.9rem; margin-top: 8px; font-weight: 500;">Total Subscribers</div>
             </a>
@@ -98,7 +98,7 @@ else {
                     <div style="color: #6b7280; font-size: 0.9rem;">Add all existing platform members to your subscriber list</div>
                 </div>
             </div>
-            <form action="<?= $basePath ?>/admin/newsletters/subscribers/sync" method="POST" data-turbo="false" style="margin: 0;">
+            <form action="<?= $basePath ?>/admin-legacy/newsletters/subscribers/sync" method="POST" data-turbo="false" style="margin: 0;">
                 <?= \Nexus\Core\Csrf::input() ?>
                 <button type="submit" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 10px 20px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);">
                     <i class="fa-solid fa-sync"></i> Sync Now
@@ -120,7 +120,7 @@ else {
                 </h3>
                 <!-- Filter Pills -->
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <a href="<?= $basePath ?>/admin/newsletters/subscribers" style="padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; <?= !$currentStatus ? 'background: #6366f1; color: white;' : 'background: #f1f5f9; color: #64748b;' ?>">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/subscribers" style="padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; <?= !$currentStatus ? 'background: #6366f1; color: white;' : 'background: #f1f5f9; color: #64748b;' ?>">
                         All
                     </a>
                     <a href="?status=active" style="padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; <?= $currentStatus === 'active' ? 'background: #10b981; color: white;' : 'background: #f1f5f9; color: #64748b;' ?>">
@@ -196,7 +196,7 @@ else {
                                     <?= date('M j, Y', strtotime($sub['created_at'])) ?>
                                 </td>
                                 <td style="padding: 16px 20px; text-align: right;">
-                                    <form action="<?= $basePath ?>/admin/newsletters/subscribers/delete" method="POST" style="display: inline;" onsubmit="return confirm('Remove this subscriber?');">
+                                    <form action="<?= $basePath ?>/admin-legacy/newsletters/subscribers/delete" method="POST" style="display: inline;" onsubmit="return confirm('Remove this subscriber?');">
                                         <?= \Nexus\Core\Csrf::input() ?>
                                         <input type="hidden" name="id" value="<?= $sub['id'] ?>">
                                         <button type="submit" style="background: none; border: none; color: #dc2626; cursor: pointer; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 6px; transition: background 0.15s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='transparent'">
@@ -274,7 +274,7 @@ else {
             </div>
         </div>
 
-        <form action="<?= $basePath ?>/admin/newsletters/subscribers/add" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/newsletters/subscribers/add" method="POST">
             <?= \Nexus\Core\Csrf::input() ?>
 
             <div style="margin-bottom: 20px;">
@@ -318,7 +318,7 @@ else {
             </div>
         </div>
 
-        <form action="<?= $basePath ?>/admin/newsletters/subscribers/import" method="POST" enctype="multipart/form-data">
+        <form action="<?= $basePath ?>/admin-legacy/newsletters/subscribers/import" method="POST" enctype="multipart/form-data">
             <?= \Nexus\Core\Csrf::input() ?>
 
             <div style="margin-bottom: 20px;">

@@ -3,6 +3,9 @@ export { GlassCard, type GlassCardProps } from './GlassCard';
 export { GlassButton, type GlassButtonProps } from './GlassButton';
 export { GlassInput, type GlassInputProps } from './GlassInput';
 
+// UX Components
+export { BackToTop } from './BackToTop';
+
 // Skeleton Components
 export {
   ListingSkeleton,

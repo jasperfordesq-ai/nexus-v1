@@ -18,7 +18,7 @@ $apiKey = $apiKey ?? [];
 $usageStats = $usageStats ?? [];
 ?>
 
-<a href="<?= $basePath ?>/admin/federation/api-keys" class="admin-back-link">
+<a href="<?= $basePath ?>/admin-legacy/federation/api-keys" class="admin-back-link">
     <i class="fa-solid fa-arrow-left"></i> Back to API Keys
 </a>
 
@@ -144,7 +144,7 @@ $usageStats = $usageStats ?? [];
 function revokeApiKey(id) {
     if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) return;
 
-    fetch('<?= $basePath ?>/admin/federation/api-keys/' + id + '/revoke', {
+    fetch('<?= $basePath ?>/admin-legacy/federation/api-keys/' + id + '/revoke', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ function revokeApiKey(id) {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            window.location.href = '<?= $basePath ?>/admin/federation/api-keys';
+            window.location.href = '<?= $basePath ?>/admin-legacy/federation/api-keys';
         } else {
             alert(data.error || 'Failed to revoke key');
         }

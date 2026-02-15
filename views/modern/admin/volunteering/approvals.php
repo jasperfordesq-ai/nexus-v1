@@ -111,14 +111,14 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         </td>
                         <td style="text-align: right;">
                             <div class="admin-action-buttons">
-                                <form action="<?= $basePath ?>/admin/volunteering/approve" method="POST" style="display:inline;">
+                                <form action="<?= $basePath ?>/admin-legacy/volunteering/approve" method="POST" style="display:inline;">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-success admin-btn-sm">
                                         <i class="fa-solid fa-check"></i> Approve
                                     </button>
                                 </form>
-                                <form action="<?= $basePath ?>/admin/volunteering/decline" method="POST" style="display:inline;">
+                                <form action="<?= $basePath ?>/admin-legacy/volunteering/decline" method="POST" style="display:inline;">
                                     <?= Csrf::input() ?>
                                     <input type="hidden" name="org_id" value="<?= $org['id'] ?>">
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm" onclick="return confirm('Reject this organization?');">

@@ -1,7 +1,7 @@
 <?php
 /**
  * Groups Settings
- * Path: views/modern/admin/groups/settings.php
+ * Path: views/modern/admin-legacy/groups/settings.php
  */
 
 use Nexus\Core\TenantContext;
@@ -24,7 +24,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Configure module behavior and permissions</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/groups" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/groups" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back
         </a>
     </div>
@@ -42,7 +42,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 </div>
 <?php endif; ?>
 
-<form method="POST" action="<?= $basePath ?>/admin/groups/settings">
+<form method="POST" action="<?= $basePath ?>/admin-legacy/groups/settings">
     <?= Csrf::input() ?>
 
     <!-- General Settings -->

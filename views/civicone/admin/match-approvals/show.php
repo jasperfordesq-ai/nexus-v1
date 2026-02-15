@@ -2,7 +2,7 @@
 /**
  * Match Approval Detail View - CivicOne Theme (GOV.UK)
  * Shows full details for a single match approval request
- * Path: views/civicone/admin/match-approvals/show.php
+ * Path: views/civicone/admin-legacy/match-approvals/show.php
  */
 
 use Nexus\Core\TenantContext;
@@ -17,7 +17,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
 <div class="govuk-width-container">
-    <a href="<?= $basePath ?>/admin/match-approvals" class="govuk-back-link">Back to approvals</a>
+    <a href="<?= $basePath ?>/admin-legacy/match-approvals" class="govuk-back-link">Back to approvals</a>
 
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
@@ -259,7 +259,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                 });
 
                 function submitAction(action, notes) {
-                    fetch(basePath + '/admin/match-approvals/' + action, {
+                    fetch(basePath + '/admin-legacy/match-approvals/' + action, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -274,7 +274,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     .then(function(response) { return response.json(); })
                     .then(function(data) {
                         if (data.success) {
-                            window.location.href = basePath + '/admin/match-approvals';
+                            window.location.href = basePath + '/admin-legacy/match-approvals';
                         } else {
                             alert('Error: ' + (data.error || 'Unknown error'));
                         }

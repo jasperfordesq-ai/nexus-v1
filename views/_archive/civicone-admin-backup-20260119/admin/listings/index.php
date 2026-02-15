@@ -159,7 +159,7 @@ $totalPages = $totalPages ?? 1;
                                 <a href="<?= $editUrl ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                                     <i class="fa-solid fa-pen"></i> Edit
                                 </a>
-                                <form method="POST" action="<?= $basePath ?>/admin/listings/delete/<?= $row['id'] ?>?type=<?= $row['content_type'] ?>" onsubmit="return confirm('Delete this item?');" style="display:inline;">
+                                <form method="POST" action="<?= $basePath ?>/admin-legacy/listings/delete/<?= $row['id'] ?>?type=<?= $row['content_type'] ?>" onsubmit="return confirm('Delete this item?');" style="display:inline;">
                                     <?= Csrf::input() ?>
                                     <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
                                         <i class="fa-solid fa-trash"></i>

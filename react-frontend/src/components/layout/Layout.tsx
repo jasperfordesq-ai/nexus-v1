@@ -7,7 +7,10 @@ import { useState, useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
+import { MobileTabBar } from './MobileTabBar';
 import { Footer } from './Footer';
+import { BackToTop } from '@/components/ui/BackToTop';
+import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
 import { SessionExpiredModal } from '@/components/feedback';
 import { useApiErrorHandler } from '@/hooks';
 
@@ -34,10 +37,13 @@ export function Layout({
   withNavbarPadding = true,
 }: LayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Memoize callbacks to prevent unnecessary re-renders in MobileDrawer
+  // Memoize callbacks to prevent unnecessary re-renders
   const handleMobileMenuOpen = useCallback(() => setIsMobileMenuOpen(true), []);
   const handleMobileMenuClose = useCallback(() => setIsMobileMenuOpen(false), []);
+  const handleSearchOpen = useCallback(() => setIsSearchOpen(true), []);
+  const handleSearchOpenChange = useCallback((open: boolean) => setIsSearchOpen(open), []);
 
   // Listen for API errors and display toast notifications
   useApiErrorHandler();
@@ -51,13 +57,21 @@ export function Layout({
         <div className="blob blob-cyan" />
       </div>
 
+      {/* Offline indicator */}
+      <OfflineIndicator />
+
       {/* Navigation */}
       {showNavbar && (
         <>
-          <Navbar onMobileMenuOpen={handleMobileMenuOpen} />
+          <Navbar
+            onMobileMenuOpen={handleMobileMenuOpen}
+            externalSearchOpen={isSearchOpen}
+            onSearchOpenChange={handleSearchOpenChange}
+          />
           <MobileDrawer
             isOpen={isMobileMenuOpen}
             onClose={handleMobileMenuClose}
+            onSearchOpen={handleSearchOpen}
           />
         </>
       )}
@@ -73,6 +87,12 @@ export function Layout({
 
       {/* Footer */}
       {showFooter && <Footer />}
+
+      {/* Mobile bottom tab bar */}
+      {showNavbar && <MobileTabBar onMenuOpen={handleMobileMenuOpen} />}
+
+      {/* Back to top button */}
+      <BackToTop />
 
       {/* Session Expired Modal */}
       <SessionExpiredModal />

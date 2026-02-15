@@ -24,7 +24,7 @@ class GdprAuditController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/audit
+     * GET /admin-legacy/enterprise/gdpr/audit
      * GDPR audit log
      */
     public function index(): void
@@ -46,7 +46,7 @@ class GdprAuditController extends BaseEnterpriseController
     }
 
     /**
-     * GET /admin/enterprise/gdpr/audit/export
+     * GET /admin-legacy/enterprise/gdpr/audit/export
      * Export GDPR audit log
      */
     public function export(): void
@@ -93,7 +93,7 @@ class GdprAuditController extends BaseEnterpriseController
     }
 
     /**
-     * POST /admin/enterprise/gdpr/export-report
+     * POST /admin-legacy/enterprise/gdpr/export-report
      * Generate comprehensive GDPR compliance report
      */
     public function complianceReport(): void

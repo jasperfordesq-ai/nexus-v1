@@ -513,10 +513,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Create and manage custom badges to reward your community members</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/gamification" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/gamification" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-gamepad"></i> Gamification Hub
         </a>
-        <a href="<?= $basePath ?>/admin/custom-badges/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/custom-badges/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> Create Badge
         </a>
     </div>
@@ -571,7 +571,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     <p class="empty-state-text">
         Create your first custom badge to recognize and reward community members for special achievements, contributions, or milestones.
     </p>
-    <a href="<?= $basePath ?>/admin/custom-badges/create" class="admin-btn admin-btn-primary">
+    <a href="<?= $basePath ?>/admin-legacy/custom-badges/create" class="admin-btn admin-btn-primary">
         <i class="fa-solid fa-plus"></i> Create Your First Badge
     </a>
 </div>
@@ -633,7 +633,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
             <!-- Actions -->
             <div class="badge-actions">
-                <a href="<?= $basePath ?>/admin/custom-badges/edit/<?= $badge['id'] ?>"
+                <a href="<?= $basePath ?>/admin-legacy/custom-badges/edit/<?= $badge['id'] ?>"
                    class="action-btn action-btn-edit">
                     <i class="fa-solid fa-pen"></i> Edit
                 </a>
@@ -658,7 +658,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="modal" role="dialog" aria-modal="true"-overlay" id="awardModalOverlay" onclick="closeAwardModal()"></div>
 <div class="modal" role="dialog" aria-modal="true"-container" id="awardModal">
     <div class="modal" role="dialog" aria-modal="true"-content" onclick="event.stopPropagation()">
-        <form method="POST" action="<?= $basePath ?>/admin/custom-badges/award">
+        <form method="POST" action="<?= $basePath ?>/admin-legacy/custom-badges/award">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
             <input type="hidden" name="badge_id" id="awardBadgeId">
 
@@ -713,7 +713,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <div class="modal" role="dialog" aria-modal="true"-overlay" id="deleteModalOverlay" onclick="closeDeleteModal()"></div>
 <div class="modal" role="dialog" aria-modal="true"-container" id="deleteModal">
     <div class="modal" role="dialog" aria-modal="true"-content" onclick="event.stopPropagation()" style="max-width: 500px;">
-        <form method="POST" action="<?= $basePath ?>/admin/custom-badges/delete">
+        <form method="POST" action="<?= $basePath ?>/admin-legacy/custom-badges/delete">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
             <input type="hidden" name="id" id="deleteId">
 

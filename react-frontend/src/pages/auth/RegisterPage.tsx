@@ -297,7 +297,7 @@ export function RegisterPage() {
                   label: 'text-theme-muted',
                   value: 'text-theme-primary',
                   popoverContent:
-                    'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
+                    'bg-content1 border border-theme-default',
                 }}
               >
                 {tenants.map((t) => (
@@ -360,7 +360,7 @@ export function RegisterPage() {
                 label: 'text-theme-muted',
                 value: 'text-theme-primary',
                 popoverContent:
-                  'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
+                  'bg-content1 border border-theme-default',
               }}
             >
               <SelectItem

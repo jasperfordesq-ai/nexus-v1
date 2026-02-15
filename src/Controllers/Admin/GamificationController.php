@@ -138,7 +138,7 @@ class GamificationController
             }
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification?rechecked=' . $processed . '&awarded=' . $badgesAwarded);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?rechecked=' . $processed . '&awarded=' . $badgesAwarded);
         exit;
     }
 
@@ -154,13 +154,13 @@ class GamificationController
         $badgeKey = $_POST['badge_key'] ?? '';
 
         if (empty($userIds) || empty($badgeKey)) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/gamification?error=missing_data');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?error=missing_data');
             exit;
         }
 
         $badge = GamificationService::getBadgeByKey($badgeKey);
         if (!$badge) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/gamification?error=invalid_badge');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?error=invalid_badge');
             exit;
         }
 
@@ -180,7 +180,7 @@ class GamificationController
             }
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification?bulk_awarded=' . $awarded);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?bulk_awarded=' . $awarded);
         exit;
     }
 
@@ -195,13 +195,13 @@ class GamificationController
         $badgeKey = $_POST['badge_key'] ?? '';
 
         if (empty($badgeKey)) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/gamification?error=missing_badge');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?error=missing_badge');
             exit;
         }
 
         $badge = GamificationService::getBadgeByKey($badgeKey);
         if (!$badge) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/gamification?error=invalid_badge');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?error=invalid_badge');
             exit;
         }
 
@@ -223,7 +223,7 @@ class GamificationController
             }
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification?all_awarded=' . $awarded);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?all_awarded=' . $awarded);
         exit;
     }
 
@@ -241,7 +241,7 @@ class GamificationController
             Database::query("UPDATE users SET xp = 0, level = 1 WHERE id = ?", [$userId]);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification?xp_reset=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?xp_reset=1');
         exit;
     }
 
@@ -259,7 +259,7 @@ class GamificationController
             Database::query("DELETE FROM user_badges WHERE user_id = ?", [$userId]);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification?badges_cleared=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?badges_cleared=1');
         exit;
     }
 
@@ -320,7 +320,7 @@ class GamificationController
 
         $campaign = AchievementCampaignService::getCampaign($id);
         if (!$campaign) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/gamification/campaigns');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns');
             exit;
         }
 
@@ -359,7 +359,7 @@ class GamificationController
             AchievementCampaignService::createCampaign($data);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification/campaigns?saved=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?saved=1');
         exit;
     }
 
@@ -376,7 +376,7 @@ class GamificationController
             AchievementCampaignService::activateCampaign($campaignId);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification/campaigns?activated=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?activated=1');
         exit;
     }
 
@@ -393,7 +393,7 @@ class GamificationController
             AchievementCampaignService::pauseCampaign($campaignId);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification/campaigns?paused=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?paused=1');
         exit;
     }
 
@@ -410,7 +410,7 @@ class GamificationController
             AchievementCampaignService::deleteCampaign($campaignId);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification/campaigns?deleted=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?deleted=1');
         exit;
     }
 
@@ -429,7 +429,7 @@ class GamificationController
             $result = AchievementCampaignService::runCampaign($campaignId);
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/gamification/campaigns?run=1&awarded=' . ($result['awarded'] ?? 0));
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?run=1&awarded=' . ($result['awarded'] ?? 0));
         exit;
     }
 

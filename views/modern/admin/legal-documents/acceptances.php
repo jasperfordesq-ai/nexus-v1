@@ -18,9 +18,9 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
 <!-- Breadcrumb -->
 <nav class="admin-breadcrumb">
-    <a href="<?= $basePath ?>/admin/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
     <span>/</span>
-    <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>"><?= htmlspecialchars($document['title']) ?></a>
     <span>/</span>
     <span>Version <?= htmlspecialchars($version['version_number']) ?> Acceptances</span>
 </nav>
@@ -38,7 +38,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/export" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/export" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-download"></i> Export All (CSV)
         </a>
     </div>

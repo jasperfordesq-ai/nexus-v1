@@ -17,7 +17,7 @@ require __DIR__ . '/../partials/admin-header.php';
 $permissions = $permissions ?? [];
 ?>
 
-<a href="<?= $basePath ?>/admin/federation/api-keys" class="admin-back-link">
+<a href="<?= $basePath ?>/admin-legacy/federation/api-keys" class="admin-back-link">
     <i class="fa-solid fa-arrow-left"></i> Back to API Keys
 </a>
 
@@ -29,7 +29,7 @@ $permissions = $permissions ?? [];
         </h3>
     </div>
     <div class="fed-admin-card-body">
-        <form action="<?= $basePath ?>/admin/federation/api-keys/create" method="POST">
+        <form action="<?= $basePath ?>/admin-legacy/federation/api-keys/create" method="POST">
             <?= Csrf::input() ?>
 
             <div class="admin-form-group">

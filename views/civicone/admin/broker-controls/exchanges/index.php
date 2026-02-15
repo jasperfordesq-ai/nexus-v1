@@ -2,7 +2,7 @@
 /**
  * Exchange Requests List - CivicOne Theme (GOV.UK)
  * View and manage exchange requests pending broker action
- * Path: views/civicone/admin/broker-controls/exchanges/index.php
+ * Path: views/civicone/admin-legacy/broker-controls/exchanges/index.php
  */
 
 use Nexus\Core\TenantContext;
@@ -26,7 +26,7 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content" role="main">
 
-        <a href="<?= $basePath ?>/admin/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
+        <a href="<?= $basePath ?>/admin-legacy/broker-controls" class="govuk-back-link">Back to Broker Controls</a>
 
         <h1 class="govuk-heading-xl">Exchange Requests</h1>
         <p class="govuk-body-l">Review and manage exchange requests.</p>
@@ -139,11 +139,11 @@ require __DIR__ . '/../../../layouts/civicone/header.php';
                         </strong>
                     </td>
                     <td class="govuk-table__cell">
-                        <a href="<?= $basePath ?>/admin/broker-controls/exchanges/<?= $exchange['id'] ?>" class="govuk-link">
+                        <a href="<?= $basePath ?>/admin-legacy/broker-controls/exchanges/<?= $exchange['id'] ?>" class="govuk-link">
                             View
                         </a>
                         <?php if ($exchange['status'] === 'pending_broker'): ?>
-                        <form action="<?= $basePath ?>/admin/broker-controls/exchanges/<?= $exchange['id'] ?>/approve" method="POST" style="display:inline;">
+                        <form action="<?= $basePath ?>/admin-legacy/broker-controls/exchanges/<?= $exchange['id'] ?>/approve" method="POST" style="display:inline;">
                             <?= Csrf::input() ?>
                             <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="margin-left: 10px;">
                                 Approve

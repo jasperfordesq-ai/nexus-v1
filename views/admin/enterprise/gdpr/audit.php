@@ -11,8 +11,8 @@ $pageTitle = 'GDPR Audit Log';
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="/admin/enterprise">Enterprise</a></li>
-                    <li class="breadcrumb-item"><a href="/admin/enterprise/gdpr">GDPR</a></li>
+                    <li class="breadcrumb-item"><a href="/admin-legacy/enterprise">Enterprise</a></li>
+                    <li class="breadcrumb-item"><a href="/admin-legacy/enterprise/gdpr">GDPR</a></li>
                     <li class="breadcrumb-item active">Audit Log</li>
                 </ol>
             </nav>
@@ -113,7 +113,7 @@ $pageTitle = 'GDPR Audit Log';
                     <button type="submit" class="btn btn-primary btn-sm mr-1">
                         <i class="fas fa-search"></i> Filter
                     </button>
-                    <a href="/admin/enterprise/gdpr/audit" class="btn btn-outline-secondary btn-sm">
+                    <a href="/admin-legacy/enterprise/gdpr/audit" class="btn btn-outline-secondary btn-sm">
                         <i class="fas fa-times"></i>
                     </a>
                 </div>
@@ -183,7 +183,7 @@ $pageTitle = 'GDPR Audit Log';
                                     </td>
                                     <td>
                                         <?php if ($log['user_id']): ?>
-                                            <a href="/admin/users/<?= $log['user_id'] ?>">
+                                            <a href="/admin-legacy/users/<?= $log['user_id'] ?>">
                                                 <?= htmlspecialchars($log['user_email'] ?? 'User #' . $log['user_id']) ?>
                                             </a>
                                         <?php else: ?>
@@ -290,7 +290,7 @@ $pageTitle = 'GDPR Audit Log';
                 <h5 class="modal-title">Schedule Audit Report</h5>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form action="/admin/enterprise/gdpr/audit/schedule" method="POST">
+            <form action="/admin-legacy/enterprise/gdpr/audit/schedule" method="POST">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Report Name</label>
@@ -375,7 +375,7 @@ $pageTitle = 'GDPR Audit Log';
 function exportAuditLog() {
     const params = new URLSearchParams(window.location.search);
     params.set('export', 'csv');
-    window.location.href = '/admin/enterprise/gdpr/audit/export?' + params.toString();
+    window.location.href = '/admin-legacy/enterprise/gdpr/audit/export?' + params.toString();
 }
 
 function showMetadata(metadata) {
@@ -419,10 +419,10 @@ function formatAction($action) {
 
 function getEntityLink($type, $id) {
     $links = [
-        'user' => '/admin/users/',
-        'request' => '/admin/enterprise/gdpr/requests/',
-        'consent' => '/admin/enterprise/gdpr/consents/',
-        'breach' => '/admin/enterprise/gdpr/breaches/',
+        'user' => '/admin-legacy/users/',
+        'request' => '/admin-legacy/enterprise/gdpr/requests/',
+        'consent' => '/admin-legacy/enterprise/gdpr/consents/',
+        'breach' => '/admin-legacy/enterprise/gdpr/breaches/',
     ];
     return ($links[$type] ?? '#') . $id;
 }

@@ -27,15 +27,15 @@ require __DIR__ . '/../partials/admin-header.php';
     </div>
     <div class="admin-page-header-actions">
         <?php if ($systemEnabled && $isWhitelisted): ?>
-        <a href="<?= $basePath ?>/admin/federation/directory" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/directory" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-compass"></i>
             Directory
         </a>
-        <a href="<?= $basePath ?>/admin/federation/analytics" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/analytics" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-chart-line"></i>
             Analytics
         </a>
-        <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-handshake"></i>
             Partnerships
         </a>
@@ -184,7 +184,7 @@ require __DIR__ . '/../partials/admin-header.php';
             <i class="fa-solid fa-handshake"></i>
             Active Partnerships
         </h3>
-        <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-secondary admin-btn-sm">
+        <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-secondary admin-btn-sm">
             View All <i class="fa-solid fa-arrow-right"></i>
         </a>
     </div>
@@ -207,7 +207,7 @@ require __DIR__ . '/../partials/admin-header.php';
                     <i class="fa-solid fa-handshake" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
                     No active partnerships yet
                     <br><br>
-                    <a href="<?= $basePath ?>/admin/federation/partnerships" class="admin-btn admin-btn-primary">
+                    <a href="<?= $basePath ?>/admin-legacy/federation/partnerships" class="admin-btn admin-btn-primary">
                         Find Partners
                     </a>
                 </td>
@@ -344,7 +344,7 @@ const csrfToken = '<?= Csrf::token() ?>';
 const basePath = '<?= $basePath ?>';
 
 function updateFeature(feature, enabled) {
-    fetch(basePath + '/admin/federation/update-feature', {
+    fetch(basePath + '/admin-legacy/federation/update-feature', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -375,7 +375,7 @@ function updateFeature(feature, enabled) {
 function approvePartnership(id) {
     if (!confirm('Approve this partnership request?')) return;
 
-    fetch(basePath + '/admin/federation/approve-partnership', {
+    fetch(basePath + '/admin-legacy/federation/approve-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -396,7 +396,7 @@ function approvePartnership(id) {
 function rejectPartnership(id) {
     const reason = prompt('Reason for rejection (optional):');
 
-    fetch(basePath + '/admin/federation/reject-partnership', {
+    fetch(basePath + '/admin-legacy/federation/reject-partnership', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

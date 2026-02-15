@@ -12,20 +12,18 @@ docker compose up -d
 # phpMyAdmin:     http://localhost:8091 (run with --profile tools)
 ```
 
-**Stop XAMPP** - it's not needed and causes confusion.
-
 ---
 
-## Why Docker Instead of XAMPP?
+## Why Docker?
 
-| Aspect | XAMPP | Docker |
-|--------|-------|--------|
-| Database state | May be out of sync | Single source of truth |
-| Migrations | Manual | Applied on container start |
-| Environment | Varies by machine | Identical everywhere |
-| Port conflicts | Common (80, 3306) | Isolated (8090, internal) |
-| Redis | Not included | Included |
-| React frontend | Separate setup | Included in compose |
+| Aspect | Docker Advantage |
+|--------|------------------|
+| Database state | Single source of truth |
+| Migrations | Applied on container start automatically |
+| Environment | Identical across all machines |
+| Port conflicts | Isolated (8090, internal) |
+| Redis | Included and configured |
+| React frontend | Included in compose |
 
 ## Architecture
 
@@ -51,31 +49,15 @@ docker compose up -d
 
 ## Quick Start
 
-### 1. Stop XAMPP (Windows)
-
-Open XAMPP Control Panel and stop:
-- Apache
-- MySQL
-
-Or from command line:
-```cmd
-C:\xampp\xampp_stop.exe
-```
-
-Or kill processes directly:
-```cmd
-taskkill /F /IM httpd.exe
-taskkill /F /IM mysqld.exe
-```
-
-### 2. Start Docker Stack
+### 1. Start Docker Stack
 
 ```bash
-cd c:\xampp\htdocs\staging
+# Navigate to project root
+cd /path/to/project
 docker compose up -d
 ```
 
-### 3. Verify Everything Works
+### 2. Verify Everything Works
 
 ```bash
 # Check containers are running
@@ -92,9 +74,9 @@ curl http://localhost:8090/api/v2/tenant/bootstrap
 
 | Service | URL | Purpose |
 |---------|-----|---------|
-| React Frontend | http://localhost:5173 | New SPA frontend |
+| React Frontend | http://localhost:5173 | Primary SPA frontend |
 | PHP API | http://localhost:8090 | Backend API |
-| Legacy PHP Views | http://localhost:8090/{tenant}/ | Traditional PHP pages |
+| Legacy PHP Views | http://localhost:8090/{tenant}/ | Traditional PHP pages (reference only) |
 | phpMyAdmin | http://localhost:8091 | Database admin (needs `--profile tools`) |
 
 ## Common Commands
@@ -133,7 +115,7 @@ docker compose --profile tools up -d
 
 ### Via CLI
 ```bash
-docker exec -it nexus-mysql-db mysql -unexus -pnexus_secret nexus
+docker exec -it nexus-php-db mysql -unexus -pnexus_secret nexus
 ```
 
 ### Connection Details (for external tools)
@@ -150,14 +132,13 @@ Then connect to `localhost:3307` with:
 
 ## Environment Variables
 
-Docker uses `.env.docker`, NOT `.env`:
+Docker uses `.env.docker`:
 
 | File | Purpose |
 |------|---------|
-| `.env` | Legacy XAMPP config (not used with Docker) |
 | `.env.docker` | Docker environment variables |
 
-The `compose.yml` hardcodes database credentials to prevent `.env` from accidentally overriding Docker settings.
+The `compose.yml` hardcodes database credentials for consistent Docker operation.
 
 ## Troubleshooting
 
@@ -194,8 +175,50 @@ docker compose restart frontend
 ### Need to run migrations
 Migrations are SQL files in `/migrations`. Apply them:
 ```bash
-docker exec -it nexus-mysql-db mysql -unexus -pnexus_secret nexus < migrations/filename.sql
+docker exec -it nexus-php-db mysql -unexus -pnexus_secret nexus < migrations/filename.sql
 ```
+
+## Container Names (THIS PROJECT ONLY)
+
+> **This project is `project-nexus.ie` (PHP + React).** The `.NET backend` (`asp.net-backend/`) is a **separate project** with its own containers. Never deploy to or modify `.NET` containers from this project.
+
+Local and production container names are **identical** — no confusion between environments:
+
+| Service | Container Name | Local Port | Prod Port |
+|---------|---------------|------------|-----------|
+| PHP App (Apache) | `nexus-php-app` | 8090 | 8090 |
+| MariaDB | `nexus-php-db` | Internal | Internal |
+| Redis | `nexus-php-redis` | Internal | Internal |
+| React Frontend | `nexus-react-prod` | 5173 | 3000 |
+| Sales Site | `nexus-sales-site` | 3001 | 3001 |
+| phpMyAdmin | `nexus-phpmyadmin` | 8091 | N/A |
+
+### Containers that are NOT this project (DO NOT TOUCH)
+
+| Container | Project | Purpose |
+|-----------|---------|---------|
+| `nexus-backend-api` | asp.net-backend | .NET Core API |
+| `nexus-backend-db` | asp.net-backend | PostgreSQL |
+| `nexus-backend-rabbitmq` | asp.net-backend | RabbitMQ |
+| `nexus-backend-llama` | asp.net-backend | Ollama AI |
+| `nexus-civic-app` | nexus-civic | Node.js app |
+| `nexus-civic-db` | nexus-civic | PostgreSQL |
+| `nexus-frontend-dev` | nexus-modern-frontend | Next.js |
+| `nexus-uk-frontend-dev` | nexus-uk-frontend | Next.js |
+
+## Docker Data Storage
+
+Docker Desktop stores its data on the D: drive:
+
+| What | Path |
+|------|------|
+| WSL distro dir | `D:\DockerDesktopWSL\` |
+| Data disk (vhdx) | `D:\DockerDesktopWSL\disk\docker_data.vhdx` |
+| Docker Desktop settings | `%APPDATA%\Docker\settings-store.json` |
+
+Settings in `settings-store.json` that control this:
+- `CustomWslDistroDir`: `D:\DockerDesktopWSL`
+- `DiskPath`: Points to the data vhdx location
 
 ## File Locations
 
@@ -212,12 +235,24 @@ docker exec -it nexus-mysql-db mysql -unexus -pnexus_secret nexus < migrations/f
 
 ## Backup & Restore
 
+### Database Backup (Local)
 ```bash
-# Backup database
-./scripts/docker-backup.sh
-# or on Windows
-./scripts/docker-backup.bat
+# Dump local database
+docker exec nexus-php-db mysqldump -unexus -pnexus_secret nexus > backup.sql
 
-# Restore database
-./scripts/docker-restore.sh backups/nexus-backup-YYYYMMDD.sql
+# Restore local database
+docker exec -i nexus-php-db mysql -unexus -pnexus_secret nexus < backup.sql
 ```
+
+### Restore from Production
+```bash
+# Dump production database
+ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253 \
+  "sudo docker exec nexus-php-db mysqldump -unexus -p'<password>' --single-transaction --routines --triggers nexus" \
+  > prod_dump.sql
+
+# Import into local
+docker exec -i nexus-php-db mysql -unexus -pnexus_secret nexus < prod_dump.sql
+```
+
+> **Note**: Get the production DB password from: `sudo docker exec nexus-php-db env | grep MARIADB_PASSWORD`

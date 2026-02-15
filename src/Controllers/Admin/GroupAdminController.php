@@ -134,7 +134,7 @@ class GroupAdminController
             [$newStatus, $groupId]
         );
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/groups?featured=' . $newStatus);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups?featured=' . $newStatus);
         exit;
     }
 
@@ -165,7 +165,7 @@ class GroupAdminController
         // Delete the group
         Database::query("DELETE FROM `groups` WHERE id = ?", [$groupId]);
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/groups?deleted=1');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups?deleted=1');
         exit;
     }
 
@@ -413,7 +413,7 @@ class GroupAdminController
 
             GroupConfigurationService::setMultiple($configs);
 
-            header('Location: ' . TenantContext::getBasePath() . '/admin/groups/settings?saved=1');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups/settings?saved=1');
             exit;
         }
 
@@ -463,7 +463,7 @@ class GroupAdminController
                 GroupPolicyRepository::deletePolicy($key);
             }
 
-            header('Location: ' . TenantContext::getBasePath() . '/admin/groups/policies?saved=1');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups/policies?saved=1');
             exit;
         }
 
@@ -775,12 +775,12 @@ class GroupAdminController
 
                 GroupFeatureToggleService::bulkSet($features);
 
-                header('Location: ' . TenantContext::getBasePath() . '/admin/groups/features?saved=1');
+                header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups/features?saved=1');
                 exit;
             } elseif ($action === 'reset_defaults') {
                 GroupFeatureToggleService::resetToDefaults();
 
-                header('Location: ' . TenantContext::getBasePath() . '/admin/groups/features?reset=1');
+                header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups/features?reset=1');
                 exit;
             }
         }

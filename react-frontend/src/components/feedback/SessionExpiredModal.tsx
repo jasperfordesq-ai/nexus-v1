@@ -55,7 +55,7 @@ export function SessionExpiredModal() {
             aria-labelledby="session-expired-title"
             aria-describedby="session-expired-description"
           >
-            <div className="bg-white dark:bg-gray-900/95 backdrop-blur-xl border border-theme-default rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <div className="bg-content1 backdrop-blur-xl border border-theme-default rounded-2xl p-6 max-w-sm w-full shadow-2xl">
               {/* Icon */}
               <div className="flex justify-center mb-4">
                 <div className="p-4 rounded-full bg-amber-500/20">

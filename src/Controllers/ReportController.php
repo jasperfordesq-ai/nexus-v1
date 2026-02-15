@@ -70,6 +70,6 @@ class ReportController
             \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'resolve_report', "Marked Report #$id as $status");
         }
 
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin');
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy');
     }
 }

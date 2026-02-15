@@ -83,7 +83,7 @@ class CustomBadgeController
 
         if (empty($name)) {
             $_SESSION['flash_error'] = 'Badge name is required';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges/create');
             exit;
         }
 
@@ -94,7 +94,7 @@ class CustomBadgeController
         );
 
         $_SESSION['flash_success'] = 'Custom badge created successfully!';
-        header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
         exit;
     }
 
@@ -116,7 +116,7 @@ class CustomBadgeController
         )->fetch();
 
         if (!$badge) {
-            header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
             exit;
         }
 
@@ -153,7 +153,7 @@ class CustomBadgeController
 
         if (empty($name) || !$id) {
             $_SESSION['flash_error'] = 'Invalid badge data';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
             exit;
         }
 
@@ -164,7 +164,7 @@ class CustomBadgeController
         );
 
         $_SESSION['flash_success'] = 'Custom badge updated successfully!';
-        header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
         exit;
     }
 
@@ -187,7 +187,7 @@ class CustomBadgeController
 
         if (!$id) {
             $_SESSION['flash_error'] = 'Invalid badge ID';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
             exit;
         }
 
@@ -204,7 +204,7 @@ class CustomBadgeController
         );
 
         $_SESSION['flash_success'] = 'Custom badge deleted successfully!';
-        header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
         exit;
     }
 
@@ -228,7 +228,7 @@ class CustomBadgeController
 
         if (!$badgeId || empty($userIds)) {
             $_SESSION['flash_error'] = 'Please select a badge and at least one user';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
             exit;
         }
 
@@ -240,7 +240,7 @@ class CustomBadgeController
 
         if (!$badge) {
             $_SESSION['flash_error'] = 'Badge not found';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
             exit;
         }
 
@@ -283,7 +283,7 @@ class CustomBadgeController
         }
 
         $_SESSION['flash_success'] = "Badge awarded to {$awarded} user(s)!";
-        header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
         exit;
     }
 
@@ -306,7 +306,7 @@ class CustomBadgeController
 
         if (!$badgeId || !$userId) {
             $_SESSION['flash_error'] = 'Invalid parameters';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
             exit;
         }
 
@@ -316,7 +316,7 @@ class CustomBadgeController
         );
 
         $_SESSION['flash_success'] = 'Badge revoked successfully!';
-        header('Location: ' . TenantContext::getBasePath() . '/admin/custom-badges');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
         exit;
     }
 

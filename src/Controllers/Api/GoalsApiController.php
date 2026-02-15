@@ -379,4 +379,59 @@ class GoalsApiController extends BaseApiController
             'goal' => $goal
         ]);
     }
+
+    /**
+     * POST /api/v2/goals/{id}/complete
+     *
+     * Mark a goal as complete by setting progress to the target value.
+     *
+     * Response: 200 OK with updated goal data
+     */
+    public function complete(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('goal_complete', 10, 60);
+
+        $goal = GoalService::getById($id);
+
+        if (!$goal) {
+            $this->respondWithError(
+                ApiErrorCodes::RESOURCE_NOT_FOUND,
+                'Goal not found',
+                null,
+                404
+            );
+            return;
+        }
+
+        if ((int) ($goal['user_id'] ?? 0) !== $userId) {
+            $this->respondWithError(
+                ApiErrorCodes::RESOURCE_FORBIDDEN,
+                'You can only complete your own goals',
+                null,
+                403
+            );
+            return;
+        }
+
+        // Set progress to target value to complete the goal
+        $target = (float) ($goal['target_value'] ?? 1);
+        $current = (float) ($goal['current_value'] ?? 0);
+        $remaining = $target - $current;
+
+        if ($remaining > 0) {
+            $updated = GoalService::updateProgress($id, $userId, $remaining);
+            if ($updated === null) {
+                $this->respondWithErrors(GoalService::getErrors(), 400);
+                return;
+            }
+        }
+
+        // Reload
+        $goal = GoalService::getById($id);
+        $goal['is_owner'] = true;
+
+        $this->respondWithData($goal);
+    }
 }

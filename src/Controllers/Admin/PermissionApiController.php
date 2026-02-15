@@ -54,7 +54,7 @@ class PermissionApiController
     }
 
     /**
-     * GET /admin/api/permissions/check
+     * GET /admin-legacy/api/permissions/check
      * Check if current user has a permission
      * Query params: permission (required)
      */
@@ -79,7 +79,7 @@ class PermissionApiController
     }
 
     /**
-     * GET /admin/api/permissions
+     * GET /admin-legacy/api/permissions
      * Get all permissions grouped by category
      */
     public function getAllPermissions(): void
@@ -99,7 +99,7 @@ class PermissionApiController
     }
 
     /**
-     * GET /admin/api/roles
+     * GET /admin-legacy/api/roles
      * Get all roles with stats
      */
     public function getAllRoles(): void
@@ -119,7 +119,7 @@ class PermissionApiController
     }
 
     /**
-     * GET /admin/api/users/{userId}/permissions
+     * GET /admin-legacy/api/users/{userId}/permissions
      * Get all permissions for a specific user
      */
     public function getUserPermissions(int $userId): void
@@ -140,7 +140,7 @@ class PermissionApiController
     }
 
     /**
-     * GET /admin/api/users/{userId}/roles
+     * GET /admin-legacy/api/users/{userId}/roles
      * Get all roles assigned to a user
      */
     public function getUserRoles(int $userId): void
@@ -161,7 +161,7 @@ class PermissionApiController
     }
 
     /**
-     * POST /admin/api/users/{userId}/roles
+     * POST /admin-legacy/api/users/{userId}/roles
      * Assign a role to a user
      * Body: { role_id: int, expires_at?: string }
      */
@@ -216,7 +216,7 @@ class PermissionApiController
     }
 
     /**
-     * DELETE /admin/api/users/{userId}/roles/{roleId}
+     * DELETE /admin-legacy/api/users/{userId}/roles/{roleId}
      * Revoke a role from a user
      */
     public function revokeRoleFromUser(int $userId, int $roleId): void
@@ -251,7 +251,7 @@ class PermissionApiController
     }
 
     /**
-     * POST /admin/api/users/{userId}/permissions
+     * POST /admin-legacy/api/users/{userId}/permissions
      * Grant a direct permission to a user
      * Body: { permission_id: int, expires_at?: string }
      */
@@ -307,7 +307,7 @@ class PermissionApiController
     }
 
     /**
-     * DELETE /admin/api/users/{userId}/permissions/{permissionId}
+     * DELETE /admin-legacy/api/users/{userId}/permissions/{permissionId}
      * Revoke a direct permission from a user
      */
     public function revokePermissionFromUser(int $userId, int $permissionId): void
@@ -342,7 +342,7 @@ class PermissionApiController
     }
 
     /**
-     * GET /admin/api/audit/permissions
+     * GET /admin-legacy/api/audit/permissions
      * Get permission audit log with filters
      * Query params: user_id, permission, event_type, from_date, to_date, limit, offset
      */
@@ -423,7 +423,7 @@ class PermissionApiController
     }
 
     /**
-     * GET /admin/api/users/{userId}/effective-permissions
+     * GET /admin-legacy/api/users/{userId}/effective-permissions
      * Get user's complete effective permissions (roles + direct grants - revocations)
      */
     public function getUserEffectivePermissions(int $userId): void
@@ -507,7 +507,7 @@ class PermissionApiController
     }
 
     /**
-     * GET /admin/api/roles/{roleId}/permissions
+     * GET /admin-legacy/api/roles/{roleId}/permissions
      * Get all permissions for a specific role
      */
     public function getRolePermissions(int $roleId): void
@@ -534,7 +534,7 @@ class PermissionApiController
     }
 
     /**
-     * GET /admin/api/stats/permissions
+     * GET /admin-legacy/api/stats/permissions
      * Get permission system statistics
      */
     public function getPermissionStats(): void

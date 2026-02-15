@@ -46,7 +46,7 @@ require __DIR__ . '/partials/admin-header.php';
             <i class="fa-solid fa-rotate"></i>
             Refresh
         </button>
-        <a href="<?= $basePath ?>/admin/activity-log" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/activity-log" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-list-ul"></i>
             View All Activity
         </a>
@@ -178,7 +178,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <div class="admin-alert-title"><?= count($pending_users) ?> User<?= count($pending_users) > 1 ? 's' : '' ?> Pending</div>
             <div class="admin-alert-text">New member registrations require your review</div>
         </div>
-        <a href="<?= $basePath ?>/admin/users?filter=pending" class="admin-btn admin-btn-warning">
+        <a href="<?= $basePath ?>/admin-legacy/users?filter=pending" class="admin-btn admin-btn-warning">
             <i class="fa-solid fa-arrow-right"></i> Review
         </a>
     </div>
@@ -193,7 +193,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <div class="admin-alert-title"><?= $pending_listings ?> Listing<?= $pending_listings > 1 ? 's' : '' ?> Pending</div>
             <div class="admin-alert-text">New listings awaiting moderation</div>
         </div>
-        <a href="<?= $basePath ?>/admin/listings?status=pending" class="admin-btn admin-btn-info">
+        <a href="<?= $basePath ?>/admin-legacy/listings?status=pending" class="admin-btn admin-btn-info">
             <i class="fa-solid fa-arrow-right"></i> Review
         </a>
     </div>
@@ -208,7 +208,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <div class="admin-alert-title"><?= $pending_orgs ?> Organization<?= $pending_orgs > 1 ? 's' : '' ?> Pending</div>
             <div class="admin-alert-text">Volunteering organizations awaiting approval</div>
         </div>
-        <a href="<?= $basePath ?>/admin/volunteering/approvals" class="admin-btn admin-btn-purple">
+        <a href="<?= $basePath ?>/admin-legacy/volunteering/approvals" class="admin-btn admin-btn-purple">
             <i class="fa-solid fa-arrow-right"></i> Review
         </a>
     </div>
@@ -227,7 +227,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
 
 <div class="admin-modules-grid" id="tour-modules">
     <!-- Content -->
-    <a href="<?= $basePath ?>/admin/categories" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/categories" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-violet">
             <i class="fa-solid fa-folder-tree"></i>
         </div>
@@ -238,7 +238,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/attributes" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/attributes" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-emerald">
             <i class="fa-solid fa-tags"></i>
         </div>
@@ -249,7 +249,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/pages" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/pages" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-amber">
             <i class="fa-solid fa-file-lines"></i>
         </div>
@@ -260,7 +260,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/blog" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/blog" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-rose">
             <i class="fa-solid fa-blog"></i>
         </div>
@@ -272,7 +272,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
     </a>
 
     <!-- Community -->
-    <a href="<?= $basePath ?>/admin/volunteering" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/volunteering" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-cyan">
             <i class="fa-solid fa-hands-helping"></i>
         </div>
@@ -283,7 +283,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/group-locations" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/group-locations" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-orange">
             <i class="fa-solid fa-location-dot"></i>
         </div>
@@ -294,7 +294,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/group-ranking" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/group-ranking" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-pink">
             <i class="fa-solid fa-chart-line"></i>
         </div>
@@ -306,7 +306,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
     </a>
 
     <!-- Intelligence -->
-    <a href="<?= $basePath ?>/admin/ai-settings" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/ai-settings" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-indigo">
             <i class="fa-solid fa-microchip"></i>
         </div>
@@ -317,7 +317,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/smart-matching" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/smart-matching" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-pink">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
         </div>
@@ -328,7 +328,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/feed-algorithm" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/feed-algorithm" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-indigo">
             <i class="fa-solid fa-sliders"></i>
         </div>
@@ -339,7 +339,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/algorithm-settings" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/algorithm-settings" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-emerald">
             <i class="fa-solid fa-scale-balanced"></i>
         </div>
@@ -351,7 +351,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
     </a>
 
     <!-- Engagement -->
-    <a href="<?= $basePath ?>/admin/timebanking" class="admin-module-card admin-module-card-gradient">
+    <a href="<?= $basePath ?>/admin-legacy/timebanking" class="admin-module-card admin-module-card-gradient">
         <div class="admin-module-icon admin-module-icon-gradient-teal">
             <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
@@ -362,7 +362,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/seo" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/seo" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-red">
             <i class="fa-solid fa-magnifying-glass-chart"></i>
         </div>
@@ -373,7 +373,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/404-errors" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/404-errors" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-warning">
             <i class="fa-solid fa-exclamation-triangle"></i>
         </div>
@@ -385,7 +385,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
 
-    <a href="<?= $basePath ?>/admin/cron-jobs" class="admin-module-card">
+    <a href="<?= $basePath ?>/admin-legacy/cron-jobs" class="admin-module-card">
         <div class="admin-module-icon admin-module-icon-slate">
             <i class="fa-solid fa-clock"></i>
         </div>
@@ -412,7 +412,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                     <h3 class="admin-card-title">Real-time Activity</h3>
                     <p class="admin-card-subtitle">Latest events in your community</p>
                 </div>
-                <a href="<?= $basePath ?>/admin/activity-log" class="admin-card-header-action">
+                <a href="<?= $basePath ?>/admin-legacy/activity-log" class="admin-card-header-action">
                     View All <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
@@ -489,37 +489,37 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             </div>
             <div class="admin-card-body">
                 <div class="admin-quick-actions">
-                    <a href="<?= $basePath ?>/admin/users" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/users" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-blue">
                             <i class="fa-solid fa-user-plus"></i>
                         </div>
                         <span>Manage Users</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/listings" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/listings" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-green">
                             <i class="fa-solid fa-list-check"></i>
                         </div>
                         <span>View Listings</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/newsletters" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-purple">
                             <i class="fa-solid fa-paper-plane"></i>
                         </div>
                         <span>Send Newsletter</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/blog" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/blog" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-pink">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </div>
                         <span>New Blog Post</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/gamification" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/gamification" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-orange">
                             <i class="fa-solid fa-trophy"></i>
                         </div>
                         <span>Gamification</span>
                     </a>
-                    <a href="<?= $basePath ?>/admin/settings" class="admin-quick-action">
+                    <a href="<?= $basePath ?>/admin-legacy/settings" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-slate">
                             <i class="fa-solid fa-gear"></i>
                         </div>
@@ -542,22 +542,22 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             </div>
             <div class="admin-card-body">
                 <div class="admin-enterprise-links">
-                    <a href="<?= $basePath ?>/admin/enterprise" class="admin-enterprise-link">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise" class="admin-enterprise-link">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span>Overview</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/enterprise/gdpr" class="admin-enterprise-link">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr" class="admin-enterprise-link">
                         <i class="fa-solid fa-user-shield"></i>
                         <span>GDPR Compliance</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="admin-enterprise-link">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-enterprise-link">
                         <i class="fa-solid fa-heart-pulse"></i>
                         <span>System Health</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/enterprise/config" class="admin-enterprise-link">
+                    <a href="<?= $basePath ?>/admin-legacy/enterprise/config" class="admin-enterprise-link">
                         <i class="fa-solid fa-gears"></i>
                         <span>Configuration</span>
                         <i class="fa-solid fa-chevron-right"></i>
@@ -606,7 +606,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                         <?php endif; ?>
                     </p>
                 </div>
-                <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="admin-card-header-action">
+                <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-card-header-action">
                     Details <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>

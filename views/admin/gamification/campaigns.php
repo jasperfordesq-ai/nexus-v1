@@ -224,7 +224,7 @@ $badges = $badges ?? [];
 
                     <div class="d-flex gap-2">
                         <?php if ($campaign['status'] === 'draft'): ?>
-                        <form action="<?= $basePath ?>/admin/gamification/campaigns/activate" method="POST" style="display: inline;">
+                        <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/activate" method="POST" style="display: inline;">
                             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                             <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                             <button type="submit" class="btn btn-success btn-campaign">
@@ -232,14 +232,14 @@ $badges = $badges ?? [];
                             </button>
                         </form>
                         <?php elseif ($campaign['status'] === 'active'): ?>
-                        <form action="<?= $basePath ?>/admin/gamification/campaigns/run" method="POST" style="display: inline;">
+                        <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/run" method="POST" style="display: inline;">
                             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                             <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                             <button type="submit" class="btn btn-primary btn-campaign">
                                 <i class="fa-solid fa-bolt"></i> Run Now
                             </button>
                         </form>
-                        <form action="<?= $basePath ?>/admin/gamification/campaigns/pause" method="POST" style="display: inline;">
+                        <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/pause" method="POST" style="display: inline;">
                             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                             <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                             <button type="submit" class="btn btn-warning btn-campaign">
@@ -247,7 +247,7 @@ $badges = $badges ?? [];
                             </button>
                         </form>
                         <?php elseif ($campaign['status'] === 'paused'): ?>
-                        <form action="<?= $basePath ?>/admin/gamification/campaigns/activate" method="POST" style="display: inline;">
+                        <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/activate" method="POST" style="display: inline;">
                             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                             <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                             <button type="submit" class="btn btn-success btn-campaign">
@@ -260,7 +260,7 @@ $badges = $badges ?? [];
                             <i class="fa-solid fa-edit"></i>
                         </button>
 
-                        <form action="<?= $basePath ?>/admin/gamification/campaigns/delete" method="POST" style="display: inline;" onsubmit="return confirm('Delete this campaign?');">
+                        <form action="<?= $basePath ?>/admin-legacy/gamification/campaigns/delete" method="POST" style="display: inline;" onsubmit="return confirm('Delete this campaign?');">
                             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                             <input type="hidden" name="campaign_id" value="<?= $campaign['id'] ?>">
                             <button type="submit" class="btn btn-outline-danger btn-campaign">
@@ -280,7 +280,7 @@ $badges = $badges ?? [];
 <div class="modal fade" id="campaignModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form id="campaignForm" action="<?= $basePath ?>/admin/gamification/campaigns/save" method="POST">
+            <form id="campaignForm" action="<?= $basePath ?>/admin-legacy/gamification/campaigns/save" method="POST">
                 <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                 <input type="hidden" name="campaign_id" id="campaign_id" value="">
 
@@ -421,7 +421,7 @@ function previewAudience() {
 
     const formData = new FormData(document.getElementById('campaignForm'));
 
-    fetch('<?= $basePath ?>/admin/gamification/campaigns/preview-audience', {
+    fetch('<?= $basePath ?>/admin-legacy/gamification/campaigns/preview-audience', {
         method: 'POST',
         body: formData
     })

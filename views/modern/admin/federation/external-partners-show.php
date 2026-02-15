@@ -3,7 +3,7 @@
  * External Federation Partners - Show/Edit View
  * View and manage a single external federation partner
  *
- * Styles: /httpdocs/assets/css/admin/federation-external-partners.css
+ * Styles: /httpdocs/assets/css/admin-legacy/federation-external-partners.css
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -39,7 +39,7 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
 
 <div class="federation-partners-page">
 
-<a href="/admin/federation/external-partners" class="back-link">
+<a href="/admin-legacy/federation/external-partners" class="back-link">
     <i class="fa-solid fa-arrow-left"></i> Back to External Partners
 </a>
 
@@ -74,7 +74,7 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
             </div>
         </div>
         <div class="status-actions">
-            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/test" class="action-form-inline">
+            <form method="POST" action="/admin-legacy/federation/external-partners/<?= $partner['id'] ?>/test" class="action-form-inline">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn test">
                     <i class="fa-solid fa-plug"></i> Test Connection
@@ -82,14 +82,14 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
             </form>
 
             <?php if ($partner['status'] === 'active'): ?>
-            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/suspend" class="action-form-inline">
+            <form method="POST" action="/admin-legacy/federation/external-partners/<?= $partner['id'] ?>/suspend" class="action-form-inline">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn suspend" onclick="return confirm('Suspend this partner?')">
                     <i class="fa-solid fa-pause"></i> Suspend
                 </button>
             </form>
             <?php elseif ($partner['status'] === 'suspended'): ?>
-            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/activate" class="action-form-inline">
+            <form method="POST" action="/admin-legacy/federation/external-partners/<?= $partner['id'] ?>/activate" class="action-form-inline">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn activate">
                     <i class="fa-solid fa-play"></i> Activate
@@ -97,7 +97,7 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
             </form>
             <?php endif; ?>
 
-            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/delete" class="action-form-inline">
+            <form method="POST" action="/admin-legacy/federation/external-partners/<?= $partner['id'] ?>/delete" class="action-form-inline">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn delete" onclick="return confirm('Delete this partner? This cannot be undone.')">
                     <i class="fa-solid fa-trash"></i> Delete
@@ -114,7 +114,7 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
     <?php endif; ?>
 
     <!-- Edit Form -->
-    <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/update">
+    <form method="POST" action="/admin-legacy/federation/external-partners/<?= $partner['id'] ?>/update">
         <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
 
         <div class="content-grid">

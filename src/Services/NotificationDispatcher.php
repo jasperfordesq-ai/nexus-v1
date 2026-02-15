@@ -448,7 +448,7 @@ HTML;
     public static function dispatchMatchApprovalRequest($brokerId, $userName, $listingTitle, $requestId)
     {
         $content = "📋 Match needs approval: {$userName} matched with \"{$listingTitle}\"";
-        $link = "/admin/match-approvals";
+        $link = "/admin-legacy/match-approvals";
 
         // Create in-app notification
         Notification::create($brokerId, $content, $link, 'match_approval_request');
@@ -529,7 +529,7 @@ HTML;
             Please review this match to ensure the member is suitable (mobility, health considerations) and the activity is within insurance coverage.
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$basePath}/admin/match-approvals" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Review Match</a>
+            <a href="{$basePath}/admin-legacy/match-approvals" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Review Match</a>
         </div>
     </div>
 </div>
@@ -724,11 +724,11 @@ HTML;
                 return "/exchanges/{$exchangeId}";
             case 'exchange_pending_broker':
                 $exchangeId = $data['exchange_id'] ?? 0;
-                return "/admin/broker-controls/exchanges/{$exchangeId}";
+                return "/admin-legacy/broker-controls/exchanges/{$exchangeId}";
             case 'exchange_request_declined':
                 return "/exchanges";
             case 'listing_risk_tagged':
-                return "/admin/broker-controls/risk-tags";
+                return "/admin-legacy/broker-controls/risk-tags";
             default:
                 return "/notifications";
         }

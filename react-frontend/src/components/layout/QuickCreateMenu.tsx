@@ -96,7 +96,7 @@ export function QuickCreateMenu({ isOpen, onClose }: QuickCreateMenuProps) {
       hideCloseButton
       classNames={{
         backdrop: 'bg-black/60 backdrop-blur-sm',
-        base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-2xl mx-4',
+        base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-2xl mx-4',
         body: 'p-0',
       }}
     >

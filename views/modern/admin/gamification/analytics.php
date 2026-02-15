@@ -34,7 +34,7 @@ $recentActivity = $data['recent_activity'] ?? [];
         <p class="admin-page-subtitle">Insights into your community's gamification engagement</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/gamification" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/gamification" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Gamification
         </a>

@@ -105,7 +105,7 @@ require __DIR__ . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Track user-to-group assignment success and distribution</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/smart-match-users" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/smart-match-users" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
             Run Smart Matching
         </a>
@@ -182,7 +182,7 @@ require __DIR__ . '/partials/admin-header.php';
             <div class="admin-empty-icon"><i class="fa-solid fa-chart-column"></i></div>
             <h3 class="admin-empty-title">No data yet</h3>
             <p class="admin-empty-text">Run smart matching to assign users to groups</p>
-            <a href="<?= $basePath ?>/admin/smart-match-users" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/smart-match-users" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 Run Smart Matching
             </a>

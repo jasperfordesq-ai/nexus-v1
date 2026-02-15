@@ -77,7 +77,7 @@ class VolunteeringController
             }
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/volunteering/approvals?msg=approved');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/volunteering/approvals?msg=approved');
     }
 
     public function decline()
@@ -101,7 +101,7 @@ class VolunteeringController
             }
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/volunteering/approvals?msg=declined');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/volunteering/approvals?msg=declined');
     }
 
     public function organizations()
@@ -137,6 +137,6 @@ class VolunteeringController
 
         // Also could delete associated opportunities, but DB FK cascade should handle or allow orphan logic for now.
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/volunteering/organizations?msg=deleted');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/volunteering/organizations?msg=deleted');
     }
 }

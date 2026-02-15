@@ -2,7 +2,7 @@
 // Force Modern Layout
 // FIXED: Use consistent session variable order (active_layout first)
 $layout = layout(); // Fixed: centralized detection
-$modernView = __DIR__ . '/../modern/admin/native-app.php';
+$modernView = __DIR__ . '/../modern/admin-legacy/native-app.php';
 
 if (file_exists($modernView)) {
     require $modernView;
@@ -378,7 +378,7 @@ document.getElementById('testPushForm').addEventListener('submit', async functio
     try {
         const formData = new FormData(this);
 
-        const response = await fetch('<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/native-app/test-push', {
+        const response = await fetch('<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/native-app/test-push', {
             method: 'POST',
             body: formData
         });

@@ -2,7 +2,7 @@
 /**
  * Broker Controls Dashboard - CivicOne Theme (GOV.UK)
  * Main dashboard for broker control features
- * Path: views/civicone/admin/broker-controls/index.php
+ * Path: views/civicone/admin-legacy/broker-controls/index.php
  */
 
 use Nexus\Core\TenantContext;
@@ -24,7 +24,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                 <p class="govuk-body-l">Manage broker oversight features for your community.</p>
             </div>
             <div class="govuk-grid-column-one-third" style="text-align: right;">
-                <a href="<?= $basePath ?>/admin/broker-controls/configuration" class="govuk-button">
+                <a href="<?= $basePath ?>/admin-legacy/broker-controls/configuration" class="govuk-button">
                     Configuration
                 </a>
             </div>
@@ -114,7 +114,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     </div>
                     <div class="govuk-summary-card__content">
                         <p class="govuk-body">Review and approve exchange requests between members.</p>
-                        <a href="<?= $basePath ?>/admin/broker-controls/exchanges" class="govuk-button">
+                        <a href="<?= $basePath ?>/admin-legacy/broker-controls/exchanges" class="govuk-button">
                             View exchanges
                         </a>
                     </div>
@@ -127,7 +127,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     </div>
                     <div class="govuk-summary-card__content">
                         <p class="govuk-body">Manage risk assessments for listings.</p>
-                        <a href="<?= $basePath ?>/admin/broker-controls/risk-tags" class="govuk-button">
+                        <a href="<?= $basePath ?>/admin-legacy/broker-controls/risk-tags" class="govuk-button">
                             View risk tags
                         </a>
                     </div>
@@ -143,7 +143,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     </div>
                     <div class="govuk-summary-card__content">
                         <p class="govuk-body">Review flagged and monitored messages.</p>
-                        <a href="<?= $basePath ?>/admin/broker-controls/messages" class="govuk-button">
+                        <a href="<?= $basePath ?>/admin-legacy/broker-controls/messages" class="govuk-button">
                             Review messages
                         </a>
                     </div>
@@ -156,7 +156,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     </div>
                     <div class="govuk-summary-card__content">
                         <p class="govuk-body">Manage user messaging restrictions.</p>
-                        <a href="<?= $basePath ?>/admin/broker-controls/monitoring" class="govuk-button">
+                        <a href="<?= $basePath ?>/admin-legacy/broker-controls/monitoring" class="govuk-button">
                             View monitoring
                         </a>
                     </div>

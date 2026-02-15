@@ -21,17 +21,17 @@ Upload changed source files to the server:
 ```bash
 # Single file
 scp -i "C:/ssh-keys/project-nexus.pem" \
-  c:/xampp/htdocs/staging/react-frontend/src/components/layout/MobileDrawer.tsx \
+  $PROJECT_ROOT/react-frontend/src/components/layout/MobileDrawer.tsx \
   azureuser@20.224.171.253:/opt/nexus-php/react-frontend/src/components/layout/
 
 # Multiple files (example)
 scp -i "C:/ssh-keys/project-nexus.pem" \
-  c:/xampp/htdocs/staging/react-frontend/src/pages/auth/*.tsx \
+  $PROJECT_ROOT/react-frontend/src/pages/auth/*.tsx \
   azureuser@20.224.171.253:/opt/nexus-php/react-frontend/src/pages/auth/
 
 # Entire directory
 scp -i "C:/ssh-keys/project-nexus.pem" -r \
-  c:/xampp/htdocs/staging/react-frontend/src/ \
+  $PROJECT_ROOT/react-frontend/src/ \
   azureuser@20.224.171.253:/opt/nexus-php/react-frontend/
 ```
 

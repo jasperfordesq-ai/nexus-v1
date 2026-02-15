@@ -23,6 +23,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
+import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -248,8 +249,9 @@ interface OrganisationCardProps {
 }
 
 function OrganisationCard({ organisation }: OrganisationCardProps) {
+  const { tenantPath } = useTenant();
   return (
-    <Link to={`/organisations/${organisation.id}`}>
+    <Link to={tenantPath(`/organisations/${organisation.id}`)}>
       <GlassCard hoverable className="p-5 h-full">
         <div className="flex items-center gap-3 mb-3">
           <Avatar

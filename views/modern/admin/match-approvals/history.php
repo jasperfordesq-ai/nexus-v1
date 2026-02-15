@@ -2,7 +2,7 @@
 /**
  * Match Approval History
  * Shows approved/rejected matches
- * Path: views/modern/admin/match-approvals/history.php
+ * Path: views/modern/admin-legacy/match-approvals/history.php
  */
 
 use Nexus\Core\TenantContext;
@@ -24,7 +24,7 @@ $filter_status = $filter_status ?? '';
 <div class="admin-page-header">
     <div>
         <h1 class="admin-page-title">
-            <a href="<?= $basePath ?>/admin/match-approvals" class="back-link">
+            <a href="<?= $basePath ?>/admin-legacy/match-approvals" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             Approval History
@@ -32,7 +32,7 @@ $filter_status = $filter_status ?? '';
         <p class="admin-page-subtitle">View past match approval decisions</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/match-approvals" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/match-approvals" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-clock"></i> Pending Approvals
         </a>
     </div>
@@ -49,7 +49,7 @@ $filter_status = $filter_status ?? '';
                 <option value="rejected" <?= $filter_status === 'rejected' ? 'selected' : '' ?>>Rejected Only</option>
             </select>
             <?php if ($filter_status): ?>
-                <a href="<?= $basePath ?>/admin/match-approvals/history" class="admin-btn admin-btn-sm admin-btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/match-approvals/history" class="admin-btn admin-btn-sm admin-btn-secondary">
                     <i class="fa-solid fa-times"></i> Clear Filter
                 </a>
             <?php endif; ?>
@@ -82,7 +82,7 @@ $filter_status = $filter_status ?? '';
                         <?php foreach ($history as $item): ?>
                             <tr>
                                 <td>
-                                    <a href="<?= $basePath ?>/admin/match-approvals/<?= $item['id'] ?>" class="admin-link">
+                                    <a href="<?= $basePath ?>/admin-legacy/match-approvals/<?= $item['id'] ?>" class="admin-link">
                                         #<?= $item['id'] ?>
                                     </a>
                                 </td>
@@ -161,6 +161,6 @@ $filter_status = $filter_status ?? '';
 </div>
 
 <!-- Match Approvals CSS loaded from external file (CLAUDE.md compliant) -->
-<link rel="stylesheet" href="/assets/css/admin/match-approvals.css">
+<link rel="stylesheet" href="/assets/css/admin-legacy/match-approvals.css">
 
 <?php require dirname(__DIR__) . '/partials/admin-footer.php'; ?>

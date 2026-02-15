@@ -646,10 +646,10 @@ function getStatusBadge(string $status): string {
         <p class="req-page-subtitle">Validate server configuration and dependencies</p>
     </div>
     <div class="req-page-actions">
-        <a href="<?= $basePath ?>/admin/enterprise/monitoring" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Monitoring
         </a>
-        <a href="<?= $basePath ?>/admin/enterprise/monitoring/requirements" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring/requirements" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-rotate"></i> Re-check
         </a>
     </div>

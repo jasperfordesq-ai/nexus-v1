@@ -25,7 +25,7 @@ $typeId = $isEdit ? (int)$editId : null;
 $type = $isEdit ? GroupType::findById($typeId) : null;
 
 if ($isEdit && !$type) {
-    header('Location: ' . $basePath . '/admin/group-types');
+    header('Location: ' . $basePath . '/admin-legacy/group-types');
     exit;
 }
 
@@ -158,7 +158,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/group-types" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/group-types" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Back to List
         </a>
     </div>
@@ -365,7 +365,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     <i class="fa-solid fa-save"></i>
                     <?= $isEdit ? 'Update' : 'Create' ?> Type
                 </button>
-                <a href="<?= $basePath ?>/admin/group-types" class="admin-btn admin-btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/group-types" class="admin-btn admin-btn-secondary">
                     Cancel
                 </a>
             </div>

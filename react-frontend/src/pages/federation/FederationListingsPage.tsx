@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -20,6 +20,11 @@ import {
   SelectItem,
   Chip,
   Avatar,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@heroui/react';
 import {
   Search,
@@ -30,11 +35,13 @@ import {
   AlertTriangle,
   RefreshCw,
   ListTodo,
+  MessageSquare,
+  User,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
-import { useToast } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -49,6 +56,9 @@ const PER_PAGE = 20;
 export function FederationListingsPage() {
   usePageTitle('Federated Listings');
   const toast = useToast();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { tenantPath } = useTenant();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Data
@@ -61,6 +71,10 @@ export function FederationListingsPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
+
+  // Detail modal
+  const [selectedListing, setSelectedListing] = useState<FederatedListing | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -327,7 +341,13 @@ export function FederationListingsPage() {
           >
             {listings.map((listing) => (
               <motion.div key={`${listing.timebank.id}-${listing.id}`} variants={itemVariants}>
-                <FederatedListingCard listing={listing} />
+                <FederatedListingCard
+                  listing={listing}
+                  onViewDetails={() => {
+                    setSelectedListing(listing);
+                    setIsDetailOpen(true);
+                  }}
+                />
               </motion.div>
             ))}
           </motion.div>
@@ -347,6 +367,190 @@ export function FederationListingsPage() {
           )}
         </>
       )}
+      {/* Listing Detail Modal */}
+      <Modal
+        isOpen={isDetailOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsDetailOpen(false);
+            setSelectedListing(null);
+          }
+        }}
+        size="2xl"
+        backdrop="blur"
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-4',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          {selectedListing && (() => {
+            const isOffer = selectedListing.type === 'offer';
+            const authorAvatar = resolveAvatarUrl(selectedListing.author?.avatar);
+            const listingImage = selectedListing.image_url ? resolveAssetUrl(selectedListing.image_url) : null;
+
+            return (
+              <>
+                <ModalHeader className="flex items-center gap-3">
+                  <div
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isOffer ? 'bg-emerald-500/20' : 'bg-amber-500/20'
+                    }`}
+                  >
+                    <Hand
+                      className={`w-5 h-5 ${
+                        isOffer
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-amber-600 dark:text-amber-400'
+                      }`}
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-lg font-bold text-theme-primary line-clamp-2">
+                      {selectedListing.title}
+                    </h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        className={
+                          isOffer
+                            ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                        }
+                      >
+                        {isOffer ? 'Offer' : 'Request'}
+                      </Chip>
+                      {selectedListing.category_name && (
+                        <Chip size="sm" variant="flat" className="bg-theme-hover text-theme-muted">
+                          {selectedListing.category_name}
+                        </Chip>
+                      )}
+                    </div>
+                  </div>
+                </ModalHeader>
+                <ModalBody>
+                  <div className="space-y-4">
+                    {/* Listing image */}
+                    {listingImage && (
+                      <div className="w-full h-48 rounded-lg overflow-hidden bg-theme-hover">
+                        <img
+                          src={listingImage}
+                          alt={selectedListing.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+
+                    {/* Description */}
+                    {selectedListing.description && (
+                      <p className="text-theme-muted whitespace-pre-line">
+                        {selectedListing.description}
+                      </p>
+                    )}
+
+                    {/* Meta info */}
+                    <div className="flex flex-wrap gap-4 text-sm">
+                      {selectedListing.estimated_hours && (
+                        <span className="flex items-center gap-1.5 text-theme-muted">
+                          <Clock className="w-4 h-4" aria-hidden="true" />
+                          {selectedListing.estimated_hours} hours estimated
+                        </span>
+                      )}
+                      {selectedListing.location && (
+                        <span className="flex items-center gap-1.5 text-theme-muted">
+                          <MapPin className="w-4 h-4" aria-hidden="true" />
+                          {selectedListing.location}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Author & Community */}
+                    <div className="flex items-center justify-between pt-3 border-t border-theme-default">
+                      <button
+                        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                        onClick={() => {
+                          if (selectedListing.author?.id) {
+                            setIsDetailOpen(false);
+                            setSelectedListing(null);
+                            navigate(tenantPath(`/federation/members/${selectedListing.author.id}`));
+                          }
+                        }}
+                      >
+                        <Avatar
+                          src={authorAvatar}
+                          name={selectedListing.author?.name || 'User'}
+                          size="sm"
+                        />
+                        <div className="text-left">
+                          <p className="text-sm font-medium text-theme-primary">
+                            {selectedListing.author?.name || 'Unknown'}
+                          </p>
+                          <p className="text-xs text-theme-subtle">View Profile</p>
+                        </div>
+                      </button>
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                        startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
+                      >
+                        {selectedListing.timebank.name}
+                      </Chip>
+                    </div>
+                  </div>
+                </ModalBody>
+                <ModalFooter className="flex gap-2">
+                  {isAuthenticated && selectedListing.author?.id && (
+                    <>
+                      <Button
+                        variant="flat"
+                        className="bg-theme-elevated text-theme-primary"
+                        startContent={<User className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => {
+                          setIsDetailOpen(false);
+                          setSelectedListing(null);
+                          navigate(tenantPath(`/federation/members/${selectedListing.author!.id}`));
+                        }}
+                      >
+                        View Profile
+                      </Button>
+                      <Button
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                        startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => {
+                          setIsDetailOpen(false);
+                          setSelectedListing(null);
+                          navigate(
+                            tenantPath(`/federation/messages?compose=true&to_user=${selectedListing.author!.id}&to_tenant=${selectedListing.timebank.id}`)
+                          );
+                        }}
+                      >
+                        Contact Author
+                      </Button>
+                    </>
+                  )}
+                  {!isAuthenticated && (
+                    <Button
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-muted"
+                      onPress={() => {
+                        setIsDetailOpen(false);
+                        setSelectedListing(null);
+                      }}
+                    >
+                      Close
+                    </Button>
+                  )}
+                </ModalFooter>
+              </>
+            );
+          })()}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
@@ -357,15 +561,19 @@ export function FederationListingsPage() {
 
 interface FederatedListingCardProps {
   listing: FederatedListing;
+  onViewDetails: () => void;
 }
 
-function FederatedListingCard({ listing }: FederatedListingCardProps) {
+function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardProps) {
   const isOffer = listing.type === 'offer';
   const avatarSrc = resolveAvatarUrl(listing.author?.avatar);
   const imageSrc = listing.image_url ? resolveAssetUrl(listing.image_url) : null;
 
   return (
-    <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full flex flex-col">
+    <GlassCard
+      className="p-5 hover:scale-[1.02] transition-transform h-full flex flex-col cursor-pointer"
+      onClick={onViewDetails}
+    >
       {/* Image or Type Icon */}
       {imageSrc ? (
         <div className="w-full h-36 rounded-lg overflow-hidden mb-3 bg-theme-hover">

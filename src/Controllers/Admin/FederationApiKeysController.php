@@ -17,7 +17,7 @@ class FederationApiKeysController
 {
     /**
      * List all API keys
-     * GET /admin/federation/api-keys
+     * GET /admin-legacy/federation/api-keys
      */
     public function index(): void
     {
@@ -64,7 +64,7 @@ class FederationApiKeysController
 
     /**
      * Create new API key form
-     * GET /admin/federation/api-keys/create
+     * GET /admin-legacy/federation/api-keys/create
      */
     public function create(): void
     {
@@ -78,7 +78,7 @@ class FederationApiKeysController
 
     /**
      * Store new API key
-     * POST /admin/federation/api-keys/store
+     * POST /admin-legacy/federation/api-keys/store
      */
     public function store(): void
     {
@@ -93,7 +93,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: /admin/federation/api-keys/create');
+            header('Location: /admin-legacy/federation/api-keys/create');
             exit;
         }
 
@@ -107,7 +107,7 @@ class FederationApiKeysController
         // Validate
         if (empty($name)) {
             $_SESSION['flash_error'] = 'API key name is required.';
-            header('Location: /admin/federation/api-keys/create');
+            header('Location: /admin-legacy/federation/api-keys/create');
             exit;
         }
 
@@ -173,13 +173,13 @@ class FederationApiKeysController
         // Ensure session data is written before redirect
         session_write_close();
 
-        header('Location: /admin/federation/api-keys');
+        header('Location: /admin-legacy/federation/api-keys');
         exit;
     }
 
     /**
      * View API key details
-     * GET /admin/federation/api-keys/{id}
+     * GET /admin-legacy/federation/api-keys/{id}
      */
     public function show(int $id): void
     {
@@ -198,7 +198,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: /admin/federation/api-keys');
+            header('Location: /admin-legacy/federation/api-keys');
             exit;
         }
 
@@ -235,7 +235,7 @@ class FederationApiKeysController
 
     /**
      * Suspend API key
-     * POST /admin/federation/api-keys/{id}/suspend
+     * POST /admin-legacy/federation/api-keys/{id}/suspend
      */
     public function suspend(int $id): void
     {
@@ -244,7 +244,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: /admin/federation/api-keys');
+            header('Location: /admin-legacy/federation/api-keys');
             exit;
         }
 
@@ -258,7 +258,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: /admin/federation/api-keys');
+            header('Location: /admin-legacy/federation/api-keys');
             exit;
         }
 
@@ -274,13 +274,13 @@ class FederationApiKeysController
         );
 
         $_SESSION['flash_success'] = 'API key suspended.';
-        header('Location: /admin/federation/api-keys');
+        header('Location: /admin-legacy/federation/api-keys');
         exit;
     }
 
     /**
      * Reactivate API key
-     * POST /admin/federation/api-keys/{id}/activate
+     * POST /admin-legacy/federation/api-keys/{id}/activate
      */
     public function activate(int $id): void
     {
@@ -289,7 +289,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: /admin/federation/api-keys');
+            header('Location: /admin-legacy/federation/api-keys');
             exit;
         }
 
@@ -302,7 +302,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: /admin/federation/api-keys');
+            header('Location: /admin-legacy/federation/api-keys');
             exit;
         }
 
@@ -318,13 +318,13 @@ class FederationApiKeysController
         );
 
         $_SESSION['flash_success'] = 'API key reactivated.';
-        header('Location: /admin/federation/api-keys');
+        header('Location: /admin-legacy/federation/api-keys');
         exit;
     }
 
     /**
      * Revoke (permanently delete) API key
-     * POST /admin/federation/api-keys/{id}/revoke
+     * POST /admin-legacy/federation/api-keys/{id}/revoke
      */
     public function revoke(int $id): void
     {
@@ -333,7 +333,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: /admin/federation/api-keys');
+            header('Location: /admin-legacy/federation/api-keys');
             exit;
         }
 
@@ -346,7 +346,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: /admin/federation/api-keys');
+            header('Location: /admin-legacy/federation/api-keys');
             exit;
         }
 
@@ -363,13 +363,13 @@ class FederationApiKeysController
         );
 
         $_SESSION['flash_success'] = 'API key permanently revoked.';
-        header('Location: /admin/federation/api-keys');
+        header('Location: /admin-legacy/federation/api-keys');
         exit;
     }
 
     /**
      * Regenerate API key
-     * POST /admin/federation/api-keys/{id}/regenerate
+     * POST /admin-legacy/federation/api-keys/{id}/regenerate
      */
     public function regenerate(int $id): void
     {
@@ -383,7 +383,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: /admin/federation/api-keys');
+            header('Location: /admin-legacy/federation/api-keys');
             exit;
         }
 
@@ -396,7 +396,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: /admin/federation/api-keys');
+            header('Location: /admin-legacy/federation/api-keys');
             exit;
         }
 
@@ -426,7 +426,7 @@ class FederationApiKeysController
         // Ensure session data is written before redirect
         session_write_close();
 
-        header('Location: /admin/federation/api-keys');
+        header('Location: /admin-legacy/federation/api-keys');
         exit;
     }
 }

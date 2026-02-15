@@ -347,7 +347,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     <div class="resend-container">
 
         <!-- Back Link -->
-        <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>" class="back-link">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Analytics
         </a>
 
@@ -409,7 +409,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 "Did you see this?" or "Reminder: [Original Subject]" often work well.
             </div>
 
-            <form action="<?= $basePath ?>/admin/newsletters/resend/<?= $newsletter['id'] ?>" method="POST">
+            <form action="<?= $basePath ?>/admin-legacy/newsletters/resend/<?= $newsletter['id'] ?>" method="POST">
                 <?= Csrf::input() ?>
 
                 <div class="form-group">
@@ -440,7 +440,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         <i class="fa-solid fa-paper-plane"></i>
                         Send to <?= number_format($nonOpenerCount) ?> Non-Openers
                     </button>
-                    <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>" class="btn-secondary">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>" class="btn-secondary">
                         Cancel
                     </a>
                 </div>
@@ -470,7 +470,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 You can resend to <?= number_format($nonOpenerCount) ?> non-openers in <?= $daysRemaining ?> day<?= $daysRemaining !== 1 ? 's' : '' ?>.
                 <br>This gives recipients enough time to open the original email.
             </p>
-            <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>" class="btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>" class="btn-secondary">
                 <i class="fa-solid fa-arrow-left"></i> Back to Analytics
             </a>
         </div>

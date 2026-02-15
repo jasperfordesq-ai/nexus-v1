@@ -1,4 +1,4 @@
 <?php
-// Dispatcher: /admin/attributes -> /modern/admin/attributes/index
+// Dispatcher: /admin-legacy/attributes -> /modern/admin-legacy/attributes/index
 
-require dirname(__DIR__, 3) . '/views/modern/admin/attributes/index.php';
+require dirname(__DIR__, 3) . '/views/modern/admin-legacy/attributes/index.php';

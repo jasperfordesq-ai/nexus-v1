@@ -30,13 +30,13 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
     </div>
     <div class="page-hero-actions">
-        <a href="<?= $basePath ?>/admin/plans/subscriptions" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/plans/subscriptions" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-users"></i> Tenant Subscriptions
         </a>
-        <a href="<?= $basePath ?>/admin/plans/comparison" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/plans/comparison" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-table"></i> Compare Plans
         </a>
-        <a href="<?= $basePath ?>/admin/plans/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/plans/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> New Plan
         </a>
     </div>
@@ -106,7 +106,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
 
         <div class="plan-actions">
-            <a href="<?= $basePath ?>/admin/plans/edit/<?= $plan['id'] ?>" class="admin-btn admin-btn-sm admin-btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/plans/edit/<?= $plan['id'] ?>" class="admin-btn admin-btn-sm admin-btn-secondary">
                 <i class="fa-solid fa-edit"></i> Edit
             </a>
             <button onclick="deletePlan(<?= $plan['id'] ?>, '<?= htmlspecialchars($plan['name']) ?>')" class="admin-btn admin-btn-sm admin-btn-danger">
@@ -124,7 +124,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     </div>
     <h3 class="admin-empty-title">No Plans Yet</h3>
     <p class="admin-empty-text">Create your first subscription plan to get started.</p>
-    <a href="<?= $basePath ?>/admin/plans/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+    <a href="<?= $basePath ?>/admin-legacy/plans/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
         <i class="fa-solid fa-plus"></i> Create First Plan
     </a>
 </div>
@@ -302,7 +302,7 @@ function deletePlan(planId, planName) {
         return;
     }
 
-    fetch('<?= $basePath ?>/admin/plans/delete/' + planId, {
+    fetch('<?= $basePath ?>/admin-legacy/plans/delete/' + planId, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'

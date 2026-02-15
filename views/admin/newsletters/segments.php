@@ -32,10 +32,10 @@ else {
 
         <!-- Back Button & Actions Row -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-            <a href="<?= $basePath ?>/admin/newsletters" style="text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(4px); font-size: 0.9rem; transition: background 0.2s;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters" style="text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(4px); font-size: 0.9rem; transition: background 0.2s;">
                 &larr; Back to Newsletters
             </a>
-            <a href="<?= $basePath ?>/admin/newsletters/segments/create" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/segments/create" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
                 <i class="fa-solid fa-plus"></i> Create Segment
             </a>
         </div>
@@ -91,7 +91,7 @@ else {
                 <p style="color: #6b7280; margin: 0 0 24px; font-size: 1rem; max-width: 400px; margin-left: auto; margin-right: auto;">
                     Create segments to target specific groups of members with your newsletters based on location, groups, activity, and more.
                 </p>
-                <a href="<?= $basePath ?>/admin/newsletters/segments/create" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 14px 28px; border-radius: 12px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/segments/create" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 14px 28px; border-radius: 12px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);">
                     <i class="fa-solid fa-plus"></i> Create Your First Segment
                 </a>
             </div>
@@ -192,13 +192,13 @@ else {
                                     </td>
                                     <td style="text-align: right; padding: 20px;">
                                         <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                            <a href="<?= $basePath ?>/admin/newsletters/segments/edit/<?= $segment['id'] ?>"
+                                            <a href="<?= $basePath ?>/admin-legacy/newsletters/segments/edit/<?= $segment['id'] ?>"
                                                style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #475569; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;"
                                                onmouseover="this.style.background='linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)'; this.style.color='white';"
                                                onmouseout="this.style.background='linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)'; this.style.color='#475569';">
                                                 <i class="fa-solid fa-pen" style="font-size: 0.75rem;"></i> Edit
                                             </a>
-                                            <form action="<?= $basePath ?>/admin/newsletters/segments/delete" method="POST" style="display: inline; margin: 0;"
+                                            <form action="<?= $basePath ?>/admin-legacy/newsletters/segments/delete" method="POST" style="display: inline; margin: 0;"
                                                   onsubmit="return confirm('Delete this segment? This action cannot be undone.')">
                                                 <?= \Nexus\Core\Csrf::input() ?>
                                                 <input type="hidden" name="id" value="<?= $segment['id'] ?>">

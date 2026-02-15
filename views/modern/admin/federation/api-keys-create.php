@@ -205,7 +205,7 @@ require __DIR__ . '/../partials/admin-header.php';
     </div>
 
     <div class="form-card">
-        <form method="POST" action="/admin/federation/api-keys/store">
+        <form method="POST" action="/admin-legacy/federation/api-keys/store">
             <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
 
             <div class="form-group">
@@ -306,7 +306,7 @@ require __DIR__ . '/../partials/admin-header.php';
                 <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-key"></i> Generate API Key
                 </button>
-                <a href="/admin/federation/api-keys" class="btn btn-secondary">Cancel</a>
+                <a href="/admin-legacy/federation/api-keys" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>

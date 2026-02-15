@@ -18,6 +18,13 @@ class CorsHelper
         'https://project-nexus.ie',
         'https://www.project-nexus.ie',
         'https://app.project-nexus.ie',
+        'https://api.project-nexus.ie',
+        'https://hour-timebank.ie',
+        'https://www.hour-timebank.ie',
+        'https://nexuscivic.ie',
+        'https://www.nexuscivic.ie',
+        'https://timebank.global',
+        'https://www.timebank.global',
         'http://staging.timebank.local',
         'http://localhost:5173',
         'http://localhost:8090',
@@ -183,13 +190,18 @@ class CorsHelper
                     return $cached;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Redis unavailable - fall through to DB
         }
 
         // Query all active tenant custom domains
         $origins = [];
         try {
+            if (!class_exists('\Nexus\Core\Database', false)) {
+                // Database class not loaded yet (called before autoloader)
+                self::$tenantDomainOrigins = $origins;
+                return $origins;
+            }
             $db = \Nexus\Core\Database::getConnection();
             $stmt = $db->query(
                 "SELECT domain FROM tenants WHERE domain IS NOT NULL AND domain != '' AND is_active = 1"
@@ -205,8 +217,8 @@ class CorsHelper
                     $origins[] = 'https://www.' . $domain;
                 }
             }
-        } catch (\Exception $e) {
-            // Database unavailable - return empty
+        } catch (\Throwable $e) {
+            // Database or class unavailable (e.g., called before autoloader) - return empty
         }
 
         // Cache the result
@@ -214,7 +226,7 @@ class CorsHelper
             if (class_exists('\Nexus\Services\RedisCache')) {
                 \Nexus\Services\RedisCache::set($cacheKey, $origins, $cacheTtl, null);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Cache write failure is non-fatal
         }
 

@@ -15,7 +15,7 @@ $adminPageSubtitle = 'Detailed test execution results';
 $adminPageIcon = 'fa-file-alt';
 
 // Include the standalone admin header (includes <!DOCTYPE html>, <head>, etc.)
-require __DIR__ . '/../../modern/admin/partials/admin-header.php';
+require __DIR__ . '/../../modern/admin-legacy/partials/admin-header.php';
 ?>
 
 <!-- Dashboard Header -->
@@ -30,7 +30,7 @@ require __DIR__ . '/../../modern/admin/partials/admin-header.php';
         </p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/tests" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/tests" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Test Runner
         </a>
@@ -411,5 +411,5 @@ function copyToClipboard() {
 
 <?php
 // Include admin footer
-require __DIR__ . '/../../modern/admin/partials/admin-footer.php';
+require __DIR__ . '/../../modern/admin-legacy/partials/admin-footer.php';
 ?>

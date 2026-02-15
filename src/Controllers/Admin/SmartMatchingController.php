@@ -152,7 +152,7 @@ class SmartMatchingController
             SmartMatchingEngine::clearCache();
 
             $_SESSION['flash_success'] = 'Smart Matching configuration saved successfully!';
-            header('Location: ' . TenantContext::getBasePath() . '/admin/smart-matching/configuration');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/smart-matching/configuration');
             exit;
         }
 
@@ -186,7 +186,7 @@ class SmartMatchingController
             $_SESSION['flash_error'] = 'Failed to clear cache: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/smart-matching');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/smart-matching');
         exit;
     }
 
@@ -210,7 +210,7 @@ class SmartMatchingController
             $_SESSION['flash_error'] = 'Failed to warm up cache: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/smart-matching');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/smart-matching');
         exit;
     }
 
@@ -237,7 +237,7 @@ class SmartMatchingController
             $_SESSION['flash_error'] = 'Geocoding error: ' . $e->getMessage();
         }
 
-        header('Location: ' . TenantContext::getBasePath() . '/admin/smart-matching');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/smart-matching');
         exit;
     }
 

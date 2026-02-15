@@ -69,6 +69,7 @@ const defaultFeatures: TenantFeatures = {
   search: true,
   exchange_workflow: false,
   direct_messaging: true,
+  group_exchanges: false,
 };
 
 // Default modules (all enabled)

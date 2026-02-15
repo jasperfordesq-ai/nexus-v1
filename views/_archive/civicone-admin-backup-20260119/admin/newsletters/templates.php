@@ -44,11 +44,11 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <p class="admin-page-subtitle">Pre-built and custom email templates for your newsletters</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/newsletters" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back
         </a>
-        <a href="<?= $basePath ?>/admin/newsletters/templates/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i>
             Create Template
         </a>
@@ -70,7 +70,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <div class="template-card">
             <!-- Preview Area -->
             <div class="template-preview template-preview-amber">
-                <iframe src="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" class="template-iframe"></iframe>
+                <iframe src="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" class="template-iframe"></iframe>
                 <div class="template-preview-overlay"></div>
             </div>
 
@@ -84,10 +84,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     <?= htmlspecialchars($template['description'] ?? 'Ready-to-use template') ?>
                 </p>
                 <div class="template-actions">
-                    <a href="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" target="_blank" class="admin-btn admin-btn-secondary admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" target="_blank" class="admin-btn admin-btn-secondary admin-btn-sm">
                         <i class="fa-solid fa-eye"></i> Preview
                     </a>
-                    <a href="<?= $basePath ?>/admin/newsletters/templates/duplicate/<?= $template['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/duplicate/<?= $template['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">
                         <i class="fa-solid fa-copy"></i> Use
                     </a>
                 </div>
@@ -112,7 +112,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <?php foreach ($grouped['saved'] as $template): ?>
         <div class="template-card">
             <div class="template-preview template-preview-blue">
-                <iframe src="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" class="template-iframe"></iframe>
+                <iframe src="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" class="template-iframe"></iframe>
                 <div class="template-preview-overlay"></div>
             </div>
             <div class="template-info">
@@ -124,13 +124,13 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <p class="template-subject"><?= htmlspecialchars($template['subject']) ?></p>
                 <?php endif; ?>
                 <div class="template-actions">
-                    <a href="<?= $basePath ?>/admin/newsletters/templates/edit/<?= $template['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/edit/<?= $template['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                         <i class="fa-solid fa-pen"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/newsletters/templates/duplicate/<?= $template['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/duplicate/<?= $template['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">
                         <i class="fa-solid fa-copy"></i> Use
                     </a>
-                    <form action="<?= $basePath ?>/admin/newsletters/templates/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this template?')">
+                    <form action="<?= $basePath ?>/admin-legacy/newsletters/templates/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this template?')">
                         <?= Csrf::input() ?>
                         <input type="hidden" name="id" value="<?= $template['id'] ?>">
                         <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
@@ -159,7 +159,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <?php foreach ($grouped['custom'] as $template): ?>
         <div class="template-card">
             <div class="template-preview template-preview-green">
-                <iframe src="<?= $basePath ?>/admin/newsletters/templates/preview/<?= $template['id'] ?>" class="template-iframe"></iframe>
+                <iframe src="<?= $basePath ?>/admin-legacy/newsletters/templates/preview/<?= $template['id'] ?>" class="template-iframe"></iframe>
                 <div class="template-preview-overlay"></div>
             </div>
             <div class="template-info">
@@ -173,13 +173,13 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </p>
                 <?php endif; ?>
                 <div class="template-actions">
-                    <a href="<?= $basePath ?>/admin/newsletters/templates/edit/<?= $template['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/edit/<?= $template['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm">
                         <i class="fa-solid fa-pen"></i>
                     </a>
-                    <a href="<?= $basePath ?>/admin/newsletters/templates/duplicate/<?= $template['id'] ?>" class="admin-btn admin-btn-success admin-btn-sm">
+                    <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/duplicate/<?= $template['id'] ?>" class="admin-btn admin-btn-success admin-btn-sm">
                         <i class="fa-solid fa-copy"></i> Use
                     </a>
-                    <form action="<?= $basePath ?>/admin/newsletters/templates/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this template?')">
+                    <form action="<?= $basePath ?>/admin-legacy/newsletters/templates/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this template?')">
                         <?= Csrf::input() ?>
                         <input type="hidden" name="id" value="<?= $template['id'] ?>">
                         <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
@@ -203,7 +203,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
         <h3 class="admin-empty-title">No templates yet</h3>
         <p class="admin-empty-text">Create your first template or run the migration to load starter templates.</p>
-        <a href="<?= $basePath ?>/admin/newsletters/templates/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+        <a href="<?= $basePath ?>/admin-legacy/newsletters/templates/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
             <i class="fa-solid fa-plus"></i>
             Create Template
         </a>

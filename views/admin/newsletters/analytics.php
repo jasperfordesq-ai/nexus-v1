@@ -23,14 +23,14 @@ else {
 
         <!-- Navigation -->
         <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-            <a href="<?= $basePath ?>/admin/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters" style="color: #6b7280; text-decoration: none; font-size: 0.9rem;">
                 <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
             </a>
             <div style="display: flex; gap: 12px;">
-                <a href="<?= $basePath ?>/admin/newsletters/send-time" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/send-time" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-clock"></i> Send Time Optimization
                 </a>
-                <a href="<?= $basePath ?>/admin/newsletters/bounces" style="background: #f1f5f9; color: #475569; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+                <a href="<?= $basePath ?>/admin-legacy/newsletters/bounces" style="background: #f1f5f9; color: #475569; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-shield-halved"></i> Bounces
                 </a>
             </div>
@@ -167,7 +167,7 @@ else {
                             <?php endif; ?>
                         </td>
                         <td style="padding: 16px 20px;">
-                            <a href="<?= $basePath ?>/admin/newsletters/stats/<?= $newsletter['id'] ?>" style="color: #111827; text-decoration: none; font-weight: 500;">
+                            <a href="<?= $basePath ?>/admin-legacy/newsletters/stats/<?= $newsletter['id'] ?>" style="color: #111827; text-decoration: none; font-weight: 500;">
                                 <?= htmlspecialchars(strlen($newsletter['subject']) > 50 ? substr($newsletter['subject'], 0, 50) . '...' : $newsletter['subject']) ?>
                             </a>
                         </td>
@@ -196,7 +196,7 @@ else {
             </div>
             <h3 style="margin: 0 0 10px 0; font-size: 1.25rem; color: #111827;">No analytics data yet</h3>
             <p style="color: #6b7280; margin-bottom: 24px;">Send your first newsletter to start seeing performance metrics.</p>
-            <a href="<?= $basePath ?>/admin/newsletters/create" class="nexus-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+            <a href="<?= $basePath ?>/admin-legacy/newsletters/create" class="nexus-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-plus"></i> Create Newsletter
             </a>
         </div>

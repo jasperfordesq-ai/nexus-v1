@@ -620,4 +620,77 @@ class GamificationV2ApiController extends BaseApiController
             );
         }
     }
+
+    /**
+     * POST /api/v2/gamification/challenges/{id}/claim
+     *
+     * Claim reward for a completed challenge.
+     *
+     * Response: 200 OK with reward data
+     */
+    public function claimChallenge(int $id): void
+    {
+        $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+
+        $this->rateLimit('gamification_claim_challenge', 10, 60);
+
+        try {
+            // Get challenge details
+            $challenge = ChallengeService::getById($id);
+
+            if (!$challenge) {
+                $this->respondWithError(
+                    ApiErrorCodes::RESOURCE_NOT_FOUND,
+                    'Challenge not found',
+                    null,
+                    404
+                );
+                return;
+            }
+
+            // Check if user has completed it
+            $progress = Database::query(
+                "SELECT * FROM challenge_progress WHERE challenge_id = ? AND user_id = ?",
+                [$id, $userId]
+            )->fetch();
+
+            if (!$progress) {
+                $this->respondWithError('CHALLENGE_NOT_STARTED', 'You have not started this challenge', null, 400);
+                return;
+            }
+
+            if ($progress['status'] === 'claimed') {
+                $this->respondWithError('CHALLENGE_ALREADY_CLAIMED', 'You have already claimed this reward', null, 400);
+                return;
+            }
+
+            // Mark as claimed
+            Database::query(
+                "UPDATE challenge_progress SET status = 'claimed', claimed_at = NOW() WHERE challenge_id = ? AND user_id = ?",
+                [$id, $userId]
+            );
+
+            // Award XP if configured
+            $xpReward = (int) ($challenge['xp_reward'] ?? 0);
+            if ($xpReward > 0) {
+                GamificationService::awardXP($userId, $xpReward, 'challenge_complete', "Completed challenge: {$challenge['title']}");
+            }
+
+            $this->respondWithData([
+                'claimed' => true,
+                'challenge_id' => $id,
+                'reward' => [
+                    'xp' => $xpReward,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            $this->respondWithError(
+                ApiErrorCodes::SERVER_INTERNAL_ERROR,
+                'Failed to claim challenge reward',
+                null,
+                500
+            );
+        }
+    }
 }

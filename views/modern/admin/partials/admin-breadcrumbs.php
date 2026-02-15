@@ -25,13 +25,13 @@ function buildAdminBreadcrumbs($navigation, $currentPath, $basePath) {
     // Always start with Admin Dashboard
     $breadcrumbs[] = [
         'label' => 'Admin',
-        'url' => $basePath . '/admin',
+        'url' => $basePath . '/admin-legacy',
         'icon' => 'fa-gauge-high',
         'isHome' => true,
     ];
 
     // If we're on the dashboard, just return that
-    if ($currentPath === '/admin' || $currentPath === '/admin/') {
+    if ($currentPath === '/admin-legacy' || $currentPath === '/admin-legacy/') {
         $breadcrumbs[0]['isCurrent'] = true;
         return $breadcrumbs;
     }
@@ -55,7 +55,7 @@ function buildAdminBreadcrumbs($navigation, $currentPath, $basePath) {
                     $childPath = $child['url'];
                     // Check for exact match or prefix match
                     if ($currentPath === $childPath ||
-                        (strpos($currentPath, $childPath) === 0 && strlen($childPath) > strlen('/admin/'))) {
+                        (strpos($currentPath, $childPath) === 0 && strlen($childPath) > strlen('/admin-legacy/'))) {
                         $sectionMatched = true;
                         $matchedChild = $child;
                         break;
@@ -116,7 +116,7 @@ function buildAdminBreadcrumbs($navigation, $currentPath, $basePath) {
 
             $breadcrumbs[] = [
                 'label' => $label,
-                'url' => $isLast ? null : $basePath . '/admin/' . implode('/', array_slice($segments, 0, $i + 1)),
+                'url' => $isLast ? null : $basePath . '/admin-legacy/' . implode('/', array_slice($segments, 0, $i + 1)),
                 'icon' => null,
                 'isCurrent' => $isLast,
             ];

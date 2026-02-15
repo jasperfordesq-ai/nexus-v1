@@ -1,7 +1,7 @@
 <?php
 // Federation Admin Dashboard - View Dispatcher
 $layout = layout();
-$modernView = __DIR__ . '/../../modern/admin/federation/dashboard.php';
+$modernView = __DIR__ . '/../../modern/admin-legacy/federation/dashboard.php';
 
 if (($layout === 'modern' || $layout === 'high-contrast') && file_exists($modernView)) {
     require $modernView;

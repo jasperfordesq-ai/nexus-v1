@@ -541,7 +541,7 @@ export function ResourcesPage() {
         }}
         size="lg"
         classNames={{
-          base: 'bg-theme-card border border-theme-default',
+          base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',

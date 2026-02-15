@@ -139,16 +139,16 @@ $protocol = $isSecure ? 'https://' : 'http://';
             <div class="htb-dropdown">
                 <button class="util-link newsletter-dropdown-btn">Newsletter <span class="htb-arrow">▾</span></button>
                 <div class="htb-dropdown-content">
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters">All Newsletters</a>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/create">Create Newsletter</a>
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/newsletters">All Newsletters</a>
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/newsletters/create">Create Newsletter</a>
                     <div class="layout-divider"></div>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/subscribers">Subscribers</a>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/segments">Segments</a>
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/newsletters/subscribers">Subscribers</a>
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/newsletters/segments">Segments</a>
                 </div>
             </div>
         <?php elseif ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin" class="util-link admin-link">Admin</a>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/group-ranking" class="util-link group-ranking-link" title="Smart Group Ranking">
+            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/group-ranking" class="util-link group-ranking-link" title="Smart Group Ranking">
                 <i class="fa-solid fa-chart-line"></i> Ranking
             </a>
         <?php endif; ?>

@@ -20,7 +20,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 
 <!-- Breadcrumb -->
 <nav class="admin-breadcrumb">
-    <a href="<?= $basePath ?>/admin/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
+    <a href="<?= $basePath ?>/admin-legacy/legal-documents"><i class="fa-solid fa-arrow-left"></i> All Documents</a>
 </nav>
 
 <!-- Page Header -->
@@ -46,10 +46,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/create" class="admin-btn admin-btn-primary">
+        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/create" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-plus"></i> New Version
         </a>
-        <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/edit" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/edit" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-cog"></i> Settings
         </a>
         <a href="<?= $basePath ?>/<?= $document['slug'] ?>" class="admin-btn admin-btn-secondary" target="_blank">
@@ -135,7 +135,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <p class="admin-card-subtitle">All versions of this document, newest first</p>
         </div>
         <div class="admin-card-header-actions">
-            <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/compare" class="admin-btn admin-btn-secondary admin-btn-sm">
+            <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/compare" class="admin-btn admin-btn-secondary admin-btn-sm">
                 <i class="fa-solid fa-code-compare"></i> Compare Versions
             </a>
         </div>
@@ -148,7 +148,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             </div>
             <h3 class="admin-empty-title">No Versions Yet</h3>
             <p class="admin-empty-text">Create the first version of this document.</p>
-            <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
                 <i class="fa-solid fa-plus"></i> Create Version 1.0
             </a>
         </div>
@@ -203,31 +203,31 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     </div>
                 </div>
                 <div class="version-actions">
-                    <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="View Version">
+                    <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>" class="admin-btn admin-btn-secondary admin-btn-sm" title="View Version">
                         <i class="fa-solid fa-eye"></i>
                     </a>
                     <?php if ($v['is_draft']): ?>
-                        <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/edit" class="admin-btn admin-btn-secondary admin-btn-sm" title="Edit Draft">
+                        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/edit" class="admin-btn admin-btn-secondary admin-btn-sm" title="Edit Draft">
                             <i class="fa-solid fa-pen"></i>
                         </a>
-                        <form action="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/publish" method="POST" style="display:inline;">
+                        <form action="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/publish" method="POST" style="display:inline;">
                             <?= Csrf::input() ?>
                             <button type="submit" class="admin-btn admin-btn-success admin-btn-sm" title="Publish Version" onclick="return confirm('Publish this version? It will become the current active version.');">
                                 <i class="fa-solid fa-rocket"></i>
                             </button>
                         </form>
-                        <form action="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/delete" method="POST" style="display:inline;">
+                        <form action="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/delete" method="POST" style="display:inline;">
                             <?= Csrf::input() ?>
                             <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm" title="Delete Draft" onclick="return confirm('Delete this draft? This cannot be undone.');">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </form>
                     <?php elseif (!$v['is_current']): ?>
-                        <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/acceptances" class="admin-btn admin-btn-secondary admin-btn-sm" title="View Acceptances">
+                        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/acceptances" class="admin-btn admin-btn-secondary admin-btn-sm" title="View Acceptances">
                             <i class="fa-solid fa-users"></i>
                         </a>
                     <?php else: ?>
-                        <a href="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/acceptances" class="admin-btn admin-btn-primary admin-btn-sm" title="View Acceptances">
+                        <a href="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/versions/<?= $v['id'] ?>/acceptances" class="admin-btn admin-btn-primary admin-btn-sm" title="View Acceptances">
                             <i class="fa-solid fa-users"></i> Acceptances
                         </a>
                     <?php endif; ?>
@@ -251,7 +251,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         </div>
     </div>
     <div class="admin-card-body">
-        <form action="<?= $basePath ?>/admin/legal-documents/<?= $document['id'] ?>/export" method="GET" class="export-form">
+        <form action="<?= $basePath ?>/admin-legacy/legal-documents/<?= $document['id'] ?>/export" method="GET" class="export-form">
             <div class="export-fields">
                 <div class="form-group">
                     <label>Start Date (optional)</label>
