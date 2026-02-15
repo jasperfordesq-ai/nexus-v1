@@ -280,7 +280,7 @@ $isProfileActiveTab = isNavActive('/profile', $currentPath, $basePath) || isNavA
         <!-- Admin Section -->
         <div class="mobile-menu-section mobile-menu-section-admin">
             <div class="mobile-menu-section-title">Admin Tools</div>
-            <a href="<?= $base ?>/admin" class="mobile-menu-item" onclick="closeMobileMenu()">
+            <a href="<?= $base ?>/admin-legacy" class="mobile-menu-item" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-gauge-high"></i>
                 Admin Dashboard
             </a>

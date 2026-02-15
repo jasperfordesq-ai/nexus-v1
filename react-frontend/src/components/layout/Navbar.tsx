@@ -58,7 +58,7 @@ import {
 } from 'lucide-react';
 import { useAuth, useTenant, useNotifications, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { api } from '@/lib/api';
+import { api, tokenManager, API_BASE } from '@/lib/api';
 
 interface SearchSuggestion {
   id: number;
@@ -673,7 +673,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       if (k === 'logout') { handleLogout(); return; }
                       if (k === 'profile-header') return;
                       if (k === 'admin-panel') { if (isAdmin) dropdownNavigate('/admin'); return; }
-                      if (k === 'legacy-admin') { if (isAdmin) { closeAllDropdowns(); window.location.href = '/admin-legacy'; } return; }
+                      if (k === 'legacy-admin') { if (isAdmin) { closeAllDropdowns(); const t = tokenManager.getAccessToken(); const apiOrigin = API_BASE.startsWith('http') ? API_BASE.replace(/\/api\/?$/, '') : ''; window.location.href = t ? `${apiOrigin}/api/auth/admin-session?token=${encodeURIComponent(t)}&redirect=/admin-legacy` : `${apiOrigin}/admin-legacy`; } return; }
                       dropdownNavigate(k);
                     }}
                   >

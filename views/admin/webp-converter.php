@@ -348,7 +348,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
                 </a>
 
-                <a href="<?= $basePath ?>/admin" class="quick-action-item">
+                <a href="<?= $basePath ?>/admin-legacy" class="quick-action-item">
                     <div class="quick-action-icon quick-action-dashboard">
                         <i class="fa-solid fa-gauge-high"></i>
                     </div>

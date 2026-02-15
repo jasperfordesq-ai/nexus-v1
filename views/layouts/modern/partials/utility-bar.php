@@ -147,7 +147,7 @@ $protocol = $isSecure ? 'https://' : 'http://';
                 </div>
             </div>
         <?php elseif ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin" class="util-link admin-link">Admin</a>
+            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy" class="util-link admin-link">Admin</a>
             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/group-ranking" class="util-link group-ranking-link" title="Smart Group Ranking">
                 <i class="fa-solid fa-chart-line"></i> Ranking
             </a>

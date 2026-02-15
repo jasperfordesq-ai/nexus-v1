@@ -24,7 +24,7 @@ if (!isset($notifications)) {
     <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px;">
 
         <div style="margin-bottom: 10px;">
-            <a href="/admin" style="text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(4px); font-size: 0.9rem; transition: background 0.2s;">
+            <a href="/admin-legacy" style="text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(4px); font-size: 0.9rem; transition: background 0.2s;">
                 &larr; Back to Dashboard
             </a>
         </div>

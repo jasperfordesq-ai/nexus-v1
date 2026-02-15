@@ -6,4 +6,4 @@
  */
 
 // Include the shared admin gold standard footer
-require dirname(__DIR__, 3) . '/partials/admin-legacy/admin-footer.php';
+require dirname(__DIR__, 3) . '/partials/admin/admin-footer.php';

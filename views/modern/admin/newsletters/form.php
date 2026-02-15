@@ -27,15 +27,17 @@ $adminPageTitle = $isEdit ? 'Edit Newsletter' : 'Create Newsletter';
 $adminPageSubtitle = $isEdit ? 'Update your campaign' : 'Compose a new email campaign';
 $adminPageIcon = 'fa-solid fa-envelope-open-text';
 
-// Get TinyMCE API key from .env
-$tinymceApiKey = 'no-api-key';
-$envPath = dirname(__DIR__, 4) . '/.env';
-if (file_exists($envPath)) {
-    $envLines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($envLines as $line) {
-        if (strpos($line, 'TINYMCE_API_KEY=') === 0) {
-            $tinymceApiKey = trim(substr($line, 16), '"\'');
-            break;
+// Get TinyMCE API key from environment or .env file
+$tinymceApiKey = getenv('TINYMCE_API_KEY') ?: 'no-api-key';
+if ($tinymceApiKey === 'no-api-key') {
+    $envPath = dirname(__DIR__, 4) . '/.env';
+    if (file_exists($envPath)) {
+        $envLines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($envLines as $line) {
+            if (strpos($line, 'TINYMCE_API_KEY=') === 0) {
+                $tinymceApiKey = trim(substr($line, 16), '"\'');
+                break;
+            }
         }
     }
 }

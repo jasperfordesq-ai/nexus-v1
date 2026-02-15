@@ -1000,7 +1000,7 @@ function isEnterpriseNavActive($url, $currentPath, $basePath) {
             <span class="enterprise-badge <?= $isSuperAdmin ? 'enterprise-badge-super' : 'enterprise-badge-admin' ?>">
                 <?= $isSuperAdmin ? 'Super Admin' : 'Admin' ?>
             </span>
-            <a href="<?= $basePath ?>/admin" class="enterprise-back-link">
+            <a href="<?= $basePath ?>/admin-legacy" class="enterprise-back-link">
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>Admin</span>
             </a>

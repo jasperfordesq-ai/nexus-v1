@@ -902,7 +902,7 @@ $activeModule = getActiveSuperAdminModule($superAdminModules, $currentPath, $bas
         </div>
         <div class="super-admin-header-actions">
             <span class="super-admin-badge">Super Admin</span>
-            <a href="/admin" class="super-admin-back-link">
+            <a href="/admin-legacy" class="super-admin-back-link">
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>Tenant Admin</span>
             </a>

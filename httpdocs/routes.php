@@ -885,6 +885,9 @@ $router->add('GET', '/api/auth/validate-token', 'Nexus\Controllers\Api\AuthContr
 $router->add('POST', '/api/auth/revoke', 'Nexus\Controllers\Api\AuthController@revokeToken');
 $router->add('POST', '/api/auth/revoke-all', 'Nexus\Controllers\Api\AuthController@revokeAllTokens');
 
+// JWT-to-Session bridge for legacy admin access from React frontend
+$router->add('GET', '/api/auth/admin-session', 'Nexus\Controllers\Api\AuthController@adminSession');
+
 // CSRF Token API (for SPAs using session auth - Bearer clients don't need this)
 $router->add('GET', '/api/auth/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken');
 $router->add('GET', '/api/v2/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken'); // V2 alias

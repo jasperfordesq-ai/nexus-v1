@@ -126,7 +126,7 @@ class User
             END as name,
             organization_name,
             email, role, profile_type, balance, bio, location, phone, avatar_url, created_at, tenant_id, is_approved,
-            privacy_profile, privacy_search, privacy_contact, is_super_admin{$gamificationColumns}{$onlineColumns}
+            privacy_profile, privacy_search, privacy_contact, is_super_admin, onboarding_completed{$gamificationColumns}{$onlineColumns}
             FROM users WHERE id = ?";
 
         // Security: Add tenant isolation unless explicitly disabled or user is super_admin

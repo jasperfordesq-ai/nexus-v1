@@ -332,7 +332,7 @@ $navSections = [
             <button type="button" class="nav-action-btn" onclick="refreshPage()" title="Refresh">
                 <i class="fa-solid fa-rotate"></i>
             </button>
-            <a href="<?= $basePath ?>/admin" class="nav-action-btn" title="Back to Admin">
+            <a href="<?= $basePath ?>/admin-legacy" class="nav-action-btn" title="Back to Admin">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
         </div>

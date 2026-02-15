@@ -232,7 +232,7 @@ require __DIR__ . '/partials/header.php';
                     <i class="fa-solid fa-crown"></i>
                     View Super Admins
                 </a>
-                <a href="/admin" class="super-btn super-btn-secondary" style="justify-content: center;">
+                <a href="/admin-legacy" class="super-btn super-btn-secondary" style="justify-content: center;">
                     <i class="fa-solid fa-arrow-left"></i>
                     Back to Platform Admin
                 </a>

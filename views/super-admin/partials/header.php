@@ -784,7 +784,7 @@ $scopeColor = $access['level'] === 'master' ? '#dc2626' : '#2563eb';
 
         <div class="super-user">
             <span class="super-scope-badge"><?= $scopeBadge ?></span>
-            <a href="<?= $basePath ?>/admin" class="super-user-menu" title="Back to Platform Admin">
+            <a href="<?= $basePath ?>/admin-legacy" class="super-user-menu" title="Back to Platform Admin">
                 <i class="fa-solid fa-arrow-left"></i>
                 Platform Admin
             </a>
