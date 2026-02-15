@@ -46,7 +46,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
             <a href="<?= $basePath ?>/admin-legacy/menus?enable_menu_manager=0" class="admin-btn admin-btn-danger admin-btn-sm">
                 <i class="fa-solid fa-power-off"></i> Disable Menu Manager (Use Original Navigation)
             </a>
-            <a href="<?= $basePath ?>/admin" class="admin-btn admin-btn-secondary admin-btn-sm">
+            <a href="<?= $basePath ?>/admin-legacy" class="admin-btn admin-btn-secondary admin-btn-sm">
                 <i class="fa-solid fa-arrow-left"></i> Back to Admin
             </a>
         </div>

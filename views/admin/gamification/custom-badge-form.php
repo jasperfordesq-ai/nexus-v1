@@ -8,7 +8,7 @@ require dirname(__DIR__, 2) . '/layouts/admin-legacy/header.php';
         <div class="col">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= $basePath ?>/admin">Admin</a></li>
+                    <li class="breadcrumb-item"><a href="<?= $basePath ?>/admin-legacy">Admin</a></li>
                     <li class="breadcrumb-item"><a href="<?= $basePath ?>/admin-legacy/custom-badges">Custom Badges</a></li>
                     <li class="breadcrumb-item active"><?= $isEdit ? 'Edit' : 'Create' ?> Badge</li>
                 </ol>

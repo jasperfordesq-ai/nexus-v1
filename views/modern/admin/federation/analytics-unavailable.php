@@ -49,7 +49,7 @@ $isWhitelisted = $isWhitelisted ?? false;
         <?php endif; ?>
 
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="<?= $basePath ?>/admin" class="admin-btn admin-btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy" class="admin-btn admin-btn-secondary">
                 <i class="fa-solid fa-arrow-left"></i>
                 Back to Dashboard
             </a>

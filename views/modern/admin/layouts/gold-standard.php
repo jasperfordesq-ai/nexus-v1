@@ -187,7 +187,7 @@ $activeModule = getActiveModule($adminModules, $currentPath, $basePath);
     <!-- Top Navigation Bar -->
     <header class="admin-topbar">
         <!-- Brand -->
-        <a href="<?= $basePath ?>/admin" class="admin-topbar-brand">
+        <a href="<?= $basePath ?>/admin-legacy" class="admin-topbar-brand">
             <div class="admin-topbar-brand-icon">
                 <i class="fa-solid fa-bolt"></i>
             </div>

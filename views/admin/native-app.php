@@ -224,7 +224,7 @@ require __DIR__ . '/../layouts/modern/header.php';
 </style>
 
 <div class="native-app-admin">
-    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin" class="back-link">
+    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy" class="back-link">
         <i class="fa-solid fa-arrow-left"></i> Back to Admin
     </a>
 

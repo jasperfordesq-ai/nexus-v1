@@ -1008,4 +1008,102 @@ class AuthController
 
         return $maskedLocal . '@' . $domain;
     }
+
+    /**
+     * Bridge JWT auth to PHP session for legacy admin access.
+     * GET /api/auth/admin-session?token=JWT&redirect=/admin-legacy
+     *
+     * Validates the JWT, creates a PHP session with the same user context
+     * as a normal login, then redirects to the legacy admin panel.
+     */
+    public function adminSession()
+    {
+        $token = $_GET['token'] ?? '';
+        $redirect = $_GET['redirect'] ?? '/admin-legacy';
+
+        // Sanitize redirect — only allow paths starting with /admin-legacy
+        if (strpos($redirect, '/admin-legacy') !== 0) {
+            $redirect = '/admin-legacy';
+        }
+
+        if (empty($token)) {
+            http_response_code(400);
+            echo 'Missing token';
+            exit;
+        }
+
+        // Validate the JWT
+        $payload = TokenService::validateToken($token);
+        if (!$payload) {
+            http_response_code(401);
+            echo 'Invalid or expired token';
+            exit;
+        }
+
+        $userId = $payload['user_id'] ?? $payload['sub'] ?? null;
+        if (!$userId) {
+            http_response_code(401);
+            echo 'Invalid token payload';
+            exit;
+        }
+
+        // Load user from DB
+        $user = Database::query(
+            "SELECT id, first_name, last_name, email, role, tenant_id, avatar_url, is_super_admin, is_god, is_admin FROM users WHERE id = ?",
+            [(int)$userId]
+        )->fetch();
+
+        if (!$user) {
+            http_response_code(404);
+            echo 'User not found';
+            exit;
+        }
+
+        // Check admin privileges
+        $adminRoles = ['admin', 'super_admin', 'tenant_admin'];
+        $isAdmin = in_array($user['role'], $adminRoles) || !empty($user['is_super_admin']) || !empty($user['is_god']);
+        if (!$isAdmin) {
+            http_response_code(403);
+            echo 'Admin access required';
+            exit;
+        }
+
+        // Look up the tenant's domain to ensure session is on the right domain
+        $tenantDomain = Database::query(
+            "SELECT domain FROM tenants WHERE id = ?",
+            [(int)$user['tenant_id']]
+        )->fetchColumn();
+
+        // If we're on the wrong domain (e.g., api.project-nexus.ie instead of hour-timebank.ie),
+        // redirect to the tenant domain's bridge so the session cookie is set correctly
+        $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+        if ($tenantDomain && $currentHost !== $tenantDomain && empty($_GET['final'])) {
+            // Detect HTTPS (nginx terminates SSL, so check X-Forwarded-Proto too)
+            $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+            $scheme = $isHttps ? 'https' : 'http';
+            $bridgeUrl = "{$scheme}://{$tenantDomain}/api/auth/admin-session?token=" . urlencode($token) . "&redirect=" . urlencode($redirect) . "&final=1";
+            header('Location: ' . $bridgeUrl);
+            exit;
+        }
+
+        // Create PHP session (mirrors AuthController::login session setup)
+        session_regenerate_id(true);
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
+        $_SESSION['user_email'] = $user['email'];
+        $_SESSION['user_role'] = $user['role'] ?? 'member';
+        $_SESSION['role'] = $user['role'] ?? 'member';
+        $_SESSION['is_super_admin'] = $user['is_super_admin'] ?? 0;
+        $_SESSION['is_god'] = $user['is_god'] ?? 0;
+        $_SESSION['tenant_id'] = $user['tenant_id'];
+        $_SESSION['user_avatar'] = $user['avatar_url'] ?? '/assets/img/defaults/default_avatar.png';
+        $_SESSION['is_admin'] = in_array($user['role'], $adminRoles) ? 1 : 0;
+        $_SESSION['is_logged_in'] = true;
+
+        // Redirect to legacy admin
+        header('Location: ' . $redirect);
+        exit;
+    }
 }

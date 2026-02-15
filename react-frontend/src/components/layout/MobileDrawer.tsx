@@ -50,6 +50,7 @@ import {
 } from 'lucide-react';
 import { useAuth, useTenant, useNotifications } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { tokenManager, API_BASE } from '@/lib/api';
 import type { TenantFeatures, TenantModules } from '@/types/api';
 
 interface MobileDrawerProps {
@@ -373,6 +374,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   </a>
                   <a
                     href="/admin-legacy"
+                    onClick={(e) => { e.preventDefault(); const t = tokenManager.getAccessToken(); const apiOrigin = API_BASE.startsWith('http') ? API_BASE.replace(/\/api\/?$/, '') : ''; window.location.href = t ? `${apiOrigin}/api/auth/admin-session?token=${encodeURIComponent(t)}&redirect=/admin-legacy` : `${apiOrigin}/admin-legacy`; }}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
                   >
                     <Shield className="w-5 h-5" aria-hidden="true" />

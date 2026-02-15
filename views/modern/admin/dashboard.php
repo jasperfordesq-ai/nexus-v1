@@ -635,7 +635,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
 
 <?php
 // Include unified admin footer (closes wrapper, adds toast container)
-require __DIR__ . '/../../partials/admin-legacy/admin-footer.php';
+require __DIR__ . '/../../partials/admin/admin-footer.php';
 
 // Chart Data
 if (!empty($stats['monthly_stats'])):

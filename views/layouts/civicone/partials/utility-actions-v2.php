@@ -142,7 +142,7 @@ if ($isGod) {
                     <?php if ($isAdmin): ?>
                     <li class="civicone-utility-dropdown__sep" role="separator"></li>
                     <li role="none">
-                        <a href="<?= $basePath ?>/admin" role="menuitem">Admin panel</a>
+                        <a href="<?= $basePath ?>/admin-legacy" role="menuitem">Admin panel</a>
                     </li>
                     <?php endif; ?>
                     <li class="civicone-utility-dropdown__sep" role="separator"></li>

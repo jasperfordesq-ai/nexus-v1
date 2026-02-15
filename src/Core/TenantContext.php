@@ -130,6 +130,7 @@ class TenantContext
             'register',
             'dashboard',
             'admin',
+            'admin-legacy',
             'super-admin',
             'logout',
             'api',

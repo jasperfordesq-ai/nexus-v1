@@ -93,7 +93,7 @@ $totalModules = 6;
         <p class="admin-page-subtitle">EdgeRank configuration for intelligent content ranking</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back
         </a>
@@ -682,7 +682,7 @@ $totalModules = 6;
                             </div>
                             <span>Algorithm Settings</span>
                         </a>
-                        <a href="<?= $basePath ?>/admin" class="admin-quick-action">
+                        <a href="<?= $basePath ?>/admin-legacy" class="admin-quick-action">
                             <div class="admin-quick-action-icon admin-quick-action-icon-blue">
                                 <i class="fa-solid fa-gauge"></i>
                             </div>
@@ -788,7 +788,7 @@ $totalModules = 6;
 
     <!-- Save Button -->
     <div class="form-actions">
-        <a href="<?= $basePath ?>/admin" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy" class="admin-btn admin-btn-secondary">
             Cancel
         </a>
         <button type="submit" class="admin-btn admin-btn-primary admin-btn-lg">

@@ -43,7 +43,7 @@ $configuredProviders = count(array_filter($providers, fn($p) => $p['configured']
         <p class="admin-page-subtitle">Configure AI providers, API keys, and usage limits</p>
     </div>
     <div class="admin-page-header-actions">
-        <a href="<?= $basePath ?>/admin" class="admin-btn admin-btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy" class="admin-btn admin-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
             Back
         </a>
@@ -430,7 +430,7 @@ $configuredProviders = count(array_filter($providers, fn($p) => $p['configured']
                             </div>
                             <span>Algorithm Settings</span>
                         </a>
-                        <a href="<?= $basePath ?>/admin" class="ai-quick-action-card">
+                        <a href="<?= $basePath ?>/admin-legacy" class="ai-quick-action-card">
                             <div class="ai-quick-action-icon ai-icon-blue">
                                 <i class="fa-solid fa-gauge"></i>
                             </div>

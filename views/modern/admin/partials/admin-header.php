@@ -2,7 +2,7 @@
 /**
  * Admin Gold Standard Header Component - Modern Theme
  * STANDALONE admin interface - does NOT use main site header/footer
- * Uses shared navigation configuration from views/partials/admin-legacy/
+ * Uses shared navigation configuration from views/partials/admin/
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -12,7 +12,7 @@ if (session_status() === PHP_SESSION_NONE) {
 use Nexus\Core\TenantContext;
 
 // Include shared navigation configuration
-require_once dirname(__DIR__, 3) . '/partials/admin-legacy/admin-navigation-config.php';
+require_once dirname(__DIR__, 3) . '/partials/admin/admin-navigation-config.php';
 
 $basePath = TenantContext::getBasePath();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
@@ -156,7 +156,7 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
 
 <!-- Sidebar Layout -->
 <div class="admin-layout">
-    <?php require dirname(__DIR__, 3) . '/partials/admin-legacy/admin-sidebar.php'; ?>
+    <?php require dirname(__DIR__, 3) . '/partials/admin/admin-sidebar.php'; ?>
 
     <!-- Main Content Area -->
     <main class="admin-main-content">

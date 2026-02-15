@@ -13,7 +13,7 @@
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+export const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 const TOKEN_KEY = 'nexus_access_token';
 const REFRESH_TOKEN_KEY = 'nexus_refresh_token';
 const TENANT_ID_KEY = 'nexus_tenant_id';
