@@ -218,6 +218,7 @@ class AuthController
                     'role' => $user['role'] ?? 'member',
                     'is_admin' => in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin']) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']),
                     'is_super_admin' => !empty($user['is_super_admin']),
+                    'onboarding_completed' => (bool)($user['onboarding_completed'] ?? false),
                 ],
                 // New secure tokens for mobile apps
                 'access_token' => $accessToken,

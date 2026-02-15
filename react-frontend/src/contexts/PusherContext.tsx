@@ -130,8 +130,8 @@ export function PusherProvider({ children }: PusherProviderProps) {
 
     pusherRef.current = pusher;
 
-    // Subscribe to user's personal channel
-    const userChannel = pusher.subscribe(`private-user-${user.id}`);
+    // Subscribe to user's personal channel (must match backend PusherService::getUserChannel format)
+    const userChannel = pusher.subscribe(`private-tenant.${user.tenant_id}.user.${user.id}`);
 
     userChannel.bind('new-message', (data: NewMessageEvent) => {
       messageListenersRef.current.forEach((listener) => listener(data));
