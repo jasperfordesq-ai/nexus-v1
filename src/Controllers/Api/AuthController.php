@@ -214,7 +214,10 @@ class AuthController
                     'last_name' => $user['last_name'],
                     'email' => $user['email'],
                     'avatar_url' => $user['avatar_url'],
-                    'tenant_id' => $user['tenant_id']
+                    'tenant_id' => $user['tenant_id'],
+                    'role' => $user['role'] ?? 'member',
+                    'is_admin' => in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin']) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']),
+                    'is_super_admin' => !empty($user['is_super_admin']),
                 ],
                 // New secure tokens for mobile apps
                 'access_token' => $accessToken,

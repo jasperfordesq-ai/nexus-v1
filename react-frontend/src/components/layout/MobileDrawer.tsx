@@ -39,7 +39,6 @@ import {
   Building2,
   Search,
   Shield,
-  ToggleRight,
   Globe,
 } from 'lucide-react';
 import { useAuth, useTenant, useNotifications } from '@/contexts';
@@ -63,6 +62,7 @@ const mainNavItems = [
 
 const communityNavItems = [
   { label: 'Exchanges', href: '/exchanges', icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
+  { label: 'Group Exchanges', href: '/group-exchanges', icon: Users, feature: 'group_exchanges' as keyof TenantFeatures },
   { label: 'Members', href: '/members', icon: Users, feature: 'connections' as const },
   { label: 'Events', href: '/events', icon: Calendar, feature: 'events' as const },
   { label: 'Groups', href: '/groups', icon: Users, feature: 'groups' as const },
@@ -168,8 +168,8 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
       size="sm"
       hideCloseButton
       classNames={{
-        base: 'bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-white/10 shadow-2xl',
-        header: 'border-b border-gray-200 dark:border-white/10 p-4',
+        base: 'bg-[var(--surface-overlay)] border-l border-[var(--border-default)] shadow-2xl',
+        header: 'border-b border-[var(--border-default)] p-4',
         body: 'p-0',
       }}
     >
@@ -210,7 +210,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
           {/* User Section */}
           {isAuthenticated && user && (
-            <div className="p-4 border-b border-gray-200 dark:border-white/10">
+            <div className="p-4 border-b border-[var(--border-default)]">
               <Link
                 to={tenantPath('/profile')}
                 className="flex items-center gap-3"
@@ -323,27 +323,27 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             </div>
 
             {/* Admin Tools */}
-            {isAuthenticated && user && (user.role === 'admin' || user.is_admin) && (
+            {isAuthenticated && user && (user.role === 'admin' || user.role === 'tenant_admin' || user.role === 'super_admin' || user.is_admin || user.is_super_admin) && (
               <div>
-                <Divider className="bg-theme-default mb-4" />
+                <Divider className="bg-theme-elevated mb-4" />
                 <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider flex items-center gap-2">
                   <Shield className="w-3 h-3" aria-hidden="true" />
                   Admin Tools
                 </p>
                 <div className="space-y-1">
                   <a
-                    href="/admin/dashboard"
+                    href="/admin"
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
                   >
                     <LayoutDashboard className="w-5 h-5" aria-hidden="true" />
-                    <span>Admin Dashboard</span>
+                    <span>Admin Panel</span>
                   </a>
                   <a
-                    href="/admin/tenant-features"
+                    href="/admin-legacy"
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
                   >
-                    <ToggleRight className="w-5 h-5" aria-hidden="true" />
-                    <span>Tenant Features</span>
+                    <Shield className="w-5 h-5" aria-hidden="true" />
+                    <span>Legacy Admin</span>
                   </a>
                 </div>
               </div>
@@ -384,7 +384,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {/* Auth buttons for guests */}
             {!isAuthenticated && (
               <div className="space-y-2 pt-4">
-                <Divider className="bg-theme-default" />
+                <Divider className="bg-theme-elevated" />
                 <Link to={tenantPath('/login')}>
                   <Button
                     variant="flat"
