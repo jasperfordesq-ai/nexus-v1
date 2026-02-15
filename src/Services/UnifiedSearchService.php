@@ -263,18 +263,18 @@ class UnifiedSearchService
                 e.id,
                 e.title,
                 e.description,
-                e.image_url,
+                e.cover_image,
                 e.location,
-                e.start_date,
-                e.end_date,
+                e.start_time,
+                e.end_time,
                 e.created_at,
                 u.name as organizer_name,
                 u.avatar_url as organizer_avatar
             FROM events e
-            JOIN users u ON e.created_by = u.id
+            JOIN users u ON e.user_id = u.id
             WHERE e.tenant_id = ?
             AND (e.title LIKE ? OR e.description LIKE ? OR e.location LIKE ?)
-            ORDER BY e.start_date DESC
+            ORDER BY e.start_time DESC
             LIMIT ? OFFSET ?
         ");
         $stmt->execute([$tenantId, $searchTerm, $searchTerm, $searchTerm, $limit, $offset]);
@@ -282,18 +282,18 @@ class UnifiedSearchService
 
         $items = array_map(function ($row) {
             $now = new \DateTime();
-            $startDate = new \DateTime($row['start_date']);
+            $startTime = new \DateTime($row['start_time']);
 
             return [
                 'type' => 'event',
                 'id' => (int)$row['id'],
                 'title' => $row['title'],
                 'description' => self::truncate($row['description'], 150),
-                'image_url' => $row['image_url'],
+                'image_url' => $row['cover_image'],
                 'location' => $row['location'],
-                'start_date' => $row['start_date'],
-                'end_date' => $row['end_date'],
-                'is_upcoming' => $startDate > $now,
+                'start_date' => $row['start_time'],
+                'end_date' => $row['end_time'],
+                'is_upcoming' => $startTime > $now,
                 'organizer' => [
                     'name' => $row['organizer_name'],
                     'avatar_url' => $row['organizer_avatar'],
@@ -327,8 +327,8 @@ class UnifiedSearchService
                 g.id,
                 g.name,
                 g.description,
-                g.cover_image,
-                g.privacy,
+                g.image_url,
+                g.visibility,
                 g.created_at,
                 COUNT(DISTINCT gm.user_id) as member_count
             FROM `groups` g
@@ -348,8 +348,8 @@ class UnifiedSearchService
                 'id' => (int)$row['id'],
                 'name' => $row['name'],
                 'description' => self::truncate($row['description'], 150),
-                'cover_image' => $row['cover_image'],
-                'privacy' => $row['privacy'] ?? 'public',
+                'cover_image' => $row['image_url'],
+                'privacy' => $row['visibility'] ?? 'public',
                 'member_count' => (int)$row['member_count'],
                 'created_at' => $row['created_at'],
             ];
