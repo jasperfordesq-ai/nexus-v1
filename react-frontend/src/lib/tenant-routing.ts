@@ -28,8 +28,9 @@ export const RESERVED_PATHS = new Set([
   'events', 'groups', 'messages', 'notifications', 'wallet', 'feed',
   'search', 'members', 'profile', 'settings', 'exchanges', 'achievements',
   'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
-  'organisations', 'federation', 'help', 'contact', 'about', 'terms',
-  'privacy', 'accessibility', 'admin', 'super-admin', 'api', 'assets',
+  'organisations', 'federation', 'onboarding', 'group-exchanges',
+  'help', 'contact', 'about', 'terms',
+  'privacy', 'accessibility', 'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
   'uploads', 'classic', 'health', 'favicon.ico', 'robots.txt',
   'sitemap.xml', 'manifest.json', 'service-worker.js', '.well-known',
 ]);

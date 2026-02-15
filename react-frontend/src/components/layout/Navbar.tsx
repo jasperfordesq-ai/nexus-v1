@@ -5,7 +5,7 @@
  * Theme-aware styling for light and dark modes
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -47,6 +47,7 @@ import {
   Building2,
   X,
   Globe,
+  Shield,
 } from 'lucide-react';
 import { useAuth, useTenant, useNotifications, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -73,6 +74,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const { branding, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
   const { resolvedTheme, toggleTheme } = useTheme();
+
+  // Compute admin status once — used for admin links in dropdown
+  const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin);
 
   // Search state — can be controlled externally
   const [internalSearchOpen, setInternalSearchOpen] = useState(false);
@@ -164,6 +168,19 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     setSelectedIndex(-1);
   }, [suggestions]);
 
+  const handleSuggestionClick = useCallback((suggestion: SearchSuggestion) => {
+    const pathMap: Record<string, string> = {
+      listing: tenantPath(`/listings/${suggestion.id}`),
+      user: tenantPath(`/profile/${suggestion.id}`),
+      event: tenantPath(`/events/${suggestion.id}`),
+      group: tenantPath(`/groups/${suggestion.id}`),
+    };
+    navigate(pathMap[suggestion.type] || tenantPath('/search'));
+    setIsSearchOpen(false);
+    setSearchQuery('');
+    setSuggestions([]);
+  }, [navigate, tenantPath, setIsSearchOpen]);
+
   const handleSearchKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (suggestions.length === 0) return;
 
@@ -177,7 +194,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       e.preventDefault();
       handleSuggestionClick(suggestions[selectedIndex]);
     }
-  }, [suggestions, selectedIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [suggestions, selectedIndex, handleSuggestionClick]);
 
   const handleSearchSubmit = useCallback((e?: React.FormEvent) => {
     e?.preventDefault();
@@ -191,28 +208,15 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       setSearchQuery('');
       setSuggestions([]);
     }
-  }, [searchQuery, navigate, selectedIndex, suggestions]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleSuggestionClick = useCallback((suggestion: SearchSuggestion) => {
-    const pathMap: Record<string, string> = {
-      listing: tenantPath(`/listings/${suggestion.id}`),
-      user: tenantPath(`/profile/${suggestion.id}`),
-      event: tenantPath(`/events/${suggestion.id}`),
-      group: tenantPath(`/groups/${suggestion.id}`),
-    };
-    navigate(pathMap[suggestion.type] || tenantPath('/search'));
-    setIsSearchOpen(false);
-    setSearchQuery('');
-    setSuggestions([]);
-  }, [navigate]);
+  }, [searchQuery, navigate, tenantPath, selectedIndex, suggestions, handleSuggestionClick, setIsSearchOpen]);
 
   // Check if current path matches any in a group
   const isActiveGroup = (paths: string[]) => {
     return paths.some(path => location.pathname.startsWith(path));
   };
 
-  // Community dropdown items
-  const communityItems = [
+  // Community dropdown items (memoized to avoid re-creation on every render)
+  const communityItems = useMemo(() => [
     { label: 'Members', href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
     { label: 'Events', href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
     { label: 'Groups', href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
@@ -220,11 +224,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: 'Volunteering', href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
     { label: 'Organisations', href: tenantPath('/organisations'), icon: Building2, feature: 'volunteering' as const },
     { label: 'Resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
-  ].filter(item => hasFeature(item.feature));
+  ].filter(item => hasFeature(item.feature)), [tenantPath, hasFeature]);
 
   // Activity dropdown items — filtered by feature flags and module flags
-  const activityItems = [
+  const activityItems = useMemo(() => [
     { label: 'Exchanges', href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
+    { label: 'Group Exchanges', href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
     { label: 'Wallet', href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
     { label: 'Achievements', href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' as const },
     { label: 'Goals', href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
@@ -232,17 +237,17 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     if (item.feature && !hasFeature(item.feature)) return false;
     if (item.module && !hasModule(item.module)) return false;
     return true;
-  });
+  }), [tenantPath, hasFeature, hasModule]);
 
   // Federation dropdown items — only shown when federation feature is enabled
-  const federationItems = hasFeature('federation') ? [
+  const federationItems = useMemo(() => hasFeature('federation') ? [
     { label: 'Federation Hub', href: tenantPath('/federation'), icon: Globe },
     { label: 'Partner Communities', href: tenantPath('/federation/partners'), icon: Building2 },
     { label: 'Federated Members', href: tenantPath('/federation/members'), icon: Users },
     { label: 'Federated Messages', href: tenantPath('/federation/messages'), icon: MessageSquare },
     { label: 'Federated Listings', href: tenantPath('/federation/listings'), icon: ListTodo },
     { label: 'Federated Events', href: tenantPath('/federation/events'), icon: Calendar },
-  ] : [];
+  ] : [], [tenantPath, hasFeature]);
 
   const communityPaths = communityItems.map(i => i.href);
   const activityPaths = activityItems.map(i => i.href);
@@ -335,24 +340,27 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
             {/* Messages - Direct Link with Badge (module-gated) */}
             {hasModule('messages') && (
-              <NavLink
-                to={tenantPath('/messages')}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-theme-active text-theme-primary'
-                      : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                  }`
-                }
+              <Badge
+                content={counts.messages > 99 ? '99+' : counts.messages}
+                color="danger"
+                size="sm"
+                isInvisible={!isAuthenticated || counts.messages === 0}
+                placement="top-right"
               >
-                <MessageSquare className="w-4 h-4" aria-hidden="true" />
-                <span>Messages</span>
-                {counts.messages > 0 && isAuthenticated && (
-                  <span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full">
-                    {counts.messages > 99 ? '99+' : counts.messages}
-                  </span>
-                )}
-              </NavLink>
+                <NavLink
+                  to={tenantPath('/messages')}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-theme-active text-theme-primary'
+                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                    }`
+                  }
+                >
+                  <MessageSquare className="w-4 h-4" aria-hidden="true" />
+                  <span>Messages</span>
+                </NavLink>
+              </Badge>
             )}
 
             {/* Community Dropdown */}
@@ -377,14 +385,14 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   aria-label="Community navigation"
                   className="min-w-[180px]"
                   classNames={{
-                    base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-xl',
+                    base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl',
                   }}
                 >
                   {communityItems.map((item) => (
                     <DropdownItem
-                      key={item.href}
+                      key={item.label}
+                      href={item.href}
                       startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                      onPress={() => navigate(item.href)}
                       className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
                     >
                       {item.label}
@@ -416,14 +424,14 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   aria-label="Activity navigation"
                   className="min-w-[180px]"
                   classNames={{
-                    base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-xl',
+                    base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl',
                   }}
                 >
                   {activityItems.map((item) => (
                     <DropdownItem
-                      key={item.href}
+                      key={item.label}
+                      href={item.href}
                       startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                      onPress={() => navigate(item.href)}
                       className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
                     >
                       {item.label}
@@ -455,14 +463,14 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   aria-label="Federation navigation"
                   className="min-w-[200px]"
                   classNames={{
-                    base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-xl',
+                    base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl',
                   }}
                 >
                   {federationItems.map((item) => (
                     <DropdownItem
-                      key={item.href}
+                      key={item.label}
+                      href={item.href}
                       startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                      onPress={() => navigate(item.href)}
                       className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
                     >
                       {item.label}
@@ -517,21 +525,21 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <DropdownMenu
                     aria-label="Create actions"
                     classNames={{
-                      base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-xl',
+                      base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl',
                     }}
                   >
                     <DropdownItem
                       key="listing"
+                      href={tenantPath('/listings/create')}
                       startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
-                      onPress={() => navigate(tenantPath('/listings/create'))}
                     >
                       New Listing
                     </DropdownItem>
                     {hasFeature('events') ? (
                       <DropdownItem
                         key="event"
+                        href={tenantPath('/events/create')}
                         startContent={<Calendar className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => navigate(tenantPath('/events/create'))}
                       >
                         New Event
                       </DropdownItem>
@@ -574,7 +582,19 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <DropdownMenu
                     aria-label="User actions"
                     classNames={{
-                      base: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-xl min-w-[220px]',
+                      base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl min-w-[220px]',
+                    }}
+                    onAction={(key) => {
+                      switch (key) {
+                        case 'profile': navigate(tenantPath('/profile')); break;
+                        case 'wallet': navigate(tenantPath('/wallet')); break;
+                        case 'settings': navigate(tenantPath('/settings')); break;
+                        case 'theme': toggleTheme(); break;
+                        case 'help': navigate(tenantPath('/help')); break;
+                        case 'admin-panel': if (isAdmin) navigate('/admin'); break;
+                        case 'legacy-admin': if (isAdmin) window.location.href = '/admin-legacy'; break;
+                        case 'logout': handleLogout(); break;
+                      }
                     }}
                   >
                     <DropdownSection showDivider>
@@ -595,28 +615,23 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       <DropdownItem
                         key="profile"
                         startContent={<UserCircle className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => navigate(tenantPath('/profile'))}
                       >
                         My Profile
                       </DropdownItem>
-                      {hasModule('wallet') ? (
-                        <DropdownItem
-                          key="wallet"
-                          startContent={<Wallet className="w-4 h-4" aria-hidden="true" />}
-                          onPress={() => navigate(tenantPath('/wallet'))}
-                          endContent={
-                            <span className="text-xs text-theme-subtle">
-                              {user?.balance ?? 0}h
-                            </span>
-                          }
-                        >
-                          Wallet
-                        </DropdownItem>
-                      ) : null}
+                      <DropdownItem
+                        key="wallet"
+                        startContent={<Wallet className="w-4 h-4" aria-hidden="true" />}
+                        endContent={
+                          <span className="text-xs text-theme-subtle">
+                            {user?.balance ?? 0}h
+                          </span>
+                        }
+                      >
+                        Wallet
+                      </DropdownItem>
                       <DropdownItem
                         key="settings"
                         startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => navigate(tenantPath('/settings'))}
                       >
                         Settings
                       </DropdownItem>
@@ -632,16 +647,35 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                             <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
                           )
                         }
-                        onPress={toggleTheme}
                       >
                         {resolvedTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                       </DropdownItem>
                       <DropdownItem
                         key="help"
                         startContent={<HelpCircle className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => navigate(tenantPath('/help'))}
                       >
                         Help Center
+                      </DropdownItem>
+                    </DropdownSection>
+
+                    <DropdownSection
+                      showDivider
+                      title="Admin"
+                      classNames={{
+                        base: isAdmin ? '' : 'hidden',
+                      }}
+                    >
+                      <DropdownItem
+                        key="admin-panel"
+                        startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
+                      >
+                        Admin Panel
+                      </DropdownItem>
+                      <DropdownItem
+                        key="legacy-admin"
+                        startContent={<LayoutDashboard className="w-4 h-4" aria-hidden="true" />}
+                      >
+                        Legacy Admin
                       </DropdownItem>
                     </DropdownSection>
 
@@ -650,7 +684,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         key="logout"
                         color="danger"
                         startContent={<LogOut className="w-4 h-4" aria-hidden="true" />}
-                        onPress={handleLogout}
                         className="text-red-500 dark:text-red-400"
                       >
                         Log Out
@@ -697,7 +730,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               transition={{ duration: 0.15 }}
               className="fixed top-20 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl z-[70]"
             >
-              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden">
+              <div className="bg-[var(--surface-overlay)] rounded-xl border border-[var(--border-default)] shadow-2xl overflow-hidden">
                 <form onSubmit={handleSearchSubmit} className="flex items-center px-4 py-3 gap-3">
                   <Search className="w-5 h-5 text-theme-subtle flex-shrink-0" aria-hidden="true" />
                   <input
@@ -724,13 +757,13 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       <X className="w-4 h-4" aria-hidden="true" />
                     </Button>
                   )}
-                  <kbd className="hidden sm:inline-flex items-center px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-xs text-theme-subtle border border-gray-200 dark:border-gray-700">
+                  <kbd className="hidden sm:inline-flex items-center px-2 py-1 rounded bg-[var(--surface-elevated)] text-xs text-theme-subtle border border-[var(--border-default)]">
                     ESC
                   </kbd>
                 </form>
 
                 {/* Suggestions or Quick Links */}
-                <div className="border-t border-gray-200 dark:border-white/10 px-4 py-3 max-h-64 overflow-y-auto">
+                <div className="border-t border-[var(--border-default)] px-4 py-3 max-h-64 overflow-y-auto">
                   {suggestions.length > 0 ? (
                     <>
                       <p className="text-xs text-theme-subtle mb-2">Suggestions</p>
@@ -742,7 +775,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                             event: { label: 'Event', color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
                             group: { label: 'Group', color: 'bg-purple-500/20 text-purple-600 dark:text-purple-400' },
                           };
-                          const typeInfo = typeLabels[suggestion.type] || { label: suggestion.type, color: 'bg-gray-500/20 text-gray-400' };
+                          const typeInfo = typeLabels[suggestion.type] || { label: suggestion.type, color: 'bg-[var(--surface-elevated)] text-theme-subtle' };
                           const isSelected = index === selectedIndex;
 
                           return (
@@ -758,7 +791,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                               className={`flex items-center justify-between px-3 py-2 rounded-lg text-left h-auto min-h-0 ${
                                 isSelected
                                   ? 'bg-indigo-50 dark:bg-indigo-500/10'
-                                  : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                                  : 'hover:bg-[var(--surface-hover)]'
                               }`}
                             >
                               <span className="text-sm text-theme-primary truncate">
@@ -792,7 +825,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                             variant="flat"
                             size="sm"
                             onPress={() => { navigate(link.path); setIsSearchOpen(false); setSearchQuery(''); }}
-                            className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm text-theme-muted hover:text-theme-primary hover:bg-gray-200 dark:hover:bg-gray-700"
+                            className="px-3 py-1.5 rounded-lg bg-[var(--surface-elevated)] text-sm text-theme-muted hover:text-theme-primary hover:bg-[var(--surface-hover)]"
                           >
                             {link.label}
                           </Button>

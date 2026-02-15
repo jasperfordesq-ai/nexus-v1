@@ -59,6 +59,12 @@ export function LoginPage() {
   // Redirect after successful login (preserve tenant slug prefix)
   const from = (location.state as { from?: string })?.from || tenantPath('/dashboard');
 
+  // Clear stale auth tokens on mount — login page should always start clean
+  // This prevents tenant mismatch errors when switching between tenants
+  useEffect(() => {
+    tokenManager.clearTokens();
+  }, []);
+
   // Fetch available tenants on mount, with ?tenant= hint support (TRS-001 Phase 0)
   useEffect(() => {
     const fetchTenants = async () => {
@@ -124,6 +130,15 @@ export function LoginPage() {
     // Ensure tenant is selected before login
     if (tenants.length > 0 && !selectedTenantId) {
       return;
+    }
+
+    // Clear any stale tokens from a previous session before attempting login
+    // This prevents X-Tenant-ID mismatch errors when switching between tenants
+    tokenManager.clearTokens();
+
+    // Ensure the selected tenant ID is set for the login request
+    if (selectedTenantId) {
+      tokenManager.setTenantId(selectedTenantId);
     }
 
     await login({ email, password });
@@ -230,7 +245,7 @@ export function LoginPage() {
                         trigger: 'bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10',
                         label: 'text-theme-muted',
                         value: 'text-theme-primary',
-                        popoverContent: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10',
+                        popoverContent: 'bg-content1 border border-theme-default',
                       }}
                     >
                       {tenants.map((tenant) => (
@@ -348,7 +363,7 @@ export function LoginPage() {
                 </form>
 
                 {/* Divider */}
-                <Divider className="my-6" style={{ backgroundColor: 'var(--border-default)' }} />
+                <Divider className="my-6 bg-[var(--border-default)]" />
 
                 {/* Register Link */}
                 <p className="text-center text-theme-muted text-sm">

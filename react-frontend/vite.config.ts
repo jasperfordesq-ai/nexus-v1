@@ -13,6 +13,10 @@ export default defineConfig({
   server: {
     port: 5173,
     host: '0.0.0.0', // Required for Docker
+    watch: {
+      usePolling: true, // Required for Docker on Windows (bind mounts don't trigger inotify)
+      interval: 1000,
+    },
     proxy: {
       // Proxy API requests to PHP backend
       // Uses Docker service name 'app' when running in Docker, localhost:8090 otherwise
@@ -24,6 +28,11 @@ export default defineConfig({
           // Ensure headers are forwarded
           'X-Forwarded-Proto': 'http',
         },
+      },
+      // Proxy legacy admin panel to PHP backend
+      '/admin-legacy': {
+        target: process.env.VITE_API_URL || 'http://localhost:8090',
+        changeOrigin: true,
       },
       // Proxy health check
       '/health.php': {
