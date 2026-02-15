@@ -25,6 +25,8 @@ use Nexus\Models\ActivityLog;
  * - POST   /api/v2/admin/users/{id}/ban            - Ban user
  * - POST   /api/v2/admin/users/{id}/reactivate     - Reactivate suspended/banned user
  * - POST   /api/v2/admin/users/{id}/reset-2fa      - Reset user's 2FA
+ * - POST   /api/v2/admin/users/import              - Bulk import users from CSV
+ * - GET    /api/v2/admin/users/import/template      - Download CSV import template
  */
 class AdminUsersApiController extends BaseApiController
 {
@@ -673,6 +675,161 @@ class AdminUsersApiController extends BaseApiController
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to remove badge: ' . $e->getMessage(), null, 500);
         }
+    }
+
+    /**
+     * POST /api/v2/admin/users/import
+     *
+     * Bulk import users from CSV file.
+     * CSV format: first_name, last_name, email, phone (optional), role (optional)
+     */
+    public function import(): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'No CSV file uploaded or upload error', null, 400);
+            return;
+        }
+
+        $file = $_FILES['csv_file'];
+        $allowedTypes = ['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid file type. Please upload a CSV file.', null, 400);
+            return;
+        }
+
+        $handle = fopen($file['tmp_name'], 'r');
+        if (!$handle) {
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Could not read file', null, 500);
+            return;
+        }
+
+        // Read header row
+        $header = fgetcsv($handle);
+        if (!$header) {
+            fclose($handle);
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Empty CSV file', null, 400);
+            return;
+        }
+
+        // Normalize headers (lowercase, trim, underscores)
+        $header = array_map(function ($h) {
+            return strtolower(trim(str_replace([' ', '-'], '_', $h)));
+        }, $header);
+
+        // Validate required columns
+        $requiredColumns = ['first_name', 'last_name', 'email'];
+        $missing = array_diff($requiredColumns, $header);
+        if (!empty($missing)) {
+            fclose($handle);
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Missing required columns: ' . implode(', ', $missing), null, 400);
+            return;
+        }
+
+        $results = ['imported' => 0, 'skipped' => 0, 'errors' => []];
+        $row = 1;
+        $defaultRole = $_POST['default_role'] ?? 'member';
+
+        while (($data = fgetcsv($handle)) !== false) {
+            $row++;
+            if (count($data) !== count($header)) {
+                $results['errors'][] = "Row {$row}: Column count mismatch";
+                $results['skipped']++;
+                continue;
+            }
+
+            $record = array_combine($header, $data);
+            $email = trim($record['email'] ?? '');
+            $firstName = trim($record['first_name'] ?? '');
+            $lastName = trim($record['last_name'] ?? '');
+
+            // Validate email
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $results['errors'][] = "Row {$row}: Invalid email '{$email}'";
+                $results['skipped']++;
+                continue;
+            }
+
+            if (empty($firstName) || empty($lastName)) {
+                $results['errors'][] = "Row {$row}: First name and last name are required";
+                $results['skipped']++;
+                continue;
+            }
+
+            // Check if user already exists in this tenant
+            try {
+                $existing = Database::query(
+                    "SELECT id FROM users WHERE email = ? AND tenant_id = ?",
+                    [$email, $tenantId]
+                )->fetch();
+
+                if ($existing) {
+                    $results['errors'][] = "Row {$row}: User with email '{$email}' already exists";
+                    $results['skipped']++;
+                    continue;
+                }
+
+                // Create user with random temp password
+                $password = bin2hex(random_bytes(16));
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+                Database::query(
+                    "INSERT INTO users (tenant_id, first_name, last_name, email, password, phone, role, status, is_approved, created_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, 'active', 1, NOW())",
+                    [
+                        $tenantId,
+                        $firstName,
+                        $lastName,
+                        $email,
+                        $hashedPassword,
+                        trim($record['phone'] ?? ''),
+                        $record['role'] ?? $defaultRole,
+                    ]
+                );
+
+                $results['imported']++;
+            } catch (\Exception $e) {
+                $results['errors'][] = "Row {$row}: " . $e->getMessage();
+                $results['skipped']++;
+            }
+        }
+
+        fclose($handle);
+
+        ActivityLog::log($adminId, 'admin_bulk_import_users', "Bulk imported {$results['imported']} users ({$results['skipped']} skipped)");
+
+        $this->respondWithData([
+            'imported' => $results['imported'],
+            'skipped' => $results['skipped'],
+            'errors' => array_slice($results['errors'], 0, 50),
+            'total_rows' => $row - 1,
+        ]);
+    }
+
+    /**
+     * GET /api/v2/admin/users/import/template
+     *
+     * Download CSV template for bulk import.
+     */
+    public function importTemplate(): void
+    {
+        $this->requireAdmin();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="user_import_template.csv"');
+
+        $output = fopen('php://output', 'w');
+        // UTF-8 BOM for Excel compatibility
+        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+        fputcsv($output, ['first_name', 'last_name', 'email', 'phone', 'role']);
+        fputcsv($output, ['Jane', 'Doe', 'jane@example.com', '+353861234567', 'member']);
+        fputcsv($output, ['John', 'Smith', 'john@example.com', '', 'member']);
+
+        fclose($output);
+        exit;
     }
 
     /**

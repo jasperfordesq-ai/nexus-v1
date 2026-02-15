@@ -7,6 +7,7 @@
 import { Suspense, lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { LoadingScreen } from '@/components/feedback';
+import { SuperAdminRoute } from './SuperAdminRoute';
 
 // Lazy-loaded admin pages
 const AdminDashboard = lazy(() => import('./modules/dashboard/AdminDashboard'));
@@ -34,6 +35,7 @@ const ExchangeManagement = lazy(() => import('./modules/broker/ExchangeManagemen
 const RiskTags = lazy(() => import('./modules/broker/RiskTags'));
 const MessageReview = lazy(() => import('./modules/broker/MessageReview'));
 const UserMonitoring = lazy(() => import('./modules/broker/UserMonitoring'));
+const VettingRecords = lazy(() => import('./modules/broker/VettingRecords'));
 const GamificationHub = lazy(() => import('./modules/gamification/GamificationHub'));
 const CampaignList = lazy(() => import('./modules/gamification/CampaignList'));
 const CampaignForm = lazy(() => import('./modules/gamification/CampaignForm'));
@@ -118,16 +120,27 @@ const DeliverabilityAnalytics = lazy(() => import('./modules/deliverability/Deli
 const MatchingDiagnostic = lazy(() => import('./modules/diagnostics/MatchingDiagnostic'));
 const NexusScoreAnalytics = lazy(() => import('./modules/diagnostics/NexusScoreAnalytics'));
 
+// Analytics & Reporting
+const CommunityAnalytics = lazy(() => import('./modules/analytics/CommunityAnalytics'));
+const ImpactReport = lazy(() => import('./modules/impact/ImpactReport'));
+
+// Admin 404
+const AdminNotFound = lazy(() => import('./modules/AdminNotFound'));
+
 // Super Admin module
 const SuperDashboard = lazy(() => import('./modules/super/SuperDashboard'));
 const TenantListAdmin = lazy(() => import('./modules/super/TenantList'));
 const TenantForm = lazy(() => import('./modules/super/TenantForm'));
+const TenantShow = lazy(() => import('./modules/super/TenantShow'));
 const TenantHierarchy = lazy(() => import('./modules/super/TenantHierarchy'));
 const SuperUserList = lazy(() => import('./modules/super/SuperUserList'));
 const SuperUserForm = lazy(() => import('./modules/super/SuperUserForm'));
+const UserShow = lazy(() => import('./modules/super/UserShow'));
 const BulkOperations = lazy(() => import('./modules/super/BulkOperations'));
 const SuperAuditLog = lazy(() => import('./modules/super/SuperAuditLog'));
 const FederationControls = lazy(() => import('./modules/super/FederationControls'));
+const FederationAuditLog = lazy(() => import('./modules/super/FederationAuditLog'));
+const FederationTenantFeatures = lazy(() => import('./modules/super/FederationTenantFeatures'));
 
 // Content module
 const PagesAdmin = lazy(() => import('./modules/content/PagesAdmin'));
@@ -196,6 +209,7 @@ export function AdminRoutes() {
       <Route path="broker-controls/risk-tags" element={<Lazy><RiskTags /></Lazy>} />
       <Route path="broker-controls/messages" element={<Lazy><MessageReview /></Lazy>} />
       <Route path="broker-controls/monitoring" element={<Lazy><UserMonitoring /></Lazy>} />
+      <Route path="broker-controls/vetting" element={<Lazy><VettingRecords /></Lazy>} />
 
       {/* ─── MARKETING ─── */}
       <Route path="newsletters" element={<Lazy><NewsletterList /></Lazy>} />
@@ -299,17 +313,30 @@ export function AdminRoutes() {
       <Route path="nexus-score/analytics" element={<Lazy><NexusScoreAnalytics /></Lazy>} />
 
       {/* ─── SUPER ADMIN (requires super admin role) ─── */}
-      <Route path="super" element={<Lazy><SuperDashboard /></Lazy>} />
-      <Route path="super/tenants" element={<Lazy><TenantListAdmin /></Lazy>} />
-      <Route path="super/tenants/create" element={<Lazy><TenantForm /></Lazy>} />
-      <Route path="super/tenants/:id/edit" element={<Lazy><TenantForm /></Lazy>} />
-      <Route path="super/tenants/hierarchy" element={<Lazy><TenantHierarchy /></Lazy>} />
-      <Route path="super/users" element={<Lazy><SuperUserList /></Lazy>} />
-      <Route path="super/users/create" element={<Lazy><SuperUserForm /></Lazy>} />
-      <Route path="super/users/:id/edit" element={<Lazy><SuperUserForm /></Lazy>} />
-      <Route path="super/bulk" element={<Lazy><BulkOperations /></Lazy>} />
-      <Route path="super/audit" element={<Lazy><SuperAuditLog /></Lazy>} />
-      <Route path="super/federation" element={<Lazy><FederationControls /></Lazy>} />
+      <Route path="super" element={<SuperAdminRoute />}>
+        <Route index element={<Lazy><SuperDashboard /></Lazy>} />
+        <Route path="tenants" element={<Lazy><TenantListAdmin /></Lazy>} />
+        <Route path="tenants/create" element={<Lazy><TenantForm /></Lazy>} />
+        <Route path="tenants/hierarchy" element={<Lazy><TenantHierarchy /></Lazy>} />
+        <Route path="tenants/:id" element={<Lazy><TenantShow /></Lazy>} />
+        <Route path="tenants/:id/edit" element={<Lazy><TenantForm /></Lazy>} />
+        <Route path="users" element={<Lazy><SuperUserList /></Lazy>} />
+        <Route path="users/create" element={<Lazy><SuperUserForm /></Lazy>} />
+        <Route path="users/:id" element={<Lazy><UserShow /></Lazy>} />
+        <Route path="users/:id/edit" element={<Lazy><SuperUserForm /></Lazy>} />
+        <Route path="bulk" element={<Lazy><BulkOperations /></Lazy>} />
+        <Route path="audit" element={<Lazy><SuperAuditLog /></Lazy>} />
+        <Route path="federation" element={<Lazy><FederationControls /></Lazy>} />
+        <Route path="federation/audit" element={<Lazy><FederationAuditLog /></Lazy>} />
+        <Route path="federation/tenant/:tenantId/features" element={<Lazy><FederationTenantFeatures /></Lazy>} />
+      </Route>
+
+      {/* ─── ANALYTICS & REPORTING ─── */}
+      <Route path="community-analytics" element={<Lazy><CommunityAnalytics /></Lazy>} />
+      <Route path="impact-report" element={<Lazy><ImpactReport /></Lazy>} />
+
+      {/* ─── 404 CATCH-ALL ─── */}
+      <Route path="*" element={<Lazy><AdminNotFound /></Lazy>} />
     </>
   );
 }

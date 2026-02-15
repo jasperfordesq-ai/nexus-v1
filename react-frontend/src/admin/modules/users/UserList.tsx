@@ -16,9 +16,18 @@ import {
   DropdownItem,
   Tabs,
   Tab,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Select,
+  SelectItem,
 } from '@heroui/react';
 import {
   Plus,
+  Upload,
+  Download,
   MoreVertical,
   UserCheck,
   UserX,
@@ -28,6 +37,9 @@ import {
   Shield,
   KeyRound,
   LogIn,
+  FileUp,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -51,6 +63,18 @@ export function UserList() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState(searchParams.get('filter') || 'all');
   const [search, setSearch] = useState('');
+
+  // Import modal state
+  const [importOpen, setImportOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importRole, setImportRole] = useState('member');
+  const [importLoading, setImportLoading] = useState(false);
+  const [importResults, setImportResults] = useState<{
+    imported: number;
+    skipped: number;
+    errors: string[];
+    total_rows: number;
+  } | null>(null);
 
   // Confirm modal state
   const [confirmAction, setConfirmAction] = useState<{
@@ -96,6 +120,32 @@ export function UserList() {
       searchParams.set('filter', key);
     }
     setSearchParams(searchParams);
+  };
+
+  const handleImport = async () => {
+    if (!importFile) return;
+    setImportLoading(true);
+    setImportResults(null);
+
+    const res = await adminUsers.importUsers(importFile, { default_role: importRole });
+    if (res.success && res.data) {
+      const data = res.data as { imported: number; skipped: number; errors: string[]; total_rows: number };
+      setImportResults(data);
+      if (data.imported > 0) {
+        toast.success(`Successfully imported ${data.imported} users`);
+        loadUsers();
+      }
+    } else {
+      toast.error(res.error || 'Import failed');
+    }
+    setImportLoading(false);
+  };
+
+  const resetImportModal = () => {
+    setImportOpen(false);
+    setImportFile(null);
+    setImportRole('member');
+    setImportResults(null);
   };
 
   const handleAction = async () => {
@@ -294,13 +344,22 @@ export function UserList() {
         title="Users"
         description="Manage platform users, roles, and permissions"
         actions={
-          <Button
-            color="primary"
-            startContent={<Plus size={16} />}
-            onPress={() => navigate(tenantPath('/admin/users/create'))}
-          >
-            Add User
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="bordered"
+              startContent={<Upload size={16} />}
+              onPress={() => setImportOpen(true)}
+            >
+              Import CSV
+            </Button>
+            <Button
+              color="primary"
+              startContent={<Plus size={16} />}
+              onPress={() => navigate(tenantPath('/admin/users/create'))}
+            >
+              Add User
+            </Button>
+          </div>
         }
       />
 
@@ -346,6 +405,106 @@ export function UserList() {
           isLoading={actionLoading}
         />
       )}
+
+      {/* Import Users Modal */}
+      <Modal isOpen={importOpen} onClose={resetImportModal} size="lg">
+        <ModalContent>
+          <ModalHeader className="flex items-center gap-2">
+            <FileUp size={20} />
+            Import Users from CSV
+          </ModalHeader>
+          <ModalBody>
+            {!importResults ? (
+              <div className="flex flex-col gap-4">
+                <p className="text-sm text-default-500">
+                  Upload a CSV file with columns: <strong>first_name</strong>, <strong>last_name</strong>, <strong>email</strong>, phone (optional), role (optional).
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    startContent={<Download size={14} />}
+                    onPress={() => adminUsers.downloadImportTemplate()}
+                  >
+                    Download Template
+                  </Button>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">CSV File</label>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                    className="block w-full text-sm text-default-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                  />
+                </div>
+
+                <Select
+                  label="Default Role"
+                  selectedKeys={[importRole]}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    if (selected) setImportRole(selected);
+                  }}
+                  size="sm"
+                  variant="bordered"
+                >
+                  <SelectItem key="member">Member</SelectItem>
+                  <SelectItem key="broker">Broker</SelectItem>
+                  <SelectItem key="coordinator">Coordinator</SelectItem>
+                </Select>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 text-success">
+                    <CheckCircle2 size={18} />
+                    <span className="font-medium">{importResults.imported} imported</span>
+                  </div>
+                  {importResults.skipped > 0 && (
+                    <div className="flex items-center gap-2 text-warning">
+                      <AlertCircle size={18} />
+                      <span className="font-medium">{importResults.skipped} skipped</span>
+                    </div>
+                  )}
+                  <span className="text-sm text-default-400">
+                    of {importResults.total_rows} rows
+                  </span>
+                </div>
+
+                {importResults.errors.length > 0 && (
+                  <div className="max-h-48 overflow-y-auto rounded-lg bg-danger-50 p-3">
+                    <p className="text-sm font-medium text-danger mb-1">Errors:</p>
+                    <ul className="text-xs text-danger-600 space-y-1">
+                      {importResults.errors.map((err, i) => (
+                        <li key={i}>{err}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={resetImportModal} isDisabled={importLoading}>
+              {importResults ? 'Close' : 'Cancel'}
+            </Button>
+            {!importResults && (
+              <Button
+                color="primary"
+                onPress={handleImport}
+                isLoading={importLoading}
+                isDisabled={!importFile}
+                startContent={!importLoading ? <Upload size={16} /> : undefined}
+              >
+                Import
+              </Button>
+            )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

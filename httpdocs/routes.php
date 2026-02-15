@@ -347,6 +347,13 @@ $router->add('GET', '/api/v2/wallet/pending-count', 'Nexus\Controllers\Api\Walle
 $router->add('GET', '/api/v2/feed', 'Nexus\Controllers\Api\SocialApiController@feedV2');
 $router->add('POST', '/api/v2/feed/posts', 'Nexus\Controllers\Api\SocialApiController@createPostV2');
 $router->add('POST', '/api/v2/feed/like', 'Nexus\Controllers\Api\SocialApiController@likeV2');
+$router->add('POST', '/api/v2/feed/polls', 'Nexus\Controllers\Api\SocialApiController@createPollV2');
+$router->add('GET', '/api/v2/feed/polls/{id}', 'Nexus\Controllers\Api\SocialApiController@getPollV2');
+$router->add('POST', '/api/v2/feed/polls/{id}/vote', 'Nexus\Controllers\Api\SocialApiController@votePollV2');
+$router->add('POST', '/api/v2/feed/posts/{id}/hide', 'Nexus\Controllers\Api\SocialApiController@hidePostV2');
+$router->add('POST', '/api/v2/feed/posts/{id}/report', 'Nexus\Controllers\Api\SocialApiController@reportPostV2');
+$router->add('POST', '/api/v2/feed/posts/{id}/delete', 'Nexus\Controllers\Api\SocialApiController@deletePostV2');
+$router->add('POST', '/api/v2/feed/users/{id}/mute', 'Nexus\Controllers\Api\SocialApiController@muteUserV2');
 
 // ============================================
 // API V2 - REALTIME (Pusher Configuration)
@@ -373,6 +380,7 @@ $router->add('DELETE', '/api/v2/notifications/{id}', 'Nexus\Controllers\Api\Noti
 // ============================================
 $router->add('GET', '/api/v2/reviews/pending', 'Nexus\Controllers\Api\ReviewsApiController@pending');
 $router->add('GET', '/api/v2/reviews/user/{userId}', 'Nexus\Controllers\Api\ReviewsApiController@userReviews');
+$router->add('GET', '/api/v2/users/{userId}/reviews', 'Nexus\Controllers\Api\ReviewsApiController@userReviews');
 $router->add('GET', '/api/v2/reviews/user/{userId}/stats', 'Nexus\Controllers\Api\ReviewsApiController@userStats');
 $router->add('GET', '/api/v2/reviews/user/{userId}/trust', 'Nexus\Controllers\Api\ReviewsApiController@userTrust');
 $router->add('GET', '/api/v2/reviews/{id}', 'Nexus\Controllers\Api\ReviewsApiController@show');
@@ -406,6 +414,7 @@ $router->add('PUT', '/api/v2/goals/{id}', 'Nexus\Controllers\Api\GoalsApiControl
 $router->add('DELETE', '/api/v2/goals/{id}', 'Nexus\Controllers\Api\GoalsApiController@destroy');
 $router->add('POST', '/api/v2/goals/{id}/progress', 'Nexus\Controllers\Api\GoalsApiController@progress');
 $router->add('POST', '/api/v2/goals/{id}/buddy', 'Nexus\Controllers\Api\GoalsApiController@buddy');
+$router->add('POST', '/api/v2/goals/{id}/complete', 'Nexus\Controllers\Api\GoalsApiController@complete');
 
 // ============================================
 // API V2 - GAMIFICATION (XP, Badges, Leaderboards)
@@ -423,6 +432,7 @@ $router->add('POST', '/api/v2/gamification/shop/purchase', 'Nexus\Controllers\Ap
 $router->add('PUT', '/api/v2/gamification/showcase', 'Nexus\Controllers\Api\GamificationV2ApiController@updateShowcase');
 $router->add('GET', '/api/v2/gamification/seasons', 'Nexus\Controllers\Api\GamificationV2ApiController@seasons');
 $router->add('GET', '/api/v2/gamification/seasons/current', 'Nexus\Controllers\Api\GamificationV2ApiController@currentSeason');
+$router->add('POST', '/api/v2/gamification/challenges/{id}/claim', 'Nexus\Controllers\Api\GamificationV2ApiController@claimChallenge');
 
 // ============================================
 // API V2 - VOLUNTEERING (Full Module)
@@ -462,6 +472,29 @@ $router->add('POST', '/api/v2/volunteering/reviews', 'Nexus\Controllers\Api\Volu
 $router->add('GET', '/api/v2/volunteering/reviews/{type}/{id}', 'Nexus\Controllers\Api\VolunteerApiController@getReviews');
 
 // ============================================
+// API V2 - COMMENTS (Threaded comments for React frontend)
+// ============================================
+$router->add('GET', '/api/v2/comments', 'Nexus\Controllers\Api\CommentsV2ApiController@index');
+$router->add('POST', '/api/v2/comments', 'Nexus\Controllers\Api\CommentsV2ApiController@store');
+$router->add('PUT', '/api/v2/comments/{id}', 'Nexus\Controllers\Api\CommentsV2ApiController@update');
+$router->add('DELETE', '/api/v2/comments/{id}', 'Nexus\Controllers\Api\CommentsV2ApiController@destroy');
+$router->add('POST', '/api/v2/comments/{id}/reactions', 'Nexus\Controllers\Api\CommentsV2ApiController@reactions');
+
+// ============================================
+// API V2 - BLOG (Public, for React frontend)
+// ============================================
+$router->add('GET', '/api/v2/blog', 'Nexus\Controllers\Api\BlogPublicApiController@index');
+$router->add('GET', '/api/v2/blog/categories', 'Nexus\Controllers\Api\BlogPublicApiController@categories');
+$router->add('GET', '/api/v2/blog/{slug}', 'Nexus\Controllers\Api\BlogPublicApiController@show');
+
+// ============================================
+// API V2 - RESOURCES (Public, for React frontend)
+// ============================================
+$router->add('GET', '/api/v2/resources', 'Nexus\Controllers\Api\ResourcesPublicApiController@index');
+$router->add('GET', '/api/v2/resources/categories', 'Nexus\Controllers\Api\ResourcesPublicApiController@categories');
+$router->add('POST', '/api/v2/resources', 'Nexus\Controllers\Api\ResourcesPublicApiController@store');
+
+// ============================================
 // API V2 - ADMIN (React Admin Panel)
 // Dashboard, Users, Listings, Config, Cache, Jobs
 // ============================================
@@ -474,6 +507,8 @@ $router->add('GET', '/api/v2/admin/dashboard/activity', 'Nexus\Controllers\Api\A
 // Admin Users
 $router->add('GET', '/api/v2/admin/users', 'Nexus\Controllers\Api\AdminUsersApiController@index');
 $router->add('POST', '/api/v2/admin/users', 'Nexus\Controllers\Api\AdminUsersApiController@store');
+$router->add('POST', '/api/v2/admin/users/import', 'Nexus\Controllers\Api\AdminUsersApiController@import');
+$router->add('GET', '/api/v2/admin/users/import/template', 'Nexus\Controllers\Api\AdminUsersApiController@importTemplate');
 $router->add('GET', '/api/v2/admin/users/{id}', 'Nexus\Controllers\Api\AdminUsersApiController@show');
 $router->add('PUT', '/api/v2/admin/users/{id}', 'Nexus\Controllers\Api\AdminUsersApiController@update');
 $router->add('DELETE', '/api/v2/admin/users/{id}', 'Nexus\Controllers\Api\AdminUsersApiController@destroy');
@@ -598,6 +633,7 @@ $router->add('PUT', '/api/v2/admin/timebanking/alerts/{id}', 'Nexus\Controllers\
 $router->add('POST', '/api/v2/admin/timebanking/adjust-balance', 'Nexus\Controllers\Api\AdminTimebankingApiController@adjustBalance');
 $router->add('GET', '/api/v2/admin/timebanking/org-wallets', 'Nexus\Controllers\Api\AdminTimebankingApiController@orgWallets');
 $router->add('GET', '/api/v2/admin/timebanking/user-report', 'Nexus\Controllers\Api\AdminTimebankingApiController@userReport');
+$router->add('GET', '/api/v2/admin/timebanking/user-statement', 'Nexus\Controllers\Api\AdminTimebankingApiController@userStatement');
 
 // Admin Enterprise
 $router->add('GET', '/api/v2/admin/enterprise/dashboard', 'Nexus\Controllers\Api\AdminEnterpriseApiController@dashboard');
@@ -635,6 +671,17 @@ $router->add('GET', '/api/v2/admin/broker/messages', 'Nexus\Controllers\Api\Admi
 $router->add('POST', '/api/v2/admin/broker/messages/{id}/review', 'Nexus\Controllers\Api\AdminBrokerApiController@reviewMessage');
 $router->add('GET', '/api/v2/admin/broker/monitoring', 'Nexus\Controllers\Api\AdminBrokerApiController@monitoring');
 
+// Admin Vetting Records (TOL2 compliance — DBS/Garda vetting)
+$router->add('GET', '/api/v2/admin/vetting/stats', 'Nexus\Controllers\Api\AdminVettingApiController@stats');
+$router->add('GET', '/api/v2/admin/vetting/user/{userId}', 'Nexus\Controllers\Api\AdminVettingApiController@getUserRecords');
+$router->add('GET', '/api/v2/admin/vetting', 'Nexus\Controllers\Api\AdminVettingApiController@list');
+$router->add('GET', '/api/v2/admin/vetting/{id}', 'Nexus\Controllers\Api\AdminVettingApiController@show');
+$router->add('POST', '/api/v2/admin/vetting', 'Nexus\Controllers\Api\AdminVettingApiController@store');
+$router->add('PUT', '/api/v2/admin/vetting/{id}', 'Nexus\Controllers\Api\AdminVettingApiController@update');
+$router->add('POST', '/api/v2/admin/vetting/{id}/verify', 'Nexus\Controllers\Api\AdminVettingApiController@verify');
+$router->add('POST', '/api/v2/admin/vetting/{id}/reject', 'Nexus\Controllers\Api\AdminVettingApiController@reject');
+$router->add('DELETE', '/api/v2/admin/vetting/{id}', 'Nexus\Controllers\Api\AdminVettingApiController@destroy');
+
 // Admin Newsletters
 $router->add('GET', '/api/v2/admin/newsletters', 'Nexus\Controllers\Api\AdminNewsletterApiController@index');
 $router->add('POST', '/api/v2/admin/newsletters', 'Nexus\Controllers\Api\AdminNewsletterApiController@store');
@@ -662,6 +709,22 @@ $router->add('GET', '/api/v2/admin/federation/analytics', 'Nexus\Controllers\Api
 $router->add('GET', '/api/v2/admin/federation/api-keys', 'Nexus\Controllers\Api\AdminFederationApiController@apiKeys');
 $router->add('POST', '/api/v2/admin/federation/api-keys', 'Nexus\Controllers\Api\AdminFederationApiController@createApiKey');
 $router->add('GET', '/api/v2/admin/federation/data', 'Nexus\Controllers\Api\AdminFederationApiController@dataManagement');
+
+// Federation V2 (user-facing, for React frontend)
+$router->add('GET', '/api/v2/federation/status', 'Nexus\Controllers\Api\FederationV2ApiController@status');
+$router->add('POST', '/api/v2/federation/opt-in', 'Nexus\Controllers\Api\FederationV2ApiController@optIn');
+$router->add('POST', '/api/v2/federation/opt-out', 'Nexus\Controllers\Api\FederationV2ApiController@optOut');
+$router->add('GET', '/api/v2/federation/partners', 'Nexus\Controllers\Api\FederationV2ApiController@partners');
+$router->add('GET', '/api/v2/federation/activity', 'Nexus\Controllers\Api\FederationV2ApiController@activity');
+$router->add('GET', '/api/v2/federation/events', 'Nexus\Controllers\Api\FederationV2ApiController@events');
+$router->add('GET', '/api/v2/federation/listings', 'Nexus\Controllers\Api\FederationV2ApiController@listings');
+$router->add('GET', '/api/v2/federation/members', 'Nexus\Controllers\Api\FederationV2ApiController@members');
+$router->add('GET', '/api/v2/federation/members/{id}', 'Nexus\Controllers\Api\FederationV2ApiController@member');
+$router->add('GET', '/api/v2/federation/messages', 'Nexus\Controllers\Api\FederationV2ApiController@messages');
+$router->add('POST', '/api/v2/federation/messages', 'Nexus\Controllers\Api\FederationV2ApiController@sendMessage');
+$router->add('POST', '/api/v2/federation/messages/{id}/mark-read', 'Nexus\Controllers\Api\FederationV2ApiController@markMessageRead');
+$router->add('GET', '/api/v2/federation/settings', 'Nexus\Controllers\Api\FederationV2ApiController@getSettings');
+$router->add('PUT', '/api/v2/federation/settings', 'Nexus\Controllers\Api\FederationV2ApiController@updateSettings');
 
 // Admin Pages
 $router->add('GET', '/api/v2/admin/pages', 'Nexus\Controllers\Api\AdminContentApiController@getPages');
@@ -1482,68 +1545,73 @@ $router->add('GET', '/matches/stats', 'Nexus\Controllers\MatchController@stats')
 $router->add('GET', '/matches/debug', 'Nexus\Controllers\MatchController@debug');
 
 // --------------------------------------------------------------------------
+// LEGACY ADMIN PANEL (PHP views — being decommissioned)
+// React admin panel at /admin/* is the primary admin UI
+// --------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------
 // 10.8. ADMIN > SMART MATCHING
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin/smart-matching', 'Nexus\Controllers\Admin\SmartMatchingController@index');
-$router->add('GET', '/admin/smart-matching/analytics', 'Nexus\Controllers\Admin\SmartMatchingController@analytics');
-$router->add('GET', '/admin/smart-matching/configuration', 'Nexus\Controllers\Admin\SmartMatchingController@configuration');
-$router->add('POST', '/admin/smart-matching/configuration', 'Nexus\Controllers\Admin\SmartMatchingController@configuration');
-$router->add('POST', '/admin/smart-matching/clear-cache', 'Nexus\Controllers\Admin\SmartMatchingController@clearCache');
-$router->add('POST', '/admin/smart-matching/warmup-cache', 'Nexus\Controllers\Admin\SmartMatchingController@warmupCache');
-$router->add('POST', '/admin/smart-matching/run-geocoding', 'Nexus\Controllers\Admin\SmartMatchingController@runGeocoding');
-$router->add('GET', '/admin/smart-matching/api/stats', 'Nexus\Controllers\Admin\SmartMatchingController@apiStats');
+$router->add('GET', '/admin-legacy/smart-matching', 'Nexus\Controllers\Admin\SmartMatchingController@index');
+$router->add('GET', '/admin-legacy/smart-matching/analytics', 'Nexus\Controllers\Admin\SmartMatchingController@analytics');
+$router->add('GET', '/admin-legacy/smart-matching/configuration', 'Nexus\Controllers\Admin\SmartMatchingController@configuration');
+$router->add('POST', '/admin-legacy/smart-matching/configuration', 'Nexus\Controllers\Admin\SmartMatchingController@configuration');
+$router->add('POST', '/admin-legacy/smart-matching/clear-cache', 'Nexus\Controllers\Admin\SmartMatchingController@clearCache');
+$router->add('POST', '/admin-legacy/smart-matching/warmup-cache', 'Nexus\Controllers\Admin\SmartMatchingController@warmupCache');
+$router->add('POST', '/admin-legacy/smart-matching/run-geocoding', 'Nexus\Controllers\Admin\SmartMatchingController@runGeocoding');
+$router->add('GET', '/admin-legacy/smart-matching/api/stats', 'Nexus\Controllers\Admin\SmartMatchingController@apiStats');
 
 // --------------------------------------------------------------------------
 // 10.8.1. ADMIN > MATCH APPROVALS (Broker Workflow)
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin/match-approvals', 'Nexus\Controllers\Admin\MatchApprovalsController@index');
-$router->add('GET', '/admin/match-approvals/history', 'Nexus\Controllers\Admin\MatchApprovalsController@history');
-$router->add('GET', '/admin/match-approvals/{id}', 'Nexus\Controllers\Admin\MatchApprovalsController@show');
-$router->add('POST', '/admin/match-approvals/approve', 'Nexus\Controllers\Admin\MatchApprovalsController@approve');
-$router->add('POST', '/admin/match-approvals/reject', 'Nexus\Controllers\Admin\MatchApprovalsController@reject');
-$router->add('GET', '/admin/match-approvals/api/stats', 'Nexus\Controllers\Admin\MatchApprovalsController@apiStats');
+$router->add('GET', '/admin-legacy/match-approvals', 'Nexus\Controllers\Admin\MatchApprovalsController@index');
+$router->add('GET', '/admin-legacy/match-approvals/history', 'Nexus\Controllers\Admin\MatchApprovalsController@history');
+$router->add('GET', '/admin-legacy/match-approvals/{id}', 'Nexus\Controllers\Admin\MatchApprovalsController@show');
+$router->add('POST', '/admin-legacy/match-approvals/approve', 'Nexus\Controllers\Admin\MatchApprovalsController@approve');
+$router->add('POST', '/admin-legacy/match-approvals/reject', 'Nexus\Controllers\Admin\MatchApprovalsController@reject');
+$router->add('GET', '/admin-legacy/match-approvals/api/stats', 'Nexus\Controllers\Admin\MatchApprovalsController@apiStats');
 
 // --------------------------------------------------------------------------
 // 10.8.2. ADMIN > BROKER CONTROLS
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin/broker-controls', 'Nexus\Controllers\Admin\BrokerControlsController@index');
-$router->add('GET', '/admin/broker-controls/configuration', 'Nexus\Controllers\Admin\BrokerControlsController@configuration');
-$router->add('POST', '/admin/broker-controls/configuration', 'Nexus\Controllers\Admin\BrokerControlsController@configuration');
+$router->add('GET', '/admin-legacy/broker-controls', 'Nexus\Controllers\Admin\BrokerControlsController@index');
+$router->add('GET', '/admin-legacy/broker-controls/configuration', 'Nexus\Controllers\Admin\BrokerControlsController@configuration');
+$router->add('POST', '/admin-legacy/broker-controls/configuration', 'Nexus\Controllers\Admin\BrokerControlsController@configuration');
 
 // Broker Controls - Exchanges
-$router->add('GET', '/admin/broker-controls/exchanges', 'Nexus\Controllers\Admin\BrokerControlsController@exchanges');
-$router->add('GET', '/admin/broker-controls/exchanges/{id}', 'Nexus\Controllers\Admin\BrokerControlsController@showExchange');
-$router->add('POST', '/admin/broker-controls/exchanges/{id}/approve', 'Nexus\Controllers\Admin\BrokerControlsController@approveExchange');
-$router->add('POST', '/admin/broker-controls/exchanges/{id}/reject', 'Nexus\Controllers\Admin\BrokerControlsController@rejectExchange');
+$router->add('GET', '/admin-legacy/broker-controls/exchanges', 'Nexus\Controllers\Admin\BrokerControlsController@exchanges');
+$router->add('GET', '/admin-legacy/broker-controls/exchanges/{id}', 'Nexus\Controllers\Admin\BrokerControlsController@showExchange');
+$router->add('POST', '/admin-legacy/broker-controls/exchanges/{id}/approve', 'Nexus\Controllers\Admin\BrokerControlsController@approveExchange');
+$router->add('POST', '/admin-legacy/broker-controls/exchanges/{id}/reject', 'Nexus\Controllers\Admin\BrokerControlsController@rejectExchange');
 
 // Broker Controls - Risk Tags
-$router->add('GET', '/admin/broker-controls/risk-tags', 'Nexus\Controllers\Admin\BrokerControlsController@riskTags');
-$router->add('GET', '/admin/broker-controls/risk-tags/{listingId}', 'Nexus\Controllers\Admin\BrokerControlsController@tagListing');
-$router->add('POST', '/admin/broker-controls/risk-tags/{listingId}', 'Nexus\Controllers\Admin\BrokerControlsController@tagListing');
-$router->add('POST', '/admin/broker-controls/risk-tags/{listingId}/remove', 'Nexus\Controllers\Admin\BrokerControlsController@removeTag');
+$router->add('GET', '/admin-legacy/broker-controls/risk-tags', 'Nexus\Controllers\Admin\BrokerControlsController@riskTags');
+$router->add('GET', '/admin-legacy/broker-controls/risk-tags/{listingId}', 'Nexus\Controllers\Admin\BrokerControlsController@tagListing');
+$router->add('POST', '/admin-legacy/broker-controls/risk-tags/{listingId}', 'Nexus\Controllers\Admin\BrokerControlsController@tagListing');
+$router->add('POST', '/admin-legacy/broker-controls/risk-tags/{listingId}/remove', 'Nexus\Controllers\Admin\BrokerControlsController@removeTag');
 
 // Broker Controls - Messages
-$router->add('GET', '/admin/broker-controls/messages', 'Nexus\Controllers\Admin\BrokerControlsController@messages');
-$router->add('POST', '/admin/broker-controls/messages/{id}/review', 'Nexus\Controllers\Admin\BrokerControlsController@reviewMessage');
-$router->add('POST', '/admin/broker-controls/messages/{id}/flag', 'Nexus\Controllers\Admin\BrokerControlsController@flagMessage');
+$router->add('GET', '/admin-legacy/broker-controls/messages', 'Nexus\Controllers\Admin\BrokerControlsController@messages');
+$router->add('POST', '/admin-legacy/broker-controls/messages/{id}/review', 'Nexus\Controllers\Admin\BrokerControlsController@reviewMessage');
+$router->add('POST', '/admin-legacy/broker-controls/messages/{id}/flag', 'Nexus\Controllers\Admin\BrokerControlsController@flagMessage');
 
 // Broker Controls - User Monitoring
-$router->add('GET', '/admin/broker-controls/monitoring', 'Nexus\Controllers\Admin\BrokerControlsController@userMonitoring');
-$router->add('POST', '/admin/broker-controls/monitoring/{userId}', 'Nexus\Controllers\Admin\BrokerControlsController@setMonitoring');
+$router->add('GET', '/admin-legacy/broker-controls/monitoring', 'Nexus\Controllers\Admin\BrokerControlsController@userMonitoring');
+$router->add('POST', '/admin-legacy/broker-controls/monitoring/{userId}', 'Nexus\Controllers\Admin\BrokerControlsController@setMonitoring');
 
 // Broker Controls - Statistics
-$router->add('GET', '/admin/broker-controls/stats', 'Nexus\Controllers\Admin\BrokerControlsController@stats');
+$router->add('GET', '/admin-legacy/broker-controls/stats', 'Nexus\Controllers\Admin\BrokerControlsController@stats');
 
 // --------------------------------------------------------------------------
 // 10.9. ADMIN > SEED GENERATOR
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin/seed-generator', 'Nexus\Controllers\Admin\SeedGeneratorController@index');
-$router->add('GET', '/admin/seed-generator/verification', 'Nexus\Controllers\Admin\SeedGeneratorVerificationController@index');
-$router->add('POST', '/admin/seed-generator/generate-production', 'Nexus\Controllers\Admin\SeedGeneratorController@generateProduction');
-$router->add('POST', '/admin/seed-generator/generate-demo', 'Nexus\Controllers\Admin\SeedGeneratorController@generateDemo');
-$router->add('GET', '/admin/seed-generator/preview', 'Nexus\Controllers\Admin\SeedGeneratorController@preview');
-$router->add('GET', '/admin/seed-generator/download', 'Nexus\Controllers\Admin\SeedGeneratorController@download');
-$router->add('GET', '/admin/seed-generator/test', 'Nexus\Controllers\Admin\SeedGeneratorVerificationController@runLiveTest');
+$router->add('GET', '/admin-legacy/seed-generator', 'Nexus\Controllers\Admin\SeedGeneratorController@index');
+$router->add('GET', '/admin-legacy/seed-generator/verification', 'Nexus\Controllers\Admin\SeedGeneratorVerificationController@index');
+$router->add('POST', '/admin-legacy/seed-generator/generate-production', 'Nexus\Controllers\Admin\SeedGeneratorController@generateProduction');
+$router->add('POST', '/admin-legacy/seed-generator/generate-demo', 'Nexus\Controllers\Admin\SeedGeneratorController@generateDemo');
+$router->add('GET', '/admin-legacy/seed-generator/preview', 'Nexus\Controllers\Admin\SeedGeneratorController@preview');
+$router->add('GET', '/admin-legacy/seed-generator/download', 'Nexus\Controllers\Admin\SeedGeneratorController@download');
+$router->add('GET', '/admin-legacy/seed-generator/test', 'Nexus\Controllers\Admin\SeedGeneratorVerificationController@runLiveTest');
 
 // --------------------------------------------------------------------------
 // 11. WALLET
@@ -1626,36 +1694,41 @@ $router->add('GET', '/messages/{id}', 'Nexus\Controllers\MessageController@show'
 // NOTE: Reply handled via /messages/store with receiver_id
 
 // --------------------------------------------------------------------------
+// LEGACY ADMIN PANEL (PHP views — being decommissioned)
+// React admin panel at /admin/* is the primary admin UI
+// --------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------
 // 12. ADMIN DASHBOARD
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin', 'Nexus\Controllers\AdminController@index');
-$router->add('GET', '/admin/activity-log', 'Nexus\Controllers\AdminController@activityLogs');
-$router->add('GET', '/admin/group-locations', 'Nexus\Controllers\AdminController@groupLocations');
-$router->add('POST', '/admin/group-locations', 'Nexus\Controllers\AdminController@groupLocations');
-$router->add('GET', '/admin/geocode-groups', 'Nexus\Controllers\AdminController@geocodeGroups');
-$router->add('GET', '/admin/smart-match-users', 'Nexus\Controllers\AdminController@smartMatchUsers');
-$router->add('GET', '/admin/smart-match-monitoring', 'Nexus\Controllers\AdminController@smartMatchMonitoring');
+$router->add('GET', '/admin-legacy', 'Nexus\Controllers\AdminController@index');
+$router->add('GET', '/admin-legacy/activity-log', 'Nexus\Controllers\AdminController@activityLogs');
+$router->add('GET', '/admin-legacy/group-locations', 'Nexus\Controllers\AdminController@groupLocations');
+$router->add('POST', '/admin-legacy/group-locations', 'Nexus\Controllers\AdminController@groupLocations');
+$router->add('GET', '/admin-legacy/geocode-groups', 'Nexus\Controllers\AdminController@geocodeGroups');
+$router->add('GET', '/admin-legacy/smart-match-users', 'Nexus\Controllers\AdminController@smartMatchUsers');
+$router->add('GET', '/admin-legacy/smart-match-monitoring', 'Nexus\Controllers\AdminController@smartMatchMonitoring');
 // Removed: /admin/test-smart-match (debug endpoint)
 
 // WebP Image Converter
-$router->add('GET', '/admin/webp-converter', 'Nexus\Controllers\AdminController@webpConverter');
-$router->add('POST', '/admin/webp-converter/convert', 'Nexus\Controllers\AdminController@webpConvertBatch');
+$router->add('GET', '/admin-legacy/webp-converter', 'Nexus\Controllers\AdminController@webpConverter');
+$router->add('POST', '/admin-legacy/webp-converter/convert', 'Nexus\Controllers\AdminController@webpConvertBatch');
 
 // Group Ranking Management
-$router->add('GET', '/admin/group-ranking', 'Nexus\Controllers\AdminController@groupRanking');
-$router->add('POST', '/admin/group-ranking/update', 'Nexus\Controllers\AdminController@updateFeaturedGroups');
-$router->add('POST', '/admin/group-ranking/toggle', 'Nexus\Controllers\AdminController@toggleFeaturedGroup');
+$router->add('GET', '/admin-legacy/group-ranking', 'Nexus\Controllers\AdminController@groupRanking');
+$router->add('POST', '/admin-legacy/group-ranking/update', 'Nexus\Controllers\AdminController@updateFeaturedGroups');
+$router->add('POST', '/admin-legacy/group-ranking/toggle', 'Nexus\Controllers\AdminController@toggleFeaturedGroup');
 // Removed: /admin/test-ranking (debug endpoint)
 
 // Cron Endpoints
-$router->add('GET', '/admin/cron/update-featured-groups', 'Nexus\Controllers\AdminController@cronUpdateFeaturedGroups');
+$router->add('GET', '/admin-legacy/cron/update-featured-groups', 'Nexus\Controllers\AdminController@cronUpdateFeaturedGroups');
 
 // Group Types Management
-$router->add('GET', '/admin/group-types', 'Nexus\Controllers\AdminController@groupTypes');
-$router->add('POST', '/admin/group-types', 'Nexus\Controllers\AdminController@groupTypes');
-$router->add('GET', '/admin/group-types/create', 'Nexus\Controllers\AdminController@groupTypeForm');
-$router->add('GET', '/admin/group-types/edit/{id}', 'Nexus\Controllers\AdminController@groupTypeForm');
-$router->add('POST', '/admin/group-types/edit/{id}', 'Nexus\Controllers\AdminController@groupTypeForm');
+$router->add('GET', '/admin-legacy/group-types', 'Nexus\Controllers\AdminController@groupTypes');
+$router->add('POST', '/admin-legacy/group-types', 'Nexus\Controllers\AdminController@groupTypes');
+$router->add('GET', '/admin-legacy/group-types/create', 'Nexus\Controllers\AdminController@groupTypeForm');
+$router->add('GET', '/admin-legacy/group-types/edit/{id}', 'Nexus\Controllers\AdminController@groupTypeForm');
+$router->add('POST', '/admin-legacy/group-types/edit/{id}', 'Nexus\Controllers\AdminController@groupTypeForm');
 
 // User Management - MOVED TO Nexus\Controllers\Admin\UserController
 // See lines 252+ 
@@ -1663,481 +1736,481 @@ $router->add('POST', '/admin/group-types/edit/{id}', 'Nexus\Controllers\AdminCon
 // Listing Management
 
 // Listing Management
-$router->add('POST', '/admin/listings/delete', 'Nexus\Controllers\AdminController@deleteListing');
+$router->add('POST', '/admin-legacy/listings/delete', 'Nexus\Controllers\AdminController@deleteListing');
 
 // Settings (User Hub) - Defined in Public Pages section (Line 284)
-$router->add('GET', '/admin/settings', 'Nexus\Controllers\AdminController@settings');
-$router->add('POST', '/admin/settings/update', 'Nexus\Controllers\AdminController@saveSettings');
-$router->add('POST', '/admin/settings/save-tenant', 'Nexus\Controllers\AdminController@saveTenantSettings');
-$router->add('POST', '/admin/settings/test-gmail', 'Nexus\Controllers\AdminController@testGmailConnection');
-$router->add('POST', '/admin/settings/regenerate-css', 'Nexus\Controllers\AdminController@regenerateMinifiedCSS');
+$router->add('GET', '/admin-legacy/settings', 'Nexus\Controllers\AdminController@settings');
+$router->add('POST', '/admin-legacy/settings/update', 'Nexus\Controllers\AdminController@saveSettings');
+$router->add('POST', '/admin-legacy/settings/save-tenant', 'Nexus\Controllers\AdminController@saveTenantSettings');
+$router->add('POST', '/admin-legacy/settings/test-gmail', 'Nexus\Controllers\AdminController@testGmailConnection');
+$router->add('POST', '/admin-legacy/settings/regenerate-css', 'Nexus\Controllers\AdminController@regenerateMinifiedCSS');
 
 // Image Optimization Settings
-$router->add('GET', '/admin/image-settings', 'Nexus\Controllers\AdminController@imageSettings');
-$router->add('POST', '/admin/image-settings/save', 'Nexus\Controllers\AdminController@saveImageSettings');
+$router->add('GET', '/admin-legacy/image-settings', 'Nexus\Controllers\AdminController@imageSettings');
+$router->add('POST', '/admin-legacy/image-settings/save', 'Nexus\Controllers\AdminController@saveImageSettings');
 
 // Tenant Admin Federation Dashboard
-$router->add('GET', '/admin/federation/dashboard', 'Nexus\Controllers\FederationAdminController@index');
-$router->add('POST', '/admin/federation/dashboard/toggle', 'Nexus\Controllers\FederationAdminController@toggleFederation');
-$router->add('POST', '/admin/federation/dashboard/settings', 'Nexus\Controllers\FederationAdminController@updateSettings');
+$router->add('GET', '/admin-legacy/federation/dashboard', 'Nexus\Controllers\FederationAdminController@index');
+$router->add('POST', '/admin-legacy/federation/dashboard/toggle', 'Nexus\Controllers\FederationAdminController@toggleFederation');
+$router->add('POST', '/admin-legacy/federation/dashboard/settings', 'Nexus\Controllers\FederationAdminController@updateSettings');
 
 // Tenant Admin Federation Settings
-$router->add('GET', '/admin/federation', 'Nexus\Controllers\Admin\FederationSettingsController@index');
-$router->add('POST', '/admin/federation/update-feature', 'Nexus\Controllers\Admin\FederationSettingsController@updateFeature');
-$router->add('GET', '/admin/federation/partnerships', 'Nexus\Controllers\Admin\FederationSettingsController@partnerships');
-$router->add('POST', '/admin/federation/request-partnership', 'Nexus\Controllers\Admin\FederationSettingsController@requestPartnership');
-$router->add('POST', '/admin/federation/approve-partnership', 'Nexus\Controllers\Admin\FederationSettingsController@approvePartnership');
-$router->add('POST', '/admin/federation/reject-partnership', 'Nexus\Controllers\Admin\FederationSettingsController@rejectPartnership');
-$router->add('POST', '/admin/federation/update-partnership-permissions', 'Nexus\Controllers\Admin\FederationSettingsController@updatePartnershipPermissions');
-$router->add('POST', '/admin/federation/terminate-partnership', 'Nexus\Controllers\Admin\FederationSettingsController@terminatePartnership');
-$router->add('POST', '/admin/federation/counter-propose', 'Nexus\Controllers\Admin\FederationSettingsController@counterPropose');
-$router->add('POST', '/admin/federation/accept-counter-proposal', 'Nexus\Controllers\Admin\FederationSettingsController@acceptCounterProposal');
-$router->add('POST', '/admin/federation/withdraw-request', 'Nexus\Controllers\Admin\FederationSettingsController@withdrawRequest');
+$router->add('GET', '/admin-legacy/federation', 'Nexus\Controllers\Admin\FederationSettingsController@index');
+$router->add('POST', '/admin-legacy/federation/update-feature', 'Nexus\Controllers\Admin\FederationSettingsController@updateFeature');
+$router->add('GET', '/admin-legacy/federation/partnerships', 'Nexus\Controllers\Admin\FederationSettingsController@partnerships');
+$router->add('POST', '/admin-legacy/federation/request-partnership', 'Nexus\Controllers\Admin\FederationSettingsController@requestPartnership');
+$router->add('POST', '/admin-legacy/federation/approve-partnership', 'Nexus\Controllers\Admin\FederationSettingsController@approvePartnership');
+$router->add('POST', '/admin-legacy/federation/reject-partnership', 'Nexus\Controllers\Admin\FederationSettingsController@rejectPartnership');
+$router->add('POST', '/admin-legacy/federation/update-partnership-permissions', 'Nexus\Controllers\Admin\FederationSettingsController@updatePartnershipPermissions');
+$router->add('POST', '/admin-legacy/federation/terminate-partnership', 'Nexus\Controllers\Admin\FederationSettingsController@terminatePartnership');
+$router->add('POST', '/admin-legacy/federation/counter-propose', 'Nexus\Controllers\Admin\FederationSettingsController@counterPropose');
+$router->add('POST', '/admin-legacy/federation/accept-counter-proposal', 'Nexus\Controllers\Admin\FederationSettingsController@acceptCounterProposal');
+$router->add('POST', '/admin-legacy/federation/withdraw-request', 'Nexus\Controllers\Admin\FederationSettingsController@withdrawRequest');
 
 // Federation Directory
-$router->add('GET', '/admin/federation/directory', 'Nexus\Controllers\Admin\FederationDirectoryController@index');
-$router->add('GET', '/admin/federation/directory/api', 'Nexus\Controllers\Admin\FederationDirectoryController@api');
-$router->add('GET', '/admin/federation/directory/profile', 'Nexus\Controllers\Admin\FederationDirectoryController@profile');
-$router->add('POST', '/admin/federation/directory/update-profile', 'Nexus\Controllers\Admin\FederationDirectoryController@updateProfile');
-$router->add('POST', '/admin/federation/directory/request-partnership', 'Nexus\Controllers\Admin\FederationDirectoryController@requestPartnership');
-$router->add('GET', '/admin/federation/directory/{id}', 'Nexus\Controllers\Admin\FederationDirectoryController@show');
+$router->add('GET', '/admin-legacy/federation/directory', 'Nexus\Controllers\Admin\FederationDirectoryController@index');
+$router->add('GET', '/admin-legacy/federation/directory/api', 'Nexus\Controllers\Admin\FederationDirectoryController@api');
+$router->add('GET', '/admin-legacy/federation/directory/profile', 'Nexus\Controllers\Admin\FederationDirectoryController@profile');
+$router->add('POST', '/admin-legacy/federation/directory/update-profile', 'Nexus\Controllers\Admin\FederationDirectoryController@updateProfile');
+$router->add('POST', '/admin-legacy/federation/directory/request-partnership', 'Nexus\Controllers\Admin\FederationDirectoryController@requestPartnership');
+$router->add('GET', '/admin-legacy/federation/directory/{id}', 'Nexus\Controllers\Admin\FederationDirectoryController@show');
 
 // Federation Analytics
-$router->add('GET', '/admin/federation/analytics', 'Nexus\Controllers\Admin\FederationAnalyticsController@index');
-$router->add('GET', '/admin/federation/analytics/api', 'Nexus\Controllers\Admin\FederationAnalyticsController@api');
-$router->add('GET', '/admin/federation/analytics/export', 'Nexus\Controllers\Admin\FederationAnalyticsController@export');
+$router->add('GET', '/admin-legacy/federation/analytics', 'Nexus\Controllers\Admin\FederationAnalyticsController@index');
+$router->add('GET', '/admin-legacy/federation/analytics/api', 'Nexus\Controllers\Admin\FederationAnalyticsController@api');
+$router->add('GET', '/admin-legacy/federation/analytics/export', 'Nexus\Controllers\Admin\FederationAnalyticsController@export');
 
 // Federation API Keys Management
-$router->add('GET', '/admin/federation/api-keys', 'Nexus\Controllers\Admin\FederationApiKeysController@index');
-$router->add('GET', '/admin/federation/api-keys/create', 'Nexus\Controllers\Admin\FederationApiKeysController@create');
-$router->add('POST', '/admin/federation/api-keys/store', 'Nexus\Controllers\Admin\FederationApiKeysController@store');
-$router->add('GET', '/admin/federation/api-keys/{id}', 'Nexus\Controllers\Admin\FederationApiKeysController@show');
-$router->add('POST', '/admin/federation/api-keys/{id}/suspend', 'Nexus\Controllers\Admin\FederationApiKeysController@suspend');
-$router->add('POST', '/admin/federation/api-keys/{id}/activate', 'Nexus\Controllers\Admin\FederationApiKeysController@activate');
-$router->add('POST', '/admin/federation/api-keys/{id}/revoke', 'Nexus\Controllers\Admin\FederationApiKeysController@revoke');
-$router->add('POST', '/admin/federation/api-keys/{id}/regenerate', 'Nexus\Controllers\Admin\FederationApiKeysController@regenerate');
+$router->add('GET', '/admin-legacy/federation/api-keys', 'Nexus\Controllers\Admin\FederationApiKeysController@index');
+$router->add('GET', '/admin-legacy/federation/api-keys/create', 'Nexus\Controllers\Admin\FederationApiKeysController@create');
+$router->add('POST', '/admin-legacy/federation/api-keys/store', 'Nexus\Controllers\Admin\FederationApiKeysController@store');
+$router->add('GET', '/admin-legacy/federation/api-keys/{id}', 'Nexus\Controllers\Admin\FederationApiKeysController@show');
+$router->add('POST', '/admin-legacy/federation/api-keys/{id}/suspend', 'Nexus\Controllers\Admin\FederationApiKeysController@suspend');
+$router->add('POST', '/admin-legacy/federation/api-keys/{id}/activate', 'Nexus\Controllers\Admin\FederationApiKeysController@activate');
+$router->add('POST', '/admin-legacy/federation/api-keys/{id}/revoke', 'Nexus\Controllers\Admin\FederationApiKeysController@revoke');
+$router->add('POST', '/admin-legacy/federation/api-keys/{id}/regenerate', 'Nexus\Controllers\Admin\FederationApiKeysController@regenerate');
 
 // Federation Data Import/Export
-$router->add('GET', '/admin/federation/data', 'Nexus\Controllers\Admin\FederationExportController@index');
-$router->add('GET', '/admin/federation/export/users', 'Nexus\Controllers\Admin\FederationExportController@exportUsers');
-$router->add('GET', '/admin/federation/export/partnerships', 'Nexus\Controllers\Admin\FederationExportController@exportPartnerships');
-$router->add('GET', '/admin/federation/export/transactions', 'Nexus\Controllers\Admin\FederationExportController@exportTransactions');
-$router->add('GET', '/admin/federation/export/audit', 'Nexus\Controllers\Admin\FederationExportController@exportAudit');
-$router->add('GET', '/admin/federation/export/all', 'Nexus\Controllers\Admin\FederationExportController@exportAll');
-$router->add('POST', '/admin/federation/import/users', 'Nexus\Controllers\Admin\FederationImportController@importUsers');
-$router->add('GET', '/admin/federation/import/template', 'Nexus\Controllers\Admin\FederationImportController@downloadTemplate');
+$router->add('GET', '/admin-legacy/federation/data', 'Nexus\Controllers\Admin\FederationExportController@index');
+$router->add('GET', '/admin-legacy/federation/export/users', 'Nexus\Controllers\Admin\FederationExportController@exportUsers');
+$router->add('GET', '/admin-legacy/federation/export/partnerships', 'Nexus\Controllers\Admin\FederationExportController@exportPartnerships');
+$router->add('GET', '/admin-legacy/federation/export/transactions', 'Nexus\Controllers\Admin\FederationExportController@exportTransactions');
+$router->add('GET', '/admin-legacy/federation/export/audit', 'Nexus\Controllers\Admin\FederationExportController@exportAudit');
+$router->add('GET', '/admin-legacy/federation/export/all', 'Nexus\Controllers\Admin\FederationExportController@exportAll');
+$router->add('POST', '/admin-legacy/federation/import/users', 'Nexus\Controllers\Admin\FederationImportController@importUsers');
+$router->add('GET', '/admin-legacy/federation/import/template', 'Nexus\Controllers\Admin\FederationImportController@downloadTemplate');
 
 // External Federation Partners (connections to servers outside this installation)
-$router->add('GET', '/admin/federation/external-partners', 'Nexus\Controllers\Admin\FederationExternalPartnersController@index');
-$router->add('GET', '/admin/federation/external-partners/create', 'Nexus\Controllers\Admin\FederationExternalPartnersController@create');
-$router->add('POST', '/admin/federation/external-partners/store', 'Nexus\Controllers\Admin\FederationExternalPartnersController@store');
-$router->add('GET', '/admin/federation/external-partners/{id}', 'Nexus\Controllers\Admin\FederationExternalPartnersController@show');
-$router->add('POST', '/admin/federation/external-partners/{id}/update', 'Nexus\Controllers\Admin\FederationExternalPartnersController@update');
-$router->add('POST', '/admin/federation/external-partners/{id}/test', 'Nexus\Controllers\Admin\FederationExternalPartnersController@test');
-$router->add('POST', '/admin/federation/external-partners/{id}/suspend', 'Nexus\Controllers\Admin\FederationExternalPartnersController@suspend');
-$router->add('POST', '/admin/federation/external-partners/{id}/activate', 'Nexus\Controllers\Admin\FederationExternalPartnersController@activate');
-$router->add('POST', '/admin/federation/external-partners/{id}/delete', 'Nexus\Controllers\Admin\FederationExternalPartnersController@delete');
+$router->add('GET', '/admin-legacy/federation/external-partners', 'Nexus\Controllers\Admin\FederationExternalPartnersController@index');
+$router->add('GET', '/admin-legacy/federation/external-partners/create', 'Nexus\Controllers\Admin\FederationExternalPartnersController@create');
+$router->add('POST', '/admin-legacy/federation/external-partners/store', 'Nexus\Controllers\Admin\FederationExternalPartnersController@store');
+$router->add('GET', '/admin-legacy/federation/external-partners/{id}', 'Nexus\Controllers\Admin\FederationExternalPartnersController@show');
+$router->add('POST', '/admin-legacy/federation/external-partners/{id}/update', 'Nexus\Controllers\Admin\FederationExternalPartnersController@update');
+$router->add('POST', '/admin-legacy/federation/external-partners/{id}/test', 'Nexus\Controllers\Admin\FederationExternalPartnersController@test');
+$router->add('POST', '/admin-legacy/federation/external-partners/{id}/suspend', 'Nexus\Controllers\Admin\FederationExternalPartnersController@suspend');
+$router->add('POST', '/admin-legacy/federation/external-partners/{id}/activate', 'Nexus\Controllers\Admin\FederationExternalPartnersController@activate');
+$router->add('POST', '/admin-legacy/federation/external-partners/{id}/delete', 'Nexus\Controllers\Admin\FederationExternalPartnersController@delete');
 
 // Native App Management (FCM Push Notifications)
-$router->add('GET', '/admin/native-app', 'Nexus\Controllers\AdminController@nativeApp');
-$router->add('POST', '/admin/native-app/test-push', 'Nexus\Controllers\AdminController@sendTestPush');
+$router->add('GET', '/admin-legacy/native-app', 'Nexus\Controllers\AdminController@nativeApp');
+$router->add('POST', '/admin-legacy/native-app/test-push', 'Nexus\Controllers\AdminController@sendTestPush');
 
 // Feed Algorithm (EdgeRank) Settings
-$router->add('GET', '/admin/feed-algorithm', 'Nexus\Controllers\AdminController@feedAlgorithm');
-$router->add('POST', '/admin/feed-algorithm/save', 'Nexus\Controllers\AdminController@saveFeedAlgorithm');
+$router->add('GET', '/admin-legacy/feed-algorithm', 'Nexus\Controllers\AdminController@feedAlgorithm');
+$router->add('POST', '/admin-legacy/feed-algorithm/save', 'Nexus\Controllers\AdminController@saveFeedAlgorithm');
 
 // --------------------------------------------------------------------------
 // DELIVERABILITY TRACKING MODULE
 // --------------------------------------------------------------------------
 
 // Dashboard & List Views
-$router->add('GET', '/admin/deliverability', 'Nexus\Controllers\AdminController@deliverabilityDashboard');
-$router->add('GET', '/admin/deliverability/list', 'Nexus\Controllers\AdminController@deliverablesList');
-$router->add('GET', '/admin/deliverability/analytics', 'Nexus\Controllers\AdminController@deliverabilityAnalytics');
+$router->add('GET', '/admin-legacy/deliverability', 'Nexus\Controllers\AdminController@deliverabilityDashboard');
+$router->add('GET', '/admin-legacy/deliverability/list', 'Nexus\Controllers\AdminController@deliverablesList');
+$router->add('GET', '/admin-legacy/deliverability/analytics', 'Nexus\Controllers\AdminController@deliverabilityAnalytics');
 
 // CRUD Operations
-$router->add('GET', '/admin/deliverability/create', 'Nexus\Controllers\AdminController@deliverableCreate');
-$router->add('POST', '/admin/deliverability/store', 'Nexus\Controllers\AdminController@deliverableStore');
-$router->add('GET', '/admin/deliverability/view/{id}', 'Nexus\Controllers\AdminController@deliverableView');
-$router->add('GET', '/admin/deliverability/edit/{id}', 'Nexus\Controllers\AdminController@deliverableEdit');
-$router->add('POST', '/admin/deliverability/update/{id}', 'Nexus\Controllers\AdminController@deliverableUpdate');
-$router->add('POST', '/admin/deliverability/delete/{id}', 'Nexus\Controllers\AdminController@deliverableDelete');
+$router->add('GET', '/admin-legacy/deliverability/create', 'Nexus\Controllers\AdminController@deliverableCreate');
+$router->add('POST', '/admin-legacy/deliverability/store', 'Nexus\Controllers\AdminController@deliverableStore');
+$router->add('GET', '/admin-legacy/deliverability/view/{id}', 'Nexus\Controllers\AdminController@deliverableView');
+$router->add('GET', '/admin-legacy/deliverability/edit/{id}', 'Nexus\Controllers\AdminController@deliverableEdit');
+$router->add('POST', '/admin-legacy/deliverability/update/{id}', 'Nexus\Controllers\AdminController@deliverableUpdate');
+$router->add('POST', '/admin-legacy/deliverability/delete/{id}', 'Nexus\Controllers\AdminController@deliverableDelete');
 
 // AJAX Endpoints
-$router->add('POST', '/admin/deliverability/ajax/update-status', 'Nexus\Controllers\AdminController@deliverableUpdateStatus');
-$router->add('POST', '/admin/deliverability/ajax/complete-milestone', 'Nexus\Controllers\AdminController@milestoneComplete');
-$router->add('POST', '/admin/deliverability/ajax/add-comment', 'Nexus\Controllers\AdminController@deliverableAddComment');
+$router->add('POST', '/admin-legacy/deliverability/ajax/update-status', 'Nexus\Controllers\AdminController@deliverableUpdateStatus');
+$router->add('POST', '/admin-legacy/deliverability/ajax/complete-milestone', 'Nexus\Controllers\AdminController@milestoneComplete');
+$router->add('POST', '/admin-legacy/deliverability/ajax/add-comment', 'Nexus\Controllers\AdminController@deliverableAddComment');
 
 // --------------------------------------------------------------------------
 // LAYOUT SYSTEM COMPLETELY REMOVED - All page layout routes obliterated
 // --------------------------------------------------------------------------
 
 // Unified Algorithm Settings (MatchRank for Listings, CommunityRank for Members)
-$router->add('GET', '/admin/algorithm-settings', 'Nexus\Controllers\AdminController@algorithmSettings');
-$router->add('POST', '/admin/algorithm-settings/save', 'Nexus\Controllers\AdminController@saveAlgorithmSettings');
+$router->add('GET', '/admin-legacy/algorithm-settings', 'Nexus\Controllers\AdminController@algorithmSettings');
+$router->add('POST', '/admin-legacy/algorithm-settings/save', 'Nexus\Controllers\AdminController@saveAlgorithmSettings');
 
 // Admin Live Search API (for command palette)
-$router->add('GET', '/admin/api/search', 'Nexus\Controllers\AdminController@liveSearch');
+$router->add('GET', '/admin-legacy/api/search', 'Nexus\Controllers\AdminController@liveSearch');
 
 // --------------------------------------------------------------------------
 // 12.5. ADMIN > CATEGORIES & ATTRIBUTES
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin/categories', 'Nexus\Controllers\Admin\CategoryController@index');
-$router->add('GET', '/admin/categories/create', 'Nexus\Controllers\Admin\CategoryController@create');
-$router->add('POST', '/admin/categories/store', 'Nexus\Controllers\Admin\CategoryController@store');
+$router->add('GET', '/admin-legacy/categories', 'Nexus\Controllers\Admin\CategoryController@index');
+$router->add('GET', '/admin-legacy/categories/create', 'Nexus\Controllers\Admin\CategoryController@create');
+$router->add('POST', '/admin-legacy/categories/store', 'Nexus\Controllers\Admin\CategoryController@store');
 
 // Volunteering Admin
-$router->add('GET', '/admin/volunteering', 'Nexus\Controllers\Admin\VolunteeringController@index');
-$router->add('GET', '/admin/volunteering/approvals', 'Nexus\Controllers\Admin\VolunteeringController@approvals');
-$router->add('GET', '/admin/volunteering/organizations', 'Nexus\Controllers\Admin\VolunteeringController@organizations');
-$router->add('POST', '/admin/volunteering/approve', 'Nexus\Controllers\Admin\VolunteeringController@approve');
-$router->add('POST', '/admin/volunteering/decline', 'Nexus\Controllers\Admin\VolunteeringController@decline');
-$router->add('POST', '/admin/volunteering/delete', 'Nexus\Controllers\Admin\VolunteeringController@deleteOrg');
-$router->add('GET', '/admin/categories/edit', function () {
-    header('Location: /admin/categories');
+$router->add('GET', '/admin-legacy/volunteering', 'Nexus\Controllers\Admin\VolunteeringController@index');
+$router->add('GET', '/admin-legacy/volunteering/approvals', 'Nexus\Controllers\Admin\VolunteeringController@approvals');
+$router->add('GET', '/admin-legacy/volunteering/organizations', 'Nexus\Controllers\Admin\VolunteeringController@organizations');
+$router->add('POST', '/admin-legacy/volunteering/approve', 'Nexus\Controllers\Admin\VolunteeringController@approve');
+$router->add('POST', '/admin-legacy/volunteering/decline', 'Nexus\Controllers\Admin\VolunteeringController@decline');
+$router->add('POST', '/admin-legacy/volunteering/delete', 'Nexus\Controllers\Admin\VolunteeringController@deleteOrg');
+$router->add('GET', '/admin-legacy/categories/edit', function () {
+    header('Location: /admin-legacy/categories');
     exit;
 }); // Fallback
-$router->add('GET', '/admin/categories/edit/{id}', 'Nexus\Controllers\Admin\CategoryController@edit');
-$router->add('POST', '/admin/categories/update', 'Nexus\Controllers\Admin\CategoryController@update'); // Often forms POST to generic update
-$router->add('POST', '/admin/categories/delete', 'Nexus\Controllers\Admin\CategoryController@delete'); // POST to delete
+$router->add('GET', '/admin-legacy/categories/edit/{id}', 'Nexus\Controllers\Admin\CategoryController@edit');
+$router->add('POST', '/admin-legacy/categories/update', 'Nexus\Controllers\Admin\CategoryController@update'); // Often forms POST to generic update
+$router->add('POST', '/admin-legacy/categories/delete', 'Nexus\Controllers\Admin\CategoryController@delete'); // POST to delete
 
-$router->add('GET', '/admin/attributes', 'Nexus\Controllers\Admin\AttributeController@index');
-$router->add('GET', '/admin/attributes/create', 'Nexus\Controllers\Admin\AttributeController@create');
-$router->add('POST', '/admin/attributes/store', 'Nexus\Controllers\Admin\AttributeController@store');
-$router->add('GET', '/admin/attributes/edit', function () {
-    header('Location: /admin/attributes');
+$router->add('GET', '/admin-legacy/attributes', 'Nexus\Controllers\Admin\AttributeController@index');
+$router->add('GET', '/admin-legacy/attributes/create', 'Nexus\Controllers\Admin\AttributeController@create');
+$router->add('POST', '/admin-legacy/attributes/store', 'Nexus\Controllers\Admin\AttributeController@store');
+$router->add('GET', '/admin-legacy/attributes/edit', function () {
+    header('Location: /admin-legacy/attributes');
     exit;
 }); // Fallback
-$router->add('GET', '/admin/attributes/edit/{id}', 'Nexus\Controllers\Admin\AttributeController@edit');
-$router->add('POST', '/admin/attributes/update', 'Nexus\Controllers\Admin\AttributeController@update');
-$router->add('POST', '/admin/attributes/delete', 'Nexus\Controllers\Admin\AttributeController@delete');
+$router->add('GET', '/admin-legacy/attributes/edit/{id}', 'Nexus\Controllers\Admin\AttributeController@edit');
+$router->add('POST', '/admin-legacy/attributes/update', 'Nexus\Controllers\Admin\AttributeController@update');
+$router->add('POST', '/admin-legacy/attributes/delete', 'Nexus\Controllers\Admin\AttributeController@delete');
 
 // Admin Pages
-$router->add('GET', '/admin/pages', 'Nexus\Controllers\Admin\PageController@index');
-$router->add('GET', '/admin/pages/create', 'Nexus\Controllers\Admin\PageController@create');
-$router->add('GET', '/admin/pages/builder/{id}', 'Nexus\Controllers\Admin\PageController@builder');
-$router->add('GET', '/admin/pages/preview/{id}', 'Nexus\Controllers\Admin\PageController@preview');
-$router->add('GET', '/admin/pages/versions/{id}', 'Nexus\Controllers\Admin\PageController@versions');
-$router->add('GET', '/admin/pages/duplicate/{id}', 'Nexus\Controllers\Admin\PageController@duplicate');
-$router->add('GET', '/admin/pages/version-content/{id}', 'Nexus\Controllers\Admin\PageController@versionContent');
-$router->add('POST', '/admin/pages/save', 'Nexus\Controllers\Admin\PageController@save');
-$router->add('POST', '/admin/pages/restore-version', 'Nexus\Controllers\Admin\PageController@restoreVersion');
-$router->add('POST', '/admin/pages/reorder', 'Nexus\Controllers\Admin\PageController@reorder');
-$router->add('POST', '/admin/pages/delete', 'Nexus\Controllers\Admin\PageController@delete');
+$router->add('GET', '/admin-legacy/pages', 'Nexus\Controllers\Admin\PageController@index');
+$router->add('GET', '/admin-legacy/pages/create', 'Nexus\Controllers\Admin\PageController@create');
+$router->add('GET', '/admin-legacy/pages/builder/{id}', 'Nexus\Controllers\Admin\PageController@builder');
+$router->add('GET', '/admin-legacy/pages/preview/{id}', 'Nexus\Controllers\Admin\PageController@preview');
+$router->add('GET', '/admin-legacy/pages/versions/{id}', 'Nexus\Controllers\Admin\PageController@versions');
+$router->add('GET', '/admin-legacy/pages/duplicate/{id}', 'Nexus\Controllers\Admin\PageController@duplicate');
+$router->add('GET', '/admin-legacy/pages/version-content/{id}', 'Nexus\Controllers\Admin\PageController@versionContent');
+$router->add('POST', '/admin-legacy/pages/save', 'Nexus\Controllers\Admin\PageController@save');
+$router->add('POST', '/admin-legacy/pages/restore-version', 'Nexus\Controllers\Admin\PageController@restoreVersion');
+$router->add('POST', '/admin-legacy/pages/reorder', 'Nexus\Controllers\Admin\PageController@reorder');
+$router->add('POST', '/admin-legacy/pages/delete', 'Nexus\Controllers\Admin\PageController@delete');
 
 // Page Builder V2 API
-$router->add('POST', '/admin/api/pages/{id}/blocks', 'Nexus\Controllers\Admin\PageController@saveBlocks');
-$router->add('GET', '/admin/api/pages/{id}/blocks', 'Nexus\Controllers\Admin\PageController@getBlocks');
-$router->add('POST', '/admin/api/blocks/preview', 'Nexus\Controllers\Admin\PageController@previewBlock');
-$router->add('POST', '/admin/api/pages/{id}/settings', 'Nexus\Controllers\Admin\PageController@saveSettings');
+$router->add('POST', '/admin-legacy/api/pages/{id}/blocks', 'Nexus\Controllers\Admin\PageController@saveBlocks');
+$router->add('GET', '/admin-legacy/api/pages/{id}/blocks', 'Nexus\Controllers\Admin\PageController@getBlocks');
+$router->add('POST', '/admin-legacy/api/blocks/preview', 'Nexus\Controllers\Admin\PageController@previewBlock');
+$router->add('POST', '/admin-legacy/api/pages/{id}/settings', 'Nexus\Controllers\Admin\PageController@saveSettings');
 
 // Admin Legal Documents (Version-Controlled Terms/Privacy/etc.)
-$router->add('GET', '/admin/legal-documents', 'Nexus\Controllers\Admin\LegalDocumentsController@index');
-$router->add('GET', '/admin/legal-documents/create', 'Nexus\Controllers\Admin\LegalDocumentsController@create');
-$router->add('POST', '/admin/legal-documents', 'Nexus\Controllers\Admin\LegalDocumentsController@store');
-$router->add('GET', '/admin/legal-documents/compliance', 'Nexus\Controllers\Admin\LegalDocumentsController@compliance');
-$router->add('GET', '/admin/legal-documents/{id}', 'Nexus\Controllers\Admin\LegalDocumentsController@show');
-$router->add('GET', '/admin/legal-documents/{id}/edit', 'Nexus\Controllers\Admin\LegalDocumentsController@edit');
-$router->add('POST', '/admin/legal-documents/{id}', 'Nexus\Controllers\Admin\LegalDocumentsController@update');
-$router->add('GET', '/admin/legal-documents/{id}/versions/create', 'Nexus\Controllers\Admin\LegalDocumentsController@createVersion');
-$router->add('POST', '/admin/legal-documents/{id}/versions', 'Nexus\Controllers\Admin\LegalDocumentsController@storeVersion');
-$router->add('GET', '/admin/legal-documents/{id}/versions/{versionId}', 'Nexus\Controllers\Admin\LegalDocumentsController@showVersion');
-$router->add('GET', '/admin/legal-documents/{id}/versions/{versionId}/edit', 'Nexus\Controllers\Admin\LegalDocumentsController@editVersion');
-$router->add('POST', '/admin/legal-documents/{id}/versions/{versionId}', 'Nexus\Controllers\Admin\LegalDocumentsController@updateVersion');
-$router->add('POST', '/admin/legal-documents/{id}/versions/{versionId}/publish', 'Nexus\Controllers\Admin\LegalDocumentsController@publishVersion');
-$router->add('POST', '/admin/legal-documents/{id}/versions/{versionId}/delete', 'Nexus\Controllers\Admin\LegalDocumentsController@deleteVersion');
-$router->add('POST', '/admin/legal-documents/{id}/versions/{versionId}/notify', 'Nexus\Controllers\Admin\LegalDocumentsController@notifyUsers');
-$router->add('GET', '/admin/legal-documents/{id}/versions/{versionId}/acceptances', 'Nexus\Controllers\Admin\LegalDocumentsController@acceptances');
-$router->add('GET', '/admin/legal-documents/{id}/compare', 'Nexus\Controllers\Admin\LegalDocumentsController@compareVersions');
-$router->add('GET', '/admin/legal-documents/{id}/export', 'Nexus\Controllers\Admin\LegalDocumentsController@exportAcceptances');
+$router->add('GET', '/admin-legacy/legal-documents', 'Nexus\Controllers\Admin\LegalDocumentsController@index');
+$router->add('GET', '/admin-legacy/legal-documents/create', 'Nexus\Controllers\Admin\LegalDocumentsController@create');
+$router->add('POST', '/admin-legacy/legal-documents', 'Nexus\Controllers\Admin\LegalDocumentsController@store');
+$router->add('GET', '/admin-legacy/legal-documents/compliance', 'Nexus\Controllers\Admin\LegalDocumentsController@compliance');
+$router->add('GET', '/admin-legacy/legal-documents/{id}', 'Nexus\Controllers\Admin\LegalDocumentsController@show');
+$router->add('GET', '/admin-legacy/legal-documents/{id}/edit', 'Nexus\Controllers\Admin\LegalDocumentsController@edit');
+$router->add('POST', '/admin-legacy/legal-documents/{id}', 'Nexus\Controllers\Admin\LegalDocumentsController@update');
+$router->add('GET', '/admin-legacy/legal-documents/{id}/versions/create', 'Nexus\Controllers\Admin\LegalDocumentsController@createVersion');
+$router->add('POST', '/admin-legacy/legal-documents/{id}/versions', 'Nexus\Controllers\Admin\LegalDocumentsController@storeVersion');
+$router->add('GET', '/admin-legacy/legal-documents/{id}/versions/{versionId}', 'Nexus\Controllers\Admin\LegalDocumentsController@showVersion');
+$router->add('GET', '/admin-legacy/legal-documents/{id}/versions/{versionId}/edit', 'Nexus\Controllers\Admin\LegalDocumentsController@editVersion');
+$router->add('POST', '/admin-legacy/legal-documents/{id}/versions/{versionId}', 'Nexus\Controllers\Admin\LegalDocumentsController@updateVersion');
+$router->add('POST', '/admin-legacy/legal-documents/{id}/versions/{versionId}/publish', 'Nexus\Controllers\Admin\LegalDocumentsController@publishVersion');
+$router->add('POST', '/admin-legacy/legal-documents/{id}/versions/{versionId}/delete', 'Nexus\Controllers\Admin\LegalDocumentsController@deleteVersion');
+$router->add('POST', '/admin-legacy/legal-documents/{id}/versions/{versionId}/notify', 'Nexus\Controllers\Admin\LegalDocumentsController@notifyUsers');
+$router->add('GET', '/admin-legacy/legal-documents/{id}/versions/{versionId}/acceptances', 'Nexus\Controllers\Admin\LegalDocumentsController@acceptances');
+$router->add('GET', '/admin-legacy/legal-documents/{id}/compare', 'Nexus\Controllers\Admin\LegalDocumentsController@compareVersions');
+$router->add('GET', '/admin-legacy/legal-documents/{id}/export', 'Nexus\Controllers\Admin\LegalDocumentsController@exportAcceptances');
 
 // Admin Menus (Menu Manager)
-$router->add('GET', '/admin/menus', 'Nexus\Controllers\Admin\MenuController@index');
-$router->add('GET', '/admin/menus/create', 'Nexus\Controllers\Admin\MenuController@create');
-$router->add('POST', '/admin/menus/create', 'Nexus\Controllers\Admin\MenuController@create');
-$router->add('GET', '/admin/menus/builder/{id}', 'Nexus\Controllers\Admin\MenuController@builder');
-$router->add('POST', '/admin/menus/update/{id}', 'Nexus\Controllers\Admin\MenuController@update');
-$router->add('POST', '/admin/menus/toggle/{id}', 'Nexus\Controllers\Admin\MenuController@toggleActive');
-$router->add('POST', '/admin/menus/delete/{id}', 'Nexus\Controllers\Admin\MenuController@delete');
-$router->add('POST', '/admin/menus/item/add', 'Nexus\Controllers\Admin\MenuController@addItem');
-$router->add('GET', '/admin/menus/item/{id}', 'Nexus\Controllers\Admin\MenuController@getItem');
-$router->add('POST', '/admin/menus/item/update/{id}', 'Nexus\Controllers\Admin\MenuController@updateItem');
-$router->add('POST', '/admin/menus/item/delete/{id}', 'Nexus\Controllers\Admin\MenuController@deleteItem');
-$router->add('POST', '/admin/menus/items/reorder', 'Nexus\Controllers\Admin\MenuController@reorder');
-$router->add('POST', '/admin/menus/cache/clear', 'Nexus\Controllers\Admin\MenuController@clearCache');
-$router->add('POST', '/admin/menus/bulk', 'Nexus\Controllers\Admin\MenuController@bulk');
+$router->add('GET', '/admin-legacy/menus', 'Nexus\Controllers\Admin\MenuController@index');
+$router->add('GET', '/admin-legacy/menus/create', 'Nexus\Controllers\Admin\MenuController@create');
+$router->add('POST', '/admin-legacy/menus/create', 'Nexus\Controllers\Admin\MenuController@create');
+$router->add('GET', '/admin-legacy/menus/builder/{id}', 'Nexus\Controllers\Admin\MenuController@builder');
+$router->add('POST', '/admin-legacy/menus/update/{id}', 'Nexus\Controllers\Admin\MenuController@update');
+$router->add('POST', '/admin-legacy/menus/toggle/{id}', 'Nexus\Controllers\Admin\MenuController@toggleActive');
+$router->add('POST', '/admin-legacy/menus/delete/{id}', 'Nexus\Controllers\Admin\MenuController@delete');
+$router->add('POST', '/admin-legacy/menus/item/add', 'Nexus\Controllers\Admin\MenuController@addItem');
+$router->add('GET', '/admin-legacy/menus/item/{id}', 'Nexus\Controllers\Admin\MenuController@getItem');
+$router->add('POST', '/admin-legacy/menus/item/update/{id}', 'Nexus\Controllers\Admin\MenuController@updateItem');
+$router->add('POST', '/admin-legacy/menus/item/delete/{id}', 'Nexus\Controllers\Admin\MenuController@deleteItem');
+$router->add('POST', '/admin-legacy/menus/items/reorder', 'Nexus\Controllers\Admin\MenuController@reorder');
+$router->add('POST', '/admin-legacy/menus/cache/clear', 'Nexus\Controllers\Admin\MenuController@clearCache');
+$router->add('POST', '/admin-legacy/menus/bulk', 'Nexus\Controllers\Admin\MenuController@bulk');
 
 // Admin Plans (Subscription Manager)
-$router->add('GET', '/admin/plans', 'Nexus\Controllers\Admin\PlanController@index');
-$router->add('GET', '/admin/plans/create', 'Nexus\Controllers\Admin\PlanController@create');
-$router->add('POST', '/admin/plans/create', 'Nexus\Controllers\Admin\PlanController@create');
-$router->add('GET', '/admin/plans/edit/{id}', 'Nexus\Controllers\Admin\PlanController@edit');
-$router->add('POST', '/admin/plans/edit/{id}', 'Nexus\Controllers\Admin\PlanController@edit');
-$router->add('POST', '/admin/plans/delete/{id}', 'Nexus\Controllers\Admin\PlanController@delete');
-$router->add('GET', '/admin/plans/subscriptions', 'Nexus\Controllers\Admin\PlanController@subscriptions');
-$router->add('POST', '/admin/plans/assign', 'Nexus\Controllers\Admin\PlanController@assignPlan');
-$router->add('GET', '/admin/plans/comparison', 'Nexus\Controllers\Admin\PlanController@comparison');
+$router->add('GET', '/admin-legacy/plans', 'Nexus\Controllers\Admin\PlanController@index');
+$router->add('GET', '/admin-legacy/plans/create', 'Nexus\Controllers\Admin\PlanController@create');
+$router->add('POST', '/admin-legacy/plans/create', 'Nexus\Controllers\Admin\PlanController@create');
+$router->add('GET', '/admin-legacy/plans/edit/{id}', 'Nexus\Controllers\Admin\PlanController@edit');
+$router->add('POST', '/admin-legacy/plans/edit/{id}', 'Nexus\Controllers\Admin\PlanController@edit');
+$router->add('POST', '/admin-legacy/plans/delete/{id}', 'Nexus\Controllers\Admin\PlanController@delete');
+$router->add('GET', '/admin-legacy/plans/subscriptions', 'Nexus\Controllers\Admin\PlanController@subscriptions');
+$router->add('POST', '/admin-legacy/plans/assign', 'Nexus\Controllers\Admin\PlanController@assignPlan');
+$router->add('GET', '/admin-legacy/plans/comparison', 'Nexus\Controllers\Admin\PlanController@comparison');
 
 // Admin News (Blog)
-$router->add('GET', '/admin/news', 'Nexus\Controllers\Admin\BlogController@index');
-$router->add('GET', '/admin/news/create', 'Nexus\Controllers\Admin\BlogController@create');
-$router->add('GET', '/admin/news/edit/{id}', 'Nexus\Controllers\Admin\BlogController@edit');
-$router->add('GET', '/admin/news/builder/{id}', 'Nexus\Controllers\Admin\BlogController@builder');
-$router->add('POST', '/admin/news/save-builder', 'Nexus\Controllers\Admin\BlogController@saveBuilder');
-$router->add('POST', '/admin/news/update', 'Nexus\Controllers\Admin\BlogController@update');
-$router->add('GET', '/admin/news/delete/{id}', 'Nexus\Controllers\Admin\BlogController@delete');
+$router->add('GET', '/admin-legacy/news', 'Nexus\Controllers\Admin\BlogController@index');
+$router->add('GET', '/admin-legacy/news/create', 'Nexus\Controllers\Admin\BlogController@create');
+$router->add('GET', '/admin-legacy/news/edit/{id}', 'Nexus\Controllers\Admin\BlogController@edit');
+$router->add('GET', '/admin-legacy/news/builder/{id}', 'Nexus\Controllers\Admin\BlogController@builder');
+$router->add('POST', '/admin-legacy/news/save-builder', 'Nexus\Controllers\Admin\BlogController@saveBuilder');
+$router->add('POST', '/admin-legacy/news/update', 'Nexus\Controllers\Admin\BlogController@update');
+$router->add('GET', '/admin-legacy/news/delete/{id}', 'Nexus\Controllers\Admin\BlogController@delete');
 
 // Legacy Aliases (admin/blog)
-$router->add('GET', '/admin/blog', 'Nexus\Controllers\Admin\BlogController@index');
-$router->add('GET', '/admin/blog/create', 'Nexus\Controllers\Admin\BlogController@create');
-$router->add('GET', '/admin/blog/edit/{id}', 'Nexus\Controllers\Admin\BlogController@edit');
-$router->add('GET', '/admin/blog/builder/{id}', 'Nexus\Controllers\Admin\BlogController@builder');
-$router->add('POST', '/admin/blog/save-builder', 'Nexus\Controllers\Admin\BlogController@saveBuilder');
-$router->add('POST', '/admin/blog/update/{id}', 'Nexus\Controllers\Admin\BlogController@update'); // Note: Added {id} to match form if needed, or generic
-$router->add('POST', '/admin/blog/store', 'Nexus\Controllers\Admin\BlogController@store');
-$router->add('POST', '/admin/blog/delete', 'Nexus\Controllers\Admin\BlogController@delete');
+$router->add('GET', '/admin-legacy/blog', 'Nexus\Controllers\Admin\BlogController@index');
+$router->add('GET', '/admin-legacy/blog/create', 'Nexus\Controllers\Admin\BlogController@create');
+$router->add('GET', '/admin-legacy/blog/edit/{id}', 'Nexus\Controllers\Admin\BlogController@edit');
+$router->add('GET', '/admin-legacy/blog/builder/{id}', 'Nexus\Controllers\Admin\BlogController@builder');
+$router->add('POST', '/admin-legacy/blog/save-builder', 'Nexus\Controllers\Admin\BlogController@saveBuilder');
+$router->add('POST', '/admin-legacy/blog/update/{id}', 'Nexus\Controllers\Admin\BlogController@update'); // Note: Added {id} to match form if needed, or generic
+$router->add('POST', '/admin-legacy/blog/store', 'Nexus\Controllers\Admin\BlogController@store');
+$router->add('POST', '/admin-legacy/blog/delete', 'Nexus\Controllers\Admin\BlogController@delete');
 
 // Admin Blog Restore
-$router->add('GET', '/admin/blog-restore', 'Nexus\Controllers\Admin\BlogRestoreController@index');
-$router->add('GET', '/admin/blog-restore/diagnostic', 'Nexus\Controllers\Admin\BlogRestoreController@diagnostic');
-$router->add('POST', '/admin/blog-restore/upload', 'Nexus\Controllers\Admin\BlogRestoreController@upload');
-$router->add('POST', '/admin/blog-restore/import', 'Nexus\Controllers\Admin\BlogRestoreController@import');
-$router->add('GET', '/admin/blog-restore/export', 'Nexus\Controllers\Admin\BlogRestoreController@downloadExport');
+$router->add('GET', '/admin-legacy/blog-restore', 'Nexus\Controllers\Admin\BlogRestoreController@index');
+$router->add('GET', '/admin-legacy/blog-restore/diagnostic', 'Nexus\Controllers\Admin\BlogRestoreController@diagnostic');
+$router->add('POST', '/admin-legacy/blog-restore/upload', 'Nexus\Controllers\Admin\BlogRestoreController@upload');
+$router->add('POST', '/admin-legacy/blog-restore/import', 'Nexus\Controllers\Admin\BlogRestoreController@import');
+$router->add('GET', '/admin-legacy/blog-restore/export', 'Nexus\Controllers\Admin\BlogRestoreController@downloadExport');
 
 // Admin Nexus Score Analytics
-$router->add('GET', '/admin/nexus-score/analytics', 'Nexus\Controllers\NexusScoreController@adminAnalytics');
+$router->add('GET', '/admin-legacy/nexus-score/analytics', 'Nexus\Controllers\NexusScoreController@adminAnalytics');
 
 // Admin Users
-$router->add('GET', '/admin/users', 'Nexus\Controllers\Admin\UserController@index');
-$router->add('GET', '/admin/users/create', 'Nexus\Controllers\Admin\UserController@create');
-$router->add('POST', '/admin/users/store', 'Nexus\Controllers\Admin\UserController@store');
-$router->add('GET', '/admin/users/edit', function () {
-    header('Location: /admin/users');
+$router->add('GET', '/admin-legacy/users', 'Nexus\Controllers\Admin\UserController@index');
+$router->add('GET', '/admin-legacy/users/create', 'Nexus\Controllers\Admin\UserController@create');
+$router->add('POST', '/admin-legacy/users/store', 'Nexus\Controllers\Admin\UserController@store');
+$router->add('GET', '/admin-legacy/users/edit', function () {
+    header('Location: /admin-legacy/users');
     exit;
 }); // Fallback
-$router->add('GET', '/admin/users/edit/{id}', 'Nexus\Controllers\Admin\UserController@edit');
-$router->add('GET', '/admin/users/{id}/edit', 'Nexus\Controllers\Admin\UserController@edit'); // Standard REST Alias
-$router->add('GET', '/admin/users/{id}/permissions', 'Nexus\Controllers\Admin\UserController@permissions');
-$router->add('POST', '/admin/users/update', 'Nexus\Controllers\Admin\UserController@update');
-$router->add('POST', '/admin/users/delete', 'Nexus\Controllers\Admin\UserController@delete');
-$router->add('POST', '/admin/users/suspend', 'Nexus\Controllers\Admin\UserController@suspend');
-$router->add('POST', '/admin/users/ban', 'Nexus\Controllers\Admin\UserController@ban');
-$router->add('POST', '/admin/users/reactivate', 'Nexus\Controllers\Admin\UserController@reactivate');
-$router->add('POST', '/admin/users/revoke-super-admin', 'Nexus\Controllers\Admin\UserController@revokeSuperAdmin');
-$router->add('POST', '/admin/users/{id}/reset-2fa', 'Nexus\Controllers\Admin\UserController@reset2fa');
-$router->add('POST', '/admin/approve-user', 'Nexus\Controllers\Admin\UserController@approve');
-$router->add('POST', '/admin/users/badges/add', 'Nexus\Controllers\Admin\UserController@addBadge');
-$router->add('POST', '/admin/users/badges/remove', 'Nexus\Controllers\Admin\UserController@removeBadge');
-$router->add('POST', '/admin/users/badges/recheck', 'Nexus\Controllers\Admin\UserController@recheckBadges');
-$router->add('POST', '/admin/users/badges/bulk-award', 'Nexus\Controllers\Admin\UserController@bulkAwardBadge');
-$router->add('POST', '/admin/users/badges/recheck-all', 'Nexus\Controllers\Admin\UserController@recheckAllBadges');
+$router->add('GET', '/admin-legacy/users/edit/{id}', 'Nexus\Controllers\Admin\UserController@edit');
+$router->add('GET', '/admin-legacy/users/{id}/edit', 'Nexus\Controllers\Admin\UserController@edit'); // Standard REST Alias
+$router->add('GET', '/admin-legacy/users/{id}/permissions', 'Nexus\Controllers\Admin\UserController@permissions');
+$router->add('POST', '/admin-legacy/users/update', 'Nexus\Controllers\Admin\UserController@update');
+$router->add('POST', '/admin-legacy/users/delete', 'Nexus\Controllers\Admin\UserController@delete');
+$router->add('POST', '/admin-legacy/users/suspend', 'Nexus\Controllers\Admin\UserController@suspend');
+$router->add('POST', '/admin-legacy/users/ban', 'Nexus\Controllers\Admin\UserController@ban');
+$router->add('POST', '/admin-legacy/users/reactivate', 'Nexus\Controllers\Admin\UserController@reactivate');
+$router->add('POST', '/admin-legacy/users/revoke-super-admin', 'Nexus\Controllers\Admin\UserController@revokeSuperAdmin');
+$router->add('POST', '/admin-legacy/users/{id}/reset-2fa', 'Nexus\Controllers\Admin\UserController@reset2fa');
+$router->add('POST', '/admin-legacy/approve-user', 'Nexus\Controllers\Admin\UserController@approve');
+$router->add('POST', '/admin-legacy/users/badges/add', 'Nexus\Controllers\Admin\UserController@addBadge');
+$router->add('POST', '/admin-legacy/users/badges/remove', 'Nexus\Controllers\Admin\UserController@removeBadge');
+$router->add('POST', '/admin-legacy/users/badges/recheck', 'Nexus\Controllers\Admin\UserController@recheckBadges');
+$router->add('POST', '/admin-legacy/users/badges/bulk-award', 'Nexus\Controllers\Admin\UserController@bulkAwardBadge');
+$router->add('POST', '/admin-legacy/users/badges/recheck-all', 'Nexus\Controllers\Admin\UserController@recheckAllBadges');
 
 // Admin Impersonation
-$router->add('POST', '/admin/impersonate', 'Nexus\Controllers\AuthController@impersonate');
-$router->add('GET', '/admin/stop-impersonating', 'Nexus\Controllers\AuthController@stopImpersonating');
-$router->add('POST', '/admin/stop-impersonating', 'Nexus\Controllers\AuthController@stopImpersonating');
+$router->add('POST', '/admin-legacy/impersonate', 'Nexus\Controllers\AuthController@impersonate');
+$router->add('GET', '/admin-legacy/stop-impersonating', 'Nexus\Controllers\AuthController@stopImpersonating');
+$router->add('POST', '/admin-legacy/stop-impersonating', 'Nexus\Controllers\AuthController@stopImpersonating');
 
 // Admin Groups
-$router->add('GET', '/admin/groups', 'Nexus\Controllers\Admin\GroupAdminController@index');
-$router->add('GET', '/admin/groups/analytics', 'Nexus\Controllers\Admin\GroupAdminController@analytics');
-$router->add('GET', '/admin/groups/recommendations', 'Nexus\Controllers\Admin\GroupAdminController@recommendations');
-$router->add('GET', '/admin/groups/view', 'Nexus\Controllers\Admin\GroupAdminController@view');
-$router->add('GET', '/admin/groups/settings', 'Nexus\Controllers\Admin\GroupAdminController@settings');
-$router->add('POST', '/admin/groups/settings', 'Nexus\Controllers\Admin\GroupAdminController@saveSettings');
-$router->add('GET', '/admin/groups/policies', 'Nexus\Controllers\Admin\GroupAdminController@policies');
-$router->add('POST', '/admin/groups/policies', 'Nexus\Controllers\Admin\GroupAdminController@savePolicies');
-$router->add('GET', '/admin/groups/moderation', 'Nexus\Controllers\Admin\GroupAdminController@moderation');
-$router->add('POST', '/admin/groups/moderate-flag', 'Nexus\Controllers\Admin\GroupAdminController@moderateFlag');
-$router->add('GET', '/admin/groups/approvals', 'Nexus\Controllers\Admin\GroupAdminController@approvals');
-$router->add('POST', '/admin/groups/process-approval', 'Nexus\Controllers\Admin\GroupAdminController@processApproval');
-$router->add('POST', '/admin/groups/manage-members', 'Nexus\Controllers\Admin\GroupAdminController@manageMembers');
-$router->add('POST', '/admin/groups/batch-operations', 'Nexus\Controllers\Admin\GroupAdminController@batchOperations');
-$router->add('GET', '/admin/groups/export', 'Nexus\Controllers\Admin\GroupAdminController@export');
-$router->add('POST', '/admin/groups/toggle-featured', 'Nexus\Controllers\Admin\GroupAdminController@toggleFeatured');
-$router->add('POST', '/admin/groups/delete', 'Nexus\Controllers\Admin\GroupAdminController@delete');
+$router->add('GET', '/admin-legacy/groups', 'Nexus\Controllers\Admin\GroupAdminController@index');
+$router->add('GET', '/admin-legacy/groups/analytics', 'Nexus\Controllers\Admin\GroupAdminController@analytics');
+$router->add('GET', '/admin-legacy/groups/recommendations', 'Nexus\Controllers\Admin\GroupAdminController@recommendations');
+$router->add('GET', '/admin-legacy/groups/view', 'Nexus\Controllers\Admin\GroupAdminController@view');
+$router->add('GET', '/admin-legacy/groups/settings', 'Nexus\Controllers\Admin\GroupAdminController@settings');
+$router->add('POST', '/admin-legacy/groups/settings', 'Nexus\Controllers\Admin\GroupAdminController@saveSettings');
+$router->add('GET', '/admin-legacy/groups/policies', 'Nexus\Controllers\Admin\GroupAdminController@policies');
+$router->add('POST', '/admin-legacy/groups/policies', 'Nexus\Controllers\Admin\GroupAdminController@savePolicies');
+$router->add('GET', '/admin-legacy/groups/moderation', 'Nexus\Controllers\Admin\GroupAdminController@moderation');
+$router->add('POST', '/admin-legacy/groups/moderate-flag', 'Nexus\Controllers\Admin\GroupAdminController@moderateFlag');
+$router->add('GET', '/admin-legacy/groups/approvals', 'Nexus\Controllers\Admin\GroupAdminController@approvals');
+$router->add('POST', '/admin-legacy/groups/process-approval', 'Nexus\Controllers\Admin\GroupAdminController@processApproval');
+$router->add('POST', '/admin-legacy/groups/manage-members', 'Nexus\Controllers\Admin\GroupAdminController@manageMembers');
+$router->add('POST', '/admin-legacy/groups/batch-operations', 'Nexus\Controllers\Admin\GroupAdminController@batchOperations');
+$router->add('GET', '/admin-legacy/groups/export', 'Nexus\Controllers\Admin\GroupAdminController@export');
+$router->add('POST', '/admin-legacy/groups/toggle-featured', 'Nexus\Controllers\Admin\GroupAdminController@toggleFeatured');
+$router->add('POST', '/admin-legacy/groups/delete', 'Nexus\Controllers\Admin\GroupAdminController@delete');
 
 // Admin Matching Diagnostic
-$router->add('GET', '/admin/matching-diagnostic', 'Nexus\Controllers\Admin\MatchingDiagnosticController@index');
+$router->add('GET', '/admin-legacy/matching-diagnostic', 'Nexus\Controllers\Admin\MatchingDiagnosticController@index');
 
 // Admin Gamification
-$router->add('GET', '/admin/gamification', 'Nexus\Controllers\Admin\GamificationController@index');
-$router->add('POST', '/admin/gamification/recheck-all', 'Nexus\Controllers\Admin\GamificationController@recheckAll');
-$router->add('POST', '/admin/gamification/bulk-award', 'Nexus\Controllers\Admin\GamificationController@bulkAward');
-$router->add('POST', '/admin/gamification/award-all', 'Nexus\Controllers\Admin\GamificationController@awardToAll');
-$router->add('POST', '/admin/gamification/reset-xp', 'Nexus\Controllers\Admin\GamificationController@resetXp');
-$router->add('POST', '/admin/gamification/clear-badges', 'Nexus\Controllers\Admin\GamificationController@clearBadges');
+$router->add('GET', '/admin-legacy/gamification', 'Nexus\Controllers\Admin\GamificationController@index');
+$router->add('POST', '/admin-legacy/gamification/recheck-all', 'Nexus\Controllers\Admin\GamificationController@recheckAll');
+$router->add('POST', '/admin-legacy/gamification/bulk-award', 'Nexus\Controllers\Admin\GamificationController@bulkAward');
+$router->add('POST', '/admin-legacy/gamification/award-all', 'Nexus\Controllers\Admin\GamificationController@awardToAll');
+$router->add('POST', '/admin-legacy/gamification/reset-xp', 'Nexus\Controllers\Admin\GamificationController@resetXp');
+$router->add('POST', '/admin-legacy/gamification/clear-badges', 'Nexus\Controllers\Admin\GamificationController@clearBadges');
 
 // Admin AI Settings
-$router->add('GET', '/admin/ai-settings', 'Nexus\Controllers\Admin\AiSettingsController@index');
-$router->add('POST', '/admin/ai-settings/save', 'Nexus\Controllers\Admin\AiSettingsController@save');
-$router->add('POST', '/admin/ai-settings/test', 'Nexus\Controllers\Admin\AiSettingsController@testProvider');
-$router->add('POST', '/admin/ai-settings/initialize', 'Nexus\Controllers\Admin\AiSettingsController@initialize');
+$router->add('GET', '/admin-legacy/ai-settings', 'Nexus\Controllers\Admin\AiSettingsController@index');
+$router->add('POST', '/admin-legacy/ai-settings/save', 'Nexus\Controllers\Admin\AiSettingsController@save');
+$router->add('POST', '/admin-legacy/ai-settings/test', 'Nexus\Controllers\Admin\AiSettingsController@testProvider');
+$router->add('POST', '/admin-legacy/ai-settings/initialize', 'Nexus\Controllers\Admin\AiSettingsController@initialize');
 
 // Admin Custom Badges
-$router->add('GET', '/admin/custom-badges', 'Nexus\Controllers\Admin\CustomBadgeController@index');
-$router->add('GET', '/admin/custom-badges/create', 'Nexus\Controllers\Admin\CustomBadgeController@create');
-$router->add('POST', '/admin/custom-badges/store', 'Nexus\Controllers\Admin\CustomBadgeController@store');
-$router->add('GET', '/admin/custom-badges/edit/{id}', 'Nexus\Controllers\Admin\CustomBadgeController@edit');
-$router->add('POST', '/admin/custom-badges/update', 'Nexus\Controllers\Admin\CustomBadgeController@update');
-$router->add('POST', '/admin/custom-badges/delete', 'Nexus\Controllers\Admin\CustomBadgeController@delete');
-$router->add('POST', '/admin/custom-badges/award', 'Nexus\Controllers\Admin\CustomBadgeController@award');
-$router->add('POST', '/admin/custom-badges/revoke', 'Nexus\Controllers\Admin\CustomBadgeController@revoke');
-$router->add('GET', '/admin/custom-badges/awardees', 'Nexus\Controllers\Admin\CustomBadgeController@getAwardees');
+$router->add('GET', '/admin-legacy/custom-badges', 'Nexus\Controllers\Admin\CustomBadgeController@index');
+$router->add('GET', '/admin-legacy/custom-badges/create', 'Nexus\Controllers\Admin\CustomBadgeController@create');
+$router->add('POST', '/admin-legacy/custom-badges/store', 'Nexus\Controllers\Admin\CustomBadgeController@store');
+$router->add('GET', '/admin-legacy/custom-badges/edit/{id}', 'Nexus\Controllers\Admin\CustomBadgeController@edit');
+$router->add('POST', '/admin-legacy/custom-badges/update', 'Nexus\Controllers\Admin\CustomBadgeController@update');
+$router->add('POST', '/admin-legacy/custom-badges/delete', 'Nexus\Controllers\Admin\CustomBadgeController@delete');
+$router->add('POST', '/admin-legacy/custom-badges/award', 'Nexus\Controllers\Admin\CustomBadgeController@award');
+$router->add('POST', '/admin-legacy/custom-badges/revoke', 'Nexus\Controllers\Admin\CustomBadgeController@revoke');
+$router->add('GET', '/admin-legacy/custom-badges/awardees', 'Nexus\Controllers\Admin\CustomBadgeController@getAwardees');
 
 // Admin Achievement Analytics
-$router->add('GET', '/admin/gamification/analytics', 'Nexus\Controllers\Admin\GamificationController@analytics');
+$router->add('GET', '/admin-legacy/gamification/analytics', 'Nexus\Controllers\Admin\GamificationController@analytics');
 
 // Admin Timebanking Analytics & Abuse Detection
-$router->add('GET', '/admin/timebanking', 'Nexus\Controllers\Admin\TimebankingController@index');
-$router->add('GET', '/admin/timebanking/alerts', 'Nexus\Controllers\Admin\TimebankingController@alerts');
-$router->add('GET', '/admin/timebanking/alert/{id}', 'Nexus\Controllers\Admin\TimebankingController@viewAlert');
-$router->add('POST', '/admin/timebanking/alert/{id}/status', 'Nexus\Controllers\Admin\TimebankingController@updateAlertStatus');
-$router->add('POST', '/admin/timebanking/run-detection', 'Nexus\Controllers\Admin\TimebankingController@runDetection');
-$router->add('GET', '/admin/timebanking/user-report/{id}', 'Nexus\Controllers\Admin\TimebankingController@userReport');
-$router->add('GET', '/admin/timebanking/user-report', 'Nexus\Controllers\Admin\TimebankingController@userReport');
-$router->add('POST', '/admin/timebanking/adjust-balance', 'Nexus\Controllers\Admin\TimebankingController@adjustBalance');
-$router->add('GET', '/admin/timebanking/org-wallets', 'Nexus\Controllers\Admin\TimebankingController@orgWallets');
-$router->add('POST', '/admin/timebanking/org-wallets/initialize', 'Nexus\Controllers\Admin\TimebankingController@initializeOrgWallet');
-$router->add('POST', '/admin/timebanking/org-wallets/initialize-all', 'Nexus\Controllers\Admin\TimebankingController@initializeAllOrgWallets');
-$router->add('GET', '/admin/timebanking/org-members/{id}', 'Nexus\Controllers\Admin\TimebankingController@orgMembers');
-$router->add('POST', '/admin/timebanking/org-members/add', 'Nexus\Controllers\Admin\TimebankingController@addOrgMember');
-$router->add('POST', '/admin/timebanking/org-members/update-role', 'Nexus\Controllers\Admin\TimebankingController@updateOrgMemberRole');
-$router->add('POST', '/admin/timebanking/org-members/remove', 'Nexus\Controllers\Admin\TimebankingController@removeOrgMember');
-$router->add('GET', '/admin/timebanking/create-org', 'Nexus\Controllers\Admin\TimebankingController@createOrgForm');
-$router->add('POST', '/admin/timebanking/create-org', 'Nexus\Controllers\Admin\TimebankingController@createOrg');
+$router->add('GET', '/admin-legacy/timebanking', 'Nexus\Controllers\Admin\TimebankingController@index');
+$router->add('GET', '/admin-legacy/timebanking/alerts', 'Nexus\Controllers\Admin\TimebankingController@alerts');
+$router->add('GET', '/admin-legacy/timebanking/alert/{id}', 'Nexus\Controllers\Admin\TimebankingController@viewAlert');
+$router->add('POST', '/admin-legacy/timebanking/alert/{id}/status', 'Nexus\Controllers\Admin\TimebankingController@updateAlertStatus');
+$router->add('POST', '/admin-legacy/timebanking/run-detection', 'Nexus\Controllers\Admin\TimebankingController@runDetection');
+$router->add('GET', '/admin-legacy/timebanking/user-report/{id}', 'Nexus\Controllers\Admin\TimebankingController@userReport');
+$router->add('GET', '/admin-legacy/timebanking/user-report', 'Nexus\Controllers\Admin\TimebankingController@userReport');
+$router->add('POST', '/admin-legacy/timebanking/adjust-balance', 'Nexus\Controllers\Admin\TimebankingController@adjustBalance');
+$router->add('GET', '/admin-legacy/timebanking/org-wallets', 'Nexus\Controllers\Admin\TimebankingController@orgWallets');
+$router->add('POST', '/admin-legacy/timebanking/org-wallets/initialize', 'Nexus\Controllers\Admin\TimebankingController@initializeOrgWallet');
+$router->add('POST', '/admin-legacy/timebanking/org-wallets/initialize-all', 'Nexus\Controllers\Admin\TimebankingController@initializeAllOrgWallets');
+$router->add('GET', '/admin-legacy/timebanking/org-members/{id}', 'Nexus\Controllers\Admin\TimebankingController@orgMembers');
+$router->add('POST', '/admin-legacy/timebanking/org-members/add', 'Nexus\Controllers\Admin\TimebankingController@addOrgMember');
+$router->add('POST', '/admin-legacy/timebanking/org-members/update-role', 'Nexus\Controllers\Admin\TimebankingController@updateOrgMemberRole');
+$router->add('POST', '/admin-legacy/timebanking/org-members/remove', 'Nexus\Controllers\Admin\TimebankingController@removeOrgMember');
+$router->add('GET', '/admin-legacy/timebanking/create-org', 'Nexus\Controllers\Admin\TimebankingController@createOrgForm');
+$router->add('POST', '/admin-legacy/timebanking/create-org', 'Nexus\Controllers\Admin\TimebankingController@createOrg');
 $router->add('GET', '/api/admin/users/search', 'Nexus\Controllers\Admin\TimebankingController@userSearchApi');
 
 // Admin Campaigns
-$router->add('GET', '/admin/gamification/campaigns', 'Nexus\Controllers\Admin\GamificationController@campaigns');
-$router->add('GET', '/admin/gamification/campaigns/create', 'Nexus\Controllers\Admin\GamificationController@createCampaign');
-$router->add('GET', '/admin/gamification/campaigns/edit/{id}', 'Nexus\Controllers\Admin\GamificationController@editCampaign');
-$router->add('POST', '/admin/gamification/campaigns/save', 'Nexus\Controllers\Admin\GamificationController@saveCampaign');
-$router->add('POST', '/admin/gamification/campaigns/activate', 'Nexus\Controllers\Admin\GamificationController@activateCampaign');
-$router->add('POST', '/admin/gamification/campaigns/pause', 'Nexus\Controllers\Admin\GamificationController@pauseCampaign');
-$router->add('POST', '/admin/gamification/campaigns/delete', 'Nexus\Controllers\Admin\GamificationController@deleteCampaign');
-$router->add('POST', '/admin/gamification/campaigns/run', 'Nexus\Controllers\Admin\GamificationController@runCampaign');
-$router->add('POST', '/admin/gamification/campaigns/preview-audience', 'Nexus\Controllers\Admin\GamificationController@previewAudience');
+$router->add('GET', '/admin-legacy/gamification/campaigns', 'Nexus\Controllers\Admin\GamificationController@campaigns');
+$router->add('GET', '/admin-legacy/gamification/campaigns/create', 'Nexus\Controllers\Admin\GamificationController@createCampaign');
+$router->add('GET', '/admin-legacy/gamification/campaigns/edit/{id}', 'Nexus\Controllers\Admin\GamificationController@editCampaign');
+$router->add('POST', '/admin-legacy/gamification/campaigns/save', 'Nexus\Controllers\Admin\GamificationController@saveCampaign');
+$router->add('POST', '/admin-legacy/gamification/campaigns/activate', 'Nexus\Controllers\Admin\GamificationController@activateCampaign');
+$router->add('POST', '/admin-legacy/gamification/campaigns/pause', 'Nexus\Controllers\Admin\GamificationController@pauseCampaign');
+$router->add('POST', '/admin-legacy/gamification/campaigns/delete', 'Nexus\Controllers\Admin\GamificationController@deleteCampaign');
+$router->add('POST', '/admin-legacy/gamification/campaigns/run', 'Nexus\Controllers\Admin\GamificationController@runCampaign');
+$router->add('POST', '/admin-legacy/gamification/campaigns/preview-audience', 'Nexus\Controllers\Admin\GamificationController@previewAudience');
 
 // --------------------------------------------------------------------------
 // 12.9. ADMIN > CRON JOB MANAGER
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin/cron-jobs', 'Nexus\Controllers\Admin\CronJobController@index');
-$router->add('POST', '/admin/cron-jobs/run/{id}', 'Nexus\Controllers\Admin\CronJobController@run');
-$router->add('POST', '/admin/cron-jobs/toggle/{id}', 'Nexus\Controllers\Admin\CronJobController@toggle');
-$router->add('GET', '/admin/cron-jobs/logs', 'Nexus\Controllers\Admin\CronJobController@logs');
-$router->add('GET', '/admin/cron-jobs/setup', 'Nexus\Controllers\Admin\CronJobController@setup');
-$router->add('GET', '/admin/cron-jobs/settings', 'Nexus\Controllers\Admin\CronJobController@settings');
-$router->add('POST', '/admin/cron-jobs/settings', 'Nexus\Controllers\Admin\CronJobController@saveSettings');
-$router->add('POST', '/admin/cron-jobs/clear-logs', 'Nexus\Controllers\Admin\CronJobController@clearLogs');
-$router->add('GET', '/admin/cron-jobs/api/stats', 'Nexus\Controllers\Admin\CronJobController@apiStats');
+$router->add('GET', '/admin-legacy/cron-jobs', 'Nexus\Controllers\Admin\CronJobController@index');
+$router->add('POST', '/admin-legacy/cron-jobs/run/{id}', 'Nexus\Controllers\Admin\CronJobController@run');
+$router->add('POST', '/admin-legacy/cron-jobs/toggle/{id}', 'Nexus\Controllers\Admin\CronJobController@toggle');
+$router->add('GET', '/admin-legacy/cron-jobs/logs', 'Nexus\Controllers\Admin\CronJobController@logs');
+$router->add('GET', '/admin-legacy/cron-jobs/setup', 'Nexus\Controllers\Admin\CronJobController@setup');
+$router->add('GET', '/admin-legacy/cron-jobs/settings', 'Nexus\Controllers\Admin\CronJobController@settings');
+$router->add('POST', '/admin-legacy/cron-jobs/settings', 'Nexus\Controllers\Admin\CronJobController@saveSettings');
+$router->add('POST', '/admin-legacy/cron-jobs/clear-logs', 'Nexus\Controllers\Admin\CronJobController@clearLogs');
+$router->add('GET', '/admin-legacy/cron-jobs/api/stats', 'Nexus\Controllers\Admin\CronJobController@apiStats');
 
 // Admin Listings
-$router->add('GET', '/admin/listings', 'Nexus\Controllers\Admin\ListingController@index');
-$router->add('POST', '/admin/listings/delete/{id}', 'Nexus\Controllers\Admin\ListingController@delete');
-$router->add('POST', '/admin/listings/approve/{id}', 'Nexus\Controllers\Admin\ListingController@approve');
+$router->add('GET', '/admin-legacy/listings', 'Nexus\Controllers\Admin\ListingController@index');
+$router->add('POST', '/admin-legacy/listings/delete/{id}', 'Nexus\Controllers\Admin\ListingController@delete');
+$router->add('POST', '/admin-legacy/listings/approve/{id}', 'Nexus\Controllers\Admin\ListingController@approve');
 
 // Admin SEO
-$router->add('GET', '/admin/seo', 'Nexus\Controllers\Admin\SeoController@index');
-$router->add('POST', '/admin/seo/store', 'Nexus\Controllers\Admin\SeoController@store');
-$router->add('GET', '/admin/seo/audit', 'Nexus\Controllers\Admin\SeoController@audit');
-$router->add('GET', '/admin/seo/bulk/{type}', 'Nexus\Controllers\Admin\SeoController@bulkEdit');
-$router->add('POST', '/admin/seo/bulk/save', 'Nexus\Controllers\Admin\SeoController@bulkSave');
-$router->add('GET', '/admin/seo/redirects', 'Nexus\Controllers\Admin\SeoController@redirects');
-$router->add('POST', '/admin/seo/redirects/store', 'Nexus\Controllers\Admin\SeoController@storeRedirect');
-$router->add('POST', '/admin/seo/redirects/delete', 'Nexus\Controllers\Admin\SeoController@deleteRedirect');
-$router->add('GET', '/admin/seo/organization', 'Nexus\Controllers\Admin\SeoController@organization');
-$router->add('POST', '/admin/seo/organization/save', 'Nexus\Controllers\Admin\SeoController@saveOrganization');
-$router->add('POST', '/admin/seo/ping-sitemaps', 'Nexus\Controllers\Admin\SeoController@pingSitemaps');
+$router->add('GET', '/admin-legacy/seo', 'Nexus\Controllers\Admin\SeoController@index');
+$router->add('POST', '/admin-legacy/seo/store', 'Nexus\Controllers\Admin\SeoController@store');
+$router->add('GET', '/admin-legacy/seo/audit', 'Nexus\Controllers\Admin\SeoController@audit');
+$router->add('GET', '/admin-legacy/seo/bulk/{type}', 'Nexus\Controllers\Admin\SeoController@bulkEdit');
+$router->add('POST', '/admin-legacy/seo/bulk/save', 'Nexus\Controllers\Admin\SeoController@bulkSave');
+$router->add('GET', '/admin-legacy/seo/redirects', 'Nexus\Controllers\Admin\SeoController@redirects');
+$router->add('POST', '/admin-legacy/seo/redirects/store', 'Nexus\Controllers\Admin\SeoController@storeRedirect');
+$router->add('POST', '/admin-legacy/seo/redirects/delete', 'Nexus\Controllers\Admin\SeoController@deleteRedirect');
+$router->add('GET', '/admin-legacy/seo/organization', 'Nexus\Controllers\Admin\SeoController@organization');
+$router->add('POST', '/admin-legacy/seo/organization/save', 'Nexus\Controllers\Admin\SeoController@saveOrganization');
+$router->add('POST', '/admin-legacy/seo/ping-sitemaps', 'Nexus\Controllers\Admin\SeoController@pingSitemaps');
 
 // 404 Error Tracking
-$router->add('GET', '/admin/404-errors', 'Nexus\Controllers\Admin\Error404Controller@index');
-$router->add('GET', '/admin/404-errors/api/list', 'Nexus\Controllers\Admin\Error404Controller@apiList');
-$router->add('GET', '/admin/404-errors/api/top', 'Nexus\Controllers\Admin\Error404Controller@topErrors');
-$router->add('GET', '/admin/404-errors/api/stats', 'Nexus\Controllers\Admin\Error404Controller@stats');
-$router->add('POST', '/admin/404-errors/mark-resolved', 'Nexus\Controllers\Admin\Error404Controller@markResolved');
-$router->add('POST', '/admin/404-errors/mark-unresolved', 'Nexus\Controllers\Admin\Error404Controller@markUnresolved');
-$router->add('POST', '/admin/404-errors/delete', 'Nexus\Controllers\Admin\Error404Controller@delete');
-$router->add('GET', '/admin/404-errors/search', 'Nexus\Controllers\Admin\Error404Controller@search');
-$router->add('POST', '/admin/404-errors/create-redirect', 'Nexus\Controllers\Admin\Error404Controller@createRedirect');
-$router->add('POST', '/admin/404-errors/bulk-redirect', 'Nexus\Controllers\Admin\Error404Controller@bulkRedirect');
-$router->add('POST', '/admin/404-errors/clean-old', 'Nexus\Controllers\Admin\Error404Controller@cleanOld');
+$router->add('GET', '/admin-legacy/404-errors', 'Nexus\Controllers\Admin\Error404Controller@index');
+$router->add('GET', '/admin-legacy/404-errors/api/list', 'Nexus\Controllers\Admin\Error404Controller@apiList');
+$router->add('GET', '/admin-legacy/404-errors/api/top', 'Nexus\Controllers\Admin\Error404Controller@topErrors');
+$router->add('GET', '/admin-legacy/404-errors/api/stats', 'Nexus\Controllers\Admin\Error404Controller@stats');
+$router->add('POST', '/admin-legacy/404-errors/mark-resolved', 'Nexus\Controllers\Admin\Error404Controller@markResolved');
+$router->add('POST', '/admin-legacy/404-errors/mark-unresolved', 'Nexus\Controllers\Admin\Error404Controller@markUnresolved');
+$router->add('POST', '/admin-legacy/404-errors/delete', 'Nexus\Controllers\Admin\Error404Controller@delete');
+$router->add('GET', '/admin-legacy/404-errors/search', 'Nexus\Controllers\Admin\Error404Controller@search');
+$router->add('POST', '/admin-legacy/404-errors/create-redirect', 'Nexus\Controllers\Admin\Error404Controller@createRedirect');
+$router->add('POST', '/admin-legacy/404-errors/bulk-redirect', 'Nexus\Controllers\Admin\Error404Controller@bulkRedirect');
+$router->add('POST', '/admin-legacy/404-errors/clean-old', 'Nexus\Controllers\Admin\Error404Controller@cleanOld');
 
 // --------------------------------------------------------------------------
 // 12.6. ADMIN > NEWSLETTERS
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin/newsletters', 'Nexus\Controllers\Admin\NewsletterController@index');
-$router->add('GET', '/admin/newsletters/create', 'Nexus\Controllers\Admin\NewsletterController@create');
-$router->add('POST', '/admin/newsletters/store', 'Nexus\Controllers\Admin\NewsletterController@store');
-$router->add('GET', '/admin/newsletters/edit/{id}', 'Nexus\Controllers\Admin\NewsletterController@edit');
-$router->add('POST', '/admin/newsletters/update/{id}', 'Nexus\Controllers\Admin\NewsletterController@update');
-$router->add('GET', '/admin/newsletters/preview/{id}', 'Nexus\Controllers\Admin\NewsletterController@preview');
-$router->add('POST', '/admin/newsletters/send/{id}', 'Nexus\Controllers\Admin\NewsletterController@send');
-$router->add('GET', '/admin/newsletters/send-direct/{id}', 'Nexus\Controllers\Admin\NewsletterController@sendDirect');
-$router->add('POST', '/admin/newsletters/send-test/{id}', 'Nexus\Controllers\Admin\NewsletterController@sendTest');
-$router->add('POST', '/admin/newsletters/delete', 'Nexus\Controllers\Admin\NewsletterController@delete');
-$router->add('GET', '/admin/newsletters/duplicate/{id}', 'Nexus\Controllers\Admin\NewsletterController@duplicate');
-$router->add('GET', '/admin/newsletters/stats/{id}', 'Nexus\Controllers\Admin\NewsletterController@stats');
-$router->add('GET', '/admin/newsletters/activity/{id}', 'Nexus\Controllers\Admin\NewsletterController@activity');
-$router->add('GET', '/admin/newsletters/analytics', 'Nexus\Controllers\Admin\NewsletterController@analytics');
-$router->add('POST', '/admin/newsletters/select-winner/{id}', 'Nexus\Controllers\Admin\NewsletterController@selectWinner');
+$router->add('GET', '/admin-legacy/newsletters', 'Nexus\Controllers\Admin\NewsletterController@index');
+$router->add('GET', '/admin-legacy/newsletters/create', 'Nexus\Controllers\Admin\NewsletterController@create');
+$router->add('POST', '/admin-legacy/newsletters/store', 'Nexus\Controllers\Admin\NewsletterController@store');
+$router->add('GET', '/admin-legacy/newsletters/edit/{id}', 'Nexus\Controllers\Admin\NewsletterController@edit');
+$router->add('POST', '/admin-legacy/newsletters/update/{id}', 'Nexus\Controllers\Admin\NewsletterController@update');
+$router->add('GET', '/admin-legacy/newsletters/preview/{id}', 'Nexus\Controllers\Admin\NewsletterController@preview');
+$router->add('POST', '/admin-legacy/newsletters/send/{id}', 'Nexus\Controllers\Admin\NewsletterController@send');
+$router->add('GET', '/admin-legacy/newsletters/send-direct/{id}', 'Nexus\Controllers\Admin\NewsletterController@sendDirect');
+$router->add('POST', '/admin-legacy/newsletters/send-test/{id}', 'Nexus\Controllers\Admin\NewsletterController@sendTest');
+$router->add('POST', '/admin-legacy/newsletters/delete', 'Nexus\Controllers\Admin\NewsletterController@delete');
+$router->add('GET', '/admin-legacy/newsletters/duplicate/{id}', 'Nexus\Controllers\Admin\NewsletterController@duplicate');
+$router->add('GET', '/admin-legacy/newsletters/stats/{id}', 'Nexus\Controllers\Admin\NewsletterController@stats');
+$router->add('GET', '/admin-legacy/newsletters/activity/{id}', 'Nexus\Controllers\Admin\NewsletterController@activity');
+$router->add('GET', '/admin-legacy/newsletters/analytics', 'Nexus\Controllers\Admin\NewsletterController@analytics');
+$router->add('POST', '/admin-legacy/newsletters/select-winner/{id}', 'Nexus\Controllers\Admin\NewsletterController@selectWinner');
 
 // AJAX Endpoints for Live Count & Preview
-$router->add('POST', '/admin/newsletters/get-recipient-count', 'Nexus\Controllers\Admin\NewsletterController@getRecipientCount');
-$router->add('POST', '/admin/newsletters/preview-recipients', 'Nexus\Controllers\Admin\NewsletterController@previewRecipients');
+$router->add('POST', '/admin-legacy/newsletters/get-recipient-count', 'Nexus\Controllers\Admin\NewsletterController@getRecipientCount');
+$router->add('POST', '/admin-legacy/newsletters/preview-recipients', 'Nexus\Controllers\Admin\NewsletterController@previewRecipients');
 
 // Admin Subscriber Management
-$router->add('GET', '/admin/newsletters/subscribers', 'Nexus\Controllers\Admin\NewsletterController@subscribers');
-$router->add('POST', '/admin/newsletters/subscribers/add', 'Nexus\Controllers\Admin\NewsletterController@addSubscriber');
-$router->add('POST', '/admin/newsletters/subscribers/delete', 'Nexus\Controllers\Admin\NewsletterController@deleteSubscriber');
-$router->add('POST', '/admin/newsletters/subscribers/sync', 'Nexus\Controllers\Admin\NewsletterController@syncMembers');
-$router->add('GET', '/admin/newsletters/subscribers/export', 'Nexus\Controllers\Admin\NewsletterController@exportSubscribers');
-$router->add('POST', '/admin/newsletters/subscribers/import', 'Nexus\Controllers\Admin\NewsletterController@importSubscribers');
+$router->add('GET', '/admin-legacy/newsletters/subscribers', 'Nexus\Controllers\Admin\NewsletterController@subscribers');
+$router->add('POST', '/admin-legacy/newsletters/subscribers/add', 'Nexus\Controllers\Admin\NewsletterController@addSubscriber');
+$router->add('POST', '/admin-legacy/newsletters/subscribers/delete', 'Nexus\Controllers\Admin\NewsletterController@deleteSubscriber');
+$router->add('POST', '/admin-legacy/newsletters/subscribers/sync', 'Nexus\Controllers\Admin\NewsletterController@syncMembers');
+$router->add('GET', '/admin-legacy/newsletters/subscribers/export', 'Nexus\Controllers\Admin\NewsletterController@exportSubscribers');
+$router->add('POST', '/admin-legacy/newsletters/subscribers/import', 'Nexus\Controllers\Admin\NewsletterController@importSubscribers');
 
 // Segment Management
-$router->add('GET', '/admin/newsletters/segments', 'Nexus\Controllers\Admin\NewsletterController@segments');
-$router->add('GET', '/admin/newsletters/segments/create', 'Nexus\Controllers\Admin\NewsletterController@createSegment');
-$router->add('POST', '/admin/newsletters/segments/store', 'Nexus\Controllers\Admin\NewsletterController@storeSegment');
-$router->add('GET', '/admin/newsletters/segments/edit/{id}', 'Nexus\Controllers\Admin\NewsletterController@editSegment');
-$router->add('POST', '/admin/newsletters/segments/update/{id}', 'Nexus\Controllers\Admin\NewsletterController@updateSegment');
-$router->add('POST', '/admin/newsletters/segments/delete', 'Nexus\Controllers\Admin\NewsletterController@deleteSegment');
-$router->add('POST', '/admin/newsletters/segments/preview', 'Nexus\Controllers\Admin\NewsletterController@previewSegment');
-$router->add('GET', '/admin/newsletters/segments/suggestions', 'Nexus\Controllers\Admin\NewsletterController@getSmartSuggestions');
-$router->add('POST', '/admin/newsletters/segments/from-suggestion', 'Nexus\Controllers\Admin\NewsletterController@createFromSuggestion');
+$router->add('GET', '/admin-legacy/newsletters/segments', 'Nexus\Controllers\Admin\NewsletterController@segments');
+$router->add('GET', '/admin-legacy/newsletters/segments/create', 'Nexus\Controllers\Admin\NewsletterController@createSegment');
+$router->add('POST', '/admin-legacy/newsletters/segments/store', 'Nexus\Controllers\Admin\NewsletterController@storeSegment');
+$router->add('GET', '/admin-legacy/newsletters/segments/edit/{id}', 'Nexus\Controllers\Admin\NewsletterController@editSegment');
+$router->add('POST', '/admin-legacy/newsletters/segments/update/{id}', 'Nexus\Controllers\Admin\NewsletterController@updateSegment');
+$router->add('POST', '/admin-legacy/newsletters/segments/delete', 'Nexus\Controllers\Admin\NewsletterController@deleteSegment');
+$router->add('POST', '/admin-legacy/newsletters/segments/preview', 'Nexus\Controllers\Admin\NewsletterController@previewSegment');
+$router->add('GET', '/admin-legacy/newsletters/segments/suggestions', 'Nexus\Controllers\Admin\NewsletterController@getSmartSuggestions');
+$router->add('POST', '/admin-legacy/newsletters/segments/from-suggestion', 'Nexus\Controllers\Admin\NewsletterController@createFromSuggestion');
 
 // Template Management
-$router->add('GET', '/admin/newsletters/templates', 'Nexus\Controllers\Admin\NewsletterController@templates');
-$router->add('GET', '/admin/newsletters/templates/create', 'Nexus\Controllers\Admin\NewsletterController@createTemplate');
-$router->add('POST', '/admin/newsletters/templates/store', 'Nexus\Controllers\Admin\NewsletterController@storeTemplate');
-$router->add('GET', '/admin/newsletters/templates/edit/{id}', 'Nexus\Controllers\Admin\NewsletterController@editTemplate');
-$router->add('POST', '/admin/newsletters/templates/update/{id}', 'Nexus\Controllers\Admin\NewsletterController@updateTemplate');
-$router->add('POST', '/admin/newsletters/templates/delete', 'Nexus\Controllers\Admin\NewsletterController@deleteTemplate');
-$router->add('GET', '/admin/newsletters/templates/duplicate/{id}', 'Nexus\Controllers\Admin\NewsletterController@duplicateTemplate');
-$router->add('GET', '/admin/newsletters/templates/preview/{id}', 'Nexus\Controllers\Admin\NewsletterController@previewTemplate');
-$router->add('POST', '/admin/newsletters/save-as-template', 'Nexus\Controllers\Admin\NewsletterController@saveAsTemplate');
-$router->add('GET', '/admin/newsletters/get-templates', 'Nexus\Controllers\Admin\NewsletterController@getTemplates');
-$router->add('GET', '/admin/newsletters/load-template/{id}', 'Nexus\Controllers\Admin\NewsletterController@loadTemplate');
+$router->add('GET', '/admin-legacy/newsletters/templates', 'Nexus\Controllers\Admin\NewsletterController@templates');
+$router->add('GET', '/admin-legacy/newsletters/templates/create', 'Nexus\Controllers\Admin\NewsletterController@createTemplate');
+$router->add('POST', '/admin-legacy/newsletters/templates/store', 'Nexus\Controllers\Admin\NewsletterController@storeTemplate');
+$router->add('GET', '/admin-legacy/newsletters/templates/edit/{id}', 'Nexus\Controllers\Admin\NewsletterController@editTemplate');
+$router->add('POST', '/admin-legacy/newsletters/templates/update/{id}', 'Nexus\Controllers\Admin\NewsletterController@updateTemplate');
+$router->add('POST', '/admin-legacy/newsletters/templates/delete', 'Nexus\Controllers\Admin\NewsletterController@deleteTemplate');
+$router->add('GET', '/admin-legacy/newsletters/templates/duplicate/{id}', 'Nexus\Controllers\Admin\NewsletterController@duplicateTemplate');
+$router->add('GET', '/admin-legacy/newsletters/templates/preview/{id}', 'Nexus\Controllers\Admin\NewsletterController@previewTemplate');
+$router->add('POST', '/admin-legacy/newsletters/save-as-template', 'Nexus\Controllers\Admin\NewsletterController@saveAsTemplate');
+$router->add('GET', '/admin-legacy/newsletters/get-templates', 'Nexus\Controllers\Admin\NewsletterController@getTemplates');
+$router->add('GET', '/admin-legacy/newsletters/load-template/{id}', 'Nexus\Controllers\Admin\NewsletterController@loadTemplate');
 
 // Bounce Management
-$router->add('GET', '/admin/newsletters/bounces', 'Nexus\Controllers\Admin\NewsletterController@bounces');
-$router->add('POST', '/admin/newsletters/unsuppress', 'Nexus\Controllers\Admin\NewsletterController@unsuppress');
-$router->add('POST', '/admin/newsletters/suppress', 'Nexus\Controllers\Admin\NewsletterController@suppress');
+$router->add('GET', '/admin-legacy/newsletters/bounces', 'Nexus\Controllers\Admin\NewsletterController@bounces');
+$router->add('POST', '/admin-legacy/newsletters/unsuppress', 'Nexus\Controllers\Admin\NewsletterController@unsuppress');
+$router->add('POST', '/admin-legacy/newsletters/suppress', 'Nexus\Controllers\Admin\NewsletterController@suppress');
 
 // Resend to Non-Openers
-$router->add('GET', '/admin/newsletters/resend/{id}', 'Nexus\Controllers\Admin\NewsletterController@resendForm');
-$router->add('POST', '/admin/newsletters/resend/{id}', 'Nexus\Controllers\Admin\NewsletterController@resend');
-$router->add('GET', '/admin/newsletters/resend-info/{id}', 'Nexus\Controllers\Admin\NewsletterController@getResendInfo');
+$router->add('GET', '/admin-legacy/newsletters/resend/{id}', 'Nexus\Controllers\Admin\NewsletterController@resendForm');
+$router->add('POST', '/admin-legacy/newsletters/resend/{id}', 'Nexus\Controllers\Admin\NewsletterController@resend');
+$router->add('GET', '/admin-legacy/newsletters/resend-info/{id}', 'Nexus\Controllers\Admin\NewsletterController@getResendInfo');
 
 // Send Time Optimization
-$router->add('GET', '/admin/newsletters/send-time', 'Nexus\Controllers\Admin\NewsletterController@sendTimeOptimization');
-$router->add('GET', '/admin/newsletters/send-time-recommendations', 'Nexus\Controllers\Admin\NewsletterController@getSendTimeRecommendations');
-$router->add('GET', '/admin/newsletters/send-time-heatmap', 'Nexus\Controllers\Admin\NewsletterController@getSendTimeHeatmap');
+$router->add('GET', '/admin-legacy/newsletters/send-time', 'Nexus\Controllers\Admin\NewsletterController@sendTimeOptimization');
+$router->add('GET', '/admin-legacy/newsletters/send-time-recommendations', 'Nexus\Controllers\Admin\NewsletterController@getSendTimeRecommendations');
+$router->add('GET', '/admin-legacy/newsletters/send-time-heatmap', 'Nexus\Controllers\Admin\NewsletterController@getSendTimeHeatmap');
 
 // Email Client Preview
-$router->add('GET', '/admin/newsletters/client-preview/{id}', 'Nexus\Controllers\Admin\NewsletterController@getEmailClientPreview');
+$router->add('GET', '/admin-legacy/newsletters/client-preview/{id}', 'Nexus\Controllers\Admin\NewsletterController@getEmailClientPreview');
 
 // Diagnostics & Repair
-$router->add('GET', '/admin/newsletters/diagnostics', 'Nexus\Controllers\Admin\NewsletterController@diagnostics');
-$router->add('POST', '/admin/newsletters/repair', 'Nexus\Controllers\Admin\NewsletterController@repair');
+$router->add('GET', '/admin-legacy/newsletters/diagnostics', 'Nexus\Controllers\Admin\NewsletterController@diagnostics');
+$router->add('POST', '/admin-legacy/newsletters/repair', 'Nexus\Controllers\Admin\NewsletterController@repair');
 
 // --------------------------------------------------------------------------
 // 12.7. PUBLIC > NEWSLETTER SUBSCRIPTION
@@ -2159,108 +2232,108 @@ $router->add('GET', '/newsletter/track/click/{newsletterId}/{linkId}/{trackingTo
 // --------------------------------------------------------------------------
 // 12.95. ADMIN > ENTERPRISE FEATURES (GDPR, Monitoring, Config)
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin/enterprise', 'Nexus\Controllers\Admin\Enterprise\EnterpriseDashboardController@dashboard');
+$router->add('GET', '/admin-legacy/enterprise', 'Nexus\Controllers\Admin\Enterprise\EnterpriseDashboardController@dashboard');
 
 // API Test Runner
-$router->add('GET', '/admin/tests', 'Nexus\Controllers\Admin\TestRunnerController@index');
-$router->add('POST', '/admin/tests/run', 'Nexus\Controllers\Admin\TestRunnerController@runTests');
-$router->add('GET', '/admin/tests/view', 'Nexus\Controllers\Admin\TestRunnerController@viewRun');
+$router->add('GET', '/admin-legacy/tests', 'Nexus\Controllers\Admin\TestRunnerController@index');
+$router->add('POST', '/admin-legacy/tests/run', 'Nexus\Controllers\Admin\TestRunnerController@runTests');
+$router->add('GET', '/admin-legacy/tests/view', 'Nexus\Controllers\Admin\TestRunnerController@viewRun');
 
 // GDPR Requests
-$router->add('GET', '/admin/enterprise/gdpr', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@dashboard');
-$router->add('GET', '/admin/enterprise/gdpr/requests', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@index');
-$router->add('GET', '/admin/enterprise/gdpr/requests/new', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@create');
-$router->add('GET', '/admin/enterprise/gdpr/requests/create', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@create');
-$router->add('POST', '/admin/enterprise/gdpr/requests', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@store');
-$router->add('GET', '/admin/enterprise/gdpr/requests/{id}', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@show');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/process', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@process');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/complete', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@complete');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/reject', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@reject');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/assign', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@assign');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/notes', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@addNote');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/generate-export', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@generateExport');
-$router->add('POST', '/admin/enterprise/gdpr/requests/bulk-process', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@bulkProcess');
+$router->add('GET', '/admin-legacy/enterprise/gdpr', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@dashboard');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/requests', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@index');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/requests/new', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@create');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/requests/create', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@create');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/requests', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@store');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/requests/{id}', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@show');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/requests/{id}/process', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@process');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/requests/{id}/complete', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@complete');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/requests/{id}/reject', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@reject');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/requests/{id}/assign', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@assign');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/requests/{id}/notes', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@addNote');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/requests/{id}/generate-export', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@generateExport');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/requests/bulk-process', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@bulkProcess');
 
 // GDPR Consents
-$router->add('GET', '/admin/enterprise/gdpr/consents', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@index');
-$router->add('POST', '/admin/enterprise/gdpr/consents/types', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@storeType');
-$router->add('POST', '/admin/enterprise/gdpr/consents/backfill', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@backfill');
-$router->add('GET', '/admin/enterprise/gdpr/consents/tenant-versions', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@getTenantVersions');
-$router->add('POST', '/admin/enterprise/gdpr/consents/tenant-version', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@updateTenantVersion');
-$router->add('DELETE', '/admin/enterprise/gdpr/consents/tenant-version/{slug}', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@removeTenantVersion');
-$router->add('GET', '/admin/enterprise/gdpr/consents/{id}', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@show');
-$router->add('GET', '/admin/enterprise/gdpr/consents/export', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@export');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/consents', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@index');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/consents/types', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@storeType');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/consents/backfill', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@backfill');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/consents/tenant-versions', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@getTenantVersions');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/consents/tenant-version', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@updateTenantVersion');
+$router->add('DELETE', '/admin-legacy/enterprise/gdpr/consents/tenant-version/{slug}', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@removeTenantVersion');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/consents/{id}', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@show');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/consents/export', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@export');
 
 // GDPR Breaches
-$router->add('GET', '/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@index');
-$router->add('GET', '/admin/enterprise/gdpr/breaches/report', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@create');
-$router->add('POST', '/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@store');
-$router->add('GET', '/admin/enterprise/gdpr/breaches/{id}', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@show');
-$router->add('POST', '/admin/enterprise/gdpr/breaches/{id}/escalate', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@escalate');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@index');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/breaches/report', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@create');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@store');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/breaches/{id}', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@show');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/breaches/{id}/escalate', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@escalate');
 
 // GDPR Audit
-$router->add('GET', '/admin/enterprise/gdpr/audit', 'Nexus\Controllers\Admin\Enterprise\GdprAuditController@index');
-$router->add('GET', '/admin/enterprise/gdpr/audit/export', 'Nexus\Controllers\Admin\Enterprise\GdprAuditController@export');
-$router->add('POST', '/admin/enterprise/gdpr/export-report', 'Nexus\Controllers\Admin\Enterprise\GdprAuditController@complianceReport');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/audit', 'Nexus\Controllers\Admin\Enterprise\GdprAuditController@index');
+$router->add('GET', '/admin-legacy/enterprise/gdpr/audit/export', 'Nexus\Controllers\Admin\Enterprise\GdprAuditController@export');
+$router->add('POST', '/admin-legacy/enterprise/gdpr/export-report', 'Nexus\Controllers\Admin\Enterprise\GdprAuditController@complianceReport');
 
 // Monitoring & APM
-$router->add('GET', '/admin/enterprise/monitoring', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@dashboard');
-$router->add('GET', '/admin/enterprise/monitoring/health', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@healthCheck');
-$router->add('GET', '/admin/enterprise/monitoring/requirements', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@requirements');
-$router->add('GET', '/admin/enterprise/monitoring/logs', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logs');
-$router->add('GET', '/admin/enterprise/monitoring/logs/download', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logsDownload');
-$router->add('POST', '/admin/enterprise/monitoring/logs/clear', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logsClear');
-$router->add('GET', '/admin/enterprise/monitoring/logs/{filename}', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logView');
+$router->add('GET', '/admin-legacy/enterprise/monitoring', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@dashboard');
+$router->add('GET', '/admin-legacy/enterprise/monitoring/health', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@healthCheck');
+$router->add('GET', '/admin-legacy/enterprise/monitoring/requirements', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@requirements');
+$router->add('GET', '/admin-legacy/enterprise/monitoring/logs', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logs');
+$router->add('GET', '/admin-legacy/enterprise/monitoring/logs/download', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logsDownload');
+$router->add('POST', '/admin-legacy/enterprise/monitoring/logs/clear', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logsClear');
+$router->add('GET', '/admin-legacy/enterprise/monitoring/logs/{filename}', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logView');
 
 // Real-Time Updates API (keep in monitoring for now)
-$router->add('GET', '/admin/api/realtime', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@realtimeStream');
-$router->add('GET', '/admin/api/realtime/poll', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@realtimePoll');
+$router->add('GET', '/admin-legacy/api/realtime', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@realtimeStream');
+$router->add('GET', '/admin-legacy/api/realtime/poll', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@realtimePoll');
 
 // Configuration
-$router->add('GET', '/admin/enterprise/config', 'Nexus\Controllers\Admin\Enterprise\ConfigController@dashboard');
-$router->add('POST', '/admin/enterprise/config/settings/{group}/{key}', 'Nexus\Controllers\Admin\Enterprise\ConfigController@updateSetting');
-$router->add('GET', '/admin/enterprise/config/export', 'Nexus\Controllers\Admin\Enterprise\ConfigController@export');
-$router->add('POST', '/admin/enterprise/config/cache/clear', 'Nexus\Controllers\Admin\Enterprise\ConfigController@clearCache');
-$router->add('GET', '/admin/enterprise/config/validate', 'Nexus\Controllers\Admin\Enterprise\ConfigController@validate');
-$router->add('PATCH', '/admin/enterprise/config/features/{key}', 'Nexus\Controllers\Admin\Enterprise\ConfigController@toggleFeature');
-$router->add('POST', '/admin/enterprise/config/features/reset', 'Nexus\Controllers\Admin\Enterprise\ConfigController@resetFeatures');
+$router->add('GET', '/admin-legacy/enterprise/config', 'Nexus\Controllers\Admin\Enterprise\ConfigController@dashboard');
+$router->add('POST', '/admin-legacy/enterprise/config/settings/{group}/{key}', 'Nexus\Controllers\Admin\Enterprise\ConfigController@updateSetting');
+$router->add('GET', '/admin-legacy/enterprise/config/export', 'Nexus\Controllers\Admin\Enterprise\ConfigController@export');
+$router->add('POST', '/admin-legacy/enterprise/config/cache/clear', 'Nexus\Controllers\Admin\Enterprise\ConfigController@clearCache');
+$router->add('GET', '/admin-legacy/enterprise/config/validate', 'Nexus\Controllers\Admin\Enterprise\ConfigController@validate');
+$router->add('PATCH', '/admin-legacy/enterprise/config/features/{key}', 'Nexus\Controllers\Admin\Enterprise\ConfigController@toggleFeature');
+$router->add('POST', '/admin-legacy/enterprise/config/features/reset', 'Nexus\Controllers\Admin\Enterprise\ConfigController@resetFeatures');
 
 // Secrets & Vault
-$router->add('GET', '/admin/enterprise/config/secrets', 'Nexus\Controllers\Admin\Enterprise\SecretsController@index');
-$router->add('POST', '/admin/enterprise/config/secrets', 'Nexus\Controllers\Admin\Enterprise\SecretsController@store');
-$router->add('POST', '/admin/enterprise/config/secrets/{key}/value', 'Nexus\Controllers\Admin\Enterprise\SecretsController@view');
-$router->add('POST', '/admin/enterprise/config/secrets/{key}/rotate', 'Nexus\Controllers\Admin\Enterprise\SecretsController@rotate');
-$router->add('DELETE', '/admin/enterprise/config/secrets/{key}', 'Nexus\Controllers\Admin\Enterprise\SecretsController@delete');
-$router->add('GET', '/admin/enterprise/config/vault/test', 'Nexus\Controllers\Admin\Enterprise\SecretsController@testVault');
+$router->add('GET', '/admin-legacy/enterprise/config/secrets', 'Nexus\Controllers\Admin\Enterprise\SecretsController@index');
+$router->add('POST', '/admin-legacy/enterprise/config/secrets', 'Nexus\Controllers\Admin\Enterprise\SecretsController@store');
+$router->add('POST', '/admin-legacy/enterprise/config/secrets/{key}/value', 'Nexus\Controllers\Admin\Enterprise\SecretsController@view');
+$router->add('POST', '/admin-legacy/enterprise/config/secrets/{key}/rotate', 'Nexus\Controllers\Admin\Enterprise\SecretsController@rotate');
+$router->add('DELETE', '/admin-legacy/enterprise/config/secrets/{key}', 'Nexus\Controllers\Admin\Enterprise\SecretsController@delete');
+$router->add('GET', '/admin-legacy/enterprise/config/vault/test', 'Nexus\Controllers\Admin\Enterprise\SecretsController@testVault');
 
 // Roles & Permissions Management
-$router->add('GET', '/admin/enterprise/roles', 'Nexus\Controllers\Admin\RolesController@index');
-$router->add('GET', '/admin/enterprise/permissions', 'Nexus\Controllers\Admin\RolesController@permissions');
-$router->add('GET', '/admin/enterprise/roles/create', 'Nexus\Controllers\Admin\RolesController@create');
-$router->add('POST', '/admin/enterprise/roles', 'Nexus\Controllers\Admin\RolesController@store');
-$router->add('GET', '/admin/enterprise/audit/permissions', 'Nexus\Controllers\Admin\RolesController@auditLog');
-$router->add('GET', '/admin/enterprise/roles/{id}', 'Nexus\Controllers\Admin\RolesController@show');
-$router->add('GET', '/admin/enterprise/roles/{id}/edit', 'Nexus\Controllers\Admin\RolesController@edit');
-$router->add('PATCH', '/admin/enterprise/roles/{id}', 'Nexus\Controllers\Admin\RolesController@update');
-$router->add('PUT', '/admin/enterprise/roles/{id}', 'Nexus\Controllers\Admin\RolesController@update');
-$router->add('DELETE', '/admin/enterprise/roles/{id}', 'Nexus\Controllers\Admin\RolesController@destroy');
-$router->add('POST', '/admin/enterprise/roles/{id}/users/{userId}', 'Nexus\Controllers\Admin\RolesController@assignToUser');
-$router->add('DELETE', '/admin/enterprise/roles/{id}/users/{userId}', 'Nexus\Controllers\Admin\RolesController@revokeFromUser');
+$router->add('GET', '/admin-legacy/enterprise/roles', 'Nexus\Controllers\Admin\RolesController@index');
+$router->add('GET', '/admin-legacy/enterprise/permissions', 'Nexus\Controllers\Admin\RolesController@permissions');
+$router->add('GET', '/admin-legacy/enterprise/roles/create', 'Nexus\Controllers\Admin\RolesController@create');
+$router->add('POST', '/admin-legacy/enterprise/roles', 'Nexus\Controllers\Admin\RolesController@store');
+$router->add('GET', '/admin-legacy/enterprise/audit/permissions', 'Nexus\Controllers\Admin\RolesController@auditLog');
+$router->add('GET', '/admin-legacy/enterprise/roles/{id}', 'Nexus\Controllers\Admin\RolesController@show');
+$router->add('GET', '/admin-legacy/enterprise/roles/{id}/edit', 'Nexus\Controllers\Admin\RolesController@edit');
+$router->add('PATCH', '/admin-legacy/enterprise/roles/{id}', 'Nexus\Controllers\Admin\RolesController@update');
+$router->add('PUT', '/admin-legacy/enterprise/roles/{id}', 'Nexus\Controllers\Admin\RolesController@update');
+$router->add('DELETE', '/admin-legacy/enterprise/roles/{id}', 'Nexus\Controllers\Admin\RolesController@destroy');
+$router->add('POST', '/admin-legacy/enterprise/roles/{id}/users/{userId}', 'Nexus\Controllers\Admin\RolesController@assignToUser');
+$router->add('DELETE', '/admin-legacy/enterprise/roles/{id}/users/{userId}', 'Nexus\Controllers\Admin\RolesController@revokeFromUser');
 
 // Permission API (REST endpoints for AJAX/frontend)
-$router->add('GET', '/admin/api/permissions/check', 'Nexus\Controllers\Admin\PermissionApiController@checkPermission');
-$router->add('GET', '/admin/api/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getAllPermissions');
-$router->add('GET', '/admin/api/roles', 'Nexus\Controllers\Admin\PermissionApiController@getAllRoles');
-$router->add('GET', '/admin/api/roles/{roleId}/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getRolePermissions');
-$router->add('GET', '/admin/api/users/{userId}/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getUserPermissions');
-$router->add('GET', '/admin/api/users/{userId}/roles', 'Nexus\Controllers\Admin\PermissionApiController@getUserRoles');
-$router->add('GET', '/admin/api/users/{userId}/effective-permissions', 'Nexus\Controllers\Admin\PermissionApiController@getUserEffectivePermissions');
-$router->add('POST', '/admin/api/users/{userId}/roles', 'Nexus\Controllers\Admin\PermissionApiController@assignRoleToUser');
-$router->add('DELETE', '/admin/api/users/{userId}/roles/{roleId}', 'Nexus\Controllers\Admin\PermissionApiController@revokeRoleFromUser');
-$router->add('POST', '/admin/api/users/{userId}/permissions', 'Nexus\Controllers\Admin\PermissionApiController@grantPermissionToUser');
-$router->add('DELETE', '/admin/api/users/{userId}/permissions/{permissionId}', 'Nexus\Controllers\Admin\PermissionApiController@revokePermissionFromUser');
-$router->add('GET', '/admin/api/audit/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getAuditLog');
-$router->add('GET', '/admin/api/stats/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getPermissionStats');
+$router->add('GET', '/admin-legacy/api/permissions/check', 'Nexus\Controllers\Admin\PermissionApiController@checkPermission');
+$router->add('GET', '/admin-legacy/api/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getAllPermissions');
+$router->add('GET', '/admin-legacy/api/roles', 'Nexus\Controllers\Admin\PermissionApiController@getAllRoles');
+$router->add('GET', '/admin-legacy/api/roles/{roleId}/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getRolePermissions');
+$router->add('GET', '/admin-legacy/api/users/{userId}/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getUserPermissions');
+$router->add('GET', '/admin-legacy/api/users/{userId}/roles', 'Nexus\Controllers\Admin\PermissionApiController@getUserRoles');
+$router->add('GET', '/admin-legacy/api/users/{userId}/effective-permissions', 'Nexus\Controllers\Admin\PermissionApiController@getUserEffectivePermissions');
+$router->add('POST', '/admin-legacy/api/users/{userId}/roles', 'Nexus\Controllers\Admin\PermissionApiController@assignRoleToUser');
+$router->add('DELETE', '/admin-legacy/api/users/{userId}/roles/{roleId}', 'Nexus\Controllers\Admin\PermissionApiController@revokeRoleFromUser');
+$router->add('POST', '/admin-legacy/api/users/{userId}/permissions', 'Nexus\Controllers\Admin\PermissionApiController@grantPermissionToUser');
+$router->add('DELETE', '/admin-legacy/api/users/{userId}/permissions/{permissionId}', 'Nexus\Controllers\Admin\PermissionApiController@revokePermissionFromUser');
+$router->add('GET', '/admin-legacy/api/audit/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getAuditLog');
+$router->add('GET', '/admin-legacy/api/stats/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getPermissionStats');
 
 // User-facing Privacy Settings (GDPR self-service)
 $router->add('GET', '/settings/privacy', 'Nexus\Controllers\SettingsController@privacy');
@@ -2311,6 +2384,40 @@ $router->add('GET', '/cron/run-all', 'Nexus\Controllers\CronController@runAll');
 
 // --------------------------------------------------------------------------
 // Notification API routes consolidated above
+
+// ============================================
+// API V2 - COMMUNITY ANALYTICS (Admin)
+// ============================================
+$router->add('GET', '/api/v2/admin/community-analytics', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@index');
+$router->add('GET', '/api/v2/admin/community-analytics/export', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@export');
+
+// ============================================
+// API V2 - IMPACT REPORTING (Admin)
+// ============================================
+$router->add('GET', '/api/v2/admin/impact-report', 'Nexus\Controllers\Api\AdminImpactReportApiController@index');
+$router->add('PUT', '/api/v2/admin/impact-report/config', 'Nexus\Controllers\Api\AdminImpactReportApiController@updateConfig');
+
+// ============================================
+// API V2 - ONBOARDING (Authenticated users)
+// ============================================
+$router->add('GET', '/api/v2/onboarding/status', 'Nexus\Controllers\Api\OnboardingApiController@status');
+$router->add('GET', '/api/v2/onboarding/categories', 'Nexus\Controllers\Api\OnboardingApiController@categories');
+$router->add('POST', '/api/v2/onboarding/interests', 'Nexus\Controllers\Api\OnboardingApiController@saveInterests');
+$router->add('POST', '/api/v2/onboarding/skills', 'Nexus\Controllers\Api\OnboardingApiController@saveSkills');
+$router->add('POST', '/api/v2/onboarding/complete', 'Nexus\Controllers\Api\OnboardingApiController@complete');
+
+// ============================================
+// API V2 - GROUP EXCHANGES (Authenticated users)
+// ============================================
+$router->add('GET', '/api/v2/group-exchanges', 'Nexus\Controllers\Api\GroupExchangesApiController@index');
+$router->add('POST', '/api/v2/group-exchanges', 'Nexus\Controllers\Api\GroupExchangesApiController@store');
+$router->add('GET', '/api/v2/group-exchanges/{id}', 'Nexus\Controllers\Api\GroupExchangesApiController@show');
+$router->add('PUT', '/api/v2/group-exchanges/{id}', 'Nexus\Controllers\Api\GroupExchangesApiController@update');
+$router->add('DELETE', '/api/v2/group-exchanges/{id}', 'Nexus\Controllers\Api\GroupExchangesApiController@destroy');
+$router->add('POST', '/api/v2/group-exchanges/{id}/participants', 'Nexus\Controllers\Api\GroupExchangesApiController@addParticipant');
+$router->add('DELETE', '/api/v2/group-exchanges/{id}/participants/{userId}', 'Nexus\Controllers\Api\GroupExchangesApiController@removeParticipant');
+$router->add('POST', '/api/v2/group-exchanges/{id}/confirm', 'Nexus\Controllers\Api\GroupExchangesApiController@confirm');
+$router->add('POST', '/api/v2/group-exchanges/{id}/complete', 'Nexus\Controllers\Api\GroupExchangesApiController@complete');
 
 // DISPATCH
 // --------------------------------------------------------------------------

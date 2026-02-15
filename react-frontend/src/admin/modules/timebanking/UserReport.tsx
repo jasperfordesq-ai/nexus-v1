@@ -7,7 +7,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar, Button } from '@heroui/react';
-import { Users, ArrowLeft } from 'lucide-react';
+import { Users, ArrowLeft, Download } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';
@@ -23,6 +23,7 @@ export function UserReport() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
   // Debounce search
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -71,6 +72,17 @@ export function UserReport() {
     },
     []
   );
+
+  const handleDownloadStatement = useCallback(async (userId: number) => {
+    setDownloadingId(userId);
+    try {
+      await adminTimebanking.downloadStatementCsv(userId);
+    } catch {
+      // Silently handle
+    } finally {
+      setDownloadingId(null);
+    }
+  }, []);
 
   const columns: Column<UserFinancialReportType>[] = useMemo(
     () => [
@@ -136,8 +148,24 @@ export function UserReport() {
           <span className="text-sm">{user.transaction_count}</span>
         ),
       },
+      {
+        key: 'actions' as keyof UserFinancialReportType,
+        label: 'Export',
+        render: (user) => (
+          <Button
+            size="sm"
+            variant="light"
+            isIconOnly
+            aria-label={`Download statement for ${user.name}`}
+            isLoading={downloadingId === user.id}
+            onPress={() => handleDownloadStatement(user.id)}
+          >
+            <Download size={16} />
+          </Button>
+        ),
+      },
     ],
-    [tenantPath]
+    [tenantPath, downloadingId, handleDownloadStatement]
   );
 
   return (

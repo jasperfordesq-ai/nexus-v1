@@ -76,6 +76,9 @@ import type {
   FederationWhitelistEntry,
   FederationPartnership,
   FederationStatusOverview,
+  TenantFederationFeatures,
+  VettingRecord,
+  VettingStats,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -158,6 +161,18 @@ export const adminUsers = {
 
   impersonate: (userId: number) =>
     api.post(`/v2/admin/users/${userId}/impersonate`),
+
+  importUsers: (file: File, options?: { default_role?: string }) => {
+    const formData = new FormData();
+    formData.append('csv_file', file);
+    if (options?.default_role) formData.append('default_role', options.default_role);
+    return api.upload<{ imported: number; skipped: number; errors: string[]; total_rows: number }>('/v2/admin/users/import', formData);
+  },
+
+  downloadImportTemplate: () => {
+    const baseUrl = import.meta.env.VITE_API_BASE || '/api';
+    window.open(`${baseUrl}/v2/admin/users/import/template`, '_blank');
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -337,6 +352,51 @@ export const adminTimebanking = {
     api.get<PaginatedResponse<UserFinancialReport>>(
       `/v2/admin/timebanking/user-report${buildQuery(params)}`
     ),
+
+  getUserStatement: (params: { user_id: number; start_date?: string; end_date?: string }) =>
+    api.get<{
+      user: { id: number; first_name: string; last_name: string; email: string; balance: number };
+      period: { start: string; end: string };
+      summary: {
+        total_transactions: number;
+        hours_earned: number;
+        hours_spent: number;
+        net_change: number;
+        current_balance: number;
+      };
+      transactions: Array<Record<string, unknown>>;
+    }>(`/v2/admin/timebanking/user-statement${buildQuery(params)}`),
+
+  downloadStatementCsv: async (userId: number, startDate?: string, endDate?: string) => {
+    const { tokenManager } = await import('@/lib/api');
+    const apiBase = import.meta.env.VITE_API_BASE || '/api';
+    const params = buildQuery({
+      user_id: userId,
+      format: 'csv',
+      start_date: startDate,
+      end_date: endDate,
+    });
+    const headers: Record<string, string> = { Accept: 'text/csv' };
+    const token = tokenManager.getAccessToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const tenantId = tokenManager.getTenantId();
+    if (tenantId) headers['X-Tenant-ID'] = tenantId;
+
+    const response = await fetch(`${apiBase}/v2/admin/timebanking/user-statement${params}`, {
+      headers,
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Failed to download statement');
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `statement_${userId}_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -855,10 +915,64 @@ export const adminSuper = {
     api.post(`/v2/admin/super/federation/partnerships/${id}/terminate`, { reason }),
 
   getTenantFederationFeatures: (tenantId: number) =>
-    api.get(`/v2/admin/super/federation/tenant/${tenantId}/features`),
+    api.get<TenantFederationFeatures>(`/v2/admin/super/federation/tenant/${tenantId}/features`),
 
   updateTenantFederationFeature: (tenantId: number, feature: string, enabled: boolean) =>
     api.put(`/v2/admin/super/federation/tenant/${tenantId}/features`, { feature, enabled }),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Community Analytics
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminCommunityAnalytics = {
+  getData: () => api.get('/v2/admin/community-analytics'),
+  exportCsv: () => api.get('/v2/admin/community-analytics/export'),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Impact Reporting
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminImpactReport = {
+  getData: (months = 12) => api.get(`/v2/admin/impact-report?months=${months}`),
+  updateConfig: (data: { hourly_value?: number; social_multiplier?: number }) =>
+    api.put('/v2/admin/impact-report/config', data),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vetting Records
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminVetting = {
+  list: (params: { status?: string; vetting_type?: string; search?: string; page?: number; expiring_soon?: boolean } = {}) =>
+    api.get<PaginatedResponse<VettingRecord>>(
+      `/v2/admin/vetting${buildQuery(params)}`
+    ),
+
+  stats: () =>
+    api.get<VettingStats>('/v2/admin/vetting/stats'),
+
+  show: (id: number) =>
+    api.get<VettingRecord>(`/v2/admin/vetting/${id}`),
+
+  create: (data: Partial<VettingRecord>) =>
+    api.post<{ id: number }>('/v2/admin/vetting', data),
+
+  update: (id: number, data: Partial<VettingRecord>) =>
+    api.put<{ success: boolean }>(`/v2/admin/vetting/${id}`, data),
+
+  verify: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/vetting/${id}/verify`),
+
+  reject: (id: number, reason: string) =>
+    api.post<{ success: boolean }>(`/v2/admin/vetting/${id}/reject`, { reason }),
+
+  destroy: (id: number) =>
+    api.delete<{ success: boolean }>(`/v2/admin/vetting/${id}`),
+
+  getUserRecords: (userId: number) =>
+    api.get<VettingRecord[]>(`/v2/admin/vetting/user/${userId}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
