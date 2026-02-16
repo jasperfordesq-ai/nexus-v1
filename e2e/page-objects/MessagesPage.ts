@@ -36,10 +36,16 @@ export class MessagesPage extends BasePage {
    */
   async waitForLoad(): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await this.page.locator('[class*="glass"], article, text=No messages').first().waitFor({
-      state: 'visible',
+    await this.page.waitForLoadState('networkidle').catch(() => {});
+
+    // Wait for React to hydrate - new message button should always be present
+    await this.newMessageButton.waitFor({
+      state: 'attached',
       timeout: 15000
     }).catch(() => {});
+
+    // Give React time to render
+    await this.page.waitForTimeout(500);
   }
 
   /**
