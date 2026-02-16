@@ -623,6 +623,45 @@ HTML;
      * @param string $type Notification type (e.g., 'exchange_request_received')
      * @param array $data Notification data
      */
+    /**
+     * Send credit received email to a user (no in-app notification — that's handled by Transaction::create)
+     */
+    public static function sendCreditEmail(int $recipientUserId, string $senderName, float $amount, string $description = ''): void
+    {
+        try {
+            $user = Database::query(
+                "SELECT email, name, first_name FROM users WHERE id = ?",
+                [$recipientUserId]
+            )->fetch();
+
+            if (!$user || empty($user['email'])) {
+                return;
+            }
+
+            $recipientName = $user['first_name'] ?? $user['name'] ?? 'there';
+            $tenantName = \Nexus\Core\TenantContext::getSetting('site_name', 'Project NEXUS');
+            $baseUrl = \Nexus\Core\TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
+            $basePath = \Nexus\Core\TenantContext::getBasePath();
+            $walletUrl = $baseUrl . $basePath . '/wallet';
+
+            $hourLabel = $amount == 1 ? 'hour' : 'hours';
+            $subject = htmlspecialchars($senderName) . " sent you {$amount} {$hourLabel} on {$tenantName}";
+            $emailBody = self::buildCreditReceivedEmail(
+                htmlspecialchars($recipientName),
+                htmlspecialchars($senderName),
+                $amount,
+                htmlspecialchars($description),
+                $walletUrl,
+                htmlspecialchars($tenantName)
+            );
+
+            $mailer = new \Nexus\Core\Mailer();
+            $mailer->send($user['email'], $subject, $emailBody);
+        } catch (\Exception $e) {
+            error_log("NotificationDispatcher::sendCreditEmail failed: " . $e->getMessage());
+        }
+    }
+
     public static function send(int $userId, string $type, array $data = []): void
     {
         // Build content and link based on notification type
@@ -700,6 +739,10 @@ HTML;
                 $level = $data['risk_level'] ?? 'unknown';
                 $title = $data['listing_title'] ?? 'Listing';
                 return "⚠️ Listing '{$title}' tagged as {$level} risk";
+            case 'credit_received':
+                $senderName = $data['sender_name'] ?? 'Someone';
+                $amount = $data['amount'] ?? 0;
+                return "💰 {$senderName} sent you {$amount} hour" . ($amount != 1 ? 's' : '');
             default:
                 return "Notification: {$type}";
         }
@@ -729,6 +772,8 @@ HTML;
                 return "/exchanges";
             case 'listing_risk_tagged':
                 return "/admin-legacy/broker-controls/risk-tags";
+            case 'credit_received':
+                return "/wallet";
             default:
                 return "/notifications";
         }
@@ -739,8 +784,8 @@ HTML;
      */
     private static function sendExchangeEmailImmediately(int $userId, string $type, array $data, string $content, string $link): void
     {
-        // Only send for exchange notifications
-        if (strpos($type, 'exchange_') !== 0) {
+        // Only send for exchange and credit notifications
+        if (strpos($type, 'exchange_') !== 0 && $type !== 'credit_received') {
             return;
         }
 
@@ -760,18 +805,26 @@ HTML;
             $basePath = \Nexus\Core\TenantContext::getBasePath();
             $fullUrl = $baseUrl . $basePath . $link;
 
-            // Get exchange details for richer email content
-            $exchangeDetails = self::getExchangeDetailsForEmail($data['exchange_id'] ?? 0);
-
-            // Build the rich HTML email
-            $emailBody = self::buildRichExchangeEmail($type, $data, $user, $exchangeDetails, $fullUrl);
-
-            // Get subject line
-            $subject = self::getExchangeEmailSubject($type, $exchangeDetails);
-
-            // Send immediately via Mailer
             $mailer = new \Nexus\Core\Mailer();
-            $mailer->send($user['email'], $subject, $emailBody);
+
+            if ($type === 'credit_received') {
+                // Simple credit received email
+                $senderName = htmlspecialchars($data['sender_name'] ?? 'A member');
+                $amount = (float)($data['amount'] ?? 0);
+                $description = htmlspecialchars($data['description'] ?? '');
+                $recipientName = htmlspecialchars($user['first_name'] ?? $user['name'] ?? 'there');
+                $tenantName = htmlspecialchars(\Nexus\Core\TenantContext::getSetting('site_name', 'Project NEXUS'));
+
+                $subject = "{$senderName} sent you {$amount} hour" . ($amount != 1 ? 's' : '') . " on {$tenantName}";
+                $emailBody = self::buildCreditReceivedEmail($recipientName, $senderName, $amount, $description, $fullUrl, $tenantName);
+                $mailer->send($user['email'], $subject, $emailBody);
+            } else {
+                // Exchange notification email
+                $exchangeDetails = self::getExchangeDetailsForEmail($data['exchange_id'] ?? 0);
+                $emailBody = self::buildRichExchangeEmail($type, $data, $user, $exchangeDetails, $fullUrl);
+                $subject = self::getExchangeEmailSubject($type, $exchangeDetails);
+                $mailer->send($user['email'], $subject, $emailBody);
+            }
 
         } catch (\Exception $e) {
             error_log("NotificationDispatcher: Failed to send exchange email - " . $e->getMessage());
@@ -809,6 +862,43 @@ HTML;
     /**
      * Get email subject for exchange notifications
      */
+    /**
+     * Build HTML email for credit received notification
+     */
+    private static function buildCreditReceivedEmail(string $recipientName, string $senderName, float $amount, string $description, string $walletUrl, string $tenantName): string
+    {
+        $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
+        $descriptionHtml = $description ? "<p style=\"margin:12px 0 0;padding:12px;background:#f0f0f0;border-radius:8px;font-style:italic;color:#555;\">\"{$description}\"</p>" : '';
+
+        return <<<HTML
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f4f4f5;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:24px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  <tr><td style="background:linear-gradient(135deg,#10b981,#059669);padding:32px;text-align:center;">
+    <h1 style="margin:0;color:#fff;font-size:24px;">💰 You received time credits!</h1>
+  </td></tr>
+  <tr><td style="padding:32px;">
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;">Hi {$recipientName},</p>
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;">
+      <strong>{$senderName}</strong> has sent you <strong>{$amountDisplay}</strong> on {$tenantName}.
+    </p>
+    {$descriptionHtml}
+    <div style="text-align:center;margin:28px 0;">
+      <a href="{$walletUrl}" style="display:inline-block;padding:14px 32px;background:#10b981;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;">View Your Wallet</a>
+    </div>
+  </td></tr>
+  <tr><td style="padding:16px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;text-align:center;">
+    <p style="margin:0;font-size:12px;color:#9ca3af;">{$tenantName} — Time credits that strengthen communities</p>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>
+HTML;
+    }
+
     private static function getExchangeEmailSubject(string $type, array $details): string
     {
         $listingTitle = $details['listing_title'] ?? 'your listing';

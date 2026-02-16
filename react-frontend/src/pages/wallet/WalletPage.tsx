@@ -44,7 +44,9 @@ export function WalletPage() {
   const toast = useToast();
 
   // Check for ?to=userId URL param to auto-open transfer modal
-  const prefilledRecipientId = searchParams.get('to') ? parseInt(searchParams.get('to')!, 10) : null;
+  const [savedRecipientId, setSavedRecipientId] = useState<number | null>(
+    searchParams.get('to') ? parseInt(searchParams.get('to')!, 10) : null
+  );
 
   const loadWalletData = useCallback(async () => {
     try {
@@ -80,14 +82,14 @@ export function WalletPage() {
 
   // Auto-open transfer modal when ?to=userId is present and data is loaded
   useEffect(() => {
-    if (prefilledRecipientId && !isLoading && balance && !isTransferModalOpen) {
+    if (savedRecipientId && !isLoading && balance && !isTransferModalOpen) {
       setIsTransferModalOpen(true);
       // Clear the URL param so it doesn't reopen on subsequent renders
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('to');
       setSearchParams(newParams, { replace: true });
     }
-  }, [prefilledRecipientId, isLoading, balance]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [savedRecipientId, isLoading, balance]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load more transactions (pagination)
   const loadMoreTransactions = useCallback(async () => {
@@ -409,10 +411,10 @@ export function WalletPage() {
       {/* Transfer Modal */}
       <TransferModal
         isOpen={isTransferModalOpen}
-        onClose={() => setIsTransferModalOpen(false)}
+        onClose={() => { setIsTransferModalOpen(false); setSavedRecipientId(null); }}
         currentBalance={balance?.balance ?? 0}
         onTransferComplete={handleTransferComplete}
-        initialRecipientId={prefilledRecipientId}
+        initialRecipientId={savedRecipientId}
       />
     </motion.div>
   );

@@ -448,12 +448,12 @@ export function ProfilePage() {
                           : 'Connect'}
                       </Button>
                     )}
-                    {/* Send credits shortcut when connected */}
-                    {connectionStatus === 'connected' && (
+                    {/* Send credits */}
+                    {isAuthenticated && (
                       <Link to={tenantPath(`/wallet?to=${profile.id}`)}>
                         <Button
                           variant="flat"
-                          className="bg-theme-elevated text-theme-primary"
+                          className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                           startContent={<ArrowUpRight className="w-4 h-4" aria-hidden="true" />}
                         >
                           Send Credits

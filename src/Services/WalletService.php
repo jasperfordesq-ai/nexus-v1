@@ -201,6 +201,14 @@ class WalletService
         try {
             $transactionId = Transaction::create($senderId, $receiverId, $amount, $description);
 
+            // Send email notification to recipient
+            try {
+                $senderName = $sender['name'] ?? trim(($sender['first_name'] ?? '') . ' ' . ($sender['last_name'] ?? ''));
+                NotificationDispatcher::sendCreditEmail($receiverId, $senderName, $amount, $description);
+            } catch (\Throwable $e) {
+                error_log("Credit email error: " . $e->getMessage());
+            }
+
             // Gamification
             try {
                 GamificationService::checkTransactionBadges($senderId);

@@ -38,6 +38,7 @@ export function TransferModal({
   onClose,
   currentBalance,
   onTransferComplete,
+  initialRecipientId,
 }: TransferModalProps) {
   // Form state
   const [formData, setFormData] = useState<TransferFormData>({
@@ -68,8 +69,32 @@ export function TransferModal({
       setSearchQuery('');
       setSearchResults([]);
       setError(null);
-      // Focus search input after animation
-      setTimeout(() => searchInputRef.current?.focus(), 100);
+
+      // Auto-fill recipient if initialRecipientId is provided
+      if (initialRecipientId) {
+        api.get<{ id: number; first_name: string; last_name: string; avatar_url?: string; username?: string }>(`/v2/users/${initialRecipientId}`)
+          .then((res) => {
+            if (res.success && res.data) {
+              const u = res.data;
+              setFormData((prev) => ({
+                ...prev,
+                recipient: {
+                  id: u.id,
+                  first_name: u.first_name,
+                  last_name: u.last_name,
+                  avatar: u.avatar_url || (u as Record<string, unknown>).avatar as string || null,
+                  username: u.username || null,
+                } as WalletUserSearchResult,
+              }));
+            }
+          })
+          .catch(() => {
+            // Silently fail — user can still search manually
+          });
+      } else {
+        // Focus search input after animation (only when no pre-fill)
+        setTimeout(() => searchInputRef.current?.focus(), 100);
+      }
     }
 
     // Cleanup timeout on unmount
@@ -78,7 +103,7 @@ export function TransferModal({
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [isOpen]);
+  }, [isOpen, initialRecipientId]);
 
   // Debounced user search
   const searchUsers = useCallback(async (query: string) => {
@@ -319,7 +344,7 @@ export function TransferModal({
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="absolute top-full left-0 right-0 mt-2 bg-theme-card border border-theme-default rounded-lg shadow-xl overflow-hidden z-10 max-h-60 overflow-y-auto"
+                            className="absolute top-full left-0 right-0 mt-2 bg-content1 border border-theme-default rounded-lg shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto"
                             role="listbox"
                             aria-label="Search results"
                           >
@@ -354,7 +379,7 @@ export function TransferModal({
 
                       {/* No results message */}
                       {showResults && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-theme-card border border-theme-default rounded-lg p-4 text-center">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-content1 border border-theme-default rounded-lg p-4 text-center z-50">
                           <User className="w-8 h-8 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
                           <p className="text-theme-muted text-sm">No members found</p>
                         </div>
