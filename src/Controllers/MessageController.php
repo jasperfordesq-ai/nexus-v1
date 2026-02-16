@@ -104,7 +104,7 @@ class MessageController
             if (!empty($_GET['ajax'])) {
                 $baseDir = __DIR__ . '/../../views/';
                 // Use layout-specific message partial
-                $layout = \Nexus\Services\LayoutHelper::get();
+                $layout = 'modern';
                 $partialPath = $baseDir . $layout . '/messages/messages_thread_partial.php';
                 if (file_exists($partialPath)) {
                     require $partialPath;

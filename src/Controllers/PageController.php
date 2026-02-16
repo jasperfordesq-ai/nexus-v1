@@ -354,7 +354,7 @@ class PageController
         $viewPath = 'pages/' . $slug;
 
         // Check if static view exists before rendering
-        $layout = \Nexus\Services\LayoutHelper::get();
+        $layout = 'modern';
         $viewFile = __DIR__ . '/../../views/' . $layout . '/' . $viewPath . '.php';
         $fallbackViewFile = __DIR__ . '/../../views/' . $viewPath . '.php';
 

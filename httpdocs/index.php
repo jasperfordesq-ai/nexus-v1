@@ -333,110 +333,12 @@ if (!$isDownloadRequest && !$isStatelessApiRequest && session_status() === PHP_S
     $_SESSION['_platform'] = $isMobileDevice ? 'mobile' : 'web';
     $_SESSION['_session_lifetime'] = $sessionLifetime;
 
-    // LAYOUT INITIALIZATION - FIXED RACE CONDITIONS
-    // Uses ONLY 'nexus_active_layout' as the single source of truth (session key)
-    // The LayoutHelper class handles DB persistence for logged-in users
-    //
-    // Priority order:
-    // 1. If nexus_active_layout is set in session, use it (already validated)
-    // 2. For logged-in users, LayoutHelper will fetch from DB
-    // 3. Default to 'modern' for new/anonymous sessions
-    //
-    // CLEANUP: Migrate any legacy 'nexus_layout' key to the unified key
-    if (isset($_SESSION['nexus_layout']) && !isset($_SESSION['nexus_active_layout'])) {
-        // Migrate legacy key to unified key
-        $_SESSION['nexus_active_layout'] = $_SESSION['nexus_layout'];
-    }
-    // Always remove the legacy key to prevent dual-key conflicts
+    // Layout is always 'modern' (legacy CivicOne theme removed)
+    $_SESSION['nexus_active_layout'] = 'modern';
     unset($_SESSION['nexus_layout']);
-
-    // Set default layout ONLY if neither key was set (truly new session)
-    if (!isset($_SESSION['nexus_active_layout'])) {
-        $_SESSION['nexus_active_layout'] = 'modern';
-    }
 }
 
-// --- LAYOUT QUERY PARAMETER PROCESSING ---
-// Process ?layout= and ?preview_layout= query parameters
-// This allows URL-based layout switching (e.g., ?layout=civicone)
-//
-// FIXED: Uses ONLY 'nexus_active_layout' as the unified session key
-// For logged-in users with ?layout=, we save to DB after autoloader is ready
-if (session_status() !== PHP_SESSION_NONE) {
-    $shouldRedirect = false;
-
-    // Handle reset to default (Modern) - use ?reset_layout=1
-    if (isset($_GET['reset_layout']) && $_GET['reset_layout'] === '1') {
-        $_SESSION['nexus_active_layout'] = 'modern';
-        unset($_SESSION['is_preview_mode']);
-        // Flag to save to DB after autoloader is ready
-        if (!empty($_SESSION['user_id'])) {
-            $_SESSION['_pending_layout_save'] = 'modern';
-        }
-        $shouldRedirect = true;
-    }
-    // Handle preview layout (temporary, doesn't save to DB)
-    elseif (isset($_GET['preview_layout'])) {
-        $previewLayout = preg_replace('/[^a-z-]/', '', strtolower($_GET['preview_layout']));
-        if (in_array($previewLayout, ['modern', 'civicone'], true)) {
-            $_SESSION['nexus_active_layout'] = $previewLayout;
-            $_SESSION['is_preview_mode'] = true;
-            // Preview mode does NOT persist to DB
-            $shouldRedirect = true;
-        }
-    }
-    // Handle permanent layout switch via URL parameter
-    elseif (isset($_GET['layout'])) {
-        $requestedLayout = preg_replace('/[^a-z-]/', '', strtolower($_GET['layout']));
-        if (in_array($requestedLayout, ['modern', 'civicone'], true)) {
-            // Only switch if different from current
-            $currentLayout = $_SESSION['nexus_active_layout'] ?? 'modern';
-            if ($requestedLayout !== $currentLayout) {
-                $_SESSION['nexus_active_layout'] = $requestedLayout;
-                unset($_SESSION['is_preview_mode']);
-
-                // Flag to save to DB after autoloader is ready (for logged-in users)
-                if (!empty($_SESSION['user_id'])) {
-                    $_SESSION['_pending_layout_save'] = $requestedLayout;
-                }
-                $shouldRedirect = true;
-            }
-        }
-    }
-
-    // Redirect to clean URL after layout switch to prevent re-processing and ensure clean CSS load
-    if ($shouldRedirect) {
-        // Build clean URL without layout parameters
-        $cleanUrl = strtok($_SERVER['REQUEST_URI'], '?');
-        $queryParams = $_GET;
-
-        // Remove ALL layout-related parameters to prevent redirect loops
-        unset($queryParams['layout']);
-        unset($queryParams['preview_layout']);
-        unset($queryParams['reset_layout']);
-        unset($queryParams['_refresh']); // Remove old refresh params
-
-        // Build clean query string
-        if (!empty($queryParams)) {
-            $cleanUrl .= '?' . http_build_query($queryParams);
-        }
-
-        // Set cache control headers to prevent browser caching during layout switch
-        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-        header('Cache-Control: post-check=0, pre-check=0', false);
-        header('Pragma: no-cache');
-
-        header('Location: ' . $cleanUrl);
-        exit;
-    }
-
-    // Clean up refresh parameter from URL after layout switch (client-side via pushState)
-    if (isset($_GET['_refresh'])) {
-        // This will be cleaned up by JavaScript in the footer
-        $_SESSION['_cleanup_refresh_param'] = true;
-    }
-}
-// -----------------------------
+// Layout switching removed (only modern layout exists)
 
 // DEBUG: Add ?debug_tenant=1 to any URL to see tenant resolution info
 // Security: Only allow in development environment and for super admins
@@ -457,20 +359,6 @@ if (isset($_GET['debug_tenant'])) {
 }
 
 TenantContext::resolve();
-
-// LAYOUT PERSISTENCE: Save pending layout changes to database
-// This handles ?layout= URL parameter saves for logged-in users
-// The flag was set before autoloader was ready, now we can use LayoutHelper
-if (!empty($_SESSION['_pending_layout_save']) && !empty($_SESSION['user_id'])) {
-    try {
-        $pendingLayout = $_SESSION['_pending_layout_save'];
-        \Nexus\Services\LayoutHelper::saveToDatabase((int)$_SESSION['user_id'], $pendingLayout);
-        unset($_SESSION['_pending_layout_save']);
-    } catch (\Throwable $e) {
-        error_log("Failed to save pending layout to DB: " . $e->getMessage());
-        unset($_SESSION['_pending_layout_save']);
-    }
-}
 
 // SEO REDIRECT MIDDLEWARE: Check for 301 redirects (with loop prevention)
 \Nexus\Middleware\RedirectMiddleware::handle();

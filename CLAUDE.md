@@ -50,8 +50,7 @@ This project uses **Claude Opus 4.6 Agent Teams** (swarm mode) for large, multi-
 | **PHP API** | http://localhost:8090 |
 | **Sales Site** | http://localhost:3001 |
 | **React Admin** | http://localhost:5173/admin |
-| **Legacy PHP Admin** | http://localhost:8090/admin-legacy/ |
-| **Legacy PHP Views** | http://localhost:8090/{tenant}/ |
+| **PHP Admin (Legacy)** | http://localhost:8090/admin-legacy/ |
 | **phpMyAdmin** | http://localhost:8091 (with `--profile tools`) |
 
 ```bash
@@ -67,21 +66,20 @@ See [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) for full setup guide.
 
 ## MANDATORY RULES
 
-### 🔴 REACT FRONTEND IS THE PRIMARY UI - CRITICAL
+### 🔴 REACT FRONTEND IS THE ONLY UI - CRITICAL
 
-**The React frontend (`react-frontend/`) is the ONLY active frontend.** The legacy PHP views (`views/modern/`, `views/civicone/`) are being decommissioned and kept for reference only.
+**The React frontend (`react-frontend/`) is the ONLY frontend.** The legacy PHP views (modern theme, civicone theme) have been deleted. Only PHP admin views remain at `views/admin/` and `views/modern/admin/`.
 
 **Rules:**
 
-- **ALL new UI work** goes in the React frontend — never create new PHP views
+- **ALL UI work** goes in the React frontend
 - **UI stack**: React 18 + TypeScript + **HeroUI** (component library) + **Tailwind CSS 4** + Framer Motion
 - **Icons**: Lucide React (`lucide-react`)
 - Use HeroUI components (`@heroui/react`) as the primary building blocks — buttons, inputs, modals, cards, tables, dropdowns, etc.
 - Use Tailwind CSS utility classes for layout, spacing, and custom styling
 - Use CSS tokens in `react-frontend/src/styles/tokens.css` for light/dark theme variables
 - **Do NOT** create custom CSS component files — use Tailwind utilities and HeroUI theming instead
-- **Do NOT** build new pages or features in the legacy PHP frontend
-- Legacy PHP views may still be referenced for business logic understanding, but should not be modified for UI purposes
+- **Do NOT** create PHP views — the only PHP views are for the admin panels (`/admin-legacy/` and `/super-admin/`)
 
 ### React Frontend Styling Rules
 
@@ -107,9 +105,7 @@ import { Button, Card, Input } from "@heroui/react";
 // (use Tailwind classes or tokens.css instead)
 ```
 
-### Theme System - CRITICAL
-
-**React frontend (light/dark mode) — PRIMARY:**
+### Theme System
 
 - `ThemeContext` manages `light`, `dark`, or `system` preference
 - CSS tokens in `react-frontend/src/styles/tokens.css`
@@ -117,23 +113,12 @@ import { Button, Card, Input } from "@heroui/react";
 - Persists to `users.preferred_theme` via `PUT /api/v2/users/me/theme`
 - Toggle in Navbar (sun/moon icon)
 
-<details>
-<summary>Legacy PHP themes (reference only — being decommissioned)</summary>
-
-- Theme determined by **user preference** (not tenant or URL)
-- Stored in `users.preferred_layout` column and `nexus_active_layout` session key
-- Default theme is `modern`, alternative is `civicone`
-- CivicOne follows GOV.UK Design System (WCAG 2.1 AA)
-
-</details>
-
 ### General Principles
 
 - **Do NOT default to the quickest solution**
 - Prioritize maintainability and organization over speed
 - Follow existing patterns in the codebase
 - Ask if unsure about where code should live
-- **Default to React frontend** for any UI work — legacy PHP views are reference only
 
 ---
 
@@ -171,7 +156,7 @@ Project NEXUS is an enterprise multi-tenant community platform with many modules
 - **Federation**: Multi-community network with partnerships
 - **PWA & Mobile**: Service worker, Capacitor Android app
 - **Notifications**: In-app, email digests, and push notifications
-- **React Frontend**: Primary UI — React 18 + HeroUI + Tailwind CSS 4 SPA at `react-frontend/`
+- **React Frontend**: React 18 + HeroUI + Tailwind CSS 4 SPA at `react-frontend/`
 - **Real-Time**: Pusher WebSockets for live updates, FCM for mobile push
 - **Light/Dark Theme**: React frontend supports light/dark/system modes via `ThemeContext`, stored in `users.preferred_theme`, API: `PUT /api/v2/users/me/theme`
 
@@ -200,12 +185,12 @@ project-nexus/
 │   ├── Models/                   # Data models (59+ files)
 │   ├── Services/                 # Business logic (100+ services)
 │   └── helpers.php               # Global functions
-├── views/                        # PHP templates (LEGACY - reference only, being decommissioned)
-│   ├── civicone/                 # GOV.UK-based theme (WCAG 2.1 AA)
-│   ├── modern/                   # Modern responsive theme
-│   └── admin/                    # Legacy admin views (served under /admin-legacy/)
+├── views/                        # PHP admin templates only
+│   ├── admin/                    # Admin view dispatchers (served under /admin-legacy/)
+│   ├── modern/admin/             # Admin panel views (150+ files)
+│   └── super-admin/              # Super admin panel views
 ├── httpdocs/                     # Web root
-│   ├── assets/                   # CSS, JS, images
+│   ├── assets/                   # Admin CSS/JS, images
 │   ├── index.php                 # Main entry point
 │   ├── routes.php                # Route definitions
 │   └── health.php                # Docker health check
@@ -411,78 +396,20 @@ $token = Csrf::token();
 Csrf::verify($_POST['csrf_token'] ?? '');
 ```
 
-### View Rendering (Legacy — reference only)
+### Admin View Rendering (PHP)
 
-> **Note:** New UI work goes in the React frontend, not PHP views. This section is kept for reference when maintaining legacy code.
-
-<details>
-<summary>Legacy PHP view patterns (click to expand)</summary>
+Admin panels use PHP templates in `views/modern/admin/` and `views/super-admin/`:
 
 ```php
-// In controller
-$data = ['title' => 'Page Title', 'items' => $items];
+// Admin controller renders views from views/modern/admin/
+$data = ['title' => 'Admin Page', 'items' => $items];
 extract($data);
-require __DIR__ . '/../../views/' . layout() . '/page.php';
-
-// In view - use layout helper
-<?php if (is_civicone()): ?>
-    <!-- GOV.UK Design System markup -->
-<?php else: ?>
-    <!-- Modern theme markup -->
-<?php endif; ?>
-
-// Image optimization
-<?= webp_image($imagePath, 'Alt text', 'css-class') ?>
-<?= webp_avatar($user['avatar'], $user['name'], 40) ?>
+require __DIR__ . '/../../views/modern/admin/page.php';
 ```
 
-</details>
-
-## JavaScript Conventions (Legacy PHP files)
-
-> **Note:** These rules apply to legacy JS in `/httpdocs/assets/js/`. For React frontend, use TypeScript and follow React/HeroUI patterns.
-
-<details>
-<summary>Legacy JS rules (click to expand)</summary>
-
-### NO Inline Styles
-
-ESLint enforces class-based styling:
-
-```javascript
-// WRONG - will fail lint
-element.style.display = 'none';
-element.style.padding = '10px';
-
-// CORRECT - use CSS classes
-element.classList.add('hidden');
-element.classList.remove('hidden');
-element.classList.toggle('active');
-```
-
-### General Rules
-
-```javascript
-// Use const/let, never var
-const items = [];
-let count = 0;
-
-// Console usage - warn/error only
-console.warn('Warning message');
-console.error('Error message');
-// console.log() triggers lint warning
-
-// Unused variables - prefix with underscore
-function handler(_event) {
-    // event not used but needed for signature
-}
-```
-
-</details>
+Admin CSS lives in `httpdocs/assets/css/admin-*.css` and admin JS in `httpdocs/assets/js/admin-*.js`.
 
 ## CSS Architecture
-
-### React Frontend (Primary)
 
 The React frontend uses **Tailwind CSS 4** with the **HeroUI theme plugin**:
 
@@ -501,54 +428,6 @@ The React frontend uses **Tailwind CSS 4** with the **HeroUI theme plugin**:
 // Use CSS tokens for theme-aware custom values
 <div className="bg-[var(--color-surface)] text-[var(--color-text)]">
 ```
-
-### Legacy PHP CSS (reference only — being decommissioned)
-
-<details>
-<summary>Legacy CSS architecture (click to expand)</summary>
-
-**Two Themes:**
-
-1. **CivicOne** (`views/civicone/`, `httpdocs/assets/css/civicone/`) — GOV.UK Design System, WCAG 2.1 AA
-2. **Modern** (`views/modern/`, `httpdocs/assets/css/modern/`) — Contemporary responsive design
-
-**File Organization:**
-
-| Type | Location |
-|------|----------|
-| CSS | `/httpdocs/assets/css/` |
-| JS | `/httpdocs/assets/js/` |
-| PHP Views | `/views/{theme}/` |
-| Partials | `/views/{theme}/partials/` |
-| Layouts | `/views/layouts/{theme}/` |
-
-**Legacy CSS Design Tokens** (for PHP views, not React):
-
-```css
-color: var(--color-text);
-background: var(--color-background);
-padding: var(--space-4);
-font-size: var(--font-size-body);
-```
-
-See `/httpdocs/assets/css/design-tokens.css` for full palette.
-
-**Legacy Build Commands:**
-
-```bash
-npm run build:css        # Build all CSS (includes validation)
-npm run build:css:purge  # Run PurgeCSS
-npm run minify:css       # Minify CSS files (includes validation)
-npm run lint:css         # Lint CSS
-npm run lint:js          # Lint JavaScript
-npm run css:discover     # Find untracked CSS files
-npm run css:auto-config  # Auto-add CSS to purgecss config
-npm run validate:design-tokens  # Check design tokens aren't corrupted
-```
-
-**Design Tokens Protection:** Design token files are EXCLUDED from PurgeCSS. NEVER add `design-tokens.css` back to `purgecss.config.js`.
-
-</details>
 
 ## Testing
 
@@ -622,8 +501,7 @@ docker compose restart app
 | React Frontend | http://localhost:5173 | Primary UI (HeroUI + Tailwind) |
 | React Admin | http://localhost:5173/admin | React admin panel (primary) |
 | PHP API | http://localhost:8090 | Backend API |
-| Legacy PHP Admin | http://localhost:8090/admin-legacy/ | Legacy admin (being decommissioned) |
-| Legacy PHP | http://localhost:8090/{tenant}/ | Legacy views (reference only) |
+| PHP Admin (Legacy) | http://localhost:8090/admin-legacy/ | PHP admin panel |
 | phpMyAdmin | http://localhost:8091 | DB admin (needs `--profile tools`) |
 
 ### Database Access
@@ -639,17 +517,7 @@ docker compose --profile tools up -d
 
 ### Theme Testing
 
-**React frontend (primary):** Toggle light/dark mode via the sun/moon icon in the Navbar, or set `theme` in browser DevTools to test `light`, `dark`, and `system` preferences.
-
-<details>
-<summary>Legacy PHP theme testing (reference only)</summary>
-
-To test both legacy themes:
-
-1. Change your user's `preferred_layout` in the database, OR
-2. Switch via the UI theme toggle
-
-</details>
+Toggle light/dark mode via the sun/moon icon in the Navbar, or set `theme` in browser DevTools to test `light`, `dark`, and `system` preferences.
 
 ---
 
@@ -730,31 +598,6 @@ Protected directories on Azure: `/opt/nexus-backend/`, `/opt/nexus-modern-fronte
 
 See [docs/new-production-server.md](docs/new-production-server.md) for full Azure documentation.
 
----
-
-### ⚠️ Legacy Server (GCP) - DISCONTINUED - REFERENCE ONLY
-
-> **DO NOT DEPLOY TO THIS SERVER.** The GCP server at `35.205.239.67` is discontinued.
-> All deployments go to Azure. This section is kept for historical reference only.
-
-<details>
-<summary>Legacy GCP details (click to expand - for reference only)</summary>
-
-| Item | Value |
-|------|-------|
-| **Host** | `jasper@35.205.239.67` |
-| **SSH Key** | `~/.ssh/id_ed25519` |
-| **Path** | `/var/www/vhosts/project-nexus.ie` |
-| **Method** | rsync/SCP (no Docker) |
-
-Legacy deploy commands (DO NOT USE):
-- `npm run deploy:preview`
-- `npm run deploy`
-- `npm run deploy:changed`
-- `npm run deploy:full`
-
-</details>
-
 ## Database Migrations
 
 ### Migration Files
@@ -783,9 +626,9 @@ CREATE INDEX idx_users_email ON users(email);
 php scripts/safe_migrate.php
 ```
 
-## React Frontend (Primary UI)
+## React Frontend
 
-The React frontend is in `react-frontend/`. It's the **primary and only active UI**, built with:
+The React frontend is in `react-frontend/`. It's the **only UI**, built with:
 
 - **Vite** — build tool and dev server
 - **React 18** + **TypeScript** — UI framework
@@ -899,11 +742,11 @@ Admin UI: `/admin/tenant-features` (React admin) — toggle switches for all fea
 | Route Prefix | Purpose | Stack |
 |--------------|---------|-------|
 | `/admin/*` | React admin panel (primary) | React 18 + HeroUI + Tailwind CSS 4 |
-| `/admin-legacy/*` | Legacy PHP admin (being decommissioned) | PHP controllers + `views/admin/` |
+| `/admin-legacy/*` | PHP admin panel | PHP controllers + `views/admin/` + `views/modern/admin/` |
 | `/api/v2/admin/*` | Admin API endpoints (used by React admin) | PHP API controllers |
-| `/super-admin/*` | Super admin PHP views | PHP controllers (unchanged) |
+| `/super-admin/*` | Super admin PHP views | PHP controllers + `views/super-admin/` |
 
-The React admin panel at `/admin` is the primary admin interface. Legacy PHP admin routes have been moved to `/admin-legacy/` and are being decommissioned. `admin-legacy` is a reserved path in `tenant-routing.ts` to prevent slug collision.
+The React admin panel at `/admin` is the primary admin interface. PHP admin views are served at `/admin-legacy/` (view dispatchers in `views/admin/`, actual views in `views/modern/admin/`). `admin-legacy` is a reserved path in `tenant-routing.ts` to prevent slug collision.
 
 ### React Pages
 
@@ -1221,7 +1064,7 @@ test: Adding tests
 chore: Maintenance tasks
 
 Example:
-feat(civicone): Add GOV.UK compliant form validation
+feat(wallet): Add time credit transfer confirmation modal
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
@@ -1242,10 +1085,6 @@ composer install          # Install PHP dependencies
 vendor/bin/phpunit       # Run all tests
 php tests/run-api-tests.php  # API tests
 
-# Legacy CSS/JS (for legacy PHP views only)
-npm run build            # Full build (CSS, JS, images)
-npm run lint             # Run all linters
-
 # Database
 php scripts/backup_database.php    # Backup
 php scripts/safe_migrate.php       # Run migrations
@@ -1264,8 +1103,7 @@ scripts\deploy-production.bat quick    # Code sync + restart only
 2. **Container Down**: `ssh azureuser@20.224.171.253 "cd /opt/nexus-php && sudo docker compose ps"`
 3. **502 Bad Gateway**: Check if container is running and healthy
 4. **Database Error**: `sudo docker exec nexus-php-app env | grep DB_` to verify credentials
-5. **CSS Not Loading**: Run `npm run build:css`, clear browser cache
-6. **Session Issues**: Check Redis container is healthy
+5. **Session Issues**: Check Redis container is healthy
 
 ### Debug Commands (Azure)
 

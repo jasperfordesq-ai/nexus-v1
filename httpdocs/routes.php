@@ -86,22 +86,6 @@ $router->add('POST', '/super-admin/federation/update-tenant-feature', 'Nexus\Con
 // --------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------
-// DEV TOOLS - Component Library & Testing (Local Development Only)
-// --------------------------------------------------------------------------
-$router->add('GET', '/dev/shared-components', function () {
-    require __DIR__ . '/../views/modern/components/shared/_test.php';
-});
-$router->add('GET', '/dev/storybook', function () {
-    require __DIR__ . '/../views/modern/components/_storybook.php';
-});
-$router->add('GET', '/dev/component-showcase', function () {
-    require __DIR__ . '/../views/modern/components/_showcase.php';
-});
-$router->add('GET', '/dev/component-preview', function () {
-    require __DIR__ . '/../views/modern/components/_preview.php';
-});
-
-// --------------------------------------------------------------------------
 // FEDERATION API (External Partner Integration)
 // --------------------------------------------------------------------------
 $router->add('GET', '/api/v1/federation', 'Nexus\Controllers\Api\FederationApiController@index');
@@ -136,11 +120,6 @@ $router->add('POST', '/api/events/rsvp', 'Nexus\Controllers\Api\EventApiControll
 
 // Wallet
 $router->add('GET', '/api/wallet/balance', 'Nexus\Controllers\Api\WalletApiController@balance');
-
-// Layout Switching API (session-based, no URL pollution)
-$router->add('POST', '/api/layout-switch', 'Nexus\Controllers\Api\LayoutApiController@switch');
-$router->add('GET', '/api/layout-switch', 'Nexus\Controllers\Api\LayoutApiController@current');
-$router->add('GET', '/api/layout-debug', 'Nexus\Controllers\Api\LayoutApiController@debug');
 
 // Cookie Consent API (EU Compliance)
 $router->add('GET', '/api/cookie-consent', 'Nexus\Controllers\Api\CookieConsentController@show');
@@ -1094,15 +1073,8 @@ $router->add('GET', '/legal/version/{versionId}', 'Nexus\Controllers\LegalDocume
 $router->add('GET', '/sitemap.xml', 'Nexus\Controllers\SitemapController@index');
 $router->add('GET', '/robots.txt', 'Nexus\Controllers\RobotsController@index');
 
-$router->add('GET', '/mobile-download', function () {
-    \Nexus\Core\View::render('pages/mobile-download');
-});
-
 // Legal
 $router->add('GET', '/legal', 'Nexus\Controllers\PageController@legal');
-$router->add('GET', '/legal/volunteer-license', function () {
-    \Nexus\Core\View::render('legal/volunteer-license');
-});
 $router->add('GET', '/legal/cookies', 'Nexus\Controllers\CookiePolicyController@index');
 
 // Cookie Preferences
@@ -1496,27 +1468,7 @@ $router->add('POST', '/profile/{id}', 'Nexus\Controllers\ProfileController@show'
 $router->add('GET', '/profile', 'Nexus\Controllers\ProfileController@me');
 $router->add('POST', '/profile', 'Nexus\Controllers\ProfileController@me'); // Allow POST for wall
 
-// Connections
-$router->add('GET', '/connections', function () {
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    if (!isset($_SESSION['user_id'])) {
-        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-        exit;
-    }
-    $userId = $_SESSION['user_id'];
-    $pending = \Nexus\Models\Connection::getPending($userId);
-    $friends = \Nexus\Models\Connection::getFriends($userId);
-    require __DIR__ . '/../views/modern/connections/index.php';
-});
-$router->add('GET', '/connections/add', function () {
-    require __DIR__ . '/../views/connections/add.php';
-});
-$router->add('POST', '/connections/add', function () {
-    require __DIR__ . '/../views/connections/add.php';
-});
-$router->add('POST', '/connections/accept', function () {
-    require __DIR__ . '/../views/connections/accept.php';
-});
+// Connections (legacy PHP views removed — handled by React frontend and API)
 
 
 // --------------------------------------------------------------------------

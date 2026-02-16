@@ -7,7 +7,6 @@ use Nexus\Core\TenantContext;
 use Nexus\Models\Listing;
 use Nexus\Models\User;
 use Nexus\Models\Group;
-use Nexus\Services\LayoutValidator;
 use Nexus\Helpers\UrlHelper;
 
 // V12: Removed FDS Mobile Detection (2026-01-17)
@@ -72,10 +71,7 @@ class HomeController
         // REMOVED: Duplicate ?layout= processing - now handled exclusively in index.php
         // This prevents race conditions from multiple processing points
 
-        // Use LayoutHelper for consistent layout detection
-        $layout = \Nexus\Services\LayoutHelper::get();
-
-        // 4. RENDER DESKTOP LAYOUTS - Let View class handle layout switching
+        // 4. RENDER DESKTOP LAYOUTS - View class uses modern layout
         View::render('home', compact('listings', 'members', 'hubs', 'featuredGroups', 'pageTitle'));
     }
 
@@ -95,33 +91,15 @@ class HomeController
     }
 
     /**
-     * Switch Layout Action
-     * Handle explicit layout switching via POST or GET
-     * Now uses LayoutValidator service for proper access control
+     * Switch Layout Action (deprecated)
+     * Legacy CivicOne theme has been removed. Always redirects back.
      */
     public function switchLayout()
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
 
-        $layout = $_REQUEST['layout'] ?? null;
-
-        if (!$layout) {
-            $_SESSION['layout_switch_error'] = 'No layout specified';
-            $this->redirectBack();
-        }
-
-        // Use LayoutValidator service for proper validation and access control
-        $result = LayoutValidator::handleSwitchRequest($layout);
-
-        if ($result['success']) {
-            // Success - layout was switched
-            // LayoutValidator already handled session, cookie, and user preference
-            $this->redirectBack();
-        } else {
-            // Failed - error message already set in session by LayoutValidator
-            // Fallback layout already set if applicable
-            $this->redirectBack();
-        }
+        // Layout switching is no longer supported - only modern layout exists
+        $this->redirectBack();
     }
 
     /**

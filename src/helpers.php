@@ -10,38 +10,13 @@ if (!function_exists('layout')) {
     /**
      * Get the current active layout
      *
-     * Centralized layout detection function that wraps LayoutHelper::get()
-     * for convenience throughout the application.
+     * Legacy CivicOne theme has been removed. Always returns 'modern'.
      *
-     * @return string The active layout name (modern or civicone)
+     * @return string Always 'modern'
      */
     function layout(): string
     {
-        return \Nexus\Services\LayoutHelper::get();
-    }
-}
-
-if (!function_exists('is_civicone')) {
-    /**
-     * Check if the current layout is CivicOne
-     *
-     * @return bool True if the current layout is civicone, false otherwise
-     */
-    function is_civicone(): bool
-    {
-        return layout() === 'civicone';
-    }
-}
-
-if (!function_exists('is_modern')) {
-    /**
-     * Check if the current layout is Modern
-     *
-     * @return bool True if the current layout is modern, false otherwise
-     */
-    function is_modern(): bool
-    {
-        return layout() === 'modern';
+        return 'modern';
     }
 }
 

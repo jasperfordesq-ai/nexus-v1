@@ -4,7 +4,6 @@ namespace Nexus\Controllers;
 
 use Nexus\Models\User;
 use Nexus\Core\View;
-use Nexus\Services\LayoutHelper;
 use Nexus\Services\LegalDocumentService;
 
 class AuthController
@@ -185,10 +184,6 @@ class AuthController
 
             // Set flag for biometric prompt in native app (session-based for server, JS will check)
             $_SESSION['just_logged_in'] = true;
-
-            // LAYOUT PERSISTENCE: Initialize user's preferred layout from database
-            // This is the fix for race condition #1 and #5 - DB is now the source of truth
-            LayoutHelper::initializeForUser($user['id']);
 
             if ($isJson) {
                 header('Content-Type: application/json');
