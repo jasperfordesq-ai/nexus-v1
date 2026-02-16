@@ -15,12 +15,13 @@ export class MessagesPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.conversationList = page.locator('.conversation-list, .inbox-list, .message-threads');
-    this.conversationItems = page.locator('.conversation-item, .message-thread, [data-conversation]');
-    this.newMessageButton = page.locator('a[href*="messages/new"], .new-message-btn');
-    this.searchInput = page.locator('.inbox-search input, input[name="search"]');
-    this.unreadCount = page.locator('.unread-badge, .unread-count');
-    this.emptyInbox = page.locator('.empty-inbox, .no-messages');
+    // React: GlassCard conversation items
+    this.conversationList = page.locator('[class*="glass"]').filter({ has: page.locator('img[alt], .avatar') });
+    this.conversationItems = page.locator('a[href*="/messages/"], article').filter({ has: page.locator('img[alt], .avatar') });
+    this.newMessageButton = page.locator('button:has-text("New Message"), button:has-text("Compose")').first();
+    this.searchInput = page.locator('input[placeholder*="Search"]');
+    this.unreadCount = page.locator('.unread-badge, [class*="chip"]').filter({ hasText: /\d+/ });
+    this.emptyInbox = page.locator('text=/No messages|No conversations/');
   }
 
   /**
@@ -28,6 +29,17 @@ export class MessagesPage extends BasePage {
    */
   async navigate(): Promise<void> {
     await this.goto('messages');
+  }
+
+  /**
+   * Wait for messages page to load
+   */
+  async waitForLoad(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.locator('[class*="glass"], article, text=No messages').first().waitFor({
+      state: 'visible',
+      timeout: 15000
+    }).catch(() => {});
   }
 
   /**
@@ -66,7 +78,7 @@ export class MessagesPage extends BasePage {
    */
   async clickNewMessage(): Promise<void> {
     await this.newMessageButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(300);
   }
 
   /**
@@ -192,8 +204,8 @@ export class NewMessagePage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.recipientInput = page.locator('input[name="recipient"], .recipient-search, #recipient');
-    this.recipientSuggestions = page.locator('.recipient-suggestion, .user-suggestion, [data-user-id]');
+    this.recipientInput = page.locator('input[placeholder*="Search for a member"], input[name="recipient"], .recipient-search');
+    this.recipientSuggestions = page.locator('button').filter({ has: page.locator('img, .avatar') });
     this.messageInput = page.locator('textarea[name="message"], .message-input');
     this.sendButton = page.locator('button[type="submit"], .send-btn');
   }
@@ -202,7 +214,12 @@ export class NewMessagePage extends BasePage {
    * Navigate to new message page
    */
   async navigate(): Promise<void> {
-    await this.goto('messages/new');
+    await this.goto('messages');
+    const newMessageButton = this.page.locator('button:has-text("New Message")').first();
+    if (await newMessageButton.count() > 0) {
+      await newMessageButton.click();
+      await this.page.waitForTimeout(300);
+    }
   }
 
   /**

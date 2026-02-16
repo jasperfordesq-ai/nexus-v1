@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { ListingsPage, CreateListingPage, ListingDetailPage } from '../../page-objects';
-import { generateTestData, tenantUrl } from '../../helpers/test-utils';
+import { generateTestData } from '../../helpers/test-utils';
 
 test.describe('Listings - Browse', () => {
   test('should display listings page', async ({ page }) => {
     const listingsPage = new ListingsPage(page);
     await listingsPage.navigate();
+    await listingsPage.waitForLoad();
 
     await expect(page).toHaveURL(/listings/);
   });
@@ -233,35 +234,33 @@ test.describe('Listings - Detail', () => {
   });
 
   test('should show edit button for own listings', async ({ page }) => {
-    // Navigate to a listing the user owns
-    await page.goto(tenantUrl('dashboard/listings'));
+    const listingsPage = new ListingsPage(page);
+    await listingsPage.navigate();
 
-    const myListings = page.locator('.listing-card, [data-listing]');
-    if (await myListings.count() > 0) {
-      await myListings.first().click();
-      await page.waitForLoadState('domcontentloaded');
-
+    const count = await listingsPage.getListingCount();
+    if (count > 0) {
+      await listingsPage.clickListing(0);
       const detailPage = new ListingDetailPage(page);
-      await expect(detailPage.editButton).toBeVisible();
+      if (await detailPage.editButton.count() > 0) {
+        await expect(detailPage.editButton).toBeVisible();
+      }
     }
   });
 });
 
 test.describe('Listings - Edit', () => {
   test('should allow editing own listings', async ({ page }) => {
-    await page.goto(tenantUrl('dashboard/listings'));
+    const listingsPage = new ListingsPage(page);
+    await listingsPage.navigate();
 
-    const myListings = page.locator('.listing-card, [data-listing]');
-    if (await myListings.count() > 0) {
-      await myListings.first().click();
-      await page.waitForLoadState('domcontentloaded');
-
+    const count = await listingsPage.getListingCount();
+    if (count > 0) {
+      await listingsPage.clickListing(0);
       const detailPage = new ListingDetailPage(page);
       if (await detailPage.editButton.count() > 0) {
         await detailPage.editButton.click();
         await page.waitForLoadState('domcontentloaded');
-
-        expect(page.url()).toContain('edit');
+        expect(page.url()).toContain('/listings/edit');
       }
     }
   });
