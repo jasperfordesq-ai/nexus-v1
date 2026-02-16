@@ -2,16 +2,17 @@ import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
- * Broker Controls Page Object
+ * Broker Controls Page Object (React Admin with HeroUI)
  *
- * Provides navigation and element access for the 5 Broker Controls pages:
+ * Provides navigation and element access for the 5+ Broker Controls pages:
  * 1. BrokerDashboard      -- /admin/broker-controls
  * 2. ExchangeManagement   -- /admin/broker-controls/exchanges
  * 3. RiskTags             -- /admin/broker-controls/risk-tags
  * 4. MessageReview        -- /admin/broker-controls/messages
  * 5. UserMonitoring       -- /admin/broker-controls/monitoring
+ * 6. VettingRecords       -- /admin/broker-controls/vetting (if enabled)
  *
- * Uses HeroUI-compatible selectors throughout.
+ * Uses HeroUI-compatible selectors and tenant-aware routing.
  */
 export class BrokerControlsPage extends BasePage {
   /** Page heading rendered by PageHeader component (h1) */
@@ -31,7 +32,7 @@ export class BrokerControlsPage extends BasePage {
 
   /** Navigate to a broker controls page by path */
   async navigateTo(path: string): Promise<void> {
-    await this.page.goto(`/admin/${path.replace(/^\//, '')}`);
+    await this.page.goto(this.tenantUrl(`/admin/${path.replace(/^\//, '')}`));
     await this.page.waitForLoadState('domcontentloaded');
   }
 
@@ -76,7 +77,7 @@ export class BrokerControlsPage extends BasePage {
     return this.page.locator('[data-slot="base"]').filter({ has: this.page.locator('.text-2xl, .text-3xl') });
   }
 
-  /** Dashboard: Get quick-link cards (the 4 navigation cards) */
+  /** Dashboard: Get quick-link cards (the 5 navigation cards) */
   getQuickLinkCards(): Locator {
     // Quick link cards contain ChevronRight icon and link to sub-pages
     return this.page.locator('a[href*="broker-controls/"]');
