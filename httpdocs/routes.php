@@ -1070,6 +1070,7 @@ $router->add('GET', '/about', 'Nexus\Controllers\PageController@about');
 $router->add('GET', '/contact', 'Nexus\Controllers\PageController@contact');
 $router->add('POST', '/contact/submit', 'Nexus\Controllers\ContactController@submit');
 $router->add('POST', '/contact/send', 'Nexus\Controllers\ContactController@submit');
+$router->add('POST', '/api/v2/contact', 'Nexus\Controllers\ContactController@apiSubmit');
 $router->add('GET', '/faq', 'Nexus\Controllers\PageController@faq');
 $router->add('GET', '/help', 'Nexus\Controllers\HelpController@index');
 $router->add('GET', '/help/search', 'Nexus\Controllers\HelpController@search');

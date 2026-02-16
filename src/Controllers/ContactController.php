@@ -180,6 +180,74 @@ HTML;
     }
 
     /**
+     * API endpoint for contact form (JSON)
+     * POST /api/v2/contact
+     */
+    public function apiSubmit()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['error' => 'Method not allowed']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        $name = trim($input['name'] ?? '');
+        $email = trim($input['email'] ?? '');
+        $subject = trim($input['subject'] ?? 'General Inquiry');
+        $message = trim($input['message'] ?? '');
+
+        // Validate
+        $errors = [];
+        if (empty($name)) $errors[] = 'Name is required.';
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'A valid email address is required.';
+        if (empty($message)) $errors[] = 'Message is required.';
+
+        if (!empty($errors)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => implode(' ', $errors)]);
+            return;
+        }
+
+        // Get tenant info for the email
+        $tenant = TenantContext::get();
+        $tenantName = $tenant['name'] ?? 'Project NEXUS';
+        $tenantEmail = $tenant['contact_email'] ?? '';
+
+        if (empty($tenantEmail)) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'No contact email configured for this community.']);
+            return;
+        }
+
+        // Build and send email
+        $emailSubject = "[{$tenantName}] Contact Form: {$subject}";
+        $emailBody = $this->buildEmailBody($name, $email, $subject, $message, $tenantName);
+
+        $sent = false;
+        try {
+            $mailer = new Mailer();
+            $replyTo = "{$name} <{$email}>";
+            $sent = $mailer->send($tenantEmail, $emailSubject, $emailBody, null, $replyTo);
+        } catch (\Exception $e) {
+            error_log("Contact form email error: " . $e->getMessage());
+        }
+
+        // Log submission
+        $this->logContactSubmission($name, $email, $subject, $message, $sent);
+
+        if ($sent) {
+            echo json_encode(['success' => true, 'message' => 'Message sent successfully.']);
+        } else {
+            // Log it but tell user it was received (we have it in DB)
+            echo json_encode(['success' => true, 'message' => 'Message received. We\'ll get back to you soon.']);
+        }
+    }
+
+    /**
      * Redirect helper
      */
     private function redirect($path)
