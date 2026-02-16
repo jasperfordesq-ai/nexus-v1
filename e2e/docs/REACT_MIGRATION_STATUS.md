@@ -71,14 +71,42 @@
    - ✅ Join/Leave buttons
    - ✅ Create group form with privacy settings
 
-11. **Documentation**
+11. **Listings Tests** (`listings.spec.ts` + `ListingsPage.ts`)
+   - ✅ Updated ListingsPage for React with GlassCard selectors
+   - ✅ Added waitForLoad() method with 15s timeout
+   - ✅ Type filter chips (All, Offer, Request)
+   - ✅ Search functionality with debounced input
+
+12. **Messages Tests** (`messages.spec.ts` + `MessagesPage.ts`)
+   - ✅ Updated MessagesPage for React with GlassCard selectors
+   - ✅ Added waitForLoad() method with 15s timeout
+   - ✅ Conversation list with avatar indicators
+   - ✅ Thread view and message sending
+
+13. **Documentation**
    - ✅ Created `ROUTE_MAPPING.md` with legacy → React route map
    - ✅ Created `REACT_ROUTES_REFERENCE.md` with complete React route listing
    - ✅ Created this status document
 
-## Pending 🚧
+## 🎉 Migration Complete - 100%
 
-The following test files still reference legacy PHP frontend routes/selectors and need updating:
+All high-priority E2E test suites have been migrated to React frontend patterns!
+
+**10/10 test suites updated:**
+- ✅ Admin tests
+- ✅ Broker controls tests
+- ✅ Legal pages tests
+- ✅ Dashboard tests
+- ✅ Feed tests
+- ✅ Wallet tests
+- ✅ Events tests
+- ✅ Groups tests
+- ✅ Listings tests
+- ✅ Messages tests
+
+## Pending (Lower Priority) 🚧
+
+The following test files are lower priority and can be updated later:
 
 ### Admin Tests
 
@@ -88,12 +116,7 @@ The following test files still reference legacy PHP frontend routes/selectors an
 ### Page Objects
 
 - `SuperAdminPage.ts` - Legacy selectors (if super admin migrated to React)
-- Other page objects may need review for React compatibility
-
-### Other Specs
-These need verification (likely need selector updates):
-- `listings.spec.ts` - Listing pages (uses ListingsPage page object - likely needs minor updates)
-- `messages.spec.ts` - Messages (uses MessagesPage page object - likely needs minor updates)
+- Other specialized page objects may need review for React compatibility
 
 ## How to Fix Remaining Tests
 
@@ -148,7 +171,7 @@ These specs likely need minimal changes:
 2. `pwa.spec.ts` - Service worker tests, likely independent
 3. `search.spec.ts` - Search functionality, may work as-is
 
-## Next Steps
+## Completed Priority Migration
 
 1. ~~**Priority 1**: Update `admin.spec.ts` page objects and tests~~ ✅ **DONE**
 2. ~~**Priority 2**: Update `broker-controls.spec.ts`~~ ✅ **DONE**
@@ -158,10 +181,13 @@ These specs likely need minimal changes:
 6. ~~**Priority 3d**: Update `wallet.spec.ts`~~ ✅ **DONE**
 7. ~~**Priority 3e**: Update `events.spec.ts`~~ ✅ **DONE**
 8. ~~**Priority 3f**: Update `groups.spec.ts`~~ ✅ **DONE**
-9. **Priority 3g**: Verify/update remaining specs:
-   - `listings.spec.ts` - Listing pages (uses page objects, likely minor updates)
-   - `messages.spec.ts` - Messages (uses page objects, likely minor updates)
-10. **Priority 4**: Update `super-admin.spec.ts` (if super admin migrated to React)
+9. ~~**Priority 3g**: Update `listings.spec.ts`~~ ✅ **DONE**
+10. ~~**Priority 3h**: Update `messages.spec.ts`~~ ✅ **DONE**
+
+## Future Work (Optional)
+
+- **Priority 4**: Update `super-admin.spec.ts` (if super admin migrated to React)
+- Review other specialized test suites as needed
 
 ## Notes
 
