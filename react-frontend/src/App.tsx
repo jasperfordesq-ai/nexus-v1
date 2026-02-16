@@ -87,6 +87,7 @@ const PrivacyPage = lazy(() => import('@/pages/public/PrivacyPage'));
 const AccessibilityPage = lazy(() => import('@/pages/public/AccessibilityPage'));
 const CookiesPage = lazy(() => import('@/pages/public/CookiesPage'));
 const LegalHubPage = lazy(() => import('@/pages/public/LegalHubPage'));
+const LegalVersionHistoryPage = lazy(() => import('@/pages/public/LegalVersionHistoryPage'));
 const FaqPage = lazy(() => import('@/pages/public/FaqPage'));
 const HelpCenterPage = lazy(() => import('@/pages/help/HelpCenterPage'));
 
@@ -122,9 +123,13 @@ function AppRoutes() {
         <Route path="contact" element={<ContactPage />} />
         <Route path="help" element={<HelpCenterPage />} />
         <Route path="terms" element={<TermsPage />} />
+        <Route path="terms/versions" element={<LegalVersionHistoryPage />} />
         <Route path="privacy" element={<PrivacyPage />} />
+        <Route path="privacy/versions" element={<LegalVersionHistoryPage />} />
         <Route path="accessibility" element={<AccessibilityPage />} />
+        <Route path="accessibility/versions" element={<LegalVersionHistoryPage />} />
         <Route path="cookies" element={<CookiesPage />} />
+        <Route path="cookies/versions" element={<LegalVersionHistoryPage />} />
         <Route path="legal" element={<LegalHubPage />} />
         <Route path="timebanking-guide" element={<TimebankingGuidePage />} />
         <Route path="partner" element={<PartnerPage />} />

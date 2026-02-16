@@ -90,6 +90,37 @@ class TenantBootstrapController extends BaseApiController
             return;
         }
 
+        // Origin-based resolution for custom domains (e.g., hour-timebank.ie)
+        // When the React SPA is on a tenant's custom domain and calls the API at
+        // api.project-nexus.ie, TenantContext::resolve() sees HTTP_HOST=api.project-nexus.ie
+        // and falls back to master tenant. The Origin header tells us the real domain.
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        if ($origin) {
+            $originHost = parse_url($origin, PHP_URL_HOST);
+            if ($originHost) {
+                $originHost = preg_replace('/^www\./', '', $originHost);
+                $db = \Nexus\Core\Database::getConnection();
+                $stmt = $db->prepare("SELECT * FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1");
+                $stmt->execute([$originHost]);
+                $originTenant = $stmt->fetch();
+
+                if ($originTenant && (int) $originTenant['id'] !== 1) {
+                    $tenantId = (int) $originTenant['id'];
+
+                    $cached = RedisCache::get(self::CACHE_KEY, $tenantId);
+                    if ($cached !== null) {
+                        $this->respondWithData($cached);
+                        return;
+                    }
+
+                    $data = $this->buildBootstrapData($originTenant);
+                    RedisCache::set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
+                    $this->respondWithData($data);
+                    return;
+                }
+            }
+        }
+
         // Default: use TenantContext resolved by index.php (header/domain/token/fallback)
         $tenantId = TenantContext::getId();
 
