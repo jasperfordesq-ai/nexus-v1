@@ -7,7 +7,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
+import { Button, Spinner } from '@heroui/react';
 import {
   Accessibility,
   CheckCircle,
@@ -19,8 +19,10 @@ import {
   Globe,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { useLegalDocument } from '@/hooks/useLegalDocument';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -38,6 +40,19 @@ const itemVariants = {
 export function AccessibilityPage() {
   usePageTitle('Accessibility');
   const { branding, tenantPath } = useTenant();
+  const { document: customDoc, loading } = useLegalDocument('accessibility');
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (customDoc) {
+    return <CustomLegalDocument document={customDoc} accentColor="indigo" />;
+  }
 
   return (
     <motion.div

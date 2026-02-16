@@ -1,13 +1,14 @@
 /**
  * Terms of Service Page
  *
- * Comprehensive terms covering time credits, community guidelines,
- * prohibited activities, safety, liability, and account termination.
+ * Fetches custom tenant-specific terms from the API (managed via admin
+ * Legal Documents). Falls back to a generic default if no custom document
+ * exists for this tenant.
  */
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Chip, Divider } from '@heroui/react';
+import { Button, Chip, Divider, Spinner } from '@heroui/react';
 import {
   FileText,
   Clock,
@@ -28,8 +29,10 @@ import {
   CircleSlash,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { useLegalDocument } from '@/hooks/useLegalDocument';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -43,6 +46,31 @@ const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
+
+export function TermsPage() {
+  usePageTitle('Terms of Service');
+  const { branding, tenantPath } = useTenant();
+  const { document: customDoc, loading } = useLegalDocument('terms');
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (customDoc) {
+    return <CustomLegalDocument document={customDoc} accentColor="blue" />;
+  }
+
+  // Default fallback — generic terms content
+  return <DefaultTermsContent branding={branding} tenantPath={tenantPath} />;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Default Terms Content (shown when no custom document exists)
+// ─────────────────────────────────────────────────────────────────────────────
 
 const quickNavItems = [
   { id: 'time-credits', label: 'Time Credits', icon: Clock },
@@ -67,10 +95,7 @@ function scrollToSection(id: string) {
   }
 }
 
-export function TermsPage() {
-  usePageTitle('Terms of Service');
-  const { branding, tenantPath } = useTenant();
-
+function DefaultTermsContent({ branding, tenantPath }: { branding: { name: string }; tenantPath: (path: string) => string }) {
   return (
     <motion.div
       variants={containerVariants}

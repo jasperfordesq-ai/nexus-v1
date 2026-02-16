@@ -129,7 +129,8 @@ $router->add('DELETE', '/api/cookie-consent/{id}', 'Nexus\Controllers\Api\Cookie
 $router->add('GET', '/api/cookie-consent/inventory', 'Nexus\Controllers\Api\CookieConsentController@inventory');
 $router->add('GET', '/api/cookie-consent/check/{category}', 'Nexus\Controllers\Api\CookieConsentController@check');
 
-// Legal Documents API (User Acceptance Tracking)
+// Legal Documents API (Public Content + User Acceptance Tracking)
+$router->add('GET', '/api/v2/legal/{type}', 'Nexus\Controllers\LegalDocumentController@apiGetDocument');
 $router->add('POST', '/api/legal/accept', 'Nexus\Controllers\LegalDocumentController@accept');
 $router->add('POST', '/api/legal/accept-all', 'Nexus\Controllers\LegalDocumentController@acceptAll');
 $router->add('GET', '/api/legal/status', 'Nexus\Controllers\LegalDocumentController@status');

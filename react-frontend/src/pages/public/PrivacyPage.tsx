@@ -7,7 +7,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Chip, Divider } from '@heroui/react';
+import { Button, Chip, Divider, Spinner } from '@heroui/react';
 import {
   Shield,
   Database,
@@ -27,8 +27,10 @@ import {
   CalendarDays,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { useLegalDocument } from '@/hooks/useLegalDocument';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -156,6 +158,19 @@ function scrollToSection(id: string) {
 export function PrivacyPage() {
   usePageTitle('Privacy Policy');
   const { branding, tenantPath } = useTenant();
+  const { document: customDoc, loading } = useLegalDocument('privacy');
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (customDoc) {
+    return <CustomLegalDocument document={customDoc} accentColor="indigo" />;
+  }
 
   return (
     <motion.div
