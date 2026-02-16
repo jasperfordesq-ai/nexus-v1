@@ -14,7 +14,7 @@ class VolReview
 
     public static function getForTarget($type, $id)
     {
-        $sql = "SELECT r.*, u.first_name, u.last_name, u.avatar 
+        $sql = "SELECT r.*, u.first_name, u.last_name, u.avatar_url
                 FROM vol_reviews r
                 JOIN users u ON r.reviewer_id = u.id
                 WHERE r.target_type = ? AND r.target_id = ?
