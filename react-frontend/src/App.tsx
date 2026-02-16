@@ -22,15 +22,13 @@ import { ToastProvider, ThemeProvider } from '@/contexts';
 // Layout Components
 import { Layout, AuthLayout } from '@/components/layout';
 import { ProtectedRoute, FeatureGate, ScrollToTop, TenantShell } from '@/components/routing';
-import { LoadingScreen, ErrorBoundary } from '@/components/feedback';
+import { LoadingScreen, ErrorBoundary, FeatureErrorBoundary } from '@/components/feedback';
 
 // Auth Pages (not lazy loaded - critical path)
 import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from '@/pages/auth';
 
-// Admin Panel
-import { AdminLayout } from '@/admin/AdminLayout';
-import { AdminRoute } from '@/admin/AdminRoute';
-import { AdminRoutes } from '@/admin/routes';
+// Admin Panel (lazy-loaded — keeps recharts, jsPDF, admin sidebar/header out of main bundle)
+const AdminApp = lazy(() => import('@/admin/AdminApp'));
 
 // Lazy-loaded Pages
 const HomePage = lazy(() => import('@/pages/public/HomePage'));
@@ -138,12 +136,16 @@ function AppRoutes() {
         {/* Public: Blog (feature-gated) */}
         <Route path="blog" element={
           <FeatureGate feature="blog" redirect="/">
-            <BlogPage />
+            <FeatureErrorBoundary featureName="Blog">
+              <BlogPage />
+            </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="blog/:slug" element={
           <FeatureGate feature="blog" redirect="/">
-            <BlogPostPage />
+            <FeatureErrorBoundary featureName="Blog">
+              <BlogPostPage />
+            </FeatureErrorBoundary>
           </FeatureGate>
         } />
 
@@ -229,193 +231,253 @@ function AppRoutes() {
           {/* Feature-gated: Group Exchanges */}
           <Route path="group-exchanges" element={
             <FeatureGate feature="group_exchanges" fallback={<ComingSoonPage feature="Group Exchanges" />}>
-              <GroupExchangesPage />
+              <FeatureErrorBoundary featureName="Group Exchanges">
+                <GroupExchangesPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="group-exchanges/create" element={
             <FeatureGate feature="group_exchanges" redirect="/dashboard">
-              <CreateGroupExchangePage />
+              <FeatureErrorBoundary featureName="Group Exchanges">
+                <CreateGroupExchangePage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="group-exchanges/:id" element={
             <FeatureGate feature="group_exchanges" redirect="/dashboard">
-              <GroupExchangeDetailPage />
+              <FeatureErrorBoundary featureName="Group Exchanges">
+                <GroupExchangeDetailPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Feature-gated: Exchanges */}
           <Route path="exchanges" element={
             <FeatureGate feature="exchange_workflow" fallback={<ComingSoonPage feature="Exchanges" />}>
-              <ExchangesPage />
+              <FeatureErrorBoundary featureName="Exchanges">
+                <ExchangesPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="exchanges/:id" element={
             <FeatureGate feature="exchange_workflow" redirect="/dashboard">
-              <ExchangeDetailPage />
+              <FeatureErrorBoundary featureName="Exchanges">
+                <ExchangeDetailPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="listings/:id/request-exchange" element={
             <FeatureGate feature="exchange_workflow" redirect="/dashboard">
-              <RequestExchangePage />
+              <FeatureErrorBoundary featureName="Exchanges">
+                <RequestExchangePage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Feature-gated: Members/Connections */}
           <Route path="members" element={
             <FeatureGate feature="connections" fallback={<ComingSoonPage feature="Members Directory" />}>
-              <MembersPage />
+              <FeatureErrorBoundary featureName="Members Directory">
+                <MembersPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Feature-gated: Events */}
           <Route path="events" element={
             <FeatureGate feature="events" fallback={<ComingSoonPage feature="Events" />}>
-              <EventsPage />
+              <FeatureErrorBoundary featureName="Events">
+                <EventsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="events/create" element={
             <FeatureGate feature="events" redirect="/dashboard">
-              <CreateEventPage />
+              <FeatureErrorBoundary featureName="Events">
+                <CreateEventPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="events/edit/:id" element={
             <FeatureGate feature="events" redirect="/dashboard">
-              <CreateEventPage />
+              <FeatureErrorBoundary featureName="Events">
+                <CreateEventPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="events/:id" element={
             <FeatureGate feature="events" redirect="/dashboard">
-              <EventDetailPage />
+              <FeatureErrorBoundary featureName="Events">
+                <EventDetailPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Feature-gated: Groups */}
           <Route path="groups" element={
             <FeatureGate feature="groups" fallback={<ComingSoonPage feature="Groups" />}>
-              <GroupsPage />
+              <FeatureErrorBoundary featureName="Groups">
+                <GroupsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="groups/create" element={
             <FeatureGate feature="groups" redirect="/dashboard">
-              <CreateGroupPage />
+              <FeatureErrorBoundary featureName="Groups">
+                <CreateGroupPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="groups/edit/:id" element={
             <FeatureGate feature="groups" redirect="/dashboard">
-              <CreateGroupPage />
+              <FeatureErrorBoundary featureName="Groups">
+                <CreateGroupPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="groups/:id" element={
             <FeatureGate feature="groups" redirect="/dashboard">
-              <GroupDetailPage />
+              <FeatureErrorBoundary featureName="Groups">
+                <GroupDetailPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Feature-gated: Gamification */}
           <Route path="achievements" element={
             <FeatureGate feature="gamification" fallback={<ComingSoonPage feature="Achievements" />}>
-              <AchievementsPage />
+              <FeatureErrorBoundary featureName="Achievements">
+                <AchievementsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="leaderboard" element={
             <FeatureGate feature="gamification" fallback={<ComingSoonPage feature="Leaderboard" />}>
-              <LeaderboardPage />
+              <FeatureErrorBoundary featureName="Leaderboard">
+                <LeaderboardPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Feature-gated: Goals */}
           <Route path="goals" element={
             <FeatureGate feature="goals" fallback={<ComingSoonPage feature="Goals" />}>
-              <GoalsPage />
+              <FeatureErrorBoundary featureName="Goals">
+                <GoalsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Feature-gated: Volunteering */}
           <Route path="volunteering" element={
             <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
-              <VolunteeringPage />
+              <FeatureErrorBoundary featureName="Volunteering">
+                <VolunteeringPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="organisations" element={
             <FeatureGate feature="volunteering" redirect="/dashboard">
-              <OrganisationsPage />
+              <FeatureErrorBoundary featureName="Volunteering">
+                <OrganisationsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="organisations/:id" element={
             <FeatureGate feature="volunteering" redirect="/dashboard">
-              <OrganisationDetailPage />
+              <FeatureErrorBoundary featureName="Volunteering">
+                <OrganisationDetailPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Module-gated: Feed */}
           <Route path="feed" element={
             <FeatureGate module="feed" redirect="/dashboard">
-              <FeedPage />
+              <FeatureErrorBoundary featureName="Feed">
+                <FeedPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Feature-gated: Resources */}
           <Route path="resources" element={
             <FeatureGate feature="resources" fallback={<ComingSoonPage feature="Resources" />}>
-              <ResourcesPage />
+              <FeatureErrorBoundary featureName="Resources">
+                <ResourcesPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
           {/* Feature-gated: Federation */}
           <Route path="federation" element={
             <FeatureGate feature="federation" fallback={<ComingSoonPage feature="Federation" />}>
-              <FederationHubPage />
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationHubPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="federation/partners" element={
             <FeatureGate feature="federation" redirect="/dashboard">
-              <FederationPartnersPage />
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationPartnersPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="federation/members" element={
             <FeatureGate feature="federation" redirect="/dashboard">
-              <FederationMembersPage />
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationMembersPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="federation/members/:id" element={
             <FeatureGate feature="federation" redirect="/dashboard">
-              <FederationMemberProfilePage />
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationMemberProfilePage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="federation/messages" element={
             <FeatureGate feature="federation" redirect="/dashboard">
-              <FederationMessagesPage />
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationMessagesPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="federation/listings" element={
             <FeatureGate feature="federation" redirect="/dashboard">
-              <FederationListingsPage />
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationListingsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="federation/events" element={
             <FeatureGate feature="federation" redirect="/dashboard">
-              <FederationEventsPage />
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationEventsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="federation/settings" element={
             <FeatureGate feature="federation" redirect="/dashboard">
-              <FederationSettingsPage />
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationSettingsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="federation/onboarding" element={
             <FeatureGate feature="federation" redirect="/dashboard">
-              <FederationOnboardingPage />
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationOnboardingPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
         </Route>
       </Route>
 
-      {/* Admin Panel (separate layout, no main navbar/footer) */}
-      <Route path="admin" element={<AdminRoute />}>
-        <Route element={<AdminLayout />}>
-          {AdminRoutes()}
-        </Route>
-      </Route>
+      {/* Admin Panel (separate layout, no main navbar/footer) — fully lazy-loaded */}
+      <Route path="admin/*" element={<AdminApp />} />
 
       {/* 404 Fallback (must be after admin to avoid catching /admin paths) */}
       <Route element={<Layout />}>

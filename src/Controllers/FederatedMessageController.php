@@ -58,10 +58,7 @@ class FederatedMessageController
         $partnerCommunities = $this->getPartnerCommunities($tenantId);
         $currentScope = $_GET['scope'] ?? 'all';
 
-        // Use CivicOne wrapper if CivicOne layout is active
-        $viewPath = (layout() === 'civicone')
-            ? 'civicone/federation/messages'
-            : 'federation/messages/index';
+        $viewPath = 'federation/messages/index';
 
         View::render($viewPath, [
             'conversations' => $conversations,

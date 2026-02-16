@@ -37,7 +37,7 @@ export interface User {
   profile_type?: 'individual' | 'organisation';
   organization_name?: string;
   has_2fa_enabled?: boolean;
-  preferred_layout?: 'modern' | 'civicone';
+  preferred_layout?: 'modern';
   onboarding_completed?: boolean;
   email_verified_at?: string | null;
   created_at?: string;

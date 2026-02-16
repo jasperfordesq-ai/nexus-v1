@@ -15,7 +15,7 @@ $adminPageTitle = htmlspecialchars($deliverable['title'] ?? 'View Deliverable');
 $adminPageSubtitle = 'Deliverability Tracking';
 $adminPageIcon = 'fa-eye';
 
-require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-header.php';
+require dirname(dirname(dirname(__DIR__))) . '/layouts/admin-header.php';
 
 $deliverable = $deliverable ?? [];
 $milestones = $milestones ?? [];
@@ -414,4 +414,4 @@ document.getElementById('comment-form').addEventListener('submit', async functio
 });
 </script>
 
-<?php require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(dirname(__DIR__))) . '/layouts/admin-footer.php'; ?>

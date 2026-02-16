@@ -1057,7 +1057,7 @@ function FeedCard({
           <div>
             <div className="flex items-center gap-2">
               <Link
-                to={`/profile/${author.id}`}
+                to={tenantPath(`/profile/${author.id}`)}
                 className="font-semibold text-theme-primary hover:underline text-sm"
               >
                 {author.name}
@@ -1353,7 +1353,7 @@ function CommentItem({ comment }: CommentItemProps) {
         <div className="bg-theme-elevated rounded-xl px-3 py-2">
           <div className="flex items-center gap-2">
             <Link
-              to={`/profile/${comment.author.id}`}
+              to={tenantPath(`/profile/${comment.author.id}`)}
               className="text-xs font-semibold text-theme-primary hover:underline"
             >
               {comment.author.name}

@@ -29,6 +29,20 @@ class AuditLogService
     const ACTION_BULK_APPROVE = 'bulk_approve';
     const ACTION_BULK_REJECT = 'bulk_reject';
 
+    // Admin user management actions
+    const ACTION_ADMIN_USER_CREATED = 'admin_user_created';
+    const ACTION_ADMIN_USER_UPDATED = 'admin_user_updated';
+    const ACTION_ADMIN_USER_DELETED = 'admin_user_deleted';
+    const ACTION_ADMIN_USER_SUSPENDED = 'admin_user_suspended';
+    const ACTION_ADMIN_USER_BANNED = 'admin_user_banned';
+    const ACTION_ADMIN_USER_REACTIVATED = 'admin_user_reactivated';
+    const ACTION_ADMIN_USER_APPROVED = 'admin_user_approved';
+    const ACTION_ADMIN_ROLE_CHANGED = 'admin_role_changed';
+    const ACTION_ADMIN_2FA_RESET = 'admin_2fa_reset';
+    const ACTION_ADMIN_USER_IMPERSONATED = 'admin_user_impersonated';
+    const ACTION_ADMIN_SUPER_ADMIN_REVOKED = 'admin_super_admin_revoked';
+    const ACTION_ADMIN_BULK_IMPORT = 'admin_bulk_import';
+
     /**
      * Log an action
      *
@@ -199,6 +213,141 @@ class AuditLogService
             'rejected_count' => $successCount,
             'failed_count' => $failCount,
             'reason' => $reason
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Admin user management audit helpers
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Log an admin user management action (no organization context)
+     */
+    public static function logAdminAction($action, $adminUserId, $targetUserId = null, $details = [])
+    {
+        return self::log($action, null, $adminUserId, $details, $targetUserId);
+    }
+
+    /**
+     * Log user suspension by admin
+     */
+    public static function logUserSuspended($adminUserId, $targetUserId, $reason = '')
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_USER_SUSPENDED, $adminUserId, $targetUserId, [
+            'reason' => $reason,
+        ]);
+    }
+
+    /**
+     * Log user ban by admin
+     */
+    public static function logUserBanned($adminUserId, $targetUserId, $reason = '')
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_USER_BANNED, $adminUserId, $targetUserId, [
+            'reason' => $reason,
+        ]);
+    }
+
+    /**
+     * Log user reactivation by admin
+     */
+    public static function logUserReactivated($adminUserId, $targetUserId, $previousStatus = '')
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_USER_REACTIVATED, $adminUserId, $targetUserId, [
+            'previous_status' => $previousStatus,
+        ]);
+    }
+
+    /**
+     * Log user deletion by admin
+     */
+    public static function logUserDeleted($adminUserId, $targetUserId, $targetEmail = '')
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_USER_DELETED, $adminUserId, $targetUserId, [
+            'deleted_email' => $targetEmail,
+        ]);
+    }
+
+    /**
+     * Log user approval by admin
+     */
+    public static function logUserApproved($adminUserId, $targetUserId, $targetEmail = '')
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_USER_APPROVED, $adminUserId, $targetUserId, [
+            'approved_email' => $targetEmail,
+        ]);
+    }
+
+    /**
+     * Log role change by admin
+     */
+    public static function logAdminRoleChanged($adminUserId, $targetUserId, $oldRole, $newRole)
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_ROLE_CHANGED, $adminUserId, $targetUserId, [
+            'old_role' => $oldRole,
+            'new_role' => $newRole,
+        ]);
+    }
+
+    /**
+     * Log 2FA reset by admin
+     */
+    public static function log2faReset($adminUserId, $targetUserId, $reason = '')
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_2FA_RESET, $adminUserId, $targetUserId, [
+            'reason' => $reason,
+        ]);
+    }
+
+    /**
+     * Log user impersonation by admin
+     */
+    public static function logUserImpersonated($adminUserId, $targetUserId, $targetEmail = '')
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_USER_IMPERSONATED, $adminUserId, $targetUserId, [
+            'impersonated_email' => $targetEmail,
+        ]);
+    }
+
+    /**
+     * Log user creation by admin
+     */
+    public static function logUserCreated($adminUserId, $targetUserId, $targetEmail = '')
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_USER_CREATED, $adminUserId, $targetUserId, [
+            'created_email' => $targetEmail,
+        ]);
+    }
+
+    /**
+     * Log user profile update by admin
+     */
+    public static function logUserUpdated($adminUserId, $targetUserId, $changedFields = [])
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_USER_UPDATED, $adminUserId, $targetUserId, [
+            'changed_fields' => $changedFields,
+        ]);
+    }
+
+    /**
+     * Log super admin revocation
+     */
+    public static function logSuperAdminRevoked($adminUserId, $targetUserId, $targetEmail = '')
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_SUPER_ADMIN_REVOKED, $adminUserId, $targetUserId, [
+            'revoked_email' => $targetEmail,
+        ]);
+    }
+
+    /**
+     * Log bulk user import by admin
+     */
+    public static function logBulkImport($adminUserId, $importedCount, $skippedCount, $totalRows)
+    {
+        return self::logAdminAction(self::ACTION_ADMIN_BULK_IMPORT, $adminUserId, null, [
+            'imported_count' => $importedCount,
+            'skipped_count' => $skippedCount,
+            'total_rows' => $totalRows,
         ]);
     }
 
@@ -412,6 +561,19 @@ class AuditLogService
             self::ACTION_LIMITS_CHANGED => 'Limits Changed',
             self::ACTION_BULK_APPROVE => 'Bulk Approval',
             self::ACTION_BULK_REJECT => 'Bulk Rejection',
+            // Admin user management
+            self::ACTION_ADMIN_USER_CREATED => 'Admin Created User',
+            self::ACTION_ADMIN_USER_UPDATED => 'Admin Updated User',
+            self::ACTION_ADMIN_USER_DELETED => 'Admin Deleted User',
+            self::ACTION_ADMIN_USER_SUSPENDED => 'Admin Suspended User',
+            self::ACTION_ADMIN_USER_BANNED => 'Admin Banned User',
+            self::ACTION_ADMIN_USER_REACTIVATED => 'Admin Reactivated User',
+            self::ACTION_ADMIN_USER_APPROVED => 'Admin Approved User',
+            self::ACTION_ADMIN_ROLE_CHANGED => 'Admin Changed User Role',
+            self::ACTION_ADMIN_2FA_RESET => 'Admin Reset 2FA',
+            self::ACTION_ADMIN_USER_IMPERSONATED => 'Admin Impersonated User',
+            self::ACTION_ADMIN_SUPER_ADMIN_REVOKED => 'Super Admin Revoked',
+            self::ACTION_ADMIN_BULK_IMPORT => 'Admin Bulk Import Users',
         ];
 
         return $labels[$action] ?? ucwords(str_replace('_', ' ', $action));

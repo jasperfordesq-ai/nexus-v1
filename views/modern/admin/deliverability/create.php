@@ -8,7 +8,7 @@ $adminPageTitle = 'Create Deliverable';
 $adminPageSubtitle = 'Deliverability Tracking';
 $adminPageIcon = 'fa-plus';
 
-require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-header.php';
+require dirname(dirname(dirname(__DIR__))) . '/layouts/admin-header.php';
 
 $users = $users ?? [];
 $groups = $groups ?? [];
@@ -262,4 +262,4 @@ $groups = $groups ?? [];
     </div>
 </div>
 
-<?php require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(dirname(__DIR__))) . '/layouts/admin-footer.php'; ?>

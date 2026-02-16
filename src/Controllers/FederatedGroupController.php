@@ -83,10 +83,7 @@ class FederatedGroupController
 
             $currentScope = $_GET['scope'] ?? 'all';
 
-            // Use CivicOne wrapper if CivicOne layout is active
-            $viewPath = (layout() === 'civicone')
-                ? 'civicone/federation/groups'
-                : 'federation/groups';
+            $viewPath = 'federation/groups';
 
             View::render($viewPath, [
                 'groups' => $result['groups'],
@@ -99,7 +96,7 @@ class FederatedGroupController
 
         } catch (\Exception $e) {
             error_log('FederatedGroupController::index error: ' . $e->getMessage());
-            View::render('civicone/federation/groups', [
+            View::render('federation/groups', [
                 'groups' => [],
                 'partnerTenants' => [],
                 'filters' => $filters,

@@ -989,22 +989,11 @@ $router->add('GET', '/nexus-score/report', 'Nexus\Controllers\NexusScoreControll
 $router->add('GET', '/nexus-score/leaderboard', 'Nexus\Controllers\NexusScoreController@leaderboard');
 $router->add('GET', '/profile/{id}/score', 'Nexus\Controllers\NexusScoreController@publicProfile');
 
-// PUBLIC SECTOR DEMO OVERRIDES
-$tenantSlug = TenantContext::get()['slug'] ?? '';
-if ($tenantSlug === 'public-sector-demo') {
-    $router->add('GET', '/', 'Nexus\Controllers\DemoController@home');
-    $router->add('GET', '/home', 'Nexus\Controllers\DemoController@home');
-    $router->add('GET', '/compliance', 'Nexus\Controllers\DemoController@compliance');
-    $router->add('GET', '/hse-case-study', 'Nexus\Controllers\DemoController@hseCaseStudy');
-    $router->add('GET', '/council-case-study', 'Nexus\Controllers\DemoController@councilCaseStudy');
-    $router->add('GET', '/technical-specs', 'Nexus\Controllers\DemoController@technicalSpecs');
-} else {
-    // Normal Homepage
-    $router->add('GET', '/', 'Nexus\Controllers\HomeController@index');
-    $router->add('POST', '/', 'Nexus\Controllers\HomeController@index'); // Support Feed Post
-    $router->add('GET', '/home', 'Nexus\Controllers\HomeController@index'); // Alias
-    $router->add('POST', '/home', 'Nexus\Controllers\HomeController@index'); // Support Feed Post
-}
+// Homepage
+$router->add('GET', '/', 'Nexus\Controllers\HomeController@index');
+$router->add('POST', '/', 'Nexus\Controllers\HomeController@index'); // Support Feed Post
+$router->add('GET', '/home', 'Nexus\Controllers\HomeController@index'); // Alias
+$router->add('POST', '/home', 'Nexus\Controllers\HomeController@index'); // Support Feed Post
 
 // Compose - Full-page multi-form for creating content (mobile-optimized)
 $router->add('GET', '/compose', 'Nexus\Controllers\ComposeController@index');

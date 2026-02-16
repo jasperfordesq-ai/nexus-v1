@@ -7,6 +7,7 @@ use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Models\User;
 use Nexus\Models\ActivityLog;
+use Nexus\Services\AuditLogService;
 
 /**
  * AdminUsersApiController - V2 API for React admin user management
@@ -180,7 +181,10 @@ class AdminUsersApiController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $user = Database::query(
-            "SELECT * FROM users WHERE id = ? AND tenant_id = ?",
+            "SELECT id, first_name, last_name, email, avatar_url, location, bio, tagline, phone,
+                    role, status, is_approved, is_super_admin, balance, profile_type,
+                    organization_name, created_at, last_active_at
+             FROM users WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         )->fetch();
 
@@ -306,6 +310,7 @@ class AdminUsersApiController extends BaseApiController
             User::updateAdminFields($newUser['id'], $role, 1);
 
             ActivityLog::log($adminId, 'admin_create_user', "Created user: {$email}");
+            AuditLogService::logUserCreated($adminId, (int) $newUser['id'], $email);
 
             $this->respondWithData([
                 'id' => (int) $newUser['id'],
@@ -404,6 +409,15 @@ class AdminUsersApiController extends BaseApiController
 
         ActivityLog::log($adminId, 'admin_update_user', "Updated user #{$id}");
 
+        // Audit log: track which fields changed
+        $changedFields = array_keys($input);
+        AuditLogService::logUserUpdated($adminId, $id, $changedFields);
+
+        // Audit log: if role changed, log it specifically
+        if (isset($input['role']) && ($user['role'] ?? 'member') !== $input['role']) {
+            AuditLogService::logAdminRoleChanged($adminId, $id, $user['role'] ?? 'member', $input['role']);
+        }
+
         // Return updated user
         $this->show($id);
     }
@@ -437,6 +451,7 @@ class AdminUsersApiController extends BaseApiController
         Database::query("DELETE FROM users WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         ActivityLog::log($adminId, 'admin_delete_user', "Deleted user #{$id} ({$user['email']})");
+        AuditLogService::logUserDeleted($adminId, $id, $user['email']);
 
         $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
@@ -458,6 +473,7 @@ class AdminUsersApiController extends BaseApiController
         User::updateAdminFields($id, $user['role'] ?? 'member', 1);
 
         ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']})");
+        AuditLogService::logUserApproved($adminId, $id, $user['email']);
 
         $this->respondWithData(['approved' => true, 'id' => $id]);
     }
@@ -497,6 +513,7 @@ class AdminUsersApiController extends BaseApiController
         );
 
         ActivityLog::log($adminId, 'admin_suspend_user', "Suspended user #{$id}: {$reason}");
+        AuditLogService::logUserSuspended($adminId, $id, $reason);
 
         $this->respondWithData(['suspended' => true, 'id' => $id]);
     }
@@ -536,6 +553,7 @@ class AdminUsersApiController extends BaseApiController
         );
 
         ActivityLog::log($adminId, 'admin_ban_user', "Banned user #{$id}: {$reason}");
+        AuditLogService::logUserBanned($adminId, $id, $reason);
 
         $this->respondWithData(['banned' => true, 'id' => $id]);
     }
@@ -560,6 +578,7 @@ class AdminUsersApiController extends BaseApiController
         );
 
         ActivityLog::log($adminId, 'admin_reactivate_user', "Reactivated user #{$id} ({$user['email']})");
+        AuditLogService::logUserReactivated($adminId, $id, $user['status'] ?? 'unknown');
 
         $this->respondWithData(['reactivated' => true, 'id' => $id]);
     }
@@ -596,6 +615,7 @@ class AdminUsersApiController extends BaseApiController
         }
 
         ActivityLog::log($adminId, 'admin_reset_2fa', "Reset 2FA for user #{$id}: {$reason}");
+        AuditLogService::log2faReset($adminId, $id, $reason);
 
         $this->respondWithData(['reset' => true, 'id' => $id]);
     }
@@ -799,6 +819,7 @@ class AdminUsersApiController extends BaseApiController
         fclose($handle);
 
         ActivityLog::log($adminId, 'admin_bulk_import_users', "Bulk imported {$results['imported']} users ({$results['skipped']} skipped)");
+        AuditLogService::logBulkImport($adminId, $results['imported'], $results['skipped'], $row - 1);
 
         $this->respondWithData([
             'imported' => $results['imported'],
@@ -868,6 +889,7 @@ class AdminUsersApiController extends BaseApiController
             ]);
 
             ActivityLog::log($adminId, 'admin_impersonate', "Impersonated user #{$id} ({$user['email']})");
+            AuditLogService::logUserImpersonated($adminId, $id, $user['email']);
 
             $this->respondWithData([
                 'token' => $token,
