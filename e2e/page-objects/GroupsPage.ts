@@ -2,27 +2,47 @@ import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
- * Groups/Hubs List Page Object
+ * Groups List Page Object (React with GlassCard and HeroUI components)
+ *
+ * The React groups page uses:
+ * - GlassCard for group cards and search bar
+ * - HeroUI Select for filter (All Groups, My Groups, Public, Private)
+ * - Avatar/AvatarGroup for member previews
+ * - Load More pagination
  */
 export class GroupsPage extends BasePage {
-  readonly groupCards: Locator;
-  readonly searchInput: Locator;
+  readonly pageHeading: Locator;
   readonly createGroupButton: Locator;
-  readonly myGroupsTab: Locator;
-  readonly allGroupsTab: Locator;
-  readonly categoryFilter: Locator;
+
+  // Search and filters
+  readonly searchCard: Locator;
+  readonly searchInput: Locator;
+  readonly filterSelect: Locator;
+
+  // Group cards
+  readonly groupCards: Locator;
   readonly noGroupsMessage: Locator;
+
+  // Load more
+  readonly loadMoreButton: Locator;
 
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.groupCards = page.locator('.groups-grid .glass-group-card, .glass-group-card, .group-card, .hub-card, [data-group], article[class*="group"]');
-    this.searchInput = page.locator('#groups-search, .glass-search-input, input[name="q"], input[name="search"], input[placeholder*="Search"]');
-    this.createGroupButton = page.locator('a[href*="groups/create"], a[href*="create-group"], .btn--primary:has-text("Create"), button:has-text("Create"), a:has-text("Create Group"), a:has-text("Create Hub")');
-    this.myGroupsTab = page.locator('a[href*="my-groups"], a[href*="my-hubs"], [data-tab="my-groups"]');
-    this.allGroupsTab = page.locator('a[href*="groups"]:not([href*="my-groups"]), [data-tab="all"]');
-    this.categoryFilter = page.locator('.glass-select, select[name="type"], select[name="category"], select[name="category_id"]');
-    this.noGroupsMessage = page.locator('.empty-state, .no-groups, .no-results');
+    this.pageHeading = page.locator('h1:has-text("Groups")');
+    this.createGroupButton = page.locator('a[href*="/groups/create"], button:has-text("Create Group")').first();
+
+    // Search card
+    this.searchCard = page.locator('[class*="glass"]').filter({ has: page.locator('input[placeholder*="Search groups"]') });
+    this.searchInput = page.locator('input[placeholder*="Search groups"]');
+    this.filterSelect = page.locator('select, [role="combobox"]').filter({ hasText: /All Groups|My Groups|Public|Private/ });
+
+    // Group cards - article or GlassCard with group content
+    this.groupCards = page.locator('article').filter({ has: page.locator('h3, .avatar-group') });
+    this.noGroupsMessage = page.locator('text=/No groups found|No groups/');
+
+    // Pagination
+    this.loadMoreButton = page.locator('button:has-text("Load More")');
   }
 
   /**
@@ -33,14 +53,18 @@ export class GroupsPage extends BasePage {
   }
 
   /**
-   * Navigate to my groups
+   * Wait for groups page to load
    */
-  async navigateToMyGroups(): Promise<void> {
-    await this.goto('groups/my-groups');
+  async waitForLoad(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.locator('[class*="glass"], article, text=No groups').first().waitFor({
+      state: 'visible',
+      timeout: 15000
+    }).catch(() => {});
   }
 
   /**
-   * Get number of visible groups
+   * Get number of visible group cards
    */
   async getGroupCount(): Promise<number> {
     return await this.groupCards.count();
@@ -51,12 +75,20 @@ export class GroupsPage extends BasePage {
    */
   async searchGroups(query: string): Promise<void> {
     await this.searchInput.fill(query);
-    await this.searchInput.press('Enter');
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(500); // Debounce
   }
 
   /**
-   * Click on a group
+   * Filter groups by type
+   */
+  async filterByType(filter: 'all' | 'joined' | 'public' | 'private'): Promise<void> {
+    const selectItem = this.page.locator(`text=${filter === 'all' ? 'All Groups' : filter === 'joined' ? 'My Groups' : filter === 'public' ? 'Public' : 'Private'}`).first();
+    await selectItem.click();
+    await this.page.waitForTimeout(500);
+  }
+
+  /**
+   * Click on a group card
    */
   async clickGroup(index: number = 0): Promise<void> {
     await this.groupCards.nth(index).click();
@@ -72,56 +104,101 @@ export class GroupsPage extends BasePage {
   }
 
   /**
-   * Filter by category
+   * Check if no groups are shown
    */
-  async filterByCategory(category: string): Promise<void> {
-    await this.categoryFilter.selectOption(category);
-    await this.page.waitForLoadState('domcontentloaded');
+  async hasNoGroups(): Promise<boolean> {
+    return await this.noGroupsMessage.isVisible();
   }
 
   /**
-   * Get group names
+   * Get group names from visible cards
    */
   async getGroupNames(): Promise<string[]> {
-    const names = await this.groupCards.locator('.group-name, h3, h4').allTextContents();
+    const names = await this.groupCards.locator('h3').allTextContents();
     return names.map(n => n.trim());
+  }
+
+  /**
+   * Check if search is available
+   */
+  async hasSearch(): Promise<boolean> {
+    return await this.searchInput.count() > 0;
+  }
+
+  /**
+   * Check if create button is available
+   */
+  async hasCreateButton(): Promise<boolean> {
+    return await this.createGroupButton.count() > 0;
+  }
+
+  /**
+   * Load more groups
+   */
+  async loadMore(): Promise<void> {
+    await this.loadMoreButton.click();
+    await this.page.waitForTimeout(1000);
   }
 }
 
 /**
- * Group Detail Page Object
+ * Group Detail Page Object (React with Tabs)
+ *
+ * The React group detail page uses:
+ * - GlassCard for main content
+ * - HeroUI Tabs for different sections
+ * - Join/Leave buttons
+ * - Member avatars
  */
 export class GroupDetailPage extends BasePage {
+  readonly pageHeading: Locator;
+  readonly breadcrumbs: Locator;
+
+  // Group info
   readonly groupName: Locator;
   readonly description: Locator;
   readonly memberCount: Locator;
+  readonly privacyBadge: Locator;
+
+  // Actions
   readonly joinButton: Locator;
   readonly leaveButton: Locator;
-  readonly discussionsList: Locator;
-  readonly createPostButton: Locator;
-  readonly createDiscussionButton: Locator;
-  readonly membersTab: Locator;
-  readonly discussionsTab: Locator;
-  readonly eventsTab: Locator;
   readonly settingsButton: Locator;
-  readonly inviteButton: Locator;
+
+  // Tabs
+  readonly discussionsTab: Locator;
+  readonly membersTab: Locator;
+  readonly eventsTab: Locator;
+
+  // Members
+  readonly membersList: Locator;
+  readonly memberItems: Locator;
 
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.groupName = page.locator('h1, .group-title');
-    this.description = page.locator('.group-description, .description');
-    this.memberCount = page.locator('.member-count, [data-member-count]');
-    this.joinButton = page.locator('.join-btn, button:has-text("Join"), [data-join]');
-    this.leaveButton = page.locator('.leave-btn, button:has-text("Leave"), [data-leave]');
-    this.discussionsList = page.locator('.discussion, .discussion-item, [data-discussion]');
-    this.createPostButton = page.locator('a[href*="post"], .create-post-btn');
-    this.createDiscussionButton = page.locator('a[href*="discussions/create"], .create-discussion-btn');
-    this.membersTab = page.locator('[data-tab="members"], a[href*="members"]');
-    this.discussionsTab = page.locator('[data-tab="discussions"], a[href*="discussions"]');
-    this.eventsTab = page.locator('[data-tab="events"], a[href*="events"]');
-    this.settingsButton = page.locator('.settings-btn, a[href*="edit"]');
-    this.inviteButton = page.locator('.invite-btn, a[href*="invite"]');
+    this.pageHeading = page.locator('h1');
+    this.breadcrumbs = page.locator('nav[aria-label="Breadcrumb"]');
+
+    // Group info
+    this.groupName = page.locator('h1').first();
+    this.description = page.locator('text=About').locator('..').locator('p');
+    this.memberCount = page.locator('text=/\\d+ members?/');
+    this.privacyBadge = page.locator('[class*="chip"]').filter({ hasText: /Public|Private/ });
+
+    // Actions
+    this.joinButton = page.locator('button:has-text("Join")');
+    this.leaveButton = page.locator('button:has-text("Leave")');
+    this.settingsButton = page.locator('button:has-text("Settings"), a[href*="/edit"]');
+
+    // Tabs
+    this.discussionsTab = page.locator('button[role="tab"]:has-text("Discussions")');
+    this.membersTab = page.locator('button[role="tab"]:has-text("Members")');
+    this.eventsTab = page.locator('button[role="tab"]:has-text("Events")');
+
+    // Members
+    this.membersList = page.locator('[key="members"]');
+    this.memberItems = page.locator('.bg-theme-elevated').filter({ has: page.locator('img[alt], .avatar') });
   }
 
   /**
@@ -132,11 +209,19 @@ export class GroupDetailPage extends BasePage {
   }
 
   /**
+   * Wait for group detail to load
+   */
+  async waitForLoad(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.groupName.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
+  }
+
+  /**
    * Join the group
    */
   async join(): Promise<void> {
     await this.joinButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(500);
   }
 
   /**
@@ -144,12 +229,7 @@ export class GroupDetailPage extends BasePage {
    */
   async leave(): Promise<void> {
     await this.leaveButton.click();
-    // Handle confirmation if present
-    const confirmButton = this.page.locator('.confirm-leave, [data-confirm]');
-    if (await confirmButton.isVisible()) {
-      await confirmButton.click();
-    }
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(500);
   }
 
   /**
@@ -163,7 +243,7 @@ export class GroupDetailPage extends BasePage {
    * Get group name
    */
   async getGroupName(): Promise<string> {
-    return await this.groupName.textContent() || '';
+    return (await this.groupName.textContent())?.trim() || '';
   }
 
   /**
@@ -171,101 +251,108 @@ export class GroupDetailPage extends BasePage {
    */
   async getMemberCount(): Promise<number> {
     const countText = await this.memberCount.textContent() || '0';
-    return parseInt(countText.replace(/\D/g, ''), 10);
+    const match = countText.match(/(\d+)/);
+    return match ? parseInt(match[1], 10) : 0;
   }
 
   /**
-   * Click create post
+   * Switch to Members tab
    */
-  async clickCreatePost(): Promise<void> {
-    await this.createPostButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
-  }
-
-  /**
-   * Click create discussion
-   */
-  async clickCreateDiscussion(): Promise<void> {
-    await this.createDiscussionButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
-  }
-
-  /**
-   * Get number of discussions
-   */
-  async getDiscussionCount(): Promise<number> {
-    return await this.discussionsList.count();
-  }
-
-  /**
-   * Click on discussions tab
-   */
-  async goToDiscussionsTab(): Promise<void> {
-    await this.discussionsTab.click();
-    await this.page.waitForLoadState('domcontentloaded');
-  }
-
-  /**
-   * Click on members tab
-   */
-  async goToMembersTab(): Promise<void> {
+  async switchToMembersTab(): Promise<void> {
     await this.membersTab.click();
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(300);
   }
 
   /**
-   * Click invite button
+   * Get number of visible members in list
    */
-  async clickInvite(): Promise<void> {
-    await this.inviteButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
+  async getVisibleMemberCount(): Promise<number> {
+    await this.switchToMembersTab();
+    return await this.memberItems.count();
+  }
+
+  /**
+   * Check if current user can edit
+   */
+  async canEdit(): Promise<boolean> {
+    return await this.settingsButton.isVisible();
   }
 }
 
 /**
- * Create Group Page Object
+ * Create Group Page Object (React with HeroUI Form)
+ *
+ * The React create/edit group page uses:
+ * - HeroUI Input/Textarea components
+ * - HeroUI Select for privacy setting
+ * - Image upload with drag & drop
  */
 export class CreateGroupPage extends BasePage {
+  readonly pageHeading: Locator;
+
+  // Form fields
   readonly nameInput: Locator;
-  readonly descriptionInput: Locator;
-  readonly categorySelect: Locator;
+  readonly descriptionTextarea: Locator;
   readonly privacySelect: Locator;
-  readonly imageUpload: Locator;
+
+  // Image upload
+  readonly imageUploadArea: Locator;
+  readonly imagePreview: Locator;
+
+  // Actions
   readonly submitButton: Locator;
+  readonly cancelButton: Locator;
+
+  // Validation
+  readonly errorMessages: Locator;
 
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.nameInput = page.locator('input[name="name"], input[name="title"]');
-    this.descriptionInput = page.locator('textarea[name="description"]');
-    this.categorySelect = page.locator('select[name="category_id"]');
-    this.privacySelect = page.locator('select[name="privacy"], select[name="visibility"]');
-    this.imageUpload = page.locator('input[type="file"]');
-    this.submitButton = page.locator('button[type="submit"]');
+    this.pageHeading = page.locator('h1:has-text("Create"), h1:has-text("Edit")');
+
+    // Form fields
+    this.nameInput = page.locator('input[placeholder*="Group Name"], label:has-text("Group Name") + input').first();
+    this.descriptionTextarea = page.locator('textarea[placeholder*="Describe"], label:has-text("Description") + textarea').first();
+    this.privacySelect = page.locator('select, [role="combobox"]').filter({ hasText: /Public|Private/ });
+
+    // Image upload
+    this.imageUploadArea = page.locator('text=Click to upload or drag and drop');
+    this.imagePreview = page.locator('img[alt*="preview"]');
+
+    // Actions
+    this.submitButton = page.locator('button[type="submit"]:has-text("Create"), button[type="submit"]:has-text("Update")');
+    this.cancelButton = page.locator('button:has-text("Cancel")');
+
+    // Validation
+    this.errorMessages = page.locator('[role="alert"], .error, [data-slot="error-message"]');
   }
 
   /**
    * Navigate to create group page
    */
   async navigate(): Promise<void> {
-    await this.goto('create-group');
+    await this.goto('groups/create');
   }
 
   /**
-   * Fill group creation form
+   * Wait for form to load
+   */
+  async waitForLoad(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.nameInput.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+  }
+
+  /**
+   * Fill group form
    */
   async fillForm(data: {
     name: string;
     description: string;
-    category?: string;
-    privacy?: 'public' | 'private' | 'hidden';
+    privacy?: 'public' | 'private';
   }): Promise<void> {
     await this.nameInput.fill(data.name);
-    await this.descriptionInput.fill(data.description);
-
-    if (data.category) {
-      await this.categorySelect.selectOption({ label: data.category });
-    }
+    await this.descriptionTextarea.fill(data.description);
 
     if (data.privacy) {
       await this.privacySelect.selectOption(data.privacy);
@@ -273,23 +360,17 @@ export class CreateGroupPage extends BasePage {
   }
 
   /**
-   * Submit group creation form
+   * Submit group form
    */
   async submit(): Promise<void> {
     await this.submitButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
   }
 
   /**
-   * Create a group with full flow
+   * Check if form has validation errors
    */
-  async createGroup(data: {
-    name: string;
-    description: string;
-    category?: string;
-    privacy?: 'public' | 'private' | 'hidden';
-  }): Promise<void> {
-    await this.fillForm(data);
-    await this.submit();
+  async hasErrors(): Promise<boolean> {
+    return await this.errorMessages.count() > 0;
   }
 }
