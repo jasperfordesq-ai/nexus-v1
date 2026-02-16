@@ -437,7 +437,7 @@ class AdminDeliverabilityApiController extends BaseApiController
         $comments = Database::query(
             "SELECT c.*,
                     CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
-                    u.avatar as user_avatar
+                    u.avatar_url as user_avatar
              FROM deliverable_comments c
              LEFT JOIN users u ON c.user_id = u.id
              WHERE c.deliverable_id = ? AND c.tenant_id = ? AND c.is_deleted = 0
@@ -908,7 +908,7 @@ class AdminDeliverabilityApiController extends BaseApiController
         $comment = Database::query(
             "SELECT c.*,
                     CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
-                    u.avatar as user_avatar
+                    u.avatar_url as user_avatar
              FROM deliverable_comments c
              LEFT JOIN users u ON c.user_id = u.id
              WHERE c.id = ? AND c.tenant_id = ?",
