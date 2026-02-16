@@ -459,17 +459,17 @@ class ConnectionService
             }
 
             $mailer = new Mailer();
-            $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
-            $host = $_SERVER['HTTP_HOST'] ?? 'project-nexus.ie';
-            $profileLink = "{$protocol}://{$host}/profile/{$requester['id']}";
+            $baseUrl = TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
+            $profileLink = rtrim($baseUrl, '/') . "/profile/{$requester['id']}";
+            $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
 
             $html = EmailTemplate::render(
                 "New Connection Request",
                 "{$requester['name']} sent you a connection request.",
-                "Expand your network on Project NEXUS. View their profile to accept or decline the request.",
+                "Expand your network on {$tenantName}. View their profile to accept or decline the request.",
                 "View Profile",
                 $profileLink,
-                "Project NEXUS"
+                $tenantName
             );
 
             $mailer->send($receiver['email'], "New Connection Request", $html);
@@ -490,9 +490,9 @@ class ConnectionService
             }
 
             $mailer = new Mailer();
-            $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
-            $host = $_SERVER['HTTP_HOST'] ?? 'project-nexus.ie';
-            $profileLink = "{$protocol}://{$host}/profile/{$receiver['id']}";
+            $baseUrl = TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
+            $profileLink = rtrim($baseUrl, '/') . "/profile/{$receiver['id']}";
+            $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
 
             $html = EmailTemplate::render(
                 "Request Accepted",
@@ -500,7 +500,7 @@ class ConnectionService
                 "You are now connected. You can send messages, exchange credits, and see their updates.",
                 "View Profile",
                 $profileLink,
-                "Project NEXUS"
+                $tenantName
             );
 
             $mailer->send($requester['email'], "Connection Request Accepted", $html);

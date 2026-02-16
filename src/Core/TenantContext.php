@@ -363,6 +363,33 @@ class TenantContext
         return $value;
     }
 
+    /**
+     * Get the frontend URL for user-facing links (emails, notifications).
+     * Uses tenant domain → FRONTEND_URL env → APP_URL env → fallback.
+     */
+    public static function getFrontendUrl(): string
+    {
+        // 1. Tenant domain is the best source (tenant-specific)
+        $siteUrl = self::getSetting('site_url');
+        if ($siteUrl) {
+            return rtrim($siteUrl, '/');
+        }
+
+        // 2. Explicit FRONTEND_URL env var
+        $frontendUrl = Env::get('FRONTEND_URL');
+        if ($frontendUrl) {
+            return rtrim($frontendUrl, '/');
+        }
+
+        // 3. Fallback to APP_URL (may be API domain — not ideal)
+        $appUrl = Env::get('APP_URL');
+        if ($appUrl) {
+            return rtrim($appUrl, '/');
+        }
+
+        return 'https://app.project-nexus.ie';
+    }
+
     public static function hasFeature($feature)
     {
         $tenant = self::get();

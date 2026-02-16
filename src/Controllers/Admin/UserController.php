@@ -127,7 +127,7 @@ class UserController
                 try {
                     $tenant = TenantContext::get();
                     $tenantName = $tenant['name'] ?? 'Project NEXUS';
-                    $loginLink = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . TenantContext::getBasePath() . "/login";
+                    $loginLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/login";
 
                     $html = \Nexus\Core\EmailTemplate::render(
                         "Your Account Has Been Created",
@@ -393,7 +393,7 @@ class UserController
                              <p style='font-size: 48px; text-align: center; margin: 20px 0;'>{$icon}</p>
                              <p>Log in to your profile to view your latest achievement.</p>",
                             "View My Badges",
-                            (isset($_SERVER['HTTPS']) ? "https://" : "http://") . $_SERVER['HTTP_HOST'] . $basePath . "/profile/me"
+                            TenantContext::getFrontendUrl() . $basePath . "/profile/me"
                         );
                         $mailer->send($user['email'], "You earned a new badge! {$icon}", $body);
                     }

@@ -7,6 +7,7 @@ use Nexus\Models\Notification;
 use Nexus\Models\User;
 use Nexus\Core\Mailer;
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 use Nexus\Helpers\UrlHelper;
 
 class ConnectionController
@@ -44,15 +45,17 @@ class ConnectionController
                     if ($receiver && $receiver['email']) {
                         $mailer = new Mailer();
                         $subject = "New Friend Request";
-                        $profileLink = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . "/profile/{$_SESSION['user_id']}";
+                        $baseUrl = TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
+                        $profileLink = rtrim($baseUrl, '/') . "/profile/{$_SESSION['user_id']}";
+                        $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
 
                         $html = \Nexus\Core\EmailTemplate::render(
                             "New Friend Request",
                             "{$_SESSION['user_name']} sent you a friend request.",
-                            "Expand your network on Project NEXUS. View their profile to accept or decline the request.",
+                            "Expand your network on {$tenantName}. View their profile to accept or decline the request.",
                             "View Profile",
                             $profileLink,
-                            "Project NEXUS"
+                            $tenantName
                         );
 
                         $mailer->send($receiver['email'], $subject, $html);
@@ -101,7 +104,9 @@ class ConnectionController
                 if ($requester && $requester['email']) {
                     $mailer = new Mailer();
                     $subject = "Friend Request Accepted";
-                    $profileLink = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . "/profile/{$_SESSION['user_id']}";
+                    $baseUrl = TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
+                    $profileLink = rtrim($baseUrl, '/') . "/profile/{$_SESSION['user_id']}";
+                    $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
 
                     $html = \Nexus\Core\EmailTemplate::render(
                         "Request Accepted",
@@ -109,7 +114,7 @@ class ConnectionController
                         "You are now connected. You can send messages, exchange credits, and see their updates.",
                         "View Profile",
                         $profileLink,
-                        "Project NEXUS"
+                        $tenantName
                     );
 
                     $mailer->send($requester['email'], $subject, $html);

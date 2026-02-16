@@ -313,7 +313,7 @@ class CronController
                     $body = $item['email_body'] ?? nl2br($item['content_snippet']);
 
                     // Replace placeholder URLs in email body
-                    $baseUrl = TenantContext::getSetting('site_url', 'https://' . ($_SERVER['HTTP_HOST'] ?? ''));
+                    $baseUrl = TenantContext::getFrontendUrl();
                     $basePath = TenantContext::getBasePath();
 
                     // Replace {{MATCHES_URL}} placeholder
@@ -355,7 +355,7 @@ class CronController
         foreach ($items as $item) {
             $date = date('M j, g:i a', strtotime($item['created_at']));
             $snippet = htmlspecialchars($item['content_snippet']);
-            $link = $item['link'] ? "https://" . $_SERVER['HTTP_HOST'] . $item['link'] : '#';
+            $link = $item['link'] ? TenantContext::getFrontendUrl() . $item['link'] : '#';
 
             $listHtml .= "
             <div style='margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;'>
@@ -382,7 +382,7 @@ class CronController
 
                 <div style='margin-top: 30px; font-size: 12px; color: #aaa; text-align: center;'>
                     <p>You received this email because you opted for a $frequency summary.</p>
-                    <p><a href='https://" . $_SERVER['HTTP_HOST'] . "/dashboard?tab=notifications' style='color: #aaa;'>Manage Notifications</a></p>
+                    <p><a href='" . TenantContext::getFrontendUrl() . "/dashboard?tab=notifications' style='color: #aaa;'>Manage Notifications</a></p>
                 </div>
             </div>
         </body>

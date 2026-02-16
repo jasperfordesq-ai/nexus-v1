@@ -854,7 +854,7 @@ class GamificationService
                     $badgeName = htmlspecialchars($def['name']);
                     $badgeIcon = $def['icon'];
                     $achievementDesc = ucfirst($msg);
-                    $siteUrl = (isset($_SERVER['HTTPS']) ? "https://" : "http://") . $_SERVER['HTTP_HOST'];
+                    $siteUrl = \Nexus\Core\TenantContext::getFrontendUrl();
                     $achievementsUrl = $siteUrl . $basePath . "/achievements/badges";
 
                     $body = <<<HTML

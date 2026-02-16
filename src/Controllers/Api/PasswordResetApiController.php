@@ -235,16 +235,11 @@ class PasswordResetApiController extends BaseApiController
         );
 
         // Build reset URL
-        $appUrl = \Nexus\Core\Env::get('APP_URL') ?? '';
-        if (empty($appUrl)) {
-            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $appUrl = "{$protocol}://{$host}";
-        }
+        $appUrl = TenantContext::getFrontendUrl();
 
         // For API clients, provide a deep link or web fallback
         // Mobile apps can intercept this URL pattern
-        $resetUrl = rtrim($appUrl, '/') . "/password/reset?token=" . $token;
+        $resetUrl = $appUrl . "/password/reset?token=" . $token;
 
         // Send reset email
         try {

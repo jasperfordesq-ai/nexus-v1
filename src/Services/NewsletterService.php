@@ -568,9 +568,11 @@ class NewsletterService
         $color = '#6366f1';
         $colorDark = '#4f46e5';
 
-        // App URL for links
-        $appUrl = Env::get('APP_URL') ?? '';
+        // Frontend URL for user-facing links (uses tenant domain, not API domain)
+        $frontendUrl = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getBasePath();
+        // API URL for tracking endpoints (must hit PHP backend)
+        $apiUrl = rtrim(Env::get('APP_URL') ?? $frontendUrl, '/');
 
         // Process dynamic content blocks first
         $content = EmailTemplateBuilder::processDynamicBlocks($content);
@@ -580,12 +582,12 @@ class NewsletterService
             $content = EmailTemplateBuilder::personalizeContent($content, $recipient);
         }
 
-        // Build unsubscribe URL
+        // Build unsubscribe URL (PHP route — uses API URL)
         if ($unsubscribeToken) {
-            $unsubscribeUrl = rtrim($appUrl, '/') . $basePath . '/newsletter/unsubscribe?token=' . $unsubscribeToken;
-            $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a> <span style="color: #d1d5db; margin: 0 8px;">|</span> <a href="' . rtrim($appUrl, '/') . $basePath . '/settings" style="color: #6b7280; text-decoration: underline;">Manage Preferences</a>';
+            $unsubscribeUrl = $apiUrl . $basePath . '/newsletter/unsubscribe?token=' . $unsubscribeToken;
+            $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a> <span style="color: #d1d5db; margin: 0 8px;">|</span> <a href="' . $frontendUrl . $basePath . '/settings" style="color: #6b7280; text-decoration: underline;">Manage Preferences</a>';
         } else {
-            $unsubscribeUrl = rtrim($appUrl, '/') . $basePath . '/settings';
+            $unsubscribeUrl = $frontendUrl . $basePath . '/settings';
             $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">Manage Email Preferences</a>';
         }
 
@@ -1005,7 +1007,8 @@ HTML;
     {
         $tenant = TenantContext::get();
         $basePath = TenantContext::getBasePath();
-        $appUrl = Env::get('APP_URL') ?? '';
+        $frontendUrl = TenantContext::getFrontendUrl();
+        $apiUrl = rtrim(Env::get('APP_URL') ?? $frontendUrl, '/');
 
         // Default sample data for preview
         $defaults = [
@@ -1014,8 +1017,8 @@ HTML;
             'email' => 'john.doe@example.com',
             'name' => 'John Doe',
             'tenant_name' => $tenant['name'] ?? 'Your Organization',
-            'unsubscribe_link' => rtrim($appUrl, '/') . $basePath . '/newsletter/unsubscribe?token=SAMPLE_TOKEN',
-            'view_in_browser' => rtrim($appUrl, '/') . $basePath . '/newsletter/view/preview',
+            'unsubscribe_link' => $apiUrl . $basePath . '/newsletter/unsubscribe?token=SAMPLE_TOKEN',
+            'view_in_browser' => $apiUrl . $basePath . '/newsletter/view/preview',
             'current_date' => date('F j, Y'),
             'current_year' => date('Y'),
         ];
