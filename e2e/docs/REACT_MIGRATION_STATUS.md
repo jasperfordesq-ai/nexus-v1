@@ -46,8 +46,16 @@
    - ✅ Tests for like/comment interactions, filter chips, load more
    - ✅ Skipped destructive tests (create poll, report, hide, delete)
 
-8. **Documentation**
+8. **Wallet Tests** (`wallet.spec.ts` + `WalletPage.ts`)
+   - ✅ Rewrote WalletPage page object for React with GlassCard components
+   - ✅ Updated TransferPage for modal-based transfer (NOT separate route `/wallet/transfer`)
+   - ✅ Transfer modal opens on wallet page (no route change)
+   - ✅ Tests for filter chips (All, Earned, Spent, Pending) and pagination
+   - ✅ Tests for modal elements (recipient search, amount, description, balance display)
+
+9. **Documentation**
    - ✅ Created `ROUTE_MAPPING.md` with legacy → React route map
+   - ✅ Created `REACT_ROUTES_REFERENCE.md` with complete React route listing
    - ✅ Created this status document
 
 ## Pending 🚧
