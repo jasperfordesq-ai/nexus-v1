@@ -62,8 +62,8 @@ export function useLegalDocument(type: LegalDocumentType) {
 
     api.get<LegalDocument | null>(`/v2/legal/${type}`)
       .then((res) => {
-        if (res.success && res.data) {
-          setDocument(res.data);
+        if (res.success && res.data && typeof res.data === 'object' && 'id' in res.data && 'content' in res.data) {
+          setDocument(res.data as LegalDocument);
         }
       })
       .catch(() => {

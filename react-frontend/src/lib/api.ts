@@ -392,7 +392,7 @@ class ApiClient {
       if (response.ok) {
         return {
           success: true,
-          data: data.data ?? data,
+          data: 'data' in data ? data.data : data,
           message: data.message,
           meta: data.meta,
         };
