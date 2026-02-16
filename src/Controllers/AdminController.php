@@ -2155,7 +2155,7 @@ class AdminController
     public function webpConverter()
     {
         $this->checkAdmin();
-        require __DIR__ . '/../../views/admin-legacy/webp-converter.php';
+        require __DIR__ . '/../../views/admin/webp-converter.php';
     }
 
     /**
@@ -2280,7 +2280,7 @@ class AdminController
     public function imageSettings()
     {
         $this->checkAdmin();
-        require __DIR__ . '/../../views/admin-legacy/image-settings.php';
+        require __DIR__ . '/../../views/admin/image-settings.php';
     }
 
     /**

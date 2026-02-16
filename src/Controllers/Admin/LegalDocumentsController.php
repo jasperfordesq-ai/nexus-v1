@@ -631,7 +631,7 @@ class LegalDocumentsController
     private function notFound(): void
     {
         http_response_code(404);
-        require __DIR__ . '/../../../views/admin-legacy/errors/404.php';
+        require __DIR__ . '/../../../views/errors/404.php';
     }
 
     private function getDocumentTypes(): array

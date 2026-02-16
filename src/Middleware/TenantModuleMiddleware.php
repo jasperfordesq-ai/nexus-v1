@@ -149,8 +149,7 @@ class TenantModuleMiddleware
 
         // Try to use the tenant's 404 view if it exists
         $viewPaths = [
-            __DIR__ . '/../../views/tenants/' . ($tenant['slug'] ?? 'default') . '/modern/errors/404.php',
-            __DIR__ . '/../../views/layouts/modern/errors/404.php',
+            __DIR__ . '/../../views/tenants/' . ($tenant['slug'] ?? 'default') . '/errors/404.php',
             __DIR__ . '/../../views/errors/404.php',
         ];
 
