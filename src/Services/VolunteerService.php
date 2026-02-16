@@ -1478,7 +1478,7 @@ class VolunteerService
                 'comment' => $r['comment'],
                 'reviewer' => [
                     'name' => trim(($r['first_name'] ?? '') . ' ' . ($r['last_name'] ?? '')),
-                    'avatar_url' => $r['avatar'] ?? null,
+                    'avatar_url' => $r['avatar_url'] ?? null,
                 ],
                 'created_at' => $r['created_at'],
             ];
