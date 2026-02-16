@@ -2,29 +2,104 @@ import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
- * Wallet Page Object - Time Credit Management
+ * Wallet Page Object (React with GlassCard and TransferModal)
+ *
+ * The React wallet page uses:
+ * - GlassCard for balance display and stats
+ * - Transaction list with filter chips (All, Earned, Spent, Pending)
+ * - TransferModal (modal overlay, NOT a separate route)
+ * - Load More button for pagination
  */
 export class WalletPage extends BasePage {
+  // Balance section
+  readonly balanceCard: Locator;
   readonly balance: Locator;
+  readonly balanceLabel: Locator;
+
+  // Stats
+  readonly totalEarnedStat: Locator;
+  readonly totalSpentStat: Locator;
+  readonly pendingTransactionsStat: Locator;
+
+  // Actions
+  readonly transferButton: Locator;
+
+  // Transaction list
   readonly transactionsList: Locator;
   readonly transactionItems: Locator;
-  readonly transferButton: Locator;
-  readonly insightsLink: Locator;
-  readonly filterDropdown: Locator;
-  readonly pendingCount: Locator;
   readonly noTransactionsMessage: Locator;
+
+  // Filter chips
+  readonly filterChips: Locator;
+  readonly allFilterChip: Locator;
+  readonly earnedFilterChip: Locator;
+  readonly spentFilterChip: Locator;
+  readonly pendingFilterChip: Locator;
+
+  // Pagination
+  readonly loadMoreButton: Locator;
+
+  // Transfer Modal elements
+  readonly transferModal: Locator;
+  readonly modalTitle: Locator;
+  readonly recipientSearchInput: Locator;
+  readonly recipientResults: Locator;
+  readonly selectedRecipient: Locator;
+  readonly amountInput: Locator;
+  readonly descriptionInput: Locator;
+  readonly modalSubmitButton: Locator;
+  readonly modalCancelButton: Locator;
+  readonly modalCloseButton: Locator;
+  readonly availableBalanceDisplay: Locator;
 
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.balance = page.locator('.wallet-balance-amount, .wallet-balance, [data-balance], .balance-display');
-    this.transactionsList = page.locator('.wallet-transactions, .transaction-list, .transactions');
-    this.transactionItems = page.locator('.wallet-tx-row, .transaction, .transaction-item, [data-transaction]');
-    this.transferButton = page.locator('.wallet-submit-btn, .transfer-btn, a[href*="transfer"], button:has-text("Send")');
-    this.insightsLink = page.locator('.wallet-insights-link, a[href*="insights"], .insights-link');
-    this.filterDropdown = page.locator('select[name="filter"], [data-filter]');
-    this.pendingCount = page.locator('.pending-count, [data-pending]');
-    this.noTransactionsMessage = page.locator('.no-transactions, .empty-state, .wallet-empty');
+    // Balance section - GlassCard with balance display
+    this.balanceCard = page.locator('[class*="glass"]').filter({ hasText: 'Available Balance' }).or(
+      page.locator('[class*="glass"]').filter({ hasText: 'Current Balance' })
+    );
+    this.balance = page.locator('text=/\\d+(\\.\\d+)?\\s*hours?/').first();
+    this.balanceLabel = page.locator('text=Available Balance, text=Current Balance').first();
+
+    // Stats cards
+    this.totalEarnedStat = page.locator('text=Total Earned').locator('..').locator('p, span').filter({ hasText: /\d+/ });
+    this.totalSpentStat = page.locator('text=Total Spent').locator('..').locator('p, span').filter({ hasText: /\d+/ });
+    this.pendingTransactionsStat = page.locator('text=Pending').locator('..').locator('p, span').filter({ hasText: /\d+/ });
+
+    // Transfer button (gradient button)
+    this.transferButton = page.locator('button:has-text("Send Credits"), button:has-text("Transfer")').first();
+
+    // Transaction list
+    this.transactionsList = page.locator('[class*="glass"]').filter({ hasText: 'Transaction History' }).or(
+      page.locator('[class*="glass"]').filter({ hasText: 'Recent Transactions' })
+    );
+    this.transactionItems = page.locator('[class*="glass"]').filter({ hasText: 'Transaction History' })
+      .locator('> div').filter({ has: page.locator('text=/\\d+(\\.\\d+)?\\s*hours?/') });
+    this.noTransactionsMessage = page.locator('text=No transactions yet, text=No transactions found');
+
+    // Filter chips (All, Earned, Spent, Pending)
+    this.filterChips = page.locator('button:has-text("All"), button:has-text("Earned"), button:has-text("Spent"), button:has-text("Pending")');
+    this.allFilterChip = page.locator('button:has-text("All")').first();
+    this.earnedFilterChip = page.locator('button:has-text("Earned")').first();
+    this.spentFilterChip = page.locator('button:has-text("Spent")').first();
+    this.pendingFilterChip = page.locator('button:has-text("Pending")').first();
+
+    // Load more button
+    this.loadMoreButton = page.locator('button:has-text("Load More")');
+
+    // Transfer Modal (overlay, NOT a route)
+    this.transferModal = page.locator('[role="dialog"][aria-modal="true"]:has-text("Send Credits")');
+    this.modalTitle = this.transferModal.locator('#transfer-modal-title, h2:has-text("Send Credits")');
+    this.recipientSearchInput = this.transferModal.locator('input[placeholder*="Search"]');
+    this.recipientResults = page.locator('[role="listbox"][aria-label="Search results"]');
+    this.selectedRecipient = this.transferModal.locator('.bg-theme-elevated:has(img[alt])').first();
+    this.amountInput = this.transferModal.locator('input[type="number"], input[name="amount"]');
+    this.descriptionInput = this.transferModal.locator('textarea[placeholder*="description" i], textarea[name="description"]');
+    this.modalSubmitButton = this.transferModal.locator('button[type="submit"]:has-text("Send")');
+    this.modalCancelButton = this.transferModal.locator('button:has-text("Cancel")');
+    this.modalCloseButton = this.transferModal.locator('button[aria-label="Close modal"]');
+    this.availableBalanceDisplay = this.transferModal.locator('text=Available Balance').locator('..').locator('span').filter({ hasText: /\d+/ });
   }
 
   /**
@@ -35,7 +110,19 @@ export class WalletPage extends BasePage {
   }
 
   /**
-   * Get current balance
+   * Wait for wallet page to load
+   */
+  async waitForLoad(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+    // Wait for balance or empty state to appear
+    await this.page.locator('[class*="glass"], text=No transactions yet').first().waitFor({
+      state: 'visible',
+      timeout: 15000
+    }).catch(() => {});
+  }
+
+  /**
+   * Get current balance as number
    */
   async getBalance(): Promise<number> {
     const balanceText = await this.balance.textContent() || '0';
@@ -52,45 +139,13 @@ export class WalletPage extends BasePage {
   }
 
   /**
-   * Get number of transactions shown
+   * Get number of visible transactions
    */
   async getTransactionCount(): Promise<number> {
-    return await this.transactionItems.count();
-  }
-
-  /**
-   * Click transfer button
-   */
-  async clickTransfer(): Promise<void> {
-    await this.transferButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
-  }
-
-  /**
-   * Go to insights page
-   */
-  async goToInsights(): Promise<void> {
-    await this.insightsLink.click();
-    await this.page.waitForLoadState('domcontentloaded');
-  }
-
-  /**
-   * Filter transactions
-   */
-  async filterTransactions(filter: 'all' | 'sent' | 'received' | 'pending'): Promise<void> {
-    await this.filterDropdown.selectOption(filter);
-    await this.page.waitForLoadState('domcontentloaded');
-  }
-
-  /**
-   * Get pending transaction count
-   */
-  async getPendingCount(): Promise<number> {
-    if (await this.pendingCount.count() > 0) {
-      const text = await this.pendingCount.textContent() || '0';
-      return parseInt(text.replace(/\D/g, ''), 10);
-    }
-    return 0;
+    // Count transaction items within the transaction list
+    const items = this.page.locator('[class*="glass"]').filter({ hasText: 'Transaction History' })
+      .locator('> div > div').filter({ has: this.page.locator('text=/\\d+(\\.\\d+)?\\s*hours?/') });
+    return await items.count();
   }
 
   /**
@@ -101,7 +156,50 @@ export class WalletPage extends BasePage {
   }
 
   /**
-   * Get transaction details
+   * Get pending transaction count from stat card
+   */
+  async getPendingCount(): Promise<number> {
+    if (await this.pendingTransactionsStat.count() > 0) {
+      const text = await this.pendingTransactionsStat.textContent() || '0';
+      return parseInt(text.replace(/\D/g, ''), 10);
+    }
+    return 0;
+  }
+
+  /**
+   * Open transfer modal by clicking Send Credits button
+   */
+  async clickTransfer(): Promise<void> {
+    await this.transferButton.click();
+    // Wait for modal to appear
+    await this.transferModal.waitFor({ state: 'visible', timeout: 3000 });
+  }
+
+  /**
+   * Filter transactions by type
+   */
+  async filterTransactions(filter: 'all' | 'earned' | 'spent' | 'pending'): Promise<void> {
+    const chipMap = {
+      all: this.allFilterChip,
+      earned: this.earnedFilterChip,
+      spent: this.spentFilterChip,
+      pending: this.pendingFilterChip,
+    };
+
+    await chipMap[filter].click();
+    await this.page.waitForTimeout(500);
+  }
+
+  /**
+   * Load more transactions
+   */
+  async loadMore(): Promise<void> {
+    await this.loadMoreButton.click();
+    await this.page.waitForTimeout(1000);
+  }
+
+  /**
+   * Get transaction details by index
    */
   async getTransactionDetails(index: number = 0): Promise<{
     amount: string;
@@ -109,17 +207,20 @@ export class WalletPage extends BasePage {
     date: string;
     type: 'sent' | 'received' | 'pending';
   }> {
-    const transaction = this.transactionItems.nth(index);
+    const items = this.page.locator('[class*="glass"]').filter({ hasText: 'Transaction History' })
+      .locator('> div > div').filter({ has: this.page.locator('text=/\\d+(\\.\\d+)?\\s*hours?/') });
 
-    const amount = await transaction.locator('.amount, [data-amount]').textContent() || '';
-    const description = await transaction.locator('.description, [data-description]').textContent() || '';
-    const date = await transaction.locator('.date, [data-date], time').textContent() || '';
+    const transaction = items.nth(index);
+
+    const amount = await transaction.locator('text=/[+-]?\\d+(\\.\\d+)?\\s*hours?/').first().textContent() || '';
+    const description = await transaction.locator('p, span').filter({ hasText: /\w+/ }).first().textContent() || '';
+    const date = await transaction.locator('time, .text-xs').first().textContent() || '';
 
     let type: 'sent' | 'received' | 'pending' = 'received';
-    const classes = await transaction.getAttribute('class') || '';
-    if (classes.includes('sent') || classes.includes('debit')) {
+    const amountText = amount.toLowerCase();
+    if (amountText.includes('-') || amountText.includes('sent')) {
       type = 'sent';
-    } else if (classes.includes('pending')) {
+    } else if (amountText.includes('pending')) {
       type = 'pending';
     }
 
@@ -128,29 +229,65 @@ export class WalletPage extends BasePage {
 }
 
 /**
- * Transfer Page Object
+ * Transfer Modal Helper (NOT a separate page/route)
+ *
+ * This represents the transfer modal that appears as an overlay on the wallet page.
+ * Use WalletPage.clickTransfer() to open it.
  */
 export class TransferPage extends BasePage {
+  readonly modal: Locator;
   readonly recipientInput: Locator;
   readonly recipientSuggestions: Locator;
+  readonly selectedRecipientDisplay: Locator;
+  readonly removeRecipientButton: Locator;
   readonly amountInput: Locator;
   readonly descriptionInput: Locator;
+  readonly availableBalance: Locator;
   readonly submitButton: Locator;
   readonly cancelButton: Locator;
+  readonly closeButton: Locator;
   readonly errorMessage: Locator;
   readonly successMessage: Locator;
 
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.recipientInput = page.locator('input[name="recipient"], .recipient-search, #recipient');
-    this.recipientSuggestions = page.locator('.recipient-suggestion, .user-suggestion, [data-user-id]');
-    this.amountInput = page.locator('input[name="amount"], input[name="hours"]');
-    this.descriptionInput = page.locator('textarea[name="description"], input[name="description"]');
-    this.submitButton = page.locator('button[type="submit"], .transfer-submit');
-    this.cancelButton = page.locator('.cancel-btn, a[href*="wallet"]');
-    this.errorMessage = page.locator('.error, .alert-danger, .govuk-error-summary');
-    this.successMessage = page.locator('.success, .alert-success, .govuk-notification-banner--success');
+    this.modal = page.locator('[role="dialog"][aria-modal="true"]:has-text("Send Credits")');
+    this.recipientInput = this.modal.locator('input[placeholder*="Search"]');
+    this.recipientSuggestions = page.locator('[role="listbox"][aria-label="Search results"]');
+    this.selectedRecipientDisplay = this.modal.locator('.bg-theme-elevated:has(img[alt])').first();
+    this.removeRecipientButton = this.selectedRecipientDisplay.locator('button[aria-label*="Remove"]');
+    this.amountInput = this.modal.locator('input[type="number"], input[name="amount"]');
+    this.descriptionInput = this.modal.locator('textarea[placeholder*="description" i]');
+    this.availableBalance = this.modal.locator('text=Available Balance').locator('..').locator('span').filter({ hasText: /\d+/ });
+    this.submitButton = this.modal.locator('button[type="submit"]:has-text("Send")');
+    this.cancelButton = this.modal.locator('button:has-text("Cancel")');
+    this.closeButton = this.modal.locator('button[aria-label="Close modal"]');
+    this.errorMessage = page.locator('[role="alert"], .error, text=Error').filter({ hasText: /error|failed/i });
+    this.successMessage = page.locator('[role="alert"], text=successful, text=sent').filter({ hasText: /success|sent/i });
+  }
+
+  /**
+   * Check if modal is open
+   */
+  async isOpen(): Promise<boolean> {
+    return await this.modal.isVisible();
+  }
+
+  /**
+   * Close modal via cancel button
+   */
+  async cancel(): Promise<void> {
+    await this.cancelButton.click();
+    await this.modal.waitFor({ state: 'hidden', timeout: 2000 });
+  }
+
+  /**
+   * Close modal via X button
+   */
+  async close(): Promise<void> {
+    await this.closeButton.click();
+    await this.modal.waitFor({ state: 'hidden', timeout: 2000 });
   }
 
   /**
@@ -162,10 +299,22 @@ export class TransferPage extends BasePage {
   }
 
   /**
-   * Select recipient from suggestions
+   * Select recipient from search results
    */
   async selectRecipient(index: number = 0): Promise<void> {
-    await this.recipientSuggestions.nth(index).click();
+    const results = this.recipientSuggestions.locator('button[role="option"]');
+    await results.nth(index).click();
+    await this.page.waitForTimeout(300);
+  }
+
+  /**
+   * Get number of search results
+   */
+  async getResultsCount(): Promise<number> {
+    if (await this.recipientSuggestions.isVisible()) {
+      return await this.recipientSuggestions.locator('button[role="option"]').count();
+    }
+    return 0;
   }
 
   /**
@@ -176,10 +325,19 @@ export class TransferPage extends BasePage {
     amount: string;
     description?: string;
   }): Promise<void> {
+    // Search and select recipient
     await this.searchRecipient(data.recipient);
-    await this.selectRecipient(0);
+    await this.page.waitForTimeout(500);
+
+    const resultsCount = await this.getResultsCount();
+    if (resultsCount > 0) {
+      await this.selectRecipient(0);
+    }
+
+    // Fill amount
     await this.amountInput.fill(data.amount);
 
+    // Fill description if provided
     if (data.description) {
       await this.descriptionInput.fill(data.description);
     }
@@ -190,11 +348,11 @@ export class TransferPage extends BasePage {
    */
   async submit(): Promise<void> {
     await this.submitButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
   }
 
   /**
-   * Make a transfer
+   * Make a complete transfer
    */
   async transfer(data: {
     recipient: string;
@@ -209,14 +367,14 @@ export class TransferPage extends BasePage {
    * Check if transfer was successful
    */
   async isSuccess(): Promise<boolean> {
-    return await this.successMessage.isVisible();
+    return await this.successMessage.isVisible({ timeout: 3000 }).catch(() => false);
   }
 
   /**
    * Check if there's an error
    */
   async hasError(): Promise<boolean> {
-    return await this.errorMessage.isVisible();
+    return await this.errorMessage.isVisible({ timeout: 2000 }).catch(() => false);
   }
 
   /**
@@ -228,10 +386,28 @@ export class TransferPage extends BasePage {
     }
     return '';
   }
+
+  /**
+   * Check if submit button is disabled
+   */
+  async isSubmitDisabled(): Promise<boolean> {
+    return await this.submitButton.isDisabled();
+  }
+
+  /**
+   * Get available balance from modal
+   */
+  async getAvailableBalance(): Promise<number> {
+    const balanceText = await this.availableBalance.textContent() || '0';
+    const match = balanceText.match(/[\d.]+/);
+    return match ? parseFloat(match[0]) : 0;
+  }
 }
 
 /**
- * Insights Page Object
+ * Insights Page Object (if separate insights page exists)
+ *
+ * NOTE: Check if this is a separate route or part of wallet page
  */
 export class InsightsPage extends BasePage {
   readonly totalEarned: Locator;
@@ -243,15 +419,15 @@ export class InsightsPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.totalEarned = page.locator('.total-earned, [data-earned]');
-    this.totalSpent = page.locator('.total-spent, [data-spent]');
-    this.chartContainer = page.locator('.chart-container, canvas, .insights-chart');
-    this.periodSelector = page.locator('select[name="period"], [data-period]');
-    this.categoryBreakdown = page.locator('.category-breakdown, .breakdown');
+    this.totalEarned = page.locator('text=Total Earned').locator('..').locator('span, p').filter({ hasText: /\d+/ });
+    this.totalSpent = page.locator('text=Total Spent').locator('..').locator('span, p').filter({ hasText: /\d+/ });
+    this.chartContainer = page.locator('canvas, [class*="chart"]').first();
+    this.periodSelector = page.locator('button[role="combobox"], select').filter({ hasText: /Week|Month|Year/ });
+    this.categoryBreakdown = page.locator('text=Category').locator('..').locator('..');
   }
 
   /**
-   * Navigate to insights page
+   * Navigate to insights page (if separate route exists)
    */
   async navigate(): Promise<void> {
     await this.goto('wallet/insights');
@@ -269,14 +445,6 @@ export class InsightsPage extends BasePage {
    */
   async getTotalSpent(): Promise<string> {
     return (await this.totalSpent.textContent())?.trim() || '';
-  }
-
-  /**
-   * Change time period
-   */
-  async changePeriod(period: 'week' | 'month' | 'year' | 'all'): Promise<void> {
-    await this.periodSelector.selectOption(period);
-    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**
