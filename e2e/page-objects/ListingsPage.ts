@@ -18,16 +18,17 @@ export class ListingsPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.listingCards = page.locator('#listings-grid .glass-listing-card, .glass-listing-card, .listing-card, .service-card, [data-listing], article[class*="listing"]');
-    this.searchInput = page.locator('#listing-search, .glass-search-input, input[name="q"], input[name="search"], input[placeholder*="Search"]');
-    this.filterButtons = page.locator('.filter-pill, .filter-btn, [data-filter], .tab-btn');
-    this.categoryFilter = page.locator('.filter-pill.category, select[name="category"], select[name="category_id"], [data-filter="category"]');
-    this.typeFilter = page.locator('.filter-pill.offer, .filter-pill.request, select[name="type"], [data-filter="type"], .type-filter');
-    this.sortDropdown = page.locator('select[name="sort"], [data-sort], .sort-dropdown');
-    // Create listing - either /compose?type=listing or /listings/create, or the compose prompt link
-    this.createListingButton = page.locator('a[href*="compose?type=listing"], a[href*="listings/create"], .compose-prompt-link, .create-listing-btn, a:has-text("Create Listing"), a:has-text("Offer"), a:has-text("Request")');
-    this.loadMoreButton = page.locator('.load-more, [data-load-more], button:has-text("Load more")');
-    this.noResultsMessage = page.locator('.glass-empty-state, .no-results, .empty-state, .no-listings');
+    // React: GlassCard listing cards (article elements)
+    this.listingCards = page.locator('article').filter({ has: page.locator('h3') });
+    this.searchInput = page.locator('input[placeholder*="Search"]');
+    // React: HeroUI Chip components for filters
+    this.filterButtons = page.locator('button[role="option"], .chip, button:has-text("All"), button:has-text("Offers"), button:has-text("Requests")');
+    this.categoryFilter = page.locator('select, [role="combobox"]').filter({ hasText: /Category/ });
+    this.typeFilter = page.locator('select, [role="combobox"]').filter({ hasText: /All|Offers|Requests/ });
+    this.sortDropdown = page.locator('select, [role="combobox"]').filter({ hasText: /Sort|Recent|Popular/ });
+    this.createListingButton = page.locator('a[href*="/listings/create"], button:has-text("Create")').first();
+    this.loadMoreButton = page.locator('button:has-text("Load More")');
+    this.noResultsMessage = page.locator('text=/No listings found|No listings/');
   }
 
   /**
@@ -35,6 +36,17 @@ export class ListingsPage extends BasePage {
    */
   async navigate(): Promise<void> {
     await this.goto('listings');
+  }
+
+  /**
+   * Wait for listings page to load
+   */
+  async waitForLoad(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.locator('[class*="glass"], article, text=No listings').first().waitFor({
+      state: 'visible',
+      timeout: 15000
+    }).catch(() => {});
   }
 
   /**
