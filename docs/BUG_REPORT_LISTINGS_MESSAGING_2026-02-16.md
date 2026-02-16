@@ -3,19 +3,36 @@
 **Date:** 2026-02-16
 **Reporter:** User Testing Feedback
 **Severity:** High - Core user flow broken
+**Status:** ✅ **RESOLVED** - Both critical bugs fixed
 
-## Summary
+## Executive Summary
 
 Users clicking "Send Message" or "Request Exchange" buttons on listing detail pages experience broken flows where listing context is lost, messages don't get sent properly, and the exchange workflow isn't functioning correctly.
 
+### ✅ Fixes Applied
+
+- **Bug #1 FIXED** (Commit `4523834`): Listing context now preserved when sending messages from listings
+- **Bug #2 FIXED** (Commit `866c9fe`): Exchanges now appear on exchanges page after creation
+- **Bug #3 PARTIAL**: Email notifications already supported in backend, listing context now included
+
+### Impact
+
+- ✅ Users now see listing context when messaging about a listing
+- ✅ Listing owners know which listing each inquiry is about
+- ✅ New exchange requests appear immediately on exchanges page
+- ✅ All active exchanges (pending, accepted, in progress) visible in "Active" tab
+- ✅ Analytics tracking enabled for listing-to-message conversions
+
 ---
 
-## Bug #1: Listing Context Lost When Sending Messages
+## Bug #1: Listing Context Lost When Sending Messages ✅ FIXED
 
 ### Description
+
 When a user clicks "Send Message" from a listing detail page, the listing reference is lost during the message composition flow.
 
-### Current Flow (BROKEN)
+### Current Flow (WAS BROKEN)
+
 1. User views listing at `/listings/123`
 2. Clicks "Send Message" button (when exchange workflow disabled)
 3. Navigates to `/messages?to=456&listing=123`
@@ -25,7 +42,8 @@ When a user clicks "Send Message" from a listing detail page, the listing refere
 7. User composes message with NO reference to original listing
 8. First message sent has no listing_id associated with it
 
-### Impact
+### Impact (Before Fix)
+
 - **User confusion**: No context about which listing they're messaging about
 - **Lost referrals**: Listing owner doesn't know which listing generated the inquiry
 - **Tracking failure**: Can't measure which listings drive most interest
@@ -36,6 +54,7 @@ When a user clicks "Send Message" from a listing detail page, the listing refere
 **File:** `react-frontend/src/pages/messages/MessagesPage.tsx`
 
 **Line 160-169:**
+
 ```typescript
 const startNewConversation = useCallback((userId: number, _listing?: number) => {
   // Find existing conversation or create new
@@ -52,7 +71,24 @@ const startNewConversation = useCallback((userId: number, _listing?: number) => 
 
 The `_listing` parameter (with underscore = unused) is accepted but never used. Should be passed as query parameter or in navigation state.
 
-### Fix Required
+### Fix Applied ✅
+
+**Commits:** `4523834` - fix(messages): preserve listing context when sending messages from listings
+
+**Changes Made:**
+
+1. **MessagesPage.tsx** (lines 160-185): Updated `startNewConversation()` to pass listing ID as query parameter
+2. **ConversationPage.tsx**: Added `useSearchParams`, listing state, listing fetch useEffect, listing preview card UI
+3. **ConversationPage.tsx** (lines 760-807): Include `listing_id` in message API payload (both text and attachments)
+4. **MessagesApiController.php** (lines 177-181): Extract `listing_id` from multipart form data
+5. **MessageService.php** (lines 536, 543-555): Store `listing_id` when inserting messages
+6. **Migration**: `2026_02_16_add_listing_id_to_messages.sql` - Added `listing_id INT(11) NULL` column with index and FK
+
+**Database Changes:**
+
+- `messages.listing_id`: New column, INT(11) NULL, indexed, soft FK to `listings(id)` ON DELETE SET NULL
+
+### Original Fix Options (Selected Option A)
 
 #### Option A: Pass as Query Parameter
 ```typescript
@@ -90,7 +126,8 @@ const startNewConversation = useCallback((userId: number, listing?: number) => {
 }, [conversations, navigate, tenantPath]);
 ```
 
-### Files to Update
+### Files Updated ✅
+
 1. **react-frontend/src/pages/messages/MessagesPage.tsx**
    - Fix `startNewConversation()` to pass listing ID
 
@@ -105,41 +142,67 @@ const startNewConversation = useCallback((userId: number, listing?: number) => {
 
 ---
 
-## Bug #2: Exchange Workflow Not Showing Up on Exchanges Page
+## Bug #2: Exchange Workflow Not Showing Up on Exchanges Page ✅ FIXED
 
 ### Description
 When users complete an exchange request flow, the exchange doesn't appear on the exchanges page.
 
-### Current Flow (NEEDS VERIFICATION)
-1. User clicks "Request Exchange" from listing
-2. Navigates to `/listings/:id/request-exchange`
-3. Fills out exchange request form
-4. Submits request
-5. **Expected**: Exchange appears on `/exchanges` page
-6. **Actual**: Exchange missing or not visible
+### Root Cause (CONFIRMED)
+**The "active" status filter was broken:**
 
-### Suspected Issues
-1. Exchange not being created in database
-2. Exchange created but with wrong status (not visible to requestor)
-3. Exchange API endpoint filtering out pending requests
-4. Frontend not fetching/displaying pending exchanges
+1. Frontend defaults to "Active" tab, sends `?status=active` to API
+2. Backend treated 'active' as a literal status value: `WHERE e.status = 'active'`
+3. But 'active' is NOT a real database status!
+4. Real statuses: `pending_provider`, `pending_broker`, `accepted`, `in_progress`, `pending_confirmation`, `completed`, `disputed`, `cancelled`
+5. Result: Query returned zero rows, page appeared empty
 
-### Files to Investigate
-1. **react-frontend/src/pages/exchanges/RequestExchangePage.tsx**
-   - Verify POST request actually sends
-   - Check response handling
+**File:** `src/Services/ExchangeWorkflowService.php:602-604`
 
-2. **src/Controllers/Api/ExchangesApiController.php**
-   - Verify `requestExchange()` method creates record
-   - Check status values being set
+```php
+// BEFORE (BROKEN):
+if (!empty($filters['status'])) {
+    $whereClause .= " AND e.status = ?";
+    $params[] = $filters['status']; // 'active' doesn't exist!
+}
+```
 
-3. **react-frontend/src/pages/exchanges/ExchangesPage.tsx**
-   - Verify API call includes pending exchanges
-   - Check filtering logic
+### Fix Applied ✅
+**File:** `src/Services/ExchangeWorkflowService.php:602-618` and `621-639`
 
-4. **src/Services/ExchangeWorkflowService.php**
-   - Verify exchange creation logic
-   - Check if notifications are sent
+Detect 'active' filter and expand to IN clause with multiple statuses:
+
+```php
+// AFTER (FIXED):
+if (!empty($filters['status'])) {
+    if ($filters['status'] === 'active') {
+        $activeStatuses = [
+            self::STATUS_PENDING_PROVIDER,
+            self::STATUS_PENDING_BROKER,
+            self::STATUS_ACCEPTED,
+            self::STATUS_IN_PROGRESS,
+            self::STATUS_PENDING_CONFIRMATION,
+        ];
+        $placeholders = implode(',', array_fill(0, count($activeStatuses), '?'));
+        $whereClause .= " AND e.status IN ($placeholders)";
+        $params = array_merge($params, $activeStatuses);
+    } else {
+        $whereClause .= " AND e.status = ?";
+        $params[] = $filters['status'];
+    }
+}
+```
+
+Applied to both main query filter and role-based filter.
+
+### Impact After Fix
+- ✅ New exchange requests (`pending_provider`) now appear on "Active" tab
+- ✅ Provider-accepted exchanges (`accepted`) appear on "Active" tab
+- ✅ In-progress and pending confirmation exchanges appear on "Active" tab
+- ✅ Users can see their exchange requests immediately after creation
+- ✅ Backend properly interprets frontend's semantic 'active' filter
+
+### Commit
+`866c9fe` - fix(exchanges): expand 'active' status filter to include all non-completed statuses
 
 ---
 
