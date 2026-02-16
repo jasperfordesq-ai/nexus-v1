@@ -4,7 +4,7 @@ import { BrokerControlsPage } from '../../page-objects';
 /**
  * Broker Controls E2E Tests
  *
- * Tests all 5 Broker Controls pages for correct rendering.
+ * Tests all 5+ Broker Controls pages for correct rendering.
  * All tests are READ-ONLY -- no mutations, no approving/rejecting exchanges.
  * Uses the 'admin' project which has admin storage state.
  *
@@ -14,6 +14,7 @@ import { BrokerControlsPage } from '../../page-objects';
  * 3. RiskTags             -- /admin/broker-controls/risk-tags
  * 4. MessageReview        -- /admin/broker-controls/messages
  * 5. UserMonitoring       -- /admin/broker-controls/monitoring
+ * 6. VettingRecords       -- /admin/broker-controls/vetting (if enabled)
  */
 
 // Collect console errors per test for verification
@@ -78,12 +79,13 @@ test.describe('Broker Controls - Dashboard', () => {
     await broker.gotoDashboard();
     await broker.waitForPageLoad();
 
-    // The 4 quick-link cards: Exchange Management, Risk Tags, Message Review, User Monitoring
+    // The 5 quick-link cards: Exchange Management, Risk Tags, Message Review, User Monitoring, Vetting Records
     const quickLinkTexts = [
       'Exchange Management',
       'Risk Tags',
       'Message Review',
       'User Monitoring',
+      'Vetting Records',
     ];
 
     let foundCount = 0;
@@ -94,6 +96,7 @@ test.describe('Broker Controls - Dashboard', () => {
       }
     }
 
+    // Should have at least 4 of the 5 quick links (some may be feature-gated)
     expect(foundCount).toBeGreaterThanOrEqual(4);
 
     expect(consoleErrors).toHaveLength(0);
@@ -107,7 +110,7 @@ test.describe('Broker Controls - Dashboard', () => {
     const quickLinks = broker.getQuickLinkCards();
     const linkCount = await quickLinks.count();
 
-    // Should have at least 4 links (one for each sub-page)
+    // Should have at least 4 links (5 total: exchanges, risk-tags, messages, monitoring, vetting)
     expect(linkCount).toBeGreaterThanOrEqual(4);
 
     expect(consoleErrors).toHaveLength(0);

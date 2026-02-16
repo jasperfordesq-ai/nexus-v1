@@ -22,7 +22,13 @@
    - ✅ Added fallback selectors for optional features
    - ✅ Tests now target `/admin/*` (React admin, not `/admin-legacy/*`)
 
-4. **Documentation**
+4. **Broker Controls Tests** (`broker-controls.spec.ts` + `BrokerControlsPage.ts`)
+   - ✅ Already used HeroUI selectors (StatCard, DataTable, tabs)
+   - ✅ Fixed `navigateTo()` to use `tenantUrl()` for tenant routing
+   - ✅ Updated quick link count (5 cards: exchanges, risk-tags, messages, monitoring, vetting)
+   - ✅ Tests already targeting React admin at `/admin/broker-controls/*`
+
+5. **Documentation**
    - ✅ Created `ROUTE_MAPPING.md` with legacy → React route map
    - ✅ Created this status document
 
@@ -32,18 +38,13 @@ The following test files still reference legacy PHP frontend routes/selectors an
 
 ### Admin Tests
 
-- `broker-controls.spec.ts` - May reference legacy selectors
-  - **Fix**: Update to match React admin broker dashboard
-
 - `super-admin.spec.ts` - Targets legacy PHP super admin
   - **Fix**: Update for React super admin (if migrated) or mark as legacy
 
 ### Page Objects
-All page objects in `e2e/page-objects/` need selector updates:
-- `AdminPage.ts` - Legacy PHP admin selectors
-- `BrokerControlsPage.ts` - Legacy selectors
-- `SuperAdminPage.ts` - Legacy selectors
-- Other page objects may also need review
+
+- `SuperAdminPage.ts` - Legacy selectors (if super admin migrated to React)
+- Other page objects may need review for React compatibility
 
 ### Other Specs
 These should mostly work but need verification:
@@ -112,7 +113,7 @@ These specs likely need minimal changes:
 ## Next Steps
 
 1. ~~**Priority 1**: Update `admin.spec.ts` page objects and tests~~ ✅ **DONE**
-2. **Priority 2**: Update `broker-controls.spec.ts`
+2. ~~**Priority 2**: Update `broker-controls.spec.ts`~~ ✅ **DONE**
 3. **Priority 3**: Verify other specs work with current React frontend
 4. **Priority 4**: Update `super-admin.spec.ts` (if super admin migrated to React)
 
