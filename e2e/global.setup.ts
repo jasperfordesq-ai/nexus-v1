@@ -17,20 +17,15 @@ dotenv.config({ path: path.join(__dirname, '.env.test') });
 
 // Test user credentials (should be configured in .env.test)
 const TEST_USERS = {
-  modern: {
+  user: {
     email: process.env.E2E_USER_EMAIL || 'test@hour-timebank.ie',
     password: process.env.E2E_USER_PASSWORD || 'TestPassword123!',
-    theme: 'modern',
-  },
-  civicone: {
-    email: process.env.E2E_CIVICONE_EMAIL || 'civicone@hour-timebank.ie',
-    password: process.env.E2E_CIVICONE_PASSWORD || 'TestPassword123!',
-    theme: 'civicone',
+    theme: 'react',
   },
   admin: {
     email: process.env.E2E_ADMIN_EMAIL || 'admin@hour-timebank.ie',
     password: process.env.E2E_ADMIN_PASSWORD || 'AdminPassword123!',
-    theme: 'modern',
+    theme: 'react',
   },
 };
 
@@ -96,9 +91,9 @@ async function dismissDevNoticeModal(page: any): Promise<void> {
 }
 
 /**
- * Authenticate admin user via the React SPA API (JWT-based).
+ * Authenticate a React user via the API (JWT-based).
  *
- * The React admin panel uses JWT tokens stored in localStorage,
+ * The React app uses JWT tokens stored in localStorage,
  * not session cookies. This function calls the auth API directly,
  * then injects the JWT tokens into the browser's localStorage
  * via the storage state file.
@@ -107,6 +102,7 @@ async function authenticateViaApi(
   authContext: any,
   authPage: any,
   credentials: { email: string; password: string; theme: string },
+  userType: string,
   authDir: string
 ): Promise<void> {
   // The PHP API is accessible at the same BASE_URL for local dev (proxied)
@@ -149,7 +145,7 @@ async function authenticateViaApi(
   // Navigate to the React app origin so we can set localStorage
   // Use the React frontend URL (may differ from API URL in Docker setup)
   const reactUrl = process.env.E2E_REACT_URL || BASE_URL;
-  await authPage.goto(`${reactUrl}/login`, { waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {
+  await authPage.goto(`${reactUrl}/${TENANT_SLUG}/login`, { waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {
     // If /login redirects or fails, try the root
     return authPage.goto(reactUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
   });
@@ -171,13 +167,13 @@ async function authenticateViaApi(
   );
 
   // Save storage state (includes localStorage with JWT tokens)
-  const storagePath = path.join(authDir, 'admin.json');
+  const storagePath = path.join(authDir, `${userType}.json`);
   await authContext.storageState({ path: storagePath });
 }
 
 /**
  * Authenticate user via the legacy PHP form login (session-based).
- * Used for modern/civicone test users that browse legacy PHP pages.
+ * Legacy-only. Not used for the React SPA.
  */
 async function authenticateViaForm(
   authContext: any,
@@ -234,7 +230,7 @@ async function authenticateViaForm(
   }
 
   // Save storage state
-  const storageName = userType === 'modern' ? 'user-modern' : userType === 'civicone' ? 'user-civicone' : userType;
+  const storageName = userType === 'user' ? 'user' : userType;
   const storagePath = path.join(authDir, `${storageName}.json`);
   await authContext.storageState({ path: storagePath });
 }
@@ -250,7 +246,7 @@ async function globalSetup(config: FullConfig) {
 
   // Create empty auth files first (so tests can run even if auth fails)
   const emptyState = { cookies: [], origins: [] };
-  for (const userType of ['user-modern', 'user-civicone', 'admin']) {
+  for (const userType of ['user', 'admin']) {
     const storagePath = path.join(authDir, `${userType}.json`);
     if (!fs.existsSync(storagePath)) {
       fs.writeFileSync(storagePath, JSON.stringify(emptyState, null, 2));
@@ -298,13 +294,8 @@ async function globalSetup(config: FullConfig) {
         await dismissDevNoticeModal(authPage);
 
         try {
-          // Admin users authenticate via the React SPA API (JWT-based)
-          // Other users use the legacy PHP form login
-          if (userType === 'admin') {
-            await authenticateViaApi(authContext, authPage, credentials, authDir);
-          } else {
-            await authenticateViaForm(authContext, authPage, credentials, userType, authDir);
-          }
+          // All React users authenticate via the API (JWT-based)
+          await authenticateViaApi(authContext, authPage, credentials, userType, authDir);
 
           console.log(`✅ Auth session saved for ${userType}\n`);
         } catch (error) {

@@ -711,6 +711,38 @@ See [docs/REACT_DEPLOYMENT.md](docs/REACT_DEPLOYMENT.md) for full instructions.
 | `BackToTop` | `src/components/ui/BackToTop.tsx` | Floating scroll-to-top button (appears after 400px) |
 | `OfflineIndicator` | `src/components/feedback/OfflineIndicator.tsx` | Offline/online status banner |
 | `TransferModal` | `src/components/wallet/TransferModal.tsx` | Time credit transfer dialog |
+| `CustomLegalDocument` | `src/components/legal/CustomLegalDocument.tsx` | Renders tenant-specific legal docs with section TOC |
+
+### Legal Document System
+
+Per-tenant custom legal documents (Terms, Privacy, Cookies, etc.) managed via admin and rendered on the React frontend.
+
+**Architecture:**
+- **DB tables:** `legal_documents` (per-tenant, keyed by `document_type`) + `legal_document_versions` (content, versioning, `is_current` flag)
+- **API:** `LegalDocumentController.php` — `GET /api/v2/legal/{type}` returns current version, `GET /api/v2/legal/{type}/versions` returns version history, `GET /api/v2/legal/{type}/versions/{id}` returns specific version
+- **React hook:** `useLegalDocument(type)` in `src/hooks/useLegalDocument.ts` — fetches custom doc, returns `{ document, loading }`. Waits for `TenantContext` to bootstrap before calling API (ensures `X-Tenant-ID` header is set)
+- **Renderer:** `CustomLegalDocument` in `src/components/legal/CustomLegalDocument.tsx` — parses HTML content on `<h2>` boundaries into sections, renders TOC (when 4+ sections) + GlassCard per section with staggered animations
+- **CSS:** `.legal-content` styles in `src/index.css` — handles `h2`, `h3`, `h4`, `p`, `ul`, `ol`, `strong`, `a`, `.legal-notice` callouts, nested lists, dark mode
+- **Fallback:** Each legal page (Terms, Privacy, etc.) checks for a custom document first; if none exists, renders hardcoded default content
+
+**Key details:**
+- The `api.ts` response unwrapping uses `'data' in data ? data.data : data` (NOT `data.data ?? data`) — the `??` form treats `{data: null}` as nullish and returns the wrapper object instead of `null`
+- `useLegalDocument` validates the response shape (`'id' in res.data && 'content' in res.data`) before setting state
+- `CustomLegalDocument` detects documents with their own numbering (e.g. "1. Definitions") and uses those numbers in chips instead of auto-numbering; un-numbered sections show `·`
+- Admin manages documents at `/admin-legacy/legal-documents` (PHP admin)
+- Tenant 2 (hOUR Timebank) and Tenant 4 (Timebank Global) both have custom documents; Tenant 4's terms are comprehensive Platform Terms of Service (46K chars, 19 sections)
+
+**Files:**
+| File | Purpose |
+|------|---------|
+| `src/Controllers/LegalDocumentController.php` | API + admin CRUD |
+| `src/hooks/useLegalDocument.ts` | React hook to fetch custom docs |
+| `src/components/legal/CustomLegalDocument.tsx` | Section parser + renderer |
+| `src/pages/public/TermsPage.tsx` | Terms page (custom or default) |
+| `src/pages/public/PrivacyPage.tsx` | Privacy page (custom or default) |
+| `src/pages/public/CookiesPage.tsx` | Cookies page (custom or default) |
+| `src/pages/public/LegalVersionHistoryPage.tsx` | Version history timeline |
+| `src/index.css` | `.legal-content` styles |
 
 ### Feature & Module Gating
 

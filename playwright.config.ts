@@ -1,11 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+dotenv.config({ path: path.join(__dirname, 'e2e/.env.test') });
 
 /**
  * Project NEXUS - E2E Test Configuration
  *
  * This configuration supports:
  * - Multi-tenant testing (hour-timebank tenant)
- * - Both Modern and CivicOne themes
+ * - React frontend only
  * - Parallel test execution
  * - Visual regression testing
  * - Mobile viewport testing
@@ -68,7 +72,7 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
   },
 
-  // Configure projects for major browsers and themes
+  // Configure projects for major browsers
   projects: [
     // Setup project for authentication state
     {
@@ -76,22 +80,12 @@ export default defineConfig({
       testMatch: /global\.setup\.ts/,
     },
 
-    // Desktop Chrome - Modern Theme
+    // Desktop Chrome - React app
     {
       name: 'chromium-modern',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'e2e/fixtures/.auth/user-modern.json',
-      },
-      dependencies: ['setup'],
-    },
-
-    // Desktop Chrome - CivicOne Theme
-    {
-      name: 'chromium-civicone',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'e2e/fixtures/.auth/user-civicone.json',
+        storageState: 'e2e/fixtures/.auth/user.json',
       },
       dependencies: ['setup'],
     },
@@ -101,7 +95,7 @@ export default defineConfig({
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
-        storageState: 'e2e/fixtures/.auth/user-modern.json',
+        storageState: 'e2e/fixtures/.auth/user.json',
       },
       dependencies: ['setup'],
     },
