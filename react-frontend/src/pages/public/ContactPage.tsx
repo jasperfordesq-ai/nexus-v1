@@ -1,7 +1,7 @@
 /**
  * Contact Page
  *
- * Uses V1 API: POST /api/help/feedback
+ * Uses V2 API: POST /api/v2/contact
  */
 
 import { useState, type FormEvent } from 'react';
@@ -35,12 +35,11 @@ export function ContactPage() {
     setError(null);
 
     try {
-      const response = await api.post('/help/feedback', {
+      const response = await api.post('/v2/contact', {
         name: formData.name,
         email: formData.email,
         subject: formData.subject || 'General Inquiry',
         message: formData.message,
-        type: 'contact',
       });
 
       if (response.success) {
