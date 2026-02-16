@@ -2,7 +2,7 @@ import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
- * Admin Dashboard Page Object
+ * Admin Dashboard Page Object (React Admin with HeroUI)
  */
 export class AdminDashboardPage extends BasePage {
   readonly statsCards: Locator;
@@ -10,41 +10,47 @@ export class AdminDashboardPage extends BasePage {
   readonly quickActions: Locator;
   readonly userCount: Locator;
   readonly listingCount: Locator;
-  readonly eventCount: Locator;
   readonly transactionCount: Locator;
   readonly sidebarNav: Locator;
+  readonly pageHeader: Locator;
+  readonly refreshButton: Locator;
 
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    // Admin dashboard uses .admin-stats-grid with .admin-stat-card elements
-    this.statsCards = page.locator('.admin-stats-grid .admin-stat-card, .admin-stat-card');
-    this.recentActivity = page.locator('.admin-activity-list, .admin-activity-log, .recent-activity');
-    this.quickActions = page.locator('.admin-page-header-actions, .admin-quick-actions');
-    // Match actual labels: "Total Members", "Active Listings", "Transactions"
-    this.userCount = page.locator('.admin-stat-card:has-text("Total Members") .admin-stat-value, .admin-stat-card:has-text("Members") .admin-stat-value');
-    this.listingCount = page.locator('.admin-stat-card:has-text("Active Listings") .admin-stat-value, .admin-stat-card:has-text("Listings") .admin-stat-value');
-    this.eventCount = page.locator('.admin-stat-card:has-text("Events") .admin-stat-value');
-    this.transactionCount = page.locator('.admin-stat-card:has-text("Transactions") .admin-stat-value');
-    // Sidebar navigation - actual sidebar element from admin-header.php
-    this.sidebarNav = page.locator('aside.admin-sidebar, .admin-sidebar');
+    // React admin uses grid layout with StatCard components
+    // StatCard is a HeroUI Card with specific structure
+    this.statsCards = page.locator('[data-slot="base"]:has(p.text-sm.text-default-500), .grid > div:has(p.text-2xl.font-bold)');
+    this.recentActivity = page.locator('.activity-list, [data-activity-log]');
+    this.quickActions = page.locator('.page-header-actions, [data-quick-actions]');
+
+    // Match actual StatCard labels from AdminDashboard.tsx
+    this.userCount = page.locator('text=Total Users').locator('..').locator('p.text-2xl.font-bold');
+    this.listingCount = page.locator('text=Total Listings').locator('..').locator('p.text-2xl.font-bold');
+    this.transactionCount = page.locator('text=Total Transactions').locator('..').locator('p.text-2xl.font-bold');
+
+    // React admin sidebar - nav element with links
+    this.sidebarNav = page.locator('nav.admin-sidebar, nav:has(a[href*="/admin/"])');
+
+    // PageHeader component
+    this.pageHeader = page.locator('h1, [data-page-header]');
+    this.refreshButton = page.locator('button:has-text("Refresh")');
   }
 
   /**
    * Navigate to admin dashboard
    */
   async navigate(): Promise<void> {
-    await this.page.goto('/admin');
+    await this.page.goto(this.tenantUrl('/admin'));
     await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**
-   * Get stat value by name
+   * Get stat value by label
    */
-  async getStatValue(statName: string): Promise<string> {
-    const stat = this.statsCards.filter({ hasText: statName }).first();
-    const value = stat.locator('.stat-value, .count, .number');
-    return await value.textContent() || '0';
+  async getStatValue(statLabel: string): Promise<string> {
+    const statCard = this.page.locator(`text=${statLabel}`).locator('..').locator('p.text-2xl.font-bold');
+    return await statCard.textContent() || '0';
   }
 
   /**
@@ -61,10 +67,18 @@ export class AdminDashboardPage extends BasePage {
   async isDashboardLoaded(): Promise<boolean> {
     return await this.statsCards.count() > 0;
   }
+
+  /**
+   * Click refresh button
+   */
+  async refresh(): Promise<void> {
+    await this.refreshButton.click();
+    await this.page.waitForLoadState('networkidle');
+  }
 }
 
 /**
- * Admin Users Page Object
+ * Admin Users Page Object (React Admin)
  */
 export class AdminUsersPage extends BasePage {
   readonly userTable: Locator;
@@ -78,21 +92,30 @@ export class AdminUsersPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.userTable = page.locator('.admin-table, .admin-data-table, table');
-    this.userRows = page.locator('.admin-table tbody tr, .admin-data-table tbody tr, table tbody tr');
-    // Admin uses inline search or filter on the users page (not the modal)
-    this.searchInput = page.locator('input[name="search"], input[placeholder*="Search"], .admin-filter input[type="text"]');
-    this.filterDropdown = page.locator('.admin-filter-select, select[name="filter"], select[name="status"]');
-    this.bulkActions = page.locator('.admin-bulk-actions, [data-bulk-action]');
-    this.createUserButton = page.locator('.admin-btn-primary:has-text("Create"), .admin-btn:has-text("Add"), a[href*="create"]');
-    this.pagination = page.locator('.admin-pagination, .pagination');
+    // React admin uses HeroUI Table component
+    this.userTable = page.locator('table, [role="table"]');
+    this.userRows = page.locator('tbody tr, [role="row"]');
+
+    // Search may be inline or global search (Cmd+K)
+    this.searchInput = page.locator('input[type="search"], input[placeholder*="Search" i]');
+
+    // HeroUI Select component for filters
+    this.filterDropdown = page.locator('button[role="combobox"], select');
+
+    this.bulkActions = page.locator('[data-bulk-actions]');
+
+    // Create button - HeroUI Button with primary color
+    this.createUserButton = page.locator('button:has-text("Create"), button:has-text("Add User"), a[href*="create"]');
+
+    // HeroUI Pagination component
+    this.pagination = page.locator('nav[aria-label*="pagination" i], [data-pagination]');
   }
 
   /**
    * Navigate to admin users page
    */
   async navigate(): Promise<void> {
-    await this.page.goto('/admin/users');
+    await this.page.goto(this.tenantUrl('/admin/users'));
     await this.page.waitForLoadState('domcontentloaded');
   }
 
@@ -100,6 +123,7 @@ export class AdminUsersPage extends BasePage {
    * Get user count
    */
   async getUserCount(): Promise<number> {
+    await this.page.waitForLoadState('domcontentloaded');
     return await this.userRows.count();
   }
 
@@ -109,15 +133,16 @@ export class AdminUsersPage extends BasePage {
   async searchUsers(query: string): Promise<void> {
     await this.searchInput.fill(query);
     await this.searchInput.press('Enter');
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**
-   * Filter users
+   * Filter users (if dropdown exists)
    */
   async filterUsers(filter: string): Promise<void> {
-    await this.filterDropdown.selectOption(filter);
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.filterDropdown.click();
+    await this.page.locator(`text=${filter}`).click();
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**
@@ -129,16 +154,16 @@ export class AdminUsersPage extends BasePage {
   }
 
   /**
-   * Get user emails
+   * Get user emails from table
    */
   async getUserEmails(): Promise<string[]> {
-    const emails = await this.userRows.locator('.email, td:nth-child(2)').allTextContents();
-    return emails.map(e => e.trim());
+    const emails = await this.userRows.locator('td:nth-child(2), [data-email]').allTextContents();
+    return emails.map(e => e.trim()).filter(e => e.length > 0);
   }
 }
 
 /**
- * Admin Listings Page Object
+ * Admin Listings Page Object (React Admin)
  */
 export class AdminListingsPage extends BasePage {
   readonly listingTable: Locator;
@@ -151,19 +176,23 @@ export class AdminListingsPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.listingTable = page.locator('.listing-table, table');
-    this.listingRows = page.locator('tbody tr, .listing-row');
-    this.searchInput = page.locator('input[name="search"]');
-    this.statusFilter = page.locator('select[name="status"]');
-    this.approveButton = page.locator('.approve-btn, [data-approve]');
-    this.deleteButton = page.locator('.delete-btn, [data-delete]');
+    this.listingTable = page.locator('table, [role="table"]');
+    this.listingRows = page.locator('tbody tr, [role="row"]');
+    this.searchInput = page.locator('input[type="search"], input[placeholder*="Search" i]');
+
+    // Status filter - HeroUI Select or button group
+    this.statusFilter = page.locator('button[role="combobox"][aria-label*="status" i], select[name="status"]');
+
+    // Action buttons - HeroUI Button components
+    this.approveButton = page.locator('button:has-text("Approve")');
+    this.deleteButton = page.locator('button:has-text("Delete"), button[aria-label*="delete" i]');
   }
 
   /**
    * Navigate to admin listings page
    */
   async navigate(): Promise<void> {
-    await this.page.goto('/admin/listings');
+    await this.page.goto(this.tenantUrl('/admin/listings'));
     await this.page.waitForLoadState('domcontentloaded');
   }
 
@@ -171,6 +200,7 @@ export class AdminListingsPage extends BasePage {
    * Get listing count
    */
   async getListingCount(): Promise<number> {
+    await this.page.waitForLoadState('domcontentloaded');
     return await this.listingRows.count();
   }
 
@@ -178,8 +208,9 @@ export class AdminListingsPage extends BasePage {
    * Filter by status
    */
   async filterByStatus(status: 'all' | 'pending' | 'approved' | 'rejected'): Promise<void> {
-    await this.statusFilter.selectOption(status);
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.statusFilter.click();
+    await this.page.locator(`text=${status}`).click();
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**
@@ -187,8 +218,15 @@ export class AdminListingsPage extends BasePage {
    */
   async approveListing(index: number = 0): Promise<void> {
     const row = this.listingRows.nth(index);
-    await row.locator('.approve-btn, [data-approve]').click();
-    await this.page.waitForLoadState('domcontentloaded');
+    await row.locator('button:has-text("Approve")').click();
+
+    // Handle confirmation modal if present
+    const confirmButton = this.page.locator('button:has-text("Confirm"), button[type="submit"]');
+    if (await confirmButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await confirmButton.click();
+    }
+
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**
@@ -196,18 +234,20 @@ export class AdminListingsPage extends BasePage {
    */
   async deleteListing(index: number = 0): Promise<void> {
     const row = this.listingRows.nth(index);
-    await row.locator('.delete-btn, [data-delete]').click();
-    // Handle confirmation
-    const confirm = this.page.locator('.confirm-delete, [data-confirm]');
-    if (await confirm.isVisible()) {
-      await confirm.click();
+    await row.locator('button:has-text("Delete"), button[aria-label*="delete" i]').click();
+
+    // Handle confirmation modal (ConfirmModal component)
+    const confirmButton = this.page.locator('button:has-text("Delete"), button:has-text("Confirm")').last();
+    if (await confirmButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await confirmButton.click();
     }
-    await this.page.waitForLoadState('domcontentloaded');
+
+    await this.page.waitForLoadState('networkidle');
   }
 }
 
 /**
- * Admin Settings Page Object
+ * Admin Settings Page Object (React Admin)
  */
 export class AdminSettingsPage extends BasePage {
   readonly settingsTabs: Locator;
@@ -226,25 +266,32 @@ export class AdminSettingsPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.settingsTabs = page.locator('.settings-tabs, .nav-tabs');
-    this.generalTab = page.locator('[data-tab="general"], a[href*="general"]');
-    this.featuresTab = page.locator('[data-tab="features"], a[href*="features"]');
-    this.emailTab = page.locator('[data-tab="email"], a[href*="email"]');
+    // HeroUI Tabs component
+    this.settingsTabs = page.locator('[role="tablist"]');
+    this.generalTab = page.locator('[role="tab"]:has-text("General")');
+    this.featuresTab = page.locator('[role="tab"]:has-text("Features")');
+    this.emailTab = page.locator('[role="tab"]:has-text("Email")');
 
-    this.siteNameInput = page.locator('input[name="site_name"]');
-    this.siteDescriptionInput = page.locator('textarea[name="site_description"]');
-    this.logoUpload = page.locator('input[type="file"][name="logo"]');
+    // HeroUI Input components
+    this.siteNameInput = page.locator('input[name="site_name"], input[label*="Site Name" i]');
+    this.siteDescriptionInput = page.locator('textarea[name="site_description"], textarea[label*="Description" i]');
+    this.logoUpload = page.locator('input[type="file"][accept*="image"]');
 
-    this.featureToggles = page.locator('.feature-toggle, input[type="checkbox"]');
-    this.saveButton = page.locator('button[type="submit"], .save-btn');
-    this.successMessage = page.locator('.success, .alert-success');
+    // HeroUI Switch components for feature toggles
+    this.featureToggles = page.locator('button[role="switch"], input[type="checkbox"][role="switch"]');
+
+    // HeroUI Button with primary color
+    this.saveButton = page.locator('button[type="submit"]:has-text("Save")');
+
+    // Toast notification or alert
+    this.successMessage = page.locator('[role="alert"]:has-text("success"), .toast:has-text("success")');
   }
 
   /**
    * Navigate to admin settings
    */
   async navigate(): Promise<void> {
-    await this.page.goto('/admin/settings');
+    await this.page.goto(this.tenantUrl('/admin/settings'));
     await this.page.waitForLoadState('domcontentloaded');
   }
 
@@ -262,33 +309,35 @@ export class AdminSettingsPage extends BasePage {
   async updateSiteName(name: string): Promise<void> {
     await this.siteNameInput.fill(name);
     await this.saveButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**
    * Toggle a feature
    */
   async toggleFeature(featureName: string, enabled: boolean): Promise<void> {
-    const toggle = this.page.locator(`input[name="${featureName}"], input[data-feature="${featureName}"]`);
-    if (enabled) {
-      await toggle.check();
-    } else {
-      await toggle.uncheck();
+    const toggle = this.page.locator(`[role="switch"][aria-label*="${featureName}" i]`);
+
+    const isChecked = await toggle.getAttribute('aria-checked') === 'true';
+
+    if ((enabled && !isChecked) || (!enabled && isChecked)) {
+      await toggle.click();
     }
+
     await this.saveButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**
    * Check if save was successful
    */
   async isSaveSuccessful(): Promise<boolean> {
-    return await this.successMessage.isVisible();
+    return await this.successMessage.isVisible({ timeout: 5000 }).catch(() => false);
   }
 }
 
 /**
- * Admin Timebanking Page Object
+ * Admin Timebanking Page Object (React Admin)
  */
 export class AdminTimebankingPage extends BasePage {
   readonly transactionTable: Locator;
@@ -302,12 +351,17 @@ export class AdminTimebankingPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.transactionTable = page.locator('.transaction-table, table');
-    this.transactionRows = page.locator('tbody tr');
-    this.totalCreditsCirculating = page.locator('.total-credits, [data-total-credits]');
-    this.adjustBalanceButton = page.locator('.adjust-balance-btn, a[href*="adjust"]');
-    this.userSelect = page.locator('select[name="user_id"]');
-    this.amountInput = page.locator('input[name="amount"]');
+    this.transactionTable = page.locator('table, [role="table"]');
+    this.transactionRows = page.locator('tbody tr, [role="row"]');
+
+    // Stat card or metric display
+    this.totalCreditsCirculating = page.locator('text=Total Credits').locator('..').locator('p.text-2xl.font-bold');
+
+    this.adjustBalanceButton = page.locator('button:has-text("Adjust Balance"), a[href*="adjust"]');
+
+    // HeroUI Select and Input components
+    this.userSelect = page.locator('button[role="combobox"][aria-label*="user" i], select[name="user_id"]');
+    this.amountInput = page.locator('input[name="amount"], input[type="number"]');
     this.reasonInput = page.locator('textarea[name="reason"], input[name="reason"]');
   }
 
@@ -315,7 +369,7 @@ export class AdminTimebankingPage extends BasePage {
    * Navigate to admin timebanking
    */
   async navigate(): Promise<void> {
-    await this.page.goto('/admin/timebanking');
+    await this.page.goto(this.tenantUrl('/admin/timebanking'));
     await this.page.waitForLoadState('domcontentloaded');
   }
 
@@ -333,12 +387,15 @@ export class AdminTimebankingPage extends BasePage {
     await this.adjustBalanceButton.click();
     await this.page.waitForLoadState('domcontentloaded');
 
-    await this.userSelect.selectOption(userId);
+    // Select user (may be autocomplete or select)
+    await this.userSelect.click();
+    await this.page.locator(`text=${userId}`).click();
+
     await this.amountInput.fill(amount);
     await this.reasonInput.fill(reason);
 
-    await this.page.click('button[type="submit"]');
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.locator('button[type="submit"]').click();
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**
@@ -346,7 +403,7 @@ export class AdminTimebankingPage extends BasePage {
    */
   async viewUserReport(index: number = 0): Promise<void> {
     const row = this.transactionRows.nth(index);
-    await row.locator('a[href*="user-report"]').click();
+    await row.locator('a[href*="report"], button:has-text("View")').click();
     await this.page.waitForLoadState('domcontentloaded');
   }
 }
