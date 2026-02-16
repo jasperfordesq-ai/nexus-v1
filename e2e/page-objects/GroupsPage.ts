@@ -35,7 +35,7 @@ export class GroupsPage extends BasePage {
     // Search card
     this.searchCard = page.locator('[class*="glass"]').filter({ has: page.locator('input[placeholder*="Search groups"]') });
     this.searchInput = page.locator('input[placeholder*="Search groups"]');
-    this.filterSelect = page.locator('select, [role="combobox"]').filter({ hasText: /All Groups|My Groups|Public|Private/ });
+    this.filterSelect = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /All Groups|My Groups|Public|Private|Filter/ });
 
     // Group cards - article or GlassCard with group content
     this.groupCards = page.locator('article').filter({ has: page.locator('h3, .avatar-group') });
@@ -82,8 +82,14 @@ export class GroupsPage extends BasePage {
    * Filter groups by type
    */
   async filterByType(filter: 'all' | 'joined' | 'public' | 'private'): Promise<void> {
-    const selectItem = this.page.locator(`text=${filter === 'all' ? 'All Groups' : filter === 'joined' ? 'My Groups' : filter === 'public' ? 'Public' : 'Private'}`).first();
-    await selectItem.click();
+    // Click the Select button to open dropdown
+    await this.filterSelect.click();
+    await this.page.waitForTimeout(200);
+
+    // Click the option from the dropdown
+    const filterText = filter === 'all' ? 'All Groups' : filter === 'joined' ? 'My Groups' : filter === 'public' ? 'Public' : 'Private';
+    const option = this.page.locator(`li[role="option"]:has-text("${filterText}")`).first();
+    await option.click();
     await this.page.waitForTimeout(500);
   }
 
@@ -311,10 +317,10 @@ export class CreateGroupPage extends BasePage {
 
     this.pageHeading = page.locator('h1:has-text("Create"), h1:has-text("Edit")');
 
-    // Form fields
-    this.nameInput = page.locator('input[placeholder*="Group Name"], label:has-text("Group Name") + input').first();
-    this.descriptionTextarea = page.locator('textarea[placeholder*="Describe"], label:has-text("Description") + textarea').first();
-    this.privacySelect = page.locator('select, [role="combobox"]').filter({ hasText: /Public|Private/ });
+    // Form fields - use label parent traversal for HeroUI
+    this.nameInput = page.locator('label:has-text("Group Name")').locator('..').locator('input').first();
+    this.descriptionTextarea = page.locator('textarea[placeholder*="Describe"]').first();
+    this.privacySelect = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Public|Private|Privacy/ });
 
     // Image upload
     this.imageUploadArea = page.locator('text=Click to upload or drag and drop');

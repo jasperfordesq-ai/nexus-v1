@@ -35,15 +35,15 @@ export class EventsPage extends BasePage {
     this.createEventButton = page.locator('a[href*="/events/create"], button:has-text("Create Event")').first();
 
     // Search card with GlassCard styling
-    this.searchCard = page.locator('[class*="glass"]').filter({ hasText: 'Search events' }).or(
-      page.locator('[class*="glass"]').filter({ has: page.locator('input[placeholder*="Search events"]') })
-    );
+    this.searchCard = page.locator('[class*="glass"]').filter({ has: page.locator('input[placeholder*="Search events"]') });
     this.searchInput = page.locator('input[placeholder*="Search events"]');
-    this.timeFilterSelect = page.locator('select, [role="combobox"]').filter({ hasText: /Upcoming|Past|All Events/ });
 
-    // Category filter chips
-    this.categoryChips = page.locator('button[role="option"], .chip, button:has-text("Workshop"), button:has-text("Social"), button:has-text("Outdoor")');
-    this.allCategoryChip = page.locator('button:has-text("All")').first();
+    // HeroUI Select uses button trigger, not <select> or role="combobox"
+    this.timeFilterSelect = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Upcoming|Past|All Events|Filter/ });
+
+    // Category filter chips - HeroUI Chip components with aria-pressed
+    this.categoryChips = page.locator('[aria-pressed]').filter({ hasText: /Workshop|Social|Outdoor|Online|Meeting|Training|Other/ });
+    this.allCategoryChip = page.locator('[aria-pressed]:has-text("All")').first();
 
     // Event cards - GlassCard with event content
     this.eventCards = page.locator('article').filter({ has: page.locator('time') });
@@ -98,8 +98,14 @@ export class EventsPage extends BasePage {
    * Filter events by time (Upcoming, Past, All Events)
    */
   async filterByTime(filter: 'upcoming' | 'past' | 'all'): Promise<void> {
-    const selectItem = this.page.locator(`text=${filter === 'upcoming' ? 'Upcoming' : filter === 'past' ? 'Past' : 'All Events'}`).first();
-    await selectItem.click();
+    // Click the Select button to open dropdown
+    await this.timeFilterSelect.click();
+    await this.page.waitForTimeout(200);
+
+    // Click the option from the dropdown
+    const filterText = filter === 'upcoming' ? 'Upcoming' : filter === 'past' ? 'Past' : 'All Events';
+    const option = this.page.locator(`li[role="option"]:has-text("${filterText}")`).first();
+    await option.click();
     await this.page.waitForTimeout(500);
   }
 
@@ -207,9 +213,9 @@ export class CreateEventPage extends BasePage {
     this.pageHeading = page.locator('h1:has-text("Create"), h1:has-text("Edit")');
 
     // Form fields with HeroUI Input components
-    this.titleInput = page.locator('input[placeholder*="Community Garden"], label:has-text("Event Title") + input').first();
-    this.categorySelect = page.locator('select, [role="combobox"]').filter({ hasText: /Category|Workshop|Social/ }).first();
-    this.descriptionTextarea = page.locator('textarea[placeholder*="Describe"], label:has-text("Description") + textarea').first();
+    this.titleInput = page.locator('label:has-text("Event Title")').locator('..').locator('input').first();
+    this.categorySelect = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Select a category|Category|Workshop|Social/ }).first();
+    this.descriptionTextarea = page.locator('textarea[placeholder*="Describe"]').first();
 
     // Date/time inputs
     this.startDateInput = page.locator('input[type="date"]').first();
@@ -217,8 +223,8 @@ export class CreateEventPage extends BasePage {
     this.endDateInput = page.locator('input[type="date"]').nth(1);
     this.endTimeInput = page.locator('input[type="time"]').nth(1);
 
-    this.locationInput = page.locator('input[placeholder*="Online"], input[placeholder*="Community Center"], label:has-text("Location") + input').first();
-    this.maxAttendeesInput = page.locator('input[type="number"], input[placeholder*="unlimited"], label:has-text("Max Attendees") + input').first();
+    this.locationInput = page.locator('label:has-text("Location")').locator('..').locator('input').first();
+    this.maxAttendeesInput = page.locator('label:has-text("Max Attendees")').locator('..').locator('input').first();
 
     // Image upload
     this.imageUploadArea = page.locator('text=Click to upload or drag and drop');

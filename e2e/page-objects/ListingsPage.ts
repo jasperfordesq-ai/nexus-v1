@@ -21,11 +21,11 @@ export class ListingsPage extends BasePage {
     // React: GlassCard listing cards (article elements)
     this.listingCards = page.locator('article').filter({ has: page.locator('h3') });
     this.searchInput = page.locator('input[placeholder*="Search"]');
-    // React: HeroUI Chip components for filters
-    this.filterButtons = page.locator('button[role="option"], .chip, button:has-text("All"), button:has-text("Offers"), button:has-text("Requests")');
-    this.categoryFilter = page.locator('select, [role="combobox"]').filter({ hasText: /Category/ });
-    this.typeFilter = page.locator('select, [role="combobox"]').filter({ hasText: /All|Offers|Requests/ });
-    this.sortDropdown = page.locator('select, [role="combobox"]').filter({ hasText: /Sort|Recent|Popular/ });
+    // React: HeroUI Select components (button triggers, not <select> elements)
+    this.filterButtons = page.locator('button[aria-haspopup="listbox"]');
+    this.categoryFilter = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Category|All Categories/ }).first();
+    this.typeFilter = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /All Types|Offer|Request/ }).first();
+    this.sortDropdown = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Sort|Recent|Popular/ }).first();
     this.createListingButton = page.locator('a[href*="/listings/create"], button:has-text("Create")').first();
     this.loadMoreButton = page.locator('button:has-text("Load More")');
     this.noResultsMessage = page.locator('text=/No listings found|No listings/');
@@ -69,12 +69,15 @@ export class ListingsPage extends BasePage {
    * Filter by type (offer/request)
    */
   async filterByType(type: 'offer' | 'request' | 'all'): Promise<void> {
-    if (await this.typeFilter.count() > 0) {
-      await this.typeFilter.selectOption(type);
-    } else {
-      await this.filterButtons.filter({ hasText: type }).click();
-    }
-    await this.page.waitForLoadState('domcontentloaded');
+    // Click the Select button to open dropdown
+    await this.typeFilter.click();
+    await this.page.waitForTimeout(200);
+
+    // Click the option from the dropdown
+    const typeText = type === 'all' ? 'All Types' : type === 'offer' ? 'Offers' : 'Requests';
+    const option = this.page.locator(`li[role="option"]:has-text("${typeText}")`).first();
+    await option.click();
+    await this.page.waitForTimeout(500);
   }
 
   /**
