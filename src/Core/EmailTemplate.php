@@ -27,10 +27,10 @@ class EmailTemplate
         // Year
         $year = date('Y');
 
-        // Settings URL
-        $appUrl = \Nexus\Core\Env::get('APP_URL') ?? '';
+        // Settings URL (frontend domain for user-facing links)
+        $frontendUrl = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getBasePath();
-        $settingsUrl = rtrim($appUrl, '/') . $basePath . '/notifications';
+        $settingsUrl = $frontendUrl . $basePath . '/notifications';
 
         // Button HTML
         $buttonHtml = '';

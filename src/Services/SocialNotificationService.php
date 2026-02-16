@@ -248,8 +248,7 @@ class SocialNotificationService
         try {
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            $appUrl = \Nexus\Core\Env::get('APP_URL') ?? '';
-            $fullLink = rtrim($appUrl, '/') . $link;
+            $fullLink = \Nexus\Core\TenantContext::getFrontendUrl() . $link;
 
             $likerName = $liker['name'] ?? 'Someone';
             $contentLabel = self::getContentLabel($contentType);
@@ -283,8 +282,7 @@ class SocialNotificationService
         try {
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            $appUrl = \Nexus\Core\Env::get('APP_URL') ?? '';
-            $fullLink = rtrim($appUrl, '/') . $link;
+            $fullLink = \Nexus\Core\TenantContext::getFrontendUrl() . $link;
 
             $commenterName = $commenter['name'] ?? 'Someone';
             $contentLabel = self::getContentLabel($contentType);
@@ -318,8 +316,7 @@ class SocialNotificationService
         try {
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            $appUrl = \Nexus\Core\Env::get('APP_URL') ?? '';
-            $fullLink = rtrim($appUrl, '/') . $link;
+            $fullLink = \Nexus\Core\TenantContext::getFrontendUrl() . $link;
 
             $sharerName = $sharer['name'] ?? 'Someone';
             $contentLabel = self::getContentLabel($contentType);

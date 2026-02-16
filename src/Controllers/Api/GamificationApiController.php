@@ -223,7 +223,7 @@ class GamificationApiController extends BaseApiController
         ];
 
         $basePath = TenantContext::getBasePath();
-        $baseUrl = (isset($_SERVER['HTTPS']) ? "https://" : "http://") . $_SERVER['HTTP_HOST'];
+        $baseUrl = TenantContext::getFrontendUrl();
 
         switch ($type) {
             case 'badge':

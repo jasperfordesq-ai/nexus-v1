@@ -120,7 +120,7 @@ class ReferralService
     {
         $code = self::getReferralCode($userId);
         $basePath = TenantContext::getBasePath();
-        $baseUrl = (isset($_SERVER['HTTPS']) ? "https://" : "http://") . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+        $baseUrl = TenantContext::getFrontendUrl();
 
         return $baseUrl . $basePath . '/register?ref=' . $code;
     }

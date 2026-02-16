@@ -211,8 +211,8 @@ class WalletService
 
             // Gamification
             try {
-                GamificationService::checkTransactionBadges($senderId);
-                GamificationService::checkTransactionBadges($receiverId);
+                GamificationService::checkTimebankingBadges($senderId);
+                GamificationService::checkTimebankingBadges($receiverId);
             } catch (\Throwable $e) {
                 error_log("Gamification transaction error: " . $e->getMessage());
             }

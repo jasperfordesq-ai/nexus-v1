@@ -34,7 +34,7 @@ class EmailTemplateBuilder
     public function __construct(string $tenantName = 'Newsletter')
     {
         $this->tenantName = $tenantName;
-        $this->appUrl = rtrim(Env::get('APP_URL') ?? '', '/');
+        $this->appUrl = TenantContext::getFrontendUrl();
         $this->basePath = TenantContext::getBasePath();
     }
 
@@ -770,7 +770,7 @@ HTML;
      */
     public static function personalizeContent(string $content, array $recipient): string
     {
-        $appUrl = rtrim(\Nexus\Core\Env::get('APP_URL') ?? '', '/');
+        $appUrl = \Nexus\Core\TenantContext::getFrontendUrl();
         $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         $tokens = [
@@ -842,7 +842,7 @@ HTML;
             }
 
             $basePath = TenantContext::getBasePath();
-            $appUrl = rtrim(Env::get('APP_URL') ?? '', '/');
+            $appUrl = TenantContext::getFrontendUrl();
 
             $html = '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 20px 0;">';
 
@@ -894,7 +894,7 @@ HTML;
             }
 
             $basePath = TenantContext::getBasePath();
-            $appUrl = rtrim(Env::get('APP_URL') ?? '', '/');
+            $appUrl = TenantContext::getFrontendUrl();
 
             $html = '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 20px 0;">';
 
@@ -955,7 +955,7 @@ HTML;
             }
 
             $basePath = TenantContext::getBasePath();
-            $appUrl = rtrim(Env::get('APP_URL') ?? '', '/');
+            $appUrl = TenantContext::getFrontendUrl();
 
             $name = htmlspecialchars(trim($member['first_name'] . ' ' . $member['last_name']));
             $bio = htmlspecialchars(substr($member['bio'] ?? '', 0, 150)) . (strlen($member['bio'] ?? '') > 150 ? '...' : '');
@@ -1051,7 +1051,7 @@ HTML;
     private static function renderQuickLinksBlock(array $options = []): string
     {
         $basePath = TenantContext::getBasePath();
-        $appUrl = rtrim(Env::get('APP_URL') ?? '', '/');
+        $appUrl = TenantContext::getFrontendUrl();
 
         $links = [
             ['title' => 'Browse Listings', 'url' => $appUrl . $basePath . '/listings', 'icon' => '🔍'],

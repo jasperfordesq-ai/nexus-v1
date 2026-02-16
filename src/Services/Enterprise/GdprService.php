@@ -387,7 +387,7 @@ class GdprService
         $badges = $this->query(
             "SELECT b.name, b.description, ub.awarded_at
              FROM user_badges ub
-             JOIN badges b ON ub.badge_id = b.id
+             JOIN badges b ON ub.badge_key = b.badge_key AND ub.tenant_id = b.tenant_id
              WHERE ub.user_id = ?",
             [$userId]
         )->fetchAll();

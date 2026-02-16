@@ -13,7 +13,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react';
 import Pusher, { type Channel } from 'pusher-js';
 import { useAuth } from './AuthContext';
-import { api } from '@/lib/api';
+import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
 interface PusherConfig {
@@ -131,7 +131,12 @@ export function PusherProvider({ children }: PusherProviderProps) {
     pusherRef.current = pusher;
 
     // Subscribe to user's personal channel (must match backend PusherService::getUserChannel format)
-    const userChannel = pusher.subscribe(`private-tenant.${user.tenant_id}.user.${user.id}`);
+    const tenantId = user.tenant_id || tokenManager.getTenantId();
+    if (!tenantId) {
+      logError('Cannot subscribe to Pusher: no tenant_id available');
+      return;
+    }
+    const userChannel = pusher.subscribe(`private-tenant.${tenantId}.user.${user.id}`);
 
     userChannel.bind('new-message', (data: NewMessageEvent) => {
       messageListenersRef.current.forEach((listener) => listener(data));

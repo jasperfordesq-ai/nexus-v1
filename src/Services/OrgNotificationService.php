@@ -604,8 +604,7 @@ class OrgNotificationService
         try {
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            $appUrl = \Nexus\Core\Env::get('APP_URL') ?? '';
-            $fullUrl = rtrim($appUrl, '/') . $btnUrl;
+            $fullUrl = TenantContext::getFrontendUrl() . $btnUrl;
 
             $html = EmailTemplate::render(
                 $title,

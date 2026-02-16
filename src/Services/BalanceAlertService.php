@@ -284,8 +284,7 @@ class BalanceAlertService
         try {
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            $appUrl = \Nexus\Core\Env::get('APP_URL') ?? '';
-            $fullUrl = rtrim($appUrl, '/') . $link;
+            $fullUrl = \Nexus\Core\TenantContext::getFrontendUrl() . $link;
 
             $html = \Nexus\Core\EmailTemplate::render(
                 $subject,

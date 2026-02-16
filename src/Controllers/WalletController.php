@@ -145,7 +145,7 @@ class WalletController
                                     <p><strong>New Balance:</strong> $newBalance Credits</p>
                                 ",
                                 "View Wallet",
-                                (isset($_SERVER['HTTPS']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . \Nexus\Core\TenantContext::getBasePath() . "/wallet",
+                                \Nexus\Core\TenantContext::getFrontendUrl() . \Nexus\Core\TenantContext::getBasePath() . "/wallet",
                                 "Project NEXUS"
                             );
 
@@ -173,7 +173,7 @@ class WalletController
                                     <p><strong>Description:</strong> $description</p>
                                 ",
                                 "View Logs",
-                                (isset($_SERVER['HTTPS']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . \Nexus\Core\TenantContext::getBasePath() . "/admin-legacy/logs",
+                                \Nexus\Core\TenantContext::getFrontendUrl() . \Nexus\Core\TenantContext::getBasePath() . "/admin-legacy/logs",
                                 "Project NEXUS Admin"
                             );
 

@@ -890,8 +890,7 @@ class GroupController
             // Ah, sendInstantEmail had $htmlContent.
             // So we must generating the HTML here.
 
-            $appUrl = \Nexus\Core\Env::get('APP_URL');
-            $absoluteLink = $appUrl . $link;
+            $absoluteLink = \Nexus\Core\TenantContext::getFrontendUrl() . $link;
 
             // Generate "Email Body" for Immediate Sends (This will be used if Frequency = Instant)
             // We need 2 versions? Or just one generic?
@@ -1018,8 +1017,7 @@ class GroupController
                 $discussion = \Nexus\Models\GroupDiscussion::findById($discussionId);
 
                 $link = "/groups/" . $groupId . "?tab=discussions&active_discussion=" . $discussionId;
-                $appUrl = \Nexus\Core\Env::get('APP_URL');
-                $absoluteLink = $appUrl . $link;
+                $absoluteLink = \Nexus\Core\TenantContext::getFrontendUrl() . $link;
 
                 $emailBody = "<h2>New Reply in " . htmlspecialchars($group['name']) . "</h2>";
                 $emailBody .= "<p><strong>" . htmlspecialchars($_SESSION['user_name'] ?? 'A member') . "</strong> replied to <strong>" . htmlspecialchars($discussion['title']) . "</strong>.</p>";

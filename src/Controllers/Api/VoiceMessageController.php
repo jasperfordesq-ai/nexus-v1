@@ -82,8 +82,7 @@ class VoiceMessageController
             $receiver = $stmt->fetch();
 
             if ($receiver && $receiver['email']) {
-                $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
-                $replyLink = $protocol . "://" . $_SERVER['HTTP_HOST'] . TenantContext::getBasePath() . "/messages/" . $senderId;
+                $replyLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/messages/" . $senderId;
 
                 $durationFormatted = gmdate("i:s", $audioResult['duration']);
                 $emailHtml = EmailTemplate::render(

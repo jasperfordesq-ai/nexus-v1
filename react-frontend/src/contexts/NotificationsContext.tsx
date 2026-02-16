@@ -243,7 +243,12 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       pusherRef.current = pusher;
 
       // Subscribe to private user channel (must match backend PusherService::getUserChannel format)
-      const channelName = `private-tenant.${user.tenant_id}.user.${user.id}`;
+      const tenantId = user.tenant_id || tokenManager.getTenantId();
+      if (!tenantId) {
+        logError('Cannot subscribe to Pusher: no tenant_id available');
+        return;
+      }
+      const channelName = `private-tenant.${tenantId}.user.${user.id}`;
       const channel = pusher.subscribe(channelName);
       channelRef.current = channel;
 
@@ -325,7 +330,10 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       if (pusherRef.current) {
         if (channelRef.current) {
           channelRef.current.unbind_all();
-          pusherRef.current.unsubscribe(`private-tenant.${user.tenant_id}.user.${user.id}`);
+          const cleanupTenantId = user.tenant_id || tokenManager.getTenantId();
+          if (cleanupTenantId) {
+            pusherRef.current.unsubscribe(`private-tenant.${cleanupTenantId}.user.${user.id}`);
+          }
         }
         pusherRef.current.disconnect();
         pusherRef.current = null;

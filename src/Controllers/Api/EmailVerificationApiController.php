@@ -244,16 +244,11 @@ class EmailVerificationApiController extends BaseApiController
         );
 
         // Build verification URL
-        $appUrl = \Nexus\Core\Env::get('APP_URL') ?? '';
-        if (empty($appUrl)) {
-            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $appUrl = "{$protocol}://{$host}";
-        }
+        $appUrl = TenantContext::getFrontendUrl();
 
         // For API clients, provide a URL that mobile apps can intercept
         // or that opens the web verification page
-        $verifyUrl = rtrim($appUrl, '/') . "/verify-email?token=" . $token;
+        $verifyUrl = $appUrl . "/verify-email?token=" . $token;
 
         // Send verification email
         try {

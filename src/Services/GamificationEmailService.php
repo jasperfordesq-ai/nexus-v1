@@ -218,7 +218,7 @@ class GamificationEmailService
     {
         $basePath = TenantContext::getBasePath();
         $siteName = TenantContext::getSetting('site_name', 'Community');
-        $siteUrl = TenantContext::getSetting('site_url', '');
+        $siteUrl = TenantContext::getFrontendUrl();
 
         $subject = "Your Weekly Progress - {$siteName}";
 
@@ -831,7 +831,7 @@ HTML;
 
         $siteName = TenantContext::getSetting('site_name', 'Community');
         $basePath = TenantContext::getBasePath();
-        $siteUrl = TenantContext::getSetting('site_url', '');
+        $siteUrl = TenantContext::getFrontendUrl();
 
         switch ($type) {
             case 'level_up':

@@ -235,8 +235,7 @@ class MessageController
             $receiver = $stmt->fetch();
 
             if ($receiver && $receiver['email']) {
-                $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
-                $replyLink = $protocol . "://" . $_SERVER['HTTP_HOST'] . TenantContext::getBasePath() . "/messages/" . $senderId;
+                $replyLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/messages/" . $senderId;
 
                 if (class_exists('Nexus\Core\EmailTemplate')) {
                     $emailHtml = EmailTemplate::render(
