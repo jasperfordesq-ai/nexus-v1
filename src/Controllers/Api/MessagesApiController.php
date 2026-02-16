@@ -177,6 +177,10 @@ class MessagesApiController extends BaseApiController
                 'recipient_id' => (int)($_POST['recipient_id'] ?? 0),
                 'body' => trim($_POST['body'] ?? ''),
             ];
+            // Include listing_id if provided (for first message in listing context)
+            if (!empty($_POST['listing_id'])) {
+                $data['listing_id'] = (int)$_POST['listing_id'];
+            }
         } else {
             $data = $this->getAllInput();
         }

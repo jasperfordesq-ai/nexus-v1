@@ -533,6 +533,7 @@ class MessageService
         $subject = $data['subject'] ?? '';
         $voiceUrl = $data['voice_url'] ?? $data['audio_url'] ?? null;
         $voiceDuration = $data['voice_duration'] ?? $data['audio_duration'] ?? null;
+        $listingId = isset($data['listing_id']) ? (int)$data['listing_id'] : null;
 
         $db = Database::getConnection();
 
@@ -541,17 +542,17 @@ class MessageService
             if ($voiceUrl) {
                 // Voice message
                 $stmt = $db->prepare("
-                    INSERT INTO messages (tenant_id, sender_id, receiver_id, subject, body, audio_url, audio_duration, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+                    INSERT INTO messages (tenant_id, sender_id, receiver_id, listing_id, subject, body, audio_url, audio_duration, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
                 ");
-                $stmt->execute([$tenantId, $senderId, $receiverId, $subject, $body, $voiceUrl, $voiceDuration]);
+                $stmt->execute([$tenantId, $senderId, $receiverId, $listingId, $subject, $body, $voiceUrl, $voiceDuration]);
             } else {
                 // Text message
                 $stmt = $db->prepare("
-                    INSERT INTO messages (tenant_id, sender_id, receiver_id, subject, body, created_at)
-                    VALUES (?, ?, ?, ?, ?, NOW())
+                    INSERT INTO messages (tenant_id, sender_id, receiver_id, listing_id, subject, body, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, NOW())
                 ");
-                $stmt->execute([$tenantId, $senderId, $receiverId, $subject, $body]);
+                $stmt->execute([$tenantId, $senderId, $receiverId, $listingId, $subject, $body]);
             }
 
             $messageId = $db->lastInsertId();

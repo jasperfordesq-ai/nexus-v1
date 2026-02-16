@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { ArrowLeft, Send, Info, Loader2, MoreVertical, Trash2, Mic, Square, Play, Pause, SmilePlus, Check, CheckCheck, Search, Paperclip, X, FileText, Pencil, AlertTriangle } from 'lucide-react';
@@ -55,6 +55,7 @@ interface PaginationState {
 export function ConversationPage() {
   usePageTitle('Messages');
   const { id, userId } = useParams<{ id?: string; userId?: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const toast = useToast();
@@ -72,11 +73,16 @@ export function ConversationPage() {
   const isNewConversationRoute = !!userId;
   const targetId = userId || id;
 
+  // Get listing ID from query params if provided
+  const listingIdParam = searchParams.get('listing');
+  const listingId = listingIdParam ? parseInt(listingIdParam) : null;
+
   const [conversation, setConversation] = useState<ConversationData | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [isNewConversation, setIsNewConversation] = useState(false);
+  const [listing, setListing] = useState<{ id: number; title: string; type: string } | null>(null);
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
@@ -295,6 +301,28 @@ export function ConversationPage() {
       }
     }
   }, [conversation?.messages.length]);
+
+  // Fetch listing details if listing ID is provided
+  useEffect(() => {
+    if (!listingId) return;
+
+    async function fetchListing() {
+      try {
+        const response = await api.get(`/v2/listings/${listingId}`);
+        if (response.success && response.data) {
+          setListing({
+            id: response.data.id,
+            title: response.data.title,
+            type: response.data.type,
+          });
+        }
+      } catch (error) {
+        logError('Failed to fetch listing for message context', error);
+      }
+    }
+
+    fetchListing();
+  }, [listingId]);
 
   async function loadUserForNewConversation(userIdToLoad: number) {
     try {
@@ -756,6 +784,11 @@ export function ConversationPage() {
           formData.append('attachments[]', file);
         });
 
+        // Include listing ID if this is the first message in conversation
+        if (listingId && isNewConversation) {
+          formData.append('listing_id', listingId.toString());
+        }
+
         const response = await api.upload<Message>('/v2/messages', formData);
 
         if (response.success && response.data) {
@@ -786,10 +819,17 @@ export function ConversationPage() {
         }
       } else {
         // Regular text message (no attachments)
-        const response = await api.post<Message>('/v2/messages', {
+        const payload: Record<string, unknown> = {
           recipient_id: parseInt(id, 10),
           body: newMessage.trim(),
-        });
+        };
+
+        // Include listing ID if this is the first message in conversation
+        if (listingId && isNewConversation) {
+          payload.listing_id = listingId;
+        }
+
+        const response = await api.post<Message>('/v2/messages', payload);
 
         if (response.success && response.data) {
           const sentMessage = response.data;
@@ -1085,6 +1125,26 @@ export function ConversationPage() {
             <X className="w-4 h-4" />
           </Button>
         </div>
+      )}
+
+      {/* Listing Context Card */}
+      {listing && (
+        <GlassCard className="p-4">
+          <div className="flex items-start gap-3">
+            <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-theme-muted mb-1">
+                Regarding this {listing.type === 'offer' ? 'offer' : 'request'}:
+              </p>
+              <Link
+                to={tenantPath(`/listings/${listing.id}`)}
+                className="font-medium text-theme-heading hover:text-primary transition-colors"
+              >
+                {listing.title}
+              </Link>
+            </div>
+          </div>
+        </GlassCard>
       )}
 
       {/* Messages */}

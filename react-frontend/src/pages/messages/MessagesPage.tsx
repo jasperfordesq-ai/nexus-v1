@@ -157,14 +157,22 @@ export function MessagesPage() {
   }, [loadConversations]);
 
   // Memoize startNewConversation
-  const startNewConversation = useCallback((userId: number, _listing?: number) => {
+  const startNewConversation = useCallback((userId: number, listing?: number) => {
     // Find existing conversation or create new
     const existing = conversations.find((c) => getOtherUser(c).id === userId);
     if (existing) {
-      navigate(tenantPath(`/messages/${existing.id}`), { replace: true });
+      // Pass listing ID if provided
+      const url = listing
+        ? tenantPath(`/messages/${existing.id}?listing=${listing}`)
+        : tenantPath(`/messages/${existing.id}`);
+      navigate(url, { replace: true });
     } else {
       // Navigate with "new" prefix to indicate this is a user ID, not conversation ID
-      navigate(tenantPath(`/messages/new/${userId}`), { replace: true });
+      // Pass listing ID if provided
+      const url = listing
+        ? tenantPath(`/messages/new/${userId}?listing=${listing}`)
+        : tenantPath(`/messages/new/${userId}`);
+      navigate(url, { replace: true });
     }
   }, [conversations, navigate, tenantPath]);
 
