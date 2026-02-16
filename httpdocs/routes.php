@@ -131,6 +131,8 @@ $router->add('GET', '/api/cookie-consent/check/{category}', 'Nexus\Controllers\A
 
 // Legal Documents API (Public Content + User Acceptance Tracking)
 $router->add('GET', '/api/v2/legal/{type}', 'Nexus\Controllers\LegalDocumentController@apiGetDocument');
+$router->add('GET', '/api/v2/legal/{type}/versions', 'Nexus\Controllers\LegalDocumentController@apiGetVersions');
+$router->add('GET', '/api/v2/legal/version/{versionId}', 'Nexus\Controllers\LegalDocumentController@apiGetVersion');
 $router->add('POST', '/api/legal/accept', 'Nexus\Controllers\LegalDocumentController@accept');
 $router->add('POST', '/api/legal/accept-all', 'Nexus\Controllers\LegalDocumentController@acceptAll');
 $router->add('GET', '/api/legal/status', 'Nexus\Controllers\LegalDocumentController@status');

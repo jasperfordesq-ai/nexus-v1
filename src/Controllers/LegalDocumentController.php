@@ -327,15 +327,125 @@ class LegalDocumentController
             return;
         }
 
+        // Check how many published versions exist (for "View changes" link)
+        $versions = LegalDocumentService::getVersions((int) $document['id']);
+        $publishedCount = count(array_filter($versions, fn($v) => !$v['is_draft']));
+
         echo json_encode([
             'data' => [
                 'id' => (int) $document['id'],
+                'document_id' => (int) $document['id'],
                 'type' => $document['document_type'],
                 'title' => $document['title'],
                 'content' => $document['content'],
                 'version_number' => $document['version_number'],
                 'effective_date' => $document['effective_date'],
                 'summary_of_changes' => $document['summary_of_changes'] ?? null,
+                'has_previous_versions' => $publishedCount > 1,
+            ]
+        ]);
+    }
+
+    /**
+     * API: Get version history for a legal document type (public)
+     * GET /api/v2/legal/{type}/versions
+     */
+    public function apiGetVersions(string $type): void
+    {
+        header('Content-Type: application/json');
+
+        $validTypes = [
+            LegalDocumentService::TYPE_TERMS,
+            LegalDocumentService::TYPE_PRIVACY,
+            LegalDocumentService::TYPE_COOKIES,
+            LegalDocumentService::TYPE_ACCESSIBILITY,
+            LegalDocumentService::TYPE_COMMUNITY_GUIDELINES,
+            LegalDocumentService::TYPE_ACCEPTABLE_USE,
+        ];
+
+        if (!in_array($type, $validTypes, true)) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Document type not found']);
+            return;
+        }
+
+        $document = LegalDocumentService::getByType($type);
+
+        if (!$document) {
+            echo json_encode(['data' => ['title' => '', 'versions' => []]]);
+            return;
+        }
+
+        $versions = LegalDocumentService::getVersions((int) $document['id']);
+
+        // Only show published versions to the public
+        $published = [];
+        foreach ($versions as $v) {
+            if ($v['is_draft']) {
+                continue;
+            }
+            $published[] = [
+                'id' => (int) $v['id'],
+                'version_number' => $v['version_number'],
+                'version_label' => $v['version_label'] ?? null,
+                'effective_date' => $v['effective_date'],
+                'published_at' => $v['published_at'],
+                'is_current' => (bool) $v['is_current'],
+                'summary_of_changes' => $v['summary_of_changes'] ?? null,
+            ];
+        }
+
+        echo json_encode([
+            'data' => [
+                'title' => $document['title'],
+                'type' => $document['document_type'],
+                'versions' => $published,
+            ]
+        ]);
+    }
+
+    /**
+     * API: Get a specific version's content (public)
+     * GET /api/v2/legal/version/{versionId}
+     */
+    public function apiGetVersion(int $versionId): void
+    {
+        header('Content-Type: application/json');
+
+        $version = LegalDocumentService::getVersion($versionId);
+
+        if (!$version) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Version not found']);
+            return;
+        }
+
+        // Verify tenant access
+        if ((int) $version['tenant_id'] !== TenantContext::getId()) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Version not found']);
+            return;
+        }
+
+        // Don't show drafts
+        if ($version['is_draft']) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Version not found']);
+            return;
+        }
+
+        echo json_encode([
+            'data' => [
+                'id' => (int) $version['id'],
+                'document_type' => $version['document_type'],
+                'title' => $version['title'],
+                'version_number' => $version['version_number'],
+                'version_label' => $version['version_label'] ?? null,
+                'content' => $version['content'],
+                'effective_date' => $version['effective_date'],
+                'published_at' => $version['published_at'],
+                'is_current' => (bool) $version['is_current'],
+                'summary_of_changes' => $version['summary_of_changes'] ?? null,
             ]
         ]);
     }
