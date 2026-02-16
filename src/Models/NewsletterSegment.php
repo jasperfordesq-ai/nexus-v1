@@ -401,7 +401,7 @@ class NewsletterSegment
                 return self::buildStringCondition('bio', $operator, $value, $params);
 
             case 'avatar':
-                return self::buildStringCondition('avatar', $operator, $value, $params);
+                return self::buildStringCondition('avatar_url', $operator, $value, $params);
 
             default:
                 return null;
