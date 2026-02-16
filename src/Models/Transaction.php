@@ -53,7 +53,13 @@ class Transaction
             ActivityLog::log($senderId, "sent_payment", "Sent $amount Hours");
             ActivityLog::log($receiverId, "received_payment", "Received $amount Hours");
 
-            Notification::create($receiverId, "You received $amount Time Credits from user #$senderId.");
+            // Get sender name for a user-friendly notification
+            $senderStmt = Database::query("SELECT name, first_name, last_name FROM users WHERE id = ?", [$senderId]);
+            $senderRow = $senderStmt->fetch();
+            $senderName = $senderRow ? ($senderRow['name'] ?: trim($senderRow['first_name'] . ' ' . $senderRow['last_name'])) : "User #{$senderId}";
+            $hourLabel = $amount == 1 ? 'hour' : 'hours';
+
+            Notification::create($receiverId, "💰 {$senderName} sent you {$amount} {$hourLabel}", '/wallet', 'credit_received');
 
             $pdo->commit();
 
