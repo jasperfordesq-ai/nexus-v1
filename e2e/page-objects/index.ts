@@ -21,3 +21,4 @@ export {
 } from './AdminPage';
 export { SuperAdminPage } from './SuperAdminPage';
 export { BrokerControlsPage } from './BrokerControlsPage';
+export { FeedPage } from './FeedPage';
