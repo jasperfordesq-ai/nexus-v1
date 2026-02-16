@@ -142,6 +142,20 @@ async function authenticateViaApi(
 
   console.log('   JWT tokens obtained, injecting into localStorage...');
 
+  // Ensure onboarding is marked complete to avoid redirecting to the wizard
+  try {
+    await authPage.request.post(`${apiBaseUrl}/v2/onboarding/complete`, {
+      data: { offers: [], needs: [] },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+        'X-Tenant-ID': TENANT_SLUG,
+      },
+    });
+  } catch {
+    // Ignore if already completed or endpoint unavailable
+  }
+
   // Navigate to the React app origin so we can set localStorage
   // Use the React frontend URL (may differ from API URL in Docker setup)
   const reactUrl = process.env.E2E_REACT_URL || BASE_URL;
