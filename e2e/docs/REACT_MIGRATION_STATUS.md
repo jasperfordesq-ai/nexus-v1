@@ -53,7 +53,25 @@
    - ✅ Tests for filter chips (All, Earned, Spent, Pending) and pagination
    - ✅ Tests for modal elements (recipient search, amount, description, balance display)
 
-9. **Documentation**
+9. **Events Tests** (`events.spec.ts` + `EventsPage.ts`)
+   - ✅ Rewrote EventsPage, CreateEventPage, EventDetailPage for React (515 lines)
+   - ✅ Updated selectors for GlassCard event cards with date badges
+   - ✅ Category filter chips (Workshop, Social, Outdoor, Online, etc.)
+   - ✅ Time filter select (Upcoming, Past, All Events)
+   - ✅ Event detail with tabs (Details, Attendees, Check-in for organizers)
+   - ✅ RSVP buttons (Going, Interested, Not Going)
+   - ✅ Create/edit form with image upload, validation tests
+   - ✅ 53 tests total (browse, search, filters, create, detail, RSVP, accessibility, responsive)
+
+10. **Groups Tests** (`groups.spec.ts` + `GroupsPage.ts`)
+   - ✅ Rewrote GroupsPage, GroupDetailPage, CreateGroupPage for React (377 lines)
+   - ✅ Group cards with avatar groups and member counts
+   - ✅ Filter select (All Groups, My Groups, Public, Private)
+   - ✅ Group detail with tabs (Discussions, Members, Events)
+   - ✅ Join/Leave buttons
+   - ✅ Create group form with privacy settings
+
+11. **Documentation**
    - ✅ Created `ROUTE_MAPPING.md` with legacy → React route map
    - ✅ Created `REACT_ROUTES_REFERENCE.md` with complete React route listing
    - ✅ Created this status document
@@ -74,10 +92,7 @@ The following test files still reference legacy PHP frontend routes/selectors an
 
 ### Other Specs
 These need verification (likely need selector updates):
-- `events.spec.ts` - Event creation/detail pages (uses EventsPage page object)
-- `groups.spec.ts` - Group pages (uses GroupsPage page object)
 - `listings.spec.ts` - Listing pages (uses ListingsPage page object - likely needs minor updates)
-- `wallet.spec.ts` - Wallet page (uses WalletPage page object - likely needs updates)
 - `messages.spec.ts` - Messages (uses MessagesPage page object - likely needs minor updates)
 
 ## How to Fix Remaining Tests
@@ -140,13 +155,13 @@ These specs likely need minimal changes:
 3. ~~**Priority 3a**: Update `legal-pages.spec.ts`~~ ✅ **DONE**
 4. ~~**Priority 3b**: Update `dashboard.spec.ts`~~ ✅ **DONE**
 5. ~~**Priority 3c**: Update `feed.spec.ts`~~ ✅ **DONE**
-6. **Priority 3d**: Verify/update remaining high-priority specs:
-   - `events.spec.ts` - Event pages (uses page objects, may need selector updates)
-   - `groups.spec.ts` - Group pages (uses page objects, may need selector updates)
-   - `wallet.spec.ts` - Wallet page (likely needs updates for React)
+6. ~~**Priority 3d**: Update `wallet.spec.ts`~~ ✅ **DONE**
+7. ~~**Priority 3e**: Update `events.spec.ts`~~ ✅ **DONE**
+8. ~~**Priority 3f**: Update `groups.spec.ts`~~ ✅ **DONE**
+9. **Priority 3g**: Verify/update remaining specs:
    - `listings.spec.ts` - Listing pages (uses page objects, likely minor updates)
    - `messages.spec.ts` - Messages (uses page objects, likely minor updates)
-7. **Priority 4**: Update `super-admin.spec.ts` (if super admin migrated to React)
+10. **Priority 4**: Update `super-admin.spec.ts` (if super admin migrated to React)
 
 ## Notes
 
