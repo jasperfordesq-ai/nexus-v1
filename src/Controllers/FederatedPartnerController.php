@@ -115,10 +115,7 @@ class FederatedPartnerController
         \Nexus\Core\SEO::setTitle($partner['name'] . ' - Partner Timebank');
         \Nexus\Core\SEO::setDescription('View details about our partner timebank ' . $partner['name'] . ' and explore available features.');
 
-        // Use CivicOne wrapper if CivicOne layout is active
-        $viewPath = (layout() === 'civicone')
-            ? 'civicone/federation/partner-profile'
-            : 'federation/partner-profile';
+        $viewPath = 'federation/partner-profile';
 
         View::render($viewPath, [
             'pageTitle' => $partner['name'],

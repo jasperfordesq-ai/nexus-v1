@@ -83,6 +83,7 @@ export interface RequestOptions extends Omit<RequestInit, 'body'> {
   skipTenant?: boolean;
   skipCsrf?: boolean;
   body?: unknown;
+  timeout?: number; // Request timeout in ms (default 30000)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -171,6 +172,13 @@ class ApiClient {
 
   constructor(baseUrl: string = API_BASE) {
     this.baseUrl = baseUrl;
+  }
+
+  /**
+   * Clear all in-flight request cache (call on tenant switch)
+   */
+  clearInflightRequests(): void {
+    this.inflightRequests.clear();
   }
 
   /**
@@ -334,13 +342,20 @@ class ApiClient {
     const headers = this.buildHeaders(options);
     const body = options.body ? JSON.stringify(options.body) : undefined;
 
+    // Request timeout (default 30s, configurable per-request)
+    const timeout = options.timeout ?? 30000;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
     try {
       const response = await fetch(url, {
         ...options,
         headers,
         body,
         credentials: 'include',
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       // Handle 401 Unauthorized with token refresh
       if (response.status === 401 && retryOnUnauthorized && !options.skipAuth) {
@@ -390,6 +405,15 @@ class ApiClient {
         code: data.code ?? `HTTP_${response.status}`,
       };
     } catch (error) {
+      clearTimeout(timeoutId);
+
+      // Handle timeout abort
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        const message = 'Request timed out. Please try again.';
+        this.dispatchApiError(message, 'TIMEOUT', endpoint);
+        return { success: false, error: message, code: 'TIMEOUT' };
+      }
+
       // Network or other error - sanitize for production
       const rawMessage = error instanceof Error ? error.message : 'Network error';
       const message = import.meta.env.PROD

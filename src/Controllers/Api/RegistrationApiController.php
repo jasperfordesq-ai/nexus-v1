@@ -80,7 +80,20 @@ class RegistrationApiController extends BaseApiController
      */
     public function register(): void
     {
-        // Rate limit by IP - 5 registrations per hour
+        // SECURITY: Redis-based rate limiting (fast, per-IP, 3 attempts per minute)
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if (\Nexus\Services\RateLimitService::check("auth:register:$ip", 3, 60)) {
+            header('Retry-After: 60');
+            $this->respondWithError(
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                'Too many registration attempts. Please try again later.',
+                null,
+                429
+            );
+        }
+        \Nexus\Services\RateLimitService::increment("auth:register:$ip", 60);
+
+        // Rate limit by IP - 5 registrations per hour (database-based, longer window)
         $this->rateLimit('registration', 5, 3600);
 
         // Collect input - Basic

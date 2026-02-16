@@ -29,7 +29,8 @@ try {
     );
     $health['database'] = 'connected';
 } catch (PDOException $e) {
-    $health['database'] = 'error: ' . $e->getMessage();
+    error_log('Health check DB error: ' . $e->getMessage());
+    $health['database'] = 'disconnected';
     $health['status'] = 'degraded';
 }
 

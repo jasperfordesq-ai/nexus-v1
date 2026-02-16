@@ -371,10 +371,7 @@ class FederatedTransactionController
         $partnerCommunities = $this->getPartnerCommunities($tenantId);
         $currentScope = $_GET['scope'] ?? 'all';
 
-        // Use CivicOne wrapper if CivicOne layout is active
-        $viewPath = (layout() === 'civicone')
-            ? 'civicone/federation/transactions'
-            : 'federation/transactions/index';
+        $viewPath = 'federation/transactions/index';
 
         View::render($viewPath, [
             'transactions' => $transactions,

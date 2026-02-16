@@ -16,7 +16,7 @@ $adminPageSubtitle = 'System';
 $adminPageIcon = 'fa-image';
 
 // Include standalone admin header
-require __DIR__ . '/../modern/admin-legacy/partials/admin-header.php';
+require __DIR__ . '/../layouts/admin-header.php';
 
 // Initialize converter
 $converter = new WebPConverter();
@@ -1794,4 +1794,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 })();
 </script>
 
-<?php require __DIR__ . '/../modern/admin-legacy/partials/admin-footer.php'; ?>
+<?php require __DIR__ . '/../layouts/admin-footer.php'; ?>

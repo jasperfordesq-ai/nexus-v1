@@ -193,6 +193,49 @@ class RedisCache
     }
 
     /**
+     * Atomically increment a counter in cache.
+     *
+     * Uses Redis INCR (preserves existing TTL). Sets TTL only on first increment.
+     * Falls back to get-then-set when Redis is unavailable.
+     *
+     * @param string $key Cache key
+     * @param int $ttl Time to live in seconds (only applied when key is first created)
+     * @param int|null $tenantId Optional tenant ID
+     * @return int New counter value
+     */
+    public static function increment(string $key, int $ttl = self::DEFAULT_TTL, ?int $tenantId = null): int
+    {
+        $redis = self::getRedis();
+
+        if ($redis === null) {
+            // Fallback: get → increment → set (not atomic, but functional)
+            $current = (int) self::get($key, $tenantId);
+            $newValue = $current + 1;
+            self::set($key, $newValue, $ttl, $tenantId);
+            return $newValue;
+        }
+
+        try {
+            $cacheKey = self::getCacheKey($key, $tenantId);
+            $newValue = $redis->incr($cacheKey);
+
+            // Set TTL only on first increment (when key was just created)
+            if ($newValue === 1) {
+                $redis->expire($cacheKey, $ttl);
+            }
+
+            return $newValue;
+        } catch (\Exception $e) {
+            error_log('RedisCache::increment error: ' . $e->getMessage());
+            // Fallback on error
+            $current = (int) self::get($key, $tenantId);
+            $newValue = $current + 1;
+            self::set($key, $newValue, $ttl, $tenantId);
+            return $newValue;
+        }
+    }
+
+    /**
      * Check if key exists in cache
      *
      * @param string $key Cache key

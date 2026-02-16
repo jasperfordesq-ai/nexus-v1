@@ -8,6 +8,7 @@ use Nexus\Core\TenantContext;
 use Nexus\Core\AdminAuth;
 use Nexus\Models\User;
 use Nexus\Helpers\UrlHelper;
+use Nexus\Services\AuditLogService;
 
 class UserController
 {
@@ -110,6 +111,8 @@ class UserController
         if ($newUser) {
             // Update role, status, and super admin flag
             User::updateAdminFields($newUser['id'], $role, $status, $isSuperAdmin);
+
+            AuditLogService::logUserCreated($_SESSION['user_id'], (int) $newUser['id'], $email);
 
             // Record GDPR consents (admin-created accounts)
             try {
@@ -255,6 +258,12 @@ class UserController
 
         User::updateAdminFields($id, $role, $status, $isSuperAdmin);
 
+        // Audit log: track update and role changes
+        AuditLogService::logUserUpdated($_SESSION['user_id'], (int) $id, ['first_name', 'last_name', 'role', 'status']);
+        if (($user['role'] ?? 'member') !== $role) {
+            AuditLogService::logAdminRoleChanged($_SESSION['user_id'], (int) $id, $user['role'] ?? 'member', $role);
+        }
+
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users');
         exit;
     }
@@ -286,6 +295,7 @@ class UserController
             exit;
         }
 
+        AuditLogService::logUserDeleted($_SESSION['user_id'], (int) $id, $targetUser['email'] ?? '');
         User::delete($id);
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?deleted=1');
         exit;
@@ -303,6 +313,7 @@ class UserController
 
         if ($target) {
             User::updateAdminFields($id, 'member', 1);
+            AuditLogService::logUserApproved($_SESSION['user_id'], (int) $id, $target['email'] ?? '');
 
             // Send Approval Email
             try {
@@ -560,6 +571,7 @@ class UserController
 
         // Log the action
         \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'suspend_user', "Suspended user #{$id}: {$targetUser['email']}");
+        AuditLogService::logUserSuspended($_SESSION['user_id'], (int) $id, 'Suspended by admin');
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?suspended=1');
         exit;
@@ -603,6 +615,7 @@ class UserController
 
         // Log the action
         \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'ban_user', "Banned user #{$id}: {$targetUser['email']}");
+        AuditLogService::logUserBanned($_SESSION['user_id'], (int) $id, 'Banned by admin');
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?banned=1');
         exit;
@@ -639,6 +652,7 @@ class UserController
 
         // Log the action
         \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'reactivate_user', "Reactivated user #{$id}: {$targetUser['email']}");
+        AuditLogService::logUserReactivated($_SESSION['user_id'], (int) $id, $targetUser['status'] ?? 'unknown');
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?reactivated=1');
         exit;
@@ -675,6 +689,7 @@ class UserController
 
         // Log the action
         \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'revoke_super_admin', "Revoked super admin from user #{$id}: {$targetUser['email']}");
+        AuditLogService::logSuperAdminRevoked($_SESSION['user_id'], (int) $id, $targetUser['email'] ?? '');
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users?super_admin_revoked=1');
         exit;
@@ -714,6 +729,7 @@ class UserController
         if ($result['success']) {
             // Log the action
             \Nexus\Models\ActivityLog::log($_SESSION['user_id'], 'reset_2fa', "Reset 2FA for user #{$id}: {$targetUser['email']} - Reason: {$reason}");
+            AuditLogService::log2faReset($_SESSION['user_id'], (int) $id, $reason);
 
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $id . '/edit?2fa_reset=1');
         } else {

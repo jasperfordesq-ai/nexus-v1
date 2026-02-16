@@ -357,8 +357,7 @@ class PlanController
     private function getAvailableLayouts()
     {
         return [
-            'modern' => 'Modern',
-            'civicone' => 'CivicOne'
+            'modern' => 'Modern'
         ];
     }
 }

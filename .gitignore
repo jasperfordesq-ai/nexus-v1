@@ -28,6 +28,10 @@
 *.temp
 nul
 debug_output.html
+tmp_*.php
+tmp_*.json
+tmp_*.sh
+tmp_*.txt
 
 # IDE
 .idea
@@ -97,10 +101,24 @@ firebase-service-account.json
 .agent/
 .claude/settings.local.json
 
-# Temp files with unusual names
+# Temp files with unusual names (includes Unicode fullwidth colon artifacts)
 C?temp*
+C?tmp*
+C?Users*
+c?xampp*
 *tempcivicone_dirs.txt
 *tempmodern_dirs.txt
+
+# Vite build artifacts
+*.timestamp-*.mjs
+
+# Misc temp/debug text files
+admin_routes.txt
+drawer_good.txt
+navbar_good.txt
+
+# Temp test scripts in scripts/
+scripts/test_*.sh
 
 # E2E Testing (Playwright)
 e2e/fixtures/.auth/

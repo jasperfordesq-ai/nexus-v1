@@ -8,7 +8,7 @@ $adminPageTitle = 'Deliverability Analytics';
 $adminPageSubtitle = 'Performance & Insights';
 $adminPageIcon = 'fa-chart-line';
 
-require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-header.php';
+require dirname(dirname(dirname(__DIR__))) . '/layouts/admin-header.php';
 
 $analytics = $analytics ?? [];
 $report = $report ?? [];
@@ -365,4 +365,4 @@ new Chart(statusCtx, {
 });
 </script>
 
-<?php require dirname(dirname(__DIR__)) . '/admin-legacy/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(dirname(__DIR__))) . '/layouts/admin-footer.php'; ?>

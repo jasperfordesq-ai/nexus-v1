@@ -171,20 +171,20 @@ class UserService
 
         // Count transactions
         $transactionCount = Database::query(
-            "SELECT COUNT(*) as cnt FROM transactions WHERE (sender_id = ? OR receiver_id = ?)",
-            [$userId, $userId]
+            "SELECT COUNT(*) as cnt FROM transactions WHERE (sender_id = ? OR receiver_id = ?) AND tenant_id = ?",
+            [$userId, $userId, $tenantId]
         )->fetch(\PDO::FETCH_ASSOC);
 
         // Count connections
         $connectionCount = Database::query(
-            "SELECT COUNT(*) as cnt FROM connections WHERE (requester_id = ? OR receiver_id = ?) AND status = 'accepted'",
-            [$userId, $userId]
+            "SELECT COUNT(*) as cnt FROM connections WHERE (requester_id = ? OR receiver_id = ?) AND status = 'accepted' AND tenant_id = ?",
+            [$userId, $userId, $tenantId]
         )->fetch(\PDO::FETCH_ASSOC);
 
         // Average review score
         $reviews = Database::query(
-            "SELECT AVG(rating) as avg_rating, COUNT(*) as review_count FROM reviews WHERE receiver_id = ?",
-            [$userId]
+            "SELECT AVG(rating) as avg_rating, COUNT(*) as review_count FROM reviews WHERE receiver_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch(\PDO::FETCH_ASSOC);
 
         return [

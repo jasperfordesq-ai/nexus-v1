@@ -74,9 +74,20 @@ class AuthController
             );
         }
 
-        // SECURITY: Rate limiting to prevent brute force attacks
+        // SECURITY: Redis-based rate limiting (fast, per-IP, 5 attempts per minute)
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if (\Nexus\Services\RateLimitService::check("auth:login:$ip", 5, 60)) {
+            header('Retry-After: 60');
+            return $this->errorResponse(
+                'Too many login attempts. Please try again later.',
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                429,
+                ['retry_after' => 60]
+            );
+        }
+        \Nexus\Services\RateLimitService::increment("auth:login:$ip", 60);
 
+        // SECURITY: Database-based rate limiting for brute force protection (tracks failed attempts)
         // Check rate limit by email
         if (!empty($email)) {
             $emailLimit = \Nexus\Core\RateLimiter::check($email, 'email');
@@ -116,6 +127,9 @@ class AuthController
                 \Nexus\Core\RateLimiter::recordAttempt($email, 'email', true);
             }
             \Nexus\Core\RateLimiter::recordAttempt($ip, 'ip', true);
+
+            // Clear Redis rate limit counter on successful login
+            \Nexus\Services\RateLimitService::reset("auth:login:$ip");
 
             // Detect if this is a mobile/API request for platform-appropriate token expiry
             $isMobile = TokenService::isMobileRequest();
@@ -248,8 +262,20 @@ class AuthController
 
     public function register()
     {
-        // SECURITY: Rate limiting to prevent registration abuse
+        // SECURITY: Redis-based rate limiting (fast, per-IP, 3 attempts per minute)
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if (\Nexus\Services\RateLimitService::check("auth:register:$ip", 3, 60)) {
+            header('Retry-After: 60');
+            return $this->errorResponse(
+                'Too many registration attempts. Please try again later.',
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                429,
+                ['retry_after' => 60]
+            );
+        }
+        \Nexus\Services\RateLimitService::increment("auth:register:$ip", 60);
+
+        // SECURITY: Database-based rate limiting for additional protection
         $ipLimit = \Nexus\Core\RateLimiter::check($ip, 'ip');
         if ($ipLimit['limited']) {
             $message = \Nexus\Core\RateLimiter::getRetryMessage($ipLimit['retry_after']);
@@ -628,6 +654,19 @@ class AuthController
      */
     public function refreshToken()
     {
+        // SECURITY: Rate limiting to prevent token refresh abuse
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if (\Nexus\Services\RateLimitService::check("auth:refresh:$ip", 10, 60)) {
+            header('Retry-After: 60');
+            return $this->errorResponse(
+                'Too many attempts. Please try again later.',
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                429,
+                ['retry_after' => 60]
+            );
+        }
+        \Nexus\Services\RateLimitService::increment("auth:refresh:$ip", 60);
+
         $data = $this->getJsonInput();
         $refreshToken = $data['refresh_token'] ?? '';
 

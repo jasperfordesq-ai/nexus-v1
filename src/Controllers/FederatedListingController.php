@@ -99,10 +99,7 @@ class FederatedListingController
 
         $currentScope = $_GET['scope'] ?? 'all';
 
-        // Use CivicOne wrapper if CivicOne layout is active
-        $viewPath = (layout() === 'civicone')
-            ? 'civicone/federation/listings'
-            : 'federation/listings';
+        $viewPath = 'federation/listings';
 
         View::render($viewPath, [
             'listings' => $listings,

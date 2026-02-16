@@ -1,6 +1,6 @@
 <?php
 $basePath = \Nexus\Core\TenantContext::getBasePath();
-require dirname(__DIR__, 2) . '/layouts/admin-legacy/header.php';
+require dirname(__DIR__, 2) . '/layouts/admin-header.php';
 ?>
 
 <div class="container-fluid py-4">
@@ -183,4 +183,4 @@ document.getElementById('badgeIcon').addEventListener('input', function() {
 });
 </script>
 
-<?php require dirname(__DIR__, 2) . '/layouts/admin-legacy/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/admin-footer.php'; ?>

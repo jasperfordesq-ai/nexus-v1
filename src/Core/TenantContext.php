@@ -365,20 +365,24 @@ class TenantContext
 
     /**
      * Get the frontend URL for user-facing links (emails, notifications).
-     * Uses tenant domain → FRONTEND_URL env → APP_URL env → fallback.
+     * Priority: FRONTEND_URL env → tenant site_url → APP_URL env → fallback.
+     *
+     * FRONTEND_URL is checked first because tenant site_url may point to the
+     * legacy PHP domain (e.g. hour-timebank.ie) while the React frontend
+     * lives at app.project-nexus.ie.
      */
     public static function getFrontendUrl(): string
     {
-        // 1. Tenant domain is the best source (tenant-specific)
-        $siteUrl = self::getSetting('site_url');
-        if ($siteUrl) {
-            return rtrim($siteUrl, '/');
-        }
-
-        // 2. Explicit FRONTEND_URL env var
+        // 1. Explicit FRONTEND_URL env var (React app URL — highest priority)
         $frontendUrl = Env::get('FRONTEND_URL');
         if ($frontendUrl) {
             return rtrim($frontendUrl, '/');
+        }
+
+        // 2. Tenant domain (may be legacy PHP domain — use as fallback)
+        $siteUrl = self::getSetting('site_url');
+        if ($siteUrl) {
+            return rtrim($siteUrl, '/');
         }
 
         // 3. Fallback to APP_URL (may be API domain — not ideal)

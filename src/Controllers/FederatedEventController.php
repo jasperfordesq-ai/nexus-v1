@@ -76,10 +76,7 @@ class FederatedEventController
 
         $currentScope = $_GET['scope'] ?? 'all';
 
-        // Use CivicOne wrapper if CivicOne layout is active
-        $viewPath = (layout() === 'civicone')
-            ? 'civicone/federation/events'
-            : 'federation/events';
+        $viewPath = 'federation/events';
 
         View::render($viewPath, [
             'events' => $events,

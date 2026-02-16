@@ -2,7 +2,7 @@
 
 // Admin: Volunteering Approvals
 $pageTitle = "Organization Approvals";
-require __DIR__ . '/../../layouts/admin-legacy/header.php';
+require __DIR__ . '/../../layouts/admin-header.php';
 ?>
 
 <div class="admin-header">
@@ -59,4 +59,4 @@ require __DIR__ . '/../../layouts/admin-legacy/header.php';
     <?php endif; ?>
 </div>
 
-<?php require __DIR__ . '/../../layouts/admin-legacy/footer.php'; ?>
+<?php require __DIR__ . '/../../layouts/admin-footer.php'; ?>

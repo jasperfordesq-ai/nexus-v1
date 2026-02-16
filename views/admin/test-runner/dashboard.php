@@ -15,7 +15,7 @@ $adminPageSubtitle = 'Automated testing and API health monitoring';
 $adminPageIcon = 'fa-flask';
 
 // Include the standalone admin header (includes <!DOCTYPE html>, <head>, etc.)
-require __DIR__ . '/../../modern/admin-legacy/partials/admin-header.php';
+require __DIR__ . '/../../layouts/admin-header.php';
 ?>
 
 <!-- Dashboard Header -->
@@ -464,5 +464,5 @@ function closeTestOutput() {
 
 <?php
 // Include admin footer
-require __DIR__ . '/../../modern/admin-legacy/partials/admin-footer.php';
+require __DIR__ . '/../../layouts/admin-footer.php';
 ?>

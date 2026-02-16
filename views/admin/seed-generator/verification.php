@@ -236,7 +236,7 @@
 </head>
 <body>
 
-<?php require __DIR__ . '/../../modern/admin-legacy/partials/admin-header.php'; ?>
+<?php require __DIR__ . '/../../layouts/admin-header.php'; ?>
 
 <div class="verification-container">
 
