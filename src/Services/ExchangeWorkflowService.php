@@ -600,8 +600,22 @@ class ExchangeWorkflowService
         $params = [$tenantId, $userId, $userId];
 
         if (!empty($filters['status'])) {
-            $whereClause .= " AND e.status = ?";
-            $params[] = $filters['status'];
+            // Handle 'active' as a special filter that includes multiple statuses
+            if ($filters['status'] === 'active') {
+                $activeStatuses = [
+                    self::STATUS_PENDING_PROVIDER,
+                    self::STATUS_PENDING_BROKER,
+                    self::STATUS_ACCEPTED,
+                    self::STATUS_IN_PROGRESS,
+                    self::STATUS_PENDING_CONFIRMATION,
+                ];
+                $placeholders = implode(',', array_fill(0, count($activeStatuses), '?'));
+                $whereClause .= " AND e.status IN ($placeholders)";
+                $params = array_merge($params, $activeStatuses);
+            } else {
+                $whereClause .= " AND e.status = ?";
+                $params[] = $filters['status'];
+            }
         }
 
         if (!empty($filters['role'])) {
@@ -613,8 +627,22 @@ class ExchangeWorkflowService
                 $params = [$tenantId, $userId];
             }
             if (!empty($filters['status'])) {
-                $whereClause .= " AND e.status = ?";
-                $params[] = $filters['status'];
+                // Handle 'active' as a special filter that includes multiple statuses
+                if ($filters['status'] === 'active') {
+                    $activeStatuses = [
+                        self::STATUS_PENDING_PROVIDER,
+                        self::STATUS_PENDING_BROKER,
+                        self::STATUS_ACCEPTED,
+                        self::STATUS_IN_PROGRESS,
+                        self::STATUS_PENDING_CONFIRMATION,
+                    ];
+                    $placeholders = implode(',', array_fill(0, count($activeStatuses), '?'));
+                    $whereClause .= " AND e.status IN ($placeholders)";
+                    $params = array_merge($params, $activeStatuses);
+                } else {
+                    $whereClause .= " AND e.status = ?";
+                    $params[] = $filters['status'];
+                }
             }
         }
 
