@@ -616,7 +616,7 @@ class SmartSegmentSuggestionService
                 AND u.is_approved = 1
                 AND (
                     (u.bio IS NULL OR u.bio = '')
-                    OR (u.avatar IS NULL OR u.avatar = '')
+                    OR (u.avatar_url IS NULL OR u.avatar_url = '')
                     OR (u.location IS NULL OR u.location = '')
                 )
             ", [$tenantId])->fetch()['cnt'];
@@ -989,7 +989,7 @@ class SmartSegmentSuggestionService
                 WHERE u.tenant_id = ?
                 AND u.is_approved = 1
                 AND u.bio IS NOT NULL AND u.bio != ''
-                AND u.avatar IS NOT NULL AND u.avatar != ''
+                AND u.avatar_url IS NOT NULL AND u.avatar_url != ''
                 AND u.location IS NOT NULL AND u.location != ''
                 AND (
                     SELECT COUNT(*)

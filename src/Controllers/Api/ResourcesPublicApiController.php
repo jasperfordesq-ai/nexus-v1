@@ -66,7 +66,7 @@ class ResourcesPublicApiController extends BaseApiController
             "SELECT r.id, r.title, r.description, r.file_path, r.file_type, r.file_size,
                     r.downloads, r.category_id, r.user_id, r.created_at,
                     CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as uploader_name,
-                    u.avatar as uploader_avatar,
+                    u.avatar_url as uploader_avatar,
                     c.name as category_name,
                     c.slug as category_slug,
                     c.color as category_color

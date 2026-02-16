@@ -40,7 +40,7 @@ class VettingService
     {
         $tenantId = TenantContext::getId();
         $stmt = Database::query(
-            "SELECT vr.*, u.first_name, u.last_name, u.email, u.avatar,
+            "SELECT vr.*, u.first_name, u.last_name, u.email, u.avatar_url,
                     vb.first_name as verifier_first_name, vb.last_name as verifier_last_name
              FROM vetting_records vr
              JOIN users u ON u.id = vr.user_id
@@ -98,7 +98,7 @@ class VettingService
 
         // Fetch records
         $stmt = Database::query(
-            "SELECT vr.*, u.first_name, u.last_name, u.email, u.avatar,
+            "SELECT vr.*, u.first_name, u.last_name, u.email, u.avatar_url,
                     vb.first_name as verifier_first_name, vb.last_name as verifier_last_name
              FROM vetting_records vr
              JOIN users u ON u.id = vr.user_id
