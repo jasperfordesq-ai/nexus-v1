@@ -9,36 +9,28 @@ use Nexus\Models\User;
 
 /**
  * TotpController - Handles 2FA setup, verification, and settings
+ *
+ * NOTE: 2FA is currently DISABLED system-wide (see AuthController::login()).
+ * The legacy PHP views (views/modern/auth/totp-*.php) were removed with the
+ * frontend migration to React. When 2FA is re-enabled, it will use the React
+ * frontend and API endpoints (TotpApiController) instead of these PHP views.
+ *
+ * All view-rendering methods now redirect to login to prevent fatal errors
+ * from missing view files.
  */
 class TotpController
 {
     /**
      * Show 2FA verification form during login
      * GET /auth/2fa
+     *
+     * Legacy view removed — redirects to login. When 2FA is re-enabled,
+     * the React frontend will handle verification via TotpApiController.
      */
     public function showVerify(): void
     {
-        // Must have pending 2FA session
-        if (empty($_SESSION['pending_2fa_user_id'])) {
-            header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
-        }
-
-        // Check if session expired
-        if (($_SESSION['pending_2fa_expires'] ?? 0) < time()) {
-            unset($_SESSION['pending_2fa_user_id'], $_SESSION['pending_2fa_expires']);
-            header('Location: ' . TenantContext::getBasePath() . '/login?error=2fa_timeout');
-            exit;
-        }
-
-        $data = [
-            'title' => 'Two-Factor Authentication',
-            'error' => $_GET['error'] ?? null,
-            'csrf_token' => Csrf::token()
-        ];
-
-        extract($data);
-        require __DIR__ . '/../../views/' . layout() . '/auth/totp-verify.php';
+        header('Location: ' . TenantContext::getBasePath() . '/login');
+        exit;
     }
 
     /**
@@ -108,67 +100,9 @@ class TotpController
      */
     public function showSetup(): void
     {
-        // Must have pending setup session OR be logged in
-        $userId = $_SESSION['pending_2fa_setup_user_id'] ?? $_SESSION['user_id'] ?? null;
-
-        if (!$userId) {
-            header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
-        }
-
-        // Check if pending setup expired
-        if (isset($_SESSION['pending_2fa_setup_expires']) && $_SESSION['pending_2fa_setup_expires'] < time()) {
-            unset($_SESSION['pending_2fa_setup_user_id'], $_SESSION['pending_2fa_setup_expires']);
-            header('Location: ' . TenantContext::getBasePath() . '/login?error=setup_timeout');
-            exit;
-        }
-
-        // Force refresh if requested OR if QR is old base64 data URI format (not raw SVG)
-        $needsRefresh = isset($_GET['refresh']);
-        if (!$needsRefresh && !empty($_SESSION['totp_setup_qr'])) {
-            // Check for old data URI format or missing SVG tag
-            $qr = $_SESSION['totp_setup_qr'];
-            if (strpos($qr, 'data:image') === 0 || strpos($qr, '<svg') === false) {
-                $needsRefresh = true; // Old format, regenerate
-            }
-        }
-
-        if ($needsRefresh) {
-            unset($_SESSION['totp_setup_secret'], $_SESSION['totp_setup_qr'], $_SESSION['totp_setup_uri']);
-        }
-
-        // Initialize setup if not already done
-        if (empty($_SESSION['totp_setup_secret']) || empty($_SESSION['totp_setup_qr'])) {
-            try {
-                $setup = TotpService::initializeSetup($userId);
-                $_SESSION['totp_setup_secret'] = $setup['secret'];
-                $_SESSION['totp_setup_qr'] = $setup['qr_code'];
-                $_SESSION['totp_setup_uri'] = $setup['provisioning_uri'];
-            } catch (\Exception $e) {
-                error_log("TOTP setup init error: " . $e->getMessage());
-                $data = [
-                    'title' => 'Setup Error',
-                    'error' => 'Failed to initialize 2FA setup. Please try again.',
-                    'qr_code' => null,
-                    'secret' => null,
-                    'csrf_token' => Csrf::token()
-                ];
-                extract($data);
-                require __DIR__ . '/../../views/' . layout() . '/auth/totp-setup.php';
-                return;
-            }
-        }
-
-        $data = [
-            'title' => 'Set Up Two-Factor Authentication',
-            'qr_code' => $_SESSION['totp_setup_qr'],
-            'secret' => $_SESSION['totp_setup_secret'],
-            'error' => $_GET['error'] ?? null,
-            'csrf_token' => Csrf::token()
-        ];
-
-        extract($data);
-        require __DIR__ . '/../../views/' . layout() . '/auth/totp-setup.php';
+        // Legacy view removed — redirect to login
+        header('Location: ' . TenantContext::getBasePath() . '/login');
+        exit;
     }
 
     /**
@@ -228,29 +162,14 @@ class TotpController
      */
     public function showBackupCodes(): void
     {
-        // Must be logged in
+        // Legacy view removed — redirect to settings
+        $basePath = TenantContext::getBasePath();
         if (empty($_SESSION['user_id'])) {
-            header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            header('Location: ' . $basePath . '/login');
+        } else {
+            header('Location: ' . $basePath . '/settings');
         }
-
-        // Get backup codes from session (only shown once after setup)
-        $backupCodes = $_SESSION['totp_backup_codes'] ?? null;
-
-        if ($backupCodes) {
-            // Clear from session after displaying
-            unset($_SESSION['totp_backup_codes']);
-        }
-
-        $data = [
-            'title' => 'Backup Codes',
-            'backup_codes' => $backupCodes,
-            'codes_remaining' => TotpService::getBackupCodeCount($_SESSION['user_id']),
-            'csrf_token' => Csrf::token()
-        ];
-
-        extract($data);
-        require __DIR__ . '/../../views/' . layout() . '/auth/backup-codes.php';
+        exit;
     }
 
     /**
@@ -289,28 +208,14 @@ class TotpController
      */
     public function settings(): void
     {
+        // Legacy view removed — redirect to React settings page
+        $basePath = TenantContext::getBasePath();
         if (empty($_SESSION['user_id'])) {
-            header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            header('Location: ' . $basePath . '/login');
+        } else {
+            header('Location: ' . $basePath . '/settings');
         }
-
-        $userId = $_SESSION['user_id'];
-
-        $data = [
-            'title' => '2FA Settings',
-            'is_enabled' => TotpService::isEnabled($userId),
-            'backup_codes_remaining' => TotpService::getBackupCodeCount($userId),
-            'trusted_devices' => TotpService::getTrustedDevices($userId),
-            'trusted_device_count' => TotpService::getTrustedDeviceCount($userId),
-            'flash_success' => $_SESSION['flash_success'] ?? null,
-            'flash_error' => $_SESSION['flash_error'] ?? null,
-            'csrf_token' => Csrf::token()
-        ];
-
-        unset($_SESSION['flash_success'], $_SESSION['flash_error']);
-
-        extract($data);
-        require __DIR__ . '/../../views/' . layout() . '/settings/2fa.php';
+        exit;
     }
 
     /**

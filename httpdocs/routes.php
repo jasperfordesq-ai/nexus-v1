@@ -1082,7 +1082,7 @@ $router->add('GET', '/blog/{slug}', 'Nexus\Controllers\BlogController@show'); //
 // Dynamic Tenant Pages
 // Automatically register routes for pages found in views/tenants/{slug}/pages/ AND layout overrides
 $tenantPages = [];
-foreach ([null, 'modern', 'civicone'] as $layout) {
+foreach ([null, 'modern'] as $layout) {
     $found = TenantContext::getCustomPages($layout);
     foreach ($found as $p) {
         $tenantPages[$p['url']] = $p; // Key by URL to deduplicate
@@ -1246,9 +1246,7 @@ $router->add('POST', '/events/rsvp', 'Nexus\Controllers\EventController@rsvp');
 $router->add('POST', '/events/invite', 'Nexus\Controllers\EventController@invite');
 $router->add('POST', '/events/check-in', 'Nexus\Controllers\EventController@checkIn');
 
-// Specific Event Routes
-$router->add('GET', '/events/{id}', 'Nexus\Controllers\EventController@show');
-$router->add('GET', '/events/{id}/edit', 'Nexus\Controllers\EventController@edit');
+// Specific Event Routes (additional aliases)
 $router->add('GET', '/events/edit/{id}', 'Nexus\Controllers\EventController@edit'); // Alias for Admin Directory
 $router->add('POST', '/events/{id}/update', 'Nexus\Controllers\EventController@update');
 $router->add('GET', '/events/{id}/delete', 'Nexus\Controllers\EventController@destroy'); // Ideally POST/DELETE, but commonly GET link in simple apps

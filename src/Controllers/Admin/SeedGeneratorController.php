@@ -102,7 +102,7 @@ class SeedGeneratorController
             $stats = $this->getDatabaseStats();
 
             // Render preview page
-            require __DIR__ . '/../../../views/admin-legacy/seed-generator/preview.php';
+            require __DIR__ . '/../../../views/admin/seed-generator/preview.php';
             return;
         }
 
