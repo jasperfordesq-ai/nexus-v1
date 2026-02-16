@@ -297,6 +297,50 @@ class LegalDocumentController
     }
 
     /**
+     * API: Get legal document content by type (public, no auth required)
+     * GET /api/v2/legal/{type}
+     */
+    public function apiGetDocument(string $type): void
+    {
+        header('Content-Type: application/json');
+
+        $validTypes = [
+            LegalDocumentService::TYPE_TERMS,
+            LegalDocumentService::TYPE_PRIVACY,
+            LegalDocumentService::TYPE_COOKIES,
+            LegalDocumentService::TYPE_ACCESSIBILITY,
+            LegalDocumentService::TYPE_COMMUNITY_GUIDELINES,
+            LegalDocumentService::TYPE_ACCEPTABLE_USE,
+        ];
+
+        if (!in_array($type, $validTypes, true)) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Document type not found']);
+            return;
+        }
+
+        $document = LegalDocumentService::getByType($type);
+
+        if (!$document || !$document['content']) {
+            // No custom document — React should show its default content
+            echo json_encode(['data' => null]);
+            return;
+        }
+
+        echo json_encode([
+            'data' => [
+                'id' => (int) $document['id'],
+                'type' => $document['document_type'],
+                'title' => $document['title'],
+                'content' => $document['content'],
+                'version_number' => $document['version_number'],
+                'effective_date' => $document['effective_date'],
+                'summary_of_changes' => $document['summary_of_changes'] ?? null,
+            ]
+        ]);
+    }
+
+    /**
      * Common method to show a legal document
      */
     private function showDocument(string $type, string $fallbackTitle): void
