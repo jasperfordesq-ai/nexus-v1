@@ -2,13 +2,11 @@
 
 namespace Nexus\Core;
 
-use Nexus\Services\LayoutHelper;
-
 /**
  * View Rendering System
  *
- * Supports dynamic layout switching between modern and civicone.
- * Layout is determined by LayoutHelper service.
+ * Uses the 'modern' layout for all legacy PHP views.
+ * The React frontend is the primary UI; these views are for admin-legacy and reference only.
  *
  * ISOLATION: Each layout is fully self-contained. No cross-layout fallbacks.
  * If a view doesn't exist in the active layout, it shows an error rather than
@@ -39,14 +37,8 @@ class View
 
         $currentTenant = TenantContext::get();
 
-        // Get the current active layout from LayoutHelper
-        $activeLayout = LayoutHelper::get();
-
-        // Admin views always use Modern layout (Modern is the admin source of truth)
-        // This ensures consistent admin experience regardless of user's site layout preference
-        if (strpos($viewPath, 'admin/') === 0) {
-            $activeLayout = 'modern';
-        }
+        // Legacy CivicOne theme has been removed; always use modern layout
+        $activeLayout = 'modern';
 
         // Build view paths - ISOLATED per layout (no cross-layout fallbacks)
         $viewPaths = [];

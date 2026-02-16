@@ -1,1 +1,0 @@
-*:focus-visible{outline:3px solid var(--color-govuk-yellow);outline-offset:0;box-shadow:inset 0 0 0 2px var(--color-govuk-black)}*:focus:not(:focus-visible){outline:none}

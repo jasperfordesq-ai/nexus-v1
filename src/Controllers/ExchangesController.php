@@ -53,7 +53,7 @@ class ExchangesController
      */
     private function getViewPath(string $viewName): string
     {
-        $layout = \Nexus\Services\LayoutHelper::get();
+        $layout = 'modern';
         $baseDir = __DIR__ . '/../../views/';
         $viewPath = $baseDir . $layout . '/exchanges/' . $viewName . '.php';
 
