@@ -28,7 +28,25 @@
    - ✅ Updated quick link count (5 cards: exchanges, risk-tags, messages, monitoring, vetting)
    - ✅ Tests already targeting React admin at `/admin/broker-controls/*`
 
-5. **Documentation**
+5. **Legal Pages Tests** (`legal-pages.spec.ts`)
+   - ✅ Added `tenantUrl()` to all route navigation
+   - ✅ Made tests flexible for custom vs default tenant documents
+   - ✅ Added test for custom document TOC rendering
+
+6. **Dashboard Tests** (`dashboard.spec.ts` + `DashboardPage.ts`)
+   - ✅ Rewrote DashboardPage page object for React dashboard with GlassCard components
+   - ✅ Removed all legacy PHP sub-route tests (/dashboard/listings, /dashboard/hubs, etc.)
+   - ✅ React dashboard is single page at /dashboard with sections in cards
+   - ✅ Made all assertions flexible for feature-gated content (wallet, groups, events, gamification)
+
+7. **Feed Tests** (`feed.spec.ts` + `FeedPage.ts`)
+   - ✅ Created FeedPage page object for React social feed with GlassCard components
+   - ✅ Replaced legacy selectors (.feed-post, .post-card) with React/HeroUI patterns
+   - ✅ Tests for create post modal (text and poll modes)
+   - ✅ Tests for like/comment interactions, filter chips, load more
+   - ✅ Skipped destructive tests (create poll, report, hide, delete)
+
+8. **Documentation**
    - ✅ Created `ROUTE_MAPPING.md` with legacy → React route map
    - ✅ Created this status document
 
@@ -47,15 +65,12 @@ The following test files still reference legacy PHP frontend routes/selectors an
 - Other page objects may need review for React compatibility
 
 ### Other Specs
-These should mostly work but need verification:
-- `dashboard.spec.ts` - May reference legacy dashboard
-- `events.spec.ts` - Event creation/detail pages
-- `groups.spec.ts` - Group pages
-- `listings.spec.ts` - Listing pages (should mostly work)
-- `feed.spec.ts` - Feed page (should mostly work)
-- `wallet.spec.ts` - Wallet page (should mostly work)
-- `messages.spec.ts` - Messages (should mostly work)
-- `legal-pages.spec.ts` - Legal pages (should mostly work)
+These need verification (likely need selector updates):
+- `events.spec.ts` - Event creation/detail pages (uses EventsPage page object)
+- `groups.spec.ts` - Group pages (uses GroupsPage page object)
+- `listings.spec.ts` - Listing pages (uses ListingsPage page object - likely needs minor updates)
+- `wallet.spec.ts` - Wallet page (uses WalletPage page object - likely needs updates)
+- `messages.spec.ts` - Messages (uses MessagesPage page object - likely needs minor updates)
 
 ## How to Fix Remaining Tests
 
@@ -114,8 +129,16 @@ These specs likely need minimal changes:
 
 1. ~~**Priority 1**: Update `admin.spec.ts` page objects and tests~~ ✅ **DONE**
 2. ~~**Priority 2**: Update `broker-controls.spec.ts`~~ ✅ **DONE**
-3. **Priority 3**: Verify other specs work with current React frontend
-4. **Priority 4**: Update `super-admin.spec.ts` (if super admin migrated to React)
+3. ~~**Priority 3a**: Update `legal-pages.spec.ts`~~ ✅ **DONE**
+4. ~~**Priority 3b**: Update `dashboard.spec.ts`~~ ✅ **DONE**
+5. ~~**Priority 3c**: Update `feed.spec.ts`~~ ✅ **DONE**
+6. **Priority 3d**: Verify/update remaining high-priority specs:
+   - `events.spec.ts` - Event pages (uses page objects, may need selector updates)
+   - `groups.spec.ts` - Group pages (uses page objects, may need selector updates)
+   - `wallet.spec.ts` - Wallet page (likely needs updates for React)
+   - `listings.spec.ts` - Listing pages (uses page objects, likely minor updates)
+   - `messages.spec.ts` - Messages (uses page objects, likely minor updates)
+7. **Priority 4**: Update `super-admin.spec.ts` (if super admin migrated to React)
 
 ## Notes
 
