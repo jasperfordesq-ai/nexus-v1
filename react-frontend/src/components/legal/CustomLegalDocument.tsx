@@ -46,15 +46,24 @@ const itemVariants = {
 interface Section {
   id: string;
   title: string;
+  /** Display title with any leading number prefix stripped */
+  displayTitle: string;
+  /** Original numeric prefix (e.g. "1") if present, otherwise null */
+  numericPrefix: string | null;
   html: string;
 }
 
 /**
- * Splits HTML content on <h2> boundaries into individual sections.
- * Each section gets an id derived from the h2's existing id attribute
- * (or slugified from the heading text) and the HTML between that h2
- * and the next one.
+ * Extract a leading numeric prefix from a section title.
+ * Matches patterns like "1. Title", "12. Title", "1) Title".
+ * Returns [numericPrefix, cleanedTitle] or [null, originalTitle].
  */
+function parseNumberedTitle(title: string): [string | null, string] {
+  const match = title.match(/^(\d+)[.)]\s+(.+)$/);
+  if (match) return [match[1], match[2]];
+  return [null, title];
+}
+
 function parseSections(html: string): Section[] {
   // Split on <h2 ...>...</h2> while keeping the matched heading
   const parts = html.split(/(<h2[^>]*>[\s\S]*?<\/h2>)/i);
@@ -73,7 +82,8 @@ function parseSections(html: string): Section[] {
     if (h2Match) {
       // Flush previous section
       if (currentTitle) {
-        sections.push({ id: currentId, title: currentTitle, html: currentHtml.trim() });
+        const [numericPrefix, displayTitle] = parseNumberedTitle(currentTitle);
+        sections.push({ id: currentId, title: currentTitle, displayTitle, numericPrefix, html: currentHtml.trim() });
       }
       const rawTitle = h2Match[2].replace(/<[^>]+>/g, '').trim();
       currentTitle = rawTitle;
@@ -86,12 +96,13 @@ function parseSections(html: string): Section[] {
 
   // Flush last section
   if (currentTitle) {
-    sections.push({ id: currentId, title: currentTitle, html: currentHtml.trim() });
+    const [numericPrefix, displayTitle] = parseNumberedTitle(currentTitle);
+    sections.push({ id: currentId, title: currentTitle, displayTitle, numericPrefix, html: currentHtml.trim() });
   }
 
   // If there was content before the first h2, prepend as an intro section
   if (hasIntro) {
-    sections.unshift({ id: 'introduction', title: 'Introduction', html: introHtml });
+    sections.unshift({ id: 'introduction', title: 'Introduction', displayTitle: 'Introduction', numericPrefix: null, html: introHtml });
   }
 
   return sections;
@@ -182,6 +193,11 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
   const styles = ACCENT_STYLES[accentColor] ?? ACCENT_STYLES.blue;
   const sections = useMemo(() => parseSections(doc.content), [doc.content]);
 
+  // Check if the document already uses its own numbering scheme.
+  // If most sections have numeric prefixes, use those instead of auto-numbering.
+  const numberedCount = sections.filter((s) => s.numericPrefix !== null).length;
+  const hasOwnNumbering = numberedCount > sections.length / 2;
+
   // Show TOC only when there are enough sections to justify it
   const showToc = sections.length >= 4;
 
@@ -240,53 +256,63 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
               Contents
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-              {sections.map((section, idx) => (
-                <button
-                  key={section.id}
-                  onClick={() => scrollToSection(section.id)}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm text-theme-muted transition-colors ${styles.tocHover} group`}
-                >
-                  <span
-                    className={`inline-flex items-center justify-center w-5 h-5 rounded text-[0.65rem] font-bold ${styles.chipBg} flex-shrink-0`}
+              {sections.map((section, idx) => {
+                const chipLabel = hasOwnNumbering
+                  ? (section.numericPrefix ?? '·')
+                  : String(idx + 1);
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => scrollToSection(section.id)}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm text-theme-muted transition-colors ${styles.tocHover} group`}
                   >
-                    {idx + 1}
-                  </span>
-                  <span className="truncate group-hover:text-theme-primary transition-colors">
-                    {section.title}
-                  </span>
-                  <ChevronRight
-                    className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-60 transition-opacity flex-shrink-0"
-                    aria-hidden="true"
-                  />
-                </button>
-              ))}
+                    <span
+                      className={`inline-flex items-center justify-center w-5 h-5 rounded text-[0.65rem] font-bold ${styles.chipBg} shrink-0`}
+                    >
+                      {chipLabel}
+                    </span>
+                    <span className="truncate group-hover:text-theme-primary transition-colors">
+                      {hasOwnNumbering ? section.displayTitle : section.title}
+                    </span>
+                    <ChevronRight
+                      className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-60 transition-opacity shrink-0"
+                      aria-hidden="true"
+                    />
+                  </button>
+                );
+              })}
             </div>
           </GlassCard>
         </motion.div>
       )}
 
       {/* ── Content Sections ── */}
-      {sections.map((section, idx) => (
-        <motion.div key={section.id} variants={itemVariants} id={section.id}>
-          <GlassCard className="p-6 sm:p-8">
-            <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2.5 pb-3 border-b border-[var(--border-default)]">
-              <Chip
-                size="sm"
-                variant="flat"
-                classNames={{ base: styles.chipBg }}
-                className="text-xs font-bold min-w-[1.75rem]"
-              >
-                {idx + 1}
-              </Chip>
-              {section.title}
-            </h2>
-            <div
-              className="legal-content"
-              dangerouslySetInnerHTML={{ __html: section.html }}
-            />
-          </GlassCard>
-        </motion.div>
-      ))}
+      {sections.map((section, idx) => {
+        const chipLabel = hasOwnNumbering
+          ? (section.numericPrefix ?? '·')
+          : String(idx + 1);
+        return (
+          <motion.div key={section.id} variants={itemVariants} id={section.id}>
+            <GlassCard className="p-6 sm:p-8">
+              <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2.5 pb-3 border-b border-(--border-default)">
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  classNames={{ base: styles.chipBg }}
+                  className="text-xs font-bold min-w-7"
+                >
+                  {chipLabel}
+                </Chip>
+                {hasOwnNumbering ? section.displayTitle : section.title}
+              </h2>
+              <div
+                className="legal-content"
+                dangerouslySetInnerHTML={{ __html: section.html }}
+              />
+            </GlassCard>
+          </motion.div>
+        );
+      })}
 
       {/* ── Version History + Contact CTA ── */}
       <motion.div variants={itemVariants}>
