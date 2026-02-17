@@ -1,15 +1,17 @@
 /**
- * Create/Edit Event Page with image upload and category selection
+ * Create/Edit Event Page with image upload, category selection,
+ * and HeroUI DatePicker + TimeInput components.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Select, SelectItem } from '@heroui/react';
+import { Button, Input, Textarea, Select, SelectItem, DatePicker, TimeInput } from '@heroui/react';
+import type { DateInputValue, TimeInputValue } from '@heroui/react';
+import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
 import {
   Save,
   Calendar,
-  Clock,
   FileText,
   CheckCircle,
   Users,
@@ -47,10 +49,10 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gi
 interface FormData {
   title: string;
   description: string;
-  start_date: string;
-  start_time: string;
-  end_date: string;
-  end_time: string;
+  startDate: DateInputValue | null;
+  startTime: TimeInputValue | null;
+  endDate: DateInputValue | null;
+  endTime: TimeInputValue | null;
   location: string;
   latitude?: number;
   longitude?: number;
@@ -61,14 +63,25 @@ interface FormData {
 const initialFormData: FormData = {
   title: '',
   description: '',
-  start_date: '',
-  start_time: '',
-  end_date: '',
-  end_time: '',
+  startDate: null,
+  startTime: null,
+  endDate: null,
+  endTime: null,
   location: '',
   max_attendees: '',
   category: '',
 };
+
+/** Convert a DateInputValue + TimeInputValue into a JS Date */
+function toJSDate(date: DateInputValue, time: TimeInputValue | null): Date {
+  const dateStr = date.toString(); // "2026-02-17"
+  if (time) {
+    const h = String(time.hour).padStart(2, '0');
+    const m = String(time.minute).padStart(2, '0');
+    return new Date(`${dateStr}T${h}:${m}:00`);
+  }
+  return new Date(`${dateStr}T00:00:00`);
+}
 
 export function CreateEventPage() {
   usePageTitle('Create Event');
@@ -82,7 +95,7 @@ export function CreateEventPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Image upload state
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -106,10 +119,10 @@ export function CreateEventPage() {
         setFormData({
           title: event.title,
           description: event.description || '',
-          start_date: startDate.toISOString().split('T')[0],
-          start_time: startDate.toTimeString().slice(0, 5),
-          end_date: endDate ? endDate.toISOString().split('T')[0] : '',
-          end_time: endDate ? endDate.toTimeString().slice(0, 5) : '',
+          startDate: parseDate(startDate.toISOString().split('T')[0]),
+          startTime: parseTime(startDate.toTimeString().slice(0, 5)),
+          endDate: endDate ? parseDate(endDate.toISOString().split('T')[0]) : null,
+          endTime: endDate ? parseTime(endDate.toTimeString().slice(0, 5)) : null,
           location: event.location || '',
           latitude: event.coordinates?.lat,
           longitude: event.coordinates?.lng,
@@ -141,13 +154,11 @@ export function CreateEventPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate type
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       toast.error('Please select a JPEG, PNG, WebP, or GIF image');
       return;
     }
 
-    // Validate size
     if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
       toast.error(`Image must be smaller than ${MAX_IMAGE_SIZE_MB}MB`);
       return;
@@ -155,7 +166,6 @@ export function CreateEventPage() {
 
     setImageFile(file);
 
-    // Create preview
     const reader = new FileReader();
     reader.onload = (ev) => {
       setImagePreview(ev.target?.result as string);
@@ -202,7 +212,7 @@ export function CreateEventPage() {
   }
 
   function validateForm(): boolean {
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
@@ -216,16 +226,18 @@ export function CreateEventPage() {
       newErrors.description = 'Description must be at least 20 characters';
     }
 
-    if (!formData.start_date) {
-      newErrors.start_date = 'Start date is required';
+    if (!formData.startDate) {
+      newErrors.startDate = 'Start date is required';
     }
 
-    if (!formData.start_time) {
-      newErrors.start_time = 'Start time is required';
+    if (!formData.startTime) {
+      newErrors.startTime = 'Start time is required';
     }
 
-    if (formData.start_date && formData.end_date && formData.end_date < formData.start_date) {
-      newErrors.end_date = 'End date must be after start date';
+    if (formData.startDate && formData.endDate) {
+      if (formData.endDate.toString() < formData.startDate.toString()) {
+        newErrors.endDate = 'End date must be after start date';
+      }
     }
 
     if (formData.max_attendees) {
@@ -264,9 +276,12 @@ export function CreateEventPage() {
     try {
       setIsSubmitting(true);
 
-      const startDateTime = new Date(`${formData.start_date}T${formData.start_time}`);
-      const endDateTime = formData.end_date && formData.end_time
-        ? new Date(`${formData.end_date}T${formData.end_time}`)
+      const startDateTime = formData.startDate
+        ? toJSDate(formData.startDate, formData.startTime)
+        : new Date();
+
+      const endDateTime = formData.endDate
+        ? toJSDate(formData.endDate, formData.endTime)
         : null;
 
       const payload: Record<string, unknown> = {
@@ -292,7 +307,6 @@ export function CreateEventPage() {
       }
 
       if (response.success) {
-        // Upload image if one was selected
         const eventId = isEditing
           ? Number(id)
           : (response.data as { id?: number })?.id;
@@ -311,13 +325,6 @@ export function CreateEventPage() {
       toast.error('Something went wrong');
     } finally {
       setIsSubmitting(false);
-    }
-  }
-
-  function updateField<K extends keyof FormData>(field: K, value: FormData[K]) {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   }
 
@@ -451,7 +458,10 @@ export function CreateEventPage() {
               label="Event Title"
               placeholder="e.g., Community Garden Day, Skill Share Workshop..."
               value={formData.title}
-              onChange={(e) => updateField('title', e.target.value)}
+              onChange={(e) => {
+                setFormData((prev) => ({ ...prev, title: e.target.value }));
+                if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
+              }}
               isInvalid={!!errors.title}
               errorMessage={errors.title}
               startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -470,7 +480,7 @@ export function CreateEventPage() {
               placeholder="Select a category"
               aria-label="Event category"
               selectedKeys={formData.category ? [formData.category] : []}
-              onChange={(e) => updateField('category', e.target.value)}
+              onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
               startContent={<Tag className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
@@ -490,7 +500,10 @@ export function CreateEventPage() {
               label="Description"
               placeholder="Describe your event in detail..."
               value={formData.description}
-              onChange={(e) => updateField('description', e.target.value)}
+              onChange={(e) => {
+                setFormData((prev) => ({ ...prev, description: e.target.value }));
+                if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
+              }}
               minRows={4}
               isInvalid={!!errors.description}
               errorMessage={errors.description}
@@ -506,16 +519,17 @@ export function CreateEventPage() {
           <fieldset className="grid sm:grid-cols-2 gap-4">
             <legend className="sr-only">Start date and time</legend>
             <div>
-              <Input
-                type="date"
+              <DatePicker
                 label="Start Date"
-                value={formData.start_date}
-                onChange={(e) => updateField('start_date', e.target.value)}
-                isInvalid={!!errors.start_date}
-                errorMessage={errors.start_date}
-                startContent={<Calendar className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                value={formData.startDate}
+                onChange={(val) => {
+                  setFormData((prev) => ({ ...prev, startDate: val }));
+                  if (errors.startDate) setErrors((prev) => ({ ...prev, startDate: '' }));
+                }}
+                minValue={today(getLocalTimeZone())}
+                isInvalid={!!errors.startDate}
+                errorMessage={errors.startDate}
                 classNames={{
-                  input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                 }}
@@ -523,16 +537,16 @@ export function CreateEventPage() {
             </div>
 
             <div>
-              <Input
-                type="time"
+              <TimeInput
                 label="Start Time"
-                value={formData.start_time}
-                onChange={(e) => updateField('start_time', e.target.value)}
-                isInvalid={!!errors.start_time}
-                errorMessage={errors.start_time}
-                startContent={<Clock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                value={formData.startTime}
+                onChange={(val) => {
+                  setFormData((prev) => ({ ...prev, startTime: val }));
+                  if (errors.startTime) setErrors((prev) => ({ ...prev, startTime: '' }));
+                }}
+                isInvalid={!!errors.startTime}
+                errorMessage={errors.startTime}
                 classNames={{
-                  input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                 }}
@@ -544,16 +558,17 @@ export function CreateEventPage() {
           <fieldset className="grid sm:grid-cols-2 gap-4">
             <legend className="sr-only">End date and time (optional)</legend>
             <div>
-              <Input
-                type="date"
+              <DatePicker
                 label="End Date (optional)"
-                value={formData.end_date}
-                onChange={(e) => updateField('end_date', e.target.value)}
-                isInvalid={!!errors.end_date}
-                errorMessage={errors.end_date}
-                startContent={<Calendar className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                value={formData.endDate}
+                onChange={(val) => {
+                  setFormData((prev) => ({ ...prev, endDate: val }));
+                  if (errors.endDate) setErrors((prev) => ({ ...prev, endDate: '' }));
+                }}
+                minValue={formData.startDate || today(getLocalTimeZone())}
+                isInvalid={!!errors.endDate}
+                errorMessage={errors.endDate}
                 classNames={{
-                  input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                 }}
@@ -561,14 +576,11 @@ export function CreateEventPage() {
             </div>
 
             <div>
-              <Input
-                type="time"
+              <TimeInput
                 label="End Time (optional)"
-                value={formData.end_time}
-                onChange={(e) => updateField('end_time', e.target.value)}
-                startContent={<Clock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                value={formData.endTime}
+                onChange={(val) => setFormData((prev) => ({ ...prev, endTime: val }))}
                 classNames={{
-                  input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                 }}
@@ -583,7 +595,7 @@ export function CreateEventPage() {
                 label="Location (optional)"
                 placeholder="e.g., Online, Community Center..."
                 value={formData.location}
-                onChange={(val) => updateField('location', val)}
+                onChange={(val) => setFormData((prev) => ({ ...prev, location: val }))}
                 onPlaceSelect={(place) => {
                   setFormData((prev) => ({
                     ...prev,
@@ -614,7 +626,10 @@ export function CreateEventPage() {
                 label="Max Attendees (optional)"
                 placeholder="Leave empty for unlimited"
                 value={formData.max_attendees}
-                onChange={(e) => updateField('max_attendees', e.target.value)}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, max_attendees: e.target.value }));
+                  if (errors.max_attendees) setErrors((prev) => ({ ...prev, max_attendees: '' }));
+                }}
                 min={1}
                 max={10000}
                 isInvalid={!!errors.max_attendees}

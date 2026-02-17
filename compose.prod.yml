@@ -76,6 +76,7 @@ services:
       dockerfile: Dockerfile.prod
       args:
         VITE_API_BASE: https://api.project-nexus.ie/api
+        VITE_GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
     container_name: nexus-react-prod
     restart: unless-stopped
     ports:

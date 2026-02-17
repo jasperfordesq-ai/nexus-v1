@@ -2,17 +2,16 @@
  * Help Center Page - FAQ and support resources
  *
  * Displays common questions, guides, and links to contact support.
+ * Uses HeroUI Accordion component for expand/collapse.
  */
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Input } from '@heroui/react';
+import { motion } from 'framer-motion';
+import { Accordion, AccordionItem, Button, Input } from '@heroui/react';
 import {
   HelpCircle,
   Search,
-  ChevronDown,
-  ChevronUp,
   MessageSquare,
   BookOpen,
   Wallet,
@@ -176,8 +175,6 @@ export function HelpCenterPage() {
   const { branding, tenantPath } = useTenant();
   usePageTitle('Help Center');
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCategory, setExpandedCategory] = useState<number | null>(0);
-  const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
   // Filter FAQ items by search
   const filteredCategories = searchQuery.trim()
@@ -192,14 +189,6 @@ export function HelpCenterPage() {
         }))
         .filter((cat) => cat.items.length > 0)
     : faqCategories;
-
-  const toggleCategory = (index: number) => {
-    setExpandedCategory(expandedCategory === index ? null : index);
-  };
-
-  const toggleItem = (key: string) => {
-    setExpandedItem(expandedItem === key ? null : key);
-  };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -264,90 +253,55 @@ export function HelpCenterPage() {
             </p>
           </GlassCard>
         ) : (
-          filteredCategories.map((category, catIdx) => (
-            <GlassCard key={catIdx} className="overflow-hidden">
-              {/* Category Header */}
-              <Button
-                variant="light"
-                fullWidth
-                onPress={() => toggleCategory(catIdx)}
-                className="flex items-center justify-between p-5 text-left h-auto rounded-none hover:bg-theme-hover/30"
-              >
-                <div className="flex items-center gap-3">
+          <Accordion
+            selectionMode="multiple"
+            variant="splitted"
+            defaultExpandedKeys={["0"]}
+            itemClasses={{
+              base: 'bg-theme-elevated/50 backdrop-blur-md border border-theme-default/30 shadow-sm',
+              title: 'font-semibold text-theme-primary',
+              subtitle: 'text-xs text-theme-subtle',
+              trigger: 'p-5 hover:bg-theme-hover/30 data-[hover=true]:bg-theme-hover/30',
+              indicator: 'text-theme-muted',
+              content: 'px-5 pb-2',
+            }}
+          >
+            {filteredCategories.map((category, catIdx) => (
+              <AccordionItem
+                key={String(catIdx)}
+                aria-label={category.title}
+                title={category.title}
+                subtitle={`${category.items.length} articles`}
+                startContent={
                   <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400">
                     {category.icon}
                   </div>
-                  <div>
-                    <h2 className="font-semibold text-theme-primary">{category.title}</h2>
-                    <p className="text-xs text-theme-subtle">{category.items.length} articles</p>
-                  </div>
-                </div>
-                {expandedCategory === catIdx ? (
-                  <ChevronUp className="w-5 h-5 text-theme-muted" aria-hidden="true" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-theme-muted" aria-hidden="true" />
-                )}
-              </Button>
-
-              {/* Category Items */}
-              <AnimatePresence>
-                {expandedCategory === catIdx && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="border-t border-theme-default"
-                  >
-                    <div className="divide-y divide-theme-default">
-                      {category.items.map((item, itemIdx) => {
-                        const key = `${catIdx}-${itemIdx}`;
-                        const isExpanded = expandedItem === key;
-
-                        return (
-                          <div key={key}>
-                            <Button
-                              variant="light"
-                              fullWidth
-                              onPress={() => toggleItem(key)}
-                              className="flex items-center justify-between px-5 py-4 text-left h-auto rounded-none hover:bg-theme-hover/20"
-                            >
-                              <span className="text-sm font-medium text-theme-primary pr-4">
-                                {item.question}
-                              </span>
-                              {isExpanded ? (
-                                <ChevronUp className="w-4 h-4 text-theme-muted flex-shrink-0" aria-hidden="true" />
-                              ) : (
-                                <ChevronDown className="w-4 h-4 text-theme-muted flex-shrink-0" aria-hidden="true" />
-                              )}
-                            </Button>
-
-                            <AnimatePresence>
-                              {isExpanded && (
-                                <motion.div
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: 'auto' }}
-                                  exit={{ opacity: 0, height: 0 }}
-                                  transition={{ duration: 0.15 }}
-                                  className="overflow-hidden"
-                                >
-                                  <div className="px-5 pb-4">
-                                    <p className="text-sm text-theme-muted leading-relaxed">
-                                      {item.answer}
-                                    </p>
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </GlassCard>
-          ))
+                }
+              >
+                <Accordion
+                  selectionMode="multiple"
+                  variant="light"
+                  itemClasses={{
+                    base: 'border-b border-theme-default/50 last:border-b-0',
+                    title: 'text-sm font-medium text-theme-primary',
+                    trigger: 'px-2 py-3 hover:bg-theme-hover/20 data-[hover=true]:bg-theme-hover/20',
+                    content: 'px-2 pb-3 text-sm text-theme-muted leading-relaxed',
+                    indicator: 'text-theme-muted',
+                  }}
+                >
+                  {category.items.map((item, itemIdx) => (
+                    <AccordionItem
+                      key={`${catIdx}-${itemIdx}`}
+                      aria-label={item.question}
+                      title={item.question}
+                    >
+                      {item.answer}
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </AccordionItem>
+            ))}
+          </Accordion>
         )}
       </motion.div>
 
