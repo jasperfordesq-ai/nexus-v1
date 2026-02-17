@@ -1107,25 +1107,11 @@ class AuthController
             exit;
         }
 
-        // Look up the tenant's domain to ensure session is on the right domain
-        $tenantDomain = Database::query(
-            "SELECT domain FROM tenants WHERE id = ?",
-            [(int)$user['tenant_id']]
-        )->fetchColumn();
-
-        // If we're on the wrong domain (e.g., api.project-nexus.ie instead of hour-timebank.ie),
-        // redirect to the tenant domain's bridge so the session cookie is set correctly
-        $currentHost = $_SERVER['HTTP_HOST'] ?? '';
-        if ($tenantDomain && $currentHost !== $tenantDomain && empty($_GET['final'])) {
-            // Detect HTTPS (nginx terminates SSL, so check X-Forwarded-Proto too)
-            $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-                || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
-            $scheme = $isHttps ? 'https' : 'http';
-            $bridgeUrl = "{$scheme}://{$tenantDomain}/api/auth/admin-session?token=" . urlencode($token) . "&redirect=" . urlencode($redirect) . "&final=1";
-            header('Location: ' . $bridgeUrl);
-            exit;
-        }
+        // NOTE: The legacy admin always runs on the API domain (api.project-nexus.ie).
+        // The session cookie must be set on THIS domain, not the tenant's public domain.
+        // Previously this code redirected to the tenant domain, but that breaks when the
+        // tenant domain is a different site (e.g., project-nexus.ie is the sales site,
+        // not the PHP API). The admin session stays on the API domain.
 
         // Create PHP session (mirrors AuthController::login session setup)
         session_regenerate_id(true);
