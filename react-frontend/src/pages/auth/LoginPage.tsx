@@ -69,11 +69,15 @@ export function LoginPage() {
     tokenManager.clearTokens();
   }, []);
 
-  // Determine if tenant is already known from URL/domain via TenantContext.
-  // Wait for TenantContext to finish loading before deciding.
-  const tenantResolvedFromUrl = !tenantLoading && tenant !== null;
+  // Tenant is "resolved from URL" only when there's an explicit URL slug or
+  // the hostname is a custom tenant domain (not the generic app.* domain).
+  // If bootstrap just fell back to tenant 1 with no URL hint, we still need
+  // the dropdown so regular users can pick their community.
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const isGenericAppDomain = hostname === 'app.project-nexus.ie' || hostname === 'localhost' || hostname === '127.0.0.1';
+  const tenantResolvedFromUrl = !tenantLoading && tenant !== null && (!!tenantSlug || !isGenericAppDomain);
 
-  // When TenantContext has resolved a tenant, use it directly — no dropdown needed.
+  // When tenant is resolved from URL/domain, set it directly — no dropdown needed.
   useEffect(() => {
     if (tenantResolvedFromUrl && tenant) {
       setSelectedTenantId(String(tenant.id));
