@@ -13,19 +13,19 @@ async function dismissCookieBanner(page: any): Promise<void> {
 }
 
 /**
- * Helper to fill location field (handles Mapbox autocomplete)
- * The location field is transformed by Mapbox into a text input for autocomplete
+ * Helper to fill location field (handles Google Places autocomplete)
+ * The PlaceAutocompleteInput renders a standard text input with autocomplete suggestions
  */
 async function fillLocationField(page: any, location: string): Promise<void> {
-  // Try to find the visible location input (Mapbox creates a text input)
-  const locationInput = page.locator('input[name="location"]:visible, .mapbox-location-input-v2:visible, input.mapbox-autocomplete:visible').first();
+  // Find the visible location input (PlaceAutocompleteInput renders a standard input)
+  const locationInput = page.locator('input[name="location"]:visible, input[aria-label*="location" i]:visible, input[placeholder*="City"]:visible').first();
 
   if (await locationInput.isVisible({ timeout: 2000 }).catch(() => false)) {
     await locationInput.fill(location);
-    await page.waitForTimeout(500); // Wait for autocomplete
+    await page.waitForTimeout(500); // Wait for autocomplete suggestions
 
-    // Try to select first suggestion if dropdown appears
-    const suggestion = page.locator('.mapbox-suggestions li, .suggestions li, [data-suggestion]').first();
+    // Try to select first Google Places suggestion if dropdown appears
+    const suggestion = page.locator('[role="option"], [data-place-id], .place-suggestion').first();
     if (await suggestion.isVisible({ timeout: 1000 }).catch(() => false)) {
       await suggestion.click();
     }
@@ -143,7 +143,7 @@ test.describe('Authentication - Registration', () => {
     });
 
     test.skip('should show error for already registered email', async ({ page }) => {
-      // Skip - requires valid location field interaction which uses Mapbox
+      // Skip - requires valid location field interaction with Google Places API
       await page.goto(tenantUrl('register'));
       await dismissDevNoticeModal(page);
       await dismissCookieBanner(page);
@@ -193,7 +193,7 @@ test.describe('Authentication - Registration', () => {
     });
 
     test.skip('should not allow registration without GDPR consent', async ({ page }) => {
-      // Skip - requires valid location field interaction which uses Mapbox
+      // Skip - requires valid location field interaction with Google Places API
       await page.goto(tenantUrl('register'));
       await dismissDevNoticeModal(page);
       await dismissCookieBanner(page);

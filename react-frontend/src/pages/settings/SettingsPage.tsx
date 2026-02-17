@@ -65,6 +65,7 @@ import {
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
+import { PlaceAutocompleteInput } from '@/components/location';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -83,6 +84,8 @@ interface ProfileFormData {
   tagline: string;
   bio: string;
   location: string;
+  latitude?: number;
+  longitude?: number;
   avatar: string | null;
   profile_type: 'individual' | 'organisation';
   organization_name: string;
@@ -170,6 +173,8 @@ export function SettingsPage() {
     tagline: '',
     bio: '',
     location: '',
+    latitude: undefined,
+    longitude: undefined,
     avatar: null,
     profile_type: 'individual',
     organization_name: '',
@@ -291,6 +296,8 @@ export function SettingsPage() {
         tagline: user.tagline || '',
         bio: user.bio || '',
         location: user.location || '',
+        latitude: user.latitude ?? undefined,
+        longitude: user.longitude ?? undefined,
         avatar: user.avatar || null,
         profile_type: user.profile_type || 'individual',
         organization_name: user.organization_name || '',
@@ -324,6 +331,8 @@ export function SettingsPage() {
         tagline: profileData.tagline,
         bio: sanitizedBio,
         location: profileData.location,
+        latitude: profileData.latitude,
+        longitude: profileData.longitude,
         profile_type: profileData.profile_type,
         organization_name: profileData.profile_type === 'organisation' ? profileData.organization_name : '',
       };
@@ -847,11 +856,27 @@ export function SettingsPage() {
                 }}
               />
 
-              <Input
+              <PlaceAutocompleteInput
                 label="Location"
                 placeholder="City, Country"
                 value={profileData.location}
-                onChange={(e) => setProfileData((prev) => ({ ...prev, location: e.target.value }))}
+                onChange={(val) => setProfileData((prev) => ({ ...prev, location: val }))}
+                onPlaceSelect={(place) => {
+                  setProfileData((prev) => ({
+                    ...prev,
+                    location: place.formattedAddress,
+                    latitude: place.lat,
+                    longitude: place.lng,
+                  }));
+                }}
+                onClear={() => {
+                  setProfileData((prev) => ({
+                    ...prev,
+                    location: '',
+                    latitude: undefined,
+                    longitude: undefined,
+                  }));
+                }}
                 classNames={inputClassNames}
               />
 

@@ -24,7 +24,6 @@ import {
   ArrowRight,
   Loader2,
   Building2,
-  MapPin,
   Phone,
   Check,
   X,
@@ -33,6 +32,7 @@ import {
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
+import { PlaceAutocompleteInput } from '@/components/location';
 import { api, tokenManager } from '@/lib/api';
 import { PASSWORD_REQUIREMENTS, isPasswordValid, getPasswordStrength } from '@/lib/validation';
 
@@ -88,6 +88,8 @@ export function RegisterPage() {
 
   // Form state - Contact
   const [location, setLocation] = useState('');
+  const [latitude, setLatitude] = useState<number | undefined>();
+  const [longitude, setLongitude] = useState<number | undefined>();
   const [phone, setPhone] = useState('');
 
   // Form state - Consents
@@ -248,6 +250,8 @@ export function RegisterPage() {
       profile_type: profileType,
       organization_name: profileType === 'organisation' ? organizationName : undefined,
       location: location || undefined,
+      latitude,
+      longitude,
       phone: phone || undefined,
       terms_accepted: termsAccepted,
       newsletter_opt_in: newsletterOptIn,
@@ -447,17 +451,23 @@ export function RegisterPage() {
             </div>
 
             {/* Location */}
-            <Input
-              type="text"
+            <PlaceAutocompleteInput
               label="Location"
               placeholder="Your town or city"
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-              autoComplete="address-level2"
+              onChange={(val) => setLocation(val)}
+              onPlaceSelect={(place) => {
+                setLocation(place.formattedAddress);
+                setLatitude(place.lat);
+                setLongitude(place.lng);
+              }}
+              onClear={() => {
+                setLocation('');
+                setLatitude(undefined);
+                setLongitude(undefined);
+              }}
               classNames={{
-                inputWrapper:
-                  'glass-card border-glass-border hover:border-glass-border-hover',
+                inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
               }}

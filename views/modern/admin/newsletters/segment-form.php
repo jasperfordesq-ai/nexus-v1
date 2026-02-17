@@ -1475,7 +1475,7 @@ existingConditions.forEach(condition => {
 addRule();
 <?php endif; ?>
 
-// Geo search with Mapbox (if available)
+// Geo search (manual input for now)
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('geo-search')) {
         const row = e.target.closest('.rule-row');

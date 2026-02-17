@@ -9,11 +9,11 @@ import { Button, Input, Textarea, Select, SelectItem, Radio, RadioGroup } from '
 import {
   Save,
   Clock,
-  MapPin,
   Tag,
   FileText,
   CheckCircle,
 } from 'lucide-react';
+import { PlaceAutocompleteInput } from '@/components/location';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
@@ -30,6 +30,8 @@ interface FormData {
   category_id: string;
   hours_estimate: string;
   location: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 const initialFormData: FormData = {
@@ -88,6 +90,8 @@ export function CreateListingPage() {
           category_id: listing.category_id?.toString() || '',
           hours_estimate: (listing.hours_estimate ?? listing.estimated_hours ?? 1).toString(),
           location: listing.location || '',
+          latitude: listing.latitude ?? undefined,
+          longitude: listing.longitude ?? undefined,
         });
       }
     } catch (error) {
@@ -304,16 +308,31 @@ export function CreateListingPage() {
             </div>
 
             <div>
-              <Input
+              <PlaceAutocompleteInput
                 label="Location (optional)"
                 placeholder="e.g., Online, Dublin, Cork..."
                 value={formData.location}
-                onChange={(e) => updateField('location', e.target.value)}
-                startContent={<MapPin className="w-4 h-4 text-theme-subtle" />}
+                onChange={(val) => updateField('location', val)}
+                onPlaceSelect={(place) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    location: place.formattedAddress,
+                    latitude: place.lat,
+                    longitude: place.lng,
+                  }));
+                }}
+                onClear={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    location: '',
+                    latitude: undefined,
+                    longitude: undefined,
+                  }));
+                }}
                 classNames={{
-                  input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
+                  input: 'text-theme-primary placeholder:text-theme-subtle',
                 }}
               />
             </div>

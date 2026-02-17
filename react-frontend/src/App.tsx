@@ -19,6 +19,9 @@ import { HelmetProvider } from 'react-helmet-async';
 // Contexts (app-wide only — tenant-scoped contexts are inside TenantShell)
 import { ToastProvider, ThemeProvider } from '@/contexts';
 
+// Google Maps Provider (loads API key, enables PlaceAutocompleteInput)
+import { GoogleMapsProvider } from '@/components/location';
+
 // Layout Components
 import { Layout, AuthLayout } from '@/components/layout';
 import { ProtectedRoute, FeatureGate, ScrollToTop, TenantShell } from '@/components/routing';
@@ -512,27 +515,29 @@ function App() {
     <ErrorBoundary>
       <HelmetProvider>
         <ThemeProvider>
-          <BrowserRouter>
-            <HeroUIRouterProvider>
-              <ScrollToTop />
-              <ToastProvider>
-                <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                  <Routes>
-                    {/* Single catch-all route — TenantShell detects tenant slug from
-                        the first path segment (if it's not reserved like "admin").
-                        When a slug IS found, TenantShell renders a nested <Routes>
-                        with the slug stripped so child routes match correctly.
-                        This avoids the `:tenantSlug/*` dynamic param route which caused
-                        React Router v6 to rank `/:tenantSlug/listings` higher than
-                        `/admin/*` (splat routes rank lowest in RRv6). */}
-                    <Route path="/*" element={<TenantShell appRoutes={AppRoutes} />}>
-                      {AppRoutes()}
-                    </Route>
-                  </Routes>
-                </Suspense>
-              </ToastProvider>
-            </HeroUIRouterProvider>
-          </BrowserRouter>
+          <GoogleMapsProvider>
+            <BrowserRouter>
+              <HeroUIRouterProvider>
+                <ScrollToTop />
+                <ToastProvider>
+                  <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                    <Routes>
+                      {/* Single catch-all route — TenantShell detects tenant slug from
+                          the first path segment (if it's not reserved like "admin").
+                          When a slug IS found, TenantShell renders a nested <Routes>
+                          with the slug stripped so child routes match correctly.
+                          This avoids the `:tenantSlug/*` dynamic param route which caused
+                          React Router v6 to rank `/:tenantSlug/listings` higher than
+                          `/admin/*` (splat routes rank lowest in RRv6). */}
+                      <Route path="/*" element={<TenantShell appRoutes={AppRoutes} />}>
+                        {AppRoutes()}
+                      </Route>
+                    </Routes>
+                  </Suspense>
+                </ToastProvider>
+              </HeroUIRouterProvider>
+            </BrowserRouter>
+          </GoogleMapsProvider>
         </ThemeProvider>
       </HelmetProvider>
     </ErrorBoundary>

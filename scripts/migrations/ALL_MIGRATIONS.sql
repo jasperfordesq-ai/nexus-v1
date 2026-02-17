@@ -79,7 +79,7 @@ UPDATE users SET status = 'inactive' WHERE is_approved = 0 AND status IS NULL;
 UPDATE users SET last_activity = created_at WHERE last_activity IS NULL;
 
 -- ============================================================================
--- 4. GROUPS LOCATION FIELDS (for Mapbox location picker)
+-- 4. GROUPS LOCATION FIELDS (for Google Maps location picker)
 -- ============================================================================
 -- Note: Table is named `groups` (with backticks because it's a reserved word)
 ALTER TABLE `groups` ADD COLUMN location VARCHAR(255) DEFAULT NULL;

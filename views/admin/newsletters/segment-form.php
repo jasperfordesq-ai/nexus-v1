@@ -653,11 +653,11 @@ existingConditions.forEach(condition => {
 addRule();
 <?php endif; ?>
 
-// Geo search with Mapbox (if available)
+// Geo search (manual input for now)
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('geo-search')) {
         // For now, allow manual lat/lng input.
-        // TODO: Integrate with Mapbox geocoding API
+        // TODO: Integrate with Google Maps geocoding API
         const row = e.target.closest('.rule-row');
         const lat = prompt('Enter latitude:', row.querySelector('.geo-lat').value || '53.349805');
         const lng = prompt('Enter longitude:', row.querySelector('.geo-lng').value || '-6.26031');

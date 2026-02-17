@@ -122,7 +122,19 @@ class RegistrationApiController extends BaseApiController
 
         // Collect input - Contact
         $location = trim($this->input('location', ''));
+        $rawLat = $this->input('latitude', '');
+        $rawLng = $this->input('longitude', '');
+        $latitude = ($rawLat !== '' && is_numeric($rawLat)) ? (float) $rawLat : null;
+        $longitude = ($rawLng !== '' && is_numeric($rawLng)) ? (float) $rawLng : null;
         $phone = trim($this->input('phone', ''));
+
+        // Validate coordinates if provided
+        if ($latitude !== null && ($latitude < -90 || $latitude > 90)) {
+            $latitude = null;
+        }
+        if ($longitude !== null && ($longitude < -180 || $longitude > 180)) {
+            $longitude = null;
+        }
 
         // Collect input - Consents
         $termsAccepted = $this->inputBool('terms_accepted', false);
@@ -229,10 +241,10 @@ class RegistrationApiController extends BaseApiController
             $stmt = $db->prepare("
                 INSERT INTO users (
                     first_name, last_name, email, password_hash, tenant_id,
-                    profile_type, organization_name, location, phone,
+                    profile_type, organization_name, location, latitude, longitude, phone,
                     role, status, email_verified, created_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'member', 'pending', 0, NOW())
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'member', 'pending', 0, NOW())
             ");
             $stmt->execute([
                 $firstName,
@@ -243,6 +255,8 @@ class RegistrationApiController extends BaseApiController
                 $profileType,
                 $organizationName ?: null,
                 $location ?: null,
+                $latitude,
+                $longitude,
                 $phone ?: null
             ]);
             $userId = (int) $db->lastInsertId();

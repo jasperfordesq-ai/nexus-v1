@@ -168,7 +168,7 @@ class MemberController
     }
 
     /**
-     * Get user coordinates from their profile location via Mapbox geocoding
+     * Get user coordinates from their profile location via GeocodingService (Google)
      */
     private function getUserCoordinates($userId)
     {
@@ -178,7 +178,7 @@ class MemberController
                 return null;
             }
 
-            // First check if we have cached coordinates
+            // First check if we have stored coordinates
             try {
                 $coords = User::getCoordinates($userId);
                 if ($coords && !empty($coords['latitude']) && !empty($coords['longitude'])) {
@@ -189,77 +189,30 @@ class MemberController
                     ];
                 }
             } catch (\Exception $e) {
-                // Columns may not exist yet, continue to geocoding
                 error_log("getCoordinates error: " . $e->getMessage());
             }
 
-            // Geocode using Mapbox
-            $token = getenv('MAPBOX_ACCESS_TOKEN');
-            if (!$token) {
-                // No Mapbox token, but user has location - return dummy coords for Ireland center
+            // Geocode using GeocodingService (Google Maps)
+            $result = \Nexus\Services\GeocodingService::geocode($user['location']);
+            if ($result) {
+                // Cache the coordinates for future use
+                try {
+                    User::updateCoordinates($userId, $result['latitude'], $result['longitude']);
+                } catch (\Exception $e) {
+                    error_log("updateCoordinates error: " . $e->getMessage());
+                }
+
                 return [
-                    'lat' => 53.3498,  // Dublin latitude
-                    'lon' => -6.2603,  // Dublin longitude
+                    'lat' => $result['latitude'],
+                    'lon' => $result['longitude'],
                     'location' => $user['location']
                 ];
             }
 
-            // Security: Sanitize location to prevent SSRF
-            $location = preg_replace('/[\x00-\x1F\x7F]/', '', $user['location']);
-            $location = trim($location);
-            if (strlen($location) > 500 ||
-                preg_match('/^(https?|ftp|file|data|javascript|vbscript):/i', $location) ||
-                preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $location)) {
-                return [
-                    'lat' => 53.3498,
-                    'lon' => -6.2603,
-                    'location' => $user['location']
-                ];
-            }
-
-            $url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" . urlencode($location) . ".json?access_token=$token&country=ie&limit=1";
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-            $resp = curl_exec($ch);
-
-            if (curl_errno($ch)) {
-                error_log("Mapbox curl error: " . curl_error($ch));
-                curl_close($ch);
-                return [
-                    'lat' => 53.3498,
-                    'lon' => -6.2603,
-                    'location' => $user['location']
-                ];
-            }
-            curl_close($ch);
-
-            $json = json_decode($resp, true);
-
-            if (empty($json['features'][0]['center'])) {
-                return [
-                    'lat' => 53.3498,
-                    'lon' => -6.2603,
-                    'location' => $user['location']
-                ];
-            }
-
-            // Mapbox returns [longitude, latitude]
-            $lon = $json['features'][0]['center'][0];
-            $lat = $json['features'][0]['center'][1];
-
-            // Cache the coordinates for future use
-            try {
-                User::updateCoordinates($userId, $lat, $lon);
-            } catch (\Exception $e) {
-                error_log("updateCoordinates error: " . $e->getMessage());
-            }
-
+            // Fallback: Ireland center
             return [
-                'lat' => $lat,
-                'lon' => $lon,
+                'lat' => 53.3498,
+                'lon' => -6.2603,
                 'location' => $user['location']
             ];
         } catch (\Exception $e) {

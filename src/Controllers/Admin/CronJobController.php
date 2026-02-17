@@ -238,7 +238,7 @@ class CronJobController
                 'category' => 'geocoding',
                 'priority' => 'low',
                 'estimated_duration' => '1-10 minutes',
-                'dependencies' => ['Mapbox API key configured'],
+                'dependencies' => ['Google Maps API key configured'],
             ],
 
             // Maintenance
