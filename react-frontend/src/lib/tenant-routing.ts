@@ -19,7 +19,7 @@ export const RESERVED_SUBDOMAINS = new Set([
 ]);
 
 /**
- * Reserved top-level path segments — TRS-001 Section 4 (42 entries).
+ * Reserved top-level path segments — TRS-001 Section 4 (48 entries).
  * Used for R3 (path-based resolution on app.project-nexus.ie).
  * If the first path segment matches, it is a React route, NOT a tenant slug.
  */
@@ -30,7 +30,9 @@ export const RESERVED_PATHS = new Set([
   'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
   'organisations', 'federation', 'onboarding', 'group-exchanges',
   'help', 'contact', 'about', 'faq', 'legal', 'terms',
-  'privacy', 'accessibility', 'cookies', 'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
+  'privacy', 'accessibility', 'cookies',
+  'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
+  'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
   'uploads', 'classic', 'health', 'favicon.ico', 'robots.txt',
   'sitemap.xml', 'manifest.json', 'service-worker.js', '.well-known',
 ]);
