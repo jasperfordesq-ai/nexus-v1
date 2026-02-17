@@ -544,33 +544,62 @@ Toggle light/dark mode via the sun/moon icon in the Navbar, or set `theme` in br
 
 #### Deploy to Azure (Production)
 
-Production uses **git pull** from GitHub (deploy key configured). Workflow:
+Production uses **git pull** from GitHub (deploy key `ed25519` configured). Workflow:
 
 ```bash
 # 1. Push changes to GitHub (pre-push hook validates build)
 git push origin main
 
-# 2. Deploy to production
+# 2. Deploy to production (from Windows)
 scripts\deploy-production.bat           # Full: git pull + rebuild + nginx + health check
 scripts\deploy-production.bat quick     # Quick: git pull + restart (OPCache clear)
 scripts\deploy-production.bat status    # Check git commit + containers + logs
 scripts\deploy-production.bat nginx     # Update nginx config only
 ```
 
-**Manual deployment on server:**
+**Manual deployment on server (SSH):**
 ```bash
 ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253
 cd /opt/nexus-php
 
-# Pull latest code
-sudo git fetch origin main && sudo git reset --hard origin/main
-
-# Rebuild React frontend (ALWAYS --no-cache)
-sudo docker compose build --no-cache frontend && sudo docker compose up -d frontend
-
-# Restart PHP (OPCache clear)
-sudo docker restart nexus-php-app
+# SAFE: Use the safe deploy script (handles compose.yml restoration)
+sudo bash scripts/safe-deploy.sh          # Quick: git pull + restart
+sudo bash scripts/safe-deploy.sh full     # Full: git pull + rebuild --no-cache
 ```
+
+#### 🔴 Production Git Safety Rules (CRITICAL)
+
+Production has git initialized at `/opt/nexus-php/` tracking `origin/main`.
+
+**SAFE operations:**
+```bash
+sudo git fetch origin main                    # Safe — only fetches, changes nothing
+sudo git log --oneline -5                     # Safe — read only
+sudo git status                               # Safe — read only
+sudo bash scripts/safe-deploy.sh              # Safe — restores compose.yml after pull
+```
+
+**DANGEROUS operations — NEVER run directly:**
+```bash
+sudo git reset --hard origin/main             # DANGER: Overwrites compose.yml with dev version!
+sudo git clean -fd                            # DANGER: Deletes ALL 1173 untracked files (.env, uploads, configs)
+sudo git checkout -- .                        # DANGER: Overwrites compose.yml
+```
+
+**Why compose.yml is dangerous:** The repo tracks `compose.yml` (local dev config). Production needs `compose.prod.yml` as its active `compose.yml`. A bare `git reset --hard` replaces the production compose with the dev one — wrong ports, wrong env vars, wrong container names. The deploy script and `safe-deploy.sh` always run `cp compose.prod.yml compose.yml` after any git reset.
+
+**Production-only files (NOT in git, must never be deleted):**
+
+| File | Purpose | Protected by |
+|------|---------|-------------|
+| `.env` | Database passwords, API keys, secrets | `.gitignore` (untracked) |
+| `compose.yml` (active) | Production Docker config (copied from `compose.prod.yml`) | `safe-deploy.sh` restores after pull |
+| `config/nginx/` | Nginx templates | Untracked |
+| `httpdocs/uploads/` (228MB) | User-uploaded images and files | `.gitignore` (untracked) |
+| `vendor/` | PHP dependencies (installed on server) | `.gitignore` (untracked) |
+| `compose.yml.pre-deploy-backup` | Pre-deploy backup | Created by `safe-deploy.sh` |
+
+**Deploy key:** ED25519 at `/home/azureuser/.ssh/id_ed25519` (read-only access to GitHub repo)
 
 #### SSH to Azure
 

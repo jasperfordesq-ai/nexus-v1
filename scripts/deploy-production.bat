@@ -83,7 +83,10 @@ goto :end
 
 :git_pull
 echo [INFO] Pulling latest from GitHub...
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo git fetch origin main && sudo git reset --hard origin/main && echo 'Now at:' && sudo git log --oneline -1"
+REM SAFETY: git reset --hard overwrites tracked files including compose.yml (the dev version).
+REM Production needs compose.prod.yml as the active compose.yml.
+REM We always restore it after git pull to prevent production breakage.
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo git fetch origin main && sudo git reset --hard origin/main && sudo cp compose.prod.yml compose.yml && echo 'Now at:' && sudo git log --oneline -1 && echo 'compose.yml restored from compose.prod.yml'"
 echo [INFO] Code synced via git
 goto :eof
 
