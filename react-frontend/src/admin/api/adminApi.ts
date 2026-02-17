@@ -163,6 +163,8 @@ export const adminUsers = {
 
   impersonate: (userId: number) =>
     api.post(`/v2/admin/users/${userId}/impersonate`),
+  setSuperAdmin: (userId: number, grant: boolean) =>
+    api.put(`/v2/admin/users/${userId}/super-admin`, { grant }),
 
   importUsers: (file: File, options?: { default_role?: string }) => {
     const formData = new FormData();

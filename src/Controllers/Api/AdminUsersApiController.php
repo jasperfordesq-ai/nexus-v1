@@ -900,4 +900,61 @@ class AdminUsersApiController extends BaseApiController
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to generate impersonation token', null, 500);
         }
     }
+
+    /**
+     * PUT /api/v2/admin/users/{id}/super-admin
+     *
+     * Grant or revoke super admin status for a user.
+     * Body: { grant: bool }
+     * Only callable by super admins.
+     */
+    public function setSuperAdmin(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        // Only super admins can grant/revoke super admin status
+        $admin = Database::query(
+            "SELECT is_super_admin FROM users WHERE id = ?",
+            [$adminId]
+        )->fetch();
+
+        if (empty($admin['is_super_admin'])) {
+            $this->respondWithError(ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 'Only super admins can manage super admin status', null, 403);
+            return;
+        }
+
+        // Prevent self-modification
+        if ($id === $adminId) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'You cannot modify your own super admin status', null, 422);
+            return;
+        }
+
+        $grant = (bool) ($this->input('grant', false));
+
+        try {
+            $user = Database::query(
+                "SELECT id, email, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$user) {
+                $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+                return;
+            }
+
+            Database::query(
+                "UPDATE users SET is_super_admin = ? WHERE id = ?",
+                [$grant ? 1 : 0, $id]
+            );
+
+            $action = $grant ? 'grant_super_admin' : 'revoke_super_admin';
+            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " super admin for user #{$id}: {$user['email']}");
+            AuditLogService::log(\, \, \);
+
+            $this->respondWithData(['id' => $id, 'is_super_admin' => $grant]);
+        } catch (\Exception $e) {
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update super admin status', null, 500);
+        }
+    }
 }

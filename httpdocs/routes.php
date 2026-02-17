@@ -503,6 +503,7 @@ $router->add('POST', '/api/v2/admin/users/badges/recheck-all', 'Nexus\Controller
 $router->add('POST', '/api/v2/admin/users/{id}/badges', 'Nexus\Controllers\Api\AdminUsersApiController@addBadge');
 $router->add('DELETE', '/api/v2/admin/users/{id}/badges/{badgeId}', 'Nexus\Controllers\Api\AdminUsersApiController@removeBadge');
 $router->add('POST', '/api/v2/admin/users/{id}/impersonate', 'Nexus\Controllers\Api\AdminUsersApiController@impersonate');
+$router->add('PUT', '/api/v2/admin/users/{id}/super-admin', 'Nexus\Controllers\Api\AdminUsersApiController@setSuperAdmin');
 
 // Admin Listings/Content
 $router->add('GET', '/api/v2/admin/listings', 'Nexus\Controllers\Api\AdminListingsApiController@index');
