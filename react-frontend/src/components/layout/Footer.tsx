@@ -22,7 +22,7 @@ export function Footer({ children, copyright }: FooterProps) {
   const defaultCopyright = `© ${year} ${branding.name}. All rights reserved.`;
 
   return (
-    <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm">
+    <footer className="hidden md:block relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children ? (
           children

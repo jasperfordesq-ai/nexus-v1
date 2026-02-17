@@ -111,6 +111,13 @@ const supportNavItems = [
   { label: 'Contact', href: '/contact', icon: MessageSquare },
 ];
 
+const legalNavItems = [
+  { label: 'Legal Hub', href: '/legal', icon: FileText },
+  { label: 'Terms of Service', href: '/terms', icon: FileText },
+  { label: 'Privacy Policy', href: '/privacy', icon: FileText },
+  { label: 'Accessibility', href: '/accessibility', icon: FileText },
+];
+
 export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -353,6 +360,16 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </p>
               <div className="space-y-1">
                 {supportNavItems.map(renderNavLink)}
+              </div>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
+                Legal
+              </p>
+              <div className="space-y-1">
+                {legalNavItems.map(renderNavLink)}
               </div>
             </div>
 
