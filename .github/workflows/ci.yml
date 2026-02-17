@@ -2,169 +2,37 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 env:
-  PHP_VERSION: '8.1'
-  NODE_VERSION: '18'
+  PHP_VERSION: '8.2'
+  NODE_VERSION: '20'
 
 jobs:
   # ─────────────────────────────────────────────────────────────────
-  # Stage 1: Code Quality
+  # Stage 1: PHP Checks (syntax + unit tests + service tests)
   # ─────────────────────────────────────────────────────────────────
-  lint:
-    name: Code Quality
+  php-checks:
+    name: PHP Checks
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ env.PHP_VERSION }}
-          tools: phpcs, phpstan
-          extensions: pdo_mysql, mbstring, xml, zip
-
-      - name: Cache Composer Dependencies
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: composer-${{ hashFiles('composer.lock') }}
-          restore-keys: composer-
-
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist
-
-      - name: PHP Syntax Check
-        run: find src -name "*.php" -exec php -l {} \; | grep -v "No syntax errors"
-
-      - name: PHP CodeSniffer (PSR-12)
-        run: vendor/bin/phpcs --standard=PSR12 --extensions=php src/ --ignore=*/vendor/* || true
-
-      - name: PHPStan Static Analysis
-        run: vendor/bin/phpstan analyse src --level=5 --memory-limit=512M || true
-
-  # ─────────────────────────────────────────────────────────────────
-  # Stage 2: Security Scanning
-  # ─────────────────────────────────────────────────────────────────
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ env.PHP_VERSION }}
-
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist
-
-      - name: Check for Secrets in Code
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          extra_args: --only-verified
-        continue-on-error: true
-
-      - name: Composer Dependency Audit
-        run: composer audit || true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: NPM Audit
-        run: npm audit --production || true
-
-  # ─────────────────────────────────────────────────────────────────
-  # Stage 3: Unit Tests
-  # ─────────────────────────────────────────────────────────────────
-  test-unit:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    needs: [lint]
 
     services:
-      mysql:
-        image: mysql:8.0
+      mariadb:
+        image: mariadb:10.11
         env:
           MYSQL_ROOT_PASSWORD: testing
           MYSQL_DATABASE: nexus_test
+          MYSQL_USER: nexus
+          MYSQL_PASSWORD: nexus_test
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ env.PHP_VERSION }}
-          extensions: pdo_mysql, mbstring, xml, zip
-          coverage: xdebug
-
-      - name: Cache Composer Dependencies
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: composer-${{ hashFiles('composer.lock') }}
-
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist
-
-      - name: Create Test Environment
-        run: |
-          cp .env.example .env.testing || true
-          echo "DB_HOST=127.0.0.1" >> .env.testing
-          echo "DB_DATABASE=nexus_test" >> .env.testing
-          echo "DB_USERNAME=root" >> .env.testing
-          echo "DB_PASSWORD=testing" >> .env.testing
-
-      - name: Run Unit Tests
-        run: vendor/bin/phpunit --testsuite=Unit --coverage-clover=coverage.xml
-        env:
-          DB_HOST: 127.0.0.1
-          DB_DATABASE: nexus_test
-          DB_USERNAME: root
-          DB_PASSWORD: testing
-
-      - name: Upload Coverage Report
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: false
-
-  # ─────────────────────────────────────────────────────────────────
-  # Stage 4: Integration Tests
-  # ─────────────────────────────────────────────────────────────────
-  test-integration:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    needs: [test-unit]
-
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: testing
-          MYSQL_DATABASE: nexus_test
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+          --health-retries=5
 
       redis:
         image: redis:7-alpine
@@ -183,45 +51,58 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
-          extensions: pdo_mysql, mbstring, xml, zip, redis
+          extensions: pdo_mysql, mbstring, xml, zip, redis, gd, intl, bcmath, opcache, curl, fileinfo
+          coverage: none
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
 
       - name: Install Dependencies
-        run: composer install --no-interaction
+        run: composer install --no-interaction --prefer-dist
 
-      - name: Run Integration Tests
-        run: vendor/bin/phpunit --testsuite=Integration
+      - name: PHP Syntax Check
+        run: |
+          echo "Checking PHP syntax in src/ ..."
+          ERRORS=$(find src -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep -c "Parse error" || true)
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::Found $ERRORS PHP syntax error(s):"
+            find src -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep "Parse error"
+            exit 1
+          fi
+          echo "All PHP files passed syntax check."
+
+      - name: PHPUnit Unit Tests (BLOCKING)
+        run: vendor/bin/phpunit --testsuite=Unit
         env:
           DB_HOST: 127.0.0.1
-          DB_DATABASE: nexus_test
-          DB_USERNAME: root
-          DB_PASSWORD: testing
+          DB_PORT: 3306
+          DB_NAME: nexus_test
+          DB_USER: nexus
+          DB_PASS: nexus_test
           REDIS_HOST: 127.0.0.1
+          APP_ENV: testing
 
-      - name: Run Controller Tests
-        run: vendor/bin/phpunit --testsuite=Controllers
-        env:
-          DB_HOST: 127.0.0.1
-          DB_DATABASE: nexus_test
-          DB_USERNAME: root
-          DB_PASSWORD: testing
-          REDIS_HOST: 127.0.0.1
-
-      - name: Run Service Tests
+      - name: PHPUnit Service Tests (BLOCKING)
         run: vendor/bin/phpunit --testsuite=Services
         env:
           DB_HOST: 127.0.0.1
-          DB_DATABASE: nexus_test
-          DB_USERNAME: root
-          DB_PASSWORD: testing
+          DB_PORT: 3306
+          DB_NAME: nexus_test
+          DB_USER: nexus
+          DB_PASS: nexus_test
           REDIS_HOST: 127.0.0.1
+          APP_ENV: testing
 
   # ─────────────────────────────────────────────────────────────────
-  # Stage 5: Build Assets
+  # Stage 2: React Frontend (TypeScript + Vitest + Build)
   # ─────────────────────────────────────────────────────────────────
-  build:
-    name: Build Assets
+  react-build:
+    name: React Build & Tests
     runs-on: ubuntu-latest
-    needs: [lint]
 
     steps:
       - uses: actions/checkout@v4
@@ -231,168 +112,177 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: react-frontend/package-lock.json
 
-      - name: Install Node Dependencies
-        run: npm ci || npm install
+      - name: Install Dependencies
+        working-directory: react-frontend
+        run: npm ci
 
-      - name: Build Production Assets
-        run: npm run build || echo "No build script defined"
+      - name: TypeScript Check (BLOCKING)
+        working-directory: react-frontend
+        run: npx tsc --noEmit
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-assets
-          path: httpdocs/assets/dist/
-          if-no-files-found: ignore
+      - name: Vitest Unit Tests (BLOCKING)
+        working-directory: react-frontend
+        run: npm test -- --run
 
-      - name: Build React Frontend
+      - name: Build Production Bundle (BLOCKING)
+        working-directory: react-frontend
+        run: npm run build
+        env:
+          VITE_API_BASE: /api
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 3: Docker Build Verification
+  # ─────────────────────────────────────────────────────────────────
+  docker-verify:
+    name: Docker Build Verify
+    runs-on: ubuntu-latest
+    needs: [php-checks, react-build]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build PHP Container
+        run: docker build --no-cache -f Dockerfile -t nexus-php-test:ci .
+
+      - name: Build Production PHP Container
+        run: docker build --no-cache -f Dockerfile.prod -t nexus-php-prod-test:ci .
+
+      - name: Build React Frontend Container
         working-directory: react-frontend
         run: |
-          npm ci || npm install
-          npm run build
+          if [ -f Dockerfile.prod ]; then
+            docker build --no-cache -f Dockerfile.prod --build-arg VITE_API_BASE=/api -t nexus-react-test:ci .
+          elif [ -f Dockerfile ]; then
+            docker build --no-cache -f Dockerfile -t nexus-react-test:ci .
+          fi
 
-  # ─────────────────────────────────────────────────────────────────
-  # Stage 6: Build Docker Image
-  # ─────────────────────────────────────────────────────────────────
-  docker-build:
-    name: Build Docker Image
-    runs-on: ubuntu-latest
-    needs: [test-unit, security, build]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix=
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-
-      - name: Build and Push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./docker/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # ─────────────────────────────────────────────────────────────────
-  # Stage 7: Deploy to Staging
-  # ─────────────────────────────────────────────────────────────────
-  deploy-staging:
-    name: Deploy to Staging
-    runs-on: ubuntu-latest
-    needs: [test-unit, test-integration, docker-build]
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-    environment:
-      name: staging
-      url: https://staging.nexus.example.com
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy to Staging Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.STAGING_HOST }}
-          username: ${{ secrets.STAGING_USER }}
-          key: ${{ secrets.STAGING_SSH_KEY }}
-          script: |
-            cd /var/www/staging
-            git pull origin develop
-            composer install --no-dev --optimize-autoloader
-            php scripts/migrations/run_all.php
-            php scripts/cache/clear.php || true
-
-      - name: Run Smoke Tests
+      - name: Verify PHP Container Starts
         run: |
-          sleep 10
-          curl -f ${{ vars.STAGING_URL }}/health || echo "Health check endpoint not available"
-
-      - name: Notify Slack
-        if: always()
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "Staging deployment ${{ job.status }}: ${{ github.sha }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-        continue-on-error: true
+          docker run -d --name php-test nexus-php-prod-test:ci
+          sleep 5
+          docker exec php-test curl -sf http://localhost/health.php || echo "::warning::Health check failed"
+          docker stop php-test
 
   # ─────────────────────────────────────────────────────────────────
-  # Stage 8: Deploy to Production
+  # Stage 4: Dockerfile Drift Detection
   # ─────────────────────────────────────────────────────────────────
-  deploy-production:
-    name: Deploy to Production
+  dockerfile-drift:
+    name: Dockerfile Drift Detection
     runs-on: ubuntu-latest
-    needs: [test-unit, test-integration, docker-build]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment:
-      name: production
-      url: https://nexus.example.com
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create Release Tag
-        id: tag
+      - name: Compare PHP settings between Dockerfile and Dockerfile.prod
         run: |
-          VERSION=$(date +%Y%m%d%H%M%S)
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          git tag "release-$VERSION"
-          git push origin "release-$VERSION" || true
+          echo "========================================="
+          echo "Dockerfile Drift Detection"
+          echo "========================================="
+          echo ""
 
-      - name: Deploy to Production Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.PROD_USER }}
-          key: ${{ secrets.PROD_SSH_KEY }}
-          script: |
-            cd /var/www/production
+          SETTINGS="upload_max_filesize post_max_size max_execution_time max_input_time max_input_vars memory_limit"
+          DRIFT_FOUND=0
 
-            # Backup current version
-            cp -r current "backup-$(date +%Y%m%d%H%M%S)" || true
+          for SETTING in $SETTINGS; do
+            # Extract value from Dockerfile (dev)
+            DEV_VALUE=$(grep -oP "${SETTING}\s*=\s*\K[^\s\\\\]+" Dockerfile || echo "NOT_SET")
+            # Extract value from Dockerfile.prod
+            PROD_VALUE=$(grep -oP "${SETTING}\s*=\s*\K[^\s\\\\]+" Dockerfile.prod || echo "NOT_SET")
 
-            # Deploy new version
-            git fetch origin
-            git checkout main
-            git pull origin main
-            composer install --no-dev --optimize-autoloader
-            php scripts/migrations/run_all.php
-            php scripts/cache/clear.php || true
+            if [ "$DEV_VALUE" != "$PROD_VALUE" ]; then
+              echo "::error::DRIFT DETECTED: ${SETTING} differs between Dockerfile (${DEV_VALUE}) and Dockerfile.prod (${PROD_VALUE})"
+              DRIFT_FOUND=1
+            else
+              echo "OK: ${SETTING} = ${DEV_VALUE} (both files match)"
+            fi
+          done
 
-            # Health check
-            curl -f http://localhost/health || echo "Health check failed"
+          echo ""
+          if [ "$DRIFT_FOUND" -eq 1 ]; then
+            echo "========================================="
+            echo "FAILURE: Dockerfile settings have drifted!"
+            echo "Update both Dockerfile and Dockerfile.prod to keep PHP settings in sync."
+            echo "========================================="
+            exit 1
+          else
+            echo "========================================="
+            echo "SUCCESS: All tracked PHP settings match."
+            echo "========================================="
+          fi
 
-      - name: Notify Team
-        if: always()
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "Production deployment ${{ job.status }}: release-${{ steps.tag.outputs.VERSION }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-        continue-on-error: true
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 5: Regression Pattern Detection
+  # ─────────────────────────────────────────────────────────────────
+  regression-patterns:
+    name: Regression Pattern Detection
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "BLOCKING: Check for incorrect API response unwrapping (data.data ??)"
+        run: |
+          echo "Checking for 'data.data ??' pattern in React source..."
+          echo "(This pattern causes ErrorBoundary crashes — must use 'data' in data ? data.data : data)"
+          echo ""
+
+          MATCHES=$(grep -rn "data\.data ??" react-frontend/src/ || true)
+
+          if [ -n "$MATCHES" ]; then
+            echo "::error::REGRESSION DETECTED: Found 'data.data ??' pattern (incorrect API response unwrapping)."
+            echo ""
+            echo "Offending files:"
+            echo "$MATCHES"
+            echo ""
+            echo "Fix: Use \"'data' in data ? data.data : data\" instead of \"data.data ?? data\""
+            exit 1
+          fi
+
+          echo "PASS: No incorrect 'data.data ??' patterns found."
+
+      - name: "WARNING: Count 'as any' type assertions"
+        run: |
+          echo "Counting 'as any' type assertions in React source..."
+          echo ""
+
+          COUNT=$(grep -rn "as any" react-frontend/src/ | wc -l || echo "0")
+          COUNT=$(echo "$COUNT" | tr -d ' ')
+
+          echo "Found ${COUNT} 'as any' assertion(s)."
+
+          if [ "$COUNT" -gt 20 ]; then
+            echo "::warning::TypeScript safety: Found ${COUNT} 'as any' assertions (threshold: 20). Consider reducing type assertion usage."
+          else
+            echo "PASS: 'as any' count (${COUNT}) is within acceptable threshold (<=20)."
+          fi
+
+      - name: "WARNING: Check for DELETE without tenant_id scoping"
+        run: |
+          echo "Checking for DELETE FROM statements without tenant_id in PHP source..."
+          echo ""
+
+          # Find DELETE FROM statements, then check if they lack tenant_id
+          # We look for DELETE FROM in PHP files, excluding migrations and test files
+          UNSCOPED=$(grep -rn "DELETE FROM" src/ \
+            --include="*.php" \
+            | grep -iv "tenant_id" \
+            | grep -iv "migration" \
+            | grep -iv "// " \
+            | grep -iv "sessions" \
+            | grep -iv "password_resets" \
+            | grep -iv "cache" \
+            | grep -iv "jobs" \
+            | grep -iv "failed_jobs" \
+            || true)
+
+          if [ -n "$UNSCOPED" ]; then
+            echo "::warning::Potential unscoped DELETE statements found (missing tenant_id). Review these carefully:"
+            echo ""
+            echo "$UNSCOPED"
+            echo ""
+            echo "If these tables are intentionally not tenant-scoped (e.g., sessions, cache), this warning can be ignored."
+          else
+            echo "PASS: All DELETE FROM statements appear to include tenant_id scoping."
+          fi

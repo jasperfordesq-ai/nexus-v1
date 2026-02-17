@@ -105,6 +105,7 @@ class Goal
 
     public static function delete($id)
     {
-        Database::query("DELETE FROM goals WHERE id = ?", [$id]);
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        Database::query("DELETE FROM goals WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
     }
 }

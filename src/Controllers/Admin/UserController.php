@@ -437,7 +437,8 @@ class UserController
         if ($userId && $badgeKey) {
             // We need a remove method in UserBadge model, or execute query directly here for now as explicit model update wasn't planned but is needed.
             // Direct query for MVP speed, matching project pattern
-            \Nexus\Core\Database::query("DELETE FROM user_badges WHERE user_id = ? AND badge_key = ?", [$userId, $badgeKey]);
+            $tenantId = TenantContext::getId();
+            \Nexus\Core\Database::query("DELETE FROM user_badges WHERE user_id = ? AND badge_key = ? AND tenant_id = ?", [$userId, $badgeKey, $tenantId]);
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/users/' . $userId . '/edit?badge_removed=true');

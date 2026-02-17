@@ -121,10 +121,9 @@ export function FederationOnboardingPage() {
   const loadPartners = useCallback(async () => {
     try {
       setPartnersLoading(true);
-      const response = await api.get<{ data: FederationPartner[] }>('/v2/federation/partners');
+      const response = await api.get<FederationPartner[]>('/v2/federation/partners');
       if (response.success && response.data) {
-        const list = Array.isArray(response.data) ? response.data : response.data.data ?? [];
-        setPartners(list);
+        setPartners(Array.isArray(response.data) ? response.data : []);
       }
     } catch (error) {
       logError('Failed to load federation partners', error);

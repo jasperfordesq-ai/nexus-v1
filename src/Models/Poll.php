@@ -72,6 +72,7 @@ class Poll
 
     public static function delete($id)
     {
-        Database::query("DELETE FROM polls WHERE id = ?", [$id]);
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        Database::query("DELETE FROM polls WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
     }
 }

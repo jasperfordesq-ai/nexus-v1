@@ -123,21 +123,19 @@ export function OrganisationDetailPage() {
       ]);
 
       if (orgRes.success && orgRes.data) {
-        const orgData = (orgRes.data as unknown as { data?: OrganisationDetail })?.data ?? orgRes.data;
-        setOrganisation(orgData as OrganisationDetail);
+        setOrganisation(orgRes.data as OrganisationDetail);
       } else {
         setError('Organisation not found.');
         return;
       }
 
       if (oppsRes.success && oppsRes.data) {
-        const oppsData = oppsRes.data as unknown as { data?: Opportunity[] };
-        setOpportunities(Array.isArray(oppsData.data) ? oppsData.data : (Array.isArray(oppsRes.data) ? oppsRes.data as unknown as Opportunity[] : []));
+        setOpportunities(Array.isArray(oppsRes.data) ? oppsRes.data as Opportunity[] : []);
       }
 
       if (reviewsRes.success && reviewsRes.data) {
-        const reviewsData = reviewsRes.data as unknown as { data?: { reviews?: Review[] }; reviews?: Review[] };
-        setReviews(reviewsData.reviews ?? reviewsData.data?.reviews ?? []);
+        const reviewsData = reviewsRes.data as { reviews?: Review[] };
+        setReviews(reviewsData.reviews ?? []);
       }
     } catch (err) {
       logError('Failed to load organisation', err);

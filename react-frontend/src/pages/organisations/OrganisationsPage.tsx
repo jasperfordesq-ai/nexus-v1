@@ -94,17 +94,15 @@ export function OrganisationsPage() {
       );
 
       if (response.success && response.data) {
-        const responseData = response.data as unknown as { data?: Organisation[]; meta?: { cursor: string | null; has_more: boolean } };
-        const items = responseData.data ?? (response.data as unknown as Organisation[]);
-        const resMeta = responseData.meta;
+        const items = Array.isArray(response.data) ? response.data : [];
 
         if (append) {
-          setOrganisations((prev) => [...prev, ...(Array.isArray(items) ? items : [])]);
+          setOrganisations((prev) => [...prev, ...items]);
         } else {
-          setOrganisations(Array.isArray(items) ? items : []);
+          setOrganisations(items);
         }
-        setHasMore(resMeta?.has_more ?? false);
-        setCursor(resMeta?.cursor ?? undefined);
+        setHasMore(response.meta?.has_more ?? false);
+        setCursor(response.meta?.cursor ?? undefined);
       } else {
         if (!append) setError('Failed to load organisations.');
       }

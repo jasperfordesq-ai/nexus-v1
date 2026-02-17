@@ -20,6 +20,8 @@ import {
 } from 'react';
 import { api, tokenManager, SESSION_EXPIRED_EVENT } from '@/lib/api';
 import { logWarn } from '@/lib/logger';
+import { validateResponseIfPresent } from '@/lib/api-validation';
+import { loginResponseSchema, userSchema } from '@/lib/api-schemas';
 import type {
   User,
   LoginRequest,
@@ -107,6 +109,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await api.get<User>('/v2/users/me');
 
       if (response.success && response.data) {
+        // Dev-only: validate user profile shape
+        validateResponseIfPresent(userSchema, response.data, 'GET /v2/users/me');
+
         // Only set tenant ID from user data if no tenant was pre-selected
         // This allows super admins to access any tenant they selected at login
         if (response.data.tenant_id && !tokenManager.getTenantId()) {
@@ -162,6 +167,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     const data = response.data;
+
+    // Dev-only: validate login response shape
+    validateResponseIfPresent(loginResponseSchema, data, 'POST /auth/login');
 
     // Check if 2FA is required
     if (data && 'requires_2fa' in data && data.requires_2fa) {

@@ -211,20 +211,18 @@ export function GoalsPage() {
         ? `/v2/goals/discover?${params}`
         : `/v2/goals?${params}&status=all`;
 
-      const response = await api.get<{ data: Goal[]; meta: { cursor: string | null; has_more: boolean } }>(endpoint);
+      const response = await api.get<Goal[]>(endpoint);
 
       if (response.success && response.data) {
-        const responseData = response.data as unknown as { data?: Goal[]; meta?: { cursor: string | null; has_more: boolean } };
-        const items = responseData.data ?? (response.data as unknown as Goal[]);
-        const resMeta = responseData.meta;
+        const items = Array.isArray(response.data) ? response.data : [];
 
         if (append) {
-          setGoals((prev) => [...prev, ...(Array.isArray(items) ? items : [])]);
+          setGoals((prev) => [...prev, ...items]);
         } else {
-          setGoals(Array.isArray(items) ? items : []);
+          setGoals(items);
         }
-        setHasMore(resMeta?.has_more ?? false);
-        setCursor(resMeta?.cursor ?? undefined);
+        setHasMore(response.meta?.has_more ?? false);
+        setCursor(response.meta?.cursor ?? undefined);
       } else {
         if (!append) setError('Failed to load goals.');
       }
@@ -403,10 +401,9 @@ export function GoalsPage() {
 
     try {
       setIsLoadingDetail(true);
-      const response = await api.get<{ data: { progress_history?: ProgressEntry[] } }>(`/v2/goals/${goal.id}`);
+      const response = await api.get<Goal & { progress_history?: ProgressEntry[] }>(`/v2/goals/${goal.id}`);
       if (response.success && response.data) {
-        const data = response.data as unknown as { data?: Goal & { progress_history?: ProgressEntry[] } };
-        const fullGoal = data.data ?? (response.data as unknown as Goal & { progress_history?: ProgressEntry[] });
+        const fullGoal = response.data;
         if (fullGoal.progress_history) {
           setDetailHistory(fullGoal.progress_history);
         }

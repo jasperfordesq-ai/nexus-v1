@@ -439,8 +439,9 @@ class GroupService
             }
             $db->prepare("DELETE FROM group_discussions WHERE group_id = ?")->execute([$id]);
 
-            // Delete the group
-            $db->prepare("DELETE FROM `groups` WHERE id = ?")->execute([$id]);
+            // Delete the group — scoped by tenant
+            $tenantId = TenantContext::getId();
+            $db->prepare("DELETE FROM `groups` WHERE id = ? AND tenant_id = ?")->execute([$id, $tenantId]);
 
             return true;
         } catch (\Exception $e) {

@@ -246,7 +246,7 @@ class AdminController
             die("Cannot delete yourself.");
         }
 
-        Database::query("DELETE FROM users WHERE id = ?", [$id]);
+        Database::query("DELETE FROM users WHERE id = ? AND tenant_id = ?", [$id, \Nexus\Core\TenantContext::getId()]);
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/users');
     }
 
@@ -314,7 +314,7 @@ class AdminController
         // Security: Use strict comparison to prevent type juggling attacks
         $target = Database::query("SELECT tenant_id FROM listings WHERE id = ?", [$id])->fetch();
         if ($target && (int)$target['tenant_id'] === (int)\Nexus\Core\TenantContext::getId()) {
-            Database::query("DELETE FROM listings WHERE id = ?", [$id]);
+            Database::query("DELETE FROM listings WHERE id = ? AND tenant_id = ?", [$id, \Nexus\Core\TenantContext::getId()]);
         }
 
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy');

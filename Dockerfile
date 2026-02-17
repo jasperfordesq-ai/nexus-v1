@@ -90,13 +90,13 @@ error_log = /var/log/php_errors.log\n\
 \n\
 ; Performance\n\
 memory_limit = 256M\n\
-max_execution_time = 120\n\
-max_input_time = 120\n\
-max_input_vars = 5000\n\
+max_execution_time = 60\n\
+max_input_time = 60\n\
+max_input_vars = 3000\n\
 \n\
 ; File uploads\n\
-upload_max_filesize = 100M\n\
-post_max_size = 105M\n\
+upload_max_filesize = 50M\n\
+post_max_size = 55M\n\
 max_file_uploads = 20\n\
 \n\
 ; Sessions (file-based for dev, Redis in container)\n\

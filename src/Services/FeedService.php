@@ -560,14 +560,14 @@ class FeedService
         $db = Database::getConnection();
         $tenantId = TenantContext::getId();
 
-        // Check existing like
-        $stmt = $db->prepare("SELECT id FROM likes WHERE user_id = ? AND target_type = ? AND target_id = ?");
-        $stmt->execute([$userId, $targetType, $targetId]);
+        // Check existing like — scoped by tenant
+        $stmt = $db->prepare("SELECT id FROM likes WHERE user_id = ? AND target_type = ? AND target_id = ? AND tenant_id = ?");
+        $stmt->execute([$userId, $targetType, $targetId, $tenantId]);
         $existing = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if ($existing) {
-            // Unlike
-            $db->prepare("DELETE FROM likes WHERE id = ?")->execute([$existing['id']]);
+            // Unlike — scoped by tenant
+            $db->prepare("DELETE FROM likes WHERE id = ? AND tenant_id = ?")->execute([$existing['id'], $tenantId]);
 
             if ($targetType === 'post') {
                 $db->prepare("UPDATE feed_posts SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = ?")->execute([$targetId]);

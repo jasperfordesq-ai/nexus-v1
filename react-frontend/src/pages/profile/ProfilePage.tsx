@@ -145,9 +145,8 @@ export function ProfilePage() {
         setConnectionId(connectionRes.data.connection_id ?? null);
       }
       if (gamificationRes?.success && gamificationRes.data) {
-        const gData = gamificationRes.data as unknown as { data?: ProfileBadge[] };
         // The badges endpoint returns an array of badges
-        const badges = gData.data ?? (gamificationRes.data as unknown as ProfileBadge[]);
+        const badges = Array.isArray(gamificationRes.data) ? gamificationRes.data as ProfileBadge[] : [];
         if (Array.isArray(badges)) {
           const earned = badges.filter((b: ProfileBadge) => b.earned);
           setGamification({

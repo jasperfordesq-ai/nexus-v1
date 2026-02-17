@@ -658,7 +658,7 @@ export default function FederationHubPage() {
         if (partnersRes.success && partnersRes.data) {
           const partnersData = Array.isArray(partnersRes.data)
             ? partnersRes.data
-            : partnersRes.data.data || [];
+            : [];
           newData.partners = partnersData;
           newData.stats.partners_count = partnersData.length;
         }
@@ -666,7 +666,7 @@ export default function FederationHubPage() {
         if (activityRes.success && activityRes.data) {
           const activityData = Array.isArray(activityRes.data)
             ? activityRes.data
-            : activityRes.data.data || [];
+            : [];
           newData.activity = activityData;
 
           // Derive message and transaction counts from activity

@@ -331,10 +331,9 @@ function ChallengesTab() {
   const loadChallenges = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await api.get<{ data: Challenge[] }>('/v2/gamification/challenges');
+      const res = await api.get<Challenge[]>('/v2/gamification/challenges');
       if (res.success && res.data) {
-        const d = res.data as unknown as { data?: Challenge[] };
-        setChallenges(d.data ?? (res.data as unknown as Challenge[]));
+        setChallenges(Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
       logError('Failed to load challenges', err);
@@ -549,10 +548,9 @@ function CollectionsTab() {
   const loadCollections = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await api.get<{ data: BadgeCollection[] }>('/v2/gamification/collections');
+      const res = await api.get<BadgeCollection[]>('/v2/gamification/collections');
       if (res.success && res.data) {
-        const d = res.data as unknown as { data?: BadgeCollection[] };
-        setCollections(d.data ?? (res.data as unknown as BadgeCollection[]));
+        setCollections(Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
       logError('Failed to load collections', err);
@@ -703,10 +701,9 @@ function XpShopTab({ userXp }: { userXp: number }) {
   const loadShop = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await api.get<{ data: ShopItem[] }>('/v2/gamification/shop');
+      const res = await api.get<ShopItem[]>('/v2/gamification/shop');
       if (res.success && res.data) {
-        const d = res.data as unknown as { data?: ShopItem[] };
-        setItems(d.data ?? (res.data as unknown as ShopItem[]));
+        setItems(Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
       logError('Failed to load shop', err);
@@ -1057,13 +1054,8 @@ export function AchievementsPage() {
       }
 
       if (badgesRes.success && badgesRes.data) {
-        const badgeData = badgesRes.data as unknown as { data?: BadgeEntry[]; meta?: { available_types: string[] } };
-        if (badgeData.data) {
-          setBadges(badgeData.data);
-          setAvailableTypes(badgeData.meta?.available_types ?? []);
-        } else {
-          setBadges(badgesRes.data as unknown as BadgeEntry[]);
-        }
+        setBadges(Array.isArray(badgesRes.data) ? badgesRes.data : []);
+        setAvailableTypes((badgesRes.meta?.available_types as string[]) ?? []);
       }
     } catch (err) {
       logError('Failed to load achievements', err);

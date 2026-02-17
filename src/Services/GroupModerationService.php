@@ -162,7 +162,8 @@ class GroupModerationService
 
             case self::CONTENT_GROUP:
                 Database::query("DELETE FROM group_members WHERE group_id = ?", [$contentId]);
-                Database::query("DELETE FROM `groups` WHERE id = ?", [$contentId]);
+                $tenantId = TenantContext::getId();
+                Database::query("DELETE FROM `groups` WHERE id = ? AND tenant_id = ?", [$contentId, $tenantId]);
                 GroupAuditService::logGroupDeleted($contentId, $moderatorId, $reason);
                 break;
         }

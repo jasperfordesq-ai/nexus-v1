@@ -314,11 +314,12 @@ class SocialApiController extends BaseApiController
     public function deletePostV2(int $id): void
     {
         $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
         $this->verifyCsrf();
 
         $post = Database::query(
-            "SELECT id, user_id FROM feed_posts WHERE id = ?",
-            [$id]
+            "SELECT id, user_id FROM feed_posts WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
         )->fetch();
 
         if (!$post) {
@@ -331,7 +332,7 @@ class SocialApiController extends BaseApiController
             return;
         }
 
-        Database::query("DELETE FROM feed_posts WHERE id = ?", [$id]);
+        Database::query("DELETE FROM feed_posts WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
@@ -416,13 +417,13 @@ class SocialApiController extends BaseApiController
         try {
             // Check if already liked
             $existing = Database::query(
-                "SELECT id FROM likes WHERE user_id = ? AND target_type = ? AND target_id = ?",
-                [$userId, $targetType, $targetId]
+                "SELECT id FROM likes WHERE user_id = ? AND target_type = ? AND target_id = ? AND tenant_id = ?",
+                [$userId, $targetType, $targetId, $tenantId]
             )->fetch();
 
             if ($existing) {
                 // Unlike
-                Database::query("DELETE FROM likes WHERE id = ?", [$existing['id']]);
+                Database::query("DELETE FROM likes WHERE id = ? AND tenant_id = ?", [$existing['id'], $tenantId]);
 
                 // Decrement likes_count on feed_posts if applicable
                 if ($targetType === 'post') {
@@ -806,14 +807,15 @@ class SocialApiController extends BaseApiController
                 $this->jsonResponse($result);
             } else {
                 // Fallback - verify ownership
-                $comment = Database::query("SELECT user_id FROM comments WHERE id = ?", [$commentId])->fetch();
+                $tenantId = $this->getTenantId();
+                $comment = Database::query("SELECT user_id FROM comments WHERE id = ? AND tenant_id = ?", [$commentId, $tenantId])->fetch();
                 if (!$comment) {
                     $this->jsonResponse(['error' => 'Comment not found'], 404);
                 }
                 if ($comment['user_id'] != $userId && !$this->isSuperAdmin()) {
                     $this->jsonResponse(['error' => 'Unauthorized'], 403);
                 }
-                Database::query("DELETE FROM comments WHERE id = ?", [$commentId]);
+                Database::query("DELETE FROM comments WHERE id = ? AND tenant_id = ?", [$commentId, $tenantId]);
                 $this->jsonResponse(['success' => true, 'status' => 'success']);
             }
         } catch (\Exception $e) {
@@ -866,7 +868,7 @@ class SocialApiController extends BaseApiController
                 )->fetch();
 
                 if ($existing) {
-                    Database::query("DELETE FROM reactions WHERE id = ?", [$existing['id']]);
+                    Database::query("DELETE FROM reactions WHERE id = ? AND tenant_id = ?", [$existing['id'], $tenantId]);
                     $action = 'removed';
                 } else {
                     Database::query(
@@ -961,8 +963,10 @@ class SocialApiController extends BaseApiController
         try {
             // Handle feed_posts deletion
             if ($targetType === 'post') {
+                $tenantId = $this->getTenantId();
+
                 // Check ownership
-                $post = Database::query("SELECT user_id FROM feed_posts WHERE id = ?", [$targetId])->fetch();
+                $post = Database::query("SELECT user_id FROM feed_posts WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId])->fetch();
 
                 if (!$post) {
                     $this->jsonResponse(['error' => 'Post not found'], 404);
@@ -973,11 +977,11 @@ class SocialApiController extends BaseApiController
                 }
 
                 // Delete associated likes and comments
-                Database::query("DELETE FROM likes WHERE target_type = 'post' AND target_id = ?", [$targetId]);
-                Database::query("DELETE FROM comments WHERE target_type = 'post' AND target_id = ?", [$targetId]);
+                Database::query("DELETE FROM likes WHERE target_type = 'post' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
+                Database::query("DELETE FROM comments WHERE target_type = 'post' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 // Delete the post
-                Database::query("DELETE FROM feed_posts WHERE id = ?", [$targetId]);
+                Database::query("DELETE FROM feed_posts WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 $this->jsonResponse(['success' => true, 'status' => 'deleted']);
             }
@@ -997,8 +1001,8 @@ class SocialApiController extends BaseApiController
                 }
 
                 // Delete associated likes and comments
-                Database::query("DELETE FROM likes WHERE target_type = 'listing' AND target_id = ?", [$targetId]);
-                Database::query("DELETE FROM comments WHERE target_type = 'listing' AND target_id = ?", [$targetId]);
+                Database::query("DELETE FROM likes WHERE target_type = 'listing' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
+                Database::query("DELETE FROM comments WHERE target_type = 'listing' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 // Soft delete the listing (using status = 'deleted' like the Listing model does)
                 Database::query("UPDATE listings SET status = 'deleted' WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
@@ -1021,8 +1025,8 @@ class SocialApiController extends BaseApiController
                 }
 
                 // Delete associated likes and comments
-                Database::query("DELETE FROM likes WHERE target_type = 'event' AND target_id = ?", [$targetId]);
-                Database::query("DELETE FROM comments WHERE target_type = 'event' AND target_id = ?", [$targetId]);
+                Database::query("DELETE FROM likes WHERE target_type = 'event' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
+                Database::query("DELETE FROM comments WHERE target_type = 'event' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 // Delete event (hard delete)
                 Database::query("DELETE FROM events WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
@@ -1045,8 +1049,8 @@ class SocialApiController extends BaseApiController
                 }
 
                 // Delete associated likes and comments
-                Database::query("DELETE FROM likes WHERE target_type = 'poll' AND target_id = ?", [$targetId]);
-                Database::query("DELETE FROM comments WHERE target_type = 'poll' AND target_id = ?", [$targetId]);
+                Database::query("DELETE FROM likes WHERE target_type = 'poll' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
+                Database::query("DELETE FROM comments WHERE target_type = 'poll' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 // Delete poll votes and options first
                 Database::query("DELETE FROM poll_votes WHERE poll_id = ?", [$targetId]);
@@ -1073,8 +1077,8 @@ class SocialApiController extends BaseApiController
                 }
 
                 // Delete associated likes and comments
-                Database::query("DELETE FROM likes WHERE target_type = 'goal' AND target_id = ?", [$targetId]);
-                Database::query("DELETE FROM comments WHERE target_type = 'goal' AND target_id = ?", [$targetId]);
+                Database::query("DELETE FROM likes WHERE target_type = 'goal' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
+                Database::query("DELETE FROM comments WHERE target_type = 'goal' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 // Delete goal
                 Database::query("DELETE FROM goals WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
@@ -1097,8 +1101,8 @@ class SocialApiController extends BaseApiController
                 }
 
                 // Delete associated likes and comments
-                Database::query("DELETE FROM likes WHERE target_type = 'volunteering' AND target_id = ?", [$targetId]);
-                Database::query("DELETE FROM comments WHERE target_type = 'volunteering' AND target_id = ?", [$targetId]);
+                Database::query("DELETE FROM likes WHERE target_type = 'volunteering' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
+                Database::query("DELETE FROM comments WHERE target_type = 'volunteering' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 // Delete applications for this opportunity
                 Database::query("DELETE FROM vol_applications WHERE opportunity_id = ?", [$targetId]);

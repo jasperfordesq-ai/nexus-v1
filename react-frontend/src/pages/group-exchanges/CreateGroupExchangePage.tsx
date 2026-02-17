@@ -163,7 +163,7 @@ export function CreateGroupExchangePage() {
         const response = await api.get<{ data: SearchResult[] }>(`/v2/users?search=${encodeURIComponent(value.trim())}&limit=10`);
 
         if (response.success && response.data) {
-          const results = Array.isArray(response.data) ? response.data : (response.data as any).data ?? [];
+          const results = Array.isArray(response.data) ? response.data : [];
           // Filter out current user and already-added participants
           const existingIds = new Set(participants.map((p) => p.user_id));
           if (user?.id) {
@@ -313,15 +313,14 @@ export function CreateGroupExchangePage() {
         })),
       };
 
-      const response = await api.post<{ data: { id: number } }>('/v2/group-exchanges', payload);
+      const response = await api.post<{ id: number }>('/v2/group-exchanges', payload);
 
       if (response.success && response.data) {
-        const exchangeData = (response.data as any).data ?? response.data;
-        const newId = exchangeData.id;
+        const newId = response.data.id;
         toast.success('Group exchange created!', 'Your exchange has been created successfully.');
         navigate(tenantPath(`/group-exchanges/${newId}`));
       } else {
-        toast.error('Failed to create exchange', (response as any).error || 'An error occurred.');
+        toast.error('Failed to create exchange', response.error || 'An error occurred.');
       }
     } catch (err) {
       logError('Failed to create group exchange', err);

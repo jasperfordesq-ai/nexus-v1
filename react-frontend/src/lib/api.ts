@@ -10,6 +10,13 @@
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Imports
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { validateResponse } from '@/lib/api-validation';
+import { apiResponseSchema } from '@/lib/api-schemas';
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -64,6 +71,7 @@ export interface PaginationMeta {
   current_page?: number;
   total_items?: number;
   total_pages?: number;
+  total?: number;
   has_next_page?: boolean;
   has_previous_page?: boolean;
   // Messages API returns conversation details in meta
@@ -76,6 +84,8 @@ export interface PaginationMeta {
       tagline?: string;
     };
   };
+  // Allow additional meta fields from various endpoints
+  [key: string]: unknown;
 }
 
 export interface RequestOptions extends Omit<RequestInit, 'body'> {
@@ -390,12 +400,17 @@ class ApiClient {
 
       // Handle successful response
       if (response.ok) {
-        return {
+        const result: ApiResponse<T> = {
           success: true,
           data: 'data' in data ? data.data : data,
           message: data.message,
           meta: data.meta,
         };
+
+        // Dev-only: validate the response envelope structure
+        validateResponse(apiResponseSchema, result, `${options.method || 'GET'} ${endpoint}`);
+
+        return result;
       }
 
       // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})
@@ -565,7 +580,7 @@ class ApiClient {
       const data = await response.json();
 
       if (response.ok) {
-        return { success: true, data: data.data ?? data };
+        return { success: true, data: 'data' in data ? data.data : data };
       }
 
       return {

@@ -47,9 +47,8 @@ export function GdprRequests() {
         status: statusFilter !== 'all' ? statusFilter : undefined,
       });
       if (res.success && res.data) {
-        const data = res.data as unknown as { data?: GdprRequest[]; meta?: { total?: number } };
-        setRequests(Array.isArray(data) ? data : (data.data ?? []));
-        setTotal(typeof data === 'object' && !Array.isArray(data) ? (data.meta?.total ?? 0) : 0);
+        setRequests(Array.isArray(res.data) ? res.data : []);
+        setTotal(res.meta?.total ?? 0);
       }
     } catch {
       toast.error('Failed to load GDPR requests');
