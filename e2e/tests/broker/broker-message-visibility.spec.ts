@@ -124,13 +124,10 @@ test.describe('Broker API — Message Review (UK Compliance)', () => {
 
     if (res.status() === 200) {
       const body = await res.json();
-      const data = body?.data ?? body;
-
-      // Should return a paginated list
-      expect(data).toHaveProperty('items');
-      expect(Array.isArray(data.items)).toBe(true);
-      expect(data).toHaveProperty('total');
-      expect(typeof data.total).toBe('number');
+      // API shape: { data: [...], meta: { total, page, per_page, ... } }
+      expect(Array.isArray(body.data)).toBe(true);
+      expect(body).toHaveProperty('meta');
+      expect(typeof body.meta.total).toBe('number');
     }
   });
 
@@ -146,8 +143,7 @@ test.describe('Broker API — Message Review (UK Compliance)', () => {
 
     if (res.status() === 200) {
       const body = await res.json();
-      const data = body?.data ?? body;
-      const items = data?.items ?? [];
+      const items: any[] = Array.isArray(body.data) ? body.data : [];
 
       // All returned items should NOT have a reviewed_at value
       for (const item of items) {
@@ -168,8 +164,7 @@ test.describe('Broker API — Message Review (UK Compliance)', () => {
 
     if (res.status() === 200) {
       const body = await res.json();
-      const data = body?.data ?? body;
-      const items = data?.items ?? [];
+      const items: any[] = Array.isArray(body.data) ? body.data : [];
 
       // All returned items should be flagged
       for (const item of items) {
@@ -188,8 +183,7 @@ test.describe('Broker API — Message Review (UK Compliance)', () => {
 
     if (res.status() === 200) {
       const body = await res.json();
-      const data = body?.data ?? body;
-      const items = data?.items ?? [];
+      const items: any[] = Array.isArray(body.data) ? body.data : [];
 
       // Every message copy must include a copy_reason (required for compliance audit)
       const validReasons = ['first_contact', 'high_risk_listing', 'new_member', 'flagged_user', 'manual_monitoring', 'random_sample'];
@@ -216,7 +210,7 @@ test.describe('Broker API — Message Review (UK Compliance)', () => {
     }
 
     const listBody = await listRes.json();
-    const items = listBody?.data?.items ?? listBody?.items ?? [];
+    const items: any[] = Array.isArray(listBody.data) ? listBody.data : [];
 
     if (items.length === 0) {
       // No unreviewed messages to test with — skip gracefully
@@ -247,7 +241,7 @@ test.describe('Broker API — Message Review (UK Compliance)', () => {
 
       if (checkRes.status() === 200) {
         const checkBody = await checkRes.json();
-        const remaining = checkBody?.data?.items ?? checkBody?.items ?? [];
+        const remaining: any[] = Array.isArray(checkBody.data) ? checkBody.data : [];
         const wasFound = remaining.some((m: { id: number }) => m.id === messageId);
         expect(wasFound).toBe(false);
       }
@@ -431,13 +425,10 @@ test.describe('Broker API — Exchange Management', () => {
 
     if (res.status() === 200) {
       const body = await res.json();
-      const data = body?.data ?? body;
-
-      // Should be paginated
-      const items = data?.items ?? [];
-      expect(Array.isArray(items)).toBe(true);
-      expect(data).toHaveProperty('total');
-      expect(typeof data.total).toBe('number');
+      // API shape: { data: [...], meta: { total, ... } }
+      expect(Array.isArray(body.data)).toBe(true);
+      expect(body).toHaveProperty('meta');
+      expect(typeof body.meta.total).toBe('number');
     }
   });
 
@@ -453,8 +444,7 @@ test.describe('Broker API — Exchange Management', () => {
 
     if (res.status() === 200) {
       const body = await res.json();
-      const data = body?.data ?? body;
-      const items = data?.items ?? [];
+      const items: any[] = Array.isArray(body.data) ? body.data : [];
 
       for (const item of items) {
         expect(item.status).toBe('pending_broker');
@@ -522,28 +512,29 @@ test.describe('Broker API — Messaging Restrictions (UK Compliance)', () => {
   });
 
   test('regular user token cannot access broker monitoring endpoints', async ({ request }) => {
-    // Try to get a regular user token (may or may not be configured)
     const userEmail = process.env.E2E_USER_EMAIL || 'test@hour-timebank.ie';
-    const userPassword = process.env.E2E_USER_PASSWORD || 'TestPassword123!';
+    const adminEmail = process.env.E2E_ADMIN_EMAIL || 'admin@hour-timebank.ie';
+
+    // Skip if the environment only has one account (user == admin)
+    test.skip(
+      userEmail === adminEmail,
+      'User and admin share the same account — cannot test regular-user access denial'
+    );
 
     const loginRes = await request.post(`${API_BASE}/api/auth/login`, {
-      data: { email: userEmail, password: userPassword, tenant_slug: TENANT_SLUG },
+      data: { email: userEmail, password: process.env.E2E_USER_PASSWORD || 'TestPassword123!', tenant_slug: TENANT_SLUG },
       headers: { 'Content-Type': 'application/json', 'X-Tenant-ID': TENANT_SLUG },
     });
 
-    if (!loginRes.ok()) {
-      // Can't get user token — skip
-      return;
-    }
+    test.skip(!loginRes.ok(), 'Regular user auth not available — skipping');
 
     const loginBody = await loginRes.json();
     const userToken = loginBody?.data?.access_token || loginBody?.access_token;
-
-    if (!userToken) return;
+    test.skip(!userToken, 'No user token in login response — skipping');
 
     // Attempt to access broker monitoring with regular user token
     const res = await request.get(`${API_BASE}/api/v2/admin/broker/monitoring`, {
-      headers: adminHeaders(userToken),
+      headers: adminHeaders(userToken!),
     });
 
     // Regular users MUST be denied access to broker monitoring
@@ -626,8 +617,7 @@ test.describe('Broker API — First Contact Monitoring (UK Safeguarding)', () =>
     if (res.status() !== 200) return;
 
     const body = await res.json();
-    const data = body?.data ?? body;
-    const items = data?.items ?? [];
+    const items: any[] = Array.isArray(body.data) ? body.data : [];
 
     // If first_contact monitoring is enabled, we may see first_contact copies
     // We can't assert they MUST be present (no test data guaranteed),
@@ -654,8 +644,7 @@ test.describe('Broker API — First Contact Monitoring (UK Safeguarding)', () =>
     if (res.status() !== 200) return;
 
     const body = await res.json();
-    const data = body?.data ?? body;
-    const items = data?.items ?? [];
+    const items: any[] = Array.isArray(body.data) ? body.data : [];
 
     const highRiskItems = items.filter((m: { copy_reason: string }) => m.copy_reason === 'high_risk_listing');
 
