@@ -11,23 +11,24 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
+// Field names match the backend's TENANT_DIRECT_COLUMNS and GENERAL_SETTING_KEYS exactly
 interface SettingsForm {
-  site_name: string;
-  site_description: string;
-  support_email: string;
-  contact_phone: string;
-  open_registration: boolean;
-  email_verification: boolean;
-  admin_approval: boolean;
-  maintenance_mode: boolean;
+  name: string;               // tenants.name
+  description: string;        // tenants.description
+  contact_email: string;      // tenants.contact_email
+  contact_phone: string;      // tenants.contact_phone
+  registration_mode: string;  // general.registration_mode ('open' | 'closed' | 'invite')
+  email_verification: boolean; // general.email_verification
+  admin_approval: boolean;    // general.admin_approval
+  maintenance_mode: boolean;  // general.maintenance_mode
 }
 
 const DEFAULT_SETTINGS: SettingsForm = {
-  site_name: '',
-  site_description: '',
-  support_email: '',
+  name: '',
+  description: '',
+  contact_email: '',
   contact_phone: '',
-  open_registration: true,
+  registration_mode: 'open',
   email_verification: true,
   admin_approval: false,
   maintenance_mode: false,
@@ -48,14 +49,14 @@ export function AdminSettings() {
       const data = res.data;
       if (data) {
         setForm({
-          site_name: (data.site_name as string) ?? '',
-          site_description: (data.site_description as string) ?? '',
-          support_email: (data.support_email as string) ?? '',
+          name: (data.name as string) ?? '',
+          description: (data.description as string) ?? '',
+          contact_email: (data.contact_email as string) ?? '',
           contact_phone: (data.contact_phone as string) ?? '',
-          open_registration: data.open_registration !== false,
-          email_verification: data.email_verification !== false,
-          admin_approval: !!data.admin_approval,
-          maintenance_mode: !!data.maintenance_mode,
+          registration_mode: (data.registration_mode as string) ?? 'open',
+          email_verification: data.email_verification === 'true' || data.email_verification === true || data.email_verification !== 'false',
+          admin_approval: data.admin_approval === 'true' || data.admin_approval === true,
+          maintenance_mode: data.maintenance_mode === 'true' || data.maintenance_mode === true,
         });
       }
     } catch {
@@ -72,7 +73,16 @@ export function AdminSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await adminSettings.update(form as unknown as Record<string, unknown>);
+      await adminSettings.update({
+        name: form.name,
+        description: form.description,
+        contact_email: form.contact_email,
+        contact_phone: form.contact_phone,
+        registration_mode: form.registration_mode,
+        email_verification: String(form.email_verification),
+        admin_approval: String(form.admin_approval),
+        maintenance_mode: String(form.maintenance_mode),
+      });
       toast.success('Settings saved');
     } catch {
       toast.error('Failed to save settings');
@@ -108,23 +118,23 @@ export function AdminSettings() {
               label="Site Name"
               placeholder="Project NEXUS"
               variant="bordered"
-              value={form.site_name}
-              onValueChange={(val) => setForm(prev => ({ ...prev, site_name: val }))}
+              value={form.name}
+              onValueChange={(val) => setForm(prev => ({ ...prev, name: val }))}
             />
             <Textarea
               label="Site Description"
               placeholder="Community timebanking platform"
               variant="bordered"
               minRows={2}
-              value={form.site_description}
-              onValueChange={(val) => setForm(prev => ({ ...prev, site_description: val }))}
+              value={form.description}
+              onValueChange={(val) => setForm(prev => ({ ...prev, description: val }))}
             />
             <Input
               label="Support Email"
               placeholder="support@project-nexus.ie"
               variant="bordered"
-              value={form.support_email}
-              onValueChange={(val) => setForm(prev => ({ ...prev, support_email: val }))}
+              value={form.contact_email}
+              onValueChange={(val) => setForm(prev => ({ ...prev, contact_email: val }))}
             />
             <Input
               label="Contact Phone"
@@ -147,8 +157,8 @@ export function AdminSettings() {
                 <p className="text-sm text-default-500">Allow new users to register without an invitation</p>
               </div>
               <Switch
-                isSelected={form.open_registration}
-                onValueChange={(val) => setForm(prev => ({ ...prev, open_registration: val }))}
+                isSelected={form.registration_mode === 'open'}
+                onValueChange={(val) => setForm(prev => ({ ...prev, registration_mode: val ? 'open' : 'closed' }))}
                 aria-label="Open registration"
               />
             </div>
