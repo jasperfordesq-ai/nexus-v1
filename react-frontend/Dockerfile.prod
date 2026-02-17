@@ -11,12 +11,14 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Build arguments for API URL (baked into the build)
+# Build arguments (baked into the build)
 # Note: Tenant is detected dynamically from subdomain/hostname, not hardcoded
 ARG VITE_API_BASE=https://api.project-nexus.ie/api
+ARG VITE_GOOGLE_MAPS_API_KEY=
 
 # Set environment variables for build
 ENV VITE_API_BASE=$VITE_API_BASE
+ENV VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
 
 # Install dependencies first (better layer caching)
 COPY package.json package-lock.json ./

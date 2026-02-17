@@ -2,15 +2,16 @@
  * FAQ Page - Native React
  *
  * Frequently Asked Questions with searchable accordion categories.
- * Converted from legacy PHP views/pages/faq.php.
+ * Uses HeroUI Accordion component for expand/collapse.
  */
 
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Accordion, AccordionItem, Input } from '@heroui/react';
 import {
   Rocket, Wallet, Handshake, Trophy, ShieldCheck,
-  Search, ChevronDown, HelpCircle,
+  Search, HelpCircle,
 } from 'lucide-react';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -41,7 +42,6 @@ export function FaqPage() {
   usePageTitle('FAQ');
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
   const categories: FaqCategory[] = useMemo(() => [
     {
@@ -319,15 +319,6 @@ export function FaqPage() {
     },
   ], [tenantPath]);
 
-  const toggleItem = (key: string) => {
-    setOpenItems((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
-
   // Filter by search query
   const filteredCategories = useMemo(() => {
     if (!searchQuery.trim()) return categories;
@@ -366,19 +357,16 @@ export function FaqPage() {
             </p>
 
             {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-subtle" />
-              <input
-                type="text"
-                placeholder="Search questions..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-theme-subtle/10 border border-theme-default
-                           text-theme-primary placeholder:text-theme-subtle
-                           focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50
-                           transition-all"
-              />
-            </div>
+            <Input
+              placeholder="Search questions..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-subtle/10 border-theme-default',
+              }}
+            />
           </GlassCard>
         </motion.div>
 
@@ -402,41 +390,27 @@ export function FaqPage() {
                     <h2 className="text-lg font-semibold text-theme-primary">{cat.title}</h2>
                   </div>
 
-                  <div className="space-y-2">
-                    {cat.items.map((item) => {
-                      const key = `${cat.title}-${item.question}`;
-                      const isOpen = openItems.has(key);
-                      return (
-                        <div
-                          key={key}
-                          className="border border-theme-default/50 rounded-xl overflow-hidden
-                                     hover:border-indigo-500/30 transition-colors"
-                        >
-                          <button
-                            onClick={() => toggleItem(key)}
-                            className="w-full flex items-center justify-between px-5 py-4
-                                       text-left text-theme-primary font-medium
-                                       hover:bg-theme-subtle/5 transition-colors"
-                          >
-                            <span>{item.question}</span>
-                            <ChevronDown
-                              className={`w-4 h-4 text-theme-subtle shrink-0 ml-3 transition-transform ${
-                                isOpen ? 'rotate-180' : ''
-                              }`}
-                            />
-                          </button>
-                          {isOpen && (
-                            <div className="px-5 pb-4 text-theme-muted text-sm leading-relaxed
-                                            [&_p]:mb-3 [&_p:last-child]:mb-0
-                                            [&_ul]:ml-5 [&_ul]:list-disc [&_ul]:mb-3
-                                            [&_li]:mb-1.5">
-                              {item.answer}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <Accordion
+                    selectionMode="multiple"
+                    variant="bordered"
+                    itemClasses={{
+                      base: 'border-theme-default/50',
+                      title: 'text-theme-primary font-medium text-sm',
+                      trigger: 'px-4 py-3 hover:bg-theme-subtle/5 data-[hover=true]:bg-theme-subtle/5',
+                      content: 'px-4 pb-4 text-theme-muted text-sm leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0 [&_ul]:ml-5 [&_ul]:list-disc [&_ul]:mb-3 [&_li]:mb-1.5',
+                      indicator: 'text-theme-subtle',
+                    }}
+                  >
+                    {cat.items.map((item, idx) => (
+                      <AccordionItem
+                        key={`${cat.title}-${idx}`}
+                        aria-label={item.question}
+                        title={item.question}
+                      >
+                        {item.answer}
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </GlassCard>
               </motion.div>
             );
