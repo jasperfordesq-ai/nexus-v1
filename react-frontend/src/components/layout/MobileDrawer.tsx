@@ -395,7 +395,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   </a>
                   <a
                     href="/admin-legacy"
-                    onClick={(e) => { e.preventDefault(); const t = tokenManager.getAccessToken(); window.location.href = t ? `${window.location.origin}/api/auth/admin-session?token=${encodeURIComponent(t)}&redirect=/admin-legacy` : `${window.location.origin}/admin-legacy`; }}
+                    onClick={(e) => { e.preventDefault(); const t = tokenManager.getAccessToken(); const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin; window.location.href = t ? `${phpOrigin}/api/auth/admin-session?token=${encodeURIComponent(t)}&redirect=/admin-legacy` : `${phpOrigin}/admin-legacy`; }}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
                   >
                     <Shield className="w-5 h-5" aria-hidden="true" />
