@@ -686,6 +686,7 @@ class AdminConfigApiController extends BaseApiController
         'timezone', 'registration_mode', 'welcome_message',
         'maintenance_mode', 'default_currency', 'date_format',
         'time_format', 'items_per_page', 'max_upload_size_mb',
+        'email_verification', 'admin_approval',
     ];
 
     /**
