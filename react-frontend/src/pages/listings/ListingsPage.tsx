@@ -171,7 +171,7 @@ export function ListingsPage() {
         <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <Input
-              placeholder="Search listings..."
+              placeholder="Search by title, description or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}
@@ -408,16 +408,17 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
             />
             <span className="text-sm text-theme-subtle truncate">{listing.author_name}</span>
           </div>
-          <div className="flex items-center gap-3 text-xs text-theme-subtle flex-shrink-0">
+          <div className="flex items-center gap-2 text-xs text-theme-subtle min-w-0 overflow-hidden">
             {hours && (
-              <span className="flex items-center gap-1" aria-label={`${hours} hours estimated`}>
+              <span className="flex items-center gap-1 flex-shrink-0" aria-label={`${hours} hours estimated`}>
                 <Clock className="w-3 h-3" aria-hidden="true" />
                 {hours}h
               </span>
             )}
             {listing.location && (
-              <span className="flex items-center gap-1" aria-label={`Location: ${listing.location}`}>
-                <MapPin className="w-3 h-3" aria-hidden="true" />
+              <span className="flex items-center gap-1 min-w-0" aria-label={`Location: ${listing.location}`}>
+                <MapPin className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
+                <span className="truncate">{listing.location}</span>
               </span>
             )}
           </div>
