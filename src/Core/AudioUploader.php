@@ -11,6 +11,7 @@ class AudioUploader
 {
     private static $allowedTypes = [
         'audio/webm',
+        'video/webm', // Chrome records audio-only WebM as video/webm (finfo detection)
         'audio/ogg',
         'audio/mpeg',
         'audio/mp3',
@@ -64,22 +65,16 @@ class AudioUploader
         // Generate secure filename
         $filename = uniqid('voice_', true) . '.' . $extension;
 
-        // Tenant-scoped directory
-        $tenant = TenantContext::get();
-        $slug = $tenant['slug'] ?? 'default';
-        if ($tenant['id'] == 1 && empty($tenant['slug'])) {
-            $slug = 'master';
-        }
-
-        $directory = 'tenants/' . $slug . '/voice_messages';
-        $targetDir = __DIR__ . '/../../httpdocs/uploads/' . $directory;
+        // Tenant-scoped directory (consistent with UserService avatar convention)
+        $tenantId = TenantContext::getId();
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $tenantId . '/voice_messages';
 
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0755, true);
         }
 
         $targetPath = $targetDir . '/' . $filename;
-        $publicPath = '/uploads/' . $directory . '/' . $filename;
+        $publicPath = '/uploads/' . $tenantId . '/voice_messages/' . $filename;
 
         // Move uploaded file
         if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
@@ -133,22 +128,16 @@ class AudioUploader
         $extension = self::getExtensionFromMime($mimeType);
         $filename = uniqid('voice_', true) . '.' . $extension;
 
-        // Tenant-scoped directory
-        $tenant = TenantContext::get();
-        $slug = $tenant['slug'] ?? 'default';
-        if ($tenant['id'] == 1 && empty($tenant['slug'])) {
-            $slug = 'master';
-        }
-
-        $directory = 'tenants/' . $slug . '/voice_messages';
-        $targetDir = __DIR__ . '/../../httpdocs/uploads/' . $directory;
+        // Tenant-scoped directory (consistent with UserService avatar convention)
+        $tenantId = TenantContext::getId();
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $tenantId . '/voice_messages';
 
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0755, true);
         }
 
         $targetPath = $targetDir . '/' . $filename;
-        $publicPath = '/uploads/' . $directory . '/' . $filename;
+        $publicPath = '/uploads/' . $tenantId . '/voice_messages/' . $filename;
 
         // Save file
         if (file_put_contents($targetPath, $audioData) === false) {
@@ -168,6 +157,7 @@ class AudioUploader
     {
         $map = [
             'audio/webm' => 'webm',
+            'video/webm' => 'webm',
             'audio/ogg' => 'ogg',
             'audio/mpeg' => 'mp3',
             'audio/mp3' => 'mp3',

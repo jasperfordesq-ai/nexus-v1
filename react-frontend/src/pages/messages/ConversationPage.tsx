@@ -21,7 +21,7 @@ import { usePageTitle } from '@/hooks';
 import type { NewMessageEvent, TypingEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { Message, User } from '@/types/api';
 
 interface OtherUser {
@@ -589,14 +589,14 @@ export function ConversationPage() {
    * Send voice message
    */
   async function sendVoiceMessage() {
-    if (!audioBlob || !id || isSending) return;
+    if (!audioBlob || !targetId || isSending) return;
 
     try {
       setIsSending(true);
 
       // Create form data with audio file
       const formData = new FormData();
-      formData.append('recipient_id', id);
+      formData.append('recipient_id', targetId);
       formData.append('voice_message', audioBlob, 'voice-message.webm');
 
       const response = await api.upload<Message>('/v2/messages/voice', formData);
@@ -770,7 +770,7 @@ export function ConversationPage() {
    */
   async function sendMessageWithAttachments(e: React.FormEvent) {
     e.preventDefault();
-    if ((!newMessage.trim() && attachments.length === 0) || !id || isSending) return;
+    if ((!newMessage.trim() && attachments.length === 0) || !targetId || isSending) return;
 
     try {
       setIsSending(true);
@@ -778,7 +778,7 @@ export function ConversationPage() {
       if (attachments.length > 0) {
         // Create form data with attachments
         const formData = new FormData();
-        formData.append('recipient_id', id);
+        formData.append('recipient_id', targetId);
         formData.append('body', newMessage.trim());
         attachments.forEach((file) => {
           formData.append('attachments[]', file);
@@ -816,11 +816,13 @@ export function ConversationPage() {
           }
 
           setTimeout(() => scrollToBottom(), 50);
+        } else {
+          toast.error('Error', response.error || 'Failed to send message. Please try again.');
         }
       } else {
         // Regular text message (no attachments)
         const payload: Record<string, unknown> = {
-          recipient_id: parseInt(id, 10),
+          recipient_id: parseInt(targetId, 10),
           body: newMessage.trim(),
         };
 
@@ -849,6 +851,9 @@ export function ConversationPage() {
           }
 
           setTimeout(() => scrollToBottom(), 50);
+        } else {
+          console.error('[Messages] Send failed:', response);
+          toast.error('Error', response.error || 'Failed to send message. Please try again.');
         }
       }
     } catch (error) {
@@ -1810,7 +1815,7 @@ function VoiceMessagePlayer({ audioUrl, audioBlob }: VoiceMessagePlayerProps) {
     if (audioBlob) {
       audio.src = URL.createObjectURL(audioBlob);
     } else if (audioUrl) {
-      audio.src = audioUrl;
+      audio.src = resolveAssetUrl(audioUrl);
     }
 
     audio.onloadedmetadata = () => {
