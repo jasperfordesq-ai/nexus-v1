@@ -15,8 +15,9 @@ use Nexus\Services\SmartMatchingAnalyticsService;
  * Community Analytics page with charts, trends, and top-performer tables.
  *
  * Endpoints:
- * - GET  /api/v2/admin/community-analytics         - Full analytics payload
- * - GET  /api/v2/admin/community-analytics/export   - CSV export of monthly trends
+ * - GET  /api/v2/admin/community-analytics             - Full analytics payload
+ * - GET  /api/v2/admin/community-analytics/export       - CSV export of monthly trends
+ * - GET  /api/v2/admin/community-analytics/geography    - Member geographic distribution
  */
 class AdminCommunityAnalyticsApiController extends BaseApiController
 {
@@ -199,6 +200,94 @@ class AdminCommunityAnalyticsApiController extends BaseApiController
 
         fclose($output);
         exit;
+    }
+
+    /**
+     * GET /api/v2/admin/community-analytics/geography
+     *
+     * Returns member geographic distribution: clustered locations, coverage stats,
+     * and top areas. Used by the Community Analytics dashboard map section.
+     */
+    public function geography(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        // Get member locations grouped by rounded coordinates (2 decimal places ~ 1km clusters)
+        $clusters = [];
+        try {
+            $stmt = Database::query(
+                "SELECT
+                    ROUND(latitude, 2) as lat,
+                    ROUND(longitude, 2) as lng,
+                    COUNT(*) as count,
+                    MIN(location) as area
+                FROM users
+                WHERE tenant_id = ?
+                    AND latitude IS NOT NULL
+                    AND longitude IS NOT NULL
+                    AND status = 'active'
+                GROUP BY ROUND(latitude, 2), ROUND(longitude, 2)
+                ORDER BY count DESC",
+                [$tenantId]
+            );
+            $clusters = $stmt->fetchAll();
+        } catch (\Throwable $e) {
+            // latitude/longitude columns may not exist
+        }
+
+        // Total stats
+        $total = 0;
+        $withLocation = 0;
+        try {
+            $statsStmt = Database::query(
+                "SELECT
+                    COUNT(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 END) as with_location,
+                    COUNT(*) as total
+                FROM users
+                WHERE tenant_id = ? AND status = 'active'",
+                [$tenantId]
+            );
+            $stats = $statsStmt->fetch();
+            $total = (int) ($stats['total'] ?? 0);
+            $withLocation = (int) ($stats['with_location'] ?? 0);
+        } catch (\Throwable $e) {
+            // Fallback
+        }
+
+        // Top areas (by location text, grouped)
+        $topAreas = [];
+        try {
+            $areasStmt = Database::query(
+                "SELECT location as area, COUNT(*) as count
+                FROM users
+                WHERE tenant_id = ? AND location IS NOT NULL AND location != '' AND status = 'active'
+                GROUP BY location
+                ORDER BY count DESC
+                LIMIT 10",
+                [$tenantId]
+            );
+            $topAreas = $areasStmt->fetchAll();
+        } catch (\Throwable $e) {
+            // location column may not exist
+        }
+
+        $this->respondWithData([
+            'member_locations' => array_map(fn($c) => [
+                'lat' => (float) $c['lat'],
+                'lng' => (float) $c['lng'],
+                'count' => (int) $c['count'],
+                'area' => $c['area'] ?? 'Unknown',
+            ], $clusters),
+            'total_with_location' => $withLocation,
+            'total_members' => $total,
+            'coverage_percentage' => $total > 0 ? round(($withLocation / $total) * 100, 1) : 0,
+            'top_areas' => array_map(fn($a) => [
+                'area' => $a['area'],
+                'count' => (int) $a['count'],
+                'percentage' => $total > 0 ? round(((int) $a['count'] / $total) * 100, 1) : 0,
+            ], $topAreas),
+        ]);
     }
 
     /**

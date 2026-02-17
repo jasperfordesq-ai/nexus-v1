@@ -31,9 +31,13 @@ import {
   RefreshCw,
   BarChart3,
   PieChart as PieChartIcon,
+  MapPin,
+  Globe,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { LocationMap } from '@/components/location';
+import { MAPS_ENABLED } from '@/lib/map-config';
 import { StatCard, PageHeader } from '../../components';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -79,6 +83,14 @@ interface CommunityAnalyticsData {
   engagement_rate: number;
 }
 
+interface GeographyData {
+  member_locations: Array<{ lat: number; lng: number; count: number; area: string }>;
+  total_with_location: number;
+  total_members: number;
+  coverage_percentage: number;
+  top_areas: Array<{ area: string; count: number; percentage: number }>;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Chart color palette (works well in both light and dark modes)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -105,6 +117,8 @@ export function CommunityAnalytics() {
 
   const [data, setData] = useState<CommunityAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [geoData, setGeoData] = useState<GeographyData | null>(null);
+  const [geoLoading, setGeoLoading] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -120,9 +134,25 @@ export function CommunityAnalytics() {
     }
   }, []);
 
+  const loadGeoData = useCallback(async () => {
+    if (!MAPS_ENABLED) return;
+    setGeoLoading(true);
+    try {
+      const res = await api.get('/v2/admin/community-analytics/geography');
+      if (res.success && res.data) {
+        setGeoData(res.data as GeographyData);
+      }
+    } catch {
+      // Silently fail — geography section won't render
+    } finally {
+      setGeoLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadData();
-  }, [loadData]);
+    loadGeoData();
+  }, [loadData, loadGeoData]);
 
   const handleExport = async () => {
     try {
@@ -170,7 +200,7 @@ export function CommunityAnalytics() {
             <Button
               variant="flat"
               startContent={<RefreshCw size={16} />}
-              onPress={loadData}
+              onPress={() => { loadData(); loadGeoData(); }}
               isLoading={loading}
               size="sm"
             >
@@ -555,6 +585,105 @@ export function CommunityAnalytics() {
           </CardBody>
         </Card>
       </div>
+
+      {/* Geographic Distribution */}
+      {MAPS_ENABLED && (
+        <Card shadow="sm" className="mt-6">
+          <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
+            <Globe size={18} className="text-primary" />
+            <h3 className="font-semibold">Geographic Distribution</h3>
+          </CardHeader>
+          <CardBody className="px-4 pb-4">
+            {geoLoading ? (
+              <div className="flex h-[400px] items-center justify-center">
+                <Spinner />
+              </div>
+            ) : geoData ? (
+              <>
+                {/* Stats row */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
+                  <StatCard
+                    label="Members with Location"
+                    value={`${geoData.total_with_location} / ${geoData.total_members}`}
+                    icon={MapPin}
+                    color="primary"
+                  />
+                  <StatCard
+                    label="Location Coverage"
+                    value={`${geoData.coverage_percentage}%`}
+                    icon={Globe}
+                    color={geoData.coverage_percentage > 50 ? 'success' : 'warning'}
+                  />
+                  <StatCard
+                    label="Top Area"
+                    value={geoData.top_areas[0]?.area || 'N/A'}
+                    icon={MapPin}
+                    color="secondary"
+                  />
+                </div>
+
+                {/* Map */}
+                {geoData.member_locations.length > 0 && (
+                  <LocationMap
+                    markers={geoData.member_locations.map((loc, i) => ({
+                      id: `cluster-${i}`,
+                      lat: loc.lat,
+                      lng: loc.lng,
+                      title: `${loc.area}: ${loc.count} member${loc.count > 1 ? 's' : ''}`,
+                      pinGlyph: String(loc.count),
+                      infoContent: (
+                        <div className="p-2">
+                          <h4 className="font-semibold text-sm text-gray-900">{loc.area}</h4>
+                          <p className="text-xs text-gray-600">
+                            {loc.count} member{loc.count > 1 ? 's' : ''}
+                          </p>
+                        </div>
+                      ),
+                    }))}
+                    height="400px"
+                    fitBounds
+                    className="mb-6 rounded-xl"
+                  />
+                )}
+
+                {/* Top Areas list */}
+                {geoData.top_areas.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-foreground mb-3">Top Areas</h4>
+                    <div className="space-y-2">
+                      {geoData.top_areas.map((area, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                          <span className="text-xs text-default-400 w-6">{i + 1}.</span>
+                          <span className="text-sm text-foreground flex-1">{area.area}</span>
+                          <span className="text-xs text-default-500">
+                            {area.count} member{area.count !== 1 ? 's' : ''}
+                          </span>
+                          <div className="w-24 h-1.5 rounded-full bg-default-100 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-primary"
+                              style={{ width: `${Math.min(area.percentage, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {geoData.member_locations.length === 0 && geoData.top_areas.length === 0 && (
+                  <p className="py-8 text-center text-sm text-default-400">
+                    No location data available yet. Members can add their location in Settings.
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="py-8 text-center text-sm text-default-400">
+                Geographic data could not be loaded
+              </p>
+            )}
+          </CardBody>
+        </Card>
+      )}
     </div>
   );
 }

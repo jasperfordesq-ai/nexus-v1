@@ -13,6 +13,7 @@ import {
   Grid,
   List,
   ListTodo,
+  Map as MapIcon,
   MapPin,
   Tag,
   Clock,
@@ -20,17 +21,19 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Listing, Category } from '@/types/api';
 
 type ListingType = 'all' | 'offer' | 'request';
-type ViewMode = 'grid' | 'list';
+type ViewMode = 'grid' | 'list' | 'map';
 
 export function ListingsPage() {
   usePageTitle('Listings');
@@ -237,6 +240,19 @@ export function ListingsPage() {
               >
                 <List className="w-4 h-4 text-theme-primary" aria-hidden="true" />
               </Button>
+              {MAPS_ENABLED && (
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  className={`rounded-none rounded-r-lg ${viewMode === 'map' ? 'bg-primary/10 text-primary' : 'bg-theme-elevated'}`}
+                  aria-label="Map view"
+                  aria-pressed={viewMode === 'map'}
+                  onPress={() => setViewMode('map')}
+                >
+                  <MapIcon className="w-4 h-4" aria-hidden="true" />
+                </Button>
+              )}
             </div>
           </div>
         </form>
@@ -283,18 +299,48 @@ export function ListingsPage() {
         />
       ) : (
         <>
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
-          >
-            {listings.map((listing) => (
-              <motion.div key={listing.id} variants={itemVariants}>
-                <ListingCard listing={listing} viewMode={viewMode} />
-              </motion.div>
-            ))}
-          </motion.div>
+          {viewMode === 'map' ? (
+            <EntityMapView
+              items={listings}
+              getCoordinates={(l) =>
+                l.latitude && l.longitude ? { lat: l.latitude, lng: l.longitude } : null
+              }
+              getMarkerConfig={(l) => ({
+                id: l.id,
+                title: l.title,
+                pinColor: l.type === 'offer' ? '#10b981' : '#f59e0b',
+              })}
+              renderInfoContent={(l) => (
+                <div className="p-2 max-w-[250px]">
+                  <div className="flex items-center gap-1 mb-1">
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                      l.type === 'offer' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                    }`}>
+                      {l.type === 'offer' ? 'Offer' : 'Request'}
+                    </span>
+                  </div>
+                  <h4 className="font-semibold text-sm text-gray-900">{l.title}</h4>
+                  <p className="text-xs text-gray-600 line-clamp-2 mt-0.5">{l.description}</p>
+                  {l.location && <p className="text-xs text-gray-500 mt-1">{l.location}</p>}
+                </div>
+              )}
+              isLoading={isLoading}
+              emptyMessage="No listings with location data"
+            />
+          ) : (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
+            >
+              {listings.map((listing) => (
+                <motion.div key={listing.id} variants={itemVariants}>
+                  <ListingCard listing={listing} viewMode={viewMode} />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
 
           {/* Load More */}
           {hasMore && (

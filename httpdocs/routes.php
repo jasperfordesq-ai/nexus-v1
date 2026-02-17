@@ -235,6 +235,7 @@ $router->add('GET', '/api/v2/users/{id}', 'Nexus\Controllers\Api\UsersApiControl
 $router->add('GET', '/api/v2/users/{id}/listings', 'Nexus\Controllers\Api\UsersApiController@listings');
 $router->add('GET', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@notificationPreferences');
 $router->add('PUT', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@updateNotificationPreferences');
+$router->add('GET', '/api/v2/members/nearby', 'Nexus\Controllers\Api\UsersApiController@nearby');
 
 // ============================================
 // API V2 - MESSAGES (RESTful Messaging)
@@ -272,6 +273,7 @@ $router->add('DELETE', '/api/v2/exchanges/{id}', 'Nexus\Controllers\Api\Exchange
 // API V2 - EVENTS (RESTful Event Management)
 // ============================================
 $router->add('GET', '/api/v2/events', 'Nexus\Controllers\Api\EventsApiController@index');
+$router->add('GET', '/api/v2/events/nearby', 'Nexus\Controllers\Api\EventsApiController@nearby');
 $router->add('POST', '/api/v2/events', 'Nexus\Controllers\Api\EventsApiController@store');
 $router->add('GET', '/api/v2/events/{id}', 'Nexus\Controllers\Api\EventsApiController@show');
 $router->add('PUT', '/api/v2/events/{id}', 'Nexus\Controllers\Api\EventsApiController@update');
@@ -2349,6 +2351,7 @@ $router->add('GET', '/cron/run-all', 'Nexus\Controllers\CronController@runAll');
 // ============================================
 $router->add('GET', '/api/v2/admin/community-analytics', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@index');
 $router->add('GET', '/api/v2/admin/community-analytics/export', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@export');
+$router->add('GET', '/api/v2/admin/community-analytics/geography', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@geography');
 
 // ============================================
 // API V2 - IMPACT REPORTING (Admin)

@@ -729,4 +729,31 @@ class EventService
             return false;
         }
     }
+
+    /**
+     * Get nearby upcoming events with distance calculation
+     *
+     * @param float $lat Latitude
+     * @param float $lon Longitude
+     * @param array $filters Additional filters (radius_km, category_id, limit)
+     * @return array ['items' => [], 'has_more' => bool]
+     */
+    public static function getNearby(float $lat, float $lon, array $filters = []): array
+    {
+        $radiusKm = (float)($filters['radius_km'] ?? 25);
+        $limit = min((int)($filters['limit'] ?? 20), 100);
+
+        $items = Event::getNearby(
+            $lat,
+            $lon,
+            $radiusKm,
+            $limit,
+            $filters['category_id'] ?? null
+        );
+
+        return [
+            'items' => $items,
+            'has_more' => count($items) >= $limit,
+        ];
+    }
 }

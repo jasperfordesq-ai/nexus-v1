@@ -179,12 +179,83 @@ class Event
 
     public static function getHosted($userId)
     {
-        $sql = "SELECT e.*, 
+        $sql = "SELECT e.*,
                 (SELECT count(*) FROM event_rsvps WHERE event_id = e.id AND status = 'going') as attending_count,
                 (SELECT count(*) FROM event_rsvps WHERE event_id = e.id AND status = 'invited') as invited_count
                 FROM events e
                 WHERE e.user_id = ? AND e.start_time >= NOW()
                 ORDER BY e.start_time ASC";
         return Database::query($sql, [$userId])->fetchAll();
+    }
+
+    /**
+     * Get nearby upcoming events using Haversine formula
+     * @param float $lat User's latitude
+     * @param float $lon User's longitude
+     * @param float $radiusKm Search radius in kilometers
+     * @param int $limit Maximum results
+     * @param int|null $categoryId Filter by category
+     * @return array Events sorted by distance
+     */
+    public static function getNearby($lat, $lon, $radiusKm = 25, $limit = 50, $categoryId = null)
+    {
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        $limit = (int)$limit;
+        $radiusKm = (float)$radiusKm;
+
+        try {
+            $sql = "
+                SELECT * FROM (
+                    SELECT e.id, e.tenant_id, e.user_id, e.title, e.description, e.location,
+                        e.start_time, e.end_time, e.group_id, e.category_id,
+                        e.latitude, e.longitude, e.created_at, e.updated_at,
+                        u.first_name, u.last_name,
+                        CASE
+                            WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != '' THEN u.organization_name
+                            ELSE CONCAT(u.first_name, ' ', u.last_name)
+                        END as organizer_name,
+                        u.avatar_url as organizer_avatar,
+                        c.name as category_name, c.color as category_color,
+                        (
+                            6371 * acos(
+                                LEAST(1.0, GREATEST(-1.0,
+                                    cos(radians(?)) * cos(radians(e.latitude)) * cos(radians(e.longitude) - radians(?)) +
+                                    sin(radians(?)) * sin(radians(e.latitude))
+                                ))
+                            )
+                        ) AS calculated_distance_km
+                    FROM events e
+                    JOIN users u ON e.user_id = u.id
+                    LEFT JOIN categories c ON e.category_id = c.id
+                    WHERE e.tenant_id = ?
+                    AND e.start_time > NOW()
+                    AND e.latitude IS NOT NULL
+                    AND e.longitude IS NOT NULL
+            ";
+
+            $params = [$lat, $lon, $lat, $tenantId];
+
+            if ($categoryId) {
+                $sql .= " AND e.category_id = ?";
+                $params[] = $categoryId;
+            }
+
+            $sql .= "
+                ) AS events_with_distance
+                WHERE calculated_distance_km <= ?
+                ORDER BY calculated_distance_km ASC
+                LIMIT $limit
+            ";
+
+            // Rename calculated_distance_km to distance_km for consistency
+            $sql = "SELECT *, calculated_distance_km AS distance_km FROM ($sql) AS final_results";
+
+            $params[] = $radiusKm;
+
+            return Database::query($sql, $params)->fetchAll();
+        } catch (\Exception $e) {
+            error_log("Event::getNearby error: " . $e->getMessage());
+            return [];
+        }
     }
 }

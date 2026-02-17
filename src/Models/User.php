@@ -750,6 +750,7 @@ class User
                 FROM users u
                 LEFT JOIN listings l ON u.id = l.user_id AND l.status = 'active'
                 WHERE u.tenant_id = ?
+                AND u.status = 'active'
                 AND u.latitude IS NOT NULL
                 AND u.longitude IS NOT NULL
                 AND u.id != ?

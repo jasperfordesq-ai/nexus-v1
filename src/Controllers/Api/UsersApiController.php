@@ -18,6 +18,7 @@ use Nexus\Core\ImageUploader;
  * - PUT    /api/v2/users/me/preferences  - Update notification/privacy preferences
  * - PUT    /api/v2/users/me/avatar       - Update avatar
  * - PUT    /api/v2/users/me/password     - Update password
+ * - GET    /api/v2/members/nearby        - Get nearby active members (geospatial)
  *
  * Response Format:
  * Success: { "data": {...}, "meta": {...} }
@@ -361,6 +362,62 @@ class UsersApiController extends BaseApiController
         }
 
         $this->respondWithData(['message' => 'Notification preferences updated']);
+    }
+
+    /**
+     * GET /api/v2/members/nearby
+     *
+     * Get active members near a geographic point.
+     * Only includes users who have latitude/longitude set (respects privacy).
+     *
+     * Query Parameters:
+     * - lat: float (required) - Latitude
+     * - lon: float (required) - Longitude
+     * - radius_km: float (default 25) - Search radius in kilometers
+     * - per_page: int (default 20, max 100)
+     *
+     * Response: 200 OK with data array and search meta
+     */
+    public function nearby(): void
+    {
+        // Optional auth - if logged in, exclude current user from results
+        $currentUserId = $this->getOptionalUserId();
+
+        $lat = $this->query('lat');
+        $lon = $this->query('lon');
+
+        if ($lat === null || $lon === null) {
+            $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required', null, 400);
+        }
+
+        $lat = (float)$lat;
+        $lon = (float)$lon;
+
+        // Validate coordinates
+        if ($lat < -90 || $lat > 90) {
+            $this->respondWithError('VALIDATION_ERROR', 'Latitude must be between -90 and 90', 'lat', 400);
+        }
+        if ($lon < -180 || $lon > 180) {
+            $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
+        }
+
+        $filters = [
+            'radius_km' => (float)$this->query('radius_km', '25'),
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ];
+
+        $result = UserService::getNearby($lat, $lon, $filters, $currentUserId);
+
+        $this->respondWithData($result['items'], [
+            'search' => [
+                'type' => 'nearby',
+                'lat' => $lat,
+                'lon' => $lon,
+                'radius_km' => $filters['radius_km'],
+            ],
+            'per_page' => $filters['limit'],
+            'has_more' => $result['has_more'],
+        ]);
     }
 
     /**

@@ -24,6 +24,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { LocationMapCard } from '@/components/location';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -272,6 +273,24 @@ export function ListingDetailPage() {
               <div className="text-theme-primary">{listing.location}</div>
             </div>
           </div>
+        )}
+
+        {/* Location Map */}
+        {listing.location && listing.latitude && listing.longitude && (
+          <LocationMapCard
+            title="Service Location"
+            locationText={listing.location}
+            markers={[{
+              id: listing.id,
+              lat: listing.latitude,
+              lng: listing.longitude,
+              title: listing.title,
+            }]}
+            center={{ lat: listing.latitude, lng: listing.longitude }}
+            mapHeight="250px"
+            zoom={15}
+            className="mt-6"
+          />
         )}
 
         {/* Spacer if no location */}

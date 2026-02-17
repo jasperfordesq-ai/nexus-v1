@@ -9,6 +9,7 @@ import { Input, Select, SelectItem, Avatar, Button, Chip } from '@heroui/react';
 import {
   Search,
   Users,
+  Map as MapIcon,
   MapPin,
   Star,
   Clock,
@@ -21,16 +22,18 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { GlassCard, MemberCardSkeleton } from '@/components/ui';
+import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
+import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import type { User } from '@/types/api';
 
 type SortOption = 'name' | 'joined' | 'rating' | 'hours_given';
-type ViewMode = 'grid' | 'list';
+type ViewMode = 'grid' | 'list' | 'map';
 type QuickFilter = 'all' | 'new' | 'active';
 
 const ITEMS_PER_PAGE = 24;
@@ -331,6 +334,19 @@ export function MembersPage() {
               >
                 <List className="w-4 h-4 text-theme-primary" aria-hidden="true" />
               </Button>
+              {MAPS_ENABLED && (
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  className={`rounded-none rounded-r-lg ${viewMode === 'map' ? 'bg-primary/10 text-primary' : 'bg-theme-elevated'}`}
+                  aria-label="Map view"
+                  aria-pressed={viewMode === 'map'}
+                  onPress={() => setViewMode('map')}
+                >
+                  <MapIcon className="w-4 h-4" aria-hidden="true" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -378,18 +394,50 @@ export function MembersPage() {
                 </p>
               )}
 
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'}
-              >
-                {members.map((member) => (
-                  <motion.div key={member.id} variants={itemVariants}>
-                    <MemberCard member={member} viewMode={viewMode} />
-                  </motion.div>
-                ))}
-              </motion.div>
+              {viewMode === 'map' ? (
+                <EntityMapView
+                  items={members}
+                  getCoordinates={(m) =>
+                    m.latitude && m.longitude ? { lat: m.latitude, lng: m.longitude } : null
+                  }
+                  getMarkerConfig={(m) => ({
+                    id: m.id,
+                    title: `${m.first_name || ''} ${m.last_name || ''}`.trim() || m.name || 'Member',
+                  })}
+                  renderInfoContent={(m) => (
+                    <div className="p-2 max-w-[200px]">
+                      <div className="flex items-center gap-2">
+                        {m.avatar_url && (
+                          <img src={m.avatar_url} alt="" className="w-8 h-8 rounded-full" />
+                        )}
+                        <div>
+                          <h4 className="font-semibold text-sm text-gray-900">
+                            {m.first_name} {m.last_name}
+                          </h4>
+                          {m.tagline && (
+                            <p className="text-xs text-gray-600">{m.tagline}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  isLoading={isLoading}
+                  emptyMessage="No members with location data"
+                />
+              ) : (
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'}
+                >
+                  {members.map((member) => (
+                    <motion.div key={member.id} variants={itemVariants}>
+                      <MemberCard member={member} viewMode={viewMode} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
 
               {/* Load More Button */}
               {hasMore && (

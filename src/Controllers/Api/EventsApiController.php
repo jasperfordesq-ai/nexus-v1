@@ -12,6 +12,7 @@ use Nexus\Core\ImageUploader;
  *
  * Endpoints:
  * - GET    /api/v2/events              - List events (cursor paginated)
+ * - GET    /api/v2/events/nearby       - Get nearby upcoming events (geospatial)
  * - GET    /api/v2/events/{id}         - Get single event
  * - POST   /api/v2/events              - Create event
  * - PUT    /api/v2/events/{id}         - Update event
@@ -89,6 +90,63 @@ class EventsApiController extends BaseApiController
             $filters['limit'],
             $result['has_more']
         );
+    }
+
+    /**
+     * GET /api/v2/events/nearby
+     *
+     * Get upcoming events near a geographic point.
+     *
+     * Query Parameters:
+     * - lat: float (required) - Latitude
+     * - lon: float (required) - Longitude
+     * - radius_km: float (default 25) - Search radius in kilometers
+     * - category_id: int
+     * - per_page: int (default 20, max 100)
+     *
+     * Response: 200 OK with data array and search meta
+     */
+    public function nearby(): void
+    {
+        $lat = $this->query('lat');
+        $lon = $this->query('lon');
+
+        if ($lat === null || $lon === null) {
+            $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required', null, 400);
+        }
+
+        $lat = (float)$lat;
+        $lon = (float)$lon;
+
+        // Validate coordinates
+        if ($lat < -90 || $lat > 90) {
+            $this->respondWithError('VALIDATION_ERROR', 'Latitude must be between -90 and 90', 'lat', 400);
+        }
+        if ($lon < -180 || $lon > 180) {
+            $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
+        }
+
+        $filters = [
+            'radius_km' => (float)$this->query('radius_km', '25'),
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ];
+
+        if ($this->query('category_id')) {
+            $filters['category_id'] = $this->queryInt('category_id');
+        }
+
+        $result = EventService::getNearby($lat, $lon, $filters);
+
+        $this->respondWithData($result['items'], [
+            'search' => [
+                'type' => 'nearby',
+                'lat' => $lat,
+                'lon' => $lon,
+                'radius_km' => $filters['radius_km'],
+            ],
+            'per_page' => $filters['limit'],
+            'has_more' => $result['has_more'],
+        ]);
     }
 
     /**

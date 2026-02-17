@@ -648,4 +648,32 @@ class UserService
             return false;
         }
     }
+
+    /**
+     * Get nearby active members with distance calculation
+     *
+     * @param float $lat Latitude
+     * @param float $lon Longitude
+     * @param array $filters Additional filters (radius_km, limit)
+     * @param int|null $excludeUserId User ID to exclude (current user)
+     * @return array ['items' => [], 'has_more' => bool]
+     */
+    public static function getNearby(float $lat, float $lon, array $filters = [], ?int $excludeUserId = null): array
+    {
+        $radiusKm = (float)($filters['radius_km'] ?? 25);
+        $limit = min((int)($filters['limit'] ?? 20), 100);
+
+        $items = User::getNearby(
+            $lat,
+            $lon,
+            $radiusKm,
+            $limit,
+            $excludeUserId
+        );
+
+        return [
+            'items' => $items,
+            'has_more' => count($items) >= $limit,
+        ];
+    }
 }
