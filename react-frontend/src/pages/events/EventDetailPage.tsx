@@ -38,6 +38,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { LocationMapCard } from '@/components/location';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -474,6 +475,24 @@ export function EventDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Location Map */}
+        {event.location && !event.is_online && event.coordinates?.lat && event.coordinates?.lng && (
+          <LocationMapCard
+            title="Event Location"
+            locationText={event.location}
+            markers={[{
+              id: event.id,
+              lat: event.coordinates.lat,
+              lng: event.coordinates.lng,
+              title: event.title,
+            }]}
+            center={{ lat: event.coordinates.lat, lng: event.coordinates.lng }}
+            mapHeight="250px"
+            zoom={15}
+            className="mt-6"
+          />
+        )}
 
         {/* Tabs: Details / Attendees / Check-in (organizer only) */}
         <Tabs

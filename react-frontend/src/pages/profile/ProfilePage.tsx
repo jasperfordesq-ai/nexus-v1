@@ -39,6 +39,7 @@ import {
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { LocationMapCard } from '@/components/location';
 import { useAuth, useFeature, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -465,6 +466,24 @@ export function ProfilePage() {
             </div>
           </div>
         </GlassCard>
+
+        {/* Location Map */}
+        {profile.location && profile.latitude && profile.longitude && (
+          <LocationMapCard
+            title="Location"
+            locationText={profile.location}
+            markers={[{
+              id: profile.id,
+              lat: profile.latitude,
+              lng: profile.longitude,
+              title: `${profile.first_name} ${profile.last_name}`,
+            }]}
+            center={{ lat: profile.latitude, lng: profile.longitude }}
+            mapHeight="200px"
+            zoom={13}
+            className="mt-6"
+          />
+        )}
       </motion.div>
 
       {/* Stats Cards Row */}

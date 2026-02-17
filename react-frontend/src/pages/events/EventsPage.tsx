@@ -9,6 +9,8 @@ import { Button, Input, Select, SelectItem, Chip } from '@heroui/react';
 import {
   Search,
   Calendar,
+  List,
+  Map as MapIcon,
   MapPin,
   Users,
   Clock,
@@ -22,9 +24,11 @@ import {
   Star,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
+import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import type { Event } from '@/types/api';
@@ -62,6 +66,7 @@ export function EventsPage() {
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [filter, setFilter] = useState<EventFilter>('upcoming');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -223,6 +228,33 @@ export function EventsPage() {
             <SelectItem key="past">Past</SelectItem>
             <SelectItem key="all">All Events</SelectItem>
           </Select>
+
+          {MAPS_ENABLED && (
+            <div className="flex rounded-lg overflow-hidden border border-default-200" role="group" aria-label="View mode">
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className={`rounded-none ${viewMode === 'list' ? 'bg-primary/10 text-primary' : ''}`}
+                aria-label="List view"
+                aria-pressed={viewMode === 'list'}
+                onPress={() => setViewMode('list')}
+              >
+                <List className="w-4 h-4" aria-hidden="true" />
+              </Button>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className={`rounded-none ${viewMode === 'map' ? 'bg-primary/10 text-primary' : ''}`}
+                aria-label="Map view"
+                aria-pressed={viewMode === 'map'}
+                onPress={() => setViewMode('map')}
+              >
+                <MapIcon className="w-4 h-4" aria-hidden="true" />
+              </Button>
+            </div>
+          )}
         </div>
       </GlassCard>
 
@@ -267,7 +299,7 @@ export function EventsPage() {
         </GlassCard>
       )}
 
-      {/* Events List */}
+      {/* Events List / Map */}
       {!error && (
         <>
           {isLoading ? (
@@ -305,6 +337,28 @@ export function EventsPage() {
                   </Link>
                 )
               }
+            />
+          ) : viewMode === 'map' ? (
+            <EntityMapView
+              items={events}
+              getCoordinates={(e) =>
+                e.coordinates ? { lat: e.coordinates.lat, lng: e.coordinates.lng } : null
+              }
+              getMarkerConfig={(e) => ({
+                id: e.id,
+                title: e.title,
+              })}
+              renderInfoContent={(e) => (
+                <div className="p-2 max-w-[250px]">
+                  <h4 className="font-semibold text-sm text-gray-900">{e.title}</h4>
+                  {e.location && <p className="text-xs text-gray-500 mt-0.5">{e.location}</p>}
+                  <p className="text-xs text-gray-600 mt-1">
+                    {new Date(e.start_date).toLocaleDateString()}
+                  </p>
+                </div>
+              )}
+              isLoading={isLoading}
+              emptyMessage="No events with location data"
             />
           ) : (
             <motion.div

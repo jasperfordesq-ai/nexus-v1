@@ -60,6 +60,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { LocationMapCard } from '@/components/location';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -848,6 +849,24 @@ export function GroupDetailPage() {
             <span>Created <time dateTime={group.created_at}>{new Date(group.created_at).toLocaleDateString()}</time></span>
           </div>
         </div>
+
+        {/* Location Map */}
+        {group.location && group.latitude && group.longitude && (
+          <LocationMapCard
+            title="Group Location"
+            locationText={group.location}
+            markers={[{
+              id: group.id,
+              lat: group.latitude,
+              lng: group.longitude,
+              title: group.name,
+            }]}
+            center={{ lat: group.latitude, lng: group.longitude }}
+            mapHeight="250px"
+            zoom={14}
+            className="mt-6"
+          />
+        )}
 
         {/* Admin: Pending Requests Banner */}
         {userIsAdmin && isPrivateGroup && !requestsLoaded && (

@@ -1194,3 +1194,48 @@ export interface FederationSettings {
   travel_radius_km?: number;
   federation_optin?: boolean;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Map & Geolocation Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface NearbyListing extends Listing {
+  distance_km: number;
+}
+
+export interface NearbyEvent {
+  id: number;
+  title: string;
+  location?: string;
+  start_time: string;
+  latitude: number;
+  longitude: number;
+  distance_km: number;
+}
+
+export interface NearbyMember {
+  id: number;
+  first_name: string;
+  last_name: string;
+  avatar_url?: string | null;
+  tagline?: string;
+  location?: string;
+  latitude: number;
+  longitude: number;
+  distance_km: number;
+}
+
+export interface GeographicCluster {
+  lat: number;
+  lng: number;
+  count: number;
+  area: string;
+}
+
+export interface GeographyAnalytics {
+  member_locations: GeographicCluster[];
+  total_with_location: number;
+  total_members: number;
+  coverage_percentage: number;
+  top_areas: Array<{ area: string; count: number; percentage: number }>;
+}
