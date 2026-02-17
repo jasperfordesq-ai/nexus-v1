@@ -351,12 +351,20 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
             {/* Brand */}
             <Link to={tenantPath('/')} className="flex items-center gap-2">
-              <motion.div
-                whileHover={{ rotate: 180 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Hexagon className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
-              </motion.div>
+              {branding.logo ? (
+                <img
+                  src={branding.logo}
+                  alt={branding.name}
+                  className="h-8 sm:h-9 w-auto object-contain"
+                />
+              ) : (
+                <motion.div
+                  whileHover={{ rotate: 180 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Hexagon className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                </motion.div>
+              )}
               <span className="font-bold text-lg sm:text-xl text-gradient hidden min-[480px]:inline">
                 {branding.name}
               </span>

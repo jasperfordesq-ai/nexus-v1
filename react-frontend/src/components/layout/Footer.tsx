@@ -1,25 +1,32 @@
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTenant, useFeature } from '@/contexts';
-import { Hexagon } from 'lucide-react';
+import { Hexagon, Mail, Phone, MapPin } from 'lucide-react';
 
 export interface FooterProps {
   /** Footer content/links */
   children?: ReactNode;
-  /** Copyright text */
+  /** Copyright text override */
   copyright?: string;
 }
 
 /**
  * Footer - Glass-styled footer component
- * Theme-aware styling for light and dark modes
+ * Shows tenant branding, contact info, and footer_text from bootstrap API.
+ * Hidden on mobile (md:block) — mobile uses MobileDrawer for nav links.
  */
 export function Footer({ children, copyright }: FooterProps) {
-  const { branding, tenantPath } = useTenant();
+  const { tenant, branding, tenantPath } = useTenant();
   const hasEvents = useFeature('events');
   const hasBlog = useFeature('blog');
   const year = new Date().getFullYear();
-  const defaultCopyright = `© ${year} ${branding.name}. All rights reserved.`;
+
+  // Use tenant's footer_text from config if set, otherwise build a default
+  const footerText = tenant?.config?.footer_text?.trim()
+    || copyright
+    || `© ${year} ${branding.name}. All rights reserved.`;
+
+  const contact = tenant?.contact;
 
   return (
     <footer className="hidden md:block relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm">
@@ -30,15 +37,48 @@ export function Footer({ children, copyright }: FooterProps) {
           <div className="space-y-8">
             {/* Footer Links Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
-              {/* Brand */}
-              <div className="col-span-2 sm:col-span-1">
-                <Link to={tenantPath('/')} className="flex items-center gap-2 mb-3">
-                  <Hexagon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+              {/* Brand + Contact */}
+              <div className="col-span-2 sm:col-span-1 space-y-3">
+                <Link to={tenantPath('/')} className="flex items-center gap-2">
+                  {branding.logo ? (
+                    <img src={branding.logo} alt={branding.name} className="h-7 w-auto object-contain" />
+                  ) : (
+                    <Hexagon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                  )}
                   <span className="font-bold text-lg text-gradient">{branding.name}</span>
                 </Link>
                 <p className="text-sm text-theme-subtle">
                   {branding.tagline || 'Building stronger communities through the exchange of time.'}
                 </p>
+                {/* Contact info from tenant bootstrap */}
+                {contact && (
+                  <div className="space-y-1.5 pt-1">
+                    {contact.email && (
+                      <a
+                        href={`mailto:${contact.email}`}
+                        className="flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors"
+                      >
+                        <Mail className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+                        {contact.email}
+                      </a>
+                    )}
+                    {contact.phone && (
+                      <a
+                        href={`tel:${contact.phone}`}
+                        className="flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors"
+                      >
+                        <Phone className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+                        {contact.phone}
+                      </a>
+                    )}
+                    {contact.location && (
+                      <p className="flex items-center gap-1.5 text-sm text-theme-muted">
+                        <MapPin className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+                        {contact.location}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Platform */}
@@ -76,12 +116,8 @@ export function Footer({ children, copyright }: FooterProps) {
 
             {/* Bottom Bar */}
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className="text-sm text-theme-subtle">
-                {copyright || defaultCopyright}
-              </p>
-              <p className="text-xs text-theme-subtle">
-                Powered by Project NEXUS
-              </p>
+              <p className="text-sm text-theme-subtle">{footerText}</p>
+              <p className="text-xs text-theme-subtle">Powered by Project NEXUS</p>
             </div>
           </div>
         )}

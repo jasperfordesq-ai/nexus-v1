@@ -203,7 +203,11 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         {/* Header */}
         <DrawerHeader className="flex items-center justify-between">
           <Link to={tenantPath('/')} className="flex items-center gap-2">
-            <Hexagon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+            {branding.logo ? (
+              <img src={branding.logo} alt={branding.name} className="h-9 w-auto object-contain" />
+            ) : (
+              <Hexagon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+            )}
             <span className="font-bold text-xl text-gradient">{branding.name}</span>
           </Link>
           <Button
