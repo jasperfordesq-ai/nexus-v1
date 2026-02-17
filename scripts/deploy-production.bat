@@ -2,13 +2,17 @@
 REM =============================================================================
 REM Project NEXUS - Production Deployment Script (Windows)
 REM =============================================================================
-REM Deploys PHP backend and React frontend to Azure/Plesk server
+REM Deploys PHP backend and React frontend to Azure/Plesk server via git pull.
 REM
 REM Usage:
-REM   deploy-production.bat           - Full deployment
-REM   deploy-production.bat quick     - Code only (no rebuild)
-REM   deploy-production.bat init      - First-time setup
+REM   deploy-production.bat           - Full deployment (git pull + rebuild)
+REM   deploy-production.bat quick     - Code only (git pull + restart)
 REM   deploy-production.bat status    - Check status
+REM   deploy-production.bat nginx     - Update nginx config only
+REM
+REM Prerequisites:
+REM   - Push changes to GitHub first (git push origin main)
+REM   - Production server has git configured with deploy key
 REM =============================================================================
 
 setlocal EnableDelayedExpansion
@@ -26,29 +30,22 @@ if not exist "%SSH_KEY%" (
 )
 
 REM Parse arguments
-if "%1"=="init" goto :init
 if "%1"=="quick" goto :quick
 if "%1"=="status" goto :status
 if "%1"=="nginx" goto :nginx
 goto :full
 
-:init
-echo [INFO] Running initial setup...
-ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %SERVER_USER%@%SERVER_HOST% "sudo mkdir -p %REMOTE_PATH% && sudo chown %SERVER_USER%:%SERVER_USER% %REMOTE_PATH% && mkdir -p %REMOTE_PATH%/{httpdocs,src,views,config,react-frontend,vendor,migrations,scripts}"
-echo [INFO] Initial setup complete. Now run without 'init' to deploy.
-goto :end
-
 :quick
-echo [INFO] Quick deployment (code sync + restart)...
-call :sync_files
-echo [INFO] Restarting containers...
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo docker compose restart app frontend"
+echo [INFO] Quick deployment (git pull + restart)...
+call :git_pull
+echo [INFO] Restarting PHP container (OPCache clear)...
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo docker restart nexus-php-app"
 call :health_check
 goto :end
 
 :status
 echo [INFO] Checking deployment status...
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo docker compose ps && echo && sudo docker compose logs --tail=20 app"
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && echo '=== Git Status ===' && sudo git log --oneline -3 && echo && echo '=== Containers ===' && sudo docker ps --format 'table {{.Names}}\t{{.Status}}' | grep nexus && echo && echo '=== Recent Logs ===' && sudo docker compose logs --tail=10 app 2>/dev/null"
 goto :end
 
 :nginx
@@ -58,25 +55,36 @@ goto :end
 
 :full
 echo [INFO] Starting full deployment...
-call :sync_files
+echo.
+echo [STEP 1/5] Pulling latest code from GitHub...
+call :git_pull
+echo.
+echo [STEP 2/5] Installing PHP dependencies...
 call :install_deps
+echo.
+echo [STEP 3/5] Building containers (--no-cache)...
 call :build_start
+echo.
+echo [STEP 4/5] Configuring Nginx...
 call :configure_nginx
+echo.
+echo [STEP 5/5] Health checks...
 call :health_check
 echo.
+echo ================================================================
 echo [SUCCESS] Deployment complete!
+echo ================================================================
 echo.
-echo URLs:
 echo   API:      https://api.project-nexus.ie
 echo   Frontend: https://app.project-nexus.ie
+echo.
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && echo 'Deployed commit:' && sudo git log --oneline -1"
 goto :end
 
-:sync_files
-echo [INFO] Syncing files to server...
-REM Using scp for Windows compatibility (rsync not always available)
-scp -i "%SSH_KEY%" -r httpdocs src views config migrations scripts Dockerfile Dockerfile.prod compose.prod.yml composer.json composer.lock %SERVER_USER%@%SERVER_HOST%:%REMOTE_PATH%/
-scp -i "%SSH_KEY%" -r react-frontend\src react-frontend\public react-frontend\package.json react-frontend\package-lock.json react-frontend\Dockerfile.prod react-frontend\nginx.conf react-frontend\vite.config.ts react-frontend\tsconfig.json %SERVER_USER%@%SERVER_HOST%:%REMOTE_PATH%/react-frontend/
-echo [INFO] Files synced
+:git_pull
+echo [INFO] Pulling latest from GitHub...
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo git fetch origin main && sudo git reset --hard origin/main && echo 'Now at:' && sudo git log --oneline -1"
+echo [INFO] Code synced via git
 goto :eof
 
 :install_deps
@@ -86,9 +94,9 @@ echo [INFO] Dependencies installed
 goto :eof
 
 :build_start
-echo [INFO] Building and starting containers...
+echo [INFO] Building and starting containers (--no-cache)...
 ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && cp compose.prod.yml compose.yml && sudo docker compose build --no-cache && sudo docker compose up -d"
-echo [INFO] Containers started
+echo [INFO] Containers rebuilt and started
 goto :eof
 
 :configure_nginx
@@ -100,7 +108,7 @@ echo [INFO] Nginx configured
 goto :eof
 
 :health_check
-echo [INFO] Running health checks...
+echo [INFO] Running health checks (waiting 5s for containers)...
 timeout /t 5 /nobreak > nul
 ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:8090/health.php && echo ' - API OK' || echo ' - API FAILED'"
 ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:3000/ > /dev/null && echo 'Frontend OK' || echo 'Frontend FAILED'"

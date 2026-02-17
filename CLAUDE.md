@@ -531,7 +531,7 @@ Toggle light/dark mode via the sun/moon icon in the Navbar, or set `theme` in br
 | **User** | `azureuser` |
 | **SSH Key** | `C:\ssh-keys\project-nexus.pem` |
 | **Deploy Path** | `/opt/nexus-php/` |
-| **Method** | Docker containers |
+| **Method** | Git pull + Docker rebuild |
 | **Plesk Panel** | <https://20.224.171.253:8443> |
 
 #### Production Domains
@@ -544,18 +544,32 @@ Toggle light/dark mode via the sun/moon icon in the Navbar, or set `theme` in br
 
 #### Deploy to Azure (Production)
 
-```bash
-# Windows
-scripts\deploy-production.bat           # Full deployment
-scripts\deploy-production.bat quick     # Code sync + restart only
-scripts\deploy-production.bat init      # First-time setup
-scripts\deploy-production.bat status    # Check container status
+Production uses **git pull** from GitHub (deploy key configured). Workflow:
 
-# Linux/Git Bash
-./scripts/deploy-production.sh          # Full deployment
-./scripts/deploy-production.sh --quick  # Code sync + restart only
-./scripts/deploy-production.sh --init   # First-time setup
-./scripts/deploy-production.sh --nginx  # Update nginx config only
+```bash
+# 1. Push changes to GitHub (pre-push hook validates build)
+git push origin main
+
+# 2. Deploy to production
+scripts\deploy-production.bat           # Full: git pull + rebuild + nginx + health check
+scripts\deploy-production.bat quick     # Quick: git pull + restart (OPCache clear)
+scripts\deploy-production.bat status    # Check git commit + containers + logs
+scripts\deploy-production.bat nginx     # Update nginx config only
+```
+
+**Manual deployment on server:**
+```bash
+ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253
+cd /opt/nexus-php
+
+# Pull latest code
+sudo git fetch origin main && sudo git reset --hard origin/main
+
+# Rebuild React frontend (ALWAYS --no-cache)
+sudo docker compose build --no-cache frontend && sudo docker compose up -d frontend
+
+# Restart PHP (OPCache clear)
+sudo docker restart nexus-php-app
 ```
 
 #### SSH to Azure
@@ -1122,9 +1136,11 @@ php scripts/backup_database.php    # Backup
 php scripts/safe_migrate.php       # Run migrations
 php scripts/seed_database.php      # Seed data
 
-# Deployment (Azure)
-scripts\deploy-production.bat          # Full deployment
-scripts\deploy-production.bat quick    # Code sync + restart only
+# Deployment (Azure) — git-based
+git push origin main                         # Push to GitHub (pre-push hook validates build)
+scripts\deploy-production.bat                # Full: git pull + rebuild + health check
+scripts\deploy-production.bat quick          # Quick: git pull + restart (OPCache clear)
+scripts\deploy-production.bat status         # Check git commit + container status
 ```
 
 ## Regression Prevention System
