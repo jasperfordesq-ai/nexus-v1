@@ -681,7 +681,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       if (k === 'logout') { handleLogout(); return; }
                       if (k === 'profile-header') return;
                       if (k === 'admin-panel') { if (isAdmin) dropdownNavigate('/admin'); return; }
-                      if (k === 'legacy-admin') { if (isAdmin) { closeAllDropdowns(); const t = tokenManager.getAccessToken(); const apiBase = API_BASE.startsWith('http') ? API_BASE.replace(/\/+$/, '') : window.location.origin + (API_BASE.startsWith('/') ? API_BASE : '/' + API_BASE).replace(/\/+$/, ''); window.location.href = t ? `${apiBase}/auth/admin-session?token=${encodeURIComponent(t)}&redirect=/admin-legacy` : `${apiBase.replace(/\/api$/, '')}/admin-legacy`; } return; }
+                      if (k === 'legacy-admin') { if (isAdmin) { closeAllDropdowns(); const t = tokenManager.getAccessToken(); window.location.href = t ? `${window.location.origin}/api/auth/admin-session?token=${encodeURIComponent(t)}&redirect=/admin-legacy` : `${window.location.origin}/admin-legacy`; } return; }
                       dropdownNavigate(k);
                     }}
                   >
