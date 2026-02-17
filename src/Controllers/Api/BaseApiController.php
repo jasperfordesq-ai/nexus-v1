@@ -631,6 +631,26 @@ abstract class BaseApiController
     }
 
     /**
+     * Require broker/admin role for broker control endpoints.
+     * Extends requireAdmin() to also allow tenant_admin, because tenant admins
+     * are the primary users of broker controls but don't have the 'admin' role.
+     *
+     * @return int User ID
+     */
+    protected function requireBrokerAdmin(): int
+    {
+        $userId = $this->requireAuth();
+
+        $role = $this->getAuthenticatedUserRole() ?? 'member';
+
+        if (!in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])) {
+            $this->error('Admin access required', 403, ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS);
+        }
+
+        return $userId;
+    }
+
+    /**
      * Require super admin role
      * Only allows super_admin or god roles
      *

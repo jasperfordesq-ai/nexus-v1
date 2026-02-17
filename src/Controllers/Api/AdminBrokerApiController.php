@@ -4,6 +4,7 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Services\ExchangeWorkflowService;
 
 /**
  * AdminBrokerApiController - V2 API for React admin broker controls
@@ -36,7 +37,7 @@ class AdminBrokerApiController extends BaseApiController
      */
     public function dashboard(): void
     {
-        $this->requireAdmin();
+        $this->requireBrokerAdmin();
         $tenantId = TenantContext::getId();
 
         // Pending exchanges
@@ -156,7 +157,7 @@ class AdminBrokerApiController extends BaseApiController
      */
     public function exchanges(): void
     {
-        $this->requireAdmin();
+        $this->requireBrokerAdmin();
         $tenantId = TenantContext::getId();
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
@@ -210,12 +211,12 @@ class AdminBrokerApiController extends BaseApiController
      */
     public function approveExchange(int $id): void
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerAdmin();
         $tenantId = TenantContext::getId();
         $notes = $this->input('notes', '');
 
         try {
-            // Verify the exchange belongs to this tenant and is pending
+            // Verify the exchange belongs to this tenant and is pending broker approval
             $exchange = Database::query(
                 "SELECT id, status FROM exchange_requests WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
@@ -231,12 +232,16 @@ class AdminBrokerApiController extends BaseApiController
                 return;
             }
 
-            Database::query(
-                "UPDATE exchange_requests SET status = 'approved', broker_id = ?, broker_notes = ?, broker_approved_at = NOW() WHERE id = ? AND tenant_id = ?",
-                [$adminId, $notes, $id, $tenantId]
-            );
+            // Delegate to ExchangeWorkflowService so status transitions, history, and
+            // notifications all run through the standard workflow engine.
+            $success = ExchangeWorkflowService::approveExchange($id, $adminId, $notes);
 
-            $this->respondWithData(['id' => $id, 'status' => 'approved']);
+            if (!$success) {
+                $this->respondWithError('SERVER_ERROR', 'Failed to approve exchange', null, 500);
+                return;
+            }
+
+            $this->respondWithData(['id' => $id, 'status' => 'accepted']);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to approve exchange', null, 500);
         }
@@ -249,7 +254,7 @@ class AdminBrokerApiController extends BaseApiController
      */
     public function rejectExchange(int $id): void
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerAdmin();
         $tenantId = TenantContext::getId();
         $reason = $this->input('reason', '');
 
@@ -259,7 +264,7 @@ class AdminBrokerApiController extends BaseApiController
         }
 
         try {
-            // Verify the exchange belongs to this tenant and is pending
+            // Verify the exchange belongs to this tenant and is pending broker approval
             $exchange = Database::query(
                 "SELECT id, status FROM exchange_requests WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
@@ -275,12 +280,16 @@ class AdminBrokerApiController extends BaseApiController
                 return;
             }
 
-            Database::query(
-                "UPDATE exchange_requests SET status = 'rejected', broker_id = ?, broker_notes = ? WHERE id = ? AND tenant_id = ?",
-                [$adminId, $reason, $id, $tenantId]
-            );
+            // Delegate to ExchangeWorkflowService so status transitions, history, and
+            // notifications all run through the standard workflow engine.
+            $success = ExchangeWorkflowService::rejectExchange($id, $adminId, $reason);
 
-            $this->respondWithData(['id' => $id, 'status' => 'rejected']);
+            if (!$success) {
+                $this->respondWithError('SERVER_ERROR', 'Failed to reject exchange', null, 500);
+                return;
+            }
+
+            $this->respondWithData(['id' => $id, 'status' => 'cancelled']);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to reject exchange', null, 500);
         }
@@ -294,7 +303,7 @@ class AdminBrokerApiController extends BaseApiController
      */
     public function riskTags(): void
     {
-        $this->requireAdmin();
+        $this->requireBrokerAdmin();
         $tenantId = TenantContext::getId();
         $riskLevel = $this->query('risk_level');
 
@@ -333,7 +342,7 @@ class AdminBrokerApiController extends BaseApiController
      */
     public function messages(): void
     {
-        $this->requireAdmin();
+        $this->requireBrokerAdmin();
         $tenantId = TenantContext::getId();
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
@@ -392,7 +401,7 @@ class AdminBrokerApiController extends BaseApiController
      */
     public function reviewMessage(int $id): void
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerAdmin();
         $tenantId = TenantContext::getId();
 
         try {
@@ -425,7 +434,7 @@ class AdminBrokerApiController extends BaseApiController
      */
     public function monitoring(): void
     {
-        $this->requireAdmin();
+        $this->requireBrokerAdmin();
         $tenantId = TenantContext::getId();
 
         try {
@@ -434,7 +443,7 @@ class AdminBrokerApiController extends BaseApiController
                     CONCAT(u.first_name, ' ', u.last_name) as user_name
                 FROM user_messaging_restrictions umr
                 LEFT JOIN users u ON umr.user_id = u.id
-                WHERE umr.tenant_id = ?
+                WHERE umr.tenant_id = ? AND umr.under_monitoring = 1
                 ORDER BY umr.monitoring_started_at DESC",
                 [$tenantId]
             )->fetchAll();
