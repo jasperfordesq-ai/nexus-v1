@@ -17,7 +17,7 @@ import {
   ModalFooter,
   Textarea,
 } from '@heroui/react';
-import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Eye } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';
@@ -161,6 +161,17 @@ export function ExchangeManagement() {
       label: 'Actions',
       render: (item) => (
         <div className="flex gap-1">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            color="default"
+            as={Link}
+            to={tenantPath(`/admin/broker-controls/exchanges/${item.id}`)}
+            aria-label="View exchange details"
+          >
+            <Eye size={14} />
+          </Button>
           {item.status === 'pending_broker' && (
             <>
               <Button
@@ -221,6 +232,7 @@ export function ExchangeManagement() {
           <Tab key="in_progress" title="In Progress" />
           <Tab key="completed" title="Completed" />
           <Tab key="cancelled" title="Cancelled" />
+          <Tab key="disputed" title="Disputed" />
         </Tabs>
       </div>
 

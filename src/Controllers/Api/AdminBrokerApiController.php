@@ -44,7 +44,7 @@ class AdminBrokerApiController extends BaseApiController
         $pendingExchanges = 0;
         try {
             $row = Database::query(
-                "SELECT COUNT(*) as cnt FROM exchange_requests WHERE tenant_id = ? AND status = 'pending_broker'",
+                "SELECT COUNT(*) as cnt FROM exchange_requests WHERE tenant_id = ? AND status IN ('pending_broker', 'disputed')",
                 [$tenantId]
             )->fetch();
             $pendingExchanges = (int) ($row['cnt'] ?? 0);
@@ -456,6 +456,389 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData($items);
         } catch (\Exception $e) {
             $this->respondWithData([]);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/broker/messages/{id}/flag
+     *
+     * Flag a broker message copy with a reason and severity.
+     * Body: { reason: string (required), severity: 'concern'|'serious'|'urgent' }
+     */
+    public function flagMessage(int $id): void
+    {
+        $adminId = $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+        $reason = trim($this->input('reason', ''));
+        $severity = $this->input('severity', 'concern');
+
+        if (empty($reason)) {
+            $this->respondWithError('VALIDATION_ERROR', 'A reason is required to flag a message', 'reason');
+            return;
+        }
+
+        $allowedSeverities = ['concern', 'serious', 'urgent'];
+        if (!in_array($severity, $allowedSeverities)) {
+            $severity = 'concern';
+        }
+
+        try {
+            $message = Database::query(
+                "SELECT id FROM broker_message_copies WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$message) {
+                $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+                return;
+            }
+
+            Database::query(
+                "UPDATE broker_message_copies SET flagged = 1, flag_reason = ?, flag_severity = ?, reviewed_by = ?, reviewed_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$reason, $severity, $adminId, $id, $tenantId]
+            );
+
+            $this->respondWithData(['id' => $id, 'flagged' => true, 'flag_reason' => $reason, 'flag_severity' => $severity]);
+        } catch (\Exception $e) {
+            $this->respondWithError('SERVER_ERROR', 'Failed to flag message', null, 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/broker/monitoring/{userId}
+     *
+     * Set or remove monitoring for a user.
+     * Body: { under_monitoring: bool, reason?: string, messaging_disabled?: bool }
+     * If under_monitoring is false, removes monitoring.
+     */
+    public function setMonitoring(int $userId): void
+    {
+        $adminId = $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+        $underMonitoring = (bool) $this->input('under_monitoring', true);
+        $reason = trim($this->input('reason', ''));
+        $messagingDisabled = (bool) $this->input('messaging_disabled', false);
+
+        try {
+            // Verify user belongs to this tenant
+            $user = Database::query(
+                "SELECT id FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
+            )->fetch();
+
+            if (!$user) {
+                $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+                return;
+            }
+
+            // Check if record already exists
+            $existing = Database::query(
+                "SELECT id FROM user_messaging_restrictions WHERE user_id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
+            )->fetch();
+
+            if ($underMonitoring) {
+                if (empty($reason)) {
+                    $this->respondWithError('VALIDATION_ERROR', 'A reason is required to set monitoring', 'reason');
+                    return;
+                }
+
+                if ($existing) {
+                    Database::query(
+                        "UPDATE user_messaging_restrictions SET under_monitoring = 1, monitoring_reason = ?, messaging_disabled = ?, monitoring_started_at = NOW(), restricted_by = ? WHERE user_id = ? AND tenant_id = ?",
+                        [$reason, $messagingDisabled ? 1 : 0, $adminId, $userId, $tenantId]
+                    );
+                } else {
+                    Database::query(
+                        "INSERT INTO user_messaging_restrictions (user_id, tenant_id, under_monitoring, monitoring_reason, messaging_disabled, monitoring_started_at, restricted_by) VALUES (?, ?, 1, ?, ?, NOW(), ?)",
+                        [$userId, $tenantId, $reason, $messagingDisabled ? 1 : 0, $adminId]
+                    );
+                }
+                $this->respondWithData(['user_id' => $userId, 'under_monitoring' => true]);
+            } else {
+                if ($existing) {
+                    Database::query(
+                        "UPDATE user_messaging_restrictions SET under_monitoring = 0, monitoring_reason = NULL, monitoring_started_at = NULL WHERE user_id = ? AND tenant_id = ?",
+                        [$userId, $tenantId]
+                    );
+                }
+                $this->respondWithData(['user_id' => $userId, 'under_monitoring' => false]);
+            }
+        } catch (\Exception $e) {
+            $this->respondWithError('SERVER_ERROR', 'Failed to update monitoring', null, 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/broker/risk-tags/{listingId}
+     *
+     * Create or update a risk tag for a listing.
+     * Body: { risk_level, risk_category, risk_notes?, member_visible_notes?, requires_approval?, insurance_required?, dbs_required? }
+     */
+    public function saveRiskTag(int $listingId): void
+    {
+        $adminId = $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+
+        $riskLevel = $this->input('risk_level', 'low');
+        $riskCategory = trim($this->input('risk_category', ''));
+        $riskNotes = trim($this->input('risk_notes', ''));
+        $memberVisibleNotes = trim($this->input('member_visible_notes', ''));
+        $requiresApproval = (bool) $this->input('requires_approval', false);
+        $insuranceRequired = (bool) $this->input('insurance_required', false);
+        $dbsRequired = (bool) $this->input('dbs_required', false);
+
+        $allowedLevels = ['low', 'medium', 'high', 'critical'];
+        if (!in_array($riskLevel, $allowedLevels)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Invalid risk level', 'risk_level');
+            return;
+        }
+
+        if (empty($riskCategory)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Risk category is required', 'risk_category');
+            return;
+        }
+
+        try {
+            // Verify listing belongs to this tenant
+            $listing = Database::query(
+                "SELECT id FROM listings WHERE id = ? AND tenant_id = ?",
+                [$listingId, $tenantId]
+            )->fetch();
+
+            if (!$listing) {
+                $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+                return;
+            }
+
+            // Upsert
+            $existing = Database::query(
+                "SELECT id FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
+                [$listingId, $tenantId]
+            )->fetch();
+
+            if ($existing) {
+                Database::query(
+                    "UPDATE listing_risk_tags SET risk_level = ?, risk_category = ?, risk_notes = ?, member_visible_notes = ?, requires_approval = ?, insurance_required = ?, dbs_required = ?, tagged_by = ?, updated_at = NOW() WHERE listing_id = ? AND tenant_id = ?",
+                    [$riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId, $listingId, $tenantId]
+                );
+                $tagId = $existing['id'];
+            } else {
+                Database::query(
+                    "INSERT INTO listing_risk_tags (listing_id, tenant_id, risk_level, risk_category, risk_notes, member_visible_notes, requires_approval, insurance_required, dbs_required, tagged_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                    [$listingId, $tenantId, $riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId]
+                );
+                $tagId = Database::lastInsertId();
+            }
+
+            $this->respondWithData(['id' => $tagId, 'listing_id' => $listingId, 'risk_level' => $riskLevel]);
+        } catch (\Exception $e) {
+            $this->respondWithError('SERVER_ERROR', 'Failed to save risk tag', null, 500);
+        }
+    }
+
+    /**
+     * DELETE /api/v2/admin/broker/risk-tags/{listingId}
+     *
+     * Remove a risk tag from a listing.
+     */
+    public function removeRiskTag(int $listingId): void
+    {
+        $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+
+        try {
+            $existing = Database::query(
+                "SELECT id FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
+                [$listingId, $tenantId]
+            )->fetch();
+
+            if (!$existing) {
+                $this->respondWithError('NOT_FOUND', 'Risk tag not found', null, 404);
+                return;
+            }
+
+            Database::query(
+                "DELETE FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
+                [$listingId, $tenantId]
+            );
+
+            $this->respondWithData(['listing_id' => $listingId, 'removed' => true]);
+        } catch (\Exception $e) {
+            $this->respondWithError('SERVER_ERROR', 'Failed to remove risk tag', null, 500);
+        }
+    }
+
+    /**
+     * GET /api/v2/admin/broker/configuration
+     *
+     * Return the broker configuration for this tenant.
+     * Reads from tenant_settings table (key = 'broker_config') or returns defaults.
+     */
+    public function getConfiguration(): void
+    {
+        $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+
+        $defaults = [
+            // Messaging
+            'broker_messaging_enabled' => true,
+            'broker_copy_all_messages' => false,
+            'broker_copy_threshold_hours' => 5,
+            // Risk Tagging
+            'risk_tagging_enabled' => true,
+            'auto_flag_high_risk' => true,
+            'require_approval_high_risk' => false,
+            // Exchange Workflow
+            'broker_approval_required' => true,
+            'auto_approve_low_risk' => false,
+            'exchange_timeout_days' => 7,
+            // Broker Visibility
+            'broker_visible_to_members' => false,
+            'show_broker_name' => false,
+            'broker_contact_email' => '',
+        ];
+
+        try {
+            $row = Database::query(
+                "SELECT setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'broker_config'",
+                [$tenantId]
+            )->fetch();
+
+            $config = $defaults;
+            if ($row && !empty($row['setting_value'])) {
+                $saved = json_decode($row['setting_value'], true) ?? [];
+                $config = array_merge($defaults, $saved);
+            }
+
+            $this->respondWithData($config);
+        } catch (\Exception $e) {
+            $this->respondWithData($defaults);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/broker/configuration
+     *
+     * Save the broker configuration for this tenant.
+     * Body: flat object with any/all config keys.
+     */
+    public function saveConfiguration(): void
+    {
+        $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+
+        $body = $this->getJsonInput();
+
+        // Whitelist allowed keys
+        $allowedKeys = [
+            'broker_messaging_enabled', 'broker_copy_all_messages', 'broker_copy_threshold_hours',
+            'risk_tagging_enabled', 'auto_flag_high_risk', 'require_approval_high_risk',
+            'broker_approval_required', 'auto_approve_low_risk', 'exchange_timeout_days',
+            'broker_visible_to_members', 'show_broker_name', 'broker_contact_email',
+        ];
+
+        $config = [];
+        foreach ($allowedKeys as $key) {
+            if (array_key_exists($key, $body)) {
+                $config[$key] = $body[$key];
+            }
+        }
+
+        try {
+            $existing = Database::query(
+                "SELECT id FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'broker_config'",
+                [$tenantId]
+            )->fetch();
+
+            $json = json_encode($config);
+            if ($existing) {
+                Database::query(
+                    "UPDATE tenant_settings SET setting_value = ?, updated_at = NOW() WHERE tenant_id = ? AND setting_key = 'broker_config'",
+                    [$json, $tenantId]
+                );
+            } else {
+                Database::query(
+                    "INSERT INTO tenant_settings (tenant_id, setting_key, setting_value, created_at, updated_at) VALUES (?, 'broker_config', ?, NOW(), NOW())",
+                    [$tenantId, $json]
+                );
+            }
+
+            $this->respondWithData($config);
+        } catch (\Exception $e) {
+            $this->respondWithError('SERVER_ERROR', 'Failed to save configuration', null, 500);
+        }
+    }
+
+    /**
+     * GET /api/v2/admin/broker/exchanges/{id}
+     *
+     * Return full detail for a single exchange request including history timeline.
+     */
+    public function showExchange(int $id): void
+    {
+        $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+
+        try {
+            $exchange = Database::query(
+                "SELECT er.*,
+                    CONCAT(req.first_name, ' ', req.last_name) as requester_name,
+                    req.email as requester_email,
+                    req.avatar as requester_avatar,
+                    CONCAT(prov.first_name, ' ', prov.last_name) as provider_name,
+                    prov.email as provider_email,
+                    prov.avatar as provider_avatar,
+                    l.title as listing_title,
+                    l.listing_type,
+                    l.hours_offered
+                FROM exchange_requests er
+                JOIN users req ON er.requester_id = req.id
+                JOIN users prov ON er.provider_id = prov.id
+                LEFT JOIN listings l ON er.listing_id = l.id
+                WHERE er.id = ? AND er.tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$exchange) {
+                $this->respondWithError('NOT_FOUND', 'Exchange request not found', null, 404);
+                return;
+            }
+
+            // Fetch history/timeline
+            $history = [];
+            try {
+                $history = Database::query(
+                    "SELECT eh.*,
+                        CONCAT(u.first_name, ' ', u.last_name) as actor_name
+                    FROM exchange_history eh
+                    LEFT JOIN users u ON eh.actor_id = u.id
+                    WHERE eh.exchange_id = ?
+                    ORDER BY eh.created_at ASC",
+                    [$id]
+                )->fetchAll();
+            } catch (\Exception $e) {
+                // exchange_history table may not exist
+            }
+
+            // Risk tag for the listing
+            $riskTag = null;
+            if (!empty($exchange['listing_id'])) {
+                try {
+                    $riskTag = Database::query(
+                        "SELECT * FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
+                        [$exchange['listing_id'], $tenantId]
+                    )->fetch() ?: null;
+                } catch (\Exception $e) {}
+            }
+
+            $this->respondWithData([
+                'exchange' => $exchange,
+                'history' => $history,
+                'risk_tag' => $riskTag,
+            ]);
+        } catch (\Exception $e) {
+            $this->respondWithError('SERVER_ERROR', 'Failed to load exchange', null, 500);
         }
     }
 }

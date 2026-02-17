@@ -6,7 +6,20 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Tabs, Tab, Button, Chip } from '@heroui/react';
+import {
+  Tabs,
+  Tab,
+  Button,
+  Chip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Textarea,
+  Select,
+  SelectItem,
+} from '@heroui/react';
 import { ArrowLeft, CheckCircle, Flag } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -25,6 +38,13 @@ export function MessageReview() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState('unreviewed');
   const [reviewingId, setReviewingId] = useState<number | null>(null);
+
+  // Flag modal state
+  const [flagModalOpen, setFlagModalOpen] = useState(false);
+  const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
+  const [flagReason, setFlagReason] = useState('');
+  const [flagSeverity, setFlagSeverity] = useState<'concern' | 'serious' | 'urgent'>('concern');
+  const [flagLoading, setFlagLoading] = useState(false);
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -63,6 +83,36 @@ export function MessageReview() {
       toast.error('Failed to mark message as reviewed');
     } finally {
       setReviewingId(null);
+    }
+  };
+
+  const openFlagModal = (id: number) => {
+    setSelectedMessageId(id);
+    setFlagReason('');
+    setFlagSeverity('concern');
+    setFlagModalOpen(true);
+  };
+
+  const handleFlag = async () => {
+    if (!selectedMessageId) return;
+    if (!flagReason.trim()) {
+      toast.error('A reason is required to flag a message');
+      return;
+    }
+    setFlagLoading(true);
+    try {
+      const res = await adminBroker.flagMessage(selectedMessageId, flagReason, flagSeverity);
+      if (res?.success) {
+        toast.success('Message flagged successfully');
+        setFlagModalOpen(false);
+        loadItems();
+      } else {
+        toast.error(res?.error || 'Failed to flag message');
+      }
+    } catch {
+      toast.error('Failed to flag message');
+    } finally {
+      setFlagLoading(false);
     }
   };
 
@@ -154,6 +204,18 @@ export function MessageReview() {
               Review
             </Button>
           )}
+          {!item.flagged && (
+            <Button
+              size="sm"
+              variant="flat"
+              color="warning"
+              startContent={<Flag size={14} />}
+              onPress={() => openFlagModal(item.id)}
+              aria-label="Flag message"
+            >
+              Flag
+            </Button>
+          )}
         </div>
       ),
     },
@@ -201,6 +263,61 @@ export function MessageReview() {
         pageSize={20}
         onPageChange={setPage}
       />
+
+      {/* Flag Message Modal */}
+      <Modal
+        isOpen={flagModalOpen}
+        onClose={() => setFlagModalOpen(false)}
+        size="md"
+      >
+        <ModalContent>
+          <ModalHeader className="flex items-center gap-2">
+            <Flag size={20} className="text-warning" />
+            Flag Message
+          </ModalHeader>
+          <ModalBody>
+            <Textarea
+              label="Reason (required)"
+              placeholder="Describe why this message is being flagged..."
+              value={flagReason}
+              onValueChange={setFlagReason}
+              minRows={3}
+              variant="bordered"
+              isRequired
+            />
+            <Select
+              label="Severity"
+              selectedKeys={[flagSeverity]}
+              onSelectionChange={(keys) => {
+                const val = Array.from(keys)[0] as 'concern' | 'serious' | 'urgent';
+                if (val) setFlagSeverity(val);
+              }}
+              variant="bordered"
+            >
+              <SelectItem key="concern">Concern</SelectItem>
+              <SelectItem key="serious">Serious</SelectItem>
+              <SelectItem key="urgent">Urgent</SelectItem>
+            </Select>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              onPress={() => setFlagModalOpen(false)}
+              isDisabled={flagLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              color="warning"
+              onPress={handleFlag}
+              isLoading={flagLoading}
+              startContent={!flagLoading && <Flag size={14} />}
+            >
+              Flag Message
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
