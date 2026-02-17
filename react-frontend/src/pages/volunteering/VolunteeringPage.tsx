@@ -208,17 +208,15 @@ function OpportunitiesTab() {
       );
 
       if (response.success && response.data) {
-        const responseData = response.data as unknown as { data?: Opportunity[]; meta?: { cursor: string | null; has_more: boolean } };
-        const items = responseData.data ?? (response.data as unknown as Opportunity[]);
-        const resMeta = responseData.meta;
+        const items = Array.isArray(response.data) ? response.data : [];
 
         if (append) {
-          setOpportunities((prev) => [...prev, ...(Array.isArray(items) ? items : [])]);
+          setOpportunities((prev) => [...prev, ...items]);
         } else {
-          setOpportunities(Array.isArray(items) ? items : []);
+          setOpportunities(items);
         }
-        setHasMore(resMeta?.has_more ?? false);
-        setCursor(resMeta?.cursor ?? undefined);
+        setHasMore(response.meta?.has_more ?? false);
+        setCursor(response.meta?.cursor ?? undefined);
       } else {
         if (!append) setError('Failed to load opportunities.');
       }
@@ -524,17 +522,15 @@ function ApplicationsTab() {
       );
 
       if (response.success && response.data) {
-        const responseData = response.data as unknown as { data?: Application[]; meta?: { cursor: string | null; has_more: boolean } };
-        const items = responseData.data ?? (response.data as unknown as Application[]);
-        const resMeta = responseData.meta;
+        const items = Array.isArray(response.data) ? response.data : [];
 
         if (append) {
-          setApplications((prev) => [...prev, ...(Array.isArray(items) ? items : [])]);
+          setApplications((prev) => [...prev, ...items]);
         } else {
-          setApplications(Array.isArray(items) ? items : []);
+          setApplications(items);
         }
-        setHasMore(resMeta?.has_more ?? false);
-        setCursor(resMeta?.cursor ?? undefined);
+        setHasMore(response.meta?.has_more ?? false);
+        setCursor(response.meta?.cursor ?? undefined);
       } else {
         if (!append) setError('Failed to load applications.');
       }
@@ -759,8 +755,7 @@ function HoursTab() {
       }
 
       if (orgsRes.success && orgsRes.data) {
-        const orgsData = orgsRes.data as unknown as { data?: Organization[] };
-        setOrganisations(Array.isArray(orgsData.data) ? orgsData.data : (Array.isArray(orgsRes.data) ? orgsRes.data as unknown as Organization[] : []));
+        setOrganisations(Array.isArray(orgsRes.data) ? orgsRes.data as Organization[] : []);
       }
     } catch (err) {
       logError('Failed to load hours summary', err);

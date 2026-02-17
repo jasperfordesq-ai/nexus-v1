@@ -134,10 +134,9 @@ export function ResourcesPage() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const response = await api.get<{ data: ResourceCategory[] }>('/v2/resources/categories');
+        const response = await api.get<ResourceCategory[]>('/v2/resources/categories');
         if (response.success && response.data) {
-          const data = response.data as unknown as { data?: ResourceCategory[] };
-          setCategories(data.data ?? (response.data as unknown as ResourceCategory[]));
+          setCategories(Array.isArray(response.data) ? response.data : []);
         }
       } catch (err) {
         logError('Failed to load resource categories', err);
@@ -161,22 +160,20 @@ export function ResourcesPage() {
       if (searchQuery.trim()) params.set('search', searchQuery.trim());
       if (selectedCategory) params.set('category_id', String(selectedCategory));
 
-      const response = await api.get<{ data: Resource[]; meta: { cursor: string | null; has_more: boolean } }>(
+      const response = await api.get<Resource[]>(
         `/v2/resources?${params}`
       );
 
       if (response.success && response.data) {
-        const responseData = response.data as unknown as { data?: Resource[]; meta?: { cursor: string | null; has_more: boolean } };
-        const items = responseData.data ?? (response.data as unknown as Resource[]);
-        const resMeta = responseData.meta;
+        const items = Array.isArray(response.data) ? response.data : [];
 
         if (append) {
-          setResources((prev) => [...prev, ...(Array.isArray(items) ? items : [])]);
+          setResources((prev) => [...prev, ...items]);
         } else {
-          setResources(Array.isArray(items) ? items : []);
+          setResources(items);
         }
-        setHasMore(resMeta?.has_more ?? false);
-        setCursor(resMeta?.cursor ?? undefined);
+        setHasMore(response.meta?.has_more ?? false);
+        setCursor(response.meta?.cursor ?? undefined);
       } else {
         if (!append) setError('Failed to load resources.');
       }

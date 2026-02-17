@@ -24,6 +24,8 @@ import {
 } from 'react';
 import { api, tokenManager, fetchCsrfToken } from '@/lib/api';
 import { detectTenantFromUrl, tenantPath as buildTenantPath } from '@/lib/tenant-routing';
+import { validateResponseIfPresent } from '@/lib/api-validation';
+import { tenantBootstrapSchema } from '@/lib/api-schemas';
 import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding } from '@/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -140,6 +142,9 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
 
       if (response.success && response.data) {
         const tenant = response.data;
+
+        // Dev-only: validate tenant bootstrap response shape
+        validateResponseIfPresent(tenantBootstrapSchema, tenant, `GET ${endpoint}`);
 
         // TRS-001: Stale localStorage override
         // If URL resolved a tenant and it differs from stored value, override.

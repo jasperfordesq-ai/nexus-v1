@@ -1,0 +1,60 @@
+name: PR Quality Checks
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, synchronize]
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────
+  # Enforce root cause analysis on bug fix PRs
+  # ─────────────────────────────────────────────────────────────────
+  root-cause-check:
+    name: Root Cause Analysis Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check PR description for root cause (fix PRs only)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const title = pr.title.toLowerCase();
+            const body = pr.body || '';
+
+            // Only enforce on fix/bugfix PRs
+            const isFix = title.startsWith('fix') || title.includes('bug') || title.includes('hotfix');
+
+            if (!isFix) {
+              console.log('Not a fix PR — skipping root cause check.');
+              return;
+            }
+
+            // Check for root cause section
+            const hasRootCause = body.includes('Root Cause:') || body.includes('**Root Cause:**');
+            const hasPrevention = body.includes('Prevention:') || body.includes('**Prevention:**');
+
+            const errors = [];
+            if (!hasRootCause) {
+              errors.push('Missing "Root Cause:" section — explain WHY the bug happened');
+            }
+            if (!hasPrevention) {
+              errors.push('Missing "Prevention:" section — explain what stops this from happening again');
+            }
+
+            if (errors.length > 0) {
+              const message = [
+                '## Root Cause Analysis Required',
+                '',
+                'This PR appears to be a bug fix but is missing required root cause analysis.',
+                '',
+                ...errors.map(e => `- ${e}`),
+                '',
+                'Please edit the PR description to include these sections.',
+                'See `docs/REGRESSION_PREVENTION.md` for guidance.',
+              ].join('\n');
+
+              core.setFailed(message);
+            } else {
+              console.log('Root cause analysis found — PR description looks good.');
+            }

@@ -118,10 +118,9 @@ function SeasonCard() {
     }
     try {
       setLoadingAllSeasons(true);
-      const res = await api.get<{ data: Season[] }>('/v2/gamification/seasons');
+      const res = await api.get<Season[]>('/v2/gamification/seasons');
       if (res.success && res.data) {
-        const d = res.data as unknown as { data?: Season[] };
-        setAllSeasons(d.data ?? (res.data as unknown as Season[]));
+        setAllSeasons(Array.isArray(res.data) ? res.data : []);
       }
       setShowAllSeasons(true);
     } catch (err) {
@@ -318,14 +317,8 @@ export function LeaderboardPage() {
       );
 
       if (response.success && response.data) {
-        // Handle both wrapped and unwrapped response shapes
-        const responseData = response.data as unknown as { data?: LeaderboardEntry[]; meta?: LeaderboardMeta };
-        if (responseData.data) {
-          setEntries(responseData.data);
-          setMeta(responseData.meta ?? null);
-        } else {
-          setEntries(response.data as unknown as LeaderboardEntry[]);
-        }
+        setEntries(Array.isArray(response.data) ? response.data : []);
+        setMeta((response.meta as unknown as LeaderboardMeta) ?? null);
       } else {
         setError('Failed to load leaderboard.');
       }

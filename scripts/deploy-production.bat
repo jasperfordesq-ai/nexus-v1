@@ -87,7 +87,7 @@ goto :eof
 
 :build_start
 echo [INFO] Building and starting containers...
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && cp compose.prod.yml compose.yml && sudo docker compose build && sudo docker compose up -d"
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && cp compose.prod.yml compose.yml && sudo docker compose build --no-cache && sudo docker compose up -d"
 echo [INFO] Containers started
 goto :eof
 

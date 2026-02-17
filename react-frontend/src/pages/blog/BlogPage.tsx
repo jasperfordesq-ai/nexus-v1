@@ -81,10 +81,9 @@ export function BlogPage() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const response = await api.get<{ data: BlogCategory[] }>('/v2/blog/categories');
+        const response = await api.get<BlogCategory[]>('/v2/blog/categories');
         if (response.success && response.data) {
-          const data = response.data as unknown as { data?: BlogCategory[] };
-          setCategories(data.data ?? (response.data as unknown as BlogCategory[]));
+          setCategories(Array.isArray(response.data) ? response.data : []);
         }
       } catch (err) {
         logError('Failed to load blog categories', err);
@@ -108,22 +107,20 @@ export function BlogPage() {
       if (searchQuery.trim()) params.set('search', searchQuery.trim());
       if (selectedCategory) params.set('category_id', String(selectedCategory));
 
-      const response = await api.get<{ data: BlogPost[]; meta: { cursor: string | null; has_more: boolean } }>(
+      const response = await api.get<BlogPost[]>(
         `/v2/blog?${params}`
       );
 
       if (response.success && response.data) {
-        const responseData = response.data as unknown as { data?: BlogPost[]; meta?: { cursor: string | null; has_more: boolean } };
-        const items = responseData.data ?? (response.data as unknown as BlogPost[]);
-        const resMeta = responseData.meta;
+        const items = Array.isArray(response.data) ? response.data : [];
 
         if (append) {
-          setPosts((prev) => [...prev, ...(Array.isArray(items) ? items : [])]);
+          setPosts((prev) => [...prev, ...items]);
         } else {
-          setPosts(Array.isArray(items) ? items : []);
+          setPosts(items);
         }
-        setHasMore(resMeta?.has_more ?? false);
-        setCursor(resMeta?.cursor ?? undefined);
+        setHasMore(response.meta?.has_more ?? false);
+        setCursor(response.meta?.cursor ?? undefined);
       } else {
         if (!append) setError('Failed to load blog posts.');
       }

@@ -77,7 +77,7 @@ class AdminBadgeCountService
         try {
             $result = Database::query(
                 "SELECT COUNT(*) as count FROM users
-                 WHERE tenant_id = ? AND (status = 'pending' OR approval_status = 'pending')",
+                 WHERE tenant_id = ? AND status = 'pending'",
                 [$tenantId]
             )->fetch();
             return (int) ($result['count'] ?? 0);
@@ -162,8 +162,7 @@ class AdminBadgeCountService
         try {
             $result = Database::query(
                 "SELECT COUNT(*) as count FROM error_404_log
-                 WHERE tenant_id = ? AND resolved = 0 AND created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)",
-                [$tenantId]
+                 WHERE resolved = 0 AND last_seen_at > DATE_SUB(NOW(), INTERVAL 7 DAY)"
             )->fetch();
             return (int) ($result['count'] ?? 0);
         } catch (\Exception $e) {

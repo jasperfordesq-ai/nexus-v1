@@ -425,8 +425,9 @@ class PollService
             // Delete options
             Database::query("DELETE FROM poll_options WHERE poll_id = ?", [$id]);
 
-            // Delete poll
-            Database::query("DELETE FROM polls WHERE id = ?", [$id]);
+            // Delete poll — scoped by tenant
+            $tenantId = TenantContext::getId();
+            Database::query("DELETE FROM polls WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
             Database::commit();
             return true;

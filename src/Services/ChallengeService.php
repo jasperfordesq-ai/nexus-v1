@@ -238,7 +238,8 @@ class ChallengeService
      */
     public static function delete($id)
     {
-        Database::query("DELETE FROM challenges WHERE id = ?", [$id]);
+        $tenantId = TenantContext::getId();
+        Database::query("DELETE FROM challenges WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
     }
 
     /**

@@ -209,10 +209,11 @@ class CommentService
     public static function deleteComment(int $commentId, int $userId, bool $isSuperAdmin = false): array
     {
         $pdo = Database::getInstance();
+        $tenantId = TenantContext::getId();
 
-        // Verify ownership (or super admin)
-        $stmt = $pdo->prepare("SELECT id, user_id FROM comments WHERE id = ?");
-        $stmt->execute([$commentId]);
+        // Verify ownership (or super admin) — scoped by tenant
+        $stmt = $pdo->prepare("SELECT id, user_id FROM comments WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$commentId, $tenantId]);
         $comment = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$comment) {
@@ -223,9 +224,9 @@ class CommentService
             return ['success' => false, 'error' => 'Unauthorized'];
         }
 
-        // Delete comment (CASCADE will handle replies and mentions)
-        $stmt = $pdo->prepare("DELETE FROM comments WHERE id = ?");
-        $stmt->execute([$commentId]);
+        // Delete comment (CASCADE will handle replies and mentions) — scoped by tenant
+        $stmt = $pdo->prepare("DELETE FROM comments WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$commentId, $tenantId]);
 
         return ['success' => true, 'status' => 'success', 'message' => 'Comment deleted'];
     }
@@ -242,15 +243,15 @@ class CommentService
             return ['success' => false, 'error' => 'Invalid reaction'];
         }
 
-        // Check if reaction exists
-        $stmt = $pdo->prepare("SELECT id FROM reactions WHERE user_id = ? AND target_type = 'comment' AND target_id = ? AND emoji = ?");
-        $stmt->execute([$userId, $commentId, $emoji]);
+        // Check if reaction exists — scoped by tenant
+        $stmt = $pdo->prepare("SELECT id FROM reactions WHERE user_id = ? AND target_type = 'comment' AND target_id = ? AND emoji = ? AND tenant_id = ?");
+        $stmt->execute([$userId, $commentId, $emoji, $tenantId]);
         $existing = $stmt->fetch();
 
         if ($existing) {
-            // Remove reaction
-            $stmt = $pdo->prepare("DELETE FROM reactions WHERE id = ?");
-            $stmt->execute([$existing['id']]);
+            // Remove reaction — scoped by tenant
+            $stmt = $pdo->prepare("DELETE FROM reactions WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$existing['id'], $tenantId]);
             $action = 'removed';
         } else {
             // Add reaction

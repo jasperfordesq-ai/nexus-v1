@@ -177,22 +177,20 @@ export function FeedPage() {
       if (filter !== 'all') params.set('type', filter);
       if (append && cursor) params.set('cursor', cursor);
 
-      const response = await api.get<{ data: FeedItem[]; meta: { cursor: string | null; has_more: boolean } }>(
+      const response = await api.get<FeedItem[]>(
         `/v2/feed?${params}`
       );
 
       if (response.success && response.data) {
-        const responseData = response.data as unknown as { data?: FeedItem[]; meta?: { cursor: string | null; has_more: boolean } };
-        const feedItems = responseData.data ?? (response.data as unknown as FeedItem[]);
-        const resMeta = responseData.meta;
+        const feedItems = Array.isArray(response.data) ? response.data : [];
 
         if (append) {
-          setItems((prev) => [...prev, ...(Array.isArray(feedItems) ? feedItems : [])]);
+          setItems((prev) => [...prev, ...feedItems]);
         } else {
-          setItems(Array.isArray(feedItems) ? feedItems : []);
+          setItems(feedItems);
         }
-        setHasMore(resMeta?.has_more ?? false);
-        setCursor(resMeta?.cursor ?? undefined);
+        setHasMore(response.meta?.has_more ?? false);
+        setCursor(response.meta?.cursor ?? undefined);
       } else {
         if (!append) setError('Failed to load feed.');
       }
@@ -997,13 +995,12 @@ function FeedCard({
   const loadComments = async () => {
     try {
       setIsLoadingComments(true);
-      const response = await api.get<{ data: { comments: FeedComment[] } }>(
+      const response = await api.get<{ comments: FeedComment[] }>(
         `/v2/comments?target_type=${item.type}&target_id=${item.id}`
       );
 
       if (response.success && response.data) {
-        const data = response.data as unknown as { data?: { comments?: FeedComment[] } };
-        setComments(data.data?.comments ?? []);
+        setComments(response.data.comments ?? []);
       }
     } catch (err) {
       logError('Failed to load comments', err);

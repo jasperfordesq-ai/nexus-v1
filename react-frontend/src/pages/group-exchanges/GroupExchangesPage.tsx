@@ -130,8 +130,8 @@ export function GroupExchangesPage() {
       if (abortControllerRef.current?.signal.aborted) return;
 
       if (response.success && response.data) {
-        const items = Array.isArray(response.data) ? response.data : (response.data as any).data ?? [];
-        const more = Array.isArray(response.data) ? items.length >= ITEMS_PER_PAGE : (response.data as any).has_more ?? false;
+        const items = Array.isArray(response.data) ? response.data : [];
+        const more = response.meta?.has_more ?? items.length >= ITEMS_PER_PAGE;
 
         if (append) {
           setExchanges((prev) => [...prev, ...items]);

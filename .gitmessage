@@ -1,0 +1,10 @@
+# <type>(<scope>): <subject>
+#
+# Types: feat, fix, docs, style, refactor, test, chore
+#
+# --- FOR FIX COMMITS ONLY ---
+# Root Cause: <what actually caused the bug>
+# Prevention: <what stops this from happening again>
+# ---
+#
+# Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>

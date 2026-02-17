@@ -171,8 +171,7 @@ export function GroupExchangeDetailPage() {
       const response = await api.get<{ data: GroupExchangeDetail }>(`/v2/group-exchanges/${id}`);
 
       if (response.success && response.data) {
-        const data = (response.data as any).data ?? response.data;
-        setExchange(data);
+        setExchange(response.data as unknown as GroupExchangeDetail);
       } else {
         setError('Exchange not found');
       }
@@ -266,7 +265,7 @@ export function GroupExchangeDetailPage() {
         toast.success('Exchange completed!', 'All transactions have been created.');
         loadExchange();
       } else {
-        toast.error('Failed to complete', (response as any).error || 'An error occurred.');
+        toast.error('Failed to complete', response.error || 'An error occurred.');
       }
     } catch (err) {
       toast.error('Failed to complete exchange');
@@ -310,7 +309,7 @@ export function GroupExchangeDetailPage() {
       const response = await api.get<{ data: SearchResult[] }>(`/v2/users?search=${encodeURIComponent(query.trim())}&limit=10`);
 
       if (response.success && response.data) {
-        const results = Array.isArray(response.data) ? response.data : (response.data as any).data ?? [];
+        const results = Array.isArray(response.data) ? response.data : [];
         // Filter out existing participants
         const existingIds = new Set(exchange?.participants?.map((p) => p.user_id) ?? []);
         setSearchResults(results.filter((r: SearchResult) => !existingIds.has(r.id)));

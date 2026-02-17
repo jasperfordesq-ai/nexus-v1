@@ -133,10 +133,13 @@ class Review
     /**
      * Delete a review
      */
-    public static function delete($reviewId)
+    public static function delete($reviewId, $tenantId = null)
     {
-        $sql = "DELETE FROM reviews WHERE id = ?";
-        return Database::query($sql, [$reviewId]);
+        if ($tenantId === null) {
+            $tenantId = \Nexus\Core\TenantContext::getId();
+        }
+        $sql = "DELETE FROM reviews WHERE id = ? AND tenant_id = ?";
+        return Database::query($sql, [$reviewId, $tenantId]);
     }
 
     /**

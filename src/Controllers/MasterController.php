@@ -133,7 +133,7 @@ class MasterController
             // Confirm user belongs to tenant and is admin
             $check = Database::query("SELECT id FROM users WHERE id = ? AND tenant_id = ? AND role = 'admin'", [$adminId, $tenantId])->fetch();
             if ($check) {
-                Database::query("DELETE FROM users WHERE id = ?", [$adminId]);
+                Database::query("DELETE FROM users WHERE id = ? AND tenant_id = ?", [$adminId, $tenantId]);
             }
         }
 

@@ -25,19 +25,7 @@ export function GroupAnalytics() {
       try {
         const res = await adminGroups.getAnalytics();
         if (res.success && res.data) {
-          // Handle both v2 envelope (res.data.data) and direct data
-          const payload = res.data as unknown;
-          if (payload && typeof payload === 'object' && 'total_groups' in (payload as object)) {
-            setData(payload as GroupAnalyticsData);
-          } else if (
-            payload &&
-            typeof payload === 'object' &&
-            'data' in (payload as Record<string, unknown>)
-          ) {
-            setData(
-              (payload as Record<string, unknown>).data as GroupAnalyticsData
-            );
-          }
+          setData(res.data as GroupAnalyticsData);
         }
       } catch {
         toast.error('Failed to load group analytics');

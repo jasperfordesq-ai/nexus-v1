@@ -908,13 +908,13 @@ class MessageService
         $hasDeletedColumn = self::hasColumn('messages', 'is_deleted');
 
         if ($hasDeletedColumn) {
-            // Soft delete - mark as deleted and clear body
-            $stmt = $db->prepare("UPDATE messages SET is_deleted = 1, body = '[Message deleted]', deleted_at = NOW() WHERE id = ?");
+            // Soft delete - mark as deleted and clear body — scoped by tenant
+            $stmt = $db->prepare("UPDATE messages SET is_deleted = 1, body = '[Message deleted]', deleted_at = NOW() WHERE id = ? AND tenant_id = ?");
         } else {
-            // Hard delete as fallback
-            $stmt = $db->prepare("DELETE FROM messages WHERE id = ?");
+            // Hard delete as fallback — scoped by tenant
+            $stmt = $db->prepare("DELETE FROM messages WHERE id = ? AND tenant_id = ?");
         }
-        $stmt->execute([$messageId]);
+        $stmt->execute([$messageId, $tenantId]);
 
         return true;
     }

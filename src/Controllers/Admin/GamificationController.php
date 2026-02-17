@@ -256,7 +256,8 @@ class GamificationController
         $userId = $_POST['user_id'] ?? null;
 
         if ($userId) {
-            Database::query("DELETE FROM user_badges WHERE user_id = ?", [$userId]);
+            $tenantId = TenantContext::getId();
+            Database::query("DELETE FROM user_badges WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?badges_cleared=1');

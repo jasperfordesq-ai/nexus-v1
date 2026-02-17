@@ -9,14 +9,25 @@
     "test:e2e:firefox": "npx playwright test --project=firefox-modern",
     "test:e2e:mobile": "npx playwright test --project=mobile-chrome",
     "test:e2e:report": "npx playwright show-report e2e/reports/html",
-    "test:e2e:codegen": "npx playwright codegen http://staging.timebank.local/hour-timebank"
+    "test:e2e:codegen": "npx playwright codegen http://staging.timebank.local/hour-timebank",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",
     "dotenv": "^17.2.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "pa11y": "^9.0.1",
     "prisma": "^5.22.0",
     "sharp": "^0.34.5"
+  },
+  "lint-staged": {
+    "react-frontend/src/**/*.{ts,tsx}": [
+      "bash -c 'cd react-frontend && npx tsc --noEmit'"
+    ],
+    "src/**/*.php": [
+      "bash -c 'for f in \"$@\"; do php -l \"$f\" || exit 1; done' _"
+    ]
   },
   "dependencies": {
     "@capacitor/cli": "^8.0.0",

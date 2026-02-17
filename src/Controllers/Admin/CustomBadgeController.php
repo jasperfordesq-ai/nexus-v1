@@ -193,8 +193,8 @@ class CustomBadgeController
 
         // Remove from users first
         Database::query(
-            "DELETE FROM user_badges WHERE badge_key = ?",
-            ['custom_' . $id]
+            "DELETE FROM user_badges WHERE badge_key = ? AND tenant_id = ?",
+            ['custom_' . $id, $tenantId]
         );
 
         // Delete the badge
@@ -310,9 +310,10 @@ class CustomBadgeController
             exit;
         }
 
+        $tenantId = TenantContext::getId();
         Database::query(
-            "DELETE FROM user_badges WHERE user_id = ? AND badge_key = ?",
-            [$userId, 'custom_' . $badgeId]
+            "DELETE FROM user_badges WHERE user_id = ? AND badge_key = ? AND tenant_id = ?",
+            [$userId, 'custom_' . $badgeId, $tenantId]
         );
 
         $_SESSION['flash_success'] = 'Badge revoked successfully!';

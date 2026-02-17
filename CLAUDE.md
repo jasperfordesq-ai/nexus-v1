@@ -1127,6 +1127,85 @@ scripts\deploy-production.bat          # Full deployment
 scripts\deploy-production.bat quick    # Code sync + restart only
 ```
 
+## Regression Prevention System
+
+> **Full guide:** [docs/REGRESSION_PREVENTION.md](docs/REGRESSION_PREVENTION.md)
+> **Audit report:** [docs/plans/REGRESSION_AUDIT_REPORT.md](docs/plans/REGRESSION_AUDIT_REPORT.md)
+
+### 7 Layers of Protection
+
+| Layer | Tool | When | Blocks? |
+|-------|------|------|---------|
+| 1. Pre-commit | Husky + lint-staged | Every `git commit` | Yes — TypeScript check on staged files, PHP syntax on staged `.php` |
+| 2. Pre-push | Husky pre-push | Every `git push` | Yes — full `tsc --noEmit` + `npm run build` |
+| 3. CI Pipeline | GitHub Actions (`ci.yml`) | Every push/PR to `main` | Yes — 5 stages (PHP tests, React build, Docker verify, drift detect, regression patterns) |
+| 4. PR Enforcement | GitHub Actions (`pr-checks.yml`) | Every PR to `main` | Yes — fix PRs must include Root Cause + Prevention sections |
+| 5. Runtime Validation | Zod schemas (`api-schemas.ts`) | Dev mode only | No — console.warn on shape mismatch, zero production overhead |
+| 6. Local Scripts | `check-dockerfile-drift.sh`, `check-regression-patterns.sh` | On demand | No — informational |
+| 7. Deploy Rules | `--no-cache`, OPCache restart, server-side build | Every deployment | Manual enforcement |
+
+### Mandatory Rules (NEVER SKIP)
+
+1. **`--no-cache` on production builds** — Docker reuses stale layers without it
+2. **`docker restart nexus-php-app` after PHP deploys** — OPCache never re-reads files
+3. **Never double-unwrap** — `response.data` IS the final data; `response.meta` IS the meta
+4. **Every DELETE/UPDATE must include `AND tenant_id = ?`** on tenant-scoped tables
+5. **Run `scripts/verify-feature.sh`** after any agent swarm builds features
+6. **Dockerfile limits must match** between `Dockerfile` and `Dockerfile.prod`
+7. **Never build React locally and upload `dist/`** — always rebuild on the server
+8. **Fix PRs must explain Root Cause + Prevention** — enforced by CI
+
+### Git Hooks (Husky)
+
+```bash
+# Pre-commit: lint-staged runs TypeScript + PHP syntax on staged files only
+# Pre-push: full tsc --noEmit + npm run build (blocks push on failure)
+# Commit template: .gitmessage (includes Root Cause/Prevention fields for fix commits)
+```
+
+### CI/CD Pipeline Stages
+
+| Stage | Name | What it checks | Blocking? |
+|-------|------|---------------|-----------|
+| 1 | PHP Checks | Syntax + PHPUnit Unit + Services tests (with MariaDB + Redis) | BLOCKING |
+| 2 | React Build | `tsc --noEmit` + Vitest + `npm run build` | BLOCKING |
+| 3 | Docker Verify | Builds all 3 containers, health check | BLOCKING |
+| 4 | Dockerfile Drift | Compares 6 PHP settings between `Dockerfile` and `Dockerfile.prod` | BLOCKING |
+| 5 | Regression Patterns | `data.data ??` (BLOCKING), `as any` count (WARN at >20), unscoped DELETE (WARN) | MIXED |
+
+### Zod Runtime Validation (Dev Only)
+
+API responses are validated against Zod schemas in development mode:
+
+```tsx
+// Schemas defined in react-frontend/src/lib/api-schemas.ts
+// Validation helper in react-frontend/src/lib/api-validation.ts
+// Wired into: api.ts, AuthContext.tsx, TenantContext.tsx
+
+// Dev mode: console.warn on schema mismatch (never throws)
+// Production: validation code is tree-shaken out (zero overhead)
+```
+
+### Regression Prevention Files
+
+| File | Purpose |
+|------|---------|
+| `.husky/pre-commit` | Lint-staged hook (TypeScript + PHP syntax on staged files) |
+| `.husky/pre-push` | Full TypeScript + build check before push |
+| `.gitmessage` | Commit template with Root Cause/Prevention for fix commits |
+| `.github/workflows/ci.yml` | 5-stage CI pipeline |
+| `.github/workflows/pr-checks.yml` | PR root cause enforcement for fix PRs |
+| `.github/pull_request_template.md` | PR template with mandatory sections |
+| `react-frontend/src/lib/api-schemas.ts` | Zod schemas for API responses |
+| `react-frontend/src/lib/api-validation.ts` | Dev-only validation helper |
+| `scripts/check-dockerfile-drift.sh` | Local Dockerfile alignment check |
+| `scripts/check-regression-patterns.sh` | Local regression pattern scanner |
+| `scripts/verify-feature.sh` | Post-swarm feature verification |
+| `docs/REGRESSION_PREVENTION.md` | Full regression prevention guide |
+| `docs/plans/REGRESSION_AUDIT_REPORT.md` | Original audit findings |
+
+---
+
 ## Troubleshooting
 
 ### Common Issues (Azure Production)

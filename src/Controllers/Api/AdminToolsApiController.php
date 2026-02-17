@@ -199,23 +199,21 @@ class AdminToolsApiController extends BaseApiController
 
         try {
             $errors = Database::query(
-                "SELECT id, tenant_id, url, referrer, hits,
-                        first_seen, last_seen
+                "SELECT id, url, referer, hit_count,
+                        first_seen_at, last_seen_at, resolved
                  FROM error_404_log
-                 WHERE tenant_id = ?
-                 ORDER BY hits DESC, last_seen DESC",
-                [$tenantId]
+                 WHERE resolved = 0
+                 ORDER BY hit_count DESC, last_seen_at DESC"
             )->fetchAll();
 
             $errors = array_map(function ($row) {
                 return [
                     'id' => (int) $row['id'],
-                    'tenant_id' => (int) $row['tenant_id'],
                     'url' => $row['url'],
-                    'referrer' => $row['referrer'] ?? null,
-                    'hits' => (int) ($row['hits'] ?? 1),
-                    'first_seen' => $row['first_seen'] ?? '',
-                    'last_seen' => $row['last_seen'] ?? '',
+                    'referrer' => $row['referer'] ?? null,
+                    'hits' => (int) ($row['hit_count'] ?? 1),
+                    'first_seen' => $row['first_seen_at'] ?? '',
+                    'last_seen' => $row['last_seen_at'] ?? '',
                 ];
             }, $errors);
         } catch (\Throwable $e) {
@@ -247,8 +245,8 @@ class AdminToolsApiController extends BaseApiController
 
         try {
             $error = Database::query(
-                "SELECT id FROM error_404_log WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                "SELECT id FROM error_404_log WHERE id = ?",
+                [$id]
             )->fetch();
 
             if (!$error) {
@@ -257,8 +255,8 @@ class AdminToolsApiController extends BaseApiController
             }
 
             Database::query(
-                "DELETE FROM error_404_log WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                "DELETE FROM error_404_log WHERE id = ?",
+                [$id]
             );
 
             $this->respondWithData(['deleted' => true, 'id' => $id]);

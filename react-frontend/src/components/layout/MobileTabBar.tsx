@@ -54,7 +54,7 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
   const tabs: {
     key: string;
     label: string;
-    icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+    icon: React.ComponentType<{ className?: string; strokeWidth?: string | number }>;
     path?: string;
     action?: () => void;
     isCreate?: boolean;

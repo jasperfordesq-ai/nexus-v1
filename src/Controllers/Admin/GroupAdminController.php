@@ -162,8 +162,9 @@ class GroupAdminController
         // Delete group members first
         Database::query("DELETE FROM group_members WHERE group_id = ?", [$groupId]);
 
-        // Delete the group
-        Database::query("DELETE FROM `groups` WHERE id = ?", [$groupId]);
+        // Delete the group — scoped by tenant
+        $tenantId = TenantContext::getId();
+        Database::query("DELETE FROM `groups` WHERE id = ? AND tenant_id = ?", [$groupId, $tenantId]);
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups?deleted=1');
         exit;

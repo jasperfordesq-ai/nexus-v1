@@ -127,11 +127,10 @@ export function BlogPostPage() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: BlogPostDetail }>(`/v2/blog/${slug}`);
+      const response = await api.get<BlogPostDetail>(`/v2/blog/${slug}`);
 
       if (response.success && response.data) {
-        const data = response.data as unknown as { data?: BlogPostDetail };
-        setPost(data.data ?? (response.data as unknown as BlogPostDetail));
+        setPost(response.data);
       } else {
         setError('Blog post not found.');
       }
@@ -146,13 +145,12 @@ export function BlogPostPage() {
   const loadComments = useCallback(async (postId: number) => {
     try {
       setIsLoadingComments(true);
-      const response = await api.get<{ data: { comments: BlogComment[] } }>(
+      const response = await api.get<{ comments: BlogComment[] }>(
         `/v2/comments?target_type=blog_post&target_id=${postId}`
       );
 
       if (response.success && response.data) {
-        const data = response.data as unknown as { data?: { comments?: BlogComment[] } };
-        const loaded = data.data?.comments ?? [];
+        const loaded = response.data.comments ?? [];
         setComments(loaded);
         // Count all comments including replies
         const countAll = (list: BlogComment[]): number =>

@@ -736,8 +736,8 @@ class AdminUsersApiController extends BaseApiController
 
         try {
             $badge = Database::query(
-                "SELECT * FROM user_badges WHERE id = ? AND user_id = ?",
-                [$badgeId, $id]
+                "SELECT * FROM user_badges WHERE id = ? AND user_id = ? AND tenant_id = ?",
+                [$badgeId, $id, $tenantId]
             )->fetch();
 
             if (!$badge) {
@@ -745,7 +745,7 @@ class AdminUsersApiController extends BaseApiController
                 return;
             }
 
-            Database::query("DELETE FROM user_badges WHERE id = ? AND user_id = ?", [$badgeId, $id]);
+            Database::query("DELETE FROM user_badges WHERE id = ? AND user_id = ? AND tenant_id = ?", [$badgeId, $id, $tenantId]);
 
             ActivityLog::log($adminId, 'admin_remove_badge', "Removed badge #{$badgeId} from user #{$id}");
 

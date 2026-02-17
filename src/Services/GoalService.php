@@ -609,7 +609,8 @@ class GoalService
         }
 
         try {
-            Database::query("DELETE FROM goals WHERE id = ?", [$id]);
+            $tenantId = TenantContext::getId();
+            Database::query("DELETE FROM goals WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return true;
         } catch (\Throwable $e) {
             error_log("Goal deletion failed: " . $e->getMessage());

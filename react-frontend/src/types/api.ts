@@ -749,6 +749,7 @@ export interface PaginationMeta {
   current_page?: number;
   total_items?: number;
   total_pages?: number;
+  total?: number;
   has_next_page?: boolean;
   has_previous_page?: boolean;
   next_cursor?: string;
@@ -763,6 +764,8 @@ export interface PaginationMeta {
       tagline?: string;
     };
   };
+  // Allow additional meta fields from various endpoints
+  [key: string]: unknown;
 }
 
 export interface PaginatedResponse<T> {

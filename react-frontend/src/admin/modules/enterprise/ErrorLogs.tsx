@@ -27,9 +27,8 @@ export function ErrorLogs() {
     try {
       const res = await adminEnterprise.getLogs({ page });
       if (res.success && res.data) {
-        const data = res.data as unknown as { data?: ErrorLogEntry[]; meta?: { total?: number } };
-        setLogs(Array.isArray(data) ? data : (data.data ?? []));
-        setTotal(typeof data === 'object' && !Array.isArray(data) ? (data.meta?.total ?? 0) : 0);
+        setLogs(Array.isArray(res.data) ? res.data : []);
+        setTotal(res.meta?.total ?? 0);
       }
     } catch {
       toast.error('Failed to load error logs');

@@ -615,16 +615,16 @@ class ListingController
 
             // TOGGLE LIKE
             if ($action === 'toggle_like') {
-                $stmt = $pdo->prepare("SELECT id FROM likes WHERE user_id = ? AND target_type = ? AND target_id = ?");
-                $stmt->execute([$userId, $targetType, $targetId]);
+                $stmt = $pdo->prepare("SELECT id FROM likes WHERE user_id = ? AND target_type = ? AND target_id = ? AND tenant_id = ?");
+                $stmt->execute([$userId, $targetType, $targetId, $tenantId]);
                 $existing = $stmt->fetch();
 
                 if ($existing) {
-                    $stmt = $pdo->prepare("DELETE FROM likes WHERE id = ?");
-                    $stmt->execute([$existing['id']]);
+                    $stmt = $pdo->prepare("DELETE FROM likes WHERE id = ? AND tenant_id = ?");
+                    $stmt->execute([$existing['id'], $tenantId]);
 
-                    $stmt = $pdo->prepare("SELECT COUNT(*) as cnt FROM likes WHERE target_type = ? AND target_id = ?");
-                    $stmt->execute([$targetType, $targetId]);
+                    $stmt = $pdo->prepare("SELECT COUNT(*) as cnt FROM likes WHERE target_type = ? AND target_id = ? AND tenant_id = ?");
+                    $stmt->execute([$targetType, $targetId, $tenantId]);
                     $countResult = $stmt->fetch();
                     echo json_encode(['status' => 'unliked', 'likes_count' => (int)($countResult['cnt'] ?? 0)]);
                 } else {
