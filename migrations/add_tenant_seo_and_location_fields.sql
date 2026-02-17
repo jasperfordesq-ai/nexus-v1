@@ -42,7 +42,7 @@ ALTER TABLE tenants ADD COLUMN IF NOT EXISTS robots_directive VARCHAR(50) DEFAUL
     COMMENT 'Robots meta directive (index/noindex, follow/nofollow)';
 
 -- ============================================================================
--- 2. GEOLOCATION FIELDS (Mapbox Integration)
+-- 2. GEOLOCATION FIELDS (Google Maps Integration)
 -- ============================================================================
 -- These power local SEO and Schema.org Organization/LocalBusiness markup
 

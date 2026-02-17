@@ -18,12 +18,12 @@ import {
   AlertTriangle,
   RefreshCw,
   ImagePlus,
-  MapPin,
   X,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
+import { PlaceAutocompleteInput } from '@/components/location';
 import { useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -36,6 +36,8 @@ interface FormData {
   description: string;
   is_private: boolean;
   location: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 const initialFormData: FormData = {
@@ -80,6 +82,8 @@ export function CreateGroupPage() {
           description: group.description || '',
           is_private: group.visibility === 'private' || group.visibility === 'secret',
           location: group.location || '',
+          latitude: group.latitude ?? undefined,
+          longitude: group.longitude ?? undefined,
         });
         // Set existing image for preview
         const imgUrl = group.image_url || group.cover_image_url || group.cover_image;
@@ -207,6 +211,8 @@ export function CreateGroupPage() {
         description: formData.description,
         is_private: formData.is_private,
         location: formData.location || undefined,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
       };
 
       let response;
@@ -391,16 +397,31 @@ export function CreateGroupPage() {
 
           {/* Location */}
           <div>
-            <Input
+            <PlaceAutocompleteInput
               label="Location"
               placeholder="e.g., Dublin, Ireland (optional)"
               value={formData.location}
-              onChange={(e) => updateField('location', e.target.value)}
-              startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+              onChange={(val) => updateField('location', val)}
+              onPlaceSelect={(place) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  location: place.formattedAddress,
+                  latitude: place.lat,
+                  longitude: place.lng,
+                }));
+              }}
+              onClear={() => {
+                setFormData((prev) => ({
+                  ...prev,
+                  location: '',
+                  latitude: undefined,
+                  longitude: undefined,
+                }));
+              }}
               classNames={{
-                input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
                 label: 'text-theme-muted',
+                input: 'text-theme-primary placeholder:text-theme-subtle',
               }}
             />
           </div>

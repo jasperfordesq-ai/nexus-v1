@@ -10,7 +10,6 @@ import {
   Save,
   Calendar,
   Clock,
-  MapPin,
   FileText,
   CheckCircle,
   Users,
@@ -23,6 +22,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
+import { PlaceAutocompleteInput } from '@/components/location';
 import { useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -52,6 +52,8 @@ interface FormData {
   end_date: string;
   end_time: string;
   location: string;
+  latitude?: number;
+  longitude?: number;
   max_attendees: string;
   category: string;
 }
@@ -109,6 +111,8 @@ export function CreateEventPage() {
           end_date: endDate ? endDate.toISOString().split('T')[0] : '',
           end_time: endDate ? endDate.toTimeString().slice(0, 5) : '',
           location: event.location || '',
+          latitude: event.coordinates?.lat,
+          longitude: event.coordinates?.lng,
           max_attendees: event.max_attendees?.toString() || '',
           category: event.category_name || '',
         });
@@ -271,6 +275,8 @@ export function CreateEventPage() {
         start_date: startDateTime.toISOString(),
         end_date: endDateTime?.toISOString() || null,
         location: formData.location || null,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
         max_attendees: formData.max_attendees ? parseInt(formData.max_attendees) : null,
       };
 
@@ -573,16 +579,31 @@ export function CreateEventPage() {
           {/* Location & Max Attendees */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <Input
+              <PlaceAutocompleteInput
                 label="Location (optional)"
                 placeholder="e.g., Online, Community Center..."
                 value={formData.location}
-                onChange={(e) => updateField('location', e.target.value)}
-                startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                onChange={(val) => updateField('location', val)}
+                onPlaceSelect={(place) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    location: place.formattedAddress,
+                    latitude: place.lat,
+                    longitude: place.lng,
+                  }));
+                }}
+                onClear={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    location: '',
+                    latitude: undefined,
+                    longitude: undefined,
+                  }));
+                }}
                 classNames={{
-                  input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
+                  input: 'text-theme-primary placeholder:text-theme-subtle',
                 }}
               />
             </div>

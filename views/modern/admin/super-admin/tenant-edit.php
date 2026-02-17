@@ -225,7 +225,7 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                             </div>
                         </div>
                         <div class="super-admin-form-group" style="margin-bottom: 16px;">
-                            <label class="super-admin-label">Location Search <span style="opacity: 0.5;">(Mapbox)</span></label>
+                            <label class="super-admin-label">Location Search <span style="opacity: 0.5;">(Google Maps)</span></label>
                             <div style="position: relative;">
                                 <input type="text" id="location_search" class="super-admin-input" placeholder="Search for headquarters address..." autocomplete="off">
                                 <div id="location_suggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: #1a1025; border: 1px solid rgba(147, 51, 234, 0.3); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 100; display: none;"></div>
@@ -439,7 +439,7 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
     }
 }
 
-/* Mapbox suggestions styling */
+/* Location suggestions styling */
 #location_suggestions .suggestion-item {
     padding: 10px 12px;
     cursor: pointer;
@@ -480,15 +480,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Mapbox Geocoding for Location Search
-    const MAPBOX_TOKEN = '<?= $_ENV['MAPBOX_ACCESS_TOKEN'] ?? '' ?>';
+    // Google Maps Geocoding for Location Search
+    const GOOGLE_MAPS_KEY = '<?= $_ENV['GOOGLE_MAPS_API_KEY'] ?? '' ?>';
     const locationSearch = document.getElementById('location_search');
     const suggestions = document.getElementById('location_suggestions');
     const locationName = document.getElementById('location_name');
     const latitudeInput = document.getElementById('latitude');
     const longitudeInput = document.getElementById('longitude');
 
-    if (locationSearch && MAPBOX_TOKEN) {
+    if (locationSearch && GOOGLE_MAPS_KEY) {
         let debounceTimer;
 
         locationSearch.addEventListener('input', function() {
@@ -503,14 +503,14 @@ document.addEventListener('DOMContentLoaded', function() {
             debounceTimer = setTimeout(async () => {
                 try {
                     const response = await fetch(
-                        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&types=place,locality,address&limit=5`
+                        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${GOOGLE_MAPS_KEY}`
                     );
                     const data = await response.json();
 
-                    if (data.features && data.features.length > 0) {
-                        suggestions.innerHTML = data.features.map(f => `
-                            <div class="suggestion-item" data-place="${f.place_name}" data-lng="${f.center[0]}" data-lat="${f.center[1]}">
-                                ${f.place_name}
+                    if (data.results && data.results.length > 0) {
+                        suggestions.innerHTML = data.results.slice(0, 5).map(r => `
+                            <div class="suggestion-item" data-place="${r.formatted_address}" data-lat="${r.geometry.location.lat}" data-lng="${r.geometry.location.lng}">
+                                ${r.formatted_address}
                             </div>
                         `).join('');
                         suggestions.style.display = 'block';

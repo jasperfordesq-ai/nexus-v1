@@ -28,39 +28,18 @@ class Validator
         return false;
     }
 
+    /**
+     * Validate a location string using GeocodingService (Google Maps).
+     * Returns null if valid (or if geocoding is unavailable), error string if invalid.
+     */
     public static function validateIrishLocation($location)
     {
-        $token = getenv('MAPBOX_ACCESS_TOKEN');
-        if (!$token) return null; // Skip if no token configured
+        $apiKey = getenv('GOOGLE_MAPS_API_KEY');
+        if (!$apiKey) return null; // Skip validation if no API key configured
 
-        // Security: Sanitize location input to prevent SSRF
-        $location = preg_replace('/[\x00-\x1F\x7F]/', '', $location); // Remove control chars
-        $location = trim($location);
-
-        // Block URL-like inputs and IP addresses
-        if (strlen($location) > 500 ||
-            preg_match('/^(https?|ftp|file|data|javascript|vbscript):/i', $location) ||
-            preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $location)) {
-            return "Invalid location format.";
-        }
-
-        $url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" . urlencode($location) . ".json?access_token=$token&country=ie&limit=1";
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $resp = curl_exec($ch);
-
-        if (curl_errno($ch)) {
-            curl_close($ch);
-            return null; // Fail safe if API is down
-        }
-        curl_close($ch);
-
-        $json = json_decode($resp, true);
-
-        if (empty($json['features'])) {
-            return "We could not verify that location as being in Ireland. Please try simpler terms (e.g. 'Cork', 'Dublin 4').";
+        $result = \Nexus\Services\GeocodingService::geocode($location);
+        if (!$result) {
+            return "We could not verify that location. Please try simpler terms (e.g. 'Cork', 'Dublin 4').";
         }
 
         return null; // Valid

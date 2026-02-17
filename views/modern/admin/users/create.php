@@ -88,7 +88,7 @@ $errors = $errors ?? [];
                 </div>
                 <div class="admin-form-group">
                     <label class="admin-label">Location / Area</label>
-                    <input type="text" name="location" value="<?= htmlspecialchars($old['location'] ?? '') ?>" placeholder="Start typing your town or city..." class="admin-input mapbox-location-input-v2">
+                    <input type="text" name="location" value="<?= htmlspecialchars($old['location'] ?? '') ?>" placeholder="Start typing your town or city..." class="admin-input location-input">
                     <input type="hidden" name="latitude" value="">
                     <input type="hidden" name="longitude" value="">
                 </div>

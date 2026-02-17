@@ -159,7 +159,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </div>
                 <div class="admin-form-group">
                     <label class="admin-label">Location / Area</label>
-                    <input type="text" name="location" value="<?= htmlspecialchars($user['location'] ?? '') ?>" placeholder="Start typing your town or city..." class="admin-input mapbox-location-input-v2">
+                    <input type="text" name="location" value="<?= htmlspecialchars($user['location'] ?? '') ?>" placeholder="Start typing your town or city..." class="admin-input location-input">
                     <input type="hidden" name="latitude" value="<?= htmlspecialchars($user['latitude'] ?? '') ?>">
                     <input type="hidden" name="longitude" value="<?= htmlspecialchars($user['longitude'] ?? '') ?>">
                 </div>

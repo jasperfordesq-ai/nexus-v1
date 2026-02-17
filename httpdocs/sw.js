@@ -62,7 +62,6 @@ const PRECACHE_ASSETS = [
   '/assets/js/nexus-capacitor-bridge.js',
   '/assets/js/nexus-shared-transitions.js',
   '/assets/js/nexus-pwa.js',
-  '/assets/js/nexus-mapbox.js',
   '/assets/js/notifications.js',
   '/assets/js/civicone-mobile.js',
   '/assets/js/civicone-native.js',

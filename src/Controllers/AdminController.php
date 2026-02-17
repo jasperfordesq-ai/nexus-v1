@@ -346,7 +346,7 @@ class AdminController
                 'SMTP_USER' => $getValue('SMTP_USER'),
                 'SMTP_PASS' => $getValue('SMTP_PASS'),
                 'SMTP_FROM_EMAIL' => $getValue('SMTP_FROM_EMAIL'),
-                'MAPBOX_ACCESS_TOKEN' => $getValue('MAPBOX_ACCESS_TOKEN'),
+                'GOOGLE_MAPS_API_KEY' => $getValue('GOOGLE_MAPS_API_KEY'),
                 // Gmail API Settings
                 'USE_GMAIL_API' => $getValue('USE_GMAIL_API'),
                 'GMAIL_CLIENT_ID' => $getValue('GMAIL_CLIENT_ID'),
@@ -395,7 +395,7 @@ class AdminController
             'SMTP_USER',
             'SMTP_PASS',
             'SMTP_FROM_EMAIL',
-            'MAPBOX_ACCESS_TOKEN',
+            'GOOGLE_MAPS_API_KEY',
             'USE_GMAIL_API',
             'GMAIL_CLIENT_ID',
             'GMAIL_CLIENT_SECRET',

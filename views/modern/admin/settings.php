@@ -325,8 +325,8 @@ if (!isset($configJson)) {
                     <i class="fa-solid fa-plug"></i> Integrations
                 </h4>
                 <div class="settings-form-group">
-                    <label class="admin-label">Mapbox Access Token (Public)</label>
-                    <input type="text" name="MAPBOX_ACCESS_TOKEN" value="<?= htmlspecialchars($config['MAPBOX_ACCESS_TOKEN'] ?? '') ?>" class="admin-input" placeholder="pk....">
+                    <label class="admin-label">Google Maps API Key</label>
+                    <input type="text" name="GOOGLE_MAPS_API_KEY" value="<?= htmlspecialchars($config['GOOGLE_MAPS_API_KEY'] ?? '') ?>" class="admin-input" placeholder="AIza...">
                 </div>
             </div>
 

@@ -176,20 +176,20 @@ class ConfigService
     }
 
     /**
-     * Get Mapbox configuration
+     * Get Google Maps configuration
      */
-    public function getMapbox(): array
+    public function getGoogleMaps(): array
     {
         if ($this->isUsingVault()) {
             try {
-                return $this->vault->getSecret('nexus/api-keys/mapbox');
+                return $this->vault->getSecret('nexus/api-keys/google-maps');
             } catch (\Exception $e) {
-                error_log("Vault Mapbox config error: " . $e->getMessage());
+                error_log("Vault Google Maps config error: " . $e->getMessage());
             }
         }
 
         return [
-            'access_token' => getenv('MAPBOX_ACCESS_TOKEN') ?: '',
+            'api_key' => getenv('GOOGLE_MAPS_API_KEY') ?: '',
         ];
     }
 

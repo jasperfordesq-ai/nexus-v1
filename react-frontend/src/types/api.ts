@@ -19,6 +19,8 @@ export interface User {
   bio?: string;
   tagline?: string;
   location?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   skills?: string[];
   role?: 'member' | 'admin' | 'moderator' | 'tenant_admin' | 'super_admin';
   is_super_admin?: boolean;
@@ -152,6 +154,8 @@ export interface RegisterRequest {
   profile_type?: 'individual' | 'organisation';
   organization_name?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   phone?: string;
   terms_accepted: boolean;
   newsletter_opt_in?: boolean;

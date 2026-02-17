@@ -9,24 +9,20 @@ use Nexus\Core\Env;
 /**
  * GeocodingService - Address to Coordinates Conversion
  *
- * Provides geocoding functionality to convert addresses to lat/lng coordinates.
- * Supports multiple providers with fallback:
- * 1. OpenStreetMap Nominatim (free, no API key required)
- * 2. Google Maps Geocoding API (if configured)
+ * Provides geocoding via Google Maps Geocoding API.
+ * Used for batch/cron geocoding of records missing coordinates.
+ * Interactive forms send lat/lng directly from the frontend
+ * (via Google Places Autocomplete).
  *
  * Features:
- * - Automatic geocoding when users update their location
- * - Batch geocoding for existing users
- * - Caching to avoid redundant API calls
- * - Rate limiting to respect API limits
+ * - Batch geocoding for existing users/listings
+ * - Caching to avoid redundant API calls (7-day TTL)
+ * - SSRF protection on address inputs
  */
 class GeocodingService
 {
     // Cache duration in seconds (7 days)
     const CACHE_DURATION = 604800;
-
-    // Rate limit: 1 request per second for Nominatim
-    private static $lastRequestTime = 0;
 
     /**
      * Sanitize address input to prevent SSRF attacks
@@ -82,13 +78,8 @@ class GeocodingService
             return $cached;
         }
 
-        // Try Nominatim (free, no key required)
-        $result = self::geocodeWithNominatim($address);
-
-        // Fallback to Google if configured and Nominatim fails
-        if ($result === null && Env::get('GOOGLE_MAPS_API_KEY')) {
-            $result = self::geocodeWithGoogle($address);
-        }
+        // Geocode via Google Maps API
+        $result = self::geocodeWithGoogle($address);
 
         // Cache the result
         if ($result !== null) {
@@ -99,58 +90,7 @@ class GeocodingService
     }
 
     /**
-     * Geocode using OpenStreetMap Nominatim
-     */
-    private static function geocodeWithNominatim(string $address): ?array
-    {
-        // Rate limiting: 1 request per second
-        $now = microtime(true);
-        $elapsed = $now - self::$lastRequestTime;
-        if ($elapsed < 1.0) {
-            usleep((int)((1.0 - $elapsed) * 1000000));
-        }
-        self::$lastRequestTime = microtime(true);
-
-        $url = 'https://nominatim.openstreetmap.org/search?' . http_build_query([
-            'q' => $address,
-            'format' => 'json',
-            'limit' => 1,
-            'addressdetails' => 1
-        ]);
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'GET',
-                'header' => "User-Agent: NexusPlatform/1.0 (timebanking app)\r\n",
-                'timeout' => 10
-            ]
-        ]);
-
-        try {
-            $response = @file_get_contents($url, false, $context);
-            if ($response === false) {
-                return null;
-            }
-
-            $data = json_decode($response, true);
-            if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
-                return null;
-            }
-
-            return [
-                'latitude' => (float)$data[0]['lat'],
-                'longitude' => (float)$data[0]['lon'],
-                'display_name' => $data[0]['display_name'] ?? null,
-                'provider' => 'nominatim'
-            ];
-        } catch (\Exception $e) {
-            error_log("Nominatim geocoding error: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Geocode using Google Maps API
+     * Geocode using Google Maps Geocoding API
      */
     private static function geocodeWithGoogle(string $address): ?array
     {

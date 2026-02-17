@@ -261,7 +261,7 @@ class AuthController
                 $errors[] = "Please enter a valid Irish phone number (e.g., 087 123 4567 or +353 87 123 4567).";
             }
 
-            // Location Validation (Mapbox)
+            // Location Validation (Google Maps via GeocodingService)
             if ($location) {
                 $locError = \Nexus\Core\Validator::validateIrishLocation($location);
                 if ($locError) $errors[] = $locError;

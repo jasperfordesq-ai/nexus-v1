@@ -193,8 +193,8 @@ if (!isset($notifications)) {
 
                             <h4 style="font-size: 0.95rem; font-weight: 600; color: #475569; margin-bottom: 15px; text-transform: uppercase;">Integrations</h4>
                             <div style="margin-bottom: 30px;">
-                                <label class="nexus-label">Mapbox Access Token (Public)</label>
-                                <input type="text" name="MAPBOX_ACCESS_TOKEN" value="<?= htmlspecialchars($config['MAPBOX_ACCESS_TOKEN']) ?>" class="nexus-input" placeholder="pk....">
+                                <label class="nexus-label">Google Maps API Key</label>
+                                <input type="text" name="GOOGLE_MAPS_API_KEY" value="<?= htmlspecialchars($config['GOOGLE_MAPS_API_KEY']) ?>" class="nexus-input" placeholder="AIza...">
                             </div>
 
                             <h4 style="font-size: 0.95rem; font-weight: 600; color: #475569; margin-bottom: 15px; text-transform: uppercase;">Email Provider</h4>
