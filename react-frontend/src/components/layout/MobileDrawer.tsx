@@ -338,7 +338,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </p>
               <div className="space-y-1">
                 {aboutNavItems.map(renderNavLink)}
-                {(tenant?.menu_pages?.about || []).map(p => renderNavLink({
+                {(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => renderNavLink({
                   label: p.title,
                   href: `/${p.slug}`,
                   icon: FileText,

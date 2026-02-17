@@ -316,7 +316,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: 'Our Impact', href: tenantPath('/impact-summary'), icon: TrendingUp },
     { label: 'Impact Report', href: tenantPath('/impact-report'), icon: BarChart3 },
     { label: 'Strategic Plan', href: tenantPath('/strategic-plan'), icon: Compass },
-    ...(tenant?.menu_pages?.about || []).map(p => ({
+    ...(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => ({
       label: p.title,
       href: tenantPath(`/${p.slug}`),
       icon: FileText,

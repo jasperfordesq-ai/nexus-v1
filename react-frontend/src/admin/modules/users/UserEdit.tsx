@@ -1,7 +1,7 @@
 /**
  * Admin User Edit
- * Edit user details, role, status, profile info, and manage badges.
- * Parity: PHP Admin\UserController::edit()
+ * Edit user details, role, status, profile info, manage badges, password, consents.
+ * Parity: PHP Admin\UserController::edit() — all legacy gaps closed
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -25,12 +25,24 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import { ArrowLeft, Save, Trash2, LogIn, ShieldAlert, Coins } from 'lucide-react';
+import {
+  ArrowLeft,
+  Save,
+  Trash2,
+  LogIn,
+  ShieldAlert,
+  Coins,
+  RefreshCw,
+  KeyRound,
+  Mail,
+  Building2,
+  ShieldCheck,
+} from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { adminUsers, adminTimebanking } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
-import type { AdminUserDetail, AdminBadge, UpdateUserPayload } from '../../api/types';
+import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent } from '../../api/types';
 
 export function UserEdit() {
   const { id } = useParams<{ id: string }>();
@@ -56,6 +68,8 @@ export function UserEdit() {
   const [bio, setBio] = useState('');
   const [tagline, setTagline] = useState('');
   const [location, setLocation] = useState('');
+  const [profileType, setProfileType] = useState<'individual' | 'organisation'>('individual');
+  const [organizationName, setOrganizationName] = useState('');
 
   // Super admin toggle
   const [isSuperAdminUser, setIsSuperAdminUser] = useState(false);
@@ -73,6 +87,20 @@ export function UserEdit() {
   // Badge removal
   const [badgeToRemove, setBadgeToRemove] = useState<AdminBadge | null>(null);
   const [removingBadge, setRemovingBadge] = useState(false);
+  const [recheckingBadges, setRecheckingBadges] = useState(false);
+
+  // Password management
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [resetEmailLoading, setResetEmailLoading] = useState(false);
+
+  // Welcome email
+  const [welcomeEmailLoading, setWelcomeEmailLoading] = useState(false);
+
+  // GDPR Consents
+  const [consents, setConsents] = useState<UserConsent[]>([]);
+  const [consentsLoading, setConsentsLoading] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -96,6 +124,11 @@ export function UserEdit() {
         setBio(userData.bio || '');
         setTagline(userData.tagline || '');
         setLocation(userData.location || '');
+        setProfileType(
+          (userData as unknown as Record<string, unknown>).profile_type as 'individual' | 'organisation'
+          || 'individual'
+        );
+        setOrganizationName(userData.organization_name || '');
         setIsSuperAdminUser(userData.is_super_admin || false);
       } else {
         setLoadError(res.error || 'Failed to load user');
@@ -107,7 +140,22 @@ export function UserEdit() {
     }
   }, [id]);
 
-  useEffect(() => { loadUser(); }, [loadUser]);
+  const loadConsents = useCallback(async () => {
+    if (!id) return;
+    setConsentsLoading(true);
+    try {
+      const res = await adminUsers.getConsents(Number(id));
+      if (res.success && Array.isArray(res.data)) {
+        setConsents(res.data as UserConsent[]);
+      }
+    } catch {
+      // Consents table may not exist — silently fail
+    } finally {
+      setConsentsLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => { loadUser(); loadConsents(); }, [loadUser, loadConsents]);
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
@@ -129,7 +177,7 @@ export function UserEdit() {
     if (!validate() || !id) return;
     setSubmitting(true);
     try {
-      const payload: UpdateUserPayload & { phone?: string } = {
+      const payload: UpdateUserPayload = {
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         email: email.trim(),
@@ -139,6 +187,8 @@ export function UserEdit() {
         bio: bio.trim(),
         tagline: tagline.trim(),
         location: location.trim(),
+        profile_type: profileType,
+        organization_name: organizationName.trim(),
       };
       const res = await adminUsers.update(Number(id), payload);
       if (res.success) {
@@ -178,7 +228,8 @@ export function UserEdit() {
     try {
       const res = await adminUsers.impersonate(Number(id));
       if (res.success && res.data) {
-        const token = (res.data as Record<string, unknown>).access_token as string;
+        const token = (res.data as Record<string, unknown>).access_token as string
+          || (res.data as Record<string, unknown>).token as string;
         if (token) {
           const url = `${window.location.origin}?impersonate_token=${token}`;
           window.open(url, '_blank');
@@ -235,6 +286,81 @@ export function UserEdit() {
     } finally {
       setRemovingBadge(false);
       setBadgeToRemove(null);
+    }
+  }
+
+  async function handleRecheckBadges() {
+    if (!id) return;
+    setRecheckingBadges(true);
+    try {
+      const res = await adminUsers.recheckUserBadges(Number(id));
+      if (res.success && res.data) {
+        const data = res.data as { badges?: AdminBadge[] };
+        if (data.badges) {
+          setUser((prev) => prev ? { ...prev, badges: data.badges! } : prev);
+        }
+        toast.success('Badge recheck complete');
+      } else {
+        toast.error(res.error || 'Badge recheck failed');
+      }
+    } catch {
+      toast.error('Badge recheck failed');
+    } finally {
+      setRecheckingBadges(false);
+    }
+  }
+
+  async function handleSetPassword() {
+    if (!id || !newPassword.trim()) return;
+    if (newPassword.length < 8) { toast.error('Password must be at least 8 characters'); return; }
+    setPasswordLoading(true);
+    try {
+      const res = await adminUsers.setPassword(Number(id), newPassword);
+      if (res.success) {
+        toast.success('Password updated successfully');
+        setPasswordModalOpen(false);
+        setNewPassword('');
+      } else {
+        toast.error(res.error || 'Failed to set password');
+      }
+    } catch {
+      toast.error('Failed to set password');
+    } finally {
+      setPasswordLoading(false);
+    }
+  }
+
+  async function handleSendPasswordReset() {
+    if (!id) return;
+    setResetEmailLoading(true);
+    try {
+      const res = await adminUsers.sendPasswordReset(Number(id));
+      if (res.success) {
+        toast.success('Password reset email sent');
+      } else {
+        toast.error(res.error || 'Failed to send password reset email');
+      }
+    } catch {
+      toast.error('Failed to send password reset email');
+    } finally {
+      setResetEmailLoading(false);
+    }
+  }
+
+  async function handleSendWelcomeEmail() {
+    if (!id) return;
+    setWelcomeEmailLoading(true);
+    try {
+      const res = await adminUsers.sendWelcomeEmail(Number(id));
+      if (res.success) {
+        toast.success('Welcome email sent');
+      } else {
+        toast.error(res.error || 'Failed to send welcome email');
+      }
+    } catch {
+      toast.error('Failed to send welcome email');
+    } finally {
+      setWelcomeEmailLoading(false);
     }
   }
 
@@ -351,6 +477,30 @@ export function UserEdit() {
                 </Select>
               </div>
 
+              {/* Profile Type + Organization */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Select
+                  label="Profile Type"
+                  placeholder="Select type"
+                  selectedKeys={[profileType]}
+                  onSelectionChange={(keys) => setProfileType(Array.from(keys)[0] as 'individual' | 'organisation')}
+                  isDisabled={submitting}
+                >
+                  <SelectItem key="individual">Individual</SelectItem>
+                  <SelectItem key="organisation">Organisation</SelectItem>
+                </Select>
+                {profileType === 'organisation' && (
+                  <Input
+                    label="Organisation Name"
+                    placeholder="e.g. Community Centre"
+                    value={organizationName}
+                    onValueChange={setOrganizationName}
+                    startContent={<Building2 size={14} className="text-default-400" />}
+                    isDisabled={submitting}
+                  />
+                )}
+              </div>
+
               {/* Bio */}
               <Textarea label="Bio" placeholder="A short biography for this user" value={bio} onValueChange={setBio}
                 minRows={3} maxRows={6} isDisabled={submitting} />
@@ -409,6 +559,47 @@ export function UserEdit() {
           </Card>
         )}
 
+        {/* Password & Email Management */}
+        <Card>
+          <CardHeader className="px-6 pt-5 pb-0">
+            <div className="flex items-center gap-2">
+              <KeyRound size={18} className="text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">Account Actions</h3>
+            </div>
+          </CardHeader>
+          <CardBody className="p-6">
+            <div className="flex flex-wrap gap-3">
+              <Button
+                size="sm"
+                variant="flat"
+                color="primary"
+                startContent={<KeyRound size={14} />}
+                onPress={() => setPasswordModalOpen(true)}
+              >
+                Set Password
+              </Button>
+              <Button
+                size="sm"
+                variant="flat"
+                startContent={<Mail size={14} />}
+                onPress={handleSendPasswordReset}
+                isLoading={resetEmailLoading}
+              >
+                Send Password Reset
+              </Button>
+              <Button
+                size="sm"
+                variant="flat"
+                startContent={<Mail size={14} />}
+                onPress={handleSendWelcomeEmail}
+                isLoading={welcomeEmailLoading}
+              >
+                Resend Welcome Email
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
+
         {/* Wallet Balance */}
         <Card>
           <CardHeader className="px-6 pt-5 pb-0">
@@ -433,7 +624,18 @@ export function UserEdit() {
         {/* Badges Section */}
         <Card>
           <CardHeader className="px-6 pt-5 pb-0">
-            <h3 className="text-lg font-semibold text-foreground">Badges</h3>
+            <div className="flex items-center justify-between w-full">
+              <h3 className="text-lg font-semibold text-foreground">Badges</h3>
+              <Button
+                size="sm"
+                variant="flat"
+                startContent={<RefreshCw size={14} />}
+                onPress={handleRecheckBadges}
+                isLoading={recheckingBadges}
+              >
+                Recheck Badges
+              </Button>
+            </div>
           </CardHeader>
           <CardBody className="p-6">
             {user.badges && user.badges.length > 0 ? (
@@ -459,6 +661,62 @@ export function UserEdit() {
               </div>
             ) : (
               <p className="text-sm text-default-400">This user has no badges yet.</p>
+            )}
+          </CardBody>
+        </Card>
+
+        {/* GDPR Consents Section */}
+        <Card>
+          <CardHeader className="px-6 pt-5 pb-0">
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={18} className="text-success" />
+              <h3 className="text-lg font-semibold text-foreground">GDPR Consents</h3>
+            </div>
+          </CardHeader>
+          <CardBody className="p-6">
+            {consentsLoading ? (
+              <Spinner size="sm" label="Loading consents..." />
+            ) : consents.length > 0 ? (
+              <div className="flex flex-col gap-3">
+                {consents.map((consent) => (
+                  <div
+                    key={consent.consent_type}
+                    className="flex items-center justify-between rounded-lg border border-default-200 p-3"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-foreground">
+                          {consent.name || consent.consent_type.replace(/_/g, ' ')}
+                        </p>
+                        {consent.is_required && (
+                          <Chip size="sm" variant="flat" color="warning">Required</Chip>
+                        )}
+                      </div>
+                      {consent.description && (
+                        <p className="text-xs text-default-400 mt-0.5">{consent.description}</p>
+                      )}
+                      <p className="text-xs text-default-400 mt-1">
+                        {consent.consent_given
+                          ? `Consented${consent.given_at ? ` on ${new Date(consent.given_at).toLocaleDateString()}` : ''}`
+                          : consent.withdrawn_at
+                            ? `Withdrawn on ${new Date(consent.withdrawn_at).toLocaleDateString()}`
+                            : 'Not consented'
+                        }
+                        {consent.consent_version && ` (v${consent.consent_version})`}
+                      </p>
+                    </div>
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      color={consent.consent_given ? 'success' : 'danger'}
+                    >
+                      {consent.consent_given ? 'Given' : 'Not Given'}
+                    </Chip>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-default-400">No consent records found for this user.</p>
             )}
           </CardBody>
         </Card>
@@ -506,6 +764,43 @@ export function UserEdit() {
             <Button color="primary" onPress={handleAdjustBalance} isLoading={balanceLoading}
               isDisabled={!balanceAmount.trim() || !balanceReason.trim()}>
               Apply Adjustment
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Set Password Modal */}
+      <Modal isOpen={passwordModalOpen}
+        onClose={() => { setPasswordModalOpen(false); setNewPassword(''); }}
+        size="sm">
+        <ModalContent>
+          <ModalHeader className="flex items-center gap-2">
+            <KeyRound size={20} className="text-primary" />
+            Set User Password
+          </ModalHeader>
+          <ModalBody className="gap-4">
+            <p className="text-sm text-default-500">
+              Set a new password for <strong>{user.name}</strong>. The user will not be notified.
+            </p>
+            <Input
+              label="New Password"
+              type="password"
+              placeholder="Enter new password (min 8 characters)"
+              value={newPassword}
+              onValueChange={setNewPassword}
+              isDisabled={passwordLoading}
+              description="Minimum 8 characters"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat"
+              onPress={() => { setPasswordModalOpen(false); setNewPassword(''); }}
+              isDisabled={passwordLoading}>
+              Cancel
+            </Button>
+            <Button color="primary" onPress={handleSetPassword} isLoading={passwordLoading}
+              isDisabled={newPassword.length < 8}>
+              Set Password
             </Button>
           </ModalFooter>
         </ModalContent>

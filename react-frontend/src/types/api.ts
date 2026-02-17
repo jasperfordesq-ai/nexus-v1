@@ -830,6 +830,9 @@ export interface TenantConfig {
   branding?: Partial<TenantBranding>;
   settings?: Record<string, unknown>;
   categories?: Category[];
+  menu_pages?: {
+    about?: { title: string; slug: string }[];
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

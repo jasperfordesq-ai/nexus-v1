@@ -308,7 +308,7 @@ export function ConversationPage() {
 
     async function fetchListing() {
       try {
-        const response = await api.get(`/v2/listings/${listingId}`);
+        const response = await api.get<{ id: number; title: string; type: string }>(`/v2/listings/${listingId}`);
         if (response.success && response.data) {
           setListing({
             id: response.data.id,

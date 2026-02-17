@@ -28,6 +28,11 @@ use Nexus\Services\AuditLogService;
  * - POST   /api/v2/admin/users/{id}/reset-2fa      - Reset user's 2FA
  * - POST   /api/v2/admin/users/import              - Bulk import users from CSV
  * - GET    /api/v2/admin/users/import/template      - Download CSV import template
+ * - POST   /api/v2/admin/users/{id}/badges/recheck  - Recheck badges for single user
+ * - GET    /api/v2/admin/users/{id}/consents         - Get user GDPR consents
+ * - POST   /api/v2/admin/users/{id}/password         - Admin set user password
+ * - POST   /api/v2/admin/users/{id}/send-password-reset - Send password reset email
+ * - POST   /api/v2/admin/users/{id}/send-welcome-email  - Resend welcome email
  */
 class AdminUsersApiController extends BaseApiController
 {
@@ -312,6 +317,48 @@ class AdminUsersApiController extends BaseApiController
             ActivityLog::log($adminId, 'admin_create_user', "Created user: {$email}");
             AuditLogService::logUserCreated($adminId, (int) $newUser['id'], $email);
 
+            // Record GDPR consents (admin-created accounts)
+            try {
+                $gdprService = new \Nexus\Services\Enterprise\GdprService($tenantId);
+                $consentText = "Account created by administrator. User agrees to Terms of Service and Privacy Policy upon first login.";
+                $consentVersion = '1.0';
+                $gdprService->recordConsent((int) $newUser['id'], 'terms_of_service', true, $consentText, $consentVersion);
+                $gdprService->recordConsent((int) $newUser['id'], 'privacy_policy', true, $consentText, $consentVersion);
+            } catch (\Throwable $e) {
+                error_log("GDPR Consent Recording Failed for admin-created user: " . $e->getMessage());
+            }
+
+            // Send welcome email if requested
+            $sendWelcomeEmail = !empty($input['send_welcome_email']);
+            if ($sendWelcomeEmail) {
+                try {
+                    $tenant = TenantContext::get();
+                    $tenantName = $tenant['name'] ?? 'Project NEXUS';
+                    $loginLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/login";
+
+                    $html = \Nexus\Core\EmailTemplate::render(
+                        "Your Account Has Been Created",
+                        "Welcome to {$tenantName}!",
+                        "<p>Hello <strong>" . htmlspecialchars($firstName) . "</strong>,</p>
+                        <p>An administrator has created an account for you on {$tenantName}.</p>
+                        <p>Your login credentials are:</p>
+                        <ul>
+                            <li><strong>Email:</strong> " . htmlspecialchars($email) . "</li>
+                            <li><strong>Password:</strong> " . htmlspecialchars($password) . "</li>
+                        </ul>
+                        <p>We recommend changing your password after your first login.</p>",
+                        "Login Now",
+                        $loginLink,
+                        "Project NEXUS"
+                    );
+
+                    $mailer = new \Nexus\Core\Mailer();
+                    $mailer->send($email, "Your account on {$tenantName}", $html);
+                } catch (\Throwable $e) {
+                    error_log("Welcome email failed for admin-created user: " . $e->getMessage());
+                }
+            }
+
             $this->respondWithData([
                 'id' => (int) $newUser['id'],
                 'name' => trim($firstName . ' ' . $lastName),
@@ -381,6 +428,17 @@ class AdminUsersApiController extends BaseApiController
         if (isset($input['tagline'])) {
             $updates[] = 'tagline = ?';
             $params[] = trim($input['tagline']);
+        }
+        if (isset($input['profile_type'])) {
+            $allowedTypes = ['individual', 'organisation'];
+            if (in_array($input['profile_type'], $allowedTypes)) {
+                $updates[] = 'profile_type = ?';
+                $params[] = $input['profile_type'];
+            }
+        }
+        if (isset($input['organization_name'])) {
+            $updates[] = 'organization_name = ?';
+            $params[] = trim($input['organization_name']);
         }
         if (isset($input['status'])) {
             $allowedStatuses = ['active', 'suspended', 'banned'];
@@ -796,7 +854,7 @@ class AdminUsersApiController extends BaseApiController
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
                 Database::query(
-                    "INSERT INTO users (tenant_id, first_name, last_name, email, password, phone, role, status, is_approved, created_at)
+                    "INSERT INTO users (tenant_id, first_name, last_name, email, password_hash, phone, role, status, is_approved, created_at)
                      VALUES (?, ?, ?, ?, ?, ?, ?, 'active', 1, NOW())",
                     [
                         $tenantId,
@@ -950,11 +1008,256 @@ class AdminUsersApiController extends BaseApiController
 
             $action = $grant ? 'grant_super_admin' : 'revoke_super_admin';
             ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " super admin for user #{$id}: {$user['email']}");
-            AuditLogService::log(\, \, \);
+            if ($grant) {
+                AuditLogService::logAdminAction('grant_super_admin', $adminId, $id, ['email' => $user['email']]);
+            } else {
+                AuditLogService::logSuperAdminRevoked($adminId, $id, $user['email']);
+            }
 
             $this->respondWithData(['id' => $id, 'is_super_admin' => $grant]);
         } catch (\Exception $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update super admin status', null, 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/users/{id}/badges/recheck
+     *
+     * Recheck all badge criteria for a single user.
+     */
+    public function recheckBadges(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $user = User::findById($id);
+        if (!$user || $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        try {
+            \Nexus\Services\GamificationService::runAllBadgeChecks($id);
+
+            ActivityLog::log($adminId, 'admin_recheck_badges', "Rechecked badges for user #{$id} ({$user['email']})");
+
+            // Fetch updated badges
+            $badgeRows = Database::query(
+                "SELECT ub.id, ub.badge_key, ub.awarded_at, ub.badge_name, ub.badge_description, ub.badge_icon
+                 FROM user_badges ub
+                 WHERE ub.user_id = ?
+                 ORDER BY ub.awarded_at DESC",
+                [$id]
+            )->fetchAll();
+
+            $badges = array_map(function ($b) {
+                return [
+                    'id' => (int) $b['id'],
+                    'name' => $b['badge_name'] ?? $b['badge_key'] ?? '',
+                    'slug' => $b['badge_key'] ?? '',
+                    'description' => $b['badge_description'] ?? '',
+                    'icon' => $b['badge_icon'] ?? null,
+                    'awarded_at' => $b['awarded_at'] ?? '',
+                ];
+            }, $badgeRows);
+
+            $this->respondWithData([
+                'rechecked' => true,
+                'user_id' => $id,
+                'badges' => $badges,
+            ]);
+        } catch (\Throwable $e) {
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Badge recheck failed: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
+     * GET /api/v2/admin/users/{id}/consents
+     *
+     * Get GDPR consents for a user.
+     */
+    public function getConsents(int $id): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $user = User::findById($id);
+        if (!$user || $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        try {
+            $gdprService = new \Nexus\Services\Enterprise\GdprService($tenantId);
+            $consents = $gdprService->getUserConsents($id);
+
+            $formatted = array_map(function ($c) {
+                return [
+                    'consent_type' => $c['consent_type_slug'] ?? $c['consent_type'] ?? '',
+                    'name' => $c['name'] ?? ucwords(str_replace('_', ' ', $c['consent_type_slug'] ?? '')),
+                    'description' => $c['description'] ?? null,
+                    'category' => $c['category'] ?? null,
+                    'is_required' => (bool) ($c['is_required'] ?? false),
+                    'consent_given' => (bool) ($c['consent_given'] ?? false),
+                    'consent_version' => $c['consent_version'] ?? null,
+                    'given_at' => $c['given_at'] ?? null,
+                    'withdrawn_at' => $c['withdrawn_at'] ?? null,
+                ];
+            }, $consents);
+
+            $this->respondWithData($formatted);
+        } catch (\Throwable $e) {
+            // user_consents table may not exist
+            $this->respondWithData([]);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/users/{id}/password
+     *
+     * Admin set/change a user's password.
+     * Body: { password }
+     */
+    public function setPassword(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $user = User::findById($id);
+        if (!$user || $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        $input = $this->getAllInput();
+        $password = $input['password'] ?? '';
+
+        if (strlen($password) < 8) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Password must be at least 8 characters', 'password', 422);
+            return;
+        }
+
+        $hashed = password_hash($password, PASSWORD_DEFAULT);
+
+        Database::query(
+            "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
+            [$hashed, $id, $tenantId]
+        );
+
+        ActivityLog::log($adminId, 'admin_set_password', "Admin set password for user #{$id} ({$user['email']})");
+        AuditLogService::logAdminAction('admin_set_password', $adminId, $id, ['email' => $user['email']]);
+
+        $this->respondWithData(['password_set' => true, 'id' => $id]);
+    }
+
+    /**
+     * POST /api/v2/admin/users/{id}/send-password-reset
+     *
+     * Send password reset email to a user.
+     */
+    public function sendPasswordReset(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $user = User::findById($id);
+        if (!$user || $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        try {
+            $token = bin2hex(random_bytes(32));
+            $expiry = date('Y-m-d H:i:s', strtotime('+24 hours'));
+
+            Database::query(
+                "UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ? AND tenant_id = ?",
+                [$token, $expiry, $id, $tenantId]
+            );
+
+            $tenant = TenantContext::get();
+            $tenantName = $tenant['name'] ?? 'Project NEXUS';
+            $resetLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/reset-password?token={$token}&email=" . urlencode($user['email']);
+
+            $html = \Nexus\Core\EmailTemplate::render(
+                "Password Reset",
+                "Reset your password for {$tenantName}",
+                "<p>Hello <strong>" . htmlspecialchars($user['first_name'] ?? '') . "</strong>,</p>
+                <p>An administrator has requested a password reset for your account.</p>
+                <p>Click the button below to set a new password. This link expires in 24 hours.</p>",
+                "Reset Password",
+                $resetLink,
+                "Project NEXUS"
+            );
+
+            $mailer = new \Nexus\Core\Mailer();
+            $mailer->send($user['email'], "Password Reset - {$tenantName}", $html);
+
+            ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
+
+            $this->respondWithData(['sent' => true, 'id' => $id]);
+        } catch (\Throwable $e) {
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to send password reset email: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/users/{id}/send-welcome-email
+     *
+     * Resend the welcome email to a user.
+     */
+    public function sendWelcomeEmail(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $user = User::findById($id);
+        if (!$user || $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        try {
+            $tenant = TenantContext::get();
+            $tenantName = $tenant['name'] ?? 'Project NEXUS';
+            $config = json_decode($tenant['configuration'] ?? '{}', true);
+            $welcomeConfig = $config['welcome_email'] ?? [];
+
+            $subject = !empty($welcomeConfig['subject']) ? $welcomeConfig['subject'] : "Welcome to {$tenantName}";
+
+            $firstName = htmlspecialchars($user['first_name'] ?? '');
+
+            if (!empty($welcomeConfig['body'])) {
+                $mainMessage = $welcomeConfig['body'];
+            } else {
+                $mainMessage = "<p>Hello <strong>{$firstName}</strong>,</p>
+                <p>Welcome to {$tenantName}! Your account is ready to use.</p>
+                <p>Log in to start connecting with your community, browse available services, and offer your own skills.</p>";
+            }
+
+            $loginLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/login";
+
+            if (stripos($mainMessage, '<!DOCTYPE') !== false || stripos($mainMessage, '<html') !== false) {
+                $html = $mainMessage;
+            } else {
+                $html = \Nexus\Core\EmailTemplate::render(
+                    "Welcome!",
+                    "You are a member of {$tenantName}",
+                    $mainMessage,
+                    "Login & Get Started",
+                    $loginLink,
+                    "Project NEXUS"
+                );
+            }
+
+            $mailer = new \Nexus\Core\Mailer();
+            $mailer->send($user['email'], $subject, $html);
+
+            ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})");
+
+            $this->respondWithData(['sent' => true, 'id' => $id]);
+        } catch (\Throwable $e) {
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to send welcome email: ' . $e->getMessage(), null, 500);
         }
     }
 }

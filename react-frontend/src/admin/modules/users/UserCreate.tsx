@@ -57,6 +57,9 @@ export function UserCreate() {
     if (!role) {
       newErrors.role = 'Role is required';
     }
+    if (password.trim() && password.trim().length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -175,10 +178,12 @@ export function UserCreate() {
               label="Password"
               type="password"
               placeholder="Leave blank to auto-generate"
-              description="If left blank, a random password will be generated automatically."
+              description="Minimum 8 characters. If left blank, a random password will be generated automatically."
               value={password}
               onValueChange={setPassword}
               isDisabled={submitting}
+              isInvalid={!!errors.password}
+              errorMessage={errors.password}
             />
 
             {/* Send Welcome Email */}
