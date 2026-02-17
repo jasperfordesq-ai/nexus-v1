@@ -112,11 +112,26 @@ export interface UpdateUserPayload {
   first_name?: string;
   last_name?: string;
   email?: string;
+  phone?: string;
   role?: string;
   status?: string;
   bio?: string;
   tagline?: string;
   location?: string;
+  profile_type?: 'individual' | 'organisation';
+  organization_name?: string;
+}
+
+export interface UserConsent {
+  consent_type: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  is_required: boolean;
+  consent_given: boolean;
+  consent_version: string | null;
+  given_at: string | null;
+  withdrawn_at: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

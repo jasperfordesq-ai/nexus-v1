@@ -518,13 +518,14 @@ function App() {
               <ToastProvider>
                 <Suspense fallback={<LoadingScreen message="Loading..." />}>
                   <Routes>
-                    {/* Slug-prefixed routes: /:tenantSlug/* (Phase 0-1 TRS-001) */}
-                    <Route path=":tenantSlug/*" element={<TenantShell />}>
-                      {AppRoutes()}
-                    </Route>
-
-                    {/* Non-prefixed routes: /* (domain/subdomain resolution, or chooser) */}
-                    <Route path="/*" element={<TenantShell />}>
+                    {/* Single catch-all route — TenantShell detects tenant slug from
+                        the first path segment (if it's not reserved like "admin").
+                        When a slug IS found, TenantShell renders a nested <Routes>
+                        with the slug stripped so child routes match correctly.
+                        This avoids the `:tenantSlug/*` dynamic param route which caused
+                        React Router v6 to rank `/:tenantSlug/listings` higher than
+                        `/admin/*` (splat routes rank lowest in RRv6). */}
+                    <Route path="/*" element={<TenantShell appRoutes={AppRoutes} />}>
                       {AppRoutes()}
                     </Route>
                   </Routes>

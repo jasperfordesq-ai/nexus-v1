@@ -504,6 +504,11 @@ $router->add('POST', '/api/v2/admin/users/{id}/badges', 'Nexus\Controllers\Api\A
 $router->add('DELETE', '/api/v2/admin/users/{id}/badges/{badgeId}', 'Nexus\Controllers\Api\AdminUsersApiController@removeBadge');
 $router->add('POST', '/api/v2/admin/users/{id}/impersonate', 'Nexus\Controllers\Api\AdminUsersApiController@impersonate');
 $router->add('PUT', '/api/v2/admin/users/{id}/super-admin', 'Nexus\Controllers\Api\AdminUsersApiController@setSuperAdmin');
+$router->add('POST', '/api/v2/admin/users/{id}/badges/recheck', 'Nexus\Controllers\Api\AdminUsersApiController@recheckBadges');
+$router->add('GET', '/api/v2/admin/users/{id}/consents', 'Nexus\Controllers\Api\AdminUsersApiController@getConsents');
+$router->add('POST', '/api/v2/admin/users/{id}/password', 'Nexus\Controllers\Api\AdminUsersApiController@setPassword');
+$router->add('POST', '/api/v2/admin/users/{id}/send-password-reset', 'Nexus\Controllers\Api\AdminUsersApiController@sendPasswordReset');
+$router->add('POST', '/api/v2/admin/users/{id}/send-welcome-email', 'Nexus\Controllers\Api\AdminUsersApiController@sendWelcomeEmail');
 
 // Admin Listings/Content
 $router->add('GET', '/api/v2/admin/listings', 'Nexus\Controllers\Api\AdminListingsApiController@index');

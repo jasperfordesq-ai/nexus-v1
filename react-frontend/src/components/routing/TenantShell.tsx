@@ -1,30 +1,52 @@
 /**
  * TenantShell
  *
- * Wraps tenant-scoped content. Reads :tenantSlug from route params,
+ * Wraps tenant-scoped content. Detects tenant slug from the first URL path
+ * segment (if it's not a reserved path like "admin", "login", etc.),
  * passes it to TenantProvider, and handles unknown-slug soft 404.
  *
- * Used by App.tsx to support both:
- *   /dashboard           (no slug prefix — tenant from domain or chooser)
- *   /:tenantSlug/dashboard (slug prefix — Phase 0-1 path-based resolution)
+ * Used by App.tsx inside a single `/*` catch-all route to support both:
+ *   /dashboard              (no slug prefix — tenant from domain or chooser)
+ *   /hour-timebank/dashboard (slug prefix — Phase 0-1 path-based resolution)
+ *
+ * When a tenant slug IS detected in the URL, TenantShell strips the slug prefix
+ * and re-renders child routes via a nested <Routes> so that `/hour-timebank/dashboard`
+ * matches the `dashboard` child route correctly.
+ *
+ * The single catch-all approach avoids React Router v6's route ranking issue
+ * where `/:tenantSlug/listings` (dynamic+static) outranks `/admin/*` (static+splat)
+ * because splat routes have the lowest priority in RRv6.
  *
  * Implements TRS-001 R3 (path-based resolution) at the React routing level.
  * @see docs/TRS-001-TENANT-RESOLUTION-SPEC.md
  */
 
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useLocation, Routes } from 'react-router-dom';
 import { TenantProvider, useTenant } from '@/contexts';
 import { AuthProvider, NotificationsProvider, PusherProvider } from '@/contexts';
 import { RESERVED_PATHS } from '@/lib/tenant-routing';
 
-export function TenantShell() {
-  const { tenantSlug } = useParams<{ tenantSlug: string }>();
+/**
+ * Props for TenantShell — receives appRoutes from App.tsx so it can
+ * re-render them inside a slug-stripped nested Routes when needed.
+ */
+interface TenantShellProps {
+  appRoutes?: () => React.ReactNode;
+}
 
-  // If the tenantSlug param matches a reserved path, this shouldn't be treated
-  // as a tenant slug. React Router should have matched the more specific route
-  // first, but this is a safety check.
-  const effectiveSlug = tenantSlug && !RESERVED_PATHS.has(tenantSlug.toLowerCase())
-    ? tenantSlug.toLowerCase()
+export function TenantShell({ appRoutes }: TenantShellProps) {
+  const location = useLocation();
+
+  // Extract the first path segment to check if it's a tenant slug.
+  // e.g. "/hour-timebank/dashboard" → "hour-timebank"
+  // e.g. "/admin/listings" → "admin" (reserved, not a slug)
+  // e.g. "/dashboard" → "dashboard" (reserved, not a slug)
+  const segments = location.pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0]?.toLowerCase();
+
+  // Only treat as a tenant slug if it's NOT a reserved path
+  const effectiveSlug = firstSegment && !RESERVED_PATHS.has(firstSegment)
+    ? firstSegment
     : undefined;
 
   return (
@@ -32,7 +54,7 @@ export function TenantShell() {
       <AuthProvider>
         <NotificationsProvider>
           <PusherProvider>
-            <TenantGuard>
+            <TenantGuard slugPrefix={effectiveSlug} appRoutes={appRoutes}>
               <Outlet />
             </TenantGuard>
           </PusherProvider>
@@ -45,18 +67,51 @@ export function TenantShell() {
 /**
  * Inner guard that checks if tenant resolution failed with a notFoundSlug.
  * Must be inside TenantProvider to access useTenant().
+ *
+ * When a slug prefix is detected, this component renders a nested <Routes>
+ * with the slug stripped from the location, so child routes match correctly.
+ * e.g. "/hour-timebank/dashboard" → nested Routes sees "/dashboard"
  */
-function TenantGuard({ children }: { children: React.ReactNode }) {
+function TenantGuard({
+  children,
+  slugPrefix,
+  appRoutes,
+}: {
+  children: React.ReactNode;
+  slugPrefix?: string;
+  appRoutes?: () => React.ReactNode;
+}) {
   const { isLoading, notFoundSlug } = useTenant();
+  const location = useLocation();
 
   // While loading, let the Suspense fallback handle it
   if (isLoading) {
+    // If slug-prefixed and we have appRoutes, still need nested Routes for correct path matching
+    if (slugPrefix && appRoutes) {
+      const strippedPath = location.pathname.replace(new RegExp(`^/${slugPrefix}`, 'i'), '') || '/';
+      return (
+        <Routes location={{ ...location, pathname: strippedPath }}>
+          {appRoutes()}
+        </Routes>
+      );
+    }
     return <>{children}</>;
   }
 
   // If the slug was not found, show "Community Not Found" page
   if (notFoundSlug) {
     return <CommunityNotFound slug={notFoundSlug} />;
+  }
+
+  // If there's a slug prefix, render a nested Routes with the slug stripped
+  // so child routes like "dashboard" match "/hour-timebank/dashboard" correctly
+  if (slugPrefix && appRoutes) {
+    const strippedPath = location.pathname.replace(new RegExp(`^/${slugPrefix}`, 'i'), '') || '/';
+    return (
+      <Routes location={{ ...location, pathname: strippedPath }}>
+        {appRoutes()}
+      </Routes>
+    );
   }
 
   return <>{children}</>;

@@ -166,6 +166,21 @@ export const adminUsers = {
   setSuperAdmin: (userId: number, grant: boolean) =>
     api.put(`/v2/admin/users/${userId}/super-admin`, { grant }),
 
+  recheckUserBadges: (userId: number) =>
+    api.post<{ rechecked: boolean; user_id: number; badges: import('./types').AdminBadge[] }>(`/v2/admin/users/${userId}/badges/recheck`),
+
+  getConsents: (userId: number) =>
+    api.get<import('./types').UserConsent[]>(`/v2/admin/users/${userId}/consents`),
+
+  setPassword: (userId: number, password: string) =>
+    api.post(`/v2/admin/users/${userId}/password`, { password }),
+
+  sendPasswordReset: (userId: number) =>
+    api.post(`/v2/admin/users/${userId}/send-password-reset`),
+
+  sendWelcomeEmail: (userId: number) =>
+    api.post(`/v2/admin/users/${userId}/send-welcome-email`),
+
   importUsers: (file: File, options?: { default_role?: string }) => {
     const formData = new FormData();
     formData.append('csv_file', file);
