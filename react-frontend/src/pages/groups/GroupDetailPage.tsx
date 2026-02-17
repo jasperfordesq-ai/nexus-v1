@@ -54,6 +54,8 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
+  Upload,
+  Image,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
@@ -188,6 +190,8 @@ export function GroupDetailPage() {
   const [settingsName, setSettingsName] = useState('');
   const [settingsDescription, setSettingsDescription] = useState('');
   const [settingsPrivate, setSettingsPrivate] = useState(false);
+  const [settingsLocation, setSettingsLocation] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [deletingGroup, setDeletingGroup] = useState(false);
 
@@ -513,7 +517,35 @@ export function GroupDetailPage() {
     setSettingsName(group.name);
     setSettingsDescription(group.description || '');
     setSettingsPrivate(group.visibility === 'private' || group.visibility === 'secret');
+    setSettingsLocation((group as any).location || '');
     setShowSettingsModal(true);
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') {
+    const file = e.target.files?.[0];
+    if (!file || !id) return;
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('type', type);
+      const response = await api.upload(`/v2/groups/${id}/image`, formData);
+      if (response.success) {
+        const url = (response.data as any)?.url || (response.data as any)?.image_url;
+        setGroup((prev) => prev ? {
+          ...prev,
+          ...(type === 'avatar' ? { image_url: url } : { cover_image_url: url }),
+        } : null);
+        toast.success(`Group ${type === 'avatar' ? 'image' : 'cover'} updated`);
+      } else {
+        toast.error(response.error || 'Failed to upload image');
+      }
+    } catch (err) {
+      toast.error('Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
   }
 
   async function handleSaveSettings() {
@@ -525,6 +557,7 @@ export function GroupDetailPage() {
         name: settingsName.trim(),
         description: settingsDescription.trim(),
         is_private: settingsPrivate,
+        location: settingsLocation.trim(),
       });
       if (response.success) {
         setGroup((prev) => prev ? {
@@ -532,6 +565,7 @@ export function GroupDetailPage() {
           name: settingsName.trim(),
           description: settingsDescription.trim(),
           visibility: settingsPrivate ? 'private' : 'public',
+          ...(settingsLocation.trim() ? { location: settingsLocation.trim() } : {}),
         } : null);
         setShowSettingsModal(false);
         toast.success('Group settings updated');
@@ -1471,6 +1505,61 @@ export function GroupDetailPage() {
                     label: 'text-theme-muted',
                   }}
                 />
+                <Input
+                  label="Location"
+                  placeholder="e.g. Skibbereen, Co Cork"
+                  value={settingsLocation}
+                  onChange={(e) => setSettingsLocation(e.target.value)}
+                  startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default',
+                    label: 'text-theme-muted',
+                  }}
+                />
+                {/* Images */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-lg bg-theme-elevated border border-theme-default">
+                    <p className="text-sm font-medium text-theme-primary mb-2 flex items-center gap-1.5">
+                      <Image className="w-4 h-4" aria-hidden="true" />
+                      Group Image
+                    </p>
+                    {group?.image_url && (
+                      <img src={group.image_url} alt="Group" className="w-12 h-12 rounded-full object-cover mb-2" />
+                    )}
+                    <label className="flex items-center gap-1.5 text-xs text-primary cursor-pointer hover:underline">
+                      <Upload className="w-3 h-3" aria-hidden="true" />
+                      {uploadingImage ? 'Uploading...' : 'Upload image'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploadingImage}
+                        onChange={(e) => handleImageUpload(e, 'avatar')}
+                      />
+                    </label>
+                  </div>
+                  <div className="p-3 rounded-lg bg-theme-elevated border border-theme-default">
+                    <p className="text-sm font-medium text-theme-primary mb-2 flex items-center gap-1.5">
+                      <Image className="w-4 h-4" aria-hidden="true" />
+                      Cover Image
+                    </p>
+                    {(group as any)?.cover_image_url && (
+                      <img src={(group as any).cover_image_url} alt="Cover" className="w-full h-10 rounded object-cover mb-2" />
+                    )}
+                    <label className="flex items-center gap-1.5 text-xs text-primary cursor-pointer hover:underline">
+                      <Upload className="w-3 h-3" aria-hidden="true" />
+                      {uploadingImage ? 'Uploading...' : 'Upload cover'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploadingImage}
+                        onChange={(e) => handleImageUpload(e, 'cover')}
+                      />
+                    </label>
+                  </div>
+                </div>
                 <div className="p-4 rounded-lg bg-theme-elevated border border-theme-default">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
