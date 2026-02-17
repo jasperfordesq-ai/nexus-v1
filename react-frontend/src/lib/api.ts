@@ -398,11 +398,12 @@ class ApiClient {
         };
       }
 
-      // Handle error response
+      // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})
+      const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
       return {
         success: false,
-        error: data.error ?? data.message ?? 'Request failed',
-        code: data.code ?? `HTTP_${response.status}`,
+        error: data.error ?? firstError?.message ?? data.message ?? 'Request failed',
+        code: data.code ?? firstError?.code ?? `HTTP_${response.status}`,
       };
     } catch (error) {
       clearTimeout(timeoutId);

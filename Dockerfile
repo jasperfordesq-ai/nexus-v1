@@ -135,6 +135,12 @@ RUN mkdir -p /var/www/html/httpdocs && \
 # =============================================================================
 RUN chown -R www-data:www-data /var/www/html
 
+# Create upload directories with correct ownership so Docker volumes mount
+# with the right permissions (named volumes initialise from image content)
+RUN mkdir -p /var/www/html/httpdocs/uploads /var/www/html/uploads \
+    && chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads \
+    && chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads
+
 # =============================================================================
 # Expose Port
 # =============================================================================
@@ -142,5 +148,7 @@ EXPOSE 80
 
 # =============================================================================
 # Default Command
+# Ensure upload dirs are writable by www-data at each startup (handles volume
+# re-mounts that reset ownership) then start Apache.
 # =============================================================================
-CMD ["apache2-foreground"]
+CMD ["sh", "-c", "chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; apache2-foreground"]
