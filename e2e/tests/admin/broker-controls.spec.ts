@@ -420,7 +420,8 @@ test.describe('Broker Controls - Accessibility', () => {
 
     for (const route of routes) {
       await broker.navigateTo(route.path);
-      await page.waitForLoadState('domcontentloaded');
+      // Wait for React to hydrate and render the PageHeader h1
+      await page.waitForSelector('h1', { timeout: 15000 });
 
       const h1 = page.locator('h1');
       const h1Count = await h1.count();

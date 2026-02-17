@@ -32,8 +32,7 @@ export class BrokerControlsPage extends BasePage {
 
   /** Navigate to a broker controls page by path */
   async navigateTo(path: string): Promise<void> {
-    await this.page.goto(this.tenantUrl(`/admin/${path.replace(/^\//, '')}`));
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.goto(`admin/${path.replace(/^\//, '')}`);
   }
 
   /** Navigate to Broker Dashboard */

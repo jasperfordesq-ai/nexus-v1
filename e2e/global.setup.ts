@@ -144,7 +144,7 @@ async function authenticateViaApi(
 
   // Ensure onboarding is marked complete to avoid redirecting to the wizard
   try {
-    await authPage.request.post(`${apiBaseUrl}/v2/onboarding/complete`, {
+    await authPage.request.post(`${apiBaseUrl}/api/v2/onboarding/complete`, {
       data: { offers: [], needs: [] },
       headers: {
         'Content-Type': 'application/json',

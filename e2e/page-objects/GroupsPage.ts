@@ -39,7 +39,8 @@ export class GroupsPage extends BasePage {
 
     // Group cards - article or GlassCard with group content
     this.groupCards = page.locator('article').filter({ has: page.locator('h3, .avatar-group') });
-    this.noGroupsMessage = page.locator('text=/No groups found|No groups/');
+    // EmptyState renders an h3 with the title text, wrapped in a div[role="status"]
+    this.noGroupsMessage = page.locator('h3:has-text("No groups found"), [role="status"]:has-text("No groups found")');
 
     // Pagination
     this.loadMoreButton = page.locator('button:has-text("Load More")');
@@ -150,6 +151,32 @@ export class GroupsPage extends BasePage {
   async loadMore(): Promise<void> {
     await this.loadMoreButton.click();
     await this.page.waitForTimeout(1000);
+  }
+
+  /**
+   * Navigate to "My Groups" by applying the filter
+   * There is no separate /groups/mine URL — it's a filter on the groups page
+   */
+  async navigateToMyGroups(): Promise<void> {
+    await this.navigate();
+    await this.waitForLoad();
+    await this.filterByType('joined');
+  }
+
+  /**
+   * Full flow shortcut: navigate to create page, fill form, submit
+   */
+  async createGroup(data: {
+    name: string;
+    description: string;
+    privacy?: 'public' | 'private';
+  }): Promise<void> {
+    await this.clickCreateGroup();
+    await this.page.waitForLoadState('domcontentloaded');
+    const createPage = new CreateGroupPage(this.page, this.tenant);
+    await createPage.waitForLoad();
+    await createPage.fillForm(data);
+    await createPage.submit();
   }
 }
 
@@ -323,9 +350,10 @@ export class CreateGroupPage extends BasePage {
 
     this.pageHeading = page.locator('h1:has-text("Create"), h1:has-text("Edit")');
 
-    // Form fields - use label parent traversal for HeroUI
-    this.nameInput = page.locator('label:has-text("Group Name")').locator('..').locator('input').first();
-    this.descriptionTextarea = page.locator('textarea[placeholder*="Describe"]').first();
+    // Form fields — HeroUI Input does not use standard <label for=""> structure.
+    // Match by placeholder text which is stable and unique to the field.
+    this.nameInput = page.locator('input[placeholder*="Gardening Enthusiasts"], input[placeholder*="Tech Help"]').first();
+    this.descriptionTextarea = page.locator('textarea[placeholder*="Describe what your group"]').first();
     this.privacySelect = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Public|Private|Privacy/ });
 
     // Image upload
@@ -367,7 +395,11 @@ export class CreateGroupPage extends BasePage {
     await this.descriptionTextarea.fill(data.description);
 
     if (data.privacy) {
-      await this.privacySelect.selectOption(data.privacy);
+      // HeroUI Select — click button to open, then click option
+      await this.privacySelect.first().click();
+      await this.page.waitForTimeout(200);
+      const option = this.page.locator(`li[role="option"]:has-text("${data.privacy === 'public' ? 'Public' : 'Private'}")`).first();
+      await option.click();
     }
   }
 
@@ -377,6 +409,18 @@ export class CreateGroupPage extends BasePage {
   async submit(): Promise<void> {
     await this.submitButton.click();
     await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+  }
+
+  /**
+   * Full flow shortcut: fill form and submit
+   */
+  async createGroup(data: {
+    name: string;
+    description: string;
+    privacy?: 'public' | 'private';
+  }): Promise<void> {
+    await this.fillForm(data);
+    await this.submit();
   }
 
   /**

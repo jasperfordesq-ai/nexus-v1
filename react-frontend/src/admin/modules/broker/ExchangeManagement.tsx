@@ -217,9 +217,9 @@ export function ExchangeManagement() {
         >
           <Tab key="all" title="All" />
           <Tab key="pending_broker" title="Pending" />
-          <Tab key="approved" title="Approved" />
+          <Tab key="accepted" title="Approved" />
+          <Tab key="in_progress" title="In Progress" />
           <Tab key="completed" title="Completed" />
-          <Tab key="rejected" title="Rejected" />
           <Tab key="cancelled" title="Cancelled" />
         </Tabs>
       </div>

@@ -108,7 +108,7 @@ export default defineConfig({
         storageState: 'e2e/fixtures/.auth/admin.json',
       },
       dependencies: ['setup'],
-      testMatch: '**/admin/**/*.spec.ts',
+      testMatch: ['**/admin/**/*.spec.ts', '**/broker/**/*.spec.ts'],
     },
 
     // Unauthenticated tests (public pages, login, register)

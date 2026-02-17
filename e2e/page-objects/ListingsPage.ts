@@ -26,9 +26,10 @@ export class ListingsPage extends BasePage {
     this.categoryFilter = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Category|All Categories/ }).first();
     this.typeFilter = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /All Types|Offer|Request/ }).first();
     this.sortDropdown = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Sort|Recent|Popular/ }).first();
-    this.createListingButton = page.locator('a[href*="/listings/create"], button:has-text("Create")').first();
+    this.createListingButton = page.locator('a[href*="/listings/create"], a:has-text("New Listing"), button:has-text("New Listing")').first();
     this.loadMoreButton = page.locator('button:has-text("Load More")');
-    this.noResultsMessage = page.locator('text=/No listings found|No listings/');
+    // EmptyState renders an h3 with the title text, wrapped in a div[role="status"]
+    this.noResultsMessage = page.locator('h3:has-text("No listings found"), [role="status"]:has-text("No listings found")');
   }
 
   /**
@@ -162,16 +163,22 @@ export class CreateListingPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.titleInput = page.locator('input[name="title"]');
-    this.descriptionInput = page.locator('textarea[name="description"], [name="description"]');
-    this.typeSelect = page.locator('select[name="type"], input[name="type"]');
-    this.categorySelect = page.locator('select[name="category_id"], select[name="category"]');
+    // HeroUI Input components do not use name attributes — match by placeholder.
+    // The Title field placeholder is "e.g., Help with gardening, Computer tutoring..."
+    this.titleInput = page.locator('input[placeholder*="Help with gardening"]').first();
+    // The Description field is a Textarea with placeholder "Describe what you're offering..."
+    this.descriptionInput = page.locator('textarea[placeholder*="Describe what you"]').first();
+    // HeroUI RadioGroup for type — click on the radio label text
+    this.typeSelect = page.locator('[data-slot="radio-group"]').first();
+    // HeroUI Select for category
+    this.categorySelect = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Select a category|Category/ }).first();
     this.tagsInput = page.locator('input[name="tags"], .tags-input');
-    this.locationInput = page.locator('input[name="location"]');
-    this.durationInput = page.locator('input[name="estimated_duration"]');
+    // HeroUI Input for location — match by placeholder
+    this.locationInput = page.locator('input[placeholder*="Online, Dublin"]').first();
+    this.durationInput = page.locator('input[placeholder="1"]').first();
     this.imageUpload = page.locator('input[type="file"]');
-    this.submitButton = page.locator('button[type="submit"], input[type="submit"]');
-    this.cancelButton = page.locator('a[href*="listings"], .cancel-btn');
+    this.submitButton = page.locator('button:has-text("Create Listing"), button:has-text("Update Listing")').first();
+    this.cancelButton = page.locator('button:has-text("Cancel"), a:has-text("Cancel")').first();
   }
 
   /**

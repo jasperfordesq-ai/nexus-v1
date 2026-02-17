@@ -15,13 +15,15 @@ export class MessagesPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    // React: GlassCard conversation items
-    this.conversationList = page.locator('[class*="glass"]').filter({ has: page.locator('img[alt], .avatar') });
-    this.conversationItems = page.locator('a[href*="/messages/"], article').filter({ has: page.locator('img[alt], .avatar') });
-    this.newMessageButton = page.locator('button:has-text("New Message"), button:has-text("Compose")').first();
-    this.searchInput = page.locator('input[placeholder*="Search"]');
-    this.unreadCount = page.locator('.unread-badge, [class*="chip"]').filter({ hasText: /\d+/ });
-    this.emptyInbox = page.locator('text=/No messages|No conversations/');
+    // React MessagesPage: conversations are Link > GlassCard elements
+    this.conversationList = page.locator('a[href*="/messages/"]').filter({ has: page.locator('[class*="glass"]') });
+    this.conversationItems = page.locator('a[href*="/messages/"]').filter({ has: page.locator('[class*="glass"]') });
+    // The "New Message" button always renders (may be disabled when direct_messaging feature is off)
+    this.newMessageButton = page.locator('button:has-text("New Message")').first();
+    this.searchInput = page.locator('input[placeholder*="Search conversations"]');
+    this.unreadCount = page.locator('[data-slot="badge"]').filter({ hasText: /\d+/ });
+    // EmptyState renders h3 with "No messages yet" as the title
+    this.emptyInbox = page.locator('h3:has-text("No messages yet"), [role="status"]:has-text("No messages yet")');
   }
 
   /**
@@ -38,13 +40,13 @@ export class MessagesPage extends BasePage {
     await this.page.waitForLoadState('domcontentloaded');
     await this.page.waitForLoadState('networkidle').catch(() => {});
 
-    // Wait for React to hydrate - new message button should always be present
-    await this.newMessageButton.waitFor({
-      state: 'attached',
+    // Wait for React to hydrate — the h1 "Messages" heading is always present
+    await this.page.locator('h1:has-text("Messages")').waitFor({
+      state: 'visible',
       timeout: 15000
     }).catch(() => {});
 
-    // Give React time to render
+    // Give React time to render conversations
     await this.page.waitForTimeout(500);
   }
 
@@ -199,7 +201,67 @@ export class MessageThreadPage extends BasePage {
 }
 
 /**
- * New Message Page Object
+ * New Message Modal Object
+ *
+ * In the React MessagesPage, composing a new message opens a HeroUI Modal
+ * on top of the messages page (no separate route). The modal contains a
+ * member search input and a list of matched users to select from.
+ *
+ * Usage:
+ *   const messagesPage = new MessagesPage(page);
+ *   await messagesPage.navigate();
+ *   await messagesPage.waitForLoad();
+ *   await messagesPage.clickNewMessage(); // opens the modal
+ *   const modal = new NewMessageModal(page);
+ *   await modal.searchRecipient('Alice');
+ *   await modal.selectRecipient(0); // navigates to the conversation
+ */
+export class NewMessageModal extends BasePage {
+  readonly modal: Locator;
+  readonly recipientInput: Locator;
+  readonly recipientSuggestions: Locator;
+
+  constructor(page: Page, tenant?: string) {
+    super(page, tenant);
+
+    // HeroUI Modal root
+    this.modal = page.locator('[role="dialog"]').filter({ hasText: 'New Message' });
+    // The search input inside the modal — placeholder is "Search for a member..."
+    this.recipientInput = page.locator('[role="dialog"] input[placeholder*="Search for a member"]');
+    // Suggested users are rendered as HeroUI Button elements with an Avatar inside
+    this.recipientSuggestions = page.locator('[role="dialog"] button').filter({ has: page.locator('img, [data-slot="base"]') });
+  }
+
+  /**
+   * Open the new message modal from the messages page
+   */
+  async open(): Promise<void> {
+    await this.goto('messages');
+    await this.page.locator('h1:has-text("Messages")').waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
+    await this.page.locator('button:has-text("New Message")').first().click();
+    await this.modal.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+  }
+
+  /**
+   * Search for a recipient in the modal
+   */
+  async searchRecipient(query: string): Promise<void> {
+    await this.recipientInput.fill(query);
+    await this.page.waitForTimeout(500); // Wait for debounced search
+  }
+
+  /**
+   * Select a recipient from suggestions, which navigates to the conversation
+   */
+  async selectRecipient(index: number = 0): Promise<void> {
+    await this.recipientSuggestions.nth(index).click();
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+}
+
+/**
+ * @deprecated Use NewMessageModal instead.
+ * Retained for backwards compatibility with existing test files.
  */
 export class NewMessagePage extends BasePage {
   readonly recipientInput: Locator;
@@ -210,17 +272,20 @@ export class NewMessagePage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.recipientInput = page.locator('input[placeholder*="Search for a member"], input[name="recipient"], .recipient-search');
-    this.recipientSuggestions = page.locator('button').filter({ has: page.locator('img, .avatar') });
-    this.messageInput = page.locator('textarea[name="message"], .message-input');
-    this.sendButton = page.locator('button[type="submit"], .send-btn');
+    // The search input inside the New Message modal
+    this.recipientInput = page.locator('[role="dialog"] input[placeholder*="Search for a member"]');
+    this.recipientSuggestions = page.locator('[role="dialog"] button').filter({ has: page.locator('img, [data-slot="base"]') });
+    // No separate message compose step — selecting a user navigates directly to the thread
+    this.messageInput = page.locator('textarea[placeholder*="message"], input[placeholder*="message"]');
+    this.sendButton = page.locator('button[type="submit"], button:has-text("Send")');
   }
 
   /**
-   * Navigate to new message page
+   * Open the new message modal by navigating to /messages and clicking the button
    */
   async navigate(): Promise<void> {
     await this.goto('messages');
+    await this.page.locator('h1:has-text("Messages")').waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
     const newMessageButton = this.page.locator('button:has-text("New Message")').first();
     if (await newMessageButton.count() > 0) {
       await newMessageButton.click();
@@ -229,11 +294,11 @@ export class NewMessagePage extends BasePage {
   }
 
   /**
-   * Search for recipient
+   * Search for recipient in the modal
    */
   async searchRecipient(query: string): Promise<void> {
     await this.recipientInput.fill(query);
-    await this.page.waitForTimeout(500); // Wait for autocomplete
+    await this.page.waitForTimeout(500);
   }
 
   /**
@@ -241,6 +306,7 @@ export class NewMessagePage extends BasePage {
    */
   async selectRecipient(index: number = 0): Promise<void> {
     await this.recipientSuggestions.nth(index).click();
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**
