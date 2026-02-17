@@ -166,6 +166,7 @@ export function UserCreate() {
             >
               <SelectItem key="member">Member</SelectItem>
               <SelectItem key="moderator">Moderator</SelectItem>
+              <SelectItem key="newsletter_admin">Newsletter Admin</SelectItem>
               <SelectItem key="admin">Admin</SelectItem>
             </Select>
 
