@@ -463,8 +463,11 @@ class TenantBootstrapController extends BaseApiController
      */
     public function list(): void
     {
-        // Try to get from cache first
-        $cacheKey = 'tenants_list_public';
+        // ?include_master=1 allows tenant 1 to appear (needed for super admin login)
+        $includeMaster = !empty($_GET['include_master']);
+
+        // Cache key varies by whether master is included
+        $cacheKey = $includeMaster ? 'tenants_list_public_all' : 'tenants_list_public';
         $cached = RedisCache::get($cacheKey);
 
         if ($cached !== null) {
@@ -472,13 +475,14 @@ class TenantBootstrapController extends BaseApiController
             return;
         }
 
-        // Query all active tenants (excluding master/admin tenant ID 1)
+        // Query active tenants; exclude master tenant (ID 1) by default
         $db = \Nexus\Core\Database::getConnection();
+        $where = $includeMaster ? 'WHERE is_active = 1' : 'WHERE is_active = 1 AND id > 1';
         $stmt = $db->query("
             SELECT id, name, slug, domain, tagline
             FROM tenants
-            WHERE is_active = 1 AND id > 1
-            ORDER BY name ASC
+            {$where}
+            ORDER BY id ASC
         ");
         $tenants = $stmt->fetchAll();
 
@@ -491,7 +495,6 @@ class TenantBootstrapController extends BaseApiController
                 'slug' => $tenant['slug'],
             ];
 
-            // Optional fields
             if (!empty($tenant['domain'])) {
                 $item['domain'] = $tenant['domain'];
             }
