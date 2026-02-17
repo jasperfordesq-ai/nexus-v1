@@ -652,6 +652,13 @@ $router->add('GET', '/api/v2/admin/broker/risk-tags', 'Nexus\Controllers\Api\Adm
 $router->add('GET', '/api/v2/admin/broker/messages', 'Nexus\Controllers\Api\AdminBrokerApiController@messages');
 $router->add('POST', '/api/v2/admin/broker/messages/{id}/review', 'Nexus\Controllers\Api\AdminBrokerApiController@reviewMessage');
 $router->add('GET', '/api/v2/admin/broker/monitoring', 'Nexus\Controllers\Api\AdminBrokerApiController@monitoring');
+$router->add('POST', '/api/v2/admin/broker/messages/{id}/flag', 'Nexus\Controllers\Api\AdminBrokerApiController@flagMessage');
+$router->add('POST', '/api/v2/admin/broker/monitoring/{userId}', 'Nexus\Controllers\Api\AdminBrokerApiController@setMonitoring');
+$router->add('POST', '/api/v2/admin/broker/risk-tags/{listingId}', 'Nexus\Controllers\Api\AdminBrokerApiController@saveRiskTag');
+$router->add('DELETE', '/api/v2/admin/broker/risk-tags/{listingId}', 'Nexus\Controllers\Api\AdminBrokerApiController@removeRiskTag');
+$router->add('GET', '/api/v2/admin/broker/configuration', 'Nexus\Controllers\Api\AdminBrokerApiController@getConfiguration');
+$router->add('POST', '/api/v2/admin/broker/configuration', 'Nexus\Controllers\Api\AdminBrokerApiController@saveConfiguration');
+$router->add('GET', '/api/v2/admin/broker/exchanges/{id}', 'Nexus\Controllers\Api\AdminBrokerApiController@showExchange');
 
 // Admin Vetting Records (TOL2 compliance — DBS/Garda vetting)
 $router->add('GET', '/api/v2/admin/vetting/stats', 'Nexus\Controllers\Api\AdminVettingApiController@stats');

@@ -626,6 +626,48 @@ export interface MonitoredUser {
   restricted_by?: number;
 }
 
+export interface BrokerConfig {
+  // Messaging
+  broker_messaging_enabled: boolean;
+  broker_copy_all_messages: boolean;
+  broker_copy_threshold_hours: number;
+  // Risk Tagging
+  risk_tagging_enabled: boolean;
+  auto_flag_high_risk: boolean;
+  require_approval_high_risk: boolean;
+  // Exchange Workflow
+  broker_approval_required: boolean;
+  auto_approve_low_risk: boolean;
+  exchange_timeout_days: number;
+  // Broker Visibility
+  broker_visible_to_members: boolean;
+  show_broker_name: boolean;
+  broker_contact_email: string;
+}
+
+export interface ExchangeHistoryEntry {
+  id: number;
+  exchange_id: number;
+  actor_id?: number;
+  actor_name?: string;
+  action: string;
+  notes?: string;
+  created_at: string;
+}
+
+export interface ExchangeDetail {
+  exchange: ExchangeRequest & {
+    requester_email?: string;
+    requester_avatar?: string;
+    provider_email?: string;
+    provider_avatar?: string;
+    listing_type?: string;
+    hours_offered?: number;
+  };
+  history: ExchangeHistoryEntry[];
+  risk_tag?: RiskTag | null;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Groups
 // ─────────────────────────────────────────────────────────────────────────────

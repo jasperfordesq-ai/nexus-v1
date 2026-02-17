@@ -38,9 +38,11 @@ import type {
   BadgeDefinition,
   BrokerDashboardStats,
   ExchangeRequest,
+  ExchangeDetail,
   RiskTag,
   BrokerMessage,
   MonitoredUser,
+  BrokerConfig,
   AdminGroup,
   GroupApproval,
   GroupAnalyticsData,
@@ -457,6 +459,34 @@ export const adminBroker = {
 
   getMonitoring: () =>
     api.get<MonitoredUser[]>('/v2/admin/broker/monitoring'),
+
+  flagMessage: (id: number, reason: string, severity: 'concern' | 'serious' | 'urgent') =>
+    api.post(`/v2/admin/broker/messages/${id}/flag`, { reason, severity }),
+
+  setMonitoring: (userId: number, data: { under_monitoring: boolean; reason?: string; messaging_disabled?: boolean }) =>
+    api.post(`/v2/admin/broker/monitoring/${userId}`, data),
+
+  saveRiskTag: (listingId: number, data: {
+    risk_level: 'low' | 'medium' | 'high' | 'critical';
+    risk_category: string;
+    risk_notes?: string;
+    member_visible_notes?: string;
+    requires_approval?: boolean;
+    insurance_required?: boolean;
+    dbs_required?: boolean;
+  }) => api.post(`/v2/admin/broker/risk-tags/${listingId}`, data),
+
+  removeRiskTag: (listingId: number) =>
+    api.delete(`/v2/admin/broker/risk-tags/${listingId}`),
+
+  getConfiguration: () =>
+    api.get<BrokerConfig>('/v2/admin/broker/configuration'),
+
+  saveConfiguration: (config: Partial<BrokerConfig>) =>
+    api.post<BrokerConfig>('/v2/admin/broker/configuration', config),
+
+  showExchange: (id: number) =>
+    api.get<ExchangeDetail>(`/v2/admin/broker/exchanges/${id}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -18,6 +18,7 @@ import {
   Clock,
   AlertTriangle,
   Activity,
+  Settings,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
@@ -60,6 +61,13 @@ const quickLinks = [
     icon: ShieldCheck,
     color: 'success' as const,
     path: '/admin/broker-controls/vetting',
+  },
+  {
+    title: 'Configuration',
+    description: 'Configure broker controls, messaging oversight, and risk settings',
+    icon: Settings,
+    color: 'default' as const,
+    path: '/admin/broker-controls/configuration',
   },
 ];
 
