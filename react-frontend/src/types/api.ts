@@ -819,19 +819,38 @@ export interface TenantModules {
 export interface TenantBranding {
   name: string;
   tagline?: string;
-  logo?: string;
-  favicon?: string;
+  logo?: string;       // normalised from logo_url
+  logo_url?: string;   // raw backend field
+  favicon?: string;    // normalised from favicon_url
+  favicon_url?: string; // raw backend field
   primaryColor?: string;
+  primary_color?: string; // raw backend field
   secondaryColor?: string;
+  og_image_url?: string;
 }
 
 export interface TenantConfig {
   id: number;
   name: string;
   slug: string;
+  tagline?: string;
   features: Partial<TenantFeatures>;
   modules?: Partial<TenantModules>;
   branding?: Partial<TenantBranding>;
+  contact?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+    location?: string;
+  };
+  config?: {
+    footer_text?: string;
+    [key: string]: unknown;
+  };
+  seo?: {
+    meta_title?: string;
+    meta_description?: string;
+  };
   settings?: Record<string, unknown>;
   categories?: Category[];
   menu_pages?: {

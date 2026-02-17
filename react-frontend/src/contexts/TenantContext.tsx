@@ -210,14 +210,28 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   }, [state.tenant?.modules]);
 
   /**
-   * Get branding with fallback to defaults
+   * Get branding with fallback to defaults.
+   * Normalises backend snake_case fields (logo_url, favicon_url, primary_color)
+   * to the camelCase aliases expected by components (logo, favicon, primaryColor).
+   * Also pulls name/tagline from the top-level tenant response since the backend
+   * returns them there rather than inside the branding sub-object.
    */
   const branding = useMemo<TenantBranding>(() => {
-    if (!state.tenant?.branding) {
-      return defaultBranding;
-    }
-    return { ...defaultBranding, ...state.tenant.branding };
-  }, [state.tenant?.branding]);
+    const raw = state.tenant?.branding ?? {};
+    const logo = raw.logo ?? raw.logo_url ?? undefined;
+    const favicon = raw.favicon ?? raw.favicon_url ?? undefined;
+    const primaryColor = raw.primaryColor ?? raw.primary_color ?? defaultBranding.primaryColor;
+    return {
+      ...defaultBranding,
+      ...raw,
+      // Top-level tenant fields take precedence for name/tagline
+      name: state.tenant?.name ?? raw.name ?? defaultBranding.name,
+      tagline: state.tenant?.tagline ?? raw.tagline ?? defaultBranding.tagline,
+      logo,
+      favicon,
+      primaryColor,
+    };
+  }, [state.tenant]);
 
   /**
    * Check if feature is enabled
