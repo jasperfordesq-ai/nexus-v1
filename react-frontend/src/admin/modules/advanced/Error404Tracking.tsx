@@ -49,12 +49,19 @@ export function Error404Tracking() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await adminTools.delete404Error(deleteTarget.id);
-      toast.success('404 entry dismissed');
-      setDeleteTarget(null);
-      await fetchErrors();
-    } catch {
+      const res = await adminTools.delete404Error(deleteTarget.id);
+
+      if (res.success) {
+        toast.success('404 entry dismissed');
+        setDeleteTarget(null);
+        await fetchErrors();
+      } else {
+        const error = (res as { error?: string }).error || 'Failed to delete 404 entry';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to delete 404 entry');
+      console.error('404 error delete error:', err);
     } finally {
       setDeleting(false);
     }

@@ -48,12 +48,19 @@ export function LegalDocList() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await adminLegalDocs.delete(deleteTarget.id);
-      toast.success('Document deleted');
-      setDeleteTarget(null);
-      loadData();
-    } catch {
+      const res = await adminLegalDocs.delete(deleteTarget.id);
+
+      if (res.success) {
+        toast.success('Document deleted');
+        setDeleteTarget(null);
+        loadData();
+      } else {
+        const error = (res as { error?: string }).error || 'Failed to delete document';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to delete document');
+      console.error('Legal document delete error:', err);
     } finally {
       setDeleting(false);
     }
