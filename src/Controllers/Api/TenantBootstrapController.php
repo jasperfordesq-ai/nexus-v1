@@ -218,7 +218,45 @@ class TenantBootstrapController extends BaseApiController
             $data['social'] = $social;
         }
 
+        // General settings (maintenance mode, registration settings, etc.)
+        $data['settings'] = $this->buildGeneralSettings((int) $tenant['id']);
+
         return $data;
+    }
+
+    /**
+     * Build general settings from tenant_settings table
+     */
+    private function buildGeneralSettings(int $tenantId): array
+    {
+        $settings = [];
+
+        try {
+            // Fetch general.* settings from tenant_settings table
+            $rows = Database::query(
+                "SELECT setting_key, setting_value FROM tenant_settings
+                 WHERE tenant_id = ? AND setting_key LIKE 'general.%'",
+                [$tenantId]
+            )->fetchAll();
+
+            foreach ($rows as $row) {
+                $key = str_replace('general.', '', $row['setting_key']);
+                $value = $row['setting_value'];
+
+                // Convert boolean strings to actual booleans
+                if ($value === 'true' || $value === '1') {
+                    $settings[$key] = true;
+                } elseif ($value === 'false' || $value === '0') {
+                    $settings[$key] = false;
+                } else {
+                    $settings[$key] = $value;
+                }
+            }
+        } catch (\Exception $e) {
+            // tenant_settings table may not exist yet - return empty settings
+        }
+
+        return $settings;
     }
 
     /**

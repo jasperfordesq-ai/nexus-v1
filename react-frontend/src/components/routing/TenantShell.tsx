@@ -22,9 +22,12 @@
  */
 
 import { Outlet, useLocation, Routes } from 'react-router-dom';
-import { TenantProvider, useTenant } from '@/contexts';
+import { TenantProvider, useTenant, useAuth } from '@/contexts';
 import { AuthProvider, NotificationsProvider, PusherProvider } from '@/contexts';
 import { RESERVED_PATHS } from '@/lib/tenant-routing';
+import { lazy, Suspense } from 'react';
+
+const MaintenancePage = lazy(() => import('@/pages/public/MaintenancePage'));
 
 /**
  * Props for TenantShell — receives appRoutes from App.tsx so it can
@@ -81,7 +84,8 @@ function TenantGuard({
   slugPrefix?: string;
   appRoutes?: () => React.ReactNode;
 }) {
-  const { isLoading, notFoundSlug } = useTenant();
+  const { isLoading, notFoundSlug, tenant } = useTenant();
+  const { user } = useAuth();
   const location = useLocation();
 
   // While loading, let the Suspense fallback handle it
@@ -101,6 +105,24 @@ function TenantGuard({
   // If the slug was not found, show "Community Not Found" page
   if (notFoundSlug) {
     return <CommunityNotFound slug={notFoundSlug} />;
+  }
+
+  // Check for maintenance mode (after tenant is loaded)
+  const maintenanceMode = tenant?.settings?.maintenance_mode === true;
+  const isAdmin = user?.role && ['admin', 'tenant_admin', 'super_admin'].includes(user.role);
+
+  // Show maintenance page to non-admin users when maintenance mode is enabled
+  // Allow access to admin routes even in maintenance mode
+  const isAdminRoute = location.pathname.startsWith('/admin') ||
+                       location.pathname.includes('/admin') ||
+                       (slugPrefix ? location.pathname.startsWith(`/${slugPrefix}/admin`) : false);
+
+  if (maintenanceMode && !isAdmin && !isAdminRoute) {
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <MaintenancePage />
+      </Suspense>
+    );
   }
 
   // If there's a slug prefix, render a nested Routes with the slug stripped

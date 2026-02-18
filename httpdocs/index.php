@@ -363,6 +363,9 @@ TenantContext::resolve();
 // SEO REDIRECT MIDDLEWARE: Check for 301 redirects (with loop prevention)
 \Nexus\Middleware\RedirectMiddleware::handle();
 
+// MAINTENANCE MODE MIDDLEWARE: Block non-admin users when maintenance mode is enabled
+\Nexus\Middleware\MaintenanceModeMiddleware::check();
+
 // TENANT ISOLATION: Ensure logged-in users can only access their own tenant
 // This is a CRITICAL security check - users must not access other tenants' data
 //
