@@ -4,7 +4,7 @@ namespace Nexus\Middleware;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
+use Nexus\Services\TokenService;
 
 /**
  * MaintenanceModeMiddleware
@@ -22,10 +22,11 @@ class MaintenanceModeMiddleware
         '/admin/',
         '/admin-legacy/',
         '/super-admin/',
-        '/api/auth/login',
-        '/api/auth/logout',
+        '/api/auth/',
         '/api/v2/tenant/bootstrap',
         '/api/v2/tenants',
+        '/api/v2/messages/unread-count',
+        '/api/v2/notifications/counts',
         '/health.php',
         '/favicon.ico',
     ];
@@ -84,16 +85,32 @@ class MaintenanceModeMiddleware
      */
     private static function isUserAdmin(): bool
     {
-        try {
-            // Try API auth first
-            $user = ApiAuth::authenticate();
-            if ($user) {
-                return in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin'])
-                    || !empty($user['is_super_admin'])
-                    || !empty($user['is_tenant_super_admin']);
+        // Check Bearer token auth first (for API requests)
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        if (preg_match('/Bearer\s+(.+)/i', $authHeader, $matches)) {
+            try {
+                $token = $matches[1];
+                $payload = TokenService::verifyAccessToken($token);
+
+                if ($payload && isset($payload['user_id'])) {
+                    $userId = $payload['user_id'];
+                    $tenantId = $payload['tenant_id'] ?? null;
+
+                    $user = Database::query(
+                        "SELECT role, is_super_admin, is_tenant_super_admin
+                         FROM users WHERE id = ?" . ($tenantId ? " AND tenant_id = ?" : ""),
+                        $tenantId ? [$userId, $tenantId] : [$userId]
+                    )->fetch();
+
+                    if ($user) {
+                        return in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin'])
+                            || !empty($user['is_super_admin'])
+                            || !empty($user['is_tenant_super_admin']);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Token validation failed, continue to session check
             }
-        } catch (\Exception $e) {
-            // API auth failed, continue
         }
 
         // Check session auth
@@ -124,7 +141,7 @@ class MaintenanceModeMiddleware
     {
         $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 
-        // If it's an API request, return JSON
+        // For API requests, return JSON error
         if (strpos($requestUri, '/api/') === 0) {
             header('Content-Type: application/json');
             http_response_code(503);
@@ -136,92 +153,9 @@ class MaintenanceModeMiddleware
             exit;
         }
 
-        // Otherwise show HTML page
-        http_response_code(503);
-        header('Content-Type: text/html; charset=utf-8');
-        header('Retry-After: 3600'); // Suggest retry in 1 hour
-
-        $tenantName = TenantContext::getSetting('name') ?? 'Project NEXUS';
-
-        echo <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maintenance Mode - {$tenantName}</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            color: #1a202c;
-        }
-        .container {
-            background: white;
-            border-radius: 1rem;
-            padding: 3rem 2rem;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-        .icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 2rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-        }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: #1a202c;
-        }
-        p {
-            font-size: 1.1rem;
-            color: #4a5568;
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-        .footer {
-            margin-top: 2rem;
-            font-size: 0.9rem;
-            color: #718096;
-        }
-        @media (max-width: 640px) {
-            .container { padding: 2rem 1.5rem; }
-            h1 { font-size: 1.5rem; }
-            p { font-size: 1rem; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="icon">🔧</div>
-        <h1>We'll be back soon!</h1>
-        <p>
-            <strong>{$tenantName}</strong> is currently undergoing scheduled maintenance to improve your experience.
-        </p>
-        <p>
-            We apologize for any inconvenience. Please check back in a little while.
-        </p>
-        <div class="footer">
-            Thank you for your patience!
-        </div>
-    </div>
-</body>
-</html>
-HTML;
-        exit;
+        // For HTML requests, let React handle the maintenance page
+        // React's TenantShell will check maintenance mode and show MaintenancePage.tsx
+        // This provides a polished HeroUI component instead of plain HTML
+        return;
     }
 }

@@ -47,6 +47,15 @@ import type {
   GroupApproval,
   GroupAnalyticsData,
   GroupModerationItem,
+  GroupType,
+  // @ts-ignore - Type imports used for type annotations
+  GroupPolicy,
+  // @ts-ignore - Type imports used for type annotations
+  GroupMember,
+  // @ts-ignore - Type imports used for type annotations
+  GroupRecommendation,
+  // @ts-ignore - Type imports used for type annotations
+  FeaturedGroup,
   EnterpriseDashboardStats,
   Role,
   GdprDashboardStats,
@@ -59,6 +68,10 @@ import type {
   ErrorLogEntry,
   SecretEntry,
   LegalDocument,
+  LegalDocumentVersion,
+  VersionComparison,
+  ComplianceStats,
+  UserAcceptance,
   SuperAdminDashboardStats,
   SuperAdminTenant,
   SuperAdminTenantDetail,
@@ -81,6 +94,10 @@ import type {
   TenantFederationFeatures,
   VettingRecord,
   VettingStats,
+  CronLog,
+  CronJobSettings,
+  GlobalCronSettings,
+  CronHealthMetrics,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -536,6 +553,77 @@ export const adminGroups = {
 
   delete: (id: number) =>
     api.delete(`/v2/admin/groups/${id}`),
+
+  // Group types
+  getGroupTypes: () =>
+    api.get('/v2/admin/groups/types'),
+
+  createGroupType: (data: Partial<GroupType>) =>
+    api.post('/v2/admin/groups/types', data),
+
+  updateGroupType: (id: number, data: Partial<GroupType>) =>
+    api.put(`/v2/admin/groups/types/${id}`, data),
+
+  deleteGroupType: (id: number) =>
+    api.delete(`/v2/admin/groups/types/${id}`),
+
+  // Policies
+  getPolicies: (typeId: number) =>
+    api.get(`/v2/admin/groups/types/${typeId}/policies`),
+
+  setPolicy: (typeId: number, key: string, value: unknown) =>
+    api.put(`/v2/admin/groups/types/${typeId}/policies`, { key, value }),
+
+  // Group detail
+  getGroup: (id: number) =>
+    api.get(`/v2/admin/groups/${id}`),
+
+  updateGroup: (id: number, data: unknown) =>
+    api.put(`/v2/admin/groups/${id}`, data),
+
+  getMembers: (groupId: number, params?: { role?: string; limit?: number; offset?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.role) query.append('role', params.role);
+    if (params?.limit) query.append('limit', params.limit.toString());
+    if (params?.offset) query.append('offset', params.offset.toString());
+    const qs = query.toString();
+    return api.get(`/v2/admin/groups/${groupId}/members${qs ? `?${qs}` : ''}`);
+  },
+
+  promoteMember: (groupId: number, userId: number) =>
+    api.post(`/v2/admin/groups/${groupId}/members/${userId}/promote`, {}),
+
+  demoteMember: (groupId: number, userId: number) =>
+    api.post(`/v2/admin/groups/${groupId}/members/${userId}/demote`, {}),
+
+  kickMember: (groupId: number, userId: number) =>
+    api.delete(`/v2/admin/groups/${groupId}/members/${userId}`),
+
+  // Geocoding
+  geocodeGroup: (groupId: number) =>
+    api.post(`/v2/admin/groups/${groupId}/geocode`, {}),
+
+  batchGeocode: () =>
+    api.post('/v2/admin/groups/batch-geocode', {}),
+
+  // Recommendations
+  getRecommendationData: (params?: { limit?: number; offset?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.limit) query.append('limit', params.limit.toString());
+    if (params?.offset) query.append('offset', params.offset.toString());
+    const qs = query.toString();
+    return api.get(`/v2/admin/groups/recommendations${qs ? `?${qs}` : ''}`);
+  },
+
+  // Ranking
+  getFeaturedGroups: () =>
+    api.get('/v2/admin/groups/featured'),
+
+  updateFeaturedGroups: () =>
+    api.post('/v2/admin/groups/featured/update', {}),
+
+  toggleFeatured: (groupId: number) =>
+    api.put(`/v2/admin/groups/${groupId}/toggle-featured`, {}),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -644,6 +732,38 @@ export const adminLegalDocs = {
 
   delete: (id: number) =>
     api.delete(`/v2/admin/legal-documents/${id}`),
+
+  // Version Management
+  getVersions: (docId: number) =>
+    api.get<LegalDocumentVersion[]>(`/v2/admin/legal-documents/${docId}/versions`),
+
+  compareVersions: (docId: number, v1: number, v2: number) =>
+    api.get<VersionComparison>(`/v2/admin/legal-documents/${docId}/versions/compare?v1=${v1}&v2=${v2}`),
+
+  createVersion: (docId: number, data: { version_number: string; version_label?: string; content: string; summary_of_changes?: string; effective_date: string; is_draft?: boolean }) =>
+    api.post<{ id: number }>(`/v2/admin/legal-documents/${docId}/versions`, data),
+
+  publishVersion: (versionId: number) =>
+    api.post<{ published: boolean }>(`/v2/admin/legal-documents/versions/${versionId}/publish`, {}),
+
+  // Compliance & Acceptance Tracking
+  getComplianceStats: (docId?: number) =>
+    api.get<ComplianceStats>(`/v2/admin/legal-documents/compliance${docId ? `?doc_id=${docId}` : ''}`),
+
+  getAcceptances: (versionId: number, limit = 50, offset = 0) =>
+    api.get<UserAcceptance[]>(`/v2/admin/legal-documents/versions/${versionId}/acceptances?limit=${limit}&offset=${offset}`),
+
+  exportAcceptances: (docId: number, startDate?: string, endDate?: string) => {
+    const query = buildQuery({ start_date: startDate, end_date: endDate });
+    return api.get(`/v2/admin/legal-documents/${docId}/acceptances/export${query}`);
+  },
+
+  // Notifications
+  notifyUsers: (docId: number, versionId: number, notify: { target: 'all' | 'non_accepted' }) =>
+    api.post<{ notified: boolean }>(`/v2/admin/legal-documents/${docId}/versions/${versionId}/notify`, notify),
+
+  getUsersPendingCount: (docId: number, versionId: number) =>
+    api.get<{ count: number }>(`/v2/admin/legal-documents/${docId}/versions/${versionId}/pending-count`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -671,6 +791,32 @@ export const adminNewsletters = {
   getTemplates: () => api.get('/v2/admin/newsletters/templates'),
 
   getAnalytics: () => api.get('/v2/admin/newsletters/analytics'),
+
+  // Bounce management
+  getBounces: (params: { limit?: number; offset?: number; type?: string; startDate?: string; endDate?: string } = {}) =>
+    api.get(`/v2/admin/newsletters/bounces${buildQuery(params)}`),
+
+  getSuppressionList: () => api.get('/v2/admin/newsletters/suppression-list'),
+
+  unsuppress: (email: string) =>
+    api.post(`/v2/admin/newsletters/suppression-list/${encodeURIComponent(email)}/unsuppress`, {}),
+
+  suppress: (email: string) =>
+    api.post(`/v2/admin/newsletters/suppression-list/${encodeURIComponent(email)}/suppress`, {}),
+
+  // Resend workflow
+  getResendInfo: (newsletterId: number) =>
+    api.get(`/v2/admin/newsletters/${newsletterId}/resend-info`),
+
+  resend: (newsletterId: number, options: { target: string; segment_id?: number; subject_override?: string }) =>
+    api.post(`/v2/admin/newsletters/${newsletterId}/resend`, options),
+
+  // Send-time optimizer
+  getSendTimeData: (params?: { days?: number }) =>
+    api.get(`/v2/admin/newsletters/send-time-optimizer${params ? buildQuery(params) : ''}`),
+
+  // Diagnostics
+  getDiagnostics: () => api.get('/v2/admin/newsletters/diagnostics'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1041,6 +1187,39 @@ export const adminVetting = {
 
   getUserRecords: (userId: number) =>
     api.get<VettingRecord[]>(`/v2/admin/vetting/user/${userId}`),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cron Job Monitoring
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminCron = {
+  // Logs
+  getLogs: (params?: { jobId?: string; limit?: number; offset?: number; status?: string; startDate?: string; endDate?: string }) =>
+    api.get<PaginatedResponse<CronLog>>(`/v2/admin/system/cron-jobs/logs${buildQuery(params || {})}`),
+
+  getLogDetail: (logId: number) =>
+    api.get<CronLog>(`/v2/admin/system/cron-jobs/logs/${logId}`),
+
+  clearLogs: (beforeDate: string) =>
+    api.delete<{ success: boolean }>(`/v2/admin/system/cron-jobs/logs?before=${beforeDate}`),
+
+  // Settings
+  getJobSettings: (jobId: string) =>
+    api.get<CronJobSettings>(`/v2/admin/system/cron-jobs/${jobId}/settings`),
+
+  updateJobSettings: (jobId: string, data: Partial<CronJobSettings>) =>
+    api.put<{ success: boolean }>(`/v2/admin/system/cron-jobs/${jobId}/settings`, data),
+
+  getGlobalSettings: () =>
+    api.get<GlobalCronSettings>('/v2/admin/system/cron-jobs/settings'),
+
+  updateGlobalSettings: (data: Partial<GlobalCronSettings>) =>
+    api.put<{ success: boolean }>('/v2/admin/system/cron-jobs/settings', data),
+
+  // Health
+  getHealthMetrics: () =>
+    api.get<CronHealthMetrics>('/v2/admin/system/cron-jobs/health'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

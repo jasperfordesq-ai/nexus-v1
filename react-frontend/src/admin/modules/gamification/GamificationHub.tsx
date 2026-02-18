@@ -30,12 +30,7 @@ export function GamificationHub() {
     setLoading(true);
     const res = await adminGamification.getStats();
     if (res.success && res.data) {
-      const data = res.data as unknown;
-      if (data && typeof data === 'object' && 'data' in data) {
-        setStats((data as { data: GamificationStats }).data);
-      } else {
-        setStats(data as GamificationStats);
-      }
+      setStats(res.data as GamificationStats);
     } else {
       toast.error('Failed to load gamification stats');
     }
@@ -50,12 +45,11 @@ export function GamificationHub() {
     setRechecking(true);
     const res = await adminGamification.recheckAll();
     if (res.success) {
-      const data = res.data as { data?: { users_checked?: number; message?: string }; users_checked?: number; message?: string } | undefined;
-      const inner = data?.data ?? data;
-      toast.success(inner?.message || 'Badge recheck completed');
+      const data = res.data as { users_checked?: number; message?: string } | undefined;
+      toast.success(data?.message || 'Badge recheck completed');
       loadStats();
     } else {
-      toast.error('Badge recheck failed');
+      toast.error(res.error || 'Badge recheck failed');
     }
     setRechecking(false);
   };

@@ -6,12 +6,12 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button, Chip, Spinner, Divider } from '@heroui/react';
-import { Clock, Play, RefreshCw, CheckCircle, XCircle, Terminal, Calendar, Tag } from 'lucide-react';
+import { Clock, Play, RefreshCw, CheckCircle, XCircle, Terminal, Calendar, Tag, AlertTriangle, Activity } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { adminSystem } from '../../api/adminApi';
+import { adminSystem, adminCron } from '../../api/adminApi';
 import { PageHeader, StatusBadge } from '../../components';
-import type { CronJob } from '../../api/types';
+import type { CronJob, CronHealthMetrics } from '../../api/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Extended type to include extra fields from the API
@@ -79,6 +79,8 @@ export function CronJobs() {
   const [jobs, setJobs] = useState<CronJobExtended[]>([]);
   const [loading, setLoading] = useState(true);
   const [runningJob, setRunningJob] = useState<number | null>(null);
+  const [healthMetrics, setHealthMetrics] = useState<CronHealthMetrics | null>(null);
+  const [loadingHealth, setLoadingHealth] = useState(true);
 
   const loadJobs = useCallback(async () => {
     setLoading(true);
@@ -91,6 +93,19 @@ export function CronJobs() {
       setJobs([]);
     }
     setLoading(false);
+  }, []);
+
+  const loadHealthMetrics = useCallback(async () => {
+    setLoadingHealth(true);
+    try {
+      const res = await adminCron.getHealthMetrics();
+      if (res.success && res.data) {
+        setHealthMetrics(res.data);
+      }
+    } catch {
+      setHealthMetrics(null);
+    }
+    setLoadingHealth(false);
   }, []);
 
   const handleRunJob = async (id: number, jobName: string) => {
@@ -111,7 +126,8 @@ export function CronJobs() {
 
   useEffect(() => {
     loadJobs();
-  }, [loadJobs]);
+    loadHealthMetrics();
+  }, [loadJobs, loadHealthMetrics]);
 
   // Group jobs by category
   const jobsByCategory = jobs.reduce<Record<string, CronJobExtended[]>>((acc, job) => {
@@ -149,6 +165,155 @@ export function CronJobs() {
       {loading && jobs.length === 0 && (
         <div className="flex items-center justify-center py-20">
           <Spinner size="lg" label="Loading cron jobs..." />
+        </div>
+      )}
+
+      {/* Health Metrics Section */}
+      {!loadingHealth && healthMetrics && (
+        <div className="mb-6">
+          {/* Alert Banner for Critical Status */}
+          {healthMetrics.alert_status === 'critical' && (
+            <Card shadow="sm" className="mb-4 border-2 border-danger">
+              <CardBody className="flex flex-row items-center gap-3 p-4 bg-danger/10">
+                <AlertTriangle size={24} className="text-danger shrink-0" />
+                <div>
+                  <p className="font-semibold text-danger">Critical: Cron Jobs Failing</p>
+                  <p className="text-sm text-danger-700 dark:text-danger-300">
+                    {healthMetrics.jobs_failed_24h} jobs failed in the last 24 hours. Immediate attention required.
+                  </p>
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Health Score Card */}
+            <Card shadow="sm">
+              <CardHeader className="flex items-center gap-2 pb-2">
+                <Activity size={16} className="text-default-500" />
+                <span className="text-sm font-medium">Health Score</span>
+              </CardHeader>
+              <CardBody className="pt-0">
+                <div className="flex items-end gap-2">
+                  <span className={`text-4xl font-bold ${
+                    healthMetrics.health_score >= 80 ? 'text-success' :
+                    healthMetrics.health_score >= 50 ? 'text-warning' :
+                    'text-danger'
+                  }`}>
+                    {healthMetrics.health_score}
+                  </span>
+                  <span className="text-sm text-default-500 mb-1">/100</span>
+                </div>
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  color={
+                    healthMetrics.alert_status === 'healthy' ? 'success' :
+                    healthMetrics.alert_status === 'warning' ? 'warning' :
+                    'danger'
+                  }
+                  className="mt-2"
+                >
+                  {healthMetrics.alert_status}
+                </Chip>
+              </CardBody>
+            </Card>
+
+            {/* Success Rate Card */}
+            <Card shadow="sm">
+              <CardHeader className="flex items-center gap-2 pb-2">
+                <CheckCircle size={16} className="text-success" />
+                <span className="text-sm font-medium">7-Day Success Rate</span>
+              </CardHeader>
+              <CardBody className="pt-0">
+                <div className="flex items-end gap-2">
+                  <span className="text-4xl font-bold text-success">
+                    {Math.round(healthMetrics.avg_success_rate_7d * 100)}
+                  </span>
+                  <span className="text-sm text-default-500 mb-1">%</span>
+                </div>
+                <p className="text-xs text-default-400 mt-2">
+                  Average across all jobs
+                </p>
+              </CardBody>
+            </Card>
+
+            {/* Recent Failures Card */}
+            <Card shadow="sm">
+              <CardHeader className="flex items-center gap-2 pb-2">
+                <XCircle size={16} className="text-danger" />
+                <span className="text-sm font-medium">24h Failures</span>
+              </CardHeader>
+              <CardBody className="pt-0">
+                <div className="flex items-end gap-2">
+                  <span className={`text-4xl font-bold ${
+                    healthMetrics.jobs_failed_24h === 0 ? 'text-success' :
+                    healthMetrics.jobs_failed_24h < 5 ? 'text-warning' :
+                    'text-danger'
+                  }`}>
+                    {healthMetrics.jobs_failed_24h}
+                  </span>
+                </div>
+                <p className="text-xs text-default-400 mt-2">
+                  Jobs failed in last 24 hours
+                </p>
+              </CardBody>
+            </Card>
+          </div>
+
+          {/* Recent Failures List */}
+          {healthMetrics.recent_failures.length > 0 && (
+            <Card shadow="sm" className="mt-4">
+              <CardHeader>
+                <span className="text-sm font-semibold">Recent Failures</span>
+              </CardHeader>
+              <CardBody className="p-0">
+                <div className="divide-y divide-divider">
+                  {healthMetrics.recent_failures.slice(0, 5).map((failure, idx) => (
+                    <div key={idx} className="px-4 py-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{failure.job_name}</p>
+                          <p className="text-xs text-default-500 line-clamp-1">
+                            {failure.reason}
+                          </p>
+                        </div>
+                        <span className="text-xs text-default-400 shrink-0">
+                          {new Date(failure.failed_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
+          {/* Overdue Jobs */}
+          {healthMetrics.jobs_overdue.length > 0 && (
+            <Card shadow="sm" className="mt-4 border border-warning">
+              <CardHeader className="flex items-center gap-2 bg-warning/10">
+                <AlertTriangle size={16} className="text-warning" />
+                <span className="text-sm font-semibold">Overdue Jobs</span>
+              </CardHeader>
+              <CardBody className="p-0">
+                <div className="divide-y divide-divider">
+                  {healthMetrics.jobs_overdue.map((job, idx) => (
+                    <div key={idx} className="px-4 py-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{job.job_name}</p>
+                          <p className="text-xs text-default-500">
+                            Expected: {job.expected_interval} • Last run: {job.last_run || 'Never'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          )}
         </div>
       )}
 
