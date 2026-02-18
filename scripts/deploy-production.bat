@@ -75,8 +75,9 @@ echo ================================================================
 echo [SUCCESS] Deployment complete!
 echo ================================================================
 echo.
-echo   API:      https://api.project-nexus.ie
-echo   Frontend: https://app.project-nexus.ie
+echo   API:        https://api.project-nexus.ie
+echo   Frontend:   https://app.project-nexus.ie
+echo   Sales Site: https://project-nexus.ie
 echo.
 ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && echo 'Deployed commit:' && sudo git log --oneline -1"
 goto :end
@@ -106,6 +107,7 @@ goto :eof
 echo [INFO] Configuring Nginx reverse proxy...
 ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "echo 'location / { proxy_pass http://127.0.0.1:8090; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; }' | sudo tee /var/www/vhosts/system/api.project-nexus.ie/conf/vhost_nginx.conf"
 ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "echo 'location / { proxy_pass http://127.0.0.1:3000; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; }' | sudo tee /var/www/vhosts/system/app.project-nexus.ie/conf/vhost_nginx.conf"
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "echo 'location / { proxy_pass http://127.0.0.1:3003; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; }' | sudo tee /var/www/vhosts/system/project-nexus.ie/conf/vhost_nginx.conf"
 ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "sudo nginx -t && sudo systemctl reload nginx"
 echo [INFO] Nginx configured
 goto :eof
@@ -115,6 +117,7 @@ echo [INFO] Running health checks (waiting 5s for containers)...
 timeout /t 5 /nobreak > nul
 ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:8090/health.php && echo ' - API OK' || echo ' - API FAILED'"
 ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:3000/ > /dev/null && echo 'Frontend OK' || echo 'Frontend FAILED'"
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:3003/ > /dev/null && echo 'Sales Site OK' || echo 'Sales Site FAILED'"
 goto :eof
 
 :end
