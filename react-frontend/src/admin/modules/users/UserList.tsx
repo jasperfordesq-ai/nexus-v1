@@ -40,6 +40,7 @@ import {
   FileUp,
   CheckCircle2,
   AlertCircle,
+  Trash2,
 } from 'lucide-react';
 import { useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -201,7 +202,7 @@ export function UserList() {
   };
 
   function UserActionsMenu({ user }: { user: AdminUser }) {
-    type ActionKey = 'edit' | 'approve' | 'suspend' | 'ban' | 'reactivate' | 'reset2fa' | 'permissions' | 'impersonate';
+    type ActionKey = 'edit' | 'approve' | 'suspend' | 'ban' | 'reactivate' | 'reset2fa' | 'permissions' | 'impersonate' | 'delete';
 
     const items: { key: ActionKey; label: string; icon: React.ReactNode; color?: 'success' | 'warning' | 'danger'; className?: string }[] = [
       { key: 'edit', label: 'Edit', icon: <Edit size={14} /> },
@@ -226,6 +227,10 @@ export function UserList() {
     // Super admins can impersonate other users (but not other super admins)
     if (isSuperAdmin && !user.is_super_admin && user.id !== currentUser?.id) {
       items.push({ key: 'impersonate', label: 'Impersonate', icon: <LogIn size={14} /> });
+    }
+    // Delete (only if not current user)
+    if (user.id !== currentUser?.id) {
+      items.push({ key: 'delete', label: 'Delete', icon: <Trash2 size={14} />, color: 'danger', className: 'text-danger' });
     }
 
     const handleMenuAction = (key: React.Key) => {

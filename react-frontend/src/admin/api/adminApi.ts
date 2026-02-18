@@ -110,7 +110,7 @@ export const adminDashboard = {
     api.get<MonthlyTrend[]>(`/v2/admin/dashboard/trends?months=${months}`),
 
   getActivity: (page = 1, limit = 20) =>
-    api.get<PaginatedResponse<ActivityLogEntry>>(
+    api.get<ActivityLogEntry[]>(
       `/v2/admin/dashboard/activity?page=${page}&limit=${limit}`
     ),
 };
@@ -772,7 +772,7 @@ export const adminMenus = {
 export const adminPlans = {
   list: () => api.get<Array<{ id: number; name: string; slug: string; tier_level: number; price_monthly: number; price_yearly: number; is_active: boolean }>>('/v2/admin/plans'),
   get: (id: number) => api.get('/v2/admin/plans/' + id),
-  create: (data: { name: string; description?: string; price_monthly?: number; price_yearly?: number; tier_level?: number }) =>
+  create: (data: { name: string; description?: string; price_monthly?: number; price_yearly?: number; tier_level?: number; max_menus?: number; max_menu_items?: number; features?: string[]; allowed_layouts?: string[]; is_active?: boolean }) =>
     api.post('/v2/admin/plans', data),
   update: (id: number, data: Record<string, unknown>) =>
     api.put('/v2/admin/plans/' + id, data),

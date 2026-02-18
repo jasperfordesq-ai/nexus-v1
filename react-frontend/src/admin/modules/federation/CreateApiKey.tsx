@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader, Input, Button, Checkbox } from '@heroui/rea
 import { Key, ArrowLeft, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
+import { useTenant } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
@@ -16,6 +17,7 @@ const AVAILABLE_SCOPES = ['read:users', 'read:listings', 'read:transactions', 'w
 export function CreateApiKey() {
   usePageTitle('Admin - Create API Key');
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const [name, setName] = useState('');
   const [scopes, setScopes] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -42,7 +44,7 @@ export function CreateApiKey() {
         if (d.api_key) {
           setCreatedKey(d.api_key);
         } else {
-          navigate('../federation/api-keys');
+          navigate(tenantPath('/admin/federation/api-keys'));
         }
       }
     } catch { /* empty */ }
@@ -69,7 +71,7 @@ export function CreateApiKey() {
             </div>
             <div className="flex gap-2">
               <Button variant="flat" startContent={<Copy size={16} />} onPress={handleCopy}>{copied ? 'Copied!' : 'Copy Key'}</Button>
-              <Button color="primary" onPress={() => navigate('../federation/api-keys')}>Done</Button>
+              <Button color="primary" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>Done</Button>
             </div>
           </CardBody>
         </Card>
@@ -82,7 +84,7 @@ export function CreateApiKey() {
       <PageHeader
         title="Create API Key"
         description="Generate a new federation API key"
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate('../federation/api-keys')}>Back</Button>}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>Back</Button>}
       />
       <Card shadow="sm">
         <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Key size={20} /> New API Key</h3></CardHeader>
@@ -99,7 +101,7 @@ export function CreateApiKey() {
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate('../federation/api-keys')}>Cancel</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>Cancel</Button>
             <Button color="primary" onPress={handleSubmit} isLoading={saving} isDisabled={!name.trim()}>Create Key</Button>
           </div>
         </CardBody>

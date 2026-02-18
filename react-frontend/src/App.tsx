@@ -12,12 +12,12 @@
  */
 
 import { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 import { HelmetProvider } from 'react-helmet-async';
 
 // Contexts (app-wide only — tenant-scoped contexts are inside TenantShell)
-import { ToastProvider, ThemeProvider } from '@/contexts';
+import { ToastProvider, ThemeProvider, useTenant } from '@/contexts';
 
 // Google Maps Provider (loads API key, enables PlaceAutocompleteInput)
 import { GoogleMapsProvider } from '@/components/location';
@@ -103,6 +103,19 @@ const ImpactReportPage = lazy(() => import('@/pages/about/ImpactReportPage'));
 const StrategicPlanPage = lazy(() => import('@/pages/about/StrategicPlanPage'));
 
 /**
+ * Gate that only renders children for a specific tenant slug.
+ * Other tenants see NotFoundPage. Used for tenant-specific content pages
+ * (e.g. hOUR Timebank's impact report, strategic plan, etc.)
+ */
+function TenantSlugGate({ slug, children }: { slug: string; children: React.ReactNode }) {
+  const { tenant } = useTenant();
+  if (tenant?.slug !== slug) {
+    return <Navigate to="about" replace />;
+  }
+  return <>{children}</>;
+}
+
+/**
  * All application routes rendered inside TenantShell.
  * This is rendered identically at both / and /:tenantSlug/ prefixes.
  */
@@ -135,11 +148,12 @@ function AppRoutes() {
         <Route path="cookies/versions" element={<LegalVersionHistoryPage />} />
         <Route path="legal" element={<LegalHubPage />} />
         <Route path="timebanking-guide" element={<TimebankingGuidePage />} />
-        <Route path="partner" element={<PartnerPage />} />
-        <Route path="social-prescribing" element={<SocialPrescribingPage />} />
-        <Route path="impact-summary" element={<ImpactSummaryPage />} />
-        <Route path="impact-report" element={<ImpactReportPage />} />
-        <Route path="strategic-plan" element={<StrategicPlanPage />} />
+        {/* Tenant 2 (hOUR Timebank) specific pages — redirect other tenants to /about */}
+        <Route path="partner" element={<TenantSlugGate slug="hour-timebank"><PartnerPage /></TenantSlugGate>} />
+        <Route path="social-prescribing" element={<TenantSlugGate slug="hour-timebank"><SocialPrescribingPage /></TenantSlugGate>} />
+        <Route path="impact-summary" element={<TenantSlugGate slug="hour-timebank"><ImpactSummaryPage /></TenantSlugGate>} />
+        <Route path="impact-report" element={<TenantSlugGate slug="hour-timebank"><ImpactReportPage /></TenantSlugGate>} />
+        <Route path="strategic-plan" element={<TenantSlugGate slug="hour-timebank"><StrategicPlanPage /></TenantSlugGate>} />
 
         {/* Public: Blog (feature-gated) */}
         <Route path="blog" element={

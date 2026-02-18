@@ -185,6 +185,8 @@ export function UserCreate() {
                 isDisabled={submitting}
               >
                 <SelectItem key="member">Member</SelectItem>
+                <SelectItem key="broker">Broker</SelectItem>
+                <SelectItem key="moderator">Moderator</SelectItem>
                 <SelectItem key="newsletter_admin">Newsletter Admin</SelectItem>
                 <SelectItem key="tenant_admin">Tenant Admin</SelectItem>
                 <SelectItem key="admin">Admin</SelectItem>

@@ -158,6 +158,18 @@ export function MenuBuilder() {
           description: formData.description,
         });
         if (res?.success) {
+          // If there are locally-added items, create them on the new menu
+          const newMenu = res.data as { id?: number } | undefined;
+          const newMenuId = newMenu?.id;
+          if (newMenuId && menuItems.length > 0) {
+            for (const item of menuItems) {
+              await adminMenus.createItem(newMenuId, {
+                label: item.label,
+                url: item.url,
+                sort_order: item.sort_order,
+              });
+            }
+          }
           toast.success('Menu created successfully');
           navigate('../menus');
         } else {

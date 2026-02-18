@@ -37,6 +37,7 @@ export function NativeApp() {
       })
       .catch(() => toast.error('Failed to load native app settings'))
       .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSave = async () => {

@@ -8,6 +8,7 @@ import { Button, Chip } from '@heroui/react';
 import { Key, Plus, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
+import { useTenant } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
 
@@ -25,6 +26,7 @@ interface ApiKey {
 export function ApiKeys() {
   usePageTitle('Admin - Federation API Keys');
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const [items, setItems] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -80,9 +82,9 @@ export function ApiKeys() {
         <PageHeader
           title="API Keys"
           description="Federation integration API keys"
-          actions={<Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate('../federation/api-keys/create')}>Create Key</Button>}
+          actions={<Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>Create Key</Button>}
         />
-        <EmptyState icon={Key} title="No API Keys" description="Create an API key to enable federation integrations." actionLabel="Create API Key" onAction={() => navigate('../federation/api-keys/create')} />
+        <EmptyState icon={Key} title="No API Keys" description="Create an API key to enable federation integrations." actionLabel="Create API Key" onAction={() => navigate(tenantPath('/admin/federation/api-keys/create'))} />
       </div>
     );
   }
@@ -95,7 +97,7 @@ export function ApiKeys() {
         actions={
           <div className="flex gap-2">
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate('../federation/api-keys/create')}>Create Key</Button>
+            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>Create Key</Button>
           </div>
         }
       />

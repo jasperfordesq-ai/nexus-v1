@@ -462,6 +462,7 @@ export function UserEdit() {
                   onSelectionChange={(keys) => setRole(Array.from(keys)[0] as string)}
                   isRequired isInvalid={!!errors.role} errorMessage={errors.role} isDisabled={submitting}>
                   <SelectItem key="member">Member</SelectItem>
+                  <SelectItem key="broker">Broker</SelectItem>
                   <SelectItem key="moderator">Moderator</SelectItem>
                   <SelectItem key="newsletter_admin">Newsletter Admin</SelectItem>
                   <SelectItem key="admin">Admin</SelectItem>

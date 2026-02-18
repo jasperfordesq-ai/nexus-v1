@@ -43,6 +43,7 @@ export function VolunteerApprovals() {
         }
       }
     } catch {
+      toast.error('Failed to load approvals');
       setItems([]);
     }
     setLoading(false);

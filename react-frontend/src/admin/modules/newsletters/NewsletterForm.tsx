@@ -12,7 +12,7 @@ import {
 import { Save, ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { RichTextEditor, PageHeader } from '../../components';
 
@@ -31,6 +31,7 @@ export function NewsletterForm() {
   const isEdit = Boolean(id);
   usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Newsletter`);
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   // Core fields
@@ -136,7 +137,7 @@ export function NewsletterForm() {
 
       if (res.success) {
         toast.success(isEdit ? 'Newsletter updated' : 'Newsletter created');
-        navigate('../newsletters');
+        navigate(tenantPath('/admin/newsletters'));
       } else {
         toast.error((res as { error?: string }).error || 'Failed to save newsletter');
       }
@@ -156,7 +157,7 @@ export function NewsletterForm() {
         title={isEdit ? 'Edit Newsletter' : 'Create Newsletter'}
         description={isEdit ? 'Update newsletter details' : 'Create a new email campaign'}
         actions={
-          <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate('../newsletters')}>
+          <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters'))}>
             Back
           </Button>
         }
@@ -284,7 +285,7 @@ export function NewsletterForm() {
             <Button color="primary" startContent={<Save size={16} />} onPress={handleSubmit} isLoading={saving} className="w-full">
               {isEdit ? 'Update' : 'Create'} Newsletter
             </Button>
-            <Button variant="flat" onPress={() => navigate('../newsletters')} className="w-full">
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/newsletters'))} className="w-full">
               Cancel
             </Button>
           </div>

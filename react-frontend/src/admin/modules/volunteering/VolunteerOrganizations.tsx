@@ -7,6 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@heroui/react';
 import { Building2, RefreshCw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
 
@@ -23,6 +24,7 @@ interface VolOrg {
 
 export function VolunteerOrganizations() {
   usePageTitle('Admin - Volunteer Organizations');
+  const toast = useToast();
   const [items, setItems] = useState<VolOrg[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,6 +41,7 @@ export function VolunteerOrganizations() {
         }
       }
     } catch {
+      toast.error('Failed to load organizations');
       setItems([]);
     }
     setLoading(false);
