@@ -3,7 +3,10 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Services\EventService;
+use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 use Nexus\Core\ImageUploader;
+use Nexus\Models\EventRsvp;
 
 /**
  * EventsApiController - RESTful API for events
@@ -463,6 +466,96 @@ class EventsApiController extends BaseApiController
             $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {
             $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
+        }
+    }
+
+    /**
+     * POST /api/v2/events/{id}/attendees/{attendeeId}/check-in
+     *
+     * Check in an attendee at an event. Only the event organizer (or admin) can do this.
+     * Creates a time credit transaction for the attendee based on event duration.
+     *
+     * Response: 200 OK with check-in confirmation
+     */
+    public function checkIn(int $id, int $attendeeId): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_checkin', 30, 60);
+
+        $tenantId = TenantContext::getId();
+
+        // Verify event exists and belongs to this tenant
+        $event = EventService::getById($id);
+        if (!$event) {
+            $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return;
+        }
+
+        // Only the organizer or an admin can check in attendees
+        $isOrganizer = (int) $event['user_id'] === $userId;
+        $isAdmin = false;
+        try {
+            $adminCheck = Database::query(
+                "SELECT role, is_super_admin FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
+            )->fetch();
+            if ($adminCheck && (
+                !empty($adminCheck['is_super_admin']) ||
+                in_array($adminCheck['role'], ['admin', 'tenant_admin'])
+            )) {
+                $isAdmin = true;
+            }
+        } catch (\Exception $e) {
+            // Ignore — just means no admin override
+        }
+
+        if (!$isOrganizer && !$isAdmin) {
+            $this->respondWithError('FORBIDDEN', 'Only the event organizer can check in attendees', null, 403);
+            return;
+        }
+
+        // Verify the attendee has an RSVP for this event
+        $currentStatus = EventRsvp::getUserStatus($id, $attendeeId);
+        if (!$currentStatus) {
+            $this->respondWithError('VALIDATION_ERROR', 'This user has not RSVPed to this event', null, 422);
+            return;
+        }
+        if ($currentStatus === 'attended') {
+            $this->respondWithError('VALIDATION_ERROR', 'This attendee has already been checked in', null, 422);
+            return;
+        }
+
+        // Calculate event duration (default 1 hour)
+        $duration = 1;
+        if (!empty($event['start_time']) && !empty($event['end_time'])) {
+            $start = strtotime($event['start_time']);
+            $end = strtotime($event['end_time']);
+            $diff = ($end - $start) / 3600;
+            $duration = round($diff, 2);
+            if ($duration < 0.5) $duration = 0.5;
+        }
+
+        try {
+            // Create time credit transaction (organizer → attendee)
+            \Nexus\Models\Transaction::create(
+                $userId,
+                $attendeeId,
+                $duration,
+                "Event Attendance: " . ($event['title'] ?? 'Event #' . $id)
+            );
+
+            // Update RSVP status to 'attended'
+            EventRsvp::rsvp($id, $attendeeId, 'attended');
+
+            $this->respondWithData([
+                'checked_in' => true,
+                'attendee_id' => $attendeeId,
+                'event_id' => $id,
+                'hours_credited' => $duration,
+            ]);
+        } catch (\Exception $e) {
+            $this->respondWithError('CHECKIN_ERROR', 'Failed to check in attendee: ' . $e->getMessage(), null, 500);
         }
     }
 }

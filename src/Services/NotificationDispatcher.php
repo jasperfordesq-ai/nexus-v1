@@ -800,10 +800,9 @@ HTML;
                 return;
             }
 
-            // Build full URL
-            $baseUrl = \Nexus\Core\TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
-            $basePath = \Nexus\Core\TenantContext::getBasePath();
-            $fullUrl = $baseUrl . $basePath . $link;
+            // Build full URL — use getFrontendUrl() so links go to React app, not legacy PHP
+            $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+            $fullUrl = $baseUrl . $link;
 
             $mailer = new \Nexus\Core\Mailer();
 

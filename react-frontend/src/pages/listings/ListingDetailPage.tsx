@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar } from '@heroui/react';
+import { Button, Avatar, Chip } from '@heroui/react';
 import {
   Clock,
   MapPin,
@@ -46,6 +46,7 @@ export function ListingDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [exchangeConfig, setExchangeConfig] = useState<ExchangeConfig | null>(null);
+  const [activeExchange, setActiveExchange] = useState<{ id: number; status: string; role: string; proposed_hours: number } | null>(null);
 
   const loadExchangeConfig = useCallback(async () => {
     try {
@@ -57,6 +58,18 @@ export function ListingDetailPage() {
       // Exchange workflow may not be enabled
     }
   }, []);
+
+  const checkActiveExchange = useCallback(async () => {
+    if (!id || !isAuthenticated) return;
+    try {
+      const response = await api.get<{ id: number; status: string; role: string; proposed_hours: number } | null>(`/v2/exchanges/check?listing_id=${id}`);
+      if (response.success && response.data) {
+        setActiveExchange(response.data);
+      }
+    } catch {
+      // Not critical
+    }
+  }, [id, isAuthenticated]);
 
   const loadListing = useCallback(async () => {
     if (!id) return;
@@ -82,7 +95,8 @@ export function ListingDetailPage() {
   useEffect(() => {
     loadListing();
     loadExchangeConfig();
-  }, [loadListing, loadExchangeConfig]);
+    checkActiveExchange();
+  }, [loadListing, loadExchangeConfig, checkActiveExchange]);
 
   async function handleDelete() {
     if (!listing || !window.confirm('Are you sure you want to delete this listing?')) return;
@@ -308,14 +322,41 @@ export function ListingDetailPage() {
         {isAuthenticated && !isOwner && (
           <div className="flex flex-wrap gap-3 pt-6 border-t border-theme-default">
             {exchangeConfig?.exchange_workflow_enabled ? (
-              <Link to={tenantPath(`/listings/${listing.id}/request-exchange`)} className="flex-1 sm:flex-none">
-                <Button
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
-                  startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
-                >
-                  Request Exchange
-                </Button>
-              </Link>
+              activeExchange ? (
+                <Link to={tenantPath(`/exchanges/${activeExchange.id}`)} className="flex-1 sm:flex-none">
+                  <Button
+                    className="w-full bg-theme-elevated text-theme-primary"
+                    startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
+                    endContent={
+                      <Chip size="sm" variant="flat" color={
+                        activeExchange.status === 'accepted' || activeExchange.status === 'in_progress' ? 'success' :
+                        activeExchange.status === 'pending_provider' || activeExchange.status === 'pending_broker' ? 'warning' :
+                        activeExchange.status === 'pending_confirmation' ? 'primary' :
+                        'default'
+                      }>
+                        {activeExchange.status === 'pending_provider' ? 'Waiting for response' :
+                         activeExchange.status === 'pending_broker' ? 'Awaiting approval' :
+                         activeExchange.status === 'accepted' ? 'Accepted' :
+                         activeExchange.status === 'in_progress' ? 'In Progress' :
+                         activeExchange.status === 'pending_confirmation' ? 'Confirm Hours' :
+                         activeExchange.status === 'disputed' ? 'Under Review' :
+                         activeExchange.status.replace(/_/g, ' ')}
+                      </Chip>
+                    }
+                  >
+                    Exchange
+                  </Button>
+                </Link>
+              ) : (
+                <Link to={tenantPath(`/listings/${listing.id}/request-exchange`)} className="flex-1 sm:flex-none">
+                  <Button
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
+                    startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    Request Exchange
+                  </Button>
+                </Link>
+              )
             ) : (
               <Link to={tenantPath(`/messages?to=${listing.user_id}&listing=${listing.id}`)} className="flex-1 sm:flex-none">
                 <Button

@@ -393,6 +393,34 @@ class ExchangesApiController extends BaseApiController
     }
 
     /**
+     * Check if user has an active exchange for a listing
+     *
+     * GET /api/v2/exchanges/check?listing_id={id}
+     */
+    public function check(): void
+    {
+        $userId = $this->requireAuth();
+
+        $listingId = (int) ($_GET['listing_id'] ?? 0);
+        if ($listingId <= 0) {
+            $this->error('listing_id is required', 400);
+            return;
+        }
+
+        $exchange = ExchangeWorkflowService::getActiveExchangeForListing($userId, $listingId);
+
+        $this->jsonResponse([
+            'data' => $exchange ? [
+                'id' => (int) $exchange['id'],
+                'status' => $exchange['status'],
+                'proposed_hours' => (float) $exchange['proposed_hours'],
+                'role' => (int) $exchange['requester_id'] === $userId ? 'requester' : 'provider',
+                'created_at' => $exchange['created_at'],
+            ] : null,
+        ]);
+    }
+
+    /**
      * Get exchange workflow configuration for current tenant
      *
      * GET /api/v2/exchanges/config
