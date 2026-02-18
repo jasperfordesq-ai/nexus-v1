@@ -47,8 +47,15 @@ export function GdprRequests() {
         status: statusFilter !== 'all' ? statusFilter : undefined,
       });
       if (res.success && res.data) {
-        setRequests(Array.isArray(res.data) ? res.data : []);
-        setTotal(res.meta?.total ?? 0);
+        const result = res.data as unknown;
+        if (Array.isArray(result)) {
+          setRequests(result);
+          setTotal(result.length);
+        } else if (result && typeof result === 'object') {
+          const pd = result as { data?: GdprRequest[]; meta?: { total?: number } };
+          setRequests(pd.data || []);
+          setTotal(pd.meta?.total ?? pd.data?.length ?? 0);
+        }
       }
     } catch {
       toast.error('Failed to load GDPR requests');

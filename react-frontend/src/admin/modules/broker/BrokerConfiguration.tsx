@@ -8,12 +8,14 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardBody, Button, Input, Switch, Divider, Spinner } from '@heroui/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { usePageTitle } from '@/hooks';
 import { adminBroker } from '../../api/adminApi';
 import type { BrokerConfig } from '../../api/types';
 import { PageHeader } from '../../components/PageHeader';
 import { useTenant, useToast } from '@/contexts';
 
 export default function BrokerConfiguration() {
+  usePageTitle('Admin - Broker Configuration');
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [loading, setLoading] = useState(true);

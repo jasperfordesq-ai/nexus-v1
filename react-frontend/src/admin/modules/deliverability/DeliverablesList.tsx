@@ -9,7 +9,7 @@ import { Button, Spinner } from '@heroui/react';
 import { Target, Plus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, ConfirmModal, type Column } from '../../components';
 
@@ -26,6 +26,7 @@ interface DeliverableItem {
 
 export function DeliverablesList() {
   usePageTitle('Admin - All Deliverables');
+  const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -152,7 +153,7 @@ export function DeliverablesList() {
           <Button
             color="primary"
             startContent={<Plus size={16} />}
-            onPress={() => navigate('../deliverability/create')}
+            onPress={() => navigate(tenantPath('/admin/deliverability/create'))}
           >
             Create Deliverable
           </Button>
@@ -165,7 +166,7 @@ export function DeliverablesList() {
           title="No Deliverables"
           description="Create deliverables to track project milestones and progress."
           actionLabel="Create Deliverable"
-          onAction={() => navigate('../deliverability/create')}
+          onAction={() => navigate(tenantPath('/admin/deliverability/create'))}
         />
       ) : (
         <DataTable

@@ -9,7 +9,7 @@ import { Card, CardBody, CardHeader, Input, Button, Spinner } from '@heroui/reac
 import { Menu, ArrowLeft, Save, Plus, Trash2, GripVertical } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminMenus } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
@@ -32,6 +32,7 @@ export function MenuBuilder() {
   const isEdit = id !== undefined && id !== 'new';
   usePageTitle('Admin - Menu Builder');
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   const [formData, setFormData] = useState<MenuFormData>({
@@ -147,7 +148,7 @@ export function MenuBuilder() {
         const res = await adminMenus.update(Number(id), formData as unknown as Record<string, unknown>);
         if (res?.success) {
           toast.success('Menu updated successfully');
-          navigate('../menus');
+          navigate(tenantPath('/admin/menus'));
         } else {
           toast.error('Failed to update menu');
         }
@@ -171,7 +172,7 @@ export function MenuBuilder() {
             }
           }
           toast.success('Menu created successfully');
-          navigate('../menus');
+          navigate(tenantPath('/admin/menus'));
         } else {
           toast.error('Failed to create menu');
         }
@@ -197,7 +198,7 @@ export function MenuBuilder() {
       <PageHeader
         title={isEdit ? 'Edit Menu' : 'Menu Builder'}
         description="Build and organize navigation menu items"
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate('../menus')}>Back</Button>}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/menus'))}>Back</Button>}
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -288,7 +289,7 @@ export function MenuBuilder() {
               onValueChange={(v) => handleChange('description', v)}
             />
             <div className="flex justify-end gap-2 pt-2">
-              <Button variant="flat" onPress={() => navigate('../menus')}>Cancel</Button>
+              <Button variant="flat" onPress={() => navigate(tenantPath('/admin/menus'))}>Cancel</Button>
               <Button
                 color="primary"
                 startContent={<Save size={16} />}

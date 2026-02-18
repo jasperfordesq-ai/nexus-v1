@@ -13,12 +13,10 @@ import { adminDeliverability } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
 interface AnalyticsData {
-  total_deliverables: number;
-  completion_rate: number;
-  avg_completion_days: number;
-  on_time_rate: number;
-  by_priority: Record<string, number>;
-  by_status: Record<string, number>;
+  completion_trends: Array<{ date: string; count: number }>;
+  priority_distribution: Record<string, number>;
+  avg_days_to_complete: number | null;
+  risk_distribution: Record<string, number>;
 }
 
 export function DeliverabilityAnalytics() {
@@ -71,19 +69,19 @@ export function DeliverabilityAnalytics() {
       <PageHeader title="Deliverability Analytics" description="Deliverable progress and performance reports" />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <StatCard label="Total Deliverables" value={data.total_deliverables} icon={BarChart3} color="primary" />
-        <StatCard label="Completion Rate" value={`${data.completion_rate ?? 0}%`} icon={CheckCircle} color="success" />
-        <StatCard label="Avg Completion (days)" value={data.avg_completion_days ?? '--'} icon={Clock} color="warning" />
-        <StatCard label="On-Time Rate" value={`${data.on_time_rate ?? 0}%`} icon={TrendingUp} color="secondary" />
+        <StatCard label="Completions (30d)" value={data.completion_trends?.length ?? 0} icon={BarChart3} color="primary" />
+        <StatCard label="Avg Completion (days)" value={data.avg_days_to_complete ?? '--'} icon={Clock} color="warning" />
+        <StatCard label="Priority Levels" value={Object.keys(data.priority_distribution || {}).length} icon={CheckCircle} color="success" />
+        <StatCard label="Risk Levels" value={Object.keys(data.risk_distribution || {}).length} icon={TrendingUp} color="secondary" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card shadow="sm">
           <CardHeader><h3 className="text-lg font-semibold">By Priority</h3></CardHeader>
           <CardBody>
-            {data.by_priority && Object.keys(data.by_priority).length > 0 ? (
+            {data.priority_distribution && Object.keys(data.priority_distribution).length > 0 ? (
               <div className="space-y-3">
-                {Object.entries(data.by_priority).map(([priority, count]) => (
+                {Object.entries(data.priority_distribution).map(([priority, count]) => (
                   <div key={priority} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
                     <span className="text-sm capitalize">{priority}</span>
                     <span className="text-sm font-medium">{count}</span>
@@ -97,19 +95,19 @@ export function DeliverabilityAnalytics() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">By Status</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">By Risk Level</h3></CardHeader>
           <CardBody>
-            {data.by_status && Object.keys(data.by_status).length > 0 ? (
+            {data.risk_distribution && Object.keys(data.risk_distribution).length > 0 ? (
               <div className="space-y-3">
-                {Object.entries(data.by_status).map(([status, count]) => (
-                  <div key={status} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
-                    <span className="text-sm capitalize">{status.replace('_', ' ')}</span>
+                {Object.entries(data.risk_distribution).map(([level, count]) => (
+                  <div key={level} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
+                    <span className="text-sm capitalize">{level.replace('_', ' ')}</span>
                     <span className="text-sm font-medium">{count}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-400 text-center py-4">No status data available</p>
+              <p className="text-sm text-default-400 text-center py-4">No risk data available</p>
             )}
           </CardBody>
         </Card>

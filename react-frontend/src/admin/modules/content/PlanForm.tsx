@@ -9,7 +9,7 @@ import { Card, CardBody, CardHeader, Input, Textarea, Switch, Button, Spinner } 
 import { CreditCard, ArrowLeft, Save } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminPlans } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
@@ -31,6 +31,7 @@ export function PlanForm() {
   const isEdit = Boolean(id);
   usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Plan`);
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   const [formData, setFormData] = useState<PlanFormData>({
@@ -109,7 +110,7 @@ export function PlanForm() {
         const res = await adminPlans.update(Number(id), payload);
         if (res?.success) {
           toast.success('Plan updated successfully');
-          navigate('../plans');
+          navigate(tenantPath('/admin/plans'));
         } else {
           toast.error('Failed to update plan');
         }
@@ -117,7 +118,7 @@ export function PlanForm() {
         const res = await adminPlans.create(payload);
         if (res?.success) {
           toast.success('Plan created successfully');
-          navigate('../plans');
+          navigate(tenantPath('/admin/plans'));
         } else {
           toast.error('Failed to create plan');
         }
@@ -143,7 +144,7 @@ export function PlanForm() {
       <PageHeader
         title={isEdit ? 'Edit Plan' : 'Create Plan'}
         description={isEdit ? 'Update plan details' : 'Create a new subscription plan'}
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate('../plans')}>Back</Button>}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/plans'))}>Back</Button>}
       />
 
       <Card shadow="sm">
@@ -242,7 +243,7 @@ export function PlanForm() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate('../plans')}>Cancel</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/plans'))}>Cancel</Button>
             <Button
               color="primary"
               startContent={<Save size={16} />}

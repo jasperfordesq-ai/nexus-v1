@@ -9,7 +9,7 @@ import { Button, Spinner, Chip } from '@heroui/react';
 import { Menu, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminMenus } from '../../api/adminApi';
 import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
 
@@ -24,6 +24,7 @@ interface MenuItem {
 
 export function MenusAdmin() {
   usePageTitle('Admin - Menus');
+  const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -84,7 +85,7 @@ export function MenusAdmin() {
         <button
           type="button"
           className="text-left font-medium text-primary hover:underline"
-          onClick={() => navigate(`../menus/builder/${item.id}`)}
+          onClick={() => navigate(tenantPath(`/admin/menus/builder/${item.id}`))}
         >
           {item.name}
         </button>
@@ -121,7 +122,7 @@ export function MenusAdmin() {
             size="sm"
             variant="flat"
             color="primary"
-            onPress={() => navigate(`../menus/builder/${item.id}`)}
+            onPress={() => navigate(tenantPath(`/admin/menus/builder/${item.id}`))}
             aria-label="Edit menu"
           >
             <Pencil size={14} />
@@ -159,7 +160,7 @@ export function MenusAdmin() {
           <Button
             color="primary"
             startContent={<Plus size={16} />}
-            onPress={() => navigate('../menus/builder/new')}
+            onPress={() => navigate(tenantPath('/admin/menus/builder/new'))}
           >
             Create Menu
           </Button>
@@ -172,7 +173,7 @@ export function MenusAdmin() {
           title="No Custom Menus"
           description="Create custom navigation menus for your community. Menus can be used in the header, footer, or sidebar."
           actionLabel="Create Menu"
-          onAction={() => navigate('../menus/builder/new')}
+          onAction={() => navigate(tenantPath('/admin/menus/builder/new'))}
         />
       ) : (
         <DataTable

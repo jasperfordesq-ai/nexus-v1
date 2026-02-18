@@ -130,7 +130,7 @@ export function SmartMatchingOverview() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
           label="Active Matches"
-          value={overview?.cache_entries ?? '---'}
+          value={overview?.active_users_matching ?? '---'}
           icon={Target}
           color="primary"
           loading={loading}

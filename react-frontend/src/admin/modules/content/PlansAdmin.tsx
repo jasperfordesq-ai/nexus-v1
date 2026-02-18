@@ -9,7 +9,7 @@ import { Button, Spinner, Chip } from '@heroui/react';
 import { CreditCard, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminPlans } from '../../api/adminApi';
 import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
 
@@ -25,6 +25,7 @@ interface PlanItem {
 
 export function PlansAdmin() {
   usePageTitle('Admin - Plans & Pricing');
+  const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -90,7 +91,7 @@ export function PlansAdmin() {
         <button
           type="button"
           className="text-left font-medium text-primary hover:underline"
-          onClick={() => navigate(`../plans/edit/${item.id}`)}
+          onClick={() => navigate(tenantPath(`/admin/plans/edit/${item.id}`))}
         >
           {item.name}
         </button>
@@ -133,7 +134,7 @@ export function PlansAdmin() {
             size="sm"
             variant="flat"
             color="primary"
-            onPress={() => navigate(`../plans/edit/${item.id}`)}
+            onPress={() => navigate(tenantPath(`/admin/plans/edit/${item.id}`))}
             aria-label="Edit plan"
           >
             <Pencil size={14} />
@@ -171,7 +172,7 @@ export function PlansAdmin() {
           <Button
             color="primary"
             startContent={<Plus size={16} />}
-            onPress={() => navigate('../plans/create')}
+            onPress={() => navigate(tenantPath('/admin/plans/create'))}
           >
             Create Plan
           </Button>
@@ -184,7 +185,7 @@ export function PlansAdmin() {
           title="No Plans Created"
           description="Create subscription plans to offer different tiers of access to your community platform."
           actionLabel="Create Plan"
-          onAction={() => navigate('../plans/create')}
+          onAction={() => navigate(tenantPath('/admin/plans/create'))}
         />
       ) : (
         <DataTable

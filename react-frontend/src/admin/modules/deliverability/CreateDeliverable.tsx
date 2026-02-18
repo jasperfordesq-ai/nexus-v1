@@ -9,7 +9,7 @@ import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem, Button
 import { Target, ArrowLeft, Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
@@ -25,6 +25,7 @@ interface DeliverableFormData {
 export function CreateDeliverable() {
   usePageTitle('Admin - Create Deliverable');
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   const [formData, setFormData] = useState<DeliverableFormData>({
@@ -52,11 +53,12 @@ export function CreateDeliverable() {
         title: formData.title,
         description: formData.description || undefined,
         priority: formData.priority || undefined,
+        status: formData.status || undefined,
         due_date: formData.due_date || undefined,
       });
       if (res?.success) {
         toast.success('Deliverable created successfully');
-        navigate('../deliverability/list');
+        navigate(tenantPath('/admin/deliverability/list'));
       } else {
         toast.error('Failed to create deliverable');
       }
@@ -72,7 +74,7 @@ export function CreateDeliverable() {
       <PageHeader
         title="Create Deliverable"
         description="Add a new project deliverable or milestone"
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate('../deliverability/list')}>Back</Button>}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>Back</Button>}
       />
 
       <Card shadow="sm">
@@ -137,7 +139,7 @@ export function CreateDeliverable() {
             onValueChange={(v) => handleChange('assigned_to', v)}
           />
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate('../deliverability/list')}>Cancel</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>Cancel</Button>
             <Button
               color="primary"
               startContent={<Save size={16} />}
