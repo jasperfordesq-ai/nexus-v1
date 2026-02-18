@@ -573,6 +573,20 @@ $router->add('PUT', '/api/v2/admin/config/native-app', 'Nexus\Controllers\Api\Ad
 $router->add('GET', '/api/v2/admin/system/cron-jobs', 'Nexus\Controllers\Api\AdminConfigApiController@getCronJobs');
 $router->add('POST', '/api/v2/admin/system/cron-jobs/{id}/run', 'Nexus\Controllers\Api\AdminConfigApiController@runCronJob');
 
+// Admin System - Cron Jobs - Logs
+$router->add('GET', '/api/v2/admin/system/cron-jobs/logs', 'Nexus\Controllers\Api\AdminCronApiController@getLogs');
+$router->add('GET', '/api/v2/admin/system/cron-jobs/logs/{id}', 'Nexus\Controllers\Api\AdminCronApiController@getLogDetail');
+$router->add('DELETE', '/api/v2/admin/system/cron-jobs/logs', 'Nexus\Controllers\Api\AdminCronApiController@clearLogs');
+
+// Admin System - Cron Jobs - Settings
+$router->add('GET', '/api/v2/admin/system/cron-jobs/{jobId}/settings', 'Nexus\Controllers\Api\AdminCronApiController@getJobSettings');
+$router->add('PUT', '/api/v2/admin/system/cron-jobs/{jobId}/settings', 'Nexus\Controllers\Api\AdminCronApiController@updateJobSettings');
+$router->add('GET', '/api/v2/admin/system/cron-jobs/settings', 'Nexus\Controllers\Api\AdminCronApiController@getGlobalSettings');
+$router->add('PUT', '/api/v2/admin/system/cron-jobs/settings', 'Nexus\Controllers\Api\AdminCronApiController@updateGlobalSettings');
+
+// Admin System - Cron Jobs - Health
+$router->add('GET', '/api/v2/admin/system/cron-jobs/health', 'Nexus\Controllers\Api\AdminCronApiController@getHealthMetrics');
+
 // Admin System - Activity Log
 $router->add('GET', '/api/v2/admin/system/activity-log', 'Nexus\Controllers\Api\AdminDashboardApiController@activity');
 
@@ -619,6 +633,32 @@ $router->add('GET', '/api/v2/admin/groups/moderation', 'Nexus\Controllers\Api\Ad
 $router->add('PUT', '/api/v2/admin/groups/{id}/status', 'Nexus\Controllers\Api\AdminGroupsApiController@updateStatus');
 $router->add('DELETE', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@deleteGroup');
 
+// Admin Groups - Types & Policies (Phase 3)
+$router->add('GET', '/api/v2/admin/groups/types', 'Nexus\Controllers\Api\AdminGroupsApiController@getGroupTypes');
+$router->add('POST', '/api/v2/admin/groups/types', 'Nexus\Controllers\Api\AdminGroupsApiController@createGroupType');
+$router->add('PUT', '/api/v2/admin/groups/types/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@updateGroupType');
+$router->add('DELETE', '/api/v2/admin/groups/types/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@deleteGroupType');
+$router->add('GET', '/api/v2/admin/groups/types/{id}/policies', 'Nexus\Controllers\Api\AdminGroupsApiController@getPolicies');
+$router->add('PUT', '/api/v2/admin/groups/types/{id}/policies', 'Nexus\Controllers\Api\AdminGroupsApiController@setPolicy');
+
+// Admin Groups - Detail & Members (Phase 3)
+$router->add('GET', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@getGroup');
+$router->add('PUT', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@updateGroup');
+$router->add('GET', '/api/v2/admin/groups/{groupId}/members', 'Nexus\Controllers\Api\AdminGroupsApiController@getMembers');
+$router->add('POST', '/api/v2/admin/groups/{groupId}/members/{userId}/promote', 'Nexus\Controllers\Api\AdminGroupsApiController@promoteMember');
+$router->add('POST', '/api/v2/admin/groups/{groupId}/members/{userId}/demote', 'Nexus\Controllers\Api\AdminGroupsApiController@demoteMember');
+$router->add('DELETE', '/api/v2/admin/groups/{groupId}/members/{userId}', 'Nexus\Controllers\Api\AdminGroupsApiController@kickMember');
+
+// Admin Groups - Geocoding (Phase 3)
+$router->add('POST', '/api/v2/admin/groups/{id}/geocode', 'Nexus\Controllers\Api\AdminGroupsApiController@geocodeGroup');
+$router->add('POST', '/api/v2/admin/groups/batch-geocode', 'Nexus\Controllers\Api\AdminGroupsApiController@batchGeocode');
+
+// Admin Groups - Recommendations & Ranking (Phase 3)
+$router->add('GET', '/api/v2/admin/groups/recommendations', 'Nexus\Controllers\Api\AdminGroupsApiController@getRecommendationData');
+$router->add('GET', '/api/v2/admin/groups/featured', 'Nexus\Controllers\Api\AdminGroupsApiController@getFeaturedGroups');
+$router->add('POST', '/api/v2/admin/groups/featured/update', 'Nexus\Controllers\Api\AdminGroupsApiController@updateFeaturedGroups');
+$router->add('PUT', '/api/v2/admin/groups/{id}/toggle-featured', 'Nexus\Controllers\Api\AdminGroupsApiController@toggleFeatured');
+
 // Admin Timebanking
 $router->add('GET', '/api/v2/admin/timebanking/stats', 'Nexus\Controllers\Api\AdminTimebankingApiController@stats');
 $router->add('GET', '/api/v2/admin/timebanking/alerts', 'Nexus\Controllers\Api\AdminTimebankingApiController@alerts');
@@ -655,6 +695,17 @@ $router->add('GET', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\Api
 $router->add('PUT', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@updateLegalDoc');
 $router->add('DELETE', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@deleteLegalDoc');
 
+// Legal Document Version Management
+$router->add('GET', '/api/v2/admin/legal-documents/{docId}/versions', 'Nexus\Controllers\Api\AdminLegalDocController@getVersions');
+$router->add('GET', '/api/v2/admin/legal-documents/{docId}/versions/compare', 'Nexus\Controllers\Api\AdminLegalDocController@compareVersions');
+$router->add('POST', '/api/v2/admin/legal-documents/{docId}/versions', 'Nexus\Controllers\Api\AdminLegalDocController@createVersion');
+$router->add('POST', '/api/v2/admin/legal-documents/versions/{versionId}/publish', 'Nexus\Controllers\Api\AdminLegalDocController@publishVersion');
+$router->add('GET', '/api/v2/admin/legal-documents/compliance', 'Nexus\Controllers\Api\AdminLegalDocController@getComplianceStats');
+$router->add('GET', '/api/v2/admin/legal-documents/versions/{versionId}/acceptances', 'Nexus\Controllers\Api\AdminLegalDocController@getAcceptances');
+$router->add('GET', '/api/v2/admin/legal-documents/{docId}/acceptances/export', 'Nexus\Controllers\Api\AdminLegalDocController@exportAcceptances');
+$router->add('POST', '/api/v2/admin/legal-documents/{docId}/versions/{versionId}/notify', 'Nexus\Controllers\Api\AdminLegalDocController@notifyUsers');
+$router->add('GET', '/api/v2/admin/legal-documents/{docId}/versions/{versionId}/pending-count', 'Nexus\Controllers\Api\AdminLegalDocController@getUsersPendingCount');
+
 // Admin Broker Controls
 $router->add('GET', '/api/v2/admin/broker/dashboard', 'Nexus\Controllers\Api\AdminBrokerApiController@dashboard');
 $router->add('GET', '/api/v2/admin/broker/exchanges', 'Nexus\Controllers\Api\AdminBrokerApiController@exchanges');
@@ -690,7 +741,15 @@ $router->add('GET', '/api/v2/admin/newsletters/subscribers', 'Nexus\Controllers\
 $router->add('GET', '/api/v2/admin/newsletters/segments', 'Nexus\Controllers\Api\AdminNewsletterApiController@segments');
 $router->add('GET', '/api/v2/admin/newsletters/templates', 'Nexus\Controllers\Api\AdminNewsletterApiController@templates');
 $router->add('GET', '/api/v2/admin/newsletters/analytics', 'Nexus\Controllers\Api\AdminNewsletterApiController@analytics');
+$router->add('GET', '/api/v2/admin/newsletters/bounces', 'Nexus\Controllers\Api\AdminNewsletterApiController@getBounces');
+$router->add('GET', '/api/v2/admin/newsletters/suppression-list', 'Nexus\Controllers\Api\AdminNewsletterApiController@getSuppressionList');
+$router->add('POST', '/api/v2/admin/newsletters/suppression-list/{email}/unsuppress', 'Nexus\Controllers\Api\AdminNewsletterApiController@unsuppress');
+$router->add('POST', '/api/v2/admin/newsletters/suppression-list/{email}/suppress', 'Nexus\Controllers\Api\AdminNewsletterApiController@suppress');
+$router->add('GET', '/api/v2/admin/newsletters/send-time-optimizer', 'Nexus\Controllers\Api\AdminNewsletterApiController@getSendTimeData');
+$router->add('GET', '/api/v2/admin/newsletters/diagnostics', 'Nexus\Controllers\Api\AdminNewsletterApiController@getDiagnostics');
 $router->add('GET', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@show');
+$router->add('GET', '/api/v2/admin/newsletters/{id}/resend-info', 'Nexus\Controllers\Api\AdminNewsletterApiController@getResendInfo');
+$router->add('POST', '/api/v2/admin/newsletters/{id}/resend', 'Nexus\Controllers\Api\AdminNewsletterApiController@resend');
 $router->add('PUT', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@update');
 $router->add('DELETE', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@destroy');
 

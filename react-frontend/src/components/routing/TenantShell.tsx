@@ -112,12 +112,16 @@ function TenantGuard({
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'super_admin'].includes(user.role);
 
   // Show maintenance page to non-admin users when maintenance mode is enabled
-  // Allow access to admin routes even in maintenance mode
+  // Allow access to admin routes and auth pages (login, register) even in maintenance mode
   const isAdminRoute = location.pathname.startsWith('/admin') ||
                        location.pathname.includes('/admin') ||
                        (slugPrefix ? location.pathname.startsWith(`/${slugPrefix}/admin`) : false);
 
-  if (maintenanceMode && !isAdmin && !isAdminRoute) {
+  const isAuthRoute = location.pathname === '/login' ||
+                      location.pathname === '/register' ||
+                      (slugPrefix && (location.pathname === `/${slugPrefix}/login` || location.pathname === `/${slugPrefix}/register`));
+
+  if (maintenanceMode && !isAdmin && !isAdminRoute && !isAuthRoute) {
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <MaintenancePage />

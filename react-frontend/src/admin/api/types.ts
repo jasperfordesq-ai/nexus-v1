@@ -4,6 +4,59 @@
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Groups - Advanced Management (Phase 3)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface GroupType {
+  id: number;
+  name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  member_count: number;
+  policy_count: number;
+  created_at: string;
+}
+
+export interface GroupPolicy {
+  category: string;
+  key: string;
+  value: string | number | boolean;
+  type: 'boolean' | 'number' | 'string';
+  label: string;
+  description?: string;
+}
+
+export interface GroupMember {
+  user_id: number;
+  user_name: string;
+  user_avatar?: string;
+  role: 'owner' | 'admin' | 'member';
+  joined_at: string;
+}
+
+export interface GroupRecommendation {
+  user_id: number;
+  user_name: string;
+  group_id: number;
+  group_name: string;
+  score: number;
+  joined: boolean;
+  created_at: string;
+}
+
+export interface FeaturedGroup {
+  group_id: number;
+  name: string;
+  member_count: number;
+  engagement_score: number;
+  geographic_diversity: number;
+  ranking_score: number;
+  is_featured: boolean;
+  manual_rank?: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Dashboard
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -395,6 +448,74 @@ export interface Newsletter {
   created_at: string;
 }
 
+export interface NewsletterBounce {
+  id: number;
+  newsletter_id: number;
+  email: string;
+  bounce_type: 'hard' | 'soft' | 'complaint';
+  bounce_reason: string;
+  bounced_at: string;
+  campaign_name?: string;
+  newsletter_subject?: string;
+}
+
+export interface SuppressionListEntry {
+  email: string;
+  reason: string;
+  suppressed_at: string;
+  bounce_count: number;
+}
+
+export interface ResendInfo {
+  newsletter_id: number;
+  total_sent: number;
+  total_opened: number;
+  total_clicked: number;
+  non_openers_count: number;
+  non_clickers_count: number;
+}
+
+export interface ResendOptions {
+  target: 'non_openers' | 'non_clickers' | 'segment';
+  segment_id?: number;
+  subject_override?: string;
+}
+
+export interface SendTimeData {
+  heatmap: Array<{
+    day_of_week: number;
+    hour: number;
+    engagement_score: number;
+    opens: number;
+    clicks: number;
+  }>;
+  recommendations: Array<{
+    day_of_week: number;
+    hour: number;
+    score: number;
+    description: string;
+  }>;
+  insights: string;
+}
+
+export interface NewsletterDiagnostics {
+  queue_status: {
+    total: number;
+    pending: number;
+    sending: number;
+    sent: number;
+    failed: number;
+  };
+  bounce_rate: number;
+  sender_score: number;
+  configuration: {
+    smtp_configured: boolean;
+    api_configured: boolean;
+    tracking_enabled: boolean;
+  };
+  health_status: 'healthy' | 'warning' | 'critical';
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Enterprise
 // ─────────────────────────────────────────────────────────────────────────────
@@ -430,6 +551,62 @@ export interface LegalDocument {
   status: 'draft' | 'published' | 'archived';
   created_at: string;
   updated_at?: string;
+}
+
+export interface LegalDocumentVersion {
+  id: number;
+  document_id: number;
+  version_number: string;
+  version_label?: string | null;
+  content: string;
+  content_plain: string;
+  summary_of_changes?: string | null;
+  effective_date?: string | null;
+  published_at?: string | null;
+  is_draft: boolean;
+  is_current: boolean;
+  notification_sent?: boolean;
+  notification_sent_at?: string | null;
+  created_by: number;
+  created_by_name?: string;
+  published_by?: number | null;
+  published_by_name?: string | null;
+  created_at: string;
+}
+
+export interface VersionComparison {
+  version1: LegalDocumentVersion;
+  version2: LegalDocumentVersion;
+  diff_html: string;
+  changes_count: number;
+}
+
+export interface ComplianceStats {
+  total_users: number;
+  overall_compliance_rate: number;
+  users_pending_acceptance: number;
+  documents: Array<{
+    id: number;
+    document_type: string;
+    title: string;
+    current_version_id: number | null;
+    version_number: string;
+    effective_date: string | null;
+    users_accepted: number;
+    users_not_accepted: number;
+    acceptance_rate: number;
+  }>;
+}
+
+export interface UserAcceptance {
+  user_id: number;
+  user_name: string;
+  user_email: string;
+  version_id: number;
+  version_number: string;
+  accepted_at: string;
+  acceptance_method: string;
+  ip_address: string | null;
 }
 
 export interface SystemHealth {
@@ -718,6 +895,7 @@ export interface AdminGroup {
   status: string;
   creator_name?: string;
   member_count: number;
+  location?: string;
   created_at: string;
 }
 
@@ -1103,4 +1281,53 @@ export interface AdminSettingsResponse {
     admin_approval: string | boolean;
     maintenance_mode: string | boolean;
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cron Job Monitoring
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface CronLog {
+  id: number;
+  job_id: string;
+  job_name: string;
+  status: 'success' | 'failed';
+  output: string;
+  duration_seconds: number;
+  executed_at: string;
+  executed_by: string; // 'cron' or 'manual-{user_id}'
+}
+
+export interface CronJobSettings {
+  job_id: string;
+  is_enabled: boolean;
+  custom_schedule?: string;
+  notify_on_failure: boolean;
+  notify_emails?: string;
+  max_retries: number;
+  timeout_seconds: number;
+}
+
+export interface GlobalCronSettings {
+  default_notify_email?: string;
+  log_retention_days: number;
+  max_concurrent_jobs: number;
+}
+
+export interface CronHealthMetrics {
+  health_score: number;
+  recent_failures: Array<{
+    job_name: string;
+    failed_at: string;
+    reason: string;
+  }>;
+  jobs_failed_24h: number;
+  jobs_overdue: Array<{
+    job_id: string;
+    job_name: string;
+    last_run: string;
+    expected_interval: string;
+  }>;
+  avg_success_rate_7d: number;
+  alert_status: 'critical' | 'warning' | 'healthy';
 }

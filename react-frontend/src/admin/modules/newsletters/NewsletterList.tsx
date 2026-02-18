@@ -7,12 +7,13 @@ import { useState, useCallback, useEffect } from 'react';
 import {
   Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
 } from '@heroui/react';
-import { Mail, Plus, RefreshCw, MoreVertical, Edit, Trash2, Copy } from 'lucide-react';
+import { Mail, Plus, RefreshCw, MoreVertical, Edit, Trash2, Copy, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { DataTable, PageHeader, StatusBadge, ConfirmModal, type Column } from '../../components';
+import { NewsletterResend } from './NewsletterResend';
 
 interface NewsletterItem {
   id: number;
@@ -37,6 +38,7 @@ export function NewsletterList() {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<NewsletterItem | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [resendTarget, setResendTarget] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -129,10 +131,18 @@ export function NewsletterList() {
           <DropdownMenu aria-label="Newsletter actions" onAction={(key) => {
             if (key === 'edit') navigate(tenantPath(`/admin/newsletters/edit/${item.id}`));
             else if (key === 'duplicate') handleDuplicate(item);
+            else if (key === 'resend') setResendTarget(item.id);
             else if (key === 'delete') setDeleteTarget(item);
           }}>
             <DropdownItem key="edit" startContent={<Edit size={14} />}>Edit</DropdownItem>
             <DropdownItem key="duplicate" startContent={<Copy size={14} />}>Duplicate</DropdownItem>
+            <DropdownItem
+              key="resend"
+              startContent={<Send size={14} />}
+              classNames={{ base: item.status === 'sent' ? '' : 'hidden' }}
+            >
+              Resend
+            </DropdownItem>
             <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">Delete</DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -181,6 +191,15 @@ export function NewsletterList() {
           confirmLabel="Delete"
           confirmColor="danger"
           isLoading={deleting}
+        />
+      )}
+
+      {resendTarget && (
+        <NewsletterResend
+          isOpen={!!resendTarget}
+          onClose={() => setResendTarget(null)}
+          newsletterId={resendTarget}
+          onSuccess={loadData}
         />
       )}
     </div>

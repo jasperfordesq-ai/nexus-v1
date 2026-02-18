@@ -19,6 +19,9 @@ const ListingsAdmin = lazy(() => import('./modules/listings/ListingsAdmin'));
 const ActivityLog = lazy(() => import('./modules/system/ActivityLog'));
 const CategoriesAdmin = lazy(() => import('./modules/categories/CategoriesAdmin'));
 const CronJobs = lazy(() => import('./modules/system/CronJobs'));
+const CronJobLogs = lazy(() => import('./modules/system/CronJobLogs'));
+const CronJobSettings = lazy(() => import('./modules/system/CronJobSettings'));
+const CronJobSetup = lazy(() => import('./modules/system/CronJobSetup'));
 const BlogAdmin = lazy(() => import('./modules/blog/BlogAdmin'));
 const BlogPostForm = lazy(() => import('./modules/blog/BlogPostForm'));
 const SmartMatchingOverview = lazy(() => import('./modules/matching/SmartMatchingOverview'));
@@ -48,6 +51,10 @@ const GroupList = lazy(() => import('./modules/groups/GroupList'));
 const GroupAnalytics = lazy(() => import('./modules/groups/GroupAnalytics'));
 const GroupApprovals = lazy(() => import('./modules/groups/GroupApprovals'));
 const GroupModeration = lazy(() => import('./modules/groups/GroupModeration'));
+const GroupTypes = lazy(() => import('./modules/groups/GroupTypes'));
+const GroupDetail = lazy(() => import('./modules/groups/GroupDetail'));
+const GroupRecommendations = lazy(() => import('./modules/groups/GroupRecommendations'));
+const GroupRanking = lazy(() => import('./modules/groups/GroupRanking'));
 
 // Enterprise module
 const EnterpriseDashboard = lazy(() => import('./modules/enterprise/EnterpriseDashboard'));
@@ -66,6 +73,8 @@ const SystemConfig = lazy(() => import('./modules/enterprise/SystemConfig'));
 const SecretsVault = lazy(() => import('./modules/enterprise/SecretsVault'));
 const LegalDocList = lazy(() => import('./modules/enterprise/LegalDocList'));
 const LegalDocForm = lazy(() => import('./modules/enterprise/LegalDocForm'));
+const LegalDocVersionList = lazy(() => import('./modules/enterprise/LegalDocVersionList'));
+const LegalDocComplianceDashboard = lazy(() => import('./modules/enterprise/LegalDocComplianceDashboard'));
 
 // Newsletter module
 const NewsletterList = lazy(() => import('./modules/newsletters/NewsletterList'));
@@ -74,6 +83,9 @@ const Subscribers = lazy(() => import('./modules/newsletters/Subscribers'));
 const Segments = lazy(() => import('./modules/newsletters/Segments'));
 const Templates = lazy(() => import('./modules/newsletters/Templates'));
 const NewsletterAnalytics = lazy(() => import('./modules/newsletters/NewsletterAnalytics'));
+const NewsletterBounces = lazy(() => import('./modules/newsletters/NewsletterBounces'));
+const NewsletterSendTimeOptimizer = lazy(() => import('./modules/newsletters/NewsletterSendTimeOptimizer'));
+const NewsletterDiagnostics = lazy(() => import('./modules/newsletters/NewsletterDiagnostics'));
 
 // Volunteering module
 const VolunteeringOverview = lazy(() => import('./modules/volunteering/VolunteeringOverview'));
@@ -223,6 +235,9 @@ export function AdminRoutes() {
       <Route path="newsletters/segments" element={<Lazy><Segments /></Lazy>} />
       <Route path="newsletters/templates" element={<Lazy><Templates /></Lazy>} />
       <Route path="newsletters/analytics" element={<Lazy><NewsletterAnalytics /></Lazy>} />
+      <Route path="newsletters/bounces" element={<Lazy><NewsletterBounces /></Lazy>} />
+      <Route path="newsletters/send-time-optimizer" element={<Lazy><NewsletterSendTimeOptimizer /></Lazy>} />
+      <Route path="newsletters/diagnostics" element={<Lazy><NewsletterDiagnostics /></Lazy>} />
 
       {/* ─── ADVANCED ─── */}
       <Route path="ai-settings" element={<Lazy><AiSettings /></Lazy>} />
@@ -266,6 +281,8 @@ export function AdminRoutes() {
       <Route path="legal-documents/create" element={<Lazy><LegalDocForm /></Lazy>} />
       <Route path="legal-documents/:id" element={<Lazy><LegalDocForm /></Lazy>} />
       <Route path="legal-documents/:id/edit" element={<Lazy><LegalDocForm /></Lazy>} />
+      <Route path="legal-documents/:id/versions" element={<Lazy><LegalDocVersionList /></Lazy>} />
+      <Route path="legal-documents/compliance" element={<Lazy><LegalDocComplianceDashboard /></Lazy>} />
 
       {/* ─── FEDERATION ─── */}
       <Route path="federation" element={<Lazy><FederationSettings /></Lazy>} />
@@ -281,6 +298,9 @@ export function AdminRoutes() {
       <Route path="settings" element={<Lazy><AdminSettings /></Lazy>} />
       <Route path="tenant-features" element={<Lazy><TenantFeatures /></Lazy>} />
       <Route path="cron-jobs" element={<Lazy><CronJobs /></Lazy>} />
+      <Route path="cron-jobs/logs" element={<Lazy><CronJobLogs /></Lazy>} />
+      <Route path="cron-jobs/settings" element={<Lazy><CronJobSettings /></Lazy>} />
+      <Route path="cron-jobs/setup" element={<Lazy><CronJobSetup /></Lazy>} />
       <Route path="activity-log" element={<Lazy><ActivityLog /></Lazy>} />
       <Route path="tests" element={<Lazy><TestRunner /></Lazy>} />
       <Route path="seed-generator" element={<Lazy><SeedGenerator /></Lazy>} />
@@ -294,6 +314,10 @@ export function AdminRoutes() {
       <Route path="groups/analytics" element={<Lazy><GroupAnalytics /></Lazy>} />
       <Route path="groups/approvals" element={<Lazy><GroupApprovals /></Lazy>} />
       <Route path="groups/moderation" element={<Lazy><GroupModeration /></Lazy>} />
+      <Route path="groups/types" element={<Lazy><GroupTypes /></Lazy>} />
+      <Route path="groups/:id/detail" element={<Lazy><GroupDetail /></Lazy>} />
+      <Route path="groups/recommendations" element={<Lazy><GroupRecommendations /></Lazy>} />
+      <Route path="groups/ranking" element={<Lazy><GroupRanking /></Lazy>} />
       <Route path="group-types" element={<Lazy><GroupList /></Lazy>} />
       <Route path="group-ranking" element={<Lazy><GroupList /></Lazy>} />
       <Route path="group-locations" element={<Lazy><GroupList /></Lazy>} />

@@ -2,6 +2,7 @@
 
 namespace Nexus\Controllers\Api;
 
+use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\RedisCache;
 use Nexus\Services\BrokerControlConfigService;
