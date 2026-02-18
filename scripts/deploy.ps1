@@ -7,9 +7,9 @@
 
 param(
     [string]$SSH_USER = "jasper",
-    [string]$SSH_HOST = "35.205.239.67",
+    [string]$SSH_HOST = "20.224.171.253",
     [int]$SSH_PORT = 22,
-    [string]$REMOTE_PATH = "/var/www/vhosts/project-nexus.ie",
+    [string]$REMOTE_PATH = "/opt/nexus-php",
     [string[]]$Only = @()  # Deploy only specific folders
 )
 

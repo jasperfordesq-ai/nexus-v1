@@ -15,9 +15,9 @@ param(
 )
 
 $SSH_USER = "jasper"
-$SSH_HOST = "35.205.239.67"
+$SSH_HOST = "20.224.171.253"
 $SSH_PORT = 22
-$REMOTE_PATH = "/var/www/vhosts/project-nexus.ie"
+$REMOTE_PATH = "/opt/nexus-php"
 $ProjectRoot = "C:\xampp\htdocs\staging"
 
 # Handle multiple targets (comma-separated)

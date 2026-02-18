@@ -1,0 +1,57 @@
+# =============================================================================
+# React Frontend - Docker Build Context Exclusions
+# =============================================================================
+# CRITICAL: Without this file, Docker copies stale node_modules/ and dist/
+# into the build context, causing the production image to serve old code.
+# =============================================================================
+
+# Dependencies (reinstalled via npm ci in Dockerfile)
+node_modules/
+
+# Build output (rebuilt inside Docker)
+dist/
+
+# Environment files (secrets must not be baked into images)
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker files (don't need themselves in context)
+Dockerfile
+Dockerfile.prod
+.dockerignore
+
+# Misc
+*.md
+LICENSE
+.eslintcache
+.prettierrc
+tsconfig.tsbuildinfo
