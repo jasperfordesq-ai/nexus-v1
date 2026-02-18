@@ -95,10 +95,15 @@ const federationNavItems = [
   { label: 'Federated Events', href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
 ];
 
+// Universal about items — shown for all tenants
 const aboutNavItems = [
   { label: 'About', href: '/about', icon: Info },
   { label: 'FAQ', href: '/faq', icon: HelpCircle },
   { label: 'Timebanking Guide', href: '/timebanking-guide', icon: BookOpen },
+];
+
+// Tenant 2 (hOUR Timebank) specific pages — contain hardcoded org content
+const hourTimebankAboutItems = [
   { label: 'Partner With Us', href: '/partner', icon: Handshake },
   { label: 'Social Prescribing', href: '/social-prescribing', icon: Stethoscope },
   { label: 'Our Impact', href: '/impact-summary', icon: TrendingUp },
@@ -349,6 +354,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </p>
               <div className="space-y-1">
                 {aboutNavItems.map(renderNavLink)}
+                {tenant?.slug === 'hour-timebank' && hourTimebankAboutItems.map(renderNavLink)}
                 {(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => renderNavLink({
                   label: p.title,
                   href: `/${p.slug}`,

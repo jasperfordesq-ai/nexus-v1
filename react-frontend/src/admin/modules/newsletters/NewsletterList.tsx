@@ -10,7 +10,7 @@ import {
 import { Mail, Plus, RefreshCw, MoreVertical, Edit, Trash2, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { DataTable, PageHeader, StatusBadge, ConfirmModal, type Column } from '../../components';
 
@@ -29,6 +29,7 @@ interface NewsletterItem {
 export function NewsletterList() {
   usePageTitle('Admin - Newsletters');
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const toast = useToast();
   const [items, setItems] = useState<NewsletterItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -126,7 +127,7 @@ export function NewsletterList() {
             <Button isIconOnly size="sm" variant="light"><MoreVertical size={16} /></Button>
           </DropdownTrigger>
           <DropdownMenu aria-label="Newsletter actions" onAction={(key) => {
-            if (key === 'edit') navigate(`../newsletters/edit/${item.id}`);
+            if (key === 'edit') navigate(tenantPath(`/admin/newsletters/edit/${item.id}`));
             else if (key === 'duplicate') handleDuplicate(item);
             else if (key === 'delete') setDeleteTarget(item);
           }}>
@@ -147,7 +148,7 @@ export function NewsletterList() {
         actions={
           <div className="flex gap-2">
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate('../newsletters/create')}>Create Newsletter</Button>
+            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters/create'))}>Create Newsletter</Button>
           </div>
         }
       />

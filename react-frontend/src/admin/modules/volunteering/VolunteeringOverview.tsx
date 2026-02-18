@@ -7,6 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Button, Chip } from '@heroui/react';
 import { Heart, Users, Clock, Briefcase, RefreshCw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
@@ -30,6 +31,7 @@ interface Opportunity {
 
 export function VolunteeringOverview() {
   usePageTitle('Admin - Volunteering');
+  const toast = useToast();
   const [stats, setStats] = useState<VolStats | null>(null);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +52,7 @@ export function VolunteeringOverview() {
         setOpportunities(d.recent_opportunities || []);
       }
     } catch {
+      toast.error('Failed to load volunteering data');
       setStats(null);
       setOpportunities([]);
     }

@@ -306,16 +306,20 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: 'Federated Events', href: tenantPath('/federation/events'), icon: Calendar },
   ] : [];
 
-  // About dropdown — static items + dynamic CMS pages from bootstrap
+  // About dropdown — universal items + tenant-specific items + dynamic CMS pages
+  const isHourTimebank = tenant?.slug === 'hour-timebank';
   const aboutItems = [
     { label: 'About', href: tenantPath('/about'), icon: Info },
     { label: 'FAQ', href: tenantPath('/faq'), icon: HelpCircle },
     { label: 'Timebanking Guide', href: tenantPath('/timebanking-guide'), icon: BookOpen },
-    { label: 'Partner With Us', href: tenantPath('/partner'), icon: Handshake },
-    { label: 'Social Prescribing', href: tenantPath('/social-prescribing'), icon: Stethoscope },
-    { label: 'Our Impact', href: tenantPath('/impact-summary'), icon: TrendingUp },
-    { label: 'Impact Report', href: tenantPath('/impact-report'), icon: BarChart3 },
-    { label: 'Strategic Plan', href: tenantPath('/strategic-plan'), icon: Compass },
+    // Tenant 2 (hOUR Timebank) specific pages — these contain hardcoded org content
+    ...(isHourTimebank ? [
+      { label: 'Partner With Us', href: tenantPath('/partner'), icon: Handshake },
+      { label: 'Social Prescribing', href: tenantPath('/social-prescribing'), icon: Stethoscope },
+      { label: 'Our Impact', href: tenantPath('/impact-summary'), icon: TrendingUp },
+      { label: 'Impact Report', href: tenantPath('/impact-report'), icon: BarChart3 },
+      { label: 'Strategic Plan', href: tenantPath('/strategic-plan'), icon: Compass },
+    ] : []),
     ...(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => ({
       label: p.title,
       href: tenantPath(`/${p.slug}`),

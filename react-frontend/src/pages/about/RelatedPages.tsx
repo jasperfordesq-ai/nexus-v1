@@ -25,8 +25,13 @@ interface AboutLink {
   description: string;
 }
 
-const aboutPages: AboutLink[] = [
+// Universal about pages — shown for all tenants
+const universalAboutPages: AboutLink[] = [
   { label: 'Timebanking Guide', href: '/timebanking-guide', icon: BookOpen, description: 'How timebanking works' },
+];
+
+// Tenant 2 (hOUR Timebank) specific pages — contain hardcoded org content
+const hourTimebankAboutPages: AboutLink[] = [
   { label: 'Partner With Us', href: '/partner', icon: Handshake, description: 'Partnership opportunities' },
   { label: 'Social Prescribing', href: '/social-prescribing', icon: Stethoscope, description: 'Evidence-based referral pathway' },
   { label: 'Our Impact', href: '/impact-summary', icon: TrendingUp, description: 'Social return on investment' },
@@ -40,7 +45,12 @@ interface RelatedPagesProps {
 }
 
 export function RelatedPages({ current }: RelatedPagesProps) {
-  const { tenantPath } = useTenant();
+  const { tenant, tenantPath } = useTenant();
+  const isHourTimebank = tenant?.slug === 'hour-timebank';
+  const aboutPages = [
+    ...universalAboutPages,
+    ...(isHourTimebank ? hourTimebankAboutPages : []),
+  ];
   const links = aboutPages.filter((p) => p.href !== current);
 
   return (

@@ -40,23 +40,28 @@ export function ListingsAdmin() {
 
   const loadItems = useCallback(async () => {
     setLoading(true);
-    const res = await adminListings.list({
-      page,
-      status: status === 'all' ? undefined : status,
-      search: search || undefined,
-    });
-    if (res.success && res.data) {
-      const data = res.data as unknown;
-      if (Array.isArray(data)) {
-        setItems(data);
-        setTotal(data.length);
-      } else if (data && typeof data === 'object') {
-        const pd = data as { data: AdminListing[]; meta?: { total: number } };
-        setItems(pd.data || []);
-        setTotal(pd.meta?.total || 0);
+    try {
+      const res = await adminListings.list({
+        page,
+        status: status === 'all' ? undefined : status,
+        search: search || undefined,
+      });
+      if (res.success && res.data) {
+        const data = res.data as unknown;
+        if (Array.isArray(data)) {
+          setItems(data);
+          setTotal(data.length);
+        } else if (data && typeof data === 'object') {
+          const pd = data as { data: AdminListing[]; meta?: { total: number } };
+          setItems(pd.data || []);
+          setTotal(pd.meta?.total || 0);
+        }
       }
+    } catch {
+      toast.error('Failed to load content');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [page, status, search]);
 
   useEffect(() => {

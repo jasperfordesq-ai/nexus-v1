@@ -36,6 +36,7 @@ export function ImageSettings() {
       })
       .catch(() => toast.error('Failed to load image settings'))
       .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSave = async () => {

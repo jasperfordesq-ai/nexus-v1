@@ -42,11 +42,9 @@ export function SeoAudit() {
       if (res.success && res.data) {
         const payload = res.data as unknown;
         if (payload && typeof payload === 'object') {
-          const d = payload as { checks?: AuditCheck[]; last_run_at?: string | null; data?: { checks?: AuditCheck[]; last_run_at?: string | null } };
-          // Handle both direct and wrapped responses
-          const resolved = d.data ?? d;
-          setChecks(resolved.checks ?? []);
-          setLastRunAt(resolved.last_run_at ?? null);
+          const d = payload as { checks?: AuditCheck[]; last_run_at?: string | null };
+          setChecks(d.checks ?? []);
+          setLastRunAt(d.last_run_at ?? null);
         }
       }
     } catch {

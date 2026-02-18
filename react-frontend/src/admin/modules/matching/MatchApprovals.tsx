@@ -30,7 +30,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import {
   DataTable,
@@ -51,6 +51,7 @@ function scoreColor(score: number): 'danger' | 'warning' | 'success' {
 export function MatchApprovals() {
   usePageTitle('Admin - Match Approvals');
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const navigate = useNavigate();
 
   // Data state
@@ -269,7 +270,7 @@ export function MatchApprovals() {
             isIconOnly
             size="sm"
             variant="flat"
-            onPress={() => navigate(`/admin/match-approvals/${item.id}`)}
+            onPress={() => navigate(tenantPath(`/admin/match-approvals/${item.id}`))}
             aria-label="View match details"
           >
             <Eye size={14} />

@@ -1,7 +1,7 @@
 /**
  * Timebanking Guide Page - How timebanking works, impact stats, values, and CTAs
  *
- * Tenant-specific "About" page for the hOUR Timebank community.
+ * Universal "About" page — content is generic to all timebanking communities.
  * Visual sections:
  * 1. Hero with subtitle
  * 2. Impact stats row (3 stat cards)
@@ -146,7 +146,7 @@ export function TimebankingGuidePage() {
     <>
     <PageMeta
       title="Timebanking Guide"
-      description="Learn how timebanking works: give an hour, earn a credit, get help. Discover the values and proven impact behind hOUR Timebank."
+      description="Learn how timebanking works: give an hour, earn a credit, get help. Discover the values and proven impact behind community timebanking."
     />
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -my-6 sm:-my-8">
       {/* ─── Breadcrumbs ─── */}

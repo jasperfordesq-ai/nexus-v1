@@ -34,7 +34,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import { PageHeader, StatusBadge } from '../../components';
 import type { MatchApprovalDetail } from '../../api/types';
@@ -57,6 +57,7 @@ function scoreLabel(score: number): string {
 export function MatchDetail() {
   usePageTitle('Admin - Match Detail');
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
@@ -143,7 +144,7 @@ export function MatchDetail() {
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}
-              onPress={() => navigate('/admin/match-approvals')}
+              onPress={() => navigate(tenantPath('/admin/match-approvals'))}
             >
               Back
             </Button>
@@ -175,7 +176,7 @@ export function MatchDetail() {
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
-            onPress={() => navigate('/admin/match-approvals')}
+            onPress={() => navigate(tenantPath('/admin/match-approvals'))}
           >
             Back to Approvals
           </Button>
