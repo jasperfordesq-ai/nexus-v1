@@ -48,8 +48,15 @@ class AdminFederationApiController extends BaseApiController
             $row = $stmt->fetch();
             if ($row && !empty($row['configuration'])) {
                 $config = json_decode($row['configuration'], true);
-                if (isset($config['federation'])) {
-                    $data['settings'] = array_merge($data['settings'], $config['federation']);
+                if (isset($config['federation']) && is_array($config['federation'])) {
+                    // Separate federation_enabled from other settings
+                    $federationConfig = $config['federation'];
+                    if (isset($federationConfig['federation_enabled'])) {
+                        $data['federation_enabled'] = (bool) $federationConfig['federation_enabled'];
+                    }
+                    // Merge all other settings (excluding federation_enabled)
+                    $otherSettings = array_diff_key($federationConfig, ['federation_enabled' => '']);
+                    $data['settings'] = array_merge($data['settings'], $otherSettings);
                 }
             }
         } catch (\Exception $e) {}
@@ -76,7 +83,17 @@ class AdminFederationApiController extends BaseApiController
             $row = $stmt->fetch();
             $config = json_decode($row['configuration'] ?? '{}', true) ?: [];
 
-            $config['federation'] = array_merge($config['federation'] ?? [], $input);
+            // Flatten the input structure - merge settings array into federation config
+            $federationSettings = $config['federation'] ?? [];
+            if (isset($input['settings']) && is_array($input['settings'])) {
+                // Merge the nested settings into the flat federation config
+                $federationSettings = array_merge($federationSettings, $input['settings']);
+            }
+            if (isset($input['federation_enabled'])) {
+                $federationSettings['federation_enabled'] = $input['federation_enabled'];
+            }
+
+            $config['federation'] = $federationSettings;
 
             Database::query(
                 "UPDATE tenants SET configuration = ? WHERE id = ?",
@@ -91,12 +108,12 @@ class AdminFederationApiController extends BaseApiController
             }
 
             $this->respondWithData([
-                'federation_enabled' => TenantContext::hasFeature('federation'),
+                'federation_enabled' => $federationSettings['federation_enabled'] ?? false,
                 'tenant_id' => $tenantId,
-                'settings' => $config['federation'],
+                'settings' => array_diff_key($federationSettings, ['federation_enabled' => '']),
             ]);
         } catch (\Exception $e) {
-            $this->respondWithError('UPDATE_FAILED', 'Failed to update federation settings', null, 500);
+            $this->respondWithError('UPDATE_FAILED', 'Failed to update federation settings: ' . $e->getMessage(), null, 500);
         }
     }
 

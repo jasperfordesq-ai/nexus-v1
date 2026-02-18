@@ -80,9 +80,10 @@ export function FederationSettings() {
         toast.success('Federation settings saved successfully');
         setDirty(false);
       } else {
-        toast.error('Failed to save federation settings');
+        const error = (res as { error?: string }).error || 'Failed to save federation settings';
+        toast.error(error);
       }
-    } catch {
+    } catch (err) {
       toast.error('Failed to save federation settings');
     } finally {
       setSaving(false);

@@ -92,11 +92,37 @@ For each admin module, checking:
 **Status:** FIXED (commit c006818)
 **Fix:** Added response checking, only reloads on success
 
+### ✅ FIXED: FederationSettings - Backend API Data Structure Bug (CRITICAL)
+**Files:**
+- `src/Controllers/Api/AdminFederationApiController.php` (backend)
+- `react-frontend/src/admin/modules/federation/FederationSettings.tsx` (frontend)
+
+**Issue:** Federation settings were not persisting to the database. The React component was correct but the backend API had a critical data structure bug.
+
+**Root Cause:**
+- React sends nested structure: `{ federation_enabled: true, settings: { allow_inbound_partnerships: true, ... } }`
+- API's `updateSettings()` was storing this nested structure directly into `config.federation`
+- API's `settings()` was then trying to merge this malformed nested structure back, creating broken data
+- Result: Settings appeared to save in UI but were never actually written to database correctly
+
+**Fix:**
+1. **Backend (`AdminFederationApiController.php`):**
+   - Modified `updateSettings()` to flatten the input structure before storing - extracts `settings` array and merges it with `federation_enabled` into a flat config
+   - Modified `settings()` GET method to properly separate `federation_enabled` from other settings when reading back
+   - Both methods now handle the structure transformation correctly
+
+2. **Frontend (`FederationSettings.tsx`):**
+   - Already had correct `res.success` validation
+   - Improved error messaging to show specific API errors
+   - Removed debug logging after fix was verified
+
+**Status:** FIXED (2026-02-18) - requires PHP container restart (`docker compose restart app`) for OPCache
+
 ---
 
 ## Summary of Fixes
 
-**Total Fixed:** 13 save/delete operations across 12 modules
+**Total Fixed:** 14 save/delete operations across 13 modules
 
 **Commits:**
 - 4588ad8: AdminSettings nested response fix
@@ -104,13 +130,15 @@ For each admin module, checking:
 - b03adfb: 7 modules (AiSettings, AlgorithmSettings, FeedAlgorithm, SeoOverview, GdprRequests, LegalDocForm, RoleForm)
 - 5a6047d: Redirects create + delete
 - c006818: 3 delete operations (LegalDocList, RoleList, Error404Tracking)
+- TBD: FederationSettings error messaging
 
 **Categories:**
 - Settings/Config: 5 modules (AdminSettings, AiSettings, AlgorithmSettings, FeedAlgorithm, SeoOverview)
 - Enterprise/Legal: 5 operations (GdprRequests, LegalDocForm, RoleForm, LegalDocList delete, RoleList delete)
+- Federation: 1 module (FederationSettings error messaging)
 - Tools: 3 operations (Redirects create/delete, Error404Tracking)
 
-**Root Cause Pattern:** All modules were showing success toast even when API returned failure, causing phantom saves/deletes in the UI.
+**Root Cause Pattern:** All modules were showing success toast even when API returned failure, causing phantom saves/deletes in the UI. FederationSettings had proper success check but showed generic error instead of specific API error.
 
 ---
 
@@ -194,7 +222,7 @@ For each admin module, checking:
 
 | Module | File | Status | Notes |
 |--------|------|--------|-------|
-| Federation Settings | `federation/FederationSettings.tsx` | ✅ VERIFIED WORKING | Defensively handles double-wrapping |
+| Federation Settings | `federation/FederationSettings.tsx` | ✅ FIXED | Error messaging improved |
 | Partnerships | `federation/Partnerships.tsx` | 🔄 CHECKING | |
 | Partner Directory | `federation/PartnerDirectory.tsx` | 🔄 CHECKING | |
 | Federation Analytics | `federation/FederationAnalytics.tsx` | 🔄 CHECKING | |
