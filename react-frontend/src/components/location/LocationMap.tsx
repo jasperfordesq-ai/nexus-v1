@@ -1,12 +1,13 @@
 /**
  * LocationMap — renders an interactive Google Map with markers.
  *
- * Uses @vis.gl/react-google-maps components (Map, AdvancedMarker, Pin, InfoWindow).
- * Returns null if no API key is configured (graceful degradation).
+ * Uses @vis.gl/react-google-maps components (Map, Marker, InfoWindow).
+ * Returns null if no API key is configured or if the API fails to load
+ * (e.g., billing not enabled) — graceful degradation.
  */
 
 import { useState, useEffect, useCallback, type ReactNode } from 'react';
-import { Map, AdvancedMarker, Pin, InfoWindow, useMap } from '@vis.gl/react-google-maps';
+import { Map, Marker, InfoWindow, useMap, useApiLoadingStatus, APILoadingStatus } from '@vis.gl/react-google-maps';
 import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
 
@@ -45,6 +46,7 @@ function LocationMapInner({
 }: LocationMapProps) {
   const { resolvedTheme } = useTheme();
   const map = useMap();
+  const status = useApiLoadingStatus();
   const [activeMarkerId, setActiveMarkerId] = useState<number | string | null>(null);
 
   // Auto-fit bounds when markers change
@@ -61,6 +63,11 @@ function LocationMapInner({
     markers.forEach((m) => bounds.extend({ lat: m.lat, lng: m.lng }));
     map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
   }, [map, markers, fitBounds, zoom]);
+
+  // Gracefully degrade if API auth fails (billing not enabled, key restricted, etc.)
+  if (status === APILoadingStatus.AUTH_FAILURE || status === APILoadingStatus.FAILED) {
+    return null;
+  }
 
   const mapCenter = center ?? (markers.length === 1
     ? { lat: markers[0].lat, lng: markers[0].lng }
@@ -91,19 +98,12 @@ function LocationMapInner({
         clickableIcons={false}
       >
         {markers.map((marker) => (
-          <AdvancedMarker
+          <Marker
             key={marker.id}
             position={{ lat: marker.lat, lng: marker.lng }}
             title={marker.title}
             onClick={() => handleMarkerClick(marker)}
-          >
-            <Pin
-              background={marker.pinColor || '#7c3aed'}
-              borderColor={marker.pinColor || '#7c3aed'}
-              glyphColor="#fff"
-              glyph={marker.pinGlyph || undefined}
-            />
-          </AdvancedMarker>
+          />
         ))}
 
         {activeMarker?.infoContent && (
