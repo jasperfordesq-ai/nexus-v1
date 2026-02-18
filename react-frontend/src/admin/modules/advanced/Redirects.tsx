@@ -73,19 +73,26 @@ export function Redirects() {
     }
     setSaving(true);
     try {
-      await adminTools.createRedirect({
+      const res = await adminTools.createRedirect({
         from_url: fromUrl.trim(),
         to_url: toUrl.trim(),
         status_code: Number(statusCode),
       });
-      toast.success('Redirect created');
-      setFromUrl('');
-      setToUrl('');
-      setStatusCode('301');
-      onAddClose();
-      await fetchRedirects();
-    } catch {
+
+      if (res.success) {
+        toast.success('Redirect created');
+        setFromUrl('');
+        setToUrl('');
+        setStatusCode('301');
+        onAddClose();
+        await fetchRedirects();
+      } else {
+        const error = (res as { error?: string }).error || 'Failed to create redirect';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to create redirect');
+      console.error('Redirect create error:', err);
     } finally {
       setSaving(false);
     }
@@ -95,12 +102,19 @@ export function Redirects() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await adminTools.deleteRedirect(deleteTarget.id);
-      toast.success('Redirect deleted');
-      setDeleteTarget(null);
-      await fetchRedirects();
-    } catch {
+      const res = await adminTools.deleteRedirect(deleteTarget.id);
+
+      if (res.success) {
+        toast.success('Redirect deleted');
+        setDeleteTarget(null);
+        await fetchRedirects();
+      } else {
+        const error = (res as { error?: string }).error || 'Failed to delete redirect';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to delete redirect');
+      console.error('Redirect delete error:', err);
     } finally {
       setDeleting(false);
     }
