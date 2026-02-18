@@ -857,11 +857,11 @@ export function GroupDetailPage() {
             locationText={group.location}
             markers={[{
               id: group.id,
-              lat: group.latitude,
-              lng: group.longitude,
+              lat: Number(group.latitude),
+              lng: Number(group.longitude),
               title: group.name,
             }]}
-            center={{ lat: group.latitude, lng: group.longitude }}
+            center={{ lat: Number(group.latitude), lng: Number(group.longitude) }}
             mapHeight="250px"
             zoom={14}
             className="mt-6"

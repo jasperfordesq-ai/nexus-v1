@@ -474,11 +474,11 @@ export function ProfilePage() {
             locationText={profile.location}
             markers={[{
               id: profile.id,
-              lat: profile.latitude,
-              lng: profile.longitude,
+              lat: Number(profile.latitude),
+              lng: Number(profile.longitude),
               title: `${profile.first_name} ${profile.last_name}`,
             }]}
-            center={{ lat: profile.latitude, lng: profile.longitude }}
+            center={{ lat: Number(profile.latitude), lng: Number(profile.longitude) }}
             mapHeight="200px"
             zoom={13}
             className="mt-6"

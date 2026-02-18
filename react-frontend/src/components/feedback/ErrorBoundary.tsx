@@ -90,8 +90,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   An unexpected error occurred. Please try again or go back to the home page.
                 </p>
 
-                {/* Error details — temporarily visible in production for debugging */}
-                {this.state.error && (
+                {/* Error details in development */}
+                {import.meta.env.DEV && this.state.error && (
                   <div className="mb-6 p-4 rounded-xl bg-red-500/5 border border-red-500/20 text-left">
                     <p className="text-red-400 text-sm font-mono break-all">
                       {this.state.error.message}

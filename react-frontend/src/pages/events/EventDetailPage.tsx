@@ -483,11 +483,11 @@ export function EventDetailPage() {
             locationText={event.location}
             markers={[{
               id: event.id,
-              lat: event.coordinates.lat,
-              lng: event.coordinates.lng,
+              lat: Number(event.coordinates.lat),
+              lng: Number(event.coordinates.lng),
               title: event.title,
             }]}
-            center={{ lat: event.coordinates.lat, lng: event.coordinates.lng }}
+            center={{ lat: Number(event.coordinates.lat), lng: Number(event.coordinates.lng) }}
             mapHeight="250px"
             zoom={15}
             className="mt-6"
