@@ -77,6 +77,10 @@ class TenantBootstrapController extends BaseApiController
 
             $tenantId = (int) $slugTenant['id'];
 
+            // Set TenantContext so downstream calls (e.g. BrokerControlConfigService)
+            // read config for the correct tenant, not the API domain's tenant
+            TenantContext::setById($tenantId);
+
             // Try cache first
             $cached = RedisCache::get(self::CACHE_KEY, $tenantId);
             if ($cached !== null) {
@@ -106,6 +110,9 @@ class TenantBootstrapController extends BaseApiController
 
                 if ($originTenant && (int) $originTenant['id'] !== 1) {
                     $tenantId = (int) $originTenant['id'];
+
+                    // Set TenantContext so downstream calls read correct tenant config
+                    TenantContext::setById($tenantId);
 
                     $cached = RedisCache::get(self::CACHE_KEY, $tenantId);
                     if ($cached !== null) {
