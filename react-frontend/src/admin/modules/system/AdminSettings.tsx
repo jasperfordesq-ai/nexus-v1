@@ -77,7 +77,7 @@ export function AdminSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await adminSettings.update({
+      const res = await adminSettings.update({
         name: form.name,
         description: form.description,
         contact_email: form.contact_email,
@@ -87,9 +87,18 @@ export function AdminSettings() {
         admin_approval: String(form.admin_approval),
         maintenance_mode: String(form.maintenance_mode),
       });
-      toast.success('Settings saved');
-    } catch {
+
+      if (res.success) {
+        toast.success('Settings saved');
+        // Reload settings to confirm persistence
+        fetchSettings();
+      } else {
+        const error = (res as { error?: string }).error || 'Save failed';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to save settings');
+      console.error('Settings save error:', err);
     } finally {
       setSaving(false);
     }
