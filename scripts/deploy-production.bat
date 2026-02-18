@@ -1,18 +1,27 @@
 @echo off
 REM =============================================================================
-REM Project NEXUS - Production Deployment Script (Windows)
+REM Project NEXUS - Production Deployment Script (Windows) - Enhanced
 REM =============================================================================
 REM Deploys PHP backend and React frontend to Azure/Plesk server via git pull.
 REM
 REM Usage:
 REM   deploy-production.bat           - Full deployment (git pull + rebuild)
 REM   deploy-production.bat quick     - Code only (git pull + restart)
-REM   deploy-production.bat status    - Check status
+REM   deploy-production.bat rollback  - Rollback to last successful deploy
+REM   deploy-production.bat status    - Check deployment status
 REM   deploy-production.bat nginx     - Update nginx config only
+REM   deploy-production.bat logs      - View recent logs
 REM
 REM Prerequisites:
 REM   - Push changes to GitHub first (git push origin main)
 REM   - Production server has git configured with deploy key
+REM
+REM New Features:
+REM   - Rollback capability
+REM   - Pre-deploy validation
+REM   - Post-deploy smoke tests
+REM   - Deployment locking (prevents concurrent deploys)
+REM   - Comprehensive logging
 REM =============================================================================
 
 setlocal EnableDelayedExpansion
@@ -30,94 +39,193 @@ if not exist "%SSH_KEY%" (
 )
 
 REM Parse arguments
+if "%1"=="" goto :full
 if "%1"=="quick" goto :quick
+if "%1"=="full" goto :full
+if "%1"=="rollback" goto :rollback
 if "%1"=="status" goto :status
 if "%1"=="nginx" goto :nginx
-goto :full
+if "%1"=="logs" goto :logs
+echo [ERROR] Invalid argument: %1
+echo Usage: deploy-production.bat [quick^|full^|rollback^|status^|nginx^|logs]
+exit /b 1
 
 :quick
-echo [INFO] Quick deployment (git pull + restart)...
-call :git_pull
-echo [INFO] Restarting PHP container (OPCache clear)...
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo docker restart nexus-php-app"
-call :health_check
-goto :end
-
-:status
-echo [INFO] Checking deployment status...
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && echo '=== Git Status ===' && sudo git log --oneline -3 && echo && echo '=== Containers ===' && sudo docker ps --format 'table {{.Names}}\t{{.Status}}' | grep nexus && echo && echo '=== Recent Logs ===' && sudo docker compose logs --tail=10 app 2>/dev/null"
-goto :end
-
-:nginx
-echo [INFO] Configuring Nginx...
-call :configure_nginx
+echo ============================================================
+echo   Quick Deployment (Git Pull + Restart)
+echo ============================================================
+echo.
+call :push_check
+echo [STEP 1/2] Running safe-deploy.sh quick on server...
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo bash scripts/safe-deploy.sh quick"
+if errorlevel 1 (
+    echo.
+    echo [FAILED] Deployment failed - check logs above
+    exit /b 1
+)
+echo.
+echo [STEP 2/2] Verifying deployment...
+call :show_status
 goto :end
 
 :full
-echo [INFO] Starting full deployment...
+echo ============================================================
+echo   Full Deployment (Git Pull + Rebuild)
+echo ============================================================
 echo.
-echo [STEP 1/5] Pulling latest code from GitHub...
-call :git_pull
+call :push_check
+echo [STEP 1/3] Running safe-deploy.sh full on server...
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo bash scripts/safe-deploy.sh full"
+if errorlevel 1 (
+    echo.
+    echo [FAILED] Deployment failed - check logs above
+    echo [HELP] You can rollback with: deploy-production.bat rollback
+    exit /b 1
+)
 echo.
-echo [STEP 2/5] Installing PHP dependencies...
-call :install_deps
-echo.
-echo [STEP 3/5] Building containers (--no-cache)...
-call :build_start
-echo.
-echo [STEP 4/5] Configuring Nginx...
+echo [STEP 2/3] Configuring Nginx...
 call :configure_nginx
 echo.
-echo [STEP 5/5] Health checks...
-call :health_check
+echo [STEP 3/3] Final verification...
+call :show_status
 echo.
 echo ================================================================
-echo [SUCCESS] Deployment complete!
+echo   Deployment Successful!
 echo ================================================================
 echo.
 echo   API:        https://api.project-nexus.ie
 echo   Frontend:   https://app.project-nexus.ie
 echo   Sales Site: https://project-nexus.ie
 echo.
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && echo 'Deployed commit:' && sudo git log --oneline -1"
 goto :end
 
-:git_pull
-echo [INFO] Pulling latest from GitHub...
-REM SAFETY: git reset --hard overwrites tracked files including compose.yml (the dev version).
-REM Production needs compose.prod.yml as the active compose.yml.
-REM We always restore it after git pull to prevent production breakage.
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo git fetch origin main && sudo git reset --hard origin/main && sudo cp compose.prod.yml compose.yml && echo 'Now at:' && sudo git log --oneline -1 && echo 'compose.yml restored from compose.prod.yml'"
-echo [INFO] Code synced via git
-goto :eof
+:rollback
+echo ============================================================
+echo   Rolling Back to Last Successful Deployment
+echo ============================================================
+echo.
+echo [WARNING] This will revert to the last successful deployment.
+echo.
+set /p CONFIRM="Are you sure? (yes/no): "
+if /i not "%CONFIRM%"=="yes" (
+    echo [CANCELLED] Rollback cancelled
+    exit /b 0
+)
+echo.
+echo [ROLLBACK] Running safe-deploy.sh rollback on server...
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo bash scripts/safe-deploy.sh rollback"
+if errorlevel 1 (
+    echo.
+    echo [FAILED] Rollback failed - check logs above
+    exit /b 1
+)
+echo.
+echo [SUCCESS] Rollback complete
+call :show_status
+goto :end
 
-:install_deps
-echo [INFO] Installing PHP dependencies...
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo docker run --rm -v $(pwd):/app -w /app composer:2 install --no-dev --optimize-autoloader --no-interaction"
-echo [INFO] Dependencies installed
-goto :eof
+:status
+echo ============================================================
+echo   Deployment Status
+echo ============================================================
+echo.
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo bash scripts/safe-deploy.sh status"
+goto :end
 
-:build_start
-echo [INFO] Building and starting containers (--no-cache)...
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && cp compose.prod.yml compose.yml && sudo docker compose build --no-cache && sudo docker compose up -d"
-echo [INFO] Containers rebuilt and started
+:nginx
+echo ============================================================
+echo   Nginx Configuration Update
+echo ============================================================
+echo.
+call :configure_nginx
+echo [SUCCESS] Nginx configuration updated
+goto :end
+
+:logs
+echo ============================================================
+echo   Recent Deployment Logs
+echo ============================================================
+echo.
+echo Latest deployment log:
+echo.
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH%/logs && ls -t deploy-*.log 2>/dev/null | head -1 | xargs tail -50 2>/dev/null || echo 'No deployment logs found'"
+echo.
+echo.
+echo Recent container logs:
+echo.
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && sudo docker compose logs --tail=20 app 2>/dev/null || echo 'Could not fetch container logs'"
+goto :end
+
+REM =============================================================================
+REM Helper Functions
+REM =============================================================================
+
+:push_check
+echo [CHECK] Verifying local changes pushed to GitHub...
+for /f "tokens=*" %%i in ('git status --porcelain') do (
+    echo [WARNING] You have uncommitted local changes:
+    git status --short
+    echo.
+    set /p CONTINUE="Continue deployment anyway? (yes/no): "
+    if /i not "!CONTINUE!"=="yes" (
+        echo [CANCELLED] Deployment cancelled
+        exit /b 1
+    )
+    goto :push_check_done
+)
+:push_check_done
+REM Check if local branch is ahead of origin
+for /f %%i in ('git rev-list --count origin/main..HEAD') do set AHEAD=%%i
+if !AHEAD! GTR 0 (
+    echo [WARNING] You have !AHEAD! local commit(s) not pushed to GitHub
+    echo.
+    set /p PUSH_NOW="Push to GitHub now? (yes/no): "
+    if /i "!PUSH_NOW!"=="yes" (
+        echo [PUSH] Pushing to origin/main...
+        git push origin main
+        if errorlevel 1 (
+            echo [ERROR] Git push failed
+            exit /b 1
+        )
+        echo [SUCCESS] Changes pushed to GitHub
+    ) else (
+        echo [WARNING] Deploying without pushing - server will NOT get your latest changes
+        timeout /t 3 /nobreak > nul
+    )
+)
+echo [OK] Ready to deploy
+echo.
 goto :eof
 
 :configure_nginx
-echo [INFO] Configuring Nginx reverse proxy...
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "echo 'location / { proxy_pass http://127.0.0.1:8090; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; }' | sudo tee /var/www/vhosts/system/api.project-nexus.ie/conf/vhost_nginx.conf"
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "echo 'location / { proxy_pass http://127.0.0.1:3000; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; }' | sudo tee /var/www/vhosts/system/app.project-nexus.ie/conf/vhost_nginx.conf"
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "echo 'location / { proxy_pass http://127.0.0.1:3003; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; }' | sudo tee /var/www/vhosts/system/project-nexus.ie/conf/vhost_nginx.conf"
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "sudo nginx -t && sudo systemctl reload nginx"
-echo [INFO] Nginx configured
+echo [NGINX] Configuring reverse proxy for all domains...
+REM API domain
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "echo 'location / { proxy_pass http://127.0.0.1:8090; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; }' | sudo tee /var/www/vhosts/system/api.project-nexus.ie/conf/vhost_nginx.conf > nul" 2>nul
+REM Frontend domain
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "echo 'location / { proxy_pass http://127.0.0.1:3000; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; }' | sudo tee /var/www/vhosts/system/app.project-nexus.ie/conf/vhost_nginx.conf > nul" 2>nul
+REM Sales site domain
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "echo 'location / { proxy_pass http://127.0.0.1:3003; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; }' | sudo tee /var/www/vhosts/system/project-nexus.ie/conf/vhost_nginx.conf > nul" 2>nul
+REM Test and reload nginx
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "sudo nginx -t && sudo systemctl reload nginx" 2>nul
+if errorlevel 1 (
+    echo [WARNING] Nginx configuration may have failed
+) else (
+    echo [OK] Nginx configured successfully
+)
 goto :eof
 
-:health_check
-echo [INFO] Running health checks (waiting 5s for containers)...
-timeout /t 5 /nobreak > nul
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:8090/health.php && echo ' - API OK' || echo ' - API FAILED'"
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:3000/ > /dev/null && echo 'Frontend OK' || echo 'Frontend FAILED'"
-ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:3003/ > /dev/null && echo 'Sales Site OK' || echo 'Sales Site FAILED'"
+:show_status
+echo.
+echo Current deployment:
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "cd %REMOTE_PATH% && git log --oneline -1"
+echo.
+echo Container status:
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "sudo docker ps --filter 'name=nexus' --format 'table {{.Names}}\t{{.Status}}'"
+echo.
+echo Health checks:
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:8090/health.php > /dev/null && echo '  API:        OK' || echo '  API:        FAILED'"
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:3000/ > /dev/null && echo '  Frontend:   OK' || echo '  Frontend:   FAILED'"
+ssh -i "%SSH_KEY%" %SERVER_USER%@%SERVER_HOST% "curl -sf http://127.0.0.1:3003/ > /dev/null && echo '  Sales Site: OK' || echo '  Sales Site: FAILED'"
 goto :eof
 
 :end
