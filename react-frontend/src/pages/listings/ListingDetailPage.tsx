@@ -282,11 +282,11 @@ export function ListingDetailPage() {
             locationText={listing.location}
             markers={[{
               id: listing.id,
-              lat: listing.latitude,
-              lng: listing.longitude,
+              lat: Number(listing.latitude),
+              lng: Number(listing.longitude),
               title: listing.title,
             }]}
-            center={{ lat: listing.latitude, lng: listing.longitude }}
+            center={{ lat: Number(listing.latitude), lng: Number(listing.longitude) }}
             mapHeight="250px"
             zoom={15}
             className="mt-6"

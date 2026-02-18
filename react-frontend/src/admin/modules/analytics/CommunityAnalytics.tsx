@@ -627,8 +627,8 @@ export function CommunityAnalytics() {
                   <LocationMap
                     markers={geoData.member_locations.map((loc, i) => ({
                       id: `cluster-${i}`,
-                      lat: loc.lat,
-                      lng: loc.lng,
+                      lat: Number(loc.lat),
+                      lng: Number(loc.lng),
                       title: `${loc.area}: ${loc.count} member${loc.count > 1 ? 's' : ''}`,
                       pinGlyph: String(loc.count),
                       infoContent: (

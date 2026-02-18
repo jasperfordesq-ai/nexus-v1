@@ -342,7 +342,7 @@ export function EventsPage() {
             <EntityMapView
               items={events}
               getCoordinates={(e) =>
-                e.coordinates ? { lat: e.coordinates.lat, lng: e.coordinates.lng } : null
+                e.coordinates ? { lat: Number(e.coordinates.lat), lng: Number(e.coordinates.lng) } : null
               }
               getMarkerConfig={(e) => ({
                 id: e.id,

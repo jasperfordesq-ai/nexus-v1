@@ -303,7 +303,7 @@ export function ListingsPage() {
             <EntityMapView
               items={listings}
               getCoordinates={(l) =>
-                l.latitude && l.longitude ? { lat: l.latitude, lng: l.longitude } : null
+                l.latitude && l.longitude ? { lat: Number(l.latitude), lng: Number(l.longitude) } : null
               }
               getMarkerConfig={(l) => ({
                 id: l.id,

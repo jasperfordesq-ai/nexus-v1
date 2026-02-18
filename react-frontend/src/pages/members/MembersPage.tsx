@@ -398,7 +398,7 @@ export function MembersPage() {
                 <EntityMapView
                   items={members}
                   getCoordinates={(m) =>
-                    m.latitude && m.longitude ? { lat: m.latitude, lng: m.longitude } : null
+                    m.latitude && m.longitude ? { lat: Number(m.latitude), lng: Number(m.longitude) } : null
                   }
                   getMarkerConfig={(m) => ({
                     id: m.id,
