@@ -68,6 +68,50 @@ For each admin module, checking:
 **Status:** FIXED
 **Fix:** Added response checking, only navigates on success (prevents phantom roles)
 
+### ✅ FIXED: Redirects - Create + Delete Operations
+**File:** `react-frontend/src/admin/modules/advanced/Redirects.tsx`
+**Issue:** Both `createRedirect` and `deleteRedirect` didn't check `res.success`
+**Status:** FIXED (commit 5a6047d)
+**Fix:** Added response checking for both operations
+
+### ✅ FIXED: LegalDocList - Delete Operation (CRITICAL)
+**File:** `react-frontend/src/admin/modules/enterprise/LegalDocList.tsx`
+**Issue:** `delete` operation didn't check `res.success` before removing from UI
+**Status:** FIXED (commit c006818)
+**Fix:** Added response checking, only reloads on success (prevents showing deleted when still live)
+
+### ✅ FIXED: RoleList - Delete Operation (SECURITY CRITICAL)
+**File:** `react-frontend/src/admin/modules/enterprise/RoleList.tsx`
+**Issue:** `deleteRole` didn't check `res.success` before removing from UI
+**Status:** FIXED (commit c006818)
+**Fix:** Added response checking, only reloads on success (prevents phantom deletes)
+
+### ✅ FIXED: Error404Tracking - Delete Operation
+**File:** `react-frontend/src/admin/modules/advanced/Error404Tracking.tsx`
+**Issue:** `delete404Error` didn't check `res.success` before removing from UI
+**Status:** FIXED (commit c006818)
+**Fix:** Added response checking, only reloads on success
+
+---
+
+## Summary of Fixes
+
+**Total Fixed:** 13 save/delete operations across 12 modules
+
+**Commits:**
+- 4588ad8: AdminSettings nested response fix
+- 87c7756: AdminSettings save operation fix
+- b03adfb: 7 modules (AiSettings, AlgorithmSettings, FeedAlgorithm, SeoOverview, GdprRequests, LegalDocForm, RoleForm)
+- 5a6047d: Redirects create + delete
+- c006818: 3 delete operations (LegalDocList, RoleList, Error404Tracking)
+
+**Categories:**
+- Settings/Config: 5 modules (AdminSettings, AiSettings, AlgorithmSettings, FeedAlgorithm, SeoOverview)
+- Enterprise/Legal: 5 operations (GdprRequests, LegalDocForm, RoleForm, LegalDocList delete, RoleList delete)
+- Tools: 3 operations (Redirects create/delete, Error404Tracking)
+
+**Root Cause Pattern:** All modules were showing success toast even when API returned failure, causing phantom saves/deletes in the UI.
+
 ---
 
 ## Modules Under Review
