@@ -48,15 +48,19 @@ export function AdminSettings() {
       const res = await adminSettings.get();
       const data = res.data;
       if (data) {
+        // API returns nested structure: { tenant: {...}, settings: {...} }
+        const tenant = (data as any).tenant || data;
+        const settings = (data as any).settings || data;
+
         setForm({
-          name: (data.name as string) ?? '',
-          description: (data.description as string) ?? '',
-          contact_email: (data.contact_email as string) ?? '',
-          contact_phone: (data.contact_phone as string) ?? '',
-          registration_mode: (data.registration_mode as string) ?? 'open',
-          email_verification: data.email_verification === 'true' || data.email_verification === true || data.email_verification !== 'false',
-          admin_approval: data.admin_approval === 'true' || data.admin_approval === true,
-          maintenance_mode: data.maintenance_mode === 'true' || data.maintenance_mode === true,
+          name: (tenant.name as string) ?? '',
+          description: (tenant.description as string) ?? '',
+          contact_email: (tenant.contact_email as string) ?? '',
+          contact_phone: (tenant.contact_phone as string) ?? '',
+          registration_mode: (settings.registration_mode as string) ?? 'open',
+          email_verification: settings.email_verification === 'true' || settings.email_verification === true || settings.email_verification !== 'false',
+          admin_approval: settings.admin_approval === 'true' || settings.admin_approval === true,
+          maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === true,
         });
       }
     } catch {

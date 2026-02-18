@@ -1084,3 +1084,23 @@ export interface VettingStats {
   expired: number;
   expiring_soon: number;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin Settings Response
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AdminSettingsResponse {
+  tenant_id: number;
+  tenant: {
+    name: string;
+    description: string;
+    contact_email: string;
+    contact_phone: string;
+  };
+  settings: {
+    registration_mode: string;
+    email_verification: string | boolean;
+    admin_approval: string | boolean;
+    maintenance_mode: string | boolean;
+  };
+}

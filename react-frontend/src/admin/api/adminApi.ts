@@ -817,7 +817,7 @@ export const adminDiagnostics = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminSettings = {
-  get: () => api.get<Record<string, unknown>>('/v2/admin/settings'),
+  get: () => api.get<import('./types').AdminSettingsResponse>('/v2/admin/settings'),
   update: (data: Record<string, unknown>) => api.put('/v2/admin/settings', data),
 
   getAiConfig: () => api.get<Record<string, unknown>>('/v2/admin/config/ai'),
