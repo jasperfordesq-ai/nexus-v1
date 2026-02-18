@@ -1,12 +1,14 @@
 /**
  * Volunteer Approvals
  * Lists pending volunteer applications requiring admin review.
+ * Parity: PHP VolunteeringController::approvals() + approve() + decline()
  */
 
 import { useState, useCallback, useEffect } from 'react';
 import { Button, Avatar } from '@heroui/react';
-import { ClipboardCheck, RefreshCw } from 'lucide-react';
+import { ClipboardCheck, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, StatusBadge, type Column } from '../../components';
 
@@ -23,8 +25,10 @@ interface VolApplication {
 
 export function VolunteerApprovals() {
   usePageTitle('Admin - Volunteer Approvals');
+  const toast = useToast();
   const [items, setItems] = useState<VolApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionId, setActionId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -45,6 +49,40 @@ export function VolunteerApprovals() {
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  const handleApprove = async (id: number) => {
+    setActionId(id);
+    try {
+      const res = await adminVolunteering.approveApplication(id);
+      if (res.success) {
+        toast.success('Application approved');
+        loadData();
+      } else {
+        toast.error('Failed to approve application');
+      }
+    } catch {
+      toast.error('Failed to approve application');
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  const handleDecline = async (id: number) => {
+    setActionId(id);
+    try {
+      const res = await adminVolunteering.declineApplication(id);
+      if (res.success) {
+        toast.success('Application declined');
+        loadData();
+      } else {
+        toast.error('Failed to decline application');
+      }
+    } catch {
+      toast.error('Failed to decline application');
+    } finally {
+      setActionId(null);
+    }
+  };
 
   const columns: Column<VolApplication>[] = [
     {
@@ -67,6 +105,35 @@ export function VolunteerApprovals() {
     {
       key: 'created_at', label: 'Applied', sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+    },
+    {
+      key: 'actions', label: 'Actions',
+      render: (item) => (
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="flat"
+            color="success"
+            startContent={<CheckCircle size={14} />}
+            onPress={() => handleApprove(item.id)}
+            isLoading={actionId === item.id}
+            isDisabled={actionId !== null && actionId !== item.id}
+          >
+            Approve
+          </Button>
+          <Button
+            size="sm"
+            variant="flat"
+            color="danger"
+            startContent={<XCircle size={14} />}
+            onPress={() => handleDecline(item.id)}
+            isLoading={actionId === item.id}
+            isDisabled={actionId !== null && actionId !== item.id}
+          >
+            Decline
+          </Button>
+        </div>
+      ),
     },
   ];
 

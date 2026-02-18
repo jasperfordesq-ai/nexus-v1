@@ -13,12 +13,14 @@ import {
   ArrowLeftRight,
   Clock,
   UserCheck,
+  UserPlus,
+  FileCheck,
   TrendingUp,
   Activity,
   RefreshCw,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminDashboard } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../api/types';
@@ -26,6 +28,7 @@ import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../
 export function AdminDashboard() {
   usePageTitle('Admin Dashboard');
   const { tenantPath } = useTenant();
+  const toast = useToast();
 
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [activity, setActivity] = useState<ActivityLogEntry[]>([]);
@@ -56,11 +59,11 @@ export function AdminDashboard() {
         setTrends(Array.isArray(trendsRes.data) ? trendsRes.data : []);
       }
     } catch {
-      // Silently handle — stats will show as loading
+      toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     loadDashboard();
@@ -84,8 +87,8 @@ export function AdminDashboard() {
         }
       />
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      {/* Stats Grid - Row 1: Core Metrics */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">
         <StatCard
           label="Total Users"
           value={stats?.total_users ?? '—'}
@@ -94,14 +97,14 @@ export function AdminDashboard() {
           loading={loading}
         />
         <StatCard
-          label="Total Listings"
-          value={stats?.total_listings ?? '—'}
-          icon={ListChecks}
+          label="Active Listings"
+          value={stats?.active_listings ?? '—'}
+          icon={FileCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Total Transactions"
+          label="Transactions"
           value={stats?.total_transactions ?? '—'}
           icon={ArrowLeftRight}
           color="secondary"
@@ -112,6 +115,38 @@ export function AdminDashboard() {
           value={stats?.total_hours_exchanged ?? '—'}
           icon={Clock}
           color="warning"
+          loading={loading}
+        />
+      </div>
+
+      {/* Stats Grid - Row 2: This Month */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+        <StatCard
+          label="New Users This Month"
+          value={stats?.new_users_this_month ?? '—'}
+          icon={UserPlus}
+          color="primary"
+          loading={loading}
+        />
+        <StatCard
+          label="Active Users"
+          value={stats?.active_users ?? '—'}
+          icon={UserCheck}
+          color="success"
+          loading={loading}
+        />
+        <StatCard
+          label="Total Listings"
+          value={stats?.total_listings ?? '—'}
+          icon={ListChecks}
+          color="default"
+          loading={loading}
+        />
+        <StatCard
+          label="New Listings This Month"
+          value={stats?.new_listings_this_month ?? '—'}
+          icon={ListChecks}
+          color="default"
           loading={loading}
         />
       </div>

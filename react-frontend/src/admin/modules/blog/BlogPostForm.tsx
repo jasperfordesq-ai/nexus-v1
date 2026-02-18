@@ -14,11 +14,13 @@ import {
   Button,
   Select,
   SelectItem,
+  Switch,
   Textarea,
+  Divider,
   Spinner,
 } from '@heroui/react';
 import { RichTextEditor } from '../../components';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Search } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBlog, adminCategories } from '../../api/adminApi';
@@ -48,6 +50,11 @@ export function BlogPostForm() {
   const [status, setStatus] = useState('draft');
   const [categoryId, setCategoryId] = useState('');
   const [featuredImage, setFeaturedImage] = useState('');
+
+  // SEO fields
+  const [metaTitle, setMetaTitle] = useState('');
+  const [metaDescription, setMetaDescription] = useState('');
+  const [noindex, setNoindex] = useState(false);
 
   // Categories for the dropdown
   const [categories, setCategories] = useState<AdminCategory[]>([]);
@@ -98,6 +105,9 @@ export function BlogPostForm() {
         setStatus(postData.status || 'draft');
         setCategoryId(postData.category_id ? String(postData.category_id) : '');
         setFeaturedImage(postData.featured_image || '');
+        setMetaTitle(postData.meta_title || '');
+        setMetaDescription(postData.meta_description || '');
+        setNoindex(postData.noindex || false);
       } else {
         setLoadError(res.error || 'Failed to load blog post');
       }
@@ -146,11 +156,15 @@ export function BlogPostForm() {
     try {
       const payload = {
         title: title.trim(),
+        slug: slug.trim() || undefined,
         content,
         excerpt: excerpt.trim(),
         status: status as 'draft' | 'published',
         featured_image: featuredImage.trim() || undefined,
         category_id: categoryId ? Number(categoryId) : undefined,
+        meta_title: metaTitle.trim() || undefined,
+        meta_description: metaDescription.trim() || undefined,
+        noindex: noindex || undefined,
       };
 
       const res = isEdit
@@ -241,14 +255,14 @@ export function BlogPostForm() {
               isDisabled={submitting}
             />
 
-            {/* Slug (read-only) */}
+            {/* Slug */}
             <Input
               label="Slug"
               placeholder="Auto-generated from title"
               value={slug}
-              isReadOnly
-              isDisabled
-              description={isEdit ? 'Slug will update automatically if title changes.' : 'Auto-generated from the title.'}
+              onValueChange={setSlug}
+              isDisabled={submitting}
+              description={isEdit ? 'Edit to customize the URL. Leave as-is to keep current slug.' : 'Auto-generated from title, or type a custom slug.'}
             />
 
             {/* Content */}
@@ -316,6 +330,43 @@ export function BlogPostForm() {
               isDisabled={submitting}
               description="URL to the featured image for this post."
             />
+
+            {/* SEO Override (Optional) */}
+            <Divider />
+            <div className="flex items-center gap-2 text-default-600">
+              <Search size={16} />
+              <span className="text-sm font-semibold">SEO Override (Optional)</span>
+            </div>
+            <Input
+              label="Meta Title"
+              placeholder="Custom tab title for search engines"
+              value={metaTitle}
+              onValueChange={setMetaTitle}
+              isDisabled={submitting}
+              description="Overrides the page title in search results. Leave blank to use post title."
+            />
+            <Textarea
+              label="Meta Description"
+              placeholder="Custom description for search engine results"
+              value={metaDescription}
+              onValueChange={setMetaDescription}
+              minRows={2}
+              maxRows={3}
+              isDisabled={submitting}
+              description="Appears as the snippet in search results. Leave blank to use excerpt."
+            />
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">NoIndex (Hide from Google)</p>
+                <p className="text-xs text-default-400">Prevent search engines from indexing this post</p>
+              </div>
+              <Switch
+                isSelected={noindex}
+                onValueChange={setNoindex}
+                isDisabled={submitting}
+                size="sm"
+              />
+            </div>
 
             {/* Submit */}
             <div className="flex justify-end gap-3 pt-2">

@@ -37,13 +37,16 @@ class Mailer
             $this->gmailRefreshToken = $envValues['GMAIL_REFRESH_TOKEN'] ?? '';
             $this->fromEmail = $envValues['GMAIL_SENDER_EMAIL'] ?? $envValues['SMTP_FROM_EMAIL'] ?? '';
             $this->fromName = $envValues['GMAIL_SENDER_NAME'] ?? $envValues['SMTP_FROM_NAME'] ?? 'Project NEXUS';
-        } else {
-            // SMTP credentials
-            $this->host = $envValues['SMTP_HOST'] ?? '';
-            $this->port = $envValues['SMTP_PORT'] ?? 587;
-            $this->username = $envValues['SMTP_USER'] ?? '';
-            $this->password = $envValues['SMTP_PASS'] ?? '';
-            $this->encryption = $envValues['SMTP_ENCRYPTION'] ?? 'tls';
+        }
+
+        // Always load SMTP credentials (used as primary when Gmail is disabled, or as fallback when Gmail fails)
+        $this->host = $envValues['SMTP_HOST'] ?? '';
+        $this->port = $envValues['SMTP_PORT'] ?? 587;
+        $this->username = $envValues['SMTP_USER'] ?? '';
+        $this->password = $envValues['SMTP_PASS'] ?? '';
+        $this->encryption = $envValues['SMTP_ENCRYPTION'] ?? 'tls';
+
+        if (!$this->useGmailApi) {
             $this->fromEmail = $envValues['SMTP_FROM_EMAIL'] ?? '';
             $this->fromName = $envValues['SMTP_FROM_NAME'] ?? 'Project NEXUS';
         }
@@ -113,7 +116,19 @@ class Mailer
     public function send($to, $subject, $body, $cc = null, $replyTo = null)
     {
         if ($this->useGmailApi) {
-            return $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo);
+            $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo);
+            if ($result) {
+                return true;
+            }
+
+            // Gmail API failed — fall back to SMTP if credentials are configured
+            if (!empty($this->host) && !empty($this->username)) {
+                error_log("Mailer: Gmail API failed, falling back to SMTP for: $to");
+                return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo);
+            }
+
+            error_log("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: $to");
+            return false;
         }
         return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo);
     }

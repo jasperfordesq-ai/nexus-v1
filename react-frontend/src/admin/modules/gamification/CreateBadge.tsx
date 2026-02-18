@@ -15,6 +15,7 @@ import {
   Textarea,
   Select,
   SelectItem,
+  Switch,
 } from '@heroui/react';
 import { ArrowLeft, Save, Award } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
@@ -41,6 +42,15 @@ const ICON_OPTIONS = [
   { key: 'rocket', label: 'Rocket' },
 ] as const;
 
+const CATEGORY_OPTIONS = [
+  { key: 'special', label: 'Special' },
+  { key: 'achievement', label: 'Achievement' },
+  { key: 'participation', label: 'Participation' },
+  { key: 'milestone', label: 'Milestone' },
+  { key: 'community', label: 'Community' },
+  { key: 'expertise', label: 'Expertise' },
+] as const;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -50,6 +60,9 @@ interface FormData {
   slug: string;
   description: string;
   icon: string;
+  category: string;
+  xp: number;
+  is_active: boolean;
 }
 
 export function CreateBadge() {
@@ -62,6 +75,9 @@ export function CreateBadge() {
     slug: '',
     description: '',
     icon: 'award',
+    category: 'special',
+    xp: 0,
+    is_active: true,
   });
   const [saving, setSaving] = useState(false);
 
@@ -69,7 +85,7 @@ export function CreateBadge() {
     setFormData((prev) => {
       const updated = { ...prev, [key]: value };
       // Auto-generate slug from name if slug hasn't been manually edited
-      if (key === 'name') {
+      if (key === 'name' && typeof value === 'string') {
         const autoSlug = value
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '_')
@@ -93,6 +109,9 @@ export function CreateBadge() {
       slug: formData.slug.trim() || undefined,
       description: formData.description.trim(),
       icon: formData.icon,
+      category: formData.category,
+      xp: formData.xp,
+      is_active: formData.is_active,
     });
 
     if (res.success) {
@@ -157,19 +176,60 @@ export function CreateBadge() {
             minRows={3}
           />
 
-          <Select
-            label="Icon"
-            selectedKeys={new Set([formData.icon])}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0] as string;
-              if (selected) updateField('icon', selected);
-            }}
-            variant="bordered"
-          >
-            {ICON_OPTIONS.map((opt) => (
-              <SelectItem key={opt.key}>{opt.label}</SelectItem>
-            ))}
-          </Select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Select
+              label="Icon"
+              selectedKeys={new Set([formData.icon])}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                if (selected) updateField('icon', selected);
+              }}
+              variant="bordered"
+            >
+              {ICON_OPTIONS.map((opt) => (
+                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+              ))}
+            </Select>
+
+            <Select
+              label="Category"
+              selectedKeys={new Set([formData.category])}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                if (selected) updateField('category', selected);
+              }}
+              variant="bordered"
+            >
+              {CATEGORY_OPTIONS.map((opt) => (
+                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+              ))}
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="XP Value"
+              type="number"
+              placeholder="0"
+              value={String(formData.xp)}
+              onValueChange={(v) => updateField('xp', parseInt(v) || 0 as never)}
+              variant="bordered"
+              min={0}
+              max={10000}
+              description="XP awarded when this badge is earned"
+            />
+            <div className="flex items-center justify-between p-3 rounded-lg border border-default-200">
+              <div>
+                <p className="text-sm font-medium">Active</p>
+                <p className="text-xs text-default-400">Badge can be earned by users</p>
+              </div>
+              <Switch
+                isSelected={formData.is_active}
+                onValueChange={(v) => updateField('is_active', v as never)}
+                size="sm"
+              />
+            </div>
+          </div>
 
           {/* Preview */}
           <div className="rounded-lg border border-default-200 p-4">

@@ -248,6 +248,7 @@ export function MessageReview() {
         >
           <Tab key="unreviewed" title="Unreviewed" />
           <Tab key="flagged" title="Flagged" />
+          <Tab key="reviewed" title="Reviewed" />
           <Tab key="all" title="All" />
         </Tabs>
       </div>

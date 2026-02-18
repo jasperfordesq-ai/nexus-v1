@@ -22,15 +22,28 @@ export default function BrokerConfiguration() {
     broker_messaging_enabled: true,
     broker_copy_all_messages: false,
     broker_copy_threshold_hours: 5,
+    new_member_monitoring_days: 30,
+    require_exchange_for_listings: false,
     risk_tagging_enabled: true,
     auto_flag_high_risk: true,
     require_approval_high_risk: false,
+    notify_on_high_risk_match: true,
     broker_approval_required: true,
     auto_approve_low_risk: false,
     exchange_timeout_days: 7,
+    max_hours_without_approval: 5,
+    confirmation_deadline_hours: 48,
+    allow_hour_adjustment: false,
+    max_hour_variance_percent: 20,
+    expiry_hours: 168,
     broker_visible_to_members: false,
     show_broker_name: false,
     broker_contact_email: '',
+    copy_first_contact: true,
+    copy_new_member_messages: true,
+    copy_high_risk_listing_messages: true,
+    random_sample_percentage: 0,
+    retention_days: 90,
   });
 
   useEffect(() => {
@@ -152,6 +165,33 @@ export default function BrokerConfiguration() {
               size="sm"
             />
           </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">New Member Monitoring (days)</p>
+              <p className="text-sm text-default-500">Number of days to monitor new members after joining</p>
+            </div>
+            <Input
+              type="number"
+              value={String(config.new_member_monitoring_days)}
+              onValueChange={v => updateConfig('new_member_monitoring_days', parseInt(v) || 0)}
+              className="w-24"
+              min={0}
+              max={365}
+              size="sm"
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Require Exchange for Listings</p>
+              <p className="text-sm text-default-500">Force members to use exchange requests instead of direct messages</p>
+            </div>
+            <Switch
+              isSelected={config.require_exchange_for_listings}
+              onValueChange={v => updateConfig('require_exchange_for_listings', v)}
+            />
+          </div>
         </CardBody>
       </Card>
 
@@ -192,6 +232,17 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.require_approval_high_risk}
               onValueChange={v => updateConfig('require_approval_high_risk', v)}
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Notify on High Risk Match</p>
+              <p className="text-sm text-default-500">Alert brokers when high-risk listings are matched</p>
+            </div>
+            <Switch
+              isSelected={config.notify_on_high_risk_match}
+              onValueChange={v => updateConfig('notify_on_high_risk_match', v)}
             />
           </div>
         </CardBody>
@@ -241,6 +292,86 @@ export default function BrokerConfiguration() {
               size="sm"
             />
           </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Max Hours Without Approval</p>
+              <p className="text-sm text-default-500">Auto-approve exchanges below this hour threshold</p>
+            </div>
+            <Input
+              type="number"
+              value={String(config.max_hours_without_approval)}
+              onValueChange={v => updateConfig('max_hours_without_approval', parseFloat(v) || 0)}
+              className="w-24"
+              min={0}
+              max={24}
+              step={0.5}
+              size="sm"
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Confirmation Deadline (hours)</p>
+              <p className="text-sm text-default-500">Time for parties to confirm an exchange</p>
+            </div>
+            <Input
+              type="number"
+              value={String(config.confirmation_deadline_hours)}
+              onValueChange={v => updateConfig('confirmation_deadline_hours', parseInt(v) || 48)}
+              className="w-24"
+              min={1}
+              max={720}
+              size="sm"
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Request Expiry (hours)</p>
+              <p className="text-sm text-default-500">Automatically expire pending exchange requests</p>
+            </div>
+            <Input
+              type="number"
+              value={String(config.expiry_hours)}
+              onValueChange={v => updateConfig('expiry_hours', parseInt(v) || 168)}
+              className="w-24"
+              min={1}
+              max={720}
+              size="sm"
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Allow Hour Adjustment</p>
+              <p className="text-sm text-default-500">Allow parties to adjust hours during an exchange</p>
+            </div>
+            <Switch
+              isSelected={config.allow_hour_adjustment}
+              onValueChange={v => updateConfig('allow_hour_adjustment', v)}
+            />
+          </div>
+          {config.allow_hour_adjustment && (
+            <>
+              <Divider />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Max Hour Variance (%)</p>
+                  <p className="text-sm text-default-500">Maximum allowed percentage variance from agreed hours</p>
+                </div>
+                <Input
+                  type="number"
+                  value={String(config.max_hour_variance_percent)}
+                  onValueChange={v => updateConfig('max_hour_variance_percent', parseInt(v) || 0)}
+                  className="w-24"
+                  min={0}
+                  max={100}
+                  size="sm"
+                />
+              </div>
+            </>
+          )}
         </CardBody>
       </Card>
 
@@ -284,6 +415,80 @@ export default function BrokerConfiguration() {
               onValueChange={v => updateConfig('broker_contact_email', v)}
               placeholder="broker@example.com"
               className="w-64"
+              size="sm"
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Message Copy Rules */}
+      <Card shadow="sm">
+        <CardHeader>
+          <h3 className="text-lg font-semibold">Message Copy Rules</h3>
+        </CardHeader>
+        <Divider />
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Copy First Contact</p>
+              <p className="text-sm text-default-500">Copy first message between any two members</p>
+            </div>
+            <Switch
+              isSelected={config.copy_first_contact}
+              onValueChange={v => updateConfig('copy_first_contact', v)}
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Copy New Member Messages</p>
+              <p className="text-sm text-default-500">Copy messages from members within monitoring period</p>
+            </div>
+            <Switch
+              isSelected={config.copy_new_member_messages}
+              onValueChange={v => updateConfig('copy_new_member_messages', v)}
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Copy High Risk Listing Messages</p>
+              <p className="text-sm text-default-500">Copy messages about high-risk tagged listings</p>
+            </div>
+            <Switch
+              isSelected={config.copy_high_risk_listing_messages}
+              onValueChange={v => updateConfig('copy_high_risk_listing_messages', v)}
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Random Sample (%)</p>
+              <p className="text-sm text-default-500">Percentage of messages to randomly sample for review</p>
+            </div>
+            <Input
+              type="number"
+              value={String(config.random_sample_percentage)}
+              onValueChange={v => updateConfig('random_sample_percentage', parseInt(v) || 0)}
+              className="w-24"
+              min={0}
+              max={100}
+              size="sm"
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Retention (days)</p>
+              <p className="text-sm text-default-500">How long to retain message copies before auto-deletion</p>
+            </div>
+            <Input
+              type="number"
+              value={String(config.retention_days)}
+              onValueChange={v => updateConfig('retention_days', parseInt(v) || 90)}
+              className="w-24"
+              min={1}
+              max={3650}
               size="sm"
             />
           </div>

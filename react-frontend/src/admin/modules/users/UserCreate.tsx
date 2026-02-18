@@ -32,7 +32,9 @@ export function UserCreate() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [role, setRole] = useState('member');
+  const [status, setStatus] = useState('active');
   const [password, setPassword] = useState('');
   const [sendWelcomeEmail, setSendWelcomeEmail] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -78,12 +80,16 @@ export function UserCreate() {
         last_name: lastName.trim(),
         email: email.trim(),
         role,
+        status,
         send_welcome_email: sendWelcomeEmail,
       };
 
       // Only include password if provided (backend auto-generates if empty)
       if (password.trim()) {
         payload.password = password.trim();
+      }
+      if (phone.trim()) {
+        payload.phone = phone.trim();
       }
 
       const res = await adminUsers.create(payload);
@@ -156,22 +162,45 @@ export function UserCreate() {
               isDisabled={submitting}
             />
 
-            {/* Role */}
-            <Select
-              label="Role"
-              placeholder="Select a role"
-              selectedKeys={role ? [role] : []}
-              onSelectionChange={(keys) => setRole(Array.from(keys)[0] as string)}
-              isRequired
-              isInvalid={!!errors.role}
-              errorMessage={errors.role}
+            {/* Phone */}
+            <Input
+              label="Phone"
+              type="tel"
+              placeholder="Enter phone number (optional)"
+              value={phone}
+              onValueChange={setPhone}
               isDisabled={submitting}
-            >
-              <SelectItem key="member">Member</SelectItem>
-              <SelectItem key="moderator">Moderator</SelectItem>
-              <SelectItem key="newsletter_admin">Newsletter Admin</SelectItem>
-              <SelectItem key="admin">Admin</SelectItem>
-            </Select>
+            />
+
+            {/* Role & Status */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Select
+                label="Role"
+                placeholder="Select a role"
+                selectedKeys={role ? [role] : []}
+                onSelectionChange={(keys) => setRole(Array.from(keys)[0] as string)}
+                isRequired
+                isInvalid={!!errors.role}
+                errorMessage={errors.role}
+                isDisabled={submitting}
+              >
+                <SelectItem key="member">Member</SelectItem>
+                <SelectItem key="newsletter_admin">Newsletter Admin</SelectItem>
+                <SelectItem key="tenant_admin">Tenant Admin</SelectItem>
+                <SelectItem key="admin">Admin</SelectItem>
+              </Select>
+
+              <Select
+                label="Status"
+                placeholder="Select status"
+                selectedKeys={[status]}
+                onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}
+                isDisabled={submitting}
+              >
+                <SelectItem key="active">Active</SelectItem>
+                <SelectItem key="pending">Pending</SelectItem>
+              </Select>
+            </div>
 
             {/* Password */}
             <Input

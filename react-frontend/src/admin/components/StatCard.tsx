@@ -12,7 +12,7 @@ interface StatCardProps {
   icon: LucideIcon;
   trend?: number;
   trendLabel?: string;
-  color?: 'primary' | 'success' | 'warning' | 'danger' | 'secondary';
+  color?: 'primary' | 'success' | 'warning' | 'danger' | 'secondary' | 'default';
   loading?: boolean;
 }
 
@@ -22,6 +22,7 @@ const colorMap = {
   warning: 'text-warning bg-warning/10',
   danger: 'text-danger bg-danger/10',
   secondary: 'text-secondary bg-secondary/10',
+  default: 'text-default-600 bg-default/20',
 };
 
 export function StatCard({

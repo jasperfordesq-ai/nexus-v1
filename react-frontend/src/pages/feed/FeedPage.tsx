@@ -139,7 +139,6 @@ export function FeedPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FeedFilter>('all');
   const [hasMore, setHasMore] = useState(false);
-  const [cursor, setCursor] = useState<string | undefined>();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Create post
@@ -163,6 +162,10 @@ export function FeedPage() {
   const [reportReason, setReportReason] = useState('');
   const [isReporting, setIsReporting] = useState(false);
 
+  // Use a ref for cursor to avoid infinite re-render loop:
+  // loadFeed depends on cursor → setCursor in loadFeed recreates it → useEffect re-fires
+  const cursorRef = useRef<string | undefined>();
+
   const loadFeed = useCallback(async (append = false) => {
     try {
       if (append) {
@@ -175,7 +178,7 @@ export function FeedPage() {
       const params = new URLSearchParams();
       params.set('per_page', '20');
       if (filter !== 'all') params.set('type', filter);
-      if (append && cursor) params.set('cursor', cursor);
+      if (append && cursorRef.current) params.set('cursor', cursorRef.current);
 
       const response = await api.get<FeedItem[]>(
         `/v2/feed?${params}`
@@ -190,7 +193,7 @@ export function FeedPage() {
           setItems(feedItems);
         }
         setHasMore(response.meta?.has_more ?? false);
-        setCursor(response.meta?.cursor ?? undefined);
+        cursorRef.current = response.meta?.cursor ?? undefined;
       } else {
         if (!append) setError('Failed to load feed.');
       }
@@ -201,10 +204,10 @@ export function FeedPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [cursor, filter]);
+  }, [filter]);
 
   useEffect(() => {
-    setCursor(undefined);
+    cursorRef.current = undefined;
     loadFeed();
   }, [filter, loadFeed]);
 
@@ -258,7 +261,7 @@ export function FeedPage() {
         if (response.success) {
           onCreateClose();
           resetCreateForm();
-          setCursor(undefined);
+          cursorRef.current = undefined;
           loadFeed();
           toast.success('Post created!');
         }
@@ -271,7 +274,7 @@ export function FeedPage() {
         if (response.success) {
           onCreateClose();
           resetCreateForm();
-          setCursor(undefined);
+          cursorRef.current = undefined;
           loadFeed();
           toast.success('Post created!');
         }
@@ -308,7 +311,7 @@ export function FeedPage() {
       if (response.success) {
         onCreateClose();
         resetCreateForm();
-        setCursor(undefined);
+        cursorRef.current = undefined;
         loadFeed();
         toast.success('Poll created!');
       }

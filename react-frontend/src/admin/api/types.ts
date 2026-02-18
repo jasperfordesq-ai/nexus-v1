@@ -104,6 +104,8 @@ export interface CreateUserPayload {
   last_name: string;
   email: string;
   role: string;
+  status?: string;
+  phone?: string;
   password?: string;
   send_welcome_email?: boolean;
 }
@@ -544,17 +546,24 @@ export interface AdminBlogPost {
   author_name?: string;
   category_id?: number | null;
   category_name?: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  noindex?: boolean;
   created_at: string;
   updated_at?: string;
 }
 
 export interface CreateBlogPostPayload {
   title: string;
+  slug?: string;
   content?: string;
   excerpt?: string;
   status?: 'draft' | 'published';
   featured_image?: string;
   category_id?: number;
+  meta_title?: string;
+  meta_description?: string;
+  noindex?: boolean;
 }
 
 export interface UpdateBlogPostPayload extends Partial<CreateBlogPostPayload> {}
@@ -646,18 +655,31 @@ export interface BrokerConfig {
   broker_messaging_enabled: boolean;
   broker_copy_all_messages: boolean;
   broker_copy_threshold_hours: number;
+  new_member_monitoring_days: number;
+  require_exchange_for_listings: boolean;
   // Risk Tagging
   risk_tagging_enabled: boolean;
   auto_flag_high_risk: boolean;
   require_approval_high_risk: boolean;
+  notify_on_high_risk_match: boolean;
   // Exchange Workflow
   broker_approval_required: boolean;
   auto_approve_low_risk: boolean;
   exchange_timeout_days: number;
-  // Broker Visibility
+  max_hours_without_approval: number;
+  confirmation_deadline_hours: number;
+  allow_hour_adjustment: boolean;
+  max_hour_variance_percent: number;
+  expiry_hours: number;
+  // Broker Visibility / Message Copy
   broker_visible_to_members: boolean;
   show_broker_name: boolean;
   broker_contact_email: string;
+  copy_first_contact: boolean;
+  copy_new_member_messages: boolean;
+  copy_high_risk_listing_messages: boolean;
+  random_sample_percentage: number;
+  retention_days: number;
 }
 
 export interface ExchangeHistoryEntry {

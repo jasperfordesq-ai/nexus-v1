@@ -227,17 +227,18 @@ class ImpactReportingService
     {
         $tenantId = TenantContext::getId();
         $stmt = Database::query(
-            "SELECT name, slug, logo_url, settings FROM tenants WHERE id = ?",
+            "SELECT name, slug, configuration FROM tenants WHERE id = ?",
             [$tenantId]
         );
         $tenant = $stmt->fetch();
 
-        $settings = json_decode($tenant['settings'] ?? '{}', true) ?: [];
+        $config = json_decode($tenant['configuration'] ?? '{}', true) ?: [];
+        $settings = $config['settings'] ?? [];
 
         return [
             'tenant_name' => $tenant['name'] ?? 'Community',
             'tenant_slug' => $tenant['slug'] ?? '',
-            'logo_url' => $tenant['logo_url'] ?? null,
+            'logo_url' => $config['logo_url'] ?? null,
             'hourly_value' => (float) ($settings['impact_hourly_value'] ?? self::DEFAULT_HOURLY_VALUE),
             'social_multiplier' => (float) ($settings['impact_social_multiplier'] ?? self::DEFAULT_SOCIAL_MULTIPLIER),
         ];

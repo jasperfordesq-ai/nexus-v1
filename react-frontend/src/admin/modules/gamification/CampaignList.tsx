@@ -13,7 +13,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import { Plus, MoreVertical, Edit, Trash2, Megaphone } from 'lucide-react';
+import { Plus, MoreVertical, Edit, Trash2, Megaphone, Play, Pause, RotateCcw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
@@ -72,14 +72,30 @@ export function CampaignList() {
     setDeleting(false);
   };
 
+  const handleStatusChange = async (campaign: Campaign, newStatus: Campaign['status']) => {
+    const res = await adminGamification.updateCampaign(campaign.id, { status: newStatus });
+    if (res.success) {
+      toast.success(`Campaign "${campaign.name}" ${newStatus === 'active' ? 'activated' : newStatus === 'paused' ? 'paused' : 'updated'}`);
+      loadCampaigns();
+    } else {
+      toast.error(`Failed to update campaign status`);
+    }
+  };
+
   // Actions menu per row
   function CampaignActions({ campaign }: { campaign: Campaign }) {
-    type ActionKey = 'edit' | 'delete';
+    type ActionKey = 'edit' | 'activate' | 'pause' | 'resume' | 'delete';
 
     const handleAction = (key: React.Key) => {
       const action = key as ActionKey;
       if (action === 'edit') {
         navigate(`../gamification/campaigns/edit/${campaign.id}`);
+      } else if (action === 'activate') {
+        handleStatusChange(campaign, 'active');
+      } else if (action === 'pause') {
+        handleStatusChange(campaign, 'paused');
+      } else if (action === 'resume') {
+        handleStatusChange(campaign, 'active');
       } else if (action === 'delete') {
         setDeleteTarget(campaign);
       }
@@ -95,6 +111,30 @@ export function CampaignList() {
         <DropdownMenu aria-label="Campaign actions" onAction={handleAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
             Edit
+          </DropdownItem>
+          <DropdownItem
+            key="activate"
+            startContent={<Play size={14} />}
+            color="success"
+            className={campaign.status === 'draft' ? 'text-success' : 'hidden'}
+          >
+            Activate
+          </DropdownItem>
+          <DropdownItem
+            key="pause"
+            startContent={<Pause size={14} />}
+            color="warning"
+            className={campaign.status === 'active' ? 'text-warning' : 'hidden'}
+          >
+            Pause
+          </DropdownItem>
+          <DropdownItem
+            key="resume"
+            startContent={<RotateCcw size={14} />}
+            color="success"
+            className={campaign.status === 'paused' ? 'text-success' : 'hidden'}
+          >
+            Resume
           </DropdownItem>
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
             Delete

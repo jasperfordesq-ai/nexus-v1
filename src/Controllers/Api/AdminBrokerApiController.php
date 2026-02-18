@@ -357,6 +357,8 @@ class AdminBrokerApiController extends BaseApiController
                 $where .= " AND bmc.reviewed_by IS NULL";
             } elseif ($filter === 'flagged') {
                 $where .= " AND bmc.flagged = 1";
+            } elseif ($filter === 'reviewed') {
+                $where .= " AND bmc.reviewed_by IS NOT NULL";
             }
 
             // Count
@@ -685,18 +687,32 @@ class AdminBrokerApiController extends BaseApiController
             'broker_messaging_enabled' => true,
             'broker_copy_all_messages' => false,
             'broker_copy_threshold_hours' => 5,
+            'new_member_monitoring_days' => 30,
+            'require_exchange_for_listings' => false,
             // Risk Tagging
             'risk_tagging_enabled' => true,
             'auto_flag_high_risk' => true,
             'require_approval_high_risk' => false,
+            'notify_on_high_risk_match' => true,
             // Exchange Workflow
             'broker_approval_required' => true,
             'auto_approve_low_risk' => false,
             'exchange_timeout_days' => 7,
+            'max_hours_without_approval' => 5,
+            'confirmation_deadline_hours' => 48,
+            'allow_hour_adjustment' => false,
+            'max_hour_variance_percent' => 20,
+            'expiry_hours' => 168,
             // Broker Visibility
             'broker_visible_to_members' => false,
             'show_broker_name' => false,
             'broker_contact_email' => '',
+            // Message Copy Rules
+            'copy_first_contact' => true,
+            'copy_new_member_messages' => true,
+            'copy_high_risk_listing_messages' => true,
+            'random_sample_percentage' => 0,
+            'retention_days' => 90,
         ];
 
         try {
@@ -733,9 +749,15 @@ class AdminBrokerApiController extends BaseApiController
         // Whitelist allowed keys
         $allowedKeys = [
             'broker_messaging_enabled', 'broker_copy_all_messages', 'broker_copy_threshold_hours',
+            'new_member_monitoring_days', 'require_exchange_for_listings',
             'risk_tagging_enabled', 'auto_flag_high_risk', 'require_approval_high_risk',
+            'notify_on_high_risk_match',
             'broker_approval_required', 'auto_approve_low_risk', 'exchange_timeout_days',
+            'max_hours_without_approval', 'confirmation_deadline_hours', 'allow_hour_adjustment',
+            'max_hour_variance_percent', 'expiry_hours',
             'broker_visible_to_members', 'show_broker_name', 'broker_contact_email',
+            'copy_first_contact', 'copy_new_member_messages', 'copy_high_risk_listing_messages',
+            'random_sample_percentage', 'retention_days',
         ];
 
         $config = [];
