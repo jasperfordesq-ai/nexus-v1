@@ -789,7 +789,7 @@ export const adminDeliverability = {
   list: (params: { page?: number; status?: string; priority?: string } = {}) =>
     api.get('/v2/admin/deliverability' + buildQuery(params)),
   get: (id: number) => api.get('/v2/admin/deliverability/' + id),
-  create: (data: { title: string; description?: string; priority?: string; due_date?: string; assigned_to?: number }) =>
+  create: (data: { title: string; description?: string; priority?: string; status?: string; due_date?: string; assigned_to?: number }) =>
     api.post('/v2/admin/deliverability', data),
   update: (id: number, data: Record<string, unknown>) =>
     api.put('/v2/admin/deliverability/' + id, data),

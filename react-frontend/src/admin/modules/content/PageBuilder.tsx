@@ -9,7 +9,7 @@ import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem, Button
 import { FileText, ArrowLeft, Save } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
@@ -26,6 +26,7 @@ export function PageBuilder() {
   const isEdit = id !== undefined && id !== 'new';
   usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Page`);
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   const [formData, setFormData] = useState<PageFormData>({
@@ -73,7 +74,7 @@ export function PageBuilder() {
         const res = await adminPages.update(Number(id), formData as unknown as Record<string, unknown>);
         if (res?.success) {
           toast.success('Page updated successfully');
-          navigate('../pages');
+          navigate(tenantPath('/admin/pages'));
         } else {
           toast.error('Failed to update page');
         }
@@ -81,7 +82,7 @@ export function PageBuilder() {
         const res = await adminPages.create(formData);
         if (res?.success) {
           toast.success('Page created successfully');
-          navigate('../pages');
+          navigate(tenantPath('/admin/pages'));
         } else {
           toast.error('Failed to create page');
         }
@@ -107,7 +108,7 @@ export function PageBuilder() {
       <PageHeader
         title={isEdit ? 'Edit Page' : 'Page Builder'}
         description="Create or edit a CMS page"
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate('../pages')}>Back</Button>}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/pages'))}>Back</Button>}
       />
 
       <Card shadow="sm">
@@ -157,7 +158,7 @@ export function PageBuilder() {
             <SelectItem key="published">Published</SelectItem>
           </Select>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate('../pages')}>Cancel</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/pages'))}>Cancel</Button>
             <Button
               color="primary"
               startContent={<Save size={16} />}

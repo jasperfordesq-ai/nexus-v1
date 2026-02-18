@@ -13,16 +13,16 @@ import { adminDeliverability } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
 interface DashboardData {
-  total_deliverables: number;
-  completed: number;
-  in_progress: number;
+  total: number;
+  by_status: Record<string, number>;
   overdue: number;
+  completion_rate: number;
   recent_activity: Array<{
     id: number;
-    title: string;
-    action: string;
+    deliverable_title: string;
+    action_type: string;
     user_name: string;
-    created_at: string;
+    action_timestamp: string;
   }>;
 }
 
@@ -53,16 +53,18 @@ export function DeliverabilityDashboard() {
     );
   }
 
-  const stats = data || { total_deliverables: 0, completed: 0, in_progress: 0, overdue: 0, recent_activity: [] };
+  const stats = data || { total: 0, by_status: {}, overdue: 0, completion_rate: 0, recent_activity: [] };
+  const completed = stats.by_status?.completed ?? 0;
+  const inProgress = stats.by_status?.in_progress ?? 0;
 
   return (
     <div>
       <PageHeader title="Deliverability Dashboard" description="Track project deliverables and milestones" />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <StatCard label="Total Deliverables" value={stats.total_deliverables} icon={Target} color="primary" />
-        <StatCard label="Completed" value={stats.completed} icon={CheckCircle} color="success" />
-        <StatCard label="In Progress" value={stats.in_progress} icon={Clock} color="warning" />
+        <StatCard label="Total Deliverables" value={stats.total} icon={Target} color="primary" />
+        <StatCard label="Completed" value={completed} icon={CheckCircle} color="success" />
+        <StatCard label="In Progress" value={inProgress} icon={Clock} color="warning" />
         <StatCard label="Overdue" value={stats.overdue} icon={AlertCircle} color="danger" />
       </div>
 
@@ -77,9 +79,9 @@ export function DeliverabilityDashboard() {
                     <Target size={14} className="text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{activity.title}</p>
+                    <p className="text-sm font-medium">{activity.deliverable_title}</p>
                     <p className="text-xs text-default-400">
-                      {activity.action} by {activity.user_name} -- {new Date(activity.created_at).toLocaleDateString()}
+                      {activity.action_type} by {activity.user_name} -- {new Date(activity.action_timestamp).toLocaleDateString()}
                     </p>
                   </div>
                 </div>

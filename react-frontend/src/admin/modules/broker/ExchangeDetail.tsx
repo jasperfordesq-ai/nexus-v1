@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Chip, Divider, Spinner } from '@heroui/react';
 import { ArrowLeft, User, Shield, Clock } from 'lucide-react';
+import { usePageTitle } from '@/hooks';
 import { adminBroker } from '../../api/adminApi';
 import type { ExchangeDetail as ExchangeDetailType } from '../../api/types';
 import { PageHeader } from '../../components/PageHeader';
@@ -23,6 +24,7 @@ const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default'
 };
 
 export default function ExchangeDetail() {
+  usePageTitle('Admin - Exchange Detail');
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const [data, setData] = useState<ExchangeDetailType | null>(null);

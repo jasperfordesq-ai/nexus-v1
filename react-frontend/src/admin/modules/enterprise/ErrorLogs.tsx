@@ -27,8 +27,15 @@ export function ErrorLogs() {
     try {
       const res = await adminEnterprise.getLogs({ page });
       if (res.success && res.data) {
-        setLogs(Array.isArray(res.data) ? res.data : []);
-        setTotal(res.meta?.total ?? 0);
+        const result = res.data as unknown;
+        if (Array.isArray(result)) {
+          setLogs(result);
+          setTotal(result.length);
+        } else if (result && typeof result === 'object') {
+          const pd = result as { data?: ErrorLogEntry[]; meta?: { total?: number } };
+          setLogs(pd.data || []);
+          setTotal(pd.meta?.total ?? pd.data?.length ?? 0);
+        }
       }
     } catch {
       toast.error('Failed to load error logs');

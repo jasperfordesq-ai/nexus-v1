@@ -35,6 +35,7 @@ class AdminNewsletterApiController extends BaseApiController
 
         if (!$this->tableExists('newsletters')) {
             $this->respondWithPaginatedCollection([], 0, $page, $perPage);
+            return;
         }
 
         try {
@@ -69,6 +70,7 @@ class AdminNewsletterApiController extends BaseApiController
 
         if (!$this->tableExists('newsletters')) {
             $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+            return;
         }
 
         try {
@@ -79,6 +81,7 @@ class AdminNewsletterApiController extends BaseApiController
             $item = $stmt->fetch();
             if (!$item) {
                 $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return;
             }
             $this->respondWithData($item);
         } catch (\Exception $e) {
@@ -97,10 +100,12 @@ class AdminNewsletterApiController extends BaseApiController
 
         if (!$name) {
             $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name');
+            return;
         }
 
         if (!$this->tableExists('newsletters')) {
             $this->respondWithError('TABLE_MISSING', 'Newsletter functionality is not yet configured', null, 503);
+            return;
         }
 
         try {
@@ -122,6 +127,7 @@ class AdminNewsletterApiController extends BaseApiController
 
         if (!$this->tableExists('newsletters')) {
             $this->respondWithError('TABLE_MISSING', 'Newsletter functionality is not yet configured', null, 503);
+            return;
         }
 
         try {
@@ -136,6 +142,7 @@ class AdminNewsletterApiController extends BaseApiController
             }
             if (empty($fields)) {
                 $this->respondWithError('VALIDATION_ERROR', 'No fields to update');
+                return;
             }
             $params[] = $id;
             $params[] = $tenantId;
@@ -156,6 +163,7 @@ class AdminNewsletterApiController extends BaseApiController
 
         if (!$this->tableExists('newsletters')) {
             $this->respondWithError('TABLE_MISSING', 'Newsletter functionality is not yet configured', null, 503);
+            return;
         }
 
         try {

@@ -175,9 +175,24 @@ export function UserList() {
       case 'reset2fa':
         res = await adminUsers.reset2fa(user.id, 'Admin reset');
         break;
-      case 'impersonate':
+      case 'impersonate': {
         res = await adminUsers.impersonate(user.id);
-        break;
+        if (res?.success && res.data) {
+          const tokenData = res.data as { token?: string; impersonation_token?: string };
+          const token = tokenData.token || tokenData.impersonation_token;
+          if (token) {
+            toast.success(`Impersonating ${user.name}. Opening in new tab...`);
+            window.open(`${window.location.origin}${tenantPath('/dashboard')}?impersonate_token=${token}`, '_blank');
+          } else {
+            toast.success('Impersonation started');
+          }
+        } else {
+          toast.error(res?.error || 'Failed to impersonate user');
+        }
+        setActionLoading(false);
+        setConfirmAction(null);
+        return;
+      }
     }
 
     if (res?.success) {

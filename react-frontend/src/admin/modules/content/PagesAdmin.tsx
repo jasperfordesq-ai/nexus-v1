@@ -9,7 +9,7 @@ import { Button, Spinner } from '@heroui/react';
 import { FileText, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, ConfirmModal, type Column } from '../../components';
 
@@ -24,6 +24,7 @@ interface PageItem {
 
 export function PagesAdmin() {
   usePageTitle('Admin - Pages');
+  const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -84,7 +85,7 @@ export function PagesAdmin() {
         <button
           type="button"
           className="text-left font-medium text-primary hover:underline"
-          onClick={() => navigate(`../pages/builder/${item.id}`)}
+          onClick={() => navigate(tenantPath(`/admin/pages/builder/${item.id}`))}
         >
           {item.title}
         </button>
@@ -122,7 +123,7 @@ export function PagesAdmin() {
             size="sm"
             variant="flat"
             color="primary"
-            onPress={() => navigate(`../pages/builder/${item.id}`)}
+            onPress={() => navigate(tenantPath(`/admin/pages/builder/${item.id}`))}
             aria-label="Edit page"
           >
             <Pencil size={14} />
@@ -160,7 +161,7 @@ export function PagesAdmin() {
           <Button
             color="primary"
             startContent={<Plus size={16} />}
-            onPress={() => navigate('../pages/builder/new')}
+            onPress={() => navigate(tenantPath('/admin/pages/builder/new'))}
           >
             Create Page
           </Button>
@@ -173,7 +174,7 @@ export function PagesAdmin() {
           title="No Pages Created"
           description="Create custom CMS pages for your community. Pages can be used for about, terms, privacy policy, and other static content."
           actionLabel="Create Page"
-          onAction={() => navigate('../pages/builder/new')}
+          onAction={() => navigate(tenantPath('/admin/pages/builder/new'))}
         />
       ) : (
         <DataTable

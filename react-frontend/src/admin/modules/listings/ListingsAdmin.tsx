@@ -71,19 +71,24 @@ export function ListingsAdmin() {
   const handleAction = async () => {
     if (!confirmAction) return;
     setActionLoading(true);
-    const { type, item } = confirmAction;
-    const res = type === 'approve'
-      ? await adminListings.approve(item.id)
-      : await adminListings.delete(item.id);
+    try {
+      const { type, item } = confirmAction;
+      const res = type === 'approve'
+        ? await adminListings.approve(item.id)
+        : await adminListings.delete(item.id);
 
-    if (res?.success) {
-      toast.success(`Content ${type}d successfully`);
-      loadItems();
-    } else {
-      toast.error(res?.error || `Failed to ${type} content`);
+      if (res?.success) {
+        toast.success(`Content ${type}d successfully`);
+        loadItems();
+      } else {
+        toast.error(res?.error || `Failed to ${type} content`);
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setActionLoading(false);
+      setConfirmAction(null);
     }
-    setActionLoading(false);
-    setConfirmAction(null);
   };
 
   const columns: Column<AdminListing>[] = [
