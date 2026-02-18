@@ -48,12 +48,19 @@ export function RoleList() {
     if (!deleteTarget || !deleteTarget.id) return;
     setDeleting(true);
     try {
-      await adminEnterprise.deleteRole(deleteTarget.id);
-      toast.success('Role deleted');
-      setDeleteTarget(null);
-      loadRoles();
-    } catch {
+      const res = await adminEnterprise.deleteRole(deleteTarget.id);
+
+      if (res.success) {
+        toast.success('Role deleted');
+        setDeleteTarget(null);
+        loadRoles();
+      } else {
+        const error = (res as { error?: string }).error || 'Failed to delete role';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to delete role');
+      console.error('Role delete error:', err);
     } finally {
       setDeleting(false);
     }
