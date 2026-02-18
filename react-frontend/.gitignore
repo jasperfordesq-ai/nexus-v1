@@ -1,3 +1,4 @@
 node_modules
 dist
 *.local
+react-frontend/tsconfig.tsbuildinfo
