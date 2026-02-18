@@ -259,6 +259,7 @@ $router->add('POST', '/api/v2/messages/conversations/{id}/restore', 'Nexus\Contr
 // API V2 - EXCHANGES (Exchange Workflow System)
 // ============================================
 $router->add('GET', '/api/v2/exchanges/config', 'Nexus\Controllers\Api\ExchangesApiController@config');
+$router->add('GET', '/api/v2/exchanges/check', 'Nexus\Controllers\Api\ExchangesApiController@check');
 $router->add('GET', '/api/v2/exchanges', 'Nexus\Controllers\Api\ExchangesApiController@index');
 $router->add('POST', '/api/v2/exchanges', 'Nexus\Controllers\Api\ExchangesApiController@store');
 $router->add('GET', '/api/v2/exchanges/{id}', 'Nexus\Controllers\Api\ExchangesApiController@show');
@@ -281,6 +282,7 @@ $router->add('DELETE', '/api/v2/events/{id}', 'Nexus\Controllers\Api\EventsApiCo
 $router->add('POST', '/api/v2/events/{id}/rsvp', 'Nexus\Controllers\Api\EventsApiController@rsvp');
 $router->add('DELETE', '/api/v2/events/{id}/rsvp', 'Nexus\Controllers\Api\EventsApiController@removeRsvp');
 $router->add('GET', '/api/v2/events/{id}/attendees', 'Nexus\Controllers\Api\EventsApiController@attendees');
+$router->add('POST', '/api/v2/events/{id}/attendees/{attendeeId}/check-in', 'Nexus\Controllers\Api\EventsApiController@checkIn');
 $router->add('POST', '/api/v2/events/{id}/image', 'Nexus\Controllers\Api\EventsApiController@uploadImage');
 
 // ============================================

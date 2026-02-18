@@ -589,6 +589,35 @@ class ExchangeWorkflowService
     }
 
     /**
+     * Get active exchange for a user on a specific listing
+     *
+     * Returns the most recent non-terminal exchange (not completed/cancelled/expired)
+     * for the given user and listing, or null if none exists.
+     */
+    public static function getActiveExchangeForListing(int $userId, int $listingId): ?array
+    {
+        $tenantId = TenantContext::getId();
+
+        $terminalStatuses = [self::STATUS_COMPLETED, self::STATUS_CANCELLED, self::STATUS_EXPIRED];
+        $placeholders = implode(',', array_fill(0, count($terminalStatuses), '?'));
+
+        $stmt = Database::query(
+            "SELECT e.id, e.status, e.proposed_hours, e.created_at,
+                    e.requester_id, e.provider_id
+             FROM exchange_requests e
+             WHERE e.listing_id = ? AND e.tenant_id = ?
+               AND (e.requester_id = ? OR e.provider_id = ?)
+               AND e.status NOT IN ($placeholders)
+             ORDER BY e.created_at DESC
+             LIMIT 1",
+            [$listingId, $tenantId, $userId, $userId, ...$terminalStatuses]
+        );
+
+        $exchange = $stmt->fetch();
+        return $exchange ?: null;
+    }
+
+    /**
      * Get exchanges for a user
      *
      * @param int $userId User ID

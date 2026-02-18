@@ -138,7 +138,7 @@ class ExchangesController
         }
 
         // Verify user has access (must be requester or provider)
-        if ($exchange['requester_id'] !== $userId && $exchange['provider_id'] !== $userId) {
+        if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
             header('HTTP/1.1 403 Forbidden');
             $basePath = TenantContext::getBasePath();
             header('Location: ' . $basePath . '/exchanges');
