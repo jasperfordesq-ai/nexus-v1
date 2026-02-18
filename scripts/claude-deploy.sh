@@ -18,8 +18,8 @@
 set -e
 
 # Configuration
-SERVER="jasper@35.205.239.67"
-REMOTE_PATH="/var/www/vhosts/project-nexus.ie"
+SERVER="jasper@20.224.171.253"
+REMOTE_PATH="/opt/nexus-php"
 LOCAL_PATH="/c/xampp/htdocs/staging"
 LOG_DIR="$LOCAL_PATH/logs"
 

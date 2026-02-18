@@ -8,9 +8,9 @@
 
 # Configuration
 DEFAULT_SSH_USER="jasper"
-DEFAULT_SSH_HOST="35.205.239.67"
+DEFAULT_SSH_HOST="20.224.171.253"
 DEFAULT_SSH_PORT="22"
-DEFAULT_REMOTE_PATH="/var/www/vhosts/project-nexus.ie"
+DEFAULT_REMOTE_PATH="/opt/nexus-php"
 
 # Colors for output
 RED='\033[0;31m'
