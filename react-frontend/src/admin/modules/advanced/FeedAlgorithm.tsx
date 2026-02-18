@@ -40,10 +40,17 @@ export function FeedAlgorithm() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await adminSettings.updateFeedAlgorithm(formData);
-      toast.success('Feed algorithm settings saved successfully');
-    } catch {
+      const res = await adminSettings.updateFeedAlgorithm(formData);
+
+      if (res.success) {
+        toast.success('Feed algorithm settings saved successfully');
+      } else {
+        const error = (res as { error?: string }).error || 'Save failed';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to save feed algorithm settings');
+      console.error('Feed algorithm save error:', err);
     } finally {
       setSaving(false);
     }

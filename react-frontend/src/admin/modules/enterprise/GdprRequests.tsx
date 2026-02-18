@@ -70,11 +70,18 @@ export function GdprRequests() {
 
   const handleStatusUpdate = async (id: number, newStatus: string) => {
     try {
-      await adminEnterprise.updateGdprRequest(id, { status: newStatus });
-      toast.success(`Request updated to ${newStatus}`);
-      loadData();
-    } catch {
+      const res = await adminEnterprise.updateGdprRequest(id, { status: newStatus });
+
+      if (res.success) {
+        toast.success(`Request updated to ${newStatus}`);
+        loadData();
+      } else {
+        const error = (res as { error?: string }).error || 'Update failed';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to update request');
+      console.error('GDPR request update error:', err);
     }
   };
 

@@ -39,10 +39,17 @@ export function AlgorithmSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await adminSettings.updateFeedAlgorithm(formData);
-      toast.success('Algorithm settings saved successfully');
-    } catch {
+      const res = await adminSettings.updateFeedAlgorithm(formData);
+
+      if (res.success) {
+        toast.success('Algorithm settings saved successfully');
+      } else {
+        const error = (res as { error?: string }).error || 'Save failed';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to save algorithm settings');
+      console.error('Algorithm settings save error:', err);
     } finally {
       setSaving(false);
     }

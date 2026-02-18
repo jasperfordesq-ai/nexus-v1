@@ -45,10 +45,17 @@ export function AiSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await adminSettings.updateAiConfig(formData);
-      toast.success('AI settings saved successfully');
-    } catch {
+      const res = await adminSettings.updateAiConfig(formData);
+
+      if (res.success) {
+        toast.success('AI settings saved successfully');
+      } else {
+        const error = (res as { error?: string }).error || 'Save failed';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to save AI settings');
+      console.error('AI settings save error:', err);
     } finally {
       setSaving(false);
     }

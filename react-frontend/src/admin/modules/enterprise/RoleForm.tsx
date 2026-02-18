@@ -97,16 +97,23 @@ export function RoleForm() {
         permissions: Array.from(selectedPermissions),
       };
 
+      let res;
       if (isEdit && id) {
-        await adminEnterprise.updateRole(parseInt(id), payload);
-        toast.success('Role updated');
+        res = await adminEnterprise.updateRole(parseInt(id), payload);
       } else {
-        await adminEnterprise.createRole(payload);
-        toast.success('Role created');
+        res = await adminEnterprise.createRole(payload);
       }
-      navigate(tenantPath('/admin/enterprise/roles'));
-    } catch {
+
+      if (res.success) {
+        toast.success(isEdit ? 'Role updated' : 'Role created');
+        navigate(tenantPath('/admin/enterprise/roles'));
+      } else {
+        const error = (res as { error?: string }).error || 'Save failed';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error(`Failed to ${isEdit ? 'update' : 'create'} role`);
+      console.error('Role save error:', err);
     } finally {
       setSaving(false);
     }
