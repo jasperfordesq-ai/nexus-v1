@@ -4,7 +4,7 @@
  * Uses V2 API: GET /api/v2/blog, GET /api/v2/blog/categories
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -74,7 +74,7 @@ export function BlogPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(false);
-  const [cursor, setCursor] = useState<string | undefined>();
+  const [isPaginated, setIsPaginated] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Load categories on mount
@@ -92,6 +92,8 @@ export function BlogPage() {
     loadCategories();
   }, []);
 
+  const cursorRef = useRef<string | undefined>();
+
   const loadPosts = useCallback(async (append = false) => {
     try {
       if (append) {
@@ -103,7 +105,7 @@ export function BlogPage() {
 
       const params = new URLSearchParams();
       params.set('per_page', '12');
-      if (append && cursor) params.set('cursor', cursor);
+      if (append && cursorRef.current) params.set('cursor', cursorRef.current);
       if (searchQuery.trim()) params.set('search', searchQuery.trim());
       if (selectedCategory) params.set('category_id', String(selectedCategory));
 
@@ -116,11 +118,13 @@ export function BlogPage() {
 
         if (append) {
           setPosts((prev) => [...prev, ...items]);
+          setIsPaginated(true);
         } else {
           setPosts(items);
+          setIsPaginated(false);
         }
         setHasMore(response.meta?.has_more ?? false);
-        setCursor(response.meta?.cursor ?? undefined);
+        cursorRef.current = response.meta?.cursor ?? undefined;
       } else {
         if (!append) setError('Failed to load blog posts.');
       }
@@ -131,10 +135,10 @@ export function BlogPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [cursor, searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory]);
 
   useEffect(() => {
-    setCursor(undefined);
+    cursorRef.current = undefined;
     loadPosts();
   }, [searchQuery, selectedCategory, loadPosts]);
 
@@ -263,7 +267,7 @@ export function BlogPage() {
           ) : (
             <>
               {/* Featured Post (first post gets larger treatment) */}
-              {posts.length > 0 && !searchQuery && !selectedCategory && !cursor && (
+              {posts.length > 0 && !searchQuery && !selectedCategory && !isPaginated && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -279,7 +283,7 @@ export function BlogPage() {
                 animate="visible"
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               >
-                {posts.slice(searchQuery || selectedCategory || cursor ? 0 : 1).map((post) => (
+                {posts.slice(searchQuery || selectedCategory || isPaginated ? 0 : 1).map((post) => (
                   <motion.div key={post.id} variants={itemVariants}>
                     <BlogPostCard post={post} categoryColors={categoryColorMap} />
                   </motion.div>
