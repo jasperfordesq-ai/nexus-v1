@@ -85,16 +85,19 @@ class AdminImpactReportApiController extends BaseApiController
         }
 
         $tenantId = TenantContext::getId();
-        $stmt = Database::query("SELECT settings FROM tenants WHERE id = ?", [$tenantId]);
+        $stmt = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
         $tenant = $stmt->fetch();
-        $settings = json_decode($tenant['settings'] ?? '{}', true) ?: [];
+        $config = json_decode($tenant['configuration'] ?? '{}', true) ?: [];
 
-        $settings['impact_hourly_value'] = $hourlyValue;
-        $settings['impact_social_multiplier'] = $socialMultiplier;
+        if (!isset($config['settings'])) {
+            $config['settings'] = [];
+        }
+        $config['settings']['impact_hourly_value'] = $hourlyValue;
+        $config['settings']['impact_social_multiplier'] = $socialMultiplier;
 
         Database::query(
-            "UPDATE tenants SET settings = ? WHERE id = ?",
-            [json_encode($settings), $tenantId]
+            "UPDATE tenants SET configuration = ? WHERE id = ?",
+            [json_encode($config), $tenantId]
         );
 
         $this->respondWithData(['message' => 'Configuration updated']);

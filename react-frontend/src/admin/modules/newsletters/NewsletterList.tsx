@@ -4,12 +4,15 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Button } from '@heroui/react';
-import { Mail, Plus, RefreshCw } from 'lucide-react';
+import {
+  Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
+} from '@heroui/react';
+import { Mail, Plus, RefreshCw, MoreVertical, Edit, Trash2, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
-import { DataTable, PageHeader, StatusBadge, type Column } from '../../components';
+import { DataTable, PageHeader, StatusBadge, ConfirmModal, type Column } from '../../components';
 
 interface NewsletterItem {
   id: number;
@@ -26,10 +29,13 @@ interface NewsletterItem {
 export function NewsletterList() {
   usePageTitle('Admin - Newsletters');
   const navigate = useNavigate();
+  const toast = useToast();
   const [items, setItems] = useState<NewsletterItem[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<NewsletterItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -54,6 +60,45 @@ export function NewsletterList() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await adminNewsletters.delete(deleteTarget.id);
+      if (res.success) {
+        toast.success(`Newsletter "${deleteTarget.name}" deleted`);
+        setDeleteTarget(null);
+        loadData();
+      } else {
+        toast.error('Failed to delete newsletter');
+      }
+    } catch {
+      toast.error('Failed to delete newsletter');
+    }
+    setDeleting(false);
+  };
+
+  const handleDuplicate = async (item: NewsletterItem) => {
+    try {
+      const res = await adminNewsletters.get(item.id);
+      if (res.success && res.data) {
+        const d = res.data as Record<string, unknown>;
+        const dupRes = await adminNewsletters.create({
+          name: `${d.name || item.name} (Copy)`,
+          subject: (d.subject as string) || item.subject,
+          content: (d.content as string) || '',
+          status: 'draft',
+        });
+        if (dupRes.success) {
+          toast.success('Newsletter duplicated');
+          loadData();
+        }
+      }
+    } catch {
+      toast.error('Failed to duplicate newsletter');
+    }
+  };
+
   const columns: Column<NewsletterItem>[] = [
     { key: 'name', label: 'Name', sortable: true },
     { key: 'subject', label: 'Subject', sortable: true },
@@ -72,6 +117,25 @@ export function NewsletterList() {
     {
       key: 'created_at', label: 'Created', sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+    },
+    {
+      key: 'actions' as keyof NewsletterItem, label: 'Actions',
+      render: (item) => (
+        <Dropdown>
+          <DropdownTrigger>
+            <Button isIconOnly size="sm" variant="light"><MoreVertical size={16} /></Button>
+          </DropdownTrigger>
+          <DropdownMenu aria-label="Newsletter actions" onAction={(key) => {
+            if (key === 'edit') navigate(`../newsletters/edit/${item.id}`);
+            else if (key === 'duplicate') handleDuplicate(item);
+            else if (key === 'delete') setDeleteTarget(item);
+          }}>
+            <DropdownItem key="edit" startContent={<Edit size={14} />}>Edit</DropdownItem>
+            <DropdownItem key="duplicate" startContent={<Copy size={14} />}>Duplicate</DropdownItem>
+            <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">Delete</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      ),
     },
   ];
 
@@ -105,6 +169,19 @@ export function NewsletterList() {
           </div>
         }
       />
+
+      {deleteTarget && (
+        <ConfirmModal
+          isOpen={!!deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDelete}
+          title="Delete Newsletter"
+          message={`Are you sure you want to delete "${deleteTarget.name}"? This cannot be undone.`}
+          confirmLabel="Delete"
+          confirmColor="danger"
+          isLoading={deleting}
+        />
+      )}
     </div>
   );
 }

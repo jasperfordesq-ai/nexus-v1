@@ -623,8 +623,13 @@ abstract class BaseApiController
         // Use the trait method which works for both Bearer and session auth
         $role = $this->getAuthenticatedUserRole() ?? 'member';
 
-        if (!in_array($role, ['admin', 'super_admin', 'god'])) {
-            $this->error('Admin access required', 403, ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS);
+        // Accept admin, tenant_admin, super_admin, and god roles
+        // Also accept if is_super_admin claim is set in the JWT
+        if (!in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])) {
+            // Fallback: check is_super_admin from JWT or DB
+            if (!$this->isAuthenticatedSuperAdmin()) {
+                $this->error('Admin access required', 403, ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS);
+            }
         }
 
         return $userId;
@@ -652,7 +657,7 @@ abstract class BaseApiController
 
     /**
      * Require super admin role
-     * Only allows super_admin or god roles
+     * Checks JWT role claim AND is_super_admin flag (from JWT or DB fallback)
      *
      * @return int User ID
      */
@@ -662,11 +667,48 @@ abstract class BaseApiController
 
         $role = $this->getAuthenticatedUserRole() ?? 'member';
 
-        if (!in_array($role, ['super_admin', 'god'])) {
-            $this->error('Super admin access required', 403, ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS);
+        // Check role claim first
+        if (in_array($role, ['super_admin', 'god'])) {
+            return $userId;
         }
 
-        return $userId;
+        // Fallback: check is_super_admin from JWT claim or DB
+        if ($this->isAuthenticatedSuperAdmin()) {
+            return $userId;
+        }
+
+        $this->error('Super admin access required', 403, ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS);
+        return $userId; // unreachable, but satisfies static analysis
+    }
+
+    /**
+     * Check if the authenticated user is a super admin
+     * First checks JWT is_super_admin claim, then falls back to DB lookup
+     *
+     * @return bool
+     */
+    protected function isAuthenticatedSuperAdmin(): bool
+    {
+        // Check JWT claim first (set during login)
+        $payload = $this->tokenPayload ?? [];
+        if (!empty($payload['is_super_admin'])) {
+            return true;
+        }
+
+        // DB fallback for tokens issued before is_super_admin was added to JWT
+        $userId = $this->authenticatedUserId ?? null;
+        if ($userId) {
+            $stmt = \Nexus\Core\Database::query(
+                "SELECT is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
+                [$userId]
+            );
+            $user = $stmt->fetch();
+            if ($user && (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // ============================================

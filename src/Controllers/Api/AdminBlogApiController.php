@@ -126,6 +126,12 @@ class AdminBlogApiController extends BaseApiController
             return;
         }
 
+        // Fetch SEO metadata
+        $seo = Database::query(
+            "SELECT meta_title, meta_description, noindex FROM seo_metadata WHERE entity_type = 'post' AND entity_id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        )->fetch();
+
         $this->respondWithData([
             'id' => (int) $post['id'],
             'title' => $post['title'] ?? '',
@@ -138,6 +144,9 @@ class AdminBlogApiController extends BaseApiController
             'author_name' => trim($post['author_name'] ?? ''),
             'category_id' => $post['category_id'] ? (int) $post['category_id'] : null,
             'category_name' => $post['category_name'] ?? null,
+            'meta_title' => $seo['meta_title'] ?? null,
+            'meta_description' => $seo['meta_description'] ?? null,
+            'noindex' => !empty($seo['noindex']),
             'created_at' => $post['created_at'],
             'updated_at' => $post['updated_at'] ?? null,
         ]);
@@ -184,6 +193,19 @@ class AdminBlogApiController extends BaseApiController
         $featuredImage = $data['featured_image'] ?? null;
         $categoryId = isset($data['category_id']) && $data['category_id'] ? (int) $data['category_id'] : null;
 
+        // Allow custom slug override
+        if (!empty($data['slug'])) {
+            $slug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', trim($data['slug'])));
+            $slug = trim($slug, '-');
+            $existingSlug = Database::query(
+                "SELECT COUNT(*) as cnt FROM posts WHERE slug = ? AND tenant_id = ?",
+                [$slug, $tenantId]
+            )->fetch()['cnt'];
+            if ($existingSlug > 0) {
+                $slug = $slug . '-' . time();
+            }
+        }
+
         Database::query(
             "INSERT INTO posts (tenant_id, author_id, title, slug, content, excerpt, status, featured_image, category_id, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
@@ -191,6 +213,19 @@ class AdminBlogApiController extends BaseApiController
         );
 
         $newId = Database::lastInsertId();
+
+        // Save SEO metadata if provided
+        $metaTitle = trim($data['meta_title'] ?? '');
+        $metaDescription = trim($data['meta_description'] ?? '');
+        $noindex = !empty($data['noindex']) ? 1 : 0;
+        if ($metaTitle || $metaDescription || $noindex) {
+            Database::query(
+                "INSERT INTO seo_metadata (entity_type, entity_id, tenant_id, meta_title, meta_description, noindex, created_at, updated_at)
+                 VALUES ('post', ?, ?, ?, ?, ?, NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE meta_title = VALUES(meta_title), meta_description = VALUES(meta_description), noindex = VALUES(noindex), updated_at = NOW()",
+                [$newId, $tenantId, $metaTitle ?: null, $metaDescription ?: null, $noindex]
+            );
+        }
 
         ActivityLog::log($adminId, 'admin_create_blog_post', "Created blog post #{$newId}: {$title}");
 
@@ -231,22 +266,38 @@ class AdminBlogApiController extends BaseApiController
             $fields[] = 'title = ?';
             $params[] = trim($data['title']);
 
-            // Regenerate slug if title changed
-            $newSlug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', trim($data['title'])));
-            $newSlug = trim($newSlug, '-');
+            // Only auto-generate slug from title if no explicit slug provided
+            if (!isset($data['slug'])) {
+                $newSlug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', trim($data['title'])));
+                $newSlug = trim($newSlug, '-');
 
-            // Only update slug if title changed from original
+                // Only update slug if title changed from original
+                if ($newSlug !== $post['slug']) {
+                    $existing = Database::query(
+                        "SELECT COUNT(*) as cnt FROM posts WHERE slug = ? AND tenant_id = ? AND id != ?",
+                        [$newSlug, $tenantId, $id]
+                    )->fetch()['cnt'];
+                    if ($existing > 0) {
+                        $newSlug = $newSlug . '-' . time();
+                    }
+                    $fields[] = 'slug = ?';
+                    $params[] = $newSlug;
+                }
+            }
+        }
+
+        // Allow explicit slug override
+        if (isset($data['slug']) && trim($data['slug']) !== '') {
+            $newSlug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', trim($data['slug'])));
+            $newSlug = trim($newSlug, '-');
             if ($newSlug !== $post['slug']) {
-                // Check uniqueness (excluding current post)
                 $existing = Database::query(
                     "SELECT COUNT(*) as cnt FROM posts WHERE slug = ? AND tenant_id = ? AND id != ?",
                     [$newSlug, $tenantId, $id]
                 )->fetch()['cnt'];
-
                 if ($existing > 0) {
                     $newSlug = $newSlug . '-' . time();
                 }
-
                 $fields[] = 'slug = ?';
                 $params[] = $newSlug;
             }
@@ -292,6 +343,20 @@ class AdminBlogApiController extends BaseApiController
             "UPDATE posts SET {$setClause} WHERE id = ? AND tenant_id = ?",
             $params
         );
+
+        // Update SEO metadata if provided
+        if (array_key_exists('meta_title', $data) || array_key_exists('meta_description', $data) || array_key_exists('noindex', $data)) {
+            $metaTitle = isset($data['meta_title']) ? trim($data['meta_title']) : null;
+            $metaDescription = isset($data['meta_description']) ? trim($data['meta_description']) : null;
+            $noindex = isset($data['noindex']) ? ($data['noindex'] ? 1 : 0) : 0;
+
+            Database::query(
+                "INSERT INTO seo_metadata (entity_type, entity_id, tenant_id, meta_title, meta_description, noindex, created_at, updated_at)
+                 VALUES ('post', ?, ?, ?, ?, ?, NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE meta_title = VALUES(meta_title), meta_description = VALUES(meta_description), noindex = VALUES(noindex), updated_at = NOW()",
+                [$id, $tenantId, $metaTitle, $metaDescription, $noindex]
+            );
+        }
 
         ActivityLog::log($adminId, 'admin_update_blog_post', "Updated blog post #{$id}: " . ($data['title'] ?? $post['title']));
 

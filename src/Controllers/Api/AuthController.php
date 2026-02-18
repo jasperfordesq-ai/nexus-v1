@@ -212,7 +212,8 @@ class AuthController
             // Generate secure tokens for mobile app
             $accessToken = TokenService::generateToken((int)$user['id'], (int)$user['tenant_id'], [
                 'role' => $user['role'],
-                'email' => $user['email']
+                'email' => $user['email'],
+                'is_super_admin' => !empty($user['is_super_admin']),
             ], $isMobile);
             $refreshToken = TokenService::generateRefreshToken((int)$user['id'], (int)$user['tenant_id'], $isMobile);
 
@@ -745,7 +746,8 @@ class AuthController
         // Generate new tokens with platform-appropriate expiry
         $newAccessToken = TokenService::generateToken((int)$userId, (int)$tenantId, [
             'role' => $user['role'],
-            'email' => $user['email']
+            'email' => $user['email'],
+            'is_super_admin' => !empty($user['is_super_admin']),
         ], $isMobile);
 
         // Get expiry times for response

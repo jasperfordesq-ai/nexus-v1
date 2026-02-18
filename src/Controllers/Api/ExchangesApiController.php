@@ -125,8 +125,8 @@ class ExchangesApiController extends BaseApiController
             return;
         }
 
-        // Check user is participant
-        if ($exchange['requester_id'] !== $userId && $exchange['provider_id'] !== $userId) {
+        // Check user is participant (cast to int since DB may return strings)
+        if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
             $this->error('Exchange not found', 404);
             return;
         }
@@ -134,18 +134,21 @@ class ExchangesApiController extends BaseApiController
         // Get history
         $history = ExchangeWorkflowService::getExchangeHistory($id);
 
+        $formatted = $this->formatExchange($exchange);
+        $formatted['status_history'] = array_map(function ($h) {
+            return [
+                'action' => $h['action'],
+                'actor_role' => $h['actor_role'],
+                'actor_name' => $h['actor_name'] ?? null,
+                'old_status' => $h['old_status'],
+                'new_status' => $h['new_status'],
+                'notes' => $h['notes'],
+                'created_at' => $h['created_at'],
+            ];
+        }, $history);
+
         $this->jsonResponse([
-            'data' => $this->formatExchange($exchange),
-            'history' => array_map(function ($h) {
-                return [
-                    'action' => $h['action'],
-                    'actor_role' => $h['actor_role'],
-                    'old_status' => $h['old_status'],
-                    'new_status' => $h['new_status'],
-                    'notes' => $h['notes'],
-                    'created_at' => $h['created_at'],
-                ];
-            }, $history),
+            'data' => $formatted,
         ]);
     }
 
@@ -165,7 +168,7 @@ class ExchangesApiController extends BaseApiController
             return;
         }
 
-        if ($exchange['provider_id'] !== $userId) {
+        if ((int) $exchange['provider_id'] !== $userId) {
             $this->error('Only the provider can accept this request', 403);
             return;
         }
@@ -202,7 +205,7 @@ class ExchangesApiController extends BaseApiController
             return;
         }
 
-        if ($exchange['provider_id'] !== $userId) {
+        if ((int) $exchange['provider_id'] !== $userId) {
             $this->error('Only the provider can decline this request', 403);
             return;
         }
@@ -238,7 +241,7 @@ class ExchangesApiController extends BaseApiController
             return;
         }
 
-        if ($exchange['requester_id'] !== $userId && $exchange['provider_id'] !== $userId) {
+        if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
             $this->error('Exchange not found', 404);
             return;
         }
@@ -274,7 +277,7 @@ class ExchangesApiController extends BaseApiController
             return;
         }
 
-        if ($exchange['requester_id'] !== $userId && $exchange['provider_id'] !== $userId) {
+        if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
             $this->error('Exchange not found', 404);
             return;
         }
@@ -311,7 +314,7 @@ class ExchangesApiController extends BaseApiController
             return;
         }
 
-        if ($exchange['requester_id'] !== $userId && $exchange['provider_id'] !== $userId) {
+        if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
             $this->error('Exchange not found', 404);
             return;
         }
@@ -369,7 +372,7 @@ class ExchangesApiController extends BaseApiController
             return;
         }
 
-        if ($exchange['requester_id'] !== $userId && $exchange['provider_id'] !== $userId) {
+        if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
             $this->error('Exchange not found', 404);
             return;
         }
@@ -420,6 +423,9 @@ class ExchangesApiController extends BaseApiController
     {
         return [
             'id' => (int) $exchange['id'],
+            'listing_id' => (int) $exchange['listing_id'],
+            'requester_id' => (int) $exchange['requester_id'],
+            'provider_id' => (int) $exchange['provider_id'],
             'listing' => [
                 'id' => (int) $exchange['listing_id'],
                 'title' => $exchange['listing_title'] ?? null,
@@ -439,14 +445,11 @@ class ExchangesApiController extends BaseApiController
             'final_hours' => $exchange['final_hours'] ? (float) $exchange['final_hours'] : null,
             'status' => $exchange['status'],
             'risk_level' => $exchange['risk_level'] ?? null,
-            'requester_confirmed' => [
-                'at' => $exchange['requester_confirmed_at'] ?? null,
-                'hours' => $exchange['requester_confirmed_hours'] ? (float) $exchange['requester_confirmed_hours'] : null,
-            ],
-            'provider_confirmed' => [
-                'at' => $exchange['provider_confirmed_at'] ?? null,
-                'hours' => $exchange['provider_confirmed_hours'] ? (float) $exchange['provider_confirmed_hours'] : null,
-            ],
+            'message' => $exchange['requester_notes'] ?? null,
+            'requester_confirmed_at' => $exchange['requester_confirmed_at'] ?? null,
+            'requester_confirmed_hours' => $exchange['requester_confirmed_hours'] ? (float) $exchange['requester_confirmed_hours'] : null,
+            'provider_confirmed_at' => $exchange['provider_confirmed_at'] ?? null,
+            'provider_confirmed_hours' => $exchange['provider_confirmed_hours'] ? (float) $exchange['provider_confirmed_hours'] : null,
             'broker_notes' => $exchange['broker_notes'] ?? null,
             'created_at' => $exchange['created_at'],
         ];

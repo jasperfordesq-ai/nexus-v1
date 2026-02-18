@@ -303,7 +303,7 @@ export const adminGamification = {
   listBadges: () =>
     api.get<BadgeDefinition[]>('/v2/admin/gamification/badges'),
 
-  createBadge: (data: { name: string; slug?: string; description: string; icon?: string }) =>
+  createBadge: (data: { name: string; slug?: string; description: string; icon?: string; category?: string; xp?: number; is_active?: boolean }) =>
     api.post<BadgeDefinition>('/v2/admin/gamification/badges', data),
 
   deleteBadge: (id: number) =>
@@ -531,6 +531,9 @@ export const adminGroups = {
   getModeration: () =>
     api.get<GroupModerationItem[]>('/v2/admin/groups/moderation'),
 
+  updateStatus: (id: number, status: 'active' | 'inactive') =>
+    api.put(`/v2/admin/groups/${id}/status`, { status }),
+
   delete: (id: number) =>
     api.delete(`/v2/admin/groups/${id}`),
 };
@@ -594,6 +597,9 @@ export const adminEnterprise = {
 
   getGdprBreaches: () =>
     api.get<GdprBreach[]>('/v2/admin/enterprise/gdpr/breaches'),
+
+  createBreach: (data: { title: string; description?: string; severity?: string; affected_users?: number }) =>
+    api.post('/v2/admin/enterprise/gdpr/breaches', data),
 
   getGdprAudit: () =>
     api.get<GdprAuditEntry[]>('/v2/admin/enterprise/gdpr/audit'),
@@ -676,6 +682,12 @@ export const adminVolunteering = {
 
   getApprovals: () => api.get('/v2/admin/volunteering/approvals'),
 
+  approveApplication: (id: number) =>
+    api.post('/v2/admin/volunteering/approvals/' + id + '/approve', {}),
+
+  declineApplication: (id: number) =>
+    api.post('/v2/admin/volunteering/approvals/' + id + '/decline', {}),
+
   getOrganizations: () => api.get('/v2/admin/volunteering/organizations'),
 };
 
@@ -690,6 +702,15 @@ export const adminFederation = {
     api.put('/v2/admin/federation/settings', data),
 
   getPartnerships: () => api.get('/v2/admin/federation/partnerships'),
+
+  approvePartnership: (id: number) =>
+    api.post('/v2/admin/federation/partnerships/' + id + '/approve', {}),
+
+  rejectPartnership: (id: number) =>
+    api.post('/v2/admin/federation/partnerships/' + id + '/reject', {}),
+
+  terminatePartnership: (id: number) =>
+    api.post('/v2/admin/federation/partnerships/' + id + '/terminate', {}),
 
   getDirectory: () => api.get('/v2/admin/federation/directory'),
 

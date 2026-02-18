@@ -6,10 +6,13 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, Button } from '@heroui/react';
-import { Users, ArrowLeft, Download } from 'lucide-react';
+import {
+  Avatar, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
+  Input, Textarea,
+} from '@heroui/react';
+import { Users, ArrowLeft, Download, PlusCircle } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { UserFinancialReport as UserFinancialReportType } from '../../api/types';
@@ -17,6 +20,7 @@ import type { UserFinancialReport as UserFinancialReportType } from '../../api/t
 export function UserReport() {
   usePageTitle('Admin - User Financial Report');
   const { tenantPath } = useTenant();
+  const toast = useToast();
 
   const [users, setUsers] = useState<UserFinancialReportType[]>([]);
   const [total, setTotal] = useState(0);
@@ -24,6 +28,12 @@ export function UserReport() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
+
+  // Balance adjustment modal
+  const [adjustTarget, setAdjustTarget] = useState<UserFinancialReportType | null>(null);
+  const [adjustAmount, setAdjustAmount] = useState('');
+  const [adjustReason, setAdjustReason] = useState('');
+  const [adjustLoading, setAdjustLoading] = useState(false);
 
   // Debounce search
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -83,6 +93,40 @@ export function UserReport() {
       setDownloadingId(null);
     }
   }, []);
+
+  const openAdjustModal = (user: UserFinancialReportType) => {
+    setAdjustTarget(user);
+    setAdjustAmount('');
+    setAdjustReason('');
+  };
+
+  const handleAdjustBalance = async () => {
+    if (!adjustTarget) return;
+    const amount = parseFloat(adjustAmount);
+    if (isNaN(amount) || amount === 0) {
+      toast.error('Please enter a valid non-zero amount');
+      return;
+    }
+    if (!adjustReason.trim()) {
+      toast.error('A reason is required for balance adjustments');
+      return;
+    }
+    setAdjustLoading(true);
+    try {
+      const res = await adminTimebanking.adjustBalance(adjustTarget.id, amount, adjustReason.trim());
+      if (res.success) {
+        toast.success(`Balance adjusted by ${amount > 0 ? '+' : ''}${amount}h for ${adjustTarget.name}`);
+        setAdjustTarget(null);
+        loadUsers();
+      } else {
+        toast.error('Failed to adjust balance');
+      }
+    } catch {
+      toast.error('Failed to adjust balance');
+    } finally {
+      setAdjustLoading(false);
+    }
+  };
 
   const columns: Column<UserFinancialReportType>[] = useMemo(
     () => [
@@ -150,18 +194,29 @@ export function UserReport() {
       },
       {
         key: 'actions' as keyof UserFinancialReportType,
-        label: 'Export',
+        label: 'Actions',
         render: (user) => (
-          <Button
-            size="sm"
-            variant="light"
-            isIconOnly
-            aria-label={`Download statement for ${user.name}`}
-            isLoading={downloadingId === user.id}
-            onPress={() => handleDownloadStatement(user.id)}
-          >
-            <Download size={16} />
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="flat"
+              color="secondary"
+              startContent={<PlusCircle size={14} />}
+              onPress={() => openAdjustModal(user)}
+            >
+              Adjust
+            </Button>
+            <Button
+              size="sm"
+              variant="light"
+              isIconOnly
+              aria-label={`Download statement for ${user.name}`}
+              isLoading={downloadingId === user.id}
+              onPress={() => handleDownloadStatement(user.id)}
+            >
+              <Download size={16} />
+            </Button>
+          </div>
         ),
       },
     ],
@@ -205,6 +260,48 @@ export function UserReport() {
           </div>
         }
       />
+
+      {adjustTarget && (
+        <Modal isOpen={!!adjustTarget} onClose={() => setAdjustTarget(null)} size="md">
+          <ModalContent>
+            <ModalHeader>
+              Adjust Balance — {adjustTarget.name}
+            </ModalHeader>
+            <ModalBody className="gap-4">
+              <p className="text-sm text-default-500">
+                Current balance: <strong>{adjustTarget.balance}h</strong>
+              </p>
+              <Input
+                label="Amount (hours)"
+                placeholder="e.g., 5 or -3"
+                type="number"
+                value={adjustAmount}
+                onValueChange={setAdjustAmount}
+                variant="bordered"
+                description="Positive to credit, negative to debit"
+                isRequired
+              />
+              <Textarea
+                label="Reason"
+                placeholder="Explain why this adjustment is needed..."
+                value={adjustReason}
+                onValueChange={setAdjustReason}
+                variant="bordered"
+                minRows={2}
+                isRequired
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="flat" onPress={() => setAdjustTarget(null)} isDisabled={adjustLoading}>
+                Cancel
+              </Button>
+              <Button color="primary" onPress={handleAdjustBalance} isLoading={adjustLoading}>
+                Adjust Balance
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </div>
   );
 }

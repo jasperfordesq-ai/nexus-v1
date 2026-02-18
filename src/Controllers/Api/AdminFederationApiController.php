@@ -125,6 +125,105 @@ class AdminFederationApiController extends BaseApiController
         }
     }
 
+    public function approvePartnership(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = $this->getRouteParam('id');
+
+        if (!$id || !$this->tableExists('federation_partners')) {
+            $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+            return;
+        }
+
+        try {
+            $partner = Database::query(
+                "SELECT * FROM federation_partners WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)",
+                [$id, $tenantId, $tenantId]
+            )->fetch();
+
+            if (!$partner) {
+                $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+                return;
+            }
+
+            Database::query(
+                "UPDATE federation_partners SET status = 'active', updated_at = NOW() WHERE id = ?",
+                [$id]
+            );
+
+            $this->respondWithData(['message' => 'Partnership approved']);
+        } catch (\Exception $e) {
+            $this->respondWithError('UPDATE_FAILED', 'Failed to approve partnership');
+        }
+    }
+
+    public function rejectPartnership(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = $this->getRouteParam('id');
+
+        if (!$id || !$this->tableExists('federation_partners')) {
+            $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+            return;
+        }
+
+        try {
+            $partner = Database::query(
+                "SELECT * FROM federation_partners WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)",
+                [$id, $tenantId, $tenantId]
+            )->fetch();
+
+            if (!$partner) {
+                $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+                return;
+            }
+
+            Database::query(
+                "UPDATE federation_partners SET status = 'rejected', updated_at = NOW() WHERE id = ?",
+                [$id]
+            );
+
+            $this->respondWithData(['message' => 'Partnership rejected']);
+        } catch (\Exception $e) {
+            $this->respondWithError('UPDATE_FAILED', 'Failed to reject partnership');
+        }
+    }
+
+    public function terminatePartnership(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = $this->getRouteParam('id');
+
+        if (!$id || !$this->tableExists('federation_partners')) {
+            $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+            return;
+        }
+
+        try {
+            $partner = Database::query(
+                "SELECT * FROM federation_partners WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)",
+                [$id, $tenantId, $tenantId]
+            )->fetch();
+
+            if (!$partner) {
+                $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+                return;
+            }
+
+            Database::query(
+                "UPDATE federation_partners SET status = 'terminated', updated_at = NOW() WHERE id = ?",
+                [$id]
+            );
+
+            $this->respondWithData(['message' => 'Partnership terminated']);
+        } catch (\Exception $e) {
+            $this->respondWithError('UPDATE_FAILED', 'Failed to terminate partnership');
+        }
+    }
+
     public function directory(): void
     {
         $this->requireAdmin();

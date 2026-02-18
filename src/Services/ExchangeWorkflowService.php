@@ -76,7 +76,12 @@ class ExchangeWorkflowService
             return null;
         }
 
-        $providerId = $listing['owner_id'];
+        $providerId = (int) $listing['owner_id'];
+
+        // Prevent requesting your own listing
+        if ($requesterId === $providerId) {
+            return null;
+        }
         $proposedHours = max(0.25, min(24, (float) ($data['proposed_hours'] ?? $listing['hours'] ?? 1)));
 
         // Determine initial status
@@ -87,14 +92,15 @@ class ExchangeWorkflowService
 
         Database::query(
             "INSERT INTO exchange_requests
-             (tenant_id, listing_id, requester_id, provider_id, proposed_hours, status, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, NOW())",
+             (tenant_id, listing_id, requester_id, provider_id, proposed_hours, requester_notes, status, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
             [
                 $tenantId,
                 $listingId,
                 $requesterId,
                 $providerId,
                 $proposedHours,
+                $data['message'] ?? null,
                 $initialStatus,
             ]
         );
@@ -126,7 +132,7 @@ class ExchangeWorkflowService
     {
         $exchange = self::getExchange($exchangeId);
 
-        if (!$exchange || $exchange['provider_id'] !== $providerId) {
+        if (!$exchange || (int) $exchange['provider_id'] !== $providerId) {
             return false;
         }
 
@@ -178,7 +184,7 @@ class ExchangeWorkflowService
     {
         $exchange = self::getExchange($exchangeId);
 
-        if (!$exchange || $exchange['provider_id'] !== $providerId) {
+        if (!$exchange || (int) $exchange['provider_id'] !== $providerId) {
             return false;
         }
 
@@ -288,7 +294,7 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $isRequester = $exchange['requester_id'] === $userId;
+        $isRequester = (int) $exchange['requester_id'] === $userId;
         $role = $isRequester ? 'requester' : 'provider';
         $success = self::updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, $role, 'Work started');
 
@@ -319,7 +325,7 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $isRequester = $exchange['requester_id'] === $userId;
+        $isRequester = (int) $exchange['requester_id'] === $userId;
         $role = $isRequester ? 'requester' : 'provider';
         $success = self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $role, 'Work completed, pending confirmation');
 
@@ -361,8 +367,8 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $isRequester = $exchange['requester_id'] === $userId;
-        $isProvider = $exchange['provider_id'] === $userId;
+        $isRequester = (int) $exchange['requester_id'] === $userId;
+        $isProvider = (int) $exchange['provider_id'] === $userId;
 
         if (!$isRequester && !$isProvider) {
             return false;
@@ -532,8 +538,8 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $isRequester = $exchange['requester_id'] === $userId;
-        $isProvider = $exchange['provider_id'] === $userId;
+        $isRequester = (int) $exchange['requester_id'] === $userId;
+        $isProvider = (int) $exchange['provider_id'] === $userId;
         $role = $isRequester ? 'requester' : ($isProvider ? 'provider' : 'broker');
 
         $success = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $userId, $role, $reason ?: 'Cancelled');
@@ -984,13 +990,14 @@ class ExchangeWorkflowService
      */
     public static function expireOldRequests(): int
     {
+        $tenantId = TenantContext::getId();
         $expiryHours = BrokerControlConfigService::getExpiryHours();
         $expiryDate = date('Y-m-d H:i:s', strtotime("-$expiryHours hours"));
 
         $stmt = Database::query(
             "SELECT id FROM exchange_requests
-             WHERE status = ? AND created_at < ?",
-            [self::STATUS_PENDING_PROVIDER, $expiryDate]
+             WHERE tenant_id = ? AND status = ? AND created_at < ?",
+            [$tenantId, self::STATUS_PENDING_PROVIDER, $expiryDate]
         );
 
         $expired = 0;

@@ -6,8 +6,11 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tabs, Tab, Button, Chip, Avatar } from '@heroui/react';
-import { Trash2, Users, Eye, EyeOff, Lock } from 'lucide-react';
+import {
+  Tabs, Tab, Button, Chip, Avatar,
+  Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
+} from '@heroui/react';
+import { Trash2, Users, Eye, EyeOff, Lock, MoreVertical, Power, PowerOff } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
@@ -90,6 +93,21 @@ export function GroupList() {
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
+    }
+  };
+
+  const handleStatusToggle = async (item: AdminGroup) => {
+    const newStatus = item.status === 'active' ? 'inactive' : 'active';
+    try {
+      const res = await adminGroups.updateStatus(item.id, newStatus);
+      if (res?.success) {
+        toast.success(`Group "${item.name}" ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
+        loadItems();
+      } else {
+        toast.error('Failed to update group status');
+      }
+    } catch {
+      toast.error('Failed to update group status');
     }
   };
 
@@ -179,18 +197,35 @@ export function GroupList() {
       key: 'actions',
       label: 'Actions',
       render: (item) => (
-        <div className="flex gap-1">
-          <Button
-            isIconOnly
-            size="sm"
-            variant="flat"
-            color="danger"
-            onPress={() => setConfirmDelete(item)}
-            aria-label="Delete group"
+        <Dropdown>
+          <DropdownTrigger>
+            <Button isIconOnly size="sm" variant="light" aria-label="Actions">
+              <MoreVertical size={16} />
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Group actions"
+            onAction={(key) => {
+              if (key === 'view') navigate(tenantPath(`/groups/${item.id}`));
+              else if (key === 'toggle-status') handleStatusToggle(item);
+              else if (key === 'delete') setConfirmDelete(item);
+            }}
           >
-            <Trash2 size={14} />
-          </Button>
-        </div>
+            <DropdownItem key="view" startContent={<Eye size={14} />}>
+              View Group
+            </DropdownItem>
+            <DropdownItem
+              key="toggle-status"
+              startContent={item.status === 'active' ? <PowerOff size={14} /> : <Power size={14} />}
+              className={item.status === 'active' ? 'text-warning' : 'text-success'}
+            >
+              {item.status === 'active' ? 'Deactivate' : 'Activate'}
+            </DropdownItem>
+            <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+              Delete
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       ),
     },
   ];

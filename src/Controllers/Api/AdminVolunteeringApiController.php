@@ -130,6 +130,78 @@ class AdminVolunteeringApiController extends BaseApiController
         }
     }
 
+    public function approveApplication(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = $this->getRouteParam('id');
+
+        if (!$id || !$this->tableExists('vol_applications')) {
+            $this->respondWithError('Application not found', 404);
+            return;
+        }
+
+        try {
+            // Verify the application belongs to this tenant
+            $app = Database::query(
+                "SELECT va.id, va.status, va.user_id, vo.title as opportunity_title
+                 FROM vol_applications va
+                 INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
+                 WHERE va.id = ? AND vo.tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$app) {
+                $this->respondWithError('Application not found', 404);
+                return;
+            }
+
+            Database::query(
+                "UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ?",
+                [$id]
+            );
+
+            $this->respondWithData(['message' => 'Application approved']);
+        } catch (\Exception $e) {
+            $this->respondWithError('Failed to approve application');
+        }
+    }
+
+    public function declineApplication(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = $this->getRouteParam('id');
+
+        if (!$id || !$this->tableExists('vol_applications')) {
+            $this->respondWithError('Application not found', 404);
+            return;
+        }
+
+        try {
+            $app = Database::query(
+                "SELECT va.id FROM vol_applications va
+                 INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
+                 WHERE va.id = ? AND vo.tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$app) {
+                $this->respondWithError('Application not found', 404);
+                return;
+            }
+
+            Database::query(
+                "UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ?",
+                [$id]
+            );
+
+            $this->respondWithData(['message' => 'Application declined']);
+        } catch (\Exception $e) {
+            $this->respondWithError('Failed to decline application');
+        }
+    }
+
     public function organizations(): void
     {
         $this->requireAdmin();

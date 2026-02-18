@@ -560,6 +560,43 @@ class AdminEnterpriseApiController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/admin/enterprise/gdpr/breaches
+     * Report a new data breach.
+     */
+    public function createBreach(): void
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $input = $this->getAllInput();
+
+        $title = trim($input['title'] ?? '');
+        if (!$title) {
+            $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 422);
+            return;
+        }
+
+        try {
+            Database::query(
+                "INSERT INTO data_breach_log (tenant_id, title, description, severity, status, affected_users, detected_at, reported_by, created_at)
+                 VALUES (?, ?, ?, ?, 'open', ?, NOW(), ?, NOW())",
+                [
+                    $tenantId,
+                    $title,
+                    $input['description'] ?? '',
+                    $input['severity'] ?? 'medium',
+                    (int) ($input['affected_users'] ?? 0),
+                    (int) ($this->getCurrentUserId() ?? 0),
+                ]
+            );
+            $id = Database::lastInsertId();
+
+            $this->respondWithData(['id' => $id, 'message' => 'Breach reported successfully'], null, 201);
+        } catch (\Exception $e) {
+            $this->respondWithError('CREATE_FAILED', 'Failed to report breach: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * GET /api/v2/admin/enterprise/gdpr/audit
      */
     public function gdprAudit(): void

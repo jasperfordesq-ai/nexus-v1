@@ -138,7 +138,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
         endpoint += `?slug=${encodeURIComponent(effectiveTenantSlug)}`;
       }
 
-      const response = await api.get<TenantConfig>(endpoint, { skipAuth: true });
+      const response = await api.get<TenantConfig>(endpoint, { skipAuth: true, skipTenant: true });
 
       if (response.success && response.data) {
         const tenant = response.data;

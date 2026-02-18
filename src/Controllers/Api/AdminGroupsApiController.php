@@ -400,6 +400,52 @@ class AdminGroupsApiController extends BaseApiController
     }
 
     /**
+     * PUT /api/v2/admin/groups/{id}/status
+     *
+     * Update a group's status (activate/deactivate)
+     */
+    public function updateStatus(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $input = $this->getAllInput();
+
+        $newStatus = $input['status'] ?? null;
+        if (!in_array($newStatus, ['active', 'inactive'])) {
+            $this->respondWithError('VALIDATION_ERROR', 'Status must be "active" or "inactive"', 'status', 422);
+            return;
+        }
+
+        try {
+            $group = Database::query(
+                "SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$group) {
+                $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Group not found', null, 404);
+                return;
+            }
+
+            $isActive = $newStatus === 'active' ? 1 : 0;
+            Database::query(
+                "UPDATE `groups` SET is_active = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$isActive, $id, $tenantId]
+            );
+
+            ActivityLog::log(
+                $adminId,
+                'admin_update_group_status',
+                "Set group #{$id} \"{$group['name']}\" to {$newStatus}"
+            );
+
+            $this->respondWithData(['id' => $id, 'status' => $newStatus]);
+        } catch (\Exception $e) {
+            $this->respondWithError('GROUPS_STATUS_ERROR', 'Failed to update group status: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
      * DELETE /api/v2/admin/groups/{id}
      *
      * Delete a group and its memberships

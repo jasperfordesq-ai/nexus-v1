@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner } from '@heroui/react';
-import { Target, Plus, Trash2 } from 'lucide-react';
+import { Target, Plus, Trash2, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -117,16 +117,28 @@ export function DeliverablesList() {
       key: 'actions',
       label: 'Actions',
       render: (item) => (
-        <Button
-          isIconOnly
-          size="sm"
-          variant="flat"
-          color="danger"
-          onPress={() => setConfirmDelete(item)}
-          aria-label="Delete deliverable"
-        >
-          <Trash2 size={14} />
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            color="primary"
+            onPress={() => navigate(`../deliverability/edit/${item.id}`)}
+            aria-label="Edit deliverable"
+          >
+            <Edit size={14} />
+          </Button>
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            color="danger"
+            onPress={() => setConfirmDelete(item)}
+            aria-label="Delete deliverable"
+          >
+            <Trash2 size={14} />
+          </Button>
+        </div>
       ),
     },
   ];

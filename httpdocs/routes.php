@@ -614,6 +614,7 @@ $router->add('GET', '/api/v2/admin/groups/approvals', 'Nexus\Controllers\Api\Adm
 $router->add('POST', '/api/v2/admin/groups/approvals/{id}/approve', 'Nexus\Controllers\Api\AdminGroupsApiController@approveMember');
 $router->add('POST', '/api/v2/admin/groups/approvals/{id}/reject', 'Nexus\Controllers\Api\AdminGroupsApiController@rejectMember');
 $router->add('GET', '/api/v2/admin/groups/moderation', 'Nexus\Controllers\Api\AdminGroupsApiController@moderation');
+$router->add('PUT', '/api/v2/admin/groups/{id}/status', 'Nexus\Controllers\Api\AdminGroupsApiController@updateStatus');
 $router->add('DELETE', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@deleteGroup');
 
 // Admin Timebanking
@@ -638,6 +639,7 @@ $router->add('GET', '/api/v2/admin/enterprise/gdpr/requests', 'Nexus\Controllers
 $router->add('PUT', '/api/v2/admin/enterprise/gdpr/requests/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@updateGdprRequest');
 $router->add('GET', '/api/v2/admin/enterprise/gdpr/consents', 'Nexus\Controllers\Api\AdminEnterpriseApiController@gdprConsents');
 $router->add('GET', '/api/v2/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Api\AdminEnterpriseApiController@gdprBreaches');
+$router->add('POST', '/api/v2/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Api\AdminEnterpriseApiController@createBreach');
 $router->add('GET', '/api/v2/admin/enterprise/gdpr/audit', 'Nexus\Controllers\Api\AdminEnterpriseApiController@gdprAudit');
 $router->add('GET', '/api/v2/admin/enterprise/monitoring', 'Nexus\Controllers\Api\AdminEnterpriseApiController@monitoring');
 $router->add('GET', '/api/v2/admin/enterprise/monitoring/health', 'Nexus\Controllers\Api\AdminEnterpriseApiController@healthCheck');
@@ -694,11 +696,16 @@ $router->add('DELETE', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\
 $router->add('GET', '/api/v2/admin/volunteering', 'Nexus\Controllers\Api\AdminVolunteeringApiController@index');
 $router->add('GET', '/api/v2/admin/volunteering/approvals', 'Nexus\Controllers\Api\AdminVolunteeringApiController@approvals');
 $router->add('GET', '/api/v2/admin/volunteering/organizations', 'Nexus\Controllers\Api\AdminVolunteeringApiController@organizations');
+$router->add('POST', '/api/v2/admin/volunteering/approvals/{id}/approve', 'Nexus\Controllers\Api\AdminVolunteeringApiController@approveApplication');
+$router->add('POST', '/api/v2/admin/volunteering/approvals/{id}/decline', 'Nexus\Controllers\Api\AdminVolunteeringApiController@declineApplication');
 
 // Admin Federation
 $router->add('GET', '/api/v2/admin/federation/settings', 'Nexus\Controllers\Api\AdminFederationApiController@settings');
 $router->add('PUT', '/api/v2/admin/federation/settings', 'Nexus\Controllers\Api\AdminFederationApiController@updateSettings');
 $router->add('GET', '/api/v2/admin/federation/partnerships', 'Nexus\Controllers\Api\AdminFederationApiController@partnerships');
+$router->add('POST', '/api/v2/admin/federation/partnerships/{id}/approve', 'Nexus\Controllers\Api\AdminFederationApiController@approvePartnership');
+$router->add('POST', '/api/v2/admin/federation/partnerships/{id}/reject', 'Nexus\Controllers\Api\AdminFederationApiController@rejectPartnership');
+$router->add('POST', '/api/v2/admin/federation/partnerships/{id}/terminate', 'Nexus\Controllers\Api\AdminFederationApiController@terminatePartnership');
 $router->add('GET', '/api/v2/admin/federation/directory', 'Nexus\Controllers\Api\AdminFederationApiController@directory');
 $router->add('GET', '/api/v2/admin/federation/directory/profile', 'Nexus\Controllers\Api\AdminFederationApiController@profile');
 $router->add('PUT', '/api/v2/admin/federation/directory/profile', 'Nexus\Controllers\Api\AdminFederationApiController@updateProfile');
