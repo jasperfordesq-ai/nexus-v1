@@ -158,6 +158,9 @@ jobs:
             docker build --no-cache -f Dockerfile -t nexus-react-test:ci .
           fi
 
+      - name: Build Sales Site Container
+        run: docker build --no-cache -f sales-site/Dockerfile -t nexus-sales-test:ci sales-site/
+
       - name: Verify PHP Container Starts
         run: |
           docker run -d --name php-test nexus-php-prod-test:ci

@@ -200,10 +200,46 @@ project-nexus/
 ├── tests/                        # PHPUnit tests
 ├── migrations/                   # SQL migration files
 ├── scripts/                      # Build, deploy, maintenance
+├── sales-site/                   # Sales/marketing landing page (project-nexus.ie)
+│   ├── public/                   # Static HTML, CSS, favicon, robots.txt
+│   ├── Dockerfile                # Nginx Alpine container
+│   └── nginx.conf                # Nginx config (gzip, caching, security headers)
 ├── capacitor/                    # Mobile app (Capacitor)
 ├── docs/                         # Documentation
 └── config/                       # App configuration
 ```
+
+## Sales Site (`sales-site/`)
+
+A standalone static marketing/landing page served at `project-nexus.ie`. **Not part of the React frontend or PHP backend.**
+
+| Item | Value |
+|------|-------|
+| **Stack** | Static HTML + CSS + minimal vanilla JS |
+| **Server** | Nginx Alpine (Docker) |
+| **Local URL** | `http://localhost:3001` |
+| **Production URL** | `https://project-nexus.ie` |
+| **Container** | `nexus-sales-site` |
+| **Port** | 3001 |
+
+**Key files:**
+
+| File | Purpose |
+|------|---------|
+| `sales-site/Dockerfile` | Nginx Alpine container definition |
+| `sales-site/nginx.conf` | Gzip, caching headers, security headers |
+| `sales-site/public/index.html` | Landing page (all sections) |
+| `sales-site/public/styles.css` | Dark theme, responsive, CSS animations |
+| `sales-site/public/favicon.svg` | SVG favicon |
+| `sales-site/public/robots.txt` | SEO robots file |
+
+**Development:** Edit files in `sales-site/public/` — the Docker volume mount in `compose.yml` auto-refreshes changes. No build step needed.
+
+**Rules:**
+- Do NOT add JavaScript frameworks (React, Next.js, etc.) — keep it plain HTML/CSS/JS
+- Do NOT import from `react-frontend/` — the sales site is completely independent
+- CTA links should point to `https://app.project-nexus.ie` (the React app)
+- Design should match the React app's indigo/purple gradient palette
 
 ## Code Patterns & Conventions
 

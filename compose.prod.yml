@@ -172,7 +172,7 @@ services:
     container_name: nexus-sales-site
     restart: unless-stopped
     ports:
-      - "3001:80"
+      - "3003:80"
     networks:
       - nexus-php-internal
     healthcheck:
