@@ -98,16 +98,23 @@ export function LegalDocForm() {
         status,
       };
 
+      let res;
       if (isEdit && id) {
-        await adminLegalDocs.update(parseInt(id), payload);
-        toast.success('Document updated');
+        res = await adminLegalDocs.update(parseInt(id), payload);
       } else {
-        await adminLegalDocs.create(payload);
-        toast.success('Document created');
+        res = await adminLegalDocs.create(payload);
       }
-      navigate(tenantPath('/admin/legal-documents'));
-    } catch {
+
+      if (res.success) {
+        toast.success(isEdit ? 'Document updated' : 'Document created');
+        navigate(tenantPath('/admin/legal-documents'));
+      } else {
+        const error = (res as { error?: string }).error || 'Save failed';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error(`Failed to ${isEdit ? 'update' : 'create'} document`);
+      console.error('Legal document save error:', err);
     } finally {
       setSaving(false);
     }

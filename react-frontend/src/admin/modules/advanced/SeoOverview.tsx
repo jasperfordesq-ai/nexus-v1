@@ -43,10 +43,17 @@ export function SeoOverview() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await adminSettings.updateSeoSettings(formData);
-      toast.success('SEO settings saved successfully');
-    } catch {
+      const res = await adminSettings.updateSeoSettings(formData);
+
+      if (res.success) {
+        toast.success('SEO settings saved successfully');
+      } else {
+        const error = (res as { error?: string }).error || 'Save failed';
+        toast.error(error);
+      }
+    } catch (err) {
       toast.error('Failed to save SEO settings');
+      console.error('SEO settings save error:', err);
     } finally {
       setSaving(false);
     }

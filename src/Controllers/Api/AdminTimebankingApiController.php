@@ -380,8 +380,8 @@ class AdminTimebankingApiController extends BaseApiController
                     $inRow = Database::query(
                         "SELECT COALESCE(SUM(amount), 0) as total
                          FROM org_transactions
-                         WHERE tenant_id = ? AND organization_id = ? AND type = 'credit'",
-                        [$tenantId, $orgId]
+                         WHERE tenant_id = ? AND organization_id = ? AND receiver_type = 'organization' AND receiver_id = ?",
+                        [$tenantId, $orgId, $orgId]
                     )->fetch();
                     $totalIn = round((float) ($inRow['total'] ?? 0), 1);
                 } catch (\Throwable $e) {
@@ -392,8 +392,8 @@ class AdminTimebankingApiController extends BaseApiController
                     $outRow = Database::query(
                         "SELECT COALESCE(SUM(amount), 0) as total
                          FROM org_transactions
-                         WHERE tenant_id = ? AND organization_id = ? AND type = 'debit'",
-                        [$tenantId, $orgId]
+                         WHERE tenant_id = ? AND organization_id = ? AND sender_type = 'organization' AND sender_id = ?",
+                        [$tenantId, $orgId, $orgId]
                     )->fetch();
                     $totalOut = round((float) ($outRow['total'] ?? 0), 1);
                 } catch (\Throwable $e) {
