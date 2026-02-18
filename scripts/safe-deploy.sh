@@ -128,8 +128,9 @@ validate_environment() {
         log_ok "nexus-php-db container running"
     fi
 
-    # Check database connectivity
-    if docker exec nexus-php-db mysqladmin ping -h localhost -unexus -pnexus_secret > /dev/null 2>&1; then
+    # Check database connectivity (read password from .env)
+    DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus_secret")
+    if docker exec nexus-php-db mysqladmin ping -h localhost -unexus -p"$DB_PASS" > /dev/null 2>&1; then
         log_ok "Database connection OK"
     else
         log_err "Database connection failed"
@@ -190,8 +191,9 @@ run_smoke_tests() {
         log_warn "Sales site health check failed (non-critical)"
     fi
 
-    # Check database connectivity
-    if docker exec nexus-php-db mysqladmin ping -h localhost -unexus -pnexus_secret > /dev/null 2>&1; then
+    # Check database connectivity (read password from .env)
+    DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus_secret")
+    if docker exec nexus-php-db mysqladmin ping -h localhost -unexus -p"$DB_PASS" > /dev/null 2>&1; then
         log_ok "Database still accessible"
     else
         log_err "Database connection lost"
