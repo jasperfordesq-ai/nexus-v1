@@ -580,16 +580,35 @@ Toggle light/dark mode via the sun/moon icon in the Navbar, or set `theme` in br
 
 #### Deploy to Azure (Production)
 
-Production uses **git pull** from GitHub (deploy key `ed25519` configured). Workflow:
+Production uses **git pull** from GitHub (deploy key `ed25519` configured).
+
+**🆕 Enhanced Features:**
+- ✅ **Rollback capability** - One-command rollback to last successful deploy
+- ✅ **Pre-deploy validation** - Disk space, files, containers, database checks
+- ✅ **Post-deploy smoke tests** - API, frontend, database, container health
+- ✅ **Deployment locking** - Prevents concurrent deploys
+- ✅ **Comprehensive logging** - Timestamped logs in `/opt/nexus-php/logs/`
+
+**Deployment from Windows (recommended):**
 
 ```bash
 # 1. Push changes to GitHub (pre-push hook validates build)
 git push origin main
 
-# 2. Deploy to production (from Windows)
+# 2. Deploy to production
 scripts\deploy-production.bat           # Full: git pull + rebuild + nginx + health check
-scripts\deploy-production.bat quick     # Quick: git pull + restart (OPCache clear)
-scripts\deploy-production.bat status    # Check git commit + containers + logs
+scripts\deploy-production.bat quick     # Quick: git pull + restart (OPCache clear - DEFAULT)
+
+# 3. Check status
+scripts\deploy-production.bat status    # Current commit + containers + health checks
+
+# 4. Rollback if needed (NEW!)
+scripts\deploy-production.bat rollback  # Rollback to last successful deploy
+
+# 5. View logs (NEW!)
+scripts\deploy-production.bat logs      # Recent deployment logs + container logs
+
+# 6. Update nginx only
 scripts\deploy-production.bat nginx     # Update nginx config only
 ```
 
@@ -598,10 +617,17 @@ scripts\deploy-production.bat nginx     # Update nginx config only
 ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253
 cd /opt/nexus-php
 
-# SAFE: Use the safe deploy script (handles compose.yml restoration)
-sudo bash scripts/safe-deploy.sh          # Quick: git pull + restart
-sudo bash scripts/safe-deploy.sh full     # Full: git pull + rebuild --no-cache
+# Deploy modes
+sudo bash scripts/safe-deploy.sh quick     # Quick: git pull + restart (DEFAULT)
+sudo bash scripts/safe-deploy.sh full      # Full: git pull + rebuild --no-cache
+sudo bash scripts/safe-deploy.sh rollback  # Rollback to last successful deploy (NEW!)
+sudo bash scripts/safe-deploy.sh status    # Check deployment status (NEW!)
+
+# Verification only (no changes)
+sudo bash scripts/verify-deploy.sh
 ```
+
+**📖 Full documentation:** See [scripts/DEPLOYMENT_README.md](scripts/DEPLOYMENT_README.md) for detailed deployment guide.
 
 #### 🔴 Production Git Safety Rules (CRITICAL)
 
@@ -1201,11 +1227,13 @@ php scripts/backup_database.php    # Backup
 php scripts/safe_migrate.php       # Run migrations
 php scripts/seed_database.php      # Seed data
 
-# Deployment (Azure) — git-based
+# Deployment (Azure) — git-based with rollback, validation, smoke tests
 git push origin main                         # Push to GitHub (pre-push hook validates build)
 scripts\deploy-production.bat                # Full: git pull + rebuild + health check
 scripts\deploy-production.bat quick          # Quick: git pull + restart (OPCache clear)
+scripts\deploy-production.bat rollback       # Rollback to last successful deploy
 scripts\deploy-production.bat status         # Check git commit + container status
+scripts\deploy-production.bat logs           # View recent deployment logs
 ```
 
 ## Regression Prevention System
