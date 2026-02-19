@@ -48,8 +48,11 @@ function isNativeApp(): boolean {
 async function getPushPlugin() {
   try {
     if (!isNativeApp()) return null;
-    const { PushNotifications } = await import('@capacitor/push-notifications');
-    return PushNotifications;
+    // Use variable import so TypeScript doesn't try to resolve the module at build time.
+    // This package only exists in the Capacitor native app, not in the web bundle.
+    const modulePath = '@capacitor/push-notifications';
+    const mod = await import(/* @vite-ignore */ modulePath);
+    return mod.PushNotifications;
   } catch (e) {
     console.warn('[Push] Failed to load PushNotifications plugin:', e);
     return null;
