@@ -53,6 +53,10 @@ import {
   Mail,
   Wrench,
   Stethoscope,
+  MessageSquare,
+  MessageCircle,
+  Star,
+  Flag,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -143,6 +147,17 @@ function useAdminNav(): NavSection[] {
           { label: 'Match Approvals', href: '/admin/match-approvals', icon: UserCheck, badge: 'NEW' },
           { label: 'Broker Controls', href: '/admin/broker-controls', icon: Shield },
           { label: 'Vetting Records', href: '/admin/broker-controls/vetting', icon: ShieldCheck },
+        ],
+      },
+      {
+        key: 'moderation',
+        label: 'Moderation',
+        icon: Shield,
+        items: [
+          { label: 'Feed Posts', href: '/admin/moderation/feed', icon: MessageSquare },
+          { label: 'Comments', href: '/admin/moderation/comments', icon: MessageCircle },
+          { label: 'Reviews', href: '/admin/moderation/reviews', icon: Star },
+          { label: 'Reports', href: '/admin/moderation/reports', icon: Flag, badge: 'NEW' },
         ],
       },
       {

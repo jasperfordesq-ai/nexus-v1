@@ -556,7 +556,7 @@ class GamificationService
             );
 
             // Update user XP
-            Database::query("UPDATE users SET xp = xp + ? WHERE id = ?", [$amount, $userId]);
+            Database::query("UPDATE users SET xp = xp + ? WHERE id = ? AND tenant_id = ?", [$amount, $userId, $tenantId]);
 
             // Get updated user info for real-time broadcast
             $user = Database::query("SELECT xp, level FROM users WHERE id = ?", [$userId])->fetch();
@@ -596,7 +596,8 @@ class GamificationService
 
             if ($newLevel > $currentLevel) {
                 // Update level
-                Database::query("UPDATE users SET level = ? WHERE id = ?", [$newLevel, $userId]);
+                $tenantId = TenantContext::getId();
+                Database::query("UPDATE users SET level = ? WHERE id = ? AND tenant_id = ?", [$newLevel, $userId, $tenantId]);
 
                 // Notify user
                 $basePath = TenantContext::getBasePath();

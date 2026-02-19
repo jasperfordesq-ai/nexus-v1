@@ -137,7 +137,7 @@ class AdminVolunteeringApiController extends BaseApiController
         $id = $this->getRouteParam('id');
 
         if (!$id || !$this->tableExists('vol_applications')) {
-            $this->respondWithError('Application not found', 404);
+            $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
             return;
         }
 
@@ -152,7 +152,7 @@ class AdminVolunteeringApiController extends BaseApiController
             )->fetch();
 
             if (!$app) {
-                $this->respondWithError('Application not found', 404);
+                $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
                 return;
             }
 
@@ -174,7 +174,7 @@ class AdminVolunteeringApiController extends BaseApiController
         $id = $this->getRouteParam('id');
 
         if (!$id || !$this->tableExists('vol_applications')) {
-            $this->respondWithError('Application not found', 404);
+            $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
             return;
         }
 
@@ -187,7 +187,7 @@ class AdminVolunteeringApiController extends BaseApiController
             )->fetch();
 
             if (!$app) {
-                $this->respondWithError('Application not found', 404);
+                $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
                 return;
             }
 

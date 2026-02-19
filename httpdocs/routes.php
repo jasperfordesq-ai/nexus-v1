@@ -611,6 +611,33 @@ $router->add('PUT', '/api/v2/admin/blog/{id}', 'Nexus\Controllers\Api\AdminBlogA
 $router->add('DELETE', '/api/v2/admin/blog/{id}', 'Nexus\Controllers\Api\AdminBlogApiController@destroy');
 $router->add('POST', '/api/v2/admin/blog/{id}/toggle-status', 'Nexus\Controllers\Api\AdminBlogApiController@toggleStatus');
 
+// Admin Content Moderation - Feed Posts
+$router->add('GET', '/api/v2/admin/feed/posts', 'Nexus\Controllers\Api\AdminFeedApiController@index');
+$router->add('GET', '/api/v2/admin/feed/posts/{id}', 'Nexus\Controllers\Api\AdminFeedApiController@show');
+$router->add('POST', '/api/v2/admin/feed/posts/{id}/hide', 'Nexus\Controllers\Api\AdminFeedApiController@hide');
+$router->add('DELETE', '/api/v2/admin/feed/posts/{id}', 'Nexus\Controllers\Api\AdminFeedApiController@destroy');
+$router->add('GET', '/api/v2/admin/feed/stats', 'Nexus\Controllers\Api\AdminFeedApiController@stats');
+
+// Admin Content Moderation - Comments
+$router->add('GET', '/api/v2/admin/comments', 'Nexus\Controllers\Api\AdminCommentsApiController@index');
+$router->add('GET', '/api/v2/admin/comments/{id}', 'Nexus\Controllers\Api\AdminCommentsApiController@show');
+$router->add('POST', '/api/v2/admin/comments/{id}/hide', 'Nexus\Controllers\Api\AdminCommentsApiController@hide');
+$router->add('DELETE', '/api/v2/admin/comments/{id}', 'Nexus\Controllers\Api\AdminCommentsApiController@destroy');
+
+// Admin Content Moderation - Reviews
+$router->add('GET', '/api/v2/admin/reviews', 'Nexus\Controllers\Api\AdminReviewsApiController@index');
+$router->add('GET', '/api/v2/admin/reviews/{id}', 'Nexus\Controllers\Api\AdminReviewsApiController@show');
+$router->add('POST', '/api/v2/admin/reviews/{id}/flag', 'Nexus\Controllers\Api\AdminReviewsApiController@flag');
+$router->add('POST', '/api/v2/admin/reviews/{id}/hide', 'Nexus\Controllers\Api\AdminReviewsApiController@hide');
+$router->add('DELETE', '/api/v2/admin/reviews/{id}', 'Nexus\Controllers\Api\AdminReviewsApiController@destroy');
+
+// Admin Content Moderation - Reports
+$router->add('GET', '/api/v2/admin/reports', 'Nexus\Controllers\Api\AdminReportsApiController@index');
+$router->add('GET', '/api/v2/admin/reports/stats', 'Nexus\Controllers\Api\AdminReportsApiController@stats');
+$router->add('GET', '/api/v2/admin/reports/{id}', 'Nexus\Controllers\Api\AdminReportsApiController@show');
+$router->add('POST', '/api/v2/admin/reports/{id}/resolve', 'Nexus\Controllers\Api\AdminReportsApiController@resolve');
+$router->add('POST', '/api/v2/admin/reports/{id}/dismiss', 'Nexus\Controllers\Api\AdminReportsApiController@dismiss');
+
 // Admin Gamification
 $router->add('GET', '/api/v2/admin/gamification/stats', 'Nexus\Controllers\Api\AdminGamificationApiController@stats');
 $router->add('GET', '/api/v2/admin/gamification/badges', 'Nexus\Controllers\Api\AdminGamificationApiController@badges');

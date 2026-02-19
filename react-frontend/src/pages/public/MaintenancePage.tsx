@@ -7,8 +7,10 @@ import { Card, CardBody, Button } from '@heroui/react';
 import { Wrench, LogIn } from 'lucide-react';
 import { useTenant } from '@/contexts';
 import { tenantPath } from '@/lib/tenant-routing';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export function MaintenancePage() {
+  usePageTitle('Maintenance');
   const { tenant } = useTenant();
   const tenantName = tenant?.name || 'Project NEXUS';
   const loginPath = tenantPath('/login', tenant?.slug);

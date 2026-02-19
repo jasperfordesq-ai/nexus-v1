@@ -215,11 +215,14 @@ class StreakService
 
     /**
      * Reset weekly streak freezes (call via cron on Sundays)
+     * Intentionally cross-tenant: resets all users' freeze allowance globally
      */
     public static function resetWeeklyFreezes()
     {
         try {
-            Database::query("UPDATE user_streaks SET streak_freezes_remaining = 1");
+            Database::query(
+                "UPDATE user_streaks SET streak_freezes_remaining = 1 WHERE streak_freezes_remaining != 1"
+            );
             return true;
         } catch (\Throwable $e) {
             error_log("Reset Freezes Error: " . $e->getMessage());
@@ -229,6 +232,7 @@ class StreakService
 
     /**
      * Check and break expired streaks (call via daily cron)
+     * Intentionally cross-tenant: expires stale streaks for all users globally
      */
     public static function checkExpiredStreaks()
     {
@@ -237,7 +241,7 @@ class StreakService
 
             // Reset streaks that are more than 2 days old (even with freeze)
             Database::query(
-                "UPDATE user_streaks SET current_streak = 0 WHERE last_activity_date < ?",
+                "UPDATE user_streaks SET current_streak = 0 WHERE last_activity_date < ? AND current_streak > 0",
                 [$twoDaysAgo]
             );
 

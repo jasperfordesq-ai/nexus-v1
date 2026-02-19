@@ -38,7 +38,7 @@ export function CronJobSetup() {
   const [testing, setTesting] = useState(false);
 
   // In a real scenario, this would come from environment/config
-  const CRON_KEY = process.env.VITE_CRON_KEY || 'your-secure-cron-key-here';
+  const CRON_KEY = import.meta.env.VITE_CRON_KEY || 'your-secure-cron-key-here';
   const API_URL = import.meta.env.VITE_API_BASE?.replace('/api', '') || 'https://api.project-nexus.ie';
   const CRON_URL = `${API_URL}/cron.php`;
 

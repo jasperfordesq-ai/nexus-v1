@@ -327,7 +327,7 @@ export function CronJobLogs() {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">
-                        {log.duration_seconds.toFixed(2)}s
+                        {Number(log.duration_seconds).toFixed(2)}s
                       </span>
                     </TableCell>
                     <TableCell>
@@ -404,7 +404,7 @@ export function CronJobLogs() {
                   <div>
                     <p className="text-xs text-default-500 mb-1">Duration</p>
                     <p className="text-sm font-medium">
-                      {selectedLog.duration_seconds.toFixed(2)}s
+                      {Number(selectedLog.duration_seconds).toFixed(2)}s
                     </p>
                   </div>
                   <div>

@@ -344,7 +344,7 @@ class ListingService
         // Handle SDGs
         if (!empty($data['sdg_goals'])) {
             $sdgJson = is_array($data['sdg_goals']) ? json_encode($data['sdg_goals']) : $data['sdg_goals'];
-            Database::query("UPDATE listings SET sdg_goals = ? WHERE id = ?", [$sdgJson, $listingId]);
+            Database::query("UPDATE listings SET sdg_goals = ? WHERE id = ? AND tenant_id = ?", [$sdgJson, $listingId, TenantContext::getId()]);
         }
 
         // Log activity
@@ -475,7 +475,7 @@ class ListingService
         // Handle SDGs if provided
         if (isset($data['sdg_goals'])) {
             $sdgJson = is_array($data['sdg_goals']) ? json_encode($data['sdg_goals']) : $data['sdg_goals'];
-            Database::query("UPDATE listings SET sdg_goals = ? WHERE id = ?", [$sdgJson, $id]);
+            Database::query("UPDATE listings SET sdg_goals = ? WHERE id = ? AND tenant_id = ?", [$sdgJson, $id, $tenantId]);
         }
 
         return true;

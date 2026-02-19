@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Button, Avatar, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
-  Select, SelectItem,
+  Select, SelectItem, Switch,
 } from '@heroui/react';
 import { Plus, MoreVertical, Shield, ArrowRight, Eye, UserCheck, UserX } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
@@ -22,6 +22,8 @@ export function SuperUserList() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [tenantFilter, setTenantFilter] = useState<number | undefined>();
+  const [roleFilter, setRoleFilter] = useState<string | undefined>();
+  const [superAdminsOnly, setSuperAdminsOnly] = useState(false);
   const [page, setPage] = useState(1);
 
   const [confirmAction, setConfirmAction] = useState<{
@@ -33,13 +35,18 @@ export function SuperUserList() {
   const loadUsers = useCallback(async () => {
     setLoading(true);
     const res = await adminSuper.listUsers({
-      page, search: search || undefined, tenant_id: tenantFilter,
+      page,
+      search: search || undefined,
+      tenant_id: tenantFilter,
+      role: roleFilter,
+      super_admins: superAdminsOnly || undefined,
+      limit: 100,
     });
     if (res.success && res.data) {
       setUsers(Array.isArray(res.data) ? res.data : []);
     }
     setLoading(false);
-  }, [page, search, tenantFilter]);
+  }, [page, search, tenantFilter, roleFilter, superAdminsOnly]);
 
   const loadTenants = useCallback(async () => {
     const res = await adminSuper.listTenants();
@@ -89,18 +96,18 @@ export function SuperUserList() {
     },
     {
       key: 'tenant', label: 'Tenant', sortable: true,
-      render: (user) => <Chip size="sm" variant="flat">{user.tenant_name || `Tenant ${user.tenant_id}`}</Chip>,
+      render: (user) => (
+        <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="hover:text-primary">
+          <Chip size="sm" variant="flat">{user.tenant_name || `Tenant ${user.tenant_id}`}</Chip>
+        </Link>
+      ),
     },
     {
       key: 'role', label: 'Role', sortable: true,
       render: (user) => (
-        <div className="flex items-center gap-1">
-          <Chip size="sm" variant="flat" color={user.is_super_admin ? 'secondary' : user.role === 'admin' ? 'primary' : 'default'}>
-            {user.role}
-          </Chip>
-          {user.is_super_admin && <Chip size="sm" variant="flat" color="warning" startContent={<Shield size={10} />}>SA</Chip>}
-          {user.is_tenant_super_admin && <Chip size="sm" variant="flat" color="success">TSA</Chip>}
-        </div>
+        <Chip size="sm" variant="flat" color={user.role === 'admin' || user.role === 'tenant_admin' ? 'primary' : 'default'}>
+          {user.role}
+        </Chip>
       ),
     },
     {
@@ -108,8 +115,32 @@ export function SuperUserList() {
       render: (user) => <StatusBadge status={user.status} />,
     },
     {
-      key: 'created_at', label: 'Joined', sortable: true,
-      render: (user) => <span className="text-sm text-default-500">{new Date(user.created_at).toLocaleDateString()}</span>,
+      key: 'super_admin', label: 'Super Admin', sortable: true,
+      render: (user) => (
+        <div className="flex items-center gap-1">
+          {user.is_super_admin ? (
+            <Chip size="sm" variant="flat" color="danger" startContent={<Shield size={10} />}>
+              Global SA
+            </Chip>
+          ) : user.is_tenant_super_admin ? (
+            <Chip size="sm" variant="flat" color="secondary" startContent={<Shield size={10} />}>
+              Tenant SA
+            </Chip>
+          ) : (
+            <span className="text-default-400">—</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'last_login_at', label: 'Last Login', sortable: true,
+      render: (user) => (
+        <span className="text-sm text-default-500">
+          {user.last_login_at
+            ? new Date(user.last_login_at).toLocaleDateString()
+            : 'Never'}
+        </span>
+      ),
     },
     {
       key: 'actions', label: 'Actions',
@@ -164,7 +195,7 @@ export function SuperUserList() {
           </Button>
         }
       />
-      <div className="mb-4">
+      <div className="mb-4 flex flex-wrap items-end gap-4">
         <Select
           label="Filter by Tenant"
           size="sm"
@@ -178,7 +209,39 @@ export function SuperUserList() {
         >
           {tenants.map((t) => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
         </Select>
+        <Select
+          label="Filter by Role"
+          size="sm"
+          className="max-w-xs"
+          selectedKeys={roleFilter ? [roleFilter] : []}
+          onSelectionChange={(keys) => {
+            const val = Array.from(keys)[0];
+            setRoleFilter(val ? String(val) : undefined);
+            setPage(1);
+          }}
+        >
+          <SelectItem key="member">Member</SelectItem>
+          <SelectItem key="admin">Admin</SelectItem>
+          <SelectItem key="tenant_admin">Tenant Admin</SelectItem>
+        </Select>
+        <Switch
+          size="sm"
+          isSelected={superAdminsOnly}
+          onValueChange={(val) => {
+            setSuperAdminsOnly(val);
+            setPage(1);
+          }}
+        >
+          Super Admins Only
+        </Switch>
       </div>
+      {users.length >= 100 && (
+        <div className="mb-4 p-3 bg-warning-50 dark:bg-warning-50/10 border border-warning-200 dark:border-warning-200/20 rounded-lg">
+          <p className="text-sm text-warning-700 dark:text-warning-400">
+            Showing first 100 results. Use filters to narrow down your search.
+          </p>
+        </div>
+      )}
       <DataTable
         columns={columns}
         data={users}
