@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 /**
  * NEXUS API Type Definitions
  * Matches the PHP backend API contracts from docs/API_CONTRACT_REFERENCE.md

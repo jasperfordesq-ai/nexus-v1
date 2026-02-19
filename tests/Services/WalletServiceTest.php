@@ -1,4 +1,8 @@
 <?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 
 declare(strict_types=1);
 
@@ -167,7 +171,8 @@ class WalletServiceTest extends DatabaseTestCase
         );
 
         $this->assertFalse($result['success']);
-        $this->assertStringContainsString('Recipient not found', $result['message']);
+        // Membership check runs before recipient check, so the error is about membership
+        $this->assertStringContainsString('member of this organization', $result['message']);
     }
 
     // ==========================================

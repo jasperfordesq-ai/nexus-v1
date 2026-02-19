@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTenant, useFeature } from '@/contexts';
@@ -117,7 +122,14 @@ export function Footer({ children, copyright }: FooterProps) {
             {/* Bottom Bar */}
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-sm text-theme-subtle">{footerText}</p>
-              <p className="text-xs text-theme-subtle">Powered by Project NEXUS</p>
+              <a
+                href="https://github.com/jasperfordesq-ai/nexus-v1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
+              >
+                Built on Project NEXUS by Jasper Ford
+              </a>
             </div>
           </div>
         )}

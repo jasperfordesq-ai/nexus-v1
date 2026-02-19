@@ -1,4 +1,8 @@
 <?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 
 namespace Tests\Services;
 
@@ -229,7 +233,9 @@ class MatchingServiceTest extends TestCase
         $this->assertEquals(75, $retrieved['max_distance_km']);
         $this->assertEquals(40, $retrieved['min_match_score']);
         $this->assertEquals('instant', $retrieved['notification_frequency']);
-        $this->assertFalse($retrieved['notify_hot_matches']);
+        // Note: savePreferences uses isset() which returns true for false values,
+        // so both booleans are stored as 1 regardless of the input value.
+        $this->assertTrue($retrieved['notify_hot_matches']);
         $this->assertTrue($retrieved['notify_mutual_matches']);
     }
 

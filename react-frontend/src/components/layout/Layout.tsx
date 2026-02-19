@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 /**
  * Main Layout Component
  * Wraps all pages with navigation, footer, and background
@@ -115,7 +120,7 @@ export function Layout({
  */
 export function AuthLayout() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="blob blob-indigo" />
@@ -124,9 +129,21 @@ export function AuthLayout() {
       </div>
 
       {/* Main Content */}
-      <main className="relative z-10">
+      <main className="relative z-10 flex-1">
         <Outlet />
       </main>
+
+      {/* Attribution (AGPL Section 7(b) — required on all pages) */}
+      <footer className="relative z-10 py-4 text-center">
+        <a
+          href="https://github.com/jasperfordesq-ai/nexus-v1"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-white/40 hover:text-white/70 transition-colors"
+        >
+          Built on Project NEXUS by Jasper Ford
+        </a>
+      </footer>
     </div>
   );
 }

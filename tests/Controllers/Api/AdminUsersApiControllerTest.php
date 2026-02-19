@@ -1,4 +1,8 @@
 <?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 
 declare(strict_types=1);
 
@@ -20,7 +24,7 @@ class AdminUsersApiControllerTest extends ApiTestCase
     private static int $adminUserId;
     private static int $tenantId;
     private static string $adminToken;
-    private static int $testUserId;
+    protected static ?int $testUserId = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -180,7 +184,7 @@ class AdminUsersApiControllerTest extends ApiTestCase
         $this->assertEquals('simulated', $response['status']);
     }
 
-    public function testDeleteUserPreventsS selfDeletion(): void
+    public function testDeleteUserPreventsSelfDeletion(): void
     {
         $response = $this->makeApiRequest(
             'DELETE',

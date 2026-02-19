@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 /**
  * LocationMapCard — wraps LocationMap in a GlassCard with title.
  * Falls back to text-only display if no API key or no coordinates.
