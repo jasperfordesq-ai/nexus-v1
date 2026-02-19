@@ -8,7 +8,7 @@
  */
 
 // Bootstrap the application
-require_once __DIR__ . '/../../httpdocs/bootstrap.php';
+require_once __DIR__ . '/../../bootstrap.php';
 
 use Nexus\Core\TenantContext;
 use Nexus\Core\Database;

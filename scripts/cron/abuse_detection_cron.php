@@ -17,8 +17,10 @@
  * 0 2 * * 0 php /path/to/scripts/cron/abuse_detection_cron.php cleanup
  */
 
-// Bootstrap the application
-require_once dirname(__DIR__, 2) . '/bootstrap.php';
+// Bootstrap the application (skip if already loaded via admin panel include)
+if (!class_exists('Nexus\Core\Database', false)) {
+    require_once dirname(__DIR__, 2) . '/bootstrap.php';
+}
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
@@ -27,24 +29,28 @@ use Nexus\Services\AbuseDetectionService;
 // Get command argument - supports both CLI and internal (include) execution
 $command = $GLOBALS['argv'][1] ?? $argv[1] ?? 'help';
 
-// Log function (unique name to avoid conflicts when multiple cron scripts are included)
-function abuseDetectionLog($message) {
-    $timestamp = date('Y-m-d H:i:s');
-    echo "[{$timestamp}] {$message}\n";
-    error_log("[Abuse Detection Cron] {$message}");
+// Log function (unique name + function_exists guard for safe re-inclusion)
+if (!function_exists('abuseDetectionLog')) {
+    function abuseDetectionLog($message) {
+        $timestamp = date('Y-m-d H:i:s');
+        echo "[{$timestamp}] {$message}\n";
+        error_log("[Abuse Detection Cron] {$message}");
+    }
 }
 
-// Process all tenants (unique name to avoid conflicts)
-function abuseDetectionForEachTenant(callable $callback) {
-    $tenants = Database::query("SELECT id, slug FROM tenants")->fetchAll();
+// Process all tenants (unique name + function_exists guard for safe re-inclusion)
+if (!function_exists('abuseDetectionForEachTenant')) {
+    function abuseDetectionForEachTenant(callable $callback) {
+        $tenants = Database::query("SELECT id, slug FROM tenants")->fetchAll();
 
-    foreach ($tenants as $tenant) {
-        try {
-            TenantContext::setById($tenant['id']);
-            abuseDetectionLog("Processing tenant: {$tenant['slug']} (ID: {$tenant['id']})");
-            $callback($tenant);
-        } catch (\Throwable $e) {
-            abuseDetectionLog("Error processing tenant {$tenant['id']}: " . $e->getMessage());
+        foreach ($tenants as $tenant) {
+            try {
+                TenantContext::setById($tenant['id']);
+                abuseDetectionLog("Processing tenant: {$tenant['slug']} (ID: {$tenant['id']})");
+                $callback($tenant);
+            } catch (\Throwable $e) {
+                abuseDetectionLog("Error processing tenant {$tenant['id']}: " . $e->getMessage());
+            }
         }
     }
 }

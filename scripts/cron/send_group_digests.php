@@ -10,17 +10,21 @@
  * 0 9 * * 1 php /path/to/scripts/cron/send_group_digests.php
  */
 
-// Bootstrap the application
-require_once dirname(__DIR__, 2) . '/bootstrap.php';
+// Bootstrap the application (skip if already loaded via admin panel include)
+if (!class_exists('Nexus\Core\Database', false)) {
+    require_once dirname(__DIR__, 2) . '/bootstrap.php';
+}
 
 use Nexus\Services\GroupReportingService;
 use Nexus\Core\TenantContext;
 
-// Log function
-function digestLog($message) {
-    $timestamp = date('Y-m-d H:i:s');
-    echo "[{$timestamp}] {$message}\n";
-    error_log("[Group Digest Cron] {$message}");
+// Log function (guard against redeclaration when included via admin panel)
+if (!function_exists('digestLog')) {
+    function digestLog($message) {
+        $timestamp = date('Y-m-d H:i:s');
+        echo "[{$timestamp}] {$message}\n";
+        error_log("[Group Digest Cron] {$message}");
+    }
 }
 
 digestLog("Starting group weekly digest cron job...");
@@ -43,19 +47,21 @@ try {
     }
 
     // Success output
-    echo "\n✅ Group Weekly Digest Cron Completed Successfully\n";
+    echo "\nGroup Weekly Digest Cron Completed Successfully\n";
     echo "Total Groups: {$stats['total_groups']}\n";
     echo "Sent: {$stats['sent']}\n";
     echo "Failed: {$stats['failed']}\n";
-
-    exit(0);
 
 } catch (\Exception $e) {
     digestLog("ERROR: " . $e->getMessage());
     digestLog("Stack trace: " . $e->getTraceAsString());
 
-    echo "\n❌ Group Weekly Digest Cron Failed\n";
+    echo "\nGroup Weekly Digest Cron Failed\n";
     echo "Error: " . $e->getMessage() . "\n";
-
-    exit(1);
 }
+
+// Use return instead of exit when included internally to allow the calling script to continue
+if (defined('CRON_INTERNAL_RUN')) {
+    return;
+}
+exit(0);
