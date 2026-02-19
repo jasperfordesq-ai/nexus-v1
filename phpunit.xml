@@ -34,6 +34,9 @@
         <testsuite name="Enterprise">
             <directory suffix="Test.php">tests/Enterprise</directory>
         </testsuite>
+        <testsuite name="Middleware">
+            <directory suffix="Test.php">tests/Middleware</directory>
+        </testsuite>
     </testsuites>
     <php>
         <env name="APP_ENV" value="testing"/>

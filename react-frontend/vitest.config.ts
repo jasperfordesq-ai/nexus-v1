@@ -29,6 +29,14 @@ export default defineConfig({
         'src/main.tsx',
         'src/vite-env.d.ts',
       ],
+      thresholds: {
+        // Minimum coverage thresholds — raise these over time
+        // Current baseline: ~40%. Target: 70%+
+        statements: 30,
+        branches: 25,
+        functions: 25,
+        lines: 30,
+      },
     },
   },
   resolve: {
