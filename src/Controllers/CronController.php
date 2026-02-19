@@ -202,7 +202,7 @@ class CronController
 
         if (empty($users)) {
             echo "No pending notifications for $frequency digest.\n";
-            exit;
+            return;
         }
 
         echo "Found " . count($users) . " users to process.\n";
