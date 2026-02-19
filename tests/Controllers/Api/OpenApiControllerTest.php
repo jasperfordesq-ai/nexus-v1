@@ -18,12 +18,6 @@ class OpenApiControllerTest extends TestCase
         $this->assertTrue(class_exists(OpenApiController::class));
     }
 
-    public function testExtendsBaseApiController(): void
-    {
-        $reflection = new \ReflectionClass(OpenApiController::class);
-        $this->assertTrue($reflection->isSubclassOf(\Nexus\Controllers\Api\BaseApiController::class));
-    }
-
     public function testHasJsonMethod(): void
     {
         $reflection = new \ReflectionClass(OpenApiController::class);

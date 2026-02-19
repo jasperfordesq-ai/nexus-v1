@@ -31,6 +31,8 @@ This project uses **Claude Opus 4.6 Agent Teams** (swarm mode) for large, multi-
 | Item | Value |
 |------|-------|
 | **Project** | Project NEXUS - Timebanking Platform |
+| **License** | AGPL-3.0-or-later (open source) |
+| **GitHub Repo** | <https://github.com/jasperfordesq-ai/nexus-v1> |
 | **Frontend Stack** | React 18 + TypeScript + HeroUI + Tailwind CSS 4 |
 | **PHP Version** | 8.2+ (API backend only) |
 | **Database** | MariaDB 10.11 (MySQL compatible) |
@@ -65,6 +67,36 @@ See [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) for full setup guide.
 ---
 
 ## MANDATORY RULES
+
+### 🔴 OPEN SOURCE — AGPL-3.0 (CRITICAL)
+
+This project is **publicly released** under the GNU Affero General Public License v3 (AGPL-3.0-or-later).
+
+**Repository:** <https://github.com/jasperfordesq-ai/nexus-v1>
+**Old repo (retired):** `hour-timebank.git` — do NOT push to this. All pushes go to `nexus-v1`.
+
+**Rules:**
+
+- **Every new source file** (PHP, TS, TSX) MUST have this SPDX header at the top:
+
+  ```text
+  // Copyright © 2024–2026 Jasper Ford
+  // SPDX-License-Identifier: AGPL-3.0-or-later
+  // Author: Jasper Ford
+  // See NOTICE file for attribution and acknowledgements.
+  ```
+
+  For PHP files, place it immediately after `<?php`. For TS/TSX files, place it as the first lines.
+  Run `node scripts/add-spdx-headers.mjs` to batch-add headers to any files missing them.
+  Run `node scripts/check-spdx.mjs` to verify all files have headers.
+
+- **Attribution must appear on every page** — Footer ("Built on Project NEXUS by Jasper Ford" linking to the repo), mobile drawer, and auth pages all have AGPL Section 7(b) attribution. Do NOT remove it.
+
+- **About page must display all contributors** from `react-frontend/src/data/contributors.json` — rendered programmatically, never hardcoded. If you add a contributor, update both `contributors.json` (root) and `react-frontend/src/data/contributors.json`.
+
+- **NOTICE file** contains the authoritative legal terms (Section 7 a–f). Do NOT modify without understanding the legal implications.
+
+- **Never commit secrets** — `.gitignore` protects `.env`, uploads, vendor, etc. The repo is PUBLIC.
 
 ### 🔴 REACT FRONTEND IS THE ONLY UI - CRITICAL
 
@@ -580,7 +612,7 @@ Toggle light/dark mode via the sun/moon icon in the Navbar, or set `theme` in br
 
 #### Deploy to Azure (Production)
 
-Production uses **git pull** from GitHub (deploy key `ed25519` configured).
+Production uses **git pull** from GitHub over HTTPS (public repo, no auth needed).
 
 **🆕 Enhanced Features:**
 - ✅ **Rollback capability** - One-command rollback to last successful deploy
@@ -661,7 +693,7 @@ sudo git checkout -- .                        # DANGER: Overwrites compose.yml
 | `vendor/` | PHP dependencies (installed on server) | `.gitignore` (untracked) |
 | `compose.yml.pre-deploy-backup` | Pre-deploy backup | Created by `safe-deploy.sh` |
 
-**Deploy key:** ED25519 at `/home/azureuser/.ssh/id_ed25519` (read-only access to GitHub repo)
+**Git remote:** `https://github.com/jasperfordesq-ai/nexus-v1.git` (public repo, HTTPS — no deploy key required)
 
 #### SSH to Azure
 

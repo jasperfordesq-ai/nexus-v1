@@ -9,6 +9,16 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        // Prevent OOM crashes with large test suite (72 files)
+        maxForks: 2,
+        minForks: 1,
+        isolate: true,
+      },
+    },
+    fileParallelism: false,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

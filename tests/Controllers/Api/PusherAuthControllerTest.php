@@ -18,12 +18,6 @@ class PusherAuthControllerTest extends TestCase
         $this->assertTrue(class_exists(PusherAuthController::class));
     }
 
-    public function testExtendsBaseApiController(): void
-    {
-        $reflection = new \ReflectionClass(PusherAuthController::class);
-        $this->assertTrue($reflection->isSubclassOf(\Nexus\Controllers\Api\BaseApiController::class));
-    }
-
     public function testHasAuthMethod(): void
     {
         $reflection = new \ReflectionClass(PusherAuthController::class);

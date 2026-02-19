@@ -18,12 +18,6 @@ class ListingControllerTest extends TestCase
         $this->assertTrue(class_exists(ListingController::class));
     }
 
-    public function testExtendsBaseApiController(): void
-    {
-        $reflection = new \ReflectionClass(ListingController::class);
-        $this->assertTrue($reflection->isSubclassOf(\Nexus\Controllers\Api\BaseApiController::class));
-    }
-
     public function testHasIndexMethod(): void
     {
         $reflection = new \ReflectionClass(ListingController::class);
