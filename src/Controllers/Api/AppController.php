@@ -10,13 +10,13 @@ class AppController
 {
     // Current app version - UPDATE THIS when releasing a new APK
     // Must match versionName in capacitor/android/app/build.gradle
-    private const CURRENT_VERSION = '1.0';
+    private const CURRENT_VERSION = '1.1';
 
     // Minimum required version - users below this MUST update
     private const MIN_REQUIRED_VERSION = '1.0';
 
     // Update URL for APK download
-    private const UPDATE_URL = 'https://hour-timebank.ie/downloads/nexus-latest.apk';
+    private const UPDATE_URL = 'https://api.project-nexus.ie/downloads/nexus-latest.apk';
 
     // What's new in the latest version
     private const RELEASE_NOTES = [
@@ -25,6 +25,13 @@ class AppController
             'Persistent login (stay logged in for 1 year)',
             'Offline support',
             'Push notifications'
+        ],
+        '1.1' => [
+            'New React frontend with HeroUI components',
+            'Content moderation system (feed, comments, reviews, reports)',
+            'Super admin panel with tenant management',
+            'Updated to app.project-nexus.ie domain',
+            'Bug fixes and performance improvements'
         ]
     ];
 
