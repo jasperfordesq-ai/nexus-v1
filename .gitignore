@@ -27,12 +27,20 @@ CLAUDE.md
 !README.md
 !CONTRIBUTORS.md
 
-# ─── Scripts (internal maintenance utilities) ─────────────────────────────────
+# ─── Scripts & Migrations (internal, contain credentials/emails) ──────────────
 /scripts/
+/migrations/
 
 # ─── Deploy & Production Config ───────────────────────────────────────────────
 compose.prod.yml
 .deployignore
+
+# ─── Docker Config (local dev, contains credentials) ──────────────────────────
+/docker/
+
+# ─── Downloads & Binary Assets ─────────────────────────────────────────────────
+/httpdocs/downloads/
+*.apk
 
 # ─── E2E Testing (Playwright) ────────────────────────────────────────────────
 /e2e/

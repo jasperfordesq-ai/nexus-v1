@@ -295,7 +295,7 @@ class SeedGeneratorVerificationController
                 'contains_drop' => substr_count($generatedScript, 'DROP TABLE'),
                 'contains_truncate' => substr_count($generatedScript, 'TRUNCATE TABLE'),
                 'contains_confirmation' => strpos($generatedScript, 'Continue? (y/n)') !== false,
-                'contains_admin_email' => strpos($generatedScript, 'jasper.ford.esq@gmail.com') !== false,
+                'contains_admin_email' => strpos($generatedScript, '@') !== false && strpos($generatedScript, 'admin') !== false,
             ];
 
             header('Content-Type: application/json');

@@ -334,7 +334,7 @@ $preview = $_GET['preview'] ?? 'analysis';
                         <span class="icon">✓</span>
                         <div>
                             <strong>YOUR ADMIN ALWAYS FIRST</strong><br>
-                            <small>Your account (jasper.ford.esq@gmail.com) is created before anything else.</small>
+                            <small>Your account (admin@your-domain.com) is created before anything else.</small>
                         </div>
                     </li>
                 </ul>

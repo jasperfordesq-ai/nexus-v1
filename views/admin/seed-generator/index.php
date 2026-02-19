@@ -429,7 +429,7 @@
             <li><strong>Production Script:</strong> Creates ONLY your super admin account with secure password</li>
             <li><strong>Demo Script:</strong> Creates your admin + demo users with randomly generated secure passwords</li>
             <li><strong>No Weak Passwords:</strong> All passwords are bcrypt hashed with strong random values</li>
-            <li><strong>Super Admin:</strong> Your account (jasper.ford.esq@gmail.com) is always created first</li>
+            <li><strong>Super Admin:</strong> Your account (admin@your-domain.com) is always created first</li>
             <li><strong>Tenant Isolated:</strong> Scripts only seed data for your current tenant</li>
         </ul>
     </div>
@@ -452,7 +452,7 @@
 
                 <ul>
                     <li>Only super admin account created</li>
-                    <li>Your email: jasper.ford.esq@gmail.com</li>
+                    <li>Your email: admin@your-domain.com</li>
                     <li>Secure bcrypt password hash</li>
                     <li>No test data or demo users</li>
                     <li>Production-ready structure only</li>
