@@ -1080,7 +1080,7 @@ class User
     private static function moveAvatarToNewTenant(int $userId, string $oldAvatarUrl, int $oldTenantId, int $newTenantId): void
     {
         try {
-            $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? '/var/www/vhosts/project-nexus.ie/httpdocs';
+            $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? '/var/www/html';
             $oldPath = $docRoot . $oldAvatarUrl;
 
             if (!file_exists($oldPath)) {
