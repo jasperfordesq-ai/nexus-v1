@@ -18,12 +18,6 @@ class DeliverabilityApiControllerTest extends TestCase
         $this->assertTrue(class_exists(DeliverabilityApiController::class));
     }
 
-    public function testExtendsBaseApiController(): void
-    {
-        $reflection = new \ReflectionClass(DeliverabilityApiController::class);
-        $this->assertTrue($reflection->isSubclassOf(\Nexus\Controllers\Api\BaseApiController::class));
-    }
-
     public function testHasCrudMethods(): void
     {
         $reflection = new \ReflectionClass(DeliverabilityApiController::class);

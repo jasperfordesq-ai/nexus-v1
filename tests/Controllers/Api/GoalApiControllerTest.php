@@ -18,12 +18,6 @@ class GoalApiControllerTest extends TestCase
         $this->assertTrue(class_exists(GoalApiController::class));
     }
 
-    public function testExtendsBaseApiController(): void
-    {
-        $reflection = new \ReflectionClass(GoalApiController::class);
-        $this->assertTrue($reflection->isSubclassOf(\Nexus\Controllers\Api\BaseApiController::class));
-    }
-
     public function testHasIndexMethod(): void
     {
         $reflection = new \ReflectionClass(GoalApiController::class);

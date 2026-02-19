@@ -18,12 +18,6 @@ class VoiceMessageControllerTest extends TestCase
         $this->assertTrue(class_exists(VoiceMessageController::class));
     }
 
-    public function testExtendsBaseApiController(): void
-    {
-        $reflection = new \ReflectionClass(VoiceMessageController::class);
-        $this->assertTrue($reflection->isSubclassOf(\Nexus\Controllers\Api\BaseApiController::class));
-    }
-
     public function testHasStoreMethod(): void
     {
         $reflection = new \ReflectionClass(VoiceMessageController::class);

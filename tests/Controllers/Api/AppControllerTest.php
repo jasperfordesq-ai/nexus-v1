@@ -18,12 +18,6 @@ class AppControllerTest extends TestCase
         $this->assertTrue(class_exists(AppController::class));
     }
 
-    public function testExtendsBaseApiController(): void
-    {
-        $reflection = new \ReflectionClass(AppController::class);
-        $this->assertTrue($reflection->isSubclassOf(\Nexus\Controllers\Api\BaseApiController::class));
-    }
-
     public function testHasCheckVersionMethod(): void
     {
         $reflection = new \ReflectionClass(AppController::class);

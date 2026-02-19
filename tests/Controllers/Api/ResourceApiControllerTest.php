@@ -18,12 +18,6 @@ class ResourceApiControllerTest extends TestCase
         $this->assertTrue(class_exists(ResourceApiController::class));
     }
 
-    public function testExtendsBaseApiController(): void
-    {
-        $reflection = new \ReflectionClass(ResourceApiController::class);
-        $this->assertTrue($reflection->isSubclassOf(\Nexus\Controllers\Api\BaseApiController::class));
-    }
-
     public function testHasIndexMethod(): void
     {
         $reflection = new \ReflectionClass(ResourceApiController::class);

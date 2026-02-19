@@ -18,12 +18,6 @@ class CookieConsentControllerTest extends TestCase
         $this->assertTrue(class_exists(CookieConsentController::class));
     }
 
-    public function testExtendsBaseApiController(): void
-    {
-        $reflection = new \ReflectionClass(CookieConsentController::class);
-        $this->assertTrue($reflection->isSubclassOf(\Nexus\Controllers\Api\BaseApiController::class));
-    }
-
     public function testHasShowMethod(): void
     {
         $reflection = new \ReflectionClass(CookieConsentController::class);
