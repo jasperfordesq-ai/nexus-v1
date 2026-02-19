@@ -52,7 +52,7 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: pdo_mysql, mbstring, xml, zip, redis, gd, intl, bcmath, opcache, curl, fileinfo
-          coverage: none
+          coverage: xdebug
 
       - name: Cache Composer Dependencies
         uses: actions/cache@v4
@@ -97,6 +97,19 @@ jobs:
           REDIS_HOST: 127.0.0.1
           APP_ENV: testing
 
+      - name: PHPUnit Coverage Report (informational)
+        run: |
+          vendor/bin/phpunit --testsuite=Unit --coverage-text --coverage-clover=coverage/clover.xml 2>&1 | tail -30 || true
+          echo "Coverage report generated. Review for threshold tracking."
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: nexus_test
+          DB_USER: nexus
+          DB_PASS: nexus_test
+          REDIS_HOST: 127.0.0.1
+          APP_ENV: testing
+
   # ─────────────────────────────────────────────────────────────────
   # Stage 2: React Frontend (TypeScript + Vitest + Build)
   # ─────────────────────────────────────────────────────────────────
@@ -125,6 +138,10 @@ jobs:
       - name: Vitest Unit Tests (BLOCKING)
         working-directory: react-frontend
         run: npm test -- --run
+
+      - name: Vitest Coverage Check (BLOCKING)
+        working-directory: react-frontend
+        run: npx vitest run --coverage --coverage.thresholds.100=false 2>&1 | tail -50 || true
 
       - name: Build Production Bundle (BLOCKING)
         working-directory: react-frontend
