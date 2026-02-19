@@ -12,6 +12,15 @@ use Nexus\Services\MatchingService;
 use Nexus\Services\NotificationDispatcher;
 use Nexus\Services\GeocodingService;
 use Nexus\Services\FederationEmailService;
+use Nexus\Services\GamificationService;
+use Nexus\Services\GamificationEmailService;
+use Nexus\Services\AchievementCampaignService;
+use Nexus\Services\DailyRewardService;
+use Nexus\Services\ChallengeService;
+use Nexus\Services\AbuseDetectionService;
+use Nexus\Services\GroupReportingService;
+use Nexus\Services\BalanceAlertService;
+use Nexus\Services\SmartMatchingEngine;
 
 class CronController
 {
@@ -611,8 +620,27 @@ class CronController
 
     /**
      * Run all cron tasks (master endpoint)
-     * Useful for simple hosting where you can only have one cron job.
+     * Called every minute via crontab. Internal scheduling determines which tasks run.
      * URI: /cron/run-all
+     *
+     * Schedule overview:
+     *   Every run:    Instant queue, newsletter queue
+     *   Every 5 min:  Scheduled newsletters
+     *   Every 15 min: Recurring newsletters
+     *   Every 30 min: Geocode batch, warm match cache
+     *   Hourly :00:   Hot matches, gamification campaigns, abuse detection, session/token cleanup
+     *   Hourly :30:   Challenge expiry check
+     *   00:00:        Daily cleanup, leaderboard snapshot
+     *   01:00:        Streak milestones
+     *   03:00:        Gamification daily tasks
+     *   07:00:        Abuse daily report
+     *   08:00:        Daily digest, balance alerts
+     *   09:00:        Match digest daily
+     *   Fri 17:00:    Weekly digest
+     *   Sun 02:00:    Abuse cleanup
+     *   Sun 03:00:    Gamification cleanup
+     *   Mon 04:00:    Gamification weekly digest
+     *   Mon 09:00:    Federation digest, group digests, match digest weekly
      */
     public function runAll()
     {
@@ -626,22 +654,25 @@ class CronController
         $minute = (int) date('i');
         $hour = (int) date('H');
         $dayOfWeek = (int) date('w'); // 0 = Sunday
+        $taskNum = 0;
 
         try {
             echo "=== NEXUS Cron Runner ===\n";
-            echo "Time: " . date('Y-m-d H:i:s') . "\n\n";
+            echo "Time: " . date('Y-m-d H:i:s') . " (min=$minute, hour=$hour, dow=$dayOfWeek)\n\n";
 
-            // Every run: Process instant notification queue
-            echo "[1] Processing instant queue...\n";
+            // ── EVERY RUN (every minute) ──
+            $taskNum++;
+            echo "[{$taskNum}] Processing instant queue...\n";
             $this->runInstantQueueInternal();
 
-            // Every run: Process newsletter queue
-            echo "\n[2] Processing newsletter queue...\n";
+            $taskNum++;
+            echo "\n[{$taskNum}] Processing newsletter queue...\n";
             $this->processNewsletterQueueInternal();
 
-            // Every 5 minutes: Process scheduled newsletters
+            // ── EVERY 5 MINUTES ──
             if ($minute % 5 === 0) {
-                echo "\n[3] Processing scheduled newsletters...\n";
+                $taskNum++;
+                echo "\n[{$taskNum}] Processing scheduled newsletters...\n";
                 try {
                     $processed = NewsletterService::processScheduled();
                     echo "   Processed $processed scheduled newsletters.\n";
@@ -650,9 +681,10 @@ class CronController
                 }
             }
 
-            // Every 15 minutes: Process recurring newsletters
+            // ── EVERY 15 MINUTES ──
             if ($minute % 15 === 0) {
-                echo "\n[4] Processing recurring newsletters...\n";
+                $taskNum++;
+                echo "\n[{$taskNum}] Processing recurring newsletters...\n";
                 try {
                     $processed = NewsletterService::processRecurring();
                     echo "   Processed $processed recurring newsletters.\n";
@@ -661,33 +693,133 @@ class CronController
                 }
             }
 
-            // Daily at midnight: Cleanup
+            // ── EVERY 30 MINUTES ──
+            if ($minute % 30 === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Batch geocoding...\n";
+                $this->geocodeBatchInternal();
+            }
+
+            if ($minute === 30) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Warming match cache...\n";
+                $this->warmMatchCacheInternal();
+            }
+
+            // ── HOURLY (at :00) ──
+            if ($minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Hot match notifications...\n";
+                $this->notifyHotMatchesInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Gamification campaigns...\n";
+                $this->gamificationCampaignsInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Abuse detection...\n";
+                $this->abuseDetectionInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Cleaning sessions & tokens...\n";
+                $this->cleanSessionsAndTokensInternal();
+            }
+
+            // ── HOURLY (at :30) ──
+            if ($minute === 30) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Challenge expiry check...\n";
+                $this->gamificationChallengeCheckInternal();
+            }
+
+            // ── DAILY ──
             if ($hour === 0 && $minute === 0) {
-                echo "\n[5] Running daily cleanup...\n";
+                $taskNum++;
+                echo "\n[{$taskNum}] Running daily cleanup...\n";
                 $this->cleanupInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Leaderboard snapshot...\n";
+                $this->gamificationLeaderboardSnapshotInternal();
             }
 
-            // Daily at 8am: Daily digest
+            if ($hour === 1 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Streak milestones...\n";
+                $this->gamificationStreakMilestonesInternal();
+            }
+
+            if ($hour === 3 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Gamification daily tasks...\n";
+                $this->gamificationDailyInternal();
+            }
+
+            if ($hour === 7 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Abuse daily report...\n";
+                $this->abuseDetectionDailyReportInternal();
+            }
+
             if ($hour === 8 && $minute === 0) {
-                echo "\n[6] Processing daily digest...\n";
+                $taskNum++;
+                echo "\n[{$taskNum}] Processing daily digest...\n";
                 $this->processDigest('daily');
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Balance alerts...\n";
+                $this->balanceAlertsInternal();
             }
 
-            // Friday at 5pm: Weekly digest
+            if ($hour === 9 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Match digest daily...\n";
+                $this->matchDigestInternal('daily');
+            }
+
+            // ── WEEKLY ──
             if ($dayOfWeek === 5 && $hour === 17 && $minute === 0) {
-                echo "\n[7] Processing weekly digest...\n";
+                $taskNum++;
+                echo "\n[{$taskNum}] Processing weekly digest...\n";
                 $this->processDigest('weekly');
             }
 
-            // Monday at 9am: Federation weekly digest
-            if ($dayOfWeek === 1 && $hour === 9 && $minute === 0) {
-                echo "\n[8] Processing federation weekly digest...\n";
-                $this->processFederationWeeklyDigestInternal();
+            if ($dayOfWeek === 0 && $hour === 2 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Abuse cleanup...\n";
+                $this->abuseDetectionCleanupInternal();
             }
 
-            echo "\n=== Cron Run Complete ===\n";
+            if ($dayOfWeek === 0 && $hour === 3 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Gamification cleanup...\n";
+                $this->gamificationCleanupInternal();
+            }
+
+            if ($dayOfWeek === 1 && $hour === 4 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Gamification weekly digest...\n";
+                $this->gamificationWeeklyDigestInternal();
+            }
+
+            if ($dayOfWeek === 1 && $hour === 9 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Federation weekly digest...\n";
+                $this->processFederationWeeklyDigestInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Group weekly digests...\n";
+                $this->groupWeeklyDigestsInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Match digest weekly...\n";
+                $this->matchDigestInternal('weekly');
+            }
+
+            echo "\n=== Cron Run Complete ({$taskNum} tasks checked) ===\n";
         } catch (\Throwable $e) {
             echo "\nFatal Error: " . $e->getMessage() . "\n";
+            echo "Stack: " . $e->getTraceAsString() . "\n";
             $status = 'error';
         }
 
@@ -1219,5 +1351,513 @@ class CronController
         $output = ob_get_clean();
         echo $output;
         $this->logJob($status, $output);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Internal helper methods for runAll() — all tasks below
+    // ═══════════════════════════════════════════════════════════════
+
+    /**
+     * Iterate over all tenants, calling $callback($tenantId, $tenantSlug) for each.
+     */
+    private function forEachTenant(callable $callback): void
+    {
+        $tenants = Database::query("SELECT id, slug FROM tenants")->fetchAll(\PDO::FETCH_ASSOC);
+        foreach ($tenants as $tenant) {
+            try {
+                TenantContext::setById($tenant['id']);
+                $callback($tenant['id'], $tenant['slug']);
+            } catch (\Throwable $e) {
+                echo "   [Tenant {$tenant['slug']}] Error: " . $e->getMessage() . "\n";
+            }
+        }
+    }
+
+    /**
+     * Clean old sessions and expired tokens (hourly)
+     */
+    private function cleanSessionsAndTokensInternal(): void
+    {
+        try {
+            Database::query("DELETE FROM sessions WHERE last_activity < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+            echo "   Cleaned old sessions.\n";
+        } catch (\Exception $e) {
+            echo "   Sessions: skipped (" . $e->getMessage() . ")\n";
+        }
+
+        try {
+            Database::query("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+            echo "   Cleaned expired reset tokens.\n";
+        } catch (\Exception $e) {
+            echo "   Reset tokens: skipped.\n";
+        }
+    }
+
+    /**
+     * Batch geocode users and listings (every 30 min)
+     */
+    private function geocodeBatchInternal(): void
+    {
+        try {
+            $userResults = GeocodingService::batchGeocodeUsers(50);
+            echo "   Users: {$userResults['processed']} processed, {$userResults['success']} success.\n";
+
+            $listingResults = GeocodingService::batchGeocodeListings(50);
+            echo "   Listings: {$listingResults['processed']} processed, {$listingResults['success']} success.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Warm match cache for random users (every 30 min at :30)
+     */
+    private function warmMatchCacheInternal(): void
+    {
+        try {
+            $totalCached = 0;
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalCached) {
+                $result = SmartMatchingEngine::warmUpCache(20);
+                $totalCached += $result['cached'] ?? 0;
+            });
+            echo "   Cached $totalCached matches across all tenants.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Hot match notifications for new listings (hourly)
+     */
+    private function notifyHotMatchesInternal(): void
+    {
+        try {
+            $totalNotified = 0;
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalNotified) {
+                $sql = "SELECT l.*, c.name as category_name
+                        FROM listings l
+                        LEFT JOIN categories c ON l.category_id = c.id
+                        WHERE l.tenant_id = ? AND l.status = 'active'
+                        AND l.created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)
+                        LIMIT 50";
+                $newListings = Database::query($sql, [$tenantId])->fetchAll();
+
+                foreach ($newListings as $listing) {
+                    $oppositeType = $listing['type'] === 'offer' ? 'request' : 'offer';
+                    $matchSql = "SELECT DISTINCT l2.user_id
+                                 FROM listings l2
+                                 WHERE l2.category_id = ? AND l2.type = ? AND l2.status = 'active'
+                                 AND l2.user_id != ? AND l2.tenant_id = ?
+                                 LIMIT 20";
+                    $potentialMatches = Database::query($matchSql, [
+                        $listing['category_id'], $oppositeType, $listing['user_id'], $tenantId
+                    ])->fetchAll();
+
+                    foreach ($potentialMatches as $match) {
+                        try {
+                            $count = MatchingService::notifyNewMatches($match['user_id']);
+                            $totalNotified += $count;
+                        } catch (\Throwable $e) {
+                            // Continue
+                        }
+                    }
+                }
+            });
+            echo "   Sent $totalNotified hot match notifications.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Process gamification campaigns (hourly)
+     */
+    private function gamificationCampaignsInternal(): void
+    {
+        try {
+            $this->forEachTenant(function ($tenantId, $slug) {
+                if (!TenantContext::hasFeature('gamification')) return;
+                $results = AchievementCampaignService::processRecurringCampaigns();
+                $awarded = 0;
+                foreach ($results as $result) {
+                    $awarded += $result['awarded'] ?? 0;
+                }
+                if ($awarded > 0) {
+                    echo "   [$slug] Awarded campaigns to $awarded users.\n";
+                }
+            });
+            echo "   Campaigns processed.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Abuse detection checks (hourly)
+     */
+    private function abuseDetectionInternal(): void
+    {
+        try {
+            $totalAlerts = 0;
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalAlerts) {
+                $results = AbuseDetectionService::runAllChecks();
+                $count = array_sum($results);
+                $totalAlerts += $count;
+                if ($count > 0) {
+                    echo "   [$slug] $count new abuse alerts.\n";
+                }
+            });
+            echo "   Abuse detection complete ($totalAlerts total alerts).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Check and expire gamification challenges (hourly at :30)
+     */
+    private function gamificationChallengeCheckInternal(): void
+    {
+        try {
+            $this->forEachTenant(function ($tenantId, $slug) {
+                if (!TenantContext::hasFeature('gamification')) return;
+
+                $expired = Database::query(
+                    "UPDATE challenges SET is_active = 0 WHERE tenant_id = ? AND end_date < CURDATE() AND is_active = 1",
+                    [$tenantId]
+                );
+
+                Database::query(
+                    "UPDATE friend_challenges SET status = 'expired' WHERE tenant_id = ? AND end_date < CURDATE() AND status IN ('pending', 'active')",
+                    [$tenantId]
+                );
+
+                if ($expired->rowCount() > 0) {
+                    echo "   [$slug] Expired {$expired->rowCount()} challenges.\n";
+                }
+            });
+            echo "   Challenge check complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Leaderboard snapshot (daily midnight)
+     */
+    private function gamificationLeaderboardSnapshotInternal(): void
+    {
+        try {
+            $this->forEachTenant(function ($tenantId, $slug) {
+                if (!TenantContext::hasFeature('gamification')) return;
+
+                Database::query(
+                    "INSERT IGNORE INTO weekly_rank_snapshots (tenant_id, user_id, rank_position, xp, snapshot_date)
+                     SELECT ?, id, @rank := @rank + 1, xp, CURDATE()
+                     FROM users, (SELECT @rank := 0) r
+                     WHERE tenant_id = ? AND is_approved = 1
+                     ORDER BY xp DESC",
+                    [$tenantId, $tenantId]
+                );
+
+                // Finalize ended seasons
+                $endedSeasons = Database::query(
+                    "SELECT id FROM leaderboard_seasons WHERE tenant_id = ? AND end_date < CURDATE() AND is_finalized = 0",
+                    [$tenantId]
+                )->fetchAll();
+
+                foreach ($endedSeasons as $season) {
+                    $topUsers = Database::query(
+                        "SELECT user_id, rank_position FROM weekly_rank_snapshots
+                         WHERE tenant_id = ? AND snapshot_date = (SELECT end_date FROM leaderboard_seasons WHERE id = ?)
+                         ORDER BY rank_position ASC LIMIT 10",
+                        [$tenantId, $season['id']]
+                    )->fetchAll();
+
+                    $rewards = [1 => 500, 2 => 300, 3 => 200, 4 => 100, 5 => 100];
+                    foreach ($topUsers as $user) {
+                        $xp = $rewards[$user['rank_position']] ?? 50;
+                        GamificationService::awardXP($user['user_id'], $xp, 'season_reward', "Season #{$season['id']} rank #{$user['rank_position']}");
+                    }
+
+                    Database::query("UPDATE leaderboard_seasons SET is_finalized = 1 WHERE id = ?", [$season['id']]);
+                    echo "   [$slug] Finalized season {$season['id']}.\n";
+                }
+            });
+            echo "   Leaderboard snapshots complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Streak milestone badges (daily 1am)
+     */
+    private function gamificationStreakMilestonesInternal(): void
+    {
+        try {
+            $milestones = [7, 14, 30, 60, 90, 180, 365];
+            $this->forEachTenant(function ($tenantId, $slug) use ($milestones) {
+                if (!TenantContext::hasFeature('gamification')) return;
+
+                foreach ($milestones as $days) {
+                    $users = Database::query(
+                        "SELECT id FROM users WHERE tenant_id = ? AND login_streak = ?",
+                        [$tenantId, $days]
+                    )->fetchAll();
+
+                    foreach ($users as $user) {
+                        GamificationService::awardBadge($user['id'], "streak_{$days}");
+                    }
+
+                    if (count($users) > 0) {
+                        echo "   [$slug] Awarded {$days}-day streak to " . count($users) . " users.\n";
+                    }
+                }
+            });
+            echo "   Streak milestones complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Gamification daily tasks: streak resets, daily bonuses, badge checks (daily 3am)
+     */
+    private function gamificationDailyInternal(): void
+    {
+        try {
+            $this->forEachTenant(function ($tenantId, $slug) {
+                if (!TenantContext::hasFeature('gamification')) return;
+
+                // Reset streaks for inactive users
+                $result = Database::query(
+                    "UPDATE users SET login_streak = 0
+                     WHERE tenant_id = ? AND COALESCE(last_login_at, created_at) < DATE_SUB(CURDATE(), INTERVAL 1 DAY) AND login_streak > 0",
+                    [$tenantId]
+                );
+                echo "   [$slug] Reset {$result->rowCount()} streaks.\n";
+
+                // Award daily bonuses
+                $activeUsers = Database::query(
+                    "SELECT id FROM users
+                     WHERE tenant_id = ? AND DATE(COALESCE(last_login_at, created_at)) = CURDATE()
+                     AND id NOT IN (SELECT user_id FROM daily_rewards WHERE tenant_id = ? AND reward_date = CURDATE())",
+                    [$tenantId, $tenantId]
+                )->fetchAll();
+
+                $bonuses = 0;
+                foreach ($activeUsers as $user) {
+                    try {
+                        DailyRewardService::checkAndAwardDailyReward($user['id']);
+                        $bonuses++;
+                    } catch (\Throwable $e) {
+                        // Continue
+                    }
+                }
+                echo "   [$slug] Awarded $bonuses daily bonuses.\n";
+
+                // Badge checks for recently active users
+                $users = Database::query(
+                    "SELECT id FROM users
+                     WHERE tenant_id = ? AND is_approved = 1
+                     AND COALESCE(last_login_at, created_at) > DATE_SUB(NOW(), INTERVAL 24 HOUR)
+                     LIMIT 200",
+                    [$tenantId]
+                )->fetchAll();
+
+                $badges = 0;
+                foreach ($users as $user) {
+                    try {
+                        $before = Database::query("SELECT COUNT(*) as c FROM user_badges WHERE user_id = ?", [$user['id']])->fetch()['c'];
+                        GamificationService::runAllBadgeChecks($user['id']);
+                        $after = Database::query("SELECT COUNT(*) as c FROM user_badges WHERE user_id = ?", [$user['id']])->fetch()['c'];
+                        $badges += ($after - $before);
+                    } catch (\Throwable $e) {
+                        // Continue
+                    }
+                }
+                echo "   [$slug] Processed " . count($users) . " users, awarded $badges badges.\n";
+            });
+            echo "   Gamification daily complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Abuse detection daily report (daily 7am)
+     */
+    private function abuseDetectionDailyReportInternal(): void
+    {
+        try {
+            $this->forEachTenant(function ($tenantId, $slug) {
+                $counts = AbuseDetectionService::getAlertCounts();
+                $newAlerts = $counts['new'] ?? 0;
+                $reviewing = $counts['reviewing'] ?? 0;
+
+                if ($newAlerts > 0 || $reviewing > 0) {
+                    echo "   [$slug] $newAlerts new alerts, $reviewing under review.\n";
+
+                    $critical = Database::query(
+                        "SELECT COUNT(*) FROM abuse_alerts WHERE tenant_id = ? AND status = 'new' AND severity IN ('critical', 'high')",
+                        [$tenantId]
+                    )->fetchColumn();
+
+                    if ($critical > 0) {
+                        echo "   [$slug] *** $critical CRITICAL/HIGH severity alerts! ***\n";
+                    }
+                }
+            });
+            echo "   Abuse daily report complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Balance alerts for organisation wallets (daily 8am)
+     */
+    private function balanceAlertsInternal(): void
+    {
+        try {
+            $totalAlerts = 0;
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalAlerts) {
+                $alertsSent = BalanceAlertService::checkAllBalances();
+                $totalAlerts += $alertsSent;
+                if ($alertsSent > 0) {
+                    echo "   [$slug] Sent $alertsSent balance alerts.\n";
+                }
+            });
+            echo "   Balance alerts complete ($totalAlerts total).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Match digest (daily or weekly)
+     */
+    private function matchDigestInternal(string $frequency): void
+    {
+        try {
+            $totalSent = 0;
+            $lookbackHours = $frequency === 'daily' ? 24 : 168;
+
+            $this->forEachTenant(function ($tenantId, $slug) use ($frequency, $lookbackHours, &$totalSent) {
+                $sql = "SELECT DISTINCT u.id, u.name
+                        FROM users u
+                        LEFT JOIN match_preferences mp ON u.id = mp.user_id
+                        WHERE u.tenant_id = ? AND u.status = 'active'
+                        AND u.id IN (SELECT DISTINCT user_id FROM listings WHERE status = 'active')
+                        AND (
+                            (mp.notification_frequency = ? AND mp.notification_frequency IS NOT NULL)
+                            OR (mp.notification_frequency IS NULL AND ? = 'daily')
+                        )
+                        LIMIT 100";
+
+                $users = Database::query($sql, [$tenantId, $frequency, $frequency])->fetchAll();
+
+                foreach ($users as $user) {
+                    try {
+                        $matches = MatchingService::getSuggestionsForUser($user['id'], 20, [
+                            'created_after' => date('Y-m-d H:i:s', strtotime("-{$lookbackHours} hours"))
+                        ]);
+                        if (!empty($matches)) {
+                            NotificationDispatcher::dispatchMatchDigest($user['id'], $matches, $frequency);
+                            $totalSent++;
+                        }
+                    } catch (\Throwable $e) {
+                        // Continue
+                    }
+                }
+            });
+            echo "   Sent $frequency match digest to $totalSent users.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Abuse detection cleanup (Sunday 2am)
+     */
+    private function abuseDetectionCleanupInternal(): void
+    {
+        try {
+            $this->forEachTenant(function ($tenantId, $slug) {
+                $archived = Database::query(
+                    "DELETE FROM abuse_alerts WHERE tenant_id = ? AND status IN ('resolved', 'dismissed') AND resolved_at < DATE_SUB(NOW(), INTERVAL 90 DAY)",
+                    [$tenantId]
+                );
+
+                $autoDismissed = Database::query(
+                    "UPDATE abuse_alerts SET status = 'dismissed', resolved_at = NOW(), resolution_notes = 'Auto-dismissed (aged out)'
+                     WHERE tenant_id = ? AND status = 'new' AND severity = 'low' AND created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)",
+                    [$tenantId]
+                );
+
+                if ($archived->rowCount() > 0 || $autoDismissed->rowCount() > 0) {
+                    echo "   [$slug] Archived {$archived->rowCount()}, auto-dismissed {$autoDismissed->rowCount()}.\n";
+                }
+            });
+            echo "   Abuse cleanup complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Gamification cleanup: old XP notifications, campaign awards, analytics (Sunday 3am)
+     */
+    private function gamificationCleanupInternal(): void
+    {
+        try {
+            $this->forEachTenant(function ($tenantId, $slug) {
+                if (!TenantContext::hasFeature('gamification')) return;
+
+                Database::query("DELETE FROM xp_notifications WHERE tenant_id = ? AND created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)", [$tenantId]);
+                Database::query("DELETE FROM campaign_awards WHERE awarded_at < DATE_SUB(NOW(), INTERVAL 1 YEAR)");
+                Database::query("DELETE FROM achievement_analytics WHERE tenant_id = ? AND date < DATE_SUB(CURDATE(), INTERVAL 2 YEAR)", [$tenantId]);
+            });
+            echo "   Gamification cleanup complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Gamification weekly digest emails (Monday 4am)
+     */
+    private function gamificationWeeklyDigestInternal(): void
+    {
+        try {
+            $this->forEachTenant(function ($tenantId, $slug) {
+                if (!TenantContext::hasFeature('gamification')) return;
+
+                $result = GamificationEmailService::sendWeeklyDigests();
+                echo "   [$slug] Sent {$result['sent']}, skipped {$result['skipped']}, failed {$result['failed']}.\n";
+            });
+            echo "   Gamification weekly digest complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Group weekly digest emails to group owners (Monday 9am)
+     */
+    private function groupWeeklyDigestsInternal(): void
+    {
+        try {
+            $this->forEachTenant(function ($tenantId, $slug) {
+                if (!TenantContext::hasFeature('groups')) return;
+
+                $stats = GroupReportingService::sendAllWeeklyDigests();
+                echo "   [$slug] Sent {$stats['sent']}/{$stats['total_groups']} group digests.\n";
+            });
+            echo "   Group weekly digests complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
     }
 }
