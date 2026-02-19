@@ -1163,6 +1163,7 @@ class SmartMatchingEngine
     /**
      * Clear all expired cache entries
      * Should be run periodically via cron
+     * Intentionally cross-tenant: clears expired cache entries for all tenants
      */
     public static function clearExpiredCache(): int
     {

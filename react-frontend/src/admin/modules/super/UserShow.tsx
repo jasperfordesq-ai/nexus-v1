@@ -302,73 +302,39 @@ export function UserShow() {
             </CardBody>
           </Card>
 
-          {/* Admin Actions */}
+          {/* Tenant Association */}
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
-              <Shield size={18} />
-              Admin Actions
+              <Building2 size={18} />
+              Tenant Association
             </CardHeader>
             <Divider />
-            <CardBody>
-              <div className="flex flex-col gap-3">
-                {/* Tenant Super Admin toggle */}
-                {user.is_tenant_super_admin ? (
-                  <Button
-                    variant="flat"
-                    color="warning"
-                    startContent={<ShieldOff size={16} />}
-                    onPress={() => setConfirmAction('revoke-sa')}
+            <CardBody className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <div>
+                  <p className="text-xs text-default-400">Current Tenant</p>
+                  <Link
+                    to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)}
+                    className="text-sm font-medium text-primary hover:underline"
                   >
-                    Revoke Tenant Super Admin
-                  </Button>
-                ) : (
-                  <Button
-                    variant="flat"
-                    color="primary"
-                    startContent={<Shield size={16} />}
-                    onPress={() => setConfirmAction('grant-sa')}
-                  >
-                    Grant Tenant Super Admin
-                  </Button>
-                )}
-
-                {/* Global Super Admin toggle */}
-                {user.is_super_admin ? (
-                  <Button
-                    variant="flat"
-                    color="danger"
-                    startContent={<ShieldOff size={16} />}
-                    onPress={() => setConfirmAction('revoke-global')}
-                  >
-                    Revoke Global Super Admin
-                  </Button>
-                ) : (
-                  <div>
-                    <Button
-                      variant="flat"
-                      color="danger"
-                      startContent={<ShieldAlert size={16} />}
-                      onPress={() => setConfirmAction('grant-global')}
-                    >
-                      Grant Global Super Admin
-                    </Button>
-                    <p className="text-xs text-danger mt-1 ml-1">GOD-level action — grants access to ALL tenants</p>
-                  </div>
-                )}
-
-                <Divider className="my-1" />
-
-                {/* Move to Tenant */}
+                    {user.tenant_name || `Tenant ${user.tenant_id}`}
+                  </Link>
+                </div>
+                <div>
+                  <p className="text-xs text-default-400">Tenant ID</p>
+                  <p className="text-sm text-foreground">{user.tenant_id}</p>
+                </div>
+              </div>
+              <Divider />
+              <div className="flex flex-col gap-2">
                 <Button
                   variant="flat"
                   color="default"
                   startContent={<ArrowRightLeft size={16} />}
                   onPress={() => setMoveModalOpen(true)}
                 >
-                  Move to Tenant
+                  Move to Different Tenant
                 </Button>
-
-                {/* Move and Promote */}
                 <Button
                   variant="flat"
                   color="secondary"
@@ -384,29 +350,80 @@ export function UserShow() {
 
         {/* Right column - 1/3 width */}
         <div className="flex flex-col gap-6">
-          {/* Tenant Info */}
+          {/* GOD-Level Super Admin Actions */}
+          <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30">
+            <CardHeader className="font-semibold text-lg flex items-center gap-2">
+              <ShieldAlert size={18} className="text-purple-600 dark:text-purple-400" />
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                GOD-Level Access
+              </span>
+            </CardHeader>
+            <Divider className="bg-purple-500/20" />
+            <CardBody className="flex flex-col gap-3">
+              <p className="text-xs text-default-600">
+                Global Super Admin grants access to ALL tenants and ALL data across the entire platform.
+              </p>
+              {user.is_super_admin ? (
+                <Button
+                  variant="flat"
+                  className="bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30"
+                  startContent={<ShieldOff size={16} />}
+                  onPress={() => setConfirmAction('revoke-global')}
+                >
+                  <span className="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent font-medium">
+                    Revoke Global SA
+                  </span>
+                </Button>
+              ) : (
+                <div>
+                  <Button
+                    variant="flat"
+                    className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500/50 w-full"
+                    startContent={<ShieldAlert size={16} />}
+                    onPress={() => setConfirmAction('grant-global')}
+                  >
+                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-semibold">
+                      Grant Global SA
+                    </span>
+                  </Button>
+                  <p className="text-[10px] text-purple-700 dark:text-purple-400 mt-2 text-center font-medium">
+                    ⚠️ GOD-level action — use with extreme caution
+                  </p>
+                </div>
+              )}
+            </CardBody>
+          </Card>
+
+          {/* Tenant Super Admin Toggle */}
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
-              <Building2 size={18} />
-              Tenant Info
+              <Shield size={18} />
+              Tenant Super Admin
             </CardHeader>
             <Divider />
-            <CardBody>
-              <div className="flex flex-col gap-2">
-                <div>
-                  <p className="text-xs text-default-400">Tenant</p>
-                  <Link
-                    to={tenantPath(`/admin/super/tenants/${user.tenant_id}/edit`)}
-                    className="text-sm font-medium text-primary hover:underline"
-                  >
-                    {user.tenant_name || `Tenant ${user.tenant_id}`}
-                  </Link>
-                </div>
-                <div>
-                  <p className="text-xs text-default-400">Tenant ID</p>
-                  <p className="text-sm text-foreground">{user.tenant_id}</p>
-                </div>
-              </div>
+            <CardBody className="flex flex-col gap-3">
+              <p className="text-xs text-default-600">
+                Tenant Super Admin grants full administrative control within their tenant.
+              </p>
+              {user.is_tenant_super_admin ? (
+                <Button
+                  variant="flat"
+                  color="warning"
+                  startContent={<ShieldOff size={16} />}
+                  onPress={() => setConfirmAction('revoke-sa')}
+                >
+                  Revoke Tenant SA
+                </Button>
+              ) : (
+                <Button
+                  variant="flat"
+                  color="secondary"
+                  startContent={<Shield size={16} />}
+                  onPress={() => setConfirmAction('grant-sa')}
+                >
+                  Grant Tenant SA
+                </Button>
+              )}
             </CardBody>
           </Card>
 
@@ -417,14 +434,14 @@ export function UserShow() {
             <CardBody>
               <div className="flex flex-col items-center gap-3 py-2">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                  privilege.level === 4 ? 'bg-danger/10' :
+                  privilege.level === 4 ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20' :
                   privilege.level === 3 ? 'bg-secondary/10' :
                   privilege.level === 2 ? 'bg-primary/10' :
                   'bg-default/10'
                 }`}>
                   {privilege.level >= 3 ? (
                     <CrownIcon size={28} className={
-                      privilege.level === 4 ? 'text-danger' : 'text-secondary'
+                      privilege.level === 4 ? 'text-purple-600' : 'text-secondary'
                     } />
                   ) : (
                     <Shield size={28} className={
@@ -442,7 +459,7 @@ export function UserShow() {
                       key={level}
                       className={`h-2 flex-1 rounded-full ${
                         level <= privilege.level
-                          ? privilege.level === 4 ? 'bg-danger'
+                          ? privilege.level === 4 ? 'bg-gradient-to-r from-purple-500 to-pink-500'
                             : privilege.level === 3 ? 'bg-secondary'
                             : privilege.level === 2 ? 'bg-primary'
                             : 'bg-default-300'

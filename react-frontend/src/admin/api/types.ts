@@ -1331,3 +1331,284 @@ export interface CronHealthMetrics {
   avg_success_rate_7d: number;
   alert_status: 'critical' | 'warning' | 'healthy';
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Match Approvals
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface MatchApproval {
+  id: number;
+  user_a_id: number;
+  user_b_id: number;
+  user_a_name: string;
+  user_b_name: string;
+  user_a_avatar?: string | null;
+  user_b_avatar?: string | null;
+  match_score: number;
+  reasoning: string[];
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  skills_overlap?: string[];
+  interests_overlap?: string[];
+  location_proximity?: number;
+}
+
+export interface MatchStats {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+  avg_score: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Content Moderation
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AdminFeedPost {
+  id: number;
+  user_id: number;
+  user_name: string;
+  user_avatar?: string | null;
+  content: string;
+  type: 'text' | 'poll' | 'event' | 'listing';
+  status: 'active' | 'hidden' | 'flagged';
+  is_hidden: boolean;
+  is_flagged: boolean;
+  comments_count: number;
+  reactions_count: number;
+  reports_count: number;
+  created_at: string;
+}
+
+export interface AdminComment {
+  id: number;
+  user_id: number;
+  user_name: string;
+  user_avatar?: string | null;
+  content_type: 'listing' | 'event' | 'post' | 'blog';
+  content_id: number;
+  content_title?: string;
+  content: string;
+  is_hidden: boolean;
+  is_flagged: boolean;
+  reports_count: number;
+  created_at: string;
+}
+
+export interface AdminReview {
+  id: number;
+  reviewer_id: number;
+  reviewer_name: string;
+  reviewer_avatar?: string | null;
+  reviewee_id: number;
+  reviewee_name: string;
+  reviewee_avatar?: string | null;
+  rating: number;
+  content: string;
+  is_hidden: boolean;
+  is_flagged: boolean;
+  reports_count: number;
+  created_at: string;
+}
+
+export interface AdminReport {
+  id: number;
+  reporter_id: number;
+  reporter_name: string;
+  reporter_avatar?: string | null;
+  content_type: 'listing' | 'event' | 'post' | 'comment' | 'review' | 'user';
+  content_id: number;
+  content_preview?: string;
+  reason: string;
+  description?: string;
+  status: 'pending' | 'resolved' | 'dismissed';
+  created_at: string;
+  resolved_at?: string | null;
+  resolved_by?: string | null;
+}
+
+export interface ModerationStats {
+  feed_posts_total: number;
+  feed_posts_hidden: number;
+  feed_posts_flagged: number;
+  comments_total: number;
+  comments_hidden: number;
+  comments_flagged: number;
+  reviews_total: number;
+  reviews_hidden: number;
+  reviews_flagged: number;
+  reports_pending: number;
+  reports_resolved: number;
+  reports_dismissed: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Super Admin - Tenant Management
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface SuperTenant {
+  id: number;
+  name: string;
+  slug: string;
+  domain: string | null;
+  tagline: string | null;
+  description: string | null;
+  parent_id: number | null;
+  parent_name?: string | null;
+  is_active: boolean;
+  allows_subtenants: boolean;
+  max_depth: number;
+  depth: number;
+  path: string;
+  user_count: number;
+  child_count: number;
+  can_manage: boolean;
+  relationship: 'self' | 'ancestor' | 'descendant' | 'other';
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+  facebook_url?: string | null;
+  twitter_url?: string | null;
+  linkedin_url?: string | null;
+  instagram_url?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TenantHierarchyNode {
+  id: number;
+  name: string;
+  slug: string;
+  parent_id: number | null;
+  depth: number;
+  is_active: boolean;
+  allows_subtenants: boolean;
+  user_count: number;
+  children: TenantHierarchyNode[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Super Admin - User Management
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface SuperUser {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  tenant_id: number;
+  tenant_name: string;
+  role: string;
+  status: 'active' | 'inactive' | 'suspended';
+  is_super_admin: boolean;
+  is_tenant_super_admin: boolean;
+  avatar?: string | null;
+  location?: string | null;
+  phone?: string | null;
+  last_login_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Super Admin - Audit Logs
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface FederationAuditEntry {
+  id: number;
+  level: 'critical' | 'warning' | 'info' | 'debug';
+  action_type: string;
+  category: 'system' | 'tenant' | 'partnership' | 'profile' | 'messaging' | 'transaction';
+  actor_id: number | null;
+  actor_name: string | null;
+  actor_email: string | null;
+  tenant_from_id: number | null;
+  tenant_to_id: number | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  data: Record<string, any> | null;
+  created_at: string;
+}
+
+export interface AuditStats {
+  actions_30d: number;
+  tenant_changes_30d: number;
+  user_changes_30d: number;
+  active_admins_30d: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Super Admin - Federation
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface FederationStats {
+  system_enabled: boolean;
+  whitelist_mode: boolean;
+  whitelisted_count: number;
+  active_partnerships: number;
+  pending_requests: number;
+  federation_enabled_count: number;
+  profiles_enabled: boolean;
+  messaging_enabled: boolean;
+  transactions_enabled: boolean;
+  listings_enabled: boolean;
+  events_enabled: boolean;
+  groups_enabled: boolean;
+  emergency_lockdown_active: boolean;
+  lockdown_reason?: string | null;
+}
+
+export interface WhitelistedTenant {
+  tenant_id: number;
+  tenant_name: string;
+  tenant_domain: string | null;
+  approved_by: string;
+  approved_at: string;
+  notes?: string | null;
+}
+
+export interface Partnership {
+  id: number;
+  tenant_a_id: number;
+  tenant_a_name: string;
+  tenant_b_id: number;
+  tenant_b_name: string;
+  level: number;
+  level_name: string;
+  status: 'active' | 'pending' | 'suspended' | 'terminated';
+  features_enabled: {
+    profiles: boolean;
+    messaging: boolean;
+    transactions: boolean;
+    listings: boolean;
+    events: boolean;
+    groups: boolean;
+  };
+  created_at: string;
+  suspended_at?: string | null;
+  suspended_reason?: string | null;
+  terminated_at?: string | null;
+  terminated_reason?: string | null;
+}
+
+export interface TenantFederationFeatures {
+  tenant_id: number;
+  tenant_name: string;
+  tenant_domain: string | null;
+  is_whitelisted: boolean;
+  active_partnerships_count: number;
+  federation_enabled: boolean;
+  directory_visible: boolean;
+  profiles_enabled: boolean;
+  messaging_enabled: boolean;
+  transactions_enabled: boolean;
+  listings_enabled: boolean;
+  events_enabled: boolean;
+  groups_enabled: boolean;
+}

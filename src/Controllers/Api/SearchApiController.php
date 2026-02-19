@@ -129,11 +129,7 @@ class SearchApiController extends BaseApiController
      */
     private function getUserIdOptional(): ?int
     {
-        try {
-            return $this->getUserId();
-        } catch (\Exception $e) {
-            return null;
-        }
+        return $this->getOptionalUserId();
     }
 
     /**

@@ -98,6 +98,11 @@ import type {
   CronJobSettings,
   GlobalCronSettings,
   CronHealthMetrics,
+  AdminFeedPost,
+  AdminComment,
+  AdminReview,
+  AdminReport,
+  ModerationStats,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1220,6 +1225,73 @@ export const adminCron = {
   // Health
   getHealthMetrics: () =>
     api.get<CronHealthMetrics>('/v2/admin/system/cron-jobs/health'),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Content Moderation
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminModeration = {
+  // Feed Posts
+  getFeedPosts: (params?: { type?: string; status?: string; user_id?: number; page?: number; limit?: number }) =>
+    api.get<PaginatedResponse<AdminFeedPost>>(`/v2/admin/feed/posts${buildQuery(params || {})}`),
+
+  getFeedPost: (id: number) =>
+    api.get<AdminFeedPost>(`/v2/admin/feed/posts/${id}`),
+
+  hideFeedPost: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/feed/posts/${id}/hide`),
+
+  deleteFeedPost: (id: number) =>
+    api.delete<{ success: boolean }>(`/v2/admin/feed/posts/${id}`),
+
+  getFeedStats: () =>
+    api.get<ModerationStats>('/v2/admin/feed/stats'),
+
+  // Comments
+  getComments: (params?: { content_type?: string; is_flagged?: boolean; page?: number; limit?: number }) =>
+    api.get<PaginatedResponse<AdminComment>>(`/v2/admin/comments${buildQuery(params || {})}`),
+
+  getComment: (id: number) =>
+    api.get<AdminComment>(`/v2/admin/comments/${id}`),
+
+  hideComment: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/comments/${id}/hide`),
+
+  deleteComment: (id: number) =>
+    api.delete<{ success: boolean }>(`/v2/admin/comments/${id}`),
+
+  // Reviews
+  getReviews: (params?: { rating?: number; is_flagged?: boolean; page?: number; limit?: number }) =>
+    api.get<PaginatedResponse<AdminReview>>(`/v2/admin/reviews${buildQuery(params || {})}`),
+
+  getReview: (id: number) =>
+    api.get<AdminReview>(`/v2/admin/reviews/${id}`),
+
+  flagReview: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/reviews/${id}/flag`),
+
+  hideReview: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/reviews/${id}/hide`),
+
+  deleteReview: (id: number) =>
+    api.delete<{ success: boolean }>(`/v2/admin/reviews/${id}`),
+
+  // Reports
+  getReports: (params?: { type?: string; status?: string; page?: number; limit?: number }) =>
+    api.get<PaginatedResponse<AdminReport>>(`/v2/admin/reports${buildQuery(params || {})}`),
+
+  getReport: (id: number) =>
+    api.get<AdminReport>(`/v2/admin/reports/${id}`),
+
+  resolveReport: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/reports/${id}/resolve`),
+
+  dismissReport: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/reports/${id}/dismiss`),
+
+  getReportStats: () =>
+    api.get<ModerationStats>('/v2/admin/reports/stats'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

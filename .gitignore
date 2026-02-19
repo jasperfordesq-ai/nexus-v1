@@ -119,6 +119,7 @@ navbar_good.txt
 
 # Temp test scripts in scripts/
 scripts/test_*.sh
+scripts/reset-password.php
 
 # E2E Testing (Playwright)
 e2e/fixtures/.auth/

@@ -382,7 +382,7 @@ class EventService
             if (!empty($data['sdg_goals']) && is_array($data['sdg_goals'])) {
                 $goals = array_map('intval', $data['sdg_goals']);
                 $json = json_encode($goals);
-                Database::query("UPDATE events SET sdg_goals = ? WHERE id = ?", [$json, $eventId]);
+                Database::query("UPDATE events SET sdg_goals = ? WHERE id = ? AND tenant_id = ?", [$json, $eventId, TenantContext::getId()]);
             }
 
             // Log activity
@@ -451,7 +451,7 @@ class EventService
             if (array_key_exists('sdg_goals', $data)) {
                 $goals = is_array($data['sdg_goals']) ? array_map('intval', $data['sdg_goals']) : [];
                 $json = json_encode($goals);
-                Database::query("UPDATE events SET sdg_goals = ? WHERE id = ?", [$json, $id]);
+                Database::query("UPDATE events SET sdg_goals = ? WHERE id = ? AND tenant_id = ?", [$json, $id, TenantContext::getId()]);
             }
 
             return true;
@@ -721,7 +721,7 @@ class EventService
         }
 
         try {
-            Database::query("UPDATE events SET cover_image = ? WHERE id = ?", [$imageUrl, $eventId]);
+            Database::query("UPDATE events SET cover_image = ? WHERE id = ? AND tenant_id = ?", [$imageUrl, $eventId, TenantContext::getId()]);
             return true;
         } catch (\Exception $e) {
             error_log("EventService::updateImage error: " . $e->getMessage());
