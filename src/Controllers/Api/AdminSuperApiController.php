@@ -943,7 +943,25 @@ class AdminSuperApiController extends BaseApiController
 
         $logs = SuperAdminAuditService::getLog($filters);
 
-        $this->respondWithData($logs);
+        // Map DB columns to frontend field names
+        $mapped = array_map(function ($row) {
+            return [
+                'id' => $row['id'] ?? null,
+                'action_type' => $row['action_type'] ?? '',
+                'target_type' => $row['target_type'] ?? '',
+                'target_id' => $row['target_id'] ?? null,
+                'target_label' => $row['target_name'] ?? '',
+                'actor_id' => $row['actor_user_id'] ?? null,
+                'actor_name' => $row['actor_name'] ?? null,
+                'actor_email' => $row['actor_email'] ?? null,
+                'old_value' => $row['old_values'] ?? null,
+                'new_value' => $row['new_values'] ?? null,
+                'description' => $row['description'] ?? '',
+                'created_at' => $row['created_at'] ?? '',
+            ];
+        }, $logs);
+
+        $this->respondWithData($mapped);
     }
 
     // =========================================================================

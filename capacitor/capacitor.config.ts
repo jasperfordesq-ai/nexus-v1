@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
     // url: 'http://192.168.1.100',  // Your local network IP
 
     // For production, use your live site:
-    url: 'https://hour-timebank.ie',
+    url: 'https://app.project-nexus.ie',
 
     // Allow cleartext (HTTP) for local development only
     // Set to false for production
