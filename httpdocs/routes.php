@@ -104,25 +104,35 @@ $router->add('POST', '/api/v1/federation/oauth/token', 'Nexus\Controllers\Api\Fe
 $router->add('POST', '/api/v1/federation/webhooks/test', 'Nexus\Controllers\Api\FederationApiController@testWebhook');
 
 // --------------------------------------------------------------------------
-// API ROUTES (MOBILE APP)
+// LEGACY V1 API ROUTES — DEPRECATED
 // --------------------------------------------------------------------------
-// Polls
+// These routes predate the V2 API and are kept for backward compatibility
+// with the mobile app (Capacitor). They are superseded by /api/v2/* endpoints.
+//
+// Deprecated: 2026-02-19 (QA Phase 7.3)
+// Migrate consumers to /api/v2/* equivalents before removing.
+// V2 equivalents: /api/v2/polls, /api/v2/goals, /api/v2/volunteering,
+//   /api/v2/events, /api/v2/wallet/*, /api/v2/listings, /api/v2/notifications,
+//   /api/v2/users (members)
+// --------------------------------------------------------------------------
+
+// Polls (deprecated — use /api/v2/polls)
 $router->add('GET', '/api/polls', 'Nexus\Controllers\Api\PollApiController@index');
 $router->add('POST', '/api/polls/vote', 'Nexus\Controllers\Api\PollApiController@vote');
 
-// Goals
+// Goals (deprecated — use /api/v2/goals)
 $router->add('GET', '/api/goals', 'Nexus\Controllers\Api\GoalApiController@index');
 $router->add('POST', '/api/goals/update', 'Nexus\Controllers\Api\GoalApiController@updateProgress'); // Method is updateProgress
 $router->add('POST', '/api/goals/offer-buddy', 'Nexus\Controllers\Api\GoalApiController@offerBuddy'); // Offer to be a goal buddy
 
-// Volunteering
+// Volunteering (deprecated — use /api/v2/volunteering)
 $router->add('GET', '/api/vol_opportunities', 'Nexus\Controllers\Api\VolunteeringApiController@index');
 
-// Events
+// Events (deprecated — use /api/v2/events)
 $router->add('GET', '/api/events', 'Nexus\Controllers\Api\EventApiController@index');
 $router->add('POST', '/api/events/rsvp', 'Nexus\Controllers\Api\EventApiController@rsvp');
 
-// Wallet
+// Wallet (deprecated — use /api/v2/wallet/*)
 $router->add('GET', '/api/wallet/balance', 'Nexus\Controllers\Api\WalletApiController@balance');
 
 // Cookie Consent API (EU Compliance)
@@ -144,14 +154,14 @@ $router->add('GET', '/api/legal/status', 'Nexus\Controllers\LegalDocumentControl
 // Nexus Score API
 $router->add('GET', '/api/nexus-score', 'Nexus\Controllers\NexusScoreController@apiGetScore');
 $router->add('POST', '/api/nexus-score/recalculate', 'Nexus\Controllers\NexusScoreController@apiRecalculateScores');
+// Wallet continued (deprecated — use /api/v2/wallet/*)
 $router->add('GET', '/api/wallet/transactions', 'Nexus\Controllers\Api\WalletApiController@transactions');
 $router->add('GET', '/api/wallet/pending-count', 'Nexus\Controllers\Api\WalletApiController@pendingCount'); // Badge updates
 $router->add('POST', '/api/wallet/transfer', 'Nexus\Controllers\Api\WalletApiController@transfer');
 $router->add('POST', '/api/wallet/delete', 'Nexus\Controllers\Api\WalletApiController@delete');
 $router->add('POST', '/api/wallet/user-search', 'Nexus\Controllers\Api\WalletApiController@userSearch'); // User autocomplete
 
-
-// Core (Directory, Feed, etc.)
+// Core — Directory, Feed, etc. (deprecated — use /api/v2/users, /api/v2/listings, /api/v2/groups, /api/v2/messages, /api/v2/notifications)
 $router->add('GET', '/api/members', 'Nexus\Controllers\Api\CoreApiController@members');
 $router->add('GET', '/api/listings', 'Nexus\Controllers\Api\CoreApiController@listings');
 $router->add('GET', '/api/groups', 'Nexus\Controllers\Api\CoreApiController@groups');
@@ -163,6 +173,7 @@ $router->add('GET', '/api/notifications/poll', 'Nexus\Controllers\NotificationCo
 $router->add('POST', '/api/notifications/read', 'Nexus\Controllers\NotificationController@markRead');
 $router->add('POST', '/api/notifications/delete', 'Nexus\Controllers\NotificationController@delete'); // New Delete API
 
+// Listings delete (deprecated — use DELETE /api/v2/listings/{id})
 $router->add('POST', '/api/listings/delete', 'Nexus\Controllers\ListingController@delete'); // Listings Delete API
 
 // ============================================
