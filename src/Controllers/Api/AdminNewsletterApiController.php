@@ -91,12 +91,20 @@ class AdminNewsletterApiController extends BaseApiController
 
     public function store(): void
     {
-        $this->requireAdmin();
+        $userId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
+
         $name = $this->input('name');
         $subject = $this->input('subject', '');
+        $previewText = $this->input('preview_text', '');
         $content = $this->input('content', '');
         $status = $this->input('status', 'draft');
+        $targetAudience = $this->input('target_audience', 'all_members');
+        $segmentId = $this->inputInt('segment_id') ?: null;
+        $scheduledAt = $this->input('scheduled_at') ?: null;
+        $abTestEnabled = $this->input('ab_test_enabled') ? 1 : 0;
+        $subjectB = $this->input('subject_b') ?: null;
+        $templateId = $this->inputInt('template_id') ?: null;
 
         if (!$name) {
             $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name');
@@ -110,13 +118,18 @@ class AdminNewsletterApiController extends BaseApiController
 
         try {
             Database::query(
-                "INSERT INTO newsletters (tenant_id, name, subject, content, status, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
-                [$tenantId, $name, $subject, $content, $status]
+                "INSERT INTO newsletters (tenant_id, name, subject, preview_text, content, status,
+                    target_audience, segment_id, scheduled_at, ab_test_enabled, subject_b, template_id,
+                    created_by, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                [$tenantId, $name, $subject, $previewText, $content, $status,
+                 $targetAudience, $segmentId, $scheduledAt, $abTestEnabled, $subjectB, $templateId,
+                 $userId]
             );
             $id = Database::lastInsertId();
             $this->respondWithData(['id' => $id, 'name' => $name, 'status' => $status], null, 201);
         } catch (\Exception $e) {
-            $this->respondWithError('CREATE_FAILED', 'Failed to create newsletter');
+            $this->respondWithError('CREATE_FAILED', 'Failed to create newsletter: ' . $e->getMessage());
         }
     }
 
@@ -133,13 +146,36 @@ class AdminNewsletterApiController extends BaseApiController
         try {
             $fields = [];
             $params = [];
-            foreach (['name', 'subject', 'content', 'status'] as $field) {
+
+            $allowedFields = [
+                'name', 'subject', 'preview_text', 'content', 'status',
+                'target_audience', 'scheduled_at', 'subject_b', 'template_id',
+            ];
+
+            foreach ($allowedFields as $field) {
                 $val = $this->input($field);
                 if ($val !== null) {
                     $fields[] = "{$field} = ?";
                     $params[] = $val;
                 }
             }
+
+            // Handle nullable int fields
+            foreach (['segment_id'] as $intField) {
+                $val = $this->input($intField);
+                if ($val !== null) {
+                    $fields[] = "{$intField} = ?";
+                    $params[] = $val ? (int)$val : null;
+                }
+            }
+
+            // Handle boolean fields
+            $abVal = $this->input('ab_test_enabled');
+            if ($abVal !== null) {
+                $fields[] = "ab_test_enabled = ?";
+                $params[] = $abVal ? 1 : 0;
+            }
+
             if (empty($fields)) {
                 $this->respondWithError('VALIDATION_ERROR', 'No fields to update');
                 return;
