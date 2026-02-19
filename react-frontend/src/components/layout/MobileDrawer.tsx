@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 /**
  * Mobile Navigation Drawer
  * Uses HeroUI Drawer component for accessibility and animations
@@ -462,6 +467,19 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 </Link>
               </div>
             )}
+
+            {/* Attribution (AGPL Section 7(b) — required on all pages) */}
+            <div className="pt-6 pb-4 px-4">
+              <Divider className="bg-theme-elevated mb-4" />
+              <a
+                href="https://github.com/jasperfordesq-ai/nexus-v1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-center text-xs text-theme-subtle hover:text-theme-primary transition-colors"
+              >
+                Built on Project NEXUS by Jasper Ford
+              </a>
+            </div>
           </nav>
         </DrawerBody>
       </DrawerContent>

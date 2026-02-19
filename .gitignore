@@ -1,107 +1,107 @@
-# Dependencies
+# =============================================================================
+# Project NEXUS — Public Repository .gitignore
+# =============================================================================
+# Only essential platform files are tracked. Everything else is excluded.
+# =============================================================================
+
+# ─── Dependencies ─────────────────────────────────────────────────────────────
 /node_modules
 /vendor
 
-# Environment files
+# ─── Environment & Credentials (NEVER commit) ────────────────────────────────
 .env
-.env.local
-.env.*.local
-.env.testing
+.env.*
+!.env.docker.example
+!.env.example
 
-# Build outputs
+# ─── Documentation (private — not for public repo) ───────────────────────────
+/docs/
+
+# ─── AI Assistant Config (contains sensitive project context) ─────────────────
+CLAUDE.md
+.agent/
+.claude/
+
+# ─── All Markdown in root except licensing files ──────────────────────────────
+/*.md
+!README.md
+!CONTRIBUTORS.md
+
+# ─── Scripts (internal maintenance utilities) ─────────────────────────────────
+/scripts/
+
+# ─── Deploy & Production Config ───────────────────────────────────────────────
+compose.prod.yml
+.deployignore
+
+# ─── E2E Testing (Playwright) ────────────────────────────────────────────────
+/e2e/
+playwright.config.ts
+playwright-report/
+test-results/
+
+# ─── Mobile App Build (Capacitor) ────────────────────────────────────────────
+/capacitor/
+
+# ─── Old/Quarantined Directories ─────────────────────────────────────────────
+react-frontend__quarantine_*/
+--version/
+
+# ─── Old Git Hooks (replaced by .husky) ──────────────────────────────────────
+/.githooks/
+
+# ─── Backups, Exports, Storage, Uploads ───────────────────────────────────────
+/backups/
+/exports/
+/storage/
+/uploads/
+/httpdocs/uploads/
+
+# ─── Build Outputs & Caches ──────────────────────────────────────────────────
 /public/build
 /public/hot
 /public/storage
-
-# Caches
+/public/css
+/public/js
+/public/mix-manifest.json
 /cache
 /.phpunit.cache
-/.vscode
 .snapshots
 
-# Logs
+# ─── Logs ─────────────────────────────────────────────────────────────────────
 /logs
 *.log
 
-# Temporary files
+# ─── Database Files ───────────────────────────────────────────────────────────
+*.sqlite
+*.sqlite-journal
+database.sqlite
+schema_production.sql
+dump.sql
+
+# ─── SQL Scripts in Root ──────────────────────────────────────────────────────
+/*.sql
+!schema.sql
+
+# ─── Archives & Binaries ─────────────────────────────────────────────────────
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.pdf
+
+# ─── Temporary Files ─────────────────────────────────────────────────────────
 *.tmp
 *.temp
+*.bak
+*.backup
 nul
 debug_output.html
 tmp_*.php
 tmp_*.json
 tmp_*.sh
 tmp_*.txt
-
-# IDE
-.idea
-.vscode
-*.swp
-*.swo
-*~
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Uploaded files (if not needed in git)
-/uploads
-/httpdocs/uploads/
-
-# Database
-*.sqlite
-*.sqlite-journal
-database.sqlite
-
-# Compiled assets
-/public/css
-/public/js
-/public/mix-manifest.json
-
-# Test files in root (should be in tests/)
-test-*.php
-test_*.php
-diagnose-*.php
-debug-*.php
-verify-*.php
-
-# Documentation in root (should be in docs/)
-# Note: CLAUDE.md is tracked (not ignored)
-/*.md
-!CLAUDE.md
-
-# SQL scripts in root (should be in scripts/sql/)
-/*.sql
-
-# Archives
-*.zip
-*.tar
-*.tar.gz
-*.rar
-
-# Firebase credentials
-firebase-service-account.json
-
-# Backup files
-*.bak
-*.backup
-/backups/db/*.sql
-!backups/db/.gitkeep
-
-# Docker local overrides
-.env.docker.local
-
-# Export files
-/exports/
-
-# PDF files (large binaries)
-*.pdf
-
-# AI agent/assistant local config
-.agent/
-.claude/settings.local.json
-
-# Temp files with unusual names (includes Unicode fullwidth colon artifacts)
+*.timestamp-*.mjs
 C?temp*
 C?tmp*
 C?Users*
@@ -109,23 +109,28 @@ c?xampp*
 *tempcivicone_dirs.txt
 *tempmodern_dirs.txt
 
-# Vite build artifacts
-*.timestamp-*.mjs
-
-# Misc temp/debug text files
+# ─── Stray Test/Debug Files in Root ───────────────────────────────────────────
+test-*.php
+test_*.php
+diagnose-*.php
+debug-*.php
+verify-*.php
 admin_routes.txt
 drawer_good.txt
 navbar_good.txt
+privacy-page.min.css
+production-status.log
+*.min.css
 
-# Temp test scripts in scripts/
-scripts/test_*.sh
-scripts/reset-password.php
+# ─── IDE & OS Files ──────────────────────────────────────────────────────────
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
 
-# E2E Testing (Playwright)
-e2e/fixtures/.auth/
-e2e/test-results/
-e2e/reports/
-e2e/screenshots/
-e2e/.env.test
-playwright-report/
-test-results/
+# ─── Credentials & Secrets ───────────────────────────────────────────────────
+firebase-service-account.json
+*.pem

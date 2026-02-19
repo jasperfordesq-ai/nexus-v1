@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 /**
  * BackToTop - Floating scroll-to-top button
  * Appears after scrolling 400px, smooth scrolls to top on click

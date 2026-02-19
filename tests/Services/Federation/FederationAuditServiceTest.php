@@ -1,4 +1,8 @@
 <?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 
 declare(strict_types=1);
 
@@ -43,7 +47,7 @@ class FederationAuditServiceTest extends DatabaseTestCase
     {
         if (self::$testUserId) {
             try {
-                Database::query("DELETE FROM federation_audit_log WHERE user_id = ?", [self::$testUserId]);
+                Database::query("DELETE FROM federation_audit_log WHERE actor_user_id = ?", [self::$testUserId]);
                 Database::query("DELETE FROM users WHERE id = ?", [self::$testUserId]);
             } catch (\Exception $e) {}
         }
@@ -70,12 +74,12 @@ class FederationAuditServiceTest extends DatabaseTestCase
 
         // Verify entry exists
         $entry = Database::query(
-            "SELECT * FROM federation_audit_log WHERE user_id = ? AND action = ? ORDER BY id DESC LIMIT 1",
+            "SELECT * FROM federation_audit_log WHERE actor_user_id = ? AND action_type = ? ORDER BY id DESC LIMIT 1",
             [self::$testUserId, 'test_action']
         )->fetch();
 
         $this->assertNotFalse($entry);
-        $this->assertEquals('test_action', $entry['action']);
+        $this->assertEquals('test_action', $entry['action_type']);
         $this->assertEquals(self::$tenant1Id, $entry['source_tenant_id']);
         $this->assertEquals(self::$tenant2Id, $entry['target_tenant_id']);
     }
@@ -86,7 +90,7 @@ class FederationAuditServiceTest extends DatabaseTestCase
             FederationAuditService::LEVEL_DEBUG ?? 'debug',
             FederationAuditService::LEVEL_INFO ?? 'info',
             FederationAuditService::LEVEL_WARNING ?? 'warning',
-            FederationAuditService::LEVEL_ERROR ?? 'error',
+            FederationAuditService::LEVEL_CRITICAL ?? 'critical',
         ];
 
         foreach ($levels as $level) {
@@ -140,12 +144,12 @@ class FederationAuditServiceTest extends DatabaseTestCase
 
         // Verify metadata was stored correctly
         $entry = Database::query(
-            "SELECT * FROM federation_audit_log WHERE user_id = ? AND action = ? ORDER BY id DESC LIMIT 1",
+            "SELECT * FROM federation_audit_log WHERE actor_user_id = ? AND action_type = ? ORDER BY id DESC LIMIT 1",
             [self::$testUserId, 'test_complex_meta']
         )->fetch();
 
         $this->assertNotFalse($entry);
-        $storedMeta = json_decode($entry['metadata'] ?? '{}', true);
+        $storedMeta = json_decode($entry['data'] ?? '{}', true);
         $this->assertEquals('value', $storedMeta['string'] ?? null);
         $this->assertEquals(123, $storedMeta['int'] ?? null);
     }

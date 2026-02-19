@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 /**
  * About Page - Platform showcase with mission, how it works, values, and stats
  *
@@ -30,6 +35,11 @@ import {
   ArrowRight,
   HelpCircle,
   Mail,
+  Code,
+  Crown,
+  Star,
+  Award,
+  BookOpen,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -37,6 +47,7 @@ import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import contributors from '@/data/contributors.json';
 
 /* ─────────────── Types ─────────────── */
 
@@ -316,6 +327,148 @@ export function AboutPage() {
             </div>
           </section>
         )}
+
+        {/* ─── Credits & Open Source ─── */}
+        <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
+                Powered by Project NEXUS
+              </h2>
+              <p className="text-theme-muted max-w-lg mx-auto">
+                Open-source community platform created by Jasper Ford. Licensed under AGPL v3.
+              </p>
+            </motion.div>
+
+            <div className="grid sm:grid-cols-2 gap-6 mb-8">
+              {/* Creator & Founders (from contributors.json) */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <GlassCard className="p-6 h-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2.5 rounded-xl bg-indigo-500/15">
+                      <Crown className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                    </div>
+                    <h3 className="font-semibold text-theme-primary text-lg">Creator</h3>
+                  </div>
+                  {contributors.filter(c => c.type === 'creator').map(c => (
+                    <p key={c.name} className="text-theme-primary font-medium mb-4">{c.name}</p>
+                  ))}
+
+                  <h4 className="text-sm font-semibold text-theme-muted mb-2">Founders of hOUR Timebank CLC</h4>
+                  <ul className="space-y-1 text-sm text-theme-muted">
+                    {contributors.filter(c => c.type === 'creator' || c.type === 'founder').map(c => (
+                      <li key={c.name}>{c.name}</li>
+                    ))}
+                  </ul>
+                </GlassCard>
+              </motion.div>
+
+              {/* Contributors (from contributors.json) */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <GlassCard className="p-6 h-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2.5 rounded-xl bg-purple-500/15">
+                      <Star className="w-5 h-5 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                    </div>
+                    <h3 className="font-semibold text-theme-primary text-lg">Contributors</h3>
+                  </div>
+                  <ul className="space-y-2 text-sm text-theme-muted mb-4">
+                    {contributors.filter(c => c.type === 'contributor').map(c => (
+                      <li key={c.name}><span className="text-theme-primary font-medium">{c.name}</span> — {c.role}</li>
+                    ))}
+                  </ul>
+
+                  {contributors.some(c => c.note?.includes('social impact study')) && (
+                    <>
+                      <h4 className="text-sm font-semibold text-theme-muted mb-2">Research Foundation</h4>
+                      <p className="text-sm text-theme-muted">
+                        Informed by a social impact study commissioned by the{' '}
+                        <span className="text-theme-primary font-medium">
+                          {contributors.find(c => c.note?.includes('social impact study'))?.name}
+                        </span>.
+                      </p>
+                    </>
+                  )}
+                </GlassCard>
+              </motion.div>
+            </div>
+
+            {/* Acknowledgements & License (from contributors.json) */}
+            <div className="grid sm:grid-cols-2 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <GlassCard className="p-6 h-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2.5 rounded-xl bg-amber-500/15">
+                      <Award className="w-5 h-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
+                    </div>
+                    <h3 className="font-semibold text-theme-primary text-lg">Acknowledgements</h3>
+                  </div>
+                  <ul className="space-y-1 text-sm text-theme-muted">
+                    {contributors.filter(c => c.type === 'acknowledgement').map(c => (
+                      <li key={c.name}>{c.name}{c.role !== 'Research Foundation' ? `, ${c.role}` : ''}</li>
+                    ))}
+                  </ul>
+                </GlassCard>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+              >
+                <GlassCard className="p-6 h-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2.5 rounded-xl bg-emerald-500/15">
+                      <Code className="w-5 h-5 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
+                    </div>
+                    <h3 className="font-semibold text-theme-primary text-lg">Open Source</h3>
+                  </div>
+                  <p className="text-sm text-theme-muted mb-3">
+                    Licensed under the GNU Affero General Public License v3 (AGPL-3.0).
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://github.com/jasperfordesq-ai/nexus-v1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
+                    >
+                      <BookOpen className="w-4 h-4" aria-hidden="true" />
+                      V1 Source Code (PHP + React)
+                    </a>
+                    <a
+                      href="https://github.com/jasperfordesq-ai/api.project-nexus.net"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
+                    >
+                      <BookOpen className="w-4 h-4" aria-hidden="true" />
+                      V2 Source Code (ASP.NET Core)
+                    </a>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            </div>
+          </div>
+        </section>
 
         {/* ─── CTA Section ─── */}
         <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">

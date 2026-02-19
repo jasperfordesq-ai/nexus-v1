@@ -1,4 +1,9 @@
 <?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 /**
  * Simple health check endpoint for Docker
  * Does NOT load the full application
