@@ -174,7 +174,9 @@ export function PusherProvider({ children }: PusherProviderProps) {
       ? `${user.id}-${otherUserId}`
       : `${otherUserId}-${user.id}`;
 
-    const channelName = `private-chat-${chatId}`;
+    // Must match backend PusherService::getChatChannel format (tenant-scoped)
+    const tenantId = user.tenant_id || tokenManager.getTenantId();
+    const channelName = `private-tenant.${tenantId}.chat.${chatId}`;
 
     // Already subscribed?
     if (conversationChannelsRef.current.has(channelName)) {
@@ -204,7 +206,9 @@ export function PusherProvider({ children }: PusherProviderProps) {
       ? `${user.id}-${otherUserId}`
       : `${otherUserId}-${user.id}`;
 
-    const channelName = `private-chat-${chatId}`;
+    // Must match backend PusherService::getChatChannel format (tenant-scoped)
+    const tenantId = user.tenant_id || tokenManager.getTenantId();
+    const channelName = `private-tenant.${tenantId}.chat.${chatId}`;
 
     const channel = conversationChannelsRef.current.get(channelName);
     if (channel) {

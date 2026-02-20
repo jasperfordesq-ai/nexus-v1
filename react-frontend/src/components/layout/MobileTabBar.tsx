@@ -10,7 +10,7 @@
  * Only visible when the user is authenticated and not on auth pages.
  */
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Badge, Button } from '@heroui/react';
@@ -80,11 +80,11 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
 
   return (
     <>
-      {/* Spacer so page content isn't hidden behind the bar */}
+      {/* Spacer so page content isn't hidden behind the fixed bar */}
       <div className="h-16 md:hidden" aria-hidden="true" />
 
       <nav
-        className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-300 md:hidden"
         aria-label="Mobile navigation"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
@@ -125,9 +125,10 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
               }
 
               /* ── Regular tab ───────────────────────────── */
+              const hasBadge = (tab.badgeCount ?? 0) > 0;
+
               const tabButton = (
                 <Button
-                  key={tab.key}
                   variant="light"
                   radius="lg"
                   onPress={() => {
@@ -146,14 +147,14 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
                   aria-label={tab.label}
                   aria-current={active ? 'page' : undefined}
                 >
-                  {/* Active background pill */}
-                  {active && (
-                    <motion.div
-                      layoutId="tab-active-bg"
-                      className="absolute inset-x-2 top-1.5 h-8 rounded-xl bg-indigo-500/10 dark:bg-indigo-400/10"
-                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                    />
-                  )}
+                  {/* Active background pill — always rendered, opacity-driven */}
+                  <div
+                    className={`absolute inset-x-2 top-1.5 h-8 rounded-xl transition-opacity duration-200 ${
+                      active
+                        ? 'opacity-100 bg-indigo-500/10 dark:bg-indigo-400/10'
+                        : 'opacity-0'
+                    }`}
+                  />
 
                   <div className="relative z-10 flex flex-col items-center gap-0.5">
                     <Icon
@@ -164,26 +165,27 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
                     <span className="text-[10px] font-medium leading-none">{tab.label}</span>
                   </div>
 
-                  {/* Active indicator dot */}
-                  {active && (
-                    <motion.div
-                      layoutId="tab-dot"
-                      className="absolute bottom-1.5 w-1 h-1 rounded-full bg-indigo-600 dark:bg-indigo-400"
-                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                    />
-                  )}
+                  {/* Active indicator dot — always rendered, opacity-driven */}
+                  <div
+                    className={`absolute bottom-1.5 w-1 h-1 rounded-full transition-opacity duration-200 ${
+                      active
+                        ? 'opacity-100 bg-indigo-600 dark:bg-indigo-400'
+                        : 'opacity-0'
+                    }`}
+                  />
                 </Button>
               );
 
-              // Wrap in HeroUI Badge for unread message count
-              if (tab.badgeCount && tab.badgeCount > 0) {
+              // Always wrap in Badge — use isInvisible to avoid DOM structure changes on count update
+              if (tab.badgeCount !== undefined) {
                 return (
                   <Badge
                     key={tab.key}
-                    content={tab.badgeCount > 99 ? '99+' : tab.badgeCount}
+                    content={hasBadge ? (tab.badgeCount! > 99 ? '99+' : tab.badgeCount) : 0}
                     color="danger"
                     size="sm"
                     placement="top-right"
+                    isInvisible={!hasBadge}
                     className="translate-x-[-8px] translate-y-[6px]"
                   >
                     {tabButton}
@@ -191,7 +193,7 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
                 );
               }
 
-              return tabButton;
+              return <React.Fragment key={tab.key}>{tabButton}</React.Fragment>;
             })}
           </div>
         </div>
