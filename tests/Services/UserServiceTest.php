@@ -41,7 +41,7 @@ class UserServiceTest extends DatabaseTestCase
 
         // Primary test user
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, bio, location, phone, balance, role, is_approved, privacy_profile, privacy_search, privacy_contact, password, created_at)
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, bio, location, phone, balance, role, is_approved, privacy_profile, privacy_search, privacy_contact, password_hash, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'public', 1, 1, ?, NOW())",
             [self::$testTenantId, "usrvc_user1_{$ts}@test.com", "usrvc_user1_{$ts}", 'User', 'One', 'User One', 'Test bio content', 'Dublin, Ireland', '+353891234567', 100, 'member', password_hash('TestPass123!', PASSWORD_BCRYPT)]
         );
