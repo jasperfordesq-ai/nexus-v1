@@ -16,9 +16,48 @@
  * @see docs/TRS-001-TENANT-RESOLUTION-SPEC.md
  */
 
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, type ComponentType } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
+
+/**
+ * Wrapper around React.lazy() that handles stale chunk errors after deployment.
+ * When a new build changes chunk hashes, users with cached index.html will try
+ * to load old chunk filenames that no longer exist (404). This catches that error
+ * and forces a page reload to fetch the new index.html with correct chunk references.
+ * Uses sessionStorage to prevent infinite reload loops.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function lazyWithRetry(
+  importFn: () => Promise<{ default: ComponentType<any> }>
+) {
+  return lazy(() =>
+    importFn().catch((error: Error) => {
+      // Only reload for chunk load errors (network/404 failures)
+      const isChunkError =
+        error.message?.includes('Failed to fetch dynamically imported module') ||
+        error.message?.includes('Loading chunk') ||
+        error.message?.includes('Loading CSS chunk') ||
+        error.message?.includes('Unable to preload CSS') ||
+        error.name === 'ChunkLoadError';
+
+      if (isChunkError) {
+        const reloadKey = `chunk_reload_${window.location.pathname}`;
+        const lastReload = sessionStorage.getItem(reloadKey);
+        const now = Date.now();
+
+        // Prevent infinite reload loop — only reload once per path per 30 seconds
+        if (!lastReload || now - parseInt(lastReload) > 30000) {
+          sessionStorage.setItem(reloadKey, now.toString());
+          window.location.reload();
+        }
+      }
+
+      // Re-throw so the error boundary still catches it if reload didn't help
+      throw error;
+    })
+  );
+}
 import { HelmetProvider } from 'react-helmet-async';
 
 // Contexts (app-wide only — tenant-scoped contexts are inside TenantShell)
@@ -36,76 +75,76 @@ import { LoadingScreen, ErrorBoundary, FeatureErrorBoundary } from '@/components
 import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from '@/pages/auth';
 
 // Admin Panel (lazy-loaded — keeps recharts, jsPDF, admin sidebar/header out of main bundle)
-const AdminApp = lazy(() => import('@/admin/AdminApp'));
+const AdminApp = lazyWithRetry(() => import('@/admin/AdminApp'));
 
-// Lazy-loaded Pages
-const HomePage = lazy(() => import('@/pages/public/HomePage'));
-const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
-const ListingsPage = lazy(() => import('@/pages/listings/ListingsPage'));
-const ListingDetailPage = lazy(() => import('@/pages/listings/ListingDetailPage'));
-const CreateListingPage = lazy(() => import('@/pages/listings/CreateListingPage'));
-const MessagesPage = lazy(() => import('@/pages/messages/MessagesPage'));
-const ConversationPage = lazy(() => import('@/pages/messages/ConversationPage'));
-const WalletPage = lazy(() => import('@/pages/wallet/WalletPage'));
-const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
-const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage'));
-const SearchPage = lazy(() => import('@/pages/search/SearchPage'));
-const NotificationsPage = lazy(() => import('@/pages/notifications/NotificationsPage'));
-const MembersPage = lazy(() => import('@/pages/members/MembersPage'));
-const EventsPage = lazy(() => import('@/pages/events/EventsPage'));
-const EventDetailPage = lazy(() => import('@/pages/events/EventDetailPage'));
-const CreateEventPage = lazy(() => import('@/pages/events/CreateEventPage'));
-const GroupsPage = lazy(() => import('@/pages/groups/GroupsPage'));
-const GroupDetailPage = lazy(() => import('@/pages/groups/GroupDetailPage'));
-const CreateGroupPage = lazy(() => import('@/pages/groups/CreateGroupPage'));
-const NotFoundPage = lazy(() => import('@/pages/errors/NotFoundPage'));
-const ComingSoonPage = lazy(() => import('@/pages/errors/ComingSoonPage'));
-const ExchangesPage = lazy(() => import('@/pages/exchanges/ExchangesPage'));
-const ExchangeDetailPage = lazy(() => import('@/pages/exchanges/ExchangeDetailPage'));
-const RequestExchangePage = lazy(() => import('@/pages/exchanges/RequestExchangePage'));
-const LeaderboardPage = lazy(() => import('@/pages/leaderboard/LeaderboardPage'));
-const AchievementsPage = lazy(() => import('@/pages/achievements/AchievementsPage'));
-const GoalsPage = lazy(() => import('@/pages/goals/GoalsPage'));
-const VolunteeringPage = lazy(() => import('@/pages/volunteering/VolunteeringPage'));
-const OrganisationsPage = lazy(() => import('@/pages/organisations/OrganisationsPage'));
-const OrganisationDetailPage = lazy(() => import('@/pages/organisations/OrganisationDetailPage'));
-const FeedPage = lazy(() => import('@/pages/feed/FeedPage'));
-const BlogPage = lazy(() => import('@/pages/blog/BlogPage'));
-const BlogPostPage = lazy(() => import('@/pages/blog/BlogPostPage'));
-const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage'));
-const FederationHubPage = lazy(() => import('@/pages/federation/FederationHubPage'));
-const FederationPartnersPage = lazy(() => import('@/pages/federation/FederationPartnersPage'));
-const FederationMembersPage = lazy(() => import('@/pages/federation/FederationMembersPage'));
-const FederationMemberProfilePage = lazy(() => import('@/pages/federation/FederationMemberProfilePage'));
-const FederationMessagesPage = lazy(() => import('@/pages/federation/FederationMessagesPage'));
-const FederationListingsPage = lazy(() => import('@/pages/federation/FederationListingsPage'));
-const FederationEventsPage = lazy(() => import('@/pages/federation/FederationEventsPage'));
-const FederationSettingsPage = lazy(() => import('@/pages/federation/FederationSettingsPage'));
-const FederationOnboardingPage = lazy(() => import('@/pages/federation/FederationOnboardingPage'));
-const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
-const GroupExchangesPage = lazy(() => import('@/pages/group-exchanges/GroupExchangesPage'));
-const CreateGroupExchangePage = lazy(() => import('@/pages/group-exchanges/CreateGroupExchangePage'));
-const GroupExchangeDetailPage = lazy(() => import('@/pages/group-exchanges/GroupExchangeDetailPage'));
+// Lazy-loaded Pages (all use lazyWithRetry to handle stale chunk errors after deploys)
+const HomePage = lazyWithRetry(() => import('@/pages/public/HomePage'));
+const DashboardPage = lazyWithRetry(() => import('@/pages/dashboard/DashboardPage'));
+const ListingsPage = lazyWithRetry(() => import('@/pages/listings/ListingsPage'));
+const ListingDetailPage = lazyWithRetry(() => import('@/pages/listings/ListingDetailPage'));
+const CreateListingPage = lazyWithRetry(() => import('@/pages/listings/CreateListingPage'));
+const MessagesPage = lazyWithRetry(() => import('@/pages/messages/MessagesPage'));
+const ConversationPage = lazyWithRetry(() => import('@/pages/messages/ConversationPage'));
+const WalletPage = lazyWithRetry(() => import('@/pages/wallet/WalletPage'));
+const ProfilePage = lazyWithRetry(() => import('@/pages/profile/ProfilePage'));
+const SettingsPage = lazyWithRetry(() => import('@/pages/settings/SettingsPage'));
+const SearchPage = lazyWithRetry(() => import('@/pages/search/SearchPage'));
+const NotificationsPage = lazyWithRetry(() => import('@/pages/notifications/NotificationsPage'));
+const MembersPage = lazyWithRetry(() => import('@/pages/members/MembersPage'));
+const EventsPage = lazyWithRetry(() => import('@/pages/events/EventsPage'));
+const EventDetailPage = lazyWithRetry(() => import('@/pages/events/EventDetailPage'));
+const CreateEventPage = lazyWithRetry(() => import('@/pages/events/CreateEventPage'));
+const GroupsPage = lazyWithRetry(() => import('@/pages/groups/GroupsPage'));
+const GroupDetailPage = lazyWithRetry(() => import('@/pages/groups/GroupDetailPage'));
+const CreateGroupPage = lazyWithRetry(() => import('@/pages/groups/CreateGroupPage'));
+const NotFoundPage = lazyWithRetry(() => import('@/pages/errors/NotFoundPage'));
+const ComingSoonPage = lazyWithRetry(() => import('@/pages/errors/ComingSoonPage'));
+const ExchangesPage = lazyWithRetry(() => import('@/pages/exchanges/ExchangesPage'));
+const ExchangeDetailPage = lazyWithRetry(() => import('@/pages/exchanges/ExchangeDetailPage'));
+const RequestExchangePage = lazyWithRetry(() => import('@/pages/exchanges/RequestExchangePage'));
+const LeaderboardPage = lazyWithRetry(() => import('@/pages/leaderboard/LeaderboardPage'));
+const AchievementsPage = lazyWithRetry(() => import('@/pages/achievements/AchievementsPage'));
+const GoalsPage = lazyWithRetry(() => import('@/pages/goals/GoalsPage'));
+const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
+const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
+const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
+const FeedPage = lazyWithRetry(() => import('@/pages/feed/FeedPage'));
+const BlogPage = lazyWithRetry(() => import('@/pages/blog/BlogPage'));
+const BlogPostPage = lazyWithRetry(() => import('@/pages/blog/BlogPostPage'));
+const ResourcesPage = lazyWithRetry(() => import('@/pages/resources/ResourcesPage'));
+const FederationHubPage = lazyWithRetry(() => import('@/pages/federation/FederationHubPage'));
+const FederationPartnersPage = lazyWithRetry(() => import('@/pages/federation/FederationPartnersPage'));
+const FederationMembersPage = lazyWithRetry(() => import('@/pages/federation/FederationMembersPage'));
+const FederationMemberProfilePage = lazyWithRetry(() => import('@/pages/federation/FederationMemberProfilePage'));
+const FederationMessagesPage = lazyWithRetry(() => import('@/pages/federation/FederationMessagesPage'));
+const FederationListingsPage = lazyWithRetry(() => import('@/pages/federation/FederationListingsPage'));
+const FederationEventsPage = lazyWithRetry(() => import('@/pages/federation/FederationEventsPage'));
+const FederationSettingsPage = lazyWithRetry(() => import('@/pages/federation/FederationSettingsPage'));
+const FederationOnboardingPage = lazyWithRetry(() => import('@/pages/federation/FederationOnboardingPage'));
+const OnboardingPage = lazyWithRetry(() => import('@/pages/onboarding/OnboardingPage'));
+const GroupExchangesPage = lazyWithRetry(() => import('@/pages/group-exchanges/GroupExchangesPage'));
+const CreateGroupExchangePage = lazyWithRetry(() => import('@/pages/group-exchanges/CreateGroupExchangePage'));
+const GroupExchangeDetailPage = lazyWithRetry(() => import('@/pages/group-exchanges/GroupExchangeDetailPage'));
 
 // Static Pages
-const AboutPage = lazy(() => import('@/pages/public/AboutPage'));
-const ContactPage = lazy(() => import('@/pages/public/ContactPage'));
-const TermsPage = lazy(() => import('@/pages/public/TermsPage'));
-const PrivacyPage = lazy(() => import('@/pages/public/PrivacyPage'));
-const AccessibilityPage = lazy(() => import('@/pages/public/AccessibilityPage'));
-const CookiesPage = lazy(() => import('@/pages/public/CookiesPage'));
-const LegalHubPage = lazy(() => import('@/pages/public/LegalHubPage'));
-const LegalVersionHistoryPage = lazy(() => import('@/pages/public/LegalVersionHistoryPage'));
-const FaqPage = lazy(() => import('@/pages/public/FaqPage'));
-const HelpCenterPage = lazy(() => import('@/pages/help/HelpCenterPage'));
+const AboutPage = lazyWithRetry(() => import('@/pages/public/AboutPage'));
+const ContactPage = lazyWithRetry(() => import('@/pages/public/ContactPage'));
+const TermsPage = lazyWithRetry(() => import('@/pages/public/TermsPage'));
+const PrivacyPage = lazyWithRetry(() => import('@/pages/public/PrivacyPage'));
+const AccessibilityPage = lazyWithRetry(() => import('@/pages/public/AccessibilityPage'));
+const CookiesPage = lazyWithRetry(() => import('@/pages/public/CookiesPage'));
+const LegalHubPage = lazyWithRetry(() => import('@/pages/public/LegalHubPage'));
+const LegalVersionHistoryPage = lazyWithRetry(() => import('@/pages/public/LegalVersionHistoryPage'));
+const FaqPage = lazyWithRetry(() => import('@/pages/public/FaqPage'));
+const HelpCenterPage = lazyWithRetry(() => import('@/pages/help/HelpCenterPage'));
 
 // About Sub-Pages
-const TimebankingGuidePage = lazy(() => import('@/pages/about/TimebankingGuidePage'));
-const PartnerPage = lazy(() => import('@/pages/about/PartnerPage'));
-const SocialPrescribingPage = lazy(() => import('@/pages/about/SocialPrescribingPage'));
-const ImpactSummaryPage = lazy(() => import('@/pages/about/ImpactSummaryPage'));
-const ImpactReportPage = lazy(() => import('@/pages/about/ImpactReportPage'));
-const StrategicPlanPage = lazy(() => import('@/pages/about/StrategicPlanPage'));
+const TimebankingGuidePage = lazyWithRetry(() => import('@/pages/about/TimebankingGuidePage'));
+const PartnerPage = lazyWithRetry(() => import('@/pages/about/PartnerPage'));
+const SocialPrescribingPage = lazyWithRetry(() => import('@/pages/about/SocialPrescribingPage'));
+const ImpactSummaryPage = lazyWithRetry(() => import('@/pages/about/ImpactSummaryPage'));
+const ImpactReportPage = lazyWithRetry(() => import('@/pages/about/ImpactReportPage'));
+const StrategicPlanPage = lazyWithRetry(() => import('@/pages/about/StrategicPlanPage'));
 
 /**
  * Gate that only renders children for a specific tenant slug.
