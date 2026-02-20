@@ -81,6 +81,9 @@ const LegalDocForm = lazy(() => import('./modules/enterprise/LegalDocForm'));
 const LegalDocVersionList = lazy(() => import('./modules/enterprise/LegalDocVersionList'));
 const LegalDocComplianceDashboard = lazy(() => import('./modules/enterprise/LegalDocComplianceDashboard'));
 
+// Performance module
+const PerformanceDashboard = lazy(() => import('./modules/performance/PerformanceDashboard'));
+
 // Newsletter module
 const NewsletterList = lazy(() => import('./modules/newsletters/NewsletterList'));
 const NewsletterForm = lazy(() => import('./modules/newsletters/NewsletterForm'));
@@ -297,6 +300,9 @@ export function AdminRoutes() {
       <Route path="enterprise/monitoring/logs" element={<Lazy><ErrorLogs /></Lazy>} />
       <Route path="enterprise/config" element={<Lazy><SystemConfig /></Lazy>} />
       <Route path="enterprise/config/secrets" element={<Lazy><SecretsVault /></Lazy>} />
+
+      {/* ─── PERFORMANCE ─── */}
+      <Route path="performance" element={<Lazy><PerformanceDashboard /></Lazy>} />
       <Route path="legal-documents" element={<Lazy><LegalDocList /></Lazy>} />
       <Route path="legal-documents/create" element={<Lazy><LegalDocForm /></Lazy>} />
       <Route path="legal-documents/:id" element={<Lazy><LegalDocForm /></Lazy>} />

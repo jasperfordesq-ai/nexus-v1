@@ -27,6 +27,7 @@ import { api, tokenManager, SESSION_EXPIRED_EVENT } from '@/lib/api';
 import { logWarn } from '@/lib/logger';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { loginResponseSchema, userSchema } from '@/lib/api-schemas';
+import { setSentryUser, captureAuthEvent } from '@/lib/sentry';
 import type {
   User,
   LoginRequest,
@@ -122,6 +123,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (response.data.tenant_id && !tokenManager.getTenantId()) {
           tokenManager.setTenantId(response.data.tenant_id);
         }
+
+        // Set Sentry user context
+        setSentryUser(response.data);
+
         setState({
           user: response.data,
           status: 'authenticated',
@@ -132,6 +137,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         // Token invalid or expired
         tokenManager.clearTokens();
+        setSentryUser(null);
         setState({
           user: null,
           status: 'idle',
@@ -163,6 +169,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     );
 
     if (!response.success) {
+      captureAuthEvent('failed_login', undefined, {
+        error: response.error,
+        code: response.code,
+      });
       setState((prev) => ({
         ...prev,
         status: 'error',
@@ -203,6 +213,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (loginData.user?.tenant_id && !tokenManager.getTenantId()) {
       tokenManager.setTenantId(loginData.user.tenant_id);
     }
+
+    // Set Sentry user context and capture login event
+    setSentryUser(loginData.user);
+    captureAuthEvent('login', loginData.user.id);
 
     setState({
       user: loginData.user,
@@ -352,6 +366,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // ─────────────────────────────────────────────────────────────────────────
 
   const logout = useCallback(async () => {
+    const userId = state.user?.id;
     const refreshToken = tokenManager.getRefreshToken();
 
     // Call logout endpoint to invalidate tokens server-side
@@ -374,6 +389,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Always clear ALL local data (tokens AND tenant ID) regardless of server response
     tokenManager.clearAll();
 
+    // Clear Sentry user context and capture logout event
+    captureAuthEvent('logout', userId);
+    setSentryUser(null);
+
     setState({
       user: null,
       status: 'idle',
@@ -381,7 +400,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       twoFactorToken: null,
       twoFactorMethods: [],
     });
-  }, []);
+  }, [state.user?.id]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Clear Error
