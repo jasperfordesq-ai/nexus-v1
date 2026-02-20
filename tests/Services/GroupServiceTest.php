@@ -214,8 +214,11 @@ class GroupServiceTest extends DatabaseTestCase
         $group = GroupService::getById(self::$testGroupId);
 
         $this->assertNotNull($group);
-        $this->assertArrayHasKey('owner_id', $group);
-        $this->assertArrayHasKey('owner_name', $group);
+        // getById returns nested 'owner' object with id/name/avatar
+        $this->assertArrayHasKey('owner', $group);
+        $this->assertIsArray($group['owner']);
+        $this->assertArrayHasKey('id', $group['owner']);
+        $this->assertArrayHasKey('name', $group['owner']);
     }
 
     // ==========================================
@@ -224,7 +227,8 @@ class GroupServiceTest extends DatabaseTestCase
 
     public function testValidateGroupAcceptsValidData(): void
     {
-        $valid = GroupService::validateGroup([
+        // GroupService::validate() exists, not validateGroup()
+        $valid = GroupService::validate([
             'name' => 'Valid Group Name',
             'description' => 'Valid description',
             'visibility' => 'public',
@@ -236,7 +240,7 @@ class GroupServiceTest extends DatabaseTestCase
 
     public function testValidateGroupRejectsMissingName(): void
     {
-        $valid = GroupService::validateGroup([
+        $valid = GroupService::validate([
             'description' => 'Description',
             'visibility' => 'public',
         ]);
@@ -247,7 +251,7 @@ class GroupServiceTest extends DatabaseTestCase
 
     public function testValidateGroupRejectsEmptyName(): void
     {
-        $valid = GroupService::validateGroup([
+        $valid = GroupService::validate([
             'name' => '',
             'description' => 'Description',
         ]);
@@ -257,7 +261,7 @@ class GroupServiceTest extends DatabaseTestCase
 
     public function testValidateGroupRejectsTooLongName(): void
     {
-        $valid = GroupService::validateGroup([
+        $valid = GroupService::validate([
             'name' => str_repeat('A', 256),
             'description' => 'Description',
         ]);
@@ -267,7 +271,7 @@ class GroupServiceTest extends DatabaseTestCase
 
     public function testValidateGroupRejectsInvalidVisibility(): void
     {
-        $valid = GroupService::validateGroup([
+        $valid = GroupService::validate([
             'name' => 'Valid Name',
             'visibility' => 'invalid_value',
         ]);
@@ -277,7 +281,7 @@ class GroupServiceTest extends DatabaseTestCase
 
     public function testValidateGroupAcceptsPublicVisibility(): void
     {
-        $valid = GroupService::validateGroup([
+        $valid = GroupService::validate([
             'name' => 'Valid Name',
             'visibility' => 'public',
         ]);
@@ -287,7 +291,7 @@ class GroupServiceTest extends DatabaseTestCase
 
     public function testValidateGroupAcceptsPrivateVisibility(): void
     {
-        $valid = GroupService::validateGroup([
+        $valid = GroupService::validate([
             'name' => 'Valid Name',
             'visibility' => 'private',
         ]);
@@ -299,65 +303,51 @@ class GroupServiceTest extends DatabaseTestCase
     // Membership Tests
     // ==========================================
 
-    public function testJoinGroupReturnsTrueForPublicGroup(): void
+    public function testJoinGroupReturnsStatusForPublicGroup(): void
     {
-        try {
-            $result = GroupService::joinGroup(self::$testGroupId, self::$testUser2Id);
+        // join() returns status string ('active', 'pending'), not bool
+        $status = GroupService::join(self::$testGroupId, self::$testUser2Id);
 
-            $this->assertTrue($result);
+        $this->assertIsString($status);
+        $this->assertEquals('active', $status); // Public groups auto-accept
 
-            // Cleanup
-            Database::query("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", [self::$testGroupId, self::$testUser2Id]);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('joinGroup not available: ' . $e->getMessage());
-        }
+        // Cleanup
+        Database::query("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", [self::$testGroupId, self::$testUser2Id]);
     }
 
-    public function testJoinGroupReturnsFalseForAlreadyMember(): void
+    public function testJoinGroupReturnsNullForAlreadyMember(): void
     {
-        try {
-            // Join once
-            GroupService::joinGroup(self::$testGroupId, self::$testUser3Id);
+        // Join once
+        GroupService::join(self::$testGroupId, self::$testUser3Id);
 
-            // Try to join again
-            $result = GroupService::joinGroup(self::$testGroupId, self::$testUser3Id);
+        // Try to join again - returns null on failure
+        $result = GroupService::join(self::$testGroupId, self::$testUser3Id);
 
-            $this->assertFalse($result);
+        $this->assertNull($result);
 
-            // Cleanup
-            Database::query("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", [self::$testGroupId, self::$testUser3Id]);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('joinGroup not available: ' . $e->getMessage());
-        }
+        // Cleanup
+        Database::query("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", [self::$testGroupId, self::$testUser3Id]);
     }
 
     public function testLeaveGroupReturnsTrueForMember(): void
     {
-        try {
-            // First join
-            GroupService::joinGroup(self::$testGroupId, self::$testUser2Id);
+        // First join
+        GroupService::join(self::$testGroupId, self::$testUser2Id);
 
-            // Then leave
-            $result = GroupService::leaveGroup(self::$testGroupId, self::$testUser2Id);
+        // Then leave - returns bool
+        $result = GroupService::leave(self::$testGroupId, self::$testUser2Id);
 
-            $this->assertTrue($result);
+        $this->assertTrue($result);
 
-            // Cleanup
-            Database::query("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", [self::$testGroupId, self::$testUser2Id]);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('leaveGroup not available: ' . $e->getMessage());
-        }
+        // Cleanup
+        Database::query("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", [self::$testGroupId, self::$testUser2Id]);
     }
 
     public function testLeaveGroupReturnsFalseForNonMember(): void
     {
-        try {
-            $result = GroupService::leaveGroup(self::$testGroupId, self::$testUser3Id);
+        $result = GroupService::leave(self::$testGroupId, self::$testUser3Id);
 
-            $this->assertFalse($result);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('leaveGroup not available: ' . $e->getMessage());
-        }
+        $this->assertFalse($result);
     }
 
     // ==========================================
@@ -366,45 +356,39 @@ class GroupServiceTest extends DatabaseTestCase
 
     public function testGetMembersReturnsValidStructure(): void
     {
-        try {
-            $result = GroupService::getMembers(self::$testGroupId);
+        // getMembers returns paginated structure, not flat array
+        $result = GroupService::getMembers(self::$testGroupId);
 
-            $this->assertIsArray($result);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('getMembers not available: ' . $e->getMessage());
-        }
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('items', $result);
+        $this->assertArrayHasKey('has_more', $result);
+        $this->assertIsArray($result['items']);
     }
 
     public function testGetMembersIncludesOwner(): void
     {
-        try {
-            $result = GroupService::getMembers(self::$testGroupId);
+        $result = GroupService::getMembers(self::$testGroupId);
 
-            $ownerFound = false;
-            foreach ($result as $member) {
-                if ($member['user_id'] == self::$testUserId) {
-                    $ownerFound = true;
-                    $this->assertEquals('owner', $member['role']);
-                    break;
-                }
+        $ownerFound = false;
+        foreach ($result['items'] as $member) {
+            // getMembers returns 'id' (user_id), not 'user_id' field
+            if ($member['id'] == self::$testUserId) {
+                $ownerFound = true;
+                $this->assertEquals('owner', $member['role']);
+                break;
             }
-
-            $this->assertTrue($ownerFound, 'Owner should be in members list');
-        } catch (\Exception $e) {
-            $this->markTestSkipped('getMembers not available: ' . $e->getMessage());
         }
+
+        $this->assertTrue($ownerFound, 'Owner should be in members list');
     }
 
-    public function testGetMembersFiltersByStatus(): void
+    public function testGetMembersFiltersByRole(): void
     {
-        try {
-            $result = GroupService::getMembers(self::$testGroupId, ['status' => 'active']);
+        // getMembers filters by 'role', not 'status'
+        $result = GroupService::getMembers(self::$testGroupId, ['role' => 'owner']);
 
-            foreach ($result as $member) {
-                $this->assertEquals('active', $member['status']);
-            }
-        } catch (\Exception $e) {
-            $this->markTestSkipped('getMembers not available: ' . $e->getMessage());
+        foreach ($result['items'] as $member) {
+            $this->assertEquals('owner', $member['role']);
         }
     }
 
@@ -414,31 +398,23 @@ class GroupServiceTest extends DatabaseTestCase
 
     public function testPromoteMemberReturnsTrueForOwner(): void
     {
-        try {
-            // Add a member first
-            GroupService::joinGroup(self::$testGroupId, self::$testUser2Id);
+        // Add a member first
+        GroupService::join(self::$testGroupId, self::$testUser2Id);
 
-            // Promote them (owner promoting)
-            $result = GroupService::promoteMember(self::$testGroupId, self::$testUser2Id, self::$testUserId);
+        // updateMemberRole(groupId, targetUserId, actingUserId, role)
+        $result = GroupService::updateMemberRole(self::$testGroupId, self::$testUser2Id, self::$testUserId, 'admin');
 
-            $this->assertTrue($result);
+        $this->assertTrue($result);
 
-            // Cleanup
-            Database::query("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", [self::$testGroupId, self::$testUser2Id]);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('promoteMember not available: ' . $e->getMessage());
-        }
+        // Cleanup
+        Database::query("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", [self::$testGroupId, self::$testUser2Id]);
     }
 
     public function testPromoteMemberReturnsFalseForNonOwner(): void
     {
-        try {
-            // User 3 trying to promote (not owner)
-            $result = GroupService::promoteMember(self::$testGroupId, self::$testUser2Id, self::$testUser3Id);
+        // User 3 trying to promote (not owner)
+        $result = GroupService::updateMemberRole(self::$testGroupId, self::$testUser2Id, self::$testUser3Id, 'admin');
 
-            $this->assertFalse($result);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('promoteMember not available: ' . $e->getMessage());
-        }
+        $this->assertFalse($result);
     }
 }
