@@ -267,6 +267,13 @@ $router->add('GET', '/api/v2/users', function () {
 
     $users = \Nexus\Core\Database::query($sql, $params)->fetchAll();
 
+    // Convert numeric fields from strings to numbers
+    foreach ($users as &$user) {
+        $user['rating'] = $user['rating'] ? (float)$user['rating'] : null;
+        $user['total_hours_given'] = (int)$user['total_hours_given'];
+    }
+    unset($user); // Break reference
+
     echo json_encode([
         'data' => $users,
         'meta' => [
