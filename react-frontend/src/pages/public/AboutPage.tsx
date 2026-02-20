@@ -363,7 +363,7 @@ export function AboutPage() {
                     <p key={c.name} className="text-theme-primary font-medium mb-4">{c.name}</p>
                   ))}
 
-                  <h4 className="text-sm font-semibold text-theme-muted mb-2">Founders of hOUR Timebank CLC</h4>
+                  <h4 className="text-sm font-semibold text-theme-muted mb-2">Founders of hOUR Timebank CLG</h4>
                   <ul className="space-y-1 text-sm text-theme-muted">
                     {contributors.filter(c => c.type === 'creator' || c.type === 'founder').map(c => (
                       <li key={c.name}>{c.name}</li>

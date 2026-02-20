@@ -127,7 +127,8 @@ services:
     build:
       context: ./react-frontend
       dockerfile: Dockerfile
-    container_name: nexus-react-prod
+    image: nexus-react-dev:latest
+    container_name: nexus-react-dev
     restart: unless-stopped
     ports:
       - "5173:5173"
