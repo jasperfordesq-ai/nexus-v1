@@ -51,6 +51,7 @@ import {
   X,
   BarChart3,
   Check,
+  Star,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
@@ -79,13 +80,19 @@ interface FeedItem {
     avatar_url?: string;
   };
   created_at: string;
-  type: 'post' | 'listing' | 'event' | 'poll' | 'goal';
+  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review';
   likes_count: number;
   comments_count: number;
   is_liked: boolean;
   image_url?: string;
   // Poll data (loaded lazily for poll-type items)
   poll_data?: PollData;
+  // Review data
+  rating?: number;
+  receiver?: {
+    id: number;
+    name: string;
+  };
 }
 
 interface PollData {
@@ -950,6 +957,7 @@ function FeedCard({
     event: 'Event',
     poll: 'Poll',
     goal: 'Goal',
+    review: 'Review',
   }[item.type];
 
   const typeColor = {
@@ -958,6 +966,7 @@ function FeedCard({
     event: 'success',
     poll: 'warning',
     goal: 'secondary',
+    review: 'warning',
   }[item.type] as 'default' | 'primary' | 'success' | 'warning' | 'secondary';
 
   // Load poll data for poll-type items
@@ -1210,6 +1219,35 @@ function FeedCard({
               </p>
             </div>
           ) : null}
+        </div>
+      )}
+
+      {/* Review Display */}
+      {item.type === 'review' && item.rating && item.receiver && (
+        <div className="mb-3 p-4 rounded-lg bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-theme-muted">Reviewed</span>
+              <Link
+                to={tenantPath(`/profile/${item.receiver.id}`)}
+                className="text-sm font-medium text-theme-primary hover:text-indigo-600 dark:hover:text-indigo-400"
+              >
+                {item.receiver.name}
+              </Link>
+            </div>
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`w-4 h-4 ${star <= item.rating! ? 'text-amber-400 fill-amber-400' : 'text-theme-muted'}`}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+          </div>
+          {item.content && (
+            <p className="text-sm text-theme-secondary italic">"{item.content}"</p>
+          )}
         </div>
       )}
 

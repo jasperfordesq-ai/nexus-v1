@@ -37,6 +37,7 @@ import {
   MessageCircle,
   UserPlus,
   Award,
+  Star,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -611,6 +612,11 @@ export function DashboardPage() {
               </GlassCard>
             </motion.div>
 
+            {/* Pending Reviews */}
+            <motion.div variants={itemVariants}>
+              <PendingReviewsCard />
+            </motion.div>
+
             {/* Suggested Matches */}
             {hasListingsModule && (
               <motion.div variants={itemVariants}>
@@ -967,6 +973,114 @@ function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
       <span className="text-indigo-600 dark:text-indigo-400">{icon}</span>
       <span>{label}</span>
     </Link>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pending Reviews Card
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface PendingReview {
+  id: number;
+  amount: number;
+  description: string;
+  created_at: string;
+  direction: 'sent' | 'received';
+  other_party_name: string;
+  other_party_id: number;
+}
+
+function PendingReviewsCard() {
+  const { tenantPath } = useTenant();
+  const [pending, setPending] = useState<PendingReview[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPending = async () => {
+      try {
+        const response = await api.get<{ local: PendingReview[]; federated: any[]; total_pending: number }>('/v2/reviews/pending');
+        const data = 'data' in response ? response.data : response;
+        if (data?.local) {
+          setPending(data.local.slice(0, 3)); // Show max 3
+        }
+      } catch (error) {
+        logError('Failed to fetch pending reviews', { error });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPending();
+  }, []);
+
+  if (loading) {
+    return (
+      <GlassCard className="p-6">
+        <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+          <Star className="w-5 h-5 text-amber-500" aria-hidden="true" />
+          Pending Reviews
+        </h2>
+        <div className="animate-pulse space-y-3">
+          {[1, 2].map((i) => (
+            <div key={i} className="h-16 bg-theme-elevated rounded-lg" />
+          ))}
+        </div>
+      </GlassCard>
+    );
+  }
+
+  if (pending.length === 0) {
+    return null; // Don't show card if no pending reviews
+  }
+
+  return (
+    <GlassCard className="p-6">
+      <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+        <Star className="w-5 h-5 text-amber-500" aria-hidden="true" />
+        Pending Reviews
+        <Chip size="sm" color="warning" variant="flat" className="ml-auto">
+          {pending.length}
+        </Chip>
+      </h2>
+
+      <div className="space-y-3">
+        {pending.map((review) => (
+          <Link
+            key={review.id}
+            to={tenantPath(`/profile/${review.other_party_id}`)}
+            className="block p-3 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors group"
+          >
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <span className="text-sm font-medium text-theme-primary group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                {review.other_party_name}
+              </span>
+              <span className="text-xs text-theme-subtle">
+                {formatRelativeTime(review.created_at)}
+              </span>
+            </div>
+            <p className="text-xs text-theme-subtle line-clamp-1">
+              {review.description}
+            </p>
+            <div className="flex items-center gap-1 mt-2">
+              <Chip size="sm" variant="flat" color={review.direction === 'sent' ? 'primary' : 'success'} className="text-[10px]">
+                {review.direction === 'sent' ? 'Sent' : 'Received'} {review.amount}h
+              </Chip>
+              <span className="text-xs text-amber-600 dark:text-amber-400 ml-auto flex items-center gap-1">
+                <Star className="w-3 h-3" aria-hidden="true" />
+                Review
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <Link
+        to={tenantPath('/wallet')}
+        className="block mt-4 text-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm"
+      >
+        View All Transactions <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
+      </Link>
+    </GlassCard>
   );
 }
 

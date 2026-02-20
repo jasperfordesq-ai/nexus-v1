@@ -45,6 +45,7 @@ import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
+import { ReviewModal } from '@/components/reviews';
 import { useAuth, useFeature, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -96,6 +97,7 @@ export function ProfilePage() {
   const [isLoadingReviews, setIsLoadingReviews] = useState(false);
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
   const [reviewsAvailable, setReviewsAvailable] = useState(true);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const isOwnProfile = !id || (currentUser && id === currentUser.id.toString());
   const profileId = id || currentUser?.id?.toString();
@@ -182,7 +184,7 @@ export function ProfilePage() {
 
     try {
       setIsLoadingReviews(true);
-      const response = await api.get<Review[]>(`/v2/users/${profileId}/reviews`);
+      const response = await api.get<Review[]>(`/v2/reviews/user/${profileId}`);
 
       if (response.success && response.data) {
         setReviews(response.data);
@@ -451,6 +453,17 @@ export function ProfilePage() {
                           : connectionStatus === 'pending_received'
                           ? 'Accept'
                           : 'Connect'}
+                      </Button>
+                    )}
+                    {/* Write Review */}
+                    {isAuthenticated && hasReviews && (
+                      <Button
+                        variant="flat"
+                        className="bg-amber-500/20 text-amber-600 dark:text-amber-400"
+                        startContent={<Star className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => setIsReviewModalOpen(true)}
+                      >
+                        Write Review
                       </Button>
                     )}
                     {/* Send credits */}
@@ -815,6 +828,21 @@ export function ProfilePage() {
           )}
         </div>
       </motion.div>
+
+      {/* Review Modal */}
+      {profile && (
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          onSuccess={() => {
+            setReviewsLoaded(false);
+            loadReviews();
+          }}
+          receiverId={profile.id}
+          receiverName={profile.name}
+          receiverAvatar={profile.avatar_url || ''}
+        />
+      )}
     </motion.div>
   );
 }
