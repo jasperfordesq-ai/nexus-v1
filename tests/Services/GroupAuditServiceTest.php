@@ -114,7 +114,8 @@ class GroupAuditServiceTest extends DatabaseTestCase
         );
 
         $this->assertNotNull($logId);
-        $this->assertIsInt($logId);
+        // log() returns via Database::lastInsertId() which may be string
+        $this->assertIsNumeric($logId);
 
         // Cleanup
         Database::query("DELETE FROM group_audit_log WHERE id = ?", [$logId]);
@@ -162,13 +163,13 @@ class GroupAuditServiceTest extends DatabaseTestCase
     // Get Logs Tests
     // ==========================================
 
-    public function testGetLogsForGroupReturnsArray(): void
+    public function testGetGroupLogReturnsArray(): void
     {
-        $logs = GroupAuditService::getLogsForGroup(self::$testGroupId);
+        $logs = GroupAuditService::getGroupLog(self::$testGroupId);
         $this->assertIsArray($logs);
     }
 
-    public function testGetLogsForGroupFiltersbyAction(): void
+    public function testGetGroupLogFiltersByAction(): void
     {
         // Create test log
         $logId = GroupAuditService::log(
@@ -177,7 +178,7 @@ class GroupAuditServiceTest extends DatabaseTestCase
             self::$testUserId
         );
 
-        $logs = GroupAuditService::getLogsForGroup(
+        $logs = GroupAuditService::getGroupLog(
             self::$testGroupId,
             ['action' => GroupAuditService::ACTION_GROUP_UPDATED]
         );
@@ -191,12 +192,12 @@ class GroupAuditServiceTest extends DatabaseTestCase
     }
 
     // ==========================================
-    // Get Logs For User Tests
+    // Get User Activity Tests
     // ==========================================
 
-    public function testGetLogsForUserReturnsArray(): void
+    public function testGetUserGroupActivityReturnsArray(): void
     {
-        $logs = GroupAuditService::getLogsForUser(self::$testUserId);
+        $logs = GroupAuditService::getUserGroupActivity(self::$testGroupId, self::$testUserId);
         $this->assertIsArray($logs);
     }
 
@@ -204,9 +205,9 @@ class GroupAuditServiceTest extends DatabaseTestCase
     // Statistics Tests
     // ==========================================
 
-    public function testGetStatisticsReturnsArray(): void
+    public function testGetActivitySummaryReturnsArray(): void
     {
-        $stats = GroupAuditService::getStatistics(self::$testGroupId);
+        $stats = GroupAuditService::getActivitySummary(self::$testGroupId);
         $this->assertIsArray($stats);
     }
 }

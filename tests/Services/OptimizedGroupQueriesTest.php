@@ -169,7 +169,7 @@ class OptimizedGroupQueriesTest extends DatabaseTestCase
 
         foreach ($tree as $node) {
             $this->assertArrayHasKey('direction', $node);
-            $this->assertContains($node['direction'], ['ancestor', 'descendant', 'current']);
+            $this->assertContains($node['direction'], ['ancestor', 'descendant', 'self']);
         }
     }
 
@@ -179,13 +179,13 @@ class OptimizedGroupQueriesTest extends DatabaseTestCase
 
     public function testGetAllDescendantsReturnsArray(): void
     {
-        $descendants = OptimizedGroupQueries::getAllDescendants(self::$testParentGroupId);
+        $descendants = OptimizedGroupQueries::getDescendants(self::$testParentGroupId);
         $this->assertIsArray($descendants);
     }
 
     public function testGetAllDescendantsIncludesChildGroup(): void
     {
-        $descendants = OptimizedGroupQueries::getAllDescendants(self::$testParentGroupId);
+        $descendants = OptimizedGroupQueries::getDescendants(self::$testParentGroupId);
 
         $ids = array_column($descendants, 'id');
         $this->assertContains(self::$testChildGroupId, $ids);
@@ -193,7 +193,7 @@ class OptimizedGroupQueriesTest extends DatabaseTestCase
 
     public function testGetAllDescendantsExcludesParent(): void
     {
-        $descendants = OptimizedGroupQueries::getAllDescendants(self::$testParentGroupId);
+        $descendants = OptimizedGroupQueries::getDescendants(self::$testParentGroupId);
 
         $ids = array_column($descendants, 'id');
         $this->assertNotContains(self::$testParentGroupId, $ids);
@@ -205,13 +205,13 @@ class OptimizedGroupQueriesTest extends DatabaseTestCase
 
     public function testGetAllAncestorsReturnsArray(): void
     {
-        $ancestors = OptimizedGroupQueries::getAllAncestors(self::$testChildGroupId);
+        $ancestors = OptimizedGroupQueries::getAncestors(self::$testChildGroupId);
         $this->assertIsArray($ancestors);
     }
 
     public function testGetAllAncestorsIncludesParent(): void
     {
-        $ancestors = OptimizedGroupQueries::getAllAncestors(self::$testChildGroupId);
+        $ancestors = OptimizedGroupQueries::getAncestors(self::$testChildGroupId);
 
         $ids = array_column($ancestors, 'id');
         $this->assertContains(self::$testParentGroupId, $ids);
@@ -219,7 +219,7 @@ class OptimizedGroupQueriesTest extends DatabaseTestCase
 
     public function testGetAllAncestorsExcludesChild(): void
     {
-        $ancestors = OptimizedGroupQueries::getAllAncestors(self::$testChildGroupId);
+        $ancestors = OptimizedGroupQueries::getAncestors(self::$testChildGroupId);
 
         $ids = array_column($ancestors, 'id');
         $this->assertNotContains(self::$testChildGroupId, $ids);

@@ -120,8 +120,8 @@ class GroupModerationServiceTest extends DatabaseTestCase
         );
 
         $this->assertNotNull($flagId);
-        $this->assertIsInt($flagId);
-        self::$testFlagId = $flagId;
+        $this->assertIsNumeric($flagId);
+        self::$testFlagId = (int)$flagId;
     }
 
     public function testFlagContentStoresAllDetails(): void
@@ -193,12 +193,11 @@ class GroupModerationServiceTest extends DatabaseTestCase
         $this->assertIsArray($flags);
     }
 
-    public function testGetFlagsForContentReturnsArray(): void
+    public function testGetPendingFlagsFiltersByContentType(): void
     {
-        $flags = GroupModerationService::getFlagsForContent(
-            GroupModerationService::CONTENT_GROUP,
-            self::$testGroupId
-        );
+        $flags = GroupModerationService::getPendingFlags([
+            'content_type' => GroupModerationService::CONTENT_GROUP
+        ]);
 
         $this->assertIsArray($flags);
     }
@@ -207,9 +206,9 @@ class GroupModerationServiceTest extends DatabaseTestCase
     // Statistics Tests
     // ==========================================
 
-    public function testGetModerationStatsReturnsArray(): void
+    public function testGetStatisticsReturnsArray(): void
     {
-        $stats = GroupModerationService::getModerationStats();
+        $stats = GroupModerationService::getStatistics();
         $this->assertIsArray($stats);
     }
 }

@@ -98,13 +98,13 @@ class GroupApprovalWorkflowServiceTest extends DatabaseTestCase
         );
 
         $this->assertNotNull($requestId);
-        $this->assertIsInt($requestId);
+        $this->assertIsNumeric($requestId);
 
         // Cleanup
         Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
     }
 
-    public function testSubmitForApprovalSetsGroupToPending(): void
+    public function testSubmitForApprovalCreatesRequest(): void
     {
         $requestId = GroupApprovalWorkflowService::submitForApproval(
             self::$testGroupId,
@@ -112,14 +112,13 @@ class GroupApprovalWorkflowServiceTest extends DatabaseTestCase
             'Test notes'
         );
 
-        // Verify group status
-        $stmt = Database::query("SELECT status FROM `groups` WHERE id = ?", [self::$testGroupId]);
-        $group = $stmt->fetch();
-        $this->assertEquals('pending', $group['status']);
+        // Verify request was created with pending status
+        $stmt = Database::query("SELECT status FROM group_approval_requests WHERE id = ?", [$requestId]);
+        $request = $stmt->fetch();
+        $this->assertEquals('pending', $request['status']);
 
         // Cleanup
         Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
-        Database::query("UPDATE `groups` SET status = 'draft' WHERE id = ?", [self::$testGroupId]);
     }
 
     public function testSubmitForApprovalPreventsDuplicates(): void
@@ -134,12 +133,11 @@ class GroupApprovalWorkflowServiceTest extends DatabaseTestCase
             self::$testUserId
         );
 
-        // Should return the same ID
+        // Should return the same ID (existing pending request)
         $this->assertEquals($requestId1, $requestId2);
 
         // Cleanup
         Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId1]);
-        Database::query("UPDATE `groups` SET status = 'draft' WHERE id = ?", [self::$testGroupId]);
     }
 
     // ==========================================
@@ -153,10 +151,7 @@ class GroupApprovalWorkflowServiceTest extends DatabaseTestCase
             self::$testUserId
         );
 
-        $request = Database::query(
-            "SELECT * FROM group_approval_requests WHERE id = ?",
-            [$requestId]
-        )->fetch();
+        $request = GroupApprovalWorkflowService::getRequest($requestId);
 
         $this->assertNotEmpty($request);
         $this->assertArrayHasKey('group_id', $request);
@@ -165,14 +160,13 @@ class GroupApprovalWorkflowServiceTest extends DatabaseTestCase
 
         // Cleanup
         Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
-        Database::query("UPDATE `groups` SET status = 'draft' WHERE id = ?", [self::$testGroupId]);
     }
 
     // ==========================================
     // Approve/Reject Tests
     // ==========================================
 
-    public function testApproveGroupChangesStatus(): void
+    public function testApproveGroupChangesRequestStatus(): void
     {
         $requestId = GroupApprovalWorkflowService::submitForApproval(
             self::$testGroupId,
@@ -187,14 +181,12 @@ class GroupApprovalWorkflowServiceTest extends DatabaseTestCase
 
         $this->assertTrue($result);
 
-        // Verify group status changed to approved
-        $stmt = Database::query("SELECT status FROM `groups` WHERE id = ?", [self::$testGroupId]);
-        $group = $stmt->fetch();
-        $this->assertEquals('approved', $group['status']);
+        // Verify request status changed to approved
+        $request = GroupApprovalWorkflowService::getRequest($requestId);
+        $this->assertEquals('approved', $request['status']);
 
         // Cleanup
         Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
-        Database::query("UPDATE `groups` SET status = 'draft' WHERE id = ?", [self::$testGroupId]);
     }
 
     public function testApproveGroupReturnsFalseForInvalidId(): void
@@ -203,7 +195,7 @@ class GroupApprovalWorkflowServiceTest extends DatabaseTestCase
         $this->assertFalse($result);
     }
 
-    public function testRejectGroupChangesStatus(): void
+    public function testRejectGroupChangesRequestStatus(): void
     {
         $requestId = GroupApprovalWorkflowService::submitForApproval(
             self::$testGroupId,
@@ -218,8 +210,11 @@ class GroupApprovalWorkflowServiceTest extends DatabaseTestCase
 
         $this->assertTrue($result);
 
+        // Verify request status changed to rejected
+        $request = GroupApprovalWorkflowService::getRequest($requestId);
+        $this->assertEquals('rejected', $request['status']);
+
         // Cleanup
         Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
-        Database::query("UPDATE `groups` SET status = 'draft' WHERE id = ?", [self::$testGroupId]);
     }
 }

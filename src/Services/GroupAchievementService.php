@@ -189,7 +189,10 @@ class GroupAchievementService
     public static function getEarnedAchievements($groupId)
     {
         $results = Database::query(
-            "SELECT * FROM group_achievements WHERE group_id = ?",
+            "SELECT gap.*, ga.achievement_key, ga.name, ga.description, ga.icon
+             FROM group_achievement_progress gap
+             JOIN group_achievements ga ON gap.achievement_id = ga.id
+             WHERE gap.group_id = ? AND gap.completed_at IS NOT NULL",
             [$groupId]
         )->fetchAll();
 
@@ -234,12 +237,21 @@ class GroupAchievementService
     {
         $tenantId = TenantContext::getId();
 
-        // Record the achievement
-        Database::query(
-            "INSERT IGNORE INTO group_achievements (tenant_id, group_id, achievement_key, earned_at)
-             VALUES (?, ?, ?, NOW())",
-            [$tenantId, $groupId, $achievementKey]
-        );
+        // Find the achievement definition
+        $achievementDef = Database::query(
+            "SELECT id FROM group_achievements WHERE tenant_id = ? AND achievement_key = ?",
+            [$tenantId, $achievementKey]
+        )->fetch();
+
+        if ($achievementDef) {
+            // Record progress as completed
+            Database::query(
+                "INSERT INTO group_achievement_progress (group_id, achievement_id, current_count, completed_at)
+                 VALUES (?, ?, ?, NOW())
+                 ON DUPLICATE KEY UPDATE completed_at = NOW(), current_count = ?",
+                [$groupId, $achievementDef['id'], $achievement['target_value'], $achievement['target_value']]
+            );
+        }
 
         // Get group members to distribute XP
         $members = Database::query(
@@ -316,11 +328,11 @@ class GroupAchievementService
         $tenantId = TenantContext::getId();
 
         return Database::query(
-            "SELECT g.id, g.name, g.photo,
-                    COUNT(ga.id) as achievement_count,
+            "SELECT g.id, g.name, g.image_url,
+                    COUNT(gap.id) as achievement_count,
                     (SELECT COUNT(*) FROM group_members WHERE group_id = g.id AND status = 'approved') as member_count
-             FROM groups g
-             LEFT JOIN group_achievements ga ON g.id = ga.group_id
+             FROM `groups` g
+             LEFT JOIN group_achievement_progress gap ON g.id = gap.group_id AND gap.completed_at IS NOT NULL
              WHERE g.tenant_id = ?
              GROUP BY g.id
              ORDER BY achievement_count DESC, member_count DESC

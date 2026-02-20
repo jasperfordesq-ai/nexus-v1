@@ -2193,16 +2193,24 @@ DROP TABLE IF EXISTS `group_content_flags`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `group_content_flags` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `content_type` varchar(50) NOT NULL,
+  `content_id` int(11) NOT NULL,
+  `reported_by` int(11) NOT NULL,
+  `reason` varchar(50) NOT NULL,
+  `description` text DEFAULT NULL,
+  `status` varchar(20) DEFAULT 'pending',
+  `moderated_by` int(11) DEFAULT NULL,
+  `moderation_action` varchar(50) DEFAULT NULL,
+  `moderator_notes` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `banned_until` varchar(255) DEFAULT NULL,
-  `moderated_by` timestamp NULL DEFAULT NULL,
-  `moderation_action` timestamp NULL DEFAULT NULL,
-  `moderator_notes` timestamp NULL DEFAULT NULL,
-  `reported_by` varchar(255) DEFAULT NULL,
   `resolved_at` timestamp NULL DEFAULT NULL,
-  `tenant_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `banned_until` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_tenant_status` (`tenant_id`,`status`),
+  KEY `idx_content` (`content_type`,`content_id`),
+  KEY `idx_reporter` (`tenant_id`,`reported_by`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_discussion_messages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2497,25 +2505,30 @@ DROP TABLE IF EXISTS `group_user_bans`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `group_user_bans` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `banned_by` varchar(255) DEFAULT NULL,
-  `banned_until` varchar(255) DEFAULT NULL,
-  `resolved_at` timestamp NULL DEFAULT NULL,
-  `tenant_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `tenant_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `banned_by` int(11) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `banned_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `banned_until` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_tenant_user_ban` (`tenant_id`,`user_id`),
+  KEY `idx_tenant_user` (`tenant_id`,`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_user_warnings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `group_user_warnings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `warned_by` int(11) NOT NULL,
+  `reason` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `banned_until` varchar(255) DEFAULT NULL,
-  `resolved_at` timestamp NULL DEFAULT NULL,
-  `tenant_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  PRIMARY KEY (`id`),
+  KEY `idx_tenant_user` (`tenant_id`,`user_id`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_views`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

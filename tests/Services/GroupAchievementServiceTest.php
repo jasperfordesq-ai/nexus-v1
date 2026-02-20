@@ -125,8 +125,8 @@ class GroupAchievementServiceTest extends DatabaseTestCase
         $achievements = GroupAchievementService::getGroupAchievements(self::$testGroupId);
 
         foreach ($achievements as $achievement) {
-            $this->assertArrayHasKey('progress', $achievement);
-            $this->assertArrayHasKey('target', $achievement);
+            $this->assertArrayHasKey('progress_percent', $achievement);
+            $this->assertArrayHasKey('target_value', $achievement);
             $this->assertArrayHasKey('earned', $achievement);
         }
     }
@@ -146,7 +146,7 @@ class GroupAchievementServiceTest extends DatabaseTestCase
     // Calculate Progress Tests
     // ==========================================
 
-    public function testCalculateProgressReturnsnumeric(): void
+    public function testCalculateProgressReturnsArray(): void
     {
         $progress = GroupAchievementService::calculateProgress(
             self::$testGroupId,
@@ -154,8 +154,10 @@ class GroupAchievementServiceTest extends DatabaseTestCase
             50
         );
 
-        $this->assertIsNumeric($progress);
-        $this->assertGreaterThanOrEqual(0, $progress);
+        $this->assertIsArray($progress);
+        $this->assertArrayHasKey('current', $progress);
+        $this->assertArrayHasKey('percent', $progress);
+        $this->assertGreaterThanOrEqual(0, $progress['current']);
     }
 
     public function testCalculateProgressHandlesZeroTarget(): void
@@ -166,7 +168,8 @@ class GroupAchievementServiceTest extends DatabaseTestCase
             0
         );
 
-        $this->assertIsNumeric($progress);
+        $this->assertIsArray($progress);
+        $this->assertEquals(0, $progress['percent']);
     }
 
     // ==========================================
@@ -181,53 +184,55 @@ class GroupAchievementServiceTest extends DatabaseTestCase
 
     public function testAwardAchievementCreatesRecord(): void
     {
+        $achievement = GroupAchievementService::GROUP_ACHIEVEMENTS['community_builders'];
         $result = GroupAchievementService::awardAchievement(
             self::$testGroupId,
-            'community_builders'
+            'community_builders',
+            $achievement
         );
 
-        if ($result) {
-            $this->assertIsInt($result);
+        $this->assertTrue($result);
 
-            // Cleanup
-            Database::query(
-                "DELETE FROM group_achievements WHERE id = ?",
-                [$result]
-            );
-        }
-        $this->assertTrue(true);
+        // Cleanup
+        Database::query(
+            "DELETE FROM group_achievement_progress WHERE group_id = ?",
+            [self::$testGroupId]
+        );
     }
 
     public function testAwardAchievementPreventsDuplicates(): void
     {
+        $achievement = GroupAchievementService::GROUP_ACHIEVEMENTS['community_builders'];
         $result1 = GroupAchievementService::awardAchievement(
             self::$testGroupId,
-            'community_builders'
+            'community_builders',
+            $achievement
         );
 
         $result2 = GroupAchievementService::awardAchievement(
             self::$testGroupId,
-            'community_builders'
+            'community_builders',
+            $achievement
         );
 
-        // Second award should be ignored or return same ID
-        if ($result1) {
-            // Cleanup
-            Database::query(
-                "DELETE FROM group_achievements WHERE id = ?",
-                [$result1]
-            );
-        }
-        $this->assertTrue(true);
+        // Both calls should succeed (ON DUPLICATE KEY UPDATE)
+        $this->assertTrue($result1);
+        $this->assertTrue($result2);
+
+        // Cleanup
+        Database::query(
+            "DELETE FROM group_achievement_progress WHERE group_id = ?",
+            [self::$testGroupId]
+        );
     }
 
     // ==========================================
     // Check Achievements Tests
     // ==========================================
 
-    public function testCheckAchievementsReturnsArray(): void
+    public function testCheckAndAwardAchievementsReturnsArray(): void
     {
-        $newAchievements = GroupAchievementService::checkAchievements(self::$testGroupId);
+        $newAchievements = GroupAchievementService::checkAndAwardAchievements(self::$testGroupId);
         $this->assertIsArray($newAchievements);
     }
 }
