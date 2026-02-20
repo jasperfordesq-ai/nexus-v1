@@ -1441,4 +1441,185 @@ HTML;
             'alertBox' => '',
         ];
     }
+
+    /**
+     * Send review received email to a user
+     * Called directly from ReviewsApiController after a review is created.
+     *
+     * @param int $receiverUserId The user who received the review
+     * @param string $reviewerName Name of the person who left the review
+     * @param int $rating Star rating (1-5)
+     * @param string|null $comment Review comment text
+     * @param bool $isAnonymous Whether the reviewer chose to be anonymous
+     */
+    public static function sendReviewEmail(int $receiverUserId, string $reviewerName, int $rating, ?string $comment = null, bool $isAnonymous = false): void
+    {
+        try {
+            $user = Database::query(
+                "SELECT email, name, first_name FROM users WHERE id = ?",
+                [$receiverUserId]
+            )->fetch();
+
+            if (!$user || empty($user['email'])) {
+                return;
+            }
+
+            $recipientName = $user['first_name'] ?? $user['name'] ?? 'there';
+            $tenantName = \Nexus\Core\TenantContext::getSetting('site_name', 'Project NEXUS');
+            $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+            $basePath = \Nexus\Core\TenantContext::getBasePath();
+            $profileUrl = $baseUrl . $basePath . '/profile?id=' . $receiverUserId;
+
+            $displayName = $isAnonymous ? 'Someone' : htmlspecialchars($reviewerName);
+            $subject = "{$displayName} left you a {$rating}-star review on {$tenantName}";
+
+            $emailBody = self::buildReviewReceivedEmail(
+                htmlspecialchars($recipientName),
+                $displayName,
+                $rating,
+                $comment ? htmlspecialchars($comment) : null,
+                $profileUrl,
+                htmlspecialchars($tenantName)
+            );
+
+            $mailer = new \Nexus\Core\Mailer();
+            $mailer->send($user['email'], $subject, $emailBody);
+        } catch (\Exception $e) {
+            error_log("NotificationDispatcher::sendReviewEmail failed: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Build HTML email for review received notification
+     */
+    private static function buildReviewReceivedEmail(string $recipientName, string $reviewerName, int $rating, ?string $comment, string $profileUrl, string $tenantName): string
+    {
+        // Build star display
+        $stars = str_repeat('&#9733;', $rating) . str_repeat('&#9734;', 5 - $rating);
+        $starColor = $rating >= 4 ? '#f59e0b' : ($rating >= 3 ? '#6b7280' : '#ef4444');
+
+        // Comment block
+        $commentHtml = '';
+        if ($comment) {
+            $commentHtml = <<<COMMENT
+                    <tr>
+                        <td style="padding: 0 24px 24px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <p style="margin: 0 0 8px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">What they said</p>
+                                        <p style="margin: 0; font-size: 16px; color: #374151; font-style: italic; line-height: 1.6;">&ldquo;{$comment}&rdquo;</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+COMMENT;
+        }
+
+        // Gradient based on rating
+        $gradient = $rating >= 4
+            ? 'linear-gradient(135deg, #f59e0b, #d97706)'
+            : ($rating >= 3
+                ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+                : 'linear-gradient(135deg, #6b7280, #4b5563)');
+
+        $emoji = $rating >= 4 ? '⭐' : ($rating >= 3 ? '📝' : '📝');
+
+        $year = date('Y');
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Review Received</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: {$gradient}; padding: 32px 24px; text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 12px;">{$emoji}</div>
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;">New Review Received!</h1>
+                            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName}</p>
+                        </td>
+                    </tr>
+
+                    <!-- Greeting -->
+                    <tr>
+                        <td style="padding: 32px 24px 16px;">
+                            <p style="margin: 0; font-size: 18px; color: #111827;">Hi {$recipientName},</p>
+                        </td>
+                    </tr>
+
+                    <!-- Main Message -->
+                    <tr>
+                        <td style="padding: 0 24px 16px;">
+                            <p style="margin: 0; font-size: 16px; color: #374151; line-height: 1.6;">
+                                <strong>{$reviewerName}</strong> has left you a review on {$tenantName}.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Star Rating -->
+                    <tr>
+                        <td style="padding: 0 24px 24px; text-align: center;">
+                            <div style="display: inline-block; padding: 16px 32px; background-color: #fffbeb; border-radius: 12px; border: 1px solid #fde68a;">
+                                <span style="font-size: 36px; color: {$starColor}; letter-spacing: 4px;">{$stars}</span>
+                                <p style="margin: 8px 0 0; font-size: 14px; color: #92400e; font-weight: 500;">{$rating} out of 5 stars</p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Comment (if provided) -->
+                    {$commentHtml}
+
+                    <!-- CTA Button -->
+                    <tr>
+                        <td style="padding: 0 24px 32px; text-align: center;">
+                            <a href="{$profileUrl}" style="display: inline-block; background: {$gradient}; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+                                View Your Profile
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Help Text -->
+                    <tr>
+                        <td style="padding: 0 24px 24px;">
+                            <p style="margin: 0; font-size: 14px; color: #6b7280; text-align: center;">
+                                Reviews help build trust in your community. Keep up the great work!
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9fafb; padding: 24px; border-top: 1px solid #e5e7eb;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <p style="margin: 0 0 8px; font-size: 14px; color: #6b7280;">
+                                            This email was sent by {$tenantName}
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                                            &copy; {$year} Project NEXUS. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+HTML;
+    }
 }

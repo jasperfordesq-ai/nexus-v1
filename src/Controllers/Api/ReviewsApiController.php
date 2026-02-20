@@ -440,9 +440,10 @@ class ReviewsApiController extends BaseApiController
             error_log("Gamification review error: " . $e->getMessage());
         }
 
-        // Notification
+        // Notification (in-app bell + email)
         $sender = User::findById($userId);
-        $content = "You received a new {$rating}-star review from {$sender['first_name']}.";
+        $senderFirstName = $sender['first_name'] ?? $sender['name'] ?? 'A member';
+        $content = "You received a new {$rating}-star review from {$senderFirstName}.";
 
         try {
             NotificationDispatcher::dispatch(
@@ -456,6 +457,18 @@ class ReviewsApiController extends BaseApiController
             );
         } catch (\Throwable $e) {
             error_log("Review notification error: " . $e->getMessage());
+        }
+
+        // Send review email immediately
+        try {
+            NotificationDispatcher::sendReviewEmail(
+                $receiverId,
+                $sender['name'] ?? $senderFirstName,
+                $rating,
+                $comment ?: null
+            );
+        } catch (\Throwable $e) {
+            error_log("Review email error: " . $e->getMessage());
         }
 
         // Return created review
