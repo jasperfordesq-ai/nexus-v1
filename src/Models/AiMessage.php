@@ -36,10 +36,13 @@ class AiMessage
             $data['model'] ?? null,
         ]);
 
+        // Capture lastInsertId BEFORE touch() — the UPDATE in touch() resets lastInsertId to 0
+        $id = (int) $db->lastInsertId();
+
         // Touch the conversation's updated_at
         AiConversation::touch($conversationId);
 
-        return (int) $db->lastInsertId();
+        return $id;
     }
 
     /**
