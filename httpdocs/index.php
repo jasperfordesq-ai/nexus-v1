@@ -249,6 +249,24 @@ if (class_exists('\Nexus\Core\Env')) {
     }
 }
 
+// 2.5 SENTRY ERROR TRACKING
+// Initialize Sentry early to catch all errors (including fatal errors)
+// Skip in development/local environments (see SentryService::init())
+if (class_exists('\Nexus\Services\SentryService')) {
+    \Nexus\Services\SentryService::init();
+
+    // Set exception handler to capture uncaught exceptions
+    set_exception_handler(function (\Throwable $exception) {
+        if (\Nexus\Services\SentryService::isEnabled()) {
+            \Nexus\Services\SentryService::captureException($exception);
+            \Nexus\Services\SentryService::flush();
+        }
+
+        // Re-throw to let existing error handlers process it
+        throw $exception;
+    });
+}
+
 // 3. BOOT APPLICATION
 use Nexus\Core\TenantContext;
 use Nexus\Core\Router;
@@ -363,6 +381,32 @@ if (isset($_GET['debug_tenant'])) {
 }
 
 TenantContext::resolve();
+
+// Set Sentry tenant context (after tenant resolution)
+if (class_exists('\Nexus\Services\SentryService') && \Nexus\Services\SentryService::isEnabled()) {
+    $tenantId = TenantContext::getId();
+    $tenant = TenantContext::get();
+    \Nexus\Services\SentryService::setTenant($tenantId, $tenant['name'] ?? null);
+
+    // Set user context if authenticated
+    if (!empty($_SESSION['user_id'])) {
+        \Nexus\Services\SentryService::setUser(
+            (int)$_SESSION['user_id'],
+            $_SESSION['user_email'] ?? null,
+            $_SESSION['user_name'] ?? null
+        );
+    }
+
+    // Add request context for API calls
+    if ($isApiRequest) {
+        \Nexus\Services\SentryService::setRequestContext([
+            'method' => $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN',
+            'uri' => $_SERVER['REQUEST_URI'] ?? '',
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
+        ]);
+    }
+}
 
 // SEO REDIRECT MIDDLEWARE: Check for 301 redirects (with loop prevention)
 \Nexus\Middleware\RedirectMiddleware::handle();

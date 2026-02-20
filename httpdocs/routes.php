@@ -440,6 +440,12 @@ $router->add('GET', '/api/v2/search', 'Nexus\Controllers\Api\SearchApiController
 $router->add('GET', '/api/v2/search/suggestions', 'Nexus\Controllers\Api\SearchApiController@suggestions');
 
 // ============================================
+// API V2 - METRICS (Performance Monitoring)
+// ============================================
+$router->add('POST', '/api/v2/metrics', 'Nexus\Controllers\Api\MetricsApiController@store');
+$router->add('GET', '/api/v2/metrics/summary', 'Nexus\Controllers\Api\MetricsApiController@summary');
+
+// ============================================
 // API V2 - POLLS (Full CRUD)
 // ============================================
 $router->add('GET', '/api/v2/polls', 'Nexus\Controllers\Api\PollsApiController@index');
@@ -649,6 +655,11 @@ $router->add('GET', '/api/v2/admin/system/cron-jobs/health', 'Nexus\Controllers\
 
 // Admin System - Activity Log
 $router->add('GET', '/api/v2/admin/system/activity-log', 'Nexus\Controllers\Api\AdminDashboardApiController@activity');
+
+// Admin System - Email
+$router->add('GET', '/api/v2/admin/email/status', 'Nexus\Controllers\Api\EmailAdminApiController@status');
+$router->add('POST', '/api/v2/admin/email/test', 'Nexus\Controllers\Api\EmailAdminApiController@test');
+$router->add('POST', '/api/v2/admin/email/test-gmail', 'Nexus\Controllers\Api\EmailAdminApiController@testGmail');
 
 // Admin Matching - Config, Stats, Cache
 $router->add('GET', '/api/v2/admin/matching/config', 'Nexus\Controllers\Api\AdminMatchingApiController@getConfig');
