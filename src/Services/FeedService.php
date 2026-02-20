@@ -230,6 +230,7 @@ class FeedService
         $items = array_merge($items, self::loadEvents($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
         $items = array_merge($items, self::loadPolls($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
         $items = array_merge($items, self::loadGoals($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadReviews($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
 
         // Sort by created_at descending
         usort($items, function ($a, $b) {
@@ -416,6 +417,55 @@ class FeedService
         $stmt->execute($params);
 
         return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load reviews
+     */
+    private static function loadReviews(?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        $sql = "
+            SELECT r.id, r.rating, r.comment as content, r.created_at, r.reviewer_id as user_id,
+                   'review' as type,
+                   COALESCE(reviewer.name, CONCAT(reviewer.first_name, ' ', reviewer.last_name)) as author_name,
+                   reviewer.avatar_url as author_avatar,
+                   COALESCE(receiver.name, CONCAT(receiver.first_name, ' ', receiver.last_name)) as receiver_name,
+                   receiver.id as receiver_id,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'review' AND target_id = r.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'review' AND target_id = r.id) as comments_count
+            FROM reviews r
+            JOIN users reviewer ON r.reviewer_id = reviewer.id
+            JOIN users receiver ON r.receiver_id = receiver.id
+            WHERE r.reviewer_tenant_id = ? AND r.status = 'approved'
+        ";
+        $params = [$tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'review') {
+            $sql .= " AND (r.created_at < ? OR (r.created_at = ? AND r.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY r.created_at DESC, r.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        $reviews = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Add rating and receiver_name to each review before formatting
+        foreach ($reviews as &$review) {
+            $review['rating'] = (int)$review['rating'];
+            $review['receiver'] = [
+                'id' => (int)$review['receiver_id'],
+                'name' => $review['receiver_name'],
+            ];
+        }
+
+        return self::formatItems($reviews, $userId);
     }
 
     /**
