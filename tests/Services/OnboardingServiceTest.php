@@ -58,8 +58,8 @@ class OnboardingServiceTest extends DatabaseTestCase
             self::$testCategoryId = (int)$category['id'];
         } else {
             Database::query(
-                "INSERT INTO categories (tenant_id, name) VALUES (?, ?)",
-                [self::$testTenantId, "Test Category {$ts}"]
+                "INSERT INTO categories (tenant_id, name, slug) VALUES (?, ?, ?)",
+                [self::$testTenantId, "Test Category {$ts}", "test-category-{$ts}"]
             );
             self::$testCategoryId = (int)Database::getInstance()->lastInsertId();
         }

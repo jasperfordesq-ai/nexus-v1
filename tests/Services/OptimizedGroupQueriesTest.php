@@ -50,16 +50,16 @@ class OptimizedGroupQueriesTest extends DatabaseTestCase
 
         // Create parent group
         Database::query(
-            "INSERT INTO `groups` (tenant_id, name, description, created_by, status, created_at)
-             VALUES (?, ?, ?, ?, 'active', NOW())",
+            "INSERT INTO `groups` (tenant_id, name, description, owner_id, created_at)
+             VALUES (?, ?, ?, ?, NOW())",
             [self::$testTenantId, "Parent Group {$ts}", 'Test parent group', self::$testUserId]
         );
         self::$testParentGroupId = (int)Database::getInstance()->lastInsertId();
 
         // Create child group (leaf group)
         Database::query(
-            "INSERT INTO `groups` (tenant_id, name, description, created_by, parent_id, status, created_at)
-             VALUES (?, ?, ?, ?, ?, 'active', NOW())",
+            "INSERT INTO `groups` (tenant_id, name, description, owner_id, parent_id, created_at)
+             VALUES (?, ?, ?, ?, ?, NOW())",
             [self::$testTenantId, "Child Group {$ts}", 'Test child group', self::$testUserId, self::$testParentGroupId]
         );
         self::$testChildGroupId = (int)Database::getInstance()->lastInsertId();

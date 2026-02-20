@@ -49,8 +49,8 @@ class GroupAchievementServiceTest extends DatabaseTestCase
 
         // Create test group
         Database::query(
-            "INSERT INTO `groups` (tenant_id, name, description, created_by, status, created_at)
-             VALUES (?, ?, ?, ?, 'active', NOW())",
+            "INSERT INTO `groups` (tenant_id, name, description, owner_id, created_at)
+             VALUES (?, ?, ?, ?, NOW())",
             [self::$testTenantId, "Achievement Group {$ts}", 'Test group for achievements', self::$testUserId]
         );
         self::$testGroupId = (int)Database::getInstance()->lastInsertId();

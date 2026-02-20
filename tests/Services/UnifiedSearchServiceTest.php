@@ -7,6 +7,8 @@
 namespace Nexus\Tests\Services;
 
 use Nexus\Services\UnifiedSearchService;
+use Nexus\Core\TenantContext;
+use Nexus\Core\Database;
 use Nexus\Tests\DatabaseTestCase;
 
 class UnifiedSearchServiceTest extends DatabaseTestCase
@@ -28,6 +30,30 @@ class UnifiedSearchServiceTest extends DatabaseTestCase
         $this->listingId = $this->createListing($this->userId, 'Gardening Services');
         $this->eventId = $this->createEvent($this->userId, 'Community Meetup');
         $this->groupId = $this->createGroup($this->userId, 'Local Gardeners');
+    }
+
+    private function createTenant(string $name): int
+    {
+        $slug = strtolower(str_replace(' ', '-', $name)) . '-' . time();
+        self::$pdo->prepare(
+            "INSERT INTO tenants (name, slug, is_active) VALUES (?, ?, 1)"
+        )->execute([$name, $slug]);
+        return (int)self::$pdo->lastInsertId();
+    }
+
+    private function setTenantContext(int $tenantId): void
+    {
+        TenantContext::setById($tenantId);
+    }
+
+    private function createUser(int $tenantId, string $email): int
+    {
+        $ts = time();
+        self::$pdo->prepare(
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, NOW())"
+        )->execute([$tenantId, $email, "user_{$ts}", 'John', 'Doe', 'John Doe']);
+        return (int)self::$pdo->lastInsertId();
     }
 
     public function testSearchReturnsListings(): void
@@ -193,41 +219,41 @@ class UnifiedSearchServiceTest extends DatabaseTestCase
 
     private function createListing(int $userId, string $title): int
     {
-        $this->db->query(
+        $stmt = self::$pdo->prepare(
             "INSERT INTO listings (tenant_id, user_id, title, description, type, status, created_at)
-             VALUES (?, ?, ?, ?, 'offer', 'active', NOW())",
-            [$this->tenantId, $userId, $title, 'Test description']
+             VALUES (?, ?, ?, ?, 'offer', 'active', NOW())"
         );
-        return (int)$this->db->lastInsertId();
+        $stmt->execute([$this->tenantId, $userId, $title, 'Test description']);
+        return (int)self::$pdo->lastInsertId();
     }
 
     private function createListingWithDesc(int $userId, string $title, string $description): int
     {
-        $this->db->query(
+        $stmt = self::$pdo->prepare(
             "INSERT INTO listings (tenant_id, user_id, title, description, type, status, created_at)
-             VALUES (?, ?, ?, ?, 'offer', 'active', NOW())",
-            [$this->tenantId, $userId, $title, $description]
+             VALUES (?, ?, ?, ?, 'offer', 'active', NOW())"
         );
-        return (int)$this->db->lastInsertId();
+        $stmt->execute([$this->tenantId, $userId, $title, $description]);
+        return (int)self::$pdo->lastInsertId();
     }
 
     private function createEvent(int $userId, string $title): int
     {
-        $this->db->query(
+        $stmt = self::$pdo->prepare(
             "INSERT INTO events (tenant_id, user_id, title, description, start_time, end_time, created_at)
-             VALUES (?, ?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), NOW())",
-            [$this->tenantId, $userId, $title, 'Test event']
+             VALUES (?, ?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), NOW())"
         );
-        return (int)$this->db->lastInsertId();
+        $stmt->execute([$this->tenantId, $userId, $title, 'Test event']);
+        return (int)self::$pdo->lastInsertId();
     }
 
     private function createGroup(int $userId, string $name): int
     {
-        $this->db->query(
-            "INSERT INTO `groups` (tenant_id, name, description, visibility, created_at)
-             VALUES (?, ?, ?, 'public', NOW())",
-            [$this->tenantId, $name, 'Test group']
+        $stmt = self::$pdo->prepare(
+            "INSERT INTO `groups` (tenant_id, owner_id, name, description, visibility, created_at)
+             VALUES (?, ?, ?, ?, 'public', NOW())"
         );
-        return (int)$this->db->lastInsertId();
+        $stmt->execute([$this->tenantId, $userId, $name, 'Test group']);
+        return (int)self::$pdo->lastInsertId();
     }
 }

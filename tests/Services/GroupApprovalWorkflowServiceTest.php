@@ -49,8 +49,8 @@ class GroupApprovalWorkflowServiceTest extends DatabaseTestCase
 
         // Create test group
         Database::query(
-            "INSERT INTO `groups` (tenant_id, name, description, created_by, status, created_at)
-             VALUES (?, ?, ?, ?, 'draft', NOW())",
+            "INSERT INTO `groups` (tenant_id, name, description, owner_id, created_at)
+             VALUES (?, ?, ?, ?, NOW())",
             [self::$testTenantId, "Test Group {$ts}", 'Test group for approval', self::$testUserId]
         );
         self::$testGroupId = (int)Database::getInstance()->lastInsertId();

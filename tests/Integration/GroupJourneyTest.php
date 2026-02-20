@@ -145,7 +145,7 @@ class GroupJourneyTest extends DatabaseTestCase
     {
         // Step 1: Create a group
         Database::query(
-            "INSERT INTO groups (tenant_id, name, description, created_by, visibility, created_at)
+            "INSERT INTO groups (tenant_id, name, description, owner_id, visibility, created_at)
              VALUES (?, ?, ?, ?, 'public', NOW())",
             [
                 self::$testTenantId,
@@ -215,7 +215,7 @@ class GroupJourneyTest extends DatabaseTestCase
     {
         // Create group with members
         Database::query(
-            "INSERT INTO groups (tenant_id, name, description, created_by, visibility, created_at)
+            "INSERT INTO groups (tenant_id, name, description, owner_id, visibility, created_at)
              VALUES (?, 'Tech Discussion', 'Technology enthusiasts', ?, 'public', NOW())",
             [self::$testTenantId, $this->groupCreatorId]
         );
@@ -295,7 +295,7 @@ class GroupJourneyTest extends DatabaseTestCase
     {
         // Create group with members
         Database::query(
-            "INSERT INTO groups (tenant_id, name, description, created_by, visibility, created_at)
+            "INSERT INTO groups (tenant_id, name, description, owner_id, visibility, created_at)
              VALUES (?, 'Hiking Club', 'Weekend hiking adventures', ?, 'public', NOW())",
             [self::$testTenantId, $this->groupCreatorId]
         );
@@ -402,7 +402,7 @@ class GroupJourneyTest extends DatabaseTestCase
     {
         // Create group with member
         Database::query(
-            "INSERT INTO groups (tenant_id, name, description, created_by, visibility, created_at)
+            "INSERT INTO groups (tenant_id, name, description, owner_id, visibility, created_at)
              VALUES (?, 'Book Club', 'Monthly book discussions', ?, 'public', NOW())",
             [self::$testTenantId, $this->groupCreatorId]
         );

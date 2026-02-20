@@ -112,6 +112,7 @@ jobs:
           DB_PASS: nexus_test
           REDIS_HOST: 127.0.0.1
           APP_ENV: testing
+          TOTP_ENCRYPTION_KEY: test-ci-totp-encryption-key-32chars!
 
       - name: PHPUnit Middleware Tests (BLOCKING)
         run: vendor/bin/phpunit --testsuite=Middleware

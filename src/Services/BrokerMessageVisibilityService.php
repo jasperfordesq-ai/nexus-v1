@@ -296,7 +296,7 @@ class BrokerMessageVisibilityService
         $stmt = Database::query(
             "SELECT id FROM user_first_contacts
              WHERE tenant_id = ?
-             AND ((user_a = ? AND user_b = ?) OR (user_a = ? AND user_b = ?))",
+             AND ((user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?))",
             [$tenantId, $senderId, $receiverId, $receiverId, $senderId]
         );
 
@@ -321,7 +321,7 @@ class BrokerMessageVisibilityService
 
         Database::query(
             "INSERT IGNORE INTO user_first_contacts
-             (tenant_id, user_a, user_b, first_message_id, created_at)
+             (tenant_id, user1_id, user2_id, first_message_id, first_contact_at)
              VALUES (?, ?, ?, ?, NOW())",
             [$tenantId, $userA, $userB, $messageId]
         );
@@ -479,7 +479,7 @@ class BrokerMessageVisibilityService
                    COALESCE(umr.messaging_disabled, 0) as messaging_disabled,
                    COALESCE(umr.under_monitoring, 0) as under_monitoring,
                    umr.restriction_reason,
-                   (SELECT COUNT(*) FROM user_first_contacts ufc WHERE ufc.user_a = u.id OR ufc.user_b = u.id) as first_contact_count
+                   (SELECT COUNT(*) FROM user_first_contacts ufc WHERE ufc.user1_id = u.id OR ufc.user2_id = u.id) as first_contact_count
             FROM users u
             LEFT JOIN user_messaging_restrictions umr ON u.id = umr.user_id AND umr.tenant_id = u.tenant_id
             WHERE u.tenant_id = ?

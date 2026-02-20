@@ -41,8 +41,8 @@ class LegalDocumentServiceTest extends DatabaseTestCase
 
         // Create a test legal document
         Database::query(
-            "INSERT INTO legal_documents (tenant_id, document_type, is_active, created_at)
-             VALUES (?, ?, 1, NOW())",
+            "INSERT INTO legal_documents (tenant_id, document_type, title, slug, is_active, created_at)
+             VALUES (?, ?, 'Terms of Service', 'terms-of-service', 1, NOW())",
             [self::$testTenantId, LegalDocumentService::TYPE_TERMS]
         );
         self::$testDocumentId = (int)Database::getInstance()->lastInsertId();

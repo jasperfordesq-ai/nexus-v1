@@ -171,7 +171,7 @@ class FederationSearchService
                 $orderBy .= "u.created_at DESC";
                 break;
             case 'active':
-                $orderBy .= "u.last_active DESC";
+                $orderBy .= "u.last_active_at DESC";
                 break;
             case 'name':
             default:
@@ -516,7 +516,7 @@ class FederationSearchService
                 case 'recent':
                     return ($b['created_at'] ?? '') <=> ($a['created_at'] ?? '');
                 case 'active':
-                    return ($b['last_active'] ?? '') <=> ($a['last_active'] ?? '');
+                    return ($b['last_active_at'] ?? '') <=> ($a['last_active_at'] ?? '');
                 case 'name':
                 default:
                     return strcasecmp($a['name'] ?? '', $b['name'] ?? '');
