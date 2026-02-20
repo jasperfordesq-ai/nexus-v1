@@ -49,8 +49,8 @@ class GroupAssignmentServiceTest extends DatabaseTestCase
 
         // Create test hub group
         Database::query(
-            "INSERT INTO `groups` (tenant_id, name, description, created_by, status, created_at)
-             VALUES (?, ?, ?, ?, 'active', NOW())",
+            "INSERT INTO `groups` (tenant_id, name, description, owner_id, created_at)
+             VALUES (?, ?, ?, ?, NOW())",
             [self::$testTenantId, "Dublin {$ts}", 'Dublin hub group', self::$testUserId]
         );
         self::$testGroupId = (int)Database::getInstance()->lastInsertId();

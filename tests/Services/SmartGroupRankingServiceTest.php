@@ -49,8 +49,8 @@ class SmartGroupRankingServiceTest extends DatabaseTestCase
 
         // Create test group
         Database::query(
-            "INSERT INTO `groups` (tenant_id, name, description, created_by, status, is_featured, created_at)
-             VALUES (?, ?, ?, ?, 'active', 0, NOW())",
+            "INSERT INTO `groups` (tenant_id, name, description, owner_id, is_featured, created_at)
+             VALUES (?, ?, ?, ?, 0, NOW())",
             [self::$testTenantId, "Ranking Group {$ts}", 'Test group for ranking', self::$testUserId]
         );
         self::$testGroupId = (int)Database::getInstance()->lastInsertId();
