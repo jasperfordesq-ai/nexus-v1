@@ -8,7 +8,7 @@ This file lists all contributors to Project NEXUS. This information MUST be disp
 
 ## Founders
 
-The originating Irish timebank initiative hOUR Timebank CLC was co-founded by:
+The originating Irish timebank initiative hOUR Timebank CLG was co-founded by:
 
 - **Jasper Ford**
 - **Mary Casey**
