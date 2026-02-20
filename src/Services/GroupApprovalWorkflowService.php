@@ -59,12 +59,6 @@ class GroupApprovalWorkflowService
 
             $requestId = Database::lastInsertId();
 
-            // Set group status to pending
-            Database::query(
-                "UPDATE `groups` SET status = 'pending' WHERE id = ?",
-                [$groupId]
-            );
-
             // Notify admins
             self::notifyAdmins($requestId, $groupId);
 
@@ -110,12 +104,6 @@ class GroupApprovalWorkflowService
                 [self::STATUS_APPROVED, $approvedBy, $notes, $requestId]
             );
 
-            // Set group status to active
-            Database::query(
-                "UPDATE `groups` SET status = 'active' WHERE id = ?",
-                [$request['group_id']]
-            );
-
             // Notify submitter
             self::notifySubmitter($request, self::STATUS_APPROVED, $notes);
 
@@ -156,12 +144,6 @@ class GroupApprovalWorkflowService
                 [self::STATUS_REJECTED, $rejectedBy, $reason, $requestId]
             );
 
-            // Set group status to rejected
-            Database::query(
-                "UPDATE `groups` SET status = 'rejected' WHERE id = ?",
-                [$request['group_id']]
-            );
-
             // Notify submitter
             self::notifySubmitter($request, self::STATUS_REJECTED, $reason);
 
@@ -200,12 +182,6 @@ class GroupApprovalWorkflowService
                      reviewed_at = NOW()
                  WHERE id = ?",
                 [self::STATUS_CHANGES_REQUESTED, $reviewedBy, $changes, $requestId]
-            );
-
-            // Set group status to draft
-            Database::query(
-                "UPDATE `groups` SET status = 'draft' WHERE id = ?",
-                [$request['group_id']]
             );
 
             // Notify submitter

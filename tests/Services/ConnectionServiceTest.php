@@ -388,20 +388,42 @@ class ConnectionServiceTest extends DatabaseTestCase
 
     public function testGetStatusReturnsPendingSentForRequester(): void
     {
-        $status = ConnectionService::getStatus(self::$testUserId, self::$testUser2Id);
+        // Create a fresh pending connection for this test
+        Database::query(
+            "INSERT INTO connections (requester_id, receiver_id, status, created_at)
+             VALUES (?, ?, 'pending', NOW())",
+            [self::$testUser3Id, self::$testUserId]
+        );
+        $tempId = (int)Database::getInstance()->lastInsertId();
+
+        $status = ConnectionService::getStatus(self::$testUser3Id, self::$testUserId);
 
         $this->assertEquals('pending_sent', $status['status']);
         $this->assertEquals('sent', $status['direction']);
         $this->assertIsInt($status['connection_id']);
+
+        // Cleanup
+        Database::query("DELETE FROM connections WHERE id = ?", [$tempId]);
     }
 
     public function testGetStatusReturnsPendingReceivedForReceiver(): void
     {
-        $status = ConnectionService::getStatus(self::$testUser2Id, self::$testUserId);
+        // Create a fresh pending connection for this test
+        Database::query(
+            "INSERT INTO connections (requester_id, receiver_id, status, created_at)
+             VALUES (?, ?, 'pending', NOW())",
+            [self::$testUser3Id, self::$testUserId]
+        );
+        $tempId = (int)Database::getInstance()->lastInsertId();
+
+        $status = ConnectionService::getStatus(self::$testUserId, self::$testUser3Id);
 
         $this->assertEquals('pending_received', $status['status']);
         $this->assertEquals('received', $status['direction']);
         $this->assertIsInt($status['connection_id']);
+
+        // Cleanup
+        Database::query("DELETE FROM connections WHERE id = ?", [$tempId]);
     }
 
     public function testGetStatusReturnsAcceptedForConnectedUsers(): void

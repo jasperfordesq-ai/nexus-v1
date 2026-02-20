@@ -47,11 +47,19 @@ class LegalDocumentServiceTest extends DatabaseTestCase
         );
         self::$testDocumentId = (int)Database::getInstance()->lastInsertId();
 
+        // Create a test user for created_by reference
+        Database::query(
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, NOW())",
+            [self::$testTenantId, "legal_{$ts}@test.com", "legal_{$ts}", 'Legal', 'User', 'Legal User']
+        );
+        $userId = (int)Database::getInstance()->lastInsertId();
+
         // Create a version for this document
         Database::query(
-            "INSERT INTO legal_document_versions (document_id, version_number, content, effective_date, is_current, created_at)
-             VALUES (?, ?, ?, NOW(), 1, NOW())",
-            [self::$testDocumentId, 1, '<p>Test Terms of Service ' . $ts . '</p>']
+            "INSERT INTO legal_document_versions (document_id, version_number, content, effective_date, is_current, created_by, created_at)
+             VALUES (?, ?, ?, NOW(), 1, ?, NOW())",
+            [self::$testDocumentId, 1, '<p>Test Terms of Service ' . $ts . '</p>', $userId]
         );
         self::$testVersionId = (int)Database::getInstance()->lastInsertId();
 
