@@ -341,7 +341,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const morePaths = [...activityPaths, ...federationPaths, ...aboutPaths];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b border-theme-default glass-surface">
+    <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Left Section: Mobile Menu + Brand */}
@@ -793,7 +793,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               </>
             ) : (
               <>
-                <Link to={tenantPath('/login')} className="hidden sm:block">
+                <Link to={tenantPath('/login')}>
                   <Button variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary">
                     Log In
                   </Button>
