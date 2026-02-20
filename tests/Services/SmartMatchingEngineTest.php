@@ -473,6 +473,9 @@ class SmartMatchingEngineTest extends TestCase
     {
         $mutualMatches = SmartMatchingEngine::getMutualMatches(self::$testUser1Id, 10);
 
+        // Array may be empty in test env without real data — that's valid
+        $this->assertIsArray($mutualMatches);
+
         foreach ($mutualMatches as $match) {
             $this->assertEquals('mutual', $match['match_type'], 'Mutual matches should have mutual type');
         }

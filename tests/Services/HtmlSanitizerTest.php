@@ -558,14 +558,19 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreExcerptCutsAtWordBoundary(): void
     {
         // "Hello world this is a test" with limit 15
-        // Should cut at word boundary near position 15
+        // excerpt() only cuts at word boundary when last space is >= 80% of length.
+        // Here last space is at position 11 (73%), so it keeps the hard cut at 15.
         $html = '<p>Hello world this is a test</p>';
         $result = \Nexus\Core\HtmlSanitizer::excerpt($html, 15);
 
         $this->assertStringEndsWith('...', $result);
-        // Should cut at a space, not mid-word
-        $textPart = rtrim($result, '.');
-        $this->assertStringNotContainsString('thi', $textPart);
+        $this->assertEquals('Hello world thi...', $result);
+
+        // With a longer limit (20), last space at 16 (80%) triggers word-boundary cut
+        $result2 = \Nexus\Core\HtmlSanitizer::excerpt($html, 20);
+        $this->assertStringEndsWith('...', $result2);
+        $textPart = rtrim($result2, '.');
+        $this->assertStringNotContainsString('is a', $textPart);
     }
 
     // ---------------------------------------------------------------

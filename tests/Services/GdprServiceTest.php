@@ -10,6 +10,8 @@ namespace Nexus\Tests\Services;
 
 use Nexus\Tests\TestCase;
 use Nexus\Services\Enterprise\GdprService;
+use Nexus\Services\Enterprise\LoggerService;
+use Nexus\Services\Enterprise\MetricsService;
 
 /**
  * GdprService Tests
@@ -76,16 +78,12 @@ class GdprServiceTest extends TestCase
         $metricsProp = $ref->getProperty('metrics');
         $metricsProp->setAccessible(true);
 
-        // Create mock logger
-        $mockLogger = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['info', 'error', 'critical', 'warning'])
-            ->getMock();
+        // Create mock logger (must match typed property LoggerService)
+        $mockLogger = $this->createMock(LoggerService::class);
         $loggerProp->setValue($service, $mockLogger);
 
-        // Create mock metrics
-        $mockMetrics = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['increment', 'histogram', 'gauge'])
-            ->getMock();
+        // Create mock metrics (must match typed property MetricsService)
+        $mockMetrics = $this->createMock(MetricsService::class);
         $metricsProp->setValue($service, $mockMetrics);
 
         return $service;
