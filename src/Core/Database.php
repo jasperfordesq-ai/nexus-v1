@@ -97,6 +97,11 @@ class Database
             // Calculate execution time
             $duration = microtime(true) - $start;
 
+            // Track query with performance monitor
+            if (class_exists('\Nexus\Services\PerformanceMonitorService')) {
+                \Nexus\Services\PerformanceMonitorService::trackQuery($sql, $params, $duration);
+            }
+
             // Log slow queries
             if ($duration > self::$slowQueryThreshold) {
                 self::logSlowQuery($sql, $params, $duration);

@@ -6,6 +6,8 @@
 
 namespace Nexus\Core;
 
+use Nexus\Services\RedisCache;
+
 class Mailer
 {
     private $host;
@@ -22,8 +24,19 @@ class Mailer
     private $gmailClientId;
     private $gmailClientSecret;
     private $gmailRefreshToken;
-    private $gmailAccessToken;
-    private $gmailTokenExpiry;
+
+    // Redis cache keys
+    private const CACHE_KEY_ACCESS_TOKEN = 'gmail_oauth_access_token';
+    private const CACHE_KEY_TOKEN_EXPIRY = 'gmail_oauth_token_expiry';
+    private const CACHE_KEY_REFRESH_ATTEMPTS = 'gmail_oauth_refresh_attempts';
+    private const CACHE_KEY_CIRCUIT_BREAKER = 'gmail_oauth_circuit_breaker';
+    private const CACHE_KEY_FAILURE_COUNT = 'gmail_oauth_failure_count';
+
+    // Rate limiting & circuit breaker constants
+    private const MAX_REFRESH_ATTEMPTS_PER_HOUR = 10;
+    private const CIRCUIT_BREAKER_THRESHOLD = 3; // failures
+    private const CIRCUIT_BREAKER_TIMEOUT = 300; // 5 minutes in seconds
+    private const TOKEN_TTL = 3000; // 50 minutes in seconds (tokens expire at ~60 min)
 
     public function __construct()
     {
@@ -119,6 +132,8 @@ class Mailer
 
     public function send($to, $subject, $body, $cc = null, $replyTo = null)
     {
+        // Default: USE_GMAIL_API=false (recommended - SMTP is more reliable)
+        // Set USE_GMAIL_API=true in .env only if you need Gmail API specifically
         if ($this->useGmailApi) {
             $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo);
             if ($result) {
@@ -126,6 +141,7 @@ class Mailer
             }
 
             // Gmail API failed — fall back to SMTP if credentials are configured
+            // Triggers: token refresh failure, rate limit exceeded, circuit breaker open, API errors
             if (!empty($this->host) && !empty($this->username)) {
                 error_log("Mailer: Gmail API failed, falling back to SMTP for: $to");
                 return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo);
@@ -197,12 +213,34 @@ class Mailer
 
     /**
      * Get Gmail API access token, refreshing if necessary
+     * Uses Redis for persistent caching with rate limiting and circuit breaker
      */
     private function getGmailAccessToken()
     {
-        // Check if we have a valid cached token
-        if ($this->gmailAccessToken && $this->gmailTokenExpiry > time()) {
-            return $this->gmailAccessToken;
+        // Check circuit breaker - if open (too many failures), use SMTP fallback
+        $circuitBreakerExpiry = RedisCache::get(self::CACHE_KEY_CIRCUIT_BREAKER, null);
+        if ($circuitBreakerExpiry && time() < $circuitBreakerExpiry) {
+            $remainingSeconds = $circuitBreakerExpiry - time();
+            error_log("Gmail API circuit breaker is open (too many consecutive failures). Blocked for {$remainingSeconds}s more.");
+            return null;
+        }
+
+        // Try to get valid token from Redis cache
+        $cachedToken = RedisCache::get(self::CACHE_KEY_ACCESS_TOKEN, null);
+        $cachedExpiry = RedisCache::get(self::CACHE_KEY_TOKEN_EXPIRY, null);
+
+        if ($cachedToken && $cachedExpiry && $cachedExpiry > time()) {
+            // Valid cached token exists
+            return $cachedToken;
+        }
+
+        // Token expired or missing - need to refresh
+        // First check rate limiting (max 10 refreshes per hour)
+        $refreshAttempts = RedisCache::increment(self::CACHE_KEY_REFRESH_ATTEMPTS, 3600, null); // 1 hour TTL
+
+        if ($refreshAttempts > self::MAX_REFRESH_ATTEMPTS_PER_HOUR) {
+            error_log("Gmail API rate limit exceeded: {$refreshAttempts} refresh attempts in the last hour (limit: " . self::MAX_REFRESH_ATTEMPTS_PER_HOUR . ")");
+            return null;
         }
 
         // Validate credentials are present
@@ -213,7 +251,36 @@ class Mailer
             return null;
         }
 
-        // Refresh the token
+        // Attempt token refresh
+        $token = $this->refreshGmailToken();
+
+        if ($token) {
+            // Success - reset failure count
+            RedisCache::delete(self::CACHE_KEY_FAILURE_COUNT, null);
+            return $token;
+        }
+
+        // Token refresh failed - increment failure counter
+        $failureCount = RedisCache::increment(self::CACHE_KEY_FAILURE_COUNT, 3600, null); // 1 hour TTL
+
+        if ($failureCount >= self::CIRCUIT_BREAKER_THRESHOLD) {
+            // Too many consecutive failures - open circuit breaker
+            $breakerExpiry = time() + self::CIRCUIT_BREAKER_TIMEOUT;
+            RedisCache::set(self::CACHE_KEY_CIRCUIT_BREAKER, $breakerExpiry, self::CIRCUIT_BREAKER_TIMEOUT, null);
+            error_log("Gmail API circuit breaker opened after {$failureCount} consecutive failures. Disabling Gmail API for " . self::CIRCUIT_BREAKER_TIMEOUT . "s.");
+        }
+
+        return null;
+    }
+
+    /**
+     * Refresh Gmail OAuth2 access token using refresh token
+     * Stores result in Redis cache on success
+     *
+     * @return string|null Access token on success, null on failure
+     */
+    private function refreshGmailToken(): ?string
+    {
         $url = 'https://oauth2.googleapis.com/token';
 
         $postData = http_build_query([
@@ -244,20 +311,42 @@ class Mailer
             return null;
         }
 
+        // Parse response
+        $data = json_decode($response, true);
+
+        // Log sanitized response for debugging (no secrets)
+        $logData = [
+            'http_code' => $httpCode,
+            'has_access_token' => isset($data['access_token']),
+            'expires_in' => $data['expires_in'] ?? null,
+            'token_type' => $data['token_type'] ?? null,
+            'error' => $data['error'] ?? null,
+            'error_description' => $data['error_description'] ?? null,
+        ];
+        error_log("Gmail token refresh response: " . json_encode($logData));
+
         if ($httpCode !== 200) {
-            error_log("Gmail token refresh failed (HTTP $httpCode): $response");
+            error_log("Gmail token refresh failed (HTTP $httpCode): " . ($data['error_description'] ?? $response));
             return null;
         }
 
-        $data = json_decode($response, true);
-        if (isset($data['access_token'])) {
-            $this->gmailAccessToken = $data['access_token'];
-            // Token expires in ~3600 seconds, cache for 3500 to be safe
-            $this->gmailTokenExpiry = time() + ($data['expires_in'] ?? 3600) - 100;
-            return $this->gmailAccessToken;
+        if (!isset($data['access_token'])) {
+            error_log("Gmail token refresh response missing access_token field");
+            return null;
         }
 
-        return null;
+        // Success - cache the token in Redis
+        $accessToken = $data['access_token'];
+        $expiresIn = $data['expires_in'] ?? 3600;
+        $expiryTimestamp = time() + $expiresIn;
+
+        // Store in Redis with 50 minute TTL (safe margin before 60 min expiry)
+        RedisCache::set(self::CACHE_KEY_ACCESS_TOKEN, $accessToken, self::TOKEN_TTL, null);
+        RedisCache::set(self::CACHE_KEY_TOKEN_EXPIRY, $expiryTimestamp, self::TOKEN_TTL, null);
+
+        error_log("Gmail token refreshed successfully. Expires in {$expiresIn}s. Cached for " . self::TOKEN_TTL . "s.");
+
+        return $accessToken;
     }
 
     /**
