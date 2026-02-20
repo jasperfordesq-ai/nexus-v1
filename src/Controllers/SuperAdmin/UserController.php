@@ -321,8 +321,10 @@ class UserController
             $oldTenantId = $user['tenant_id'];
 
             // Step 1: Move user and all their content to target tenant
-            if (!User::moveTenant($userId, $targetTenantId)) {
-                $this->redirectWithError('/super-admin/users/' . $userId . '/edit', 'Failed to move user to new tenant');
+            $moveResult = User::moveTenant($userId, $targetTenantId);
+            if (!$moveResult['success']) {
+                $failMsg = !empty($moveResult['failed']) ? ' Failures: ' . implode(', ', array_keys($moveResult['failed'])) : '';
+                $this->redirectWithError('/super-admin/users/' . $userId . '/edit', 'Failed to move user to new tenant.' . $failMsg);
                 return;
             }
 
@@ -540,7 +542,8 @@ class UserController
 
         $oldTenantId = $user['tenant_id'];
 
-        if (User::moveTenant($userId, $newTenantId)) {
+        $moveResult = User::moveTenant($userId, $newTenantId);
+        if ($moveResult['success']) {
             // Revoke super admin if moving to a tenant without sub-tenant capability
             $newTenant = Tenant::find($newTenantId);
             if (!$newTenant['allows_subtenants']) {
@@ -559,9 +562,16 @@ class UserController
                 "Moved '{$userName}' to tenant '{$newTenant['name']}' (with all content)"
             );
 
-            $_SESSION['flash_success'] = 'User and all their content moved to new tenant';
+            $movedCount = array_sum($moveResult['moved']);
+            $failedCount = count($moveResult['failed']);
+            $msg = "User and all their content moved to new tenant ({$movedCount} records moved)";
+            if ($failedCount > 0) {
+                $msg .= ". Warning: {$failedCount} tables had errors: " . implode(', ', array_keys($moveResult['failed']));
+            }
+            $_SESSION['flash_success'] = $msg;
         } else {
-            $_SESSION['flash_error'] = 'Failed to move user';
+            $failMsg = !empty($moveResult['failed']) ? ' Failures: ' . implode(', ', array_keys($moveResult['failed'])) : '';
+            $_SESSION['flash_error'] = 'Failed to move user.' . $failMsg;
         }
 
         header('Location: /super-admin/users/' . $userId);
