@@ -20,6 +20,7 @@
 
 import { validateResponse } from '@/lib/api-validation';
 import { apiResponseSchema } from '@/lib/api-schemas';
+import { captureApiCall } from '@/lib/sentry';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -356,6 +357,10 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
     const headers = this.buildHeaders(options);
     const body = options.body ? JSON.stringify(options.body) : undefined;
+    const method = options.method?.toUpperCase() || 'GET';
+
+    // Track request timing for Sentry
+    const startTime = performance.now();
 
     // Request timeout (default 30s, configurable per-request)
     const timeout = options.timeout ?? 30000;
@@ -371,6 +376,10 @@ class ApiClient {
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
+
+      // Capture API call in Sentry (success or error)
+      const duration = performance.now() - startTime;
+      captureApiCall(method, endpoint, response.status, duration);
 
       // Handle 401 Unauthorized with token refresh
       if (response.status === 401 && retryOnUnauthorized && !options.skipAuth) {
@@ -430,6 +439,8 @@ class ApiClient {
 
       // Handle timeout abort
       if (error instanceof DOMException && error.name === 'AbortError') {
+        const duration = performance.now() - startTime;
+        captureApiCall(method, endpoint, 408, duration); // 408 Request Timeout
         const message = 'Request timed out. Please try again.';
         this.dispatchApiError(message, 'TIMEOUT', endpoint);
         return { success: false, error: message, code: 'TIMEOUT' };

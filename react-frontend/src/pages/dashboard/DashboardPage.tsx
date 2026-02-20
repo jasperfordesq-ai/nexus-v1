@@ -999,9 +999,8 @@ function PendingReviewsCard() {
     const fetchPending = async () => {
       try {
         const response = await api.get<{ local: PendingReview[]; federated: any[]; total_pending: number }>('/v2/reviews/pending');
-        const data = 'data' in response ? response.data : response;
-        if (data?.local) {
-          setPending(data.local.slice(0, 3)); // Show max 3
+        if (response.data?.local) {
+          setPending(response.data.local.slice(0, 3)); // Show max 3
         }
       } catch (error) {
         logError('Failed to fetch pending reviews', { error });

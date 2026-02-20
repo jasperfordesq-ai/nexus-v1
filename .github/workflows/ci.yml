@@ -64,6 +64,17 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
+      - name: Setup Test Database Schema
+        run: |
+          echo "Loading schema into nexus_test database..."
+          mysql -h 127.0.0.1 -u root -ptesting nexus_test < schema.sql
+          echo "Creating nexus database for DatabaseTestCase fallback..."
+          mysql -h 127.0.0.1 -u root -ptesting -e "CREATE DATABASE IF NOT EXISTS nexus;"
+          mysql -h 127.0.0.1 -u root -ptesting -e "GRANT ALL PRIVILEGES ON nexus.* TO 'nexus'@'%';"
+          mysql -h 127.0.0.1 -u root -ptesting -e "FLUSH PRIVILEGES;"
+          mysql -h 127.0.0.1 -u root -ptesting nexus < schema.sql
+          echo "Test database schema loaded successfully."
+
       - name: PHP Syntax Check
         run: |
           echo "Checking PHP syntax in src/ ..."

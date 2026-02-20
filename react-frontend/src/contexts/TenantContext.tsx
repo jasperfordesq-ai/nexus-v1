@@ -31,6 +31,7 @@ import { api, tokenManager, fetchCsrfToken } from '@/lib/api';
 import { detectTenantFromUrl, tenantPath as buildTenantPath } from '@/lib/tenant-routing';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { tenantBootstrapSchema } from '@/lib/api-schemas';
+import { setSentryTenant } from '@/lib/sentry';
 import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding } from '@/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -169,6 +170,15 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
         // Fetch CSRF token for form submissions
         await fetchCsrfToken();
 
+        // Set Sentry tenant context
+        if (tenant.id && tenant.name && tenant.slug) {
+          setSentryTenant({
+            id: tenant.id,
+            name: tenant.name,
+            slug: tenant.slug,
+          });
+        }
+
         setState({
           tenant,
           isLoading: false,
@@ -177,6 +187,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
         });
       } else {
         // Bootstrap failed — if we had a slug, this is an unknown tenant (soft 404)
+        setSentryTenant(null);
         setState({
           tenant: null,
           isLoading: false,

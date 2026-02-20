@@ -839,7 +839,7 @@ export function ProfilePage() {
             loadReviews();
           }}
           receiverId={profile.id}
-          receiverName={profile.name}
+          receiverName={profile.name || ''}
           receiverAvatar={profile.avatar_url || ''}
         />
       )}
