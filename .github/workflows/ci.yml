@@ -73,7 +73,12 @@ jobs:
           mysql -h 127.0.0.1 -u root -ptesting -e "GRANT ALL PRIVILEGES ON nexus.* TO 'nexus'@'%';"
           mysql -h 127.0.0.1 -u root -ptesting -e "FLUSH PRIVILEGES;"
           mysql -h 127.0.0.1 -u root -ptesting nexus < schema.sql
-          echo "Test database schema loaded successfully."
+          echo "Seeding test tenants and categories..."
+          mysql -h 127.0.0.1 -u root -ptesting nexus_test -e "INSERT INTO tenants (id, name, slug, is_active) VALUES (1, 'Test Tenant', 'test-tenant', 1), (2, 'Test Tenant 2', 'test-tenant-2', 1);"
+          mysql -h 127.0.0.1 -u root -ptesting nexus_test -e "INSERT IGNORE INTO categories (id, name, slug, tenant_id, type) VALUES (1, 'General', 'general', 1, 'listing');"
+          mysql -h 127.0.0.1 -u root -ptesting nexus -e "INSERT INTO tenants (id, name, slug, is_active) VALUES (1, 'Test Tenant', 'test-tenant', 1), (2, 'Test Tenant 2', 'test-tenant-2', 1);"
+          mysql -h 127.0.0.1 -u root -ptesting nexus -e "INSERT IGNORE INTO categories (id, name, slug, tenant_id, type) VALUES (1, 'General', 'general', 1, 'listing');"
+          echo "Test database schema and seed data loaded successfully."
 
       - name: PHP Syntax Check
         run: |
