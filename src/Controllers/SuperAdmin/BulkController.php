@@ -103,7 +103,8 @@ class BulkController
 
             try {
                 // Move user and all their content to new tenant
-                if (!\Nexus\Models\User::moveTenant($userId, $targetTenantId)) {
+                $moveResult = \Nexus\Models\User::moveTenant($userId, $targetTenantId);
+                if (!$moveResult['success']) {
                     $errors[] = "Failed to move: " . ($user['first_name'] ?? $userId);
                     continue;
                 }

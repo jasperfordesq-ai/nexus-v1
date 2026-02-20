@@ -910,167 +910,426 @@ class User
     }
 
     /**
-     * Move user to a different tenant
-     * This method moves the user AND all their associated content to the new tenant.
+     * Move user to a different tenant.
+     * Moves the user AND ALL their associated data across every tenant-scoped table.
+     *
+     * IMPORTANT: When adding new tenant-scoped tables with user references,
+     * you MUST add them to the appropriate array in this method.
      *
      * @param int $userId The user ID to move
      * @param int $newTenantId The target tenant ID
      * @param bool $moveContent Whether to move all user content (default: true)
-     * @return bool Success status
+     * @return array{success: bool, moved: array<string, int>, failed: array<string, string>, skipped: string[]}
      */
-    public static function moveTenant(int $userId, int $newTenantId, bool $moveContent = true): bool
+    public static function moveTenant(int $userId, int $newTenantId, bool $moveContent = true): array
     {
+        $result = ['success' => false, 'moved' => [], 'failed' => [], 'skipped' => []];
+
         try {
             Database::beginTransaction();
 
-            // Get old tenant for logging
+            // Get old user data for reference
             $oldUser = self::findById($userId, false); // Don't enforce tenant for this lookup
-            $oldTenantId = $oldUser['tenant_id'] ?? null;
+            if (!$oldUser) {
+                throw new \RuntimeException("User {$userId} not found");
+            }
+            $oldTenantId = (int)$oldUser['tenant_id'];
             $oldAvatarUrl = $oldUser['avatar_url'] ?? null;
+
+            if ($oldTenantId === $newTenantId) {
+                throw new \RuntimeException("User {$userId} is already on tenant {$newTenantId}");
+            }
 
             // 1. Update the user's tenant_id
             Database::query(
                 "UPDATE users SET tenant_id = ? WHERE id = ?",
                 [$newTenantId, $userId]
             );
+            $result['moved']['users'] = 1;
 
-            // 2. Move all user-owned content if requested
-            if ($moveContent && $oldTenantId !== null) {
-                // Tables with user_id AND tenant_id that should move with the user
-                // These are user-generated content tables
-                $contentTables = [
-                    'listings',           // User's offers/requests
-                    'feed_posts',         // User's posts
-                    'events',             // User's created events
-                    'goals',              // User's goals
-                    'polls',              // User's created polls
-                    'resources',          // User's resources
-                    'comments',           // User's comments
-                    'likes',              // User's likes
-                    'reactions',          // User's reactions
-                    'vol_organizations',  // User's volunteer organizations
-                    'vol_applications',   // User's volunteer applications
-                    'vol_logs',           // User's volunteer logs
-                    'group_discussions',  // User's group discussions
-                    'group_posts',        // User's group posts
-                    'notifications',      // User's notifications
-                ];
-
-                foreach ($contentTables as $table) {
+            // 2. Move all user-owned data if requested
+            if ($moveContent) {
+                // Helper to update a table safely. Matches old tenant OR NULL tenant_id.
+                $moveTable = function (string $table, string $column) use ($newTenantId, $userId, $oldTenantId, &$result) {
                     try {
-                        Database::query(
-                            "UPDATE {$table} SET tenant_id = ? WHERE user_id = ? AND tenant_id = ?",
+                        $stmt = Database::query(
+                            "UPDATE `{$table}` SET tenant_id = ? WHERE `{$column}` = ? AND (tenant_id = ? OR tenant_id IS NULL)",
                             [$newTenantId, $userId, $oldTenantId]
                         );
-                    } catch (\Exception $e) {
-                        // Table might not exist or have different structure - log and continue
-                        error_log("User::moveTenant - Could not update {$table}: " . $e->getMessage());
-                    }
-                }
-
-                // Tables with sender_id column (messages, transactions)
-                $senderTables = [
-                    'messages' => ['sender_id', 'receiver_id'],
-                    'transactions' => ['sender_id', 'receiver_id'],
-                ];
-
-                foreach ($senderTables as $table => $columns) {
-                    foreach ($columns as $col) {
-                        try {
-                            Database::query(
-                                "UPDATE {$table} SET tenant_id = ? WHERE {$col} = ? AND tenant_id = ?",
-                                [$newTenantId, $userId, $oldTenantId]
-                            );
-                        } catch (\Exception $e) {
-                            error_log("User::moveTenant - Could not update {$table}.{$col}: " . $e->getMessage());
+                        $affected = $stmt->rowCount();
+                        if ($affected > 0) {
+                            $key = "{$table}.{$column}";
+                            $result['moved'][$key] = $affected;
                         }
+                    } catch (\Exception $e) {
+                        $key = "{$table}.{$column}";
+                        $result['failed'][$key] = $e->getMessage();
+                        error_log("User::moveTenant - Failed {$key}: " . $e->getMessage());
                     }
-                }
+                };
 
-                // Reviews - user can be reviewer or receiver
-                try {
-                    Database::query(
-                        "UPDATE reviews SET tenant_id = ?, reviewer_tenant_id = ? WHERE reviewer_id = ? AND tenant_id = ?",
-                        [$newTenantId, $newTenantId, $userId, $oldTenantId]
-                    );
-                    Database::query(
-                        "UPDATE reviews SET tenant_id = ?, receiver_tenant_id = ? WHERE receiver_id = ? AND tenant_id = ?",
-                        [$newTenantId, $newTenantId, $userId, $oldTenantId]
-                    );
-                } catch (\Exception $e) {
-                    error_log("User::moveTenant - Could not update reviews: " . $e->getMessage());
-                }
+                // Also catch records on ANY other tenant (not just old tenant)
+                // This handles edge cases where data ended up on wrong tenant
+                $moveTableAllTenants = function (string $table, string $column) use ($newTenantId, $userId, &$result) {
+                    try {
+                        $stmt = Database::query(
+                            "UPDATE `{$table}` SET tenant_id = ? WHERE `{$column}` = ? AND (tenant_id != ? OR tenant_id IS NULL)",
+                            [$newTenantId, $userId, $newTenantId]
+                        );
+                        $affected = $stmt->rowCount();
+                        if ($affected > 0) {
+                            $key = "{$table}.{$column}";
+                            $result['moved'][$key] = ($result['moved'][$key] ?? 0) + $affected;
+                        }
+                    } catch (\Exception $e) {
+                        $key = "{$table}.{$column}";
+                        $result['failed'][$key] = $e->getMessage();
+                        error_log("User::moveTenant - Failed {$key}: " . $e->getMessage());
+                    }
+                };
 
-                // Connections - user can be requester or receiver
-                try {
-                    Database::query(
-                        "UPDATE connections SET tenant_id = ? WHERE requester_id = ? AND tenant_id = ?",
-                        [$newTenantId, $userId, $oldTenantId]
-                    );
-                    Database::query(
-                        "UPDATE connections SET tenant_id = ? WHERE receiver_id = ? AND tenant_id = ?",
-                        [$newTenantId, $userId, $oldTenantId]
-                    );
-                } catch (\Exception $e) {
-                    error_log("User::moveTenant - Could not update connections: " . $e->getMessage());
-                }
+                // ─── CATEGORY 1: Simple user_id tables ───────────────────────
+                // Content, activity, preferences, gamification, security, etc.
+                $userIdTables = [
+                    // Content creation
+                    'listings',
+                    'feed_posts',
+                    'events',
+                    'goals',
+                    'polls',
+                    'resources',
+                    'comments',
+                    'likes',
+                    'reactions',
+                    'posts',                    // Blog posts (author_id handled separately)
+                    'post_likes',
+                    'news',
 
-                // User settings/preferences tables (always move)
-                $settingsTables = [
-                    'user_badges',
-                    'user_consents',
-                    'user_permissions',
-                    'user_roles',
-                    'user_category_affinity',
-                    'user_distance_preference',
-                    'user_gamification_summary',
-                    'user_stats_cache',
-                    'user_streaks',
-                    'user_xp_log',
-                    'user_points_log',
-                    'nexus_score_cache',
-                    'nexus_score_history',
-                    'nexus_score_milestones',
-                    'leaderboard_cache',
-                    'weekly_rank_snapshots',
+                    // Social
+                    'feed_hidden',
+                    'feed_muted_users',         // user_id column (who muted)
+                    'mentions',                 // handled via both columns below
+                    'group_discussions',
+                    'group_posts',
+                    'group_members',
+                    'group_views',
+                    'group_exchange_participants',
+                    'group_discussion_subscribers',
+                    'group_feedback',
+                    'group_recommendation_interactions',
+                    'group_recommendation_cache',
+
+                    // Events
+                    'event_rsvps',
+
+                    // Volunteering
+                    'vol_organizations',
+                    'vol_applications',
+                    'vol_logs',
+
+                    // Organisations
+                    'og_members',
+
+                    // Exchange & matching
+                    'exchange_requests',        // requester_id/provider_id handled separately
+                    'match_approvals',
                     'match_cache',
                     'match_history',
                     'match_preferences',
+
+                    // Notifications & messaging
+                    'notifications',
                     'notification_settings',
+                    'notification_queue',
+                    'progress_notifications',
                     'push_subscriptions',
                     'fcm_device_tokens',
+                    'user_messaging_restrictions',
+                    'user_first_contacts',
+
+                    // Gamification & XP
+                    'user_badges',
+                    'user_gamification_summary',
+                    'user_streaks',
+                    'user_xp_log',
+                    'user_points_log',
+                    'user_challenge_progress',
+                    'challenge_progress',
+                    'xp_history',
+                    'xp_notifications',
+                    'user_xp_purchases',
+                    'user_active_unlockables',
+                    'user_collection_completions',
+                    'daily_rewards',
+                    'campaign_awards',
+                    'gamification_tour_completions',
+                    'season_rankings',
+                    'nexus_scores',
+                    'nexus_score_cache',
+                    'nexus_score_history',
+                    'nexus_score_milestones',
+                    'community_ranks',
+                    'leaderboard_cache',
+                    'weekly_rank_snapshots',
+                    'user_stats_cache',
+
+                    // User preferences & settings
+                    'user_consents',
+                    'user_permissions',
+                    'user_roles',
+                    'user_categories',
+                    'user_category_affinity',
+                    'user_distance_preference',
+                    'user_interests',
+                    'user_email_preferences',
+                    'user_effective_permissions',
+                    'user_hidden_posts',
+                    'user_muted_users',
+                    'user_legal_acceptances',
+                    'cookie_consents',
+
+                    // Security & auth
                     'sessions',
+                    'webauthn_credentials',
+                    'user_totp_settings',
+                    'user_backup_codes',
+                    'user_trusted_devices',
+                    'email_verification_tokens',
+                    'revoked_tokens',
+
+                    // AI
+                    'ai_conversations',
+                    'ai_usage',
+                    'ai_user_limits',
+
+                    // Moderation & reports
+                    'abuse_alerts',
+                    'fraud_alerts',
+                    'vetting_records',
+                    'listing_risk_tags',
+
+                    // Audit & compliance
+                    'gdpr_audit_log',
+                    'gdpr_requests',
+                    'activity_log',
+                    'admin_actions',
+                    'group_audit_log',
+                    'permission_audit_log',
+
+                    // Newsletter & email
+                    'newsletter_subscribers',
+                    'newsletter_queue',
+                    'newsletter_link_clicks',
+
+                    // Search
+                    'search_logs',
+                    'search_feedback',
+
+                    // Deliverables
+                    'deliverables',             // owner_id handled separately
+                    'deliverable_comments',
+                    'deliverable_history',
+
+                    // Layout & experiments
+                    'layout_ab_assignments',
+                    'layout_ab_metrics',
+
+                    // Help
+                    'help_article_feedback',
+
+                    // Polls
+                    'poll_votes',
+
+                    // Reviews
+                    'review_votes',
+
+                    // Deliverability
+                    'deliverability_events',    // recipient_user_id handled separately
+
+                    // Federation
+                    'federation_user_settings',
+                    'federation_rate_limits',
+                    'federation_realtime_queue',
+                    'federation_notifications',
+
+                    // TOTP audit
+                    'totp_admin_overrides',
+                    'totp_verification_attempts',
+
+                    // API
+                    'api_logs',
                 ];
 
-                foreach ($settingsTables as $table) {
-                    try {
-                        Database::query(
-                            "UPDATE {$table} SET tenant_id = ? WHERE user_id = ? AND tenant_id = ?",
-                            [$newTenantId, $userId, $oldTenantId]
-                        );
-                    } catch (\Exception $e) {
-                        // Log but don't fail - some tables may not exist
-                        error_log("User::moveTenant - Could not update {$table}: " . $e->getMessage());
-                    }
+                foreach ($userIdTables as $table) {
+                    $moveTableAllTenants($table, 'user_id');
                 }
 
-                // 3. Move avatar file if it exists and is in old tenant's folder
+                // ─── CATEGORY 2: Tables with non-standard user columns ───────
+                // These reference users by columns other than user_id
+
+                // Messages: sender and receiver
+                $moveTableAllTenants('messages', 'sender_id');
+                $moveTableAllTenants('messages', 'receiver_id');
+                $moveTableAllTenants('message_attachments', 'sender_id');
+                // message_attachments may not have sender_id — try user_id too
+                $moveTableAllTenants('message_attachments', 'user_id');
+                $moveTableAllTenants('message_reactions', 'user_id');
+
+                // Transactions: sender and receiver
+                $moveTableAllTenants('transactions', 'sender_id');
+                $moveTableAllTenants('transactions', 'receiver_id');
+
+                // Org transactions
+                $moveTableAllTenants('org_transactions', 'sender_id');
+                $moveTableAllTenants('org_transactions', 'receiver_id');
+                $moveTableAllTenants('org_transfer_requests', 'requester_id');
+                $moveTableAllTenants('org_audit_log', 'user_id');
+
+                // Reviews: reviewer and receiver (also update tenant columns)
+                try {
+                    $stmt = Database::query(
+                        "UPDATE reviews SET tenant_id = ?, reviewer_tenant_id = ? WHERE reviewer_id = ? AND (tenant_id != ? OR tenant_id IS NULL)",
+                        [$newTenantId, $newTenantId, $userId, $newTenantId]
+                    );
+                    if ($stmt->rowCount() > 0) $result['moved']['reviews.reviewer_id'] = $stmt->rowCount();
+
+                    $stmt = Database::query(
+                        "UPDATE reviews SET tenant_id = ?, receiver_tenant_id = ? WHERE receiver_id = ? AND (tenant_id != ? OR tenant_id IS NULL)",
+                        [$newTenantId, $newTenantId, $userId, $newTenantId]
+                    );
+                    if ($stmt->rowCount() > 0) $result['moved']['reviews.receiver_id'] = $stmt->rowCount();
+                } catch (\Exception $e) {
+                    $result['failed']['reviews'] = $e->getMessage();
+                }
+
+                // Review responses
+                $moveTableAllTenants('review_responses', 'user_id');
+
+                // Connections: requester and receiver
+                $moveTableAllTenants('connections', 'requester_id');
+                $moveTableAllTenants('connections', 'receiver_id');
+
+                // Exchange requests: requester and provider
+                $moveTableAllTenants('exchange_requests', 'requester_id');
+                $moveTableAllTenants('exchange_requests', 'provider_id');
+
+                // Mentions: both directions
+                $moveTableAllTenants('mentions', 'mentioned_user_id');
+                $moveTableAllTenants('mentions', 'mentioning_user_id');
+
+                // Feed muted: also the muted_user_id column
+                $moveTableAllTenants('feed_muted_users', 'muted_user_id');
+                $moveTableAllTenants('user_muted_users', 'muted_user_id');
+
+                // Blog posts use author_id
+                $moveTableAllTenants('blog_posts', 'author_id');
+                $moveTableAllTenants('posts', 'author_id');
+
+                // Deliverables use owner_id
+                $moveTableAllTenants('deliverables', 'owner_id');
+
+                // Groups use owner_id
+                $moveTableAllTenants('groups', 'owner_id');
+
+                // Deliverability events
+                $moveTableAllTenants('deliverability_events', 'recipient_user_id');
+
+                // Match approvals - also listing_owner_id
+                $moveTableAllTenants('match_approvals', 'listing_owner_id');
+
+                // Broker message copies
+                $moveTableAllTenants('broker_message_copies', 'sender_id');
+                $moveTableAllTenants('broker_message_copies', 'receiver_id');
+
+                // Federation messages
+                $moveTableAllTenants('federation_messages', 'sender_user_id');
+                $moveTableAllTenants('federation_messages', 'receiver_user_id');
+
+                // Federation transactions
+                $moveTableAllTenants('federation_transactions', 'sender_user_id');
+                $moveTableAllTenants('federation_transactions', 'receiver_user_id');
+
+                // Federation reputation & audit
+                $moveTableAllTenants('federation_reputation', 'user_id');
+                $moveTableAllTenants('federation_audit_log', 'actor_user_id');
+
+                // Super admin audit
+                $moveTableAllTenants('super_admin_audit_log', 'actor_user_id');
+
+                // Group audit log target
+                $moveTableAllTenants('group_audit_log', 'target_user_id');
+
+                // Admin actions target
+                $moveTableAllTenants('admin_actions', 'target_user_id');
+
+                // Org audit log target
+                $moveTableAllTenants('org_audit_log', 'target_user_id');
+
+                // Cookie inventory
+                $moveTableAllTenants('cookie_inventory', 'recipient_user_id');
+
+                // Social identities
+                $moveTableAllTenants('social_identities', 'user_id');
+
+                // Volunteer reviews
+                $moveTableAllTenants('vol_reviews', 'reviewer_id');
+
+                // Vol opportunities
+                $moveTableAllTenants('vol_opportunities', 'created_by');
+
+                // User blocks (all three columns)
+                $moveTableAllTenants('user_blocks', 'user_id');
+                $moveTableAllTenants('user_blocks', 'blocked_user_id');
+
+                // Achievement celebrations
+                $moveTableAllTenants('achievement_celebrations', 'user_id');
+                $moveTableAllTenants('achievement_celebrations', 'achievement_user_id');
+
+                // Post shares
+                $moveTableAllTenants('post_shares', 'user_id');
+
+                // Proposals
+                $moveTableAllTenants('proposals', 'user_id');
+                $moveTableAllTenants('proposal_votes', 'user_id');
+
+                // Referral tracking
+                $moveTableAllTenants('referral_tracking', 'user_id');
+
+                // Reports
+                $moveTableAllTenants('reports', 'user_id');
+
+                // Friend challenges
+                $moveTableAllTenants('friend_challenges', 'user_id');
+
+                // ─── CATEGORY 3: Move avatar file ────────────────────────────
                 if ($oldAvatarUrl && strpos($oldAvatarUrl, "/uploads/{$oldTenantId}/") !== false) {
                     self::moveAvatarToNewTenant($userId, $oldAvatarUrl, $oldTenantId, $newTenantId);
+                    $result['moved']['avatar_file'] = 1;
                 }
             }
 
             Database::commit();
 
-            // Log the move
-            error_log("User::moveTenant - User {$userId} moved from tenant {$oldTenantId} to {$newTenantId}" .
-                      ($moveContent ? " (with content)" : " (user only)"));
+            $result['success'] = true;
 
-            return true;
+            // Log comprehensive summary
+            $movedCount = array_sum($result['moved']);
+            $failedCount = count($result['failed']);
+            error_log("User::moveTenant - User {$userId} moved from tenant {$oldTenantId} to {$newTenantId}. " .
+                      "Moved: {$movedCount} records across " . count($result['moved']) . " tables. " .
+                      "Failed: {$failedCount} tables." .
+                      ($moveContent ? "" : " (user only, content not moved)"));
+
+            if (!empty($result['failed'])) {
+                error_log("User::moveTenant - Failed tables: " . json_encode($result['failed']));
+            }
+
+            return $result;
         } catch (\Exception $e) {
             Database::rollback();
-            error_log("User::moveTenant error: " . $e->getMessage());
-            return false;
+            error_log("User::moveTenant CRITICAL error: " . $e->getMessage());
+            $result['failed']['_transaction'] = $e->getMessage();
+            return $result;
         }
     }
 

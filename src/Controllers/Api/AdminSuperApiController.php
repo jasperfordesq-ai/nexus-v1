@@ -647,7 +647,8 @@ class AdminSuperApiController extends BaseApiController
 
         $oldTenantId = $user['tenant_id'];
 
-        if (!User::moveTenant($targetUserId, $newTenantId)) {
+        $moveResult = User::moveTenant($targetUserId, $newTenantId);
+        if (!$moveResult['success']) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to move user', null, 500);
         }
 
@@ -674,6 +675,8 @@ class AdminSuperApiController extends BaseApiController
             'user_id' => $targetUserId,
             'old_tenant_id' => $oldTenantId,
             'new_tenant_id' => $newTenantId,
+            'records_moved' => $moveResult['moved'],
+            'tables_failed' => $moveResult['failed'],
         ]);
     }
 
@@ -714,7 +717,8 @@ class AdminSuperApiController extends BaseApiController
         $oldTenantId = $user['tenant_id'];
 
         // Step 1: Move user
-        if (!User::moveTenant($targetUserId, $targetTenantId)) {
+        $moveResult = User::moveTenant($targetUserId, $targetTenantId);
+        if (!$moveResult['success']) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to move user', null, 500);
         }
 
@@ -799,7 +803,8 @@ class AdminSuperApiController extends BaseApiController
             }
 
             try {
-                if (!User::moveTenant($uid, $targetTenantId)) {
+                $moveResult = User::moveTenant($uid, $targetTenantId);
+                if (!$moveResult['success']) {
                     $errors[] = "Failed to move user ID {$uid}";
                     continue;
                 }
