@@ -213,31 +213,69 @@ $router->add('GET', '/api/v2/users', function () {
     header('Content-Type: application/json');
     $tenantId = \Nexus\Core\TenantContext::getId();
 
-    $search = $_GET['q'] ?? '';
-    $sort = $_GET['sort'] ?? 'name';
+    // Pagination
     $limit = min(intval($_GET['limit'] ?? 50), 100);
+    $offset = max(intval($_GET['offset'] ?? 0), 0);
 
-    $validSorts = ['name' => 'u.name', 'joined' => 'u.created_at DESC'];
-    $orderBy = $validSorts[$sort] ?? 'u.name';
+    // Search
+    $search = $_GET['q'] ?? '';
 
+    // Sorting
+    $sort = $_GET['sort'] ?? 'name';
+    $order = strtoupper($_GET['order'] ?? 'ASC');
+    if (!in_array($order, ['ASC', 'DESC'])) {
+        $order = 'ASC';
+    }
+
+    // For subquery-based sorts, we need to use the calculated field name (alias)
+    $validSorts = [
+        'name' => 'u.name',
+        'joined' => 'u.created_at',
+        'rating' => '(SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id)',
+        'hours_given' => '(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = \'completed\' AND tenant_id = u.tenant_id)'
+    ];
+    $orderByField = $validSorts[$sort] ?? 'u.name';
+    $orderBy = "$orderByField $order";
+
+    // Build WHERE clause
     $params = [$tenantId, 'active'];
     $whereClause = "u.tenant_id = ? AND u.status = ?";
 
     if ($search) {
-        $whereClause .= " AND (u.name LIKE ? OR u.first_name LIKE ? OR u.bio LIKE ?)";
+        $whereClause .= " AND (u.name LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR u.bio LIKE ?)";
+        $params[] = "%$search%";
         $params[] = "%$search%";
         $params[] = "%$search%";
         $params[] = "%$search%";
     }
 
-    $sql = "SELECT u.id, u.name, u.first_name, u.last_name, u.avatar_url as avatar, u.bio as tagline, u.location, u.created_at
+    // Get total count for meta
+    $countSql = "SELECT COUNT(*) as total FROM users u WHERE $whereClause";
+    $totalCount = \Nexus\Core\Database::query($countSql, $params)->fetch()['total'] ?? 0;
+
+    // Get users with pagination and calculated fields
+    $sql = "SELECT u.id, u.name, u.first_name, u.last_name,
+                   u.avatar_url as avatar, u.bio as tagline,
+                   u.location, u.latitude, u.longitude,
+                   u.created_at,
+                   (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as rating,
+                   (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given
             FROM users u
             WHERE $whereClause
             ORDER BY $orderBy
-            LIMIT $limit";
+            LIMIT $limit OFFSET $offset";
 
     $users = \Nexus\Core\Database::query($sql, $params)->fetchAll();
-    echo json_encode(['data' => $users]);
+
+    echo json_encode([
+        'data' => $users,
+        'meta' => [
+            'total_items' => (int)$totalCount,
+            'per_page' => $limit,
+            'offset' => $offset,
+            'has_more' => ($offset + $limit) < $totalCount
+        ]
+    ]);
 });
 $router->add('GET', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@me');
 $router->add('PUT', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@update');
