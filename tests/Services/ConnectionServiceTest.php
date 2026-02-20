@@ -176,19 +176,15 @@ class ConnectionServiceTest extends DatabaseTestCase
     // sendRequest Tests
     // ==========================================
 
-    public function testSendRequestReturnsIdForNewRequest(): void
+    public function testSendRequestReturnsTrueForNewRequest(): void
     {
-        try {
-            $connectionId = ConnectionService::sendRequest(self::$testUser3Id, self::$testUser2Id);
+        // sendRequest(requesterId, receiverId) returns bool
+        $result = ConnectionService::sendRequest(self::$testUser3Id, self::$testUser2Id);
 
-            $this->assertIsInt($connectionId);
-            $this->assertGreaterThan(0, $connectionId);
+        $this->assertTrue($result);
 
-            // Cleanup
-            Database::query("DELETE FROM connections WHERE id = ?", [$connectionId]);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('sendRequest not available: ' . $e->getMessage());
-        }
+        // Cleanup
+        Database::query("DELETE FROM connections WHERE requester_id = ? AND receiver_id = ?", [self::$testUser3Id, self::$testUser2Id]);
     }
 
     public function testSendRequestReturnsFalseForSelfRequest(): void
@@ -377,58 +373,53 @@ class ConnectionServiceTest extends DatabaseTestCase
     // getConnectionStatus Tests
     // ==========================================
 
-    public function testGetConnectionStatusReturnsNoneForUnconnected(): void
+    public function testGetStatusReturnsArrayWithNoneStatus(): void
     {
-        try {
-            $status = ConnectionService::getConnectionStatus(self::$testUser2Id, self::$testUser3Id);
+        // getStatus() returns array, not string
+        $status = ConnectionService::getStatus(self::$testUser2Id, self::$testUser3Id);
 
-            $this->assertEquals('none', $status);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('getConnectionStatus not available: ' . $e->getMessage());
-        }
+        $this->assertIsArray($status);
+        $this->assertArrayHasKey('status', $status);
+        $this->assertArrayHasKey('connection_id', $status);
+        $this->assertArrayHasKey('direction', $status);
+        $this->assertEquals('none', $status['status']);
+        $this->assertNull($status['connection_id']);
     }
 
-    public function testGetConnectionStatusReturnsPendingSentForRequester(): void
+    public function testGetStatusReturnsPendingSentForRequester(): void
     {
-        try {
-            $status = ConnectionService::getConnectionStatus(self::$testUserId, self::$testUser2Id);
+        $status = ConnectionService::getStatus(self::$testUserId, self::$testUser2Id);
 
-            $this->assertEquals('pending_sent', $status);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('getConnectionStatus not available: ' . $e->getMessage());
-        }
+        $this->assertEquals('pending_sent', $status['status']);
+        $this->assertEquals('sent', $status['direction']);
+        $this->assertIsInt($status['connection_id']);
     }
 
-    public function testGetConnectionStatusReturnsPendingReceivedForReceiver(): void
+    public function testGetStatusReturnsPendingReceivedForReceiver(): void
     {
-        try {
-            $status = ConnectionService::getConnectionStatus(self::$testUser2Id, self::$testUserId);
+        $status = ConnectionService::getStatus(self::$testUser2Id, self::$testUserId);
 
-            $this->assertEquals('pending_received', $status);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('getConnectionStatus not available: ' . $e->getMessage());
-        }
+        $this->assertEquals('pending_received', $status['status']);
+        $this->assertEquals('received', $status['direction']);
+        $this->assertIsInt($status['connection_id']);
     }
 
-    public function testGetConnectionStatusReturnsAcceptedForConnectedUsers(): void
+    public function testGetStatusReturnsAcceptedForConnectedUsers(): void
     {
-        try {
-            // Create an accepted connection
-            Database::query(
-                "INSERT INTO connections (requester_id, receiver_id, status, created_at)
-                 VALUES (?, ?, 'accepted', NOW())",
-                [self::$testUser2Id, self::$testUser3Id]
-            );
-            $tempId = (int)Database::getInstance()->lastInsertId();
+        // Create an accepted connection
+        Database::query(
+            "INSERT INTO connections (requester_id, receiver_id, status, created_at)
+             VALUES (?, ?, 'accepted', NOW())",
+            [self::$testUser2Id, self::$testUser3Id]
+        );
+        $tempId = (int)Database::getInstance()->lastInsertId();
 
-            $status = ConnectionService::getConnectionStatus(self::$testUser2Id, self::$testUser3Id);
+        $status = ConnectionService::getStatus(self::$testUser2Id, self::$testUser3Id);
 
-            $this->assertEquals('accepted', $status);
+        $this->assertEquals('accepted', $status['status']);
+        $this->assertNull($status['direction']); // Accepted has no direction
 
-            // Cleanup
-            Database::query("DELETE FROM connections WHERE id = ?", [$tempId]);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('getConnectionStatus accepted check not available: ' . $e->getMessage());
-        }
+        // Cleanup
+        Database::query("DELETE FROM connections WHERE id = ?", [$tempId]);
     }
 }

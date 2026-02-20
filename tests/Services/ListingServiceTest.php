@@ -239,7 +239,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testValidateListingAcceptsValidData(): void
     {
-        $valid = ListingService::validateListing([
+        $valid = ListingService::validate([
             'title' => 'Valid Listing Title',
             'description' => 'Valid description',
             'type' => 'offer',
@@ -251,7 +251,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testValidateListingRejectsMissingTitle(): void
     {
-        $valid = ListingService::validateListing([
+        $valid = ListingService::validate([
             'description' => 'Description',
             'type' => 'offer',
         ]);
@@ -263,7 +263,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testValidateListingRejectsEmptyTitle(): void
     {
-        $valid = ListingService::validateListing([
+        $valid = ListingService::validate([
             'title' => '',
             'description' => 'Description',
             'type' => 'offer',
@@ -274,7 +274,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testValidateListingRejectsTooLongTitle(): void
     {
-        $valid = ListingService::validateListing([
+        $valid = ListingService::validate([
             'title' => str_repeat('A', 256),
             'description' => 'Description',
             'type' => 'offer',
@@ -285,7 +285,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testValidateListingRejectsInvalidType(): void
     {
-        $valid = ListingService::validateListing([
+        $valid = ListingService::validate([
             'title' => 'Valid Title',
             'description' => 'Description',
             'type' => 'invalid_type',
@@ -296,7 +296,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testValidateListingAcceptsOfferType(): void
     {
-        $valid = ListingService::validateListing([
+        $valid = ListingService::validate([
             'title' => 'Valid Title',
             'description' => 'Description',
             'type' => 'offer',
@@ -307,7 +307,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testValidateListingAcceptsRequestType(): void
     {
-        $valid = ListingService::validateListing([
+        $valid = ListingService::validate([
             'title' => 'Valid Title',
             'description' => 'Description',
             'type' => 'request',
@@ -322,22 +322,22 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testCreateListingReturnsFalseForInvalidData(): void
     {
-        $result = ListingService::createListing([
+        $result = ListingService::create(self::$testUserId, [
             'title' => '', // Invalid: empty
             'type' => 'offer',
-        ], self::$testUserId);
+        ]);
 
-        $this->assertFalse($result);
+        $this->assertNull($result);
         $this->assertNotEmpty(ListingService::getErrors());
     }
 
     public function testCreateListingUsesCurrentTenant(): void
     {
-        $listingId = ListingService::createListing([
+        $listingId = ListingService::create(self::$testUserId, [
             'title' => 'Tenant Test Listing',
             'description' => 'Test',
             'type' => 'offer',
-        ], self::$testUserId);
+        ]);
 
         if ($listingId) {
             $stmt = Database::query("SELECT tenant_id FROM listings WHERE id = ?", [$listingId]);
@@ -355,7 +355,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testUpdateListingReturnsFalseForInvalidData(): void
     {
-        $result = ListingService::updateListing(self::$testListingOfferId, [
+        $result = ListingService::update(self::$testListingOfferId, self::$testUserId, [
             'title' => str_repeat('X', 300),
         ]);
 
@@ -364,7 +364,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testUpdateListingReturnsTrueForEmptyData(): void
     {
-        $result = ListingService::updateListing(self::$testListingOfferId, []);
+        $result = ListingService::update(self::$testListingOfferId, self::$testUserId, []);
 
         $this->assertTrue($result);
     }
@@ -383,7 +383,7 @@ class ListingServiceTest extends DatabaseTestCase
         );
         $tempId = (int)Database::getInstance()->lastInsertId();
 
-        $result = ListingService::deleteListing($tempId);
+        $result = ListingService::delete($tempId, self::$testUserId);
 
         $this->assertTrue($result);
 
@@ -398,7 +398,7 @@ class ListingServiceTest extends DatabaseTestCase
 
     public function testDeleteListingReturnsFalseForNonExistent(): void
     {
-        $result = ListingService::deleteListing(999999);
+        $result = ListingService::delete(999999, self::$testUserId);
 
         $this->assertFalse($result);
     }
