@@ -160,6 +160,12 @@ class SocialApiController extends BaseApiController
 
         if (empty($targetType) || !$targetId) {
             $this->respondWithError('VALIDATION_ERROR', 'target_type and target_id are required', null, 400);
+            return;
+        }
+
+        if (!in_array($targetType, self::VALID_LIKE_TARGETS, true)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Invalid target_type', 'target_type', 400);
+            return;
         }
 
         $result = FeedService::toggleLike($userId, $targetType, $targetId);
@@ -302,6 +308,11 @@ class SocialApiController extends BaseApiController
         $tenantId = TenantContext::getId();
         $reason = trim($this->input('reason') ?? '');
 
+        // Validate reason length (1-1000 characters)
+        if (mb_strlen($reason) > 1000) {
+            $reason = mb_substr($reason, 0, 1000);
+        }
+
         Database::query(
             "INSERT INTO reports (user_id, tenant_id, target_type, target_id, reason, status, created_at)
              VALUES (?, ?, 'feed_post', ?, ?, 'pending', NOW())",
@@ -405,9 +416,16 @@ class SocialApiController extends BaseApiController
      * @param string target_type - post, listing, event, poll, goal, resource, volunteering
      * @param int target_id
      */
+    /** Valid target types for likes */
+    private const VALID_LIKE_TARGETS = ['post', 'listing', 'event', 'poll', 'goal', 'resource', 'volunteering', 'review', 'comment'];
+
+    /** Valid visibility values */
+    private const VALID_VISIBILITY = ['public', 'private', 'friends'];
+
     public function like()
     {
         $this->verifyCsrf();
+        $this->rateLimit('social_like', 60, 60);
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -416,6 +434,10 @@ class SocialApiController extends BaseApiController
 
         if (empty($targetType) || $targetId <= 0) {
             $this->jsonResponse(['error' => 'Invalid target'], 400);
+        }
+
+        if (!in_array($targetType, self::VALID_LIKE_TARGETS, true)) {
+            $this->jsonResponse(['error' => 'Invalid target_type'], 400);
         }
 
         try {
@@ -453,10 +475,10 @@ class SocialApiController extends BaseApiController
                 $this->notifyLike($userId, $targetType, $targetId);
             }
 
-            // Get updated count
+            // Get updated count (tenant-scoped)
             $countResult = Database::query(
-                "SELECT COUNT(*) as cnt FROM likes WHERE target_type = ? AND target_id = ?",
-                [$targetType, $targetId]
+                "SELECT COUNT(*) as cnt FROM likes WHERE target_type = ? AND target_id = ? AND tenant_id = ?",
+                [$targetType, $targetId, $tenantId]
             )->fetch();
 
             $this->jsonResponse([
@@ -512,6 +534,8 @@ class SocialApiController extends BaseApiController
 
         try {
             // Get users who liked this content
+            $tenantId = $this->getTenantId();
+
             $sql = "SELECT
                         u.id,
                         COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as name,
@@ -519,16 +543,16 @@ class SocialApiController extends BaseApiController
                         l.created_at as liked_at
                     FROM likes l
                     JOIN users u ON l.user_id = u.id
-                    WHERE l.target_type = ? AND l.target_id = ?
+                    WHERE l.target_type = ? AND l.target_id = ? AND l.tenant_id = ?
                     ORDER BY l.created_at DESC
                     LIMIT $limit OFFSET $offset";
 
-            $likers = Database::query($sql, [$targetType, $targetId])->fetchAll(\PDO::FETCH_ASSOC);
+            $likers = Database::query($sql, [$targetType, $targetId, $tenantId])->fetchAll(\PDO::FETCH_ASSOC);
 
-            // Get total count
+            // Get total count (tenant-scoped)
             $countResult = Database::query(
-                "SELECT COUNT(*) as cnt FROM likes WHERE target_type = ? AND target_id = ?",
-                [$targetType, $targetId]
+                "SELECT COUNT(*) as cnt FROM likes WHERE target_type = ? AND target_id = ? AND tenant_id = ?",
+                [$targetType, $targetId, $tenantId]
             )->fetch();
             $totalCount = (int)($countResult['cnt'] ?? 0);
 
@@ -571,6 +595,7 @@ class SocialApiController extends BaseApiController
      */
     public function comments()
     {
+        $this->rateLimit('social_comments', 60, 60);
         $action = $this->getInput('action', '');
         $targetType = $this->getInput('target_type', '');
         $targetId = (int)$this->getInput('target_id', 0);
@@ -714,6 +739,7 @@ class SocialApiController extends BaseApiController
     public function reply()
     {
         $this->verifyCsrf();
+        $this->rateLimit('social_reply', 30, 60);
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -758,6 +784,7 @@ class SocialApiController extends BaseApiController
     public function editComment()
     {
         $this->verifyCsrf();
+        $this->rateLimit('social_edit_comment', 30, 60);
         $userId = $this->getUserId();
         $commentId = (int)$this->getInput('comment_id', 0);
         $content = trim($this->getInput('content', ''));
@@ -798,6 +825,7 @@ class SocialApiController extends BaseApiController
     public function deleteComment()
     {
         $this->verifyCsrf();
+        $this->rateLimit('social_delete_comment', 20, 60);
         $userId = $this->getUserId();
         $commentId = (int)$this->getInput('comment_id', 0);
 
@@ -905,6 +933,7 @@ class SocialApiController extends BaseApiController
     public function share()
     {
         $this->verifyCsrf();
+        $this->rateLimit('social_share', 20, 60);
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -956,6 +985,7 @@ class SocialApiController extends BaseApiController
     public function delete()
     {
         $this->verifyCsrf();
+        $this->rateLimit('social_delete', 20, 60);
         $userId = $this->getUserId();
         $targetType = $this->getInput('target_type', '');
         $targetId = (int)$this->getInput('target_id', 0);
@@ -1056,9 +1086,9 @@ class SocialApiController extends BaseApiController
                 Database::query("DELETE FROM likes WHERE target_type = 'poll' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
                 Database::query("DELETE FROM comments WHERE target_type = 'poll' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
-                // Delete poll votes and options first
-                Database::query("DELETE FROM poll_votes WHERE poll_id = ?", [$targetId]);
-                Database::query("DELETE FROM poll_options WHERE poll_id = ?", [$targetId]);
+                // Delete poll votes and options first (scoped via poll ownership already verified above)
+                Database::query("DELETE FROM poll_votes WHERE poll_id = ? AND poll_id IN (SELECT id FROM polls WHERE tenant_id = ?)", [$targetId, $tenantId]);
+                Database::query("DELETE FROM poll_options WHERE poll_id = ? AND poll_id IN (SELECT id FROM polls WHERE tenant_id = ?)", [$targetId, $tenantId]);
 
                 // Delete poll
                 Database::query("DELETE FROM polls WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
@@ -1141,6 +1171,7 @@ class SocialApiController extends BaseApiController
      */
     public function mentionSearch()
     {
+        $this->rateLimit('social_mention_search', 30, 60);
         $this->getUserId(); // Must be logged in
         $tenantId = $this->getTenantId();
 
@@ -1185,6 +1216,7 @@ class SocialApiController extends BaseApiController
      */
     public function feed()
     {
+        $this->rateLimit('social_feed', 60, 60);
         $currentUserId = $this->getOptionalUserId(); // Not required
         $tenantId = $this->getTenantId();
 
@@ -1251,8 +1283,8 @@ class SocialApiController extends BaseApiController
                        COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                        u.avatar_url as author_avatar,
                        p.user_id as author_id,
-                       (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id) as comments_count,
-                       " . ($currentUserId ? "(SELECT COUNT(*) FROM likes WHERE user_id = $currentUserId AND target_type = 'post' AND target_id = p.id)" : "0") . " as is_liked
+                       (SELECT COUNT(*) FROM comments cm WHERE cm.target_type = 'post' AND cm.target_id = p.id AND cm.tenant_id = $tenantId) as comments_count,
+                       " . ($currentUserId ? "(SELECT COUNT(*) FROM likes lk WHERE lk.user_id = $currentUserId AND lk.target_type = 'post' AND lk.target_id = p.id AND lk.tenant_id = $tenantId)" : "0") . " as is_liked
                 FROM feed_posts p
                 JOIN users u ON p.user_id = u.id
                 WHERE p.group_id = ? AND p.tenant_id = ?
@@ -1266,6 +1298,7 @@ class SocialApiController extends BaseApiController
     {
         // Security: Cast all numeric values to integers to prevent SQL injection
         $currentUserId = (int) $currentUserId;
+        $tenantId = (int) $tenantId;
         $limit = (int) $limit;
         $offset = (int) $offset;
 
@@ -1274,8 +1307,8 @@ class SocialApiController extends BaseApiController
                        COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                        u.avatar_url as author_avatar,
                        p.user_id as author_id,
-                       (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id) as comments_count,
-                       " . ($currentUserId ? "(SELECT COUNT(*) FROM likes WHERE user_id = $currentUserId AND target_type = 'post' AND target_id = p.id)" : "0") . " as is_liked
+                       (SELECT COUNT(*) FROM comments cm WHERE cm.target_type = 'post' AND cm.target_id = p.id AND cm.tenant_id = $tenantId) as comments_count,
+                       " . ($currentUserId ? "(SELECT COUNT(*) FROM likes lk WHERE lk.user_id = $currentUserId AND lk.target_type = 'post' AND lk.target_id = p.id AND lk.tenant_id = $tenantId)" : "0") . " as is_liked
                 FROM feed_posts p
                 JOIN users u ON p.user_id = u.id
                 WHERE p.user_id = ? AND p.tenant_id = ? AND p.visibility = 'public'
@@ -1293,19 +1326,25 @@ class SocialApiController extends BaseApiController
         $offset = (int) $offset;
 
         $items = [];
+        // Tenant-scoped like subquery (int-cast above prevents SQL injection)
         $likeSubquery = $currentUserId
-            ? "(SELECT COUNT(*) FROM likes WHERE user_id = $currentUserId AND target_type = '%s' AND target_id = %s.id)"
+            ? "(SELECT COUNT(*) FROM likes WHERE user_id = $currentUserId AND target_type = '%s' AND target_id = %s.id AND tenant_id = $tenantId)"
             : "0";
+
+        // Tenant-scoped count helpers
+        $likesCountSub = "(SELECT COUNT(*) FROM likes lk WHERE lk.target_type = '%s' AND lk.target_id = %s.id AND lk.tenant_id = $tenantId)";
+        $commentsCountSub = "(SELECT COUNT(*) FROM comments cm WHERE cm.target_type = '%s' AND cm.target_id = %s.id AND cm.tenant_id = $tenantId)";
 
         // Posts
         if ($filter === 'all' || $filter === 'posts') {
             $isLiked = sprintf($likeSubquery, 'post', 'p');
+            $commentsSub = sprintf($commentsCountSub, 'post', 'p');
             $sql = "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count,
                            'post' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
                            p.user_id as author_id,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id) as comments_count,
+                           $commentsSub as comments_count,
                            $isLiked as is_liked
                     FROM feed_posts p
                     JOIN users u ON p.user_id = u.id
@@ -1318,13 +1357,15 @@ class SocialApiController extends BaseApiController
         // Listings
         if ($filter === 'all' || $filter === 'listings') {
             $isLiked = sprintf($likeSubquery, 'listing', 'l');
+            $likesSub = sprintf($likesCountSub, 'listing', 'l');
+            $commentsSub = sprintf($commentsCountSub, 'listing', 'l');
             $sql = "SELECT l.id, l.title, l.description as content, l.image_url, l.created_at,
                            'listing' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
                            l.user_id as author_id,
-                           (SELECT COUNT(*) FROM likes WHERE target_type = 'listing' AND target_id = l.id) as likes_count,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'listing' AND target_id = l.id) as comments_count,
+                           $likesSub as likes_count,
+                           $commentsSub as comments_count,
                            $isLiked as is_liked
                     FROM listings l
                     JOIN users u ON l.user_id = u.id
@@ -1337,13 +1378,15 @@ class SocialApiController extends BaseApiController
         // Events
         if ($filter === 'all' || $filter === 'events') {
             $isLiked = sprintf($likeSubquery, 'event', 'e');
+            $likesSub = sprintf($likesCountSub, 'event', 'e');
+            $commentsSub = sprintf($commentsCountSub, 'event', 'e');
             $sql = "SELECT e.id, e.title, e.description as content, e.cover_image as image_url, e.created_at, e.start_time as start_date,
                            'event' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
                            e.user_id as author_id,
-                           (SELECT COUNT(*) FROM likes WHERE target_type = 'event' AND target_id = e.id) as likes_count,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'event' AND target_id = e.id) as comments_count,
+                           $likesSub as likes_count,
+                           $commentsSub as comments_count,
                            $isLiked as is_liked
                     FROM events e
                     JOIN users u ON e.user_id = u.id
@@ -1356,13 +1399,15 @@ class SocialApiController extends BaseApiController
         // Polls
         if ($filter === 'all' || $filter === 'polls') {
             $isLiked = sprintf($likeSubquery, 'poll', 'po');
+            $likesSub = sprintf($likesCountSub, 'poll', 'po');
+            $commentsSub = sprintf($commentsCountSub, 'poll', 'po');
             $sql = "SELECT po.id, po.question as title, po.question as content, po.created_at,
                            'poll' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
                            po.user_id as author_id,
-                           (SELECT COUNT(*) FROM likes WHERE target_type = 'poll' AND target_id = po.id) as likes_count,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'poll' AND target_id = po.id) as comments_count,
+                           $likesSub as likes_count,
+                           $commentsSub as comments_count,
                            $isLiked as is_liked
                     FROM polls po
                     JOIN users u ON po.user_id = u.id
@@ -1375,13 +1420,15 @@ class SocialApiController extends BaseApiController
         // Goals
         if ($filter === 'all' || $filter === 'goals') {
             $isLiked = sprintf($likeSubquery, 'goal', 'g');
+            $likesSub = sprintf($likesCountSub, 'goal', 'g');
+            $commentsSub = sprintf($commentsCountSub, 'goal', 'g');
             $sql = "SELECT g.id, g.title, g.description as content, g.created_at,
                            'goal' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
                            g.user_id as author_id,
-                           (SELECT COUNT(*) FROM likes WHERE target_type = 'goal' AND target_id = g.id) as likes_count,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'goal' AND target_id = g.id) as comments_count,
+                           $likesSub as likes_count,
+                           $commentsSub as comments_count,
                            $isLiked as is_liked
                     FROM goals g
                     JOIN users u ON g.user_id = u.id
@@ -1414,6 +1461,7 @@ class SocialApiController extends BaseApiController
     public function createPost()
     {
         $this->verifyCsrf();
+        $this->rateLimit('social_create_post', 20, 60);
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -1421,6 +1469,11 @@ class SocialApiController extends BaseApiController
         $emoji = $this->getInput('emoji', null);
         $imageUrl = $this->getInput('image_url', null);
         $visibility = $this->getInput('visibility', 'public');
+
+        // Validate visibility
+        if (!in_array($visibility, self::VALID_VISIBILITY, true)) {
+            $visibility = 'public';
+        }
         $groupId = (int)$this->getInput('group_id', 0);
 
         if (empty($content) && empty($imageUrl)) {
@@ -1482,6 +1535,12 @@ class SocialApiController extends BaseApiController
 
     private function handleImageUpload($file)
     {
+        // SECURITY: Enforce server-side file size limit (5MB)
+        $maxSize = 5 * 1024 * 1024;
+        if ($file['size'] > $maxSize) {
+            return null;
+        }
+
         // SECURITY: Validate actual MIME type using finfo, not user-supplied type
         $allowedTypes = [
             'image/jpeg' => ['jpg', 'jpeg'],

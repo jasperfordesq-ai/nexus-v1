@@ -469,22 +469,30 @@ class FeedService
     }
 
     /**
-     * Format feed items with like status
+     * Format feed items with like status (batch-loaded to avoid N+1 queries)
+     * Also includes poll_data for poll-type items to avoid frontend N+1 requests.
      */
     private static function formatItems(array $items, ?int $userId): array
     {
-        $db = Database::getConnection();
+        if (empty($items)) {
+            return [];
+        }
+
+        // Batch load like status for all items in a single query
+        $likedSet = [];
+        if ($userId) {
+            $likedSet = self::batchLoadLikeStatus($userId, $items);
+        }
+
+        // Batch load poll data for poll-type items
+        $pollDataMap = self::batchLoadPollData($items, $userId);
+
         $formatted = [];
-
         foreach ($items as $item) {
-            $isLiked = false;
-            if ($userId) {
-                $check = $db->prepare("SELECT 1 FROM likes WHERE user_id = ? AND target_type = ? AND target_id = ?");
-                $check->execute([$userId, $item['type'], $item['id']]);
-                $isLiked = (bool)$check->fetchColumn();
-            }
+            $likeKey = $item['type'] . ':' . $item['id'];
+            $isLiked = isset($likedSet[$likeKey]);
 
-            $formatted[] = [
+            $entry = [
                 'id' => (int)$item['id'],
                 'type' => $item['type'],
                 'title' => $item['title'] ?? null,
@@ -502,10 +510,148 @@ class FeedService
                 // Include extra fields for events
                 'start_date' => $item['start_date'] ?? null,
                 'location' => $item['location'] ?? null,
+                // Include extra fields for reviews
+                'rating' => isset($item['rating']) ? (int)$item['rating'] : null,
+                'receiver' => $item['receiver'] ?? null,
             ];
+
+            // Include poll_data for poll-type items (avoids frontend N+1 requests)
+            if ($item['type'] === 'poll' && isset($pollDataMap[(int)$item['id']])) {
+                $entry['poll_data'] = $pollDataMap[(int)$item['id']];
+            }
+
+            $formatted[] = $entry;
         }
 
         return $formatted;
+    }
+
+    /**
+     * Batch load like status for multiple items in a single query
+     * Returns a set of "type:id" keys that the user has liked
+     */
+    private static function batchLoadLikeStatus(int $userId, array $items): array
+    {
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+
+        // Group items by type for efficient querying
+        $byType = [];
+        foreach ($items as $item) {
+            $byType[$item['type']][] = (int)$item['id'];
+        }
+
+        $likedSet = [];
+        foreach ($byType as $type => $ids) {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $params = array_merge([$userId, $type, $tenantId], $ids);
+            $stmt = $db->prepare(
+                "SELECT target_id FROM likes WHERE user_id = ? AND target_type = ? AND tenant_id = ? AND target_id IN ($placeholders)"
+            );
+            $stmt->execute($params);
+
+            while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $likedSet[$type . ':' . $row['target_id']] = true;
+            }
+        }
+
+        return $likedSet;
+    }
+
+    /**
+     * Batch load poll data for poll-type items in the feed.
+     * Returns a map of pollId => pollData (with options, votes, user vote).
+     */
+    private static function batchLoadPollData(array $items, ?int $userId): array
+    {
+        // Collect poll IDs
+        $pollIds = [];
+        foreach ($items as $item) {
+            if ($item['type'] === 'poll') {
+                $pollIds[] = (int)$item['id'];
+            }
+        }
+
+        if (empty($pollIds)) {
+            return [];
+        }
+
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+
+        // Load all poll options in one query
+        $placeholders = implode(',', array_fill(0, count($pollIds), '?'));
+        $stmt = $db->prepare(
+            "SELECT po.id as option_id, po.poll_id, po.option_text,
+                    (SELECT COUNT(*) FROM poll_votes pv WHERE pv.option_id = po.id) as vote_count
+             FROM poll_options po
+             WHERE po.poll_id IN ($placeholders)
+             ORDER BY po.id ASC"
+        );
+        $stmt->execute($pollIds);
+        $allOptions = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Load user's votes if authenticated
+        $userVotes = [];
+        if ($userId) {
+            $stmt = $db->prepare(
+                "SELECT pv.poll_id, pv.option_id
+                 FROM poll_votes pv
+                 WHERE pv.poll_id IN ($placeholders) AND pv.user_id = ?"
+            );
+            $stmt->execute(array_merge($pollIds, [$userId]));
+            foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $vote) {
+                $userVotes[(int)$vote['poll_id']] = (int)$vote['option_id'];
+            }
+        }
+
+        // Load poll metadata (is_active)
+        $stmt = $db->prepare(
+            "SELECT id, is_active, question FROM polls WHERE id IN ($placeholders) AND tenant_id = ?"
+        );
+        $stmt->execute(array_merge($pollIds, [$tenantId]));
+        $pollMeta = [];
+        foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $poll) {
+            $pollMeta[(int)$poll['id']] = $poll;
+        }
+
+        // Build poll data map
+        $pollDataMap = [];
+        $optionsByPoll = [];
+        foreach ($allOptions as $opt) {
+            $optionsByPoll[(int)$opt['poll_id']][] = $opt;
+        }
+
+        foreach ($pollIds as $pollId) {
+            $options = $optionsByPoll[$pollId] ?? [];
+            $totalVotes = 0;
+            foreach ($options as $opt) {
+                $totalVotes += (int)$opt['vote_count'];
+            }
+
+            $formattedOptions = [];
+            foreach ($options as $opt) {
+                $voteCount = (int)$opt['vote_count'];
+                $formattedOptions[] = [
+                    'id' => (int)$opt['option_id'],
+                    'text' => $opt['option_text'],
+                    'vote_count' => $voteCount,
+                    'percentage' => $totalVotes > 0 ? round(($voteCount / $totalVotes) * 100, 1) : 0,
+                ];
+            }
+
+            $meta = $pollMeta[$pollId] ?? null;
+            $pollDataMap[$pollId] = [
+                'id' => $pollId,
+                'question' => $meta['question'] ?? '',
+                'options' => $formattedOptions,
+                'total_votes' => $totalVotes,
+                'user_vote_option_id' => $userVotes[$pollId] ?? null,
+                'is_active' => (bool)($meta['is_active'] ?? true),
+            ];
+        }
+
+        return $pollDataMap;
     }
 
     /**
@@ -556,6 +702,12 @@ class FeedService
         $imageUrl = $data['image_url'] ?? null;
         $visibility = $data['visibility'] ?? 'public';
         $groupId = (int)($data['group_id'] ?? 0);
+
+        // Validate visibility
+        $validVisibility = ['public', 'private', 'friends'];
+        if (!in_array($visibility, $validVisibility, true)) {
+            $visibility = 'public';
+        }
 
         if (empty($content) && empty($imageUrl)) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content or image is required', 'field' => 'content'];
@@ -640,9 +792,9 @@ class FeedService
             $action = 'liked';
         }
 
-        // Get updated count
-        $stmt = $db->prepare("SELECT COUNT(*) FROM likes WHERE target_type = ? AND target_id = ?");
-        $stmt->execute([$targetType, $targetId]);
+        // Get updated count (tenant-scoped)
+        $stmt = $db->prepare("SELECT COUNT(*) FROM likes WHERE target_type = ? AND target_id = ? AND tenant_id = ?");
+        $stmt->execute([$targetType, $targetId, $tenantId]);
         $count = (int)$stmt->fetchColumn();
 
         return [
