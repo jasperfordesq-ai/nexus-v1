@@ -43,7 +43,7 @@ echo "Mode: " . ($dryRun ? "DRY RUN (no changes)" : "LIVE") . "\n";
 echo "Date: " . date('Y-m-d H:i:s') . "\n\n";
 
 // Get tenants to process
-$tenantQuery = "SELECT id, name, slug FROM tenants WHERE status = 'active'";
+$tenantQuery = "SELECT id, name, slug FROM tenants WHERE id > 0";
 $tenantParams = [];
 if ($tenantFilter) {
     $tenantQuery .= " AND id = ?";
