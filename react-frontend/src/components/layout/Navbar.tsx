@@ -341,8 +341,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const morePaths = [...activityPaths, ...federationPaths, ...aboutPaths];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Left Section: Mobile Menu + Brand */}
           <div className="flex items-center gap-2 sm:gap-3">
