@@ -21,7 +21,7 @@ import {
   Play,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminConfig } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { TenantConfig, CacheStats, BackgroundJob } from '../../api/types';
@@ -42,6 +42,7 @@ const FEATURE_META: Record<string, { label: string; description: string }> = {
   reviews: { label: 'Reviews', description: 'Member reviews and ratings' },
   polls: { label: 'Polls', description: 'Community polls and voting' },
   direct_messaging: { label: 'Direct Messaging', description: 'Private messaging between members' },
+  group_exchanges: { label: 'Group Exchanges', description: 'Multi-party group exchange sessions' },
 };
 
 const MODULE_META: Record<string, { label: string; description: string }> = {
@@ -58,6 +59,7 @@ const MODULE_META: Record<string, { label: string; description: string }> = {
 export function TenantFeatures() {
   usePageTitle('Admin - Tenant Features');
   const toast = useToast();
+  const { refreshTenant } = useTenant();
 
   const [config, setConfig] = useState<TenantConfig | null>(null);
   const [cacheStats, setCacheStats] = useState<CacheStats | null>(null);
@@ -97,6 +99,8 @@ export function TenantFeatures() {
         prev ? { ...prev, features: { ...prev.features, [feature]: enabled } } : prev
       );
       toast.success(`${FEATURE_META[feature]?.label || feature} ${enabled ? 'enabled' : 'disabled'}`);
+      // Refresh TenantContext so nav items update immediately
+      refreshTenant();
     } else {
       toast.error(res.error || 'Failed to update feature');
     }
@@ -111,6 +115,8 @@ export function TenantFeatures() {
         prev ? { ...prev, modules: { ...prev.modules, [module]: enabled } } : prev
       );
       toast.success(`${MODULE_META[module]?.label || module} ${enabled ? 'enabled' : 'disabled'}`);
+      // Refresh TenantContext so nav items update immediately
+      refreshTenant();
     } else {
       toast.error(res.error || 'Failed to update module');
     }

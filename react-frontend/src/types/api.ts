@@ -794,23 +794,22 @@ export interface OffsetPaginationParams {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface TenantFeatures {
-  gamification: boolean;
-  groups: boolean;
   events: boolean;
-  marketplace: boolean;
-  messaging: boolean;
-  volunteering: boolean;
-  connections: boolean;
-  polls: boolean;
+  groups: boolean;
+  gamification: boolean;
   goals: boolean;
-  federation: boolean;
   blog: boolean;
   resources: boolean;
-  reviews: boolean;
-  search: boolean;
+  volunteering: boolean;
   exchange_workflow: boolean;
+  organisations: boolean;
+  federation: boolean;
+  connections: boolean;
+  reviews: boolean;
+  polls: boolean;
   direct_messaging: boolean;
   group_exchanges: boolean;
+  search: boolean;
 }
 
 export interface TenantModules {

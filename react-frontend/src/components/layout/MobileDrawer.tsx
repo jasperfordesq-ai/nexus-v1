@@ -81,7 +81,7 @@ const communityNavItems = [
   { label: 'Groups', href: '/groups', icon: Users, feature: 'groups' as const },
   { label: 'Blog', href: '/blog', icon: BookOpen, feature: 'blog' as const },
   { label: 'Volunteering', href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
-  { label: 'Organisations', href: '/organisations', icon: Building2, feature: 'volunteering' as const },
+  { label: 'Organisations', href: '/organisations', icon: Building2, feature: 'organisations' as const },
   { label: 'Resources', href: '/resources', icon: FolderOpen, feature: 'resources' as const },
 ];
 

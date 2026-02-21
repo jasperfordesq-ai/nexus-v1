@@ -284,7 +284,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: 'Groups', href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
     { label: 'Blog', href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' as const },
     { label: 'Volunteering', href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
-    { label: 'Organisations', href: tenantPath('/organisations'), icon: Building2, feature: 'volunteering' as const },
+    { label: 'Organisations', href: tenantPath('/organisations'), icon: Building2, feature: 'organisations' as const },
     { label: 'Resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
   ].filter(item => hasFeature(item.feature));
 
