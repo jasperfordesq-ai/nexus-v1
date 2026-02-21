@@ -218,13 +218,16 @@ describe('FeedPage', () => {
     expect(screen.getByText('Goals')).toBeInTheDocument();
   });
 
-  it('shows loading skeletons while loading', () => {
-    // Mock a never-resolving promise to keep loading state
-    mockGet.mockReturnValue(new Promise(() => {}));
+  it('shows loading skeletons while loading', async () => {
+    // Use a controllable promise instead of never-resolving one (prevents Vitest hang on CI)
+    let resolveApi: (value: unknown) => void;
+    mockGet.mockReturnValue(new Promise((resolve) => { resolveApi = resolve; }));
     render(<FeedPage />);
     // Should show skeleton containers (GlassCard mocked as div.glass-card)
     const skeletonCards = document.querySelectorAll('.glass-card');
     // At least 3 skeleton cards + possible quick-post box
     expect(skeletonCards.length).toBeGreaterThanOrEqual(3);
+    // Clean up: resolve the promise so Vitest can exit cleanly
+    resolveApi!({ success: true, data: [], meta: {} });
   });
 });
