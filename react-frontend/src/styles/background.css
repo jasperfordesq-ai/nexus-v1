@@ -10,6 +10,7 @@
 html {
   background-color: var(--background);
   color: var(--foreground);
+  overflow-x: hidden;
 }
 
 body {
@@ -23,10 +24,11 @@ body {
   overflow-x: hidden;
 }
 
-/* Ensure root container matches theme */
+/* Ensure root container matches theme and prevents horizontal overflow */
 #root {
   min-height: 100vh;
   background-color: var(--background);
+  overflow-x: hidden;
 }
 
 /* ─────────────────────────────────────────────

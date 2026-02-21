@@ -80,7 +80,7 @@ export function StrategicPlanPage() {
       title="Strategic Plan 2026–2030"
       description="The Power of an Hour: hOUR Timebank's five-year strategic plan for sustainable growth, national scaling, and building a connected Ireland."
     />
-    <div className="-mx-4 sm:-mx-6 lg:-mx-8 -my-6 sm:-my-8">
+    <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
       {/* ─── Breadcrumbs ─── */}
       <div className="px-4 sm:px-6 lg:px-8 pt-6">
         <Breadcrumbs items={[

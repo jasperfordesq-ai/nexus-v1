@@ -111,7 +111,7 @@ export function ImpactReportPage() {
       title="Impact Report"
       description="Full 2023 Social Impact Study for hOUR Timebank: SROI analysis showing sixteen euros returned for every euro invested, with member outcomes and case studies."
     />
-    <div className="-mx-4 sm:-mx-6 lg:-mx-8 -my-6 sm:-my-8">
+    <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
       {/* ─── Breadcrumbs ─── */}
       <div className="px-4 sm:px-6 lg:px-8 pt-6">
         <Breadcrumbs items={[
