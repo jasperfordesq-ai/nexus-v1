@@ -89,6 +89,20 @@ class AdminSuperApiController extends BaseApiController
             }
         }
 
+        // After session sync, verify SuperPanelAccess grants access.
+        // A user can be is_super_admin but their tenant may lack sub-tenant
+        // capability (allows_subtenants=0), which means no Super Panel access.
+        // Return a clear 403 instead of silently returning empty data.
+        $access = \Nexus\Middleware\SuperPanelAccess::getAccess();
+        if (!$access['granted']) {
+            $this->respondWithError(
+                ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED,
+                'Super Panel access denied: ' . ($access['reason'] ?? 'Unknown reason'),
+                null,
+                403
+            );
+        }
+
         return $userId;
     }
 
