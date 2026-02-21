@@ -107,8 +107,12 @@ class TotpEncryption
                 return $decoded;
             }
 
-            // Try hex decoding
-            $decoded = hex2bin($key);
+            // Try hex decoding (only if valid hex string)
+            if (ctype_xdigit($key)) {
+                $decoded = hex2bin($key);
+            } else {
+                $decoded = false;
+            }
             if ($decoded !== false && strlen($decoded) === 32) {
                 return $decoded;
             }

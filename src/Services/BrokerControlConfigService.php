@@ -389,7 +389,7 @@ class BrokerControlConfigService
                 'high_risk_requires_approval' => (bool) ($data['risk_tagging']['high_risk_requires_approval'] ?? true),
                 'notify_on_high_risk_match' => (bool) ($data['risk_tagging']['notify_on_high_risk_match'] ?? true),
                 'default_risk_level' => in_array($data['risk_tagging']['default_risk_level'] ?? 'low', ['low', 'medium', 'high', 'critical'])
-                    ? $data['risk_tagging']['default_risk_level']
+                    ? ($data['risk_tagging']['default_risk_level'] ?? 'low')
                     : 'low',
             ];
         }

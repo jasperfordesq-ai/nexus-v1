@@ -431,7 +431,11 @@ class Mailer
             $host = "ssl://" . $host;
         }
 
-        $this->socket = fsockopen($host, $this->port, $errno, $errstr, 30);
+        if (empty($this->host)) {
+            throw new \Exception("SMTP host not configured");
+        }
+
+        $this->socket = @fsockopen($host, $this->port, $errno, $errstr, 30);
         if (!$this->socket) {
             throw new \Exception("Could not connect to SMTP host: $errstr ($errno)");
         }
