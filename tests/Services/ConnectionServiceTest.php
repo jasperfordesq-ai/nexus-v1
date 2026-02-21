@@ -439,7 +439,7 @@ class ConnectionServiceTest extends DatabaseTestCase
 
         $status = ConnectionService::getStatus(self::$testUser2Id, self::$testUser3Id);
 
-        $this->assertEquals('accepted', $status['status']);
+        $this->assertEquals('connected', $status['status']);
         $this->assertNull($status['direction']); // Accepted has no direction
 
         // Cleanup

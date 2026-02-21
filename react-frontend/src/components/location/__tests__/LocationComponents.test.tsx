@@ -15,6 +15,11 @@ import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 
+// ─── Set env before module imports ───────────────────────────────────────────
+// GoogleMapsProvider reads VITE_GOOGLE_MAPS_API_KEY at module level,
+// so it must be set before any component imports.
+import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
+
 // ─── Common mocks ────────────────────────────────────────────────────────────
 
 vi.mock('@/contexts', () => ({
@@ -40,6 +45,10 @@ vi.mock('@/contexts/ThemeContext', () => ({
 
 vi.mock('@/lib/map-styles', () => ({
   DARK_MAP_STYLES: [],
+}));
+
+vi.mock('@/lib/map-config', () => ({
+  MAPS_ENABLED: true,
 }));
 
 // Mock @vis.gl/react-google-maps
