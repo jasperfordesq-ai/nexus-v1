@@ -1281,10 +1281,10 @@ export interface AdminSettingsResponse {
     contact_phone: string;
   };
   settings: {
-    registration_mode: string;
-    email_verification: string | boolean;
-    admin_approval: string | boolean;
-    maintenance_mode: string | boolean;
+    registration_mode: string | null;
+    email_verification: string | null;
+    admin_approval: string | null;
+    maintenance_mode: string | null;
   };
 }
 

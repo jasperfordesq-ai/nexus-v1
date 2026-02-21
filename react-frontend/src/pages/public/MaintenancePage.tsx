@@ -13,12 +13,13 @@ import { Wrench, LogIn } from 'lucide-react';
 import { useTenant } from '@/contexts';
 import { tenantPath } from '@/lib/tenant-routing';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { Link } from 'react-router-dom';
 
 export function MaintenancePage() {
   usePageTitle('Maintenance');
   const { tenant } = useTenant();
   const tenantName = tenant?.name || 'Project NEXUS';
-  const loginPath = tenantPath('/login', tenant?.slug);
+  const adminPath = tenantPath('/admin', tenant?.slug);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-primary-500 to-secondary-600 flex items-center justify-center p-4">
@@ -51,8 +52,8 @@ export function MaintenancePage() {
 
           <div className="pt-4 border-t border-divider">
             <Button
-              as="a"
-              href={loginPath}
+              as={Link}
+              to={adminPath}
               variant="flat"
               color="primary"
               startContent={<LogIn size={18} />}

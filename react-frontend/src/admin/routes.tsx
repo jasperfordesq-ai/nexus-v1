@@ -10,7 +10,7 @@
  */
 
 import { Suspense, lazy } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import { LoadingScreen } from '@/components/feedback';
 import { SuperAdminRoute } from './SuperAdminRoute';
 
@@ -391,6 +391,9 @@ export function AdminRoutes() {
       {/* ─── ANALYTICS & REPORTING ─── */}
       <Route path="community-analytics" element={<Lazy><CommunityAnalytics /></Lazy>} />
       <Route path="impact-report" element={<Lazy><ImpactReport /></Lazy>} />
+
+      {/* ─── REDIRECT: /admin/login → main login page ─── */}
+      <Route path="login" element={<Navigate to="/login" replace />} />
 
       {/* ─── 404 CATCH-ALL ─── */}
       <Route path="*" element={<Lazy><AdminNotFound /></Lazy>} />
