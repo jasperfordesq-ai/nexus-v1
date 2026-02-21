@@ -297,6 +297,9 @@ class ReviewTest extends DatabaseTestCase
     {
         $reviews = Review::getForUser(self::$testReceiverId);
 
+        $this->assertIsArray($reviews);
+        $this->assertGreaterThanOrEqual(1, count($reviews), 'Should have at least one review for the test receiver');
+
         for ($i = 1; $i < count($reviews); $i++) {
             $this->assertGreaterThanOrEqual(
                 $reviews[$i]['created_at'],

@@ -217,9 +217,14 @@ class BadgeTest extends DatabaseTestCase
     public function testGetForUserOrdersByAwardedAtDesc(): void
     {
         UserBadge::award(self::$testUserId, 'first', 'First Badge', null);
-        // Small delay to ensure different timestamps
-        usleep(10000);
         UserBadge::award(self::$testUserId, 'second', 'Second Badge', null);
+
+        // MySQL timestamp has second precision, so rapid inserts get identical timestamps.
+        // Explicitly backdate the 'first' badge to ensure deterministic ordering.
+        Database::query(
+            "UPDATE user_badges SET awarded_at = DATE_SUB(NOW(), INTERVAL 1 HOUR) WHERE user_id = ? AND badge_key = 'first'",
+            [self::$testUserId]
+        );
 
         $badges = UserBadge::getForUser(self::$testUserId);
         $this->assertGreaterThanOrEqual(2, count($badges));

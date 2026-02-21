@@ -399,6 +399,12 @@ class CategoryTest extends DatabaseTestCase
         // We'll use a very high tenant_id and clean up after
         $tempTenantId = 999888;
 
+        // Ensure the temp tenant exists (FK constraint requires it)
+        Database::query(
+            "INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES (?, ?, ?, 1)",
+            [$tempTenantId, 'Temp Seed Test Tenant', 'temp-seed-test-tenant']
+        );
+
         // Clean up any existing categories for this temp tenant
         Database::query("DELETE FROM categories WHERE tenant_id = ?", [$tempTenantId]);
 
@@ -439,11 +445,18 @@ class CategoryTest extends DatabaseTestCase
 
         // Clean up
         Database::query("DELETE FROM categories WHERE tenant_id = ?", [$tempTenantId]);
+        Database::query("DELETE FROM tenants WHERE id = ?", [$tempTenantId]);
     }
 
     public function testSeedDefaultsIncludesExpectedListingCategories(): void
     {
         $tempTenantId = 999887;
+
+        // Ensure the temp tenant exists (FK constraint requires it)
+        Database::query(
+            "INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES (?, ?, ?, 1)",
+            [$tempTenantId, 'Temp Seed Test Tenant 2', 'temp-seed-test-tenant-2']
+        );
 
         Database::query("DELETE FROM categories WHERE tenant_id = ?", [$tempTenantId]);
         Category::seedDefaults($tempTenantId);
@@ -464,6 +477,7 @@ class CategoryTest extends DatabaseTestCase
 
         // Clean up
         Database::query("DELETE FROM categories WHERE tenant_id = ?", [$tempTenantId]);
+        Database::query("DELETE FROM tenants WHERE id = ?", [$tempTenantId]);
     }
 
     // ==========================================

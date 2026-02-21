@@ -24,7 +24,9 @@ class DeliverableTest extends DatabaseTestCase
         $this->testTenantId = 1;
         TenantContext::setById($this->testTenantId);
 
-        // Create test user with unique email
+        // Create test user with unique email using Database::query() so it's visible
+        // to the Deliverable model (which also uses Database::query(), a separate connection
+        // from DatabaseTestCase's self::$pdo)
         $timestamp = time();
         $uniqueSuffix = $timestamp . '_' . mt_rand(1000, 9999);
         $this->testUserId = $this->createTestUser("deliverable_test_{$uniqueSuffix}@test.com");
@@ -292,7 +294,9 @@ class DeliverableTest extends DatabaseTestCase
     }
 
     /**
-     * Helper method to create a test user
+     * Helper method to create a test user.
+     * Uses Database::query() (the app's DB connection) instead of self::$pdo
+     * so the user is visible to Deliverable model methods which also use Database::query().
      */
     private function createTestUser($email = null)
     {
@@ -300,23 +304,27 @@ class DeliverableTest extends DatabaseTestCase
             $uniqueSuffix = time() . '_' . mt_rand(1000, 9999);
             $email = "deliverable_test_{$uniqueSuffix}@test.com";
         }
-        return $this->insertTestData('users', [
-            'tenant_id' => $this->testTenantId,
-            'email' => $email,
-            'name' => 'Test User',
-            'first_name' => 'Test',
-            'last_name' => 'User',
-            'password_hash' => password_hash('password', PASSWORD_DEFAULT),
-            'role' => 'member',
-            'balance' => 0
-        ]);
+        $passwordHash = password_hash('password', PASSWORD_DEFAULT);
+        \Nexus\Core\Database::query(
+            "INSERT INTO users (tenant_id, email, name, first_name, last_name, password_hash, role, balance, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+            [$this->testTenantId, $email, 'Test User', 'Test', 'User', $passwordHash, 'member', 0]
+        );
+        return (int)\Nexus\Core\Database::lastInsertId();
     }
 
     protected function tearDown(): void
     {
-        // Clean up test data
-        $this->truncateTable('deliverables');
-        $this->truncateTable('deliverable_history');
+        // Clean up test data using Database::query() (same connection as the models)
+        try {
+            \Nexus\Core\Database::query("DELETE FROM deliverable_history WHERE deliverable_id IN (SELECT id FROM deliverables WHERE tenant_id = ?)", [$this->testTenantId]);
+            \Nexus\Core\Database::query("DELETE FROM deliverables WHERE tenant_id = ?", [$this->testTenantId]);
+            // Clean up test users created during this test (email pattern match)
+            \Nexus\Core\Database::query("DELETE FROM users WHERE email LIKE 'deliverable_test_%@test.com' AND tenant_id = ?", [$this->testTenantId]);
+            \Nexus\Core\Database::query("DELETE FROM users WHERE email LIKE 'assignee_%@test.com' AND tenant_id = ?", [$this->testTenantId]);
+        } catch (\Exception $e) {
+            // Ignore cleanup errors
+        }
 
         parent::tearDown();
     }
