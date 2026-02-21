@@ -87,10 +87,10 @@ class MatchApprovalWorkflowService
             // Notify brokers/admins
             self::notifyBrokers($requestId, $userId, $listing);
 
-            // Log audit
+            // Log audit (null org_id — not an org operation)
             AuditLogService::log(
                 'match_submitted_for_approval',
-                'match_approval',
+                null,
                 $requestId,
                 [
                     'user_id' => $userId,
@@ -141,10 +141,10 @@ class MatchApprovalWorkflowService
             // Notify the user about the approved match
             self::notifyUserApproved($request);
 
-            // Log audit
+            // Log audit (null org_id — not an org operation)
             AuditLogService::log(
                 'match_approved',
-                'match_approval',
+                null,
                 $requestId,
                 [
                     'approved_by' => $approvedBy,
@@ -195,10 +195,10 @@ class MatchApprovalWorkflowService
             // Notify the user about the rejection (with reason)
             self::notifyUserRejected($request, $reason);
 
-            // Log audit
+            // Log audit (null org_id — not an org operation)
             AuditLogService::log(
                 'match_rejected',
-                'match_approval',
+                null,
                 $requestId,
                 [
                     'rejected_by' => $rejectedBy,

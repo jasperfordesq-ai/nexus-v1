@@ -69,7 +69,7 @@ class TransactionLimitServiceTest extends DatabaseTestCase
         }
         if (self::$testOrgId && self::$testOrgId > 1) {
             try {
-                Database::query("DELETE FROM organizations WHERE id = ?", [self::$testOrgId]);
+                Database::query("DELETE FROM vol_organizations WHERE id = ?", [self::$testOrgId]);
             } catch (\Exception $e) {}
         }
 
