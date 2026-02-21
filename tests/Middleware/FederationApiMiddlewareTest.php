@@ -519,8 +519,10 @@ class FederationApiMiddlewareTest extends TestCase
 
         $validSignature = FederationApiMiddleware::generateSignature($secret, $method, $path, $timestamp, $body);
 
-        // Tamper with one character
-        $tamperedSignature = 'a' . substr($validSignature, 1);
+        // Tamper with one character — flip first char to guarantee a change
+        $firstChar = $validSignature[0];
+        $tamperedChar = ($firstChar === 'a') ? 'b' : 'a';
+        $tamperedSignature = $tamperedChar . substr($validSignature, 1);
 
         $this->assertNotEquals($validSignature, $tamperedSignature);
         $this->assertFalse(hash_equals($validSignature, $tamperedSignature), 'Tampered signature should not match');
