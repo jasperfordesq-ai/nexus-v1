@@ -69,11 +69,6 @@ class Router
             $uri = '/';
         }
 
-        // Ensure root slash
-        if ($uri === '' || $uri === false) {
-            $uri = '/';
-        }
-
         // NORMALIZE SLASHES (Fixes //messages issue)
         $uri = preg_replace('#/+#', '/', $uri);
 

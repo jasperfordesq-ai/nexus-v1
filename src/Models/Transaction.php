@@ -183,21 +183,20 @@ class Transaction
 
     public static function delete($id, $userId)
     {
-        // Determine if user is sender or receiver
-        $pdo = Database::getInstance();
-        $sql = "SELECT sender_id, receiver_id FROM transactions WHERE id = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$id]);
+        // Determine if user is sender or receiver — scoped by tenant_id
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        $stmt = Database::query(
+            "SELECT sender_id, receiver_id FROM transactions WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        );
         $trx = $stmt->fetch();
 
         if ($trx) {
-            if ($trx['sender_id'] == $userId) {
-                $sql = "UPDATE transactions SET deleted_for_sender = 1 WHERE id = ?";
-                Database::query($sql, [$id]);
+            if ((int)$trx['sender_id'] === (int)$userId) {
+                Database::query("UPDATE transactions SET deleted_for_sender = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             }
-            if ($trx['receiver_id'] == $userId) {
-                $sql = "UPDATE transactions SET deleted_for_receiver = 1 WHERE id = ?";
-                Database::query($sql, [$id]);
+            if ((int)$trx['receiver_id'] === (int)$userId) {
+                Database::query("UPDATE transactions SET deleted_for_receiver = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             }
         }
     }
