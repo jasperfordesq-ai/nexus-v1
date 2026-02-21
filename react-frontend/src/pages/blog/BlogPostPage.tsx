@@ -329,7 +329,7 @@ export function BlogPostPage() {
             <img
               src={imageUrl}
               alt={post.title}
-              className="w-full max-h-96 object-cover"
+              className="w-full max-h-48 sm:max-h-96 object-cover"
             />
           </motion.div>
         )}
@@ -355,7 +355,7 @@ export function BlogPostPage() {
           </h1>
 
           {/* Meta */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-theme-muted pb-6 border-b border-theme-default">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-theme-muted pb-6 border-b border-theme-default">
             <Link
               to={tenantPath(`/profile/${post.author.id}`)}
               className="flex items-center gap-2 hover:text-theme-primary transition-colors"
@@ -607,7 +607,7 @@ function CommentItem({
   };
 
   return (
-    <div className={`${depth > 0 ? 'ml-6 sm:ml-10' : ''}`}>
+    <div className={`${depth > 0 ? 'ml-3 sm:ml-6 md:ml-10' : ''}`}>
       <div className="flex items-start gap-2.5">
         <Link to={tenantPath(`/profile/${comment.author.id}`)} className="flex-shrink-0">
           <Avatar

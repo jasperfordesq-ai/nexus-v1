@@ -126,7 +126,7 @@ export function SearchPage() {
 
       {/* Search Form */}
       <GlassCard className="p-4">
-        <form onSubmit={handleSearch} className="flex gap-3">
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
           <Input
             placeholder="Search for anything..."
             value={query}

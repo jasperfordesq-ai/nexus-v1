@@ -16,7 +16,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Input, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Input, Textarea, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { ArrowLeft, Send, Info, Loader2, MoreVertical, Trash2, Mic, Square, Play, Pause, SmilePlus, Check, CheckCheck, Search, Paperclip, X, FileText, Pencil, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';
@@ -1368,7 +1368,7 @@ export function ConversationPage() {
               >
                 <Paperclip className="w-4 h-4" />
               </Button>
-              <Input
+              <Textarea
                 placeholder="Type a message..."
                 value={newMessage}
                 onChange={(e) => {
@@ -1384,6 +1384,18 @@ export function ConversationPage() {
                     pusher.sendTyping(parseInt(targetId, 10), false);
                   }
                 }}
+                onKeyDown={(e) => {
+                  // Enter sends message, Shift+Enter adds newline
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (newMessage.trim() || attachments.length > 0) {
+                      const form = e.currentTarget.closest('form');
+                      if (form) form.requestSubmit();
+                    }
+                  }
+                }}
+                minRows={1}
+                maxRows={4}
                 classNames={{
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',

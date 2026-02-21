@@ -838,7 +838,7 @@ export function GroupDetailPage() {
         </p>
 
         {/* Quick Stats */}
-        <div className="flex flex-wrap gap-6">
+        <div className="flex flex-wrap gap-3 sm:gap-6">
           <div className="flex items-center gap-2 text-theme-muted">
             <Users className="w-5 h-5" aria-hidden="true" />
             <span>{getMemberCount(group)} members</span>
@@ -1093,7 +1093,7 @@ export function GroupDetailPage() {
                               transition={{ duration: 0.2 }}
                               className="overflow-hidden"
                             >
-                              <div className="ml-6 pl-6 border-l-2 border-theme-default space-y-4 pb-2">
+                              <div className="ml-3 sm:ml-6 pl-3 sm:pl-6 border-l-2 border-theme-default space-y-4 pb-2">
                                 {expandedLoading ? (
                                   <div className="flex justify-center py-4">
                                     <Spinner size="sm" />
@@ -1131,7 +1131,7 @@ export function GroupDetailPage() {
                                     )}
 
                                     {/* Reply Form */}
-                                    <div className="flex gap-2 items-end">
+                                    <div className="flex flex-col sm:flex-row gap-2 items-end">
                                       <Textarea
                                         placeholder="Write a reply..."
                                         aria-label="Reply to discussion"
@@ -1217,7 +1217,7 @@ export function GroupDetailPage() {
                   const canManage = userIsAdmin && !memberIsOwner && member.id !== currentUser?.id;
 
                   return (
-                    <div key={member.id} className="flex items-center gap-4 p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors">
+                    <div key={member.id} className="flex items-center gap-2 sm:gap-4 p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors">
                       <Link to={tenantPath(`/profile/${member.id}`)} className="flex items-center gap-4 flex-1 min-w-0">
                         <Avatar
                           src={resolveAvatarUrl(member.avatar_url || member.avatar)}
@@ -1542,7 +1542,7 @@ export function GroupDetailPage() {
                   }}
                 />
                 {/* Images */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="p-3 rounded-lg bg-theme-elevated border border-theme-default">
                     <p className="text-sm font-medium text-theme-primary mb-2 flex items-center gap-1.5">
                       <Image className="w-4 h-4" aria-hidden="true" />

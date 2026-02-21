@@ -456,7 +456,7 @@ export function ExchangeDetailPage() {
         )}
 
         {/* Hours */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6">
           <div className="bg-theme-elevated rounded-lg p-4">
             <p className="text-sm text-theme-muted">Proposed Hours</p>
             <p className="text-2xl font-bold text-theme-primary">{exchange.proposed_hours}</p>
@@ -498,7 +498,7 @@ export function ExchangeDetailPage() {
 
         {/* Actions */}
         {(canAccept || canDecline || canStart || canComplete || canConfirm || canCancel) && (
-          <div className="flex flex-wrap gap-3 pt-4 border-t border-theme-default">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-theme-default">
             {canAccept && (
               <Button
                 color="success"

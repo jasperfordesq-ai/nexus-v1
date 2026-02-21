@@ -270,7 +270,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </Link>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-4">
                 <Link
                   to={tenantPath('/wallet')}
                   className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors"

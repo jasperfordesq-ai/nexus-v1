@@ -286,7 +286,7 @@ export function BlogPage() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
               >
                 {posts.slice(searchQuery || selectedCategory || isPaginated ? 0 : 1).map((post) => (
                   <motion.div key={post.id} variants={itemVariants}>
@@ -345,7 +345,7 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
           </div>
 
           {/* Content */}
-          <div className="md:w-1/2 p-6 flex flex-col justify-center">
+          <div className="md:w-1/2 p-4 sm:p-6 flex flex-col justify-center">
             {post.category && (
               <Chip
                 size="sm"

@@ -411,7 +411,7 @@ export function EventDetailPage() {
         )}
 
         {/* Attendee Count Breakdown */}
-        <div className="flex flex-wrap items-center gap-4 mb-6">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-6">
           <div className="flex items-center gap-2 text-sm">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
             <span className="text-theme-primary font-medium">{goingCount}</span>
@@ -755,7 +755,7 @@ export function EventDetailPage() {
 
         {/* Action Buttons */}
         {isAuthenticated && !isPast && (
-          <div className="flex flex-wrap gap-3 pt-6 border-t border-theme-default mt-8">
+          <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-theme-default mt-8">
             {/* RSVP Options */}
             <div className="flex gap-2" role="group" aria-label="RSVP options">
               <Button

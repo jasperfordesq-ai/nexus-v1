@@ -124,11 +124,11 @@ export function DataTable<T extends Record<string, any>>({
   // Top content (search + actions)
   const tableTopContent = useMemo(
     () => (
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 flex-1">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 flex-1 w-full sm:w-auto">
           {searchable && (
             <Input
-              className="max-w-xs"
+              className="w-full sm:max-w-xs"
               placeholder={searchPlaceholder}
               startContent={<Search size={16} className="text-default-400" />}
               value={searchValue}

@@ -11,31 +11,42 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth, useTenant } from '@/contexts';
 import { Button, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
-import { ArrowLeft, Bell, LogOut, User } from 'lucide-react';
+import { ArrowLeft, Bell, LogOut, Menu, User } from 'lucide-react';
 
 interface AdminHeaderProps {
   sidebarCollapsed: boolean;
+  onSidebarToggle?: () => void;
 }
 
-export function AdminHeader({ sidebarCollapsed }: AdminHeaderProps) {
+export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderProps) {
   const { user, logout } = useAuth();
   const { tenantPath, tenant } = useTenant();
   const navigate = useNavigate();
 
   return (
     <header
-      className={`fixed top-0 right-0 z-30 flex h-16 items-center justify-between border-b border-divider bg-content1/95 backdrop-blur px-6 transition-all duration-300 ${
-        sidebarCollapsed ? 'left-16' : 'left-64'
+      className={`fixed top-0 right-0 z-30 flex h-16 items-center justify-between border-b border-divider bg-content1/95 backdrop-blur px-3 sm:px-6 transition-all duration-300 left-0 ${
+        sidebarCollapsed ? 'md:left-16' : 'md:left-64'
       }`}
     >
-      {/* Left: Back to frontend + tenant name */}
-      <div className="flex items-center gap-4">
+      {/* Left: Mobile menu + Back to frontend + tenant name */}
+      <div className="flex items-center gap-2 sm:gap-4">
+        {/* Mobile hamburger */}
+        {onSidebarToggle && (
+          <button
+            onClick={onSidebarToggle}
+            className="rounded-lg p-2 text-default-500 hover:bg-default-100 hover:text-foreground md:hidden"
+            aria-label="Toggle sidebar"
+          >
+            <Menu size={20} />
+          </button>
+        )}
         <button
           onClick={() => navigate(tenantPath('/dashboard'))}
-          className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-default-500 hover:bg-default-100 hover:text-foreground transition-colors"
+          className="flex items-center gap-2 rounded-lg px-2 sm:px-3 py-1.5 text-sm text-default-500 hover:bg-default-100 hover:text-foreground transition-colors"
         >
           <ArrowLeft size={16} />
-          <span>Back to site</span>
+          <span className="hidden sm:inline">Back to site</span>
         </button>
         {tenant?.name && (
           <span className="text-sm font-medium text-default-400">

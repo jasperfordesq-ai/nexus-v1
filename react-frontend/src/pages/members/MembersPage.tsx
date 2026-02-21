@@ -302,7 +302,7 @@ export function MembersPage() {
               placeholder="Sort by"
               selectedKeys={[sortBy]}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="w-44"
+              className="w-36 sm:w-44"
               aria-label="Sort members by"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -495,7 +495,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
                   <p className="text-sm text-theme-subtle truncate">{member.tagline}</p>
                 )}
               </div>
-              <div className="flex items-center gap-6 text-sm text-theme-subtle">
+              <div className="flex items-center gap-3 sm:gap-6 text-sm text-theme-subtle">
                 {member.location && (
                   <span className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" aria-hidden="true" />

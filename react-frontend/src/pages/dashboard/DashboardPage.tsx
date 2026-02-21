@@ -379,7 +379,7 @@ export function DashboardPage() {
         {/* Welcome Header */}
         <motion.div variants={itemVariants}>
           <GlassCard className="p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-theme-primary">
                   Welcome back, {user?.first_name || user?.name?.split(' ')[0] || 'there'}!
@@ -405,7 +405,7 @@ export function DashboardPage() {
         {/* Stats Grid */}
         <motion.div
           variants={itemVariants}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
+          className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4"
         >
           <StatCard
             icon={<Wallet className="w-5 h-5" aria-hidden="true" />}
@@ -442,7 +442,7 @@ export function DashboardPage() {
         </motion.div>
 
         {/* Main Content: 2-column layout */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {/* ─── Left Column (2/3 width) ─── */}
           <div className="lg:col-span-2 space-y-6">
             {/* Recent Listings */}
@@ -635,7 +635,7 @@ export function DashboardPage() {
                     </div>
 
                     {suggestedLoading ? (
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         {[1, 2, 3, 4].map((i) => (
                           <div key={i} className="animate-pulse">
                             <div className="h-24 bg-theme-elevated rounded-lg" />
@@ -643,7 +643,7 @@ export function DashboardPage() {
                         ))}
                       </div>
                     ) : stats.suggestedListings.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         {stats.suggestedListings.map((listing) => (
                           <Link
                             key={listing.id}
@@ -862,7 +862,7 @@ export function DashboardPage() {
 
                       {/* XP Progress */}
                       <div>
-                        <div className="flex justify-between text-sm mb-1.5">
+                        <div className="flex justify-between text-xs sm:text-sm mb-1.5">
                           <span className="text-theme-muted">
                             {stats.gamification.xp} / {stats.gamification.xp_for_next_level} XP
                           </span>

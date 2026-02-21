@@ -177,7 +177,7 @@ export function AboutPage() {
         description={`Learn about ${branding.name} — a time banking platform where communities exchange skills using time as currency.`}
       />
 
-      <div className="-mx-4 sm:-mx-6 lg:-mx-8 -my-6 sm:-my-8">
+      <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
         {/* ─── Hero Section ─── */}
         <section className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8 overflow-hidden">
           {/* Background blurs */}
@@ -478,7 +478,7 @@ export function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <GlassCard className="p-10 sm:p-14 text-center relative overflow-hidden">
+              <GlassCard className="p-6 sm:p-10 lg:p-14 text-center relative overflow-hidden">
                 {/* Background gradient */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl" />

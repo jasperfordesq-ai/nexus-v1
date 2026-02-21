@@ -427,7 +427,7 @@ export function LeaderboardPage() {
             aria-label="Leaderboard type"
             selectedKeys={[type]}
             onChange={(e) => setType((e.target.value as LeaderboardType) || 'xp')}
-            className="w-48"
+            className="w-full sm:w-48"
             classNames={{
               trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               value: 'text-theme-primary',
@@ -445,7 +445,7 @@ export function LeaderboardPage() {
             aria-label="Leaderboard period"
             selectedKeys={[period]}
             onChange={(e) => setPeriod(e.target.value as LeaderboardPeriod)}
-            className="w-44"
+            className="w-full sm:w-44"
             classNames={{
               trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               value: 'text-theme-primary',

@@ -320,7 +320,7 @@ export function MessagesPage() {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <MessageSquare className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
@@ -605,7 +605,7 @@ function ConversationCard({ conversation }: ConversationCardProps) {
                 {other_user.name}
               </h3>
               {last_message && (
-                <span className="text-xs text-theme-subtle whitespace-nowrap">
+                <span className="text-xs text-theme-subtle truncate">
                   {formatRelativeTime(last_message.created_at || last_message.sent_at || '')}
                 </span>
               )}
@@ -652,7 +652,7 @@ function ArchivedConversationCard({ conversation, onRestore }: ArchivedConversat
               {other_user.name}
             </h3>
             {last_message && (
-              <span className="text-xs text-theme-subtle whitespace-nowrap">
+              <span className="text-xs text-theme-subtle truncate">
                 {formatRelativeTime(last_message.created_at || last_message.sent_at || '')}
               </span>
             )}
