@@ -91,20 +91,26 @@ describe('FederationHubPage', () => {
     vi.clearAllMocks();
   });
 
-  it('shows loading state initially', () => {
-    // API never resolves, so loading stays
-    mockApiGet.mockReturnValue(new Promise(() => {}));
+  it('shows loading state initially', async () => {
+    // Use a controllable promise instead of never-resolving one (prevents Vitest hang on CI)
+    let resolveApi: (value: unknown) => void;
+    mockApiGet.mockReturnValue(new Promise((resolve) => { resolveApi = resolve; }));
 
     render(<FederationHubPage />);
     expect(screen.getByText('Loading federation data...')).toBeInTheDocument();
+    // Clean up: resolve the promise so Vitest can exit cleanly
+    resolveApi!({ success: true, data: { enabled: false } });
   });
 
-  it('shows breadcrumbs', () => {
-    mockApiGet.mockReturnValue(new Promise(() => {}));
+  it('shows breadcrumbs', async () => {
+    let resolveApi: (value: unknown) => void;
+    mockApiGet.mockReturnValue(new Promise((resolve) => { resolveApi = resolve; }));
 
     render(<FederationHubPage />);
     expect(screen.getByTestId('breadcrumbs')).toBeInTheDocument();
     expect(screen.getByText('Federation')).toBeInTheDocument();
+    // Clean up: resolve the promise so Vitest can exit cleanly
+    resolveApi!({ success: true, data: { enabled: false } });
   });
 
   it('shows error state when API fails', async () => {
