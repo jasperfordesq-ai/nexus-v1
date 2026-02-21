@@ -519,7 +519,7 @@ class MatchApprovalWorkflowService
     {
         try {
             $listing = Database::query(
-                "SELECT title FROM listings WHERE id = ?",
+                "SELECT id, title, type, category_id FROM listings WHERE id = ?",
                 [$request['listing_id']]
             )->fetch();
 
@@ -535,10 +535,14 @@ class MatchApprovalWorkflowService
 
             // Also send email notification for hot matches (80%+ score)
             if ($matchScore >= 80) {
+                $matchData = array_merge($listing ?: [], [
+                    'id' => $request['listing_id'],
+                    'listing_id' => $request['listing_id'],
+                    'match_score' => $matchScore,
+                ]);
                 NotificationDispatcher::dispatchHotMatch(
                     $request['user_id'],
-                    $request['listing_id'],
-                    $matchScore
+                    $matchData
                 );
             }
         } catch (\Exception $e) {

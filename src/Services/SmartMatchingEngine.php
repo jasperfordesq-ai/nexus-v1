@@ -354,7 +354,7 @@ class SmartMatchingEngine
         try {
             $candidateListing['distance_km'] = $distance;
             $mlBoost = MatchLearningService::getHistoricalBoost(
-                $userData['id'],
+                $userData['id'] ?? 0,
                 $candidateListing
             );
             if ($mlBoost != 0) {
