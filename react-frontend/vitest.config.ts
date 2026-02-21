@@ -19,6 +19,8 @@ export default defineConfig({
       },
     },
     fileParallelism: false,
+    testTimeout: 30000, // 30s per test — prevents hanging on CI
+    hookTimeout: 30000, // 30s for beforeAll/afterAll hooks
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

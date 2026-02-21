@@ -177,10 +177,12 @@ jobs:
       - name: Vitest Unit Tests (BLOCKING)
         working-directory: react-frontend
         run: npm test -- --run
+        timeout-minutes: 10
 
       - name: Vitest Coverage Check (BLOCKING)
         working-directory: react-frontend
         run: npx vitest run --coverage --coverage.thresholds.100=false 2>&1 | tail -50 || true
+        timeout-minutes: 15
 
       - name: Post Coverage Report as PR Comment
         if: github.event_name == 'pull_request'
