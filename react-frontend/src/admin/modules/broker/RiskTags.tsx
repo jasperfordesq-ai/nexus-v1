@@ -85,7 +85,7 @@ export function RiskTagsPage() {
         setItems(res.data);
       }
     } catch {
-      // Silently handle
+      toast.error('Failed to load risk tags');
     } finally {
       setLoading(false);
     }

@@ -370,6 +370,16 @@ describe('adminApi', () => {
       expect(mockGet).toHaveBeenCalledWith('/v2/admin/broker/dashboard');
     });
 
+    it('getExchanges calls with params', async () => {
+      await adminBroker.getExchanges({ page: 2, status: 'pending' });
+      expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/v2/admin/broker/exchanges'));
+    });
+
+    it('showExchange calls with id', async () => {
+      await adminBroker.showExchange(10);
+      expect(mockGet).toHaveBeenCalledWith('/v2/admin/broker/exchanges/10');
+    });
+
     it('approveExchange calls POST', async () => {
       await adminBroker.approveExchange(10, 'Approved');
       expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/exchanges/10/approve', { notes: 'Approved' });
@@ -380,9 +390,54 @@ describe('adminApi', () => {
       expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/exchanges/10/reject', { reason: 'Rejected' });
     });
 
+    it('getRiskTags calls with params', async () => {
+      await adminBroker.getRiskTags({ risk_level: 'high' });
+      expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/v2/admin/broker/risk-tags'));
+    });
+
+    it('saveRiskTag calls POST', async () => {
+      await adminBroker.saveRiskTag(10, { risk_level: 'high', risk_category: 'personal_care' });
+      expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/risk-tags/10', expect.objectContaining({ risk_level: 'high' }));
+    });
+
+    it('removeRiskTag calls DELETE', async () => {
+      await adminBroker.removeRiskTag(10);
+      expect(mockDelete).toHaveBeenCalledWith('/v2/admin/broker/risk-tags/10');
+    });
+
+    it('getMessages calls with params', async () => {
+      await adminBroker.getMessages({ page: 1, filter: 'unreviewed' });
+      expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/v2/admin/broker/messages'));
+    });
+
+    it('reviewMessage calls POST', async () => {
+      await adminBroker.reviewMessage(5);
+      expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/messages/5/review');
+    });
+
     it('flagMessage calls POST', async () => {
       await adminBroker.flagMessage(5, 'Suspicious', 'concern');
       expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/messages/5/flag', { reason: 'Suspicious', severity: 'concern' });
+    });
+
+    it('getMonitoring calls correct endpoint', async () => {
+      await adminBroker.getMonitoring();
+      expect(mockGet).toHaveBeenCalledWith('/v2/admin/broker/monitoring');
+    });
+
+    it('setMonitoring calls POST', async () => {
+      await adminBroker.setMonitoring(5, { under_monitoring: true, reason: 'Test' });
+      expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/monitoring/5', expect.objectContaining({ under_monitoring: true }));
+    });
+
+    it('getConfiguration calls correct endpoint', async () => {
+      await adminBroker.getConfiguration();
+      expect(mockGet).toHaveBeenCalledWith('/v2/admin/broker/configuration');
+    });
+
+    it('saveConfiguration calls POST', async () => {
+      await adminBroker.saveConfiguration({ broker_messaging_enabled: true });
+      expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/configuration', expect.objectContaining({ broker_messaging_enabled: true }));
     });
   });
 

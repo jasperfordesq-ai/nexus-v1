@@ -65,7 +65,7 @@ export default function BrokerConfiguration() {
         setConfig(res.data);
       }
     } catch {
-      // Silently handle
+      toast.error('Failed to load broker configuration');
     } finally {
       setLoading(false);
     }
@@ -308,7 +308,7 @@ export default function BrokerConfiguration() {
             <Input
               type="number"
               value={String(config.max_hours_without_approval)}
-              onValueChange={v => updateConfig('max_hours_without_approval', parseFloat(v) || 0)}
+              onValueChange={v => updateConfig('max_hours_without_approval', v === '' ? 0 : parseFloat(v))}
               className="w-24"
               min={0}
               max={24}
