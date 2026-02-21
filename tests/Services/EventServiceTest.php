@@ -172,7 +172,8 @@ class EventServiceTest extends DatabaseTestCase
         $result = EventService::getAll(['category_id' => self::$testCategoryId]);
 
         foreach ($result['items'] as $event) {
-            $this->assertEquals(self::$testCategoryId, $event['category_id']);
+            $this->assertNotNull($event['category']);
+            $this->assertEquals(self::$testCategoryId, $event['category']['id']);
         }
     }
 
@@ -182,7 +183,7 @@ class EventServiceTest extends DatabaseTestCase
 
         $this->assertNotEmpty($result['items']);
         foreach ($result['items'] as $event) {
-            $this->assertEquals(self::$testUserId, $event['user_id']);
+            $this->assertEquals(self::$testUserId, $event['organizer']['id']);
         }
     }
 

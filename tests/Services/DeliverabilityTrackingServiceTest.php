@@ -176,18 +176,18 @@ class DeliverabilityTrackingServiceTest extends TestCase
         if ($this->testUserId) {
             try {
                 Database::query(
-                    "DELETE FROM deliverable_history WHERE deliverable_id IN (SELECT id FROM deliverables WHERE created_by = ?)",
+                    "DELETE FROM deliverable_history WHERE deliverable_id IN (SELECT id FROM deliverables WHERE owner_id = ?)",
                     [$this->testUserId]
                 );
             } catch (\Exception $e) {}
             try {
                 Database::query(
-                    "DELETE FROM deliverable_milestones WHERE deliverable_id IN (SELECT id FROM deliverables WHERE created_by = ?)",
+                    "DELETE FROM deliverable_milestones WHERE deliverable_id IN (SELECT id FROM deliverables WHERE owner_id = ?)",
                     [$this->testUserId]
                 );
             } catch (\Exception $e) {}
             try {
-                Database::query("DELETE FROM deliverables WHERE created_by = ?", [$this->testUserId]);
+                Database::query("DELETE FROM deliverables WHERE owner_id = ?", [$this->testUserId]);
             } catch (\Exception $e) {}
             try {
                 Database::query("DELETE FROM users WHERE id = ?", [$this->testUserId]);

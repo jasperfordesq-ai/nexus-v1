@@ -141,6 +141,7 @@ class PollServiceTest extends DatabaseTestCase
     {
         try {
             $result = PollService::getAll(['status' => 'open']);
+            $this->assertIsArray($result['items']);
 
             foreach ($result['items'] as $poll) {
                 // Should either have no expiry or future expiry
@@ -158,6 +159,7 @@ class PollServiceTest extends DatabaseTestCase
     {
         try {
             $result = PollService::getAll(['status' => 'closed']);
+            $this->assertIsArray($result['items']);
 
             foreach ($result['items'] as $poll) {
                 $this->assertNotNull($poll['expires_at']);
@@ -173,6 +175,7 @@ class PollServiceTest extends DatabaseTestCase
     {
         try {
             $result = PollService::getAll(['user_id' => self::$testUserId]);
+            $this->assertIsArray($result['items']);
 
             foreach ($result['items'] as $poll) {
                 $this->assertEquals(self::$testUserId, $poll['user_id']);
@@ -186,6 +189,7 @@ class PollServiceTest extends DatabaseTestCase
     {
         try {
             $result = PollService::getAll();
+            $this->assertIsArray($result['items']);
 
             if (!empty($result['items'])) {
                 $poll = $result['items'][0];

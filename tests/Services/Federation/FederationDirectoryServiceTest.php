@@ -44,6 +44,7 @@ class FederationDirectoryServiceTest extends DatabaseTestCase
     public function testGetDiscoverableTimebanksExcludesCurrentTenant(): void
     {
         $result = FederationDirectoryService::getDiscoverableTimebanks(self::$testTenantId);
+        $this->assertIsArray($result);
 
         foreach ($result as $timebank) {
             $this->assertNotEquals(self::$testTenantId, $timebank['id']);
@@ -104,6 +105,7 @@ class FederationDirectoryServiceTest extends DatabaseTestCase
     public function testGetDiscoverableTimebanksResultStructure(): void
     {
         $result = FederationDirectoryService::getDiscoverableTimebanks(self::$testTenantId);
+        $this->assertIsArray($result);
 
         foreach ($result as $timebank) {
             $this->assertArrayHasKey('id', $timebank);

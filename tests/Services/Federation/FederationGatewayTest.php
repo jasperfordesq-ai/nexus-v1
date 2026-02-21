@@ -64,13 +64,13 @@ class FederationGatewayTest extends DatabaseTestCase
         // Clean up test users
         if (self::$user1Id) {
             try {
-                Database::query("DELETE FROM federation_audit_log WHERE user_id = ?", [self::$user1Id]);
+                Database::query("DELETE FROM federation_audit_log WHERE actor_user_id = ?", [self::$user1Id]);
                 Database::query("DELETE FROM users WHERE id = ?", [self::$user1Id]);
             } catch (\Exception $e) {}
         }
         if (self::$user2Id) {
             try {
-                Database::query("DELETE FROM federation_audit_log WHERE user_id = ?", [self::$user2Id]);
+                Database::query("DELETE FROM federation_audit_log WHERE actor_user_id = ?", [self::$user2Id]);
                 Database::query("DELETE FROM users WHERE id = ?", [self::$user2Id]);
             } catch (\Exception $e) {}
         }

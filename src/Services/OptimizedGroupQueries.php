@@ -168,6 +168,7 @@ class OptimizedGroupQueries
                 WHERE g.tenant_id = ?
             )
             SELECT * FROM ancestors
+            WHERE level > 0
             ORDER BY level DESC
         ";
 
@@ -218,6 +219,7 @@ class OptimizedGroupQueries
                 COUNT(DISTINCT gm.id) as member_count
             FROM descendants d
             LEFT JOIN group_members gm ON d.id = gm.group_id AND gm.status = 'active'
+            WHERE d.level > 0
             GROUP BY d.id, d.parent_id, d.name, d.level, d.path
             ORDER BY d.level ASC, d.name ASC
         ";
@@ -238,7 +240,7 @@ class OptimizedGroupQueries
     public static function getGroupDepth($groupId)
     {
         $ancestors = self::getAncestors($groupId);
-        return count($ancestors) - 1; // Subtract 1 because it includes self
+        return count($ancestors); // Ancestors excludes self, so count = depth
     }
 
     /**

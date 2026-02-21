@@ -137,6 +137,7 @@ class ConnectionServiceTest extends DatabaseTestCase
     {
         try {
             $result = ConnectionService::getConnections(self::$testUserId, ['status' => 'accepted']);
+            $this->assertIsArray($result['items']);
 
             foreach ($result['items'] as $connection) {
                 $this->assertEquals('accepted', $connection['status']);
