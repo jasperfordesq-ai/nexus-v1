@@ -74,7 +74,6 @@ interface GamificationSummary {
 }
 
 export function ProfilePage() {
-  usePageTitle('Profile');
   const { id } = useParams<{ id: string }>();
   const { user: currentUser, isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
@@ -83,6 +82,7 @@ export function ProfilePage() {
   const toast = useToast();
 
   const [profile, setProfile] = useState<UserType | null>(null);
+  usePageTitle(profile?.name ? `${profile.name}` : 'Profile');
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,26 +121,37 @@ export function ProfilePage() {
         );
       }
 
-      // Fetch gamification data if enabled
-      if (hasGamification && isAuthenticated) {
-        requests.push(
-          api.get<GamificationSummary>('/v2/gamification/badges').catch(() => null)
-        );
-      }
-
       const results = await Promise.all(requests);
       const connectionIdx = (isAuthenticated && currentUser && profileId !== currentUser.id.toString()) ? 2 : -1;
-      const gamificationIdx = hasGamification && isAuthenticated ? (connectionIdx >= 0 ? 3 : 2) : -1;
 
       const [profileRes, listingsRes] = results as [
-        { success: boolean; data?: UserType },
+        { success: boolean; data?: UserType & { badges?: Array<{ name: string; badge_key: string; icon: string; description: string; earned_at: string }> } },
         { success: boolean; data?: Listing[] },
       ];
       const connectionRes = connectionIdx >= 0 ? results[connectionIdx] as { success: boolean; data?: { status: ConnectionStatus; connection_id?: number } } | undefined : undefined;
-      const gamificationRes = gamificationIdx >= 0 ? results[gamificationIdx] as { success?: boolean; data?: GamificationSummary } | null : null;
 
       if (profileRes.success && profileRes.data) {
         setProfile(profileRes.data);
+
+        // Use badges from the profile API response (already scoped to this user)
+        if (hasGamification && Array.isArray(profileRes.data.badges) && profileRes.data.badges.length > 0) {
+          const profileBadges: ProfileBadge[] = profileRes.data.badges.map(b => ({
+            key: b.badge_key,
+            name: b.name,
+            description: b.description || '',
+            icon: b.icon || '',
+            tier: '',
+            earned: true,
+            earned_at: b.earned_at,
+          }));
+          setGamification({
+            level: profileRes.data.level ?? 1,
+            level_name: '',
+            xp: profileRes.data.xp ?? 0,
+            total_badges: profileBadges.length,
+            badges: profileBadges.slice(0, 12),
+          });
+        }
       } else {
         setError('Profile not found');
         return;
@@ -151,20 +162,6 @@ export function ProfilePage() {
       if (connectionRes?.success && connectionRes.data) {
         setConnectionStatus(connectionRes.data.status);
         setConnectionId(connectionRes.data.connection_id ?? null);
-      }
-      if (gamificationRes?.success && gamificationRes.data) {
-        // The badges endpoint returns an array of badges
-        const badges = Array.isArray(gamificationRes.data) ? gamificationRes.data as ProfileBadge[] : [];
-        if (Array.isArray(badges)) {
-          const earned = badges.filter((b: ProfileBadge) => b.earned);
-          setGamification({
-            level: profileRes.data?.level ?? 1,
-            level_name: '',
-            xp: 0,
-            total_badges: earned.length,
-            badges: badges.slice(0, 12), // Show first 12
-          });
-        }
       }
     } catch (err) {
       logError('Failed to load profile', err);
@@ -351,7 +348,7 @@ export function ProfilePage() {
             {/* Info */}
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
-                <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">{profile.name}</h1>
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary">{profile.name}</h1>
                 {/* Connected chip for other users */}
                 {!isOwnProfile && connectionStatus === 'connected' && (
                   <Chip
@@ -527,13 +524,13 @@ export function ProfilePage() {
         <ProfileStatCard
           icon={<Users className="w-5 h-5" aria-hidden="true" />}
           label="Groups"
-          value={((profile as unknown as Record<string, unknown>).groups_count as number) ?? 0}
+          value={profile.groups_count ?? 0}
           color="amber"
         />
         <ProfileStatCard
           icon={<CalendarCheck className="w-5 h-5" aria-hidden="true" />}
           label="Events"
-          value={((profile as unknown as Record<string, unknown>).events_attended as number) ?? 0}
+          value={profile.events_attended ?? 0}
           color="rose"
         />
       </motion.div>

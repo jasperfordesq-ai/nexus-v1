@@ -180,6 +180,9 @@ class ConnectionService
         if ($status === 'pending') {
             $direction = ((int)$connection['requester_id'] === $userId) ? 'sent' : 'received';
             $status = "pending_{$direction}";
+        } elseif ($status === 'accepted') {
+            // Normalize 'accepted' to 'connected' for frontend consistency
+            $status = 'connected';
         }
 
         return [

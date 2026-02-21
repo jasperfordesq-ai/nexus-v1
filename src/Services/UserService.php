@@ -101,8 +101,16 @@ class UserService
             $profile['connection_status'] = self::getConnectionStatus($userId, $viewerId);
         }
 
-        // Add public stats
-        $profile['stats'] = self::getPublicStats($userId);
+        // Add public stats (nested for structured access)
+        $stats = self::getPublicStats($userId);
+        $profile['stats'] = $stats;
+
+        // Flatten key stats to root for frontend compatibility
+        $profile['total_hours_given'] = $stats['total_hours_given'] ?? 0;
+        $profile['total_hours_received'] = $stats['total_hours_received'] ?? 0;
+        $profile['groups_count'] = $stats['groups_count'] ?? 0;
+        $profile['events_attended'] = $stats['events_attended'] ?? 0;
+        $profile['rating'] = $stats['average_rating'] ?? null;
 
         // Add badges
         $profile['badges'] = self::getUserBadges($userId);
@@ -126,7 +134,11 @@ class UserService
             'last_name' => $user['last_name'] ?? null,
             'avatar_url' => $user['avatar_url'] ?? null,
             'bio' => $user['bio'] ?? null,
+            'tagline' => $user['tagline'] ?? null,
             'location' => $user['location'] ?? null,
+            'latitude' => isset($user['latitude']) ? (float)$user['latitude'] : null,
+            'longitude' => isset($user['longitude']) ? (float)$user['longitude'] : null,
+            'skills' => !empty($user['skills']) ? array_map('trim', explode(',', $user['skills'])) : null,
             'profile_type' => $user['profile_type'] ?? 'individual',
             'organization_name' => $user['organization_name'] ?? null,
             'created_at' => $user['created_at'] ?? null,
@@ -201,14 +213,48 @@ class UserService
     }
 
     /**
-     * Get public stats (subset of full stats)
+     * Get public stats (subset of full stats, includes hours/groups/events)
      */
     private static function getPublicStats(int $userId): array
     {
         $stats = self::getUserStats($userId);
+        $tenantId = TenantContext::getId();
 
         // Remove private stats
         unset($stats['transactions_count']);
+
+        // Calculate hours given (sum of completed transactions where user is sender)
+        $hoursGiven = Database::query(
+            "SELECT COALESCE(SUM(amount), 0) as total FROM transactions
+             WHERE sender_id = ? AND tenant_id = ? AND status = 'completed'",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+        $stats['total_hours_given'] = round((float)($hoursGiven['total'] ?? 0), 1);
+
+        // Calculate hours received (sum of completed transactions where user is receiver)
+        $hoursReceived = Database::query(
+            "SELECT COALESCE(SUM(amount), 0) as total FROM transactions
+             WHERE receiver_id = ? AND tenant_id = ? AND status = 'completed'",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+        $stats['total_hours_received'] = round((float)($hoursReceived['total'] ?? 0), 1);
+
+        // Count groups the user belongs to (group_members has no tenant_id, join through groups)
+        $groupCount = Database::query(
+            "SELECT COUNT(*) as cnt FROM group_members gm
+             JOIN `groups` g ON gm.group_id = g.id
+             WHERE gm.user_id = ? AND g.tenant_id = ? AND gm.status = 'active'",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+        $stats['groups_count'] = (int)($groupCount['cnt'] ?? 0);
+
+        // Count events the user RSVP'd as going
+        $eventCount = Database::query(
+            "SELECT COUNT(*) as cnt FROM event_rsvps
+             WHERE user_id = ? AND tenant_id = ? AND status = 'going'",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+        $stats['events_attended'] = (int)($eventCount['cnt'] ?? 0);
 
         return $stats;
     }

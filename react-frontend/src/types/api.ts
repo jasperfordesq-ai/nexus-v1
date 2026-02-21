@@ -38,7 +38,10 @@ export interface User {
   total_spent?: number;
   total_hours_given?: number;
   total_hours_received?: number;
+  groups_count?: number;
+  events_attended?: number;
   rating?: number;
+  xp?: number;
   level?: number;
   phone?: string;
   profile_type?: 'individual' | 'organisation';

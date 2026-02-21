@@ -129,7 +129,7 @@ class User
                 ELSE CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, ''))
             END as name,
             organization_name,
-            email, role, profile_type, balance, bio, location, phone, avatar_url, created_at, tenant_id, is_approved,
+            email, role, profile_type, balance, bio, tagline, location, latitude, longitude, skills, phone, avatar_url, created_at, tenant_id, is_approved,
             privacy_profile, privacy_search, privacy_contact, is_super_admin, onboarding_completed{$gamificationColumns}{$onlineColumns}
             FROM users WHERE id = ?";
 
