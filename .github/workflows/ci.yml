@@ -103,7 +103,7 @@ jobs:
           APP_ENV: testing
 
       - name: PHPUnit Service Tests (BLOCKING)
-        run: vendor/bin/phpunit --testsuite=Services
+        run: vendor/bin/phpunit --testsuite=Services --display-warnings
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
