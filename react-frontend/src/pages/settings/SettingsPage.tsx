@@ -745,7 +745,7 @@ export function SettingsPage() {
             <h2 className="text-lg font-semibold text-theme-primary mb-6">Profile Information</h2>
 
             {/* Avatar */}
-            <div className="flex items-center gap-6 mb-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-8">
               <div className="relative">
                 <Avatar
                   src={resolveAvatarUrl(profileData.avatar)}
@@ -1647,7 +1647,7 @@ export function SettingsPage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 p-4 rounded-lg bg-theme-elevated">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-4 rounded-lg bg-theme-elevated">
                 {backupCodes.map((code, index) => (
                   <p key={index} className="font-mono text-sm text-theme-primary text-center py-1">
                     {code}

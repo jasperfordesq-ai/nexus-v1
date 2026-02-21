@@ -156,7 +156,7 @@ export function OrganisationsPage() {
       </div>
 
       {/* Search */}
-      <div className="max-w-md">
+      <div className="w-full sm:max-w-md">
         <Input
           placeholder="Search organisations..."
           value={searchQuery}

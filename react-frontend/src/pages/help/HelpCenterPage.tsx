@@ -196,14 +196,14 @@ export function HelpCenterPage() {
     : faqCategories;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 px-1 sm:px-0">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-            <HelpCircle className="w-8 h-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
+            <HelpCircle className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
           </div>
-          <h1 className="text-3xl font-bold text-theme-primary">Help Center</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">Help Center</h1>
           <p className="text-theme-muted mt-2 max-w-lg mx-auto">
             Find answers to common questions about {branding.name}
           </p>

@@ -174,7 +174,7 @@ export function HomePage() {
         description="Exchange skills and services using time credits. Join our community-driven time banking platform."
         keywords="time banking, skill exchange, community, volunteer, time credits"
       />
-      <div className="-mx-4 sm:-mx-6 lg:-mx-8 -my-6 sm:-my-8">
+      <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
         {/* Hero Section */}
       <section className="relative py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -280,7 +280,7 @@ export function HomePage() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="mt-24 grid grid-cols-2 sm:grid-cols-4 gap-8"
+              className="mt-16 sm:mt-24 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8"
             >
               {stats.map((stat, index) => (
                 <div key={stat.label} className="text-center">
@@ -381,7 +381,7 @@ export function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-3 gap-4 sm:gap-6 md:gap-8"
           >
             {coreValues.map((feature, index) => (
               <motion.article
@@ -392,7 +392,7 @@ export function HomePage() {
                 transition={{ delay: index * 0.1 }}
                 className="relative group"
               >
-                <div className="p-8 rounded-2xl glass-card-hover">
+                <div className="p-5 sm:p-8 rounded-2xl glass-card-hover">
                   <div
                     className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-6`}
                     aria-hidden="true"
@@ -420,7 +420,7 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-12 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-theme-default"
+              className="p-6 sm:p-8 lg:p-12 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-theme-default"
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">
                 Ready to get started?

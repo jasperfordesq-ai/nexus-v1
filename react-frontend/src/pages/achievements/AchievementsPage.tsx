@@ -1166,7 +1166,7 @@ export function AchievementsPage() {
                 </div>
               </GlassCard>
               {/* Badge grid skeleton */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <GlassCard key={i} className="p-4 animate-pulse text-center">
                     <div className="w-12 h-12 rounded-full bg-theme-hover mx-auto mb-3" />
@@ -1330,7 +1330,7 @@ export function AchievementsPage() {
                       variants={containerVariants}
                       initial="hidden"
                       animate="visible"
-                      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
                     >
                       {filteredBadges.map((badge) => (
                         <motion.div key={badge.badge_key} variants={itemVariants}>

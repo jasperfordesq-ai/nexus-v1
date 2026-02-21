@@ -644,7 +644,7 @@ export function ResourcesPage() {
                     role="button"
                     tabIndex={0}
                     className={`
-                      flex flex-col items-center justify-center p-8 rounded-xl border-2 border-dashed transition-colors cursor-pointer
+                      flex flex-col items-center justify-center p-4 sm:p-8 rounded-xl border-2 border-dashed transition-colors cursor-pointer
                       ${isDragging
                         ? 'border-amber-500 bg-amber-500/10'
                         : 'border-theme-default bg-theme-elevated hover:border-amber-400 hover:bg-amber-500/5'

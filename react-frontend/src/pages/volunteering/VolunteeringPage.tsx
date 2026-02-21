@@ -279,7 +279,7 @@ function OpportunitiesTab() {
   return (
     <>
       {/* Search */}
-      <div className="max-w-md">
+      <div className="w-full sm:max-w-md">
         <Input
           placeholder="Search opportunities..."
           value={searchQuery}
@@ -832,7 +832,7 @@ function HoursTab() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="h-8 bg-theme-hover rounded w-1/2 mb-2" />
@@ -843,7 +843,7 @@ function HoursTab() {
           ) : summary ? (
             <div className="space-y-6">
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <GlassCard className="p-5">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">

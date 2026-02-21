@@ -256,7 +256,7 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
 
   return (
     <GlassCard className={`p-4 ${isUnread ? 'ring-1 ring-indigo-500/30' : ''}`}>
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-3 sm:gap-4">
         <div className={`p-2.5 rounded-full ${colorClasses[color]}`}>
           {icon}
         </div>

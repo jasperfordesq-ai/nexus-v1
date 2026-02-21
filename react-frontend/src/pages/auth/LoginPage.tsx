@@ -216,7 +216,7 @@ export function LoginPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md relative z-10"
         >
-          <GlassCard className="p-8">
+          <GlassCard className="p-5 sm:p-8">
             <AnimatePresence mode="wait">
               {!requires2FA ? (
                 // Login Form
@@ -231,11 +231,11 @@ export function LoginPage() {
                     <motion.div
                       initial={{ scale: 0.8 }}
                       animate={{ scale: 1 }}
-                      className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
+                      className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
                     >
                       <Mail className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
                     </motion.div>
-                    <h1 className="text-2xl font-bold text-theme-primary">Welcome Back</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">Welcome Back</h1>
                     <p className="text-theme-muted mt-2">
                       Sign in to continue to {branding.name}
                     </p>
@@ -426,11 +426,11 @@ export function LoginPage() {
                     <motion.div
                       initial={{ scale: 0.8 }}
                       animate={{ scale: 1 }}
-                      className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
+                      className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
                     >
                       <Shield className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
                     </motion.div>
-                    <h1 className="text-2xl font-bold text-theme-primary">
+                    <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">
                       Two-Factor Authentication
                     </h1>
                     <p className="text-theme-muted mt-2">

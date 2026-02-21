@@ -780,7 +780,7 @@ export function GoalsPage() {
                 </div>
 
                 {/* Meta Info Grid */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {detailGoal.deadline && (
                     <div className="bg-theme-elevated rounded-xl p-3">
                       <div className="flex items-center gap-2 text-xs text-theme-subtle mb-1">
@@ -1001,7 +1001,7 @@ function GoalCard({
           </div>
 
           {/* Meta info */}
-          <div className="flex flex-wrap items-center gap-4 text-xs text-theme-subtle">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-theme-subtle">
             {deadlineDate && (
               <span className={`flex items-center gap-1 ${isOverdue ? 'text-red-400' : ''}`}>
                 <Calendar className="w-3 h-3" aria-hidden="true" />

@@ -31,7 +31,7 @@ export function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
 
   return (
     <nav aria-label="Breadcrumb" className="mb-4">
-      <ol className="flex flex-wrap items-center gap-1 text-sm">
+      <ol className="flex items-center gap-1 text-sm overflow-x-auto">
         {showHome && (
           <li className="flex items-center">
             <Link
@@ -52,7 +52,7 @@ export function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
             <li key={`${item.label}-${index}`} className="flex items-center">
               {isLast || !item.href ? (
                 <span
-                  className="text-theme-primary font-medium truncate max-w-[200px]"
+                  className="text-theme-primary font-medium truncate max-w-[120px] sm:max-w-[200px]"
                   aria-current="page"
                   title={item.label}
                 >

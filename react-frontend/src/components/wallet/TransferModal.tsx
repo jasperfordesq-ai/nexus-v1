@@ -250,7 +250,7 @@ export function TransferModal({
             aria-modal="true"
             aria-labelledby="transfer-modal-title"
           >
-            <div className="bg-theme-card backdrop-blur-xl border border-theme-default rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="bg-theme-card backdrop-blur-xl border border-theme-default rounded-2xl w-full max-w-sm sm:max-w-md shadow-2xl">
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-theme-default">
                 <h2
@@ -270,7 +270,7 @@ export function TransferModal({
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5">
                 {/* Balance Display */}
                 <div className="bg-theme-elevated rounded-lg p-3 flex justify-between items-center">
                   <span className="text-theme-muted text-sm">Available Balance</span>

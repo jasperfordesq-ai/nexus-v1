@@ -277,7 +277,7 @@ export function WalletPage() {
             {isLoading ? (
               <div className="h-12 w-32 mx-auto bg-theme-elevated rounded animate-pulse" />
             ) : (
-              <h1 className="text-5xl font-bold text-theme-primary mb-2">
+              <h1 className="text-3xl sm:text-5xl font-bold text-theme-primary mb-2">
                 {balance?.balance ?? 0}
                 <span className="text-2xl text-theme-muted ml-2">hours</span>
               </h1>

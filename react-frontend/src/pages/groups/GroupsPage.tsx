@@ -188,7 +188,7 @@ export function GroupsPage() {
             aria-label="Filter groups by type"
             selectedKeys={[filter]}
             onChange={(e) => setFilter(e.target.value as GroupFilter)}
-            className="w-40"
+            className="w-32 sm:w-40"
             classNames={{
               trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               value: 'text-theme-primary',
