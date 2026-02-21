@@ -219,7 +219,7 @@ $remainingCount = max(0, $totalCount - 5);
                                                             <a href="<?= $listingUrl ?>" style="color: <?= $textColor ?>; text-decoration: none;"><?= htmlspecialchars($match['title'] ?? 'Listing') ?></a>
                                                         </p>
                                                         <p style="margin: 0; font-size: 14px; color: <?= $textMuted ?>; line-height: 1.4;">
-                                                            by <span style="color: <?= $primaryColor ?>; font-weight: 600;"><?= htmlspecialchars($match['user_name'] ?? 'Unknown') ?></span>
+                                                            by <span style="color: <?= $primaryColor ?>; font-weight: 600;"><?= htmlspecialchars(!empty($match['user_name']) ? $match['user_name'] : 'A member') ?></span>
                                                             <?php if ($distance !== null): ?>
                                                                 <span style="color: #d1d5db;">&bull;</span> <?= number_format($distance, 1) ?> km
                                                             <?php endif; ?>
