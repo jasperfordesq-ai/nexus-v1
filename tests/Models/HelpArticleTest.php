@@ -169,6 +169,7 @@ class HelpArticleTest extends DatabaseTestCase
     public function testGetRelatedExcludesCurrentArticle(): void
     {
         $related = HelpArticle::getRelated('core', self::$testArticleId);
+        $this->assertIsArray($related);
         foreach ($related as $article) {
             $this->assertNotEquals(self::$testArticleId, $article['id']);
         }

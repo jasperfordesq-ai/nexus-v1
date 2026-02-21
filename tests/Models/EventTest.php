@@ -651,6 +651,7 @@ class EventTest extends DatabaseTestCase
     {
         $events = Event::getNearby(53.3498, -6.2603, 100, 10);
 
+        $this->assertIsArray($events);
         foreach ($events as $event) {
             $this->assertArrayHasKey('distance_km', $event);
             $this->assertIsNumeric($event['distance_km']);
@@ -662,6 +663,7 @@ class EventTest extends DatabaseTestCase
         $radiusKm = 5;
         $events = Event::getNearby(53.3498, -6.2603, $radiusKm, 50);
 
+        $this->assertIsArray($events);
         foreach ($events as $event) {
             $this->assertLessThanOrEqual(
                 $radiusKm,

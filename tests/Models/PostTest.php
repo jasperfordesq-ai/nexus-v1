@@ -473,6 +473,8 @@ class PostTest extends DatabaseTestCase
         $allPosts = Post::getAll(100, 0);
         $offsetPosts = Post::getAll(100, 1);
 
+        $this->assertIsArray($allPosts);
+        $this->assertIsArray($offsetPosts);
         if (count($allPosts) > 1) {
             $this->assertLessThan(count($allPosts), count($offsetPosts));
         }

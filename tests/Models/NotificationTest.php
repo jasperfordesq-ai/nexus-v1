@@ -241,10 +241,10 @@ class NotificationTest extends DatabaseTestCase
             [self::$testUserId]
         )->fetch();
 
-        Notification::delete($notification['id']);
+        Notification::delete($notification['id'], self::$testUserId);
 
         $deleted = Database::query(
-            "SELECT * FROM notifications WHERE id = ?",
+            "SELECT * FROM notifications WHERE id = ? AND deleted_at IS NULL",
             [$notification['id']]
         )->fetch();
 

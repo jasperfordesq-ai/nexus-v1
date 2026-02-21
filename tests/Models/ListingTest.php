@@ -631,6 +631,7 @@ class ListingTest extends DatabaseTestCase
 
         $listings = Listing::getNearby(53.3498, -6.2603, 100, 10, null, self::$testCategoryId);
 
+        $this->assertIsArray($listings);
         foreach ($listings as $listing) {
             $this->assertEquals(self::$testCategoryId, $listing['category_id']);
         }
