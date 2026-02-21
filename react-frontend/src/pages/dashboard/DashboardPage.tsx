@@ -348,7 +348,7 @@ export function DashboardPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="space-y-6"
+        className="space-y-6 min-w-0 max-w-full"
       >
         {/* Onboarding Banner */}
         {user && user.onboarding_completed === false && (
@@ -442,18 +442,18 @@ export function DashboardPage() {
         </motion.div>
 
         {/* Main Content: 2-column layout */}
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 min-w-0">
           {/* ─── Left Column (2/3 width) ─── */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 min-w-0">
             {/* Recent Listings */}
             <motion.div variants={itemVariants}>
               <GlassCard className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                    <ListTodo className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
-                    Recent Listings
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
+                    <ListTodo className="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0" aria-hidden="true" />
+                    <span className="truncate">Recent Listings</span>
                   </h2>
-                  <Link to={tenantPath('/listings')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1">
+                  <Link to={tenantPath('/listings')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
                     View all <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </Link>
                 </div>
@@ -517,12 +517,12 @@ export function DashboardPage() {
             {hasFeedModule && (
               <motion.div variants={itemVariants}>
                 <GlassCard className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                      <Activity className="w-5 h-5 text-purple-500 dark:text-purple-400" aria-hidden="true" />
-                      Recent Activity
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
+                      <Activity className="w-5 h-5 text-purple-500 dark:text-purple-400 shrink-0" aria-hidden="true" />
+                      <span className="truncate">Recent Activity</span>
                     </h2>
-                    <Link to={tenantPath('/feed')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1">
+                    <Link to={tenantPath('/feed')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
                       View All <ArrowRight className="w-4 h-4" aria-hidden="true" />
                     </Link>
                   </div>
@@ -561,7 +561,7 @@ export function DashboardPage() {
                             </p>
                             <p className="text-xs text-theme-subtle line-clamp-1">{item.content}</p>
                           </div>
-                          <div className="flex items-center gap-3 shrink-0 text-theme-subtle text-xs">
+                          <div className="hidden sm:flex items-center gap-3 shrink-0 text-theme-subtle text-xs">
                             {item.likes_count > 0 && (
                               <span className="flex items-center gap-1">
                                 <Heart className="w-3 h-3" aria-hidden="true" />
@@ -594,7 +594,7 @@ export function DashboardPage() {
           </div>
 
           {/* ─── Right Column (1/3 width — sidebar) ─── */}
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             {/* Quick Actions */}
             <motion.div variants={itemVariants}>
               <GlassCard className="p-6">
@@ -624,12 +624,12 @@ export function DashboardPage() {
                   {/* Subtle gradient border effect */}
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
                   <div className="relative">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
-                        Suggested for You
+                    <div className="flex items-center justify-between gap-2 mb-4">
+                      <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
+                        <Sparkles className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0" aria-hidden="true" />
+                        <span className="truncate">Suggested for You</span>
                       </h2>
-                      <Link to={tenantPath('/listings')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1">
+                      <Link to={tenantPath('/listings')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
                         Browse All <ArrowRight className="w-4 h-4" aria-hidden="true" />
                       </Link>
                     </div>
@@ -688,12 +688,12 @@ export function DashboardPage() {
             {hasGroups && (
               <motion.div variants={itemVariants}>
                 <GlassCard className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                      <Users className="w-5 h-5 text-teal-500 dark:text-teal-400" aria-hidden="true" />
-                      My Groups
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
+                      <Users className="w-5 h-5 text-teal-500 dark:text-teal-400 shrink-0" aria-hidden="true" />
+                      <span className="truncate">My Groups</span>
                     </h2>
-                    <Link to={tenantPath('/groups')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1">
+                    <Link to={tenantPath('/groups')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
                       View All <ArrowRight className="w-4 h-4" aria-hidden="true" />
                     </Link>
                   </div>
@@ -760,12 +760,12 @@ export function DashboardPage() {
             {hasEvents && (
               <motion.div variants={itemVariants}>
                 <GlassCard className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-rose-500 dark:text-rose-400" aria-hidden="true" />
-                      Upcoming Events
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
+                      <Calendar className="w-5 h-5 text-rose-500 dark:text-rose-400 shrink-0" aria-hidden="true" />
+                      <span className="truncate">Upcoming Events</span>
                     </h2>
-                    <Link to={tenantPath('/events')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1">
+                    <Link to={tenantPath('/events')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
                       View All <ArrowRight className="w-4 h-4" aria-hidden="true" />
                     </Link>
                   </div>
