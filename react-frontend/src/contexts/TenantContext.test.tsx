@@ -103,8 +103,11 @@ describe('TenantContext', () => {
     vi.clearAllMocks();
   });
 
-  it('shows loading state initially', () => {
-    mockApiGet.mockReturnValue(new Promise(() => {})); // Never resolves
+  it('shows loading state initially', async () => {
+    // Use a long-delayed promise instead of a never-resolving one
+    // to prevent Vitest from hanging indefinitely
+    let resolveBootstrap: (value: unknown) => void;
+    mockApiGet.mockReturnValue(new Promise((resolve) => { resolveBootstrap = resolve; }));
 
     render(
       <TenantProvider>
@@ -113,6 +116,9 @@ describe('TenantContext', () => {
     );
 
     expect(screen.getByTestId('loading')).toHaveTextContent('true');
+
+    // Clean up: resolve the promise so Vitest can exit cleanly
+    resolveBootstrap!({ success: true, data: {} });
   });
 
   it('loads tenant data from bootstrap API', async () => {
