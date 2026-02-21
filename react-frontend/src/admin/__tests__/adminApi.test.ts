@@ -381,8 +381,8 @@ describe('adminApi', () => {
     });
 
     it('flagMessage calls POST', async () => {
-      await adminBroker.flagMessage(5, 'Suspicious', 'serious');
-      expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/messages/5/flag', { reason: 'Suspicious', severity: 'serious' });
+      await adminBroker.flagMessage(5, 'Suspicious', 'concern');
+      expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/messages/5/flag', { reason: 'Suspicious', severity: 'concern' });
     });
   });
 

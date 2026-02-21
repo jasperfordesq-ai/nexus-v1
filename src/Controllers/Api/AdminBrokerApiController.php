@@ -483,7 +483,7 @@ class AdminBrokerApiController extends BaseApiController
             return;
         }
 
-        $allowedSeverities = ['concern', 'serious', 'urgent'];
+        $allowedSeverities = ['info', 'warning', 'concern', 'urgent'];
         if (!in_array($severity, $allowedSeverities)) {
             $severity = 'concern';
         }
