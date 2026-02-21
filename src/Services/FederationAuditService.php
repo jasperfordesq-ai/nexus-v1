@@ -95,6 +95,9 @@ class FederationAuditService
         // Determine category from action type
         $category = self::getCategoryFromAction($actionType);
 
+        // Truncate action_type to fit column width (varchar 255)
+        $actionType = substr($actionType, 0, 255);
+
         try {
             Database::query("
                 INSERT INTO federation_audit_log (

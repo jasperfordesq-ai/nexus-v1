@@ -58,9 +58,9 @@ class WalletServiceTest extends DatabaseTestCase
         // Create test organization with wallet
         try {
             Database::query(
-                "INSERT INTO vol_organizations (tenant_id, name, slug, status, created_at)
-                 VALUES (?, ?, ?, 'active', NOW())",
-                [self::$testTenantId, "Wallet Test Org {$timestamp}", "wallet-test-org-{$timestamp}"]
+                "INSERT INTO vol_organizations (tenant_id, user_id, name, slug, status, created_at)
+                 VALUES (?, ?, ?, ?, 'active', NOW())",
+                [self::$testTenantId, self::$testUserId, "Wallet Test Org {$timestamp}", "wallet-test-org-{$timestamp}"]
             );
             self::$testOrgId = (int)Database::getInstance()->lastInsertId();
 
