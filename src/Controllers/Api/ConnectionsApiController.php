@@ -196,7 +196,7 @@ class ConnectionsApiController extends BaseApiController
 
         $this->respondWithData([
             'connection_id' => $connectionId,
-            'status' => 'accepted',
+            'status' => 'connected',
         ]);
     }
 

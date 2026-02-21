@@ -246,8 +246,12 @@ describe('MobileTabBar', () => {
         notifications: { counts: { messages: 0, notifications: 0 } },
       });
       render(<MobileTabBar />);
-      // No numeric badge should appear
-      expect(screen.queryByText('0')).not.toBeInTheDocument();
+      // HeroUI Badge renders the element with data-invisible="true" when count is 0
+      // so it's still in the DOM but visually hidden — check the attribute instead
+      const badge = screen.queryByText('0');
+      if (badge) {
+        expect(badge).toHaveAttribute('data-invisible', 'true');
+      }
     });
 
     it('shows 99+ when messages exceed 99', () => {
