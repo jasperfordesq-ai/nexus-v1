@@ -1227,7 +1227,7 @@ class SmartMatchingEngine
                                 $match['id'],
                                 $tenantId,
                                 $match['match_score'] ?? 0,
-                                $match['distance_km'] ?? null,
+                                isset($match['distance_km']) && $match['distance_km'] < 99999999 ? $match['distance_km'] : null,
                                 $match['match_type'] ?? 'one_way',
                                 json_encode($match['match_reasons'] ?? [])
                             ]

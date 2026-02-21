@@ -65,7 +65,7 @@ class ReferralServiceTest extends DatabaseTestCase
             try {
                 Database::query("DELETE FROM referral_tracking WHERE referrer_id = ?", [self::$testReferrerId]);
                 Database::query("DELETE FROM user_badges WHERE user_id = ?", [self::$testReferrerId]);
-                Database::query("DELETE FROM xp_log WHERE user_id = ?", [self::$testReferrerId]);
+                Database::query("DELETE FROM user_xp_log WHERE user_id = ?", [self::$testReferrerId]);
                 Database::query("DELETE FROM notifications WHERE user_id = ?", [self::$testReferrerId]);
                 Database::query("DELETE FROM users WHERE id = ?", [self::$testReferrerId]);
             } catch (\Exception $e) {}

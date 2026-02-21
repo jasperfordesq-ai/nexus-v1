@@ -406,7 +406,7 @@ CREATE TABLE `broker_message_copies` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) NOT NULL,
   `original_message_id` int(11) NOT NULL,
-  `conversation_key` varchar(100) NOT NULL COMMENT 'Hash of sorted sender+receiver IDs',
+  `conversation_key` varchar(100) DEFAULT '' COMMENT 'Hash of sorted sender+receiver IDs',
   `sender_id` int(11) NOT NULL,
   `receiver_id` int(11) NOT NULL,
   `message_body` text DEFAULT NULL,
@@ -1217,7 +1217,7 @@ CREATE TABLE `event_rsvps` (
   `tenant_id` int(10) unsigned NOT NULL DEFAULT 1,
   `event_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `status` enum('going','maybe','declined') NOT NULL DEFAULT 'going',
+  `status` enum('going','maybe','declined','interested','not_going') NOT NULL DEFAULT 'going',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `checked_in_at` datetime DEFAULT NULL,
   `checked_out_at` datetime DEFAULT NULL,
@@ -1433,7 +1433,7 @@ DROP TABLE IF EXISTS `federation_audit_log`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `federation_audit_log` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `action_type` varchar(100) NOT NULL,
+  `action_type` varchar(255) NOT NULL,
   `category` varchar(50) NOT NULL,
   `level` enum('debug','info','warning','critical') NOT NULL DEFAULT 'info',
   `source_tenant_id` int(10) unsigned DEFAULT NULL,
@@ -2917,7 +2917,7 @@ CREATE TABLE `match_cache` (
   `listing_id` int(11) NOT NULL,
   `tenant_id` int(11) NOT NULL,
   `match_score` decimal(5,2) NOT NULL COMMENT 'Score 0-100',
-  `distance_km` decimal(8,2) DEFAULT NULL,
+  `distance_km` decimal(10,2) DEFAULT NULL,
   `match_type` enum('one_way','potential','mutual','cold_start') DEFAULT 'one_way',
   `match_reasons` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Array of reason strings' CHECK (json_valid(`match_reasons`)),
   `status` enum('new','viewed','contacted','saved','dismissed') DEFAULT 'new',
@@ -3815,14 +3815,18 @@ DROP TABLE IF EXISTS `org_wallet_limits`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `org_wallet_limits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `organization_id` int(11) NOT NULL,
+  `single_transaction_max` decimal(10,2) DEFAULT 500.00,
+  `daily_limit` decimal(10,2) DEFAULT 1000.00,
+  `weekly_limit` decimal(10,2) DEFAULT 3000.00,
+  `monthly_limit` decimal(10,2) DEFAULT 10000.00,
+  `org_daily_limit` decimal(10,2) DEFAULT 5000.00,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `daily_limit` varchar(255) DEFAULT NULL,
-  `monthly_limit` varchar(255) DEFAULT NULL,
-  `org_daily_limit` varchar(255) DEFAULT NULL,
-  `single_transaction_max` varchar(255) DEFAULT NULL,
-  `tenant_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_org_limits` (`tenant_id`,`organization_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `org_wallets`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4675,9 +4679,16 @@ DROP TABLE IF EXISTS `tenant_wallet_limits`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tenant_wallet_limits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `single_transaction_max` decimal(10,2) DEFAULT 500.00,
+  `daily_limit` decimal(10,2) DEFAULT 1000.00,
+  `weekly_limit` decimal(10,2) DEFAULT 3000.00,
+  `monthly_limit` decimal(10,2) DEFAULT 10000.00,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_tenant_limits` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tenants`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5699,6 +5710,7 @@ CREATE TABLE `vol_organizations` (
   `contact_email` varchar(255) DEFAULT NULL,
   `website` varchar(255) DEFAULT NULL,
   `logo_url` varchar(255) DEFAULT NULL,
+  `slug` varchar(255) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `status` varchar(20) DEFAULT 'pending',
   `auto_pay_enabled` tinyint(1) DEFAULT 0,

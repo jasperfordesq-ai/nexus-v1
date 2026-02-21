@@ -49,13 +49,13 @@ class TransactionLimitServiceTest extends DatabaseTestCase
         // Create test organization
         try {
             Database::query(
-                "INSERT INTO organizations (tenant_id, name, slug, status, created_at)
-                 VALUES (?, ?, ?, 'active', NOW())",
-                [self::$testTenantId, "Test Org {$timestamp}", "test-org-{$timestamp}"]
+                "INSERT INTO vol_organizations (tenant_id, user_id, name, slug, status, created_at)
+                 VALUES (?, ?, ?, ?, 'active', NOW())",
+                [self::$testTenantId, self::$testUserId, "Test Org {$timestamp}", "test-org-{$timestamp}"]
             );
             self::$testOrgId = (int)Database::getInstance()->lastInsertId();
         } catch (\Exception $e) {
-            // Organizations table may not exist in test DB
+            // vol_organizations table may not exist in test DB
             self::$testOrgId = 1;
         }
     }
