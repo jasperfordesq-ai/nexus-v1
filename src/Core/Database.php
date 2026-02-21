@@ -19,7 +19,7 @@ class Database
      */
     private static $queryLog = [];
     private static $slowQueryThreshold = 0.1; // 100ms in seconds
-    private static $enableProfiling = false;
+    private static $enableProfiling = null;
 
     private function __construct()
     {
@@ -65,8 +65,8 @@ class Database
 
     public static function query($sql, $params = [])
     {
-        // Enable profiling if DEBUG mode is on
-        if (!isset(self::$enableProfiling)) {
+        // Enable profiling if DEBUG mode is on (only evaluate env vars once)
+        if (self::$enableProfiling === null) {
             self::$enableProfiling = getenv('DEBUG') === 'true' || getenv('DB_PROFILING') === 'true';
         }
 
@@ -144,13 +144,14 @@ class Database
             ? basename($caller['file']) . ':' . $caller['line']
             : 'unknown';
 
-        // Build log message
+        // Build log message (redact param values to avoid exposing sensitive data)
+        $paramCount = count($params);
         $message = sprintf(
-            "SLOW QUERY [%sms] at %s\nSQL: %s\nParams: %s",
+            "SLOW QUERY [%sms] at %s\nSQL: %s\nParam count: %d",
             $milliseconds,
             $location,
             trim(preg_replace('/\s+/', ' ', $sql)),
-            json_encode($params)
+            $paramCount
         );
 
         error_log($message);
