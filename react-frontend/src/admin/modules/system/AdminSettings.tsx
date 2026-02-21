@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner } from '@heroui/react';
 import { Settings, Save } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
@@ -42,6 +42,7 @@ const DEFAULT_SETTINGS: SettingsForm = {
 export function AdminSettings() {
   usePageTitle('Admin - Settings');
   const toast = useToast();
+  const { tenant } = useTenant();
 
   const [form, setForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
@@ -63,7 +64,7 @@ export function AdminSettings() {
           contact_email: (tenant.contact_email as string) ?? '',
           contact_phone: (tenant.contact_phone as string) ?? '',
           registration_mode: (settings.registration_mode as string) ?? 'open',
-          email_verification: settings.email_verification === 'true' || settings.email_verification === true || settings.email_verification !== 'false',
+          email_verification: settings.email_verification === 'true' || settings.email_verification === true,
           admin_approval: settings.admin_approval === 'true' || settings.admin_approval === true,
           maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === true,
         });
@@ -112,7 +113,7 @@ export function AdminSettings() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Admin Settings" description="Global platform configuration" />
+        <PageHeader title="Admin Settings" description={`Settings for ${tenant?.name || 'your community'}`} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -122,7 +123,7 @@ export function AdminSettings() {
 
   return (
     <div>
-      <PageHeader title="Admin Settings" description="Global platform configuration" />
+      <PageHeader title="Admin Settings" description={`Settings for ${tenant?.name || 'your community'}`} />
 
       <div className="space-y-4">
         <Card shadow="sm">
