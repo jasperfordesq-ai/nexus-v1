@@ -399,7 +399,8 @@ HTML;
         foreach (array_slice($matches, 0, 5) as $match) {
             $title = htmlspecialchars($match['title'] ?? 'Listing');
             $score = (int)($match['match_score'] ?? 0);
-            $posterName = htmlspecialchars($match['user_name'] ?? 'Unknown');
+            $userName = !empty($match['user_name']) ? $match['user_name'] : trim(($match['first_name'] ?? '') . ' ' . ($match['last_name'] ?? ''));
+            $posterName = htmlspecialchars($userName ?: 'A member');
             $scoreColor = $score >= 85 ? '#ef4444' : ($score >= 70 ? '#6366f1' : '#64748b');
             $matchListHtml .= <<<HTML
 <div style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 10px;">

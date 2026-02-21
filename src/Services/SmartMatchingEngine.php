@@ -805,6 +805,7 @@ class SmartMatchingEngine
                        u.first_name, u.last_name, u.avatar_url, u.location as author_location,
                        u.latitude as author_latitude, u.longitude as author_longitude,
                        u.is_verified as author_verified,
+                       TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) as user_name,
                        (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id) as author_rating,
                        c.name as category_name, c.color as category_color";
 
@@ -877,6 +878,7 @@ class SmartMatchingEngine
         $sql = "SELECT l.*,
                        u.first_name, u.last_name, u.avatar_url, u.location as author_location,
                        u.latitude as author_latitude, u.longitude as author_longitude,
+                       TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) as user_name,
                        c.name as category_name, c.color as category_color";
 
         if ($userData['latitude'] && $userData['longitude']) {
