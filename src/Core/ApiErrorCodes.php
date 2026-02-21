@@ -63,6 +63,9 @@ class ApiErrorCodes
     /** Token tenant_id doesn't match X-Tenant-ID header */
     public const TENANT_MISMATCH = 'TENANT_MISMATCH';
 
+    /** User is a super admin but their tenant lacks Super Panel access (e.g., no sub-tenant capability) */
+    public const SUPER_PANEL_ACCESS_DENIED = 'SUPER_PANEL_ACCESS_DENIED';
+
     /** 2FA code required to complete login */
     public const AUTH_2FA_REQUIRED = 'AUTH_2FA_REQUIRED';
 
@@ -239,7 +242,8 @@ class ApiErrorCodes
             self::AUTH_CSRF_INVALID,
             self::RESOURCE_FORBIDDEN,
             self::FORBIDDEN,
-            self::TENANT_MISMATCH => 403,
+            self::TENANT_MISMATCH,
+            self::SUPER_PANEL_ACCESS_DENIED => 403,
 
             // 404 Not Found
             self::RESOURCE_NOT_FOUND => 404,

@@ -637,9 +637,12 @@ class TenantContext
                     $user = $stmt->fetch();
 
                     if ($user) {
+                        // SECURITY: Only actual super admins can access cross-tenant data.
+                        // Regular admins (role=admin, role=tenant_admin) must NOT be allowed
+                        // to spoof X-Tenant-ID headers to access other tenants' data.
                         return !empty($user['is_super_admin'])
                             || !empty($user['is_tenant_super_admin'])
-                            || in_array($user['role'] ?? '', ['tenant_admin', 'admin'], true);
+                            || ($user['role'] ?? '') === 'super_admin';
                     }
                 }
             }
