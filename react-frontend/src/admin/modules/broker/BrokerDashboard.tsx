@@ -26,7 +26,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '../../api/types';
@@ -76,9 +76,28 @@ const quickLinks = [
   },
 ];
 
+// Tailwind JIT needs full class names at build time — dynamic `bg-${color}/10` won't work
+const quickLinkBgClass: Record<string, string> = {
+  primary: 'bg-primary/10',
+  danger: 'bg-danger/10',
+  warning: 'bg-warning/10',
+  secondary: 'bg-secondary/10',
+  success: 'bg-success/10',
+  default: 'bg-default/10',
+};
+const quickLinkTextClass: Record<string, string> = {
+  primary: 'text-primary',
+  danger: 'text-danger',
+  warning: 'text-warning',
+  secondary: 'text-secondary',
+  success: 'text-success',
+  default: 'text-default-500',
+};
+
 export function BrokerDashboard() {
   usePageTitle('Admin - Broker Controls');
   const { tenantPath } = useTenant();
+  const toast = useToast();
 
   const [stats, setStats] = useState<BrokerDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -91,7 +110,7 @@ export function BrokerDashboard() {
         setStats(res.data);
       }
     } catch {
-      // Silently handle — stats will show as loading
+      toast.error('Failed to load broker dashboard');
     } finally {
       setLoading(false);
     }
@@ -180,8 +199,8 @@ export function BrokerDashboard() {
           return (
             <Card key={link.path} shadow="sm" isPressable as={Link} to={tenantPath(link.path)}>
               <CardBody className="flex flex-row items-center gap-4 p-4">
-                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-${link.color}/10`}>
-                  <Icon size={24} className={`text-${link.color}`} />
+                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${quickLinkBgClass[link.color]}`}>
+                  <Icon size={24} className={quickLinkTextClass[link.color]} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-foreground">{link.title}</p>

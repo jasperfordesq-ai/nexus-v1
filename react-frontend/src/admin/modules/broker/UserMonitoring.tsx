@@ -54,7 +54,7 @@ export function UserMonitoring() {
         setItems(res.data);
       }
     } catch {
-      // Silently handle
+      toast.error('Failed to load monitored users');
     } finally {
       setLoading(false);
     }

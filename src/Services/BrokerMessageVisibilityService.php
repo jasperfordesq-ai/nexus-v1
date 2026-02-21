@@ -95,7 +95,7 @@ class BrokerMessageVisibilityService
 
         // Get message details
         $stmt = Database::query(
-            "SELECT id, sender_id, receiver_id, body, created_at
+            "SELECT id, sender_id, receiver_id, body, listing_id, created_at
              FROM messages
              WHERE id = ? AND tenant_id = ?",
             [$messageId, $tenantId]
@@ -122,8 +122,8 @@ class BrokerMessageVisibilityService
 
         Database::query(
             "INSERT INTO broker_message_copies
-             (tenant_id, original_message_id, conversation_key, sender_id, receiver_id, message_body, sent_at, copy_reason, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+             (tenant_id, original_message_id, conversation_key, sender_id, receiver_id, message_body, sent_at, copy_reason, related_listing_id, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
             [
                 $tenantId,
                 $message['id'],
@@ -133,6 +133,7 @@ class BrokerMessageVisibilityService
                 $message['body'],
                 $message['created_at'],
                 $reason,
+                $message['listing_id'] ?? null,
             ]
         );
 
@@ -342,9 +343,10 @@ class BrokerMessageVisibilityService
      */
     public static function isNewMember(int $userId, int $days = 30): bool
     {
+        $tenantId = TenantContext::getId();
         $stmt = Database::query(
-            "SELECT created_at FROM users WHERE id = ?",
-            [$userId]
+            "SELECT created_at FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         );
         $user = $stmt->fetch();
 
@@ -545,7 +547,7 @@ class BrokerMessageVisibilityService
                 (SELECT COUNT(*) FROM user_messaging_restrictions WHERE tenant_id = ? AND messaging_disabled = 1) as restricted,
                 (SELECT COUNT(*) FROM user_messaging_restrictions WHERE tenant_id = ? AND under_monitoring = 1) as monitored,
                 (SELECT COUNT(*) FROM users WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)) as new_members,
-                (SELECT COUNT(*) FROM user_first_contacts WHERE tenant_id = ? AND created_at >= CURDATE()) as first_contacts_today,
+                (SELECT COUNT(*) FROM user_first_contacts WHERE tenant_id = ? AND first_contact_at >= CURDATE()) as first_contacts_today,
                 (SELECT COUNT(*) FROM broker_message_copies WHERE tenant_id = ? AND reviewed_at IS NULL) as unreviewed_messages,
                 (SELECT COUNT(*) FROM broker_message_copies WHERE tenant_id = ? AND flagged = 1) as flagged_messages",
             [$tenantId, $tenantId, $tenantId, $monitoringDays, $tenantId, $tenantId, $tenantId]

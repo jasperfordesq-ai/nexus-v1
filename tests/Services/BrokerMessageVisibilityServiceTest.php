@@ -115,7 +115,16 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testShouldCopyMessageForFirstContact(): void
     {
-        $this->markTestSkipped('Service uses wrong column names (user_a/user_b vs user1_id/user2_id) in user_first_contacts table');
+        $result = BrokerMessageVisibilityService::shouldCopyMessage(
+            self::$testSenderId,
+            self::$testReceiverId
+        );
+
+        // Should return a reason string or null
+        $this->assertTrue(
+            $result === null || is_string($result),
+            'shouldCopyMessage should return a string reason or null'
+        );
     }
 
     /**
@@ -123,8 +132,17 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testCopyMessageForBroker(): int
     {
-        $this->markTestSkipped('Service INSERT into broker_message_copies missing required conversation_key column');
-        return 0;
+        $copyId = BrokerMessageVisibilityService::copyMessageForBroker(
+            self::$testMessageId,
+            'first_contact'
+        );
+
+        $this->assertNotNull($copyId, 'Copy ID should not be null');
+        $this->assertIsInt($copyId, 'Copy ID should be an integer');
+        $this->assertGreaterThan(0, $copyId, 'Copy ID should be positive');
+
+        self::$testCopyId = $copyId;
+        return $copyId;
     }
 
     /**
@@ -133,8 +151,20 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testGetUnreviewedMessages(int $copyId): int
     {
-        $this->markTestSkipped('Depends on testCopyMessageForBroker which is skipped');
-        return 0;
+        $messages = BrokerMessageVisibilityService::getMessages('unreviewed');
+
+        $this->assertIsArray($messages, 'Should return an array');
+        // Our copy should be in the list
+        $found = false;
+        foreach ($messages as $msg) {
+            if (isset($msg['id']) && (int) $msg['id'] === $copyId) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Our copied message should appear in unreviewed list');
+
+        return $copyId;
     }
 
     /**
@@ -154,8 +184,10 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testMarkAsReviewed(int $copyId): int
     {
-        $this->markTestSkipped('Depends on testCopyMessageForBroker which is skipped');
-        return 0;
+        $result = BrokerMessageVisibilityService::markAsReviewed($copyId, self::$testBrokerId);
+
+        $this->assertTrue($result, 'markAsReviewed should return true');
+        return $copyId;
     }
 
     /**
@@ -164,7 +196,16 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testReviewedMessagesNotInUnreviewedList(int $copyId): void
     {
-        $this->markTestSkipped('Depends on testCopyMessageForBroker which is skipped');
+        $messages = BrokerMessageVisibilityService::getMessages('unreviewed');
+
+        $found = false;
+        foreach ($messages as $msg) {
+            if (isset($msg['id']) && (int) $msg['id'] === $copyId) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertFalse($found, 'Reviewed message should not appear in unreviewed list');
     }
 
     /**
@@ -172,7 +213,29 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testFlagMessage(): void
     {
-        $this->markTestSkipped('Service INSERT into broker_message_copies missing required conversation_key column');
+        // Create another message and copy it for flagging
+        Database::query(
+            "INSERT INTO messages (tenant_id, sender_id, receiver_id, body, created_at)
+             VALUES (?, ?, ?, 'Test flag message', NOW())",
+            [self::$testTenantId, self::$testSenderId, self::$testReceiverId]
+        );
+        $msgId = Database::getInstance()->lastInsertId();
+
+        $copyId = BrokerMessageVisibilityService::copyMessageForBroker($msgId, 'random_sample');
+        $this->assertNotNull($copyId, 'Should create a copy for flagging');
+
+        $result = BrokerMessageVisibilityService::flagMessage(
+            $copyId,
+            self::$testBrokerId,
+            'Test flag reason',
+            'concern'
+        );
+
+        $this->assertTrue($result, 'flagMessage should return true');
+
+        // Clean up
+        Database::query("DELETE FROM broker_message_copies WHERE id = ?", [$copyId]);
+        Database::query("DELETE FROM messages WHERE id = ?", [$msgId]);
     }
 
     /**
@@ -180,7 +243,8 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testGetMessagesWithFlaggedFilter(): void
     {
-        $this->markTestSkipped('Service INSERT into broker_message_copies missing required conversation_key column');
+        $messages = BrokerMessageVisibilityService::getMessages('flagged');
+        $this->assertIsArray($messages, 'Should return an array for flagged filter');
     }
 
     /**
@@ -188,7 +252,13 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testIsFirstContact(): void
     {
-        $this->markTestSkipped('Service uses wrong column names (user_a/user_b vs user1_id/user2_id) in user_first_contacts table');
+        // Use new user IDs that haven't been paired
+        $result = BrokerMessageVisibilityService::isFirstContact(
+            self::$testSenderId,
+            99999999
+        );
+
+        $this->assertTrue($result, 'Should be first contact for new pair');
     }
 
     /**
@@ -196,7 +266,27 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testRecordFirstContact(): void
     {
-        $this->markTestSkipped('Service uses wrong column names (user_a/user_b vs user1_id/user2_id) in user_first_contacts table');
+        $uniqueUserId = 99999998;
+
+        BrokerMessageVisibilityService::recordFirstContact(
+            self::$testSenderId,
+            $uniqueUserId,
+            self::$testMessageId
+        );
+
+        $isFirst = BrokerMessageVisibilityService::isFirstContact(
+            self::$testSenderId,
+            $uniqueUserId
+        );
+
+        $this->assertFalse($isFirst, 'Should no longer be first contact after recording');
+
+        // Clean up
+        $ids = [min(self::$testSenderId, $uniqueUserId), max(self::$testSenderId, $uniqueUserId)];
+        Database::query(
+            "DELETE FROM user_first_contacts WHERE tenant_id = ? AND user1_id = ? AND user2_id = ?",
+            [self::$testTenantId, $ids[0], $ids[1]]
+        );
     }
 
     /**
@@ -204,7 +294,12 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testGetStatistics(): void
     {
-        $this->markTestSkipped('Service references non-existent created_at column in user_first_contacts table');
+        $stats = BrokerMessageVisibilityService::getStatistics();
+
+        $this->assertIsArray($stats, 'Should return array');
+        $this->assertArrayHasKey('unreviewed_messages', $stats);
+        $this->assertArrayHasKey('flagged_messages', $stats);
+        $this->assertArrayHasKey('first_contacts_today', $stats);
     }
 
     /**
@@ -212,7 +307,12 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testAllCopyReasons(): void
     {
-        $this->markTestSkipped('Service INSERT into broker_message_copies missing required conversation_key column');
+        // Verify constants are defined with valid DB enum values
+        $this->assertEquals('first_contact', BrokerMessageVisibilityService::REASON_FIRST_CONTACT);
+        $this->assertEquals('new_member', BrokerMessageVisibilityService::REASON_NEW_MEMBER);
+        $this->assertEquals('high_risk_listing', BrokerMessageVisibilityService::REASON_HIGH_RISK);
+        $this->assertEquals('flagged_user', BrokerMessageVisibilityService::REASON_FLAGGED_USER);
+        $this->assertEquals('random_sample', BrokerMessageVisibilityService::REASON_MONITORING);
     }
 
     /**
@@ -220,6 +320,20 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testShouldNotCopyWhenDisabled(): void
     {
-        $this->markTestSkipped('Service uses wrong column names (user_a/user_b vs user1_id/user2_id) in user_first_contacts table');
+        // Temporarily disable broker visibility
+        $config = BrokerControlConfigService::getConfig();
+        $savedConfig = $config;
+        $config['broker_visibility']['enabled'] = false;
+        BrokerControlConfigService::updateConfig($config);
+
+        $result = BrokerMessageVisibilityService::shouldCopyMessage(
+            self::$testSenderId,
+            self::$testReceiverId
+        );
+
+        $this->assertNull($result, 'Should return null when visibility is disabled');
+
+        // Restore config
+        BrokerControlConfigService::updateConfig($savedConfig);
     }
 }

@@ -63,7 +63,7 @@ export function ExchangeManagement() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      // Silently handle
+      toast.error('Failed to load exchanges');
     } finally {
       setLoading(false);
     }

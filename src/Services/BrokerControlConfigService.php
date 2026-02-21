@@ -428,8 +428,13 @@ class BrokerControlConfigService
      */
     private static function clearCache(): void
     {
-        // If using Redis or other cache, clear here
-        // Currently tenant config is not cached separately
+        $tenantId = TenantContext::getId();
+        try {
+            RedisCache::delete("broker_config", $tenantId);
+            RedisCache::delete("tenant_bootstrap_{$tenantId}");
+        } catch (\Throwable $e) {
+            // Redis unavailable — cache will expire naturally
+        }
     }
 
     /**
