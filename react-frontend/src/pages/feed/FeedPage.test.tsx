@@ -8,12 +8,16 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
+
+const mockGet = vi.fn().mockResolvedValue({ success: true, data: [], meta: {} });
+const mockPost = vi.fn().mockResolvedValue({ success: true });
 
 vi.mock('@/lib/api', () => ({
   api: {
-    get: vi.fn().mockResolvedValue({ success: true, data: [], meta: {} }),
-    post: vi.fn().mockResolvedValue({ success: true }),
+    get: (...args: unknown[]) => mockGet(...args),
+    post: (...args: unknown[]) => mockPost(...args),
   },
   tokenManager: { getTenantId: vi.fn() },
 }));
@@ -78,6 +82,8 @@ import { FeedPage } from './FeedPage';
 describe('FeedPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGet.mockResolvedValue({ success: true, data: [], meta: {} });
+    mockPost.mockResolvedValue({ success: true });
   });
 
   it('renders without crashing', () => {
@@ -107,5 +113,121 @@ describe('FeedPage', () => {
   it('shows quick post box for authenticated users', () => {
     render(<FeedPage />);
     expect(screen.getByText(/What's on your mind/i)).toBeInTheDocument();
+  });
+
+  it('shows empty state when no items returned', async () => {
+    mockGet.mockResolvedValue({ success: true, data: [], meta: {} });
+    render(<FeedPage />);
+    await waitFor(() => {
+      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+    });
+    expect(screen.getByText('No posts yet')).toBeInTheDocument();
+  });
+
+  it('renders feed items when data is returned', async () => {
+    mockGet.mockResolvedValue({
+      success: true,
+      data: [
+        {
+          id: 1,
+          content: 'First post content',
+          author_name: 'Alice',
+          author_id: 10,
+          created_at: '2026-02-21T12:00:00Z',
+          type: 'post',
+          likes_count: 2,
+          comments_count: 0,
+          is_liked: false,
+        },
+      ],
+      meta: { has_more: false },
+    });
+    render(<FeedPage />);
+    await waitFor(() => {
+      expect(screen.getByText('First post content')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Alice')).toBeInTheDocument();
+  });
+
+  it('shows Load More when has_more is true', async () => {
+    mockGet.mockResolvedValue({
+      success: true,
+      data: [
+        {
+          id: 1,
+          content: 'A post',
+          author_name: 'User',
+          author_id: 10,
+          created_at: '2026-02-21T12:00:00Z',
+          type: 'post',
+          likes_count: 0,
+          comments_count: 0,
+          is_liked: false,
+        },
+      ],
+      meta: { has_more: true, cursor: 'abc123' },
+    });
+    render(<FeedPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Load More')).toBeInTheDocument();
+    });
+  });
+
+  it('shows error state when API fails', async () => {
+    mockGet.mockRejectedValue(new Error('Network error'));
+    render(<FeedPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Unable to Load Feed')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Try Again')).toBeInTheDocument();
+  });
+
+  it('calls API with filter type when a filter is selected', async () => {
+    const user = userEvent.setup();
+    render(<FeedPage />);
+
+    // Wait for initial load
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalled();
+    });
+
+    mockGet.mockClear();
+
+    // Click the "Events" filter
+    const eventsBtn = screen.getByText('Events');
+    await user.click(eventsBtn);
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(
+        expect.stringContaining('type=events')
+      );
+    });
+  });
+
+  it('calls loadFeed without type param for "all" filter', async () => {
+    render(<FeedPage />);
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(
+        expect.stringContaining('per_page=20')
+      );
+    });
+    // "all" filter should not include type=
+    expect(mockGet).not.toHaveBeenCalledWith(
+      expect.stringContaining('type=')
+    );
+  });
+
+  it('shows Goals filter option', () => {
+    render(<FeedPage />);
+    expect(screen.getByText('Goals')).toBeInTheDocument();
+  });
+
+  it('shows loading skeletons while loading', () => {
+    // Mock a never-resolving promise to keep loading state
+    mockGet.mockReturnValue(new Promise(() => {}));
+    render(<FeedPage />);
+    // Should show 3 skeleton cards (animate-pulse elements)
+    const pulseElements = document.querySelectorAll('.animate-pulse');
+    expect(pulseElements.length).toBeGreaterThanOrEqual(3);
   });
 });
