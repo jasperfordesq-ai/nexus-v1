@@ -582,8 +582,8 @@ class FeedService
         // Load all poll options in one query
         $placeholders = implode(',', array_fill(0, count($pollIds), '?'));
         $stmt = $db->prepare(
-            "SELECT po.id as option_id, po.poll_id, po.option_text,
-                    (SELECT COUNT(*) FROM poll_votes pv WHERE pv.option_id = po.id) as vote_count
+            "SELECT po.id as option_id, po.poll_id, po.label,
+                    po.votes as vote_count
              FROM poll_options po
              WHERE po.poll_id IN ($placeholders)
              ORDER BY po.id ASC"
@@ -634,7 +634,7 @@ class FeedService
                 $voteCount = (int)$opt['vote_count'];
                 $formattedOptions[] = [
                     'id' => (int)$opt['option_id'],
-                    'text' => $opt['option_text'],
+                    'text' => $opt['label'],
                     'vote_count' => $voteCount,
                     'percentage' => $totalVotes > 0 ? round(($voteCount / $totalVotes) * 100, 1) : 0,
                 ];

@@ -17,16 +17,16 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
-  Input,
   Avatar,
   Textarea,
-  Chip,
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Skeleton,
+  Divider,
 } from '@heroui/react';
 import {
   Newspaper,
@@ -34,11 +34,14 @@ import {
   RefreshCw,
   AlertTriangle,
   ImagePlus,
-  X,
   BarChart3,
+  Sparkles,
+  TrendingUp,
+  Flag,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
-import { EmptyState } from '@/components/feedback';
+import { ComposeHub } from '@/components/compose';
+import type { ComposeTab } from '@/components/compose';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -47,6 +50,30 @@ import { usePageTitle } from '@/hooks';
 import { FeedCard } from '@/components/feed/FeedCard';
 import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
+
+/* ───────────────────────── Feed Card Skeleton ───────────────────────── */
+
+function FeedSkeleton() {
+  return (
+    <GlassCard className="p-5">
+      <div className="flex items-center gap-3 mb-4">
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <div className="flex-1">
+          <Skeleton className="h-4 w-28 rounded mb-2" />
+          <Skeleton className="h-3 w-20 rounded" />
+        </div>
+      </div>
+      <Skeleton className="h-4 w-full rounded mb-2" />
+      <Skeleton className="h-4 w-4/5 rounded mb-4" />
+      <Skeleton className="h-40 w-full rounded-xl mb-4" />
+      <Divider />
+      <div className="flex gap-4 pt-3">
+        <Skeleton className="h-8 w-20 rounded-lg" />
+        <Skeleton className="h-8 w-24 rounded-lg" />
+      </div>
+    </GlassCard>
+  );
+}
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
@@ -61,20 +88,9 @@ export function FeedPage() {
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Create post
+  // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
-  const [newPostContent, setNewPostContent] = useState('');
-  const [isCreating, setIsCreating] = useState(false);
-  const [postMode, setPostMode] = useState<'text' | 'poll'>('text');
-
-  // Image upload
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Poll creation
-  const [pollQuestion, setPollQuestion] = useState('');
-  const [pollOptions, setPollOptions] = useState<string[]>(['', '']);
+  const [composeDefaultTab, setComposeDefaultTab] = useState<ComposeTab>('post');
 
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
@@ -129,142 +145,6 @@ export function FeedPage() {
     cursorRef.current = undefined;
     loadFeed();
   }, [filter, loadFeed]);
-
-  /* ───────── Create Post (Text + Image) ───────── */
-
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be smaller than 5MB');
-      return;
-    }
-
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
-    reader.readAsDataURL(file);
-  };
-
-  const removeImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleCreatePost = async () => {
-    if (!newPostContent.trim() && !imageFile) return;
-
-    try {
-      setIsCreating(true);
-
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append('content', newPostContent.trim());
-        formData.append('visibility', 'public');
-        formData.append('image', imageFile);
-
-        const response = await api.post('/social/create-post', formData as unknown as Record<string, unknown>);
-        if (response.success) {
-          onCreateClose();
-          resetCreateForm();
-          cursorRef.current = undefined;
-          loadFeed();
-          toast.success('Post created!');
-        }
-      } else {
-        const response = await api.post('/v2/feed/posts', {
-          content: newPostContent.trim(),
-          visibility: 'public',
-        });
-
-        if (response.success) {
-          onCreateClose();
-          resetCreateForm();
-          cursorRef.current = undefined;
-          loadFeed();
-          toast.success('Post created!');
-        }
-      }
-    } catch (err) {
-      logError('Failed to create post', err);
-      toast.error('Failed to create post');
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
-  /* ───────── Create Poll ───────── */
-
-  const handleCreatePoll = async () => {
-    if (!pollQuestion.trim()) {
-      toast.error('Please enter a question');
-      return;
-    }
-
-    const validOptions = pollOptions.filter((o) => o.trim().length > 0);
-    if (validOptions.length < 2) {
-      toast.error('Add at least 2 options');
-      return;
-    }
-
-    try {
-      setIsCreating(true);
-      const response = await api.post('/v2/feed/polls', {
-        question: pollQuestion.trim(),
-        options: validOptions.map((o) => o.trim()),
-      });
-
-      if (response.success) {
-        onCreateClose();
-        resetCreateForm();
-        cursorRef.current = undefined;
-        loadFeed();
-        toast.success('Poll created!');
-      }
-    } catch (err) {
-      logError('Failed to create poll', err);
-      toast.error('Failed to create poll');
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
-  const addPollOption = () => {
-    if (pollOptions.length < 6) {
-      setPollOptions([...pollOptions, '']);
-    }
-  };
-
-  const updatePollOption = (index: number, value: string) => {
-    const updated = [...pollOptions];
-    updated[index] = value;
-    setPollOptions(updated);
-  };
-
-  const removePollOption = (index: number) => {
-    if (pollOptions.length > 2) {
-      setPollOptions(pollOptions.filter((_, i) => i !== index));
-    }
-  };
-
-  const resetCreateForm = () => {
-    setNewPostContent('');
-    setPostMode('text');
-    setImageFile(null);
-    setImagePreview(null);
-    setPollQuestion('');
-    setPollOptions(['', '']);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
 
   /* ───────── Like Toggle ───────── */
 
@@ -414,20 +294,22 @@ export function FeedPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Newspaper className="w-7 h-7 text-indigo-400" aria-hidden="true" />
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <Newspaper className="w-5 h-5 text-white" aria-hidden="true" />
+            </div>
             Community Feed
           </h1>
-          <p className="text-theme-muted mt-1">See what&apos;s happening in your community</p>
+          <p className="text-[var(--text-muted)] mt-1 text-sm">See what&apos;s happening in your community</p>
         </div>
 
         {isAuthenticated && (
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={onCreateOpen}
           >
@@ -438,37 +320,56 @@ export function FeedPage() {
 
       {/* Quick Post Box */}
       {isAuthenticated && (
-        <GlassCard className="p-4">
-          <div
-            className="flex items-center gap-3 cursor-pointer"
-            onClick={onCreateOpen}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && onCreateOpen()}
-          >
+        <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors cursor-pointer" onClick={onCreateOpen}>
+          <div className="flex items-center gap-3">
             <Avatar
               name={user?.first_name || 'You'}
               src={resolveAvatarUrl(user?.avatar)}
               size="sm"
+              isBordered
+              className="ring-2 ring-[var(--border-default)]"
             />
-            <div className="flex-1 bg-theme-hover rounded-full px-4 py-2.5 text-theme-subtle text-sm">
+            <div className="flex-1 bg-[var(--surface-elevated)] rounded-full px-4 py-2.5 text-[var(--text-subtle)] text-sm border border-[var(--border-default)] hover:border-[var(--color-primary)]/30 transition-colors">
               What&apos;s on your mind?
+            </div>
+            <div className="flex gap-1">
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className="text-[var(--text-muted)]"
+                onPress={() => { setComposeDefaultTab('post'); onCreateOpen(); }}
+                aria-label="Add image"
+              >
+                <ImagePlus className="w-4 h-4" />
+              </Button>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className="text-[var(--text-muted)]"
+                onPress={() => { setComposeDefaultTab('poll'); onCreateOpen(); }}
+                aria-label="Create poll"
+              >
+                <BarChart3 className="w-4 h-4" />
+              </Button>
             </div>
           </div>
         </GlassCard>
       )}
 
-      {/* Filter Chips */}
+      {/* Filter Tabs */}
       <div className="flex gap-2 flex-wrap">
         {filterOptions.map((opt) => (
           <Button
             key={opt.key}
             size="sm"
             variant={filter === opt.key ? 'solid' : 'flat'}
+            radius="full"
             className={
               filter === opt.key
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                : 'bg-theme-elevated text-theme-muted'
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
+                : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-default)]'
             }
             onPress={() => setFilter(opt.key)}
           >
@@ -479,12 +380,14 @@ export function FeedPage() {
 
       {/* Error State */}
       {error && !isLoading && (
-        <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Feed</h2>
-          <p className="text-theme-muted mb-4">{error}</p>
+        <GlassCard className="p-10 text-center" glow="primary">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mx-auto mb-5">
+            <AlertTriangle className="w-8 h-8 text-amber-500" aria-hidden="true" />
+          </div>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Unable to Load Feed</h2>
+          <p className="text-[var(--text-muted)] mb-5 text-sm max-w-xs mx-auto">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadFeed()}
           >
@@ -499,43 +402,30 @@ export function FeedPage() {
           {isLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-theme-hover" />
-                    <div className="flex-1">
-                      <div className="h-4 bg-theme-hover rounded w-1/3 mb-2" />
-                      <div className="h-3 bg-theme-hover rounded w-1/5" />
-                    </div>
-                  </div>
-                  <div className="h-4 bg-theme-hover rounded w-full mb-2" />
-                  <div className="h-4 bg-theme-hover rounded w-3/4 mb-4" />
-                  <div className="flex gap-4">
-                    <div className="h-3 bg-theme-hover rounded w-16" />
-                    <div className="h-3 bg-theme-hover rounded w-16" />
-                  </div>
-                </GlassCard>
+                <FeedSkeleton key={i} />
               ))}
             </div>
           ) : items.length === 0 ? (
-            <EmptyState
-              icon={<Newspaper className="w-12 h-12" aria-hidden="true" />}
-              title="No posts yet"
-              description={
-                filter !== 'all'
-                  ? `No ${filter} in the feed right now`
-                  : 'Be the first to share something with your community!'
-              }
-              action={
-                isAuthenticated ? (
-                  <Button
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                    onPress={onCreateOpen}
-                  >
-                    Create Post
-                  </Button>
-                ) : undefined
-              }
-            />
+            <GlassCard className="p-12 text-center">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="w-10 h-10 text-indigo-400" aria-hidden="true" />
+              </div>
+              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No posts yet</h2>
+              <p className="text-sm text-[var(--text-muted)] mb-6 max-w-xs mx-auto">
+                {filter !== 'all'
+                  ? `No ${filter} in the feed right now. Try a different filter!`
+                  : 'Be the first to share something with your community!'}
+              </p>
+              {isAuthenticated && (
+                <Button
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25"
+                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                  onPress={onCreateOpen}
+                >
+                  Create Post
+                </Button>
+              )}
+            </GlassCard>
           ) : (
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4">
               <AnimatePresence mode="popLayout">
@@ -557,12 +447,13 @@ export function FeedPage() {
               </AnimatePresence>
 
               {hasMore && (
-                <div className="pt-4 text-center">
+                <div className="pt-6 pb-2 text-center">
                   <Button
-                    variant="flat"
-                    className="bg-theme-elevated text-theme-muted"
+                    variant="bordered"
+                    className="border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
                     onPress={() => loadFeed(true)}
                     isLoading={isLoadingMore}
+                    startContent={!isLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
                   >
                     Load More
                   </Button>
@@ -573,209 +464,34 @@ export function FeedPage() {
         </>
       )}
 
-      {/* Hidden file input for image upload */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/gif,image/webp"
-        className="hidden"
-        onChange={handleImageSelect}
-      />
-
-      {/* Create Post Modal */}
-      <Modal
+      {/* Compose Hub */}
+      <ComposeHub
         isOpen={isCreateOpen}
-        onClose={() => { onCreateClose(); resetCreateForm(); }}
-        size="lg"
-        classNames={{
-          base: 'bg-content1 border border-theme-default',
-        }}
-      >
-        <ModalContent>
-          <ModalHeader className="text-theme-primary">
-            <div className="flex items-center gap-3 w-full">
-              <span>Create Post</span>
-              <div className="flex gap-1 ml-auto">
-                <Chip
-                  size="sm"
-                  variant={postMode === 'text' ? 'solid' : 'flat'}
-                  className={postMode === 'text' ? 'bg-indigo-500 text-white cursor-pointer' : 'bg-theme-elevated text-theme-muted cursor-pointer'}
-                  onClick={() => setPostMode('text')}
-                >
-                  Text
-                </Chip>
-                <Chip
-                  size="sm"
-                  variant={postMode === 'poll' ? 'solid' : 'flat'}
-                  className={postMode === 'poll' ? 'bg-indigo-500 text-white cursor-pointer' : 'bg-theme-elevated text-theme-muted cursor-pointer'}
-                  onClick={() => setPostMode('poll')}
-                >
-                  <BarChart3 className="w-3 h-3 mr-1 inline" aria-hidden="true" />
-                  Poll
-                </Chip>
-              </div>
-            </div>
-          </ModalHeader>
-          <ModalBody>
-            {postMode === 'text' ? (
-              <>
-                <div className="flex items-start gap-3">
-                  <Avatar
-                    name={user?.first_name || 'You'}
-                    src={resolveAvatarUrl(user?.avatar)}
-                    size="sm"
-                    className="mt-1"
-                  />
-                  <Textarea
-                    placeholder="What's on your mind?"
-                    value={newPostContent}
-                    onChange={(e) => setNewPostContent(e.target.value)}
-                    minRows={3}
-                    maxRows={8}
-                    classNames={{
-                      input: 'bg-transparent text-theme-primary',
-                      inputWrapper: 'bg-theme-elevated border-theme-default',
-                    }}
-                    autoFocus
-                  />
-                </div>
-
-                {/* Image Preview */}
-                {imagePreview && (
-                  <div className="relative mt-3 rounded-xl overflow-hidden border border-theme-default">
-                    <img src={imagePreview} alt="Upload preview" className="w-full max-h-60 object-cover" />
-                    <Button
-                      isIconOnly
-                      size="sm"
-                      variant="flat"
-                      className="absolute top-2 right-2 bg-black/60 text-white min-w-0"
-                      onPress={removeImage}
-                      aria-label="Remove image"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-
-                {/* Image Upload Button */}
-                <div className="flex items-center gap-2 mt-2">
-                  <Button
-                    size="sm"
-                    variant="flat"
-                    className="bg-theme-elevated text-theme-muted"
-                    startContent={<ImagePlus className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() => fileInputRef.current?.click()}
-                  >
-                    {imageFile ? 'Change Image' : 'Add Image'}
-                  </Button>
-                  {imageFile && (
-                    <span className="text-xs text-theme-subtle">
-                      {imageFile.name} ({(imageFile.size / 1024 / 1024).toFixed(1)}MB)
-                    </span>
-                  )}
-                </div>
-              </>
-            ) : (
-              /* Poll Creation */
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Avatar
-                    name={user?.first_name || 'You'}
-                    src={resolveAvatarUrl(user?.avatar)}
-                    size="sm"
-                    className="mt-1"
-                  />
-                  <Input
-                    placeholder="Ask a question..."
-                    value={pollQuestion}
-                    onChange={(e) => setPollQuestion(e.target.value)}
-                    classNames={{
-                      input: 'bg-transparent text-theme-primary',
-                      inputWrapper: 'bg-theme-elevated border-theme-default',
-                    }}
-                    autoFocus
-                  />
-                </div>
-
-                <div className="space-y-2 pl-11">
-                  {pollOptions.map((opt, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        placeholder={`Option ${index + 1}`}
-                        value={opt}
-                        onChange={(e) => updatePollOption(index, e.target.value)}
-                        size="sm"
-                        classNames={{
-                          input: 'bg-transparent text-theme-primary',
-                          inputWrapper: 'bg-theme-elevated border-theme-default',
-                        }}
-                      />
-                      {pollOptions.length > 2 && (
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
-                          className="text-theme-muted min-w-0"
-                          onPress={() => removePollOption(index)}
-                          aria-label={`Remove option ${index + 1}`}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-
-                  {pollOptions.length < 6 && (
-                    <Button
-                      size="sm"
-                      variant="flat"
-                      className="bg-theme-elevated text-indigo-400"
-                      startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
-                      onPress={addPollOption}
-                    >
-                      Add Option
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="flat"
-              onPress={() => { onCreateClose(); resetCreateForm(); }}
-              className="text-theme-muted"
-            >
-              Cancel
-            </Button>
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              onPress={postMode === 'text' ? handleCreatePost : handleCreatePoll}
-              isLoading={isCreating}
-              isDisabled={
-                postMode === 'text'
-                  ? (!newPostContent.trim() && !imageFile)
-                  : (!pollQuestion.trim() || pollOptions.filter((o) => o.trim()).length < 2)
-              }
-            >
-              {postMode === 'text' ? 'Post' : 'Create Poll'}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        onClose={onCreateClose}
+        defaultTab={composeDefaultTab}
+        onSuccess={() => { cursorRef.current = undefined; loadFeed(); }}
+      />
 
       {/* Report Post Modal */}
       <Modal
         isOpen={isReportOpen}
         onClose={onReportClose}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)]',
+          backdrop: 'bg-black/60 backdrop-blur-sm',
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Report Post</ModalHeader>
+          <ModalHeader className="text-[var(--text-primary)]">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
+                <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
+              </div>
+              Report Post
+            </div>
+          </ModalHeader>
           <ModalBody>
-            <p className="text-sm text-theme-muted mb-3">
+            <p className="text-sm text-[var(--text-muted)] mb-3">
               Please describe why you are reporting this post. Our moderators will review your report.
             </p>
             <Textarea
@@ -785,8 +501,8 @@ export function FeedPage() {
               onChange={(e) => setReportReason(e.target.value)}
               minRows={3}
               classNames={{
-                input: 'bg-transparent text-theme-primary',
-                inputWrapper: 'bg-theme-elevated border-theme-default',
+                input: 'bg-transparent text-[var(--text-primary)]',
+                inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
               }}
               autoFocus
             />
@@ -795,15 +511,17 @@ export function FeedPage() {
             <Button
               variant="flat"
               onPress={onReportClose}
-              className="text-theme-muted"
+              className="text-[var(--text-muted)]"
             >
               Cancel
             </Button>
             <Button
               color="danger"
+              variant="flat"
               onPress={handleReport}
               isLoading={isReporting}
               isDisabled={!reportReason.trim()}
+              className="font-medium"
             >
               Submit Report
             </Button>
