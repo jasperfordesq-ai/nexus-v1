@@ -58,12 +58,9 @@ vi.mock('@/components/seo', () => ({
   PageMeta: () => null,
 }));
 
-vi.mock('@/components/feedback', () => ({
-  EmptyState: ({ title, description }: { title: string; description?: string }) => (
-    <div data-testid="empty-state">
-      <div>{title}</div>
-      {description && <div>{description}</div>}
-    </div>
+vi.mock('@/components/ui', () => ({
+  GlassCard: ({ children, className, ...props }: Record<string, unknown>) => (
+    <div className={`glass-card ${className || ''}`} {...props}>{children as React.ReactNode}</div>
   ),
 }));
 
@@ -119,9 +116,8 @@ describe('FeedPage', () => {
     mockGet.mockResolvedValue({ success: true, data: [], meta: {} });
     render(<FeedPage />);
     await waitFor(() => {
-      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+      expect(screen.getByText('No posts yet')).toBeInTheDocument();
     });
-    expect(screen.getByText('No posts yet')).toBeInTheDocument();
   });
 
   it('renders feed items when data is returned', async () => {
@@ -226,8 +222,9 @@ describe('FeedPage', () => {
     // Mock a never-resolving promise to keep loading state
     mockGet.mockReturnValue(new Promise(() => {}));
     render(<FeedPage />);
-    // Should show 3 skeleton cards (animate-pulse elements)
-    const pulseElements = document.querySelectorAll('.animate-pulse');
-    expect(pulseElements.length).toBeGreaterThanOrEqual(3);
+    // Should show skeleton containers (GlassCard mocked as div.glass-card)
+    const skeletonCards = document.querySelectorAll('.glass-card');
+    // At least 3 skeleton cards + possible quick-post box
+    expect(skeletonCards.length).toBeGreaterThanOrEqual(3);
   });
 });
