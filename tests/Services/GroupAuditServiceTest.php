@@ -182,6 +182,7 @@ class GroupAuditServiceTest extends DatabaseTestCase
             self::$testGroupId,
             ['action' => GroupAuditService::ACTION_GROUP_UPDATED]
         );
+        $this->assertIsArray($logs);
 
         foreach ($logs as $log) {
             $this->assertEquals(GroupAuditService::ACTION_GROUP_UPDATED, $log['action']);

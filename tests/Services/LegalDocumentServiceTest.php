@@ -39,11 +39,25 @@ class LegalDocumentServiceTest extends DatabaseTestCase
     {
         $ts = time();
 
-        // Create a test legal document
+        // Clean up any pre-existing test document to avoid unique constraint violation
+        try {
+            Database::query(
+                "DELETE lv FROM legal_document_versions lv
+                 JOIN legal_documents ld ON lv.document_id = ld.id
+                 WHERE ld.tenant_id = ? AND ld.document_type = ?",
+                [self::$testTenantId, LegalDocumentService::TYPE_ACCEPTABLE_USE]
+            );
+            Database::query(
+                "DELETE FROM legal_documents WHERE tenant_id = ? AND document_type = ?",
+                [self::$testTenantId, LegalDocumentService::TYPE_ACCEPTABLE_USE]
+            );
+        } catch (\Exception $e) {}
+
+        // Create a test legal document (use acceptable_use to avoid colliding with existing terms/privacy)
         Database::query(
             "INSERT INTO legal_documents (tenant_id, document_type, title, slug, is_active, created_at)
-             VALUES (?, ?, 'Terms of Service', 'terms-of-service', 1, NOW())",
-            [self::$testTenantId, LegalDocumentService::TYPE_TERMS]
+             VALUES (?, ?, 'Acceptable Use Policy', 'acceptable-use-policy', 1, NOW())",
+            [self::$testTenantId, LegalDocumentService::TYPE_ACCEPTABLE_USE]
         );
         self::$testDocumentId = (int)Database::getInstance()->lastInsertId();
 

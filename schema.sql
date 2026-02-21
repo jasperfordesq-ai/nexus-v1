@@ -2149,11 +2149,20 @@ DROP TABLE IF EXISTS `group_approval_requests`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `group_approval_requests` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  `submitted_by` int(11) NOT NULL,
+  `submission_notes` text DEFAULT NULL,
+  `reviewed_by` int(11) DEFAULT NULL,
+  `review_notes` text DEFAULT NULL,
+  `status` varchar(50) DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `reviewed_at` timestamp NULL DEFAULT NULL,
-  `tenant_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  PRIMARY KEY (`id`),
+  KEY `idx_tenant_status` (`tenant_id`,`status`),
+  KEY `idx_group` (`group_id`),
+  KEY `idx_submitter` (`tenant_id`,`submitted_by`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_audit_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

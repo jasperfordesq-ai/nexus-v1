@@ -460,10 +460,12 @@ class GroupApprovalWorkflowService
             foreach ($admins as $admin) {
                 NotificationDispatcher::dispatch(
                     $admin['id'],
+                    'global',
+                    0,
                     'group_approval_request',
-                    'New Group Approval Request',
                     "A new group '{$group['name']}' is awaiting approval.",
-                    ['group_id' => $groupId, 'request_id' => $requestId]
+                    '/admin/groups',
+                    null
                 );
             }
         } catch (\Exception $e) {
@@ -490,10 +492,12 @@ class GroupApprovalWorkflowService
 
             NotificationDispatcher::dispatch(
                 $request['submitted_by'],
+                'global',
+                0,
                 'group_approval_decision',
-                'Group Approval Update',
                 $messages[$status] ?? 'Your group approval status has been updated.',
-                ['group_id' => $request['group_id'], 'request_id' => $request['id']]
+                '/groups/' . ($request['group_id'] ?? ''),
+                null
             );
         } catch (\Exception $e) {
             // Silently fail

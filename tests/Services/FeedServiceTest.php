@@ -247,6 +247,7 @@ class FeedServiceTest extends DatabaseTestCase
 
         try {
             $result = FeedService::getFeed(null, ['group_id' => self::$testGroupId]);
+            $this->assertIsArray($result['items']);
 
             foreach ($result['items'] as $item) {
                 $this->assertEquals(self::$testGroupId, $item['group_id'] ?? null);
