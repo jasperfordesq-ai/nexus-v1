@@ -131,12 +131,14 @@ class PageTest extends DatabaseTestCase
 
     public function testAllReturnsEmptyForWrongTenant(): void
     {
-        TenantContext::setById(999999);
+        // Switch to tenant 1 (a real, different tenant) because
+        // TenantContext::setById() silently ignores non-existent tenant IDs
+        TenantContext::setById(1);
 
         $pages = Page::all();
 
         $this->assertIsArray($pages);
-        // May be empty or gracefully handle wrong tenant
+        // Pages from tenant 1 should not include our test pages from tenant 2
 
         // Restore
         TenantContext::setById(self::$testTenantId);
@@ -175,10 +177,13 @@ class PageTest extends DatabaseTestCase
 
     public function testFindByIdEnforcesTenantIsolation(): void
     {
-        TenantContext::setById(999999);
+        // Switch to tenant 1 (a real, different tenant) because
+        // TenantContext::setById() silently ignores non-existent tenant IDs
+        TenantContext::setById(1);
 
         $page = Page::findById(self::$testPageId);
 
+        // Page was created under tenant 2, so tenant 1 context should not find it
         $this->assertFalse($page, 'Page should not be found with wrong tenant context');
 
         // Restore

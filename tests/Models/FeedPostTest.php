@@ -215,12 +215,13 @@ class FeedPostTest extends DatabaseTestCase
 
     public function testFindByIdEnforcesTenantIsolation(): void
     {
-        // Set to a different tenant
-        TenantContext::setById(9999);
+        // Switch to tenant 1 (a real, different tenant) because
+        // TenantContext::setById() silently ignores non-existent tenant IDs
+        TenantContext::setById(1);
 
         $post = FeedPost::findById(self::$testPostId);
 
-        // Should not find the post in the wrong tenant
+        // Should not find the post in the wrong tenant (post belongs to tenant 2)
         $this->assertFalse($post, 'Post should not be found from a different tenant context');
 
         // Restore tenant
@@ -271,6 +272,7 @@ class FeedPostTest extends DatabaseTestCase
     {
         $posts = FeedPost::getRecent(50);
 
+        $this->assertIsArray($posts);
         for ($i = 1; $i < count($posts); $i++) {
             $this->assertGreaterThanOrEqual(
                 $posts[$i]['created_at'],

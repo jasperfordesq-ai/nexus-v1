@@ -402,16 +402,17 @@ class PollTest extends DatabaseTestCase
         $endDate = date('Y-m-d H:i:s', strtotime('+14 days'));
         $pollId = Poll::create(self::$testTenantId, self::$testUserId, 'Tenant delete test?', 'Desc', $endDate);
 
-        // Switch to different tenant
-        TenantContext::setById(9999);
+        // Switch to tenant 1 (a real, different tenant) because
+        // TenantContext::setById() silently ignores non-existent tenant IDs
+        TenantContext::setById(1);
 
-        // Attempt delete from wrong tenant
+        // Attempt delete from wrong tenant (poll belongs to tenant 2)
         Poll::delete((int)$pollId);
 
         // Switch back
         TenantContext::setById(self::$testTenantId);
 
-        // Poll should still exist (delete was scoped to wrong tenant)
+        // Poll should still exist (delete was scoped to tenant 1, not tenant 2)
         $poll = Poll::find((int)$pollId);
         $this->assertNotFalse($poll, 'Poll should survive delete attempt from wrong tenant');
 

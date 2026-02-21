@@ -24,8 +24,10 @@ class DeliverableTest extends DatabaseTestCase
         $this->testTenantId = 1;
         TenantContext::setById($this->testTenantId);
 
-        // Create test user
-        $this->testUserId = $this->createTestUser();
+        // Create test user with unique email
+        $timestamp = time();
+        $uniqueSuffix = $timestamp . '_' . mt_rand(1000, 9999);
+        $this->testUserId = $this->createTestUser("deliverable_test_{$uniqueSuffix}@test.com");
     }
 
     public function testCreateDeliverable()
@@ -119,7 +121,8 @@ class DeliverableTest extends DatabaseTestCase
 
     public function testAssignToUser()
     {
-        $assigneeId = $this->createTestUser('assignee@test.com');
+        $uniqueSuffix = time() . '_' . mt_rand(1000, 9999);
+        $assigneeId = $this->createTestUser("assignee_{$uniqueSuffix}@test.com");
 
         $deliverable = Deliverable::create($this->testUserId, 'Assignment Test');
         $this->assertNotFalse($deliverable);
@@ -291,8 +294,12 @@ class DeliverableTest extends DatabaseTestCase
     /**
      * Helper method to create a test user
      */
-    private function createTestUser($email = 'test@example.com')
+    private function createTestUser($email = null)
     {
+        if ($email === null) {
+            $uniqueSuffix = time() . '_' . mt_rand(1000, 9999);
+            $email = "deliverable_test_{$uniqueSuffix}@test.com";
+        }
         return $this->insertTestData('users', [
             'tenant_id' => $this->testTenantId,
             'email' => $email,

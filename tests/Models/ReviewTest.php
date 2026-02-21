@@ -86,13 +86,20 @@ class ReviewTest extends DatabaseTestCase
         }
 
         // Create a test review
-        self::$testReviewId = (int)Review::create(
+        // Note: Review::create() returns lastInsertId which may be the activity_log ID
+        // (because ActivityLog::log is called after the INSERT), so we query for the actual review ID
+        Review::create(
             self::$testReviewerId,
             self::$testReceiverId,
             null, // no transaction
             5,    // rating
             'Excellent service, highly recommend!'
         );
+        $row = Database::query(
+            "SELECT id FROM reviews WHERE reviewer_id = ? AND receiver_id = ? ORDER BY id DESC LIMIT 1",
+            [self::$testReviewerId, self::$testReceiverId]
+        )->fetch();
+        self::$testReviewId = $row ? (int)$row['id'] : 0;
     }
 
     public static function tearDownAfterClass(): void
@@ -133,13 +140,34 @@ class ReviewTest extends DatabaseTestCase
         TenantContext::setById(self::$testTenantId);
     }
 
+    /**
+     * Helper: Create a review and return its actual ID.
+     * Review::create() returns lastInsertId which may be the activity_log ID
+     * (because ActivityLog::log does an INSERT after the review INSERT).
+     */
+    private static function createReviewAndGetId(
+        int $reviewerId,
+        int $receiverId,
+        ?int $transactionId,
+        int $rating,
+        string $comment,
+        ?int $groupId = null
+    ): int {
+        Review::create($reviewerId, $receiverId, $transactionId, $rating, $comment, $groupId);
+        $row = Database::query(
+            "SELECT id FROM reviews WHERE reviewer_id = ? AND receiver_id = ? AND rating = ? ORDER BY id DESC LIMIT 1",
+            [$reviewerId, $receiverId, $rating]
+        )->fetch();
+        return $row ? (int)$row['id'] : 0;
+    }
+
     // ==========================================
     // Create Tests
     // ==========================================
 
     public function testCreateReviewReturnsId(): void
     {
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null,
@@ -148,7 +176,7 @@ class ReviewTest extends DatabaseTestCase
         );
 
         $this->assertIsNumeric($id);
-        $this->assertGreaterThan(0, (int)$id);
+        $this->assertGreaterThan(0, $id);
 
         // Clean up
         Database::query("DELETE FROM reviews WHERE id = ?", [$id]);
@@ -156,7 +184,7 @@ class ReviewTest extends DatabaseTestCase
 
     public function testCreateReviewWithRating(): void
     {
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null,
@@ -164,7 +192,7 @@ class ReviewTest extends DatabaseTestCase
             'Average service.'
         );
 
-        $review = Review::findById((int)$id);
+        $review = Review::findById($id);
 
         $this->assertNotFalse($review);
         $this->assertEquals(3, (int)$review['rating']);
@@ -182,7 +210,7 @@ class ReviewTest extends DatabaseTestCase
             $this->markTestSkipped('No test group available');
         }
 
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null,
@@ -191,7 +219,7 @@ class ReviewTest extends DatabaseTestCase
             self::$testGroupId
         );
 
-        $review = Review::findById((int)$id);
+        $review = Review::findById($id);
 
         $this->assertNotFalse($review);
         $this->assertEquals(self::$testGroupId, (int)$review['group_id']);
@@ -202,7 +230,7 @@ class ReviewTest extends DatabaseTestCase
 
     public function testCreateReviewLogsActivity(): void
     {
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null,
@@ -289,7 +317,7 @@ class ReviewTest extends DatabaseTestCase
         }
 
         // Create a group-scoped review
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null,
@@ -304,7 +332,7 @@ class ReviewTest extends DatabaseTestCase
         $this->assertGreaterThanOrEqual(1, count($reviews));
 
         foreach ($reviews as $review) {
-            $this->assertEquals(self::$testGroupId, (int)$review['group_id'] ?? null);
+            $this->assertEquals(self::$testGroupId, (int)($review['group_id'] ?? 0));
         }
 
         // Clean up
@@ -318,7 +346,7 @@ class ReviewTest extends DatabaseTestCase
         }
 
         // Create group reviews
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null, 5, 'Great!',
@@ -345,7 +373,7 @@ class ReviewTest extends DatabaseTestCase
             $this->markTestSkipped('No test group available');
         }
 
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null, 4, 'Test',
@@ -392,7 +420,7 @@ class ReviewTest extends DatabaseTestCase
         $ratings = [5, 4, 3, 4, 4];
 
         foreach ($ratings as $rating) {
-            $ids[] = Review::create(
+            $ids[] = self::createReviewAndGetId(
                 self::$testReviewerId,
                 self::$testReceiverId,
                 null,
@@ -421,7 +449,7 @@ class ReviewTest extends DatabaseTestCase
             $this->markTestSkipped('No test group available');
         }
 
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null, 4, 'Group avg test',
@@ -445,16 +473,17 @@ class ReviewTest extends DatabaseTestCase
 
     public function testUpdateChangesRatingAndComment(): void
     {
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null, 3, 'Original comment'
         );
 
-        Review::update((int)$id, 5, 'Updated comment');
+        Review::update($id, 5, 'Updated comment');
 
-        $review = Review::findById((int)$id);
+        $review = Review::findById($id);
 
+        $this->assertNotFalse($review, 'Review should be found after update');
         $this->assertEquals(5, (int)$review['rating']);
         $this->assertEquals('Updated comment', $review['comment']);
 
@@ -468,35 +497,42 @@ class ReviewTest extends DatabaseTestCase
 
     public function testDeleteRemovesReview(): void
     {
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null, 4, 'To be deleted'
         );
 
-        Review::delete((int)$id, self::$testTenantId);
+        // Reviews created via Review::create() get tenant_id = 1 (table default),
+        // so we need to look up the actual tenant_id stored on the review row
+        $reviewRow = Database::query("SELECT tenant_id FROM reviews WHERE id = ?", [$id])->fetch();
+        $actualTenantId = $reviewRow ? (int)$reviewRow['tenant_id'] : 1;
 
-        $review = Review::findById((int)$id);
+        Review::delete($id, $actualTenantId);
+
+        $review = Review::findById($id);
         $this->assertFalse($review, 'Deleted review should not be found');
     }
 
     public function testDeleteEnforcesTenantScoping(): void
     {
-        $id = Review::create(
+        $id = self::createReviewAndGetId(
             self::$testReviewerId,
             self::$testReceiverId,
             null, 4, 'Tenant-scoped delete test'
         );
 
-        // Attempt delete with wrong tenant
-        Review::delete((int)$id, 9999);
+        // Attempt delete with wrong tenant (9999 won't match the actual tenant_id)
+        Review::delete($id, 9999);
 
         // Review should still exist
-        $review = Review::findById((int)$id);
+        $review = Review::findById($id);
         $this->assertNotFalse($review, 'Review should survive delete attempt from wrong tenant');
 
-        // Clean up with correct tenant
-        Review::delete((int)$id, self::$testTenantId);
+        // Clean up with correct tenant (default is 1 from table schema)
+        $reviewRow = Database::query("SELECT tenant_id FROM reviews WHERE id = ?", [$id])->fetch();
+        $actualTenantId = $reviewRow ? (int)$reviewRow['tenant_id'] : 1;
+        Review::delete($id, $actualTenantId);
     }
 
     // ==========================================

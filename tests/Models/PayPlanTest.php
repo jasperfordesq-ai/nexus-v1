@@ -155,6 +155,7 @@ class PayPlanTest extends DatabaseTestCase
     public function testGetComparisonIncludesExpectedFields(): void
     {
         $comparison = PayPlan::getComparison();
+        $this->assertIsArray($comparison);
         if (!empty($comparison)) {
             $this->assertArrayHasKey('id', $comparison[0]);
             $this->assertArrayHasKey('name', $comparison[0]);

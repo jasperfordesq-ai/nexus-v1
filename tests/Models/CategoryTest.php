@@ -161,10 +161,13 @@ class CategoryTest extends DatabaseTestCase
 
     public function testFindEnforcesTenantScoping(): void
     {
-        TenantContext::setById(999999);
+        // Use tenant 1 (a real tenant) instead of 999999, because
+        // TenantContext::setById() silently ignores non-existent tenant IDs
+        TenantContext::setById(1);
 
         $cat = Category::find(self::$testCategoryId);
 
+        // Category was created under tenant 2, so tenant 1 context should not find it
         $this->assertFalse($cat, 'Category should not be found with wrong tenant context');
 
         // Restore
@@ -325,10 +328,11 @@ class CategoryTest extends DatabaseTestCase
     {
         $originalCat = Category::find(self::$testCategoryId);
 
-        // Switch to wrong tenant
-        TenantContext::setById(999999);
+        // Switch to tenant 1 (a real, different tenant) because
+        // TenantContext::setById() silently ignores non-existent tenant IDs
+        TenantContext::setById(1);
 
-        // Update should not find the category
+        // Update should not find the category (it belongs to tenant 2)
         $result = Category::update(self::$testCategoryId, [
             'name' => 'Wrong Tenant Update',
         ]);
@@ -368,15 +372,16 @@ class CategoryTest extends DatabaseTestCase
             'type' => 'listing',
         ]);
 
-        // Switch to wrong tenant
-        TenantContext::setById(999999);
+        // Switch to tenant 1 (a real, different tenant) because
+        // TenantContext::setById() silently ignores non-existent tenant IDs
+        TenantContext::setById(1);
 
         Category::delete((int)$id);
 
         // Restore tenant
         TenantContext::setById(self::$testTenantId);
 
-        // Category should still exist
+        // Category should still exist (created under tenant 2, delete was scoped to tenant 1)
         $cat = Category::find((int)$id);
         $this->assertNotFalse($cat, 'Category should survive delete attempt from wrong tenant');
 
@@ -465,14 +470,20 @@ class CategoryTest extends DatabaseTestCase
     // Edge Cases
     // ==========================================
 
-    public function testAllReturnsEmptyForTenantWithNoCategories(): void
+    public function testAllScopedByTenantDoesNotReturnOtherTenantData(): void
     {
-        TenantContext::setById(999999);
+        // Switch to tenant 1 (a real, different tenant) because
+        // TenantContext::setById() silently ignores non-existent tenant IDs
+        TenantContext::setById(1);
 
         $categories = Category::all();
 
         $this->assertIsArray($categories);
-        $this->assertEmpty($categories);
+        // Verify none of the returned categories belong to our test tenant
+        foreach ($categories as $cat) {
+            $this->assertNotEquals(self::$testTenantId, (int)$cat['tenant_id'],
+                'Categories from tenant 2 should not appear when context is set to tenant 1');
+        }
 
         // Restore
         TenantContext::setById(self::$testTenantId);
