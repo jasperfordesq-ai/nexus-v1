@@ -151,12 +151,13 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testGetUnreviewedMessages(int $copyId): int
     {
-        $messages = BrokerMessageVisibilityService::getMessages('unreviewed');
+        $result = BrokerMessageVisibilityService::getMessages('unreviewed');
 
-        $this->assertIsArray($messages, 'Should return an array');
+        $this->assertIsArray($result, 'Should return an array');
+        $this->assertArrayHasKey('items', $result, 'Should have items key');
         // Our copy should be in the list
         $found = false;
-        foreach ($messages as $msg) {
+        foreach ($result['items'] as $msg) {
             if (isset($msg['id']) && (int) $msg['id'] === $copyId) {
                 $found = true;
                 break;
@@ -196,10 +197,10 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testReviewedMessagesNotInUnreviewedList(int $copyId): void
     {
-        $messages = BrokerMessageVisibilityService::getMessages('unreviewed');
+        $result = BrokerMessageVisibilityService::getMessages('unreviewed');
 
         $found = false;
-        foreach ($messages as $msg) {
+        foreach ($result['items'] as $msg) {
             if (isset($msg['id']) && (int) $msg['id'] === $copyId) {
                 $found = true;
                 break;
@@ -252,10 +253,17 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testIsFirstContact(): void
     {
-        // Use new user IDs that haven't been paired
+        // Use real user IDs that haven't been paired (sender/broker pair)
+        // Clean up first to ensure no prior record
+        $ids = [min(self::$testSenderId, self::$testBrokerId), max(self::$testSenderId, self::$testBrokerId)];
+        Database::query(
+            "DELETE FROM user_first_contacts WHERE tenant_id = ? AND user1_id = ? AND user2_id = ?",
+            [self::$testTenantId, $ids[0], $ids[1]]
+        );
+
         $result = BrokerMessageVisibilityService::isFirstContact(
             self::$testSenderId,
-            99999999
+            self::$testBrokerId
         );
 
         $this->assertTrue($result, 'Should be first contact for new pair');
@@ -266,23 +274,34 @@ class BrokerMessageVisibilityServiceTest extends TestCase
      */
     public function testRecordFirstContact(): void
     {
-        $uniqueUserId = 99999998;
+        // Use actual test user (FK constraint requires real users)
+        $userA = self::$testSenderId;
+        $userB = self::$testBrokerId;
+
+        // Ensure no prior first contact record exists
+        $ids = [min($userA, $userB), max($userA, $userB)];
+        Database::query(
+            "DELETE FROM user_first_contacts WHERE tenant_id = ? AND user1_id = ? AND user2_id = ?",
+            [self::$testTenantId, $ids[0], $ids[1]]
+        );
+
+        // Verify it's first contact before recording
+        $this->assertTrue(
+            BrokerMessageVisibilityService::isFirstContact($userA, $userB),
+            'Should be first contact before recording'
+        );
 
         BrokerMessageVisibilityService::recordFirstContact(
-            self::$testSenderId,
-            $uniqueUserId,
+            $userA,
+            $userB,
             self::$testMessageId
         );
 
-        $isFirst = BrokerMessageVisibilityService::isFirstContact(
-            self::$testSenderId,
-            $uniqueUserId
-        );
+        $isFirst = BrokerMessageVisibilityService::isFirstContact($userA, $userB);
 
         $this->assertFalse($isFirst, 'Should no longer be first contact after recording');
 
         // Clean up
-        $ids = [min(self::$testSenderId, $uniqueUserId), max(self::$testSenderId, $uniqueUserId)];
         Database::query(
             "DELETE FROM user_first_contacts WHERE tenant_id = ? AND user1_id = ? AND user2_id = ?",
             [self::$testTenantId, $ids[0], $ids[1]]
@@ -310,7 +329,7 @@ class BrokerMessageVisibilityServiceTest extends TestCase
         // Verify constants are defined with valid DB enum values
         $this->assertEquals('first_contact', BrokerMessageVisibilityService::REASON_FIRST_CONTACT);
         $this->assertEquals('new_member', BrokerMessageVisibilityService::REASON_NEW_MEMBER);
-        $this->assertEquals('high_risk_listing', BrokerMessageVisibilityService::REASON_HIGH_RISK);
+        $this->assertEquals('high_risk_listing', BrokerMessageVisibilityService::REASON_HIGH_RISK_LISTING);
         $this->assertEquals('flagged_user', BrokerMessageVisibilityService::REASON_FLAGGED_USER);
         $this->assertEquals('random_sample', BrokerMessageVisibilityService::REASON_MONITORING);
     }

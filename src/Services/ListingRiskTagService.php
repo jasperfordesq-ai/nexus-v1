@@ -99,11 +99,10 @@ class ListingRiskTagService
             );
 
             // Log update
-            AuditLogService::log('listing_risk_tag_updated', [
+            AuditLogService::log('listing_risk_tag_updated', null, $brokerId, [
                 'listing_id' => $listingId,
                 'old_risk_level' => $existing['risk_level'],
                 'new_risk_level' => $riskLevel,
-                'broker_id' => $brokerId,
             ]);
 
             return $existing['id'];
@@ -128,11 +127,10 @@ class ListingRiskTagService
         $tagId = Database::lastInsertId();
 
         // Log creation
-        AuditLogService::log('listing_risk_tag_created', [
+        AuditLogService::log('listing_risk_tag_created', null, $brokerId, [
             'listing_id' => $listingId,
             'tag_id' => $tagId,
             'risk_level' => $riskLevel,
-            'broker_id' => $brokerId,
         ]);
 
         // Notify admins if high/critical
@@ -187,10 +185,9 @@ class ListingRiskTagService
         );
 
         if ($result) {
-            AuditLogService::log('listing_risk_tag_removed', [
+            AuditLogService::log('listing_risk_tag_removed', null, $removedBy, [
                 'listing_id' => $listingId,
                 'previous_risk_level' => $existing['risk_level'],
-                'removed_by' => $removedBy,
             ]);
         }
 

@@ -278,9 +278,8 @@ class BrokerMessageVisibilityService
 
         if ($result) {
             // Log the flag action
-            AuditLogService::log('message_flagged', [
+            AuditLogService::log('message_flagged', null, $brokerId, [
                 'copy_id' => $copyId,
-                'flagged_by' => $brokerId,
                 'reason' => $reason,
             ]);
         }
@@ -457,12 +456,11 @@ class BrokerMessageVisibilityService
         }
 
         if ($result) {
-            AuditLogService::log('user_monitoring_updated', [
+            AuditLogService::log('user_monitoring_updated', null, $setBy, [
                 'user_id' => $userId,
                 'messaging_disabled' => $messagingDisabled,
                 'under_monitoring' => $underMonitoring,
                 'reason' => $reason,
-                'set_by' => $setBy,
             ]);
         }
 
