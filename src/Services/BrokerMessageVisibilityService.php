@@ -115,13 +115,19 @@ class BrokerMessageVisibilityService
             return null; // Already copied
         }
 
+        // Generate conversation_key as hash of sorted sender+receiver IDs
+        $ids = [(int)$message['sender_id'], (int)$message['receiver_id']];
+        sort($ids);
+        $conversationKey = md5(implode('-', $ids));
+
         Database::query(
             "INSERT INTO broker_message_copies
-             (tenant_id, original_message_id, sender_id, receiver_id, message_body, sent_at, copy_reason, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+             (tenant_id, original_message_id, conversation_key, sender_id, receiver_id, message_body, sent_at, copy_reason, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
             [
                 $tenantId,
                 $message['id'],
+                $conversationKey,
                 $message['sender_id'],
                 $message['receiver_id'],
                 $message['body'],

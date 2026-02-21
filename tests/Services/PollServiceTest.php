@@ -58,29 +58,43 @@ class PollServiceTest extends DatabaseTestCase
         // Create active test poll
         try {
             Database::query(
-                "INSERT INTO polls (tenant_id, user_id, question, options, expires_at, created_at)
-                 VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), NOW())",
+                "INSERT INTO polls (tenant_id, user_id, question, expires_at, created_at)
+                 VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), NOW())",
                 [
                     self::$testTenantId,
                     self::$testUserId,
-                    "Test Poll Question {$ts}?",
-                    json_encode(['Option A', 'Option B', 'Option C'])
+                    "Test Poll Question {$ts}?"
                 ]
             );
             self::$testPollId = (int)Database::getInstance()->lastInsertId();
 
+            // Create poll options in the normalized poll_options table
+            foreach (['Option A', 'Option B', 'Option C'] as $label) {
+                Database::query(
+                    "INSERT INTO poll_options (poll_id, label) VALUES (?, ?)",
+                    [self::$testPollId, $label]
+                );
+            }
+
             // Create expired test poll
             Database::query(
-                "INSERT INTO polls (tenant_id, user_id, question, options, expires_at, created_at)
-                 VALUES (?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL 1 DAY), NOW())",
+                "INSERT INTO polls (tenant_id, user_id, question, expires_at, created_at)
+                 VALUES (?, ?, ?, DATE_SUB(NOW(), INTERVAL 1 DAY), NOW())",
                 [
                     self::$testTenantId,
                     self::$testUserId,
-                    "Expired Poll Question {$ts}?",
-                    json_encode(['Yes', 'No'])
+                    "Expired Poll Question {$ts}?"
                 ]
             );
             self::$testExpiredPollId = (int)Database::getInstance()->lastInsertId();
+
+            // Create poll options for expired poll
+            foreach (['Yes', 'No'] as $label) {
+                Database::query(
+                    "INSERT INTO poll_options (poll_id, label) VALUES (?, ?)",
+                    [self::$testExpiredPollId, $label]
+                );
+            }
         } catch (\Exception $e) {
             // Polls may not exist in all schemas
         }
