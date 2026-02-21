@@ -306,26 +306,25 @@ class TenantBootstrapController extends BaseApiController
      */
     private function buildFeaturesData(?array $features): array
     {
-        // Default feature set - most features enabled by default
+        // Default feature set — must match AdminConfigApiController::FEATURE_DEFAULTS
+        // Features are optional add-ons toggled via Admin > Tenant Features
         $defaults = [
-            'listings' => true,
             'events' => true,
             'groups' => true,
-            'wallet' => true,
-            'messages' => true,
-            'feed' => true,
-            'notifications' => true,
-            'search' => true,
-            'connections' => true,
-            'reviews' => true,
             'gamification' => false,
-            'volunteering' => false,
-            'federation' => false,
+            'goals' => false,
             'blog' => true,
             'resources' => false,
-            'goals' => false,
-            'polls' => false,
+            'volunteering' => false,
             'exchange_workflow' => false,
+            'organisations' => false,
+            'federation' => false,
+            'connections' => true,
+            'reviews' => true,
+            'polls' => false,
+            'direct_messaging' => true,
+            'group_exchanges' => false,
+            'search' => true,
         ];
 
         if ($features === null) {
@@ -342,11 +341,12 @@ class TenantBootstrapController extends BaseApiController
             }
         }
 
-        // Check broker control config for exchange workflow
-        $result['exchange_workflow'] = BrokerControlConfigService::isExchangeWorkflowEnabled();
-
-        // Check if direct messaging is enabled (separate from exchange workflow)
-        $result['direct_messaging'] = BrokerControlConfigService::isDirectMessagingEnabled();
+        // Also include any DB features not in defaults (future-proofing)
+        foreach ($features as $key => $value) {
+            if (!array_key_exists($key, $result)) {
+                $result[$key] = (bool) $value;
+            }
+        }
 
         return $result;
     }

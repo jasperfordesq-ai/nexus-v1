@@ -443,15 +443,15 @@ function AppRoutes() {
             </FeatureGate>
           } />
           <Route path="organisations" element={
-            <FeatureGate feature="volunteering" redirect="/dashboard">
-              <FeatureErrorBoundary featureName="Volunteering">
+            <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
+              <FeatureErrorBoundary featureName="Organisations">
                 <OrganisationsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="organisations/:id" element={
-            <FeatureGate feature="volunteering" redirect="/dashboard">
-              <FeatureErrorBoundary featureName="Volunteering">
+            <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
+              <FeatureErrorBoundary featureName="Organisations">
                 <OrganisationDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>

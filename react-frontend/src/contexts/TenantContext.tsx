@@ -61,23 +61,22 @@ interface TenantContextValue extends TenantState {
 
 // Default features — synced with PHP TenantBootstrapController::buildFeaturesData() defaults
 const defaultFeatures: TenantFeatures = {
-  gamification: false,
-  groups: true,
   events: true,
-  marketplace: false,
-  messaging: true,
-  volunteering: false,
-  connections: true,
-  polls: false,
+  groups: true,
+  gamification: false,
   goals: false,
-  federation: false,
   blog: true,
   resources: false,
-  reviews: true,
-  search: true,
+  volunteering: false,
   exchange_workflow: false,
+  organisations: false,
+  federation: false,
+  connections: true,
+  reviews: true,
+  polls: false,
   direct_messaging: true,
   group_exchanges: false,
+  search: true,
 };
 
 // Default modules (all enabled)
