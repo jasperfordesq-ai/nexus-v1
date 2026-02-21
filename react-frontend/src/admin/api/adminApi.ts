@@ -504,7 +504,7 @@ export const adminBroker = {
   getMonitoring: () =>
     api.get<MonitoredUser[]>('/v2/admin/broker/monitoring'),
 
-  flagMessage: (id: number, reason: string, severity: 'concern' | 'serious' | 'urgent') =>
+  flagMessage: (id: number, reason: string, severity: 'info' | 'warning' | 'concern' | 'urgent') =>
     api.post(`/v2/admin/broker/messages/${id}/flag`, { reason, severity }),
 
   setMonitoring: (userId: number, data: { under_monitoring: boolean; reason?: string; messaging_disabled?: boolean }) =>

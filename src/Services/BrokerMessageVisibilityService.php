@@ -29,7 +29,7 @@ class BrokerMessageVisibilityService
     public const REASON_HIGH_RISK_LISTING = 'high_risk_listing';
     public const REASON_NEW_MEMBER = 'new_member';
     public const REASON_FLAGGED_USER = 'flagged_user';
-    public const REASON_MONITORING = 'monitoring';
+    public const REASON_MONITORING = 'random_sample';
 
     /**
      * Check if a message should be copied for broker review

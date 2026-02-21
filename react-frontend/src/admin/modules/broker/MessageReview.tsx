@@ -48,7 +48,7 @@ export function MessageReview() {
   const [flagModalOpen, setFlagModalOpen] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
   const [flagReason, setFlagReason] = useState('');
-  const [flagSeverity, setFlagSeverity] = useState<'concern' | 'serious' | 'urgent'>('concern');
+  const [flagSeverity, setFlagSeverity] = useState<'info' | 'warning' | 'concern' | 'urgent'>('concern');
   const [flagLoading, setFlagLoading] = useState(false);
 
   const loadItems = useCallback(async () => {
@@ -151,20 +151,25 @@ export function MessageReview() {
     {
       key: 'flagged',
       label: 'Flagged',
-      render: (item) => (
-        item.flagged ? (
+      render: (item) => {
+        if (!item.flagged) return <span className="text-sm text-default-400">No</span>;
+        const severityColor = {
+          info: 'default' as const,
+          warning: 'warning' as const,
+          concern: 'danger' as const,
+          urgent: 'danger' as const,
+        }[item.flag_severity || 'concern'] ?? 'danger' as const;
+        return (
           <Chip
             size="sm"
             variant="flat"
-            color="danger"
+            color={severityColor}
             startContent={<Flag size={12} />}
           >
             {item.flag_severity || 'Flagged'}
           </Chip>
-        ) : (
-          <span className="text-sm text-default-400">No</span>
-        )
-      ),
+        );
+      },
     },
     {
       key: 'reviewed_at',
@@ -295,13 +300,14 @@ export function MessageReview() {
               label="Severity"
               selectedKeys={[flagSeverity]}
               onSelectionChange={(keys) => {
-                const val = Array.from(keys)[0] as 'concern' | 'serious' | 'urgent';
+                const val = Array.from(keys)[0] as 'info' | 'warning' | 'concern' | 'urgent';
                 if (val) setFlagSeverity(val);
               }}
               variant="bordered"
             >
+              <SelectItem key="info">Info</SelectItem>
+              <SelectItem key="warning">Warning</SelectItem>
               <SelectItem key="concern">Concern</SelectItem>
-              <SelectItem key="serious">Serious</SelectItem>
               <SelectItem key="urgent">Urgent</SelectItem>
             </Select>
           </ModalBody>
