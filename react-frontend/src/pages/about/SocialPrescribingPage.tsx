@@ -142,7 +142,7 @@ export function SocialPrescribingPage() {
       title="Social Prescribing"
       description="Evidence-based social prescribing through timebanking: 100% improved wellbeing, 95% increased connection, and a structured referral pathway."
     />
-    <div className="-mx-4 sm:-mx-6 lg:-mx-8 -my-6 sm:-my-8">
+    <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
       {/* ─── Breadcrumbs ─── */}
       <div className="px-4 sm:px-6 lg:px-8 pt-6">
         <Breadcrumbs items={[

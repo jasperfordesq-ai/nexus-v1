@@ -59,7 +59,7 @@ export function Layout({
   const { updateInfo, dismiss: dismissUpdate } = useAppUpdate();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="blob blob-indigo" />
@@ -120,7 +120,7 @@ export function Layout({
  */
 export function AuthLayout() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="blob blob-indigo" />
