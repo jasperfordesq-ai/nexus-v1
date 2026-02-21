@@ -176,8 +176,8 @@ jobs:
 
       - name: Vitest Unit Tests (BLOCKING)
         working-directory: react-frontend
-        run: npm test -- --run
-        timeout-minutes: 10
+        run: npm test -- --run --fileParallelism
+        timeout-minutes: 15
 
       - name: Vitest Coverage Check (BLOCKING)
         working-directory: react-frontend
