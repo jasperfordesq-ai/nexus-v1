@@ -71,10 +71,11 @@ class CommentServiceTest extends DatabaseTestCase
 
             // Create test comment
             Database::query(
-                "INSERT INTO comments (user_id, target_type, target_id, content, created_at, updated_at)
-                 VALUES (?, 'post', ?, ?, NOW(), NOW())",
+                "INSERT INTO comments (user_id, tenant_id, target_type, target_id, content, created_at, updated_at)
+                 VALUES (?, ?, 'post', ?, ?, NOW(), NOW())",
                 [
                     self::$testUserId,
+                    self::$testTenantId,
                     self::$testPostId,
                     "Test comment content {$ts}"
                 ]
@@ -83,10 +84,11 @@ class CommentServiceTest extends DatabaseTestCase
 
             // Create test reply
             Database::query(
-                "INSERT INTO comments (user_id, target_type, target_id, parent_id, content, created_at, updated_at)
-                 VALUES (?, 'post', ?, ?, ?, NOW(), NOW())",
+                "INSERT INTO comments (user_id, tenant_id, target_type, target_id, parent_id, content, created_at, updated_at)
+                 VALUES (?, ?, 'post', ?, ?, ?, NOW(), NOW())",
                 [
                     self::$testUser2Id,
+                    self::$testTenantId,
                     self::$testPostId,
                     self::$testCommentId,
                     "Test reply content {$ts}"
