@@ -13,6 +13,7 @@
 .env.*
 !.env.docker.example
 !.env.example
+.cloudflare-api-token
 
 # ─── Documentation (private — not for public repo) ───────────────────────────
 /docs/
@@ -142,3 +143,6 @@ Thumbs.db
 # ─── Credentials & Secrets ───────────────────────────────────────────────────
 firebase-service-account.json
 *.pem
+*.key
+*-api-token*
+cloudflare-api-token.txt
