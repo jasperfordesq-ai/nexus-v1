@@ -30,20 +30,19 @@ class CommentService
     public static function fetchComments(string $targetType, int $targetId, int $currentUserId = 0): array
     {
         $pdo = Database::getInstance();
+        $tenantId = TenantContext::getId();
 
-        // Fetch all comments (including replies) for this target
-        // Note: We don't filter by tenant_id here because comments are tied to a specific
-        // target (post/listing) which already belongs to the correct tenant
+        // Fetch all comments (including replies) for this target — scoped by tenant_id
         $sql = "SELECT c.id, c.user_id, c.content, c.parent_id, c.created_at, c.updated_at,
                        COALESCE(u.name, u.first_name, 'Unknown') as author_name,
                        COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar
                 FROM comments c
                 LEFT JOIN users u ON c.user_id = u.id
-                WHERE c.target_type = ? AND c.target_id = ?
+                WHERE c.target_type = ? AND c.target_id = ? AND c.tenant_id = ?
                 ORDER BY c.created_at ASC";
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$targetType, $targetId]);
+        $stmt->execute([$targetType, $targetId, $tenantId]);
         $allComments = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         // Fetch reactions for all comments
@@ -84,7 +83,7 @@ class CommentService
         foreach ($allComments as &$comment) {
             $comment['reactions'] = $reactionsByComment[$comment['id']] ?? [];
             $comment['user_reactions'] = $userReactionsByComment[$comment['id']] ?? [];
-            $comment['is_owner'] = ($currentUserId && $comment['user_id'] == $currentUserId);
+            $comment['is_owner'] = ($currentUserId && (int)$comment['user_id'] === $currentUserId);
             $comment['is_edited'] = ($comment['updated_at'] !== $comment['created_at']);
             $comment['replies'] = [];
             $commentsById[$comment['id']] = &$comment;
@@ -165,28 +164,29 @@ class CommentService
     public static function editComment(int $commentId, int $userId, string $newContent): array
     {
         $pdo = Database::getInstance();
+        $tenantId = TenantContext::getId();
         $newContent = trim($newContent);
 
         if (empty($newContent)) {
             return ['success' => false, 'error' => 'Comment cannot be empty'];
         }
 
-        // Verify ownership
-        $stmt = $pdo->prepare("SELECT id, user_id, target_type, target_id FROM comments WHERE id = ?");
-        $stmt->execute([$commentId]);
+        // Verify ownership — scoped by tenant_id
+        $stmt = $pdo->prepare("SELECT id, user_id, target_type, target_id FROM comments WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$commentId, $tenantId]);
         $comment = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$comment) {
             return ['success' => false, 'error' => 'Comment not found'];
         }
 
-        if ($comment['user_id'] != $userId) {
+        if ((int)$comment['user_id'] !== $userId) {
             return ['success' => false, 'error' => 'Unauthorized'];
         }
 
-        // Update comment
-        $stmt = $pdo->prepare("UPDATE comments SET content = ?, updated_at = NOW() WHERE id = ?");
-        $stmt->execute([$newContent, $commentId]);
+        // Update comment — scoped by tenant_id
+        $stmt = $pdo->prepare("UPDATE comments SET content = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$newContent, $commentId, $tenantId]);
 
         // Re-process mentions
         $mentions = self::extractMentions($newContent);
@@ -224,7 +224,7 @@ class CommentService
             return ['success' => false, 'error' => 'Comment not found'];
         }
 
-        if ($comment['user_id'] != $userId && !$isSuperAdmin) {
+        if ((int)$comment['user_id'] !== $userId && !$isSuperAdmin) {
             return ['success' => false, 'error' => 'Unauthorized'];
         }
 
@@ -267,7 +267,7 @@ class CommentService
             $stmt = $pdo->prepare("SELECT user_id FROM comments WHERE id = ?");
             $stmt->execute([$commentId]);
             $comment = $stmt->fetch();
-            if ($comment && $comment['user_id'] != $userId) {
+            if ($comment && (int)$comment['user_id'] !== $userId) {
                 if (class_exists('\Nexus\Services\SocialNotificationService')) {
                     SocialNotificationService::notifyLike(
                         $comment['user_id'], $userId, 'comment', $commentId, "reacted $emoji to your comment"
@@ -314,7 +314,7 @@ class CommentService
             $stmt->execute([$username, "%$username%", $username, $tenantId]);
             $user = $stmt->fetch();
 
-            if ($user && $user['id'] != $mentioningUserId) {
+            if ($user && (int)$user['id'] !== $mentioningUserId) {
                 // Insert mention
                 try {
                     $stmt = $pdo->prepare("INSERT INTO mentions (comment_id, mentioned_user_id, mentioning_user_id, tenant_id, created_at) VALUES (?, ?, ?, ?, NOW())");

@@ -92,18 +92,18 @@ class ReviewService
                 }
 
                 // Reviewer must be sender or receiver
-                $isSender = ($transaction['sender_user_id'] == $reviewerId);
-                $isReceiver = ($transaction['receiver_user_id'] == $reviewerId);
+                $isSender = ((int)$transaction['sender_user_id'] === $reviewerId);
+                $isReceiver = ((int)$transaction['receiver_user_id'] === $reviewerId);
 
                 if (!$isSender && !$isReceiver) {
                     return ['success' => false, 'error' => 'You are not part of this transaction'];
                 }
 
                 // Receiver of review must be the other party
-                if ($isSender && $transaction['receiver_user_id'] != $receiverId) {
+                if ($isSender && (int)$transaction['receiver_user_id'] !== $receiverId) {
                     return ['success' => false, 'error' => 'Invalid receiver for this transaction'];
                 }
-                if ($isReceiver && $transaction['sender_user_id'] != $receiverId) {
+                if ($isReceiver && (int)$transaction['sender_user_id'] !== $receiverId) {
                     return ['success' => false, 'error' => 'Invalid receiver for this transaction'];
                 }
 
@@ -145,7 +145,7 @@ class ReviewService
 
             // Mark transaction as reviewed
             if ($federationTransactionId) {
-                $isSender = ($transaction['sender_user_id'] == $reviewerId);
+                $isSender = ((int)$transaction['sender_user_id'] === $reviewerId);
                 if ($isSender) {
                     Database::query(
                         "UPDATE federation_transactions SET sender_reviewed = 1 WHERE id = ?",
@@ -330,8 +330,8 @@ class ReviewService
             }
 
             // Check if user is part of transaction
-            $isSender = ($transaction['sender_user_id'] == $userId);
-            $isReceiver = ($transaction['receiver_user_id'] == $userId);
+            $isSender = ((int)$transaction['sender_user_id'] === $userId);
+            $isReceiver = ((int)$transaction['receiver_user_id'] === $userId);
 
             if (!$isSender && !$isReceiver) {
                 return ['can_review' => false, 'reason' => 'You are not part of this transaction'];

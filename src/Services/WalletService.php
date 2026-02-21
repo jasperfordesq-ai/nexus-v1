@@ -70,7 +70,7 @@ class WalletService
      */
     public static function getTransactions(int $userId, array $filters = []): array
     {
-        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
         $limit = min($filters['limit'] ?? 20, 100);
         $type = $filters['type'] ?? 'all';
@@ -84,7 +84,7 @@ class WalletService
             }
         }
 
-        // Build query based on type filter
+        // Build query based on type filter — always scoped by tenant_id
         $sql = "
             SELECT t.*,
                    s.name as sender_name, s.avatar_url as sender_avatar,
@@ -92,9 +92,9 @@ class WalletService
             FROM transactions t
             JOIN users s ON t.sender_id = s.id
             JOIN users r ON t.receiver_id = r.id
-            WHERE 1=1
+            WHERE t.tenant_id = ?
         ";
-        $params = [];
+        $params = [$tenantId];
 
         if ($type === 'sent') {
             $sql .= " AND t.sender_id = ? AND t.deleted_for_sender = 0";
@@ -114,10 +114,10 @@ class WalletService
         }
 
         $sql .= " ORDER BY t.created_at DESC, t.id DESC";
-        $sql .= " LIMIT " . ($limit + 1);
+        $sql .= " LIMIT ?";
+        $params[] = $limit + 1;
 
-        $stmt = $db->prepare($sql);
-        $stmt->execute($params);
+        $stmt = Database::query($sql, $params);
         $transactions = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         $hasMore = count($transactions) > $limit;
@@ -238,7 +238,7 @@ class WalletService
      */
     public static function getTransaction(int $transactionId, int $userId): ?array
     {
-        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
         $sql = "
             SELECT t.*,
@@ -247,12 +247,11 @@ class WalletService
             FROM transactions t
             JOIN users s ON t.sender_id = s.id
             JOIN users r ON t.receiver_id = r.id
-            WHERE t.id = ?
+            WHERE t.id = ? AND t.tenant_id = ?
               AND ((t.sender_id = ? AND t.deleted_for_sender = 0) OR (t.receiver_id = ? AND t.deleted_for_receiver = 0))
         ";
 
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$transactionId, $userId, $userId]);
+        $stmt = Database::query($sql, [$transactionId, $tenantId, $userId, $userId]);
         $t = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$t) {
@@ -291,11 +290,10 @@ class WalletService
     {
         self::$errors = [];
 
-        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
-        // Verify user is part of transaction
-        $stmt = $db->prepare("SELECT sender_id, receiver_id FROM transactions WHERE id = ?");
-        $stmt->execute([$transactionId]);
+        // Verify user is part of transaction — scoped by tenant_id
+        $stmt = Database::query("SELECT sender_id, receiver_id FROM transactions WHERE id = ? AND tenant_id = ?", [$transactionId, $tenantId]);
         $t = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$t) {
