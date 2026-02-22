@@ -491,7 +491,7 @@ HTML;
         $successColor = self::SUCCESS_COLOR;
         $textColor = self::TEXT_COLOR;
         $mutedColor = self::MUTED_COLOR;
-        $transactionsUrl = $siteUrl . $basePath . '/federation/transactions';
+        $transactionsUrl = $siteUrl . $basePath . '/wallet';
 
         $content = <<<HTML
                     <tr>
@@ -569,7 +569,7 @@ HTML;
         $successColor = self::SUCCESS_COLOR;
         $textColor = self::TEXT_COLOR;
         $mutedColor = self::MUTED_COLOR;
-        $transactionsUrl = $siteUrl . $basePath . '/federation/transactions';
+        $transactionsUrl = $siteUrl . $basePath . '/wallet';
 
         $content = <<<HTML
                     <tr>

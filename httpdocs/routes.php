@@ -291,6 +291,7 @@ $router->add('PUT', '/api/v2/users/me/theme', 'Nexus\Controllers\Api\UsersApiCon
 $router->add('POST', '/api/v2/users/me/avatar', 'Nexus\Controllers\Api\UsersApiController@updateAvatar');
 $router->add('POST', '/api/v2/users/me/password', 'Nexus\Controllers\Api\UsersApiController@updatePassword');
 $router->add('DELETE', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@deleteAccount');
+$router->add('GET', '/api/v2/users/me/listings', 'Nexus\Controllers\Api\UsersApiController@myListings'); // Must be before {id}/listings
 $router->add('GET', '/api/v2/users/{id}', 'Nexus\Controllers\Api\UsersApiController@show');
 $router->add('GET', '/api/v2/users/{id}/listings', 'Nexus\Controllers\Api\UsersApiController@listings');
 $router->add('GET', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@notificationPreferences');
@@ -371,6 +372,7 @@ $router->add('POST', '/api/v2/groups/{id}/image', 'Nexus\Controllers\Api\GroupsA
 // ============================================
 $router->add('GET', '/api/v2/connections', 'Nexus\Controllers\Api\ConnectionsApiController@index');
 $router->add('GET', '/api/v2/connections/pending', 'Nexus\Controllers\Api\ConnectionsApiController@pendingCounts');
+$router->add('GET', '/api/v2/connections/status/me', function () { http_response_code(422); echo json_encode(['errors' => [['code' => 'invalid_user', 'message' => 'Cannot check connection status with yourself']]]); }); // Guard: reject literal "me"
 $router->add('GET', '/api/v2/connections/status/{userId}', 'Nexus\Controllers\Api\ConnectionsApiController@status');
 $router->add('POST', '/api/v2/connections/request', 'Nexus\Controllers\Api\ConnectionsApiController@request');
 $router->add('POST', '/api/v2/connections/{id}/accept', 'Nexus\Controllers\Api\ConnectionsApiController@accept');
@@ -1079,6 +1081,7 @@ $router->add('GET', '/api/auth/admin-session', 'Nexus\Controllers\Api\AuthContro
 // CSRF Token API (for SPAs using session auth - Bearer clients don't need this)
 $router->add('GET', '/api/auth/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken');
 $router->add('GET', '/api/v2/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken'); // V2 alias
+$router->add('GET', '/api/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken'); // SPA alias (used by React fetchCsrfToken)
 
 // V2 Registration API (returns tokens immediately, field-level errors)
 $router->add('POST', '/api/v2/auth/register', 'Nexus\Controllers\Api\RegistrationApiController@register');
@@ -2374,6 +2377,9 @@ $router->add('GET', '/newsletter/unsubscribe', 'Nexus\Controllers\NewsletterSubs
 $router->add('POST', '/newsletter/unsubscribe', 'Nexus\Controllers\NewsletterSubscriptionController@unsubscribe');
 $router->add('GET', '/newsletter/unsubscribe/confirm', 'Nexus\Controllers\NewsletterSubscriptionController@oneClickUnsubscribe');
 $router->add('POST', '/newsletter/unsubscribe/confirm', 'Nexus\Controllers\NewsletterSubscriptionController@oneClickUnsubscribe');
+
+// V2 JSON API for newsletter unsubscribe (called from the React frontend unsubscribe page)
+$router->add('POST', '/api/v2/newsletter/unsubscribe', 'Nexus\Controllers\Api\NewsletterApiController@unsubscribe');
 
 // --------------------------------------------------------------------------
 // 12.8. PUBLIC > NEWSLETTER ANALYTICS TRACKING

@@ -1469,7 +1469,7 @@ HTML;
             $tenantName = \Nexus\Core\TenantContext::getSetting('site_name', 'Project NEXUS');
             $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
             $basePath = \Nexus\Core\TenantContext::getBasePath();
-            $profileUrl = $baseUrl . $basePath . '/profile?id=' . $receiverUserId;
+            $profileUrl = $baseUrl . $basePath . '/profile/' . $receiverUserId;
 
             $displayName = $isAnonymous ? 'Someone' : htmlspecialchars($reviewerName);
             $subject = "{$displayName} left you a {$rating}-star review on {$tenantName}";

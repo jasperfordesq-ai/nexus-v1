@@ -33,7 +33,7 @@ export const RESERVED_PATHS = new Set([
   'events', 'groups', 'messages', 'notifications', 'wallet', 'feed',
   'search', 'members', 'profile', 'settings', 'exchanges', 'achievements',
   'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
-  'organisations', 'federation', 'onboarding', 'group-exchanges',
+  'organisations', 'federation', 'onboarding', 'group-exchanges', 'matches', 'newsletter',
   'help', 'contact', 'about', 'faq', 'legal', 'terms',
   'privacy', 'accessibility', 'cookies',
   'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
