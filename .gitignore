@@ -17,7 +17,8 @@
 .build-version
 
 # ─── Documentation (private — not for public repo) ───────────────────────────
-/docs/
+/docs/*
+!/docs/database-migrations.md
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md
@@ -37,6 +38,11 @@ CLAUDE.md
 !/scripts/verify-feature.sh
 !/scripts/add-spdx-headers.mjs
 !/scripts/check-spdx.mjs
+!/scripts/safe_migrate.php
+!/scripts/migrate-production.sh
+!/scripts/backup-production-db.sh
+!/scripts/check-migration-drift.sh
+!/scripts/check-migration-ci.sh
 /migrations/
 
 # ─── Deploy & Production Config ───────────────────────────────────────────────

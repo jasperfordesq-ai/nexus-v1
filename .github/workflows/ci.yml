@@ -294,7 +294,22 @@ jobs:
           fi
 
   # ─────────────────────────────────────────────────────────────────
-  # Stage 5: Regression Pattern Detection
+  # Stage 5: Migration Safety Gate
+  # ─────────────────────────────────────────────────────────────────
+  migration-gate:
+    name: Migration Safety Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "BLOCKING: Check schema changes have migrations"
+        run: bash scripts/check-migration-ci.sh origin/${{ github.base_ref || 'main' }}
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 6: Regression Pattern Detection
   # ─────────────────────────────────────────────────────────────────
   regression-patterns:
     name: Regression Pattern Detection
@@ -369,7 +384,7 @@ jobs:
           fi
 
   # ─────────────────────────────────────────────────────────────────
-  # Stage 6: E2E Smoke Tests (Playwright - informational only)
+  # Stage 7: E2E Smoke Tests (Playwright - informational only)
   # ─────────────────────────────────────────────────────────────────
   e2e-smoke:
     name: E2E Smoke Tests
@@ -410,7 +425,7 @@ jobs:
           retention-days: 14
 
   # ─────────────────────────────────────────────────────────────────
-  # Stage 7: Accessibility Checks (warning only)
+  # Stage 8: Accessibility Checks (warning only)
   # ─────────────────────────────────────────────────────────────────
   accessibility-check:
     name: Accessibility Check
