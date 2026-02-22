@@ -77,6 +77,9 @@ services:
       args:
         VITE_API_BASE: https://api.project-nexus.ie/api
         VITE_GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+        VITE_SENTRY_DSN: ${SENTRY_DSN_REACT:-}
+        VITE_SENTRY_ENVIRONMENT: production
+        VITE_SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     image: nexus-react-prod:latest
     container_name: nexus-react-prod
     restart: unless-stopped
