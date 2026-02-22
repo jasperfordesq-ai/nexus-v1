@@ -891,8 +891,14 @@ class AuthController
         $email = $validRecord['email'];
         $hash = password_hash($password, PASSWORD_BCRYPT);
 
-        // Update User
-        \Nexus\Core\Database::query("UPDATE users SET password_hash = ? WHERE email = ?", [$hash, $email]);
+        // Find the specific user — scope by ID to prevent cross-tenant password changes
+        $user = \Nexus\Models\User::findGlobalByEmail($email);
+        if (!$user) {
+            die("User not found. Please request a new password reset.");
+        }
+
+        // Update by user ID — prevents changing password for same email in other tenants
+        \Nexus\Core\Database::query("UPDATE users SET password_hash = ? WHERE id = ?", [$hash, $user['id']]);
 
         // Delete Token (and any other tokens for this email)
         \Nexus\Core\Database::query("DELETE FROM password_resets WHERE email = ?", [$email]);

@@ -1056,15 +1056,20 @@ class AuthController
 
     /**
      * Bridge JWT auth to PHP session for legacy admin access.
-     * GET /api/auth/admin-session?token=JWT&redirect=/admin-legacy
+     * POST /api/auth/admin-session  { token: "JWT", redirect: "/admin-legacy" }
      *
      * Validates the JWT, creates a PHP session with the same user context
      * as a normal login, then redirects to the legacy admin panel.
+     *
+     * Security: Token is sent in POST body (not URL) to prevent exposure
+     * in server logs, browser history, and Referer headers.
      */
     public function adminSession()
     {
-        $token = $_GET['token'] ?? '';
-        $redirect = $_GET['redirect'] ?? '/admin-legacy';
+        // Accept token from POST body (preferred) or GET query (deprecated fallback)
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $token = $input['token'] ?? $_POST['token'] ?? $_GET['token'] ?? '';
+        $redirect = $input['redirect'] ?? $_POST['redirect'] ?? $_GET['redirect'] ?? '/admin-legacy';
 
         // Sanitize redirect — only allow paths starting with /admin-legacy
         if (strpos($redirect, '/admin-legacy') !== 0) {

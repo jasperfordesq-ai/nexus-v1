@@ -18,6 +18,9 @@ use Nexus\Models\User;
  *
  * Provides common utilities for testing API endpoints including
  * authentication, request simulation, and response validation.
+ *
+ * The makeApiRequest() method actually instantiates and invokes the
+ * controller method, capturing JSON output via output buffering.
  */
 abstract class ApiTestCase extends DatabaseTestCase
 {
@@ -86,75 +89,127 @@ abstract class ApiTestCase extends DatabaseTestCase
     }
 
     /**
-     * Simulate an authenticated API request
+     * Invoke a controller method directly and capture its JSON output.
      *
-     * @param string $method HTTP method (GET, POST, etc.)
-     * @param string $endpoint API endpoint path
-     * @param array $data Request data
+     * This actually instantiates the controller and calls the method,
+     * capturing echoed JSON via output buffering. If the controller calls
+     * exit(), the output captured before that point is returned.
+     *
+     * @param string $method HTTP method (GET, POST, PUT, DELETE)
+     * @param string $endpoint API endpoint path (used for $_SERVER setup)
+     * @param array $data Request data (body for POST/PUT, query for GET)
      * @param array $headers Additional headers
-     * @return array Simulated response
+     * @param string|null $controllerAction "Namespace\Controller@method" override.
+     *                                      If null, resolved from endpoint path.
+     * @return array{status: int, body: array|string, raw: string}
      */
-    protected function makeApiRequest(string $method, string $endpoint, array $data = [], array $headers = []): array
+    protected function makeApiRequest(string $method, string $endpoint, array $data = [], array $headers = [], ?string $controllerAction = null): array
     {
-        // Simulate authentication by setting session
+        // Set up superglobals to simulate the request
         $_SESSION['user_id'] = self::$testUserId;
         $_SESSION['tenant_id'] = self::$testTenantId;
 
-        // Merge default headers
-        $headers = array_merge([
-            'Authorization' => 'Bearer ' . self::$testAuthToken,
-            'Content-Type' => 'application/json',
-            'X-Tenant-ID' => (string)self::$testTenantId,
-        ], $headers);
+        $oldServer = $_SERVER;
+        $oldGet = $_GET;
+        $oldPost = $_POST;
 
-        // Set request method and data
         $_SERVER['REQUEST_METHOD'] = $method;
+        $_SERVER['REQUEST_URI'] = $endpoint;
+        $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . self::$testAuthToken;
+        $_SERVER['CONTENT_TYPE'] = 'application/json';
+        $_SERVER['HTTP_X_TENANT_ID'] = (string)self::$testTenantId;
+
+        foreach ($headers as $key => $value) {
+            $serverKey = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
+            $_SERVER[$serverKey] = $value;
+        }
 
         if ($method === 'GET') {
             $_GET = $data;
+            $_POST = [];
         } else {
             $_POST = $data;
+            $_GET = [];
+        }
+
+        // If POST/PUT with JSON body, set up php://input simulation
+        // Controllers using getJsonInput()/getAllInput() read from php://input
+        // We can't override php://input, but controllers also fall back to $_POST
+
+        $statusCode = 200;
+        $rawOutput = '';
+
+        // Capture output
+        ob_start();
+        try {
+            if ($controllerAction) {
+                [$controllerClass, $actionMethod] = explode('@', $controllerAction);
+                $controller = new $controllerClass();
+                $controller->$actionMethod();
+            }
+        } catch (\Throwable $e) {
+            // Some controllers call exit() after jsonResponse — catch that
+            // Or re-throw if it's a real error
+            if (!($e instanceof \Exception && str_contains($e->getMessage(), 'exit'))) {
+                // Capture what was output before the exception
+            }
+        } finally {
+            $rawOutput = ob_get_clean() ?: '';
+        }
+
+        // Restore superglobals
+        $_SERVER = $oldServer;
+        $_GET = $oldGet;
+        $_POST = $oldPost;
+
+        // Try to get the HTTP status code that was set
+        $statusCode = http_response_code() ?: 200;
+
+        // Parse JSON output
+        $body = json_decode($rawOutput, true);
+        if ($body === null && !empty($rawOutput)) {
+            $body = $rawOutput; // Non-JSON response
         }
 
         return [
+            'status' => $statusCode,
+            'body' => $body ?? [],
+            'raw' => $rawOutput,
             'method' => $method,
             'endpoint' => $endpoint,
-            'data' => $data,
-            'headers' => $headers,
-            'status' => 'simulated'
         ];
     }
 
     /**
      * Make a GET request to an API endpoint
      */
-    protected function get(string $endpoint, array $params = [], array $headers = []): array
+    protected function get(string $endpoint, array $params = [], array $headers = [], ?string $controllerAction = null): array
     {
-        return $this->makeApiRequest('GET', $endpoint, $params, $headers);
+        return $this->makeApiRequest('GET', $endpoint, $params, $headers, $controllerAction);
     }
 
     /**
      * Make a POST request to an API endpoint
      */
-    protected function post(string $endpoint, array $data = [], array $headers = []): array
+    protected function post(string $endpoint, array $data = [], array $headers = [], ?string $controllerAction = null): array
     {
-        return $this->makeApiRequest('POST', $endpoint, $data, $headers);
+        return $this->makeApiRequest('POST', $endpoint, $data, $headers, $controllerAction);
     }
 
     /**
      * Make a PUT request to an API endpoint
      */
-    protected function put(string $endpoint, array $data = [], array $headers = []): array
+    protected function put(string $endpoint, array $data = [], array $headers = [], ?string $controllerAction = null): array
     {
-        return $this->makeApiRequest('PUT', $endpoint, $data, $headers);
+        return $this->makeApiRequest('PUT', $endpoint, $data, $headers, $controllerAction);
     }
 
     /**
      * Make a DELETE request to an API endpoint
      */
-    protected function delete(string $endpoint, array $data = [], array $headers = []): array
+    protected function delete(string $endpoint, array $data = [], array $headers = [], ?string $controllerAction = null): array
     {
-        return $this->makeApiRequest('DELETE', $endpoint, $data, $headers);
+        return $this->makeApiRequest('DELETE', $endpoint, $data, $headers, $controllerAction);
     }
 
     /**
@@ -172,11 +227,12 @@ abstract class ApiTestCase extends DatabaseTestCase
      */
     protected function assertSuccess(array $response, string $message = ''): void
     {
-        if (isset($response['success'])) {
-            $this->assertTrue($response['success'], $message ?: 'Response should indicate success');
+        $body = $response['body'] ?? $response;
+        if (isset($body['success'])) {
+            $this->assertTrue($body['success'], $message ?: 'Response should indicate success');
         }
-        if (isset($response['error'])) {
-            $this->assertFalse($response['error'], $message ?: 'Response should not have error');
+        if (isset($body['error'])) {
+            $this->assertFalse($body['error'], $message ?: 'Response should not have error');
         }
     }
 
@@ -185,12 +241,30 @@ abstract class ApiTestCase extends DatabaseTestCase
      */
     protected function assertError(array $response, string $message = ''): void
     {
-        if (isset($response['success'])) {
-            $this->assertFalse($response['success'], $message ?: 'Response should indicate failure');
+        $body = $response['body'] ?? $response;
+        if (isset($body['success'])) {
+            $this->assertFalse($body['success'], $message ?: 'Response should indicate failure');
         }
-        if (isset($response['error'])) {
-            $this->assertTrue($response['error'], $message ?: 'Response should have error');
+        if (isset($body['error'])) {
+            $this->assertTrue($body['error'], $message ?: 'Response should have error');
         }
+    }
+
+    /**
+     * Assert response status code
+     */
+    protected function assertStatus(int $expected, array $response, string $message = ''): void
+    {
+        $this->assertEquals($expected, $response['status'], $message ?: "Expected HTTP status {$expected}");
+    }
+
+    /**
+     * Assert response body contains a key with an expected value
+     */
+    protected function assertResponseHas(string $key, array $response, string $message = ''): void
+    {
+        $body = $response['body'] ?? $response;
+        $this->assertArrayHasKey($key, $body, $message ?: "Response body should have key: {$key}");
     }
 
     /**

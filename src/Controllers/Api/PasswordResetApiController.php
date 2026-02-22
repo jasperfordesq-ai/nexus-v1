@@ -166,13 +166,29 @@ class PasswordResetApiController extends BaseApiController
             );
         }
 
-        // Update the password
+        // Update the password — scope by user ID to prevent cross-tenant updates
         $email = $resetRecord['email'];
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
+        // Find the specific user for this tenant (or globally if no tenant context)
+        $tenantId = TenantContext::getId();
+        $user = $tenantId
+            ? User::findByEmail($email)
+            : User::findGlobalByEmail($email);
+
+        if (!$user) {
+            $this->respondWithError(
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                'Unable to reset password. Please request a new password reset.',
+                'token',
+                400
+            );
+        }
+
+        // Update by user ID — prevents changing password for same email in other tenants
         Database::query(
-            "UPDATE users SET password_hash = ? WHERE email = ?",
-            [$hashedPassword, $email]
+            "UPDATE users SET password_hash = ? WHERE id = ?",
+            [$hashedPassword, $user['id']]
         );
 
         // Delete all reset tokens for this email
@@ -183,21 +199,18 @@ class PasswordResetApiController extends BaseApiController
 
         // Invalidate all existing refresh tokens for security
         // This forces re-login on all devices after password change
-        $this->invalidateUserTokens($email);
+        $this->invalidateUserTokens((int)$user['id']);
 
         // Log the password change
-        $user = User::findByEmail($email);
-        if ($user) {
-            try {
-                \Nexus\Models\ActivityLog::log(
-                    $user['id'],
-                    'password_reset',
-                    'Password was reset via API'
-                );
-            } catch (\Throwable $e) {
-                // Activity logging is optional
-                error_log("Failed to log password reset: " . $e->getMessage());
-            }
+        try {
+            \Nexus\Models\ActivityLog::log(
+                $user['id'],
+                'password_reset',
+                'Password was reset via API'
+            );
+        } catch (\Throwable $e) {
+            // Activity logging is optional
+            error_log("Failed to log password reset: " . $e->getMessage());
         }
 
         $this->respondWithData([
@@ -353,9 +366,9 @@ class PasswordResetApiController extends BaseApiController
      *
      * For now, we'll update the user's password_changed_at field if it exists.
      *
-     * @param string $email
+     * @param int $userId The specific user ID to invalidate tokens for
      */
-    private function invalidateUserTokens(string $email): void
+    private function invalidateUserTokens(int $userId): void
     {
         try {
             // Check if password_changed_at column exists
@@ -365,8 +378,8 @@ class PasswordResetApiController extends BaseApiController
 
             if (!empty($columns)) {
                 Database::query(
-                    "UPDATE users SET password_changed_at = NOW() WHERE email = ?",
-                    [$email]
+                    "UPDATE users SET password_changed_at = NOW() WHERE id = ?",
+                    [$userId]
                 );
             }
         } catch (\Throwable $e) {

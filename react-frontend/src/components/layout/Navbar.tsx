@@ -690,7 +690,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       if (k === 'logout') { handleLogout(); return; }
                       if (k === 'profile-header') return;
                       if (k === 'admin-panel') { if (isAdmin) dropdownNavigate('/admin'); return; }
-                      if (k === 'legacy-admin') { if (isAdmin) { closeAllDropdowns(); const t = tokenManager.getAccessToken(); const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin; window.location.href = t ? `${phpOrigin}/api/auth/admin-session?token=${encodeURIComponent(t)}&redirect=/admin-legacy` : `${phpOrigin}/admin-legacy`; } return; }
+                      if (k === 'legacy-admin') { if (isAdmin) { closeAllDropdowns(); const t = tokenManager.getAccessToken(); const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin; if (t) { const f = document.createElement('form'); f.method = 'POST'; f.action = `${phpOrigin}/api/auth/admin-session`; f.style.display = 'none'; const ti = document.createElement('input'); ti.name = 'token'; ti.value = t; f.appendChild(ti); const ri = document.createElement('input'); ri.name = 'redirect'; ri.value = '/admin-legacy'; f.appendChild(ri); document.body.appendChild(f); f.submit(); } else { window.location.href = `${phpOrigin}/admin-legacy`; } } return; }
                       dropdownNavigate(k);
                     }}
                   >

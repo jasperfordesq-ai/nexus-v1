@@ -21,6 +21,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Chip, Spinner } from '@heroui/react';
+import DOMPurify from 'dompurify';
 import {
   History,
   CalendarDays,
@@ -303,7 +304,7 @@ export function LegalVersionHistoryPage() {
                         )}
                         <div
                           className="legal-content"
-                          dangerouslySetInnerHTML={{ __html: expandedContent.content }}
+                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(expandedContent.content) }}
                         />
                       </div>
                     )}

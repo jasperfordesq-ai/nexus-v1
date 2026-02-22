@@ -28,16 +28,21 @@ class Transaction
         $pdo->beginTransaction();
 
         try {
-            // Deduct from sender
-            $sql = "UPDATE users SET balance = balance - ? WHERE id = ?";
-            Database::query($sql, [$amount, $senderId]);
+            $tenantId = \Nexus\Core\TenantContext::getId();
+
+            // Deduct from sender — atomic guard prevents double-spend
+            $sql = "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?";
+            $stmt = Database::query($sql, [$amount, $senderId, $tenantId, $amount]);
+            if ($stmt->rowCount() === 0) {
+                $pdo->rollBack();
+                throw new \RuntimeException('Insufficient balance or sender not found');
+            }
 
             // Add to receiver
-            $sql = "UPDATE users SET balance = balance + ? WHERE id = ?";
-            Database::query($sql, [$amount, $receiverId]);
+            $sql = "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?";
+            Database::query($sql, [$amount, $receiverId, $tenantId]);
 
             // Log transaction with optional match attribution
-            $tenantId = \Nexus\Core\TenantContext::getId();
 
             if ($sourceMatchId !== null) {
                 $sql = "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, source_match_id) VALUES (?, ?, ?, ?, ?, ?)";
@@ -110,10 +115,11 @@ class Transaction
     public static function attributeToMatch($transactionId, $matchHistoryId)
     {
         try {
-            // Update transaction
+            // Update transaction — scoped by tenant_id
+            $tenantId = \Nexus\Core\TenantContext::getId();
             Database::query(
-                "UPDATE transactions SET source_match_id = ? WHERE id = ?",
-                [$matchHistoryId, $transactionId]
+                "UPDATE transactions SET source_match_id = ? WHERE id = ? AND tenant_id = ?",
+                [$matchHistoryId, $transactionId, $tenantId]
             );
 
             // Update match history
@@ -151,33 +157,37 @@ class Transaction
 
     public static function getHistory($userId)
     {
-        $sql = "SELECT t.*, 
-                CONCAT(s.first_name, ' ', s.last_name) as sender_name, 
-                CONCAT(r.first_name, ' ', r.last_name) as receiver_name 
-                FROM transactions t 
-                JOIN users s ON t.sender_id = s.id 
-                JOIN users r ON t.receiver_id = r.id 
-                WHERE (t.sender_id = ? AND t.deleted_for_sender = 0) 
-                   OR (t.receiver_id = ? AND t.deleted_for_receiver = 0) 
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        $sql = "SELECT t.*,
+                CONCAT(s.first_name, ' ', s.last_name) as sender_name,
+                CONCAT(r.first_name, ' ', r.last_name) as receiver_name
+                FROM transactions t
+                JOIN users s ON t.sender_id = s.id
+                JOIN users r ON t.receiver_id = r.id
+                WHERE t.tenant_id = ?
+                  AND ((t.sender_id = ? AND t.deleted_for_sender = 0)
+                    OR (t.receiver_id = ? AND t.deleted_for_receiver = 0))
                 ORDER BY created_at DESC";
 
-        return Database::query($sql, [$userId, $userId])->fetchAll();
+        return Database::query($sql, [$tenantId, $userId, $userId])->fetchAll();
     }
 
     public static function countForUser($userId)
     {
-        $sql = "SELECT COUNT(*) as total FROM transactions 
-                WHERE (sender_id = ? AND deleted_for_sender = 0) 
-                   OR (receiver_id = ? AND deleted_for_receiver = 0)";
-        $result = Database::query($sql, [$userId, $userId])->fetch();
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        $sql = "SELECT COUNT(*) as total FROM transactions
+                WHERE tenant_id = ?
+                  AND ((sender_id = ? AND deleted_for_sender = 0)
+                    OR (receiver_id = ? AND deleted_for_receiver = 0))";
+        $result = Database::query($sql, [$tenantId, $userId, $userId])->fetch();
         return $result ? (int)$result['total'] : 0;
     }
 
     public static function getTotalEarned($userId)
     {
-        // Match home page query pattern - no tenant_id filter needed for user's own transactions
-        $sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE receiver_id = ?";
-        $result = Database::query($sql, [$userId])->fetch();
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        $sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE tenant_id = ? AND receiver_id = ?";
+        $result = Database::query($sql, [$tenantId, $userId])->fetch();
         return (float)($result['total'] ?? 0);
     }
 

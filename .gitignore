@@ -19,6 +19,7 @@
 # ─── Documentation (private — not for public repo) ───────────────────────────
 /docs/*
 !/docs/database-migrations.md
+!/docs/SYSTEM_AUDIT_*.md
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md

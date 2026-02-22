@@ -1053,6 +1053,8 @@ $router->add('POST', '/api/auth/revoke', 'Nexus\Controllers\Api\AuthController@r
 $router->add('POST', '/api/auth/revoke-all', 'Nexus\Controllers\Api\AuthController@revokeAllTokens');
 
 // JWT-to-Session bridge for legacy admin access from React frontend
+// POST preferred (token in body); GET kept as deprecated fallback
+$router->add('POST', '/api/auth/admin-session', 'Nexus\Controllers\Api\AuthController@adminSession');
 $router->add('GET', '/api/auth/admin-session', 'Nexus\Controllers\Api\AuthController@adminSession');
 
 // CSRF Token API (for SPAs using session auth - Bearer clients don't need this)

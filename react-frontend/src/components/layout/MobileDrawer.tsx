@@ -406,7 +406,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   </a>
                   <a
                     href="/admin-legacy"
-                    onClick={(e) => { e.preventDefault(); const t = tokenManager.getAccessToken(); const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin; window.location.href = t ? `${phpOrigin}/api/auth/admin-session?token=${encodeURIComponent(t)}&redirect=/admin-legacy` : `${phpOrigin}/admin-legacy`; }}
+                    onClick={(e) => { e.preventDefault(); const t = tokenManager.getAccessToken(); const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin; if (t) { const f = document.createElement('form'); f.method = 'POST'; f.action = `${phpOrigin}/api/auth/admin-session`; f.style.display = 'none'; const ti = document.createElement('input'); ti.name = 'token'; ti.value = t; f.appendChild(ti); const ri = document.createElement('input'); ri.name = 'redirect'; ri.value = '/admin-legacy'; f.appendChild(ri); document.body.appendChild(f); f.submit(); } else { window.location.href = `${phpOrigin}/admin-legacy`; } }}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
                   >
                     <Shield className="w-5 h-5" aria-hidden="true" />
