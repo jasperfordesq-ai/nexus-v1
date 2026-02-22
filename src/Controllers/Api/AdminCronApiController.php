@@ -11,7 +11,13 @@ use Nexus\Core\TenantContext;
 
 /**
  * Admin Cron API Controller
- * Handles cron job logs, settings, and health monitoring for React admin
+ * Handles cron job logs, settings, and health monitoring for React admin.
+ *
+ * Production table schemas (as deployed):
+ *   cron_logs:         id, job_id (varchar), status (success|error|running), output, duration_seconds, executed_at, executed_by, tenant_id
+ *   cron_settings:     id, setting_key, setting_value, updated_at  (key-value, NOT tenant-scoped)
+ *   cron_job_settings: id, job_id (varchar), is_enabled, custom_schedule, notify_on_failure, notify_emails, max_retries, timeout_seconds
+ *   cron_jobs:         id, tenant_id, job_name, job_type, last_run, last_status, last_duration, last_error, next_run, run_count, failure_count, enabled
  */
 class AdminCronApiController
 {
@@ -48,7 +54,8 @@ class AdminCronApiController
         $tenantId = TenantContext::getId();
         $params = $_GET;
 
-        $where = ["tenant_id = ?"];
+        // cron_logs.tenant_id is nullable — scope when set, include all when NULL
+        $where = ["(tenant_id = ? OR tenant_id IS NULL)"];
         $values = [$tenantId];
 
         if (!empty($params['jobId'])) {
@@ -57,8 +64,10 @@ class AdminCronApiController
         }
 
         if (!empty($params['status'])) {
+            // Map frontend 'failed' → DB 'error'
+            $status = $params['status'] === 'failed' ? 'error' : $params['status'];
             $where[] = "status = ?";
-            $values[] = $params['status'];
+            $values[] = $status;
         }
 
         if (!empty($params['startDate'])) {
@@ -90,6 +99,13 @@ class AdminCronApiController
 
         $logs = $stmt->fetchAll();
 
+        // Normalise status for frontend ('error' → 'failed')
+        foreach ($logs as &$log) {
+            if (($log['status'] ?? '') === 'error') {
+                $log['status'] = 'failed';
+            }
+        }
+
         return $this->jsonResponse([
             'success' => true,
             'data' => $logs,
@@ -110,7 +126,7 @@ class AdminCronApiController
         $tenantId = TenantContext::getId();
 
         $stmt = Database::query(
-            "SELECT * FROM cron_logs WHERE id = ? AND tenant_id = ?",
+            "SELECT * FROM cron_logs WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL)",
             [$logId, $tenantId]
         );
 
@@ -118,6 +134,11 @@ class AdminCronApiController
 
         if (!$log) {
             return $this->jsonResponse(['success' => false, 'error' => 'Log not found'], 404);
+        }
+
+        // Normalise status
+        if (($log['status'] ?? '') === 'error') {
+            $log['status'] = 'failed';
         }
 
         return $this->jsonResponse(['success' => true, 'data' => $log]);
@@ -137,7 +158,7 @@ class AdminCronApiController
         }
 
         $stmt = Database::query(
-            "DELETE FROM cron_logs WHERE tenant_id = ? AND executed_at < ?",
+            "DELETE FROM cron_logs WHERE (tenant_id = ? OR tenant_id IS NULL) AND executed_at < ?",
             [$tenantId, $beforeDate]
         );
 
@@ -156,15 +177,13 @@ class AdminCronApiController
 
     /**
      * GET /api/v2/admin/system/cron-jobs/{jobId}/settings
-     * Get per-job settings
+     * Get per-job settings (cron_job_settings — not tenant-scoped)
      */
     public function getJobSettings($jobId)
     {
-        $tenantId = TenantContext::getId();
-
         $stmt = Database::query(
-            "SELECT * FROM cron_job_settings WHERE job_id = ? AND tenant_id = ?",
-            [$jobId, $tenantId]
+            "SELECT * FROM cron_job_settings WHERE job_id = ?",
+            [$jobId]
         );
 
         $settings = $stmt->fetch();
@@ -191,13 +210,12 @@ class AdminCronApiController
      */
     public function updateJobSettings($jobId)
     {
-        $tenantId = TenantContext::getId();
         $data = $this->getJsonInput();
 
         // Check if settings exist
         $stmt = Database::query(
-            "SELECT id FROM cron_job_settings WHERE job_id = ? AND tenant_id = ?",
-            [$jobId, $tenantId]
+            "SELECT id FROM cron_job_settings WHERE job_id = ?",
+            [$jobId]
         );
 
         $existing = $stmt->fetch();
@@ -232,21 +250,21 @@ class AdminCronApiController
                 $values[] = (int)$data['timeout_seconds'];
             }
 
-            $values[] = $existing['id'];
-
-            Database::query(
-                "UPDATE cron_job_settings SET " . implode(', ', $fields) . " WHERE id = ?",
-                $values
-            );
+            if (!empty($fields)) {
+                $values[] = $existing['id'];
+                Database::query(
+                    "UPDATE cron_job_settings SET " . implode(', ', $fields) . " WHERE id = ?",
+                    $values
+                );
+            }
         } else {
             // Insert
             Database::query(
                 "INSERT INTO cron_job_settings
-                (job_id, tenant_id, is_enabled, custom_schedule, notify_on_failure, notify_emails, max_retries, timeout_seconds)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (job_id, is_enabled, custom_schedule, notify_on_failure, notify_emails, max_retries, timeout_seconds)
+                VALUES (?, ?, ?, ?, ?, ?, ?)",
                 [
                     $jobId,
-                    $tenantId,
                     $data['is_enabled'] ?? 1,
                     $data['custom_schedule'] ?? null,
                     $data['notify_on_failure'] ?? 0,
@@ -262,83 +280,49 @@ class AdminCronApiController
 
     /**
      * GET /api/v2/admin/system/cron-jobs/settings
-     * Get global cron settings
+     * Get global cron settings (key-value store, not tenant-scoped)
      */
     public function getGlobalSettings()
     {
-        $tenantId = TenantContext::getId();
+        $stmt = Database::query("SELECT setting_key, setting_value FROM cron_settings");
+        $rows = $stmt->fetchAll();
 
-        $stmt = Database::query(
-            "SELECT * FROM cron_settings WHERE tenant_id = ?",
-            [$tenantId]
-        );
-
-        $settings = $stmt->fetch();
-
-        // Return defaults if no settings exist
-        if (!$settings) {
-            $settings = [
-                'default_notify_email' => null,
-                'log_retention_days' => 30,
-                'max_concurrent_jobs' => 5,
-            ];
+        // Build settings map from key-value rows
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row['setting_key']] = $row['setting_value'];
         }
+
+        $settings = [
+            'default_notify_email' => $map['default_notify_email'] ?? null,
+            'log_retention_days' => (int)($map['log_retention_days'] ?? 30),
+            'max_concurrent_jobs' => (int)($map['max_concurrent_jobs'] ?? 5),
+        ];
 
         return $this->jsonResponse(['success' => true, 'data' => $settings]);
     }
 
     /**
      * PUT /api/v2/admin/system/cron-jobs/settings
-     * Update global cron settings
+     * Update global cron settings (upsert key-value pairs)
      */
     public function updateGlobalSettings()
     {
-        $tenantId = TenantContext::getId();
         $data = $this->getJsonInput();
 
-        // Check if settings exist
-        $stmt = Database::query(
-            "SELECT id FROM cron_settings WHERE tenant_id = ?",
-            [$tenantId]
-        );
+        $allowedKeys = ['default_notify_email', 'log_retention_days', 'max_concurrent_jobs'];
 
-        $existing = $stmt->fetch();
-
-        if ($existing) {
-            // Update
-            $fields = [];
-            $values = [];
-
-            if (isset($data['default_notify_email'])) {
-                $fields[] = "default_notify_email = ?";
-                $values[] = $data['default_notify_email'];
-            }
-            if (isset($data['log_retention_days'])) {
-                $fields[] = "log_retention_days = ?";
-                $values[] = (int)$data['log_retention_days'];
-            }
-            if (isset($data['max_concurrent_jobs'])) {
-                $fields[] = "max_concurrent_jobs = ?";
-                $values[] = (int)$data['max_concurrent_jobs'];
+        foreach ($allowedKeys as $key) {
+            if (!isset($data[$key])) {
+                continue;
             }
 
-            $values[] = $existing['id'];
-
+            // Upsert: INSERT … ON DUPLICATE KEY UPDATE
             Database::query(
-                "UPDATE cron_settings SET " . implode(', ', $fields) . " WHERE id = ?",
-                $values
-            );
-        } else {
-            // Insert
-            Database::query(
-                "INSERT INTO cron_settings (tenant_id, default_notify_email, log_retention_days, max_concurrent_jobs)
-                VALUES (?, ?, ?, ?)",
-                [
-                    $tenantId,
-                    $data['default_notify_email'] ?? null,
-                    $data['log_retention_days'] ?? 30,
-                    $data['max_concurrent_jobs'] ?? 5,
-                ]
+                "INSERT INTO cron_settings (setting_key, setting_value)
+                 VALUES (?, ?)
+                 ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)",
+                [$key, (string)$data[$key]]
             );
         }
 
@@ -357,22 +341,24 @@ class AdminCronApiController
     {
         $tenantId = TenantContext::getId();
 
-        // Jobs failed in last 24h
+        // Jobs failed in last 24h (status = 'error' in DB)
         $stmt = Database::query(
             "SELECT COUNT(*) as count FROM cron_logs
-             WHERE tenant_id = ? AND status = 'failed'
+             WHERE (tenant_id = ? OR tenant_id IS NULL) AND status = 'error'
              AND executed_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)",
             [$tenantId]
         );
         $jobsFailed24h = $stmt->fetch()['count'] ?? 0;
 
-        // Recent failures (last 5)
+        // Recent failures (last 5) — join to cron_jobs to get the job_name
         $stmt = Database::query(
-            "SELECT job_name, executed_at as failed_at, output as reason
-             FROM cron_logs
-             WHERE tenant_id = ? AND status = 'failed'
-             ORDER BY executed_at DESC LIMIT 5",
-            [$tenantId]
+            "SELECT l.job_id, COALESCE(j.job_name, l.job_id) as job_name,
+                    l.executed_at as failed_at, l.output as reason
+             FROM cron_logs l
+             LEFT JOIN cron_jobs j ON j.job_name = l.job_id AND j.tenant_id = ?
+             WHERE (l.tenant_id = ? OR l.tenant_id IS NULL) AND l.status = 'error'
+             ORDER BY l.executed_at DESC LIMIT 5",
+            [$tenantId, $tenantId]
         );
         $recentFailures = $stmt->fetchAll();
 
@@ -382,7 +368,7 @@ class AdminCronApiController
                 SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successes,
                 COUNT(*) as total
              FROM cron_logs
-             WHERE tenant_id = ?
+             WHERE (tenant_id = ? OR tenant_id IS NULL)
              AND executed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
             [$tenantId]
         );
@@ -391,9 +377,9 @@ class AdminCronApiController
             ? round($rateData['successes'] / $rateData['total'], 2)
             : 1.0;
 
-        // Check for overdue jobs (simplified - jobs that haven't run in 24h)
+        // Check for overdue jobs (enabled but haven't run in 24h)
         $stmt = Database::query(
-            "SELECT j.id as job_id, j.job_name, j.schedule, j.last_run
+            "SELECT j.id as job_id, j.job_name, j.last_run
              FROM cron_jobs j
              WHERE j.tenant_id = ? AND j.enabled = 1
              AND (j.last_run IS NULL OR j.last_run < DATE_SUB(NOW(), INTERVAL 24 HOUR))
@@ -404,7 +390,7 @@ class AdminCronApiController
 
         // Add expected_interval to overdue jobs
         foreach ($jobsOverdue as &$job) {
-            $job['expected_interval'] = '24 hours'; // Simplified
+            $job['expected_interval'] = '24 hours';
         }
 
         // Calculate health score (0-100)
