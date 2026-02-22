@@ -110,13 +110,14 @@ export function BlogAdmin() {
       label: 'Title',
       sortable: true,
       render: (item) => (
-        <button
+        <Button
           type="button"
-          className="text-left font-medium text-primary hover:underline"
-          onClick={() => navigate(tenantPath(`/admin/blog/edit/${item.id}`))}
+          variant="light"
+          onPress={() => navigate(tenantPath(`/admin/blog/edit/${item.id}`))}
+          className="text-left font-medium text-primary hover:underline min-w-0 h-auto p-0 justify-start"
         >
           {item.title}
-        </button>
+        </Button>
       ),
     },
     {

@@ -8,11 +8,9 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
 
-class ResourceApiController
+class ResourceApiController extends BaseApiController
 {
-    use ApiAuth;
 
     public function index()
     {

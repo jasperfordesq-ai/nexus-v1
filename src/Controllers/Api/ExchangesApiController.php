@@ -91,6 +91,16 @@ class ExchangesApiController extends BaseApiController
             return;
         }
 
+        // Check compliance requirements (DBS/insurance enforcement)
+        $violations = ExchangeWorkflowService::checkComplianceRequirements(
+            (int) $data['listing_id'],
+            $userId
+        );
+        if (!empty($violations)) {
+            $this->respondWithError('COMPLIANCE_VIOLATION', implode(' ', $violations), null, 403);
+            return;
+        }
+
         $exchangeId = ExchangeWorkflowService::createRequest(
             $userId,
             (int) $data['listing_id'],
@@ -174,6 +184,16 @@ class ExchangesApiController extends BaseApiController
 
         if ((int) $exchange['provider_id'] !== $userId) {
             $this->error('Only the provider can accept this request', 403);
+            return;
+        }
+
+        // Re-check compliance (credentials may have expired since request)
+        $violations = ExchangeWorkflowService::checkComplianceRequirements(
+            (int) $exchange['listing_id'],
+            $userId
+        );
+        if (!empty($violations)) {
+            $this->respondWithError('COMPLIANCE_VIOLATION', implode(' ', $violations), null, 403);
             return;
         }
 

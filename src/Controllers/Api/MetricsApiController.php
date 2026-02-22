@@ -6,7 +6,6 @@
 
 namespace Nexus\Controllers\Api;
 
-use Nexus\Core\ApiAuth;
 use Nexus\Services\PerformanceMonitorService;
 
 /**
@@ -14,7 +13,7 @@ use Nexus\Services\PerformanceMonitorService;
  *
  * Handles frontend performance metrics collection
  */
-class MetricsApiController
+class MetricsApiController extends BaseApiController
 {
     /**
      * Store frontend performance metrics
@@ -42,13 +41,7 @@ class MetricsApiController
         }
 
         // Get user ID if authenticated (optional)
-        $userId = null;
-        try {
-            $user = ApiAuth::authenticate();
-            $userId = $user['id'] ?? null;
-        } catch (\Exception $e) {
-            // User not authenticated - that's ok for metrics
-        }
+        $userId = $this->getOptionalUserId();
 
         // Add user ID and page info to each metric
         $metrics = $input['metrics'];
@@ -81,23 +74,8 @@ class MetricsApiController
     {
         header('Content-Type: application/json');
 
-        // Require authentication
-        try {
-            $user = ApiAuth::authenticate();
-
-            // Check if user is admin
-            if (!in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin']) &&
-                empty($user['is_super_admin']) &&
-                empty($user['is_tenant_super_admin'])) {
-                http_response_code(403);
-                echo json_encode(['success' => false, 'error' => 'Admin access required']);
-                exit;
-            }
-        } catch (\Exception $e) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'error' => 'Authentication required']);
-            exit;
-        }
+        // Require admin authentication
+        $this->requireAdmin();
 
         // Get hours parameter
         $hours = isset($_GET['hours']) ? (int)$_GET['hours'] : 24;

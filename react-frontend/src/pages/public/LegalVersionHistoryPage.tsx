@@ -225,9 +225,10 @@ export function LegalVersionHistoryPage() {
 
               <GlassCard className="overflow-hidden">
                 {/* Version header (clickable) */}
-                <button
-                  onClick={() => handleToggle(version)}
-                  className="w-full flex items-center gap-3 p-5 text-left hover:bg-[var(--surface-hover)] transition-colors"
+                <Button
+                  variant="light"
+                  onPress={() => handleToggle(version)}
+                  className="w-full flex items-center gap-3 p-5 text-left hover:bg-[var(--surface-hover)] transition-colors h-auto min-w-0 justify-start rounded-none"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -277,7 +278,7 @@ export function LegalVersionHistoryPage() {
                   ) : (
                     <ChevronDown className="w-5 h-5 text-theme-subtle flex-shrink-0" />
                   )}
-                </button>
+                </Button>
 
                 {/* Expanded content */}
                 {expandedId === version.id && (

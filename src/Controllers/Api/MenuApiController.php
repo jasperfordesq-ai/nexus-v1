@@ -7,7 +7,6 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
 use Nexus\Core\MenuManager;
 use Nexus\Helpers\CorsHelper;
 use Nexus\Models\PayPlan;
@@ -17,18 +16,15 @@ use Nexus\Models\PayPlan;
  *
  * Provides JSON menu structures for mobile apps and SPAs
  */
-class MenuApiController
+class MenuApiController extends BaseApiController
 {
-    use ApiAuth;
-
-    private function jsonResponse($data, $status = 200)
+    /**
+     * Override parent jsonResponse to add CORS headers
+     */
+    protected function jsonResponse($data, int $status = 200): void
     {
-        header('Content-Type: application/json');
         CorsHelper::setHeaders([], ['GET', 'POST', 'OPTIONS'], ['Content-Type', 'Authorization']);
-
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
+        parent::jsonResponse($data, $status);
     }
 
     /**

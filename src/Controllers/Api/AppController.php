@@ -10,7 +10,7 @@ namespace Nexus\Controllers\Api;
  * App Controller - Mobile app utilities
  * Handles version checking, update prompts, and app-specific endpoints
  */
-class AppController
+class AppController extends BaseApiController
 {
     // Current app version - UPDATE THIS when releasing a new APK
     // Must match versionName in capacitor/android/app/build.gradle
@@ -39,13 +39,6 @@ class AppController
         ]
     ];
 
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
 
     /**
      * Check app version and return update status

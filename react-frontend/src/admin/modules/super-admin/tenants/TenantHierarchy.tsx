@@ -271,11 +271,13 @@ export function TenantHierarchy() {
           )}
 
           {/* Expand/collapse */}
-          <button
+          <Button
             type="button"
-            onClick={() => toggleNode(node.id)}
-            className="shrink-0"
-            disabled={!hasChildren}
+            variant="light"
+            isIconOnly
+            onPress={() => toggleNode(node.id)}
+            className="shrink-0 min-w-0 h-auto p-0"
+            isDisabled={!hasChildren}
           >
             {hasChildren ? (
               isExpanded ? (
@@ -286,7 +288,7 @@ export function TenantHierarchy() {
             ) : (
               <div className="w-4" />
             )}
-          </button>
+          </Button>
 
           {/* Icon */}
           <Building2 size={16} className="text-default-400 shrink-0" />

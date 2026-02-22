@@ -8,7 +8,6 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
 use Nexus\Services\PusherService;
 use Nexus\Services\RealtimeService;
 use Nexus\Services\FederationRealtimeService;
@@ -19,23 +18,8 @@ use Nexus\Services\FederationRealtimeService;
  * Handles authentication for private and presence channels.
  * Pusher calls this endpoint when clients subscribe to secure channels.
  */
-class PusherAuthController
+class PusherAuthController extends BaseApiController
 {
-    use ApiAuth;
-
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    private function getUserId()
-    {
-        // Use unified auth - returns null if not authenticated (doesn't exit)
-        return $this->getAuthenticatedUserId();
-    }
 
     /**
      * POST /api/pusher/auth
@@ -44,7 +28,7 @@ class PusherAuthController
     public function auth()
     {
         try {
-            $userId = $this->getUserId();
+            $userId = $this->getOptionalUserId();
 
             if ($userId === null) {
                 $this->jsonResponse(['error' => 'Unauthorized'], 401);
@@ -182,7 +166,7 @@ class PusherAuthController
      */
     public function config()
     {
-        $userId = $this->getUserId();
+        $userId = $this->getOptionalUserId();
         $config = RealtimeService::getFrontendConfig();
 
         // Add user-specific channels if logged in
@@ -204,7 +188,7 @@ class PusherAuthController
     public function debug()
     {
         try {
-            $userId = $this->getUserId();
+            $userId = $this->getOptionalUserId();
             $tenantId = TenantContext::getId();
             $config = PusherService::getConfig();
 
