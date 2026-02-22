@@ -27,7 +27,7 @@ import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
 import { adminModeration } from '@/admin/api/adminApi';
-import type { AdminComment, PaginatedResponse } from '@/admin/api/types';
+import type { AdminComment } from '@/admin/api/types';
 
 const CONTENT_TYPES = [
   { label: 'All Types', value: '' },
@@ -62,7 +62,7 @@ export default function CommentsModeration() {
     return params.toString();
   };
 
-  const { data, isLoading, error, execute } = useApi<PaginatedResponse<AdminComment>>(
+  const { data, isLoading, error, execute, meta } = useApi<AdminComment[]>(
     `/v2/admin/comments?${buildQueryString()}`,
     { immediate: true, deps: [page, activeSearch, activeContentType] }
   );
@@ -108,8 +108,8 @@ export default function CommentsModeration() {
     }
   };
 
-  const comments = data?.data || [];
-  const totalPages = data?.meta ? Math.ceil(data.meta.total / data.meta.per_page) : 1;
+  const comments = data || [];
+  const totalPages = meta?.total_pages || 1;
 
   return (
     <div className="space-y-6">
@@ -162,9 +162,9 @@ export default function CommentsModeration() {
       </div>
 
       {/* Stats */}
-      {data?.meta && (
+      {meta && (
         <div className="text-sm text-default-500">
-          Showing {comments.length} of {data.meta.total} comments
+          Showing {comments.length} of {meta.total ?? comments.length} comments
         </div>
       )}
 

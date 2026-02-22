@@ -27,7 +27,7 @@ import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
 import { adminModeration } from '@/admin/api/adminApi';
-import type { AdminFeedPost, PaginatedResponse } from '@/admin/api/types';
+import type { AdminFeedPost } from '@/admin/api/types';
 
 const POST_TYPES = [
   { label: 'All Types', value: '' },
@@ -62,7 +62,7 @@ export default function FeedModeration() {
     return params.toString();
   };
 
-  const { data, isLoading, error, execute } = useApi<PaginatedResponse<AdminFeedPost>>(
+  const { data, isLoading, error, execute, meta } = useApi<AdminFeedPost[]>(
     `/v2/admin/feed/posts?${buildQueryString()}`,
     { immediate: true, deps: [page, activeSearch, activeType] }
   );
@@ -108,8 +108,8 @@ export default function FeedModeration() {
     }
   };
 
-  const posts = data?.data || [];
-  const totalPages = data?.meta ? Math.ceil(data.meta.total / data.meta.per_page) : 1;
+  const posts = data || [];
+  const totalPages = meta?.total_pages || 1;
 
   return (
     <div className="space-y-6">
@@ -162,9 +162,9 @@ export default function FeedModeration() {
       </div>
 
       {/* Stats */}
-      {data?.meta && (
+      {meta && (
         <div className="text-sm text-default-500">
-          Showing {posts.length} of {data.meta.total} posts
+          Showing {posts.length} of {meta.total ?? posts.length} posts
         </div>
       )}
 

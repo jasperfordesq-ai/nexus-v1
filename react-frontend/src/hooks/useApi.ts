@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { api, type ApiResponse } from '@/lib/api';
+import { api, type ApiResponse, type PaginationMeta } from '@/lib/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -14,6 +14,7 @@ interface UseApiState<T> {
   data: T | null;
   isLoading: boolean;
   error: string | null;
+  meta?: PaginationMeta | null;
 }
 
 interface UseApiOptions {
@@ -43,6 +44,7 @@ export function useApi<T>(
     data: null,
     isLoading: immediate,
     error: null,
+    meta: null,
   });
 
   const mountedRef = useRef(true);
@@ -58,6 +60,7 @@ export function useApi<T>(
           data: response.data ?? null,
           isLoading: false,
           error: null,
+          meta: response.meta ?? null,
         });
       } else {
         setState((prev) => ({
@@ -72,7 +75,7 @@ export function useApi<T>(
   }, [endpoint]);
 
   const reset = useCallback(() => {
-    setState({ data: null, isLoading: false, error: null });
+    setState({ data: null, isLoading: false, error: null, meta: null });
   }, []);
 
   const setData = useCallback((data: T | null) => {
@@ -236,19 +239,19 @@ export function usePaginatedApi<T>(
       const separator = endpoint.includes('?') ? '&' : '?';
       const url = `${endpoint}${separator}page=${page}&limit=${pageSize}`;
 
-      const response = await api.get<{
-        data: T[];
-        meta: { current_page: number; last_page: number; total: number };
-      }>(url);
+      const response = await api.get<T[]>(url);
 
       if (mountedRef.current) {
         if (response.success && response.data) {
-          const { data, meta } = response.data;
+          // api.ts already unwraps data.data, so response.data IS the array
+          // Pagination meta is in response.meta (preserved by api.ts)
+          const items = Array.isArray(response.data) ? response.data : [];
+          const meta = response.meta;
           setState((prev) => ({
-            items: reset ? data : [...prev.items, ...data],
-            currentPage: meta.current_page,
-            totalPages: meta.last_page,
-            total: meta.total,
+            items: reset ? items : [...prev.items, ...items],
+            currentPage: meta?.current_page ?? meta?.total_pages ?? page,
+            totalPages: meta?.total_pages ?? 1,
+            total: meta?.total ?? items.length,
             isLoading: false,
             error: null,
           }));
