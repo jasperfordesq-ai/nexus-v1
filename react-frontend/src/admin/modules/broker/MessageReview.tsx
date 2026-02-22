@@ -127,7 +127,12 @@ export function MessageReview() {
       label: 'Sender',
       sortable: true,
       render: (item) => (
-        <span className="font-medium text-foreground">{item.sender_name}</span>
+        <Link
+          to={tenantPath(`/admin/broker-controls/messages/${item.id}`)}
+          className="font-medium text-primary hover:underline"
+        >
+          {item.sender_name}
+        </Link>
       ),
     },
     {
@@ -139,13 +144,23 @@ export function MessageReview() {
       ),
     },
     {
-      key: 'listing_title',
-      label: 'Listing',
-      sortable: true,
+      key: 'message_body',
+      label: 'Preview',
       render: (item) => (
-        <span className="text-sm text-default-600">
-          {item.listing_title || '—'}
+        <span className="text-sm text-default-500 line-clamp-1 max-w-[200px]">
+          {item.message_body ? item.message_body.substring(0, 80) + (item.message_body.length > 80 ? '…' : '') : '—'}
         </span>
+      ),
+    },
+    {
+      key: 'copy_reason',
+      label: 'Reason',
+      render: (item) => (
+        item.copy_reason ? (
+          <Chip size="sm" variant="flat" color="default">
+            {item.copy_reason.replace(/_/g, ' ')}
+          </Chip>
+        ) : <span className="text-sm text-default-400">—</span>
       ),
     },
     {
