@@ -393,13 +393,12 @@ class AdminCronApiController
 
         // Check for overdue jobs (simplified - jobs that haven't run in 24h)
         $stmt = Database::query(
-            "SELECT DISTINCT j.id as job_id, j.name as job_name, j.schedule, j.last_run_at as last_run
+            "SELECT j.id as job_id, j.job_name, j.schedule, j.last_run
              FROM cron_jobs j
-             LEFT JOIN cron_logs l ON j.id = l.job_id AND l.tenant_id = ?
-             WHERE j.tenant_id = ? AND j.status = 'active'
-             AND (j.last_run_at IS NULL OR j.last_run_at < DATE_SUB(NOW(), INTERVAL 24 HOUR))
+             WHERE j.tenant_id = ? AND j.enabled = 1
+             AND (j.last_run IS NULL OR j.last_run < DATE_SUB(NOW(), INTERVAL 24 HOUR))
              LIMIT 5",
-            [$tenantId, $tenantId]
+            [$tenantId]
         );
         $jobsOverdue = $stmt->fetchAll();
 
