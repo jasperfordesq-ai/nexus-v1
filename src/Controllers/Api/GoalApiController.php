@@ -8,24 +8,9 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
 
-class GoalApiController
+class GoalApiController extends BaseApiController
 {
-    use ApiAuth;
-
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    private function getUserId()
-    {
-        return $this->requireAuth();
-    }
 
     public function index()
     {

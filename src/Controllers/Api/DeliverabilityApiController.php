@@ -6,7 +6,6 @@
 
 namespace Nexus\Controllers\Api;
 
-use Nexus\Core\ApiAuth;
 use Nexus\Models\Deliverable;
 use Nexus\Models\DeliverableMilestone;
 use Nexus\Models\DeliverableComment;
@@ -18,9 +17,8 @@ use Nexus\Services\DeliverabilityTrackingService;
  * REST API endpoints for deliverability tracking module.
  * Provides CRUD operations and analytics endpoints.
  */
-class DeliverabilityApiController
+class DeliverabilityApiController extends BaseApiController
 {
-    use ApiAuth;
 
     /**
      * Get all deliverables with optional filters
@@ -581,18 +579,4 @@ class DeliverabilityApiController
         return $this->jsonResponse(['data' => $history]);
     }
 
-    /**
-     * JSON response helper
-     *
-     * @param array $data Response data
-     * @param int $status HTTP status code
-     * @return void
-     */
-    private function jsonResponse($data, $status = 200)
-    {
-        http_response_code($status);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit;
-    }
 }

@@ -143,46 +143,53 @@ class AuthController
             $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
 
             // =====================================================
-            // 2FA CHECK - DISABLED SYSTEM-WIDE
-            // To re-enable, uncomment the block below
+            // 2FA CHECK — ENFORCED FOR ADMIN USERS
+            // Regular members skip 2FA; admins must complete it
+            // if they have TOTP enabled in their account.
             // =====================================================
-            // $has2faEnabled = !empty($user['totp_enabled']) || TotpService::isEnabled((int)$user['id']);
-            //
-            // // Check for trusted device (skips 2FA if trusted)
-            // $isTrustedDevice = $has2faEnabled && TotpService::isTrustedDevice((int)$user['id']);
-            //
-            // if ($has2faEnabled && !$isTrustedDevice) {
-            //     // 2FA required - create challenge token instead of access tokens
-            //     $twoFactorToken = TwoFactorChallengeManager::create(
-            //         (int)$user['id'],
-            //         ['totp', 'backup_code']
-            //     );
-            //
-            //     // For session-based clients, also store in session for backward compatibility
-            //     if (!$wantsStateless) {
-            //         if (session_status() == PHP_SESSION_NONE) {
-            //             session_start();
-            //         }
-            //         $_SESSION['pending_2fa_user_id'] = $user['id'];
-            //         $_SESSION['pending_2fa_expires'] = time() + 300; // 5 minutes
-            //     }
-            //
-            //     // Return 2FA required response - no access token yet
-            //     return $this->jsonResponse([
-            //         'success' => false,
-            //         'requires_2fa' => true,
-            //         'two_factor_token' => $twoFactorToken,
-            //         'methods' => ['totp', 'backup_code'],
-            //         'code' => ApiErrorCodes::AUTH_2FA_REQUIRED,
-            //         'message' => 'Two-factor authentication required',
-            //         // Include partial user info for UI
-            //         'user' => [
-            //             'id' => $user['id'],
-            //             'first_name' => $user['first_name'],
-            //             'email_masked' => $this->maskEmail($user['email'])
-            //         ]
-            //     ], 200); // 200 OK because this is expected flow, not an error
-            // }
+            $isAdminUser = in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'])
+                || !empty($user['is_super_admin'])
+                || !empty($user['is_tenant_super_admin']);
+
+            if ($isAdminUser) {
+                $has2faEnabled = !empty($user['totp_enabled']) || TotpService::isEnabled((int)$user['id']);
+
+                // Check for trusted device (skips 2FA if trusted)
+                $isTrustedDevice = $has2faEnabled && TotpService::isTrustedDevice((int)$user['id']);
+
+                if ($has2faEnabled && !$isTrustedDevice) {
+                    // 2FA required - create challenge token instead of access tokens
+                    $twoFactorToken = TwoFactorChallengeManager::create(
+                        (int)$user['id'],
+                        ['totp', 'backup_code']
+                    );
+
+                    // For session-based clients, also store in session for backward compatibility
+                    if (!$wantsStateless) {
+                        if (session_status() == PHP_SESSION_NONE) {
+                            session_start();
+                        }
+                        $_SESSION['pending_2fa_user_id'] = $user['id'];
+                        $_SESSION['pending_2fa_expires'] = time() + 300; // 5 minutes
+                    }
+
+                    // Return 2FA required response - no access token yet
+                    return $this->jsonResponse([
+                        'success' => false,
+                        'requires_2fa' => true,
+                        'two_factor_token' => $twoFactorToken,
+                        'methods' => ['totp', 'backup_code'],
+                        'code' => ApiErrorCodes::AUTH_2FA_REQUIRED,
+                        'message' => 'Two-factor authentication required',
+                        // Include partial user info for UI
+                        'user' => [
+                            'id' => $user['id'],
+                            'first_name' => $user['first_name'],
+                            'email_masked' => $this->maskEmail($user['email'])
+                        ]
+                    ], 200); // 200 OK because this is expected flow, not an error
+                }
+            }
 
             // =====================================================
             // NO 2FA or TRUSTED DEVICE - Complete login normally

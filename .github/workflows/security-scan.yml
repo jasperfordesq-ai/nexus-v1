@@ -31,13 +31,13 @@ jobs:
           severity: 'CRITICAL,HIGH'
           format: 'sarif'
           output: 'trivy-results.sarif'
-        continue-on-error: true
+          exit-code: '1'
 
       - name: Upload Trivy Scan Results
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
-        continue-on-error: true
+        if: always()
 
       - name: SAST Scan with Semgrep
         uses: returntocorp/semgrep-action@v1
@@ -46,19 +46,17 @@ jobs:
             p/php
             p/security-audit
             p/secrets
-        continue-on-error: true
 
       - name: Check for Hardcoded Secrets
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
           extra_args: --only-verified
-        continue-on-error: true
 
       - name: PHP Security Checker
         run: |
           composer require --dev enlightn/security-checker
-          vendor/bin/security-checker security:check composer.lock || true
+          vendor/bin/security-checker security:check composer.lock
 
       - name: OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
@@ -96,10 +94,10 @@ jobs:
           format: 'sarif'
           output: 'container-trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
-        continue-on-error: true
+          exit-code: '1'
 
       - name: Upload Container Scan Results
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'container-trivy-results.sarif'
-        continue-on-error: true
+        if: always()

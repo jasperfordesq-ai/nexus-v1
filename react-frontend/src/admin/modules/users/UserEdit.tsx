@@ -654,11 +654,11 @@ export function UserEdit() {
                     size="lg"
                     startContent={badge.icon ? <span className="text-sm">{badge.icon}</span> : undefined}
                     endContent={
-                      <button type="button" onClick={() => setBadgeToRemove(badge)}
-                        className="ml-1 rounded-full p-0.5 text-default-400 transition-colors hover:bg-danger-100 hover:text-danger"
+                      <Button isIconOnly variant="light" size="sm" onPress={() => setBadgeToRemove(badge)}
+                        className="ml-1 min-w-0 w-5 h-5 rounded-full text-default-400 hover:bg-danger-100 hover:text-danger"
                         aria-label={`Remove badge: ${badge.name}`}>
                         <Trash2 size={12} />
-                      </button>
+                      </Button>
                     }
                   >
                     {badge.name}

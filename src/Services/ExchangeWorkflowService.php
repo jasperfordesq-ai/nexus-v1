@@ -956,6 +956,47 @@ class ExchangeWorkflowService
     }
 
     /**
+     * Check compliance requirements for an exchange
+     *
+     * @param int $listingId Listing ID
+     * @param int $providerId Provider user ID
+     * @return array Array of violation strings (empty = compliant)
+     */
+    public static function checkComplianceRequirements(int $listingId, int $providerId): array
+    {
+        $violations = [];
+        $tenantId = TenantContext::getId();
+
+        try {
+            $riskTag = Database::query(
+                "SELECT dbs_required, insurance_required FROM listing_risk_tags
+                 WHERE listing_id = ? AND tenant_id = ?",
+                [$listingId, $tenantId]
+            )->fetch();
+
+            if (!$riskTag) {
+                return [];
+            }
+
+            if (!empty($riskTag['dbs_required']) && BrokerControlConfigService::isVettingEnforcedOnExchanges()) {
+                if (!VettingService::hasValidVetting($providerId)) {
+                    $violations[] = 'Provider requires valid DBS/vetting check for this listing.';
+                }
+            }
+
+            if (!empty($riskTag['insurance_required']) && BrokerControlConfigService::isInsuranceEnforcedOnExchanges()) {
+                if (!InsuranceCertificateService::hasValidInsurance($providerId)) {
+                    $violations[] = 'Provider requires valid insurance certificate for this listing.';
+                }
+            }
+        } catch (\Exception $e) {
+            // Tables may not exist — fail open
+        }
+
+        return $violations;
+    }
+
+    /**
      * Create a transaction for completed exchange
      *
      * @param int $exchangeId Exchange ID
