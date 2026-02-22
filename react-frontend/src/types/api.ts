@@ -636,6 +636,7 @@ export interface Notification {
   body: string;
   message?: string;  // Alias for body (frontend compatibility)
   read_at?: string | null;
+  link?: string | null;  // Navigation URL from backend (e.g. "/messages/123")
   action_url?: string;
   data?: Record<string, unknown>;
   created_at: string;

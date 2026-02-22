@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -137,11 +137,14 @@ interface TwoFactorSetup {
 export function SettingsPage() {
   usePageTitle('Settings');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, logout, refreshUser } = useAuth();
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState('profile');
+  const validTabs = ['profile', 'notifications', 'privacy', 'security'];
+  const initialTab = validTabs.includes(searchParams.get('tab') || '') ? searchParams.get('tab')! : 'profile';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -198,6 +201,9 @@ export function SettingsPage() {
     email_gamification: false,
     push_enabled: true,
   });
+
+  // Match digest frequency
+  const [matchDigestFrequency, setMatchDigestFrequency] = useState<string>('daily');
 
   // Privacy settings
   const [privacy, setPrivacy] = useState<PrivacySettings>({
@@ -256,6 +262,17 @@ export function SettingsPage() {
     } catch (error) {
       logError('Failed to load notification settings', error);
       setNotificationError('Failed to load notification settings');
+    }
+  }, []);
+
+  const loadMatchPreferences = useCallback(async () => {
+    try {
+      const response = await api.get<{ notification_frequency: string }>('/v2/users/me/match-preferences');
+      if (response.success && response.data) {
+        setMatchDigestFrequency(response.data.notification_frequency || 'daily');
+      }
+    } catch (error) {
+      logError('Failed to load match preferences', error);
     }
   }, []);
 
@@ -325,10 +342,11 @@ export function SettingsPage() {
       setTwoFactorEnabled(user.has_2fa_enabled || false);
     }
     loadNotificationSettings();
+    loadMatchPreferences();
     loadPrivacySettings();
     loadTwoFactorStatus();
     loadSessions();
-  }, [user, loadNotificationSettings, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
+  }, [user, loadNotificationSettings, loadMatchPreferences, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
 
   // Load insurance certificates when insurance is enabled
   const loadInsuranceCerts = useCallback(async () => {
@@ -394,11 +412,17 @@ export function SettingsPage() {
   const saveNotifications = useCallback(async () => {
     try {
       setIsSaving(true);
-      const response = await api.put('/v2/users/me/notifications', notifications);
-      if (response.success) {
+      // Save general notification settings and match digest frequency in parallel
+      const [notifResponse, matchResponse] = await Promise.all([
+        api.put('/v2/users/me/notifications', notifications),
+        api.put('/v2/users/me/match-preferences', {
+          notification_frequency: matchDigestFrequency,
+        }),
+      ]);
+      if (notifResponse.success && matchResponse.success) {
         toast.success('Notification settings saved');
       } else {
-        toast.error(response.error || 'Failed to save notifications');
+        toast.error(notifResponse.error || matchResponse.error || 'Failed to save notifications');
       }
     } catch (error) {
       logError('Failed to save notifications', error);
@@ -406,7 +430,7 @@ export function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [notifications, toast]);
+  }, [notifications, matchDigestFrequency, toast]);
 
   const savePrivacy = useCallback(async () => {
     try {
@@ -1066,6 +1090,40 @@ export function SettingsPage() {
                     checked={notifications.email_digest}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_digest: checked }))}
                   />
+                </div>
+
+                {/* Match Digest */}
+                <div className="pt-4 border-t border-theme-default space-y-4">
+                  <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
+                    <Search className="w-4 h-4" aria-hidden="true" />
+                    Match Digest Emails
+                  </h3>
+
+                  <div className="p-4 rounded-lg bg-theme-elevated">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div>
+                        <p className="font-medium text-theme-primary">Digest Frequency</p>
+                        <p className="text-sm text-theme-subtle">How often you receive match digest emails</p>
+                      </div>
+                      <Select
+                        aria-label="Match digest frequency"
+                        selectedKeys={[matchDigestFrequency]}
+                        onSelectionChange={(keys) => {
+                          const value = Array.from(keys)[0] as string;
+                          if (value) setMatchDigestFrequency(value);
+                        }}
+                        className="sm:max-w-[180px]"
+                        classNames={{
+                          trigger: 'bg-theme-elevated border-theme-default',
+                          value: 'text-theme-primary',
+                        }}
+                      >
+                        <SelectItem key="daily">Daily</SelectItem>
+                        <SelectItem key="weekly">Weekly</SelectItem>
+                        <SelectItem key="never">Never</SelectItem>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Push Notifications */}

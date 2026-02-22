@@ -847,6 +847,10 @@ $router->add('POST', '/api/v2/admin/insurance/{id}/verify', 'Nexus\Controllers\A
 $router->add('POST', '/api/v2/admin/insurance/{id}/reject', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@reject');
 $router->add('DELETE', '/api/v2/admin/insurance/{id}', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@destroy');
 
+// Match Preferences (digest frequency)
+$router->add('GET', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@show');
+$router->add('PUT', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@update');
+
 // User Insurance (self-service)
 $router->add('GET', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@list');
 $router->add('POST', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@upload');
