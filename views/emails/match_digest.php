@@ -35,7 +35,7 @@ $basePath = TenantContext::getBasePath();
 $year = date('Y');
 
 $matchesUrl = $appUrl . $basePath . '/matches';
-$settingsUrl = $appUrl . $basePath . '/matches/preferences';
+$settingsUrl = $appUrl . $basePath . '/settings?tab=notifications';
 
 $period = $period ?? 'daily';
 $periodTitle = ucfirst($period);

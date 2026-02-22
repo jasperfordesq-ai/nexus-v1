@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
 import {
@@ -229,7 +229,18 @@ interface NotificationCardProps {
 }
 
 function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCardProps) {
+  const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const isUnread = !notification.read_at;
+  const hasLink = !!notification.link;
+
+  function handleClick() {
+    if (!notification.link) return;
+    // Mark as read when navigating
+    if (isUnread) onMarkRead();
+    // The link from the API is a relative path like "/messages/123" — scope it to the tenant
+    navigate(tenantPath(notification.link));
+  }
 
   const iconMap: Record<string, { icon: React.ReactNode; color: string }> = {
     message: { icon: <MessageSquare className="w-5 h-5" />, color: 'indigo' },
@@ -255,22 +266,30 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
   };
 
   return (
-    <GlassCard className={`p-4 ${isUnread ? 'ring-1 ring-indigo-500/30' : ''}`}>
+    <GlassCard className={`p-4 ${isUnread ? 'ring-1 ring-indigo-500/30' : ''} ${hasLink ? 'hover:bg-theme-hover/50 transition-colors' : ''}`}>
       <div className="flex items-start gap-3 sm:gap-4">
-        <div className={`p-2.5 rounded-full ${colorClasses[color]}`}>
-          {icon}
+        <div
+          className={`flex items-start gap-3 sm:gap-4 flex-1 min-w-0 ${hasLink ? 'cursor-pointer' : ''}`}
+          onClick={handleClick}
+          role={hasLink ? 'link' : undefined}
+          tabIndex={hasLink ? 0 : undefined}
+          onKeyDown={hasLink ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); } } : undefined}
+        >
+          <div className={`p-2.5 rounded-full flex-shrink-0 ${colorClasses[color]}`}>
+            {icon}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className={`${isUnread ? 'text-theme-primary font-medium' : 'text-theme-muted'}`}>
+              {notification.message || notification.body}
+            </p>
+            <p className="text-xs text-theme-subtle mt-1">
+              {formatRelativeTime(notification.created_at)}
+            </p>
+          </div>
         </div>
 
-        <div className="flex-1 min-w-0">
-          <p className={`${isUnread ? 'text-theme-primary font-medium' : 'text-theme-muted'}`}>
-            {notification.message || notification.body}
-          </p>
-          <p className="text-xs text-theme-subtle mt-1">
-            {formatRelativeTime(notification.created_at)}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-shrink-0">
           {isUnread && (
             <Button
               isIconOnly
