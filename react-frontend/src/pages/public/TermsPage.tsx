@@ -129,14 +129,15 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
       <motion.div variants={itemVariants}>
         <div className="flex flex-wrap justify-center gap-3">
           {quickNavItems.map((item) => (
-            <button
+            <Button
               key={item.id}
-              onClick={() => scrollToSection(item.id)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-blue-500/10 text-theme-primary text-sm font-medium transition-colors"
+              variant="light"
+              onPress={() => scrollToSection(item.id)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-blue-500/10 text-theme-primary text-sm font-medium transition-colors h-auto min-w-0"
             >
               <item.icon className="w-4 h-4 text-blue-500" aria-hidden="true" />
               {item.label}
-            </button>
+            </Button>
           ))}
         </div>
       </motion.div>

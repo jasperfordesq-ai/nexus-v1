@@ -384,13 +384,44 @@ jobs:
           fi
 
   # ─────────────────────────────────────────────────────────────────
-  # Stage 7: E2E Smoke Tests (Playwright - informational only)
+  # Stage 7: E2E Smoke Tests (Playwright)
+  # ─────────────────────────────────────────────────────────────────
+  # STATUS: DISABLED — no E2E test files exist yet.
+  #
+  # The playwright.config.ts references e2e/tests/ and e2e/global.setup.ts,
+  # but the e2e/ directory has not been created. The previous version of this
+  # job installed Playwright browsers (~400 MB), ran against missing test
+  # files, swallowed the error with continue-on-error, and reported a
+  # misleading green check (audit finding H14).
+  #
+  # TO ENABLE (checklist):
+  #   1. Create the e2e/ directory tree:
+  #        e2e/
+  #        ├── global.setup.ts      (authenticate test users, save storage state)
+  #        ├── global.teardown.ts   (clean up test data)
+  #        ├── fixtures/
+  #        │   └── .auth/
+  #        │       ├── user.json    (authenticated user storage state)
+  #        │       └── admin.json   (authenticated admin storage state)
+  #        └── tests/
+  #            ├── smoke/
+  #            │   └── health.spec.ts   (tag tests with @smoke)
+  #            └── auth/
+  #                └── login.spec.ts
+  #   2. Write at least one @smoke test (e.g. landing page loads, login form renders)
+  #   3. Create compose.ci.yml (or use compose.yml with a CI profile) that starts:
+  #        - MariaDB with schema + seed data
+  #        - PHP API (port 8090)
+  #        - React dev-server or static build served via nginx (port 5173)
+  #   4. Update E2E_BASE_URL in the job env to match the CI compose ports
+  #   5. Remove the `if: false` line below to enable the job
+  #   6. Run the job once to verify, then remove continue-on-error
   # ─────────────────────────────────────────────────────────────────
   e2e-smoke:
-    name: E2E Smoke Tests
+    name: E2E Smoke Tests (DISABLED — no test files)
     runs-on: ubuntu-latest
     needs: [react-build]
-    continue-on-error: true
+    if: false  # No e2e/ directory exists yet — remove this line once E2E tests are written
 
     steps:
       - uses: actions/checkout@v4
@@ -400,6 +431,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: package-lock.json
 
       - name: Install Dependencies
         run: npm ci
@@ -407,12 +439,23 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
-      # TODO: This stage requires a running application (PHP API + React frontend)
-      # to execute real E2E tests. For now it runs as a placeholder that will
-      # fail gracefully. Once a CI docker-compose setup is available, remove
-      # continue-on-error and wire up the app containers before this step.
-      - name: Run Playwright Smoke Tests (INFORMATIONAL)
-        run: npx playwright test --grep @smoke --project=chromium-modern 2>&1 || echo "::warning::E2E smoke tests failed or no @smoke tests found. This stage is informational only."
+      # --- Start application stack for E2E tests ---
+      # Uncomment and adjust once compose.ci.yml is created:
+      #
+      # - name: Start Application Stack
+      #   run: |
+      #     docker compose -f compose.ci.yml up -d --wait
+      #     echo "Waiting for services to be healthy..."
+      #     timeout 60 bash -c 'until curl -sf http://localhost:5173 > /dev/null 2>&1; do sleep 2; done'
+      #     echo "React frontend is up."
+      #     timeout 60 bash -c 'until curl -sf http://localhost:8090/health.php > /dev/null 2>&1; do sleep 2; done'
+      #     echo "PHP API is up."
+
+      - name: Run Playwright Smoke Tests
+        run: npx playwright test --grep @smoke --project=chromium-modern
+        env:
+          E2E_BASE_URL: http://localhost:5173
+          CI: true
 
       - name: Upload Smoke Test Results
         uses: actions/upload-artifact@v4
@@ -423,6 +466,11 @@ jobs:
             e2e/reports/
             e2e/test-results/
           retention-days: 14
+
+      # Uncomment once compose.ci.yml is created:
+      # - name: Stop Application Stack
+      #   if: always()
+      #   run: docker compose -f compose.ci.yml down -v
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 8: Accessibility Checks (warning only)

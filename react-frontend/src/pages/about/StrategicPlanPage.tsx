@@ -159,17 +159,18 @@ export function StrategicPlanPage() {
               </h2>
               <div className="flex flex-wrap gap-2">
                 {tocSections.map((section, index) => (
-                  <button
+                  <Button
                     key={section.id}
                     type="button"
-                    onClick={() => scrollTo(section.id)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-theme-muted hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                    variant="light"
+                    onPress={() => scrollTo(section.id)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-theme-muted hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors h-auto min-w-0"
                   >
                     <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
                       {index + 1}
                     </span>
                     <span>{section.label}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </GlassCard>

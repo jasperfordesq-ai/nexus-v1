@@ -267,10 +267,11 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
                   ? (section.numericPrefix ?? '·')
                   : String(idx + 1);
                 return (
-                  <button
+                  <Button
                     key={section.id}
-                    onClick={() => scrollToSection(section.id)}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm text-theme-muted transition-colors ${styles.tocHover} group`}
+                    variant="light"
+                    onPress={() => scrollToSection(section.id)}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm text-theme-muted transition-colors ${styles.tocHover} group h-auto min-w-0 w-full justify-start`}
                   >
                     <span
                       className={`inline-flex items-center justify-center w-5 h-5 rounded text-[0.65rem] font-bold ${styles.chipBg} shrink-0`}
@@ -284,7 +285,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
                       className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-60 transition-opacity shrink-0"
                       aria-hidden="true"
                     />
-                  </button>
+                  </Button>
                 );
               })}
             </div>

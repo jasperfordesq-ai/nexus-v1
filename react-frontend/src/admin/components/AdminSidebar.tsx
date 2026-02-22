@@ -11,6 +11,7 @@
 
 import { useState, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import {
   LayoutDashboard,
@@ -365,13 +366,15 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
             Admin
           </Link>
         )}
-        <button
-          onClick={onToggle}
-          className="rounded-lg p-2 text-default-500 hover:bg-default-100 hover:text-foreground"
+        <Button
+          variant="light"
+          isIconOnly
+          onPress={onToggle}
+          className="rounded-lg p-2 text-default-500 hover:bg-default-100 hover:text-foreground min-w-0 h-auto"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
-        </button>
+        </Button>
       </div>
 
       {/* Navigation */}
@@ -412,9 +415,10 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
                   <div className="my-2 border-t border-warning/30" />
                 )}
                 <div className={isSuperSection ? 'rounded-lg bg-primary/5 py-1 px-1' : ''}>
-                  <button
-                    onClick={() => toggleSection(section.key)}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  <Button
+                    variant="light"
+                    onPress={() => toggleSection(section.key)}
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors h-auto min-w-0 justify-start ${
                       sectionActive
                         ? 'text-primary'
                         : 'text-default-600 hover:bg-default-100 hover:text-foreground'
@@ -432,7 +436,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
                         )}
                       </>
                     )}
-                  </button>
+                  </Button>
                   {!collapsed && isExpanded && section.items && (
                     <ul className="ml-4 mt-1 space-y-0.5 border-l border-divider pl-3">
                       {section.items.map((item) => {

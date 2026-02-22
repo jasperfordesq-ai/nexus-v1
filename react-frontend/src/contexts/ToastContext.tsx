@@ -10,6 +10,7 @@
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@heroui/react';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -190,13 +191,15 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
             <p className="text-white/60 text-sm mt-1">{toast.message}</p>
           )}
         </div>
-        <button
-          onClick={() => onRemove(toast.id)}
-          className="text-white/40 hover:text-white transition-colors flex-shrink-0"
+        <Button
+          variant="light"
+          isIconOnly
+          onPress={() => onRemove(toast.id)}
+          className="text-white/40 hover:text-white transition-colors flex-shrink-0 min-w-0 h-auto p-0"
           aria-label="Dismiss notification"
         >
           <X className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     </motion.div>
   );
