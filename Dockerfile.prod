@@ -68,7 +68,7 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 # Environment passthrough
-RUN echo 'PassEnv DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_TYPE REDIS_HOST REDIS_PORT APP_ENV APP_DEBUG APP_URL APP_KEY JWT_SECRET PUSHER_APP_KEY PUSHER_APP_SECRET PUSHER_APP_ID PUSHER_APP_CLUSTER OPENAI_API_KEY' >> /etc/apache2/conf-available/passenv.conf \
+RUN echo 'PassEnv DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_TYPE REDIS_HOST REDIS_PORT APP_ENV APP_DEBUG APP_URL APP_KEY JWT_SECRET PUSHER_APP_KEY PUSHER_APP_SECRET PUSHER_APP_ID PUSHER_APP_CLUSTER OPENAI_API_KEY SENTRY_DSN_PHP SENTRY_ENVIRONMENT SENTRY_TRACES_SAMPLE_RATE' >> /etc/apache2/conf-available/passenv.conf \
     && a2enconf passenv
 
 # Security: Hide Apache version

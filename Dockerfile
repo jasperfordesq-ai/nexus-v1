@@ -72,7 +72,7 @@ RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/Allo
 
 # Pass environment variables to PHP via Apache
 # This ensures Docker env vars are available to PHP via $_SERVER and getenv()
-RUN echo 'PassEnv DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_TYPE REDIS_HOST REDIS_PORT APP_ENV APP_DEBUG APP_URL' >> /etc/apache2/conf-available/passenv.conf \
+RUN echo 'PassEnv DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_TYPE REDIS_HOST REDIS_PORT APP_ENV APP_DEBUG APP_URL SENTRY_DSN_PHP SENTRY_ENVIRONMENT SENTRY_TRACES_SAMPLE_RATE' >> /etc/apache2/conf-available/passenv.conf \
     && a2enconf passenv
 
 # =============================================================================
