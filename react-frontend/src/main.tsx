@@ -8,6 +8,9 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
 
+// Log build version to console for deployment verification
+console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
+
 // Initialize Sentry error tracking (before React renders)
 import { initSentry, SentryErrorBoundary } from '@/lib/sentry';
 initSentry();
