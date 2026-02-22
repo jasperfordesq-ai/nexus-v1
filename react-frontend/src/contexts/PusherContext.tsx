@@ -86,8 +86,10 @@ export function PusherProvider({ children }: PusherProviderProps) {
   const typingListenersRef = useRef<Set<(event: TypingEvent) => void>>(new Set());
   const unreadListenersRef = useRef<Set<(event: UnreadCountEvent) => void>>(new Set());
 
-  // Load Pusher config from API
+  // Load Pusher config from API (only when authenticated)
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     async function loadConfig() {
       try {
         const response = await api.get<PusherConfig>('/v2/realtime/config');
@@ -101,7 +103,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
     }
 
     loadConfig();
-  }, []);
+  }, [isAuthenticated]);
 
   // Initialize Pusher when authenticated and config is available
   useEffect(() => {
@@ -109,13 +111,16 @@ export function PusherProvider({ children }: PusherProviderProps) {
       return;
     }
 
-    // Initialize Pusher
+    // Initialize Pusher with Bearer token auth (matching NotificationsContext)
+    const accessToken = tokenManager.getAccessToken();
+    if (!accessToken) return;
+
     const pusher = new Pusher(config.key, {
       cluster: config.cluster,
       authEndpoint: config.authEndpoint,
       auth: {
         headers: {
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          Authorization: `Bearer ${accessToken}`,
         },
       },
     });
