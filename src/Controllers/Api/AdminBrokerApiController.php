@@ -21,12 +21,23 @@ use Nexus\Services\ExchangeWorkflowService;
  * Endpoints:
  * - GET  /api/v2/admin/broker/dashboard              - Overview stats
  * - GET  /api/v2/admin/broker/exchanges               - List exchange requests
+ * - GET  /api/v2/admin/broker/exchanges/{id}           - Exchange detail with history
  * - POST /api/v2/admin/broker/exchanges/{id}/approve   - Approve exchange
  * - POST /api/v2/admin/broker/exchanges/{id}/reject    - Reject exchange
  * - GET  /api/v2/admin/broker/risk-tags               - List risk tags
+ * - POST /api/v2/admin/broker/risk-tags/{listingId}    - Create/update risk tag
+ * - DELETE /api/v2/admin/broker/risk-tags/{listingId}  - Remove risk tag
  * - GET  /api/v2/admin/broker/messages                - List broker message copies
+ * - GET  /api/v2/admin/broker/messages/{id}            - Message detail with thread
  * - POST /api/v2/admin/broker/messages/{id}/review     - Mark message reviewed
+ * - POST /api/v2/admin/broker/messages/{id}/flag       - Flag a message
+ * - POST /api/v2/admin/broker/messages/{id}/approve    - Approve and archive message
+ * - GET  /api/v2/admin/broker/archives                - List archived reviews
+ * - GET  /api/v2/admin/broker/archives/{id}            - Archive detail with snapshot
  * - GET  /api/v2/admin/broker/monitoring              - List monitored users
+ * - POST /api/v2/admin/broker/monitoring/{userId}      - Set/remove user monitoring
+ * - GET  /api/v2/admin/broker/configuration           - Get broker config
+ * - POST /api/v2/admin/broker/configuration           - Save broker config
  */
 class AdminBrokerApiController extends BaseApiController
 {
@@ -507,6 +518,313 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'flagged' => true, 'flag_reason' => $reason, 'flag_severity' => $severity]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to flag message', null, 500);
+        }
+    }
+
+    /**
+     * GET /api/v2/admin/broker/messages/{id}
+     *
+     * Returns full detail for a single broker message copy including the
+     * complete conversation thread between sender and receiver.
+     */
+    public function showMessage(int $id): void
+    {
+        $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+
+        try {
+            // Load the broker copy with sender/receiver names and listing title
+            $copy = Database::query(
+                "SELECT bmc.*,
+                    CONCAT(s.first_name, ' ', s.last_name) as sender_name,
+                    CONCAT(r.first_name, ' ', r.last_name) as receiver_name,
+                    l.title as listing_title
+                FROM broker_message_copies bmc
+                LEFT JOIN users s ON bmc.sender_id = s.id
+                LEFT JOIN users r ON bmc.receiver_id = r.id
+                LEFT JOIN listings l ON bmc.related_listing_id = l.id
+                WHERE bmc.id = ? AND bmc.tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$copy) {
+                $this->respondWithError('NOT_FOUND', 'Broker message copy not found', null, 404);
+                return;
+            }
+
+            $copy['flagged'] = (bool) ($copy['flagged'] ?? false);
+
+            // Load full conversation thread between sender and receiver
+            $thread = Database::query(
+                "SELECT m.id, m.sender_id, m.receiver_id, m.body, m.created_at, m.is_deleted,
+                    CONCAT(u.first_name, ' ', u.last_name) as sender_name
+                FROM messages m
+                LEFT JOIN users u ON m.sender_id = u.id
+                WHERE m.tenant_id = ?
+                  AND ((m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?))
+                ORDER BY m.created_at ASC
+                LIMIT 200",
+                [$tenantId, $copy['sender_id'], $copy['receiver_id'], $copy['receiver_id'], $copy['sender_id']]
+            )->fetchAll();
+
+            // Redact deleted messages
+            foreach ($thread as &$msg) {
+                if (!empty($msg['is_deleted'])) {
+                    $msg['body'] = '[Message deleted]';
+                }
+            }
+            unset($msg);
+
+            // If copy has an archive, load it
+            $archive = null;
+            if (!empty($copy['archive_id'])) {
+                $archive = Database::query(
+                    "SELECT id, decision, decision_notes, decided_by_name, decided_at, flag_reason, flag_severity
+                    FROM broker_review_archives
+                    WHERE id = ? AND tenant_id = ?",
+                    [$copy['archive_id'], $tenantId]
+                )->fetch() ?: null;
+            }
+
+            $this->respondWithData([
+                'copy' => $copy,
+                'thread' => $thread,
+                'archive' => $archive,
+            ]);
+        } catch (\Exception $e) {
+            $this->respondWithError('SERVER_ERROR', 'Failed to load message detail', null, 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/broker/messages/{id}/approve
+     *
+     * Approve a broker message copy and create an immutable compliance archive.
+     * The archive captures a frozen snapshot of the conversation at decision time.
+     * Body: { notes?: string }
+     */
+    public function approveMessage(int $id): void
+    {
+        $adminId = $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+        $notes = trim($this->input('notes', ''));
+
+        try {
+            // Load the broker copy with sender/receiver names and listing title
+            $copy = Database::query(
+                "SELECT bmc.*,
+                    CONCAT(s.first_name, ' ', s.last_name) as sender_name,
+                    CONCAT(r.first_name, ' ', r.last_name) as receiver_name,
+                    l.title as listing_title
+                FROM broker_message_copies bmc
+                LEFT JOIN users s ON bmc.sender_id = s.id
+                LEFT JOIN users r ON bmc.receiver_id = r.id
+                LEFT JOIN listings l ON bmc.related_listing_id = l.id
+                WHERE bmc.id = ? AND bmc.tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$copy) {
+                $this->respondWithError('NOT_FOUND', 'Broker message copy not found', null, 404);
+                return;
+            }
+
+            // Prevent double-archiving
+            if (!empty($copy['archive_id'])) {
+                $this->respondWithError('ALREADY_ARCHIVED', 'This message copy has already been archived', null, 409);
+                return;
+            }
+
+            // Get the broker/admin name for the archive
+            $adminRow = Database::query(
+                "SELECT CONCAT(first_name, ' ', last_name) as name FROM users WHERE id = ?",
+                [$adminId]
+            )->fetch();
+            $adminName = $adminRow['name'] ?? 'Unknown';
+
+            // Snapshot the full conversation between sender and receiver
+            $conversationRows = Database::query(
+                "SELECT m.id, m.sender_id, m.body, m.created_at, m.is_deleted,
+                    CONCAT(u.first_name, ' ', u.last_name) as sender_name
+                FROM messages m
+                LEFT JOIN users u ON m.sender_id = u.id
+                WHERE m.tenant_id = ?
+                  AND ((m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?))
+                ORDER BY m.created_at ASC
+                LIMIT 500",
+                [$tenantId, $copy['sender_id'], $copy['receiver_id'], $copy['receiver_id'], $copy['sender_id']]
+            )->fetchAll();
+
+            // Redact deleted messages in snapshot
+            foreach ($conversationRows as &$msg) {
+                if (!empty($msg['is_deleted'])) {
+                    $msg['body'] = '[Message deleted]';
+                }
+                unset($msg['is_deleted']);
+            }
+            unset($msg);
+
+            $conversationSnapshot = json_encode($conversationRows);
+
+            // Determine decision based on flag status
+            $decision = !empty($copy['flagged']) ? 'flagged' : 'approved';
+
+            // INSERT the immutable archive record
+            Database::query(
+                "INSERT INTO broker_review_archives
+                    (tenant_id, broker_copy_id, sender_id, sender_name, receiver_id, receiver_name,
+                     related_listing_id, listing_title, copy_reason, target_message_body, target_message_sent_at,
+                     conversation_snapshot, decision, decision_notes, decided_by, decided_by_name,
+                     decided_at, flag_reason, flag_severity, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW())",
+                [
+                    $tenantId,
+                    $id,
+                    $copy['sender_id'],
+                    $copy['sender_name'] ?? '',
+                    $copy['receiver_id'],
+                    $copy['receiver_name'] ?? '',
+                    $copy['related_listing_id'],
+                    $copy['listing_title'],
+                    $copy['copy_reason'],
+                    $copy['message_body'] ?? '',
+                    $copy['sent_at'],
+                    $conversationSnapshot,
+                    $decision,
+                    $notes ?: null,
+                    $adminId,
+                    $adminName,
+                    $copy['flag_reason'],
+                    $copy['flag_severity'],
+                ]
+            );
+
+            $archiveId = Database::lastInsertId();
+
+            // Update the broker copy: link to archive, set reviewed if not already
+            Database::query(
+                "UPDATE broker_message_copies
+                 SET archived_at = NOW(),
+                     archive_id = ?,
+                     reviewed_by = COALESCE(reviewed_by, ?),
+                     reviewed_at = COALESCE(reviewed_at, NOW())
+                 WHERE id = ? AND tenant_id = ?",
+                [$archiveId, $adminId, $id, $tenantId]
+            );
+
+            $this->respondWithData([
+                'id' => $id,
+                'archive_id' => $archiveId,
+                'decision' => $decision,
+                'decided_by' => $adminName,
+            ]);
+        } catch (\Exception $e) {
+            $this->respondWithError('SERVER_ERROR', 'Failed to archive message', null, 500);
+        }
+    }
+
+    /**
+     * GET /api/v2/admin/broker/archives
+     *
+     * List archived broker reviews with pagination, search, and filtering.
+     * Supports: ?page=, ?per_page=, ?decision=, ?search=, ?from=, ?to=
+     */
+    public function archives(): void
+    {
+        $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 20, 1, 100);
+        $decision = $this->query('decision');
+        $search = $this->query('search');
+        $from = $this->query('from');
+        $to = $this->query('to');
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            $where = "tenant_id = ?";
+            $params = [$tenantId];
+
+            if ($decision && $decision !== 'all') {
+                $where .= " AND decision = ?";
+                $params[] = $decision;
+            }
+
+            if ($search) {
+                $where .= " AND (sender_name LIKE ? OR receiver_name LIKE ?)";
+                $params[] = "%{$search}%";
+                $params[] = "%{$search}%";
+            }
+
+            if ($from) {
+                $where .= " AND decided_at >= ?";
+                $params[] = $from;
+            }
+
+            if ($to) {
+                $where .= " AND decided_at <= ?";
+                $params[] = $to . ' 23:59:59';
+            }
+
+            // Count total
+            $countRow = Database::query(
+                "SELECT COUNT(*) as cnt FROM broker_review_archives WHERE {$where}",
+                $params
+            )->fetch();
+            $total = (int) ($countRow['cnt'] ?? 0);
+
+            // Paginated data (exclude large conversation_snapshot from list view)
+            $queryParams = array_merge($params, [$perPage, $offset]);
+            $items = Database::query(
+                "SELECT id, tenant_id, broker_copy_id, sender_id, sender_name, receiver_id, receiver_name,
+                    related_listing_id, listing_title, copy_reason, decision, decision_notes,
+                    decided_by, decided_by_name, decided_at, flag_reason, flag_severity, created_at
+                FROM broker_review_archives
+                WHERE {$where}
+                ORDER BY decided_at DESC
+                LIMIT ? OFFSET ?",
+                $queryParams
+            )->fetchAll();
+
+            $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
+        } catch (\Exception $e) {
+            $this->respondWithPaginatedCollection([], 0, $page, $perPage);
+        }
+    }
+
+    /**
+     * GET /api/v2/admin/broker/archives/{id}
+     *
+     * Return the full archive detail including frozen conversation snapshot.
+     * The conversation snapshot is an immutable record of the thread at decision time.
+     */
+    public function showArchive(int $id): void
+    {
+        $this->requireBrokerAdmin();
+        $tenantId = TenantContext::getId();
+
+        try {
+            $archive = Database::query(
+                "SELECT * FROM broker_review_archives WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$archive) {
+                $this->respondWithError('NOT_FOUND', 'Archive not found', null, 404);
+                return;
+            }
+
+            // Decode the conversation snapshot from JSON
+            if (!empty($archive['conversation_snapshot'])) {
+                $archive['conversation_snapshot'] = json_decode($archive['conversation_snapshot'], true) ?? [];
+            } else {
+                $archive['conversation_snapshot'] = [];
+            }
+
+            $this->respondWithData($archive);
+        } catch (\Exception $e) {
+            $this->respondWithError('SERVER_ERROR', 'Failed to load archive', null, 500);
         }
     }
 
