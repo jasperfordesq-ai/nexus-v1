@@ -80,7 +80,7 @@ export function CustomBadges() {
         title="Custom Badges"
         description="Create and manage custom badges for your community"
         actions={
-          <Link to="../custom-badges/create">
+          <Link to="/admin/custom-badges/create">
             <Button color="primary" startContent={<Plus size={16} />}>
               Create Badge
             </Button>
@@ -113,7 +113,7 @@ export function CustomBadges() {
           title="No custom badges"
           description="Create your first custom badge to reward community members for special achievements."
           actionLabel="Create Badge"
-          onAction={() => navigate('../custom-badges/create')}
+          onAction={() => navigate('/admin/custom-badges/create')}
         />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

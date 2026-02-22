@@ -530,7 +530,7 @@ class TokenService
             return false;
         } catch (\Exception $e) {
             error_log('[TokenService] Failed to check token revocation: ' . $e->getMessage());
-            return false; // Fail open - don't lock out users on DB errors
+            return true; // Fail closed — treat as revoked on DB errors for security
         }
     }
 

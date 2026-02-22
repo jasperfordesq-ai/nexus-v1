@@ -94,7 +94,7 @@ export function CampaignList() {
     const handleAction = (key: React.Key) => {
       const action = key as ActionKey;
       if (action === 'edit') {
-        navigate(`../gamification/campaigns/edit/${campaign.id}`);
+        navigate(`/admin/gamification/campaigns/edit/${campaign.id}`);
       } else if (action === 'activate') {
         handleStatusChange(campaign, 'active');
       } else if (action === 'pause') {
@@ -211,7 +211,7 @@ export function CampaignList() {
         title="Campaigns"
         description="Manage gamification campaigns for badge and XP distribution"
         actions={
-          <Link to="../gamification/campaigns/create">
+          <Link to="/admin/gamification/campaigns/create">
             <Button color="primary" startContent={<Plus size={16} />}>
               Create Campaign
             </Button>
@@ -225,7 +225,7 @@ export function CampaignList() {
           title="No campaigns yet"
           description="Create your first campaign to start awarding badges and XP to users."
           actionLabel="Create Campaign"
-          onAction={() => navigate('../gamification/campaigns/create')}
+          onAction={() => navigate('/admin/gamification/campaigns/create')}
         />
       ) : (
         <DataTable
