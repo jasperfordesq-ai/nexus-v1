@@ -121,7 +121,7 @@ export function CreateBadge() {
 
     if (res.success) {
       toast.success(`Badge "${formData.name.trim()}" created`);
-      navigate('../custom-badges');
+      navigate('/admin/custom-badges');
     } else {
       const errorMsg = (res as { error?: string }).error
         || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
@@ -138,7 +138,7 @@ export function CreateBadge() {
         title="Create Badge"
         description="Create a new custom badge for your community"
         actions={
-          <Link to="../custom-badges">
+          <Link to="/admin/custom-badges">
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
               Back to Badges
             </Button>
@@ -251,7 +251,7 @@ export function CreateBadge() {
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <Link to="../custom-badges">
+            <Link to="/admin/custom-badges">
               <Button variant="flat" isDisabled={saving}>Cancel</Button>
             </Link>
             <Button

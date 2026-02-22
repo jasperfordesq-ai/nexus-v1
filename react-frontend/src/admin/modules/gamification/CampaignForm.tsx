@@ -141,7 +141,7 @@ export function CampaignForm() {
         });
       } else {
         toast.error('Campaign not found');
-        navigate('../gamification/campaigns');
+        navigate('/admin/gamification/campaigns');
       }
     }
     setLoadingCampaign(false);
@@ -180,7 +180,7 @@ export function CampaignForm() {
       const res = await adminGamification.updateCampaign(Number(id), payload);
       if (res.success) {
         toast.success('Campaign updated');
-        navigate('../gamification/campaigns');
+        navigate('/admin/gamification/campaigns');
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
@@ -191,7 +191,7 @@ export function CampaignForm() {
       const res = await adminGamification.createCampaign(payload);
       if (res.success) {
         toast.success('Campaign created');
-        navigate('../gamification/campaigns');
+        navigate('/admin/gamification/campaigns');
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
@@ -217,7 +217,7 @@ export function CampaignForm() {
         title={isEdit ? 'Edit Campaign' : 'Create Campaign'}
         description={isEdit ? 'Update campaign settings' : 'Set up a new gamification campaign'}
         actions={
-          <Link to="../gamification/campaigns">
+          <Link to="/admin/gamification/campaigns">
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
               Back to Campaigns
             </Button>
@@ -342,7 +342,7 @@ export function CampaignForm() {
           )}
 
           <div className="flex justify-end gap-2 pt-2">
-            <Link to="../gamification/campaigns">
+            <Link to="/admin/gamification/campaigns">
               <Button variant="flat" isDisabled={saving}>Cancel</Button>
             </Link>
             <Button

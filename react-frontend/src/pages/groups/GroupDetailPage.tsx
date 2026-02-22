@@ -523,7 +523,7 @@ export function GroupDetailPage() {
     setSettingsName(group.name);
     setSettingsDescription(group.description || '');
     setSettingsPrivate(group.visibility === 'private' || group.visibility === 'secret');
-    setSettingsLocation((group as any).location || '');
+    setSettingsLocation(group.location || '');
     setShowSettingsModal(true);
   }
 
@@ -537,7 +537,8 @@ export function GroupDetailPage() {
       formData.append('type', type);
       const response = await api.upload(`/v2/groups/${id}/image`, formData);
       if (response.success) {
-        const url = (response.data as any)?.url || (response.data as any)?.image_url;
+        const data = response.data as Record<string, unknown> | undefined;
+        const url = (data?.url as string) || (data?.image_url as string) || '';
         setGroup((prev) => prev ? {
           ...prev,
           ...(type === 'avatar' ? { image_url: url } : { cover_image_url: url }),
@@ -1568,8 +1569,8 @@ export function GroupDetailPage() {
                       <Image className="w-4 h-4" aria-hidden="true" />
                       Cover Image
                     </p>
-                    {(group as any)?.cover_image_url && (
-                      <img src={(group as any).cover_image_url} alt="Cover" className="w-full h-10 rounded object-cover mb-2" />
+                    {group?.cover_image_url && (
+                      <img src={group.cover_image_url} alt="Cover" className="w-full h-10 rounded object-cover mb-2" />
                     )}
                     <label className="flex items-center gap-1.5 text-xs text-primary cursor-pointer hover:underline">
                       <Upload className="w-3 h-3" aria-hidden="true" />
