@@ -158,8 +158,15 @@ export function PusherProvider({ children }: PusherProviderProps) {
 
     userChannelRef.current = userChannel;
 
-    // Cleanup on unmount
+    // Cleanup on unmount — unbind all handlers first, then disconnect().
+    // Do NOT call unsubscribe() before disconnect() — it queues an async send
+    // that fires after disconnect starts closing the socket, causing
+    // "WebSocket is already in CLOSING or CLOSED state" warnings.
     return () => {
+      if (userChannelRef.current) {
+        userChannelRef.current.unbind_all();
+      }
+      conversationChannelsRef.current.forEach((ch) => ch.unbind_all());
       pusher.disconnect();
       pusherRef.current = null;
       userChannelRef.current = null;
@@ -217,7 +224,14 @@ export function PusherProvider({ children }: PusherProviderProps) {
 
     const channel = conversationChannelsRef.current.get(channelName);
     if (channel) {
-      pusherRef.current.unsubscribe(channelName);
+      channel.unbind_all();
+      // Only send unsubscribe over the wire if the connection is still open;
+      // otherwise disconnect() will clean up and sending would trigger
+      // "WebSocket is already in CLOSING or CLOSED state" warnings.
+      const state = pusherRef.current.connection.state;
+      if (state === 'connected') {
+        pusherRef.current.unsubscribe(channelName);
+      }
       conversationChannelsRef.current.delete(channelName);
     }
   }, [user?.id]);
