@@ -10,15 +10,8 @@ use Nexus\Core\Mailer;
 use Nexus\Services\EmailMonitorService;
 use Nexus\Services\RedisCache;
 
-class EmailAdminApiController
+class EmailAdminApiController extends BaseApiController
 {
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
 
     /**
      * GET /api/v2/admin/email/status

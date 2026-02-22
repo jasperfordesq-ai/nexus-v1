@@ -192,7 +192,7 @@ class AdminUsersApiController extends BaseApiController
         $user = Database::query(
             "SELECT id, first_name, last_name, email, avatar_url, location, bio, tagline, phone,
                     role, status, is_approved, is_super_admin, balance, profile_type,
-                    organization_name, created_at, last_active_at
+                    organization_name, vetting_status, insurance_status, created_at, last_active_at
              FROM users WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         )->fetch();
@@ -255,6 +255,8 @@ class AdminUsersApiController extends BaseApiController
             'profile_type' => $user['profile_type'] ?? 'individual',
             'organization_name' => $user['organization_name'] ?? null,
             'badges' => $badges,
+            'vetting_status' => $user['vetting_status'] ?? 'none',
+            'insurance_status' => $user['insurance_status'] ?? 'none',
             'created_at' => $user['created_at'],
             'last_active_at' => $user['last_active_at'] ?? null,
         ]);
@@ -664,15 +666,29 @@ class AdminUsersApiController extends BaseApiController
         $input = $this->getAllInput();
         $reason = $input['reason'] ?? 'Reset by admin';
 
-        // Clear TOTP secret and backup codes
+        // Clear TOTP settings from proper tables (user_totp_settings, user_backup_codes)
         try {
             Database::query(
-                "UPDATE users SET totp_secret = NULL, totp_backup_codes = NULL WHERE id = ? AND tenant_id = ?",
+                "DELETE FROM user_totp_settings WHERE user_id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+            Database::query(
+                "DELETE FROM user_backup_codes WHERE user_id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+            // Clear the quick-check flag on users table
+            Database::query(
+                "UPDATE users SET totp_enabled = 0 WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+            // Revoke all trusted devices
+            Database::query(
+                "UPDATE user_trusted_devices SET is_revoked = 1, revoked_at = NOW(), revoked_reason = 'admin_reset' WHERE user_id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
         } catch (\Throwable $e) {
-            // totp columns may not exist
-            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, '2FA columns not available', null, 500);
+            error_log("[AdminUsers] Failed to reset 2FA for user #{$id}: " . $e->getMessage());
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to reset 2FA', null, 500);
             return;
         }
 

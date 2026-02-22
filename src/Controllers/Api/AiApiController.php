@@ -6,7 +6,6 @@
 
 namespace Nexus\Controllers\Api;
 
-use Nexus\Core\ApiAuth;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\AiConversation;
@@ -25,27 +24,8 @@ use Nexus\Services\AI\AIServiceFactory;
  *
  * Handles all AI-related API endpoints.
  */
-class AiApiController
+class AiApiController extends BaseApiController
 {
-    use ApiAuth;
-
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    private function getUserId()
-    {
-        return $this->requireAuth();
-    }
-
-    private function getInput(): array
-    {
-        return json_decode(file_get_contents('php://input'), true) ?? [];
-    }
 
     /**
      * Build dynamic user context for personalized AI responses
@@ -758,7 +738,7 @@ class AiApiController
     public function chat()
     {
         $userId = $this->getUserId();
-        $input = $this->getInput();
+        $input = $this->getAllInput();
 
         $message = trim($input['message'] ?? '');
         $conversationId = $input['conversation_id'] ?? null;
@@ -960,7 +940,7 @@ class AiApiController
     public function streamChat()
     {
         $userId = $this->getUserId();
-        $input = $this->getInput();
+        $input = $this->getAllInput();
 
         $message = trim($input['message'] ?? '');
         $conversationId = $input['conversation_id'] ?? null;
@@ -1116,7 +1096,7 @@ class AiApiController
     public function createConversation()
     {
         $userId = $this->getUserId();
-        $input = $this->getInput();
+        $input = $this->getAllInput();
 
         $conversationId = AiConversation::create($userId, [
             'title' => $input['title'] ?? 'New Chat',
@@ -1192,7 +1172,7 @@ class AiApiController
         $userId = $this->getUserId();
 
         // Check if admin (you may want to add proper admin check)
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $providerId = $input['provider'] ?? 'gemini';
 
         try {
@@ -1229,7 +1209,7 @@ class AiApiController
             $this->jsonResponse(['error' => 'Usage limit reached'], 429);
         }
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $title = trim($input['title'] ?? '');
         $type = $input['type'] ?? 'offer';
         $context = $input['context'] ?? [];
@@ -1479,7 +1459,7 @@ EOT;
             $this->jsonResponse(['error' => 'Usage limit reached'], 429);
         }
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $title = trim($input['title'] ?? '');
         $context = $input['context'] ?? [];
 
@@ -1681,7 +1661,7 @@ EOT;
             $this->jsonResponse(['error' => 'Usage limit reached'], 429);
         }
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $originalMessage = trim($input['original_message'] ?? '');
         $context = $input['context'] ?? [];
         $tone = $input['tone'] ?? 'friendly'; // friendly, professional, casual
@@ -1754,7 +1734,7 @@ EOT;
             $this->jsonResponse(['error' => 'Usage limit reached'], 429);
         }
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $existingBio = trim($input['existing_bio'] ?? '');
         $interests = $input['interests'] ?? [];
         $skills = $input['skills'] ?? [];
@@ -1845,7 +1825,7 @@ EOT;
             $this->jsonResponse(['error' => 'Usage limit reached'], 429);
         }
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $type = $input['type'] ?? 'subject'; // subject, preview, content, full
         $context = $input['context'] ?? [];
 
@@ -2281,7 +2261,7 @@ EOT;
             $this->jsonResponse(['error' => 'Usage limit reached'], 429);
         }
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $type = $input['type'] ?? 'content'; // title, excerpt, content, seo
         $context = $input['context'] ?? [];
 
@@ -2478,7 +2458,7 @@ EOT;
             $this->jsonResponse(['error' => 'Usage limit reached'], 429);
         }
 
-        $input = $this->getInput();
+        $input = $this->getAllInput();
         $type = $input['type'] ?? 'section'; // section, hero, cta, full, seo
         $context = $input['context'] ?? [];
 
