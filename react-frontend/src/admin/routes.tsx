@@ -46,6 +46,9 @@ const UserMonitoring = lazy(() => import('./modules/broker/UserMonitoring'));
 const VettingRecords = lazy(() => import('./modules/broker/VettingRecords'));
 const BrokerConfiguration = lazy(() => import('./modules/broker/BrokerConfiguration'));
 const ExchangeDetail = lazy(() => import('./modules/broker/ExchangeDetail'));
+const MessageDetail = lazy(() => import('./modules/broker/MessageDetail'));
+const ReviewArchive = lazy(() => import('./modules/broker/ReviewArchive'));
+const ArchiveDetail = lazy(() => import('./modules/broker/ArchiveDetail'));
 const GamificationHub = lazy(() => import('./modules/gamification/GamificationHub'));
 const CampaignList = lazy(() => import('./modules/gamification/CampaignList'));
 const CampaignForm = lazy(() => import('./modules/gamification/CampaignForm'));
@@ -243,6 +246,9 @@ export function AdminRoutes() {
       <Route path="broker-controls/vetting" element={<Lazy><VettingRecords /></Lazy>} />
       <Route path="broker-controls/configuration" element={<Lazy><BrokerConfiguration /></Lazy>} />
       <Route path="broker-controls/exchanges/:id" element={<Lazy><ExchangeDetail /></Lazy>} />
+      <Route path="broker-controls/messages/:id" element={<Lazy><MessageDetail /></Lazy>} />
+      <Route path="broker-controls/archives" element={<Lazy><ReviewArchive /></Lazy>} />
+      <Route path="broker-controls/archives/:id" element={<Lazy><ArchiveDetail /></Lazy>} />
 
       {/* ─── MODERATION ─── */}
       <Route path="moderation/feed" element={<Lazy><FeedModeration /></Lazy>} />
