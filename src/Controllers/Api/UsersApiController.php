@@ -84,6 +84,18 @@ class UsersApiController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/users/me/listings
+     *
+     * Get the authenticated user's own listings.
+     * Registered before {id}/listings so "me" is never passed as a string ID.
+     */
+    public function myListings(): void
+    {
+        $id = $this->getUserId();
+        $this->listings($id);
+    }
+
+    /**
      * GET /api/v2/users/{id}/listings
      *
      * Get a user's public listings.

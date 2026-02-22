@@ -99,8 +99,10 @@ export function ProfilePage() {
   const [reviewsAvailable, setReviewsAvailable] = useState(true);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
-  const isOwnProfile = !id || (currentUser && id === currentUser.id.toString());
-  const profileId = id || currentUser?.id?.toString();
+  // Resolve "me" alias (from gamification notification links) to own profile
+  const resolvedId = id === 'me' ? undefined : id;
+  const isOwnProfile = !resolvedId || (currentUser && resolvedId === currentUser.id.toString());
+  const profileId = resolvedId || currentUser?.id?.toString();
 
   const loadProfile = useCallback(async () => {
     if (!profileId) return;
