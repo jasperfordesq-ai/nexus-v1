@@ -46,6 +46,9 @@ import type {
   ExchangeDetail,
   RiskTag,
   BrokerMessage,
+  BrokerMessageDetail,
+  BrokerArchive,
+  BrokerArchiveDetail,
   MonitoredUser,
   BrokerConfig,
   AdminGroup,
@@ -531,6 +534,20 @@ export const adminBroker = {
 
   showExchange: (id: number) =>
     api.get<ExchangeDetail>(`/v2/admin/broker/exchanges/${id}`),
+
+  showMessage: (id: number) =>
+    api.get<BrokerMessageDetail>(`/v2/admin/broker/messages/${id}`),
+
+  approveMessage: (id: number, notes?: string) =>
+    api.post(`/v2/admin/broker/messages/${id}/approve`, { notes }),
+
+  getArchives: (params: { page?: number; decision?: string; search?: string; from?: string; to?: string } = {}) =>
+    api.get<PaginatedResponse<BrokerArchive>>(
+      `/v2/admin/broker/archives${buildQuery(params)}`
+    ),
+
+  showArchive: (id: number) =>
+    api.get<BrokerArchiveDetail>(`/v2/admin/broker/archives/${id}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
