@@ -6,6 +6,8 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   security-scan:
@@ -23,6 +25,8 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
+      # ── Trivy filesystem scan ─────────────────────────────────────
+      # Blocks on CRITICAL and HIGH severity vulnerabilities.
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@master
         with:
@@ -39,6 +43,9 @@ jobs:
           sarif_file: 'trivy-results.sarif'
         if: always()
 
+      # ── Semgrep SAST scan ─────────────────────────────────────────
+      # Blocks on any finding from the configured rulesets.
+      # The semgrep-action v1 exits non-zero on findings by default.
       - name: SAST Scan with Semgrep
         uses: returntocorp/semgrep-action@v1
         with:
@@ -47,17 +54,24 @@ jobs:
             p/security-audit
             p/secrets
 
+      # ── TruffleHog secret detection ──────────────────────────────
+      # Blocks if verified secrets are found in the repository.
       - name: Check for Hardcoded Secrets
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
           extra_args: --only-verified
 
+      # ── PHP dependency vulnerability check ───────────────────────
+      # Blocks if any known vulnerabilities exist in composer.lock.
       - name: PHP Security Checker
         run: |
           composer require --dev enlightn/security-checker
           vendor/bin/security-checker security:check composer.lock
 
+      # ── OWASP Dependency Check ───────────────────────────────────
+      # Blocks on CRITICAL and HIGH findings (CVSS >= 7).
+      # Medium and low findings are reported but do not fail the build.
       - name: OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
@@ -67,7 +81,7 @@ jobs:
           args: >-
             --enableRetired
             --enableExperimental
-        continue-on-error: true
+            --failOnCVSS 7
 
       - name: Upload Dependency Check Report
         uses: actions/upload-artifact@v4
@@ -87,6 +101,9 @@ jobs:
       - name: Build Docker Image
         run: docker build -t nexus-app:scan -f Dockerfile .
 
+      # ── Trivy container scan ─────────────────────────────────────
+      # Blocks on CRITICAL and HIGH severity vulnerabilities in the
+      # built Docker image.
       - name: Run Trivy Container Scan
         uses: aquasecurity/trivy-action@master
         with:

@@ -22,20 +22,8 @@ use Nexus\Services\TwoFactorChallengeManager;
  * - Success: { "success": true, "user": {...}, "access_token": "...", ... }
  * - Error: { "error": "message", "code": "ERROR_CODE", ... }
  */
-class AuthController
+class AuthController extends BaseApiController
 {
-    /**
-     * Helper to return JSON response with API version header
-     */
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        header('API-Version: 1.0');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
     /**
      * Helper to return error response with standardized error code
      *
@@ -57,11 +45,11 @@ class AuthController
 
     /**
      * Helper to get JSON input
+     * Convenience alias for getAllInput() from BaseApiController
      */
     private function getJsonInput()
     {
-        $input = file_get_contents('php://input');
-        return json_decode($input, true) ?? [];
+        return $this->getAllInput();
     }
 
     public function login()
@@ -979,27 +967,7 @@ class AuthController
         ]);
     }
 
-    /**
-     * Get authenticated user ID from Bearer token
-     *
-     * @return int|null
-     */
-    private function getAuthenticatedUserId(): ?int
-    {
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-        if (empty($authHeader) || !preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
-            return null;
-        }
-
-        $token = $matches[1];
-        $payload = TokenService::validateToken($token);
-
-        if (!$payload || ($payload['type'] ?? 'access') !== 'access') {
-            return null;
-        }
-
-        return $payload['user_id'] ?? null;
-    }
+    // getAuthenticatedUserId() is inherited from BaseApiController via ApiAuth trait
 
     /**
      * Get a CSRF token for session-based authentication

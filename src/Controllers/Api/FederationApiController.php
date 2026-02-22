@@ -23,7 +23,7 @@ use Nexus\Services\FederationExternalPartnerService;
  * External REST API for federation partner integrations.
  * Allows partner timebanks to query members, listings, and send messages/transactions.
  */
-class FederationApiController
+class FederationApiController extends BaseApiController
 {
     /**
      * API root - returns API info and available endpoints
