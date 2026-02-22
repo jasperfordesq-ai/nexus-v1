@@ -226,6 +226,12 @@ class TenantBootstrapController extends BaseApiController
         // General settings (maintenance mode, registration settings, etc.)
         $data['settings'] = $this->buildGeneralSettings((int) $tenant['id']);
 
+        // Compliance flags (vetting/insurance system availability)
+        $data['compliance'] = [
+            'vetting_enabled' => BrokerControlConfigService::isVettingEnabled(),
+            'insurance_enabled' => BrokerControlConfigService::isInsuranceEnabled(),
+        ];
+
         return $data;
     }
 
