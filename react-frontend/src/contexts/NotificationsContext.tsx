@@ -330,15 +330,14 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     // Set up polling fallback
     pollingRef.current = setInterval(refreshCounts, POLLING_INTERVAL);
 
-    // Cleanup
+    // Cleanup — disconnect() handles unsubscribing internally;
+    // calling unsubscribe() before disconnect() causes "WebSocket is already
+    // in CLOSING or CLOSED state" warnings because unsubscribe queues an
+    // async send that fires after disconnect starts closing the socket.
     return () => {
       if (pusherRef.current) {
         if (channelRef.current) {
           channelRef.current.unbind_all();
-          const cleanupTenantId = user.tenant_id || tokenManager.getTenantId();
-          if (cleanupTenantId) {
-            pusherRef.current.unsubscribe(`private-tenant.${cleanupTenantId}.user.${user.id}`);
-          }
         }
         pusherRef.current.disconnect();
         pusherRef.current = null;
