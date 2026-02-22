@@ -122,14 +122,19 @@ export function Footer({ children, copyright }: FooterProps) {
             {/* Bottom Bar */}
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-sm text-theme-subtle">{footerText}</p>
-              <a
-                href="https://github.com/jasperfordesq-ai/nexus-v1"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
-              >
-                Built on Project NEXUS by Jasper Ford
-              </a>
+              <div className="flex items-center gap-3">
+                <a
+                  href="https://github.com/jasperfordesq-ai/nexus-v1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
+                >
+                  Built on Project NEXUS by Jasper Ford
+                </a>
+                <span className="text-[10px] text-theme-subtle/50 font-mono" title={`Built ${__BUILD_TIME__}`}>
+                  {__BUILD_COMMIT__}
+                </span>
+              </div>
             </div>
           </div>
         )}
