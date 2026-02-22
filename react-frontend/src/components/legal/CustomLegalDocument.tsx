@@ -18,6 +18,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Chip } from '@heroui/react';
+import DOMPurify from 'dompurify';
 import {
   FileText,
   CalendarDays,
@@ -312,7 +313,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
               </h2>
               <div
                 className="legal-content"
-                dangerouslySetInnerHTML={{ __html: section.html }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(section.html) }}
               />
             </GlassCard>
           </motion.div>
