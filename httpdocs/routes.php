@@ -820,6 +820,10 @@ $router->add('DELETE', '/api/v2/admin/broker/risk-tags/{listingId}', 'Nexus\Cont
 $router->add('GET', '/api/v2/admin/broker/configuration', 'Nexus\Controllers\Api\AdminBrokerApiController@getConfiguration');
 $router->add('POST', '/api/v2/admin/broker/configuration', 'Nexus\Controllers\Api\AdminBrokerApiController@saveConfiguration');
 $router->add('GET', '/api/v2/admin/broker/exchanges/{id}', 'Nexus\Controllers\Api\AdminBrokerApiController@showExchange');
+$router->add('GET', '/api/v2/admin/broker/messages/{id}', 'Nexus\Controllers\Api\AdminBrokerApiController@showMessage');
+$router->add('POST', '/api/v2/admin/broker/messages/{id}/approve', 'Nexus\Controllers\Api\AdminBrokerApiController@approveMessage');
+$router->add('GET', '/api/v2/admin/broker/archives', 'Nexus\Controllers\Api\AdminBrokerApiController@archives');
+$router->add('GET', '/api/v2/admin/broker/archives/{id}', 'Nexus\Controllers\Api\AdminBrokerApiController@showArchive');
 
 // Admin Vetting Records (TOL2 compliance — DBS/Garda vetting)
 $router->add('GET', '/api/v2/admin/vetting/stats', 'Nexus\Controllers\Api\AdminVettingApiController@stats');
