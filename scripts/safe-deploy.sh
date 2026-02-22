@@ -200,8 +200,8 @@ run_smoke_tests() {
         TESTS_FAILED=1
     fi
 
-    # Check container health
-    local UNHEALTHY=$(docker ps --filter "name=nexus" --format "{{.Names}}: {{.Status}}" | grep -i "unhealthy" || true)
+    # Check container health (only OUR containers, not nexus-backend-*, nexus-frontend-*, etc.)
+    local UNHEALTHY=$(docker ps --filter "name=nexus-php" --filter "name=nexus-react-prod" --filter "name=nexus-sales-site" --format "{{.Names}}: {{.Status}}" | grep -i "unhealthy" || true)
     if [ -n "$UNHEALTHY" ]; then
         log_err "Unhealthy containers detected:"
         echo "$UNHEALTHY" | tee -a "$LOG_FILE"
