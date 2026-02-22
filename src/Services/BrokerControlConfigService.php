@@ -344,6 +344,48 @@ class BrokerControlConfigService
     }
 
     // =========================================================================
+    // COMPLIANCE FEATURE TOGGLES (read from tenant_settings flat storage)
+    // =========================================================================
+
+    private static function getComplianceSetting(string $key, mixed $default = false): mixed
+    {
+        $tenantId = TenantContext::getId();
+        try {
+            $row = Database::query(
+                "SELECT setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'broker_config'",
+                [$tenantId]
+            )->fetch();
+            if ($row && !empty($row['setting_value'])) {
+                $config = json_decode($row['setting_value'], true) ?? [];
+                return $config[$key] ?? $default;
+            }
+        } catch (\Throwable $e) {
+            // fail gracefully
+        }
+        return $default;
+    }
+
+    public static function isVettingEnabled(): bool
+    {
+        return (bool) self::getComplianceSetting('vetting_enabled', false);
+    }
+
+    public static function isInsuranceEnabled(): bool
+    {
+        return (bool) self::getComplianceSetting('insurance_enabled', false);
+    }
+
+    public static function getVettingExpiryWarningDays(): int
+    {
+        return (int) self::getComplianceSetting('vetting_expiry_warning_days', 30);
+    }
+
+    public static function getInsuranceExpiryWarningDays(): int
+    {
+        return (int) self::getComplianceSetting('insurance_expiry_warning_days', 30);
+    }
+
+    // =========================================================================
     // HELPER METHODS
     // =========================================================================
 

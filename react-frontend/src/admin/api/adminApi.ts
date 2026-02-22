@@ -102,6 +102,8 @@ import type {
   TenantFederationFeatures,
   VettingRecord,
   VettingStats,
+  InsuranceCertificate,
+  InsuranceStats,
   CronLog,
   CronJobSettings,
   GlobalCronSettings,
@@ -1214,6 +1216,41 @@ export const adminVetting = {
 
   getUserRecords: (userId: number) =>
     api.get<VettingRecord[]>(`/v2/admin/vetting/user/${userId}`),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Insurance Certificates
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminInsurance = {
+  list: (params: { status?: string; insurance_type?: string; search?: string; page?: number; expiring_soon?: boolean } = {}) =>
+    api.get<PaginatedResponse<InsuranceCertificate>>(
+      `/v2/admin/insurance${buildQuery(params)}`
+    ),
+
+  stats: () =>
+    api.get<InsuranceStats>('/v2/admin/insurance/stats'),
+
+  show: (id: number) =>
+    api.get<InsuranceCertificate>(`/v2/admin/insurance/${id}`),
+
+  create: (data: Partial<InsuranceCertificate>) =>
+    api.post<{ id: number }>('/v2/admin/insurance', data),
+
+  update: (id: number, data: Partial<InsuranceCertificate>) =>
+    api.put<{ success: boolean }>(`/v2/admin/insurance/${id}`, data),
+
+  verify: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/insurance/${id}/verify`),
+
+  reject: (id: number, reason: string) =>
+    api.post<{ success: boolean }>(`/v2/admin/insurance/${id}/reject`, { reason }),
+
+  destroy: (id: number) =>
+    api.delete<{ success: boolean }>(`/v2/admin/insurance/${id}`),
+
+  getUserCertificates: (userId: number) =>
+    api.get<InsuranceCertificate[]>(`/v2/admin/insurance/user/${userId}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

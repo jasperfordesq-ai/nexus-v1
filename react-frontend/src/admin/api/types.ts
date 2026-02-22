@@ -136,6 +136,8 @@ export interface AdminUserDetail extends AdminUser {
   organization_name?: string;
   badges: AdminBadge[];
   permissions?: string[];
+  vetting_status?: 'none' | 'pending' | 'verified' | 'expired';
+  insurance_status?: 'none' | 'pending' | 'verified' | 'expired';
 }
 
 export interface AdminBadge {
@@ -927,6 +929,13 @@ export interface BrokerConfig {
   copy_high_risk_listing_messages: boolean;
   random_sample_percentage: number;
   retention_days: number;
+  // Compliance & Safeguarding
+  vetting_enabled: boolean;
+  insurance_enabled: boolean;
+  enforce_vetting_on_exchanges: boolean;
+  enforce_insurance_on_exchanges: boolean;
+  vetting_expiry_warning_days: number;
+  insurance_expiry_warning_days: number;
 }
 
 export interface ExchangeHistoryEntry {
@@ -1326,6 +1335,42 @@ export interface VettingRecord {
 }
 
 export interface VettingStats {
+  total: number;
+  pending: number;
+  verified: number;
+  expired: number;
+  expiring_soon: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Insurance Certificates (compliance)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface InsuranceCertificate {
+  id: number;
+  user_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  avatar_url?: string;
+  insurance_type: 'public_liability' | 'professional_indemnity' | 'employers_liability' | 'product_liability' | 'personal_accident' | 'other';
+  status: 'pending' | 'submitted' | 'verified' | 'expired' | 'rejected' | 'revoked';
+  provider_name: string | null;
+  policy_number: string | null;
+  coverage_amount: number | null;
+  start_date: string | null;
+  expiry_date: string | null;
+  certificate_file_path: string | null;
+  verified_by: number | null;
+  verifier_first_name: string | null;
+  verifier_last_name: string | null;
+  verified_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export interface InsuranceStats {
   total: number;
   pending: number;
   verified: number;

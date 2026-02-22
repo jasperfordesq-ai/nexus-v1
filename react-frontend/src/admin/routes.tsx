@@ -44,6 +44,7 @@ const RiskTags = lazy(() => import('./modules/broker/RiskTags'));
 const MessageReview = lazy(() => import('./modules/broker/MessageReview'));
 const UserMonitoring = lazy(() => import('./modules/broker/UserMonitoring'));
 const VettingRecords = lazy(() => import('./modules/broker/VettingRecords'));
+const InsuranceCertificates = lazy(() => import('./modules/broker/InsuranceCertificates'));
 const BrokerConfiguration = lazy(() => import('./modules/broker/BrokerConfiguration'));
 const ExchangeDetail = lazy(() => import('./modules/broker/ExchangeDetail'));
 const MessageDetail = lazy(() => import('./modules/broker/MessageDetail'));
@@ -244,6 +245,7 @@ export function AdminRoutes() {
       <Route path="broker-controls/messages" element={<Lazy><MessageReview /></Lazy>} />
       <Route path="broker-controls/monitoring" element={<Lazy><UserMonitoring /></Lazy>} />
       <Route path="broker-controls/vetting" element={<Lazy><VettingRecords /></Lazy>} />
+      <Route path="broker-controls/insurance" element={<Lazy><InsuranceCertificates /></Lazy>} />
       <Route path="broker-controls/configuration" element={<Lazy><BrokerConfiguration /></Lazy>} />
       <Route path="broker-controls/exchanges/:id" element={<Lazy><ExchangeDetail /></Lazy>} />
       <Route path="broker-controls/messages/:id" element={<Lazy><MessageDetail /></Lazy>} />

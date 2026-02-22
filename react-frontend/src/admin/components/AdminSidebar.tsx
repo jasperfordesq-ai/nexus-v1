@@ -65,6 +65,7 @@ import {
   Flag,
   Eye,
   Archive,
+  FileCheck,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -157,6 +158,7 @@ function useAdminNav(): NavSection[] {
           { label: 'Message Review', href: '/admin/broker-controls/messages', icon: MessageSquareWarning },
           { label: 'User Monitoring', href: '/admin/broker-controls/monitoring', icon: Eye },
           { label: 'Vetting Records', href: '/admin/broker-controls/vetting', icon: ShieldCheck },
+          { label: 'Insurance Certificates', href: '/admin/broker-controls/insurance', icon: FileCheck },
           { label: 'Review Archive', href: '/admin/broker-controls/archives', icon: Archive },
         ],
       },
