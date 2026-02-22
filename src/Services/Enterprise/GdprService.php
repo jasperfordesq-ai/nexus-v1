@@ -29,7 +29,7 @@ class GdprService
     public function __construct(?int $tenantId = null)
     {
         $this->db = Database::getInstance();
-        $this->tenantId = $tenantId ?? (int) ($_SESSION['tenant_id'] ?? 1);
+        $this->tenantId = $tenantId ?? \Nexus\Core\TenantContext::getId();
         $this->logger = LoggerService::getInstance('gdpr');
         $this->metrics = MetricsService::getInstance();
     }
