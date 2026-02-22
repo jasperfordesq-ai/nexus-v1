@@ -246,7 +246,7 @@ class GamificationEmailService
         $brandColorDark = self::BRAND_COLOR_DARK;
         $bgColor = self::BG_COLOR;
         $year = date('Y');
-        $settingsUrl = $siteUrl . $basePath . '/profile/settings';
+        $settingsUrl = $siteUrl . $basePath . '/settings';
 
         return <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -971,7 +971,7 @@ HTML;
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
                                             <tr>
                                                 <td style="border-radius: 10px; background: linear-gradient(135deg, {$brandColor} 0%, #7c3aed 100%);" class="button-primary">
-                                                    <a href="{$siteUrl}{$basePath}/achievements/badges" style="display: inline-block; padding: 16px 32px; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 10px;">View All Your Badges</a>
+                                                    <a href="{$siteUrl}{$basePath}/achievements?tab=badges" style="display: inline-block; padding: 16px 32px; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 10px;">View All Your Badges</a>
                                                 </td>
                                             </tr>
                                         </table>

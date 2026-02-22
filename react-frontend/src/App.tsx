@@ -125,6 +125,8 @@ const OnboardingPage = lazyWithRetry(() => import('@/pages/onboarding/Onboarding
 const GroupExchangesPage = lazyWithRetry(() => import('@/pages/group-exchanges/GroupExchangesPage'));
 const CreateGroupExchangePage = lazyWithRetry(() => import('@/pages/group-exchanges/CreateGroupExchangePage'));
 const GroupExchangeDetailPage = lazyWithRetry(() => import('@/pages/group-exchanges/GroupExchangeDetailPage'));
+const MatchesRedirectPage = lazyWithRetry(() => import('@/pages/matches/MatchesRedirectPage'));
+const NewsletterUnsubscribePage = lazyWithRetry(() => import('@/pages/newsletter/NewsletterUnsubscribePage'));
 
 // Static Pages
 const AboutPage = lazyWithRetry(() => import('@/pages/public/AboutPage'));
@@ -192,6 +194,14 @@ function AppRoutes() {
         <Route path="cookies/versions" element={<LegalVersionHistoryPage />} />
         <Route path="legal" element={<LegalHubPage />} />
         <Route path="timebanking-guide" element={<TimebankingGuidePage />} />
+
+        {/* Newsletter unsubscribe — public, no auth, token-based */}
+        <Route path="newsletter/unsubscribe" element={<NewsletterUnsubscribePage />} />
+
+        {/* Matches redirect — /matches email links redirect to /listings */}
+        <Route path="matches" element={<MatchesRedirectPage />} />
+        <Route path="matches/preferences" element={<Navigate to="settings" replace />} />
+
         {/* Tenant 2 (hOUR Timebank) specific pages — redirect other tenants to /about */}
         <Route path="partner" element={<TenantSlugGate slug="hour-timebank"><PartnerPage /></TenantSlugGate>} />
         <Route path="social-prescribing" element={<TenantSlugGate slug="hour-timebank"><SocialPrescribingPage /></TenantSlugGate>} />
