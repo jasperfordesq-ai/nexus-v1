@@ -106,17 +106,17 @@ class OrgWallet
         }
 
         $tenantId = TenantContext::getId();
-        $currentBalance = self::getBalance($organizationId);
 
-        if ($currentBalance < $amount) {
+        // Atomic guard — prevents double-spend race condition
+        $stmt = Database::query(
+            "UPDATE org_wallets SET balance = balance - ?, updated_at = NOW()
+             WHERE tenant_id = ? AND organization_id = ? AND balance >= ?",
+            [$amount, $tenantId, $organizationId, $amount]
+        );
+
+        if ($stmt->rowCount() === 0) {
             throw new \Exception('Insufficient organization wallet balance');
         }
-
-        Database::query(
-            "UPDATE org_wallets SET balance = balance - ?, updated_at = NOW()
-             WHERE tenant_id = ? AND organization_id = ?",
-            [$amount, $tenantId, $organizationId]
-        );
 
         return true;
     }
@@ -142,17 +142,15 @@ class OrgWallet
         try {
             $tenantId = TenantContext::getId();
 
-            // Check user has sufficient balance
-            $user = User::findById($userId);
-            if (!$user || $user['balance'] < $amount) {
+            // Deduct from user — atomic guard prevents double-spend
+            $stmt = Database::query(
+                "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                [$amount, $userId, $tenantId, $amount]
+            );
+
+            if ($stmt->rowCount() === 0) {
                 throw new \Exception('Insufficient user balance');
             }
-
-            // Deduct from user
-            Database::query(
-                "UPDATE users SET balance = balance - ? WHERE id = ?",
-                [$amount, $userId]
-            );
 
             // Credit to organization
             self::credit($organizationId, $amount);
@@ -218,10 +216,10 @@ class OrgWallet
             // Deduct from organization
             self::debit($organizationId, $amount);
 
-            // Credit to user
+            // Credit to user — scoped by tenant_id
             Database::query(
-                "UPDATE users SET balance = balance + ? WHERE id = ?",
-                [$amount, $userId]
+                "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                [$amount, $userId, $tenantId]
             );
 
             // Log the transaction

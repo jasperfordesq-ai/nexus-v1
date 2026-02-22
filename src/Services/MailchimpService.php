@@ -64,7 +64,7 @@ class MailchimpService
         curl_close($ch);
 
         if ($httpCode >= 200 && $httpCode < 300) {
-            $msg = "Mailchimp Success: $email subscribed via {$this->apiKey} (List: {$this->listId})";
+            $msg = "Mailchimp Success: $email subscribed (List: {$this->listId})";
             error_log($msg);
             return ['success' => true, 'message' => $msg];
         } else {

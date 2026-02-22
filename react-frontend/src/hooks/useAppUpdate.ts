@@ -56,18 +56,18 @@ export function useAppUpdate() {
           platform: 'android',
         });
 
-        const data = (res as any).data || res;
+        const data = (res?.data && typeof res.data === 'object' ? res.data : {}) as Record<string, unknown>;
         sessionStorage.setItem('nexus_update_checked', '1');
 
-        if (data?.update_available) {
+        if (data.update_available) {
           setUpdateInfo({
             updateAvailable: true,
             forceUpdate: !!data.force_update,
-            currentVersion: data.current_version ?? '',
-            clientVersion: data.client_version ?? APP_VERSION,
-            updateUrl: data.update_url ?? '',
-            updateMessage: data.update_message || 'A new version is available.',
-            releaseNotes: data.release_notes || {},
+            currentVersion: (data.current_version as string) ?? '',
+            clientVersion: (data.client_version as string) ?? APP_VERSION,
+            updateUrl: (data.update_url as string) ?? '',
+            updateMessage: (data.update_message as string) || 'A new version is available.',
+            releaseNotes: (data.release_notes as Record<string, string[]>) || {},
           });
         }
       } catch (e) {
