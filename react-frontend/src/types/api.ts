@@ -862,6 +862,10 @@ export interface TenantConfig {
     meta_description?: string;
   };
   settings?: Record<string, unknown>;
+  compliance?: {
+    vetting_enabled?: boolean;
+    insurance_enabled?: boolean;
+  };
   categories?: Category[];
   menu_pages?: {
     about?: { title: string; slug: string }[];
