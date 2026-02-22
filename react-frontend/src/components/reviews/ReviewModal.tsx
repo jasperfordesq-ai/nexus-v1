@@ -119,13 +119,15 @@ export function ReviewModal({
             </label>
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
-                <button
+                <Button
                   key={star}
                   type="button"
-                  onClick={() => setRating(star)}
+                  variant="light"
+                  isIconOnly
+                  onPress={() => setRating(star)}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
-                  className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+                  className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded min-w-0 h-auto p-0"
                   aria-label={`Rate ${star} out of 5 stars`}
                 >
                   <Star
@@ -135,7 +137,7 @@ export function ReviewModal({
                         : 'text-theme-subtle'
                     }`}
                   />
-                </button>
+                </Button>
               ))}
               {rating > 0 && (
                 <span className="ml-2 text-sm text-theme-muted">

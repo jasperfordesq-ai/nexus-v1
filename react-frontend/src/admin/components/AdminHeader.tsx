@@ -33,21 +33,26 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
       <div className="flex items-center gap-2 sm:gap-4">
         {/* Mobile hamburger */}
         {onSidebarToggle && (
-          <button
-            onClick={onSidebarToggle}
-            className="rounded-lg p-2 text-default-500 hover:bg-default-100 hover:text-foreground md:hidden"
+          <Button
+            isIconOnly
+            variant="light"
+            size="sm"
+            onPress={onSidebarToggle}
+            className="text-default-500 md:hidden"
             aria-label="Toggle sidebar"
           >
             <Menu size={20} />
-          </button>
+          </Button>
         )}
-        <button
-          onClick={() => navigate(tenantPath('/dashboard'))}
-          className="flex items-center gap-2 rounded-lg px-2 sm:px-3 py-1.5 text-sm text-default-500 hover:bg-default-100 hover:text-foreground transition-colors"
+        <Button
+          variant="light"
+          size="sm"
+          onPress={() => navigate(tenantPath('/dashboard'))}
+          startContent={<ArrowLeft size={16} />}
+          className="text-default-500"
         >
-          <ArrowLeft size={16} />
           <span className="hidden sm:inline">Back to site</span>
-        </button>
+        </Button>
         {tenant?.name && (
           <span className="text-sm font-medium text-default-400">
             {tenant.name}
@@ -69,7 +74,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
 
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
-            <button className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-default-100 transition-colors">
+            <Button variant="light" className="flex items-center gap-2 px-2 py-1 h-auto min-w-0">
               <Avatar
                 src={user?.avatar_url || user?.avatar || undefined}
                 name={user?.name || 'Admin'}
@@ -79,7 +84,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
               <span className="hidden text-sm font-medium text-foreground sm:block">
                 {user?.name || 'Admin'}
               </span>
-            </button>
+            </Button>
           </DropdownTrigger>
           <DropdownMenu
             aria-label="Admin menu"

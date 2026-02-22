@@ -16,7 +16,7 @@ namespace Nexus\Controllers\Api;
  * - GET /api/docs/openapi.yaml - OpenAPI spec as YAML
  * - GET /api/docs - Swagger UI (if enabled)
  */
-class OpenApiController
+class OpenApiController extends BaseApiController
 {
     /**
      * Path to the OpenAPI spec file

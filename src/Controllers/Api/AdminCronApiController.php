@@ -19,27 +19,8 @@ use Nexus\Core\TenantContext;
  *   cron_job_settings: id, job_id (varchar), is_enabled, custom_schedule, notify_on_failure, notify_emails, max_retries, timeout_seconds
  *   cron_jobs:         id, tenant_id, job_name, job_type, last_run, last_status, last_duration, last_error, next_run, run_count, failure_count, enabled
  */
-class AdminCronApiController
+class AdminCronApiController extends BaseApiController
 {
-    /**
-     * JSON response helper
-     */
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    /**
-     * Get JSON input
-     */
-    private function getJsonInput(): array
-    {
-        $input = file_get_contents('php://input');
-        return json_decode($input, true) ?? [];
-    }
 
     // ─────────────────────────────────────────────────────────────────────────────
     // Logs
@@ -210,7 +191,7 @@ class AdminCronApiController
      */
     public function updateJobSettings($jobId)
     {
-        $data = $this->getJsonInput();
+        $data = $this->getAllInput();
 
         // Check if settings exist
         $stmt = Database::query(
@@ -308,7 +289,7 @@ class AdminCronApiController
      */
     public function updateGlobalSettings()
     {
-        $data = $this->getJsonInput();
+        $data = $this->getAllInput();
 
         $allowedKeys = ['default_notify_email', 'log_retention_days', 'max_concurrent_jobs'];
 

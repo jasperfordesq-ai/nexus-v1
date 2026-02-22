@@ -87,13 +87,14 @@ export function MenusAdmin() {
       label: 'Name',
       sortable: true,
       render: (item) => (
-        <button
+        <Button
           type="button"
-          className="text-left font-medium text-primary hover:underline"
-          onClick={() => navigate(tenantPath(`/admin/menus/builder/${item.id}`))}
+          variant="light"
+          onPress={() => navigate(tenantPath(`/admin/menus/builder/${item.id}`))}
+          className="text-left font-medium text-primary hover:underline min-w-0 h-auto p-0 justify-start"
         >
           {item.name}
-        </button>
+        </Button>
       ),
     },
     {

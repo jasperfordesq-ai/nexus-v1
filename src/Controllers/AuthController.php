@@ -113,44 +113,66 @@ class AuthController
                 return;
             }
 
-            // Two-Factor Authentication Check - DISABLED SYSTEM-WIDE
-            // To re-enable, uncomment the block below
+            // =====================================================
+            // 2FA CHECK — RE-ENABLED (Security Audit H3 fix)
             //
-            // if (!empty($user['totp_enabled'])) {
-            //     // Check if this is a trusted device (can skip 2FA)
-            //     // isTrustedDevice() also updates last_used_at if trusted
-            //     if (!\Nexus\Services\TotpService::isTrustedDevice($user['id'])) {
-            //         // Not a trusted device - require 2FA verification
-            //         // Store pending 2FA session (partial login state)
-            //         $_SESSION['pending_2fa_user_id'] = $user['id'];
-            //         $_SESSION['pending_2fa_expires'] = time() + 300; // 5 minute timeout
+            // Admin users (admin, tenant_admin, super_admin):
+            //   - If 2FA is set up: MUST verify TOTP before login completes
+            //   - If 2FA is NOT set up: MUST set up 2FA before login completes
             //
-            //         if ($isJson) {
-            //             header('Content-Type: application/json');
-            //             echo json_encode(['requires_2fa' => true, 'redirect' => '/auth/2fa']);
-            //             exit;
-            //         }
-            //
-            //         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa');
-            //         exit;
-            //     }
-            //     // Trusted device - skip 2FA, continue with normal login
-            // }
-            //
-            // // Check if user needs to set up 2FA (mandatory enrollment)
-            // if (!empty($user['totp_setup_required'])) {
-            //     $_SESSION['pending_2fa_setup_user_id'] = $user['id'];
-            //     $_SESSION['pending_2fa_setup_expires'] = time() + 600; // 10 minute timeout
-            //
-            //     if ($isJson) {
-            //         header('Content-Type: application/json');
-            //         echo json_encode(['requires_2fa_setup' => true, 'redirect' => '/auth/2fa/setup']);
-            //         exit;
-            //     }
-            //
-            //     header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa/setup');
-            //     exit;
-            // }
+            // Regular users:
+            //   - If 2FA is voluntarily enabled: require verification
+            //   - If 2FA is not enabled: skip (2FA is optional for members)
+            // =====================================================
+            $adminRolesFor2fa = ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'];
+            $isAdminUser = in_array($user['role'] ?? '', $adminRolesFor2fa)
+                || !empty($user['is_super_admin'])
+                || !empty($user['is_tenant_super_admin']);
+
+            $has2faEnabled = !empty($user['totp_enabled'])
+                || \Nexus\Services\TotpService::isEnabled((int)$user['id']);
+
+            if ($has2faEnabled) {
+                // User has 2FA enabled — check for trusted device bypass
+                if (!\Nexus\Services\TotpService::isTrustedDevice((int)$user['id'])) {
+                    // Not a trusted device — require 2FA verification
+                    $_SESSION['pending_2fa_user_id'] = $user['id'];
+                    $_SESSION['pending_2fa_expires'] = time() + 300; // 5 minute timeout
+
+                    if ($isJson) {
+                        header('Content-Type: application/json');
+                        echo json_encode([
+                            'requires_2fa' => true,
+                            'redirect' => '/auth/2fa',
+                            'code' => 'AUTH_2FA_REQUIRED',
+                        ]);
+                        exit;
+                    }
+
+                    header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa');
+                    exit;
+                }
+                // Trusted device — skip 2FA, continue with normal login
+            } elseif ($isAdminUser) {
+                // Admin WITHOUT 2FA set up — force mandatory enrollment
+                $_SESSION['pending_2fa_setup_user_id'] = $user['id'];
+                $_SESSION['pending_2fa_setup_expires'] = time() + 600; // 10 minute timeout
+
+                if ($isJson) {
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'requires_2fa_setup' => true,
+                        'redirect' => '/auth/2fa/setup',
+                        'code' => 'AUTH_2FA_SETUP_REQUIRED',
+                        'message' => 'Two-factor authentication setup is required for admin accounts.',
+                    ]);
+                    exit;
+                }
+
+                header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa/setup');
+                exit;
+            }
+            // Regular users without 2FA: skip — 2FA is optional for members
 
             // Security: Record successful login and clear failed attempts
             if (!empty($email)) {

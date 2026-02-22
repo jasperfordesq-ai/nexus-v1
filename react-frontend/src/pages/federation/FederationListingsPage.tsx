@@ -475,9 +475,10 @@ export function FederationListingsPage() {
 
                     {/* Author & Community */}
                     <div className="flex items-center justify-between pt-3 border-t border-theme-default">
-                      <button
-                        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-                        onClick={() => {
+                      <Button
+                        variant="light"
+                        className="flex items-center gap-3 hover:opacity-80 transition-opacity h-auto min-w-0 p-0 justify-start"
+                        onPress={() => {
                           if (selectedListing.author?.id) {
                             setIsDetailOpen(false);
                             setSelectedListing(null);
@@ -496,7 +497,7 @@ export function FederationListingsPage() {
                           </p>
                           <p className="text-xs text-theme-subtle">View Profile</p>
                         </div>
-                      </button>
+                      </Button>
                       <Chip
                         size="sm"
                         variant="flat"

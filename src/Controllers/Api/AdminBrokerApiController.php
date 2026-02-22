@@ -1035,6 +1035,13 @@ class AdminBrokerApiController extends BaseApiController
             'copy_high_risk_listing_messages' => true,
             'random_sample_percentage' => 0,
             'retention_days' => 90,
+            // Compliance & Safeguarding (defaults OFF — opt-in per tenant)
+            'vetting_enabled' => false,
+            'insurance_enabled' => false,
+            'enforce_vetting_on_exchanges' => false,
+            'enforce_insurance_on_exchanges' => false,
+            'vetting_expiry_warning_days' => 30,
+            'insurance_expiry_warning_days' => 30,
         ];
 
         try {
@@ -1080,6 +1087,9 @@ class AdminBrokerApiController extends BaseApiController
             'broker_visible_to_members', 'show_broker_name', 'broker_contact_email',
             'copy_first_contact', 'copy_new_member_messages', 'copy_high_risk_listing_messages',
             'random_sample_percentage', 'retention_days',
+            'vetting_enabled', 'insurance_enabled',
+            'enforce_vetting_on_exchanges', 'enforce_insurance_on_exchanges',
+            'vetting_expiry_warning_days', 'insurance_expiry_warning_days',
         ];
 
         $config = [];

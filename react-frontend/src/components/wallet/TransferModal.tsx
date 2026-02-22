@@ -260,13 +260,15 @@ export function TransferModal({
                   <Send className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   Send Credits
                 </h2>
-                <button
-                  onClick={onClose}
-                  className="text-theme-subtle hover:text-theme-primary transition-colors p-1"
+                <Button
+                  variant="light"
+                  isIconOnly
+                  onPress={onClose}
+                  className="text-theme-subtle hover:text-theme-primary transition-colors p-1 min-w-0 h-auto"
                   aria-label="Close modal"
                 >
                   <X className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
 
               {/* Form */}
@@ -302,14 +304,16 @@ export function TransferModal({
                           </p>
                         )}
                       </div>
-                      <button
+                      <Button
                         type="button"
-                        onClick={handleClearRecipient}
-                        className="text-theme-subtle hover:text-theme-primary transition-colors p-1"
+                        variant="light"
+                        isIconOnly
+                        onPress={handleClearRecipient}
+                        className="text-theme-subtle hover:text-theme-primary transition-colors p-1 min-w-0 h-auto"
                         aria-label="Remove recipient"
                       >
                         <X className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </div>
                   ) : (
                     // Search input
@@ -354,12 +358,13 @@ export function TransferModal({
                             aria-label="Search results"
                           >
                             {searchResults.map((user) => (
-                              <button
+                              <Button
                                 key={user.id}
                                 type="button"
                                 role="option"
-                                onClick={() => handleSelectRecipient(user)}
-                                className="w-full flex items-center gap-3 p-3 hover:bg-theme-hover transition-colors text-left"
+                                variant="light"
+                                onPress={() => handleSelectRecipient(user)}
+                                className="w-full flex items-center gap-3 p-3 hover:bg-theme-hover transition-colors text-left h-auto min-w-0 justify-start rounded-none"
                               >
                                 <Avatar
                                   src={user.avatar || undefined}
@@ -376,7 +381,7 @@ export function TransferModal({
                                     </p>
                                   )}
                                 </div>
-                              </button>
+                              </Button>
                             ))}
                           </motion.div>
                         )}

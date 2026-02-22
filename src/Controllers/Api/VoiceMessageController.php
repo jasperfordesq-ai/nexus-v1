@@ -12,15 +12,13 @@ use Nexus\Core\Database;
 use Nexus\Core\EmailTemplate;
 use Nexus\Core\Mailer;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
 use Nexus\Models\Message;
 
 /**
  * VoiceMessageController - Handles voice message uploads and sending
  */
-class VoiceMessageController
+class VoiceMessageController extends BaseApiController
 {
-    use ApiAuth;
 
     /**
      * Upload and send a voice message

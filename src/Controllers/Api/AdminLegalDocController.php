@@ -16,15 +16,8 @@ use Nexus\Services\LegalDocumentService;
  * Admin Legal Document API Controller
  * Handles version management, compliance tracking, and notifications
  */
-class AdminLegalDocController
+class AdminLegalDocController extends BaseApiController
 {
-    private function jsonResponse($data, $status = 200): void
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
 
     /**
      * Get all versions for a document

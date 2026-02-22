@@ -21,42 +21,15 @@ use Nexus\Services\CookieInventoryService;
  * REST API endpoints for cookie consent management.
  * Handles consent recording, retrieval, updates, and withdrawal.
  */
-class CookieConsentController
+class CookieConsentController extends BaseApiController
 {
     /**
-     * Send JSON response
-     *
-     * @param mixed $data Data to send
-     * @param int $status HTTP status code
-     * @return void
-     */
-    private function jsonResponse($data, int $status = 200): void
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    /**
-     * Get JSON input from request body
-     *
-     * @return array Decoded JSON data
-     */
-    private function getJsonInput(): array
-    {
-        $input = file_get_contents('php://input');
-        $decoded = json_decode($input, true);
-        return $decoded ?? [];
-    }
-
-    /**
-     * Verify CSRF token from request
+     * Verify CSRF token from request input data
      *
      * @param array $input Request data
      * @return bool True if valid
      */
-    private function verifyCsrf(array $input): bool
+    private function verifyCsrfFromInput(array $input): bool
     {
         $token = $input['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         return Csrf::verify($token);
@@ -122,10 +95,10 @@ class CookieConsentController
      */
     public function store(): void
     {
-        $input = $this->getJsonInput();
+        $input = $this->getAllInput();
 
         // Verify CSRF token
-        if (!$this->verifyCsrf($input)) {
+        if (!$this->verifyCsrfFromInput($input)) {
             $this->jsonResponse([
                 'success' => false,
                 'error' => 'Invalid security token'
@@ -174,10 +147,10 @@ class CookieConsentController
      */
     public function update(int $id): void
     {
-        $input = $this->getJsonInput();
+        $input = $this->getAllInput();
 
         // Verify CSRF token
-        if (!$this->verifyCsrf($input)) {
+        if (!$this->verifyCsrfFromInput($input)) {
             $this->jsonResponse([
                 'success' => false,
                 'error' => 'Invalid security token'
@@ -233,10 +206,10 @@ class CookieConsentController
      */
     public function withdraw(int $id): void
     {
-        $input = $this->getJsonInput();
+        $input = $this->getAllInput();
 
         // Verify CSRF token
-        if (!$this->verifyCsrf($input)) {
+        if (!$this->verifyCsrfFromInput($input)) {
             $this->jsonResponse([
                 'success' => false,
                 'error' => 'Invalid security token'

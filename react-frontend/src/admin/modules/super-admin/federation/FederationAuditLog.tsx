@@ -226,9 +226,9 @@ export default function FederationAuditLog() {
               startContent={<Search className="w-4 h-4 text-default-400" />}
               endContent={
                 filters.search && (
-                  <button onClick={() => setFilters(prev => ({ ...prev, search: '' }))}>
+                  <Button isIconOnly variant="light" size="sm" onPress={() => setFilters(prev => ({ ...prev, search: '' }))} aria-label="Clear search" className="min-w-0 w-6 h-6">
                     <X className="w-4 h-4 text-default-400" />
-                  </button>
+                  </Button>
                 )
               }
             />

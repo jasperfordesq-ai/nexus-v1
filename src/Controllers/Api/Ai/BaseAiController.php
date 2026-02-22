@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Controllers\Api\Ai;
 
-use Nexus\Core\ApiAuth;
+use Nexus\Controllers\Api\BaseApiController;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 
@@ -16,27 +16,17 @@ use Nexus\Core\TenantContext;
  * Base AI Controller
  *
  * Shared functionality for all AI API controllers.
+ * Extends BaseApiController for standardized JSON responses, auth, and rate limiting.
  */
-abstract class BaseAiController
+abstract class BaseAiController extends BaseApiController
 {
-    use ApiAuth;
-
-    protected function jsonResponse($data, $status = 200): void
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    protected function getUserId(): int
-    {
-        return $this->requireAuth();
-    }
-
+    /**
+     * Get all JSON input from the request body.
+     * Convenience alias for getAllInput() used throughout AI controllers.
+     */
     protected function getInput(): array
     {
-        return json_decode(file_get_contents('php://input'), true) ?? [];
+        return $this->getAllInput();
     }
 
     /**

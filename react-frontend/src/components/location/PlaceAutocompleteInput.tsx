@@ -25,7 +25,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Input } from '@heroui/react';
+import { Input, Button } from '@heroui/react';
 import { MapPin, X } from 'lucide-react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import type { PlaceAutocompleteInputProps, PlaceResult, AddressComponents } from '@/types/google-places';
@@ -270,14 +270,16 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
         }
         endContent={
           value ? (
-            <button
+            <Button
               type="button"
-              onClick={handleClear}
-              className="p-0.5 rounded-full hover:bg-default-200 transition-colors"
+              variant="light"
+              isIconOnly
+              onPress={handleClear}
+              className="p-0.5 rounded-full hover:bg-default-200 transition-colors min-w-0 h-auto w-auto"
               aria-label="Clear location"
             >
               <X className="w-3.5 h-3.5 text-theme-subtle" />
-            </button>
+            </Button>
           ) : undefined
         }
         classNames={classNames}
@@ -396,17 +398,19 @@ function PlaceAutocompleteFallback(props: PlaceAutocompleteInputProps) {
         }
         endContent={
           value ? (
-            <button
+            <Button
               type="button"
-              onClick={() => {
+              variant="light"
+              isIconOnly
+              onPress={() => {
                 onChange?.('');
                 onClear?.();
               }}
-              className="p-0.5 rounded-full hover:bg-default-200 transition-colors"
+              className="p-0.5 rounded-full hover:bg-default-200 transition-colors min-w-0 h-auto w-auto"
               aria-label="Clear location"
             >
               <X className="w-3.5 h-3.5 text-theme-subtle" />
-            </button>
+            </Button>
           ) : undefined
         }
         classNames={classNames}

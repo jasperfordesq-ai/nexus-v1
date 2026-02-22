@@ -203,11 +203,12 @@ export function ImpactReportPage() {
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {tocSections.map((section, index) => (
-                  <button
+                  <Button
                     key={section.id}
                     type="button"
-                    onClick={() => scrollTo(section.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors text-sm ${
+                    variant="light"
+                    onPress={() => scrollTo(section.id)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors text-sm h-auto min-w-0 justify-start ${
                       activeSection === section.id
                         ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-medium'
                         : 'text-theme-muted hover:bg-theme-hover/50 hover:text-theme-primary'
@@ -217,7 +218,7 @@ export function ImpactReportPage() {
                       {index + 1}
                     </span>
                     <span className="truncate">{section.label}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </GlassCard>
