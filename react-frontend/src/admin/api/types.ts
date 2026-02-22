@@ -814,12 +814,77 @@ export interface BrokerMessage {
   receiver_name: string;
   related_listing_id?: number;
   listing_title?: string;
+  message_body?: string;
+  copy_reason?: string;
+  conversation_key?: string;
+  original_message_id?: number;
+  sent_at?: string;
+  archived_at?: string;
+  archive_id?: number;
   reviewed_by?: number;
   reviewed_at?: string;
   flagged: boolean;
   flag_reason?: string;
   flag_severity?: string;
   created_at: string;
+}
+
+export interface ConversationMessage {
+  id: number;
+  sender_id: number;
+  sender_name: string;
+  receiver_id: number;
+  body: string;
+  subject?: string;
+  listing_id?: number;
+  created_at: string;
+  is_edited?: boolean;
+  is_deleted?: boolean;
+}
+
+export interface BrokerMessageDetail {
+  copy: BrokerMessage & {
+    message_body: string;
+    conversation_key: string;
+    copy_reason: string;
+    original_message_id: number;
+    sent_at: string;
+  };
+  thread: ConversationMessage[];
+  archive: {
+    id: number;
+    decision: 'approved' | 'flagged';
+    decision_notes?: string;
+    decided_by_name: string;
+    decided_at: string;
+  } | null;
+}
+
+export interface BrokerArchive {
+  id: number;
+  sender_name: string;
+  receiver_name: string;
+  listing_title?: string;
+  copy_reason: string;
+  decision: 'approved' | 'flagged';
+  decision_notes?: string;
+  decided_by_name: string;
+  decided_at: string;
+  flag_reason?: string;
+  flag_severity?: string;
+  created_at: string;
+}
+
+export interface BrokerArchiveDetail extends BrokerArchive {
+  tenant_id: number;
+  broker_copy_id: number;
+  sender_id: number;
+  receiver_id: number;
+  related_listing_id?: number;
+  target_message_body: string;
+  target_message_sent_at: string;
+  conversation_snapshot: ConversationMessage[];
+  decided_by: number;
 }
 
 export interface MonitoredUser {
