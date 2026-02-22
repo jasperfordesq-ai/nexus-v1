@@ -29,7 +29,7 @@ import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
 import { adminModeration } from '@/admin/api/adminApi';
-import type { AdminReport, PaginatedResponse, ModerationStats } from '@/admin/api/types';
+import type { AdminReport, ModerationStats } from '@/admin/api/types';
 
 const CONTENT_TYPES = [
   { label: 'All Types', value: '' },
@@ -80,7 +80,7 @@ export default function ReportsManagement() {
     return params.toString();
   };
 
-  const { data, isLoading, error, execute } = useApi<PaginatedResponse<AdminReport>>(
+  const { data, isLoading, error, execute, meta } = useApi<AdminReport[]>(
     `/v2/admin/reports?${buildQueryString()}`,
     { immediate: true, deps: [page, activeSearch, activeType, activeStatus] }
   );
@@ -130,8 +130,8 @@ export default function ReportsManagement() {
     }
   };
 
-  const reports = data?.data || [];
-  const totalPages = data?.meta ? Math.ceil(data.meta.total / data.meta.per_page) : 1;
+  const reports = data || [];
+  const totalPages = meta?.total_pages || 1;
 
   return (
     <div className="space-y-6">
@@ -249,9 +249,9 @@ export default function ReportsManagement() {
       </div>
 
       {/* Results Count */}
-      {data?.meta && (
+      {meta && (
         <div className="text-sm text-default-500">
-          Showing {reports.length} of {data.meta.total} reports
+          Showing {reports.length} of {meta.total ?? reports.length} reports
         </div>
       )}
 

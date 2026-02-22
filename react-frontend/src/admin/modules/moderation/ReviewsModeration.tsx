@@ -27,7 +27,7 @@ import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
 import { adminModeration } from '@/admin/api/adminApi';
-import type { AdminReview, PaginatedResponse } from '@/admin/api/types';
+import type { AdminReview } from '@/admin/api/types';
 
 const RATING_FILTERS = [
   { label: 'All Ratings', value: '' },
@@ -63,7 +63,7 @@ export default function ReviewsModeration() {
     return params.toString();
   };
 
-  const { data, isLoading, error, execute } = useApi<PaginatedResponse<AdminReview>>(
+  const { data, isLoading, error, execute, meta } = useApi<AdminReview[]>(
     `/v2/admin/reviews?${buildQueryString()}`,
     { immediate: true, deps: [page, activeSearch, activeRating] }
   );
@@ -116,8 +116,8 @@ export default function ReviewsModeration() {
     }
   };
 
-  const reviews = data?.data || [];
-  const totalPages = data?.meta ? Math.ceil(data.meta.total / data.meta.per_page) : 1;
+  const reviews = data || [];
+  const totalPages = meta?.total_pages || 1;
 
   const renderStars = (rating: number) => {
     return (
@@ -187,9 +187,9 @@ export default function ReviewsModeration() {
       </div>
 
       {/* Stats */}
-      {data?.meta && (
+      {meta && (
         <div className="text-sm text-default-500">
-          Showing {reviews.length} of {data.meta.total} reviews
+          Showing {reviews.length} of {meta.total ?? reviews.length} reviews
         </div>
       )}
 
