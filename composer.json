@@ -47,6 +47,7 @@
         "symfony/polyfill-ctype": "v1.33.0",
         "symfony/polyfill-mbstring": "v1.33.0",
         "symfony/polyfill-php80": "v1.33.0",
+        "sentry/sentry": "^4.0",
         "vlucas/phpdotenv": "v5.6.2"
     },
     "require-dev": {

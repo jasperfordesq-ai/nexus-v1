@@ -52,6 +52,10 @@ services:
       - PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER:-eu}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       # GOOGLE_MAPS_API_KEY loaded via env_file: .env.docker (not here, to avoid empty override)
+      # Sentry error tracking
+      - SENTRY_DSN_PHP=${SENTRY_DSN_PHP:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -142,6 +146,10 @@ services:
       - VITE_DEFAULT_TENANT_ID=2
       # Google Maps key is loaded from react-frontend/.env.local (gitignored)
       # For Docker, it's also available via the mounted source volume
+      # Sentry error tracking (React frontend)
+      - VITE_SENTRY_DSN=${SENTRY_DSN_REACT:-}
+      - VITE_SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - VITE_SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       - app
     networks:
