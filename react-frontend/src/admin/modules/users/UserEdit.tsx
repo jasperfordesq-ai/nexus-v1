@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
   Card,
   CardBody,
@@ -42,12 +42,13 @@ import {
   Mail,
   Building2,
   ShieldCheck,
+  FileCheck,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
-import { adminUsers, adminTimebanking } from '../../api/adminApi';
+import { adminUsers, adminTimebanking, adminVetting, adminInsurance } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
-import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent } from '../../api/types';
+import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, VettingRecord, InsuranceCertificate } from '../../api/types';
 
 export function UserEdit() {
   const { id } = useParams<{ id: string }>();
@@ -107,6 +108,11 @@ export function UserEdit() {
   const [consents, setConsents] = useState<UserConsent[]>([]);
   const [consentsLoading, setConsentsLoading] = useState(false);
 
+  // Vetting & Insurance records
+  const [vettingRecords, setVettingRecords] = useState<VettingRecord[]>([]);
+  const [insuranceRecords, setInsuranceRecords] = useState<InsuranceCertificate[]>([]);
+  const [complianceLoading, setComplianceLoading] = useState(false);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   usePageTitle(user ? `Admin - Edit ${user.name}` : 'Admin - Edit User');
@@ -160,7 +166,24 @@ export function UserEdit() {
     }
   }, [id]);
 
-  useEffect(() => { loadUser(); loadConsents(); }, [loadUser, loadConsents]);
+  const loadComplianceRecords = useCallback(async () => {
+    if (!id) return;
+    setComplianceLoading(true);
+    try {
+      const [vRes, iRes] = await Promise.all([
+        adminVetting.getUserRecords(Number(id)).catch(() => null),
+        adminInsurance.getUserCertificates(Number(id)).catch(() => null),
+      ]);
+      if (vRes?.success && Array.isArray(vRes.data)) setVettingRecords(vRes.data as VettingRecord[]);
+      if (iRes?.success && Array.isArray(iRes.data)) setInsuranceRecords(iRes.data as InsuranceCertificate[]);
+    } catch {
+      // Compliance tables may not exist
+    } finally {
+      setComplianceLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => { loadUser(); loadConsents(); loadComplianceRecords(); }, [loadUser, loadConsents, loadComplianceRecords]);
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
@@ -723,6 +746,161 @@ export function UserEdit() {
               </div>
             ) : (
               <p className="text-sm text-default-400">No consent records found for this user.</p>
+            )}
+          </CardBody>
+        </Card>
+
+        {/* Safeguarding & Compliance Section */}
+        <Card>
+          <CardHeader className="px-6 pt-5 pb-0">
+            <div className="flex items-center gap-2">
+              <ShieldAlert size={18} className="text-warning" />
+              <h3 className="text-lg font-semibold text-foreground">Safeguarding & Compliance</h3>
+            </div>
+          </CardHeader>
+          <CardBody className="p-6">
+            {complianceLoading ? (
+              <Spinner size="sm" label="Loading compliance records..." />
+            ) : (
+              <div className="flex flex-col gap-6">
+                {/* Vetting Status */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck size={16} className="text-primary" />
+                      <p className="font-medium text-foreground">DBS/Vetting Status</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={
+                          user?.vetting_status === 'verified' ? 'success'
+                            : user?.vetting_status === 'pending' ? 'warning'
+                            : user?.vetting_status === 'expired' ? 'danger'
+                            : 'default'
+                        }
+                        className="capitalize"
+                      >
+                        {user?.vetting_status || 'none'}
+                      </Chip>
+                      <Button
+                        as={Link}
+                        to={tenantPath('/admin/broker-controls/vetting')}
+                        size="sm"
+                        variant="flat"
+                        color="primary"
+                      >
+                        Manage
+                      </Button>
+                    </div>
+                  </div>
+                  {vettingRecords.length > 0 ? (
+                    <div className="flex flex-col gap-2">
+                      {vettingRecords.slice(0, 3).map((vr) => (
+                        <div key={vr.id} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">
+                              {vr.vetting_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                            </p>
+                            <p className="text-xs text-default-400">
+                              {vr.reference_number || 'No reference'}
+                              {vr.expiry_date ? ` — Expires ${new Date(vr.expiry_date).toLocaleDateString()}` : ''}
+                            </p>
+                          </div>
+                          <Chip
+                            size="sm"
+                            variant="flat"
+                            color={
+                              vr.status === 'verified' ? 'success'
+                                : vr.status === 'pending' || vr.status === 'submitted' ? 'warning'
+                                : vr.status === 'rejected' ? 'danger'
+                                : 'default'
+                            }
+                            className="capitalize"
+                          >
+                            {vr.status}
+                          </Chip>
+                        </div>
+                      ))}
+                      {vettingRecords.length > 3 && (
+                        <p className="text-xs text-default-400">+ {vettingRecords.length - 3} more records</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-default-400">No vetting records for this user.</p>
+                  )}
+                </div>
+
+                {/* Insurance Status */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <FileCheck size={16} className="text-primary" />
+                      <p className="font-medium text-foreground">Insurance Certificates</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={
+                          user?.insurance_status === 'verified' ? 'success'
+                            : user?.insurance_status === 'pending' ? 'warning'
+                            : user?.insurance_status === 'expired' ? 'danger'
+                            : 'default'
+                        }
+                        className="capitalize"
+                      >
+                        {user?.insurance_status || 'none'}
+                      </Chip>
+                      <Button
+                        as={Link}
+                        to={tenantPath('/admin/broker-controls/insurance')}
+                        size="sm"
+                        variant="flat"
+                        color="primary"
+                      >
+                        Manage
+                      </Button>
+                    </div>
+                  </div>
+                  {insuranceRecords.length > 0 ? (
+                    <div className="flex flex-col gap-2">
+                      {insuranceRecords.slice(0, 3).map((ic) => (
+                        <div key={ic.id} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">
+                              {ic.insurance_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                            </p>
+                            <p className="text-xs text-default-400">
+                              {ic.provider_name || 'Unknown provider'}
+                              {ic.expiry_date ? ` — Expires ${new Date(ic.expiry_date).toLocaleDateString()}` : ''}
+                            </p>
+                          </div>
+                          <Chip
+                            size="sm"
+                            variant="flat"
+                            color={
+                              ic.status === 'verified' ? 'success'
+                                : ic.status === 'pending' || ic.status === 'submitted' ? 'warning'
+                                : ic.status === 'rejected' ? 'danger'
+                                : 'default'
+                            }
+                            className="capitalize"
+                          >
+                            {ic.status}
+                          </Chip>
+                        </div>
+                      ))}
+                      {insuranceRecords.length > 3 && (
+                        <p className="text-xs text-default-400">+ {insuranceRecords.length - 3} more certificates</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-default-400">No insurance certificates for this user.</p>
+                  )}
+                </div>
+              </div>
             )}
           </CardBody>
         </Card>

@@ -51,6 +51,12 @@ export default function BrokerConfiguration() {
     copy_high_risk_listing_messages: true,
     random_sample_percentage: 0,
     retention_days: 90,
+    vetting_enabled: false,
+    insurance_enabled: false,
+    enforce_vetting_on_exchanges: false,
+    enforce_insurance_on_exchanges: false,
+    vetting_expiry_warning_days: 30,
+    insurance_expiry_warning_days: 30,
   });
 
   useEffect(() => {
@@ -497,6 +503,92 @@ export default function BrokerConfiguration() {
               min={1}
               max={3650}
               size="sm"
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Compliance & Safeguarding */}
+      <Card shadow="sm">
+        <CardHeader>
+          <h3 className="text-lg font-semibold">Compliance & Safeguarding</h3>
+        </CardHeader>
+        <Divider />
+        <CardBody className="gap-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="font-medium">Enable DBS/Vetting System</p>
+              <p className="text-sm text-default-400">Allow brokers to manage DBS and vetting records for members</p>
+            </div>
+            <Switch
+              isSelected={config.vetting_enabled}
+              onValueChange={v => updateConfig('vetting_enabled', v)}
+              size="sm"
+            />
+          </div>
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="font-medium">Enable Insurance Certificates</p>
+              <p className="text-sm text-default-400">Allow members to upload and brokers to verify insurance certificates</p>
+            </div>
+            <Switch
+              isSelected={config.insurance_enabled}
+              onValueChange={v => updateConfig('insurance_enabled', v)}
+              size="sm"
+            />
+          </div>
+          <Divider />
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="font-medium">Enforce Vetting on Exchanges</p>
+              <p className="text-sm text-default-400">Block exchanges on listings marked DBS-required if provider lacks valid vetting</p>
+            </div>
+            <Switch
+              isSelected={config.enforce_vetting_on_exchanges}
+              onValueChange={v => updateConfig('enforce_vetting_on_exchanges', v)}
+              size="sm"
+              isDisabled={!config.vetting_enabled}
+            />
+          </div>
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="font-medium">Enforce Insurance on Exchanges</p>
+              <p className="text-sm text-default-400">Block exchanges on listings marked insurance-required if provider lacks valid certificate</p>
+            </div>
+            <Switch
+              isSelected={config.enforce_insurance_on_exchanges}
+              onValueChange={v => updateConfig('enforce_insurance_on_exchanges', v)}
+              size="sm"
+              isDisabled={!config.insurance_enabled}
+            />
+          </div>
+          <Divider />
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-default-600">Vetting expiry warning (days):</p>
+            <Input
+              type="number"
+              variant="bordered"
+              value={String(config.vetting_expiry_warning_days)}
+              onValueChange={v => updateConfig('vetting_expiry_warning_days', parseInt(v) || 30)}
+              className="w-24"
+              min={1}
+              max={365}
+              size="sm"
+              isDisabled={!config.vetting_enabled}
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-default-600">Insurance expiry warning (days):</p>
+            <Input
+              type="number"
+              variant="bordered"
+              value={String(config.insurance_expiry_warning_days)}
+              onValueChange={v => updateConfig('insurance_expiry_warning_days', parseInt(v) || 30)}
+              className="w-24"
+              min={1}
+              max={365}
+              size="sm"
+              isDisabled={!config.insurance_enabled}
             />
           </div>
         </CardBody>

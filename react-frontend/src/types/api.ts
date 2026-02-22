@@ -636,6 +636,7 @@ export interface Notification {
   body: string;
   message?: string;  // Alias for body (frontend compatibility)
   read_at?: string | null;
+  link?: string | null;  // Navigation URL from backend (e.g. "/messages/123")
   action_url?: string;
   data?: Record<string, unknown>;
   created_at: string;
@@ -862,6 +863,10 @@ export interface TenantConfig {
     meta_description?: string;
   };
   settings?: Record<string, unknown>;
+  compliance?: {
+    vetting_enabled?: boolean;
+    insurance_enabled?: boolean;
+  };
   categories?: Category[];
   menu_pages?: {
     about?: { title: string; slug: string }[];

@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -67,6 +67,8 @@ import {
   Copy,
   CheckCircle,
   Info,
+  FileCheck,
+  Upload,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
@@ -135,11 +137,14 @@ interface TwoFactorSetup {
 export function SettingsPage() {
   usePageTitle('Settings');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, logout, refreshUser } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, tenant } = useTenant();
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState('profile');
+  const validTabs = ['profile', 'notifications', 'privacy', 'security'];
+  const initialTab = validTabs.includes(searchParams.get('tab') || '') ? searchParams.get('tab')! : 'profile';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -197,6 +202,9 @@ export function SettingsPage() {
     push_enabled: true,
   });
 
+  // Match digest frequency
+  const [matchDigestFrequency, setMatchDigestFrequency] = useState<string>('daily');
+
   // Privacy settings
   const [privacy, setPrivacy] = useState<PrivacySettings>({
     profile_visibility: 'members',
@@ -225,6 +233,19 @@ export function SettingsPage() {
   const [gdprRequestType, setGdprRequestType] = useState<string>('');
   const [isSubmittingGdpr, setIsSubmittingGdpr] = useState(false);
 
+  // Insurance certificates (user-facing)
+  interface UserInsuranceCert {
+    id: number;
+    insurance_type: string;
+    provider_name: string | null;
+    status: string;
+    expiry_date: string | null;
+    created_at: string;
+  }
+  const [insuranceCerts, setInsuranceCerts] = useState<UserInsuranceCert[]>([]);
+  const [insuranceLoading, setInsuranceLoading] = useState(false);
+  const [insuranceUploading, setInsuranceUploading] = useState(false);
+
   // ─────────────────────────────────────────────────────────────────────────
   // Data Loading
   // ─────────────────────────────────────────────────────────────────────────
@@ -241,6 +262,17 @@ export function SettingsPage() {
     } catch (error) {
       logError('Failed to load notification settings', error);
       setNotificationError('Failed to load notification settings');
+    }
+  }, []);
+
+  const loadMatchPreferences = useCallback(async () => {
+    try {
+      const response = await api.get<{ notification_frequency: string }>('/v2/users/me/match-preferences');
+      if (response.success && response.data) {
+        setMatchDigestFrequency(response.data.notification_frequency || 'daily');
+      }
+    } catch (error) {
+      logError('Failed to load match preferences', error);
     }
   }, []);
 
@@ -310,10 +342,31 @@ export function SettingsPage() {
       setTwoFactorEnabled(user.has_2fa_enabled || false);
     }
     loadNotificationSettings();
+    loadMatchPreferences();
     loadPrivacySettings();
     loadTwoFactorStatus();
     loadSessions();
-  }, [user, loadNotificationSettings, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
+  }, [user, loadNotificationSettings, loadMatchPreferences, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
+
+  // Load insurance certificates when insurance is enabled
+  const loadInsuranceCerts = useCallback(async () => {
+    if (!tenant?.compliance?.insurance_enabled) return;
+    setInsuranceLoading(true);
+    try {
+      const res = await api.get<UserInsuranceCert[]>('/v2/users/me/insurance');
+      if (res.success && Array.isArray(res.data)) {
+        setInsuranceCerts(res.data);
+      }
+    } catch {
+      // Insurance table may not exist
+    } finally {
+      setInsuranceLoading(false);
+    }
+  }, [tenant?.compliance?.insurance_enabled]);
+
+  useEffect(() => {
+    loadInsuranceCerts();
+  }, [loadInsuranceCerts]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Save Handlers
@@ -359,11 +412,17 @@ export function SettingsPage() {
   const saveNotifications = useCallback(async () => {
     try {
       setIsSaving(true);
-      const response = await api.put('/v2/users/me/notifications', notifications);
-      if (response.success) {
+      // Save general notification settings and match digest frequency in parallel
+      const [notifResponse, matchResponse] = await Promise.all([
+        api.put('/v2/users/me/notifications', notifications),
+        api.put('/v2/users/me/match-preferences', {
+          notification_frequency: matchDigestFrequency,
+        }),
+      ]);
+      if (notifResponse.success && matchResponse.success) {
         toast.success('Notification settings saved');
       } else {
-        toast.error(response.error || 'Failed to save notifications');
+        toast.error(notifResponse.error || matchResponse.error || 'Failed to save notifications');
       }
     } catch (error) {
       logError('Failed to save notifications', error);
@@ -371,7 +430,7 @@ export function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [notifications, toast]);
+  }, [notifications, matchDigestFrequency, toast]);
 
   const savePrivacy = useCallback(async () => {
     try {
@@ -623,6 +682,49 @@ export function SettingsPage() {
   function openGdprModal(type: string) {
     setGdprRequestType(type);
     gdprModal.onOpen();
+  }
+
+  // Insurance certificate upload handler
+  async function handleInsuranceUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file', 'Only PDF, JPG, and PNG files are accepted');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File too large', 'File must be under 10MB');
+      return;
+    }
+
+    setInsuranceUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('certificate_file', file);
+      formData.append('insurance_type', 'public_liability');
+
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/v2/users/me/insurance`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
+        },
+      });
+
+      if (res.ok) {
+        toast.success('Certificate uploaded', 'Your insurance certificate has been submitted for review');
+        loadInsuranceCerts();
+      } else {
+        toast.error('Upload failed', 'Failed to upload insurance certificate');
+      }
+    } catch {
+      toast.error('Upload failed', 'Failed to upload insurance certificate');
+    } finally {
+      setInsuranceUploading(false);
+      event.target.value = '';
+    }
   }
 
   // Copy backup codes to clipboard
@@ -990,6 +1092,40 @@ export function SettingsPage() {
                   />
                 </div>
 
+                {/* Match Digest */}
+                <div className="pt-4 border-t border-theme-default space-y-4">
+                  <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
+                    <Search className="w-4 h-4" aria-hidden="true" />
+                    Match Digest Emails
+                  </h3>
+
+                  <div className="p-4 rounded-lg bg-theme-elevated">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div>
+                        <p className="font-medium text-theme-primary">Digest Frequency</p>
+                        <p className="text-sm text-theme-subtle">How often you receive match digest emails</p>
+                      </div>
+                      <Select
+                        aria-label="Match digest frequency"
+                        selectedKeys={[matchDigestFrequency]}
+                        onSelectionChange={(keys) => {
+                          const value = Array.from(keys)[0] as string;
+                          if (value) setMatchDigestFrequency(value);
+                        }}
+                        className="sm:max-w-[180px]"
+                        classNames={{
+                          trigger: 'bg-theme-elevated border-theme-default',
+                          value: 'text-theme-primary',
+                        }}
+                      >
+                        <SelectItem key="daily">Daily</SelectItem>
+                        <SelectItem key="weekly">Weekly</SelectItem>
+                        <SelectItem key="never">Never</SelectItem>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Push Notifications */}
                 <div className="pt-4 border-t border-theme-default space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
@@ -1164,6 +1300,71 @@ export function SettingsPage() {
                 </p>
               </div>
             </GlassCard>
+
+            {/* Insurance Certificates — gated behind compliance flag */}
+            {tenant?.compliance?.insurance_enabled && (
+              <GlassCard className="p-6">
+                <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
+                  <FileCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                  Insurance Certificates
+                </h2>
+                <p className="text-theme-subtle text-sm mb-4">
+                  Upload your insurance certificates for verification. Accepted formats: PDF, JPG, PNG (max 10MB).
+                </p>
+
+                {insuranceLoading ? (
+                  <div className="flex items-center gap-2 text-sm text-theme-muted">
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Loading certificates...
+                  </div>
+                ) : (
+                  <>
+                    {insuranceCerts.length > 0 && (
+                      <div className="space-y-2 mb-4">
+                        {insuranceCerts.map((cert) => (
+                          <div
+                            key={cert.id}
+                            className="flex items-center justify-between rounded-lg border border-default-200 bg-theme-elevated p-3"
+                          >
+                            <div>
+                              <p className="text-sm font-medium text-theme-primary">
+                                {cert.insurance_type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                              </p>
+                              <p className="text-xs text-theme-muted">
+                                {cert.provider_name || 'Unknown provider'}
+                                {cert.expiry_date ? ` — Expires ${new Date(cert.expiry_date).toLocaleDateString()}` : ''}
+                              </p>
+                            </div>
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${
+                              cert.status === 'verified' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                                : cert.status === 'pending' || cert.status === 'submitted' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                                : cert.status === 'rejected' ? 'bg-red-500/20 text-red-600 dark:text-red-400'
+                                : 'bg-default-200 text-default-600'
+                            }`}>
+                              {cert.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-default-200">
+                      <Upload className="w-4 h-4 text-theme-primary" />
+                      <span className="text-sm font-medium text-theme-primary">
+                        {insuranceUploading ? 'Uploading...' : 'Upload Certificate'}
+                      </span>
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        className="hidden"
+                        onChange={handleInsuranceUpload}
+                        disabled={insuranceUploading}
+                      />
+                    </label>
+                  </>
+                )}
+              </GlassCard>
+            )}
           </div>
         )}
 

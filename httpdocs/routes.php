@@ -836,6 +836,25 @@ $router->add('POST', '/api/v2/admin/vetting/{id}/verify', 'Nexus\Controllers\Api
 $router->add('POST', '/api/v2/admin/vetting/{id}/reject', 'Nexus\Controllers\Api\AdminVettingApiController@reject');
 $router->add('DELETE', '/api/v2/admin/vetting/{id}', 'Nexus\Controllers\Api\AdminVettingApiController@destroy');
 
+// Admin Insurance Certificates (compliance)
+$router->add('GET', '/api/v2/admin/insurance/stats', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@stats');
+$router->add('GET', '/api/v2/admin/insurance/user/{userId}', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@getUserCertificates');
+$router->add('GET', '/api/v2/admin/insurance', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@list');
+$router->add('GET', '/api/v2/admin/insurance/{id}', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@show');
+$router->add('POST', '/api/v2/admin/insurance', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@store');
+$router->add('PUT', '/api/v2/admin/insurance/{id}', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@update');
+$router->add('POST', '/api/v2/admin/insurance/{id}/verify', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@verify');
+$router->add('POST', '/api/v2/admin/insurance/{id}/reject', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@reject');
+$router->add('DELETE', '/api/v2/admin/insurance/{id}', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@destroy');
+
+// Match Preferences (digest frequency)
+$router->add('GET', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@show');
+$router->add('PUT', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@update');
+
+// User Insurance (self-service)
+$router->add('GET', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@list');
+$router->add('POST', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@upload');
+
 // Admin Newsletters
 $router->add('GET', '/api/v2/admin/newsletters', 'Nexus\Controllers\Api\AdminNewsletterApiController@index');
 $router->add('POST', '/api/v2/admin/newsletters', 'Nexus\Controllers\Api\AdminNewsletterApiController@store');
