@@ -4,8 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { execSync } from 'child_process'
 
-// Inject git commit SHA at build time for version verification
-const commitHash = (() => {
+// Inject git commit SHA at build time for version verification.
+// In Docker production builds, BUILD_COMMIT is passed as a build arg (since
+// .dockerignore excludes .git/). Falls back to git for local dev.
+const commitHash = process.env.BUILD_COMMIT || (() => {
   try {
     return execSync('git rev-parse --short HEAD').toString().trim()
   } catch {
