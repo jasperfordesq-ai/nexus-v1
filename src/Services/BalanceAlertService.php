@@ -27,23 +27,40 @@ class BalanceAlertService
     /**
      * Check all organization wallets for low balance and send alerts
      * Should be run via cron job
+     *
+     * Only alerts for wallets that have been previously funded (have transaction history).
+     * Wallets with balance 0 that were never funded are intentionally excluded.
      */
     public static function checkAllBalances()
     {
         $tenantId = TenantContext::getId();
 
-        // Get all active org wallets
+        // Get org wallets that have ACTUALLY been funded (have at least one credit transaction).
+        // This prevents alerting on wallets that were auto-created with 0 balance
+        // but never used, which would spam all org admins.
         $wallets = Database::query(
             "SELECT ow.*, vo.name as org_name
              FROM org_wallets ow
              JOIN vol_organizations vo ON ow.organization_id = vo.id AND ow.tenant_id = vo.tenant_id
-             WHERE ow.tenant_id = ? AND vo.status = 'approved'",
+             WHERE ow.tenant_id = ? AND vo.status = 'approved'
+             AND EXISTS (
+                 SELECT 1 FROM org_transactions ot
+                 WHERE ot.organization_id = ow.organization_id
+                 AND ot.tenant_id = ow.tenant_id
+                 AND ot.receiver_type = 'organization'
+                 AND ot.receiver_id = ow.organization_id
+             )",
             [$tenantId]
         )->fetchAll();
 
         $alertsSent = 0;
 
         foreach ($wallets as $wallet) {
+            // Skip if alerts are disabled for this org
+            if (!self::areAlertsEnabled($wallet['organization_id'])) {
+                continue;
+            }
+
             $result = self::checkBalance($wallet['organization_id'], $wallet['balance'], $wallet['org_name']);
             if ($result['alert_sent']) {
                 $alertsSent++;
@@ -137,6 +154,31 @@ class BalanceAlertService
             'low' => self::DEFAULT_LOW_BALANCE_THRESHOLD,
             'critical' => self::DEFAULT_CRITICAL_BALANCE_THRESHOLD,
         ];
+    }
+
+    /**
+     * Check if balance alerts are enabled for an organization.
+     * Returns true by default if no settings exist (opt-out model for funded wallets).
+     */
+    public static function areAlertsEnabled($organizationId)
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $settings = Database::query(
+                "SELECT alerts_enabled FROM org_alert_settings
+                 WHERE tenant_id = ? AND organization_id = ?",
+                [$tenantId, $organizationId]
+            )->fetch();
+
+            if ($settings) {
+                return (bool) $settings['alerts_enabled'];
+            }
+        } catch (\Exception $e) {
+            // Table may not exist — default to enabled
+        }
+
+        return true;
     }
 
     /**
@@ -236,11 +278,27 @@ class BalanceAlertService
     }
 
     /**
-     * Send balance alert to organization admins
+     * Send balance alert to organization owner (and admins for critical only).
+     *
+     * Financial alerts are sent to the org owner. For critical alerts,
+     * admins are also notified. Regular members never receive these.
      */
     private static function sendBalanceAlert($organizationId, $orgName, $balance, $severity)
     {
-        $admins = OrgMember::getAdminsAndOwners($organizationId);
+        if ($severity === 'critical') {
+            // Critical: notify owner + admins
+            $recipients = OrgMember::getAdminsAndOwners($organizationId);
+        } else {
+            // Low: notify owner only
+            $owner = OrgMember::getOwner($organizationId);
+            $recipients = $owner ? [$owner] : [];
+        }
+
+        if (empty($recipients)) {
+            error_log("BalanceAlertService: No recipients found for org $organizationId ($orgName)");
+            return;
+        }
+
         $basePath = TenantContext::getBasePath();
         $link = $basePath . "/organizations/{$organizationId}/wallet";
 
@@ -260,7 +318,7 @@ class BalanceAlertService
                     "Consider adding funds soon.";
         }
 
-        foreach ($admins as $admin) {
+        foreach ($recipients as $admin) {
             // Platform notification
             try {
                 Notification::create($admin['user_id'], $message, $link, 'balance_alert');
