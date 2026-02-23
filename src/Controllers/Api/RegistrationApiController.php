@@ -84,7 +84,9 @@ class RegistrationApiController extends BaseApiController
      */
     public function register(): void
     {
-        // SECURITY: Redis-based rate limiting (fast, per-IP, 3 attempts per minute)
+        // SECURITY: Two-layer rate limiting (complementary, not redundant):
+        //   Layer 1 — Redis, per-IP: blocks burst attempts (3 per minute, fast check)
+        //   Layer 2 — Database, per-IP: blocks sustained volume (5 per hour, longer window)
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         if (\Nexus\Services\RateLimitService::check("auth:register:$ip", 3, 60)) {
             header('Retry-After: 60');
@@ -96,8 +98,6 @@ class RegistrationApiController extends BaseApiController
             );
         }
         \Nexus\Services\RateLimitService::increment("auth:register:$ip", 60);
-
-        // Rate limit by IP - 5 registrations per hour (database-based, longer window)
         $this->rateLimit('registration', 5, 3600);
 
         // Collect input - Basic
@@ -260,7 +260,7 @@ class RegistrationApiController extends BaseApiController
         }
 
         // Create the user
-        $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+        $passwordHash = password_hash($password, PASSWORD_ARGON2ID);
 
         try {
             $stmt = $db->prepare("
