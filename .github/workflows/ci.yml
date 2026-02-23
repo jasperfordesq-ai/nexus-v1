@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 env:
   PHP_VERSION: '8.2'
   NODE_VERSION: '20'
@@ -214,6 +218,7 @@ jobs:
 
       - name: Post Coverage Report as PR Comment
         if: github.event_name == 'pull_request'
+        continue-on-error: true
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: vitest-coverage
