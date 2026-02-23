@@ -44,14 +44,16 @@ import {
   Target,
   ShoppingBag,
   Calendar,
+  MapPin,
+  ArrowRight,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
 import type { FeedItem, FeedComment, PollData } from './types';
-import { getAuthor } from './types';
+import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
 
 /* ───────────────────────── Props ───────────────────────── */
 
@@ -217,6 +219,8 @@ const FeedCard = React.memo(function FeedCard({
   const author = getAuthor(item);
   const isOwnPost = currentUserId === author.id;
   const config = typeConfig[item.type];
+  const detailPath = getItemDetailPath(item);
+  const detailLabel = getItemDetailLabel(item);
 
   // Load poll data lazily ONLY when the item is a poll, poll_data was NOT
   // provided inline, and we haven't already loaded or started loading it.
@@ -335,15 +339,29 @@ const FeedCard = React.memo(function FeedCard({
                   {author.name}
                 </Link>
                 {config.label && (
-                  <Chip
-                    size="sm"
-                    variant="flat"
-                    color={config.color}
-                    startContent={config.icon}
-                    className="text-[10px] h-5"
-                  >
-                    {config.label}
-                  </Chip>
+                  detailPath ? (
+                    <Link to={tenantPath(detailPath)}>
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={config.color}
+                        startContent={config.icon}
+                        className="text-[10px] h-5 cursor-pointer hover:opacity-80 transition-opacity"
+                      >
+                        {config.label}
+                      </Chip>
+                    </Link>
+                  ) : (
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      color={config.color}
+                      startContent={config.icon}
+                      className="text-[10px] h-5"
+                    >
+                      {config.label}
+                    </Chip>
+                  )
                 )}
               </div>
               <Tooltip content={new Date(item.created_at).toLocaleString()} placement="bottom" delay={500} closeDelay={0} size="sm">
@@ -415,20 +433,69 @@ const FeedCard = React.memo(function FeedCard({
         {/* Content */}
         <div className="mb-4">
           {item.title && item.title !== item.content && (
-            <p className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">{item.title}</p>
+            detailPath ? (
+              <Link
+                to={tenantPath(detailPath)}
+                className="text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors mb-1.5 block"
+              >
+                {item.title}
+              </Link>
+            ) : (
+              <p className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">{item.title}</p>
+            )
           )}
-          <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">{item.content}</p>
+          <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">
+            {item.content}
+            {item.content_truncated && detailPath && (
+              <Link
+                to={tenantPath(detailPath)}
+                className="text-[var(--color-primary)] hover:underline ml-1 font-medium"
+              >
+                Read more
+              </Link>
+            )}
+          </p>
         </div>
+
+        {/* Event metadata */}
+        {item.type === 'event' && (item.start_date || item.location) && (
+          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[var(--text-muted)]">
+            {item.start_date && (
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+                <span>{formatDate(item.start_date, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                <span className="text-[var(--text-subtle)]">{formatTime(item.start_date)}</span>
+              </span>
+            )}
+            {item.location && (
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+                <span>{item.location}</span>
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Image */}
         {item.image_url && (
           <div className="mb-4 -mx-5 overflow-hidden">
-            <img
-              src={resolveAssetUrl(item.image_url)}
-              alt={`Post image by ${author.name}`}
-              className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
-              loading="lazy"
-            />
+            {detailPath ? (
+              <Link to={tenantPath(detailPath)}>
+                <img
+                  src={resolveAssetUrl(item.image_url)}
+                  alt={`${config.label ?? 'Post'} image by ${author.name}`}
+                  className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
+                  loading="lazy"
+                />
+              </Link>
+            ) : (
+              <img
+                src={resolveAssetUrl(item.image_url)}
+                alt={`Post image by ${author.name}`}
+                className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
+                loading="lazy"
+              />
+            )}
           </div>
         )}
 
@@ -526,6 +593,20 @@ const FeedCard = React.memo(function FeedCard({
               )}
             </CardBody>
           </Card>
+        )}
+
+        {/* View detail CTA — for listings, events, goals, reviews */}
+        {detailPath && detailLabel && (
+          <div className="mb-3">
+            <Link
+              to={tenantPath(detailPath)}
+              className={`flex items-center justify-center gap-2 w-full py-2 px-4 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.gradient || 'from-[var(--color-primary)]/10 to-[var(--color-primary)]/5'} text-[var(--text-primary)] hover:opacity-80 border border-[var(--border-default)] hover:border-[var(--color-primary)]/30`}
+            >
+              {config.icon}
+              {detailLabel}
+              <ArrowRight className="w-3.5 h-3.5 ml-auto" aria-hidden="true" />
+            </Link>
+          </div>
         )}
 
         {/* Stats Row */}

@@ -492,11 +492,14 @@ class FeedService
             $likeKey = $item['type'] . ':' . $item['id'];
             $isLiked = isset($likedSet[$likeKey]);
 
+            $contentResult = self::truncateWithFlag($item['content'] ?? '', 500);
+
             $entry = [
                 'id' => (int)$item['id'],
                 'type' => $item['type'],
                 'title' => $item['title'] ?? null,
-                'content' => self::truncate($item['content'] ?? '', 500),
+                'content' => $contentResult['text'],
+                'content_truncated' => $contentResult['truncated'],
                 'image_url' => $item['image_url'] ?? null,
                 'author' => [
                     'id' => (int)$item['user_id'],
@@ -804,13 +807,23 @@ class FeedService
     }
 
     /**
-     * Truncate text
+     * Truncate text and report whether it was truncated
+     *
+     * @return array{text: string, truncated: bool}
+     */
+    private static function truncateWithFlag(string $text, int $length): array
+    {
+        if (mb_strlen($text) <= $length) {
+            return ['text' => $text, 'truncated' => false];
+        }
+        return ['text' => mb_substr($text, 0, $length - 3) . '...', 'truncated' => true];
+    }
+
+    /**
+     * Truncate text (legacy helper — delegates to truncateWithFlag)
      */
     private static function truncate(string $text, int $length): string
     {
-        if (mb_strlen($text) <= $length) {
-            return $text;
-        }
-        return mb_substr($text, 0, $length - 3) . '...';
+        return self::truncateWithFlag($text, $length)['text'];
     }
 }

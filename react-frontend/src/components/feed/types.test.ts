@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { getAuthor } from './types';
+import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
 import type { FeedItem } from './types';
 
 describe('getAuthor', () => {
@@ -98,5 +98,69 @@ describe('getAuthor', () => {
     };
     const author = getAuthor(item);
     expect(author.avatar).toBeNull();
+  });
+});
+
+describe('getItemDetailPath', () => {
+  const base: FeedItem = {
+    id: 42,
+    content: 'test',
+    created_at: '2026-01-01',
+    type: 'post',
+    likes_count: 0,
+    comments_count: 0,
+    is_liked: false,
+  };
+
+  it('returns listings detail path', () => {
+    expect(getItemDetailPath({ ...base, type: 'listing' })).toBe('/listings/42');
+  });
+
+  it('returns events detail path', () => {
+    expect(getItemDetailPath({ ...base, type: 'event' })).toBe('/events/42');
+  });
+
+  it('returns goals list path', () => {
+    expect(getItemDetailPath({ ...base, type: 'goal' })).toBe('/goals');
+  });
+
+  it('returns receiver profile for review', () => {
+    expect(getItemDetailPath({ ...base, type: 'review', receiver: { id: 7, name: 'Bob' } })).toBe('/profile/7');
+  });
+
+  it('returns null for review without receiver', () => {
+    expect(getItemDetailPath({ ...base, type: 'review' })).toBeNull();
+  });
+
+  it('returns null for post', () => {
+    expect(getItemDetailPath({ ...base, type: 'post' })).toBeNull();
+  });
+
+  it('returns null for poll', () => {
+    expect(getItemDetailPath({ ...base, type: 'poll' })).toBeNull();
+  });
+});
+
+describe('getItemDetailLabel', () => {
+  const base: FeedItem = {
+    id: 1,
+    content: 'test',
+    created_at: '2026-01-01',
+    type: 'post',
+    likes_count: 0,
+    comments_count: 0,
+    is_liked: false,
+  };
+
+  it('returns correct labels for typed items', () => {
+    expect(getItemDetailLabel({ ...base, type: 'listing' })).toBe('View Listing');
+    expect(getItemDetailLabel({ ...base, type: 'event' })).toBe('View Event');
+    expect(getItemDetailLabel({ ...base, type: 'goal' })).toBe('View Goals');
+    expect(getItemDetailLabel({ ...base, type: 'review' })).toBe('View Profile');
+  });
+
+  it('returns null for post and poll', () => {
+    expect(getItemDetailLabel({ ...base, type: 'post' })).toBeNull();
+    expect(getItemDetailLabel({ ...base, type: 'poll' })).toBeNull();
   });
 });
