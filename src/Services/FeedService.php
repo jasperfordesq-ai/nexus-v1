@@ -241,6 +241,21 @@ class FeedService
             return $cmp;
         });
 
+        // Apply cursor filtering AFTER merge+sort to handle cross-type pagination.
+        // Individual loaders only filter when cursor type matches their own type,
+        // so non-matching types return their first N items unfiltered — causing duplicates.
+        // Since the sort order is uniform (created_at DESC, id DESC) across all types,
+        // we filter uniformly: keep only items that sort AFTER the cursor position.
+        if ($cursorData) {
+            $cursorTs = $cursorData['created_at'];
+            $cursorId = (int)$cursorData['id'];
+            $items = array_values(array_filter($items, function ($item) use ($cursorTs, $cursorId) {
+                $cmp = strcmp($item['created_at'], $cursorTs);
+                if ($cmp !== 0) return $cmp < 0; // Keep only items older than cursor
+                return $item['id'] < $cursorId;   // Same timestamp: keep lower IDs
+            }));
+        }
+
         return array_slice($items, 0, $limit);
     }
 
