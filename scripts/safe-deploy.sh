@@ -5,15 +5,16 @@
 # Usage: sudo bash scripts/safe-deploy.sh [quick|full|rollback|status]
 #
 # Modes:
-#   quick     - Git pull + restart (OPCache clear) - DEFAULT
-#   full      - Git pull + rebuild (--no-cache)
-#   rollback  - Rollback to last successful deploy
+#   quick     - Git pull + rebuild frontend + restart all (DEFAULT)
+#   full      - Git pull + rebuild ALL containers (--no-cache)
+#   rollback  - Rollback to last successful deploy (full rebuild)
 #   status    - Show current deployment status (no changes)
 #
 # Features:
 #   - Rollback capability (saves last successful commit)
 #   - Pre-deploy validation (disk space, files, containers)
 #   - Post-deploy smoke tests (API, frontend, database)
+#   - Post-deploy image verification (ensures prod images, not dev)
 #   - Deployment locking (prevents concurrent deploys)
 #   - Comprehensive logging (timestamped logs)
 # =============================================================================
@@ -152,6 +153,80 @@ validate_environment() {
     log_ok "All pre-deploy checks passed"
 }
 
+# --- Post-deploy image verification ---
+verify_production_images() {
+    log_step "=== Production Image Verification ==="
+
+    local VERIFY_FAILED=0
+
+    # Verify React frontend is running nginx (production), not node (dev)
+    if docker exec nexus-react-prod which nginx > /dev/null 2>&1; then
+        log_ok "Frontend: nginx detected (production image)"
+    elif docker exec nexus-react-prod which node > /dev/null 2>&1; then
+        log_err "Frontend: node detected — THIS IS A DEV IMAGE ON PRODUCTION!"
+        log_err "Run 'sudo bash scripts/safe-deploy.sh full' to fix"
+        VERIFY_FAILED=1
+    else
+        log_warn "Frontend: could not verify image type (container may not be running)"
+    fi
+
+    # Verify React container image name
+    local REACT_IMAGE
+    REACT_IMAGE=$(docker inspect nexus-react-prod --format '{{.Config.Image}}' 2>/dev/null || echo "unknown")
+    if [[ "$REACT_IMAGE" == "nexus-react-prod:latest" ]]; then
+        log_ok "Frontend image: $REACT_IMAGE (correct)"
+    elif [[ "$REACT_IMAGE" == *"dev"* ]] || [[ "$REACT_IMAGE" == "staging_frontend"* ]]; then
+        log_err "Frontend image: $REACT_IMAGE — WRONG IMAGE (dev/legacy name)"
+        VERIFY_FAILED=1
+    else
+        log_warn "Frontend image: $REACT_IMAGE (unexpected name)"
+    fi
+
+    # Verify PHP container uses production Dockerfile (OPCache validate_timestamps=0)
+    local OPCACHE_VALIDATE
+    OPCACHE_VALIDATE=$(docker exec nexus-php-app php -r 'echo ini_get("opcache.validate_timestamps");' 2>/dev/null || echo "unknown")
+    if [[ "$OPCACHE_VALIDATE" == "0" ]] || [[ "$OPCACHE_VALIDATE" == "" ]]; then
+        log_ok "PHP OPCache: validate_timestamps=0 (production)"
+    elif [[ "$OPCACHE_VALIDATE" == "1" ]]; then
+        log_err "PHP OPCache: validate_timestamps=1 — THIS IS A DEV IMAGE ON PRODUCTION!"
+        VERIFY_FAILED=1
+    else
+        log_warn "PHP OPCache: validate_timestamps=$OPCACHE_VALIDATE (unexpected)"
+    fi
+
+    # Verify PHP display_errors is off (production)
+    local DISPLAY_ERRORS
+    DISPLAY_ERRORS=$(docker exec nexus-php-app php -r 'echo ini_get("display_errors");' 2>/dev/null || echo "unknown")
+    if [[ "$DISPLAY_ERRORS" == "" ]] || [[ "$DISPLAY_ERRORS" == "0" ]] || [[ "$DISPLAY_ERRORS" == "Off" ]]; then
+        log_ok "PHP display_errors: Off (production)"
+    elif [[ "$DISPLAY_ERRORS" == "1" ]] || [[ "$DISPLAY_ERRORS" == "On" ]]; then
+        log_err "PHP display_errors: On — THIS IS A DEV IMAGE ON PRODUCTION!"
+        VERIFY_FAILED=1
+    else
+        log_warn "PHP display_errors: $DISPLAY_ERRORS (unexpected)"
+    fi
+
+    # Verify build commit is baked into the React image (if BUILD_COMMIT was set)
+    if [ -n "${BUILD_COMMIT:-}" ]; then
+        local REACT_COMMIT
+        REACT_COMMIT=$(docker exec nexus-react-prod sh -c 'cat /app/dist/.build-commit 2>/dev/null || echo "none"')
+        if [[ "$REACT_COMMIT" == "$BUILD_COMMIT" ]]; then
+            log_ok "React build commit: $REACT_COMMIT (matches)"
+        else
+            log_warn "React build commit: '$REACT_COMMIT' (expected: '$BUILD_COMMIT')"
+        fi
+    fi
+
+    if [ $VERIFY_FAILED -eq 1 ]; then
+        log_err "Image verification FAILED — dev images detected on production!"
+        log_err "Run 'sudo bash scripts/safe-deploy.sh full' to rebuild with production images"
+        return 1
+    fi
+
+    log_ok "All production images verified"
+    return 0
+}
+
 # --- Post-deploy smoke tests ---
 run_smoke_tests() {
     log_step "=== Post-Deploy Smoke Tests ==="
@@ -237,7 +312,7 @@ purge_cloudflare_cache() {
 
 # --- Deployment modes ---
 deploy_quick() {
-    log_step "=== Quick Deployment (Git Pull + Restart) ==="
+    log_step "=== Quick Deployment (Git Pull + Rebuild Frontend + Restart) ==="
 
     # Save current state
     save_current_commit
@@ -256,10 +331,26 @@ deploy_quick() {
     cp compose.prod.yml compose.yml
     log_ok "compose.yml restored (production version)"
 
-    # Restart PHP container (OPCache clear)
+    # Export commit hash so compose.prod.yml can pass it as a build arg
+    export BUILD_COMMIT=$(git rev-parse --short HEAD)
+    log_info "Build commit: $BUILD_COMMIT"
+
+    # Rebuild React frontend with --no-cache (CRITICAL: without this, old image keeps running)
+    log_info "Rebuilding React frontend with --no-cache..."
+    docker compose build --no-cache frontend
+    log_ok "React frontend rebuilt"
+
+    # Rebuild sales site
+    log_info "Rebuilding sales site..."
+    docker compose build --no-cache sales
+    log_ok "Sales site rebuilt"
+
+    # Recreate frontend + sales containers with new images, restart PHP for OPCache
+    log_info "Starting updated containers..."
+    docker compose up -d --force-recreate frontend sales
     log_info "Restarting PHP container (OPCache clear)..."
     docker restart nexus-php-app
-    log_ok "PHP container restarted"
+    log_ok "All containers updated"
 }
 
 deploy_full() {
@@ -322,11 +413,18 @@ rollback_deployment() {
     # Restore production compose.yml
     cp compose.prod.yml compose.yml
 
-    # Restart containers
-    log_info "Restarting containers..."
-    docker restart nexus-php-app
+    # Export commit hash for build arg
+    export BUILD_COMMIT=$(git rev-parse --short HEAD)
+    log_info "Build commit: $BUILD_COMMIT"
 
-    log_ok "Rollback complete"
+    # Full rebuild all containers (rollback must guarantee correct images)
+    log_info "Rebuilding ALL containers with --no-cache..."
+    docker compose build --no-cache
+
+    log_info "Starting containers (--force-recreate)..."
+    docker compose up -d --force-recreate
+
+    log_ok "Rollback complete (full rebuild)"
     log_info "Now at: $(git log -1 --format='%h - %s')"
 }
 
@@ -419,6 +517,13 @@ case "$MODE" in
         exit 1
         ;;
 esac
+
+# Verify production images (catches dev-on-prod bug)
+if ! verify_production_images; then
+    log_err "ABORTING: Dev images detected on production"
+    log_err "Fix: sudo bash scripts/safe-deploy.sh full"
+    exit 1
+fi
 
 # Run smoke tests
 if run_smoke_tests; then
