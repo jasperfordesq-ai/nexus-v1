@@ -69,6 +69,9 @@ import {
   Info,
   FileCheck,
   Upload,
+  PenLine,
+  Ban,
+  Scale,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
@@ -658,10 +661,20 @@ export function SettingsPage() {
   async function handleGdprRequest() {
     if (!gdprRequestType) return;
 
+    // Map UI types to GDPR API types
+    const typeMap: Record<string, string> = {
+      download: 'access',
+      portability: 'portability',
+      deletion: 'erasure',
+      rectification: 'rectification',
+      restriction: 'restriction',
+      objection: 'objection',
+    };
+
     try {
       setIsSubmittingGdpr(true);
       const response = await api.post('/v2/users/me/gdpr-request', {
-        type: gdprRequestType,
+        type: typeMap[gdprRequestType] || gdprRequestType,
       });
 
       if (response.success) {
@@ -1290,13 +1303,60 @@ export function SettingsPage() {
                     <p className="text-sm text-theme-subtle font-normal">Request permanent deletion of your data</p>
                   </div>
                 </Button>
+
+                <Button
+                  variant="flat"
+                  className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+                  startContent={
+                    <div className="p-2 rounded-lg bg-amber-500/20">
+                      <PenLine className="w-4 h-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                    </div>
+                  }
+                  onPress={() => openGdprModal('rectification')}
+                >
+                  <div className="text-left">
+                    <p className="font-medium">Data Rectification</p>
+                    <p className="text-sm text-theme-subtle font-normal">Request correction of inaccurate personal data</p>
+                  </div>
+                </Button>
+
+                <Button
+                  variant="flat"
+                  className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+                  startContent={
+                    <div className="p-2 rounded-lg bg-orange-500/20">
+                      <Ban className="w-4 h-4 text-orange-600 dark:text-orange-400" aria-hidden="true" />
+                    </div>
+                  }
+                  onPress={() => openGdprModal('restriction')}
+                >
+                  <div className="text-left">
+                    <p className="font-medium">Restriction of Processing</p>
+                    <p className="text-sm text-theme-subtle font-normal">Request restriction of your data processing</p>
+                  </div>
+                </Button>
+
+                <Button
+                  variant="flat"
+                  className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+                  startContent={
+                    <div className="p-2 rounded-lg bg-violet-500/20">
+                      <Scale className="w-4 h-4 text-violet-600 dark:text-violet-400" aria-hidden="true" />
+                    </div>
+                  }
+                  onPress={() => openGdprModal('objection')}
+                >
+                  <div className="text-left">
+                    <p className="font-medium">Right to Object</p>
+                    <p className="text-sm text-theme-subtle font-normal">Object to processing of your personal data</p>
+                  </div>
+                </Button>
               </div>
 
               <div className="mt-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <p className="text-sm text-theme-muted flex items-start gap-2">
                   <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                  Your rights include access to your data, rectification, erasure, restriction of processing,
-                  data portability, and the right to object. Contact our Data Protection Officer for any concerns.
+                  All six GDPR data subject rights are available above. Contact our Data Protection Officer for any additional concerns.
                 </p>
               </div>
             </GlassCard>
@@ -1893,6 +1953,9 @@ export function SettingsPage() {
             {gdprRequestType === 'download' && 'Download My Data'}
             {gdprRequestType === 'portability' && 'Data Portability Request'}
             {gdprRequestType === 'deletion' && 'Request Data Deletion'}
+            {gdprRequestType === 'rectification' && 'Data Rectification'}
+            {gdprRequestType === 'restriction' && 'Restriction of Processing'}
+            {gdprRequestType === 'objection' && 'Right to Object'}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
@@ -1918,6 +1981,27 @@ export function SettingsPage() {
                 <p className="text-theme-muted">
                   We will export your data in a structured, commonly used, and machine-readable format (JSON/CSV).
                   This allows you to transfer your data to another service. You will receive an email within 30 days.
+                </p>
+              )}
+
+              {gdprRequestType === 'rectification' && (
+                <p className="text-theme-muted">
+                  Request correction of any inaccurate or incomplete personal data we hold about you.
+                  We will review your request and update the records within 30 days.
+                </p>
+              )}
+
+              {gdprRequestType === 'restriction' && (
+                <p className="text-theme-muted">
+                  Request that we restrict the processing of your personal data. While restricted, we will
+                  store but not actively process your data. We will respond within 30 days.
+                </p>
+              )}
+
+              {gdprRequestType === 'objection' && (
+                <p className="text-theme-muted">
+                  Object to the processing of your personal data for specific purposes, such as
+                  direct marketing or profiling. We will review your objection within 30 days.
                 </p>
               )}
 

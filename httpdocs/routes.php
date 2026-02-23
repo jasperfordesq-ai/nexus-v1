@@ -296,6 +296,9 @@ $router->add('GET', '/api/v2/users/{id}', 'Nexus\Controllers\Api\UsersApiControl
 $router->add('GET', '/api/v2/users/{id}/listings', 'Nexus\Controllers\Api\UsersApiController@listings');
 $router->add('GET', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@notificationPreferences');
 $router->add('PUT', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@updateNotificationPreferences');
+$router->add('GET', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@getConsent');
+$router->add('PUT', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@updateConsent');
+$router->add('POST', '/api/v2/users/me/gdpr-request', 'Nexus\Controllers\Api\UsersApiController@createGdprRequest');
 $router->add('GET', '/api/v2/members/nearby', 'Nexus\Controllers\Api\UsersApiController@nearby');
 
 // ============================================
