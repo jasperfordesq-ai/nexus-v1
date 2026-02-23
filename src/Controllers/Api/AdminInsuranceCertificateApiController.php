@@ -116,11 +116,18 @@ class AdminInsuranceCertificateApiController extends BaseApiController
             return;
         }
 
+        $validStatuses = ['pending', 'submitted', 'verified', 'expired', 'rejected', 'revoked'];
+        $status = $this->input('status', 'pending');
+        if (!in_array($status, $validStatuses, true)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Invalid status', 'status');
+            return;
+        }
+
         try {
             $data = [
                 'user_id' => $userId,
                 'insurance_type' => $insuranceType ?? 'public_liability',
-                'status' => $this->input('status', 'pending'),
+                'status' => $status,
                 'provider_name' => $this->input('provider_name'),
                 'policy_number' => $this->input('policy_number'),
                 'coverage_amount' => $this->input('coverage_amount'),
@@ -152,9 +159,28 @@ class AdminInsuranceCertificateApiController extends BaseApiController
                 return;
             }
 
-            $data = [];
             $allInput = $this->getAllInput();
 
+            // Validate insurance_type if provided
+            if (array_key_exists('insurance_type', $allInput) && $allInput['insurance_type'] !== null) {
+                $validTypes = ['public_liability', 'professional_indemnity', 'employers_liability',
+                                'product_liability', 'personal_accident', 'other'];
+                if (!in_array($allInput['insurance_type'], $validTypes, true)) {
+                    $this->respondWithError('VALIDATION_ERROR', 'Invalid insurance type', 'insurance_type');
+                    return;
+                }
+            }
+
+            // Validate status if provided
+            if (array_key_exists('status', $allInput) && $allInput['status'] !== null) {
+                $validStatuses = ['pending', 'submitted', 'verified', 'expired', 'rejected', 'revoked'];
+                if (!in_array($allInput['status'], $validStatuses, true)) {
+                    $this->respondWithError('VALIDATION_ERROR', 'Invalid status', 'status');
+                    return;
+                }
+            }
+
+            $data = [];
             $allowed = ['insurance_type', 'provider_name', 'policy_number', 'coverage_amount',
                          'start_date', 'expiry_date', 'status', 'notes'];
 

@@ -245,6 +245,7 @@ export function SettingsPage() {
   const [insuranceCerts, setInsuranceCerts] = useState<UserInsuranceCert[]>([]);
   const [insuranceLoading, setInsuranceLoading] = useState(false);
   const [insuranceUploading, setInsuranceUploading] = useState(false);
+  const [insuranceType, setInsuranceType] = useState('public_liability');
 
   // ─────────────────────────────────────────────────────────────────────────
   // Data Loading
@@ -684,7 +685,7 @@ export function SettingsPage() {
     gdprModal.onOpen();
   }
 
-  // Insurance certificate upload handler
+  // Insurance certificate upload handler — #7: uses shared API client instead of raw fetch
   async function handleInsuranceUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -703,21 +704,16 @@ export function SettingsPage() {
     try {
       const formData = new FormData();
       formData.append('certificate_file', file);
-      formData.append('insurance_type', 'public_liability');
+      formData.append('insurance_type', insuranceType);
 
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/v2/users/me/insurance`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
-        },
-      });
+      const res = await api.upload('/v2/users/me/insurance', formData);
 
-      if (res.ok) {
+      if (res.success) {
         toast.success('Certificate uploaded', 'Your insurance certificate has been submitted for review');
         loadInsuranceCerts();
+        setInsuranceType('public_liability');
       } else {
-        toast.error('Upload failed', 'Failed to upload insurance certificate');
+        toast.error('Upload failed', res.error || 'Failed to upload insurance certificate');
       }
     } catch {
       toast.error('Upload failed', 'Failed to upload insurance certificate');
@@ -1348,19 +1344,40 @@ export function SettingsPage() {
                       </div>
                     )}
 
-                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-default-200">
-                      <Upload className="w-4 h-4 text-theme-primary" />
-                      <span className="text-sm font-medium text-theme-primary">
-                        {insuranceUploading ? 'Uploading...' : 'Upload Certificate'}
-                      </span>
-                      <input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        className="hidden"
-                        onChange={handleInsuranceUpload}
-                        disabled={insuranceUploading}
-                      />
-                    </label>
+                    {/* #4: Insurance type selector */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3">
+                      <Select
+                        label="Insurance Type"
+                        selectedKeys={[insuranceType]}
+                        onSelectionChange={(keys) => {
+                          const val = Array.from(keys)[0] as string;
+                          if (val) setInsuranceType(val);
+                        }}
+                        variant="bordered"
+                        size="sm"
+                        className="max-w-xs"
+                      >
+                        <SelectItem key="public_liability">Public Liability</SelectItem>
+                        <SelectItem key="professional_indemnity">Professional Indemnity</SelectItem>
+                        <SelectItem key="employers_liability">{"Employer's Liability"}</SelectItem>
+                        <SelectItem key="product_liability">Product Liability</SelectItem>
+                        <SelectItem key="personal_accident">Personal Accident</SelectItem>
+                        <SelectItem key="other">Other</SelectItem>
+                      </Select>
+                      <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-default-200">
+                        <Upload className="w-4 h-4 text-theme-primary" />
+                        <span className="text-sm font-medium text-theme-primary">
+                          {insuranceUploading ? 'Uploading...' : 'Upload Certificate'}
+                        </span>
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="hidden"
+                          onChange={handleInsuranceUpload}
+                          disabled={insuranceUploading}
+                        />
+                      </label>
+                    </div>
                   </>
                 )}
               </GlassCard>

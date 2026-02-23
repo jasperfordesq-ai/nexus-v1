@@ -8,6 +8,7 @@ namespace Nexus\Services;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Services\BrokerControlConfigService;
 
 /**
  * InsuranceCertificateService - Insurance certificate management for compliance
@@ -74,7 +75,8 @@ class InsuranceCertificateService
             $params[] = $filters['insurance_type'];
         }
         if (!empty($filters['expiring_soon'])) {
-            $where[] = 'ic.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)';
+            $warningDays = BrokerControlConfigService::getInsuranceExpiryWarningDays();
+            $where[] = "ic.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL {$warningDays} DAY)";
         }
         if (!empty($filters['expired'])) {
             $where[] = 'ic.expiry_date < CURDATE() AND ic.status = "verified"';
@@ -134,13 +136,14 @@ class InsuranceCertificateService
         $stats = ['pending' => 0, 'verified' => 0, 'expired' => 0, 'expiring_soon' => 0, 'total' => 0];
 
         try {
+            $warningDays = BrokerControlConfigService::getInsuranceExpiryWarningDays();
             $row = Database::query(
                 "SELECT
                     COUNT(*) as total,
                     SUM(CASE WHEN status = 'pending' OR status = 'submitted' THEN 1 ELSE 0 END) as pending,
                     SUM(CASE WHEN status = 'verified' AND (expiry_date IS NULL OR expiry_date >= CURDATE()) THEN 1 ELSE 0 END) as verified,
                     SUM(CASE WHEN status = 'verified' AND expiry_date < CURDATE() THEN 1 ELSE 0 END) as expired,
-                    SUM(CASE WHEN status = 'verified' AND expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as expiring_soon
+                    SUM(CASE WHEN status = 'verified' AND expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL {$warningDays} DAY) THEN 1 ELSE 0 END) as expiring_soon
                  FROM insurance_certificates WHERE tenant_id = ?",
                 [$tenantId]
             )->fetch();
