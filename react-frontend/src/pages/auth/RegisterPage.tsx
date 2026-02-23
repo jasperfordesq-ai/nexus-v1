@@ -179,7 +179,8 @@ export function RegisterPage() {
   }, [firstName, lastName, email, password, passwordConfirm, location, phone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Validation for each step
-  const isStep1Valid = tenants.length === 0 || tenants.length === 1 || selectedTenantId;
+  // tenant?.id means TenantContext already resolved the tenant (custom domain or slug route)
+  const isStep1Valid = !!tenant?.id || tenants.length === 0 || tenants.length === 1 || !!selectedTenantId;
   const isStep2Valid =
     firstName.trim() &&
     lastName.trim() &&
@@ -245,9 +246,9 @@ export function RegisterPage() {
       return;
     }
 
-    // Get selected tenant
+    // Get selected tenant — fall back to TenantContext (custom domain) if no explicit selection
     const selectedTenant = tenants.find((t) => String(t.id) === selectedTenantId);
-    const tenantId = selectedTenant?.id || parseInt(selectedTenantId) || undefined;
+    const tenantId = selectedTenant?.id || parseInt(selectedTenantId) || tenant?.id || undefined;
 
     const success = await register({
       first_name: firstName,
@@ -284,7 +285,7 @@ export function RegisterPage() {
     passwordValid &&
     passwordsMatch &&
     (profileType === 'individual' || organizationName.trim()) &&
-    (tenants.length === 0 || selectedTenantId);
+    (tenants.length === 0 || !!selectedTenantId || !!tenant?.id);
 
   // Step progress percentage
   const progressPercent = (currentStep / STEPS.length) * 100;
@@ -295,8 +296,8 @@ export function RegisterPage() {
       case 1:
         return (
           <div className="space-y-4">
-            {/* Tenant Selector - Only show if multiple tenants */}
-            {!tenantsLoading && tenants.length > 1 && (
+            {/* Tenant Selector - Only show if multiple tenants AND tenant not already known from context */}
+            {!tenantsLoading && tenants.length > 1 && !tenant?.id && (
               <Select
                 label="Community"
                 placeholder="Select your community"
@@ -334,8 +335,23 @@ export function RegisterPage() {
               </Select>
             )}
 
-            {/* Show selected tenant if only one */}
-            {!tenantsLoading && tenants.length === 1 && (
+            {/* Show auto-detected community (custom domain or context-resolved tenant) */}
+            {tenant?.id && (
+              <div className="p-3 rounded-xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10">
+                <div className="flex items-center gap-3">
+                  <Building2 className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                  <div>
+                    <p className="text-gray-900 dark:text-white font-medium">{tenant.name}</p>
+                    {tenant.tagline && (
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">{tenant.tagline}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Show selected tenant if only one (and context not already set) */}
+            {!tenant?.id && !tenantsLoading && tenants.length === 1 && (
               <div className="p-3 rounded-xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10">
                 <div className="flex items-center gap-3">
                   <Building2 className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
@@ -352,7 +368,7 @@ export function RegisterPage() {
             )}
 
             {/* No tenants message */}
-            {!tenantsLoading && tenants.length === 0 && (
+            {!tenantsLoading && tenants.length === 0 && !tenant?.id && (
               <div className="p-3 rounded-xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10 text-center">
                 <p className="text-theme-muted text-sm">
                   Joining {tenant?.name || 'NEXUS'}
