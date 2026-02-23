@@ -12,15 +12,25 @@
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
+import { useLegalGate } from '@/hooks/useLegalGate';
+import { LegalAcceptanceGate } from '@/components/legal/LegalAcceptanceGate';
 
 interface ProtectedRouteProps {
   children?: React.ReactNode;
 }
 
+/** Path segments that must never be blocked by the legal gate */
+const LEGAL_GATE_BYPASS_SEGMENTS = new Set([
+  'terms', 'privacy', 'cookies', 'accessibility',
+  'community-guidelines', 'acceptable-use',
+  'legal', 'onboarding',
+]);
+
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, status, user } = useAuth();
   const { tenantPath } = useTenant();
   const location = useLocation();
+  const { hasPending, pendingDocs, acceptAll, isAccepting, isLoading: legalLoading } = useLegalGate();
 
   // Show loading while checking auth status
   if (isLoading || status === 'loading') {
@@ -39,8 +49,23 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to={tenantPath('/onboarding')} replace />;
   }
 
-  // Render children or outlet
-  return children ? <>{children}</> : <Outlet />;
+  // Legal gate: block protected pages when user has unaccepted legal documents.
+  // Skip the gate on legal/onboarding pages so users can read docs before accepting.
+  const isLegalBypassPath = LEGAL_GATE_BYPASS_SEGMENTS.has(lastSegment);
+  const showLegalGate = !legalLoading && hasPending && !isLegalBypassPath;
+
+  return (
+    <>
+      {showLegalGate && (
+        <LegalAcceptanceGate
+          pendingDocs={pendingDocs}
+          onAcceptAll={acceptAll}
+          isAccepting={isAccepting}
+        />
+      )}
+      {children ? <>{children}</> : <Outlet />}
+    </>
+  );
 }
 
 export default ProtectedRoute;

@@ -16,6 +16,7 @@ import { MobileTabBar } from './MobileTabBar';
 import { Footer } from './Footer';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
+import { DevelopmentStatusBanner } from './DevelopmentStatusBanner';
 import { SessionExpiredModal } from '@/components/feedback';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
 import { useApiErrorHandler } from '@/hooks';
@@ -66,6 +67,9 @@ export function Layout({
         <div className="blob blob-purple" />
         <div className="blob blob-cyan" />
       </div>
+
+      {/* Development status banner — always visible, non-dismissible */}
+      <DevelopmentStatusBanner />
 
       {/* Offline indicator */}
       <OfflineIndicator />
@@ -127,6 +131,9 @@ export function AuthLayout() {
         <div className="blob blob-purple" />
         <div className="blob blob-cyan" />
       </div>
+
+      {/* Development status banner */}
+      <DevelopmentStatusBanner />
 
       {/* Main Content */}
       <main className="relative z-10 flex-1">
