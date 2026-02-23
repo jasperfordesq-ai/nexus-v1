@@ -924,7 +924,7 @@ class AdminUsersApiController extends BaseApiController
         fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
         fputcsv($output, ['first_name', 'last_name', 'email', 'phone', 'role']);
-        fputcsv($output, ['Jane', 'Doe', 'jane@example.com', '+353861234567', 'member']);
+        fputcsv($output, ['Jane', 'Doe', 'jane@example.com', '+15551234567', 'member']);
         fputcsv($output, ['John', 'Smith', 'john@example.com', '', 'member']);
 
         fclose($output);
