@@ -117,15 +117,19 @@ export function RegisterPage() {
         if (response.success && response.data) {
           setTenants(response.data);
 
-          // Priority: URL slug prefix > ?tenant= query param > auto-select single
+          // Priority: TenantContext (custom domain) > URL slug > ?tenant= > auto-select single
           const tenantHint = tenantSlug || searchParams.get('tenant');
+          const contextMatch = tenant?.id
+            ? response.data.find((t) => t.id === tenant.id)
+            : null;
           const hintMatch = tenantHint
             ? response.data.find((t) => t.slug === tenantHint)
             : null;
 
-          if (hintMatch) {
-            setSelectedTenantId(String(hintMatch.id));
-            tokenManager.setTenantId(hintMatch.id);
+          const match = contextMatch || hintMatch;
+          if (match) {
+            setSelectedTenantId(String(match.id));
+            tokenManager.setTenantId(match.id);
           } else if (response.data.length === 1) {
             setSelectedTenantId(String(response.data[0].id));
             tokenManager.setTenantId(response.data[0].id);
@@ -138,7 +142,7 @@ export function RegisterPage() {
       }
     };
     fetchTenants();
-  }, [tenantSlug, searchParams]);
+  }, [tenantSlug, searchParams, tenant?.id]);
 
   // Handle tenant selection
   const handleTenantChange = (keys: unknown) => {
