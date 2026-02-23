@@ -132,8 +132,12 @@ jobs:
       # Scans the built Docker image for OS and library vulnerabilities.
       # --ignore-unfixed skips CVEs with no available patch (mostly
       # linux-libc-dev kernel CVEs not exploitable in containers).
-      # .trivyignore suppresses ancient disputed/won't-fix CVEs.
-      # Blocks on CRITICAL and HIGH with available fixes only.
+      # .trivyignore suppresses known kernel CVEs irrelevant in containers.
+      #
+      # The TABLE step is the blocking gate (exit-code 1) because Trivy
+      # correctly handles .trivyignore suppressions in table format.
+      # The SARIF step is non-blocking (exit-code 0) and uploads results
+      # to the GitHub Security tab for visibility.
       - name: Run Trivy Container Scan (Table)
         uses: aquasecurity/trivy-action@master
         with:
@@ -142,7 +146,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
           trivyignores: '.trivyignore'
-          exit-code: '0'
+          exit-code: '1'
 
       - name: Run Trivy Container Scan (SARIF)
         uses: aquasecurity/trivy-action@master
@@ -153,7 +157,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
           trivyignores: '.trivyignore'
-          exit-code: '1'
+          exit-code: '0'
 
       - name: Upload Container Scan Results
         uses: github/codeql-action/upload-sarif@v3
