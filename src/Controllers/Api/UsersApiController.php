@@ -7,6 +7,7 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Services\UserService;
+use Nexus\Services\Enterprise\GdprService;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ImageUploader;
 
@@ -204,6 +205,25 @@ class UsersApiController extends BaseApiController
      *
      * Response: 200 OK with updated preferences
      */
+    /**
+     * GET /api/v2/users/me/preferences
+     * Get the user's privacy and notification preferences
+     */
+    public function getPreferences(): void
+    {
+        $userId = $this->getUserId();
+
+        $profile = UserService::getOwnProfile($userId);
+        $this->respondWithData([
+            'privacy' => [
+                'privacy_profile' => $profile['privacy_profile'] ?? 'public',
+                'privacy_search' => (bool) ($profile['privacy_search'] ?? true),
+                'privacy_contact' => (bool) ($profile['privacy_contact'] ?? true),
+            ],
+            'notifications' => $profile['notification_preferences'] ?? [],
+        ]);
+    }
+
     public function updatePreferences(): void
     {
         $userId = $this->getUserId();
@@ -342,6 +362,15 @@ class UsersApiController extends BaseApiController
             'email_messages' => (bool) ($prefs['email_messages'] ?? true),
             'email_listings' => (bool) ($prefs['email_listings'] ?? true),
             'email_digest' => (bool) ($prefs['email_digest'] ?? false),
+            'email_connections' => (bool) ($prefs['email_connections'] ?? true),
+            'email_transactions' => (bool) ($prefs['email_transactions'] ?? true),
+            'email_reviews' => (bool) ($prefs['email_reviews'] ?? true),
+            'email_gamification_digest' => (bool) ($prefs['email_gamification_digest'] ?? true),
+            'email_gamification_milestones' => (bool) ($prefs['email_gamification_milestones'] ?? true),
+            'email_org_payments' => (bool) ($prefs['email_org_payments'] ?? true),
+            'email_org_transfers' => (bool) ($prefs['email_org_transfers'] ?? true),
+            'email_org_membership' => (bool) ($prefs['email_org_membership'] ?? true),
+            'email_org_admin' => (bool) ($prefs['email_org_admin'] ?? true),
             'push_enabled' => (bool) ($prefs['push_enabled'] ?? true),
         ]);
     }
@@ -359,7 +388,13 @@ class UsersApiController extends BaseApiController
         $data = $this->getAllInput();
 
         $prefs = [];
-        $allowedKeys = ['email_messages', 'email_listings', 'email_digest', 'push_enabled'];
+        $allowedKeys = [
+            'email_messages', 'email_listings', 'email_digest',
+            'email_connections', 'email_transactions', 'email_reviews',
+            'email_gamification_digest', 'email_gamification_milestones',
+            'email_org_payments', 'email_org_transfers', 'email_org_membership', 'email_org_admin',
+            'push_enabled',
+        ];
 
         foreach ($allowedKeys as $key) {
             if (isset($data[$key])) {
@@ -378,6 +413,235 @@ class UsersApiController extends BaseApiController
         }
 
         $this->respondWithData(['message' => 'Notification preferences updated']);
+    }
+
+    /**
+     * GET /api/v2/users/me/consent
+     * Get the user's GDPR consent statuses
+     */
+    public function getConsent(): void
+    {
+        $userId = $this->getUserId();
+
+        $gdprService = new GdprService();
+        $consents = $gdprService->getUserConsents($userId);
+
+        $this->respondWithData($consents);
+    }
+
+    /**
+     * PUT /api/v2/users/me/consent
+     * Update a single consent preference
+     *
+     * Request Body (JSON):
+     * {
+     *   "slug": string (required) - consent type slug,
+     *   "given": bool (required)
+     * }
+     */
+    public function updateConsent(): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('update_consent', 10, 60);
+
+        $data = $this->getAllInput();
+        $slug = trim($data['slug'] ?? '');
+        $given = (bool) ($data['given'] ?? false);
+
+        if (empty($slug)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Missing consent slug', 'slug', 400);
+        }
+
+        try {
+            $gdprService = new GdprService();
+            $result = $gdprService->updateUserConsent($userId, $slug, $given);
+
+            // Sync newsletter subscription when marketing_email consent changes
+            if ($slug === 'marketing_email') {
+                $this->syncNewsletterFromConsent($userId, $given);
+            }
+
+            $this->respondWithData($result);
+        } catch (\Exception $e) {
+            $this->respondWithError('CONSENT_UPDATE_FAILED', $e->getMessage(), null, 400);
+        }
+    }
+
+    /**
+     * POST /api/v2/users/me/gdpr-request
+     * Create a GDPR data request (access, erasure, portability, rectification, restriction, objection)
+     *
+     * Request Body (JSON):
+     * {
+     *   "type": string (required) - GDPR request type,
+     *   "notes": string (optional)
+     * }
+     */
+    public function createGdprRequest(): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('gdpr_request', 5, 3600);
+
+        $data = $this->getAllInput();
+        $type = trim($data['type'] ?? '');
+        $notes = $data['notes'] ?? null;
+
+        $validTypes = ['access', 'erasure', 'portability', 'rectification', 'restriction', 'objection'];
+
+        if (!in_array($type, $validTypes, true)) {
+            $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid request type. Valid types: ' . implode(', ', $validTypes),
+                'type',
+                400
+            );
+        }
+
+        try {
+            $gdprService = new GdprService();
+            $result = $gdprService->createRequest($userId, $type, [
+                'notes' => $notes,
+                'metadata' => [
+                    'source' => 'user_settings',
+                    'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+                    'requested_via' => $this->isStatelessRequest() ? 'api' : 'web',
+                ],
+            ]);
+
+            $this->respondWithData([
+                'request_id' => $result['id'],
+                'type' => $type,
+                'status' => 'pending',
+                'message' => 'Your request has been submitted and will be processed within 30 days.',
+            ], null, 201);
+        } catch (\RuntimeException $e) {
+            // Duplicate request
+            $this->respondWithError('DUPLICATE_REQUEST', $e->getMessage(), null, 409);
+        } catch (\Exception $e) {
+            $this->respondWithError('REQUEST_FAILED', $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
+     * Sync newsletter subscription based on marketing_email consent
+     */
+    private function syncNewsletterFromConsent(int $userId, bool $subscribed): void
+    {
+        try {
+            $user = \Nexus\Models\User::findById($userId);
+            if (!$user) return;
+
+            $email = $user['email'];
+            $existing = \Nexus\Models\NewsletterSubscriber::findByEmail($email);
+
+            if ($subscribed) {
+                if (!$existing) {
+                    \Nexus\Models\NewsletterSubscriber::createConfirmed(
+                        $email,
+                        $user['first_name'],
+                        $user['last_name'],
+                        'gdpr_settings',
+                        $userId
+                    );
+                } elseif ($existing['status'] === 'unsubscribed') {
+                    \Nexus\Models\NewsletterSubscriber::update($existing['id'], ['status' => 'active']);
+                }
+
+                try {
+                    $mailchimp = new \Nexus\Services\MailchimpService();
+                    $mailchimp->subscribe($email, $user['first_name'], $user['last_name']);
+                } catch (\Throwable $e) {
+                    error_log("Mailchimp Subscribe Failed: " . $e->getMessage());
+                }
+            } else {
+                if ($existing && $existing['status'] === 'active') {
+                    \Nexus\Models\NewsletterSubscriber::update($existing['id'], ['status' => 'unsubscribed']);
+
+                    try {
+                        $mailchimp = new \Nexus\Services\MailchimpService();
+                        $mailchimp->unsubscribe($email);
+                    } catch (\Throwable $e) {
+                        error_log("Mailchimp Unsubscribe Failed: " . $e->getMessage());
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log("Newsletter Sync From Consent Failed: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * GET /api/v2/users/me/sessions
+     * List user's active sessions with device/browser info
+     */
+    public function sessions(): void
+    {
+        $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+
+        $db = \Nexus\Core\Database::getInstance();
+        $stmt = $db->prepare(
+            "SELECT id, ip_address, user_agent, device_type, last_activity, created_at
+             FROM sessions
+             WHERE user_id = ? AND tenant_id = ?
+               AND (expires_at IS NULL OR expires_at > NOW())
+             ORDER BY last_activity DESC
+             LIMIT 20"
+        );
+        $stmt->execute([$userId, $tenantId]);
+        $rows = $stmt->fetchAll();
+
+        $currentSessionId = session_id() ?: '';
+
+        $sessions = array_map(function ($row) use ($currentSessionId) {
+            $ua = $row['user_agent'] ?? '';
+            return [
+                'id' => $row['id'],
+                'device' => $this->parseDevice($ua, $row['device_type'] ?? 'unknown'),
+                'browser' => $this->parseBrowser($ua),
+                'ip_address' => $row['ip_address'] ?? '',
+                'last_active' => $row['last_activity'] ?? $row['created_at'],
+                'is_current' => $row['id'] === $currentSessionId,
+            ];
+        }, $rows);
+
+        $this->respondWithData($sessions);
+    }
+
+    /**
+     * Parse browser name and version from user agent string
+     */
+    private function parseBrowser(string $ua): string
+    {
+        if (empty($ua)) return 'Unknown';
+
+        if (preg_match('/Edg[e\/]?([\d.]+)/i', $ua, $m)) return 'Edge ' . intval($m[1]);
+        if (preg_match('/OPR\/([\d.]+)/i', $ua, $m)) return 'Opera ' . intval($m[1]);
+        if (preg_match('/Chrome\/([\d.]+)/i', $ua, $m)) return 'Chrome ' . intval($m[1]);
+        if (preg_match('/Firefox\/([\d.]+)/i', $ua, $m)) return 'Firefox ' . intval($m[1]);
+        if (preg_match('/Safari\/([\d.]+)/i', $ua) && preg_match('/Version\/([\d.]+)/i', $ua, $m)) {
+            return 'Safari ' . intval($m[1]);
+        }
+        return 'Unknown';
+    }
+
+    /**
+     * Parse device/OS from user agent string
+     */
+    private function parseDevice(string $ua, string $deviceType): string
+    {
+        if (empty($ua)) return ucfirst($deviceType);
+
+        if (preg_match('/iPhone/i', $ua)) return 'iPhone';
+        if (preg_match('/iPad/i', $ua)) return 'iPad';
+        if (preg_match('/Android/i', $ua)) return 'Android';
+        if (preg_match('/Windows NT 10/i', $ua)) return 'Windows';
+        if (preg_match('/Macintosh/i', $ua)) return 'Mac';
+        if (preg_match('/Linux/i', $ua)) return 'Linux';
+
+        return ucfirst($deviceType);
     }
 
     /**

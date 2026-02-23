@@ -286,6 +286,7 @@ $router->add('GET', '/api/v2/users', function () {
 });
 $router->add('GET', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@me');
 $router->add('PUT', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@update');
+$router->add('GET', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@getPreferences');
 $router->add('PUT', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@updatePreferences');
 $router->add('PUT', '/api/v2/users/me/theme', 'Nexus\Controllers\Api\UsersApiController@updateTheme');
 $router->add('POST', '/api/v2/users/me/avatar', 'Nexus\Controllers\Api\UsersApiController@updateAvatar');
@@ -296,6 +297,10 @@ $router->add('GET', '/api/v2/users/{id}', 'Nexus\Controllers\Api\UsersApiControl
 $router->add('GET', '/api/v2/users/{id}/listings', 'Nexus\Controllers\Api\UsersApiController@listings');
 $router->add('GET', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@notificationPreferences');
 $router->add('PUT', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@updateNotificationPreferences');
+$router->add('GET', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@getConsent');
+$router->add('PUT', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@updateConsent');
+$router->add('POST', '/api/v2/users/me/gdpr-request', 'Nexus\Controllers\Api\UsersApiController@createGdprRequest');
+$router->add('GET', '/api/v2/users/me/sessions', 'Nexus\Controllers\Api\UsersApiController@sessions');
 $router->add('GET', '/api/v2/members/nearby', 'Nexus\Controllers\Api\UsersApiController@nearby');
 
 // ============================================
@@ -1099,9 +1104,15 @@ $router->add('POST', '/api/auth/reset-password', 'Nexus\Controllers\Api\Password
 $router->add('POST', '/api/auth/verify-email', 'Nexus\Controllers\Api\EmailVerificationApiController@verifyEmail');
 $router->add('POST', '/api/auth/resend-verification', 'Nexus\Controllers\Api\EmailVerificationApiController@resendVerification');
 
-// TOTP 2FA API
+// TOTP 2FA API (Legacy V1)
 $router->add('POST', '/api/totp/verify', 'Nexus\Controllers\Api\TotpApiController@verify');
 $router->add('GET', '/api/totp/status', 'Nexus\Controllers\Api\TotpApiController@status');
+
+// TOTP 2FA API (V2 - Bearer token compatible, used by React SPA)
+$router->add('GET', '/api/v2/auth/2fa/status', 'Nexus\Controllers\Api\TwoFactorApiController@status');
+$router->add('POST', '/api/v2/auth/2fa/setup', 'Nexus\Controllers\Api\TwoFactorApiController@setup');
+$router->add('POST', '/api/v2/auth/2fa/verify', 'Nexus\Controllers\Api\TwoFactorApiController@verify');
+$router->add('POST', '/api/v2/auth/2fa/disable', 'Nexus\Controllers\Api\TwoFactorApiController@disable');
 
 // Mobile App API (version checking, updates)
 $router->add('POST', '/api/app/check-version', 'Nexus\Controllers\Api\AppController@checkVersion');
