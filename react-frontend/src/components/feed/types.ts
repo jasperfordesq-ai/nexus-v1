@@ -9,6 +9,7 @@ export type PostMode = 'text' | 'poll';
 export interface FeedItem {
   id: number;
   content: string;
+  content_truncated?: boolean;
   title?: string;
   author_name?: string;
   author_avatar?: string;
@@ -30,6 +31,10 @@ export interface FeedItem {
     id: number;
     name: string;
   };
+  /** Event-specific: start date/time */
+  start_date?: string;
+  /** Event-specific: location name */
+  location?: string;
 }
 
 export interface PollData {
@@ -73,4 +78,39 @@ export function getAuthor(item: FeedItem) {
     name: item.author_name ?? item.author?.name ?? 'Unknown',
     avatar: item.author_avatar ?? item.author?.avatar_url ?? null,
   };
+}
+
+/**
+ * Get the detail page path for a feed item, or null if no detail page exists.
+ * Posts and polls live exclusively in the feed — no detail page.
+ */
+export function getItemDetailPath(item: FeedItem): string | null {
+  switch (item.type) {
+    case 'listing':
+      return `/listings/${item.id}`;
+    case 'event':
+      return `/events/${item.id}`;
+    case 'goal':
+      return '/goals';
+    case 'review':
+      return item.receiver ? `/profile/${item.receiver.id}` : null;
+    default:
+      return null;
+  }
+}
+
+/** Human-readable label for the "View …" CTA */
+export function getItemDetailLabel(item: FeedItem): string | null {
+  switch (item.type) {
+    case 'listing':
+      return 'View Listing';
+    case 'event':
+      return 'View Event';
+    case 'goal':
+      return 'View Goals';
+    case 'review':
+      return 'View Profile';
+    default:
+      return null;
+  }
 }
