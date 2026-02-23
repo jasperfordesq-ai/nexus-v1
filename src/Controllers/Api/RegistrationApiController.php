@@ -529,18 +529,32 @@ class RegistrationApiController extends BaseApiController
     {
         try {
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-            $adminLink = TenantContext::getDomain() . '/admin-legacy/users/' . $userId;
+            $adminLink = TenantContext::getFrontendUrl() . '/admin/users/' . $userId;
 
-            // Get all admins for this tenant
+            // Collect notification recipients: all active admins for this tenant
+            // (includes all admin roles: admin, super_admin, tenant_admin, tenant_super_admin)
             $db = Database::getConnection();
             $stmt = $db->prepare("
                 SELECT email, first_name FROM users
-                WHERE tenant_id = ? AND role IN ('admin', 'super_admin') AND status = 'active'
+                WHERE tenant_id = ?
+                  AND role IN ('admin', 'super_admin', 'tenant_admin', 'tenant_super_admin')
+                  AND status = 'active'
             ");
             $stmt->execute([$tenantId]);
             $admins = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
+            // Always include master notification address if configured
+            // (ensures jasper@hour-timebank.ie is notified regardless of tenant setup)
+            $masterEmail = \Nexus\Core\Env::get('ADMIN_NOTIFICATION_EMAIL');
+            if ($masterEmail) {
+                $alreadyIncluded = array_filter($admins, fn($a) => strtolower($a['email']) === strtolower($masterEmail));
+                if (empty($alreadyIncluded)) {
+                    $admins[] = ['email' => $masterEmail, 'first_name' => 'Admin'];
+                }
+            }
+
             if (empty($admins)) {
+                error_log("[Registration] No admins to notify for tenant $tenantId");
                 return;
             }
 
@@ -551,6 +565,7 @@ class RegistrationApiController extends BaseApiController
                     "New User Registration",
                     "A new user has registered on $tenantName",
                     "<strong>User:</strong> $firstName $lastName ($email)<br>
+                     <strong>Community:</strong> $tenantName<br>
                      <strong>Status:</strong> Pending Approval<br><br>
                      Please review and approve this user to grant them access.",
                     "Review User",
@@ -560,7 +575,7 @@ class RegistrationApiController extends BaseApiController
 
                 $mailer->send(
                     $admin['email'],
-                    "New User Registration - $tenantName",
+                    "New Registration on $tenantName — $firstName $lastName",
                     $html
                 );
             }
