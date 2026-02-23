@@ -1,0 +1,30 @@
+# =============================================================================
+# Trivy Ignore File
+# =============================================================================
+# CVEs listed here are suppressed from Trivy vulnerability scans.
+# Each entry must be justified. Review quarterly.
+#
+# Last reviewed: 2026-02-23
+# =============================================================================
+
+# ── Ancient kernel CVEs with no fix (disputed/won't-fix) ───────────────────
+# These affect the Linux kernel shipped in the Debian base image (linux-libc-dev)
+# and are NOT exploitable in a Docker container context (no kernel access).
+
+# Memory exhaustion via crafted Graphics Execution Manager (GEM) objects —
+# requires local access and specific GPU hardware. Disputed since 2013.
+CVE-2013-7445
+
+# f2fs filesystem crafted image — requires mounting attacker-controlled
+# filesystems, not applicable in containerized web server.
+CVE-2019-19449
+
+# f2fs out-of-bounds write — same as above, requires filesystem mount.
+CVE-2019-19814
+
+# Privilege escalation via user namespaces — requires local unprivileged
+# access to the host kernel, not applicable inside containers.
+CVE-2021-3847
+
+# Descendant dumpable SUID bypass — host kernel issue, not container.
+CVE-2021-3864
