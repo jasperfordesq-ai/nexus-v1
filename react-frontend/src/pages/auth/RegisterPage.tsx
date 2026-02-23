@@ -503,7 +503,7 @@ export function RegisterPage() {
             <Input
               type="tel"
               label="Phone Number"
-              placeholder="e.g. 087 123 4567"
+              placeholder="e.g. +1 555 123 4567"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               startContent={<Phone className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}

@@ -282,15 +282,9 @@ class AuthController
             // Enforce Strong Password
             $errors = $this->validateStrongPassword($password);
 
-            // Irish Phone Validation
-            if ($phone && !\Nexus\Core\Validator::isIrishPhone($phone)) {
-                $errors[] = "Please enter a valid Irish phone number (e.g., 087 123 4567 or +353 87 123 4567).";
-            }
-
-            // Location Validation (Google Maps via GeocodingService)
-            if ($location) {
-                $locError = \Nexus\Core\Validator::validateIrishLocation($location);
-                if ($locError) $errors[] = $locError;
+            // Phone validation (optional, international format)
+            if ($phone && !\Nexus\Core\Validator::isPhone($phone)) {
+                $errors[] = "Please enter a valid phone number.";
             }
 
             if (!empty($errors)) {
