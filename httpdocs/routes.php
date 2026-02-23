@@ -746,23 +746,23 @@ $router->add('DELETE', '/api/v2/admin/groups/types/{id}', 'Nexus\Controllers\Api
 $router->add('GET', '/api/v2/admin/groups/types/{id}/policies', 'Nexus\Controllers\Api\AdminGroupsApiController@getPolicies');
 $router->add('PUT', '/api/v2/admin/groups/types/{id}/policies', 'Nexus\Controllers\Api\AdminGroupsApiController@setPolicy');
 
-// Admin Groups - Detail & Members (Phase 3)
+// Admin Groups - Geocoding (Phase 3)
+$router->add('POST', '/api/v2/admin/groups/batch-geocode', 'Nexus\Controllers\Api\AdminGroupsApiController@batchGeocode');
+
+// Admin Groups - Recommendations & Ranking (Phase 3) — static paths BEFORE {id} catch-all
+$router->add('GET', '/api/v2/admin/groups/recommendations', 'Nexus\Controllers\Api\AdminGroupsApiController@getRecommendationData');
+$router->add('GET', '/api/v2/admin/groups/featured', 'Nexus\Controllers\Api\AdminGroupsApiController@getFeaturedGroups');
+$router->add('POST', '/api/v2/admin/groups/featured/update', 'Nexus\Controllers\Api\AdminGroupsApiController@updateFeaturedGroups');
+
+// Admin Groups - Detail & Members (Phase 3) — {id} catch-all MUST be last
 $router->add('GET', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@getGroup');
 $router->add('PUT', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@updateGroup');
+$router->add('PUT', '/api/v2/admin/groups/{id}/toggle-featured', 'Nexus\Controllers\Api\AdminGroupsApiController@toggleFeatured');
+$router->add('POST', '/api/v2/admin/groups/{id}/geocode', 'Nexus\Controllers\Api\AdminGroupsApiController@geocodeGroup');
 $router->add('GET', '/api/v2/admin/groups/{groupId}/members', 'Nexus\Controllers\Api\AdminGroupsApiController@getMembers');
 $router->add('POST', '/api/v2/admin/groups/{groupId}/members/{userId}/promote', 'Nexus\Controllers\Api\AdminGroupsApiController@promoteMember');
 $router->add('POST', '/api/v2/admin/groups/{groupId}/members/{userId}/demote', 'Nexus\Controllers\Api\AdminGroupsApiController@demoteMember');
 $router->add('DELETE', '/api/v2/admin/groups/{groupId}/members/{userId}', 'Nexus\Controllers\Api\AdminGroupsApiController@kickMember');
-
-// Admin Groups - Geocoding (Phase 3)
-$router->add('POST', '/api/v2/admin/groups/{id}/geocode', 'Nexus\Controllers\Api\AdminGroupsApiController@geocodeGroup');
-$router->add('POST', '/api/v2/admin/groups/batch-geocode', 'Nexus\Controllers\Api\AdminGroupsApiController@batchGeocode');
-
-// Admin Groups - Recommendations & Ranking (Phase 3)
-$router->add('GET', '/api/v2/admin/groups/recommendations', 'Nexus\Controllers\Api\AdminGroupsApiController@getRecommendationData');
-$router->add('GET', '/api/v2/admin/groups/featured', 'Nexus\Controllers\Api\AdminGroupsApiController@getFeaturedGroups');
-$router->add('POST', '/api/v2/admin/groups/featured/update', 'Nexus\Controllers\Api\AdminGroupsApiController@updateFeaturedGroups');
-$router->add('PUT', '/api/v2/admin/groups/{id}/toggle-featured', 'Nexus\Controllers\Api\AdminGroupsApiController@toggleFeatured');
 
 // Admin Timebanking
 $router->add('GET', '/api/v2/admin/timebanking/stats', 'Nexus\Controllers\Api\AdminTimebankingApiController@stats');
