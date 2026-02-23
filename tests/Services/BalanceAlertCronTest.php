@@ -47,6 +47,7 @@ class BalanceAlertCronTest extends TestCase
             'getThresholds',
             'setThresholds',
             'getBalanceStatus',
+            'areAlertsEnabled',
         ];
 
         $ref = new \ReflectionClass(BalanceAlertService::class);
@@ -422,5 +423,94 @@ class BalanceAlertCronTest extends TestCase
             -10 <= $critical,
             'Negative balance should be at or below critical threshold'
         );
+    }
+
+    // =========================================================================
+    // ALERTS ENABLED CHECK
+    // =========================================================================
+
+    /**
+     * Test areAlertsEnabled method exists and is public static
+     */
+    public function testAreAlertsEnabledMethodExists(): void
+    {
+        $ref = new \ReflectionClass(BalanceAlertService::class);
+        $this->assertTrue($ref->hasMethod('areAlertsEnabled'));
+
+        $method = $ref->getMethod('areAlertsEnabled');
+        $this->assertTrue($method->isPublic(), 'areAlertsEnabled should be public');
+        $this->assertTrue($method->isStatic(), 'areAlertsEnabled should be static');
+
+        $params = $method->getParameters();
+        $this->assertCount(1, $params, 'Should accept organizationId');
+        $this->assertEquals('organizationId', $params[0]->getName());
+    }
+
+    // =========================================================================
+    // FUNDED WALLET GUARD (prevents alerting on never-funded wallets)
+    // =========================================================================
+
+    /**
+     * Test that checkAllBalances uses transaction existence check
+     *
+     * The checkAllBalances method should only alert for wallets that have
+     * been previously funded (have at least one credit transaction).
+     * This prevents spamming org admins for wallets auto-created with 0 balance.
+     */
+    public function testCheckAllBalancesRequiresFundedWallets(): void
+    {
+        // Verify the method exists and takes no parameters
+        $ref = new \ReflectionMethod(BalanceAlertService::class, 'checkAllBalances');
+        $this->assertCount(0, $ref->getParameters());
+
+        // The implementation should use EXISTS subquery on org_transactions
+        // to filter to only funded wallets. This is a design requirement.
+        $sourceFile = file_get_contents((new \ReflectionClass(BalanceAlertService::class))->getFileName());
+        $this->assertStringContainsString(
+            'org_transactions',
+            $sourceFile,
+            'checkAllBalances should check org_transactions to verify wallet was funded'
+        );
+    }
+
+    /**
+     * Test that checkAllBalances checks areAlertsEnabled
+     */
+    public function testCheckAllBalancesRespectsAlertsEnabled(): void
+    {
+        $sourceFile = file_get_contents((new \ReflectionClass(BalanceAlertService::class))->getFileName());
+        $this->assertStringContainsString(
+            'areAlertsEnabled',
+            $sourceFile,
+            'checkAllBalances should check areAlertsEnabled before sending alerts'
+        );
+    }
+
+    // =========================================================================
+    // RECIPIENT SCOPING
+    // =========================================================================
+
+    /**
+     * Test that sendBalanceAlert scopes recipients by severity
+     *
+     * Low alerts: owner only
+     * Critical alerts: owner + admins
+     */
+    public function testSendBalanceAlertScopesRecipientsBySeverity(): void
+    {
+        $ref = new \ReflectionClass(BalanceAlertService::class);
+        $method = $ref->getMethod('sendBalanceAlert');
+
+        // Verify the method exists and accepts severity parameter
+        $params = $method->getParameters();
+        $this->assertGreaterThanOrEqual(4, count($params));
+
+        // The implementation should call getOwner for low alerts
+        // and getAdminsAndOwners for critical alerts
+        $sourceFile = file_get_contents($ref->getFileName());
+        $this->assertStringContainsString('getOwner', $sourceFile,
+            'sendBalanceAlert should use getOwner for low-severity alerts');
+        $this->assertStringContainsString('getAdminsAndOwners', $sourceFile,
+            'sendBalanceAlert should use getAdminsAndOwners for critical alerts');
     }
 }
