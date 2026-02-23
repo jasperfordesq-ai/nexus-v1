@@ -108,7 +108,12 @@ interface NotificationSettings {
   email_connections: boolean;
   email_transactions: boolean;
   email_reviews: boolean;
-  email_gamification: boolean;
+  email_gamification_digest: boolean;
+  email_gamification_milestones: boolean;
+  email_org_payments: boolean;
+  email_org_transfers: boolean;
+  email_org_membership: boolean;
+  email_org_admin: boolean;
   push_enabled: boolean;
 }
 
@@ -201,12 +206,23 @@ export function SettingsPage() {
     email_connections: true,
     email_transactions: true,
     email_reviews: true,
-    email_gamification: false,
+    email_gamification_digest: true,
+    email_gamification_milestones: true,
+    email_org_payments: true,
+    email_org_transfers: true,
+    email_org_membership: true,
+    email_org_admin: true,
     push_enabled: true,
   });
 
-  // Match digest frequency
+  // Match digest frequency & preferences
   const [matchDigestFrequency, setMatchDigestFrequency] = useState<string>('daily');
+  const [notifyHotMatches, setNotifyHotMatches] = useState(true);
+  const [notifyMutualMatches, setNotifyMutualMatches] = useState(true);
+
+  // Marketing consent
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [marketingConsentLoading, setMarketingConsentLoading] = useState(false);
 
   // Privacy settings
   const [privacy, setPrivacy] = useState<PrivacySettings>({
@@ -270,20 +286,41 @@ export function SettingsPage() {
 
   const loadMatchPreferences = useCallback(async () => {
     try {
-      const response = await api.get<{ notification_frequency: string }>('/v2/users/me/match-preferences');
+      const response = await api.get<{ notification_frequency: string; notify_hot_matches: boolean; notify_mutual_matches: boolean }>('/v2/users/me/match-preferences');
       if (response.success && response.data) {
         setMatchDigestFrequency(response.data.notification_frequency || 'daily');
+        setNotifyHotMatches(response.data.notify_hot_matches ?? true);
+        setNotifyMutualMatches(response.data.notify_mutual_matches ?? true);
       }
     } catch (error) {
       logError('Failed to load match preferences', error);
     }
   }, []);
 
+  const loadMarketingConsent = useCallback(async () => {
+    try {
+      const response = await api.get<Array<{ consent_type_slug: string; given: boolean }>>('/v2/users/me/consent');
+      if (response.success && Array.isArray(response.data)) {
+        const marketing = response.data.find((c) => c.consent_type_slug === 'marketing_email');
+        if (marketing) {
+          setMarketingConsent(marketing.given);
+        }
+      }
+    } catch (error) {
+      logError('Failed to load marketing consent', error);
+    }
+  }, []);
+
   const loadPrivacySettings = useCallback(async () => {
     try {
-      const response = await api.get<{ privacy: PrivacySettings }>('/v2/users/me/preferences');
+      const response = await api.get<{ privacy: { privacy_profile: string; privacy_search: boolean; privacy_contact: boolean } }>('/v2/users/me/preferences');
       if (response.success && response.data?.privacy) {
-        setPrivacy((prev) => ({ ...prev, ...response.data!.privacy }));
+        const p = response.data.privacy;
+        setPrivacy({
+          profile_visibility: (p.privacy_profile as 'public' | 'members' | 'connections') || 'members',
+          search_indexing: p.privacy_search ?? true,
+          contact_permission: p.privacy_contact ?? true,
+        });
       }
     } catch (error) {
       logError('Failed to load privacy settings', error);
@@ -346,10 +383,11 @@ export function SettingsPage() {
     }
     loadNotificationSettings();
     loadMatchPreferences();
+    loadMarketingConsent();
     loadPrivacySettings();
     loadTwoFactorStatus();
     loadSessions();
-  }, [user, loadNotificationSettings, loadMatchPreferences, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
+  }, [user, loadNotificationSettings, loadMatchPreferences, loadMarketingConsent, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
 
   // Load insurance certificates when insurance is enabled
   const loadInsuranceCerts = useCallback(async () => {
@@ -420,6 +458,8 @@ export function SettingsPage() {
         api.put('/v2/users/me/notifications', notifications),
         api.put('/v2/users/me/match-preferences', {
           notification_frequency: matchDigestFrequency,
+          notify_hot_matches: notifyHotMatches,
+          notify_mutual_matches: notifyMutualMatches,
         }),
       ]);
       if (notifResponse.success && matchResponse.success) {
@@ -433,12 +473,19 @@ export function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [notifications, matchDigestFrequency, toast]);
+  }, [notifications, matchDigestFrequency, notifyHotMatches, notifyMutualMatches, toast]);
 
   const savePrivacy = useCallback(async () => {
     try {
       setIsSavingPrivacy(true);
-      const response = await api.put('/v2/users/me/preferences', { privacy });
+      // Map React field names to PHP field names
+      const response = await api.put('/v2/users/me/preferences', {
+        privacy: {
+          privacy_profile: privacy.profile_visibility,
+          privacy_search: privacy.search_indexing,
+          privacy_contact: privacy.contact_permission,
+        },
+      });
       if (response.success) {
         toast.success('Privacy settings saved');
       } else {
@@ -651,6 +698,31 @@ export function SettingsPage() {
       toast.error('Failed to disable 2FA', 'Password may be incorrect');
     } finally {
       setIsDisabling2FA(false);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Marketing Consent Handler
+  // ─────────────────────────────────────────────────────────────────────────
+
+  async function handleMarketingConsentToggle(checked: boolean) {
+    try {
+      setMarketingConsentLoading(true);
+      const response = await api.put('/v2/users/me/consent', {
+        slug: 'marketing_email',
+        given: checked,
+      });
+      if (response.success) {
+        setMarketingConsent(checked);
+        toast.success(checked ? 'Subscribed to marketing emails' : 'Unsubscribed from marketing emails');
+      } else {
+        toast.error('Failed to update marketing consent');
+      }
+    } catch (error) {
+      logError('Failed to update marketing consent', error);
+      toast.error('Failed to update marketing consent');
+    } finally {
+      setMarketingConsentLoading(false);
     }
   }
 
@@ -1091,10 +1163,17 @@ export function SettingsPage() {
                   </h3>
 
                   <SettingToggle
+                    label="Gamification Digest"
+                    description="Periodic summary of your gamification activity and progress"
+                    checked={notifications.email_gamification_digest}
+                    onChange={(checked) => setNotifications((prev) => ({ ...prev, email_gamification_digest: checked }))}
+                  />
+
+                  <SettingToggle
                     label="Achievement Milestones"
                     description="Badge unlocks, level ups, and achievement notifications"
-                    checked={notifications.email_gamification}
-                    onChange={(checked) => setNotifications((prev) => ({ ...prev, email_gamification: checked }))}
+                    checked={notifications.email_gamification_milestones}
+                    onChange={(checked) => setNotifications((prev) => ({ ...prev, email_gamification_milestones: checked }))}
                   />
 
                   <SettingToggle
@@ -1104,6 +1183,44 @@ export function SettingsPage() {
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_digest: checked }))}
                   />
                 </div>
+
+                {/* Organisation Notifications */}
+                {profileData.profile_type === 'organisation' && (
+                  <div className="pt-4 border-t border-theme-default space-y-4">
+                    <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
+                      <Building2 className="w-4 h-4" aria-hidden="true" />
+                      Organisation Notifications
+                    </h3>
+
+                    <SettingToggle
+                      label="Payment Notifications"
+                      description="Notifications for organisation payment activity"
+                      checked={notifications.email_org_payments}
+                      onChange={(checked) => setNotifications((prev) => ({ ...prev, email_org_payments: checked }))}
+                    />
+
+                    <SettingToggle
+                      label="Transfer Notifications"
+                      description="Notifications for credit transfers"
+                      checked={notifications.email_org_transfers}
+                      onChange={(checked) => setNotifications((prev) => ({ ...prev, email_org_transfers: checked }))}
+                    />
+
+                    <SettingToggle
+                      label="Membership Updates"
+                      description="Member joins, leaves, and membership changes"
+                      checked={notifications.email_org_membership}
+                      onChange={(checked) => setNotifications((prev) => ({ ...prev, email_org_membership: checked }))}
+                    />
+
+                    <SettingToggle
+                      label="Admin Notifications"
+                      description="Administrative alerts and system notifications"
+                      checked={notifications.email_org_admin}
+                      onChange={(checked) => setNotifications((prev) => ({ ...prev, email_org_admin: checked }))}
+                    />
+                  </div>
+                )}
 
                 {/* Match Digest */}
                 <div className="pt-4 border-t border-theme-default space-y-4">
@@ -1137,6 +1254,20 @@ export function SettingsPage() {
                       </Select>
                     </div>
                   </div>
+
+                  <SettingToggle
+                    label="Hot Match Alerts"
+                    description="Get notified about high-compatibility matches"
+                    checked={notifyHotMatches}
+                    onChange={setNotifyHotMatches}
+                  />
+
+                  <SettingToggle
+                    label="Mutual Match Alerts"
+                    description="Get notified when someone you matched with also matches you"
+                    checked={notifyMutualMatches}
+                    onChange={setNotifyMutualMatches}
+                  />
                 </div>
 
                 {/* Push Notifications */}
@@ -1151,6 +1282,22 @@ export function SettingsPage() {
                     description="Receive real-time notifications on your device"
                     checked={notifications.push_enabled}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, push_enabled: checked }))}
+                  />
+                </div>
+
+                {/* Marketing & Communications */}
+                <div className="pt-4 border-t border-theme-default space-y-4">
+                  <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
+                    <Mail className="w-4 h-4" aria-hidden="true" />
+                    Marketing & Communications
+                  </h3>
+
+                  <SettingToggle
+                    label="Marketing Emails"
+                    description="Receive newsletters, promotions, and community updates"
+                    checked={marketingConsent}
+                    onChange={handleMarketingConsentToggle}
+                    disabled={marketingConsentLoading}
                   />
                 </div>
 
@@ -2044,9 +2191,10 @@ interface SettingToggleProps {
   description: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  disabled?: boolean;
 }
 
-function SettingToggle({ label, description, checked, onChange }: SettingToggleProps) {
+function SettingToggle({ label, description, checked, onChange, disabled }: SettingToggleProps) {
   return (
     <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated">
       <div>
@@ -2057,6 +2205,7 @@ function SettingToggle({ label, description, checked, onChange }: SettingToggleP
         aria-label={label}
         isSelected={checked}
         onValueChange={onChange}
+        isDisabled={disabled}
         classNames={{
           wrapper: 'group-data-[selected=true]:bg-indigo-500',
         }}
