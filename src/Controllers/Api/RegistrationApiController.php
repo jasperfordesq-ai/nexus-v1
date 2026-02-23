@@ -246,9 +246,9 @@ class RegistrationApiController extends BaseApiController
                 INSERT INTO users (
                     first_name, last_name, email, password_hash, tenant_id,
                     profile_type, organization_name, location, latitude, longitude, phone,
-                    role, status, created_at
+                    role, status, is_approved, created_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'member', 'pending', NOW())
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'member', 'active', 0, NOW())
             ");
             $stmt->execute([
                 $firstName,
