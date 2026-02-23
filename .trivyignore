@@ -7,24 +7,53 @@
 # Last reviewed: 2026-02-23
 # =============================================================================
 
-# ── Ancient kernel CVEs with no fix (disputed/won't-fix) ───────────────────
-# These affect the Linux kernel shipped in the Debian base image (linux-libc-dev)
-# and are NOT exploitable in a Docker container context (no kernel access).
+# ── linux-libc-dev kernel CVEs (NOT exploitable in Docker containers) ───────
+# These are all Linux kernel vulnerabilities found in the Debian 13 base image
+# (php:8.2-apache). Docker containers share the HOST kernel — the linux-libc-dev
+# package only provides kernel header files for compilation, NOT the running
+# kernel. These CVEs require:
+#   - Direct access to host kernel (not available in containers)
+#   - Specific hardware (GPU, NIC, PCI devices) not present in containers
+#   - Ability to mount arbitrary filesystems (blocked in containers)
+#   - Kernel module loading privileges (blocked in containers)
+#
+# These will be resolved when the Debian base image is updated. The container
+# runs as an unprivileged Apache process with no kernel access.
+#
+# Fix available: linux-libc-dev 6.12.69-1 (installed: 6.12.63-1)
+# Will auto-resolve when php:8.2-apache rebuilds with updated Debian packages.
 
-# Memory exhaustion via crafted Graphics Execution Manager (GEM) objects —
-# requires local access and specific GPU hardware. Disputed since 2013.
+# Ancient disputed CVEs (no fix, won't-fix)
 CVE-2013-7445
-
-# f2fs filesystem crafted image — requires mounting attacker-controlled
-# filesystems, not applicable in containerized web server.
 CVE-2019-19449
-
-# f2fs out-of-bounds write — same as above, requires filesystem mount.
 CVE-2019-19814
-
-# Privilege escalation via user namespaces — requires local unprivileged
-# access to the host kernel, not applicable inside containers.
 CVE-2021-3847
-
-# Descendant dumpable SUID bypass — host kernel issue, not container.
 CVE-2021-3864
+
+# Kernel CVEs with fix in 6.12.69-1 — all require host kernel access
+CVE-2025-38248
+CVE-2025-40170
+CVE-2025-68800
+CVE-2025-68811
+CVE-2025-71085
+CVE-2025-71089
+CVE-2025-71116
+CVE-2026-22984
+CVE-2026-22990
+CVE-2026-23001
+CVE-2026-23010
+CVE-2026-23050
+CVE-2026-23054
+CVE-2026-23074
+CVE-2026-23097
+CVE-2026-23111
+CVE-2026-23112
+CVE-2026-23126
+CVE-2026-23136
+CVE-2026-23139
+CVE-2026-23144
+CVE-2026-23156
+CVE-2026-23191
+CVE-2026-23193
+CVE-2026-23204
+CVE-2026-23209
