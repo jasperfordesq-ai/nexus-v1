@@ -480,7 +480,7 @@ export function UserEdit() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Input label="Email" type="email" placeholder="user@example.com" value={email} onValueChange={setEmail}
                   isRequired isInvalid={!!errors.email} errorMessage={errors.email} isDisabled={submitting} />
-                <Input label="Phone" type="tel" placeholder="e.g. +353 87 123 4567" value={phone}
+                <Input label="Phone" type="tel" placeholder="e.g. +1 555 123 4567" value={phone}
                   onValueChange={setPhone} isDisabled={submitting} />
               </div>
 

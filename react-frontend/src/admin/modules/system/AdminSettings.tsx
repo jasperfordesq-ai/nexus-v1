@@ -157,7 +157,7 @@ export function AdminSettings() {
             />
             <Input
               label="Contact Phone"
-              placeholder="+353..."
+              placeholder="+1 555 123 4567"
               variant="bordered"
               value={form.contact_phone}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_phone: val }))}

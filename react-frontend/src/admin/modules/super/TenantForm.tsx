@@ -330,7 +330,7 @@ export function TenantForm() {
               />
               <Input
                 label="Contact Phone"
-                placeholder="+353 1 234 5678"
+                placeholder="+1 555 123 4567"
                 value={form.contact_phone}
                 onValueChange={(v) => updateField('contact_phone', v)}
               />

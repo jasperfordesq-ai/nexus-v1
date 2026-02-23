@@ -36,8 +36,8 @@ export interface LocationMapProps {
   fitBounds?: boolean;
 }
 
-/** Default center: Ireland */
-const DEFAULT_CENTER = { lat: 53.35, lng: -6.26 };
+/** Default center: neutral global fallback */
+const DEFAULT_CENTER = { lat: 20, lng: 0 };
 const DEFAULT_ZOOM = 12;
 
 function LocationMapInner({
