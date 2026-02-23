@@ -6,6 +6,7 @@
 export { default as FederationHubPage } from './FederationHubPage';
 export { FederationMembersPage } from './FederationMembersPage';
 export { FederationPartnersPage } from './FederationPartnersPage';
+export { FederationPartnerDetailPage } from './FederationPartnerDetailPage';
 export { FederationSettingsPage } from './FederationSettingsPage';
 export { FederationMessagesPage } from './FederationMessagesPage';
 export { FederationListingsPage } from './FederationListingsPage';
