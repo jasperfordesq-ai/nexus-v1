@@ -205,6 +205,25 @@ class UsersApiController extends BaseApiController
      *
      * Response: 200 OK with updated preferences
      */
+    /**
+     * GET /api/v2/users/me/preferences
+     * Get the user's privacy and notification preferences
+     */
+    public function getPreferences(): void
+    {
+        $userId = $this->getUserId();
+
+        $profile = UserService::getOwnProfile($userId);
+        $this->respondWithData([
+            'privacy' => [
+                'privacy_profile' => $profile['privacy_profile'] ?? 'public',
+                'privacy_search' => (bool) ($profile['privacy_search'] ?? true),
+                'privacy_contact' => (bool) ($profile['privacy_contact'] ?? true),
+            ],
+            'notifications' => $profile['notification_preferences'] ?? [],
+        ]);
+    }
+
     public function updatePreferences(): void
     {
         $userId = $this->getUserId();
@@ -551,6 +570,78 @@ class UsersApiController extends BaseApiController
         } catch (\Throwable $e) {
             error_log("Newsletter Sync From Consent Failed: " . $e->getMessage());
         }
+    }
+
+    /**
+     * GET /api/v2/users/me/sessions
+     * List user's active sessions with device/browser info
+     */
+    public function sessions(): void
+    {
+        $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+
+        $db = \Nexus\Core\Database::getInstance();
+        $stmt = $db->prepare(
+            "SELECT id, ip_address, user_agent, device_type, last_activity, created_at
+             FROM sessions
+             WHERE user_id = ? AND tenant_id = ?
+               AND (expires_at IS NULL OR expires_at > NOW())
+             ORDER BY last_activity DESC
+             LIMIT 20"
+        );
+        $stmt->execute([$userId, $tenantId]);
+        $rows = $stmt->fetchAll();
+
+        $currentSessionId = session_id() ?: '';
+
+        $sessions = array_map(function ($row) use ($currentSessionId) {
+            $ua = $row['user_agent'] ?? '';
+            return [
+                'id' => $row['id'],
+                'device' => $this->parseDevice($ua, $row['device_type'] ?? 'unknown'),
+                'browser' => $this->parseBrowser($ua),
+                'ip_address' => $row['ip_address'] ?? '',
+                'last_active' => $row['last_activity'] ?? $row['created_at'],
+                'is_current' => $row['id'] === $currentSessionId,
+            ];
+        }, $rows);
+
+        $this->respondWithData($sessions);
+    }
+
+    /**
+     * Parse browser name and version from user agent string
+     */
+    private function parseBrowser(string $ua): string
+    {
+        if (empty($ua)) return 'Unknown';
+
+        if (preg_match('/Edg[e\/]?([\d.]+)/i', $ua, $m)) return 'Edge ' . intval($m[1]);
+        if (preg_match('/OPR\/([\d.]+)/i', $ua, $m)) return 'Opera ' . intval($m[1]);
+        if (preg_match('/Chrome\/([\d.]+)/i', $ua, $m)) return 'Chrome ' . intval($m[1]);
+        if (preg_match('/Firefox\/([\d.]+)/i', $ua, $m)) return 'Firefox ' . intval($m[1]);
+        if (preg_match('/Safari\/([\d.]+)/i', $ua) && preg_match('/Version\/([\d.]+)/i', $ua, $m)) {
+            return 'Safari ' . intval($m[1]);
+        }
+        return 'Unknown';
+    }
+
+    /**
+     * Parse device/OS from user agent string
+     */
+    private function parseDevice(string $ua, string $deviceType): string
+    {
+        if (empty($ua)) return ucfirst($deviceType);
+
+        if (preg_match('/iPhone/i', $ua)) return 'iPhone';
+        if (preg_match('/iPad/i', $ua)) return 'iPad';
+        if (preg_match('/Android/i', $ua)) return 'Android';
+        if (preg_match('/Windows NT 10/i', $ua)) return 'Windows';
+        if (preg_match('/Macintosh/i', $ua)) return 'Mac';
+        if (preg_match('/Linux/i', $ua)) return 'Linux';
+
+        return ucfirst($deviceType);
     }
 
     /**
