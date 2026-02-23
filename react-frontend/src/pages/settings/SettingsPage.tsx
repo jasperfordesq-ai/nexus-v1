@@ -985,7 +985,7 @@ export function SettingsPage() {
               <Input
                 type="tel"
                 label="Phone Number"
-                placeholder="+353 1 234 5678"
+                placeholder="+1 555 123 4567"
                 value={profileData.phone}
                 onChange={(e) => setProfileData((prev) => ({ ...prev, phone: e.target.value }))}
                 startContent={<Phone className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
