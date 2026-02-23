@@ -231,8 +231,9 @@ export function RegisterPage() {
     }
 
     const timeTaken = Date.now() - formStartTime;
-    if (timeTaken < 3000) {
-      // Form submitted too fast (< 3 seconds) - likely a bot
+    if (timeTaken < 5000) {
+      // Form submitted too fast (< 5 seconds) - likely a bot.
+      // Intentionally silent: showing an error would tell bots exactly what to adjust.
       clearError();
       return;
     }
