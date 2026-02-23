@@ -36,6 +36,7 @@ function lazyWithRetry(
       // Only reload for chunk load errors (network/404 failures)
       const isChunkError =
         error.message?.includes('Failed to fetch dynamically imported module') ||
+        error.message?.includes('error loading dynamically imported module') ||
         error.message?.includes('Loading chunk') ||
         error.message?.includes('Loading CSS chunk') ||
         error.message?.includes('Unable to preload CSS') ||
