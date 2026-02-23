@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   security-scan:
     name: Security Vulnerability Scan
@@ -27,7 +31,16 @@ jobs:
 
       # ── Trivy filesystem scan ─────────────────────────────────────
       # Blocks on CRITICAL and HIGH severity vulnerabilities.
-      - name: Run Trivy Vulnerability Scanner
+      - name: Run Trivy Vulnerability Scanner (Table)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          format: 'table'
+          exit-code: '0'
+
+      - name: Run Trivy Vulnerability Scanner (SARIF)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
@@ -105,7 +118,15 @@ jobs:
       # ── Trivy container scan ─────────────────────────────────────
       # Blocks on CRITICAL and HIGH severity vulnerabilities in the
       # built Docker image.
-      - name: Run Trivy Container Scan
+      - name: Run Trivy Container Scan (Table)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'nexus-app:scan'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+      - name: Run Trivy Container Scan (SARIF)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'nexus-app:scan'
