@@ -623,7 +623,7 @@ class RegistrationApiController extends BaseApiController
                 $siteName
             );
 
-            Mailer::send($email, $subject, $html);
+            (new Mailer())->send($email, $subject, $html);
 
         } catch (\Exception $e) {
             // Log but don't fail registration if email fails
