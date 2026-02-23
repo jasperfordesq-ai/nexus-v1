@@ -34,7 +34,7 @@ class BalanceAlertServiceTest extends TestCase
     {
         $methods = [
             'checkAllBalances', 'checkBalance', 'getThresholds',
-            'setThresholds', 'getBalanceStatus'
+            'setThresholds', 'getBalanceStatus', 'areAlertsEnabled'
         ];
 
         foreach ($methods as $method) {
@@ -49,10 +49,21 @@ class BalanceAlertServiceTest extends TestCase
     {
         $ref = new \ReflectionClass(BalanceAlertService::class);
 
-        $publicMethods = ['checkAllBalances', 'checkBalance', 'getThresholds', 'setThresholds', 'getBalanceStatus'];
+        $publicMethods = ['checkAllBalances', 'checkBalance', 'getThresholds', 'setThresholds', 'getBalanceStatus', 'areAlertsEnabled'];
         foreach ($publicMethods as $methodName) {
             $method = $ref->getMethod($methodName);
             $this->assertTrue($method->isStatic(), "Method {$methodName} should be static");
         }
+    }
+
+    public function testAreAlertsEnabledMethodSignature(): void
+    {
+        $ref = new \ReflectionMethod(BalanceAlertService::class, 'areAlertsEnabled');
+        $params = $ref->getParameters();
+
+        $this->assertCount(1, $params, 'areAlertsEnabled should accept organizationId');
+        $this->assertEquals('organizationId', $params[0]->getName());
+        $this->assertTrue($ref->isPublic(), 'areAlertsEnabled should be public');
+        $this->assertTrue($ref->isStatic(), 'areAlertsEnabled should be static');
     }
 }
