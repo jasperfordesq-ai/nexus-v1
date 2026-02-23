@@ -1,0 +1,83 @@
+# =============================================================================
+# Semgrep Ignore File
+# =============================================================================
+# Controls which files/directories Semgrep skips during SAST scanning.
+# Uses .gitignore syntax.
+#
+# Last reviewed: 2026-02-23
+# =============================================================================
+
+# ── Dependencies & build artifacts ──────────────────────────────────────────
+vendor/
+node_modules/
+react-frontend/dist/
+react-frontend/.vite/
+sales-site/dist/
+sales-site/.next/
+sales-site/node_modules/
+
+# ── Legacy PHP frontend views (DEAD CODE) ──────────────────────────────────
+# The React frontend is the primary UI. These PHP themes are dead legacy code
+# and are never served to users. See CLAUDE.md "LEGACY PHP THEMES ARE DEAD".
+views/civicone/
+views/starter/
+
+# Legacy modern theme views (non-admin only — admin views are still active)
+views/modern/layouts/
+views/modern/pages/
+views/modern/partials/
+views/modern/components/
+views/modern/auth/
+views/modern/errors/
+
+# ── Legacy PHP frontend controllers ────────────────────────────────────────
+# These controllers served the old PHP frontend. The React app uses only the
+# API controllers (src/Controllers/Api/). These legacy controllers are still
+# routed but are being phased out. Excluding from blocking scan to reduce
+# noise; they remain visible in non-blocking scans.
+src/Controllers/AuthController.php
+src/Controllers/ComposeController.php
+src/Controllers/EventController.php
+src/Controllers/FederatedEventController.php
+src/Controllers/FederatedGroupController.php
+src/Controllers/FederatedListingController.php
+src/Controllers/FederatedMemberController.php
+src/Controllers/FederationHubController.php
+src/Controllers/FederationStreamController.php
+src/Controllers/GroupController.php
+src/Controllers/InsightsController.php
+src/Controllers/LeaderboardController.php
+src/Controllers/ListingController.php
+src/Controllers/MemberController.php
+src/Controllers/MessageController.php
+src/Controllers/NotificationController.php
+src/Controllers/OrganizationController.php
+src/Controllers/PageController.php
+src/Controllers/ProfileController.php
+src/Controllers/ResourceController.php
+src/Controllers/ReviewController.php
+src/Controllers/SearchController.php
+src/Controllers/SettingsController.php
+src/Controllers/WalletController.php
+
+# ── Test files ──────────────────────────────────────────────────────────────
+tests/
+e2e/
+
+# ── Database migrations (SQL only, no PHP logic) ───────────────────────────
+migrations/
+
+# ── Scripts & tooling ──────────────────────────────────────────────────────
+scripts/
+
+# ── Config / non-executable ────────────────────────────────────────────────
+docs/
+*.md
+*.json
+*.lock
+*.xml
+*.yml
+*.yaml
+*.css
+*.svg
+*.sql
