@@ -82,6 +82,7 @@ jobs:
             --enableRetired
             --enableExperimental
             --failOnCVSS 7
+            --suppression owasp-suppressions.xml
 
       - name: Upload Dependency Check Report
         uses: actions/upload-artifact@v4
