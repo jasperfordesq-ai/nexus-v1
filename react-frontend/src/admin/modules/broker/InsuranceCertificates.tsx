@@ -9,7 +9,7 @@
  * Parity: PHP AdminInsuranceCertificateApiController
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Tabs,
@@ -26,6 +26,7 @@ import {
   SelectItem,
   Textarea,
   Avatar,
+  Spinner,
 } from '@heroui/react';
 import {
   ArrowLeft,
@@ -41,12 +42,15 @@ import {
   Trash2,
   Eye,
   FileCheck,
+  Pencil,
+  ExternalLink,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { adminInsurance } from '../../api/adminApi';
+import { resolveAssetUrl } from '@/lib/helpers';
+import { adminInsurance, adminUsers, adminBroker } from '../../api/adminApi';
 import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
-import type { InsuranceCertificate, InsuranceStats } from '../../api/types';
+import type { InsuranceCertificate, InsuranceStats, BrokerConfig } from '../../api/types';
 
 const INSURANCE_TYPE_LABELS: Record<string, string> = {
   public_liability: 'Public Liability',
@@ -66,6 +70,15 @@ const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'prima
   revoked: 'default',
 };
 
+const SEARCH_DEBOUNCE_MS = 300;
+
+interface UserSearchResult {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
 export function InsuranceCertificates() {
   usePageTitle('Admin - Insurance Certificates');
   const { tenantPath } = useTenant();
@@ -78,16 +91,41 @@ export function InsuranceCertificates() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Stats
   const [stats, setStats] = useState<InsuranceStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+
+  // Broker config (for expiry warning days)
+  const [expiryWarningDays, setExpiryWarningDays] = useState(30);
 
   // Create modal
   const [createOpen, setCreateOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [createForm, setCreateForm] = useState({
     user_id: '',
+    insurance_type: 'public_liability' as InsuranceCertificate['insurance_type'],
+    provider_name: '',
+    policy_number: '',
+    coverage_amount: '',
+    start_date: '',
+    expiry_date: '',
+    notes: '',
+  });
+
+  // User search for create modal (#9)
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userSearchResults, setUserSearchResults] = useState<UserSearchResult[]>([]);
+  const [userSearchLoading, setUserSearchLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
+  const userSearchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Edit modal (#10)
+  const [editItem, setEditItem] = useState<InsuranceCertificate | null>(null);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editForm, setEditForm] = useState({
     insurance_type: 'public_liability' as InsuranceCertificate['insurance_type'],
     provider_name: '',
     policy_number: '',
@@ -112,6 +150,40 @@ export function InsuranceCertificates() {
   // Verify loading tracker
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
 
+  // #6: Debounce search input
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
+
+  // Load broker config for expiry warning days (#12)
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await adminBroker.getConfiguration();
+        if (res.success && res.data) {
+          const cfg = res.data as BrokerConfig;
+          if (cfg.insurance_expiry_warning_days) {
+            setExpiryWarningDays(cfg.insurance_expiry_warning_days);
+          }
+        }
+      } catch {
+        // Use default 30 days
+      }
+    })();
+  }, []);
+
   const loadStats = useCallback(async () => {
     setStatsLoading(true);
     try {
@@ -126,6 +198,7 @@ export function InsuranceCertificates() {
     }
   }, []);
 
+  // #5: Added toast to dependency array
   const loadItems = useCallback(async () => {
     setLoading(true);
     try {
@@ -135,8 +208,8 @@ export function InsuranceCertificates() {
       } else if (statusFilter !== 'all') {
         params.status = statusFilter;
       }
-      if (searchQuery.trim()) {
-        params.search = searchQuery.trim();
+      if (debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
       }
 
       const res = await adminInsurance.list(params as Parameters<typeof adminInsurance.list>[0]);
@@ -150,10 +223,45 @@ export function InsuranceCertificates() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, searchQuery]);
+  }, [page, statusFilter, debouncedSearch, toast]);
 
   useEffect(() => { loadStats(); }, [loadStats]);
   useEffect(() => { loadItems(); }, [loadItems]);
+
+  // #9: User search for create modal
+  useEffect(() => {
+    if (!userSearchQuery.trim() || userSearchQuery.trim().length < 2) {
+      setUserSearchResults([]);
+      return;
+    }
+    if (userSearchTimeoutRef.current) {
+      clearTimeout(userSearchTimeoutRef.current);
+    }
+    userSearchTimeoutRef.current = setTimeout(async () => {
+      setUserSearchLoading(true);
+      try {
+        const res = await adminUsers.list({ search: userSearchQuery.trim(), limit: 8 });
+        if (res.success && Array.isArray(res.data)) {
+          setUserSearchResults(res.data.map((u: Record<string, unknown>) => ({
+            id: u.id as number,
+            first_name: u.first_name as string,
+            last_name: u.last_name as string,
+            email: u.email as string,
+          })));
+        }
+      } catch {
+        // Non-critical
+      } finally {
+        setUserSearchLoading(false);
+      }
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      if (userSearchTimeoutRef.current) {
+        clearTimeout(userSearchTimeoutRef.current);
+      }
+    };
+  }, [userSearchQuery]);
 
   const handleVerify = async (item: InsuranceCertificate) => {
     setVerifyingId(item.id);
@@ -219,7 +327,7 @@ export function InsuranceCertificates() {
 
   const handleCreate = async () => {
     if (!createForm.user_id) {
-      toast.error('User ID is required');
+      toast.error('Please select a member');
       return;
     }
     setCreateLoading(true);
@@ -252,6 +360,50 @@ export function InsuranceCertificates() {
     }
   };
 
+  // #10: Edit handler
+  const handleEdit = async () => {
+    if (!editItem) return;
+    setEditLoading(true);
+    try {
+      const payload: Record<string, unknown> = {
+        insurance_type: editForm.insurance_type,
+        provider_name: editForm.provider_name || null,
+        policy_number: editForm.policy_number || null,
+        coverage_amount: editForm.coverage_amount ? Number(editForm.coverage_amount) : null,
+        start_date: editForm.start_date || null,
+        expiry_date: editForm.expiry_date || null,
+        notes: editForm.notes || null,
+      };
+
+      const res = await adminInsurance.update(editItem.id, payload as Partial<InsuranceCertificate>);
+      if (res?.success) {
+        toast.success('Insurance certificate updated');
+        setEditItem(null);
+        loadItems();
+        loadStats();
+      } else {
+        toast.error(res?.error || 'Failed to update certificate');
+      }
+    } catch {
+      toast.error('Failed to update certificate');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const openEditModal = (item: InsuranceCertificate) => {
+    setEditForm({
+      insurance_type: item.insurance_type,
+      provider_name: item.provider_name || '',
+      policy_number: item.policy_number || '',
+      coverage_amount: item.coverage_amount ? String(item.coverage_amount) : '',
+      start_date: item.start_date || '',
+      expiry_date: item.expiry_date || '',
+      notes: item.notes || '',
+    });
+    setEditItem(item);
+  };
+
   const resetCreateForm = () => {
     setCreateForm({
       user_id: '',
@@ -263,6 +415,9 @@ export function InsuranceCertificates() {
       expiry_date: '',
       notes: '',
     });
+    setSelectedUser(null);
+    setUserSearchQuery('');
+    setUserSearchResults([]);
   };
 
   const columns: Column<InsuranceCertificate>[] = [
@@ -339,7 +494,8 @@ export function InsuranceCertificates() {
         const expiry = new Date(item.expiry_date);
         const now = new Date();
         const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= 30;
+        // #12: Use configurable expiry warning days
+        const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= expiryWarningDays;
         const isExpired = daysUntilExpiry <= 0;
 
         return (
@@ -362,6 +518,16 @@ export function InsuranceCertificates() {
             aria-label="View details"
           >
             <Eye size={14} />
+          </Button>
+          {/* #10: Edit button */}
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            onPress={() => openEditModal(item)}
+            aria-label="Edit certificate"
+          >
+            <Pencil size={14} />
           </Button>
           {(item.status === 'pending' || item.status === 'submitted') && (
             <>
@@ -463,18 +629,18 @@ export function InsuranceCertificates() {
         />
       </div>
 
-      {/* Search */}
+      {/* Search — #6: now debounced */}
       <div className="mb-4">
         <Input
           placeholder="Search by name, email, provider, or policy number..."
           value={searchQuery}
-          onValueChange={(val) => { setSearchQuery(val); setPage(1); }}
+          onValueChange={setSearchQuery}
           startContent={<Search size={16} className="text-default-400" />}
           variant="bordered"
           size="sm"
           className="max-w-md"
           isClearable
-          onClear={() => { setSearchQuery(''); setPage(1); }}
+          onClear={() => setSearchQuery('')}
         />
       </div>
 
@@ -516,7 +682,7 @@ export function InsuranceCertificates() {
         }
       />
 
-      {/* Create Modal */}
+      {/* Create Modal — #9: User search instead of raw ID */}
       <Modal
         isOpen={createOpen}
         onClose={() => setCreateOpen(false)}
@@ -529,15 +695,68 @@ export function InsuranceCertificates() {
             Add Insurance Certificate
           </ModalHeader>
           <ModalBody className="gap-4">
-            <Input
-              label="User ID"
-              placeholder="Enter user ID"
-              value={createForm.user_id}
-              onValueChange={(val) => setCreateForm(prev => ({ ...prev, user_id: val }))}
-              variant="bordered"
-              type="number"
-              isRequired
-            />
+            {/* #9: Member search autocomplete */}
+            {selectedUser ? (
+              <div className="flex items-center justify-between p-3 rounded-lg border border-default-200 bg-default-50">
+                <div className="flex items-center gap-2">
+                  <Avatar name={`${selectedUser.first_name} ${selectedUser.last_name}`} size="sm" />
+                  <div>
+                    <p className="text-sm font-medium">{selectedUser.first_name} {selectedUser.last_name}</p>
+                    <p className="text-xs text-default-400">{selectedUser.email}</p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  onPress={() => {
+                    setSelectedUser(null);
+                    setCreateForm(prev => ({ ...prev, user_id: '' }));
+                    setUserSearchQuery('');
+                  }}
+                >
+                  Change
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <Input
+                  label="Search Member"
+                  placeholder="Type a name or email to search..."
+                  value={userSearchQuery}
+                  onValueChange={setUserSearchQuery}
+                  variant="bordered"
+                  isRequired
+                  startContent={<Search size={14} className="text-default-400" />}
+                  endContent={userSearchLoading ? <Spinner size="sm" /> : undefined}
+                />
+                {userSearchResults.length > 0 && (
+                  <div className="mt-1 border border-default-200 rounded-lg overflow-hidden max-h-48 overflow-y-auto">
+                    {userSearchResults.map((u) => (
+                      <button
+                        key={u.id}
+                        type="button"
+                        className="w-full flex items-center gap-2 p-2 hover:bg-default-100 transition-colors text-left"
+                        onClick={() => {
+                          setSelectedUser(u);
+                          setCreateForm(prev => ({ ...prev, user_id: String(u.id) }));
+                          setUserSearchQuery('');
+                          setUserSearchResults([]);
+                        }}
+                      >
+                        <Avatar name={`${u.first_name} ${u.last_name}`} size="sm" className="shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate">{u.first_name} {u.last_name}</p>
+                          <p className="text-xs text-default-400 truncate">{u.email}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {userSearchQuery.trim().length >= 2 && !userSearchLoading && userSearchResults.length === 0 && (
+                  <p className="text-xs text-default-400 mt-1">No members found</p>
+                )}
+              </div>
+            )}
             <Select
               label="Insurance Type"
               selectedKeys={[createForm.insurance_type]}
@@ -566,6 +785,7 @@ export function InsuranceCertificates() {
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, policy_number: val }))}
               variant="bordered"
             />
+            {/* #11: EUR instead of GBP */}
             <Input
               label="Coverage Amount"
               placeholder="e.g., 1000000"
@@ -573,7 +793,7 @@ export function InsuranceCertificates() {
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, coverage_amount: val }))}
               variant="bordered"
               type="number"
-              startContent={<span className="text-default-400 text-sm">&pound;</span>}
+              startContent={<span className="text-default-400 text-sm">&euro;</span>}
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -618,6 +838,113 @@ export function InsuranceCertificates() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* #10: Edit Modal */}
+      {editItem && (
+        <Modal
+          isOpen={!!editItem}
+          onClose={() => setEditItem(null)}
+          size="lg"
+          scrollBehavior="inside"
+        >
+          <ModalContent>
+            <ModalHeader className="flex items-center gap-2">
+              <Pencil size={20} className="text-primary" />
+              Edit Insurance Certificate
+            </ModalHeader>
+            <ModalBody className="gap-4">
+              <div className="flex items-center gap-2 p-3 rounded-lg border border-default-200 bg-default-50">
+                <Avatar
+                  src={editItem.avatar_url || undefined}
+                  name={`${editItem.first_name} ${editItem.last_name}`}
+                  size="sm"
+                />
+                <div>
+                  <p className="text-sm font-medium">{editItem.first_name} {editItem.last_name}</p>
+                  <p className="text-xs text-default-400">{editItem.email}</p>
+                </div>
+              </div>
+              <Select
+                label="Insurance Type"
+                selectedKeys={[editForm.insurance_type]}
+                onSelectionChange={(keys) => {
+                  const val = Array.from(keys)[0] as InsuranceCertificate['insurance_type'];
+                  if (val) setEditForm(prev => ({ ...prev, insurance_type: val }));
+                }}
+                variant="bordered"
+                isRequired
+              >
+                {Object.entries(INSURANCE_TYPE_LABELS).map(([key, label]) => (
+                  <SelectItem key={key}>{label}</SelectItem>
+                ))}
+              </Select>
+              <Input
+                label="Provider Name"
+                placeholder="e.g., Aviva, Zurich"
+                value={editForm.provider_name}
+                onValueChange={(val) => setEditForm(prev => ({ ...prev, provider_name: val }))}
+                variant="bordered"
+              />
+              <Input
+                label="Policy Number"
+                placeholder="e.g., PL-12345678"
+                value={editForm.policy_number}
+                onValueChange={(val) => setEditForm(prev => ({ ...prev, policy_number: val }))}
+                variant="bordered"
+              />
+              <Input
+                label="Coverage Amount"
+                placeholder="e.g., 1000000"
+                value={editForm.coverage_amount}
+                onValueChange={(val) => setEditForm(prev => ({ ...prev, coverage_amount: val }))}
+                variant="bordered"
+                type="number"
+                startContent={<span className="text-default-400 text-sm">&euro;</span>}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Start Date"
+                  type="date"
+                  value={editForm.start_date}
+                  onValueChange={(val) => setEditForm(prev => ({ ...prev, start_date: val }))}
+                  variant="bordered"
+                />
+                <Input
+                  label="Expiry Date"
+                  type="date"
+                  value={editForm.expiry_date}
+                  onValueChange={(val) => setEditForm(prev => ({ ...prev, expiry_date: val }))}
+                  variant="bordered"
+                />
+              </div>
+              <Textarea
+                label="Notes"
+                placeholder="Additional notes about this certificate..."
+                value={editForm.notes}
+                onValueChange={(val) => setEditForm(prev => ({ ...prev, notes: val }))}
+                variant="bordered"
+                minRows={3}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                variant="flat"
+                onPress={() => setEditItem(null)}
+                isDisabled={editLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                color="primary"
+                onPress={handleEdit}
+                isLoading={editLoading}
+              >
+                Save Changes
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
 
       {/* Reject Modal */}
       {rejectModal && (
@@ -666,7 +993,7 @@ export function InsuranceCertificates() {
         </Modal>
       )}
 
-      {/* View Detail Modal */}
+      {/* View Detail Modal — #1: Added certificate file display */}
       {viewItem && (
         <Modal
           isOpen={!!viewItem}
@@ -711,7 +1038,8 @@ export function InsuranceCertificates() {
                 </div>
                 <div>
                   <p className="text-default-400">Coverage Amount</p>
-                  <p className="font-medium">{viewItem.coverage_amount ? `\u00A3${Number(viewItem.coverage_amount).toLocaleString()}` : '\u2014'}</p>
+                  {/* #11: EUR instead of GBP */}
+                  <p className="font-medium">{viewItem.coverage_amount ? `\u20AC${Number(viewItem.coverage_amount).toLocaleString()}` : '\u2014'}</p>
                 </div>
                 <div>
                   <p className="text-default-400">Start Date</p>
@@ -738,6 +1066,22 @@ export function InsuranceCertificates() {
                   <p className="font-medium">{new Date(viewItem.created_at).toLocaleString()}</p>
                 </div>
               </div>
+              {/* #1: Certificate file display/download */}
+              {viewItem.certificate_file_path && (
+                <div className="mt-4">
+                  <p className="text-default-400 text-sm mb-1">Certificate File</p>
+                  <a
+                    href={resolveAssetUrl(viewItem.certificate_file_path)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-primary hover:underline bg-primary-50 dark:bg-primary-50/10 px-3 py-2 rounded-lg"
+                  >
+                    <FileText size={16} />
+                    View Certificate
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+              )}
               {viewItem.notes && (
                 <div className="mt-4">
                   <p className="text-default-400 text-sm mb-1">Notes</p>
