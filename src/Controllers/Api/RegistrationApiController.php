@@ -189,10 +189,10 @@ class RegistrationApiController extends BaseApiController
         }
 
         // Phone validation (optional, but validate format if provided)
-        if (!empty($phone) && !Validator::isIrishPhone($phone)) {
+        if (!empty($phone) && !Validator::isPhone($phone)) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'message' => 'Please enter a valid phone number (e.g., 087 123 4567)',
+                'message' => 'Please enter a valid phone number',
                 'field' => 'phone'
             ];
         }
@@ -224,8 +224,29 @@ class RegistrationApiController extends BaseApiController
             $this->respondWithErrors($errors, 400);
         }
 
-        // Check if email already exists
         $db = Database::getConnection();
+
+        // Validate tenant exists and is active
+        if (!$tenantId) {
+            $this->respondWithError(
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                'A community must be selected to register.',
+                'tenant_id',
+                422
+            );
+        }
+        $tenantCheck = $db->prepare("SELECT id FROM tenants WHERE id = ? AND is_active = 1");
+        $tenantCheck->execute([$tenantId]);
+        if (!$tenantCheck->fetch()) {
+            $this->respondWithError(
+                ApiErrorCodes::VALIDATION_INVALID_VALUE,
+                'The selected community is not available for registration.',
+                'tenant_id',
+                422
+            );
+        }
+
+        // Check if email already exists
         $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
 
@@ -310,7 +331,7 @@ class RegistrationApiController extends BaseApiController
                 'organization_name' => $organizationName ?: null,
                 'location' => $location ?: null,
                 'tenant_id' => $tenantId,
-                'status' => 'pending',
+                'status' => 'active',
                 'onboarding_completed' => false,
             ],
             'access_token' => $accessToken,
