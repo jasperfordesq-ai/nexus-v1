@@ -8,6 +8,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    globalSetup: ['./src/test/ci-force-exit.ts'],
     include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
     pool: 'forks',
     poolOptions: {
@@ -21,6 +22,7 @@ export default defineConfig({
     fileParallelism: false,
     testTimeout: 30000, // 30s per test — prevents hanging on CI
     hookTimeout: 30000, // 30s for beforeAll/afterAll hooks
+    teardownTimeout: 15000, // 15s max for worker teardown — prevents infinite hang
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
