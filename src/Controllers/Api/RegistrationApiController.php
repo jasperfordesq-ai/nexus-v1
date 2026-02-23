@@ -591,7 +591,7 @@ class RegistrationApiController extends BaseApiController
     {
         try {
             if (TenantContext::hasFeature('gamification')) {
-                \Nexus\Services\GamificationService::awardXP($userId, 'registration', 50);
+                \Nexus\Services\GamificationService::awardXP($userId, 50, 'registration');
             }
         } catch (\Throwable $e) {
             error_log("[Registration] Welcome XP award failed: " . $e->getMessage());
