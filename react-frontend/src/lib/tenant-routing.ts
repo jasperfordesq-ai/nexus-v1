@@ -35,7 +35,7 @@ export const RESERVED_PATHS = new Set([
   'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
   'organisations', 'federation', 'onboarding', 'group-exchanges', 'matches', 'newsletter',
   'help', 'contact', 'about', 'faq', 'legal', 'terms',
-  'privacy', 'accessibility', 'cookies',
+  'privacy', 'accessibility', 'cookies', 'development-status',
   'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
   'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
   'uploads', 'classic', 'health', 'favicon.ico', 'robots.txt',

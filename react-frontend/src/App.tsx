@@ -131,6 +131,7 @@ const MatchesRedirectPage = lazyWithRetry(() => import('@/pages/matches/MatchesR
 const NewsletterUnsubscribePage = lazyWithRetry(() => import('@/pages/newsletter/NewsletterUnsubscribePage'));
 
 // Static Pages
+const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
 const AboutPage = lazyWithRetry(() => import('@/pages/public/AboutPage'));
 const ContactPage = lazyWithRetry(() => import('@/pages/public/ContactPage'));
 const TermsPage = lazyWithRetry(() => import('@/pages/public/TermsPage'));
@@ -182,6 +183,7 @@ function AppRoutes() {
       <Route element={<Layout />}>
         {/* Public Routes */}
         <Route index element={<HomePage />} />
+        <Route path="development-status" element={<DevelopmentStatusPage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="faq" element={<FaqPage />} />
         <Route path="contact" element={<ContactPage />} />

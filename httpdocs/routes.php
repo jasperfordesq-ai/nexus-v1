@@ -147,6 +147,10 @@ $router->add('GET', '/api/cookie-consent/check/{category}', 'Nexus\Controllers\A
 $router->add('GET', '/api/v2/legal/{type}', 'Nexus\Controllers\LegalDocumentController@apiGetDocument');
 $router->add('GET', '/api/v2/legal/{type}/versions', 'Nexus\Controllers\LegalDocumentController@apiGetVersions');
 $router->add('GET', '/api/v2/legal/version/{versionId}', 'Nexus\Controllers\LegalDocumentController@apiGetVersion');
+// V2 user acceptance endpoints (Bearer token + session auth via ApiAuth trait)
+$router->add('GET', '/api/v2/legal/acceptance/status', 'Nexus\Controllers\Api\LegalAcceptanceApiController@getStatus');
+$router->add('POST', '/api/v2/legal/acceptance/accept-all', 'Nexus\Controllers\Api\LegalAcceptanceApiController@acceptAll');
+// Legacy session-based acceptance endpoints (kept for PHP admin views)
 $router->add('POST', '/api/legal/accept', 'Nexus\Controllers\LegalDocumentController@accept');
 $router->add('POST', '/api/legal/accept-all', 'Nexus\Controllers\LegalDocumentController@acceptAll');
 $router->add('GET', '/api/legal/status', 'Nexus\Controllers\LegalDocumentController@status');
