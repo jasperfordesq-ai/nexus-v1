@@ -179,7 +179,7 @@ export function ListingsPage() {
         <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <Input
-              placeholder="Search by title, description or location..."
+              placeholder="Search by title, description, location or name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}

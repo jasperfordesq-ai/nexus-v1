@@ -101,10 +101,17 @@ class ListingService
             $params[] = (int)$filters['user_id'];
         }
 
-        // Search filter
+        // Search filter (title, description, location, author name)
         if (!empty($filters['search'])) {
             $searchTerm = '%' . $filters['search'] . '%';
-            $sql .= " AND (l.title LIKE ? OR l.description LIKE ? OR l.location LIKE ?)";
+            $sql .= " AND (l.title LIKE ? OR l.description LIKE ? OR l.location LIKE ?
+                       OR u.first_name LIKE ? OR u.last_name LIKE ?
+                       OR CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) LIKE ?
+                       OR u.organization_name LIKE ?)";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
