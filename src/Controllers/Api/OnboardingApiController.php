@@ -58,8 +58,15 @@ class OnboardingApiController extends BaseApiController
         $complete = OnboardingService::isOnboardingComplete($userId);
         $interests = OnboardingService::getUserInterests($userId);
 
+        // Include profile completeness for frontend enforcement
+        $user = \Nexus\Models\User::findById($userId);
+        $hasAvatar = !empty($user['avatar_url'] ?? '');
+        $hasBio = !empty(trim($user['bio'] ?? ''));
+
         $this->respondWithData([
             'onboarding_completed' => $complete,
+            'has_avatar' => $hasAvatar,
+            'has_bio' => $hasBio,
             'interests' => $interests,
         ]);
     }
@@ -208,6 +215,27 @@ class OnboardingApiController extends BaseApiController
     public function complete(): void
     {
         $userId = $this->getUserId();
+
+        // Verify profile photo and bio are present (mandatory for onboarding completion)
+        $user = \Nexus\Models\User::findById($userId);
+        if (empty($user['avatar_url'])) {
+            $this->respondWithError(
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                'Profile photo is required to complete onboarding',
+                'avatar_url',
+                422
+            );
+            return;
+        }
+        if (empty(trim($user['bio'] ?? ''))) {
+            $this->respondWithError(
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                'Bio is required to complete onboarding',
+                'bio',
+                422
+            );
+            return;
+        }
 
         $offers = $this->input('offers', []);
         $needs = $this->input('needs', []);

@@ -42,10 +42,16 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to={tenantPath('/login')} state={{ from: location.pathname }} replace />;
   }
 
-  // Redirect to onboarding if not completed (skip if already on onboarding page)
+  // Redirect to onboarding if not completed OR if profile photo/bio are missing.
+  // Legacy PHP enforced photo+bio as a hard lockout; React must match this.
   const pathSegments = location.pathname.replace(/\/+$/, '').split('/');
   const lastSegment = pathSegments[pathSegments.length - 1];
-  if (user && user.onboarding_completed === false && lastSegment !== 'onboarding') {
+  const needsOnboarding = user && (
+    user.onboarding_completed === false ||
+    !user.avatar_url ||
+    !user.bio
+  );
+  if (needsOnboarding && lastSegment !== 'onboarding' && lastSegment !== 'settings') {
     return <Navigate to={tenantPath('/onboarding')} replace />;
   }
 

@@ -4,18 +4,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Onboarding Page - Post-registration 4-step wizard
+ * Onboarding Page - Post-registration 5-step wizard
  *
  * Steps:
- *  1. Welcome     - Benefits overview, community introduction
- *  2. Interests   - Select categories you're interested in
- *  3. Skills      - Mark which categories you can offer / need help with
- *  4. Confirm     - Summary + auto-create listings
+ *  1. Welcome      - Benefits overview, community introduction
+ *  2. Your Profile - Upload profile photo + write bio (MANDATORY — cannot skip)
+ *  3. Interests    - Select categories you're interested in
+ *  4. Skills       - Mark which categories you can offer / need help with
+ *  5. Confirm      - Summary + auto-create listings
  *
  * Route: /onboarding
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -23,6 +24,8 @@ import {
   Progress,
   Spinner,
   Chip,
+  Avatar,
+  Textarea,
 } from '@heroui/react';
 import {
   Sparkles,
@@ -34,12 +37,15 @@ import {
   HelpCircle,
   ListChecks,
   Rocket,
+  Camera,
+  UserCircle,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -53,7 +59,8 @@ interface Category {
   color: string | null;
 }
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
+const MIN_BIO_LENGTH = 10;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -68,39 +75,61 @@ export function OnboardingPage() {
 
   const tenantName = tenant?.branding?.name || tenant?.name || 'our community';
 
-  // ── Redirect if already completed ───────────────────────────────────────────
+  // ── Redirect if fully completed (onboarding done + has photo + has bio) ───
   // Prevents showing Step 1 again after completion (component remount from
   // AuthContext change causes fresh state). Also handles browser back button.
 
   useEffect(() => {
-    if (user?.onboarding_completed === true) {
+    if (user?.onboarding_completed === true && user?.avatar_url && user?.bio) {
       navigate(tenantPath('/dashboard'), { replace: true });
     }
-  }, [user?.onboarding_completed, navigate, tenantPath]);
+  }, [user?.onboarding_completed, user?.avatar_url, user?.bio, navigate, tenantPath]);
 
   // ── State ──────────────────────────────────────────────────────────────────
 
   const [currentStep, setCurrentStep] = useState(1);
   const [slideDirection, setSlideDirection] = useState(1);
 
+  // Step 2: Profile photo + bio
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [bio, setBio] = useState(user?.bio || '');
+
   // Categories loaded from API
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
 
-  // Step 2: Selected interest category IDs
+  // Step 3: Selected interest category IDs
   const [selectedInterests, setSelectedInterests] = useState<number[]>([]);
 
-  // Step 3: Skill offers and needs
+  // Step 4: Skill offers and needs
   const [skillOffers, setSkillOffers] = useState<number[]>([]);
   const [skillNeeds, setSkillNeeds] = useState<number[]>([]);
 
   // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ── Load categories when reaching step 2 ──────────────────────────────────
+  // ── Pre-populate bio from user context if available ──────────────────────
 
   useEffect(() => {
-    if (currentStep === 2 && categories.length === 0) {
+    if (user?.bio && !bio) {
+      setBio(user.bio);
+    }
+  }, [user?.bio]);
+
+  // ── If user has photo+bio but onboarding_completed is false, skip to step 3 ─
+
+  useEffect(() => {
+    if (user?.avatar_url && user?.bio && user?.bio.trim().length >= MIN_BIO_LENGTH && currentStep <= 2) {
+      setCurrentStep(3);
+    }
+  }, []);
+
+  // ── Load categories when reaching step 3 (was step 2) ───────────────────
+
+  useEffect(() => {
+    if (currentStep === 3 && categories.length === 0) {
       loadCategories();
     }
   }, [currentStep]);
@@ -140,7 +169,77 @@ export function OnboardingPage() {
     goBack();
   }, [goBack]);
 
-  // ── Interest toggling (Step 2) ─────────────────────────────────────────────
+  // ── Avatar upload handler (Step 2) ───────────────────────────────────────
+
+  const handleAvatarUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Invalid file type', 'Please upload an image file (JPG, PNG or GIF)');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File too large', 'Please upload an image smaller than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await api.upload<{ avatar_url: string }>('/v2/users/me/avatar', formData);
+
+      if (response.success && response.data) {
+        await refreshUser();
+        toast.success('Photo uploaded', 'Your profile photo has been set');
+      } else {
+        toast.error('Upload failed', 'Failed to upload photo. Please try again.');
+      }
+    } catch (error) {
+      logError('Failed to upload avatar during onboarding', error);
+      toast.error('Upload failed', 'Failed to upload photo. Please try again.');
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  }, [toast, refreshUser]);
+
+  // ── Save bio + proceed handler (Step 2) ──────────────────────────────────
+
+  const handleSaveProfileAndProceed = useCallback(async () => {
+    if (!user?.avatar_url) {
+      toast.error('Photo required', 'Please upload a profile photo to continue.');
+      return;
+    }
+    if (bio.trim().length < MIN_BIO_LENGTH) {
+      toast.error('Bio required', `Please write at least ${MIN_BIO_LENGTH} characters about yourself.`);
+      return;
+    }
+
+    try {
+      setIsSavingProfile(true);
+      const response = await api.put('/v2/users/me', { bio: bio.trim() });
+
+      if (response.success) {
+        await refreshUser();
+        goNextAnimated();
+      } else {
+        toast.error('Save failed', 'Failed to save your bio. Please try again.');
+      }
+    } catch (error) {
+      logError('Failed to save bio during onboarding', error);
+      toast.error('Save failed', 'Failed to save your bio. Please try again.');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  }, [bio, user?.avatar_url, toast, refreshUser, goNextAnimated]);
+
+  // ── Interest toggling (Step 3) ───────────────────────────────────────────
 
   const toggleInterest = useCallback((categoryId: number) => {
     setSelectedInterests((prev) =>
@@ -150,7 +249,7 @@ export function OnboardingPage() {
     );
   }, []);
 
-  // ── Skill toggling (Step 3) ────────────────────────────────────────────────
+  // ── Skill toggling (Step 4) ──────────────────────────────────────────────
 
   const toggleOffer = useCallback((categoryId: number) => {
     setSkillOffers((prev) =>
@@ -168,7 +267,7 @@ export function OnboardingPage() {
     );
   }, []);
 
-  // ── Category name lookup ───────────────────────────────────────────────────
+  // ── Category name lookup ─────────────────────────────────────────────────
 
   const categoryMap = useMemo(() => {
     const map = new Map<number, string>();
@@ -183,7 +282,7 @@ export function OnboardingPage() {
     [categoryMap]
   );
 
-  // ── Completion handler ─────────────────────────────────────────────────────
+  // ── Completion handler ───────────────────────────────────────────────────
 
   const totalListingsToCreate = skillOffers.length + skillNeeds.length;
 
@@ -225,11 +324,11 @@ export function OnboardingPage() {
     }
   }, [skillOffers, skillNeeds, toast, navigate, tenantPath, refreshUser]);
 
-  // ── Skip handler ───────────────────────────────────────────────────────────
+  // ── Skip handler (skips interests/skills only — photo+bio already done) ──
 
   const handleSkip = useCallback(async () => {
     try {
-      // Mark onboarding complete even when skipping
+      // Mark onboarding complete even when skipping interests/skills
       await api.post('/v2/onboarding/complete', { offers: [], needs: [] });
       // Refresh user state so ProtectedRoute sees onboarding_completed = true
       await refreshUser();
@@ -239,7 +338,7 @@ export function OnboardingPage() {
     navigate(tenantPath('/dashboard'));
   }, [navigate, tenantPath, refreshUser]);
 
-  // ── Animation variants ─────────────────────────────────────────────────────
+  // ── Animation variants ───────────────────────────────────────────────────
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -253,22 +352,29 @@ export function OnboardingPage() {
     }),
   };
 
-  // ── Step labels ────────────────────────────────────────────────────────────
+  // ── Step labels ──────────────────────────────────────────────────────────
 
   const stepLabel = (step: number) => {
     switch (step) {
       case 1: return 'Welcome';
-      case 2: return 'Interests';
-      case 3: return 'Skills';
-      case 4: return 'Confirm';
+      case 2: return 'Your Profile';
+      case 3: return 'Interests';
+      case 4: return 'Skills';
+      case 5: return 'Confirm';
       default: return '';
     }
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ── Derived state for Step 2 validation ──────────────────────────────────
 
-  // Don't render wizard if onboarding is already complete (redirect is pending)
-  if (user?.onboarding_completed === true) {
+  const hasAvatar = !!user?.avatar_url;
+  const hasBio = bio.trim().length >= MIN_BIO_LENGTH;
+  const profileStepComplete = hasAvatar && hasBio;
+
+  // ── Render ───────────────────────────────────────────────────────────────
+
+  // Don't render wizard if fully completed (redirect is pending)
+  if (user?.onboarding_completed === true && user?.avatar_url && user?.bio) {
     return null;
   }
 
@@ -401,8 +507,143 @@ export function OnboardingPage() {
             </div>
           )}
 
-          {/* ─── Step 2: Select Interests ─── */}
+          {/* ─── Step 2: Your Profile (MANDATORY — photo + bio) ─── */}
           {currentStep === 2 && (
+            <div className="space-y-6">
+              <GlassCard className="p-6">
+                <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
+                  <UserCircle
+                    className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
+                    aria-hidden="true"
+                  />
+                  Your Profile
+                </h2>
+                <p className="text-theme-muted text-sm mb-6">
+                  Add a profile photo and tell the community a bit about yourself.
+                  This helps other members recognise and trust you.
+                </p>
+
+                {/* Avatar upload */}
+                <div className="flex flex-col items-center gap-4 mb-6">
+                  <div className="relative">
+                    <Avatar
+                      src={resolveAvatarUrl(user?.avatar_url)}
+                      name={user?.first_name || user?.name}
+                      className="w-24 h-24 ring-4 ring-theme-default"
+                    />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                      aria-label="Upload profile photo"
+                    />
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      className="absolute bottom-0 right-0 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 min-w-0 w-8 h-8"
+                      onPress={() => fileInputRef.current?.click()}
+                      isDisabled={isUploadingAvatar}
+                      isLoading={isUploadingAvatar}
+                      aria-label="Upload profile photo"
+                    >
+                      <Camera className="w-4 h-4" aria-hidden="true" />
+                    </Button>
+                  </div>
+
+                  <div className="text-center">
+                    {hasAvatar ? (
+                      <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-1 justify-center">
+                        <CheckCircle className="w-4 h-4" aria-hidden="true" />
+                        Photo uploaded
+                      </p>
+                    ) : (
+                      <p className="text-sm text-theme-muted">
+                        Upload a profile photo (JPG, PNG or GIF, max 5MB)
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bio textarea */}
+                <div className="space-y-2">
+                  <Textarea
+                    label="About you"
+                    placeholder="Tell the community about yourself — your interests, skills, or what you're hoping to get from timebanking..."
+                    value={bio}
+                    onValueChange={setBio}
+                    minRows={3}
+                    maxRows={6}
+                    maxLength={5000}
+                    description={
+                      bio.trim().length < MIN_BIO_LENGTH
+                        ? `At least ${MIN_BIO_LENGTH} characters required (${bio.trim().length}/${MIN_BIO_LENGTH})`
+                        : `${bio.trim().length} characters`
+                    }
+                    classNames={{
+                      inputWrapper: 'bg-theme-elevated',
+                    }}
+                  />
+                </div>
+
+                {/* Validation summary */}
+                <div className="mt-4 p-3 rounded-lg bg-theme-elevated">
+                  <p className="text-xs font-medium text-theme-muted mb-2">
+                    Required to continue:
+                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle
+                        className={`w-4 h-4 ${hasAvatar ? 'text-emerald-500' : 'text-theme-subtle'}`}
+                        aria-hidden="true"
+                      />
+                      <span className={hasAvatar ? 'text-theme-primary' : 'text-theme-subtle'}>
+                        Profile photo
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle
+                        className={`w-4 h-4 ${hasBio ? 'text-emerald-500' : 'text-theme-subtle'}`}
+                        aria-hidden="true"
+                      />
+                      <span className={hasBio ? 'text-theme-primary' : 'text-theme-subtle'}>
+                        Bio ({MIN_BIO_LENGTH}+ characters)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </GlassCard>
+
+              {/* Navigation — Next saves bio then proceeds */}
+              <div className="flex items-center justify-between">
+                <Button
+                  variant="light"
+                  className="text-theme-muted"
+                  onPress={goBackAnimated}
+                  startContent={
+                    <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                  }
+                >
+                  Back
+                </Button>
+                <Button
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
+                  endContent={
+                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                  }
+                  onPress={handleSaveProfileAndProceed}
+                  isLoading={isSavingProfile}
+                  isDisabled={!profileStepComplete || isSavingProfile}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* ─── Step 3: Select Interests ─── */}
+          {currentStep === 3 && (
             <div className="space-y-6">
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
@@ -477,8 +718,8 @@ export function OnboardingPage() {
             </div>
           )}
 
-          {/* ─── Step 3: Your Skills ─── */}
-          {currentStep === 3 && (
+          {/* ─── Step 4: Your Skills ─── */}
+          {currentStep === 4 && (
             <div className="space-y-6">
               {/* Offers section */}
               <GlassCard className="p-6">
@@ -593,8 +834,8 @@ export function OnboardingPage() {
             </div>
           )}
 
-          {/* ─── Step 4: Confirm + Create ─── */}
-          {currentStep === 4 && (
+          {/* ─── Step 5: Confirm + Create ─── */}
+          {currentStep === 5 && (
             <div className="space-y-6">
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
