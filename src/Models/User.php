@@ -153,11 +153,13 @@ class User
         Database::query($sql, [$firstName, $lastName, $bio, $location, $phone, $profileType, $orgName, $id, $tenantId]);
     }
 
-    public static function updateAvatar($id, $url)
+    public static function updateAvatar($id, $url): bool
     {
         $tenantId = TenantContext::getId();
-        $sql = "UPDATE users SET avatar_url = ? WHERE id = ? AND tenant_id = ?";
-        Database::query($sql, [$url, $id, $tenantId]);
+        // Allow super admins whose home tenant differs from current TenantContext
+        $sql = "UPDATE users SET avatar_url = ? WHERE id = ? AND (tenant_id = ? OR is_super_admin = 1)";
+        $stmt = Database::query($sql, [$url, $id, $tenantId]);
+        return $stmt->rowCount() > 0;
     }
 
     public static function updatePrivacy($id, $profile, $search, $contact)

@@ -546,9 +546,14 @@ class UserService
             return null;
         }
 
-        // Update user record
+        // Update user record — verify the DB row was actually updated
         $avatarUrl = "/uploads/{$tenantId}/avatars/{$filename}";
-        User::updateAvatar($userId, $avatarUrl);
+        if (!User::updateAvatar($userId, $avatarUrl)) {
+            self::$errors[] = ['code' => 'UPLOAD_FAILED', 'message' => 'Failed to update avatar in database', 'field' => 'avatar'];
+            // Clean up the orphaned file
+            @unlink($filepath);
+            return null;
+        }
 
         return $avatarUrl;
     }
