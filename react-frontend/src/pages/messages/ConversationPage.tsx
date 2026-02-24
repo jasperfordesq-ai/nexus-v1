@@ -278,14 +278,18 @@ export function ConversationPage() {
       pollingIntervalRef.current = null;
     }
 
-    // Only poll if: document visible, not new conversation, have messages, and Pusher not connected
-    if (!isDocumentVisible || isNewConversation || !lastMessageIdRef.current || pusher?.isConnected) {
+    // Only poll if: document visible, not new conversation, and have messages loaded
+    if (!isDocumentVisible || isNewConversation || !lastMessageIdRef.current) {
       return;
     }
 
+    // When Pusher is connected, use a longer polling interval as a reliability fallback.
+    // When disconnected, poll more frequently as it's the primary update mechanism.
+    const interval = pusher?.isConnected ? 30000 : 5000;
+
     pollingIntervalRef.current = setInterval(() => {
       pollForNewMessages();
-    }, 5000);
+    }, interval);
 
     return () => {
       if (pollingIntervalRef.current) {
