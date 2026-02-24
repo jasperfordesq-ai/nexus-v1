@@ -599,10 +599,12 @@ class ApiClient {
         return { success: true, data: 'data' in data ? data.data : data };
       }
 
+      // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})
+      const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
       return {
         success: false,
-        error: data.error ?? 'Upload failed',
-        code: data.code ?? 'UPLOAD_ERROR',
+        error: data.error ?? firstError?.message ?? data.message ?? 'Upload failed',
+        code: data.code ?? firstError?.code ?? 'UPLOAD_ERROR',
       };
     } catch (error) {
       const rawMessage = error instanceof Error ? error.message : 'Upload failed';
