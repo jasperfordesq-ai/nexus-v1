@@ -715,6 +715,38 @@ abstract class BaseApiController
         return false;
     }
 
+    /**
+     * Resolve the effective tenant ID for admin listing endpoints.
+     *
+     * Super admins default to the current tenant context (from X-Tenant-ID header).
+     * They can explicitly pass ?tenant_id=all to see all tenants, or ?tenant_id=N
+     * to view a specific tenant. Regular admins are always locked to their tenant.
+     *
+     * @param bool $isSuperAdmin Whether the authenticated user is a super admin
+     * @param int $tenantId The current tenant context ID (from TenantContext::getId())
+     * @return int|null Effective tenant ID to filter by, or null for all tenants
+     */
+    protected function resolveAdminTenantFilter(bool $isSuperAdmin, int $tenantId): ?int
+    {
+        $filterTenantIdRaw = $_GET['tenant_id'] ?? null;
+
+        if ($isSuperAdmin) {
+            // Explicit ?tenant_id=all → show all tenants (cross-tenant view)
+            if ($filterTenantIdRaw === 'all') {
+                return null;
+            }
+            // Explicit ?tenant_id=N → show that specific tenant
+            if ($filterTenantIdRaw !== null && is_numeric($filterTenantIdRaw)) {
+                return (int) $filterTenantIdRaw;
+            }
+            // Default: scope to current tenant context (safe default)
+            return $tenantId;
+        }
+
+        // Regular admins: always locked to their own tenant
+        return $tenantId;
+    }
+
     // ============================================
     // SECURITY METHODS
     // ============================================

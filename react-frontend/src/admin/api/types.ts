@@ -157,6 +157,7 @@ export interface UserListParams {
   search?: string;
   sort?: string;
   order?: 'asc' | 'desc';
+  tenant_id?: number | string;
 }
 
 export interface CreateUserPayload {

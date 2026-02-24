@@ -48,21 +48,15 @@ class AdminCommentsApiController extends BaseApiController
         $offset = ($page - 1) * $limit;
         $targetType = $_GET['target_type'] ?? null;
         $search = $_GET['search'] ?? null;
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         $conditions = [];
         $params = [];
 
-        // Tenant scoping: super admins can see all tenants or filter by one
-        if ($isSuperAdmin) {
-            if ($filterTenantId) {
-                $conditions[] = 'c.tenant_id = ?';
-                $params[] = $filterTenantId;
-            }
-            // No tenant filter = all tenants for super admin
-        } else {
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        if ($effectiveTenantId !== null) {
             $conditions[] = 'c.tenant_id = ?';
-            $params[] = $tenantId;
+            $params[] = $effectiveTenantId;
         }
 
         // Target type filter
@@ -136,30 +130,21 @@ class AdminCommentsApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        // Super admins can view comments from any tenant
-        if ($isSuperAdmin) {
-            $query = "SELECT c.*,
-                             u.name as user_name,
-                             u.email as user_email,
-                             u.avatar_url as user_avatar,
-                             t.name as tenant_name
-                      FROM comments c
-                      LEFT JOIN users u ON c.user_id = u.id
-                      LEFT JOIN tenants t ON c.tenant_id = t.id
-                      WHERE c.id = ?";
-            $stmt = Database::query($query, [$id]);
-        } else {
-            $query = "SELECT c.*,
-                             u.name as user_name,
-                             u.email as user_email,
-                             u.avatar_url as user_avatar,
-                             t.name as tenant_name
-                      FROM comments c
-                      LEFT JOIN users u ON c.user_id = u.id
-                      LEFT JOIN tenants t ON c.tenant_id = t.id
-                      WHERE c.id = ? AND c.tenant_id = ?";
-            $stmt = Database::query($query, [$id, $tenantId]);
-        }
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'AND c.tenant_id = ?' : '';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+
+        $query = "SELECT c.*,
+                         u.name as user_name,
+                         u.email as user_email,
+                         u.avatar_url as user_avatar,
+                         t.name as tenant_name
+                  FROM comments c
+                  LEFT JOIN users u ON c.user_id = u.id
+                  LEFT JOIN tenants t ON c.tenant_id = t.id
+                  WHERE c.id = ? {$tenantWhere}";
+        $stmt = Database::query($query, array_merge([$id], $tenantParams));
         $comment = $stmt->fetch();
 
         if (!$comment) {
@@ -197,18 +182,15 @@ class AdminCommentsApiController extends BaseApiController
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Verify comment exists — super admins can hide comments from any tenant
-        if ($isSuperAdmin) {
-            $stmt = Database::query(
-                "SELECT id, target_type, target_id, tenant_id FROM comments WHERE id = ?",
-                [$id]
-            );
-        } else {
-            $stmt = Database::query(
-                "SELECT id, target_type, target_id, tenant_id FROM comments WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            );
-        }
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'AND tenant_id = ?' : '';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+
+        $stmt = Database::query(
+            "SELECT id, target_type, target_id, tenant_id FROM comments WHERE id = ? {$tenantWhere}",
+            array_merge([$id], $tenantParams)
+        );
         $comment = $stmt->fetch();
 
         if (!$comment) {
@@ -246,18 +228,15 @@ class AdminCommentsApiController extends BaseApiController
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Verify comment exists — super admins can delete comments from any tenant
-        if ($isSuperAdmin) {
-            $stmt = Database::query(
-                "SELECT id, target_type, target_id, user_id, tenant_id FROM comments WHERE id = ?",
-                [$id]
-            );
-        } else {
-            $stmt = Database::query(
-                "SELECT id, target_type, target_id, user_id, tenant_id FROM comments WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            );
-        }
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'AND tenant_id = ?' : '';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+
+        $stmt = Database::query(
+            "SELECT id, target_type, target_id, user_id, tenant_id FROM comments WHERE id = ? {$tenantWhere}",
+            array_merge([$id], $tenantParams)
+        );
         $comment = $stmt->fetch();
 
         if (!$comment) {
