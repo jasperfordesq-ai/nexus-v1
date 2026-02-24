@@ -56,7 +56,7 @@ import type { AdminUser, UserListParams } from '../../api/types';
 
 export function UserList() {
   usePageTitle('Admin - Users');
-  const { tenantPath } = useTenant();
+  const { tenantPath, tenant } = useTenant();
   const toast = useToast();
   const { user: currentUser } = useAuth();
   const isSuperAdmin = (currentUser as Record<string, unknown> | null)?.is_super_admin === true || (currentUser?.role as string) === 'super_admin';
@@ -96,6 +96,7 @@ export function UserList() {
       limit: 20,
       search: search || undefined,
       status: filter === 'all' ? undefined : filter as UserListParams['status'],
+      tenant_id: tenant?.id,
     };
 
     const res = await adminUsers.list(params);
@@ -111,7 +112,7 @@ export function UserList() {
       }
     }
     setLoading(false);
-  }, [page, filter, search]);
+  }, [page, filter, search, tenant?.id]);
 
   useEffect(() => {
     loadUsers();

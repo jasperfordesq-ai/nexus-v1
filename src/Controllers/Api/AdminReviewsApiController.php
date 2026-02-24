@@ -50,21 +50,15 @@ class AdminReviewsApiController extends BaseApiController
         $rating = isset($_GET['rating']) ? (int) $_GET['rating'] : null;
         $status = $_GET['status'] ?? null;
         $search = $_GET['search'] ?? null;
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         $conditions = [];
         $params = [];
 
-        // Tenant scoping: super admins can see all tenants or filter by one
-        if ($isSuperAdmin) {
-            if ($filterTenantId) {
-                $conditions[] = 'r.tenant_id = ?';
-                $params[] = $filterTenantId;
-            }
-            // No tenant filter = all tenants for super admin
-        } else {
+        // Tenant scoping: defaults to current tenant, super admins can explicitly request all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        if ($effectiveTenantId !== null) {
             $conditions[] = 'r.tenant_id = ?';
-            $params[] = $tenantId;
+            $params[] = $effectiveTenantId;
         }
 
         // Rating filter

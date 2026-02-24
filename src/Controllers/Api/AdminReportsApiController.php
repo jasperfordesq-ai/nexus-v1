@@ -49,21 +49,15 @@ class AdminReportsApiController extends BaseApiController
         $type = $_GET['type'] ?? null;
         $status = $_GET['status'] ?? null;
         $search = $_GET['search'] ?? null;
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         $conditions = [];
         $params = [];
 
-        // Tenant scoping: super admins can see all tenants or filter by one
-        if ($isSuperAdmin) {
-            if ($filterTenantId) {
-                $conditions[] = 'r.tenant_id = ?';
-                $params[] = $filterTenantId;
-            }
-            // No tenant filter = all tenants for super admin
-        } else {
+        // Tenant scoping: defaults to current tenant, super admins can explicitly request all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        if ($effectiveTenantId !== null) {
             $conditions[] = 'r.tenant_id = ?';
-            $params[] = $tenantId;
+            $params[] = $effectiveTenantId;
         }
 
         // Type filter (listing, user, message)
@@ -306,28 +300,19 @@ class AdminReportsApiController extends BaseApiController
         $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
+        // Tenant scoping: defaults to current tenant, super admins can explicitly request all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
-        // Super admins: aggregate across all tenants or filter by one
-        if ($isSuperAdmin && !$filterTenantId) {
-            $query = "SELECT
-                        COUNT(*) as total,
-                        SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as pending,
-                        SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved,
-                        SUM(CASE WHEN status = 'dismissed' THEN 1 ELSE 0 END) as dismissed
-                      FROM reports";
-            $stmt = Database::query($query);
-        } else {
-            $scopeTenantId = ($isSuperAdmin && $filterTenantId) ? $filterTenantId : $tenantId;
-            $query = "SELECT
-                        COUNT(*) as total,
-                        SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as pending,
-                        SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved,
-                        SUM(CASE WHEN status = 'dismissed' THEN 1 ELSE 0 END) as dismissed
-                      FROM reports
-                      WHERE tenant_id = ?";
-            $stmt = Database::query($query, [$scopeTenantId]);
-        }
+        $query = "SELECT
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved,
+                    SUM(CASE WHEN status = 'dismissed' THEN 1 ELSE 0 END) as dismissed
+                  FROM reports
+                  WHERE {$tenantWhere}";
+        $stmt = Database::query($query, $tenantParams);
 
         $stats = $stmt->fetch();
 

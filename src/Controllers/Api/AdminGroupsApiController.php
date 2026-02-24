@@ -46,22 +46,16 @@ class AdminGroupsApiController extends BaseApiController
         $offset = ($page - 1) * $limit;
         $status = $_GET['status'] ?? null;
         $search = $_GET['search'] ?? null;
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         try {
             $conditions = [];
             $params = [];
 
-            // Tenant scoping: super admins can see all tenants or filter by one
-            if ($isSuperAdmin) {
-                if ($filterTenantId) {
-                    $conditions[] = 'g.tenant_id = ?';
-                    $params[] = $filterTenantId;
-                }
-                // No tenant filter = all tenants for super admin
-            } else {
+            // Tenant scoping: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
                 $conditions[] = 'g.tenant_id = ?';
-                $params[] = $tenantId;
+                $params[] = $effectiveTenantId;
             }
 
             // Status filter (groups use is_active column, not status)
@@ -139,25 +133,12 @@ class AdminGroupsApiController extends BaseApiController
         $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
-        // Determine scope
-        if ($isSuperAdmin && $filterTenantId) {
-            $scopeTenantId = $filterTenantId;
-            $tenantCondition = 'tenant_id = ?';
-            $tenantJoinCondition = 'g.tenant_id = ?';
-            $tenantParams = [$scopeTenantId];
-        } elseif ($isSuperAdmin && !$filterTenantId) {
-            $scopeTenantId = null;
-            $tenantCondition = '1=1';
-            $tenantJoinCondition = '1=1';
-            $tenantParams = [];
-        } else {
-            $scopeTenantId = $tenantId;
-            $tenantCondition = 'tenant_id = ?';
-            $tenantJoinCondition = 'g.tenant_id = ?';
-            $tenantParams = [$scopeTenantId];
-        }
+        // Determine scope: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantJoinCondition = $effectiveTenantId !== null ? 'g.tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         try {
             // Total groups
@@ -240,22 +221,16 @@ class AdminGroupsApiController extends BaseApiController
         $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         try {
             $conditions = ['gm.status = \'pending\''];
             $params = [];
 
-            // Tenant scoping: super admins can see all tenants or filter by one
-            if ($isSuperAdmin) {
-                if ($filterTenantId) {
-                    $conditions[] = 'g.tenant_id = ?';
-                    $params[] = $filterTenantId;
-                }
-                // No tenant filter = all tenants for super admin
-            } else {
+            // Tenant scoping: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
                 $conditions[] = 'g.tenant_id = ?';
-                $params[] = $tenantId;
+                $params[] = $effectiveTenantId;
             }
 
             $where = implode(' AND ', $conditions);
@@ -443,19 +418,11 @@ class AdminGroupsApiController extends BaseApiController
         $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
-        // Determine tenant scoping
-        if ($isSuperAdmin && $filterTenantId) {
-            $tenantCondition = 'g.tenant_id = ?';
-            $tenantParams = [$filterTenantId];
-        } elseif ($isSuperAdmin && !$filterTenantId) {
-            $tenantCondition = '1=1';
-            $tenantParams = [];
-        } else {
-            $tenantCondition = 'g.tenant_id = ?';
-            $tenantParams = [$tenantId];
-        }
+        // Determine tenant scoping: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $effectiveTenantId !== null ? 'g.tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         try {
             // Try to find groups referenced in the reports table
@@ -644,28 +611,11 @@ class AdminGroupsApiController extends BaseApiController
         $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
-        // Determine scope
-        if ($isSuperAdmin && $filterTenantId) {
-            $scopeTenantId = $filterTenantId;
-            $tenantCondition = 'gt.tenant_id = ?';
-            $tenantParams = [$scopeTenantId];
-            $groupCountCondition = 'g.tenant_id = ?';
-            $groupCountParams = [$scopeTenantId];
-        } elseif ($isSuperAdmin && !$filterTenantId) {
-            $scopeTenantId = null;
-            $tenantCondition = '1=1';
-            $tenantParams = [];
-            $groupCountCondition = '1=1';
-            $groupCountParams = [];
-        } else {
-            $scopeTenantId = $tenantId;
-            $tenantCondition = 'gt.tenant_id = ?';
-            $tenantParams = [$scopeTenantId];
-            $groupCountCondition = 'g.tenant_id = ?';
-            $groupCountParams = [$scopeTenantId];
-        }
+        // Determine scope: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $scopeTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $scopeTenantId !== null ? 'gt.tenant_id = ?' : '1=1';
+        $tenantParams = $scopeTenantId !== null ? [$scopeTenantId] : [];
 
         try {
             if ($scopeTenantId !== null) {
@@ -930,10 +880,9 @@ class AdminGroupsApiController extends BaseApiController
         $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
-        // Determine scope — policies are always tenant-scoped, so super admin must pick a tenant or use current
-        $scopeTenantId = ($isSuperAdmin && $filterTenantId) ? $filterTenantId : $tenantId;
+        // Determine scope — policies are always tenant-scoped, so fall back to current tenant if cross-tenant requested
+        $scopeTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId) ?? $tenantId;
 
         try {
             $policies = \Nexus\Services\GroupPolicyRepository::getAllPolicies($scopeTenantId);
@@ -1481,19 +1430,11 @@ class AdminGroupsApiController extends BaseApiController
         $adminId = $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
-        // Determine scope
-        if ($isSuperAdmin && $filterTenantId) {
-            $tenantCondition = 'tenant_id = ?';
-            $tenantParams = [$filterTenantId];
-        } elseif ($isSuperAdmin && !$filterTenantId) {
-            $tenantCondition = '1=1';
-            $tenantParams = [];
-        } else {
-            $tenantCondition = 'tenant_id = ?';
-            $tenantParams = [$tenantId];
-        }
+        // Determine scope: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         try {
             $groups = Database::query(
@@ -1528,7 +1469,7 @@ class AdminGroupsApiController extends BaseApiController
             ActivityLog::log(
                 $adminId,
                 'admin_batch_geocode_groups',
-                "Batch geocoded {$success} groups, {$failed} failed" . ($isSuperAdmin ? " (scope: " . ($filterTenantId ? "tenant {$filterTenantId}" : "all tenants") . ")" : '')
+                "Batch geocoded {$success} groups, {$failed} failed" . ($isSuperAdmin ? " (scope: " . ($effectiveTenantId ? "tenant {$effectiveTenantId}" : "all tenants") . ")" : '')
             );
 
             $this->respondWithData([
@@ -1558,19 +1499,11 @@ class AdminGroupsApiController extends BaseApiController
         $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
-        // Determine scope
-        if ($isSuperAdmin && $filterTenantId) {
-            $tenantCondition = 'g.tenant_id = ?';
-            $tenantParams = [$filterTenantId];
-        } elseif ($isSuperAdmin && !$filterTenantId) {
-            $tenantCondition = '1=1';
-            $tenantParams = [];
-        } else {
-            $tenantCondition = 'g.tenant_id = ?';
-            $tenantParams = [$tenantId];
-        }
+        // Determine scope: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $effectiveTenantId !== null ? 'g.tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         $limit = min(100, max(1, (int) ($_GET['limit'] ?? 20)));
         $offset = (int) ($_GET['offset'] ?? 0);
@@ -1655,10 +1588,9 @@ class AdminGroupsApiController extends BaseApiController
         $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
-        // Featured groups service requires a tenant_id — super admins can specify one
-        $scopeTenantId = ($isSuperAdmin && $filterTenantId) ? $filterTenantId : $tenantId;
+        // Featured groups service requires a tenant_id — fall back to current tenant if cross-tenant requested
+        $scopeTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId) ?? $tenantId;
 
         try {
             $groups = \Nexus\Services\SmartGroupRankingService::getFeaturedGroupsWithScores($scopeTenantId);
