@@ -382,7 +382,7 @@ class AuthController extends BaseApiController
             // Notify admins of new registration (including hardcoded master email)
             try {
                 $tenantName = \Nexus\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
-                $adminLink = \Nexus\Core\TenantContext::getFrontendUrl() . \Nexus\Core\TenantContext::getBasePath() . '/admin/users/' . $userId;
+                $adminLink = \Nexus\Core\TenantContext::getFrontendUrl() . \Nexus\Core\TenantContext::getBasePath() . '/admin/users/' . $userId . '/edit';
 
                 // Get tenant admins
                 $adminStmt = $db->prepare("
