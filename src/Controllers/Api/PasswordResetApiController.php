@@ -185,10 +185,10 @@ class PasswordResetApiController extends BaseApiController
             );
         }
 
-        // Update by user ID — prevents changing password for same email in other tenants
+        // Update by user ID AND tenant_id — defense-in-depth against cross-tenant updates
         Database::query(
-            "UPDATE users SET password_hash = ? WHERE id = ?",
-            [$hashedPassword, $user['id']]
+            "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
+            [$hashedPassword, $user['id'], $user['tenant_id']]
         );
 
         // Delete all reset tokens for this email

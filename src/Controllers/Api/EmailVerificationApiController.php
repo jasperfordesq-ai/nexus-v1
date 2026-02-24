@@ -229,8 +229,8 @@ class EmailVerificationApiController extends BaseApiController
         // Generate a secure random token
         $token = bin2hex(random_bytes(32));
 
-        // Hash the token before storing
-        $hashedToken = password_hash($token, PASSWORD_DEFAULT);
+        // Hash the token with SHA-256 (consistent with RegistrationApiController)
+        $hashedToken = hash('sha256', $token);
 
         // Calculate expiry time
         $expiresAt = date('Y-m-d H:i:s', time() + self::TOKEN_EXPIRY_SECONDS);
@@ -296,9 +296,9 @@ class EmailVerificationApiController extends BaseApiController
     /**
      * Find a valid (non-expired) verification token
      *
-     * Uses SHA-256 prefix matching to avoid O(n) password_verify scan across
-     * all tokens. Stores a token_prefix column for fast lookup, then verifies
-     * with password_verify for security.
+     * Both RegistrationApiController and this controller now use SHA-256 hashing.
+     * The bcrypt fallback exists only for tokens created before this change
+     * and can be removed after the TOKEN_EXPIRY_SECONDS window passes.
      *
      * @param string $token The unhashed token from the user
      * @return array|null The verification record if valid, null otherwise
@@ -310,9 +310,7 @@ class EmailVerificationApiController extends BaseApiController
             return null;
         }
 
-        // Strategy: try SHA-256 hash match first (used by RegistrationApiController),
-        // then fall back to password_verify for tokens created by EmailVerificationApiController.
-        // This handles both hashing approaches gracefully.
+        // Primary lookup: SHA-256 hash (used by both controllers now)
         $sha256Hash = hash('sha256', $token);
         $record = Database::query(
             "SELECT * FROM email_verification_tokens WHERE token = ? AND expires_at > NOW()",
@@ -323,8 +321,8 @@ class EmailVerificationApiController extends BaseApiController
             return $record;
         }
 
-        // Fallback: scan non-expired tokens with password_verify
-        // (for tokens hashed with password_hash/bcrypt)
+        // Legacy fallback: scan for bcrypt-hashed tokens created before SHA-256 migration.
+        // TODO: Remove this fallback after 2026-03-01 (all legacy tokens will have expired).
         $records = Database::query(
             "SELECT * FROM email_verification_tokens WHERE expires_at > NOW() ORDER BY created_at DESC LIMIT 100"
         )->fetchAll();
