@@ -20,24 +20,30 @@ import {
 import { Plus, Building2, Network } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
+import { useTenant } from '@/contexts';
 import { PageHeader } from '@/admin/components/PageHeader';
 import { DataTable, StatusBadge, type Column } from '@/admin/components/DataTable';
 import type { SuperAdminTenant } from '@/admin/api/types';
-import { tenantPath } from '@/lib/tenant-routing';
 
 export function TenantListAdmin() {
   usePageTitle('Manage Tenants - Super Admin');
+  const { tenantPath } = useTenant();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [hubOnly, setHubOnly] = useState(false);
 
+  // Build query params for API
+  const params = new URLSearchParams();
+  if (search) params.set('search', search);
+  if (statusFilter !== 'all') params.set('status', statusFilter);
+  if (hubOnly) params.set('hub_only', '1');
+  const qs = params.toString();
+
   const { data: tenants, isLoading: loading } = useApi<SuperAdminTenant[]>(
-    '/v2/admin/super/tenants',
+    `/v2/admin/super/tenants${qs ? `?${qs}` : ''}`,
     { immediate: true, deps: [search, statusFilter, hubOnly] }
   );
-
-  const getTenantPath = (path: string) => tenantPath(path, null);
 
   const columns: Column<SuperAdminTenant>[] = [
     {
@@ -49,7 +55,7 @@ export function TenantListAdmin() {
           <Building2 size={16} className="text-default-400 shrink-0" />
           <div>
             <Link
-              to={getTenantPath(`/admin/super/tenants/${tenant.id}`)}
+              to={tenantPath(`/admin/super/tenants/${tenant.id}`)}
               className="font-medium text-primary hover:underline"
             >
               {tenant.name}
@@ -117,7 +123,7 @@ export function TenantListAdmin() {
         <div className="flex items-center gap-2">
           <Button
             as={Link}
-            to={getTenantPath(`/admin/super/tenants/${tenant.id}`)}
+            to={tenantPath(`/admin/super/tenants/${tenant.id}`)}
             size="sm"
             variant="flat"
           >
@@ -125,7 +131,7 @@ export function TenantListAdmin() {
           </Button>
           <Button
             as={Link}
-            to={getTenantPath(`/admin/super/tenants/${tenant.id}/edit`)}
+            to={tenantPath(`/admin/super/tenants/${tenant.id}/edit`)}
             size="sm"
             variant="light"
           >
@@ -144,7 +150,7 @@ export function TenantListAdmin() {
         actions={
           <Button
             as={Link}
-            to={getTenantPath('/admin/super/tenants/create')}
+            to={tenantPath('/admin/super/tenants/create')}
             color="primary"
             startContent={<Plus size={16} />}
           >
