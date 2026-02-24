@@ -39,7 +39,7 @@ class MatchPreferencesApiController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $input = $this->getJsonInput();
+        $input = $this->getAllInput();
         $current = MatchingService::getPreferences($userId);
 
         // Only update fields that were provided
