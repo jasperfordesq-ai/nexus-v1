@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   Card,
   CardBody,
@@ -17,6 +17,8 @@ import { Lock, Shield } from 'lucide-react';
 import PageHeader from '../../../components/PageHeader';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
+import { adminSuper } from '../../../api/adminApi';
+import type { FederationSystemControls as FederationSystemControlsType } from '../../../api/types';
 
 interface SystemControls {
   federation_enabled: boolean;
@@ -33,6 +35,26 @@ interface FeatureToggles {
   listings: boolean;
   events: boolean;
   groups: boolean;
+}
+
+function mapApiToLocal(sc: FederationSystemControlsType): { controls: SystemControls; features: FeatureToggles } {
+  return {
+    controls: {
+      federation_enabled: sc.federation_enabled,
+      whitelist_mode: sc.whitelist_mode_enabled,
+      max_level: sc.max_federation_level,
+      lockdown_active: sc.is_locked_down,
+      lockdown_reason: sc.lockdown_reason,
+    },
+    features: {
+      profiles: sc.cross_tenant_profiles_enabled,
+      messaging: sc.cross_tenant_messaging_enabled,
+      transactions: sc.cross_tenant_transactions_enabled,
+      listings: sc.cross_tenant_listings_enabled,
+      events: sc.cross_tenant_events_enabled,
+      groups: sc.cross_tenant_groups_enabled,
+    },
+  };
 }
 
 export default function FederationSystemControls() {
@@ -55,10 +77,18 @@ export default function FederationSystemControls() {
   const [lockdownReason, setLockdownReason] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // TODO: Replace with adminApi.getFederationStats()
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const res = await adminSuper.getSystemControls();
+    if (res.success && res.data) {
+      const mapped = mapApiToLocal(res.data);
+      setControls(mapped.controls);
+      setFeatures(mapped.features);
+    }
     setLoading(false);
   }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
 
   const handleTriggerLockdown = async () => {
     if (!lockdownReason.trim()) {
@@ -66,28 +96,53 @@ export default function FederationSystemControls() {
       return;
     }
 
-    // TODO: Replace with adminApi.triggerLockdown(lockdownReason)
-    setControls(prev => ({ ...prev, lockdown_active: true, lockdown_reason: lockdownReason }));
-    toast.success('Emergency lockdown activated');
-    setLockdownReason('');
+    const res = await adminSuper.emergencyLockdown(lockdownReason);
+    if (res.success) {
+      setControls(prev => ({ ...prev, lockdown_active: true, lockdown_reason: lockdownReason }));
+      toast.success('Emergency lockdown activated');
+      setLockdownReason('');
+    } else {
+      toast.error(res.error || 'Failed to activate lockdown');
+    }
   };
 
   const handleLiftLockdown = async () => {
-    // TODO: Replace with adminApi.liftLockdown()
-    setControls(prev => ({ ...prev, lockdown_active: false, lockdown_reason: undefined }));
-    toast.success('Emergency lockdown lifted');
+    const res = await adminSuper.liftLockdown();
+    if (res.success) {
+      setControls(prev => ({ ...prev, lockdown_active: false, lockdown_reason: undefined }));
+      toast.success('Emergency lockdown lifted');
+    } else {
+      toast.error(res.error || 'Failed to lift lockdown');
+    }
   };
 
   const handleToggleControl = async (key: keyof SystemControls, value: boolean | number) => {
-    // TODO: Replace with adminApi.updateSystemControl(key, value)
-    setControls(prev => ({ ...prev, [key]: value }));
-    toast.success('System control updated');
+    const apiKeyMap: Record<string, string> = {
+      federation_enabled: 'federation_enabled',
+      whitelist_mode: 'whitelist_mode_enabled',
+      max_level: 'max_federation_level',
+    };
+    const apiKey = apiKeyMap[key];
+    if (!apiKey) return;
+
+    const res = await adminSuper.updateSystemControls({ [apiKey]: value });
+    if (res.success) {
+      setControls(prev => ({ ...prev, [key]: value }));
+      toast.success('System control updated');
+    } else {
+      toast.error(res.error || 'Failed to update control');
+    }
   };
 
   const handleToggleFeature = async (key: keyof FeatureToggles, value: boolean) => {
-    // TODO: Replace with adminApi.updateSystemControl(`feature_${key}`, value)
-    setFeatures(prev => ({ ...prev, [key]: value }));
-    toast.success(`${key} feature ${value ? 'enabled' : 'disabled'}`);
+    const apiKey = `cross_tenant_${key}_enabled`;
+    const res = await adminSuper.updateSystemControls({ [apiKey]: value });
+    if (res.success) {
+      setFeatures(prev => ({ ...prev, [key]: value }));
+      toast.success(`${key} feature ${value ? 'enabled' : 'disabled'}`);
+    } else {
+      toast.error(res.error || 'Failed to update feature');
+    }
   };
 
   if (loading) {

@@ -3,13 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Button, Chip, Tabs, Tab } from '@heroui/react';
 import { TrendingUp, Users, MessageSquare, DollarSign, FileText, Calendar, UsersRound, Pause, XCircle } from 'lucide-react';
 import PageHeader from '../../../components/PageHeader';
 import ConfirmModal from '../../../components/ConfirmModal';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
+import { adminSuper } from '../../../api/adminApi';
+import type { FederationPartnership } from '../../../api/types';
 
 interface Partnership {
   id: number;
@@ -39,32 +41,80 @@ interface Stats {
 
 type PartnershipStatus = 'all' | 'active' | 'pending' | 'suspended' | 'terminated';
 
+function mapApiPartnership(p: FederationPartnership): Partnership {
+  return {
+    id: p.id,
+    tenant_a_id: p.tenant_1_id,
+    tenant_a_name: p.tenant_1_name,
+    tenant_b_id: p.tenant_2_id,
+    tenant_b_name: p.tenant_2_name,
+    level: 1,
+    status: p.status,
+    features: { profiles: false, messaging: false, transactions: false, listings: false, events: false, groups: false },
+    created_at: p.created_at,
+  };
+}
+
+function computeStats(partnerships: Partnership[]): Stats {
+  return partnerships.reduce(
+    (acc, p) => {
+      if (p.status in acc) acc[p.status as keyof Stats]++;
+      return acc;
+    },
+    { active: 0, pending: 0, suspended: 0, terminated: 0 },
+  );
+}
+
 export default function Partnerships() {
   usePageTitle('Partnerships');
   const toast = useToast();
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
-  const [stats] = useState<Stats>({ active: 0, pending: 0, suspended: 0, terminated: 0 });
+  const [stats, setStats] = useState<Stats>({ active: 0, pending: 0, suspended: 0, terminated: 0 });
   const [filter, setFilter] = useState<PartnershipStatus>('all');
   const [loading, setLoading] = useState(true);
   const [actionPartnership, setActionPartnership] = useState<{ id: number; action: 'suspend' | 'terminate' } | null>(null);
 
-  useEffect(() => {
-    // TODO: Replace with adminApi.listPartnerships()
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const res = await adminSuper.getFederationPartnerships();
+    if (res.success && res.data) {
+      const mapped = (Array.isArray(res.data) ? res.data : []).map(mapApiPartnership);
+      setPartnerships(mapped);
+      setStats(computeStats(mapped));
+    }
     setLoading(false);
   }, []);
 
+  useEffect(() => { loadData(); }, [loadData]);
+
   const handleSuspend = async (id: number) => {
-    // TODO: Replace with adminApi.suspendPartnership(id)
-    setPartnerships(prev => prev.map(p => p.id === id ? { ...p, status: 'suspended' as const } : p));
-    setActionPartnership(null);
-    toast.success('Partnership suspended');
+    const res = await adminSuper.suspendPartnership(id, 'Suspended by admin');
+    if (res.success) {
+      setPartnerships(prev => {
+        const updated = prev.map(p => p.id === id ? { ...p, status: 'suspended' as const } : p);
+        setStats(computeStats(updated));
+        return updated;
+      });
+      setActionPartnership(null);
+      toast.success('Partnership suspended');
+    } else {
+      toast.error(res.error || 'Failed to suspend partnership');
+    }
   };
 
   const handleTerminate = async (id: number) => {
-    // TODO: Replace with adminApi.terminatePartnership(id)
-    setPartnerships(prev => prev.map(p => p.id === id ? { ...p, status: 'terminated' as const } : p));
-    setActionPartnership(null);
-    toast.success('Partnership terminated');
+    const res = await adminSuper.terminatePartnership(id, 'Terminated by admin');
+    if (res.success) {
+      setPartnerships(prev => {
+        const updated = prev.map(p => p.id === id ? { ...p, status: 'terminated' as const } : p);
+        setStats(computeStats(updated));
+        return updated;
+      });
+      setActionPartnership(null);
+      toast.success('Partnership terminated');
+    } else {
+      toast.error(res.error || 'Failed to terminate partnership');
+    }
   };
 
   const getLevelColor = (level: number) => {
