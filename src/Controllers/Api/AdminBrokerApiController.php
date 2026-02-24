@@ -55,21 +55,9 @@ class AdminBrokerApiController extends BaseApiController
         $this->requireBrokerAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
-
-        // Determine tenant scoping
-        if ($isSuperAdmin) {
-            if ($filterTenantId) {
-                $tenantWhere = 'tenant_id = ?';
-                $tenantParams = [$filterTenantId];
-            } else {
-                $tenantWhere = '1=1';
-                $tenantParams = [];
-            }
-        } else {
-            $tenantWhere = 'tenant_id = ?';
-            $tenantParams = [$tenantId];
-        }
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         // Pending exchanges
         $pendingExchanges = 0;
@@ -151,8 +139,8 @@ class AdminBrokerApiController extends BaseApiController
         // Recent broker activity (last 20 actions)
         $recentActivity = [];
         try {
-            $actWhere = $isSuperAdmin && !$filterTenantId ? '1=1' : 'al.tenant_id = ?';
-            $actParams = $isSuperAdmin && !$filterTenantId ? [] : ($filterTenantId ? [$filterTenantId] : [$tenantId]);
+            $actWhere = $effectiveTenantId !== null ? 'al.tenant_id = ?' : '1=1';
+            $actParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
             $recentActivity = Database::query(
                 "SELECT al.*, u.first_name, u.last_name, t.name as tenant_name
                  FROM activity_logs al
@@ -197,7 +185,6 @@ class AdminBrokerApiController extends BaseApiController
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
         $status = $this->query('status');
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
         $offset = ($page - 1) * $perPage;
 
         try {
@@ -205,15 +192,10 @@ class AdminBrokerApiController extends BaseApiController
             $conditions = [];
             $params = [];
 
-            if ($isSuperAdmin) {
-                if ($filterTenantId) {
-                    $conditions[] = 'er.tenant_id = ?';
-                    $params[] = $filterTenantId;
-                }
-                // No tenant filter = all tenants for super admin
-            } else {
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
                 $conditions[] = 'er.tenant_id = ?';
-                $params[] = $tenantId;
+                $params[] = $effectiveTenantId;
             }
 
             if ($status && $status !== 'all') {
@@ -380,22 +362,16 @@ class AdminBrokerApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $riskLevel = $this->query('risk_level');
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         try {
             $conditions = [];
             $params = [];
 
             // Tenant scoping
-            if ($isSuperAdmin) {
-                if ($filterTenantId) {
-                    $conditions[] = 'rt.tenant_id = ?';
-                    $params[] = $filterTenantId;
-                }
-                // No filter = all tenants for super admin
-            } else {
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
                 $conditions[] = 'rt.tenant_id = ?';
-                $params[] = $tenantId;
+                $params[] = $effectiveTenantId;
             }
 
             if ($riskLevel && $riskLevel !== 'all') {
@@ -444,7 +420,6 @@ class AdminBrokerApiController extends BaseApiController
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
         $filter = $this->query('filter', 'all');
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
         $offset = ($page - 1) * $perPage;
 
         try {
@@ -452,15 +427,10 @@ class AdminBrokerApiController extends BaseApiController
             $params = [];
 
             // Tenant scoping
-            if ($isSuperAdmin) {
-                if ($filterTenantId) {
-                    $conditions[] = 'bmc.tenant_id = ?';
-                    $params[] = $filterTenantId;
-                }
-                // No filter = all tenants for super admin
-            } else {
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
                 $conditions[] = 'bmc.tenant_id = ?';
-                $params[] = $tenantId;
+                $params[] = $effectiveTenantId;
             }
 
             if ($filter === 'unreviewed') {
@@ -565,22 +535,16 @@ class AdminBrokerApiController extends BaseApiController
         $this->requireBrokerAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         try {
             $conditions = ['umr.under_monitoring = 1'];
             $params = [];
 
             // Tenant scoping
-            if ($isSuperAdmin) {
-                if ($filterTenantId) {
-                    $conditions[] = 'umr.tenant_id = ?';
-                    $params[] = $filterTenantId;
-                }
-                // No filter = all tenants for super admin
-            } else {
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
                 $conditions[] = 'umr.tenant_id = ?';
-                $params[] = $tenantId;
+                $params[] = $effectiveTenantId;
             }
 
             $where = implode(' AND ', $conditions);
@@ -927,7 +891,6 @@ class AdminBrokerApiController extends BaseApiController
         $search = $this->query('search');
         $from = $this->query('from');
         $to = $this->query('to');
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
         $offset = ($page - 1) * $perPage;
 
         try {
@@ -935,15 +898,10 @@ class AdminBrokerApiController extends BaseApiController
             $params = [];
 
             // Tenant scoping
-            if ($isSuperAdmin) {
-                if ($filterTenantId) {
-                    $conditions[] = 'bra.tenant_id = ?';
-                    $params[] = $filterTenantId;
-                }
-                // No filter = all tenants for super admin
-            } else {
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
                 $conditions[] = 'bra.tenant_id = ?';
-                $params[] = $tenantId;
+                $params[] = $effectiveTenantId;
             }
 
             if ($decision && $decision !== 'all') {
@@ -1263,7 +1221,7 @@ class AdminBrokerApiController extends BaseApiController
         $this->requireBrokerAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
 
         $defaults = [
             // Messaging
@@ -1306,15 +1264,11 @@ class AdminBrokerApiController extends BaseApiController
         ];
 
         // Determine which tenant's config to load
-        if ($isSuperAdmin && $filterTenantId) {
-            $scopeTenantId = $filterTenantId;
-        } else {
-            $scopeTenantId = $tenantId;
-        }
+        $scopeTenantId = $effectiveTenantId ?? $tenantId;
 
         try {
-            // Super admin with no tenant filter: show all tenant configs
-            if ($isSuperAdmin && !$filterTenantId) {
+            // Super admin with explicit ?tenant_id=all: show all tenant configs
+            if ($effectiveTenantId === null) {
                 $rows = Database::query(
                     "SELECT ts.tenant_id, ts.setting_value, t.name as tenant_name
                      FROM tenant_settings ts

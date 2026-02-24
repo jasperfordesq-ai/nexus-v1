@@ -46,8 +46,6 @@ class AdminListingsApiController extends BaseApiController
         $search = $_GET['search'] ?? null;
         $sort = $_GET['sort'] ?? 'created_at';
         $order = strtoupper($_GET['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
-
         // Whitelist sort columns
         $allowedSorts = ['title', 'type', 'status', 'created_at', 'user_name'];
         if (!in_array($sort, $allowedSorts)) {
@@ -57,16 +55,11 @@ class AdminListingsApiController extends BaseApiController
         $conditions = [];
         $params = [];
 
-        // Tenant scoping: super admins can see all tenants or filter by one
-        if ($isSuperAdmin) {
-            if ($filterTenantId) {
-                $conditions[] = 'l.tenant_id = ?';
-                $params[] = $filterTenantId;
-            }
-            // No tenant filter = all tenants for super admin
-        } else {
+        // Tenant scoping: defaults to current tenant, super admins can explicitly request all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        if ($effectiveTenantId !== null) {
             $conditions[] = 'l.tenant_id = ?';
-            $params[] = $tenantId;
+            $params[] = $effectiveTenantId;
         }
 
         // Status filter

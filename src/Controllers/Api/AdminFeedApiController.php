@@ -50,21 +50,15 @@ class AdminFeedApiController extends BaseApiController
         $userId = isset($_GET['user_id']) ? (int) $_GET['user_id'] : null;
         $search = $_GET['search'] ?? null;
         $isHidden = isset($_GET['is_hidden']) ? (bool) $_GET['is_hidden'] : null;
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         $conditions = [];
         $params = [];
 
-        // Tenant scoping: super admins can see all tenants or filter by one
-        if ($isSuperAdmin) {
-            if ($filterTenantId) {
-                $conditions[] = 'fp.tenant_id = ?';
-                $params[] = $filterTenantId;
-            }
-            // No tenant filter = all tenants for super admin
-        } else {
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        if ($effectiveTenantId !== null) {
             $conditions[] = 'fp.tenant_id = ?';
-            $params[] = $tenantId;
+            $params[] = $effectiveTenantId;
         }
 
         // Type filter
@@ -160,34 +154,23 @@ class AdminFeedApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        // Super admins can view posts from any tenant
-        if ($isSuperAdmin) {
-            $query = "SELECT fp.*,
-                             u.name as user_name,
-                             u.email as user_email,
-                             u.avatar_url as user_avatar,
-                             t.name as tenant_name,
-                             (fh.id IS NOT NULL) as is_hidden
-                      FROM feed_posts fp
-                      LEFT JOIN users u ON fp.user_id = u.id
-                      LEFT JOIN tenants t ON fp.tenant_id = t.id
-                      LEFT JOIN feed_hidden fh ON fh.target_type = 'post' AND fh.target_id = fp.id AND fh.tenant_id = fp.tenant_id
-                      WHERE fp.id = ?";
-            $stmt = Database::query($query, [$id]);
-        } else {
-            $query = "SELECT fp.*,
-                             u.name as user_name,
-                             u.email as user_email,
-                             u.avatar_url as user_avatar,
-                             t.name as tenant_name,
-                             (fh.id IS NOT NULL) as is_hidden
-                      FROM feed_posts fp
-                      LEFT JOIN users u ON fp.user_id = u.id
-                      LEFT JOIN tenants t ON fp.tenant_id = t.id
-                      LEFT JOIN feed_hidden fh ON fh.target_type = 'post' AND fh.target_id = fp.id AND fh.tenant_id = fp.tenant_id
-                      WHERE fp.id = ? AND fp.tenant_id = ?";
-            $stmt = Database::query($query, [$id, $tenantId]);
-        }
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'fp.tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+
+        $query = "SELECT fp.*,
+                         u.name as user_name,
+                         u.email as user_email,
+                         u.avatar_url as user_avatar,
+                         t.name as tenant_name,
+                         (fh.id IS NOT NULL) as is_hidden
+                  FROM feed_posts fp
+                  LEFT JOIN users u ON fp.user_id = u.id
+                  LEFT JOIN tenants t ON fp.tenant_id = t.id
+                  LEFT JOIN feed_hidden fh ON fh.target_type = 'post' AND fh.target_id = fp.id AND fh.tenant_id = fp.tenant_id
+                  WHERE fp.id = ? AND {$tenantWhere}";
+        $stmt = Database::query($query, array_merge([$id], $tenantParams));
         $post = $stmt->fetch();
 
         if (!$post) {
@@ -240,18 +223,15 @@ class AdminFeedApiController extends BaseApiController
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Verify post exists — super admins can hide posts from any tenant
-        if ($isSuperAdmin) {
-            $stmt = Database::query(
-                "SELECT id, user_id, tenant_id FROM feed_posts WHERE id = ?",
-                [$id]
-            );
-        } else {
-            $stmt = Database::query(
-                "SELECT id, user_id, tenant_id FROM feed_posts WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            );
-        }
+        // Verify post exists — tenant scoping defaults to current tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+
+        $stmt = Database::query(
+            "SELECT id, user_id, tenant_id FROM feed_posts WHERE id = ? AND {$tenantWhere}",
+            array_merge([$id], $tenantParams)
+        );
         $post = $stmt->fetch();
 
         if (!$post) {
@@ -289,18 +269,15 @@ class AdminFeedApiController extends BaseApiController
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Verify post exists — super admins can delete posts from any tenant
-        if ($isSuperAdmin) {
-            $stmt = Database::query(
-                "SELECT id, tenant_id FROM feed_posts WHERE id = ?",
-                [$id]
-            );
-        } else {
-            $stmt = Database::query(
-                "SELECT id, tenant_id FROM feed_posts WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            );
-        }
+        // Verify post exists — tenant scoping defaults to current tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+
+        $stmt = Database::query(
+            "SELECT id, tenant_id FROM feed_posts WHERE id = ? AND {$tenantWhere}",
+            array_merge([$id], $tenantParams)
+        );
         $post = $stmt->fetch();
 
         if (!$post) {
@@ -340,19 +317,10 @@ class AdminFeedApiController extends BaseApiController
         $this->requireAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
-        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
 
-        // Super admins: aggregate across all tenants or filter by one
-        if ($isSuperAdmin && !$filterTenantId) {
-            $query = "SELECT
-                        COUNT(DISTINCT fp.id) as total,
-                        (SELECT COUNT(DISTINCT fh.target_id) FROM feed_hidden fh
-                         WHERE fh.target_type = 'post') as hidden,
-                        (SELECT COUNT(*) FROM comments WHERE target_type = 'post') as total_comments
-                      FROM feed_posts fp";
-            $stmt = Database::query($query);
-        } else {
-            $scopeTenantId = ($isSuperAdmin && $filterTenantId) ? $filterTenantId : $tenantId;
+        if ($effectiveTenantId !== null) {
             $query = "SELECT
                         COUNT(DISTINCT fp.id) as total,
                         (SELECT COUNT(DISTINCT fh.target_id) FROM feed_hidden fh
@@ -360,7 +328,15 @@ class AdminFeedApiController extends BaseApiController
                         (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND tenant_id = ?) as total_comments
                       FROM feed_posts fp
                       WHERE fp.tenant_id = ?";
-            $stmt = Database::query($query, [$scopeTenantId, $scopeTenantId, $scopeTenantId]);
+            $stmt = Database::query($query, [$effectiveTenantId, $effectiveTenantId, $effectiveTenantId]);
+        } else {
+            $query = "SELECT
+                        COUNT(DISTINCT fp.id) as total,
+                        (SELECT COUNT(DISTINCT fh.target_id) FROM feed_hidden fh
+                         WHERE fh.target_type = 'post') as hidden,
+                        (SELECT COUNT(*) FROM comments WHERE target_type = 'post') as total_comments
+                      FROM feed_posts fp";
+            $stmt = Database::query($query);
         }
 
         $stats = $stmt->fetch();
