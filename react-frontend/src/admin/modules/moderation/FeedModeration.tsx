@@ -24,7 +24,6 @@ import { Search, RefreshCw, EyeOff, Trash2 } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTenant } from '@/contexts/TenantContext';
 import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
@@ -45,8 +44,6 @@ export default function FeedModeration() {
 
   const toast = useToast();
   const { user } = useAuth();
-  const { tenant } = useTenant();
-  const currentTenantId = tenant?.id ? String(tenant.id) : '';
   const userRecord = user as Record<string, unknown> | null;
   const isSuperAdmin =
     (user?.role as string) === 'super_admin' ||
@@ -56,10 +53,10 @@ export default function FeedModeration() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
-  const [tenantFilter, setTenantFilter] = useState(currentTenantId);
+  const [tenantFilter, setTenantFilter] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
   const [activeType, setActiveType] = useState('');
-  const [activeTenant, setActiveTenant] = useState(currentTenantId);
+  const [activeTenant, setActiveTenant] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'hide' | 'delete';
@@ -89,7 +86,7 @@ export default function FeedModeration() {
     params.append('limit', '20');
     if (activeSearch) params.append('search', activeSearch);
     if (activeType) params.append('type', activeType);
-    if (isSuperAdmin && activeTenant && activeTenant !== 'all') params.append('tenant_id', activeTenant);
+    if (activeTenant && activeTenant !== 'all') params.append('tenant_id', activeTenant);
     return params.toString();
   };
 
@@ -108,10 +105,10 @@ export default function FeedModeration() {
   const handleClear = () => {
     setSearch('');
     setTypeFilter('');
-    setTenantFilter(currentTenantId);
+    setTenantFilter('');
     setActiveSearch('');
     setActiveType('');
-    setActiveTenant(currentTenantId);
+    setActiveTenant('');
     setPage(1);
   };
 
@@ -307,7 +304,7 @@ export default function FeedModeration() {
       {meta && (
         <div className="text-sm text-default-500">
           Showing {posts.length} of {meta.total ?? posts.length} posts
-          {isSuperAdmin && activeTenant === 'all' && ' (all tenants)'}
+          {isSuperAdmin && !activeTenant && ' (all tenants)'}
         </div>
       )}
 
