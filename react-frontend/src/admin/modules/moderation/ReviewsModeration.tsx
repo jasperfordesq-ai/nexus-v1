@@ -24,7 +24,6 @@ import { Search, RefreshCw, Flag, EyeOff, Trash2, Star } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTenant } from '@/contexts/TenantContext';
 import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
@@ -46,8 +45,6 @@ export default function ReviewsModeration() {
 
   const toast = useToast();
   const { user } = useAuth();
-  const { tenant } = useTenant();
-  const currentTenantId = tenant?.id ? String(tenant.id) : '';
   const userRecord = user as Record<string, unknown> | null;
   const isSuperAdmin =
     (user?.role as string) === 'super_admin' ||
@@ -57,10 +54,10 @@ export default function ReviewsModeration() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [ratingFilter, setRatingFilter] = useState('');
-  const [tenantFilter, setTenantFilter] = useState(currentTenantId);
+  const [tenantFilter, setTenantFilter] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
   const [activeRating, setActiveRating] = useState('');
-  const [activeTenant, setActiveTenant] = useState(currentTenantId);
+  const [activeTenant, setActiveTenant] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'flag' | 'hide' | 'delete';
@@ -90,7 +87,7 @@ export default function ReviewsModeration() {
     params.append('limit', '20');
     if (activeSearch) params.append('search', activeSearch);
     if (activeRating) params.append('rating', activeRating);
-    if (isSuperAdmin && activeTenant && activeTenant !== 'all') params.append('tenant_id', activeTenant);
+    if (activeTenant && activeTenant !== 'all') params.append('tenant_id', activeTenant);
     return params.toString();
   };
 
@@ -109,10 +106,10 @@ export default function ReviewsModeration() {
   const handleClear = () => {
     setSearch('');
     setRatingFilter('');
-    setTenantFilter(currentTenantId);
+    setTenantFilter('');
     setActiveSearch('');
     setActiveRating('');
-    setActiveTenant(currentTenantId);
+    setActiveTenant('');
     setPage(1);
   };
 
@@ -347,7 +344,7 @@ export default function ReviewsModeration() {
       {meta && (
         <div className="text-sm text-default-500">
           Showing {reviews.length} of {meta.total ?? reviews.length} reviews
-          {isSuperAdmin && activeTenant === 'all' && ' (all tenants)'}
+          {isSuperAdmin && !activeTenant && ' (all tenants)'}
         </div>
       )}
 
