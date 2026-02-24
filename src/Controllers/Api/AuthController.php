@@ -123,6 +123,19 @@ class AuthController extends BaseApiController
         }
         $user = $stmt->fetch();
 
+        // SUPER ADMIN CROSS-TENANT LOGIN: If tenant-scoped lookup found no user,
+        // fall back to a global lookup. Super admins live in tenant 1 (master) but
+        // need to log in from any tenant's URL. Only allow if the user is actually
+        // a super admin — regular users must match their home tenant.
+        if (!$user && $tenantId) {
+            $stmt = $db->prepare("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?");
+            $stmt->execute([$email]);
+            $candidate = $stmt->fetch();
+            if ($candidate && (!empty($candidate['is_super_admin']) || ($candidate['role'] ?? '') === 'super_admin')) {
+                $user = $candidate;
+            }
+        }
+
         if ($user && password_verify($password, $user['password_hash'])) {
             // SECURITY: Record successful login and clear failed attempts
             if (!empty($email)) {
@@ -800,7 +813,7 @@ class AuthController extends BaseApiController
 
         // Verify user still exists and is active
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT id, email, role, status FROM users WHERE id = ? AND tenant_id = ?");
+        $stmt = $db->prepare("SELECT id, email, role, status, is_super_admin FROM users WHERE id = ? AND tenant_id = ?");
         $stmt->execute([$userId, $tenantId]);
         $user = $stmt->fetch();
 
