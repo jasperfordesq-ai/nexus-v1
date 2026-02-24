@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Input,
@@ -23,10 +23,12 @@ import {
 import { Search, RefreshCw, EyeOff, Trash2 } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
 import { adminModeration } from '@/admin/api/adminApi';
+import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminFeedPost } from '@/admin/api/types';
 
 const POST_TYPES = [
@@ -41,16 +43,41 @@ export default function FeedModeration() {
   usePageTitle('Feed Moderation');
 
   const toast = useToast();
+  const { user } = useAuth();
+  const userRecord = user as Record<string, unknown> | null;
+  const isSuperAdmin =
+    (user?.role as string) === 'super_admin' ||
+    userRecord?.is_super_admin === true ||
+    userRecord?.is_tenant_super_admin === true;
+
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  const [tenantFilter, setTenantFilter] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
   const [activeType, setActiveType] = useState('');
+  const [activeTenant, setActiveTenant] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'hide' | 'delete';
     post: AdminFeedPost;
   } | null>(null);
+  const [tenants, setTenants] = useState<Array<{ id: number; name: string }>>([]);
+
+  // Load tenants list for super admin filter
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    adminSuper.listTenants().then((res) => {
+      if (res.success && Array.isArray(res.data)) {
+        setTenants(res.data.map((t) => ({
+          id: Number(t.id),
+          name: String(t.name || 'Unknown'),
+        })));
+      }
+    }).catch(() => {
+      // Tenant list is optional; silently fail
+    });
+  }, [isSuperAdmin]);
 
   // Build query params for the endpoint
   const buildQueryString = () => {
@@ -59,25 +86,29 @@ export default function FeedModeration() {
     params.append('limit', '20');
     if (activeSearch) params.append('search', activeSearch);
     if (activeType) params.append('type', activeType);
+    if (isSuperAdmin && activeTenant) params.append('tenant_id', activeTenant);
     return params.toString();
   };
 
   const { data, isLoading, error, execute, meta } = useApi<AdminFeedPost[]>(
     `/v2/admin/feed/posts?${buildQueryString()}`,
-    { immediate: true, deps: [page, activeSearch, activeType] }
+    { immediate: true, deps: [page, activeSearch, activeType, activeTenant] }
   );
 
   const handleSearch = () => {
     setActiveSearch(search);
     setActiveType(typeFilter);
+    setActiveTenant(tenantFilter);
     setPage(1);
   };
 
   const handleClear = () => {
     setSearch('');
     setTypeFilter('');
+    setTenantFilter('');
     setActiveSearch('');
     setActiveType('');
+    setActiveTenant('');
     setPage(1);
   };
 
@@ -111,11 +142,102 @@ export default function FeedModeration() {
   const posts = data || [];
   const totalPages = meta?.total_pages || 1;
 
+  // Build cell content for a post row
+  const renderCells = (post: AdminFeedPost): React.ReactElement[] => {
+    const cells: React.ReactElement[] = [
+      <TableCell key="user">
+        <div className="flex items-center gap-3">
+          <Avatar
+            src={post.user_avatar || undefined}
+            name={post.user_name}
+            size="sm"
+            className="flex-shrink-0"
+          />
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{post.user_name}</span>
+            <span className="text-xs text-default-400">ID: {post.user_id}</span>
+          </div>
+        </div>
+      </TableCell>,
+    ];
+
+    if (isSuperAdmin) {
+      cells.push(
+        <TableCell key="tenant">
+          <Chip size="sm" variant="flat" color="secondary">
+            {post.tenant_name}
+          </Chip>
+        </TableCell>
+      );
+    }
+
+    cells.push(
+      <TableCell key="content">
+        <div className="max-w-md">
+          <p className="text-sm line-clamp-2">{post.content}</p>
+          {post.is_flagged && (
+            <Chip size="sm" color="warning" variant="flat" className="mt-1">
+              Flagged
+            </Chip>
+          )}
+        </div>
+      </TableCell>,
+      <TableCell key="type">
+        <Chip size="sm" variant="flat">
+          {post.type}
+        </Chip>
+      </TableCell>,
+      <TableCell key="status">
+        {post.is_hidden ? (
+          <Chip size="sm" color="warning" variant="flat">Hidden</Chip>
+        ) : (
+          <Chip size="sm" color="success" variant="flat">Visible</Chip>
+        )}
+      </TableCell>,
+      <TableCell key="created">
+        <span className="text-sm text-default-500">
+          {new Date(post.created_at).toLocaleDateString()}
+        </span>
+      </TableCell>,
+      <TableCell key="actions">
+        <div className="flex items-center gap-2">
+          {!post.is_hidden && (
+            <Button
+              size="sm"
+              variant="flat"
+              color="warning"
+              startContent={<EyeOff className="w-4 h-4" />}
+              onPress={() => setConfirmAction({ type: 'hide', post })}
+            >
+              Hide
+            </Button>
+          )}
+          <Button
+            size="sm"
+            variant="flat"
+            color="danger"
+            startContent={<Trash2 className="w-4 h-4" />}
+            onPress={() => setConfirmAction({ type: 'delete', post })}
+          >
+            Delete
+          </Button>
+        </div>
+      </TableCell>
+    );
+
+    return cells;
+  };
+
+  // Determine columns based on super admin status
+  const columns = isSuperAdmin
+    ? ['USER', 'TENANT', 'CONTENT', 'TYPE', 'STATUS', 'CREATED', 'ACTIONS']
+    : ['USER', 'CONTENT', 'TYPE', 'STATUS', 'CREATED', 'ACTIONS'];
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Feed Moderation"
-        description="Moderate feed posts across your community"
+        description={isSuperAdmin ? 'Moderate feed posts across all tenants' : 'Moderate feed posts across your community'}
         actions={
           <Button
             color="primary"
@@ -151,6 +273,23 @@ export default function FeedModeration() {
             </SelectItem>
           ))}
         </Select>
+        {isSuperAdmin && (
+          <Select
+            label="Tenant"
+            selectedKeys={tenantFilter ? [tenantFilter] : []}
+            onChange={(e) => setTenantFilter(e.target.value)}
+            className="w-full sm:w-56"
+          >
+            {[
+              <SelectItem key="">All Tenants</SelectItem>,
+              ...tenants.map((t) => (
+                <SelectItem key={t.id.toString()}>
+                  {t.name}
+                </SelectItem>
+              )),
+            ]}
+          </Select>
+        )}
         <div className="flex gap-2">
           <Button color="primary" onPress={handleSearch}>
             Apply
@@ -165,6 +304,7 @@ export default function FeedModeration() {
       {meta && (
         <div className="text-sm text-default-500">
           Showing {posts.length} of {meta.total ?? posts.length} posts
+          {isSuperAdmin && !activeTenant && ' (all tenants)'}
         </div>
       )}
 
@@ -178,12 +318,9 @@ export default function FeedModeration() {
       {/* Table */}
       <Table aria-label="Feed posts table">
         <TableHeader>
-          <TableColumn>USER</TableColumn>
-          <TableColumn>CONTENT</TableColumn>
-          <TableColumn>TYPE</TableColumn>
-          <TableColumn>STATUS</TableColumn>
-          <TableColumn>CREATED</TableColumn>
-          <TableColumn>ACTIONS</TableColumn>
+          {columns.map((col) => (
+            <TableColumn key={col}>{col}</TableColumn>
+          ))}
         </TableHeader>
         <TableBody
           items={posts}
@@ -197,71 +334,7 @@ export default function FeedModeration() {
         >
           {(post) => (
             <TableRow key={post.id}>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Avatar
-                    src={post.user_avatar || undefined}
-                    name={post.user_name}
-                    size="sm"
-                    className="flex-shrink-0"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{post.user_name}</span>
-                    <span className="text-xs text-default-400">ID: {post.user_id}</span>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="max-w-md">
-                  <p className="text-sm line-clamp-2">{post.content}</p>
-                  {post.is_flagged && (
-                    <Chip size="sm" color="warning" variant="flat" className="mt-1">
-                      Flagged
-                    </Chip>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                <Chip size="sm" variant="flat">
-                  {post.type}
-                </Chip>
-              </TableCell>
-              <TableCell>
-                {post.is_hidden ? (
-                  <Chip size="sm" color="warning" variant="flat">Hidden</Chip>
-                ) : (
-                  <Chip size="sm" color="success" variant="flat">Visible</Chip>
-                )}
-              </TableCell>
-              <TableCell>
-                <span className="text-sm text-default-500">
-                  {new Date(post.created_at).toLocaleDateString()}
-                </span>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  {!post.is_hidden && (
-                    <Button
-                      size="sm"
-                      variant="flat"
-                      color="warning"
-                      startContent={<EyeOff className="w-4 h-4" />}
-                      onPress={() => setConfirmAction({ type: 'hide', post })}
-                    >
-                      Hide
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="flat"
-                    color="danger"
-                    startContent={<Trash2 className="w-4 h-4" />}
-                    onPress={() => setConfirmAction({ type: 'delete', post })}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </TableCell>
+              {renderCells(post)}
             </TableRow>
           )}
         </TableBody>
@@ -288,8 +361,8 @@ export default function FeedModeration() {
         title={confirmAction?.type === 'hide' ? 'Hide Post' : 'Delete Post'}
         message={
           confirmAction?.type === 'hide'
-            ? 'Are you sure you want to hide this post? It will no longer be visible to members.'
-            : 'Are you sure you want to permanently delete this post? This action cannot be undone.'
+            ? `Are you sure you want to hide this post${isSuperAdmin && confirmAction?.post ? ` from ${confirmAction.post.tenant_name}` : ''}? It will no longer be visible to members.`
+            : `Are you sure you want to permanently delete this post${isSuperAdmin && confirmAction?.post ? ` from ${confirmAction.post.tenant_name}` : ''}? This action cannot be undone.`
         }
         confirmLabel={confirmAction?.type === 'hide' ? 'Hide Post' : 'Delete Post'}
         confirmColor={confirmAction?.type === 'hide' ? 'warning' : 'danger'}
