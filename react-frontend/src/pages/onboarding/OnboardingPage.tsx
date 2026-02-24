@@ -84,14 +84,6 @@ export function OnboardingPage() {
 
   const tenantName = tenant?.branding?.name || tenant?.name || 'our community';
 
-  // ── Redirect if fully completed (onboarding done + has photo + has bio) ───
-
-  useEffect(() => {
-    if (user?.onboarding_completed === true && user?.avatar_url && user?.bio) {
-      navigate(tenantPath('/dashboard'), { replace: true });
-    }
-  }, [user?.onboarding_completed, user?.avatar_url, user?.bio, navigate, tenantPath]);
-
   // ── State ──────────────────────────────────────────────────────────────────
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -121,6 +113,17 @@ export function OnboardingPage() {
 
   // Track which steps have been visited (for stepper)
   const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1]));
+
+  // ── Redirect if fully completed (onboarding done + has photo + has bio) ───
+  // Skip redirect when isComplete is true so the celebration animation plays
+  // fully before the setTimeout navigates to dashboard.
+
+  useEffect(() => {
+    if (isComplete) return; // Let celebration animation play out
+    if (user?.onboarding_completed === true && user?.avatar_url && user?.bio) {
+      navigate(tenantPath('/dashboard'), { replace: true });
+    }
+  }, [user?.onboarding_completed, user?.avatar_url, user?.bio, navigate, tenantPath, isComplete]);
 
   // ── Pre-populate bio from user context if available ──────────────────────
 
