@@ -364,6 +364,49 @@ class AuthController extends BaseApiController
 
         try {
             $stmt->execute([$firstName, $lastName, $email, $hashed, $tenant_id]);
+            $userId = (int) $db->lastInsertId();
+
+            // Notify admins of new registration (including hardcoded master email)
+            try {
+                $tenantName = \Nexus\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
+                $adminLink = \Nexus\Core\TenantContext::getFrontendUrl() . '/admin/users/' . $userId;
+
+                // Get tenant admins
+                $adminStmt = $db->prepare("
+                    SELECT email, first_name FROM users
+                    WHERE tenant_id = ?
+                      AND role IN ('admin', 'super_admin', 'tenant_admin', 'tenant_super_admin')
+                      AND status = 'active'
+                ");
+                $adminStmt->execute([$tenant_id]);
+                $admins = $adminStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+                // Always include master notification address — hardcoded fallback + env override
+                $masterEmail = \Nexus\Core\Env::get('ADMIN_NOTIFICATION_EMAIL') ?: 'jasper@hour-timebank.ie';
+                $alreadyIncluded = array_filter($admins, fn($a) => strtolower($a['email']) === strtolower($masterEmail));
+                if (empty($alreadyIncluded)) {
+                    $admins[] = ['email' => $masterEmail, 'first_name' => 'Platform Admin'];
+                }
+
+                $mailer = new \Nexus\Core\Mailer();
+                foreach ($admins as $admin) {
+                    $html = \Nexus\Core\EmailTemplate::render(
+                        "New User Registration",
+                        "A new user has registered on $tenantName",
+                        "<strong>User:</strong> $firstName $lastName ($email)<br>
+                         <strong>Community:</strong> $tenantName<br>
+                         <strong>Status:</strong> Pending Approval<br><br>
+                         Please review and approve this user to grant them access.",
+                        "Review User",
+                        $adminLink,
+                        $tenantName
+                    );
+                    $mailer->send($admin['email'], "New Registration on $tenantName — $firstName $lastName", $html);
+                }
+            } catch (\Throwable $e) {
+                error_log("[Legacy API Registration] Admin notification failed: " . $e->getMessage());
+            }
+
             return $this->jsonResponse(['success' => true, 'message' => 'Registration successful']);
         } catch (\Exception $e) {
             return $this->errorResponse(

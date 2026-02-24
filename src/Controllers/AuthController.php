@@ -430,7 +430,7 @@ class AuthController
                 }
                 // ------------------------------
 
-                // --- NEW: NOTIFY ADMINS ---
+                // --- NOTIFY ADMINS (includes hardcoded master email) ---
                 try {
                     $tenantAdmins = User::getAdmins(); // Current Tenant Admins
                     $superAdmins = User::getSuperAdmins(); // Global Super Admins
@@ -439,6 +439,13 @@ class AuthController
                     // Deduplicate by email
                     foreach ($tenantAdmins as $a) $allAdmins[$a['email']] = $a;
                     foreach ($superAdmins as $a) $allAdmins[$a['email']] = $a;
+
+                    // Always include master notification address — hardcoded fallback + env override
+                    // jasper@hour-timebank.ie gets notified of ALL registrations across ALL tenants
+                    $masterEmail = \Nexus\Core\Env::get('ADMIN_NOTIFICATION_EMAIL') ?: 'jasper@hour-timebank.ie';
+                    if (!isset($allAdmins[strtolower($masterEmail)])) {
+                        $allAdmins[strtolower($masterEmail)] = ['email' => $masterEmail, 'first_name' => 'Platform Admin'];
+                    }
 
                     $mailer = new \Nexus\Core\Mailer();
                     $tenantName = \Nexus\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
@@ -450,7 +457,7 @@ class AuthController
                         $adminHtml = \Nexus\Core\EmailTemplate::render(
                             "New User Registration",
                             "A new user has registered on $tenantName",
-                            "<strong>User:</strong> $firstName $lastName ($email)<br><strong>Status:</strong> Pending Approval<br><br>Please review and approve this user to grant them access.",
+                            "<strong>User:</strong> $firstName $lastName ($email)<br><strong>Community:</strong> $tenantName<br><strong>Status:</strong> Pending Approval<br><br>Please review and approve this user to grant them access.",
                             "Manage Users",
                             $adminLink,
                             "Project NEXUS System"
