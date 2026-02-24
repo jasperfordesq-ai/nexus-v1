@@ -15,7 +15,7 @@
 
 import { useState, useEffect, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Button, Input, Divider, Select, SelectItem } from '@heroui/react';
+import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2 } from 'lucide-react';
 import { useAuth, useTenant } from '@/contexts';
