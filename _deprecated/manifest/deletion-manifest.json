@@ -1,0 +1,381 @@
+{
+  "created": "2026-02-24T00:00:00Z",
+  "phase": "2",
+  "description": "Legacy frontend cleanup - moving dead controllers, orphaned views, and removing dead routes",
+  "summary": {
+    "total_controllers_moved": 55,
+    "total_view_files_moved": 8,
+    "total_route_lines_removed": "~356",
+    "controllers_kept": ["AuthController.php", "AdminController.php", "MasterController.php", "OnboardingController.php", "ContactController.php", "CronController.php", "ExchangesController.php", "FederationStreamController.php", "MessageController.php", "NewsletterTrackingController.php", "ReportController.php", "RobotsController.php", "SitemapController.php", "SocialAuthController.php", "TotpController.php", "UserPreferenceController.php"]
+  },
+  "files_moved": [
+    {
+      "original_path": "src/Controllers/AchievementsController.php",
+      "backup_path": "_deprecated/controllers/AchievementsController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles achievements."
+    },
+    {
+      "original_path": "src/Controllers/AiController.php",
+      "backup_path": "_deprecated/controllers/AiController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles AI chat."
+    },
+    {
+      "original_path": "src/Controllers/BlogController.php",
+      "backup_path": "_deprecated/controllers/BlogController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles blog/news."
+    },
+    {
+      "original_path": "src/Controllers/ComposeController.php",
+      "backup_path": "_deprecated/controllers/ComposeController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles compose."
+    },
+    {
+      "original_path": "src/Controllers/ConnectionController.php",
+      "backup_path": "_deprecated/controllers/ConnectionController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles connections."
+    },
+    {
+      "original_path": "src/Controllers/ConsentController.php",
+      "backup_path": "_deprecated/controllers/ConsentController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles consent."
+    },
+    {
+      "original_path": "src/Controllers/CookiePolicyController.php",
+      "backup_path": "_deprecated/controllers/CookiePolicyController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles cookie policy."
+    },
+    {
+      "original_path": "src/Controllers/CookiePreferencesController.php",
+      "backup_path": "_deprecated/controllers/CookiePreferencesController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles cookie preferences."
+    },
+    {
+      "original_path": "src/Controllers/DashboardController.php",
+      "backup_path": "_deprecated/controllers/DashboardController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles dashboard."
+    },
+    {
+      "original_path": "src/Controllers/DigestController.php",
+      "backup_path": "_deprecated/controllers/DigestController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. Digest emails handled by CronController."
+    },
+    {
+      "original_path": "src/Controllers/EventController.php",
+      "backup_path": "_deprecated/controllers/EventController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles events."
+    },
+    {
+      "original_path": "src/Controllers/FeedController.php",
+      "backup_path": "_deprecated/controllers/FeedController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles feed."
+    },
+    {
+      "original_path": "src/Controllers/GoalController.php",
+      "backup_path": "_deprecated/controllers/GoalController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles goals."
+    },
+    {
+      "original_path": "src/Controllers/GovernanceController.php",
+      "backup_path": "_deprecated/controllers/GovernanceController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles governance."
+    },
+    {
+      "original_path": "src/Controllers/GroupAnalyticsController.php",
+      "backup_path": "_deprecated/controllers/GroupAnalyticsController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles group analytics."
+    },
+    {
+      "original_path": "src/Controllers/GroupController.php",
+      "backup_path": "_deprecated/controllers/GroupController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles groups."
+    },
+    {
+      "original_path": "src/Controllers/GroupDiscussionController.php",
+      "backup_path": "_deprecated/controllers/GroupDiscussionController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles discussions."
+    },
+    {
+      "original_path": "src/Controllers/HelpController.php",
+      "backup_path": "_deprecated/controllers/HelpController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles help."
+    },
+    {
+      "original_path": "src/Controllers/HomeController.php",
+      "backup_path": "_deprecated/controllers/HomeController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend is the homepage."
+    },
+    {
+      "original_path": "src/Controllers/InsightsController.php",
+      "backup_path": "_deprecated/controllers/InsightsController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles insights."
+    },
+    {
+      "original_path": "src/Controllers/LeaderboardController.php",
+      "backup_path": "_deprecated/controllers/LeaderboardController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles leaderboard."
+    },
+    {
+      "original_path": "src/Controllers/LegalDocumentController.php",
+      "backup_path": "_deprecated/controllers/LegalDocumentController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles legal docs."
+    },
+    {
+      "original_path": "src/Controllers/ListingController.php",
+      "backup_path": "_deprecated/controllers/ListingController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles listings."
+    },
+    {
+      "original_path": "src/Controllers/MatchController.php",
+      "backup_path": "_deprecated/controllers/MatchController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles matches."
+    },
+    {
+      "original_path": "src/Controllers/MemberController.php",
+      "backup_path": "_deprecated/controllers/MemberController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles members."
+    },
+    {
+      "original_path": "src/Controllers/NewsletterSubscriptionController.php",
+      "backup_path": "_deprecated/controllers/NewsletterSubscriptionController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. API handles newsletter subscriptions."
+    },
+    {
+      "original_path": "src/Controllers/NexusScoreController.php",
+      "backup_path": "_deprecated/controllers/NexusScoreController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles nexus score."
+    },
+    {
+      "original_path": "src/Controllers/NotificationController.php",
+      "backup_path": "_deprecated/controllers/NotificationController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles notifications."
+    },
+    {
+      "original_path": "src/Controllers/OrgWalletController.php",
+      "backup_path": "_deprecated/controllers/OrgWalletController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles org wallets."
+    },
+    {
+      "original_path": "src/Controllers/PageController.php",
+      "backup_path": "_deprecated/controllers/PageController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles pages."
+    },
+    {
+      "original_path": "src/Controllers/PollController.php",
+      "backup_path": "_deprecated/controllers/PollController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles polls."
+    },
+    {
+      "original_path": "src/Controllers/ProfileController.php",
+      "backup_path": "_deprecated/controllers/ProfileController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles profiles."
+    },
+    {
+      "original_path": "src/Controllers/ResourceController.php",
+      "backup_path": "_deprecated/controllers/ResourceController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles resources."
+    },
+    {
+      "original_path": "src/Controllers/ReviewController.php",
+      "backup_path": "_deprecated/controllers/ReviewController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles reviews."
+    },
+    {
+      "original_path": "src/Controllers/SearchController.php",
+      "backup_path": "_deprecated/controllers/SearchController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles search."
+    },
+    {
+      "original_path": "src/Controllers/SettingsController.php",
+      "backup_path": "_deprecated/controllers/SettingsController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles settings."
+    },
+    {
+      "original_path": "src/Controllers/ShareTargetController.php",
+      "backup_path": "_deprecated/controllers/ShareTargetController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles share target."
+    },
+    {
+      "original_path": "src/Controllers/WalletController.php",
+      "backup_path": "_deprecated/controllers/WalletController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles wallet."
+    },
+    {
+      "original_path": "src/Controllers/VolunteeringController.php",
+      "backup_path": "_deprecated/controllers/VolunteeringController.php",
+      "category": "legacy-frontend",
+      "reason": "Calls View::render() on views that no longer exist. React frontend handles volunteering."
+    },
+    {
+      "original_path": "src/Controllers/FederatedEventController.php",
+      "backup_path": "_deprecated/controllers/federation/FederatedEventController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederatedGroupController.php",
+      "backup_path": "_deprecated/controllers/federation/FederatedGroupController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederatedListingController.php",
+      "backup_path": "_deprecated/controllers/federation/FederatedListingController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederatedMemberController.php",
+      "backup_path": "_deprecated/controllers/federation/FederatedMemberController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederatedMessageController.php",
+      "backup_path": "_deprecated/controllers/federation/FederatedMessageController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederatedPartnerController.php",
+      "backup_path": "_deprecated/controllers/federation/FederatedPartnerController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederatedTransactionController.php",
+      "backup_path": "_deprecated/controllers/federation/FederatedTransactionController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederationAdminController.php",
+      "backup_path": "_deprecated/controllers/federation/FederationAdminController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederationDashboardController.php",
+      "backup_path": "_deprecated/controllers/federation/FederationDashboardController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederationHelpController.php",
+      "backup_path": "_deprecated/controllers/federation/FederationHelpController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederationHubController.php",
+      "backup_path": "_deprecated/controllers/federation/FederationHubController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederationOfflineController.php",
+      "backup_path": "_deprecated/controllers/federation/FederationOfflineController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederationOnboardingController.php",
+      "backup_path": "_deprecated/controllers/federation/FederationOnboardingController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederationReviewController.php",
+      "backup_path": "_deprecated/controllers/federation/FederationReviewController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    },
+    {
+      "original_path": "src/Controllers/FederationSettingsController.php",
+      "backup_path": "_deprecated/controllers/federation/FederationSettingsController.php",
+      "category": "legacy-frontend",
+      "reason": "Federation legacy frontend. Views no longer exist."
+    }
+  ],
+  "view_files_moved": [
+    {
+      "original_path": "views/layouts/header.php",
+      "backup_path": "_deprecated/views/layouts/header.php",
+      "reason": "Proxy to non-existent modern layout. Not used by admin."
+    },
+    {
+      "original_path": "views/layouts/footer.php",
+      "backup_path": "_deprecated/views/layouts/footer.php",
+      "reason": "Proxy to non-existent modern layout. Not used by admin."
+    },
+    {
+      "original_path": "views/layouts/consent_check.php",
+      "backup_path": "_deprecated/views/layouts/consent_check.php",
+      "reason": "Orphaned middleware. Not included by any file."
+    },
+    {
+      "original_path": "views/layouts/onboarding_check.php",
+      "backup_path": "_deprecated/views/layouts/onboarding_check.php",
+      "reason": "Orphaned middleware. Not included by any file."
+    },
+    {
+      "original_path": "views/layouts/admin-page-header.php",
+      "backup_path": "_deprecated/views/layouts/admin-page-header.php",
+      "reason": "Empty stub. Not used by any file."
+    },
+    {
+      "original_path": "views/layouts/admin/header.php",
+      "backup_path": "_deprecated/views/layouts/admin/header.php",
+      "reason": "Redirect file to canonical admin-header.php. Unnecessary indirection."
+    },
+    {
+      "original_path": "views/layouts/admin/footer.php",
+      "backup_path": "_deprecated/views/layouts/admin/footer.php",
+      "reason": "Redirect file to canonical admin-footer.php. Unnecessary indirection."
+    },
+    {
+      "original_path": "views/components/group-recommendations-widget.php",
+      "backup_path": "_deprecated/views/components/group-recommendations-widget.php",
+      "reason": "Legacy widget. React frontend has its own recommendation components."
+    }
+  ],
+  "routes_removed": "~356 legacy frontend route definitions removed from httpdocs/routes.php. See routes.php git diff for details.",
+  "restore_instructions": "To restore any file: cp _deprecated/path/to/file original/path/to/file"
+}
