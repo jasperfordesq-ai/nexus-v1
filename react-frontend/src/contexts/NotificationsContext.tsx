@@ -280,7 +280,8 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       channel.bind('new-notification', handleNewNotification);
 
       // Message events (update unread count)
-      channel.bind('new-message', (data: { conversation_id: number; message: string }) => {
+      // Backend sends: { sender_id, body, preview, from_user_id, ... }
+      channel.bind('new-message', (data: { body?: string; preview?: string; message?: string }) => {
         setState((prev) => ({
           ...prev,
           unreadCount: prev.unreadCount + 1,
@@ -289,7 +290,8 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
             messages: prev.counts.messages + 1,
           },
         }));
-        toast.info('New Message', data.message?.substring(0, 50) || 'You have a new message');
+        const text = data.body || data.preview || data.message || '';
+        toast.info('New Message', text.substring(0, 50) || 'You have a new message');
       });
 
       // Transaction events

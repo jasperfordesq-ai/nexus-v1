@@ -68,6 +68,8 @@ class MessageService
         $hasLastActive = self::hasColumn('users', 'last_active_at');
         // Check if archived columns exist for soft delete filtering
         $hasArchived = self::hasColumn('messages', 'archived_by_sender');
+        // Check if is_deleted column exists for soft-delete filtering
+        $hasDeleted = self::hasColumn('messages', 'is_deleted');
 
         $lastActiveSelect = $hasLastActive
             ? "CASE WHEN m.sender_id = :uid_la THEN receiver.last_active_at ELSE sender.last_active_at END as other_user_last_active"
@@ -92,6 +94,9 @@ class MessageService
             $archiveFilter = "";
         }
 
+        // Build soft-delete filter (column may not exist in older schemas)
+        $deletedFilter = $hasDeleted ? "AND unread.is_deleted = 0" : "";
+
         // Build the query - get latest message per conversation partner
         $sql = "
             SELECT
@@ -111,6 +116,7 @@ class MessageService
                     WHERE unread.sender_id = CASE WHEN m.sender_id = :uid6 THEN m.receiver_id ELSE m.sender_id END
                     AND unread.receiver_id = :uid7
                     AND unread.is_read = 0
+                    {$deletedFilter}
                     AND unread.tenant_id = :tenant1
                 ) as unread_count
             FROM messages m
@@ -281,6 +287,8 @@ class MessageService
 
         // Check if archived columns exist for soft delete filtering
         $hasArchived = self::hasColumn('messages', 'archived_by_sender');
+        // Check if is_deleted column exists for soft-delete filtering
+        $hasDeleted = self::hasColumn('messages', 'is_deleted');
 
         // Decode cursor (message ID)
         $cursorId = null;
@@ -306,6 +314,9 @@ class MessageService
         $hasReactionsCol = self::hasColumn('messages', 'reactions');
         $reactionsSelect = $hasReactionsCol ? ", m.reactions" : ", NULL as reactions";
 
+        // Build soft-delete filter (column may not exist in older schemas)
+        $deleteFilter = $hasDeleted ? "AND m.is_deleted = 0" : "";
+
         // Build query
         $sql = "
             SELECT
@@ -325,6 +336,7 @@ class MessageService
             JOIN users sender ON m.sender_id = sender.id
             WHERE m.tenant_id = ?
             AND ((m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?))
+            {$deleteFilter}
             {$archiveFilter}
         ";
         $params = [$tenantId, $userId, $otherUserId, $otherUserId, $userId];
@@ -682,9 +694,13 @@ class MessageService
         $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
+        // Exclude soft-deleted messages from unread count (column may not exist in older schemas)
+        $hasDeleted = self::hasColumn('messages', 'is_deleted');
+        $deleteFilter = $hasDeleted ? "AND is_deleted = 0" : "";
+
         $stmt = $db->prepare("
             SELECT COUNT(*) as cnt FROM messages
-            WHERE tenant_id = ? AND receiver_id = ? AND is_read = 0
+            WHERE tenant_id = ? AND receiver_id = ? AND is_read = 0 {$deleteFilter}
         ");
         $stmt->execute([$tenantId, $userId]);
 
