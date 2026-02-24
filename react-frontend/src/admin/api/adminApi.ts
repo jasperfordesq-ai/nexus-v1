@@ -1292,7 +1292,7 @@ export const adminCron = {
 
 export const adminModeration = {
   // Feed Posts
-  getFeedPosts: (params?: { type?: string; status?: string; user_id?: number; page?: number; limit?: number }) =>
+  getFeedPosts: (params?: { type?: string; status?: string; user_id?: number; tenant_id?: number; page?: number; limit?: number }) =>
     api.get<PaginatedResponse<AdminFeedPost>>(`/v2/admin/feed/posts${buildQuery(params || {})}`),
 
   getFeedPost: (id: number) =>
@@ -1308,7 +1308,7 @@ export const adminModeration = {
     api.get<ModerationStats>('/v2/admin/feed/stats'),
 
   // Comments
-  getComments: (params?: { content_type?: string; is_flagged?: boolean; page?: number; limit?: number }) =>
+  getComments: (params?: { content_type?: string; is_flagged?: boolean; tenant_id?: number; page?: number; limit?: number }) =>
     api.get<PaginatedResponse<AdminComment>>(`/v2/admin/comments${buildQuery(params || {})}`),
 
   getComment: (id: number) =>
@@ -1321,7 +1321,7 @@ export const adminModeration = {
     api.delete<{ success: boolean }>(`/v2/admin/comments/${id}`),
 
   // Reviews
-  getReviews: (params?: { rating?: number; is_flagged?: boolean; page?: number; limit?: number }) =>
+  getReviews: (params?: { rating?: number; is_flagged?: boolean; tenant_id?: number; page?: number; limit?: number }) =>
     api.get<PaginatedResponse<AdminReview>>(`/v2/admin/reviews${buildQuery(params || {})}`),
 
   getReview: (id: number) =>
@@ -1337,7 +1337,7 @@ export const adminModeration = {
     api.delete<{ success: boolean }>(`/v2/admin/reviews/${id}`),
 
   // Reports
-  getReports: (params?: { type?: string; status?: string; page?: number; limit?: number }) =>
+  getReports: (params?: { type?: string; status?: string; tenant_id?: number; page?: number; limit?: number }) =>
     api.get<PaginatedResponse<AdminReport>>(`/v2/admin/reports${buildQuery(params || {})}`),
 
   getReport: (id: number) =>
