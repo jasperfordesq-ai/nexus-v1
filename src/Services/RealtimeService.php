@@ -76,7 +76,14 @@ class RealtimeService
         $chatSent = PusherService::trigger($channel, 'message', $eventData);
 
         // Also send a notification event to receiver's personal channel
+        // Include full message data so the frontend can update conversation list
+        // without needing an extra API call (from_user_id kept for backward compat)
         $notifSent = PusherService::trigger($receiverChannel, 'new-message', [
+            'id' => $message['id'] ?? null,
+            'sender_id' => $senderId,
+            'receiver_id' => $receiverId,
+            'body' => $message['body'] ?? '',
+            'created_at' => $message['created_at'] ?? date('Y-m-d H:i:s'),
             'from_user_id' => $senderId,
             'preview' => mb_substr($message['body'] ?? '', 0, 100),
             'timestamp' => time() * 1000,

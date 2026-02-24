@@ -77,48 +77,7 @@ export function MessagesPage() {
   const toUserId = searchParams.get('to');
   const listingId = searchParams.get('listing');
 
-  /**
-   * Handle incoming new message from Pusher
-   * Updates conversation list with new message preview and increments unread count
-   */
-  const handleNewMessage = useCallback((event: NewMessageEvent) => {
-    setConversations((prev) => {
-      // Find the conversation with this sender
-      const existingIndex = prev.findIndex((conv) => {
-        const otherUser = getOtherUser(conv);
-        return otherUser.id === event.sender_id;
-      });
-
-      if (existingIndex >= 0) {
-        // Update existing conversation
-        const updated = [...prev];
-        const conv = { ...updated[existingIndex] };
-
-        // Update last message
-        conv.last_message = {
-          id: event.id,
-          body: event.body,
-          sender_id: event.sender_id,
-          created_at: event.created_at,
-        };
-
-        // Increment unread count
-        conv.unread_count = (conv.unread_count || 0) + 1;
-
-        // Move to top of list
-        updated.splice(existingIndex, 1);
-        updated.unshift(conv);
-
-        return updated;
-      }
-
-      // New conversation - we'll reload to get the full conversation data
-      // This triggers a refresh which will include the new conversation
-      return prev;
-    });
-  }, []);
-
-  // Memoize loadConversations to use in effects
+  // Memoize loadConversations to use in effects and handlers
   const loadConversations = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -136,6 +95,62 @@ export function MessagesPage() {
       setIsLoading(false);
     }
   }, []);
+
+  /**
+   * Handle incoming new message from Pusher
+   * Updates conversation list with new message preview and increments unread count
+   */
+  const handleNewMessage = useCallback((event: NewMessageEvent) => {
+    // Backend sends from_user_id on user channel; normalize to sender_id
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = event as any;
+    const senderId: number | undefined = event.sender_id || raw.from_user_id;
+    if (!senderId) {
+      // Can't identify sender — full reload to be safe
+      loadConversations();
+      return;
+    }
+
+    setConversations((prev) => {
+      // Find the conversation with this sender
+      const existingIndex = prev.findIndex((conv) => {
+        const otherUser = getOtherUser(conv);
+        return otherUser.id === senderId;
+      });
+
+      if (existingIndex >= 0) {
+        // Update existing conversation optimistically
+        const updated = [...prev];
+        const conv = { ...updated[existingIndex] };
+
+        // Update last message (body may come as preview from legacy events)
+        conv.last_message = {
+          id: event.id,
+          body: event.body || raw.preview || '',
+          sender_id: senderId,
+          created_at: event.created_at || new Date().toISOString(),
+        };
+
+        // Increment unread count
+        conv.unread_count = (conv.unread_count || 0) + 1;
+
+        // Move to top of list
+        updated.splice(existingIndex, 1);
+        updated.unshift(conv);
+
+        return updated;
+      }
+
+      // New conversation from unknown sender — can't build full Conversation
+      // object client-side, so we return prev and let the reload below handle it
+      return prev;
+    });
+
+    // Always reload to catch new conversations and ensure data consistency.
+    // For existing conversations this is a no-op (optimistic update already applied),
+    // but for new conversations this is the only way to get the full conversation data.
+    loadConversations();
+  }, [loadConversations]);
 
   // Subscribe to Pusher for real-time updates
   useEffect(() => {
