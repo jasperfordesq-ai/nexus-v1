@@ -85,6 +85,52 @@ get_last_successful_commit() {
     fi
 }
 
+# --- Fix #4: Protect compose.yml from git overwrites ---
+# Marks compose.yml as skip-worktree so 'git reset --hard' never
+# replaces it with the dev version from the repository.
+protect_compose_yml() {
+    if git ls-files --error-unmatch compose.yml > /dev/null 2>&1; then
+        git update-index --skip-worktree compose.yml 2>/dev/null && \
+            log_ok "compose.yml protected from git overwrites (skip-worktree)" || \
+            log_warn "Could not set skip-worktree on compose.yml"
+    else
+        log_info "compose.yml is not tracked by git — no protection needed"
+    fi
+}
+
+# --- Fix #4 (Prevention): Validate Dockerfiles before build ---
+# Confirms dev and prod Dockerfiles have the expected base images,
+# catching accidental file swaps before they reach the container layer.
+validate_dockerfiles() {
+    log_step "=== Dockerfile Sanity Check ==="
+
+    local FAILED=0
+
+    if [ -f "react-frontend/Dockerfile.prod" ]; then
+        if grep -q "FROM nginx:alpine" react-frontend/Dockerfile.prod; then
+            log_ok "Dockerfile.prod: nginx base image confirmed (production)"
+        else
+            log_err "Dockerfile.prod: nginx base image NOT found — wrong Dockerfile?"
+            FAILED=1
+        fi
+    else
+        log_warn "react-frontend/Dockerfile.prod not found — skipping check"
+    fi
+
+    if [ -f "react-frontend/Dockerfile" ]; then
+        if grep -q "FROM node:" react-frontend/Dockerfile; then
+            log_ok "Dockerfile (dev): node base image confirmed"
+        else
+            log_warn "react-frontend/Dockerfile: node base image not found (unexpected)"
+        fi
+    fi
+
+    if [ $FAILED -eq 1 ]; then
+        log_err "Dockerfile sanity check failed — aborting deploy"
+        exit 1
+    fi
+}
+
 # --- Pre-deploy validation ---
 validate_environment() {
     log_step "=== Pre-Deploy Validation ==="
@@ -314,6 +360,9 @@ purge_cloudflare_cache() {
 deploy_quick() {
     log_step "=== Quick Deployment (Git Pull + Rebuild Frontend + Restart) ==="
 
+    # Fix #4: Ensure compose.yml is permanently protected from git overwrites
+    protect_compose_yml
+
     # Save current state
     save_current_commit
 
@@ -326,10 +375,13 @@ deploy_quick() {
     NEW_COMMIT=$(git rev-parse HEAD)
     log_info "Now at: ${NEW_COMMIT:0:8} - $(git log -1 --format='%s')"
 
-    # Restore production compose.yml
+    # Always restore production compose.yml (belt-and-suspenders after git reset)
     log_info "Restoring compose.yml from compose.prod.yml..."
     cp compose.prod.yml compose.yml
     log_ok "compose.yml restored (production version)"
+
+    # Fix #4 (Prevention): Validate Dockerfiles before building
+    validate_dockerfiles
 
     # Export commit hash so compose.prod.yml can pass it as a build arg
     export BUILD_COMMIT=$(git rev-parse --short HEAD)
@@ -356,6 +408,9 @@ deploy_quick() {
 deploy_full() {
     log_step "=== Full Deployment (Git Pull + Rebuild) ==="
 
+    # Fix #4: Ensure compose.yml is permanently protected from git overwrites
+    protect_compose_yml
+
     # Save current state
     save_current_commit
 
@@ -368,10 +423,13 @@ deploy_full() {
     NEW_COMMIT=$(git rev-parse HEAD)
     log_info "Now at: ${NEW_COMMIT:0:8} - $(git log -1 --format='%s')"
 
-    # Restore production compose.yml
+    # Always restore production compose.yml (belt-and-suspenders after git reset)
     log_info "Restoring compose.yml from compose.prod.yml..."
     cp compose.prod.yml compose.yml
     log_ok "compose.yml restored (production version)"
+
+    # Fix #4 (Prevention): Validate Dockerfiles before building
+    validate_dockerfiles
 
     # Export commit hash so compose.prod.yml can pass it as a build arg
     export BUILD_COMMIT=$(git rev-parse --short HEAD)
@@ -407,11 +465,17 @@ rollback_deployment() {
     log_info "Current commit: ${CURRENT_COMMIT:0:8}"
     log_info "Rolling back to: ${LAST_COMMIT:0:8}"
 
+    # Fix #4: Ensure compose.yml is protected before checkout
+    protect_compose_yml
+
     # Checkout last successful commit
     git checkout "$LAST_COMMIT"
 
-    # Restore production compose.yml
+    # Always restore production compose.yml (belt-and-suspenders after git checkout)
     cp compose.prod.yml compose.yml
+
+    # Fix #4 (Prevention): Validate Dockerfiles before building
+    validate_dockerfiles
 
     # Export commit hash for build arg
     export BUILD_COMMIT=$(git rev-parse --short HEAD)
