@@ -14,10 +14,6 @@ use Nexus\Core\TenantContext;
 
 $router = new Router();
 
-// --------------------------------------------------------------------------
-// SUPER ADMIN PANEL (Hierarchical Tenancy Management)
-// --------------------------------------------------------------------------
-// Dashboard
 $router->add('GET', '/super-admin', 'Nexus\Controllers\SuperAdmin\DashboardController@index');
 $router->add('GET', '/super-admin/dashboard', 'Nexus\Controllers\SuperAdmin\DashboardController@index');
 
@@ -63,9 +59,6 @@ $router->add('GET', '/super-admin/api/users/search', 'Nexus\Controllers\SuperAdm
 $router->add('GET', '/super-admin/api/bulk/users', 'Nexus\Controllers\SuperAdmin\BulkController@apiGetUsers');
 $router->add('GET', '/super-admin/api/audit', 'Nexus\Controllers\SuperAdmin\AuditController@apiLog');
 
-// --------------------------------------------------------------------------
-// SUPER ADMIN FEDERATION (Platform-Wide Federation Management)
-// --------------------------------------------------------------------------
 $router->add('GET', '/super-admin/federation', 'Nexus\Controllers\SuperAdmin\FederationController@index');
 $router->add('GET', '/super-admin/federation/system-controls', 'Nexus\Controllers\SuperAdmin\FederationController@systemControls');
 $router->add('POST', '/super-admin/federation/update-system-controls', 'Nexus\Controllers\SuperAdmin\FederationController@updateSystemControls');
@@ -81,17 +74,6 @@ $router->add('GET', '/super-admin/federation/audit', 'Nexus\Controllers\SuperAdm
 $router->add('GET', '/super-admin/federation/tenant/{id}', 'Nexus\Controllers\SuperAdmin\FederationController@tenantFeatures');
 $router->add('POST', '/super-admin/federation/update-tenant-feature', 'Nexus\Controllers\SuperAdmin\FederationController@updateTenantFeature');
 
-// --------------------------------------------------------------------------
-// DEBUG/TEST ROUTES REMOVED FOR SECURITY (2026-01-23)
-// --------------------------------------------------------------------------
-// Previously contained 30+ debug/test endpoints that exposed sensitive data.
-// These routes have been removed from production. If needed for development,
-// access them via CLI scripts in /scripts/ directory instead.
-// --------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------
-// FEDERATION API (External Partner Integration)
-// --------------------------------------------------------------------------
 $router->add('GET', '/api/v1/federation', 'Nexus\Controllers\Api\FederationApiController@index');
 $router->add('GET', '/api/v1/federation/timebanks', 'Nexus\Controllers\Api\FederationApiController@timebanks');
 $router->add('GET', '/api/v1/federation/members', 'Nexus\Controllers\Api\FederationApiController@members');
@@ -103,20 +85,6 @@ $router->add('POST', '/api/v1/federation/transactions', 'Nexus\Controllers\Api\F
 $router->add('POST', '/api/v1/federation/oauth/token', 'Nexus\Controllers\Api\FederationApiController@oauthToken');
 $router->add('POST', '/api/v1/federation/webhooks/test', 'Nexus\Controllers\Api\FederationApiController@testWebhook');
 
-// --------------------------------------------------------------------------
-// LEGACY V1 API ROUTES — DEPRECATED
-// --------------------------------------------------------------------------
-// These routes predate the V2 API and are kept for backward compatibility
-// with the mobile app (Capacitor). They are superseded by /api/v2/* endpoints.
-//
-// Deprecated: 2026-02-19 (QA Phase 7.3)
-// Migrate consumers to /api/v2/* equivalents before removing.
-// V2 equivalents: /api/v2/polls, /api/v2/goals, /api/v2/volunteering,
-//   /api/v2/events, /api/v2/wallet/*, /api/v2/listings, /api/v2/notifications,
-//   /api/v2/users (members)
-// --------------------------------------------------------------------------
-
-// Polls (deprecated — use /api/v2/polls)
 $router->add('GET', '/api/polls', 'Nexus\Controllers\Api\PollApiController@index');
 $router->add('POST', '/api/polls/vote', 'Nexus\Controllers\Api\PollApiController@vote');
 
@@ -1173,11 +1141,6 @@ $router->add('POST', '/api/ai/generate/newsletter', 'Nexus\Controllers\Api\Ai\Ai
 $router->add('POST', '/api/ai/generate/blog', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generateBlog');
 $router->add('POST', '/api/ai/generate/page', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generatePage');
 
-// AI Web Pages
-$router->add('GET', '/ai', 'Nexus\Controllers\AiController@index');
-$router->add('GET', '/ai/chat', 'Nexus\Controllers\AiController@chat');
-$router->add('GET', '/ai/chat/([0-9]+)', 'Nexus\Controllers\AiController@chat');
-
 // Menu API (for mobile apps)
 $router->add('GET', '/api/menus', 'Nexus\Controllers\Api\MenuApiController@index');
 $router->add('GET', '/api/menus/config', 'Nexus\Controllers\Api\MenuApiController@config');
@@ -1189,42 +1152,10 @@ $router->add('POST', '/api/menus/clear-cache', 'Nexus\Controllers\Api\MenuApiCon
 $router->add('GET', '/notifications', 'Nexus\Controllers\NotificationController@manage');
 $router->add('POST', '/notifications', 'Nexus\Controllers\NotificationController@manage'); // Handle mark all as read form
 
-// Share Target (PWA Web Share Target API)
-$router->add('POST', '/share-target', 'Nexus\Controllers\ShareTargetController@receive');
-$router->add('GET', '/share-target/compose', 'Nexus\Controllers\ShareTargetController@compose');
-$router->add('GET', '/share-target/pending', 'Nexus\Controllers\ShareTargetController@pending');
-$router->add('POST', '/share-target/create', 'Nexus\Controllers\ShareTargetController@create');
-
-
-// --------------------------------------------------------------------------
-
-// 1. PUBLIC PAGES
-// --------------------------------------------------------------------------
-
-$router->add('GET', '/dashboard', 'Nexus\Controllers\DashboardController@index');
-$router->add('GET', '/dashboard/notifications', 'Nexus\Controllers\DashboardController@notifications');
-$router->add('GET', '/dashboard/hubs', 'Nexus\Controllers\DashboardController@hubs');
-$router->add('GET', '/dashboard/listings', 'Nexus\Controllers\DashboardController@listings');
-$router->add('GET', '/dashboard/wallet', 'Nexus\Controllers\DashboardController@wallet');
-$router->add('GET', '/dashboard/events', 'Nexus\Controllers\DashboardController@events');
-$router->add('POST', '/dashboard/switch_layout', 'Nexus\Controllers\HomeController@switchLayout');
-$router->add('GET', '/dashboard/switch_layout', 'Nexus\Controllers\HomeController@switchLayout'); // Support GET link
-
-// NEXUS SCORE SYSTEM
 $router->add('GET', '/nexus-score', 'Nexus\Controllers\NexusScoreController@dashboard');
 $router->add('GET', '/nexus-score/report', 'Nexus\Controllers\NexusScoreController@impactReport');
 $router->add('GET', '/nexus-score/leaderboard', 'Nexus\Controllers\NexusScoreController@leaderboard');
 $router->add('GET', '/profile/{id}/score', 'Nexus\Controllers\NexusScoreController@publicProfile');
-
-// Homepage
-$router->add('GET', '/', 'Nexus\Controllers\HomeController@index');
-$router->add('POST', '/', 'Nexus\Controllers\HomeController@index'); // Support Feed Post
-$router->add('GET', '/home', 'Nexus\Controllers\HomeController@index'); // Alias
-$router->add('POST', '/home', 'Nexus\Controllers\HomeController@index'); // Support Feed Post
-
-// Compose - Full-page multi-form for creating content (mobile-optimized)
-$router->add('GET', '/compose', 'Nexus\Controllers\ComposeController@index');
-$router->add('POST', '/compose', 'Nexus\Controllers\ComposeController@store');
 
 $router->add('GET', '/login', 'Nexus\Controllers\AuthController@showLogin');
 $router->add('GET', '/login/oauth/redirect/{provider}', 'Nexus\Controllers\SocialAuthController@redirect');
@@ -1256,29 +1187,13 @@ $router->add('GET', '/settings/2fa', 'Nexus\Controllers\TotpController@settings'
 $router->add('POST', '/settings/2fa/disable', 'Nexus\Controllers\TotpController@disable');
 $router->add('POST', '/settings/2fa/devices/revoke', 'Nexus\Controllers\TotpController@revokeDevice');
 $router->add('POST', '/settings/2fa/devices/revoke-all', 'Nexus\Controllers\TotpController@revokeAllDevices');
-
-// Search
-$router->add('GET', '/search', 'Nexus\Controllers\SearchController@index');
-
-// Static Content Pages
-$router->add('GET', '/about', 'Nexus\Controllers\PageController@about');
-$router->add('GET', '/contact', 'Nexus\Controllers\PageController@contact');
 $router->add('POST', '/contact/submit', 'Nexus\Controllers\ContactController@submit');
 $router->add('POST', '/contact/send', 'Nexus\Controllers\ContactController@submit');
 $router->add('POST', '/api/v2/contact', 'Nexus\Controllers\ContactController@apiSubmit');
-$router->add('GET', '/faq', 'Nexus\Controllers\PageController@faq');
 $router->add('GET', '/help', 'Nexus\Controllers\HelpController@index');
 $router->add('GET', '/help/search', 'Nexus\Controllers\HelpController@search');
 $router->add('POST', '/api/help/feedback', 'Nexus\Controllers\HelpController@feedback');
 $router->add('GET', '/help/{slug}', 'Nexus\Controllers\HelpController@show');
-$router->add('GET', '/how-it-works', 'Nexus\Controllers\PageController@howItWorks');
-$router->add('GET', '/our-story', 'Nexus\Controllers\PageController@ourStory');
-$router->add('GET', '/partner', 'Nexus\Controllers\PageController@partner');
-$router->add('GET', '/social-prescribing', 'Nexus\Controllers\PageController@socialPrescribing');
-$router->add('GET', '/timebanking-guide', 'Nexus\Controllers\PageController@timebankingGuide');
-$router->add('GET', '/impact-summary', 'Nexus\Controllers\PageController@impactSummary');
-$router->add('GET', '/impact-report', 'Nexus\Controllers\PageController@impactReport');
-$router->add('GET', '/strategic-plan', 'Nexus\Controllers\PageController@strategicPlan');
 // Legal Documents (versioned with acceptance tracking - falls back to legacy files if no DB content)
 $router->add('GET', '/terms', 'Nexus\Controllers\LegalDocumentController@terms');
 $router->add('GET', '/privacy', 'Nexus\Controllers\LegalDocumentController@privacy');
@@ -1289,25 +1204,7 @@ $router->add('GET', '/legal/version/{versionId}', 'Nexus\Controllers\LegalDocume
 $router->add('GET', '/sitemap.xml', 'Nexus\Controllers\SitemapController@index');
 $router->add('GET', '/robots.txt', 'Nexus\Controllers\RobotsController@index');
 
-// Legal
-$router->add('GET', '/legal', 'Nexus\Controllers\PageController@legal');
-$router->add('GET', '/legal/cookies', 'Nexus\Controllers\CookiePolicyController@index');
-
-// Cookie Preferences
-$router->add('GET', '/cookie-preferences', 'Nexus\Controllers\CookiePreferencesController@index');
-
-// CMS Pages (created via Page Builder)
-$router->add('GET', '/page/{slug}', 'Nexus\Controllers\PageController@show');
-
 // 1.5. BLOG / NEWS
-// --------------------------------------------------------------------------
-$router->add('GET', '/news', 'Nexus\Controllers\BlogController@index');
-$router->add('GET', '/news/{slug}', 'Nexus\Controllers\BlogController@show');
-$router->add('GET', '/blog', 'Nexus\Controllers\BlogController@index'); // Alias
-$router->add('GET', '/blog/{slug}', 'Nexus\Controllers\BlogController@show'); // Alias
-
-// Dynamic Tenant Pages
-// Automatically register routes for pages found in views/tenants/{slug}/pages/ AND layout overrides
 $tenantPages = [];
 foreach ([null, 'modern'] as $layout) {
     $found = TenantContext::getCustomPages($layout);
@@ -1327,14 +1224,10 @@ foreach ($tenantPages as $page) {
     // We only need dynamic routes for NEW pages (e.g. /about-story).
     if ($slug && !$router->hasRoute('GET', '/' . $slug)) {
         $router->add('GET', '/' . $slug, function () use ($slug) {
-            (new Nexus\Controllers\PageController())->show($slug);
         });
     }
 }
 
-// --------------------------------------------------------------------------
-// 2. LISTINGS (Offers & Requests)
-// --------------------------------------------------------------------------
 $router->add('GET', '/listings', 'Nexus\Controllers\ListingController@index');
 $router->add('GET', '/listings/create', 'Nexus\Controllers\ListingController@create');
 $router->add('POST', '/listings/store', 'Nexus\Controllers\ListingController@store');
@@ -1345,9 +1238,6 @@ $router->add('POST', '/listings/delete', 'Nexus\Controllers\ListingController@de
 $router->add('GET', '/listings/{id}', 'Nexus\Controllers\ListingController@show');
 $router->add('POST', '/listings/{id}', 'Nexus\Controllers\ListingController@show'); // AJAX actions (likes/comments)
 
-// --------------------------------------------------------------------------
-// 2b. EXCHANGES (Broker-controlled exchange workflow)
-// --------------------------------------------------------------------------
 $router->add('GET', '/exchanges', 'Nexus\Controllers\ExchangesController@index');
 $router->add('GET', '/exchanges/request/{listingId}', 'Nexus\Controllers\ExchangesController@create');
 $router->add('POST', '/exchanges', 'Nexus\Controllers\ExchangesController@store');
@@ -1358,48 +1248,6 @@ $router->add('POST', '/exchanges/{id}/start', 'Nexus\Controllers\ExchangesContro
 $router->add('POST', '/exchanges/{id}/confirm', 'Nexus\Controllers\ExchangesController@confirm');
 $router->add('POST', '/exchanges/{id}/cancel', 'Nexus\Controllers\ExchangesController@cancel');
 
-// --------------------------------------------------------------------------
-// 3. GROUPS (Community Hubs)
-// --------------------------------------------------------------------------
-// HUBS (Admin-curated geographic communities)
-$router->add('GET', '/groups', 'Nexus\Controllers\GroupController@index'); // Only hubs
-$router->add('GET', '/groups/create', 'Nexus\Controllers\GroupController@create'); // Admin only - OLD form (keep for fallback)
-
-// COMMUNITY GROUPS (User-created interest groups)
-$router->add('GET', '/community-groups', 'Nexus\Controllers\GroupController@communityGroups');
-$router->add('GET', '/community-groups/create', 'Nexus\Controllers\GroupController@createCommunityGroup'); // OLD form (keep for fallback)
-
-// NEW: Modern overlay-based group creation
-$router->add('GET', '/create-group', 'Nexus\Controllers\GroupController@createGroupOverlay');
-
-// NEW: Modern overlay-based group editing
-$router->add('GET', '/edit-group/{id}', 'Nexus\Controllers\GroupController@editGroupOverlay');
-
-// Shared routes (work for both hubs and community groups)
-$router->add('GET', '/groups/my-groups', 'Nexus\Controllers\GroupController@myGroups');
-$router->add('POST', '/groups/store', 'Nexus\Controllers\GroupController@store');
-$router->add('POST', '/groups/join', 'Nexus\Controllers\GroupController@join');
-$router->add('POST', '/groups/leave', 'Nexus\Controllers\GroupController@leave');
-$router->add('POST', '/groups/update', 'Nexus\Controllers\GroupController@update');
-$router->add('POST', '/groups/manage-member', 'Nexus\Controllers\GroupController@manageMember');
-$router->add('GET', '/groups/{id}/edit', 'Nexus\Controllers\GroupController@edit');
-$router->add('GET', '/groups/{id}/post', 'Nexus\Controllers\GroupController@createPost');
-$router->add('POST', '/groups/{id}/post', 'Nexus\Controllers\GroupController@storePost');
-$router->add('GET', '/groups/{id}', 'Nexus\Controllers\GroupController@show');
-$router->add('GET', '/groups/{id}/invite', 'Nexus\Controllers\GroupController@invite');
-$router->add('POST', '/groups/{id}/invite', 'Nexus\Controllers\GroupController@sendInvites');
-$router->add('GET', '/groups/{id}/discussions/create', 'Nexus\Controllers\GroupController@createDiscussion');
-$router->add('POST', '/groups/{id}/discussions/store', 'Nexus\Controllers\GroupController@storeDiscussion');
-$router->add('GET', '/groups/{id}/discussions/{discussion_id}', 'Nexus\Controllers\GroupController@showDiscussion');
-$router->add('POST', '/groups/{id}/discussions/{discussion_id}/reply', 'Nexus\Controllers\GroupController@replyDiscussion');
-$router->add('POST', '/groups/{id}/discussions/{discussion_id}/subscribe', 'Nexus\Controllers\GroupController@toggleSubscription'); // Legacy
-$router->add('POST', '/groups/{id}/feedback', 'Nexus\Controllers\GroupController@submitFeedback');
-$router->add('GET', '/groups/{id}/feedback', 'Nexus\Controllers\GroupController@viewFeedback');
-$router->add('GET', '/groups/{id}/reviews', 'Nexus\Controllers\GroupController@getReviews');
-$router->add('POST', '/groups/{id}/reviews', 'Nexus\Controllers\GroupController@submitReview');
-$router->add('GET', '/groups/{id}/review/{memberId}', 'Nexus\Controllers\GroupController@showReviewForm');
-
-// Group Analytics (Owner/Admin view)
 $router->add('GET', '/groups/{id}/analytics', 'Nexus\Controllers\GroupAnalyticsController@index');
 $router->add('GET', '/api/groups/{id}/analytics', 'Nexus\Controllers\GroupAnalyticsController@apiData');
 
@@ -1414,229 +1262,10 @@ $router->add('POST', '/api/notifications/settings', 'Nexus\Controllers\UserPrefe
 //$router->add('POST', '/api/notifications/read', 'Nexus\Controllers\NotificationController@markRead'); // Handled by CoreApiController
 // NOTE: /notifications route handled by NotificationController@manage (line 53)
 
-// --------------------------------------------------------------------------
-// 4. VOLUNTEERING
-// --------------------------------------------------------------------------
-$router->add('GET', '/volunteering', 'Nexus\Controllers\VolunteeringController@index');
-$router->add('GET', '/volunteering/dashboard', 'Nexus\Controllers\VolunteeringController@dashboard');
-$router->add('GET', '/volunteering/my-applications', 'Nexus\Controllers\VolunteeringController@myApplications');
-$router->add('GET', '/volunteering/opportunities/create', 'Nexus\Controllers\VolunteeringController@createOpp');
-$router->add('GET', '/volunteering/certificate', 'Nexus\Controllers\VolunteeringController@printCertificate');
-$router->add('GET', '/volunteering/organizations', 'Nexus\Controllers\VolunteeringController@organizations');
-$router->add('GET', '/volunteering/{id}', 'Nexus\Controllers\VolunteeringController@show');
-$router->add('POST', '/volunteering/{id}', 'Nexus\Controllers\VolunteeringController@show'); // AJAX actions (likes/comments)
-
-// Actions
-$router->add('POST', '/volunteering/org/store', 'Nexus\Controllers\VolunteeringController@storeOrg');
-$router->add('POST', '/volunteering/opp/store', 'Nexus\Controllers\VolunteeringController@storeOpp');
-$router->add('POST', '/volunteering/apply', 'Nexus\Controllers\VolunteeringController@apply');
-$router->add('POST', '/volunteering/app/update', 'Nexus\Controllers\VolunteeringController@updateApp');
-$router->add('POST', '/volunteering/review/store', 'Nexus\Controllers\VolunteeringController@submitReview');
-$router->add('POST', '/volunteering/log-hours', 'Nexus\Controllers\VolunteeringController@logHours');
-$router->add('POST', '/volunteering/verify-hours', 'Nexus\Controllers\VolunteeringController@verifyHours');
-
-// Organization Profile (public)
-$router->add('GET', '/volunteering/organization/{id}', 'Nexus\Controllers\VolunteeringController@showOrg');
-
-// Edit Routes
-$router->add('GET', '/volunteering/org/edit/{id}', 'Nexus\Controllers\VolunteeringController@editOrg');
-$router->add('POST', '/volunteering/org/update', 'Nexus\Controllers\VolunteeringController@updateOrg');
-$router->add('GET', '/volunteering/opp/edit/{id}', 'Nexus\Controllers\VolunteeringController@editOpp');
-$router->add('GET', '/volunteering/edit/{id}', 'Nexus\Controllers\VolunteeringController@editOpp'); // Alias for Admin Directory
-$router->add('POST', '/volunteering/opp/update', 'Nexus\Controllers\VolunteeringController@updateOpp');
-
-// Shifts
-$router->add('POST', '/volunteering/shift/store', 'Nexus\Controllers\VolunteeringController@storeShift');
-$router->add('POST', '/volunteering/shift/delete', 'Nexus\Controllers\VolunteeringController@deleteShift');
-
-// Utils
-$router->add('GET', '/volunteering/app/ics/{id}', 'Nexus\Controllers\VolunteeringController@downloadIcs');
-
-// --------------------------------------------------------------------------
-// 4.5. REVIEWS
-// --------------------------------------------------------------------------
-$router->add('GET', '/reviews/create/{transactionId}', 'Nexus\Controllers\ReviewController@create');
-$router->add('POST', '/reviews/store', 'Nexus\Controllers\ReviewController@store');
-
-// --------------------------------------------------------------------------
-// 5. EVENTS
-// --------------------------------------------------------------------------
-$router->add('GET', '/events', 'Nexus\Controllers\EventController@index');
-$router->add('GET', '/events/calendar', 'Nexus\Controllers\EventController@calendar');
-$router->add('GET', '/events/create', 'Nexus\Controllers\EventController@create');
-$router->add('POST', '/events/store', 'Nexus\Controllers\EventController@store');
-$router->add('GET', '/events/{id}', 'Nexus\Controllers\EventController@show');
-$router->add('POST', '/events/{id}', 'Nexus\Controllers\EventController@show'); // AJAX actions (likes/comments)
-$router->add('GET', '/events/{id}/edit', 'Nexus\Controllers\EventController@edit'); // Standard REST
-$router->add('POST', '/events/update/{id}', 'Nexus\Controllers\EventController@update');
-$router->add('POST', '/events/rsvp', 'Nexus\Controllers\EventController@rsvp');
-$router->add('POST', '/events/invite', 'Nexus\Controllers\EventController@invite');
-$router->add('POST', '/events/check-in', 'Nexus\Controllers\EventController@checkIn');
-
-// Specific Event Routes (additional aliases)
-$router->add('GET', '/events/edit/{id}', 'Nexus\Controllers\EventController@edit'); // Alias for Admin Directory
-$router->add('POST', '/events/{id}/update', 'Nexus\Controllers\EventController@update');
-$router->add('GET', '/events/{id}/delete', 'Nexus\Controllers\EventController@destroy'); // Ideally POST/DELETE, but commonly GET link in simple apps
-$router->add('GET', '/events/{id}/export', 'Nexus\Controllers\EventController@exportAttendees');
-
-
-
-// --------------------------------------------------------------------------
-// --------------------------------------------------------------------------
-// 6. POLLS
-// --------------------------------------------------------------------------
-// Static routes MUST come before dynamic {id} routes
-$router->add('GET', '/polls', 'Nexus\Controllers\PollController@index');
-$router->add('GET', '/polls/create', 'Nexus\Controllers\PollController@create');
-$router->add('POST', '/polls/store', 'Nexus\Controllers\PollController@store');
-$router->add('POST', '/polls/vote', 'Nexus\Controllers\PollController@vote');
-$router->add('GET', '/polls/vote', 'Nexus\Controllers\PollController@index'); // Redirect GET to index
-
-// Dynamic {id} routes - must come AFTER static routes
-$router->add('GET', '/polls/{id}', 'Nexus\Controllers\PollController@show');
-$router->add('POST', '/polls/{id}', 'Nexus\Controllers\PollController@show'); // AJAX actions (likes/comments)
-$router->add('GET', '/polls/{id}/edit', 'Nexus\Controllers\PollController@edit');
-$router->add('GET', '/polls/edit/{id}', 'Nexus\Controllers\PollController@edit'); // Alias for Admin Directory
-$router->add('POST', '/polls/{id}/vote', 'Nexus\Controllers\PollController@vote');
-$router->add('POST', '/polls/{id}/update', 'Nexus\Controllers\PollController@update');
-$router->add('GET', '/polls/{id}/delete', 'Nexus\Controllers\PollController@destroy');
-
-// --------------------------------------------------------------------------
-// 7. MESSAGING - Consolidated below at 10.5
-// --------------------------------------------------------------------------
-
-
-
-// --------------------------------------------------------------------------
-// 7. GOALS
-// --------------------------------------------------------------------------
-$router->add('GET', '/goals', 'Nexus\Controllers\GoalController@index');
-$router->add('GET', '/goals/create', 'Nexus\Controllers\GoalController@create');
-$router->add('POST', '/goals/store', 'Nexus\Controllers\GoalController@store');
-$router->add('POST', '/goals/buddy', 'Nexus\Controllers\GoalController@becomeBuddy');
-
-// Specific Goal Routes
-$router->add('GET', '/goals/{id}', 'Nexus\Controllers\GoalController@show');
-$router->add('GET', '/goals/{id}/edit', 'Nexus\Controllers\GoalController@edit');
-$router->add('GET', '/goals/edit/{id}', 'Nexus\Controllers\GoalController@edit'); // Alias for Admin Directory
-$router->add('POST', '/goals/{id}/update', 'Nexus\Controllers\GoalController@update');
-$router->add('POST', '/goals/{id}/complete', 'Nexus\Controllers\GoalController@complete');
-$router->add('GET', '/goals/{id}/delete', 'Nexus\Controllers\GoalController@confirmDelete');
-$router->add('POST', '/goals/{id}/delete', 'Nexus\Controllers\GoalController@destroy');
-
-
-// --------------------------------------------------------------------------
-// GDPR CONSENT RE-ACCEPTANCE (User-facing)
-// --------------------------------------------------------------------------
-$router->add('GET', '/consent-required', 'Nexus\Controllers\ConsentController@required');
-$router->add('POST', '/consent/accept', 'Nexus\Controllers\ConsentController@accept');
-$router->add('GET', '/consent/decline', 'Nexus\Controllers\ConsentController@decline');
-
-// --------------------------------------------------------------------------
-// 8. MEMBERS & PROFILES
-// --------------------------------------------------------------------------
-$router->add('GET', '/settings', 'Nexus\Controllers\SettingsController@index'); // Route for /settings
-$router->add('POST', '/settings/profile', 'Nexus\Controllers\SettingsController@updateProfile'); // NEW: Update Profile
-$router->add('POST', '/settings/password', 'Nexus\Controllers\SettingsController@updatePassword'); // Route for password update
-$router->add('POST', '/settings/privacy', 'Nexus\Controllers\SettingsController@updatePrivacy'); // Route for privacy update
-$router->add('POST', '/settings/notifications', 'Nexus\Controllers\SettingsController@updateNotifications'); // Route for notification settings
-$router->add('GET', '/settings/notifications/edit', 'Nexus\Controllers\SettingsController@notificationsEdit'); // CivicOne notification edit form
-$router->add('POST', '/settings/consent', 'Nexus\Controllers\SettingsController@updateConsent'); // GDPR consent toggle
-$router->add('POST', '/settings/gdpr-request', 'Nexus\Controllers\SettingsController@submitGdprRequest'); // GDPR data request
-$router->add('POST', '/settings/federation/update', 'Nexus\Controllers\SettingsController@updateFederation'); // Federation settings
-$router->add('POST', '/settings/federation/opt-out', 'Nexus\Controllers\SettingsController@federationOptOut'); // Quick opt-out
-
-// --------------------------------------------------------------------------
-// FEDERATED MEMBER DIRECTORY (Multi-Tenant Federation Phase 4)
-// --------------------------------------------------------------------------
-// Base federation route - Partner Timebanks Hub
-$router->add('GET', '/federation', 'Nexus\Controllers\FederationHubController@index');
-$router->add('GET', '/federation/activity', 'Nexus\Controllers\FederationHubController@activity');
-$router->add('GET', '/federation/activity/api', 'Nexus\Controllers\FederationHubController@activityApi');
-
-// Partner Timebank Profiles
-$router->add('GET', '/federation/partners/{id}', 'Nexus\Controllers\FederatedPartnerController@show');
-
-$router->add('GET', '/federation/members', 'Nexus\Controllers\FederatedMemberController@index');
-$router->add('GET', '/federation/members/api', 'Nexus\Controllers\FederatedMemberController@api');
-$router->add('GET', '/federation/members/skills', 'Nexus\Controllers\FederatedMemberController@skillsApi');
-$router->add('GET', '/federation/members/locations', 'Nexus\Controllers\FederatedMemberController@locationsApi');
-$router->add('GET', '/federation/members/external/{partnerId}/{memberId}', 'Nexus\Controllers\FederatedMemberController@showExternal');
-$router->add('GET', '/federation/members/{id}', 'Nexus\Controllers\FederatedMemberController@show');
-
-// Federated Messaging (Cross-Tenant)
-$router->add('GET', '/federation/messages', 'Nexus\Controllers\FederatedMessageController@index');
-$router->add('GET', '/federation/messages/compose', 'Nexus\Controllers\FederatedMessageController@compose');
-$router->add('GET', '/federation/messages/api', 'Nexus\Controllers\FederatedMessageController@api');
-$router->add('GET', '/federation/messages/{id}', 'Nexus\Controllers\FederatedMessageController@thread');
-$router->add('POST', '/federation/messages/send', 'Nexus\Controllers\FederatedMessageController@send');
-$router->add('POST', '/federation/messages/mark-read', 'Nexus\Controllers\FederatedMessageController@markRead');
-
-// Federated Listings (Cross-Tenant)
-$router->add('GET', '/federation/listings', 'Nexus\Controllers\FederatedListingController@index');
-$router->add('GET', '/federation/listings/api', 'Nexus\Controllers\FederatedListingController@api');
-$router->add('GET', '/federation/listings/external/{partnerId}/{listingId}', 'Nexus\Controllers\FederatedListingController@showExternal');
-$router->add('GET', '/federation/listings/{id}', 'Nexus\Controllers\FederatedListingController@show');
-
-// Federated Transactions (Cross-Tenant Hour Exchanges)
-$router->add('GET', '/federation/transactions', 'Nexus\Controllers\FederatedTransactionController@index');
-$router->add('GET', '/federation/transactions/api', 'Nexus\Controllers\FederatedTransactionController@api');
-$router->add('GET', '/federation/transactions/new', 'Nexus\Controllers\FederatedTransactionController@create');
-$router->add('GET', '/transactions/new', 'Nexus\Controllers\FederatedTransactionController@create'); // Alias for federated=1 links
-$router->add('POST', '/federation/transactions/send', 'Nexus\Controllers\FederatedTransactionController@store');
-
-// Federation Reviews (Post-Transaction Feedback)
-$router->add('GET', '/federation/review/{transactionId}', 'Nexus\Controllers\FederationReviewController@show');
-$router->add('POST', '/federation/review/{transactionId}', 'Nexus\Controllers\FederationReviewController@store');
-$router->add('GET', '/federation/review/{transactionId}/modal', 'Nexus\Controllers\FederationReviewController@modal');
-$router->add('GET', '/federation/reviews/pending', 'Nexus\Controllers\FederationReviewController@pending');
-$router->add('GET', '/federation/reviews/user/{userId}', 'Nexus\Controllers\FederationReviewController@userReviews');
-
-// Federated Events (Cross-Tenant Event Access)
-$router->add('GET', '/federation/events', 'Nexus\Controllers\FederatedEventController@index');
-$router->add('GET', '/federation/events/api', 'Nexus\Controllers\FederatedEventController@api');
-$router->add('GET', '/federation/events/{id}', 'Nexus\Controllers\FederatedEventController@show');
-$router->add('POST', '/federation/events/{id}/register', 'Nexus\Controllers\FederatedEventController@register');
-
-// Federated Groups (Cross-Tenant Group Membership)
-$router->add('GET', '/federation/groups', 'Nexus\Controllers\FederatedGroupController@index');
-$router->add('GET', '/federation/groups/api', 'Nexus\Controllers\FederatedGroupController@api');
-$router->add('GET', '/federation/groups/my', 'Nexus\Controllers\FederatedGroupController@myGroups');
-$router->add('GET', '/federation/groups/{id}', 'Nexus\Controllers\FederatedGroupController@show');
-$router->add('POST', '/federation/groups/{id}/join', 'Nexus\Controllers\FederatedGroupController@join');
-$router->add('POST', '/federation/groups/{id}/leave', 'Nexus\Controllers\FederatedGroupController@leave');
-
-// Federation Help & FAQ
-$router->add('GET', '/federation/help', 'Nexus\Controllers\FederationHelpController@index');
-
-// Federation Onboarding Wizard
-$router->add('GET', '/federation/onboarding', 'Nexus\Controllers\FederationOnboardingController@index');
-$router->add('POST', '/federation/onboarding/save', 'Nexus\Controllers\FederationOnboardingController@save');
-
-// Federation User Dashboard
-$router->add('GET', '/federation/dashboard', 'Nexus\Controllers\FederationDashboardController@index');
-
-// Federation User Settings
-$router->add('GET', '/federation/settings', 'Nexus\Controllers\FederationSettingsController@index');
-$router->add('POST', '/federation/settings/save', 'Nexus\Controllers\FederationSettingsController@save');
-$router->add('POST', '/federation/settings/disable', 'Nexus\Controllers\FederationSettingsController@disable');
-$router->add('POST', '/federation/settings/enable', 'Nexus\Controllers\FederationSettingsController@enable');
-
-// Federation Offline Page (PWA)
-$router->add('GET', '/federation/offline', 'Nexus\Controllers\FederationOfflineController@index');
-
-// Federation Real-time Stream (SSE)
 $router->add('GET', '/federation/stream', 'Nexus\Controllers\FederationStreamController@stream');
 $router->add('GET', '/federation/stream/info', 'Nexus\Controllers\FederationStreamController@info');
 $router->add('POST', '/federation/pusher/auth', 'Nexus\Controllers\FederationStreamController@pusherAuth');
 
-$router->add('GET', '/members', 'Nexus\Controllers\MemberController@index');
-$router->add('GET', '/members/{id}', 'Nexus\Controllers\ProfileController@show'); // Member profile by ID or username
-$router->add('POST', '/members/{id}', 'Nexus\Controllers\ProfileController@show'); // Allow POST for wall
-
-// --------------------------------------------------------------------------
-// LEADERBOARDS & GAMIFICATION
-// --------------------------------------------------------------------------
 $router->add('GET', '/leaderboard', 'Nexus\Controllers\LeaderboardController@index');
 $router->add('GET', '/leaderboards', 'Nexus\Controllers\LeaderboardController@index'); // Alias
 $router->add('GET', '/api/leaderboard', 'Nexus\Controllers\LeaderboardController@api');
@@ -1668,60 +1297,14 @@ $router->add('GET', '/api/gamification/share', 'Nexus\Controllers\Api\Gamificati
 $router->add('GET', '/api/gamification/seasons', 'Nexus\Controllers\Api\GamificationApiController@getSeasons');
 $router->add('GET', '/api/gamification/seasons/current', 'Nexus\Controllers\Api\GamificationApiController@getCurrentSeason');
 $router->add('POST', '/api/shop/purchase', 'Nexus\Controllers\Api\GamificationApiController@purchaseItem');
-
-$router->add('GET', '/profile/me', 'Nexus\Controllers\ProfileController@me'); // Specific route first
-$router->add('POST', '/profile/me', 'Nexus\Controllers\ProfileController@me'); // Allow POST for wall
-$router->add('POST', '/profile/update', 'Nexus\Controllers\ProfileController@update'); // Profile Edit Form (Advanced)
 $router->add('GET', '/profile/edit', function () {
     $base = \Nexus\Core\TenantContext::getBasePath();
     header("Location: {$base}/settings?section=profile");
     exit;
 });
-$router->add('GET', '/profile/{id}', 'Nexus\Controllers\ProfileController@show');
-$router->add('POST', '/profile/{id}', 'Nexus\Controllers\ProfileController@show'); // Allow POST for wall
-$router->add('GET', '/profile', 'Nexus\Controllers\ProfileController@me');
-$router->add('POST', '/profile', 'Nexus\Controllers\ProfileController@me'); // Allow POST for wall
 
 // Connections (legacy PHP views removed — handled by React frontend and API)
 
-
-// --------------------------------------------------------------------------
-// 9. RESOURCES
-// --------------------------------------------------------------------------
-$router->add('GET', '/resources', 'Nexus\Controllers\ResourceController@index');
-$router->add('GET', '/resources/create', 'Nexus\Controllers\ResourceController@create');
-$router->add('POST', '/resources/store', 'Nexus\Controllers\ResourceController@store');
-
-// Specific Resource Routes
-$router->add('GET', '/resources/{id}/edit', 'Nexus\Controllers\ResourceController@edit');
-$router->add('POST', '/resources/{id}/update', 'Nexus\Controllers\ResourceController@update');
-$router->add('POST', '/resources/{id}/delete', 'Nexus\Controllers\ResourceController@destroy');
-$router->add('GET', '/resources/{id}/download', 'Nexus\Controllers\ResourceController@download');
-$router->add('GET', '/resources/{id}/file', 'Nexus\Controllers\ResourceController@file');
-
-
-
-// --------------------------------------------------------------------------
-// 10.7. SMART MATCHING
-// --------------------------------------------------------------------------
-$router->add('GET', '/matches', 'Nexus\Controllers\MatchController@index');
-$router->add('GET', '/matches/hot', 'Nexus\Controllers\MatchController@hot');
-$router->add('GET', '/matches/mutual', 'Nexus\Controllers\MatchController@mutual');
-$router->add('GET', '/matches/preferences', 'Nexus\Controllers\MatchController@preferences');
-$router->add('POST', '/matches/preferences', 'Nexus\Controllers\MatchController@preferences');
-$router->add('GET', '/matches/api', 'Nexus\Controllers\MatchController@api');
-$router->add('POST', '/matches/interact', 'Nexus\Controllers\MatchController@interact');
-$router->add('GET', '/matches/stats', 'Nexus\Controllers\MatchController@stats');
-$router->add('GET', '/matches/debug', 'Nexus\Controllers\MatchController@debug');
-
-// --------------------------------------------------------------------------
-// LEGACY ADMIN PANEL (PHP views — being decommissioned)
-// React admin panel at /admin/* is the primary admin UI
-// --------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------
-// 10.8. ADMIN > SMART MATCHING
-// --------------------------------------------------------------------------
 $router->add('GET', '/admin-legacy/smart-matching', 'Nexus\Controllers\Admin\SmartMatchingController@index');
 $router->add('GET', '/admin-legacy/smart-matching/analytics', 'Nexus\Controllers\Admin\SmartMatchingController@analytics');
 $router->add('GET', '/admin-legacy/smart-matching/configuration', 'Nexus\Controllers\Admin\SmartMatchingController@configuration');
@@ -1731,9 +1314,6 @@ $router->add('POST', '/admin-legacy/smart-matching/warmup-cache', 'Nexus\Control
 $router->add('POST', '/admin-legacy/smart-matching/run-geocoding', 'Nexus\Controllers\Admin\SmartMatchingController@runGeocoding');
 $router->add('GET', '/admin-legacy/smart-matching/api/stats', 'Nexus\Controllers\Admin\SmartMatchingController@apiStats');
 
-// --------------------------------------------------------------------------
-// 10.8.1. ADMIN > MATCH APPROVALS (Broker Workflow)
-// --------------------------------------------------------------------------
 $router->add('GET', '/admin-legacy/match-approvals', 'Nexus\Controllers\Admin\MatchApprovalsController@index');
 $router->add('GET', '/admin-legacy/match-approvals/history', 'Nexus\Controllers\Admin\MatchApprovalsController@history');
 $router->add('GET', '/admin-legacy/match-approvals/{id}', 'Nexus\Controllers\Admin\MatchApprovalsController@show');
@@ -1741,9 +1321,6 @@ $router->add('POST', '/admin-legacy/match-approvals/approve', 'Nexus\Controllers
 $router->add('POST', '/admin-legacy/match-approvals/reject', 'Nexus\Controllers\Admin\MatchApprovalsController@reject');
 $router->add('GET', '/admin-legacy/match-approvals/api/stats', 'Nexus\Controllers\Admin\MatchApprovalsController@apiStats');
 
-// --------------------------------------------------------------------------
-// 10.8.2. ADMIN > BROKER CONTROLS
-// --------------------------------------------------------------------------
 $router->add('GET', '/admin-legacy/broker-controls', 'Nexus\Controllers\Admin\BrokerControlsController@index');
 $router->add('GET', '/admin-legacy/broker-controls/configuration', 'Nexus\Controllers\Admin\BrokerControlsController@configuration');
 $router->add('POST', '/admin-legacy/broker-controls/configuration', 'Nexus\Controllers\Admin\BrokerControlsController@configuration');
@@ -1772,9 +1349,6 @@ $router->add('POST', '/admin-legacy/broker-controls/monitoring/{userId}', 'Nexus
 // Broker Controls - Statistics
 $router->add('GET', '/admin-legacy/broker-controls/stats', 'Nexus\Controllers\Admin\BrokerControlsController@stats');
 
-// --------------------------------------------------------------------------
-// 10.9. ADMIN > SEED GENERATOR
-// --------------------------------------------------------------------------
 $router->add('GET', '/admin-legacy/seed-generator', 'Nexus\Controllers\Admin\SeedGeneratorController@index');
 $router->add('GET', '/admin-legacy/seed-generator/verification', 'Nexus\Controllers\Admin\SeedGeneratorVerificationController@index');
 $router->add('POST', '/admin-legacy/seed-generator/generate-production', 'Nexus\Controllers\Admin\SeedGeneratorController@generateProduction');
@@ -1783,20 +1357,10 @@ $router->add('GET', '/admin-legacy/seed-generator/preview', 'Nexus\Controllers\A
 $router->add('GET', '/admin-legacy/seed-generator/download', 'Nexus\Controllers\Admin\SeedGeneratorController@download');
 $router->add('GET', '/admin-legacy/seed-generator/test', 'Nexus\Controllers\Admin\SeedGeneratorVerificationController@runLiveTest');
 
-// --------------------------------------------------------------------------
-// 11. WALLET
-// --------------------------------------------------------------------------
-$router->add('GET', '/wallet', 'Nexus\Controllers\WalletController@index');
-$router->add('POST', '/wallet/transfer', 'Nexus\Controllers\WalletController@transfer');
-
-// User Insights
 $router->add('GET', '/wallet/insights', 'Nexus\Controllers\InsightsController@index');
 $router->add('GET', '/insights', 'Nexus\Controllers\InsightsController@index'); // Alias
 $router->add('GET', '/api/insights', 'Nexus\Controllers\InsightsController@apiInsights');
 
-// --------------------------------------------------------------------------
-// 11.5. ORGANIZATION WALLETS
-// --------------------------------------------------------------------------
 $router->add('GET', '/organizations/{id}/wallet', 'Nexus\Controllers\OrgWalletController@index');
 $router->add('POST', '/organizations/{id}/wallet/deposit', 'Nexus\Controllers\OrgWalletController@deposit');
 $router->add('POST', '/organizations/{id}/wallet/request', 'Nexus\Controllers\OrgWalletController@requestTransfer');
@@ -1829,9 +1393,6 @@ $router->add('POST', '/organizations/{id}/wallet/bulk-reject', 'Nexus\Controller
 $router->add('GET', '/organizations/{id}/audit-log', 'Nexus\Controllers\OrgWalletController@auditLog');
 $router->add('GET', '/organizations/{id}/audit-log/export', 'Nexus\Controllers\OrgWalletController@exportAuditLog');
 
-// --------------------------------------------------------------------------
-// 10. FEED (Redirects to home - legacy support)
-// --------------------------------------------------------------------------
 $router->add('GET', '/feed', function() {
     header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/');
     exit;
@@ -1842,9 +1403,6 @@ $router->add('POST', '/api/feed/hide', 'Nexus\Controllers\FeedController@hidePos
 $router->add('POST', '/api/feed/mute', 'Nexus\Controllers\FeedController@muteUser');
 $router->add('POST', '/api/feed/report', 'Nexus\Controllers\FeedController@reportPost');
 
-// --------------------------------------------------------------------------
-// 10.5. MESSAGES
-// --------------------------------------------------------------------------
 $router->add('GET', '/messages', 'Nexus\Controllers\MessageController@index');
 $router->add('GET', '/messages/new', 'Nexus\Controllers\MessageController@newMessage'); // New message / user search
 $router->add('GET', '/messages/create', 'Nexus\Controllers\MessageController@create');
@@ -1863,14 +1421,6 @@ $router->add('GET', '/messages/thread/{id}', 'Nexus\Controllers\MessageControlle
 $router->add('GET', '/messages/{id}', 'Nexus\Controllers\MessageController@show');
 // NOTE: Reply handled via /messages/store with receiver_id
 
-// --------------------------------------------------------------------------
-// LEGACY ADMIN PANEL (PHP views — being decommissioned)
-// React admin panel at /admin/* is the primary admin UI
-// --------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------
-// 12. ADMIN DASHBOARD
-// --------------------------------------------------------------------------
 $router->add('GET', '/admin-legacy', 'Nexus\Controllers\AdminController@index');
 $router->add('GET', '/admin-legacy/activity-log', 'Nexus\Controllers\AdminController@activityLogs');
 $router->add('GET', '/admin-legacy/group-locations', 'Nexus\Controllers\AdminController@groupLocations');
@@ -1918,11 +1468,6 @@ $router->add('POST', '/admin-legacy/settings/regenerate-css', 'Nexus\Controllers
 // Image Optimization Settings
 $router->add('GET', '/admin-legacy/image-settings', 'Nexus\Controllers\AdminController@imageSettings');
 $router->add('POST', '/admin-legacy/image-settings/save', 'Nexus\Controllers\AdminController@saveImageSettings');
-
-// Tenant Admin Federation Dashboard
-$router->add('GET', '/admin-legacy/federation/dashboard', 'Nexus\Controllers\FederationAdminController@index');
-$router->add('POST', '/admin-legacy/federation/dashboard/toggle', 'Nexus\Controllers\FederationAdminController@toggleFederation');
-$router->add('POST', '/admin-legacy/federation/dashboard/settings', 'Nexus\Controllers\FederationAdminController@updateSettings');
 
 // Tenant Admin Federation Settings
 $router->add('GET', '/admin-legacy/federation', 'Nexus\Controllers\Admin\FederationSettingsController@index');
@@ -1989,11 +1534,6 @@ $router->add('POST', '/admin-legacy/native-app/test-push', 'Nexus\Controllers\Ad
 $router->add('GET', '/admin-legacy/feed-algorithm', 'Nexus\Controllers\AdminController@feedAlgorithm');
 $router->add('POST', '/admin-legacy/feed-algorithm/save', 'Nexus\Controllers\AdminController@saveFeedAlgorithm');
 
-// --------------------------------------------------------------------------
-// DELIVERABILITY TRACKING MODULE
-// --------------------------------------------------------------------------
-
-// Dashboard & List Views
 $router->add('GET', '/admin-legacy/deliverability', 'Nexus\Controllers\AdminController@deliverabilityDashboard');
 $router->add('GET', '/admin-legacy/deliverability/list', 'Nexus\Controllers\AdminController@deliverablesList');
 $router->add('GET', '/admin-legacy/deliverability/analytics', 'Nexus\Controllers\AdminController@deliverabilityAnalytics');
@@ -2011,20 +1551,12 @@ $router->add('POST', '/admin-legacy/deliverability/ajax/update-status', 'Nexus\C
 $router->add('POST', '/admin-legacy/deliverability/ajax/complete-milestone', 'Nexus\Controllers\AdminController@milestoneComplete');
 $router->add('POST', '/admin-legacy/deliverability/ajax/add-comment', 'Nexus\Controllers\AdminController@deliverableAddComment');
 
-// --------------------------------------------------------------------------
-// LAYOUT SYSTEM COMPLETELY REMOVED - All page layout routes obliterated
-// --------------------------------------------------------------------------
-
-// Unified Algorithm Settings (MatchRank for Listings, CommunityRank for Members)
 $router->add('GET', '/admin-legacy/algorithm-settings', 'Nexus\Controllers\AdminController@algorithmSettings');
 $router->add('POST', '/admin-legacy/algorithm-settings/save', 'Nexus\Controllers\AdminController@saveAlgorithmSettings');
 
 // Admin Live Search API (for command palette)
 $router->add('GET', '/admin-legacy/api/search', 'Nexus\Controllers\AdminController@liveSearch');
 
-// --------------------------------------------------------------------------
-// 12.5. ADMIN > CATEGORIES & ATTRIBUTES
-// --------------------------------------------------------------------------
 $router->add('GET', '/admin-legacy/categories', 'Nexus\Controllers\Admin\CategoryController@index');
 $router->add('GET', '/admin-legacy/categories/create', 'Nexus\Controllers\Admin\CategoryController@create');
 $router->add('POST', '/admin-legacy/categories/store', 'Nexus\Controllers\Admin\CategoryController@store');
@@ -2261,9 +1793,6 @@ $router->add('POST', '/admin-legacy/gamification/campaigns/delete', 'Nexus\Contr
 $router->add('POST', '/admin-legacy/gamification/campaigns/run', 'Nexus\Controllers\Admin\GamificationController@runCampaign');
 $router->add('POST', '/admin-legacy/gamification/campaigns/preview-audience', 'Nexus\Controllers\Admin\GamificationController@previewAudience');
 
-// --------------------------------------------------------------------------
-// 12.9. ADMIN > CRON JOB MANAGER
-// --------------------------------------------------------------------------
 $router->add('GET', '/admin-legacy/cron-jobs', 'Nexus\Controllers\Admin\CronJobController@index');
 $router->add('POST', '/admin-legacy/cron-jobs/run/{id}', 'Nexus\Controllers\Admin\CronJobController@run');
 $router->add('POST', '/admin-legacy/cron-jobs/toggle/{id}', 'Nexus\Controllers\Admin\CronJobController@toggle');
@@ -2305,9 +1834,6 @@ $router->add('POST', '/admin-legacy/404-errors/create-redirect', 'Nexus\Controll
 $router->add('POST', '/admin-legacy/404-errors/bulk-redirect', 'Nexus\Controllers\Admin\Error404Controller@bulkRedirect');
 $router->add('POST', '/admin-legacy/404-errors/clean-old', 'Nexus\Controllers\Admin\Error404Controller@cleanOld');
 
-// --------------------------------------------------------------------------
-// 12.6. ADMIN > NEWSLETTERS
-// --------------------------------------------------------------------------
 $router->add('GET', '/admin-legacy/newsletters', 'Nexus\Controllers\Admin\NewsletterController@index');
 $router->add('GET', '/admin-legacy/newsletters/create', 'Nexus\Controllers\Admin\NewsletterController@create');
 $router->add('POST', '/admin-legacy/newsletters/store', 'Nexus\Controllers\Admin\NewsletterController@store');
@@ -2382,9 +1908,6 @@ $router->add('GET', '/admin-legacy/newsletters/client-preview/{id}', 'Nexus\Cont
 $router->add('GET', '/admin-legacy/newsletters/diagnostics', 'Nexus\Controllers\Admin\NewsletterController@diagnostics');
 $router->add('POST', '/admin-legacy/newsletters/repair', 'Nexus\Controllers\Admin\NewsletterController@repair');
 
-// --------------------------------------------------------------------------
-// 12.7. PUBLIC > NEWSLETTER SUBSCRIPTION
-// --------------------------------------------------------------------------
 $router->add('GET', '/newsletter/subscribe', 'Nexus\Controllers\NewsletterSubscriptionController@showForm');
 $router->add('POST', '/newsletter/subscribe', 'Nexus\Controllers\NewsletterSubscriptionController@subscribe');
 $router->add('GET', '/newsletter/confirm', 'Nexus\Controllers\NewsletterSubscriptionController@confirm');
@@ -2396,15 +1919,9 @@ $router->add('POST', '/newsletter/unsubscribe/confirm', 'Nexus\Controllers\Newsl
 // V2 JSON API for newsletter unsubscribe (called from the React frontend unsubscribe page)
 $router->add('POST', '/api/v2/newsletter/unsubscribe', 'Nexus\Controllers\Api\NewsletterApiController@unsubscribe');
 
-// --------------------------------------------------------------------------
-// 12.8. PUBLIC > NEWSLETTER ANALYTICS TRACKING
-// --------------------------------------------------------------------------
 $router->add('GET', '/newsletter/track/open/{newsletterId}/{trackingToken}', 'Nexus\Controllers\NewsletterTrackingController@trackOpen');
 $router->add('GET', '/newsletter/track/click/{newsletterId}/{linkId}/{trackingToken}', 'Nexus\Controllers\NewsletterTrackingController@trackClick');
 
-// --------------------------------------------------------------------------
-// 12.95. ADMIN > ENTERPRISE FEATURES (GDPR, Monitoring, Config)
-// --------------------------------------------------------------------------
 $router->add('GET', '/admin-legacy/enterprise', 'Nexus\Controllers\Admin\Enterprise\EnterpriseDashboardController@dashboard');
 
 // API Test Runner
@@ -2507,28 +2024,10 @@ $router->add('POST', '/admin-legacy/api/users/{userId}/permissions', 'Nexus\Cont
 $router->add('DELETE', '/admin-legacy/api/users/{userId}/permissions/{permissionId}', 'Nexus\Controllers\Admin\PermissionApiController@revokePermissionFromUser');
 $router->add('GET', '/admin-legacy/api/audit/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getAuditLog');
 $router->add('GET', '/admin-legacy/api/stats/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getPermissionStats');
-
-// User-facing Privacy Settings (GDPR self-service)
-$router->add('GET', '/settings/privacy', 'Nexus\Controllers\SettingsController@privacy');
 $router->add('POST', '/api/gdpr/consent', 'Nexus\Controllers\Api\GdprApiController@updateConsent');
 $router->add('POST', '/api/gdpr/request', 'Nexus\Controllers\Api\GdprApiController@createRequest');
 $router->add('POST', '/api/gdpr/delete-account', 'Nexus\Controllers\Api\GdprApiController@deleteAccount');
 
-// --------------------------------------------------------------------------
-// 13. LEGACY SUPER ADMIN (DEPRECATED - Use /super-admin/* routes at top of file)
-// --------------------------------------------------------------------------
-// NOTE: The old MasterController routes have been replaced by the new
-// hierarchical Super Admin Panel. Routes are defined at the TOP of this file.
-// See: Nexus\Controllers\SuperAdmin\* controllers
-//
-// Legacy routes kept for backwards compatibility (will redirect):
-// $router->add('GET', '/super-admin', 'Nexus\Controllers\MasterController@index');
-// These are now handled by SuperAdmin\DashboardController, TenantController, UserController
-
-// --------------------------------------------------------------------------
-// 14. CRON JOBS
-// --------------------------------------------------------------------------
-// Notification Digests
 $router->add('GET', '/cron/daily-digest', 'Nexus\Controllers\CronController@dailyDigest');
 $router->add('GET', '/cron/weekly-digest', 'Nexus\Controllers\CronController@weeklyDigest');
 $router->add('GET', '/cron/process-queue', 'Nexus\Controllers\CronController@runInstantQueue');
@@ -2555,12 +2054,6 @@ $router->add('GET', '/cron/cleanup', 'Nexus\Controllers\CronController@cleanup')
 // Master Cron (runs all tasks based on schedule)
 $router->add('GET', '/cron/run-all', 'Nexus\Controllers\CronController@runAll');
 
-// --------------------------------------------------------------------------
-// Notification API routes consolidated above
-
-// ============================================
-// API V2 - COMMUNITY ANALYTICS (Admin)
-// ============================================
 $router->add('GET', '/api/v2/admin/community-analytics', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@index');
 $router->add('GET', '/api/v2/admin/community-analytics/export', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@export');
 $router->add('GET', '/api/v2/admin/community-analytics/geography', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@geography');
@@ -2594,5 +2087,4 @@ $router->add('POST', '/api/v2/group-exchanges/{id}/confirm', 'Nexus\Controllers\
 $router->add('POST', '/api/v2/group-exchanges/{id}/complete', 'Nexus\Controllers\Api\GroupExchangesApiController@complete');
 
 // DISPATCH
-// --------------------------------------------------------------------------
 $router->dispatch();
