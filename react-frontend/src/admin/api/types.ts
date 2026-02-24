@@ -1483,6 +1483,8 @@ export interface MatchStats {
 export interface AdminFeedPost {
   id: number;
   user_id: number;
+  tenant_id: number;
+  tenant_name: string;
   user_name: string;
   user_avatar?: string | null;
   content: string;
@@ -1499,6 +1501,8 @@ export interface AdminFeedPost {
 export interface AdminComment {
   id: number;
   user_id: number;
+  tenant_id: number;
+  tenant_name: string;
   user_name: string;
   user_avatar?: string | null;
   content_type: 'listing' | 'event' | 'post' | 'blog';
@@ -1514,6 +1518,8 @@ export interface AdminComment {
 export interface AdminReview {
   id: number;
   reviewer_id: number;
+  tenant_id: number;
+  tenant_name: string;
   reviewer_name: string;
   reviewer_avatar?: string | null;
   reviewee_id: number;
@@ -1530,6 +1536,8 @@ export interface AdminReview {
 export interface AdminReport {
   id: number;
   reporter_id: number;
+  tenant_id: number;
+  tenant_name: string;
   reporter_name: string;
   reporter_avatar?: string | null;
   content_type: 'listing' | 'event' | 'post' | 'comment' | 'review' | 'user';

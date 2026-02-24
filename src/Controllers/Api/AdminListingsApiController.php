@@ -35,6 +35,7 @@ class AdminListingsApiController extends BaseApiController
     public function index(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -45,6 +46,7 @@ class AdminListingsApiController extends BaseApiController
         $search = $_GET['search'] ?? null;
         $sort = $_GET['sort'] ?? 'created_at';
         $order = strtoupper($_GET['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
+        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         // Whitelist sort columns
         $allowedSorts = ['title', 'type', 'status', 'created_at', 'user_name'];
@@ -52,8 +54,20 @@ class AdminListingsApiController extends BaseApiController
             $sort = 'created_at';
         }
 
-        $conditions = ['l.tenant_id = ?'];
-        $params = [$tenantId];
+        $conditions = [];
+        $params = [];
+
+        // Tenant scoping: super admins can see all tenants or filter by one
+        if ($isSuperAdmin) {
+            if ($filterTenantId) {
+                $conditions[] = 'l.tenant_id = ?';
+                $params[] = $filterTenantId;
+            }
+            // No tenant filter = all tenants for super admin
+        } else {
+            $conditions[] = 'l.tenant_id = ?';
+            $params[] = $tenantId;
+        }
 
         // Status filter
         if ($status && $status !== 'all') {
@@ -84,7 +98,7 @@ class AdminListingsApiController extends BaseApiController
             $params[] = $searchTerm;
         }
 
-        $where = implode(' AND ', $conditions);
+        $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
         // Map 'user_name' sort
         $sortColumn = $sort === 'user_name' ? 'user_name' : "l.{$sort}";
@@ -95,16 +109,18 @@ class AdminListingsApiController extends BaseApiController
             $params
         )->fetch()['cnt'];
 
-        // Paginated results
+        // Paginated results — join tenants table for cross-tenant name display
         $items = Database::query(
             "SELECT l.id, l.title, l.description, l.type, l.status, l.created_at, l.updated_at,
-                    l.user_id, l.category_id, l.price,
+                    l.user_id, l.category_id, l.price, l.tenant_id,
                     CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
                     u.email as user_email, u.avatar_url as user_avatar,
-                    c.name as category_name
+                    c.name as category_name,
+                    t.name as tenant_name
              FROM listings l
              LEFT JOIN users u ON l.user_id = u.id
              LEFT JOIN categories c ON l.category_id = c.id
+             LEFT JOIN tenants t ON l.tenant_id = t.id
              WHERE {$where}
              ORDER BY {$sortColumn} {$order}
              LIMIT ? OFFSET ?",
@@ -119,6 +135,8 @@ class AdminListingsApiController extends BaseApiController
                 'description' => $row['description'] ?? '',
                 'type' => $row['type'] ?? 'listing',
                 'status' => $row['status'] ?? 'active',
+                'tenant_id' => (int) $row['tenant_id'],
+                'tenant_name' => $row['tenant_name'] ?? 'Unknown',
                 'user_id' => (int) ($row['user_id'] ?? 0),
                 'user_name' => trim($row['user_name'] ?? ''),
                 'user_email' => $row['user_email'] ?? '',
@@ -140,19 +158,39 @@ class AdminListingsApiController extends BaseApiController
     public function show(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $item = Database::query(
-            "SELECT l.*,
-                    CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
-                    u.email as user_email, u.avatar_url as user_avatar,
-                    c.name as category_name
-             FROM listings l
-             LEFT JOIN users u ON l.user_id = u.id
-             LEFT JOIN categories c ON l.category_id = c.id
-             WHERE l.id = ? AND l.tenant_id = ?",
-            [$id, $tenantId]
-        )->fetch();
+        // Super admins can view listings from any tenant
+        if ($isSuperAdmin) {
+            $item = Database::query(
+                "SELECT l.*,
+                        CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
+                        u.email as user_email, u.avatar_url as user_avatar,
+                        c.name as category_name,
+                        t.name as tenant_name
+                 FROM listings l
+                 LEFT JOIN users u ON l.user_id = u.id
+                 LEFT JOIN categories c ON l.category_id = c.id
+                 LEFT JOIN tenants t ON l.tenant_id = t.id
+                 WHERE l.id = ?",
+                [$id]
+            )->fetch();
+        } else {
+            $item = Database::query(
+                "SELECT l.*,
+                        CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
+                        u.email as user_email, u.avatar_url as user_avatar,
+                        c.name as category_name,
+                        t.name as tenant_name
+                 FROM listings l
+                 LEFT JOIN users u ON l.user_id = u.id
+                 LEFT JOIN categories c ON l.category_id = c.id
+                 LEFT JOIN tenants t ON l.tenant_id = t.id
+                 WHERE l.id = ? AND l.tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+        }
 
         if (!$item) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Listing not found', null, 404);
@@ -165,6 +203,8 @@ class AdminListingsApiController extends BaseApiController
             'description' => $item['description'] ?? '',
             'type' => $item['type'] ?? 'listing',
             'status' => $item['status'] ?? 'active',
+            'tenant_id' => (int) $item['tenant_id'],
+            'tenant_name' => $item['tenant_name'] ?? 'Unknown',
             'user_id' => (int) ($item['user_id'] ?? 0),
             'user_name' => trim($item['user_name'] ?? ''),
             'user_email' => $item['user_email'] ?? '',
@@ -184,24 +224,40 @@ class AdminListingsApiController extends BaseApiController
     public function approve(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $item = Database::query(
-            "SELECT id, title, status FROM listings WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
-        )->fetch();
+        // Super admins can approve listings from any tenant
+        if ($isSuperAdmin) {
+            $item = Database::query(
+                "SELECT id, title, status, tenant_id FROM listings WHERE id = ?",
+                [$id]
+            )->fetch();
+        } else {
+            $item = Database::query(
+                "SELECT id, title, status, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+        }
 
         if (!$item) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Listing not found', null, 404);
             return;
         }
 
+        // Use the record's own tenant_id for the write
+        $itemTenantId = (int) $item['tenant_id'];
+
         Database::query(
             "UPDATE listings SET status = 'active' WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $itemTenantId]
         );
 
-        ActivityLog::log($adminId, 'admin_approve_listing', "Approved listing #{$id}: {$item['title']}");
+        ActivityLog::log(
+            $adminId,
+            'admin_approve_listing',
+            "Approved listing #{$id}: {$item['title']}" . ($isSuperAdmin ? " (tenant {$itemTenantId})" : '')
+        );
 
         $this->respondWithData(['approved' => true, 'id' => $id]);
     }
@@ -212,24 +268,40 @@ class AdminListingsApiController extends BaseApiController
     public function destroy(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $item = Database::query(
-            "SELECT id, title FROM listings WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
-        )->fetch();
+        // Super admins can delete listings from any tenant
+        if ($isSuperAdmin) {
+            $item = Database::query(
+                "SELECT id, title, tenant_id FROM listings WHERE id = ?",
+                [$id]
+            )->fetch();
+        } else {
+            $item = Database::query(
+                "SELECT id, title, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+        }
 
         if (!$item) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Listing not found', null, 404);
             return;
         }
 
+        // Use the record's own tenant_id for the delete (safety: always keep AND tenant_id = ?)
+        $itemTenantId = (int) $item['tenant_id'];
+
         Database::query(
             "DELETE FROM listings WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $itemTenantId]
         );
 
-        ActivityLog::log($adminId, 'admin_delete_listing', "Deleted listing #{$id}: {$item['title']}");
+        ActivityLog::log(
+            $adminId,
+            'admin_delete_listing',
+            "Deleted listing #{$id}: {$item['title']}" . ($isSuperAdmin ? " (tenant {$itemTenantId})" : '')
+        );
 
         $this->respondWithData(['deleted' => true, 'id' => $id]);
     }

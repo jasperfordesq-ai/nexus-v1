@@ -50,6 +50,7 @@ class AdminUsersApiController extends BaseApiController
     public function index(): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -60,6 +61,7 @@ class AdminUsersApiController extends BaseApiController
         $role = $_GET['role'] ?? null;
         $sort = $_GET['sort'] ?? 'created_at';
         $order = strtoupper($_GET['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
+        $filterTenantId = isset($_GET['tenant_id']) ? (int) $_GET['tenant_id'] : null;
 
         // Whitelist sort columns
         $allowedSorts = ['name', 'email', 'role', 'created_at', 'balance', 'status'];
@@ -67,8 +69,20 @@ class AdminUsersApiController extends BaseApiController
             $sort = 'created_at';
         }
 
-        $conditions = ['u.tenant_id = ?'];
-        $params = [$tenantId];
+        $conditions = [];
+        $params = [];
+
+        // Tenant scoping: super admins can see all tenants or filter by one
+        if ($isSuperAdmin) {
+            if ($filterTenantId) {
+                $conditions[] = 'u.tenant_id = ?';
+                $params[] = $filterTenantId;
+            }
+            // No tenant filter = all tenants for super admin
+        } else {
+            $conditions[] = 'u.tenant_id = ?';
+            $params[] = $tenantId;
+        }
 
         // Status filter
         if ($status && $status !== 'all') {
@@ -104,7 +118,7 @@ class AdminUsersApiController extends BaseApiController
             $params[] = $searchTerm;
         }
 
-        $where = implode(' AND ', $conditions);
+        $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
         // Map 'name' sort to computed column
         $sortColumn = $sort === 'name' ? 'name' : "u.{$sort}";
@@ -119,7 +133,7 @@ class AdminUsersApiController extends BaseApiController
             $params
         )->fetch()['cnt'];
 
-        // Get paginated users
+        // Get paginated users — join tenants table for cross-tenant name display
         $users = Database::query(
             "SELECT u.id, u.first_name, u.last_name,
                 CASE
@@ -129,9 +143,12 @@ class AdminUsersApiController extends BaseApiController
                 END as name,
                 u.email, u.avatar_url, u.location, u.role, u.is_approved, u.is_super_admin,
                 u.status, u.created_at, u.last_active_at, u.profile_type, u.organization_name,
+                u.tenant_id,
+                t.name as tenant_name,
                 COALESCE(u.balance, 0) as balance,
                 (SELECT COUNT(*) FROM listings l WHERE l.user_id = u.id AND l.status = 'active') as listing_count
              FROM users u
+             LEFT JOIN tenants t ON u.tenant_id = t.id
              WHERE {$where}
              ORDER BY {$sortColumn} {$order}
              LIMIT ? OFFSET ?",
@@ -172,6 +189,8 @@ class AdminUsersApiController extends BaseApiController
                 'balance' => (float) ($row['balance'] ?? 0),
                 'listing_count' => (int) ($row['listing_count'] ?? 0),
                 'profile_type' => $row['profile_type'] ?? 'individual',
+                'tenant_id' => (int) $row['tenant_id'],
+                'tenant_name' => $row['tenant_name'] ?? 'Unknown',
                 'has_2fa_enabled' => $has2fa ? !empty($row['totp_secret'] ?? null) : false,
                 'created_at' => $row['created_at'],
                 'last_active_at' => $row['last_active_at'] ?? null,
@@ -187,15 +206,33 @@ class AdminUsersApiController extends BaseApiController
     public function show(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = Database::query(
-            "SELECT id, first_name, last_name, email, avatar_url, location, bio, tagline, phone,
-                    role, status, is_approved, is_super_admin, balance, profile_type,
-                    organization_name, vetting_status, insurance_status, created_at, last_active_at
-             FROM users WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
-        )->fetch();
+        // Super admins can view users from any tenant
+        if ($isSuperAdmin) {
+            $user = Database::query(
+                "SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.location, u.bio, u.tagline, u.phone,
+                        u.role, u.status, u.is_approved, u.is_super_admin, u.balance, u.profile_type,
+                        u.organization_name, u.vetting_status, u.insurance_status, u.created_at, u.last_active_at,
+                        u.tenant_id, t.name as tenant_name
+                 FROM users u
+                 LEFT JOIN tenants t ON u.tenant_id = t.id
+                 WHERE u.id = ?",
+                [$id]
+            )->fetch();
+        } else {
+            $user = Database::query(
+                "SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.location, u.bio, u.tagline, u.phone,
+                        u.role, u.status, u.is_approved, u.is_super_admin, u.balance, u.profile_type,
+                        u.organization_name, u.vetting_status, u.insurance_status, u.created_at, u.last_active_at,
+                        u.tenant_id, t.name as tenant_name
+                 FROM users u
+                 LEFT JOIN tenants t ON u.tenant_id = t.id
+                 WHERE u.id = ? AND u.tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+        }
 
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
@@ -254,6 +291,8 @@ class AdminUsersApiController extends BaseApiController
             'balance' => (float) ($user['balance'] ?? 0),
             'profile_type' => $user['profile_type'] ?? 'individual',
             'organization_name' => $user['organization_name'] ?? null,
+            'tenant_id' => (int) $user['tenant_id'],
+            'tenant_name' => $user['tenant_name'] ?? 'Unknown',
             'badges' => $badges,
             'vetting_status' => $user['vetting_status'] ?? 'none',
             'insurance_status' => $user['insurance_status'] ?? 'none',
@@ -385,13 +424,23 @@ class AdminUsersApiController extends BaseApiController
     public function update(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
+
+        // Regular admins can only update users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Use the user's own tenant_id for the UPDATE query (safety)
+        $userTenantId = (int) $user['tenant_id'];
 
         $input = $this->getAllInput();
 
@@ -464,14 +513,14 @@ class AdminUsersApiController extends BaseApiController
         }
 
         $params[] = $id;
-        $params[] = $tenantId;
+        $params[] = $userTenantId;
 
         Database::query(
             "UPDATE users SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?",
             $params
         );
 
-        ActivityLog::log($adminId, 'admin_update_user', "Updated user #{$id}");
+        ActivityLog::log($adminId, 'admin_update_user', "Updated user #{$id}" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
 
         // Audit log: track which fields changed
         $changedFields = array_keys($input);
@@ -492,6 +541,7 @@ class AdminUsersApiController extends BaseApiController
     public function destroy(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         // Prevent self-deletion
@@ -501,7 +551,13 @@ class AdminUsersApiController extends BaseApiController
         }
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Regular admins can only delete users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
@@ -512,9 +568,12 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        Database::query("DELETE FROM users WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        // Use the user's own tenant_id for the DELETE query (safety)
+        $userTenantId = (int) $user['tenant_id'];
 
-        ActivityLog::log($adminId, 'admin_delete_user', "Deleted user #{$id} ({$user['email']})");
+        Database::query("DELETE FROM users WHERE id = ? AND tenant_id = ?", [$id, $userTenantId]);
+
+        ActivityLog::log($adminId, 'admin_delete_user', "Deleted user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
         AuditLogService::logUserDeleted($adminId, $id, $user['email']);
 
         $this->respondWithData(['deleted' => true, 'id' => $id]);
@@ -526,17 +585,24 @@ class AdminUsersApiController extends BaseApiController
     public function approve(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Regular admins can only approve users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
 
         User::updateAdminFields($id, $user['role'] ?? 'member', 1);
 
-        ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']})");
+        ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$user['tenant_id']})" : ''));
         AuditLogService::logUserApproved($adminId, $id, $user['email']);
 
         $this->respondWithData(['approved' => true, 'id' => $id]);
@@ -550,6 +616,7 @@ class AdminUsersApiController extends BaseApiController
     public function suspend(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         if ($id === $adminId) {
@@ -558,7 +625,13 @@ class AdminUsersApiController extends BaseApiController
         }
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Regular admins can only suspend users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
@@ -568,15 +641,18 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
+        // Use the user's own tenant_id for the UPDATE query (safety)
+        $userTenantId = (int) $user['tenant_id'];
+
         $input = $this->getAllInput();
         $reason = $input['reason'] ?? 'Suspended by admin';
 
         Database::query(
             "UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $userTenantId]
         );
 
-        ActivityLog::log($adminId, 'admin_suspend_user', "Suspended user #{$id}: {$reason}");
+        ActivityLog::log($adminId, 'admin_suspend_user', "Suspended user #{$id}: {$reason}" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
         AuditLogService::logUserSuspended($adminId, $id, $reason);
 
         $this->respondWithData(['suspended' => true, 'id' => $id]);
@@ -590,6 +666,7 @@ class AdminUsersApiController extends BaseApiController
     public function ban(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         if ($id === $adminId) {
@@ -598,7 +675,13 @@ class AdminUsersApiController extends BaseApiController
         }
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Regular admins can only ban users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
@@ -608,15 +691,18 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
+        // Use the user's own tenant_id for the UPDATE query (safety)
+        $userTenantId = (int) $user['tenant_id'];
+
         $input = $this->getAllInput();
         $reason = $input['reason'] ?? 'Banned by admin';
 
         Database::query(
             "UPDATE users SET status = 'banned' WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $userTenantId]
         );
 
-        ActivityLog::log($adminId, 'admin_ban_user', "Banned user #{$id}: {$reason}");
+        ActivityLog::log($adminId, 'admin_ban_user', "Banned user #{$id}: {$reason}" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
         AuditLogService::logUserBanned($adminId, $id, $reason);
 
         $this->respondWithData(['banned' => true, 'id' => $id]);
@@ -628,20 +714,30 @@ class AdminUsersApiController extends BaseApiController
     public function reactivate(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
 
+        // Regular admins can only reactivate users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Use the user's own tenant_id for the UPDATE query (safety)
+        $userTenantId = (int) $user['tenant_id'];
+
         Database::query(
             "UPDATE users SET status = 'active', is_approved = 1 WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $userTenantId]
         );
 
-        ActivityLog::log($adminId, 'admin_reactivate_user', "Reactivated user #{$id} ({$user['email']})");
+        ActivityLog::log($adminId, 'admin_reactivate_user', "Reactivated user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
         AuditLogService::logUserReactivated($adminId, $id, $user['status'] ?? 'unknown');
 
         $this->respondWithData(['reactivated' => true, 'id' => $id]);
@@ -655,13 +751,23 @@ class AdminUsersApiController extends BaseApiController
     public function reset2fa(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
+
+        // Regular admins can only reset 2FA for users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Use the user's own tenant_id for all writes (safety)
+        $userTenantId = (int) $user['tenant_id'];
 
         $input = $this->getAllInput();
         $reason = $input['reason'] ?? 'Reset by admin';
@@ -670,21 +776,21 @@ class AdminUsersApiController extends BaseApiController
         try {
             Database::query(
                 "DELETE FROM user_totp_settings WHERE user_id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                [$id, $userTenantId]
             );
             Database::query(
                 "DELETE FROM user_backup_codes WHERE user_id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                [$id, $userTenantId]
             );
             // Clear the quick-check flag on users table
             Database::query(
                 "UPDATE users SET totp_enabled = 0 WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                [$id, $userTenantId]
             );
             // Revoke all trusted devices
             Database::query(
                 "UPDATE user_trusted_devices SET is_revoked = 1, revoked_at = NOW(), revoked_reason = 'admin_reset' WHERE user_id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                [$id, $userTenantId]
             );
         } catch (\Throwable $e) {
             error_log("[AdminUsers] Failed to reset 2FA for user #{$id}: " . $e->getMessage());
@@ -692,7 +798,7 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        ActivityLog::log($adminId, 'admin_reset_2fa', "Reset 2FA for user #{$id}: {$reason}");
+        ActivityLog::log($adminId, 'admin_reset_2fa', "Reset 2FA for user #{$id}: {$reason}" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
         AuditLogService::log2faReset($adminId, $id, $reason);
 
         $this->respondWithData(['reset' => true, 'id' => $id]);
@@ -707,10 +813,17 @@ class AdminUsersApiController extends BaseApiController
     public function addBadge(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Regular admins can only add badges for users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
@@ -726,7 +839,7 @@ class AdminUsersApiController extends BaseApiController
         try {
             \Nexus\Services\GamificationService::awardBadgeByKey($id, $badgeSlug);
 
-            ActivityLog::log($adminId, 'admin_award_badge', "Awarded badge '{$badgeSlug}' to user #{$id}");
+            ActivityLog::log($adminId, 'admin_award_badge', "Awarded badge '{$badgeSlug}' to user #{$id}" . ($isSuperAdmin ? " (tenant {$user['tenant_id']})" : ''));
 
             $this->respondWithData([
                 'awarded' => true,
@@ -746,18 +859,28 @@ class AdminUsersApiController extends BaseApiController
     public function removeBadge(int $id, int $badgeId): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
 
+        // Regular admins can only remove badges for users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Use the user's own tenant_id for badge queries (safety)
+        $userTenantId = (int) $user['tenant_id'];
+
         try {
             $badge = Database::query(
                 "SELECT * FROM user_badges WHERE id = ? AND user_id = ? AND tenant_id = ?",
-                [$badgeId, $id, $tenantId]
+                [$badgeId, $id, $userTenantId]
             )->fetch();
 
             if (!$badge) {
@@ -765,9 +888,9 @@ class AdminUsersApiController extends BaseApiController
                 return;
             }
 
-            Database::query("DELETE FROM user_badges WHERE id = ? AND user_id = ? AND tenant_id = ?", [$badgeId, $id, $tenantId]);
+            Database::query("DELETE FROM user_badges WHERE id = ? AND user_id = ? AND tenant_id = ?", [$badgeId, $id, $userTenantId]);
 
-            ActivityLog::log($adminId, 'admin_remove_badge', "Removed badge #{$badgeId} from user #{$id}");
+            ActivityLog::log($adminId, 'admin_remove_badge', "Removed badge #{$badgeId} from user #{$id}" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
 
             $this->respondWithData(['removed' => true, 'user_id' => $id, 'badge_id' => $badgeId]);
         } catch (\Throwable $e) {
@@ -940,10 +1063,17 @@ class AdminUsersApiController extends BaseApiController
     public function impersonate(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Regular admins can only impersonate users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
@@ -960,13 +1090,16 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
+        // Use the user's own tenant_id for the token (so the impersonated session is in the correct tenant)
+        $userTenantId = (int) $user['tenant_id'];
+
         try {
             // Generate an access token for the target user with impersonation claim
-            $token = \Nexus\Services\TokenService::generateToken($id, $tenantId, [
+            $token = \Nexus\Services\TokenService::generateToken($id, $userTenantId, [
                 'impersonated_by' => $adminId,
             ]);
 
-            ActivityLog::log($adminId, 'admin_impersonate', "Impersonated user #{$id} ({$user['email']})");
+            ActivityLog::log($adminId, 'admin_impersonate', "Impersonated user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
             AuditLogService::logUserImpersonated($adminId, $id, $user['email']);
 
             $this->respondWithData([
@@ -989,15 +1122,11 @@ class AdminUsersApiController extends BaseApiController
     public function setSuperAdmin(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         // Only super admins can grant/revoke super admin status
-        $admin = Database::query(
-            "SELECT is_super_admin FROM users WHERE id = ?",
-            [$adminId]
-        )->fetch();
-
-        if (empty($admin['is_super_admin'])) {
+        if (!$isSuperAdmin) {
             $this->respondWithError(ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 'Only super admins can manage super admin status', null, 403);
             return;
         }
@@ -1011,9 +1140,10 @@ class AdminUsersApiController extends BaseApiController
         $grant = (bool) ($this->input('grant', false));
 
         try {
+            // Super admins can manage users across all tenants
             $user = Database::query(
-                "SELECT id, email, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                "SELECT id, email, first_name, last_name, tenant_id FROM users WHERE id = ?",
+                [$id]
             )->fetch();
 
             if (!$user) {
@@ -1027,7 +1157,7 @@ class AdminUsersApiController extends BaseApiController
             );
 
             $action = $grant ? 'grant_super_admin' : 'revoke_super_admin';
-            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " super admin for user #{$id}: {$user['email']}");
+            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " super admin for user #{$id}: {$user['email']} (tenant {$user['tenant_id']})");
             if ($grant) {
                 AuditLogService::logAdminAction('grant_super_admin', $adminId, $id, ['email' => $user['email']]);
             } else {
@@ -1048,10 +1178,17 @@ class AdminUsersApiController extends BaseApiController
     public function recheckBadges(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Regular admins can only recheck badges for users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
@@ -1059,7 +1196,7 @@ class AdminUsersApiController extends BaseApiController
         try {
             \Nexus\Services\GamificationService::runAllBadgeChecks($id);
 
-            ActivityLog::log($adminId, 'admin_recheck_badges', "Rechecked badges for user #{$id} ({$user['email']})");
+            ActivityLog::log($adminId, 'admin_recheck_badges', "Rechecked badges for user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$user['tenant_id']})" : ''));
 
             // Fetch updated badges
             $badgeRows = Database::query(
@@ -1099,16 +1236,26 @@ class AdminUsersApiController extends BaseApiController
     public function getConsents(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
 
+        // Regular admins can only view consents for users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Use the user's own tenant_id for the GDPR service
+        $userTenantId = (int) $user['tenant_id'];
+
         try {
-            $gdprService = new \Nexus\Services\Enterprise\GdprService($tenantId);
+            $gdprService = new \Nexus\Services\Enterprise\GdprService($userTenantId);
             $consents = $gdprService->getUserConsents($id);
 
             $formatted = array_map(function ($c) {
@@ -1141,13 +1288,23 @@ class AdminUsersApiController extends BaseApiController
     public function setPassword(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
+
+        // Regular admins can only set passwords for users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Use the user's own tenant_id for the UPDATE query (safety)
+        $userTenantId = (int) $user['tenant_id'];
 
         $input = $this->getAllInput();
         $password = $input['password'] ?? '';
@@ -1161,10 +1318,10 @@ class AdminUsersApiController extends BaseApiController
 
         Database::query(
             "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
-            [$hashed, $id, $tenantId]
+            [$hashed, $id, $userTenantId]
         );
 
-        ActivityLog::log($adminId, 'admin_set_password', "Admin set password for user #{$id} ({$user['email']})");
+        ActivityLog::log($adminId, 'admin_set_password', "Admin set password for user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
         AuditLogService::logAdminAction('admin_set_password', $adminId, $id, ['email' => $user['email']]);
 
         $this->respondWithData(['password_set' => true, 'id' => $id]);
@@ -1178,13 +1335,23 @@ class AdminUsersApiController extends BaseApiController
     public function sendPasswordReset(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
+
+        // Regular admins can only send password resets for users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Use the user's own tenant_id for the UPDATE query (safety)
+        $userTenantId = (int) $user['tenant_id'];
 
         try {
             $token = bin2hex(random_bytes(32));
@@ -1192,7 +1359,7 @@ class AdminUsersApiController extends BaseApiController
 
             Database::query(
                 "UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ? AND tenant_id = ?",
-                [$token, $expiry, $id, $tenantId]
+                [$token, $expiry, $id, $userTenantId]
             );
 
             $tenant = TenantContext::get();
@@ -1213,7 +1380,7 @@ class AdminUsersApiController extends BaseApiController
             $mailer = new \Nexus\Core\Mailer();
             $mailer->send($user['email'], "Password Reset - {$tenantName}", $html);
 
-            ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
+            ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
 
             $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
@@ -1229,10 +1396,17 @@ class AdminUsersApiController extends BaseApiController
     public function sendWelcomeEmail(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $user = User::findById($id);
-        if (!$user || $user['tenant_id'] != $tenantId) {
+        if (!$user) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return;
+        }
+
+        // Regular admins can only send welcome emails to users in their own tenant
+        if (!$isSuperAdmin && $user['tenant_id'] != $tenantId) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
@@ -1273,7 +1447,7 @@ class AdminUsersApiController extends BaseApiController
             $mailer = new \Nexus\Core\Mailer();
             $mailer->send($user['email'], $subject, $html);
 
-            ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})");
+            ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$user['tenant_id']})" : ''));
 
             $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
