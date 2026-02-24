@@ -529,7 +529,7 @@ class RegistrationApiController extends BaseApiController
     {
         try {
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-            $adminLink = TenantContext::getFrontendUrl() . '/admin/users/' . $userId;
+            $adminLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . '/admin/users/' . $userId;
 
             // Collect notification recipients: all active admins for this tenant
             // (includes all admin roles: admin, super_admin, tenant_admin, tenant_super_admin)
