@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Chip } from '@heroui/react';
 import {
@@ -21,7 +21,9 @@ import {
 } from 'lucide-react';
 import PageHeader from '../../../components/PageHeader';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { tenantPath } from '@/lib/tenant-routing';
+import { useToast, useTenant } from '@/contexts';
+import { adminSuper } from '../../../api/adminApi';
+import type { FederationStatusOverview } from '../../../api/types';
 
 interface FederationStats {
   system: {
@@ -75,19 +77,74 @@ interface FederationStats {
   };
 }
 
+function mapOverviewToStats(overview: FederationStatusOverview): FederationStats {
+  const sc = overview.system_controls;
+  const ps = overview.partnership_stats;
+  return {
+    system: {
+      enabled: sc.federation_enabled,
+      whitelist_mode: sc.whitelist_mode_enabled,
+      lockdown_active: sc.is_locked_down,
+      lockdown_reason: sc.lockdown_reason,
+    },
+    counts: {
+      whitelisted_tenants: overview.whitelisted_count,
+      active_partnerships: ps.active,
+      pending_partnerships: ps.pending,
+    },
+    features: {
+      profiles: sc.cross_tenant_profiles_enabled,
+      messaging: sc.cross_tenant_messaging_enabled,
+      transactions: sc.cross_tenant_transactions_enabled,
+      listings: sc.cross_tenant_listings_enabled,
+      events: sc.cross_tenant_events_enabled,
+      groups: sc.cross_tenant_groups_enabled,
+    },
+    recent_partnerships: [],
+    whitelisted_tenants: [],
+    critical_events: overview.recent_audit
+      .filter(e => e.action_type?.includes('lockdown') || e.action_type?.includes('emergency'))
+      .slice(0, 5)
+      .map(e => ({ action: e.action_type || '', actor: e.actor_name || 'System', timestamp: e.created_at })),
+    recent_activity: overview.recent_audit.slice(0, 5).map(e => ({
+      action: e.action_type || '',
+      description: e.description || '',
+      timestamp: e.created_at,
+    })),
+    analytics: {
+      total_transactions: 0,
+      total_messages: 0,
+      active_partnerships_30d: ps.active,
+    },
+  };
+}
+
 export default function FederationControls() {
   usePageTitle('Federation Controls');
-  const [stats] = useState<FederationStats | null>(null);
+  const toast = useToast();
+  const { tenantPath } = useTenant();
+  const [stats, setStats] = useState<FederationStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // TODO: Replace with adminApi.getFederationStats()
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const res = await adminSuper.getFederationStatus();
+    if (res.success && res.data) {
+      setStats(mapOverviewToStats(res.data));
+    }
     setLoading(false);
   }, []);
 
+  useEffect(() => { loadData(); }, [loadData]);
+
   const handleLiftLockdown = async () => {
-    // TODO: Replace with adminApi.liftLockdown()
-    console.log('Lift lockdown');
+    const res = await adminSuper.liftLockdown();
+    if (res.success) {
+      toast.success('Emergency lockdown lifted');
+      loadData();
+    } else {
+      toast.error(res.error || 'Failed to lift lockdown');
+    }
   };
 
   if (loading) {
@@ -231,7 +288,7 @@ export default function FederationControls() {
           <h3 className="text-lg font-semibold">Whitelisted Tenants</h3>
           <Button
             as={Link}
-            to={tenantPath('/admin/super/federation/whitelist', null)}
+            to={tenantPath('/admin/super/federation/whitelist')}
             size="sm"
             color="primary"
             variant="flat"
@@ -275,7 +332,7 @@ export default function FederationControls() {
           <h3 className="text-lg font-semibold">Recent Partnerships</h3>
           <Button
             as={Link}
-            to={tenantPath('/admin/super/federation/partnerships', null)}
+            to={tenantPath('/admin/super/federation/partnerships')}
             size="sm"
             color="primary"
             variant="flat"
@@ -433,7 +490,7 @@ export default function FederationControls() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Button
               as={Link}
-              to={tenantPath('/admin/super/federation/system-controls', null)}
+              to={tenantPath('/admin/super/federation/system-controls')}
               className="h-auto py-6"
               variant="flat"
               color="primary"
@@ -445,7 +502,7 @@ export default function FederationControls() {
             </Button>
             <Button
               as={Link}
-              to={tenantPath('/admin/super/federation/whitelist', null)}
+              to={tenantPath('/admin/super/federation/whitelist')}
               className="h-auto py-6"
               variant="flat"
               color="primary"
@@ -457,7 +514,7 @@ export default function FederationControls() {
             </Button>
             <Button
               as={Link}
-              to={tenantPath('/admin/super/federation/partnerships', null)}
+              to={tenantPath('/admin/super/federation/partnerships')}
               className="h-auto py-6"
               variant="flat"
               color="primary"
@@ -469,7 +526,7 @@ export default function FederationControls() {
             </Button>
             <Button
               as={Link}
-              to={tenantPath('/admin/super/federation/audit', null)}
+              to={tenantPath('/admin/super/federation/audit')}
               className="h-auto py-6"
               variant="flat"
               color="primary"

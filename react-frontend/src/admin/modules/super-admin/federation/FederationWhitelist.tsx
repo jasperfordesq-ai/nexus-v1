@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Card,
@@ -18,8 +18,9 @@ import { Plus, Trash2 } from 'lucide-react';
 import PageHeader from '../../../components/PageHeader';
 import ConfirmModal from '../../../components/ConfirmModal';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { useToast } from '@/contexts/ToastContext';
-import { tenantPath } from '@/lib/tenant-routing';
+import { useToast, useTenant } from '@/contexts';
+import { adminSuper } from '../../../api/adminApi';
+import type { FederationWhitelistEntry, SuperAdminTenant } from '../../../api/types';
 
 interface WhitelistEntry {
   id: number;
@@ -37,20 +38,47 @@ interface Tenant {
   domain: string;
 }
 
+function mapWhitelistEntry(e: FederationWhitelistEntry): WhitelistEntry {
+  return {
+    id: e.tenant_id,
+    tenant_id: e.tenant_id,
+    tenant_name: e.tenant_name,
+    domain: e.tenant_domain || '',
+    approved_by_name: String(e.added_by),
+    approved_at: e.added_at,
+    notes: e.notes,
+  };
+}
+
 export default function FederationWhitelist() {
   usePageTitle('Federation Whitelist');
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const [entries, setEntries] = useState<WhitelistEntry[]>([]);
-  const [availableTenants] = useState<Tenant[]>([]);
+  const [availableTenants, setAvailableTenants] = useState<Tenant[]>([]);
   const [selectedTenantId, setSelectedTenantId] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState<number | null>(null);
 
-  useEffect(() => {
-    // TODO: Replace with adminApi.listWhitelist() and adminApi.getAvailableTenants()
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const [whitelistRes, tenantsRes] = await Promise.all([
+      adminSuper.getWhitelist(),
+      adminSuper.listTenants(),
+    ]);
+    if (whitelistRes.success && whitelistRes.data) {
+      const mapped = (Array.isArray(whitelistRes.data) ? whitelistRes.data : []).map(mapWhitelistEntry);
+      setEntries(mapped);
+    }
+    if (tenantsRes.success && tenantsRes.data) {
+      const tenants = (Array.isArray(tenantsRes.data) ? tenantsRes.data : []) as SuperAdminTenant[];
+      setAvailableTenants(tenants.map(t => ({ id: t.id, name: t.name, domain: t.domain || '' })));
+    }
     setLoading(false);
   }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
 
   const handleAdd = async () => {
     if (!selectedTenantId) {
@@ -58,17 +86,27 @@ export default function FederationWhitelist() {
       return;
     }
 
-    // TODO: Replace with adminApi.addToWhitelist(parseInt(selectedTenantId), notes)
-    toast.success('Tenant added to whitelist');
-    setSelectedTenantId('');
-    setNotes('');
+    const res = await adminSuper.addToWhitelist(parseInt(selectedTenantId), notes || undefined);
+    if (res.success) {
+      toast.success('Tenant added to whitelist');
+      setSelectedTenantId('');
+      setNotes('');
+      loadData();
+    } else {
+      toast.error(res.error || 'Failed to add tenant to whitelist');
+    }
   };
 
-  const handleRemove = async (id: number) => {
-    // TODO: Replace with adminApi.removeFromWhitelist(id)
-    setEntries(prev => prev.filter(e => e.id !== id));
-    setRemoving(null);
-    toast.success('Tenant removed from whitelist');
+  const handleRemove = async (tenantId: number) => {
+    const res = await adminSuper.removeFromWhitelist(tenantId);
+    if (res.success) {
+      setEntries(prev => prev.filter(e => e.tenant_id !== tenantId));
+      setRemoving(null);
+      toast.success('Tenant removed from whitelist');
+    } else {
+      toast.error(res.error || 'Failed to remove tenant');
+      setRemoving(null);
+    }
   };
 
   if (loading) {
@@ -152,7 +190,7 @@ export default function FederationWhitelist() {
                     <tr key={entry.id} className="border-b border-default-100">
                       <td className="py-3 px-4">
                         <Link
-                          to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`, null)}
+                          to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
                           className="text-primary hover:underline"
                         >
                           {entry.tenant_name}
@@ -170,7 +208,7 @@ export default function FederationWhitelist() {
                         <div className="flex items-center gap-2">
                           <Button
                             as={Link}
-                            to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`, null)}
+                            to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
                             size="sm"
                             variant="flat"
                             color="primary"
@@ -181,7 +219,7 @@ export default function FederationWhitelist() {
                             size="sm"
                             variant="flat"
                             color="danger"
-                            onPress={() => setRemoving(entry.id)}
+                            onPress={() => setRemoving(entry.tenant_id)}
                             startContent={<Trash2 className="w-4 h-4" />}
                           >
                             Remove
@@ -200,7 +238,7 @@ export default function FederationWhitelist() {
       </Card>
 
       {/* Remove Confirmation Modal */}
-      {removing && (
+      {removing !== null && (
         <ConfirmModal
           isOpen={true}
           onClose={() => setRemoving(null)}

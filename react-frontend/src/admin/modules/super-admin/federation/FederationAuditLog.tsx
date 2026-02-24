@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import {
   Card,
   CardBody,
@@ -22,6 +22,8 @@ import {
 import { AlertTriangle, AlertCircle, Info, Search, X, FileText } from 'lucide-react';
 import PageHeader from '../../../components/PageHeader';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { adminSuper } from '../../../api/adminApi';
+import type { SuperAuditEntry } from '../../../api/types';
 
 interface AuditEntry {
   id: number;
@@ -45,10 +47,36 @@ interface Stats {
   info: number;
 }
 
+function classifyLevel(actionType: string): 'critical' | 'warning' | 'info' {
+  if (actionType.includes('lockdown') || actionType.includes('emergency') || actionType.includes('terminate')) return 'critical';
+  if (actionType.includes('suspend') || actionType.includes('revoke') || actionType.includes('remove')) return 'warning';
+  return 'info';
+}
+
+function classifyCategory(targetType: string): string {
+  if (targetType.includes('partnership')) return 'partnership';
+  if (targetType.includes('whitelist')) return 'whitelist';
+  if (targetType.includes('feature')) return 'feature';
+  if (targetType.includes('system') || targetType.includes('federation')) return 'system';
+  return 'system';
+}
+
+function mapAuditEntry(e: SuperAuditEntry): AuditEntry {
+  return {
+    id: e.id,
+    level: classifyLevel(e.action_type),
+    action: e.action_type,
+    category: classifyCategory(e.target_type),
+    actor_name: e.actor_name,
+    data: e.new_value as Record<string, unknown> | undefined,
+    created_at: e.created_at,
+  };
+}
+
 export default function FederationAuditLog() {
   usePageTitle('Federation Audit Log');
-  const [entries] = useState<AuditEntry[]>([]);
-  const [stats] = useState<Stats>({ total: 0, critical: 0, warnings: 0, info: 0 });
+  const [entries, setEntries] = useState<AuditEntry[]>([]);
+  const [stats, setStats] = useState<Stats>({ total: 0, critical: 0, warnings: 0, info: 0 });
   const [filters, setFilters] = useState({
     level: 'all',
     category: 'all',
@@ -58,11 +86,45 @@ export default function FederationAuditLog() {
   });
   const [selectedEntry, setSelectedEntry] = useState<AuditEntry | null>(null);
   const [loading, setLoading] = useState(true);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  useEffect(() => {
-    // TODO: Replace with adminApi.getFederationAudit(filters)
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const res = await adminSuper.getAudit({
+      target_type: 'federation',
+      search: filters.search || undefined,
+      date_from: filters.from || undefined,
+      date_to: filters.to || undefined,
+      limit: 100,
+    });
+    if (res.success && res.data) {
+      const raw = Array.isArray(res.data) ? res.data : [];
+      let mapped = raw.map(mapAuditEntry);
+
+      // Apply client-side level/category filters
+      if (filters.level !== 'all') {
+        mapped = mapped.filter(e => e.level === filters.level);
+      }
+      if (filters.category !== 'all') {
+        mapped = mapped.filter(e => e.category === filters.category);
+      }
+
+      setEntries(mapped);
+      setStats({
+        total: mapped.length,
+        critical: mapped.filter(e => e.level === 'critical').length,
+        warnings: mapped.filter(e => e.level === 'warning').length,
+        info: mapped.filter(e => e.level === 'info').length,
+      });
+    }
     setLoading(false);
   }, [filters]);
+
+  useEffect(() => {
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(loadData, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [loadData]);
 
   const getLevelIcon = (level: string) => {
     switch (level) {
