@@ -378,7 +378,16 @@ class UserService
             return true; // Nothing to update
         }
 
-        User::update($userId, $updateData);
+        $updated = User::update($userId, $updateData);
+
+        if (!$updated) {
+            self::$errors[] = [
+                'code' => 'UPDATE_FAILED',
+                'message' => 'Failed to update profile in database',
+                'field' => 'profile'
+            ];
+            return false;
+        }
 
         return true;
     }

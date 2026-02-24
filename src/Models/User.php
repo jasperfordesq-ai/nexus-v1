@@ -279,7 +279,7 @@ class User
      * Allows partial updates without overwriting other fields.
      * Security: Only allows whitelisted fields to prevent mass assignment vulnerabilities
      */
-    public static function update($id, $data)
+    public static function update($id, $data): bool
     {
         $tenantId = TenantContext::getId();
 
@@ -318,15 +318,18 @@ class User
         }
 
         if (empty($fields)) {
-            return;
+            return true; // Nothing to update
         }
 
         // Handle users with NULL tenant_id (super admins / legacy users)
-        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL)";
+        // Also allow super admins who have tenant_id = 1 (master) but may be
+        // logged in cross-tenant via a different tenant's URL.
+        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL OR is_super_admin = 1)";
         $params[] = $id;
         $params[] = $tenantId;
 
-        Database::query($sql, $params);
+        $stmt = Database::query($sql, $params);
+        return $stmt->rowCount() > 0;
     }
 
     public static function getAll()
