@@ -35,22 +35,24 @@ import {
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useToast } from '@/contexts/ToastContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { adminSuper } from '@/admin/api/adminApi';
 import { PageHeader } from '@/admin/components/PageHeader';
 import { DataTable, StatusBadge, type Column } from '@/admin/components/DataTable';
 import { ConfirmModal } from '@/admin/components/ConfirmModal';
-import type { SuperAdminTenant, SuperAdminUser } from '@/admin/api/types';
+import type { SuperAdminTenant, SuperAdminUser, SuperAdminTenantDetail } from '@/admin/api/types';
 
 export function TenantShow() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [reactivateModalOpen, setReactivateModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  const { data: tenant, isLoading, error, execute } = useApi<any>(
+  const { data: tenant, isLoading, error, execute } = useApi<SuperAdminTenantDetail>(
     `/v2/admin/super/tenants/${id}`,
     { immediate: true, deps: [id] }
   );
@@ -63,7 +65,7 @@ export function TenantShow() {
       const response = await adminSuper.deleteTenant(Number(id));
       if (response.success) {
         toast.success('Tenant deleted successfully');
-        navigate(('/admin/super/tenants'));
+        navigate(tenantPath('/admin/super/tenants'));
       } else {
         toast.error(response.error || 'Failed to delete tenant');
       }
@@ -117,7 +119,7 @@ export function TenantShow() {
       label: 'Name',
       render: (t) => (
         <Link
-          to={(`/admin/super/tenants/${t.id}`)}
+          to={tenantPath(`/admin/super/tenants/${t.id}`)}
           className="text-primary hover:underline font-medium"
         >
           {t.name}
@@ -197,11 +199,11 @@ export function TenantShow() {
       {/* Breadcrumbs */}
       {tenant.breadcrumb && tenant.breadcrumb.length > 0 && (
         <nav className="mb-4 flex items-center gap-2 text-sm text-default-500">
-          {tenant.breadcrumb.map((crumb: any, idx: number) => (
+          {tenant.breadcrumb.map((crumb, idx) => (
             <span key={crumb.id} className="flex items-center gap-2">
               {idx > 0 && <span>/</span>}
               <Link
-                to={`/admin/super/tenants/${crumb.id}`}
+                to={tenantPath(`/admin/super/tenants/${crumb.id}`)}
                 className="hover:text-primary"
               >
                 {crumb.name}
@@ -227,7 +229,7 @@ export function TenantShow() {
             )}
             <Button
               as={Link}
-              to={(`/admin/super/tenants/${tenant.id}/edit`)}
+              to={tenantPath(`/admin/super/tenants/${tenant.id}/edit`)}
               color="primary"
               startContent={<Edit size={16} />}
             >
@@ -430,7 +432,7 @@ export function TenantShow() {
             <CardBody className="gap-2">
               <Button
                 as={Link}
-                to={(`/admin/super/users/create?tenant_id=${tenant.id}`)}
+                to={tenantPath(`/admin/super/users/create?tenant_id=${tenant.id}`)}
                 variant="flat"
                 startContent={<UserPlus size={16} />}
                 className="w-full justify-start"
@@ -439,7 +441,7 @@ export function TenantShow() {
               </Button>
               <Button
                 as={Link}
-                to={(`/admin/super/tenants/create?parent_id=${tenant.id}`)}
+                to={tenantPath(`/admin/super/tenants/create?parent_id=${tenant.id}`)}
                 variant="flat"
                 startContent={<Building2 size={16} />}
                 className="w-full justify-start"

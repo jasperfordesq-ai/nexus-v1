@@ -88,7 +88,7 @@ export function SuperUserForm() {
       if (isEditing) {
         navigate(tenantPath(`/admin/super/users/${id}`));
       } else {
-        const newId = (res as { data?: { id?: number } }).data?.id;
+        const newId = (res as { data?: { user_id?: number } }).data?.user_id;
         navigate(tenantPath(newId ? `/admin/super/users/${newId}` : '/admin/super/users'));
       }
     } else {

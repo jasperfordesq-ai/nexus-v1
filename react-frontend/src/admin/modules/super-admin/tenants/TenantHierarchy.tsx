@@ -37,6 +37,7 @@ import {
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useToast } from '@/contexts/ToastContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { adminSuper } from '@/admin/api/adminApi';
 import { PageHeader } from '@/admin/components/PageHeader';
 import { StatusBadge } from '@/admin/components/DataTable';
@@ -52,6 +53,7 @@ interface TreeState {
 export function TenantHierarchy() {
   usePageTitle('Tenant Hierarchy - Super Admin');
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   // State
   const [search, setSearch] = useState('');
@@ -220,7 +222,7 @@ export function TenantHierarchy() {
 
     // Validate: target must be a hub
     if (!targetNode.allows_subtenants) {
-      alert('Target tenant must be a hub (allows sub-tenants)');
+      toast.error('Target tenant must be a hub (allows sub-tenants)');
       setDraggedNode(null);
       return;
     }
@@ -233,7 +235,7 @@ export function TenantHierarchy() {
     };
 
     if (isDescendant(draggedNode, targetNode.id)) {
-      alert('Cannot move a tenant to one of its own descendants');
+      toast.error('Cannot move a tenant to one of its own descendants');
       setDraggedNode(null);
       return;
     }
@@ -295,7 +297,7 @@ export function TenantHierarchy() {
 
           {/* Name */}
           <Link
-            to={(`/admin/super/tenants/${node.id}`)}
+            to={tenantPath(`/admin/super/tenants/${node.id}`)}
             className="font-medium text-foreground hover:text-primary flex-1"
           >
             {node.name}

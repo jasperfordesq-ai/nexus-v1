@@ -26,15 +26,17 @@ import { Save, X, AlertTriangle, Building2, Globe, Settings, FileText, MapPin } 
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useToast } from '@/contexts/ToastContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { adminSuper } from '@/admin/api/adminApi';
 import { PageHeader } from '@/admin/components/PageHeader';
 import { ConfirmModal } from '@/admin/components/ConfirmModal';
-import type { CreateTenantPayload, UpdateTenantPayload } from '@/admin/api/types';
+import type { CreateTenantPayload, UpdateTenantPayload, SuperAdminTenantDetail, SuperAdminTenant } from '@/admin/api/types';
 
 export function TenantForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const isEdit = !!id;
 
   usePageTitle(isEdit ? 'Edit Tenant - Super Admin' : 'Create Tenant - Super Admin');
@@ -82,13 +84,13 @@ export function TenantForm() {
   const [submitting, setSubmitting] = useState(false);
 
   // Load tenant for edit
-  const { data: tenant, isLoading: tenantLoading } = useApi<any>(
+  const { data: tenant, isLoading: tenantLoading } = useApi<SuperAdminTenantDetail>(
     id ? `/v2/admin/super/tenants/${id}` : '',
     { immediate: !!id, deps: [id] }
   );
 
   // Load all tenants for parent selector and move
-  const { data: allTenants } = useApi<any[]>(
+  const { data: allTenants } = useApi<SuperAdminTenant[]>(
     '/v2/admin/super/tenants',
     { immediate: true, deps: [] }
   );
@@ -167,7 +169,7 @@ export function TenantForm() {
 
       if (response.success) {
         toast.success(isEdit ? 'Tenant updated successfully' : 'Tenant created successfully');
-        navigate('/admin/super/tenants');
+        navigate(tenantPath('/admin/super/tenants'));
       } else {
         toast.error(response.error || 'Failed to save tenant');
       }
@@ -185,7 +187,7 @@ export function TenantForm() {
       const response = await adminSuper.deleteTenant(Number(id));
       if (response.success) {
         toast.success('Tenant deleted successfully');
-        navigate('/admin/super/tenants');
+        navigate(tenantPath('/admin/super/tenants'));
       } else {
         toast.error(response.error || 'Failed to delete tenant');
       }
@@ -333,7 +335,7 @@ export function TenantForm() {
                   <Save size={16} />
                   Create Tenant
                 </Button>
-                <Button type="button" variant="light" onPress={() => navigate('/admin/super/tenants')}>
+                <Button type="button" variant="light" onPress={() => navigate(tenantPath('/admin/super/tenants'))}>
                   <X size={16} />
                   Cancel
                 </Button>
@@ -559,7 +561,7 @@ export function TenantForm() {
                   <Button
                     type="button"
                     variant="light"
-                    onPress={() => navigate('/admin/super/tenants')}
+                    onPress={() => navigate(tenantPath('/admin/super/tenants'))}
                     className="w-full"
                   >
                     <X size={16} />
