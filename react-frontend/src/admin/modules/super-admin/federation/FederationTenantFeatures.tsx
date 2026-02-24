@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Chip } from '@heroui/react';
 import { Users, MessageSquare, DollarSign, FileText, Calendar, UsersRound, AlertCircle, Shield } from 'lucide-react';
@@ -11,7 +11,8 @@ import PageHeader from '../../../components/PageHeader';
 import { useTenant } from '@/contexts/TenantContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
-import { tenantPath } from '@/lib/tenant-routing';
+import { adminSuper } from '../../../api/adminApi';
+import type { TenantFederationFeatures as TenantFederationFeaturesType, FederationPartnership } from '../../../api/types';
 
 interface TenantInfo {
   id: number;
@@ -41,11 +42,23 @@ interface Partnership {
   created_at: string;
 }
 
+function mapPartnership(p: FederationPartnership, currentTenantId: number): Partnership {
+  const isFirst = p.tenant_1_id === currentTenantId;
+  return {
+    id: p.id,
+    partner_id: isFirst ? p.tenant_2_id : p.tenant_1_id,
+    partner_name: isFirst ? p.tenant_2_name : p.tenant_1_name,
+    level: 1,
+    status: p.status,
+    created_at: p.created_at,
+  };
+}
+
 export default function FederationTenantFeatures() {
   const { tenantId } = useParams<{ tenantId: string }>();
-  useTenant();
+  const { tenantPath } = useTenant();
   const toast = useToast();
-  const [tenantInfo] = useState<TenantInfo | null>(null);
+  const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null);
   const [features, setFeatures] = useState<FeatureToggles>({
     profiles: false,
     messaging: false,
@@ -56,25 +69,57 @@ export default function FederationTenantFeatures() {
     analytics: false,
     webhooks: false,
   });
-  const [partnerships] = useState<Partnership[]>([]);
+  const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [loading, setLoading] = useState(true);
 
   usePageTitle(tenantInfo ? `${tenantInfo.name} - Federation Features` : 'Tenant Features');
 
-  useEffect(() => {
-    // TODO: Replace with adminApi.getTenantFeatures(tenantId)
+  const loadData = useCallback(async () => {
+    if (!tenantId) return;
+    setLoading(true);
+    const res = await adminSuper.getTenantFederationFeatures(Number(tenantId));
+    if (res.success && res.data) {
+      const data = res.data as TenantFederationFeaturesType;
+      setTenantInfo({
+        id: data.tenant_id,
+        name: data.tenant_name,
+        domain: '',
+        is_whitelisted: data.is_whitelisted,
+        partnerships_count: data.partnerships?.length || 0,
+      });
+      setFeatures({
+        profiles: data.features?.profiles ?? false,
+        messaging: data.features?.messaging ?? false,
+        transactions: data.features?.transactions ?? false,
+        listings: data.features?.listings ?? false,
+        events: data.features?.events ?? false,
+        groups: data.features?.groups ?? false,
+        analytics: data.features?.analytics ?? false,
+        webhooks: data.features?.webhooks ?? false,
+      });
+      if (data.partnerships) {
+        setPartnerships(data.partnerships.map(p => mapPartnership(p, data.tenant_id)));
+      }
+    }
     setLoading(false);
   }, [tenantId]);
+
+  useEffect(() => { loadData(); }, [loadData]);
 
   const handleToggleFeature = async (key: keyof FeatureToggles, value: boolean) => {
     if (!tenantInfo?.is_whitelisted) {
       toast.error('Tenant must be whitelisted to enable features');
       return;
     }
+    if (!tenantId) return;
 
-    // TODO: Replace with adminApi.updateTenantFeature(tenantId, key, value)
-    setFeatures(prev => ({ ...prev, [key]: value }));
-    toast.success(`${key} ${value ? 'enabled' : 'disabled'}`);
+    const res = await adminSuper.updateTenantFederationFeature(Number(tenantId), key, value);
+    if (res.success) {
+      setFeatures(prev => ({ ...prev, [key]: value }));
+      toast.success(`${key} ${value ? 'enabled' : 'disabled'}`);
+    } else {
+      toast.error(res.error || 'Failed to update feature');
+    }
   };
 
   const getLevelColor = (level: number) => {
@@ -257,7 +302,7 @@ export default function FederationTenantFeatures() {
                     <tr key={partnership.id} className="border-b border-default-100">
                       <td className="py-3 px-4">
                         <Link
-                          to={tenantPath(`/admin/super/federation/tenant/${partnership.partner_id}/features`, null)}
+                          to={tenantPath(`/admin/super/federation/tenant/${partnership.partner_id}/features`)}
                           className="text-primary hover:underline"
                         >
                           {partnership.partner_name}

@@ -189,12 +189,23 @@ class AdminSuperApiController extends BaseApiController
         $admins = TenantVisibilityService::getTenantAdmins($tenantId);
         $breadcrumb = Tenant::getBreadcrumb($tenantId);
 
-        $this->respondWithData([
-            'tenant' => $tenant,
+        // Decode features JSON for the frontend
+        $features = [];
+        if (!empty($tenant['features'])) {
+            $features = is_string($tenant['features'])
+                ? (json_decode($tenant['features'], true) ?: [])
+                : $tenant['features'];
+        }
+        unset($tenant['features']);
+
+        // Flatten: merge tenant fields with children/admins/breadcrumb at root level
+        // React SuperAdminTenantDetail expects all fields flat, not nested under 'tenant' key
+        $this->respondWithData(array_merge($tenant, [
+            'features' => $features,
             'children' => $children,
             'admins' => $admins,
             'breadcrumb' => $breadcrumb,
-        ]);
+        ]));
     }
 
     /**
@@ -390,8 +401,8 @@ class AdminSuperApiController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $userId = $this->extractId('users');
-        $user = User::findById($userId, false);
+        $targetUserId = $this->extractId('users');
+        $user = User::findById($targetUserId, false);
 
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
@@ -399,10 +410,12 @@ class AdminSuperApiController extends BaseApiController
 
         $tenant = Tenant::find($user['tenant_id']);
 
-        $this->respondWithData([
-            'user' => $user,
-            'tenant' => $tenant,
-        ]);
+        // Flatten: merge user fields with tenant_name at root level
+        // React SuperAdminUserDetail expects all fields flat, not nested under 'user' key
+        $this->respondWithData(array_merge($user, [
+            'tenant_name' => $tenant['name'] ?? null,
+            'name' => trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')),
+        ]));
     }
 
     /**
@@ -1000,15 +1013,16 @@ class AdminSuperApiController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $systemStatus = FederationFeatureService::getSystemControls();
+        $systemControls = FederationFeatureService::getSystemControls();
         $partnershipStats = FederationPartnershipService::getStats();
         $whitelistedTenants = FederationFeatureService::getWhitelistedTenants();
         $recentAudit = FederationAuditService::getLog(['limit' => 20]);
 
+        // Keys must match FederationStatusOverview TypeScript type
         $this->respondWithData([
-            'system_status' => $systemStatus,
+            'system_controls' => $systemControls,
             'partnership_stats' => $partnershipStats,
-            'whitelisted_tenants' => $whitelistedTenants,
+            'whitelisted_count' => count($whitelistedTenants),
             'recent_audit' => $recentAudit,
         ]);
     }
