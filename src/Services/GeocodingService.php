@@ -44,14 +44,11 @@ class GeocodingService
             return null;
         }
 
-        // Block URL-like inputs that could be SSRF attempts
-        if (preg_match('/^(https?|ftp|file|data|javascript|vbscript):/i', trim($address))) {
-            error_log("GeocodingService: Blocked potential SSRF attempt: " . substr($address, 0, 100));
-            return null;
-        }
-
-        // Block IP addresses (internal network probing)
-        if (preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($address))) {
+        // Whitelist approach: only allow letters, numbers, spaces, commas, hyphens,
+        // periods, apostrophes, and hash signs — typical address characters.
+        // This blocks URLs, IP addresses, protocol handlers, and injection attempts.
+        if (!preg_match('/^[\p{L}\p{N}\s,.\-\'#\/]+$/u', trim($address))) {
+            error_log("GeocodingService: Blocked non-address input: " . substr($address, 0, 100));
             return null;
         }
 
