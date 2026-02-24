@@ -9,9 +9,9 @@
  * Steps:
  *  1. Welcome      - Benefits overview, community introduction
  *  2. Your Profile - Upload profile photo + write bio (MANDATORY — cannot skip)
- *  3. Interests    - Select categories you're interested in
- *  4. Skills       - Mark which categories you can offer / need help with
- *  5. Confirm      - Summary + auto-create listings
+ *  3. Interests    - Select categories you're interested in (optional — can skip)
+ *  4. Skills       - Mark which categories you can offer / need help with (optional)
+ *  5. Confirm      - Profile preview + summary + auto-create listings
  *
  * Route: /onboarding
  */
@@ -21,11 +21,11 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
-  Progress,
   Spinner,
   Chip,
   Avatar,
   Textarea,
+  Divider,
 } from '@heroui/react';
 import {
   Sparkles,
@@ -39,6 +39,13 @@ import {
   Rocket,
   Camera,
   UserCircle,
+  Upload,
+  SkipForward,
+  PartyPopper,
+  ImagePlus,
+  Clock,
+  Users,
+  Star,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
@@ -62,6 +69,8 @@ interface Category {
 const TOTAL_STEPS = 5;
 const MIN_BIO_LENGTH = 10;
 
+const STEP_LABELS = ['Welcome', 'Profile', 'Interests', 'Skills', 'Confirm'];
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,16 +84,6 @@ export function OnboardingPage() {
 
   const tenantName = tenant?.branding?.name || tenant?.name || 'our community';
 
-  // ── Redirect if fully completed (onboarding done + has photo + has bio) ───
-  // Prevents showing Step 1 again after completion (component remount from
-  // AuthContext change causes fresh state). Also handles browser back button.
-
-  useEffect(() => {
-    if (user?.onboarding_completed === true && user?.avatar_url && user?.bio) {
-      navigate(tenantPath('/dashboard'), { replace: true });
-    }
-  }, [user?.onboarding_completed, user?.avatar_url, user?.bio, navigate, tenantPath]);
-
   // ── State ──────────────────────────────────────────────────────────────────
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -95,6 +94,7 @@ export function OnboardingPage() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [bio, setBio] = useState(user?.bio || '');
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   // Categories loaded from API
   const [categories, setCategories] = useState<Category[]>([]);
@@ -107,8 +107,23 @@ export function OnboardingPage() {
   const [skillOffers, setSkillOffers] = useState<number[]>([]);
   const [skillNeeds, setSkillNeeds] = useState<number[]>([]);
 
-  // Submission state
+  // Step 5: Submission + completion
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+
+  // Track which steps have been visited (for stepper)
+  const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1]));
+
+  // ── Redirect if fully completed (onboarding done + has photo + has bio) ───
+  // Skip redirect when isComplete is true so the celebration animation plays
+  // fully before the setTimeout navigates to dashboard.
+
+  useEffect(() => {
+    if (isComplete) return; // Let celebration animation play out
+    if (user?.onboarding_completed === true && user?.avatar_url && user?.bio) {
+      navigate(tenantPath('/dashboard'), { replace: true });
+    }
+  }, [user?.onboarding_completed, user?.avatar_url, user?.bio, navigate, tenantPath, isComplete]);
 
   // ── Pre-populate bio from user context if available ──────────────────────
 
@@ -116,22 +131,35 @@ export function OnboardingPage() {
     if (user?.bio && !bio) {
       setBio(user.bio);
     }
+    // Only run on mount and when user.bio changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.bio]);
 
-  // ── If user has photo+bio but onboarding_completed is false, skip to step 3 ─
+  // ── If user already has photo+bio but onboarding_completed is false,
+  //    skip ahead to step 3 so they don't re-do profile setup ────────────
 
+  const initialSkipDone = useRef(false);
   useEffect(() => {
-    if (user?.avatar_url && user?.bio && user?.bio.trim().length >= MIN_BIO_LENGTH && currentStep <= 2) {
+    if (
+      !initialSkipDone.current &&
+      user?.avatar_url &&
+      user?.bio &&
+      user.bio.trim().length >= MIN_BIO_LENGTH &&
+      currentStep <= 2
+    ) {
+      initialSkipDone.current = true;
       setCurrentStep(3);
+      setVisitedSteps(new Set([1, 2, 3]));
     }
-  }, []);
+  }, [user?.avatar_url, user?.bio, currentStep]);
 
-  // ── Load categories when reaching step 3 (was step 2) ───────────────────
+  // ── Load categories when reaching step 3 ───────────────────────────────
 
   useEffect(() => {
-    if (currentStep === 3 && categories.length === 0) {
+    if (currentStep >= 3 && categories.length === 0 && !categoriesLoading) {
       loadCategories();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
   const loadCategories = useCallback(async () => {
@@ -151,37 +179,32 @@ export function OnboardingPage() {
 
   // ── Navigation ─────────────────────────────────────────────────────────────
 
-  const goNext = useCallback(() => {
-    setCurrentStep((s) => Math.min(s + 1, TOTAL_STEPS));
-  }, []);
-
-  const goBack = useCallback(() => {
-    setCurrentStep((s) => Math.max(s - 1, 1));
-  }, []);
+  const goToStep = useCallback((step: number) => {
+    setSlideDirection(step > currentStep ? 1 : -1);
+    setCurrentStep(step);
+    setVisitedSteps((prev) => new Set([...prev, step]));
+  }, [currentStep]);
 
   const goNextAnimated = useCallback(() => {
-    setSlideDirection(1);
-    goNext();
-  }, [goNext]);
+    const next = Math.min(currentStep + 1, TOTAL_STEPS);
+    goToStep(next);
+  }, [currentStep, goToStep]);
 
   const goBackAnimated = useCallback(() => {
-    setSlideDirection(-1);
-    goBack();
-  }, [goBack]);
+    const prev = Math.max(currentStep - 1, 1);
+    goToStep(prev);
+  }, [currentStep, goToStep]);
 
   // ── Avatar upload handler (Step 2) ───────────────────────────────────────
 
-  const handleAvatarUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  const processAvatarFile = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      toast.error('Invalid file type', 'Please upload an image file (JPG, PNG or GIF)');
+      toast.error('Invalid file type', 'Please upload an image file (JPG, PNG or GIF).');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File too large', 'Please upload an image smaller than 5MB');
+      toast.error('File too large', 'Please upload an image smaller than 5 MB.');
       return;
     }
 
@@ -194,9 +217,9 @@ export function OnboardingPage() {
 
       if (response.success && response.data) {
         await refreshUser();
-        toast.success('Photo uploaded', 'Your profile photo has been set');
+        toast.success('Photo uploaded', 'Looking great!');
       } else {
-        toast.error('Upload failed', 'Failed to upload photo. Please try again.');
+        toast.error('Upload failed', response.error || 'Failed to upload photo. Please try again.');
       }
     } catch (error) {
       logError('Failed to upload avatar during onboarding', error);
@@ -208,6 +231,32 @@ export function OnboardingPage() {
       }
     }
   }, [toast, refreshUser]);
+
+  const handleAvatarUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) processAvatarFile(file);
+  }, [processAvatarFile]);
+
+  // Drag-and-drop handlers for photo upload
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processAvatarFile(file);
+  }, [processAvatarFile]);
 
   // ── Save bio + proceed handler (Step 2) ──────────────────────────────────
 
@@ -238,6 +287,39 @@ export function OnboardingPage() {
       setIsSavingProfile(false);
     }
   }, [bio, user?.avatar_url, toast, refreshUser, goNextAnimated]);
+
+  // ── Save interests + proceed handler (Step 3) ──────────────────────────
+
+  const [isSavingInterests, setIsSavingInterests] = useState(false);
+
+  const handleSaveInterestsAndProceed = useCallback(async () => {
+    if (selectedInterests.length === 0) {
+      // Nothing to save — just advance
+      goNextAnimated();
+      return;
+    }
+
+    try {
+      setIsSavingInterests(true);
+      const response = await api.post('/v2/onboarding/interests', {
+        category_ids: selectedInterests,
+      });
+
+      if (response.success) {
+        goNextAnimated();
+      } else {
+        // Non-blocking: interests are optional, proceed anyway
+        logError('Failed to save interests', response.error);
+        goNextAnimated();
+      }
+    } catch (error) {
+      logError('Failed to save onboarding interests', error);
+      // Non-blocking: continue even if save fails
+      goNextAnimated();
+    } finally {
+      setIsSavingInterests(false);
+    }
+  }, [selectedInterests, goNextAnimated]);
 
   // ── Interest toggling (Step 3) ───────────────────────────────────────────
 
@@ -296,73 +378,91 @@ export function OnboardingPage() {
       });
 
       if (!response.success) {
-        toast.error('Setup failed', response.error || 'Something went wrong. Please try again.');
+        // Surface the backend error clearly
+        const message = response.error || 'Something went wrong. Please try again.';
+        // If it's a profile-related issue, guide back to step 2
+        if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
+          toast.error('Profile incomplete', message);
+          goToStep(2);
+        } else {
+          toast.error('Setup failed', message);
+        }
         return;
       }
 
       const listingsCreated = (response.data as { listings_created?: number })?.listings_created ?? 0;
 
-      if (listingsCreated > 0) {
-        toast.success(
-          'Welcome aboard!',
-          `${listingsCreated} listing${listingsCreated === 1 ? '' : 's'} created for you.`
-        );
-      } else {
-        toast.success('Welcome aboard!', 'Your profile is all set up.');
-      }
+      // Show completion celebration
+      setIsComplete(true);
 
       // Refresh user state so ProtectedRoute sees onboarding_completed = true
-      // This prevents redirect loop back to /onboarding
       await refreshUser();
 
-      navigate(tenantPath('/dashboard'));
+      // Brief delay for the celebration animation, then navigate
+      setTimeout(() => {
+        if (listingsCreated > 0) {
+          toast.success(
+            'Welcome aboard!',
+            `${listingsCreated} listing${listingsCreated === 1 ? '' : 's'} created for you.`
+          );
+        } else {
+          toast.success('Welcome aboard!', 'Your profile is all set.');
+        }
+        navigate(tenantPath('/dashboard'));
+      }, 1800);
     } catch (error) {
       logError('Failed to complete onboarding', error);
       toast.error('Setup failed', 'Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
-  }, [skillOffers, skillNeeds, toast, navigate, tenantPath, refreshUser]);
+  }, [skillOffers, skillNeeds, toast, navigate, tenantPath, refreshUser, goToStep]);
 
-  // ── Skip handler (skips interests/skills only — photo+bio already done) ──
+  // ── Skip handler (skips interests/skills — photo+bio already done) ──────
 
   const handleSkip = useCallback(async () => {
     try {
-      // Mark onboarding complete even when skipping interests/skills
-      await api.post('/v2/onboarding/complete', { offers: [], needs: [] });
-      // Refresh user state so ProtectedRoute sees onboarding_completed = true
-      await refreshUser();
-    } catch {
-      // Non-critical, continue navigation
-    }
-    navigate(tenantPath('/dashboard'));
-  }, [navigate, tenantPath, refreshUser]);
+      setIsSubmitting(true);
+      const response = await api.post('/v2/onboarding/complete', { offers: [], needs: [] });
 
-  // ── Animation variants ───────────────────────────────────────────────────
+      if (!response.success) {
+        const message = response.error || 'Something went wrong.';
+        if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
+          toast.error('Profile incomplete', message);
+          goToStep(2);
+        } else {
+          toast.error('Setup failed', message);
+        }
+        return;
+      }
+
+      setIsComplete(true);
+      await refreshUser();
+
+      setTimeout(() => {
+        toast.success('Welcome aboard!', 'Your profile is all set.');
+        navigate(tenantPath('/dashboard'));
+      }, 1800);
+    } catch (error) {
+      logError('Failed to skip onboarding', error);
+      toast.error('Setup failed', 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [navigate, tenantPath, refreshUser, toast, goToStep]);
+
+  // ── Animation variants ─────────────────────────────────────────────────
 
   const slideVariants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 80 : -80,
+      x: direction > 0 ? 60 : -60,
       opacity: 0,
     }),
     center: { x: 0, opacity: 1 },
     exit: (direction: number) => ({
-      x: direction < 0 ? 80 : -80,
+      x: direction < 0 ? 60 : -60,
       opacity: 0,
     }),
-  };
-
-  // ── Step labels ──────────────────────────────────────────────────────────
-
-  const stepLabel = (step: number) => {
-    switch (step) {
-      case 1: return 'Welcome';
-      case 2: return 'Your Profile';
-      case 3: return 'Interests';
-      case 4: return 'Skills';
-      case 5: return 'Confirm';
-      default: return '';
-    }
   };
 
   // ── Derived state for Step 2 validation ──────────────────────────────────
@@ -371,48 +471,107 @@ export function OnboardingPage() {
   const hasBio = bio.trim().length >= MIN_BIO_LENGTH;
   const profileStepComplete = hasAvatar && hasBio;
 
-  // ── Render ───────────────────────────────────────────────────────────────
+  // ── Completion celebration overlay (checked BEFORE redirect guard so the
+  //    celebration screen actually renders — refreshUser() sets
+  //    onboarding_completed=true which would otherwise cause return null) ───
 
-  // Don't render wizard if fully completed (redirect is pending)
+  if (isComplete) {
+    return (
+      <div className="max-w-2xl mx-auto py-12">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="text-center space-y-6"
+        >
+          <motion.div
+            animate={{
+              rotate: [0, -10, 10, -10, 10, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="inline-flex p-6 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20"
+          >
+            <PartyPopper className="w-16 h-16 text-emerald-500" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+          >
+            <h1 className="text-3xl font-bold text-theme-primary mb-2">
+              You're all set!
+            </h1>
+            <p className="text-theme-muted text-lg">
+              Welcome to {tenantName}
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.0 }}
+          >
+            <Spinner size="sm" color="success" />
+            <p className="text-sm text-theme-subtle mt-2">Taking you to your dashboard...</p>
+          </motion.div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ── Don't render wizard if fully completed (redirect is pending) ─────────
+
   if (user?.onboarding_completed === true && user?.avatar_url && user?.bio) {
     return null;
   }
 
+  // ── Main Render ────────────────────────────────────────────────────────────
+
   return (
-    <div className="max-w-2xl mx-auto py-6 space-y-6">
-      {/* Title */}
+    <div className="max-w-2xl mx-auto py-6 px-4 space-y-6">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
         <h1 className="text-2xl font-bold text-theme-primary">Get Started</h1>
-        <p className="text-theme-muted mt-1">
+        <p className="text-theme-muted mt-1 text-sm">
           Set up your profile in a few easy steps
         </p>
       </motion.div>
 
-      {/* Progress Bar */}
+      {/* Step Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-theme-subtle">
-            Step {currentStep} of {TOTAL_STEPS}
-          </span>
-          <span className="text-sm text-theme-subtle">
-            {stepLabel(currentStep)}
-          </span>
-        </div>
-        <Progress
-          value={(currentStep / TOTAL_STEPS) * 100}
-          classNames={{
-            indicator: 'bg-gradient-to-r from-emerald-500 to-teal-600',
-            track: 'bg-theme-elevated',
+        <StepIndicator
+          currentStep={currentStep}
+          totalSteps={TOTAL_STEPS}
+          visitedSteps={visitedSteps}
+          completedSteps={getCompletedSteps({
+            hasAvatar,
+            hasBio,
+            selectedInterests,
+            skillOffers,
+            skillNeeds,
+          })}
+          onStepClick={(step) => {
+            // Only allow clicking to visited steps or the current step
+            // Never allow skipping step 2 (profile) if incomplete
+            if (step <= currentStep || visitedSteps.has(step)) {
+              if (step > 2 && !profileStepComplete) {
+                toast.error('Complete your profile first', 'Photo and bio are required.');
+                goToStep(2);
+                return;
+              }
+              goToStep(step);
+            }
           }}
-          aria-label={`Step ${currentStep} of ${TOTAL_STEPS}`}
         />
       </motion.div>
 
@@ -425,12 +584,11 @@ export function OnboardingPage() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.25, ease: 'easeInOut' }}
+          transition={{ duration: 0.2, ease: 'easeInOut' }}
         >
           {/* ─── Step 1: Welcome ─── */}
           {currentStep === 1 && (
             <div className="space-y-6">
-              {/* Hero */}
               <GlassCard className="p-8 text-center">
                 <div className="flex items-center justify-center gap-4 mb-6">
                   <motion.div
@@ -474,30 +632,29 @@ export function OnboardingPage() {
                 </p>
               </GlassCard>
 
-              {/* Benefit cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* How it works cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <BenefitCard
-                  icon={<HandHeart className="w-6 h-6 text-emerald-500" />}
-                  title="Find Help"
-                  description="Discover community members offering the skills you need"
+                  icon={<Clock className="w-6 h-6 text-emerald-500" />}
+                  title="Earn Time Credits"
+                  description="Help others and earn credits you can spend on services you need"
                 />
                 <BenefitCard
-                  icon={<Heart className="w-6 h-6 text-rose-500" />}
-                  title="Share Skills"
-                  description="Offer your talents and earn time credits in return"
-                />
-                <BenefitCard
-                  icon={<Sparkles className="w-6 h-6 text-amber-500" />}
+                  icon={<Users className="w-6 h-6 text-rose-500" />}
                   title="Build Community"
                   description="Connect with neighbours and strengthen local bonds"
                 />
+                <BenefitCard
+                  icon={<Star className="w-6 h-6 text-amber-500" />}
+                  title="Share Your Skills"
+                  description="Offer your talents and discover what your community can do"
+                />
               </div>
 
-              {/* CTA */}
-              <div className="flex justify-center">
+              <div className="flex justify-center pt-2">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-10 font-semibold shadow-lg shadow-emerald-500/20"
                   endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                   onPress={goNextAnimated}
                 >
@@ -511,7 +668,7 @@ export function OnboardingPage() {
           {currentStep === 2 && (
             <div className="space-y-6">
               <GlassCard className="p-6">
-                <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-theme-primary mb-1 flex items-center gap-2">
                   <UserCircle
                     className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
                     aria-hidden="true"
@@ -519,17 +676,32 @@ export function OnboardingPage() {
                   Your Profile
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Add a profile photo and tell the community a bit about yourself.
-                  This helps other members recognise and trust you.
+                  Add a photo and tell the community about yourself. This helps
+                  members recognise and trust you.
                 </p>
 
-                {/* Avatar upload */}
-                <div className="flex flex-col items-center gap-4 mb-6">
-                  <div className="relative">
+                {/* Avatar upload zone */}
+                <div
+                  className={`
+                    flex flex-col items-center gap-4 mb-6 p-6 rounded-xl border-2 border-dashed transition-all duration-200
+                    ${isDraggingOver
+                      ? 'border-emerald-500 bg-emerald-500/10'
+                      : hasAvatar
+                        ? 'border-emerald-500/30 bg-emerald-500/5'
+                        : 'border-theme-default bg-theme-elevated/50 hover:border-emerald-500/50'
+                    }
+                  `}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <div className="relative group">
                     <Avatar
                       src={resolveAvatarUrl(user?.avatar_url)}
                       name={user?.first_name || user?.name}
-                      className="w-24 h-24 ring-4 ring-theme-default"
+                      className="w-28 h-28 ring-4 ring-theme-default group-hover:ring-emerald-500/30 transition-all"
+                      isBordered={hasAvatar}
+                      color={hasAvatar ? 'success' : 'default'}
                     />
                     <input
                       ref={fileInputRef}
@@ -542,37 +714,64 @@ export function OnboardingPage() {
                     <Button
                       isIconOnly
                       size="sm"
-                      className="absolute bottom-0 right-0 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 min-w-0 w-8 h-8"
+                      className="absolute bottom-1 right-1 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg min-w-0 w-9 h-9"
                       onPress={() => fileInputRef.current?.click()}
                       isDisabled={isUploadingAvatar}
                       isLoading={isUploadingAvatar}
                       aria-label="Upload profile photo"
                     >
-                      <Camera className="w-4 h-4" aria-hidden="true" />
+                      {hasAvatar ? (
+                        <Camera className="w-4 h-4" aria-hidden="true" />
+                      ) : (
+                        <ImagePlus className="w-4 h-4" aria-hidden="true" />
+                      )}
                     </Button>
                   </div>
 
-                  <div className="text-center">
-                    {hasAvatar ? (
-                      <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-1 justify-center">
+                  {isUploadingAvatar ? (
+                    <p className="text-sm text-theme-muted flex items-center gap-2">
+                      <Spinner size="sm" /> Uploading...
+                    </p>
+                  ) : hasAvatar ? (
+                    <div className="text-center">
+                      <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 justify-center font-medium">
                         <CheckCircle className="w-4 h-4" aria-hidden="true" />
                         Photo uploaded
                       </p>
-                    ) : (
-                      <p className="text-sm text-theme-muted">
-                        Upload a profile photo (JPG, PNG or GIF, max 5MB)
+                      <button
+                        className="text-xs text-theme-subtle hover:text-theme-muted underline mt-1"
+                        onClick={() => fileInputRef.current?.click()}
+                        type="button"
+                      >
+                        Change photo
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <Button
+                        variant="flat"
+                        size="sm"
+                        className="mb-2"
+                        startContent={<Upload className="w-4 h-4" />}
+                        onPress={() => fileInputRef.current?.click()}
+                      >
+                        Choose a photo
+                      </Button>
+                      <p className="text-xs text-theme-subtle">
+                        or drag and drop — JPG, PNG or GIF, max 5 MB
                       </p>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Bio textarea */}
                 <div className="space-y-2">
                   <Textarea
                     label="About you"
-                    placeholder="Tell the community about yourself — your interests, skills, or what you're hoping to get from timebanking..."
+                    placeholder="Tell the community about yourself — your interests, skills, or what you hope to get from timebanking..."
                     value={bio}
                     onValueChange={setBio}
+                    isDisabled={isSavingProfile}
                     minRows={3}
                     maxRows={6}
                     maxLength={5000}
@@ -587,51 +786,31 @@ export function OnboardingPage() {
                   />
                 </div>
 
-                {/* Validation summary */}
+                {/* Validation checklist */}
                 <div className="mt-4 p-3 rounded-lg bg-theme-elevated">
                   <p className="text-xs font-medium text-theme-muted mb-2">
                     Required to continue:
                   </p>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle
-                        className={`w-4 h-4 ${hasAvatar ? 'text-emerald-500' : 'text-theme-subtle'}`}
-                        aria-hidden="true"
-                      />
-                      <span className={hasAvatar ? 'text-theme-primary' : 'text-theme-subtle'}>
-                        Profile photo
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle
-                        className={`w-4 h-4 ${hasBio ? 'text-emerald-500' : 'text-theme-subtle'}`}
-                        aria-hidden="true"
-                      />
-                      <span className={hasBio ? 'text-theme-primary' : 'text-theme-subtle'}>
-                        Bio ({MIN_BIO_LENGTH}+ characters)
-                      </span>
-                    </div>
+                  <div className="flex flex-col gap-1.5">
+                    <ValidationItem checked={hasAvatar} label="Profile photo" />
+                    <ValidationItem checked={hasBio} label={`Bio (${MIN_BIO_LENGTH}+ characters)`} />
                   </div>
                 </div>
               </GlassCard>
 
-              {/* Navigation — Next saves bio then proceeds */}
+              {/* Navigation */}
               <div className="flex items-center justify-between">
                 <Button
                   variant="light"
                   className="text-theme-muted"
                   onPress={goBackAnimated}
-                  startContent={
-                    <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-                  }
+                  startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >
                   Back
                 </Button>
                 <Button
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
-                  endContent={
-                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                  }
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium"
+                  endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
                   onPress={handleSaveProfileAndProceed}
                   isLoading={isSavingProfile}
                   isDisabled={!profileStepComplete || isSavingProfile}
@@ -642,20 +821,20 @@ export function OnboardingPage() {
             </div>
           )}
 
-          {/* ─── Step 3: Select Interests ─── */}
+          {/* ─── Step 3: Select Interests (OPTIONAL) ─── */}
           {currentStep === 3 && (
             <div className="space-y-6">
               <GlassCard className="p-6">
-                <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
-                  <HelpCircle
-                    className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
+                <h2 className="text-lg font-semibold text-theme-primary mb-1 flex items-center gap-2">
+                  <Heart
+                    className="w-5 h-5 text-rose-500"
                     aria-hidden="true"
                   />
                   What are you interested in?
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Select the categories that interest you. This helps us
-                  personalise your experience and suggest relevant listings.
+                  Select categories that interest you. This helps us personalise
+                  your experience and suggest relevant listings.
                 </p>
 
                 {categoriesLoading ? (
@@ -669,7 +848,8 @@ export function OnboardingPage() {
                       aria-hidden="true"
                     />
                     <p className="text-theme-muted text-sm">
-                      No categories available. You can skip this step.
+                      No categories available yet. You can skip this step and
+                      set your interests later in Settings.
                     </p>
                   </div>
                 ) : (
@@ -681,7 +861,7 @@ export function OnboardingPage() {
                           key={cat.id}
                           variant={isSelected ? 'solid' : 'bordered'}
                           color={isSelected ? 'success' : 'default'}
-                          className="cursor-pointer transition-all"
+                          className="cursor-pointer transition-all hover:scale-105"
                           onClick={() => toggleInterest(cat.id)}
                           aria-pressed={isSelected}
                           role="button"
@@ -700,30 +880,53 @@ export function OnboardingPage() {
                   </div>
                 )}
 
-                {/* Selection count / helper text */}
                 {categories.length > 0 && (
                   <p className="text-xs text-theme-subtle mt-4">
                     {selectedInterests.length === 0
-                      ? 'Select at least one category to continue'
+                      ? 'Select one or more, or skip this step'
                       : `${selectedInterests.length} selected`}
                   </p>
                 )}
               </GlassCard>
 
-              <StepNavigation
-                onBack={goBackAnimated}
-                onNext={goNextAnimated}
-                nextDisabled={selectedInterests.length === 0}
-              />
+              <div className="flex items-center justify-between">
+                <Button
+                  variant="light"
+                  className="text-theme-muted"
+                  onPress={goBackAnimated}
+                  startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+                >
+                  Back
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="light"
+                    className="text-theme-subtle"
+                    onPress={goNextAnimated}
+                    endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    Skip
+                  </Button>
+                  <Button
+                    className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium"
+                    endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
+                    onPress={handleSaveInterestsAndProceed}
+                    isLoading={isSavingInterests}
+                    isDisabled={selectedInterests.length === 0 || isSavingInterests}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* ─── Step 4: Your Skills ─── */}
+          {/* ─── Step 4: Your Skills (OPTIONAL — shows ALL categories) ─── */}
           {currentStep === 4 && (
             <div className="space-y-6">
               {/* Offers section */}
               <GlassCard className="p-6">
-                <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-theme-primary mb-1 flex items-center gap-2">
                   <HandHeart
                     className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
                     aria-hidden="true"
@@ -731,44 +934,47 @@ export function OnboardingPage() {
                   I can offer
                 </h2>
                 <p className="text-theme-muted text-sm mb-4">
-                  Which of your interests can you help others with?
-                  We'll create offer listings for you.
+                  Select skills you can offer to others. We'll create listings for you.
                 </p>
 
-                <div className="flex flex-wrap gap-2">
-                  {selectedInterests.length > 0 ? (
-                    selectedInterests.map((catId) => {
-                      const isOffer = skillOffers.includes(catId);
+                {categoriesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Spinner size="md" />
+                  </div>
+                ) : categories.length === 0 ? (
+                  <p className="text-theme-subtle text-sm py-4">
+                    No categories available. You can skip this step.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((cat) => {
+                      const isOffer = skillOffers.includes(cat.id);
                       return (
                         <Chip
-                          key={catId}
+                          key={cat.id}
                           variant={isOffer ? 'solid' : 'bordered'}
                           color={isOffer ? 'success' : 'default'}
-                          className="cursor-pointer transition-all"
-                          onClick={() => toggleOffer(catId)}
+                          className="cursor-pointer transition-all hover:scale-105"
+                          onClick={() => toggleOffer(cat.id)}
                           aria-pressed={isOffer}
                           role="button"
                           tabIndex={0}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
                               e.preventDefault();
-                              toggleOffer(catId);
+                              toggleOffer(cat.id);
                             }
                           }}
                         >
-                          {getCategoryName(catId)}
+                          {cat.name}
                         </Chip>
                       );
-                    })
-                  ) : (
-                    <p className="text-theme-subtle text-sm">
-                      No interests selected. Go back to pick some categories first.
-                    </p>
-                  )}
-                </div>
+                    })}
+                  </div>
+                )}
 
                 {skillOffers.length > 0 && (
-                  <p className="text-xs text-theme-subtle mt-3">
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-3 font-medium">
                     {skillOffers.length} skill{skillOffers.length !== 1 ? 's' : ''} to offer
                   </p>
                 )}
@@ -776,7 +982,7 @@ export function OnboardingPage() {
 
               {/* Needs section */}
               <GlassCard className="p-6">
-                <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-theme-primary mb-1 flex items-center gap-2">
                   <HelpCircle
                     className="w-5 h-5 text-amber-600 dark:text-amber-400"
                     aria-hidden="true"
@@ -784,202 +990,185 @@ export function OnboardingPage() {
                   I need help with
                 </h2>
                 <p className="text-theme-muted text-sm mb-4">
-                  Which categories do you need help with?
-                  We'll create request listings for you.
+                  Select categories you need help with. We'll create request listings for you.
                 </p>
 
-                <div className="flex flex-wrap gap-2">
-                  {selectedInterests.length > 0 ? (
-                    selectedInterests.map((catId) => {
-                      const isNeed = skillNeeds.includes(catId);
+                {categoriesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Spinner size="md" />
+                  </div>
+                ) : categories.length === 0 ? (
+                  <p className="text-theme-subtle text-sm py-4">
+                    No categories available. You can skip this step.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((cat) => {
+                      const isNeed = skillNeeds.includes(cat.id);
                       return (
                         <Chip
-                          key={catId}
+                          key={cat.id}
                           variant={isNeed ? 'solid' : 'bordered'}
                           color={isNeed ? 'warning' : 'default'}
-                          className="cursor-pointer transition-all"
-                          onClick={() => toggleNeed(catId)}
+                          className="cursor-pointer transition-all hover:scale-105"
+                          onClick={() => toggleNeed(cat.id)}
                           aria-pressed={isNeed}
                           role="button"
                           tabIndex={0}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
                               e.preventDefault();
-                              toggleNeed(catId);
+                              toggleNeed(cat.id);
                             }
                           }}
                         >
-                          {getCategoryName(catId)}
+                          {cat.name}
                         </Chip>
                       );
-                    })
-                  ) : (
-                    <p className="text-theme-subtle text-sm">
-                      No interests selected. Go back to pick some categories first.
-                    </p>
-                  )}
-                </div>
+                    })}
+                  </div>
+                )}
 
                 {skillNeeds.length > 0 && (
-                  <p className="text-xs text-theme-subtle mt-3">
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-3 font-medium">
                     {skillNeeds.length} skill{skillNeeds.length !== 1 ? 's' : ''} needed
                   </p>
                 )}
               </GlassCard>
 
-              <StepNavigation
-                onBack={goBackAnimated}
-                onNext={goNextAnimated}
-              />
+              <div className="flex items-center justify-between">
+                <Button
+                  variant="light"
+                  className="text-theme-muted"
+                  onPress={goBackAnimated}
+                  startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+                >
+                  Back
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="light"
+                    className="text-theme-subtle"
+                    onPress={goNextAnimated}
+                    endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    Skip
+                  </Button>
+                  <Button
+                    className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium"
+                    endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
+                    onPress={goNextAnimated}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
 
           {/* ─── Step 5: Confirm + Create ─── */}
           {currentStep === 5 && (
             <div className="space-y-6">
+              {/* Profile preview card */}
               <GlassCard className="p-6">
-                <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                   <CheckCircle
                     className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
                     aria-hidden="true"
                   />
                   Review Your Setup
                 </h2>
-                <p className="text-theme-muted text-sm mb-6">
-                  Here is a summary of your selections. We'll create listings
-                  to get you started right away.
-                </p>
 
+                {/* Mini profile card */}
+                <div className="flex items-start gap-4 p-4 rounded-xl bg-theme-elevated mb-6">
+                  <Avatar
+                    src={resolveAvatarUrl(user?.avatar_url)}
+                    name={user?.first_name || user?.name}
+                    className="w-16 h-16 flex-shrink-0"
+                    isBordered
+                    color="success"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-theme-primary text-base">
+                      {user?.first_name} {user?.last_name}
+                    </p>
+                    <p className="text-sm text-theme-muted line-clamp-2 mt-0.5">
+                      {bio || user?.bio || 'No bio yet'}
+                    </p>
+                    <button
+                      type="button"
+                      className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline mt-1"
+                      onClick={() => goToStep(2)}
+                    >
+                      Edit profile
+                    </button>
+                  </div>
+                </div>
+
+                <Divider className="my-4" />
+
+                {/* Interests summary */}
                 <div className="space-y-4">
-                  {/* Interests summary */}
-                  <div>
-                    <h3 className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4" aria-hidden="true" />
-                      Your Interests
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedInterests.length > 0 ? (
-                        selectedInterests.map((catId) => (
-                          <Chip
-                            key={catId}
-                            size="sm"
-                            variant="flat"
-                            color="primary"
-                          >
-                            {getCategoryName(catId)}
-                          </Chip>
-                        ))
-                      ) : (
-                        <p className="text-theme-subtle text-sm">None selected</p>
-                      )}
-                    </div>
-                  </div>
+                  <SummarySection
+                    icon={<Heart className="w-4 h-4 text-rose-500" />}
+                    title="Your Interests"
+                    items={selectedInterests}
+                    getCategoryName={getCategoryName}
+                    chipColor="primary"
+                    emptyText="None selected"
+                    onEdit={() => goToStep(3)}
+                  />
 
-                  <div className="border-t border-theme-default" />
+                  <Divider />
 
-                  {/* Offers summary */}
-                  <div>
-                    <h3 className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-2">
-                      <HandHeart className="w-4 h-4" aria-hidden="true" />
-                      Skills You Can Offer
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {skillOffers.length > 0 ? (
-                        skillOffers.map((catId) => (
-                          <Chip
-                            key={catId}
-                            size="sm"
-                            variant="flat"
-                            color="success"
-                          >
-                            {getCategoryName(catId)}
-                          </Chip>
-                        ))
-                      ) : (
-                        <p className="text-theme-subtle text-sm">None selected</p>
-                      )}
-                    </div>
-                  </div>
+                  <SummarySection
+                    icon={<HandHeart className="w-4 h-4 text-emerald-500" />}
+                    title="Skills You Offer"
+                    items={skillOffers}
+                    getCategoryName={getCategoryName}
+                    chipColor="success"
+                    emptyText="None selected"
+                    onEdit={() => goToStep(4)}
+                  />
 
-                  <div className="border-t border-theme-default" />
+                  <Divider />
 
-                  {/* Needs summary */}
-                  <div>
-                    <h3 className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-2">
-                      <HelpCircle className="w-4 h-4" aria-hidden="true" />
-                      Skills You Need
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {skillNeeds.length > 0 ? (
-                        skillNeeds.map((catId) => (
-                          <Chip
-                            key={catId}
-                            size="sm"
-                            variant="flat"
-                            color="warning"
-                          >
-                            {getCategoryName(catId)}
-                          </Chip>
-                        ))
-                      ) : (
-                        <p className="text-theme-subtle text-sm">None selected</p>
-                      )}
-                    </div>
-                  </div>
+                  <SummarySection
+                    icon={<HelpCircle className="w-4 h-4 text-amber-500" />}
+                    title="Skills You Need"
+                    items={skillNeeds}
+                    getCategoryName={getCategoryName}
+                    chipColor="warning"
+                    emptyText="None selected"
+                    onEdit={() => goToStep(4)}
+                  />
                 </div>
               </GlassCard>
 
               {/* Listings preview */}
               {totalListingsToCreate > 0 && (
                 <GlassCard className="p-6">
-                  <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+                  <h2 className="text-base font-semibold text-theme-primary mb-3 flex items-center gap-2">
                     <ListChecks
                       className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
                       aria-hidden="true"
                     />
-                    Listings We'll Create
+                    We'll create {totalListingsToCreate} listing{totalListingsToCreate !== 1 ? 's' : ''} for you
                   </h2>
-                  <p className="text-theme-muted text-sm mb-4">
-                    We'll create {totalListingsToCreate} listing{totalListingsToCreate !== 1 ? 's' : ''} for you:
-                  </p>
                   <div className="space-y-2">
                     {skillOffers.map((catId) => (
-                      <div
+                      <ListingPreviewItem
                         key={`offer-${catId}`}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated"
-                      >
-                        <div className="p-2 rounded-lg bg-emerald-500/20 flex-shrink-0">
-                          <HandHeart
-                            className="w-4 h-4 text-emerald-500"
-                            aria-hidden="true"
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-theme-primary text-sm">
-                            I can help with {getCategoryName(catId)}
-                          </p>
-                          <p className="text-xs text-theme-subtle">Offer listing</p>
-                        </div>
-                      </div>
+                        type="offer"
+                        name={getCategoryName(catId)}
+                      />
                     ))}
                     {skillNeeds.map((catId) => (
-                      <div
+                      <ListingPreviewItem
                         key={`need-${catId}`}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated"
-                      >
-                        <div className="p-2 rounded-lg bg-amber-500/20 flex-shrink-0">
-                          <HelpCircle
-                            className="w-4 h-4 text-amber-500"
-                            aria-hidden="true"
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-theme-primary text-sm">
-                            Looking for help with {getCategoryName(catId)}
-                          </p>
-                          <p className="text-xs text-theme-subtle">Request listing</p>
-                        </div>
-                      </div>
+                        type="need"
+                        name={getCategoryName(catId)}
+                      />
                     ))}
                   </div>
                 </GlassCard>
@@ -991,24 +1180,26 @@ export function OnboardingPage() {
                   variant="light"
                   className="text-theme-muted"
                   onPress={goBackAnimated}
-                  startContent={
-                    <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-                  }
+                  startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >
                   Back
                 </Button>
 
                 <div className="flex items-center gap-3">
-                  <Button
-                    variant="light"
-                    className="text-theme-subtle"
-                    onPress={handleSkip}
-                  >
-                    Skip for now
-                  </Button>
+                  {totalListingsToCreate === 0 && (
+                    <Button
+                      variant="light"
+                      className="text-theme-subtle"
+                      onPress={handleSkip}
+                      isDisabled={isSubmitting}
+                      endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
+                    >
+                      Skip for now
+                    </Button>
+                  )}
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
+                    className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg shadow-emerald-500/20"
                     onPress={handleComplete}
                     isLoading={isSubmitting}
                     startContent={
@@ -1017,7 +1208,7 @@ export function OnboardingPage() {
                       )
                     }
                   >
-                    Complete Setup
+                    {totalListingsToCreate > 0 ? 'Complete Setup' : 'Finish'}
                   </Button>
                 </div>
               </div>
@@ -1030,8 +1221,110 @@ export function OnboardingPage() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Helper: determine which steps are "completed" for the stepper
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getCompletedSteps(state: {
+  hasAvatar: boolean;
+  hasBio: boolean;
+  selectedInterests: number[];
+  skillOffers: number[];
+  skillNeeds: number[];
+}): Set<number> {
+  const completed = new Set<number>();
+  completed.add(1); // Welcome is always "done" once visited
+  if (state.hasAvatar && state.hasBio) completed.add(2);
+  if (state.selectedInterests.length > 0) completed.add(3);
+  if (state.skillOffers.length > 0 || state.skillNeeds.length > 0) completed.add(4);
+  return completed;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Sub-components
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ── Step Indicator (dots + labels) ───────────────────────────────────────────
+
+interface StepIndicatorProps {
+  currentStep: number;
+  totalSteps: number;
+  visitedSteps: Set<number>;
+  completedSteps: Set<number>;
+  onStepClick: (step: number) => void;
+}
+
+function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, onStepClick }: StepIndicatorProps) {
+  return (
+    <div className="flex items-center justify-between">
+      {Array.from({ length: totalSteps }, (_, i) => {
+        const step = i + 1;
+        const isCurrent = step === currentStep;
+        const isCompleted = completedSteps.has(step) && !isCurrent;
+        const isVisited = visitedSteps.has(step);
+        const isClickable = isVisited || step <= currentStep;
+
+        return (
+          <div key={step} className="flex items-center flex-1 last:flex-initial">
+            {/* Step dot + label */}
+            <button
+              type="button"
+              className={`
+                flex flex-col items-center gap-1 transition-all
+                ${isClickable ? 'cursor-pointer' : 'cursor-default'}
+              `}
+              onClick={() => isClickable && onStepClick(step)}
+              aria-label={`Step ${step}: ${STEP_LABELS[i]}${isCompleted ? ' (completed)' : isCurrent ? ' (current)' : ''}`}
+              aria-current={isCurrent ? 'step' : undefined}
+            >
+              <div
+                className={`
+                  w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300
+                  ${isCurrent
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/30 scale-110'
+                    : isCompleted
+                      ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                      : 'bg-theme-elevated text-theme-subtle'
+                  }
+                `}
+              >
+                {isCompleted ? (
+                  <CheckCircle className="w-4 h-4" />
+                ) : (
+                  <span>{step}</span>
+                )}
+              </div>
+              <span
+                className={`
+                  text-[10px] font-medium hidden sm:block
+                  ${isCurrent ? 'text-emerald-600 dark:text-emerald-400' : 'text-theme-subtle'}
+                `}
+              >
+                {STEP_LABELS[i]}
+              </span>
+            </button>
+
+            {/* Connector line */}
+            {step < totalSteps && (
+              <div className="flex-1 mx-1.5 sm:mx-2">
+                <div
+                  className={`
+                    h-0.5 rounded-full transition-all duration-500
+                    ${completedSteps.has(step) && (completedSteps.has(step + 1) || step + 1 === currentStep)
+                      ? 'bg-emerald-500'
+                      : 'bg-theme-elevated'
+                    }
+                  `}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Benefit Card ─────────────────────────────────────────────────────────────
 
 interface BenefitCardProps {
   icon: React.ReactNode;
@@ -1046,49 +1339,91 @@ function BenefitCard({ icon, title, description }: BenefitCardProps) {
         {icon}
       </div>
       <h3 className="font-semibold text-theme-primary text-sm mb-1">{title}</h3>
-      <p className="text-xs text-theme-subtle">{description}</p>
+      <p className="text-xs text-theme-subtle leading-relaxed">{description}</p>
     </GlassCard>
   );
 }
 
-interface StepNavigationProps {
-  onBack: () => void;
-  onNext: () => void;
-  nextLabel?: string;
-  nextDisabled?: boolean;
-  isLoading?: boolean;
+// ── Validation Item (checklist) ──────────────────────────────────────────────
+
+function ValidationItem({ checked, label }: { checked: boolean; label: string }) {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <CheckCircle
+        className={`w-4 h-4 transition-colors ${checked ? 'text-emerald-500' : 'text-theme-subtle'}`}
+        aria-hidden="true"
+      />
+      <span className={checked ? 'text-theme-primary' : 'text-theme-subtle'}>
+        {label}
+      </span>
+    </div>
+  );
 }
 
-function StepNavigation({
-  onBack,
-  onNext,
-  nextLabel = 'Next',
-  nextDisabled = false,
-  isLoading,
-}: StepNavigationProps) {
+// ── Summary Section (Step 5) ─────────────────────────────────────────────────
+
+interface SummarySectionProps {
+  icon: React.ReactNode;
+  title: string;
+  items: number[];
+  getCategoryName: (id: number) => string;
+  chipColor: 'primary' | 'success' | 'warning';
+  emptyText: string;
+  onEdit: () => void;
+}
+
+function SummarySection({ icon, title, items, getCategoryName, chipColor, emptyText, onEdit }: SummarySectionProps) {
   return (
-    <div className="flex items-center justify-between">
-      <Button
-        variant="light"
-        className="text-theme-muted"
-        onPress={onBack}
-        startContent={
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-        }
-      >
-        Back
-      </Button>
-      <Button
-        className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
-        endContent={
-          <ArrowRight className="w-4 h-4" aria-hidden="true" />
-        }
-        onPress={onNext}
-        isLoading={isLoading}
-        isDisabled={nextDisabled}
-      >
-        {nextLabel}
-      </Button>
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
+          {icon}
+          {title}
+        </h3>
+        <button
+          type="button"
+          className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
+          onClick={onEdit}
+        >
+          Edit
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {items.length > 0 ? (
+          items.map((catId) => (
+            <Chip key={catId} size="sm" variant="flat" color={chipColor}>
+              {getCategoryName(catId)}
+            </Chip>
+          ))
+        ) : (
+          <p className="text-theme-subtle text-sm italic">{emptyText}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Listing Preview Item (Step 5) ────────────────────────────────────────────
+
+function ListingPreviewItem({ type, name }: { type: 'offer' | 'need'; name: string }) {
+  const isOffer = type === 'offer';
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
+      <div className={`p-2 rounded-lg flex-shrink-0 ${isOffer ? 'bg-emerald-500/20' : 'bg-amber-500/20'}`}>
+        {isOffer ? (
+          <HandHeart className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+        ) : (
+          <HelpCircle className="w-4 h-4 text-amber-500" aria-hidden="true" />
+        )}
+      </div>
+      <div className="min-w-0">
+        <p className="font-medium text-theme-primary text-sm">
+          {isOffer ? `I can help with ${name}` : `Looking for help with ${name}`}
+        </p>
+        <p className="text-xs text-theme-subtle">
+          {isOffer ? 'Offer listing' : 'Request listing'}
+        </p>
+      </div>
     </div>
   );
 }
