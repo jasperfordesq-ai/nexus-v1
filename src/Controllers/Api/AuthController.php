@@ -66,9 +66,9 @@ class AuthController extends BaseApiController
             );
         }
 
-        // SECURITY: Redis-based rate limiting (fast, per-IP, 5 attempts per minute)
+        // SECURITY: Redis-based rate limiting (fast, per-IP, 10 attempts per minute)
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-        if (\Nexus\Services\RateLimitService::check("auth:login:$ip", 5, 60)) {
+        if (\Nexus\Services\RateLimitService::check("auth:login:$ip", 10, 60)) {
             header('Retry-After: 60');
             return $this->errorResponse(
                 'Too many login attempts. Please try again later.',
