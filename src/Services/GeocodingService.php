@@ -109,8 +109,22 @@ class GeocodingService
         ]);
 
         try {
-            $response = @file_get_contents($url);
-            if ($response === false) {
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_CONNECTTIMEOUT => 5,
+                CURLOPT_FOLLOWLOCATION => false,
+                CURLOPT_SSL_VERIFYPEER => true,
+            ]);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($response === false || $httpCode !== 200) {
+                error_log("Google geocoding HTTP error: code={$httpCode} error={$curlError}");
                 return null;
             }
 
