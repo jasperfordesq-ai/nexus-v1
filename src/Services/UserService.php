@@ -522,11 +522,18 @@ class UserService
             return null;
         }
 
-        // Create upload directory
+        // Create upload directory (ensure www-data can write)
         $tenantId = TenantContext::getId();
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/{$tenantId}/avatars/";
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+            if (!@mkdir($uploadDir, 0755, true)) {
+                self::$errors[] = ['code' => 'UPLOAD_FAILED', 'message' => 'Failed to create upload directory', 'field' => 'avatar'];
+                return null;
+            }
+        }
+        if (!is_writable($uploadDir)) {
+            self::$errors[] = ['code' => 'UPLOAD_FAILED', 'message' => 'Upload directory is not writable', 'field' => 'avatar'];
+            return null;
         }
 
         // Generate secure filename
