@@ -427,7 +427,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -550,7 +550,7 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -588,7 +588,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -624,7 +624,7 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -674,7 +674,7 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -717,7 +717,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -754,7 +754,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -816,7 +816,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -862,7 +862,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -1066,7 +1066,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -1181,7 +1181,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -1239,7 +1239,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -1291,7 +1291,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -1338,7 +1338,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
@@ -1399,7 +1399,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $user = User::findById($id);
+        $user = User::findById($id, !$isSuperAdmin);
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
