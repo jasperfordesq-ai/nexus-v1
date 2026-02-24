@@ -28,9 +28,9 @@ class TokenService
 {
     // Token expiration times
     // Desktop/Web: Short-lived access tokens (2 hours) for security
-    // Mobile: Very long access tokens (1 year) for "install and forget" experience - users stay logged in indefinitely
+    // Mobile: 30-day access tokens — still long-lived for UX, but manageable if compromised
     private const ACCESS_TOKEN_EXPIRY_WEB = 7200;           // 2 hours (desktop/web)
-    private const ACCESS_TOKEN_EXPIRY_MOBILE = 31536000;    // 1 year (mobile - stay logged in indefinitely)
+    private const ACCESS_TOKEN_EXPIRY_MOBILE = 2592000;     // 30 days (mobile - balanced UX/security)
     private const REFRESH_TOKEN_EXPIRY = 63072000;          // 2 years (allows indefinite login with periodic refresh)
     private const REFRESH_TOKEN_EXPIRY_MOBILE = 157680000;  // 5 years (mobile - essentially indefinite)
 
@@ -58,30 +58,23 @@ class TokenService
     }
 
     /**
-     * Check if the current request is from a mobile app
-     * Mobile apps get longer token lifetimes for "install and forget" experience
+     * Check if the current request is from a mobile app (Capacitor/native only).
+     *
+     * Only trusts Capacitor-specific indicators (custom headers and UA string).
+     * Generic "Mobile" in User-Agent is NOT trusted because it is trivially
+     * spoofable and would grant longer-lived tokens to any attacker.
      */
     public static function isMobileRequest(): bool
     {
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-        // Check for Capacitor/native app indicators
-        $isCapacitor = (
+        // Only trust Capacitor/native app indicators — these are set by our own app
+        return (
             strpos($userAgent, 'Capacitor') !== false ||
             strpos($userAgent, 'nexus-mobile') !== false ||
             isset($_SERVER['HTTP_X_CAPACITOR_APP']) ||
             isset($_SERVER['HTTP_X_NEXUS_MOBILE'])
         );
-
-        // Check for mobile user agents (iOS/Android WebView or browsers)
-        $isMobileUA = (
-            strpos($userAgent, 'Mobile') !== false ||
-            strpos($userAgent, 'Android') !== false ||
-            strpos($userAgent, 'iPhone') !== false ||
-            strpos($userAgent, 'iPad') !== false
-        );
-
-        return $isCapacitor || $isMobileUA;
     }
 
     /**

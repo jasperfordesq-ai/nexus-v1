@@ -23,7 +23,6 @@ export function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -31,7 +30,6 @@ export function ForgotPasswordPage() {
 
     try {
       setIsLoading(true);
-      setError('');
       await api.post('/auth/forgot-password', { email });
       setIsSubmitted(true);
     } catch (err) {
@@ -110,13 +108,6 @@ export function ForgotPasswordPage() {
               Enter your email and we'll send you instructions to reset your password.
             </p>
           </div>
-
-          {/* Error */}
-          {error && (
-            <div className="p-3 mb-6 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">

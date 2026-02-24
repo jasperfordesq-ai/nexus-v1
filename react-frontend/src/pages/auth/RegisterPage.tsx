@@ -135,8 +135,8 @@ export function RegisterPage() {
             tokenManager.setTenantId(response.data[0].id);
           }
         }
-      } catch {
-        // Silently fail - tenants will be empty
+      } catch (err) {
+        console.error('[RegisterPage] Failed to fetch tenants:', err);
       } finally {
         setTenantsLoading(false);
       }
@@ -169,7 +169,7 @@ export function RegisterPage() {
     if (isAuthenticated) {
       navigate(tenantPath('/dashboard'), { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, tenantPath]);
 
   // Clear error when form changes
   useEffect(() => {

@@ -619,8 +619,10 @@ class RegistrationApiController extends BaseApiController
             $stmt->execute([$userId, $tokenHash, $expiresAt]);
 
             // Build verification URL using the React frontend URL (not PHP API domain)
+            // Include tenant base path so the link resolves correctly in the React app
             $baseUrl = TenantContext::getFrontendUrl();
-            $verifyUrl = $baseUrl . '/verify-email?token=' . $token . '&user=' . $userId;
+            $basePath = TenantContext::getBasePath();
+            $verifyUrl = $baseUrl . $basePath . '/verify-email?token=' . $token;
 
             // Send email using standard template
             $siteName = TenantContext::getSetting('site_name', 'Project NEXUS');

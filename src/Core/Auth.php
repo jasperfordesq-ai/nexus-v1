@@ -29,7 +29,12 @@ class Auth
 
         try {
             $user = Database::query(
-                "SELECT * FROM users WHERE id = ? LIMIT 1",
+                "SELECT id, tenant_id, first_name, last_name, name, email, role, status,
+                        avatar_url, profile_type, organization_name, location, latitude, longitude,
+                        phone, is_approved, is_verified, is_admin, is_super_admin, is_god,
+                        is_tenant_super_admin, onboarding_completed, email_verified_at,
+                        totp_enabled, created_at, updated_at, last_active_at
+                 FROM users WHERE id = ? LIMIT 1",
                 [$userId]
             )->fetch();
 
