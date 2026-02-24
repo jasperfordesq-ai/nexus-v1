@@ -26,6 +26,7 @@ import { Search, RefreshCw, CheckCircle2, XCircle, AlertCircle, Flag } from 'luc
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
@@ -54,6 +55,8 @@ export default function ReportsManagement() {
 
   const toast = useToast();
   const { user } = useAuth();
+  const { tenant } = useTenant();
+  const currentTenantId = tenant?.id ? String(tenant.id) : '';
   const userRecord = user as Record<string, unknown> | null;
   const isSuperAdmin =
     (user?.role as string) === 'super_admin' ||
@@ -64,11 +67,11 @@ export default function ReportsManagement() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [tenantFilter, setTenantFilter] = useState('');
+  const [tenantFilter, setTenantFilter] = useState(currentTenantId);
   const [activeSearch, setActiveSearch] = useState('');
   const [activeType, setActiveType] = useState('');
   const [activeStatus, setActiveStatus] = useState('');
-  const [activeTenant, setActiveTenant] = useState('');
+  const [activeTenant, setActiveTenant] = useState(currentTenantId);
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'resolve' | 'dismiss';
@@ -104,7 +107,7 @@ export default function ReportsManagement() {
     if (activeSearch) params.append('search', activeSearch);
     if (activeType) params.append('type', activeType);
     if (activeStatus) params.append('status', activeStatus);
-    if (isSuperAdmin && activeTenant) params.append('tenant_id', activeTenant);
+    if (isSuperAdmin && activeTenant && activeTenant !== 'all') params.append('tenant_id', activeTenant);
     return params.toString();
   };
 
@@ -125,11 +128,11 @@ export default function ReportsManagement() {
     setSearch('');
     setTypeFilter('');
     setStatusFilter('');
-    setTenantFilter('');
+    setTenantFilter(currentTenantId);
     setActiveSearch('');
     setActiveType('');
     setActiveStatus('');
-    setActiveTenant('');
+    setActiveTenant(currentTenantId);
     setPage(1);
   };
 
@@ -373,7 +376,7 @@ export default function ReportsManagement() {
             className="w-full sm:w-56"
           >
             {[
-              <SelectItem key="">All Tenants</SelectItem>,
+              <SelectItem key="all">All Tenants</SelectItem>,
               ...tenants.map((t) => (
                 <SelectItem key={t.id.toString()}>
                   {t.name}
@@ -396,7 +399,7 @@ export default function ReportsManagement() {
       {meta && (
         <div className="text-sm text-default-500">
           Showing {reports.length} of {meta.total ?? reports.length} reports
-          {isSuperAdmin && !activeTenant && ' (all tenants)'}
+          {isSuperAdmin && activeTenant === 'all' && ' (all tenants)'}
         </div>
       )}
 
