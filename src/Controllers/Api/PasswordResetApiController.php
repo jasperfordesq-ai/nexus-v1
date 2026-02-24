@@ -168,7 +168,7 @@ class PasswordResetApiController extends BaseApiController
 
         // Update the password — scope by user ID to prevent cross-tenant updates
         $email = $resetRecord['email'];
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        $hashedPassword = password_hash($password, PASSWORD_ARGON2ID);
 
         // Find the specific user for this tenant (or globally if no tenant context)
         $tenantId = TenantContext::getId();
@@ -251,12 +251,13 @@ class PasswordResetApiController extends BaseApiController
             [$email, $hashedToken]
         );
 
-        // Build reset URL
+        // Build reset URL — include tenant base path for correct routing
         $appUrl = TenantContext::getFrontendUrl();
+        $basePath = TenantContext::getBasePath();
 
         // For API clients, provide a deep link or web fallback
         // Mobile apps can intercept this URL pattern
-        $resetUrl = $appUrl . "/password/reset?token=" . $token;
+        $resetUrl = $appUrl . $basePath . "/password/reset?token=" . $token;
 
         // Send reset email
         try {
@@ -287,9 +288,9 @@ class PasswordResetApiController extends BaseApiController
      */
     private function findValidResetToken(string $token): ?array
     {
-        // Find all recent tokens (within expiry window)
+        // Find recent tokens (within expiry window), capped to prevent O(n) scans
         $records = Database::query(
-            "SELECT * FROM password_resets WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)",
+            "SELECT * FROM password_resets WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND) ORDER BY created_at DESC LIMIT 100",
             [self::TOKEN_EXPIRY_SECONDS]
         )->fetchAll();
 
@@ -357,21 +358,25 @@ class PasswordResetApiController extends BaseApiController
     }
 
     /**
-     * Invalidate all refresh tokens for a user
+     * Invalidate all tokens for a user after password change.
      *
-     * Since we use stateless JWTs, we can't truly invalidate them.
-     * However, we can:
-     * 1. Update a "password_changed_at" timestamp that tokens are validated against
-     * 2. Or store a token version that increments on password change
-     *
-     * For now, we'll update the user's password_changed_at field if it exists.
+     * Uses TokenService::revokeAllTokensForUser() to properly revoke
+     * all refresh tokens, forcing re-login on all devices.
+     * Also updates password_changed_at timestamp if the column exists.
      *
      * @param int $userId The specific user ID to invalidate tokens for
      */
     private function invalidateUserTokens(int $userId): void
     {
+        // Revoke all refresh tokens via TokenService (proper JWT revocation)
         try {
-            // Check if password_changed_at column exists
+            \Nexus\Services\TokenService::revokeAllTokensForUser($userId);
+        } catch (\Throwable $e) {
+            error_log("Could not revoke tokens for user {$userId}: " . $e->getMessage());
+        }
+
+        // Also update password_changed_at timestamp if the column exists
+        try {
             $columns = Database::query(
                 "SHOW COLUMNS FROM users LIKE 'password_changed_at'"
             )->fetchAll();
@@ -383,7 +388,6 @@ class PasswordResetApiController extends BaseApiController
                 );
             }
         } catch (\Throwable $e) {
-            // Column might not exist, that's fine
             error_log("Could not update password_changed_at: " . $e->getMessage());
         }
     }

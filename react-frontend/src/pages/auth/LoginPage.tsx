@@ -58,7 +58,6 @@ export function LoginPage() {
   // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // 2FA state
@@ -118,8 +117,8 @@ export function LoginPage() {
             tokenManager.setTenantId(response.data[0].id);
           }
         }
-      } catch {
-        // Silently fail
+      } catch (err) {
+        console.error('[LoginPage] Failed to fetch tenants:', err);
       } finally {
         setTenantsLoading(false);
       }
@@ -367,18 +366,7 @@ export function LoginPage() {
                       }}
                     />
 
-                    <div className="flex items-center justify-between">
-                      <Checkbox
-                        isSelected={remember}
-                        onValueChange={setRemember}
-                        size="sm"
-                        classNames={{
-                          label: 'text-theme-muted text-sm',
-                        }}
-                      >
-                        Remember me
-                      </Checkbox>
-
+                    <div className="flex items-center justify-end">
                       <Link
                         to={tenantPath('/password/forgot')}
                         className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"

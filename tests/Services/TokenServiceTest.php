@@ -153,14 +153,16 @@ class TokenServiceTest extends TestCase
 
     public function testIsMobileRequestDetectsAndroid(): void
     {
+        // Generic Android UA is no longer trusted (spoofable) — only Capacitor UAs are
         $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36';
-        $this->assertTrue(TokenService::isMobileRequest());
+        $this->assertFalse(TokenService::isMobileRequest());
     }
 
     public function testIsMobileRequestDetectsIPhone(): void
     {
+        // Generic iPhone UA is no longer trusted (spoofable) — only Capacitor UAs are
         $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0)';
-        $this->assertTrue(TokenService::isMobileRequest());
+        $this->assertFalse(TokenService::isMobileRequest());
     }
 
     public function testIsMobileRequestReturnsFalseForDesktop(): void
@@ -182,7 +184,7 @@ class TokenServiceTest extends TestCase
         $mobileExpiry = TokenService::getAccessTokenExpiry(true);
 
         $this->assertEquals(7200, $webExpiry, 'Web token should expire in 2 hours');
-        $this->assertEquals(31536000, $mobileExpiry, 'Mobile token should expire in 1 year');
+        $this->assertEquals(2592000, $mobileExpiry, 'Mobile token should expire in 30 days');
         $this->assertGreaterThan($webExpiry, $mobileExpiry);
     }
 

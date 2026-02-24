@@ -73,7 +73,7 @@ import { ProtectedRoute, FeatureGate, ScrollToTop, TenantShell } from '@/compone
 import { LoadingScreen, ErrorBoundary, FeatureErrorBoundary } from '@/components/feedback';
 
 // Auth Pages (not lazy loaded - critical path)
-import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from '@/pages/auth';
+import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage, VerifyEmailPage } from '@/pages/auth';
 
 // Admin Panel (lazy-loaded — keeps recharts, jsPDF, admin sidebar/header out of main bundle)
 const AdminApp = lazyWithRetry(() => import('@/admin/AdminApp'));
@@ -177,6 +177,7 @@ function AppRoutes() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="password/forgot" element={<ForgotPasswordPage />} />
         <Route path="password/reset" element={<ResetPasswordPage />} />
+        <Route path="verify-email" element={<VerifyEmailPage />} />
       </Route>
 
       {/* Main Routes (with navbar/footer) */}

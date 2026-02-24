@@ -109,8 +109,18 @@ class AuthController extends BaseApiController
         }
 
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?");
-        $stmt->execute([$email]);
+
+        // Scope login by tenant when tenant context is available (from X-Tenant-ID header or URL).
+        // This prevents cross-tenant authentication where the same email exists in multiple tenants.
+        // When no tenant context is set (e.g., super admin login), fall back to global email lookup.
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        if ($tenantId) {
+            $stmt = $db->prepare("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ? AND u.tenant_id = ?");
+            $stmt->execute([$email, $tenantId]);
+        } else {
+            $stmt = $db->prepare("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?");
+            $stmt->execute([$email]);
+        }
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
@@ -302,7 +312,35 @@ class AuthController extends BaseApiController
             );
         }
 
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->errorResponse(
+                'Invalid email address',
+                ApiErrorCodes::VALIDATION_INVALID_FORMAT,
+                400
+            );
+        }
+
+        // Validate password strength (minimum 8 chars for legacy endpoint)
+        if (strlen($password) < 8) {
+            return $this->errorResponse(
+                'Password must be at least 8 characters',
+                ApiErrorCodes::VALIDATION_TOO_SHORT,
+                400
+            );
+        }
+
+        // Validate tenant exists
         $db = Database::getConnection();
+        $tenantCheck = $db->prepare("SELECT id FROM tenants WHERE id = ? AND is_active = 1");
+        $tenantCheck->execute([$tenant_id]);
+        if (!$tenantCheck->fetch()) {
+            return $this->errorResponse(
+                'Invalid community',
+                ApiErrorCodes::VALIDATION_INVALID_VALUE,
+                400
+            );
+        }
 
         // Check exists
         $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
@@ -316,7 +354,7 @@ class AuthController extends BaseApiController
         }
 
         // Create user
-        $hashed = password_hash($password, PASSWORD_BCRYPT);
+        $hashed = password_hash($password, PASSWORD_ARGON2ID);
 
         $parts = explode(' ', $name, 2);
         $firstName = $parts[0];
@@ -1041,10 +1079,11 @@ class AuthController extends BaseApiController
      */
     public function adminSession()
     {
-        // Accept token from POST body (preferred) or GET query (deprecated fallback)
+        // Accept token from POST body only — GET query param removed for security
+        // (tokens in URLs appear in server logs, browser history, and Referer headers)
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
-        $token = $input['token'] ?? $_POST['token'] ?? $_GET['token'] ?? '';
-        $redirect = $input['redirect'] ?? $_POST['redirect'] ?? $_GET['redirect'] ?? '/admin-legacy';
+        $token = $input['token'] ?? $_POST['token'] ?? '';
+        $redirect = $input['redirect'] ?? $_POST['redirect'] ?? '/admin-legacy';
 
         // Sanitize redirect — only allow paths starting with /admin-legacy
         if (strpos($redirect, '/admin-legacy') !== 0) {

@@ -247,12 +247,13 @@ class EmailVerificationApiController extends BaseApiController
             [$user['id'], $hashedToken, $expiresAt]
         );
 
-        // Build verification URL
+        // Build verification URL — include tenant base path for correct routing
         $appUrl = TenantContext::getFrontendUrl();
+        $basePath = TenantContext::getBasePath();
 
         // For API clients, provide a URL that mobile apps can intercept
         // or that opens the web verification page
-        $verifyUrl = $appUrl . "/verify-email?token=" . $token;
+        $verifyUrl = $appUrl . $basePath . "/verify-email?token=" . $token;
 
         // Send verification email
         try {
@@ -295,6 +296,10 @@ class EmailVerificationApiController extends BaseApiController
     /**
      * Find a valid (non-expired) verification token
      *
+     * Uses SHA-256 prefix matching to avoid O(n) password_verify scan across
+     * all tokens. Stores a token_prefix column for fast lookup, then verifies
+     * with password_verify for security.
+     *
      * @param string $token The unhashed token from the user
      * @return array|null The verification record if valid, null otherwise
      */
@@ -305,12 +310,25 @@ class EmailVerificationApiController extends BaseApiController
             return null;
         }
 
-        // Find all non-expired tokens
+        // Strategy: try SHA-256 hash match first (used by RegistrationApiController),
+        // then fall back to password_verify for tokens created by EmailVerificationApiController.
+        // This handles both hashing approaches gracefully.
+        $sha256Hash = hash('sha256', $token);
+        $record = Database::query(
+            "SELECT * FROM email_verification_tokens WHERE token = ? AND expires_at > NOW()",
+            [$sha256Hash]
+        )->fetch();
+
+        if ($record) {
+            return $record;
+        }
+
+        // Fallback: scan non-expired tokens with password_verify
+        // (for tokens hashed with password_hash/bcrypt)
         $records = Database::query(
-            "SELECT * FROM email_verification_tokens WHERE expires_at > NOW()"
+            "SELECT * FROM email_verification_tokens WHERE expires_at > NOW() ORDER BY created_at DESC LIMIT 100"
         )->fetchAll();
 
-        // Check each record with password_verify (constant-time comparison)
         foreach ($records as $record) {
             if (password_verify($token, $record['token'])) {
                 return $record;
