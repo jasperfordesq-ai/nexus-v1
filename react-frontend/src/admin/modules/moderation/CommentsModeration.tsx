@@ -24,7 +24,6 @@ import { Search, RefreshCw, EyeOff, Trash2 } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTenant } from '@/contexts/TenantContext';
 import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
@@ -45,8 +44,6 @@ export default function CommentsModeration() {
 
   const toast = useToast();
   const { user } = useAuth();
-  const { tenant } = useTenant();
-  const currentTenantId = tenant?.id ? String(tenant.id) : '';
   const userRecord = user as Record<string, unknown> | null;
   const isSuperAdmin =
     (user?.role as string) === 'super_admin' ||
@@ -56,10 +53,10 @@ export default function CommentsModeration() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [contentTypeFilter, setContentTypeFilter] = useState('');
-  const [tenantFilter, setTenantFilter] = useState(currentTenantId);
+  const [tenantFilter, setTenantFilter] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
   const [activeContentType, setActiveContentType] = useState('');
-  const [activeTenant, setActiveTenant] = useState(currentTenantId);
+  const [activeTenant, setActiveTenant] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'hide' | 'delete';
@@ -89,7 +86,7 @@ export default function CommentsModeration() {
     params.append('limit', '20');
     if (activeSearch) params.append('search', activeSearch);
     if (activeContentType) params.append('content_type', activeContentType);
-    if (isSuperAdmin && activeTenant && activeTenant !== 'all') params.append('tenant_id', activeTenant);
+    if (activeTenant && activeTenant !== 'all') params.append('tenant_id', activeTenant);
     return params.toString();
   };
 
@@ -108,10 +105,10 @@ export default function CommentsModeration() {
   const handleClear = () => {
     setSearch('');
     setContentTypeFilter('');
-    setTenantFilter(currentTenantId);
+    setTenantFilter('');
     setActiveSearch('');
     setActiveContentType('');
-    setActiveTenant(currentTenantId);
+    setActiveTenant('');
     setPage(1);
   };
 
@@ -298,7 +295,7 @@ export default function CommentsModeration() {
       {meta && (
         <div className="text-sm text-default-500">
           Showing {comments.length} of {meta.total ?? comments.length} comments
-          {isSuperAdmin && activeTenant === 'all' && ' (all tenants)'}
+          {isSuperAdmin && !activeTenant && ' (all tenants)'}
         </div>
       )}
 
