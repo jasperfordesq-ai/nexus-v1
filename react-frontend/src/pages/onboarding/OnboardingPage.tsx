@@ -290,36 +290,11 @@ export function OnboardingPage() {
 
   // ── Save interests + proceed handler (Step 3) ──────────────────────────
 
-  const [isSavingInterests, setIsSavingInterests] = useState(false);
-
   const handleSaveInterestsAndProceed = useCallback(async () => {
-    if (selectedInterests.length === 0) {
-      // Nothing to save — just advance
-      goNextAnimated();
-      return;
-    }
-
-    try {
-      setIsSavingInterests(true);
-      const response = await api.post('/v2/onboarding/interests', {
-        category_ids: selectedInterests,
-      });
-
-      if (response.success) {
-        goNextAnimated();
-      } else {
-        // Non-blocking: interests are optional, proceed anyway
-        logError('Failed to save interests', response.error);
-        goNextAnimated();
-      }
-    } catch (error) {
-      logError('Failed to save onboarding interests', error);
-      // Non-blocking: continue even if save fails
-      goNextAnimated();
-    } finally {
-      setIsSavingInterests(false);
-    }
-  }, [selectedInterests, goNextAnimated]);
+    // Interests are saved atomically with skills in /v2/onboarding/complete.
+    // Just advance — no separate API call needed.
+    goNextAnimated();
+  }, [goNextAnimated]);
 
   // ── Interest toggling (Step 3) ───────────────────────────────────────────
 
@@ -373,6 +348,7 @@ export function OnboardingPage() {
       setIsSubmitting(true);
 
       const response = await api.post('/v2/onboarding/complete', {
+        interests: selectedInterests,
         offers: skillOffers,
         needs: skillNeeds,
       });
@@ -423,7 +399,7 @@ export function OnboardingPage() {
   const handleSkip = useCallback(async () => {
     try {
       setIsSubmitting(true);
-      const response = await api.post('/v2/onboarding/complete', { offers: [], needs: [] });
+      const response = await api.post('/v2/onboarding/complete', { interests: [], offers: [], needs: [] });
 
       if (!response.success) {
         const message = response.error || 'Something went wrong.';
@@ -911,8 +887,7 @@ export function OnboardingPage() {
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium"
                     endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
                     onPress={handleSaveInterestsAndProceed}
-                    isLoading={isSavingInterests}
-                    isDisabled={selectedInterests.length === 0 || isSavingInterests}
+                    isDisabled={selectedInterests.length === 0}
                   >
                     Next
                   </Button>
