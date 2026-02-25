@@ -1,28 +1,28 @@
 {
-  "title": "Listings",
-  "browse": "Browse Listings",
-  "create": "Create Listing",
-  "my_listings": "My Listings",
-  "offer": "Offer",
-  "request": "Request",
-  "offering": "Offering",
-  "requesting": "Requesting",
-  "all": "All",
-  "empty": "No listings found",
-  "create_first": "Create your first listing",
+  "title": "Liostaí",
+  "browse": "Brabhsáil Liostaí",
+  "create": "Cruthaigh Liosta",
+  "my_listings": "Mo Liostaí",
+  "offer": "Tairiscint",
+  "request": "Iarratas",
+  "offering": "Ag Tairiscint",
+  "requesting": "Ag Iarraidh",
+  "all": "Uile",
+  "empty": "Gan liostaí le fáil",
+  "create_first": "Cruthaigh do chéad liosta",
   "filters": {
-    "all": "All",
-    "offers": "Offers",
-    "requests": "Requests"
+    "all": "Uile",
+    "offers": "Tairiscintí",
+    "requests": "Iarratais"
   },
   "form": {
-    "title_label": "Title",
-    "description_label": "Description",
-    "type_label": "Type",
-    "category_label": "Category",
-    "hours_label": "Hours",
-    "location_label": "Location",
-    "submit": "Post Listing",
-    "update": "Update Listing"
+    "title_label": "Teideal",
+    "description_label": "Cur síos",
+    "type_label": "Cineál",
+    "category_label": "Catagóir",
+    "hours_label": "Uaireanta",
+    "location_label": "Suíomh",
+    "submit": "Postáil Liosta",
+    "update": "Nuashonraigh Liosta"
   }
 }

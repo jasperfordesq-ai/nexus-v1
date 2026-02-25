@@ -76,11 +76,13 @@ import {
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
 import { PlaceAutocompleteInput } from '@/components/location';
-import { useAuth, useToast, useTenant } from '@/contexts';
+import { useAuth, useToast, useTenant, useTheme } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -148,6 +150,8 @@ export function SettingsPage() {
   const [searchParams] = useSearchParams();
   const { user, logout, refreshUser } = useAuth();
   const { tenantPath, tenant } = useTenant();
+  const { theme, setTheme } = useTheme();
+  const { t } = useTranslation('settings');
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const validTabs = ['profile', 'notifications', 'privacy', 'security'];
@@ -924,6 +928,7 @@ export function SettingsPage() {
         {/* PROFILE TAB */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         {activeTab === 'profile' && (
+          <div className="space-y-6">
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-6">Profile Information</h2>
 
@@ -1078,6 +1083,42 @@ export function SettingsPage() {
               </Button>
             </div>
           </GlassCard>
+
+          {/* ── Language & Appearance ── */}
+          <GlassCard className="p-6">
+            <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
+              <Monitor className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+              {t('language')} &amp; {t('appearance')}
+            </h2>
+
+            <div className="space-y-6">
+              {/* Language preference */}
+              <div>
+                <p className="text-sm font-medium text-theme-primary mb-1">{t('language_preference')}</p>
+                <p className="text-xs text-theme-muted mb-3">{t('select_language')}</p>
+                <LanguageSwitcher compact={false} />
+              </div>
+
+              {/* Theme preference */}
+              <div className="pt-4 border-t border-theme-default">
+                <p className="text-sm font-medium text-theme-primary mb-3">{t('theme.title')}</p>
+                <div className="flex gap-2 flex-wrap">
+                  {(['light', 'dark', 'system'] as const).map((mode) => (
+                    <Button
+                      key={mode}
+                      size="sm"
+                      variant={theme === mode ? 'solid' : 'flat'}
+                      className={theme === mode ? 'bg-indigo-500 text-white' : 'text-theme-secondary'}
+                      onPress={() => setTheme(mode)}
+                    >
+                      {t(`theme.${mode}`)}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </GlassCard>
+          </div>
         )}
 
         {/* ─────────────────────────────────────────────────────────────────── */}

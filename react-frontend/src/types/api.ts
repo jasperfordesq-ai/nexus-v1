@@ -48,6 +48,7 @@ export interface User {
   organization_name?: string;
   has_2fa_enabled?: boolean;
   preferred_layout?: 'modern';
+  preferred_language?: string;
   onboarding_completed?: boolean;
   email_verified_at?: string | null;
   created_at?: string;

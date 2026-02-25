@@ -1,47 +1,47 @@
 {
   "welcome": {
-    "subject": "Welcome to {{community}}!",
-    "greeting": "Welcome, {{name}}!",
-    "body": "Thank you for joining {{community}}. Your account has been created and you can now start exploring the platform.",
-    "cta": "Get Started"
+    "subject": "Fáilte go dtí {{community}}!",
+    "greeting": "Fáilte, {{name}}!",
+    "body": "Go raibh maith agat as clárú le {{community}}. Tá do chuntas cruthaithe agus is féidir leat tús a chur le taiscéalaíocht ar an ardán anois.",
+    "cta": "Tosaigh"
   },
   "verification": {
-    "subject": "Verify your email address",
-    "greeting": "Hi {{name}},",
-    "body": "Please verify your email address by clicking the button below.",
-    "cta": "Verify Email",
-    "expiry": "This link expires in {{hours}} hours."
+    "subject": "Deimhnigh do sheoladh ríomhphoist",
+    "greeting": "Dia duit {{name}},",
+    "body": "Deimhnigh do sheoladh ríomhphoist trí chliceáil ar an gcnaipe thíos.",
+    "cta": "Deimhnigh Ríomhphost",
+    "expiry": "Rachaidh an nasc seo in éag i gceann {{hours}} uair an chloig."
   },
   "password_reset": {
-    "subject": "Reset your password",
-    "greeting": "Hi {{name}},",
-    "body": "You requested a password reset. Click the button below to set a new password.",
-    "cta": "Reset Password",
-    "expiry": "This link expires in {{hours}} hours.",
-    "ignore": "If you did not request this, you can safely ignore this email."
+    "subject": "Athshocraigh do phasfhocal",
+    "greeting": "Dia duit {{name}},",
+    "body": "D'iarr tú athshocrú pasfhocail. Cliceáil ar an gcnaipe thíos chun pasfhocal nua a shocrú.",
+    "cta": "Athshocraigh Pasfhocal",
+    "expiry": "Rachaidh an nasc seo in éag i gceann {{hours}} uair an chloig.",
+    "ignore": "Murar iarr tú é seo, is féidir leat neamhaird a dhéanamh den ríomhphost seo."
   },
   "transaction": {
-    "subject": "Time credit transaction — {{amount}}h",
-    "greeting": "Hi {{name}},",
-    "sent": "You sent {{amount}} hour(s) to {{recipient}}.",
-    "received": "You received {{amount}} hour(s) from {{sender}}.",
-    "description": "Description: {{description}}"
+    "subject": "Idirbheart creidmheasa ama — {{amount}}u",
+    "greeting": "Dia duit {{name}},",
+    "sent": "Sheol tú {{amount}} uair(eanta) chuig {{recipient}}.",
+    "received": "Fuair tú {{amount}} uair(eanta) ó {{sender}}.",
+    "description": "Cur síos: {{description}}"
   },
   "review_request": {
-    "subject": "Leave a review for {{name}}",
-    "greeting": "Hi {{name}},",
-    "body": "You recently exchanged services with {{other_party}}. Please take a moment to leave a review.",
-    "cta": "Leave Review"
+    "subject": "Fág léirmheas do {{name}}",
+    "greeting": "Dia duit {{name}},",
+    "body": "Mhalairtigh tú seirbhísí le {{other_party}} le déanaí. Glac nóiméad le léirmheas a fhágáil.",
+    "cta": "Fág Léirmheas"
   },
   "new_message": {
-    "subject": "New message from {{sender}}",
-    "greeting": "Hi {{name}},",
-    "body": "{{sender}} sent you a message.",
-    "cta": "View Message"
+    "subject": "Teachtaireacht nua ó {{sender}}",
+    "greeting": "Dia duit {{name}},",
+    "body": "Sheol {{sender}} teachtaireacht chugat.",
+    "cta": "Féach ar Theachtaireacht"
   },
   "footer": {
-    "unsubscribe": "Unsubscribe from these emails",
-    "sent_by": "Sent by {{community}} powered by Project NEXUS",
+    "unsubscribe": "Díliostáil ó na ríomhphoist seo",
+    "sent_by": "Seolta ag {{community}} arna chumhachtú ag Project NEXUS",
     "address": "{{community}}"
   }
 }

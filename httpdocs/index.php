@@ -386,7 +386,22 @@ TenantContext::resolve();
 use Nexus\I18n\Translator;
 Translator::init(__DIR__ . '/../lang');
 $_supportedLocales = ['en', 'ga'];
-$_locale = $_SESSION['locale']
+
+// Locale priority: session → logged-in user's DB preference → cookie → Accept-Language header
+$_locale = $_SESSION['locale'] ?? null;
+if (!$_locale && !empty($_SESSION['user_id'])) {
+    // Load preferred_language from the user's DB record (cached in session after first load)
+    $__userLocaleRow = \Nexus\Core\Database::query(
+        "SELECT preferred_language FROM users WHERE id = ? LIMIT 1",
+        [$_SESSION['user_id']]
+    )->fetch(\PDO::FETCH_ASSOC);
+    if (!empty($__userLocaleRow['preferred_language'])) {
+        $_locale = $__userLocaleRow['preferred_language'];
+        $_SESSION['locale'] = $_locale; // Cache for next request
+    }
+    unset($__userLocaleRow);
+}
+$_locale = $_locale
     ?? $_COOKIE['nexus_language']
     ?? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'en', 0, 2);
 Translator::setLocale(in_array($_locale, $_supportedLocales, true) ? $_locale : 'en');

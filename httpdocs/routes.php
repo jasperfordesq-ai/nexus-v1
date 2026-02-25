@@ -261,6 +261,7 @@ $router->add('PUT', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiControlle
 $router->add('GET', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@getPreferences');
 $router->add('PUT', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@updatePreferences');
 $router->add('PUT', '/api/v2/users/me/theme', 'Nexus\Controllers\Api\UsersApiController@updateTheme');
+$router->add('PUT', '/api/v2/users/me/language', 'Nexus\Controllers\Api\UsersApiController@updateLanguage');
 $router->add('POST', '/api/v2/users/me/avatar', 'Nexus\Controllers\Api\UsersApiController@updateAvatar');
 $router->add('POST', '/api/v2/users/me/password', 'Nexus\Controllers\Api\UsersApiController@updatePassword');
 $router->add('DELETE', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@deleteAccount');
