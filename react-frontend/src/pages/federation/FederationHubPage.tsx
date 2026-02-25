@@ -46,6 +46,7 @@ import {
   XCircle,
   Clock,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/navigation';
 import { useTenant, useToast } from '@/contexts';
@@ -188,6 +189,7 @@ const itemVariants = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOptingIn: boolean }) {
+  const { t } = useTranslation('federation');
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -215,11 +217,10 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
           </motion.div>
 
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Connect Beyond Your Community
+            {t('hub.hero_title')}
           </h1>
           <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Federation lets you discover members, listings, and events from partner
-            timebanks in your network.
+            {t('hub.hero_description')}
           </p>
 
           <Button
@@ -229,14 +230,14 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
             isLoading={isOptingIn}
             startContent={!isOptingIn ? <Globe className="w-5 h-5" aria-hidden="true" /> : undefined}
           >
-            Enable Federation
+            {t('hub.enable_federation')}
           </Button>
         </div>
       </div>
 
       {/* How It Works */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-6">How It Works</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-6">{t('hub.how_it_works')}</h2>
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -261,8 +262,8 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
                       {index + 1}
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{card.title}</h3>
-                  <p className="text-sm text-default-500">{card.description}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{t(`hub.how_it_works_${index}_title`)}</h3>
+                  <p className="text-sm text-default-500">{t(`hub.how_it_works_${index}_description`)}</p>
                 </GlassCard>
               </motion.div>
             );
@@ -275,23 +276,23 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
           <div>
             <Shield className="w-8 h-8 text-emerald-500 mx-auto mb-2" aria-hidden="true" />
-            <h4 className="font-semibold text-foreground mb-1">Privacy First</h4>
+            <h4 className="font-semibold text-foreground mb-1">{t('hub.feature_privacy_title')}</h4>
             <p className="text-sm text-default-500">
-              You control exactly what information is shared with other communities.
+              {t('hub.feature_privacy_description')}
             </p>
           </div>
           <div>
             <Zap className="w-8 h-8 text-amber-500 mx-auto mb-2" aria-hidden="true" />
-            <h4 className="font-semibold text-foreground mb-1">Instant Setup</h4>
+            <h4 className="font-semibold text-foreground mb-1">{t('hub.feature_instant_title')}</h4>
             <p className="text-sm text-default-500">
-              Enable federation with one click. Customize your settings any time.
+              {t('hub.feature_instant_description')}
             </p>
           </div>
           <div>
             <Handshake className="w-8 h-8 text-indigo-500 mx-auto mb-2" aria-hidden="true" />
-            <h4 className="font-semibold text-foreground mb-1">Trusted Network</h4>
+            <h4 className="font-semibold text-foreground mb-1">{t('hub.feature_network_title')}</h4>
             <p className="text-sm text-default-500">
-              Only verified partner communities with broker oversight can participate.
+              {t('hub.feature_network_description')}
             </p>
           </div>
         </div>
@@ -305,31 +306,32 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
 // ─────────────────────────────────────────────────────────────────────────────
 
 function StatsRow({ stats, enabled }: { stats: FederationDashboardData['stats']; enabled: boolean }) {
+  const { t } = useTranslation('federation');
   const statCards = [
     {
-      label: 'Partner Communities',
+      label: t('hub.stat_partners'),
       value: stats.partners_count,
       icon: Globe,
       gradient: 'from-indigo-500 to-blue-500',
     },
     {
-      label: 'Federated Messages',
+      label: t('hub.stat_messages'),
       value: stats.messages_count,
       icon: MessageSquare,
       gradient: 'from-purple-500 to-pink-500',
     },
     {
-      label: 'Cross-Community Exchanges',
+      label: t('hub.stat_exchanges'),
       value: stats.transactions_count,
       icon: ArrowRightLeft,
       gradient: 'from-cyan-500 to-teal-500',
     },
     {
-      label: 'Federation Status',
+      label: t('hub.stat_status'),
       value: null,
       icon: Activity,
       gradient: 'from-emerald-500 to-green-500',
-      chipContent: enabled ? 'Active' : 'Inactive',
+      chipContent: enabled ? t('hub.status_active') : t('hub.status_inactive'),
       chipColor: enabled ? ('success' as const) : ('default' as const),
     },
   ];
@@ -386,16 +388,17 @@ function StatsRow({ stats, enabled }: { stats: FederationDashboardData['stats'];
 
 function QuickLinksSection() {
   const { tenantPath } = useTenant();
+  const { t } = useTranslation('federation');
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-bold text-foreground mb-4">Explore the Network</h2>
+      <h2 className="text-xl font-bold text-foreground mb-4">{t('hub.explore_network')}</h2>
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="grid grid-cols-2 md:grid-cols-3 gap-4"
       >
-        {quickLinks.map((link) => {
+        {quickLinks.map((link, index) => {
           const Icon = link.icon;
           return (
             <motion.div key={link.href} variants={itemVariants}>
@@ -409,9 +412,9 @@ function QuickLinksSection() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-semibold text-foreground text-sm leading-tight mb-1 group-hover:text-primary transition-colors">
-                        {link.title}
+                        {t(`hub.quick_link_${index}_title`)}
                       </h3>
-                      <p className="text-xs text-default-500 line-clamp-2">{link.description}</p>
+                      <p className="text-xs text-default-500 line-clamp-2">{t(`hub.quick_link_${index}_description`)}</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -430,17 +433,18 @@ function QuickLinksSection() {
 
 function PartnerCommunitiesSection({ partners }: { partners: FederationPartner[] }) {
   const { tenantPath } = useTenant();
+  const { t } = useTranslation('federation');
   if (partners.length === 0) {
     return (
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-foreground">Partner Communities</h2>
+          <h2 className="text-xl font-bold text-foreground">{t('hub.partner_communities')}</h2>
         </div>
         <GlassCard className="p-8 text-center">
           <Globe className="w-12 h-12 text-default-300 mx-auto mb-3" aria-hidden="true" />
-          <p className="text-default-500 mb-1">No partner communities yet</p>
+          <p className="text-default-500 mb-1">{t('hub.no_partners_yet')}</p>
           <p className="text-sm text-default-400">
-            Your community will appear here once partnerships are established.
+            {t('hub.no_partners_description')}
           </p>
         </GlassCard>
       </div>
@@ -452,13 +456,13 @@ function PartnerCommunitiesSection({ partners }: { partners: FederationPartner[]
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-foreground">Partner Communities</h2>
+        <h2 className="text-xl font-bold text-foreground">{t('hub.partner_communities')}</h2>
         {partners.length > 4 && (
           <Link
             to={tenantPath("/federation/partners")}
             className="text-sm text-primary hover:text-primary-600 flex items-center gap-1 transition-colors"
           >
-            View All ({partners.length})
+            {t('hub.view_all', { count: partners.length })}
             <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </Link>
         )}
@@ -496,7 +500,7 @@ function PartnerCommunitiesSection({ partners }: { partners: FederationPartner[]
                   {partner.federation_level_name}
                 </Chip>
                 <span className="text-xs text-default-400">
-                  {partner.member_count} {partner.member_count === 1 ? 'member' : 'members'}
+                  {t('hub.member_count', { count: partner.member_count })}
                 </span>
               </div>
 
@@ -509,7 +513,7 @@ function PartnerCommunitiesSection({ partners }: { partners: FederationPartner[]
                 className="w-full"
                 endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}
               >
-                View Community
+                {t('hub.view_community')}
               </Button>
             </GlassCard>
           </motion.div>
@@ -524,15 +528,16 @@ function PartnerCommunitiesSection({ partners }: { partners: FederationPartner[]
 // ─────────────────────────────────────────────────────────────────────────────
 
 function RecentActivitySection({ activity }: { activity: FederationActivityItem[] }) {
+  const { t } = useTranslation('federation');
   if (activity.length === 0) {
     return (
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-foreground mb-4">Recent Activity</h2>
+        <h2 className="text-xl font-bold text-foreground mb-4">{t('hub.recent_activity')}</h2>
         <GlassCard className="p-8 text-center">
           <Activity className="w-12 h-12 text-default-300 mx-auto mb-3" aria-hidden="true" />
-          <p className="text-default-500 mb-1">No federation activity yet</p>
+          <p className="text-default-500 mb-1">{t('hub.no_activity_yet')}</p>
           <p className="text-sm text-default-400">
-            Your cross-community interactions will appear here.
+            {t('hub.no_activity_description')}
           </p>
         </GlassCard>
       </div>
@@ -541,7 +546,7 @@ function RecentActivitySection({ activity }: { activity: FederationActivityItem[
 
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-bold text-foreground mb-4">Recent Activity</h2>
+      <h2 className="text-xl font-bold text-foreground mb-4">{t('hub.recent_activity')}</h2>
       <GlassCard className="divide-y divide-default-200">
         <AnimatePresence>
           {activity.slice(0, 5).map((item, index) => {
@@ -581,7 +586,7 @@ function RecentActivitySection({ activity }: { activity: FederationActivityItem[
                       <span className="text-xs text-default-500">
                         {item.actor.name}
                         {item.actor.tenant_name && (
-                          <span className="text-default-400"> from {item.actor.tenant_name}</span>
+                          <span className="text-default-400"> {t('hub.from_community', { community: item.actor.tenant_name })}</span>
                         )}
                       </span>
                     </div>
@@ -601,14 +606,15 @@ function RecentActivitySection({ activity }: { activity: FederationActivityItem[
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function FederationHubPage() {
-  usePageTitle('Federation');
+  const { t } = useTranslation('federation');
+  usePageTitle(t('hub.page_title'));
 
   const { tenant, tenantPath } = useTenant();
   const toast = useToast();
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Dashboard', href: tenantPath('/dashboard') },
-    { label: 'Federation' },
+    { label: t('hub.breadcrumb_dashboard'), href: tenantPath('/dashboard') },
+    { label: t('hub.breadcrumb_federation') },
   ];
 
   const [isLoading, setIsLoading] = useState(true);
@@ -636,7 +642,7 @@ export default function FederationHubPage() {
       const statusRes = await api.get<FederationStatus>('/v2/federation/status');
 
       if (!statusRes.success || !statusRes.data) {
-        setError(statusRes.error || 'Failed to load federation status.');
+        setError(statusRes.error || t('hub.error_load_status'));
         setIsLoading(false);
         return;
       }
@@ -687,7 +693,7 @@ export default function FederationHubPage() {
       setData(newData);
     } catch (err) {
       logError('FederationHubPage: Failed to load data', err);
-      setError('Something went wrong. Please try again.');
+      setError(t('hub.error_generic'));
     } finally {
       setIsLoading(false);
     }
@@ -704,14 +710,14 @@ export default function FederationHubPage() {
     try {
       const res = await api.post<{ success: boolean }>('/v2/federation/opt-in');
       if (res.success) {
-        toast.success('Federation Enabled', 'You are now part of the federation network.');
+        toast.success(t('hub.toast_enabled_title'), t('hub.toast_enabled_description'));
         await loadData();
       } else {
-        toast.error('Could not enable federation', res.error || 'Please try again.');
+        toast.error(t('hub.toast_enable_error_title'), res.error || t('hub.toast_enable_error_description'));
       }
     } catch (err) {
       logError('FederationHubPage: Opt-in failed', err);
-      toast.error('Error', 'Something went wrong while enabling federation.');
+      toast.error(t('hub.toast_error'), t('hub.toast_enable_error_generic'));
     } finally {
       setIsOptingIn(false);
     }
@@ -724,15 +730,15 @@ export default function FederationHubPage() {
     try {
       const res = await api.post<{ success: boolean }>('/v2/federation/opt-out');
       if (res.success) {
-        toast.info('Federation Disabled', 'You have left the federation network.');
+        toast.info(t('hub.toast_disabled_title'), t('hub.toast_disabled_description'));
         setShowOptOutConfirm(false);
         await loadData();
       } else {
-        toast.error('Could not disable federation', res.error || 'Please try again.');
+        toast.error(t('hub.toast_disable_error_title'), res.error || t('hub.toast_disable_error_description'));
       }
     } catch (err) {
       logError('FederationHubPage: Opt-out failed', err);
-      toast.error('Error', 'Something went wrong while disabling federation.');
+      toast.error(t('hub.toast_error'), t('hub.toast_disable_error_generic'));
     } finally {
       setIsOptingOut(false);
     }
@@ -746,7 +752,7 @@ export default function FederationHubPage() {
         <Breadcrumbs items={breadcrumbs} />
         <div className="flex flex-col items-center justify-center py-24">
           <Spinner size="lg" color="primary" />
-          <p className="text-default-500 mt-4">Loading federation data...</p>
+          <p className="text-default-500 mt-4">{t('hub.loading')}</p>
         </div>
       </div>
     );
@@ -760,7 +766,7 @@ export default function FederationHubPage() {
         <Breadcrumbs items={breadcrumbs} />
         <GlassCard className="p-12 text-center mt-6">
           <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-xl font-semibold text-foreground mb-2">Unable to Load</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-2">{t('hub.unable_to_load')}</h2>
           <p className="text-default-500 mb-6">{error}</p>
           <Button
             color="primary"
@@ -768,7 +774,7 @@ export default function FederationHubPage() {
             onPress={loadData}
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
           >
-            Try Again
+            {t('hub.try_again')}
           </Button>
         </GlassCard>
       </div>
@@ -783,13 +789,12 @@ export default function FederationHubPage() {
         <Breadcrumbs items={breadcrumbs} />
         <GlassCard className="p-12 text-center mt-6">
           <Network className="w-16 h-16 text-default-300 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-2xl font-bold text-foreground mb-2">Federation Not Available</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">{t('hub.not_available_title')}</h2>
           <p className="text-default-500 mb-2">
-            Federation is not currently enabled for{' '}
-            <span className="font-medium">{tenant?.name || 'your community'}</span>.
+            {t('hub.not_available_description', { community: tenant?.name || t('hub.your_community') })}
           </p>
           <p className="text-sm text-default-400">
-            Contact your community administrator to learn more about joining the federation network.
+            {t('hub.not_available_contact')}
           </p>
         </GlassCard>
       </div>
@@ -811,12 +816,12 @@ export default function FederationHubPage() {
       >
         <div className="flex items-center gap-3 mb-1">
           <Network className="w-7 h-7 text-primary" aria-hidden="true" />
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Federation Hub</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('hub.title')}</h1>
         </div>
         <p className="text-default-500 ml-10">
           {isOptedIn
-            ? 'Manage your cross-community connections and explore the federation network.'
-            : 'Join the federation network to connect with partner communities.'}
+            ? t('hub.subtitle_opted_in')
+            : t('hub.subtitle_opted_out')}
         </p>
       </motion.div>
 
@@ -841,7 +846,7 @@ export default function FederationHubPage() {
                 onPress={() => setShowOptOutConfirm(true)}
                 className="text-default-400 hover:text-danger"
               >
-                Disable Federation
+                {t('hub.disable_federation')}
               </Button>
             ) : (
               <motion.div
@@ -850,7 +855,7 @@ export default function FederationHubPage() {
                 className="inline-flex flex-col items-center gap-3"
               >
                 <p className="text-sm text-default-500">
-                  Are you sure? This will remove your profile from the federation network.
+                  {t('hub.disable_confirm_message')}
                 </p>
                 <div className="flex items-center gap-3">
                   <Button
@@ -860,14 +865,14 @@ export default function FederationHubPage() {
                     onPress={handleOptOut}
                     isLoading={isOptingOut}
                   >
-                    Yes, Disable
+                    {t('hub.disable_confirm_yes')}
                   </Button>
                   <Button
                     variant="flat"
                     size="sm"
                     onPress={() => setShowOptOutConfirm(false)}
                   >
-                    Cancel
+                    {t('hub.disable_confirm_cancel')}
                   </Button>
                 </div>
               </motion.div>

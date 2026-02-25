@@ -31,6 +31,7 @@ import {
   Car,
   User,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant } from '@/contexts';
@@ -47,7 +48,8 @@ const SERVICE_REACH_META: Record<string, { label: string; icon: typeof Home }> =
 };
 
 export function FederationMemberProfilePage() {
-  usePageTitle('Member Profile');
+  const { t } = useTranslation('federation');
+  usePageTitle(t('member_profile.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -66,11 +68,11 @@ export function FederationMemberProfilePage() {
       if (response.success && response.data) {
         setMember(response.data);
       } else {
-        setError('Member not found or not accessible.');
+        setError(t('member_profile.not_found_error'));
       }
     } catch (err) {
       logError('Failed to load federated member profile', err);
-      setError('Failed to load member profile. Please try again.');
+      setError(t('member_profile.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +94,7 @@ export function FederationMemberProfilePage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label="Loading member profile..." />
+        <Spinner size="lg" label={t('member_profile.loading')} />
       </div>
     );
   }
@@ -103,18 +105,18 @@ export function FederationMemberProfilePage() {
       <div className="space-y-6">
         <Breadcrumbs
           items={[
-            { label: 'Federation', href: tenantPath('/federation') },
-            { label: 'Members', href: tenantPath('/federation/members') },
-            { label: 'Profile' },
+            { label: t('member_profile.breadcrumb_federation'), href: tenantPath('/federation') },
+            { label: t('member_profile.breadcrumb_members'), href: tenantPath('/federation/members') },
+            { label: t('member_profile.breadcrumb_profile') },
           ]}
         />
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
-            Member Not Found
+            {t('member_profile.not_found_heading')}
           </h2>
           <p className="text-theme-muted mb-4">
-            {error || 'This federated member could not be found or is not accessible from your community.'}
+            {error || t('member_profile.not_found_description')}
           </p>
           <div className="flex gap-3 justify-center">
             <Button
@@ -123,14 +125,14 @@ export function FederationMemberProfilePage() {
               startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               onPress={() => navigate(tenantPath('/federation/members'))}
             >
-              Back to Members
+              {t('member_profile.back_to_members')}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={loadMember}
             >
-              Try Again
+              {t('member_profile.try_again')}
             </Button>
           </div>
         </GlassCard>
@@ -145,8 +147,8 @@ export function FederationMemberProfilePage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Federation', href: tenantPath('/federation') },
-          { label: 'Members', href: tenantPath('/federation/members') },
+          { label: t('member_profile.breadcrumb_federation'), href: tenantPath('/federation') },
+          { label: t('member_profile.breadcrumb_members'), href: tenantPath('/federation/members') },
           { label: displayName },
         ]}
       />
@@ -196,7 +198,7 @@ export function FederationMemberProfilePage() {
                 )}
                 <span className="flex items-center gap-1.5">
                   <ReachIcon className="w-4 h-4" aria-hidden="true" />
-                  {reachMeta.label}
+                  {t(`member_profile.reach_${reachKey}`)}
                 </span>
               </div>
 
@@ -212,7 +214,7 @@ export function FederationMemberProfilePage() {
                       )
                     }
                   >
-                    Send Message
+                    {t('member_profile.send_message')}
                   </Button>
                 )}
                 <Button
@@ -221,7 +223,7 @@ export function FederationMemberProfilePage() {
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => navigate(tenantPath('/federation/members'))}
                 >
-                  Back to Members
+                  {t('member_profile.back_to_members')}
                 </Button>
               </div>
             </div>
@@ -235,7 +237,7 @@ export function FederationMemberProfilePage() {
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-3 flex items-center gap-2">
               <User className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-              About
+              {t('member_profile.about')}
             </h2>
             <p className="text-theme-muted whitespace-pre-line">{member.bio}</p>
           </GlassCard>
@@ -247,7 +249,7 @@ export function FederationMemberProfilePage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-3">
-              Skills & Interests
+              {t('member_profile.skills_interests')}
             </h2>
             <div className="flex flex-wrap gap-2">
               {skills.map((skill) => (

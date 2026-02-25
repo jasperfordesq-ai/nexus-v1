@@ -34,6 +34,7 @@ import {
   UserCheck,
   Handshake,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant } from '@/contexts';
@@ -84,6 +85,7 @@ const PERMISSION_META: Record<string, { label: string; icon: typeof Globe }> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function FederationPartnerDetailPage() {
+  const { t } = useTranslation('federation');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -93,7 +95,7 @@ export function FederationPartnerDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  usePageTitle(partner?.name ?? 'Partner Community');
+  usePageTitle(partner?.name ?? t('partner_detail.page_title'));
 
   const loadPartner = useCallback(async () => {
     if (!id) return;
@@ -106,14 +108,14 @@ export function FederationPartnerDetailPage() {
         if (found) {
           setPartner(found);
         } else {
-          setError('Partner community not found or not accessible.');
+          setError(t('partner_detail.not_found_error'));
         }
       } else {
-        setError('Failed to load partner communities.');
+        setError(t('partner_detail.load_communities_error'));
       }
     } catch (err) {
       logError('Failed to load federation partner', err);
-      setError('Failed to load partner community. Please try again.');
+      setError(t('partner_detail.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +129,7 @@ export function FederationPartnerDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label="Loading partner community..." />
+        <Spinner size="lg" label={t('partner_detail.loading')} />
       </div>
     );
   }
@@ -138,18 +140,18 @@ export function FederationPartnerDetailPage() {
       <div className="space-y-6">
         <Breadcrumbs
           items={[
-            { label: 'Federation', href: tenantPath('/federation') },
-            { label: 'Partners', href: tenantPath('/federation/partners') },
-            { label: 'Not Found' },
+            { label: t('partner_detail.breadcrumb_federation'), href: tenantPath('/federation') },
+            { label: t('partner_detail.breadcrumb_partners'), href: tenantPath('/federation/partners') },
+            { label: t('partner_detail.breadcrumb_not_found') },
           ]}
         />
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
-            Partner Not Found
+            {t('partner_detail.not_found_heading')}
           </h2>
           <p className="text-theme-muted mb-4">
-            {error || 'This partner community could not be found or is not accessible from your community.'}
+            {error || t('partner_detail.not_found_description')}
           </p>
           <div className="flex gap-3 justify-center">
             <Button
@@ -158,14 +160,14 @@ export function FederationPartnerDetailPage() {
               startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               onPress={() => navigate(tenantPath('/federation/partners'))}
             >
-              Back to Partners
+              {t('partner_detail.back_to_partners')}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={loadPartner}
             >
-              Try Again
+              {t('partner_detail.try_again')}
             </Button>
           </div>
         </GlassCard>
@@ -180,8 +182,8 @@ export function FederationPartnerDetailPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Federation', href: tenantPath('/federation') },
-          { label: 'Partners', href: tenantPath('/federation/partners') },
+          { label: t('partner_detail.breadcrumb_federation'), href: tenantPath('/federation') },
+          { label: t('partner_detail.breadcrumb_partners'), href: tenantPath('/federation/partners') },
           { label: partner.name },
         ]}
       />
@@ -236,15 +238,16 @@ export function FederationPartnerDetailPage() {
                 )}
                 <span className="flex items-center gap-1.5">
                   <Users className="w-4 h-4" aria-hidden="true" />
-                  {partner.member_count.toLocaleString()} members
+                  {t('partner_detail.member_count', { count: partner.member_count })}
                 </span>
                 {partner.partnership_since && (
                   <span className="flex items-center gap-1.5">
                     <Shield className="w-4 h-4" aria-hidden="true" />
-                    Partner since{' '}
-                    {new Date(partner.partnership_since).toLocaleDateString('en-US', {
-                      month: 'long',
-                      year: 'numeric',
+                    {t('partner_detail.partner_since', {
+                      date: new Date(partner.partnership_since).toLocaleDateString('en-US', {
+                        month: 'long',
+                        year: 'numeric',
+                      }),
                     })}
                   </span>
                 )}
@@ -259,7 +262,7 @@ export function FederationPartnerDetailPage() {
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                         startContent={<Users className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Browse Members
+                        {t('partner_detail.browse_members')}
                       </Button>
                     </Link>
                     <Link to={tenantPath(`/federation/listings?partner_id=${partner.id}`)}>
@@ -268,7 +271,7 @@ export function FederationPartnerDetailPage() {
                         className="bg-theme-elevated text-theme-primary"
                         startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Browse Listings
+                        {t('partner_detail.browse_listings')}
                       </Button>
                     </Link>
                   </>
@@ -279,7 +282,7 @@ export function FederationPartnerDetailPage() {
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => navigate(tenantPath('/federation/partners'))}
                 >
-                  Back to Partners
+                  {t('partner_detail.back_to_partners')}
                 </Button>
               </div>
             </div>
@@ -293,7 +296,7 @@ export function FederationPartnerDetailPage() {
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-3 flex items-center gap-2">
               <Globe className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-              Available Features
+              {t('partner_detail.available_features')}
             </h2>
             <div className="flex flex-wrap gap-2">
               {partner.permissions.map((perm) => {
@@ -306,7 +309,7 @@ export function FederationPartnerDetailPage() {
                     className="bg-theme-hover text-theme-muted"
                     startContent={<Icon className="w-3.5 h-3.5" aria-hidden="true" />}
                   >
-                    {meta?.label || perm}
+                    {meta ? t(`partner_detail.permission_${perm}`) : perm}
                   </Chip>
                 );
               })}
