@@ -36,7 +36,7 @@ interface PageData {
 
 export function CustomPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { tenantPath, branding, tenant } = useTenant();
+  const { tenantPath, branding, tenant, isLoading: tenantLoading } = useTenant();
 
   const [page, setPage] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,15 +44,20 @@ export function CustomPage() {
 
   usePageTitle(page?.title || 'Page');
 
+  // tenantId captured as primitive to avoid object reference churn in deps
+  const tenantId = tenant?.id ?? null;
+
   const loadPage = useCallback(async () => {
-    if (!slug) return;
+    // Wait for tenant bootstrap to complete before fetching — avoids stale closure
+    // where tenantId is null and context_tenant is omitted from the request.
+    if (!slug || tenantLoading) return;
     setLoading(true);
     setNotFound(false);
 
     try {
       // Include context_tenant so the PHP API can resolve the correct tenant for
       // unauthenticated requests (where X-Tenant-ID header is not available).
-      const tenantParam = tenant?.id ? `?context_tenant=${tenant.id}` : '';
+      const tenantParam = tenantId ? `?context_tenant=${tenantId}` : '';
       const res = await api.get<PageData>(`/v2/pages/${encodeURIComponent(slug)}${tenantParam}`);
       if (res.success && res.data) {
         setPage(res.data);
@@ -65,7 +70,7 @@ export function CustomPage() {
     } finally {
       setLoading(false);
     }
-  }, [slug]);
+  }, [slug, tenantId, tenantLoading]);
 
   useEffect(() => {
     loadPage();
