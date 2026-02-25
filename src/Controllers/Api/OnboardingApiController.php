@@ -101,12 +101,14 @@ class OnboardingApiController extends BaseApiController
      * POST /api/v2/onboarding/complete
      *
      * Complete the onboarding process:
-     * 1. Save final skill selections (offers/needs)
-     * 2. Auto-create listings from skill selections
-     * 3. Mark onboarding as complete
+     * 1. Save interest selections (optional)
+     * 2. Save skill selections (offers/needs)
+     * 3. Auto-create listings from skill selections
+     * 4. Mark onboarding as complete
      *
      * Request Body:
      * {
+     *   "interests": [1, 2],
      *   "offers": [1, 3],
      *   "needs": [5, 7]
      * }
@@ -145,10 +147,18 @@ class OnboardingApiController extends BaseApiController
             return;
         }
 
+        $interests = $this->input('interests', []);
         $offers = $this->input('offers', []);
         $needs = $this->input('needs', []);
 
         // Sanitize: ensure all IDs are integers
+        if (is_array($interests)) {
+            $interests = array_map('intval', $interests);
+            $interests = array_filter($interests, fn($id) => $id > 0);
+        } else {
+            $interests = [];
+        }
+
         if (is_array($offers)) {
             $offers = array_map('intval', $offers);
             $offers = array_filter($offers, fn($id) => $id > 0);
@@ -162,6 +172,9 @@ class OnboardingApiController extends BaseApiController
         } else {
             $needs = [];
         }
+
+        // Save interests (optional — may be empty)
+        OnboardingService::saveInterests($userId, $interests);
 
         // Save final skills
         OnboardingService::saveSkills($userId, $offers, $needs);
