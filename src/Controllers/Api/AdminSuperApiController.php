@@ -253,6 +253,29 @@ class AdminSuperApiController extends BaseApiController
             'allows_subtenants' => !empty($input['allows_subtenants']),
             'max_depth' => (int) ($input['max_depth'] ?? 2),
             'is_active' => isset($input['is_active']) ? (int) (bool) $input['is_active'] : 1,
+            'features' => $input['features'] ?? null,
+            'contact_email' => $input['contact_email'] ?? '',
+            'contact_phone' => $input['contact_phone'] ?? '',
+            'address' => $input['address'] ?? '',
+            // SEO fields
+            'meta_title' => $input['meta_title'] ?? '',
+            'meta_description' => $input['meta_description'] ?? '',
+            'h1_headline' => $input['h1_headline'] ?? '',
+            'hero_intro' => $input['hero_intro'] ?? '',
+            'og_image_url' => $input['og_image_url'] ?? '',
+            'robots_directive' => $input['robots_directive'] ?? '',
+            // Location fields
+            'location_name' => $input['location_name'] ?? '',
+            'country_code' => $input['country_code'] ?? '',
+            'service_area' => $input['service_area'] ?? '',
+            'latitude' => $input['latitude'] ?? '',
+            'longitude' => $input['longitude'] ?? '',
+            // Social media fields
+            'social_facebook' => $input['social_facebook'] ?? '',
+            'social_twitter' => $input['social_twitter'] ?? '',
+            'social_instagram' => $input['social_instagram'] ?? '',
+            'social_linkedin' => $input['social_linkedin'] ?? '',
+            'social_youtube' => $input['social_youtube'] ?? '',
         ];
 
         $result = TenantHierarchyService::createTenant($data, $parentId);
@@ -516,6 +539,12 @@ class AdminSuperApiController extends BaseApiController
             return;
         }
 
+        $allowedRoles = ['member', 'admin', 'tenant_admin', 'broker', 'super_admin'];
+        if (!in_array($role, $allowedRoles, true)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid role. Allowed: ' . implode(', ', $allowedRoles), 'role', 422);
+            return;
+        }
+
         // Check email uniqueness
         $existing = User::findGlobalByEmail($email);
         if ($existing) {
@@ -583,6 +612,12 @@ class AdminSuperApiController extends BaseApiController
 
         if (empty($firstName) || empty($email)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'first_name and email are required', null, 422);
+            return;
+        }
+
+        $allowedRoles = ['member', 'admin', 'tenant_admin', 'broker', 'super_admin'];
+        if (!in_array($role, $allowedRoles, true)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid role. Allowed: ' . implode(', ', $allowedRoles), 'role', 422);
             return;
         }
 
@@ -954,7 +989,8 @@ class AdminSuperApiController extends BaseApiController
             return;
         }
 
-        $movedCount = 0;
+        // Pre-validate ALL users before moving any (prevents partial failures)
+        $validatedUsers = [];
         $errors = [];
 
         foreach ($userIds as $uid) {
@@ -966,11 +1002,32 @@ class AdminSuperApiController extends BaseApiController
                 continue;
             }
 
+            if ((int) $user['tenant_id'] === $targetTenantId) {
+                $errors[] = "User ID {$uid} is already in the target tenant";
+                continue;
+            }
+
             if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
                 $errors[] = "No access to user ID {$uid}'s tenant";
                 continue;
             }
 
+            $validatedUsers[] = $uid;
+        }
+
+        // If pre-validation found errors and no valid users, return early
+        if (empty($validatedUsers) && !empty($errors)) {
+            $this->respondWithData([
+                'updated_count' => 0,
+                'errors' => $errors,
+            ]);
+            return;
+        }
+
+        // Move all validated users
+        $movedCount = 0;
+
+        foreach ($validatedUsers as $uid) {
             try {
                 $moveResult = User::moveTenant($uid, $targetTenantId);
                 if (!$moveResult['success']) {

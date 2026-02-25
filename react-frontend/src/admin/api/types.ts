@@ -1044,6 +1044,7 @@ export interface SuperAdminTenant {
   description?: string;
   parent_id: number | null;
   parent_name?: string;
+  depth: number;
   is_active: boolean;
   allows_subtenants: boolean;
   max_depth: number;
@@ -1090,6 +1091,26 @@ export interface CreateTenantPayload {
   allows_subtenants?: boolean;
   max_depth?: number;
   is_active?: boolean;
+  features?: Record<string, boolean>;
+  contact_email?: string;
+  contact_phone?: string;
+  address?: string;
+  meta_title?: string;
+  meta_description?: string;
+  h1_headline?: string;
+  hero_intro?: string;
+  og_image_url?: string;
+  robots_directive?: string;
+  location_name?: string;
+  country_code?: string;
+  service_area?: string;
+  latitude?: string;
+  longitude?: string;
+  social_facebook?: string;
+  social_twitter?: string;
+  social_instagram?: string;
+  social_linkedin?: string;
+  social_youtube?: string;
 }
 
 export interface UpdateTenantPayload {

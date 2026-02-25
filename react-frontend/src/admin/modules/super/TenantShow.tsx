@@ -237,7 +237,8 @@ export function TenantShow() {
                     )
                   }
                 />
-                <DetailField label="Hierarchy Depth" value={String(tenant.max_depth)} />
+                <DetailField label="Depth in Hierarchy" value={String(tenant.depth ?? 0)} />
+                <DetailField label="Max Sub-tenant Depth" value={String(tenant.max_depth)} />
                 <DetailField
                   label="Allows Sub-tenants"
                   value={
@@ -266,6 +267,25 @@ export function TenantShow() {
               )}
             </CardBody>
           </Card>
+
+          {/* Contact Information */}
+          {(tenant.contact_email || tenant.contact_phone || tenant.address) && (
+            <Card shadow="sm">
+              <CardHeader className="pb-0">
+                <div className="flex items-center gap-2">
+                  <Users size={18} className="text-primary" />
+                  <h3 className="text-lg font-semibold">Contact Information</h3>
+                </div>
+              </CardHeader>
+              <CardBody className="pt-3">
+                <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <DetailField label="Email" value={tenant.contact_email} />
+                  <DetailField label="Phone" value={tenant.contact_phone} />
+                  <DetailField label="Address" value={tenant.address} />
+                </dl>
+              </CardBody>
+            </Card>
+          )}
 
           {/* SEO Settings */}
           <Card shadow="sm">
