@@ -744,4 +744,52 @@ class UsersApiController extends BaseApiController
             'theme' => $theme
         ]);
     }
+
+    /**
+     * PUT /api/v2/users/me/language
+     *
+     * Update the user's preferred language.
+     *
+     * Request Body (JSON):
+     * {
+     *   "language": "en"|"ga"
+     * }
+     *
+     * Response: 200 OK with { language: "..." }
+     */
+    public function updateLanguage(): void
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('language_update', 30, 60);
+
+        $data = $this->getAllInput();
+        $language = $data['language'] ?? null;
+
+        $validLanguages = ['en', 'ga'];
+        if (!$language || !in_array($language, $validLanguages, true)) {
+            $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid language. Must be one of: en, ga',
+                'language',
+                400
+            );
+        }
+
+        $success = \Nexus\Core\Database::query(
+            "UPDATE users SET preferred_language = ? WHERE id = ?",
+            [$language, $userId]
+        );
+
+        if (!$success) {
+            $this->respondWithError('UPDATE_FAILED', 'Failed to update language preference', null, 500);
+        }
+
+        // Update session so PHP admin views pick it up immediately
+        $_SESSION['locale'] = $language;
+
+        $this->respondWithData([
+            'message' => 'Language preference updated',
+            'language' => $language
+        ]);
+    }
 }

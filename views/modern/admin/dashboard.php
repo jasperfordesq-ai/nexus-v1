@@ -20,8 +20,8 @@ if (!isset($stats) || !is_array($stats)) {
 }
 
 // Admin header configuration
-$adminPageTitle = 'Mission Control';
-$adminPageSubtitle = 'Mission Control';
+$adminPageTitle = __('admin_dashboard.title');
+$adminPageSubtitle = __('admin_dashboard.title');
 $adminPageIcon = 'fa-satellite-dish';
 
 // Include the standalone admin header (includes <!DOCTYPE html>, <head>, etc.)
@@ -33,22 +33,22 @@ require __DIR__ . '/partials/admin-header.php';
     <div class="admin-page-header-content">
         <h1 class="admin-page-title">
             <i class="fa-solid fa-satellite-dish"></i>
-            Mission Control
+            <?= htmlspecialchars(__('admin_dashboard.title')) ?>
         </h1>
-        <p class="admin-page-subtitle">Real-time platform overview and command center</p>
+        <p class="admin-page-subtitle"><?= htmlspecialchars(__('admin_dashboard.subtitle')) ?></p>
     </div>
     <div class="admin-page-header-actions">
         <button class="admin-btn admin-btn-tour" onclick="AdminTour.start()" title="Take a tour">
             <i class="fa-solid fa-graduation-cap"></i>
-            <span>Tour</span>
+            <span><?= htmlspecialchars(__('admin_dashboard.tour_btn')) ?></span>
         </button>
         <button class="admin-btn admin-btn-secondary" onclick="location.reload()">
             <i class="fa-solid fa-rotate"></i>
-            Refresh
+            <?= htmlspecialchars(__('admin_dashboard.refresh')) ?>
         </button>
         <a href="<?= $basePath ?>/admin-legacy/activity-log" class="admin-btn admin-btn-primary">
             <i class="fa-solid fa-list-ul"></i>
-            View All Activity
+            <?= htmlspecialchars(__('admin_dashboard.view_all_activity')) ?>
         </a>
     </div>
 </div>
@@ -60,14 +60,14 @@ require __DIR__ . '/partials/admin-header.php';
         <span class="admin-tour-step-badge" id="tourStepBadge">1/6</span>
         <button class="admin-tour-close" onclick="AdminTour.end()"><i class="fa-solid fa-times"></i></button>
     </div>
-    <h4 class="admin-tour-title" id="tourTitle">Welcome to Mission Control!</h4>
-    <p class="admin-tour-description" id="tourDescription">This is your command center for managing your community platform. Let's take a quick tour of the key features.</p>
+    <h4 class="admin-tour-title" id="tourTitle"><?= htmlspecialchars(__('admin_dashboard.tour.welcome_title')) ?></h4>
+    <p class="admin-tour-description" id="tourDescription"><?= htmlspecialchars(__('admin_dashboard.tour.welcome_description')) ?></p>
     <div class="admin-tour-actions">
         <button class="admin-tour-btn admin-tour-btn-secondary" id="tourPrev" onclick="AdminTour.prev()">
-            <i class="fa-solid fa-arrow-left"></i> Back
+            <i class="fa-solid fa-arrow-left"></i> <?= htmlspecialchars(__('admin_dashboard.tour.back')) ?>
         </button>
         <button class="admin-tour-btn admin-tour-btn-primary" id="tourNext" onclick="AdminTour.next()">
-            Next <i class="fa-solid fa-arrow-right"></i>
+            <?= htmlspecialchars(__('admin_dashboard.tour.next')) ?> <i class="fa-solid fa-arrow-right"></i>
         </button>
     </div>
 </div>
@@ -81,10 +81,10 @@ require __DIR__ . '/partials/admin-header.php';
         </div>
         <div class="admin-stat-content">
             <div class="admin-stat-value" data-stat="users-online">0</div>
-            <div class="admin-stat-label">Users Online</div>
+            <div class="admin-stat-label"><?= htmlspecialchars(__('admin_dashboard.stats.users_online')) ?></div>
         </div>
         <div class="admin-stat-trend">
-            <span class="admin-live-indicator">LIVE</span>
+            <span class="admin-live-indicator"><?= htmlspecialchars(__('admin.live')) ?></span>
         </div>
     </div>
 
@@ -95,10 +95,10 @@ require __DIR__ . '/partials/admin-header.php';
         </div>
         <div class="admin-stat-content">
             <div class="admin-stat-value" data-stat="active-sessions">0</div>
-            <div class="admin-stat-label">Active Sessions</div>
+            <div class="admin-stat-label"><?= htmlspecialchars(__('admin_dashboard.stats.active_sessions')) ?></div>
         </div>
         <div class="admin-stat-trend">
-            <span class="admin-live-indicator">LIVE</span>
+            <span class="admin-live-indicator"><?= htmlspecialchars(__('admin.live')) ?></span>
         </div>
     </div>
 
@@ -109,11 +109,11 @@ require __DIR__ . '/partials/admin-header.php';
         </div>
         <div class="admin-stat-content">
             <div class="admin-stat-value"><?= number_format($stats['total_users']) ?></div>
-            <div class="admin-stat-label">Total Members</div>
+            <div class="admin-stat-label"><?= htmlspecialchars(__('admin_dashboard.stats.total_members')) ?></div>
         </div>
         <div class="admin-stat-trend admin-stat-trend-up">
             <i class="fa-solid fa-arrow-up"></i>
-            <span>Active</span>
+            <span><?= htmlspecialchars(__('admin.active')) ?></span>
         </div>
     </div>
 
@@ -124,11 +124,11 @@ require __DIR__ . '/partials/admin-header.php';
         </div>
         <div class="admin-stat-content">
             <div class="admin-stat-value"><?= number_format($stats['total_listings']) ?></div>
-            <div class="admin-stat-label">Active Listings</div>
+            <div class="admin-stat-label"><?= htmlspecialchars(__('admin_dashboard.stats.active_listings')) ?></div>
         </div>
         <div class="admin-stat-trend admin-stat-trend-up">
             <i class="fa-solid fa-arrow-up"></i>
-            <span>Live</span>
+            <span><?= htmlspecialchars(__('admin.live')) ?></span>
         </div>
     </div>
 
@@ -139,11 +139,11 @@ require __DIR__ . '/partials/admin-header.php';
         </div>
         <div class="admin-stat-content">
             <div class="admin-stat-value"><?= number_format($stats['total_transactions']) ?></div>
-            <div class="admin-stat-label">Transactions</div>
+            <div class="admin-stat-label"><?= htmlspecialchars(__('admin_dashboard.stats.transactions')) ?></div>
         </div>
         <div class="admin-stat-trend admin-stat-trend-up">
             <i class="fa-solid fa-check"></i>
-            <span>Completed</span>
+            <span><?= htmlspecialchars(__('admin.completed')) ?></span>
         </div>
     </div>
 
@@ -154,11 +154,11 @@ require __DIR__ . '/partials/admin-header.php';
         </div>
         <div class="admin-stat-content">
             <div class="admin-stat-value"><?= number_format($stats['total_volume']) ?></div>
-            <div class="admin-stat-label">Hours Exchanged</div>
+            <div class="admin-stat-label"><?= htmlspecialchars(__('admin_dashboard.stats.hours_exchanged')) ?></div>
         </div>
         <div class="admin-stat-trend">
             <i class="fa-solid fa-hourglass-half"></i>
-            <span>Hours</span>
+            <span><?= htmlspecialchars(__('admin_dashboard.stats.hours')) ?></span>
         </div>
     </div>
 </div>
@@ -175,11 +175,11 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-user-clock"></i>
         </div>
         <div class="admin-alert-content">
-            <div class="admin-alert-title"><?= count($pending_users) ?> User<?= count($pending_users) > 1 ? 's' : '' ?> Pending</div>
-            <div class="admin-alert-text">New member registrations require your review</div>
+            <div class="admin-alert-title"><?= htmlspecialchars(__(count($pending_users) > 1 ? 'admin_dashboard.alerts.users_pending_other' : 'admin_dashboard.alerts.users_pending_one', ['count' => count($pending_users)])) ?></div>
+            <div class="admin-alert-text"><?= htmlspecialchars(__('admin_dashboard.alerts.users_pending_text')) ?></div>
         </div>
         <a href="<?= $basePath ?>/admin-legacy/users?filter=pending" class="admin-btn admin-btn-warning">
-            <i class="fa-solid fa-arrow-right"></i> Review
+            <i class="fa-solid fa-arrow-right"></i> <?= htmlspecialchars(__('admin.review')) ?>
         </a>
     </div>
     <?php endif; ?>
@@ -190,11 +190,11 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-rectangle-list"></i>
         </div>
         <div class="admin-alert-content">
-            <div class="admin-alert-title"><?= $pending_listings ?> Listing<?= $pending_listings > 1 ? 's' : '' ?> Pending</div>
-            <div class="admin-alert-text">New listings awaiting moderation</div>
+            <div class="admin-alert-title"><?= htmlspecialchars(__(($pending_listings > 1) ? 'admin_dashboard.alerts.listings_pending_other' : 'admin_dashboard.alerts.listings_pending_one', ['count' => $pending_listings])) ?></div>
+            <div class="admin-alert-text"><?= htmlspecialchars(__('admin_dashboard.alerts.listings_pending_text')) ?></div>
         </div>
         <a href="<?= $basePath ?>/admin-legacy/listings?status=pending" class="admin-btn admin-btn-info">
-            <i class="fa-solid fa-arrow-right"></i> Review
+            <i class="fa-solid fa-arrow-right"></i> <?= htmlspecialchars(__('admin.review')) ?>
         </a>
     </div>
     <?php endif; ?>
@@ -205,11 +205,11 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-building"></i>
         </div>
         <div class="admin-alert-content">
-            <div class="admin-alert-title"><?= $pending_orgs ?> Organization<?= $pending_orgs > 1 ? 's' : '' ?> Pending</div>
-            <div class="admin-alert-text">Volunteering organizations awaiting approval</div>
+            <div class="admin-alert-title"><?= htmlspecialchars(__(($pending_orgs > 1) ? 'admin_dashboard.alerts.orgs_pending_other' : 'admin_dashboard.alerts.orgs_pending_one', ['count' => $pending_orgs])) ?></div>
+            <div class="admin-alert-text"><?= htmlspecialchars(__('admin_dashboard.alerts.orgs_pending_text')) ?></div>
         </div>
         <a href="<?= $basePath ?>/admin-legacy/volunteering/approvals" class="admin-btn admin-btn-purple">
-            <i class="fa-solid fa-arrow-right"></i> Review
+            <i class="fa-solid fa-arrow-right"></i> <?= htmlspecialchars(__('admin.review')) ?>
         </a>
     </div>
     <?php endif; ?>
@@ -220,9 +220,9 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
 <div class="admin-section-header">
     <h2 class="admin-section-title">
         <i class="fa-solid fa-grid-2"></i>
-        Platform Modules
+        <?= htmlspecialchars(__('admin_dashboard.modules.section_title')) ?>
     </h2>
-    <p class="admin-section-subtitle">Access all administrative functions</p>
+    <p class="admin-section-subtitle"><?= htmlspecialchars(__('admin_dashboard.modules.section_subtitle')) ?></p>
 </div>
 
 <div class="admin-modules-grid" id="tour-modules">
@@ -232,8 +232,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-folder-tree"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Categories</h4>
-            <p class="admin-module-desc">Organize listings & volunteering</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.categories')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.categories_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -243,8 +243,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-tags"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Attributes</h4>
-            <p class="admin-module-desc">Service tags & filters</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.attributes')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.attributes_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -254,8 +254,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-file-lines"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Pages</h4>
-            <p class="admin-module-desc">Static content pages</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.pages')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.pages_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -265,8 +265,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-blog"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Blog</h4>
-            <p class="admin-module-desc">News & announcements</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.blog')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.blog_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -277,8 +277,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-hands-helping"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Volunteering</h4>
-            <p class="admin-module-desc">Opportunities & assignments</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.volunteering')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.volunteering_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -288,8 +288,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-location-dot"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Group Locations</h4>
-            <p class="admin-module-desc">Geographic boundaries</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.group_locations')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.group_locations_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -299,8 +299,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-chart-line"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Group Ranking</h4>
-            <p class="admin-module-desc">Smart featured groups</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.group_ranking')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.group_ranking_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -311,8 +311,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-microchip"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">AI Assistant</h4>
-            <p class="admin-module-desc">Configure AI providers</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.ai_assistant')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.ai_assistant_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -322,8 +322,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-wand-magic-sparkles"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Smart Matching</h4>
-            <p class="admin-module-desc">AI-powered recommendations</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.smart_matching')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.smart_matching_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -333,8 +333,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-sliders"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Feed Algorithm</h4>
-            <p class="admin-module-desc">EdgeRank configuration</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.feed_algorithm')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.feed_algorithm_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -344,8 +344,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-scale-balanced"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Algorithm Settings</h4>
-            <p class="admin-module-desc">MatchRank & CommunityRank</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.algorithm_settings')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.algorithm_settings_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -356,8 +356,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Timebanking</h4>
-            <p class="admin-module-desc">Analytics & org wallets</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.timebanking')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.timebanking_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -367,8 +367,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-magnifying-glass-chart"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">SEO Manager</h4>
-            <p class="admin-module-desc">Search optimization</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.seo')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.seo_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -378,8 +378,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-exclamation-triangle"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">404 Error Tracking</h4>
-            <p class="admin-module-desc">Monitor broken links</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.error_tracking')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.error_tracking_desc')) ?></p>
         </div>
         <span class="admin-module-badge">NEW</span>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
@@ -390,8 +390,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             <i class="fa-solid fa-clock"></i>
         </div>
         <div class="admin-module-content">
-            <h4 class="admin-module-title">Cron Jobs</h4>
-            <p class="admin-module-desc">Scheduled tasks</p>
+            <h4 class="admin-module-title"><?= htmlspecialchars(__('admin_dashboard.modules.cron_jobs')) ?></h4>
+            <p class="admin-module-desc"><?= htmlspecialchars(__('admin_dashboard.modules.cron_jobs_desc')) ?></p>
         </div>
         <i class="fa-solid fa-arrow-right admin-module-arrow"></i>
     </a>
@@ -409,11 +409,11 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                     <i class="fa-solid fa-bolt"></i>
                 </div>
                 <div class="admin-card-header-content">
-                    <h3 class="admin-card-title">Real-time Activity</h3>
-                    <p class="admin-card-subtitle">Latest events in your community</p>
+                    <h3 class="admin-card-title"><?= htmlspecialchars(__('admin_dashboard.activity.card_title')) ?></h3>
+                    <p class="admin-card-subtitle"><?= htmlspecialchars(__('admin_dashboard.activity.card_subtitle')) ?></p>
                 </div>
                 <a href="<?= $basePath ?>/admin-legacy/activity-log" class="admin-card-header-action">
-                    View All <i class="fa-solid fa-arrow-right"></i>
+                    <?= htmlspecialchars(__('admin_dashboard.activity.view_all')) ?> <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
             <div class="admin-card-body">
@@ -445,7 +445,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                     <div class="admin-empty-icon">
                         <i class="fa-solid fa-inbox"></i>
                     </div>
-                    <p>No recent activity to display</p>
+                    <p><?= htmlspecialchars(__('admin_dashboard.activity.empty')) ?></p>
                 </div>
                 <?php endif; ?>
             </div>
@@ -459,8 +459,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                     <i class="fa-solid fa-chart-line"></i>
                 </div>
                 <div class="admin-card-header-content">
-                    <h3 class="admin-card-title">Transaction Volume</h3>
-                    <p class="admin-card-subtitle">Last 6 months activity</p>
+                    <h3 class="admin-card-title"><?= htmlspecialchars(__('admin_dashboard.chart.title')) ?></h3>
+                    <p class="admin-card-subtitle"><?= htmlspecialchars(__('admin_dashboard.chart.subtitle')) ?></p>
                 </div>
             </div>
             <div class="admin-card-body">
@@ -483,8 +483,8 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                     <i class="fa-solid fa-rocket"></i>
                 </div>
                 <div class="admin-card-header-content">
-                    <h3 class="admin-card-title">Quick Actions</h3>
-                    <p class="admin-card-subtitle">Common tasks</p>
+                    <h3 class="admin-card-title"><?= htmlspecialchars(__('admin_dashboard.quick_actions.card_title')) ?></h3>
+                    <p class="admin-card-subtitle"><?= htmlspecialchars(__('admin_dashboard.quick_actions.card_subtitle')) ?></p>
                 </div>
             </div>
             <div class="admin-card-body">
@@ -493,37 +493,37 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                         <div class="admin-quick-action-icon admin-quick-action-icon-blue">
                             <i class="fa-solid fa-user-plus"></i>
                         </div>
-                        <span>Manage Users</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.quick_actions.manage_users')) ?></span>
                     </a>
                     <a href="<?= $basePath ?>/admin-legacy/listings" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-green">
                             <i class="fa-solid fa-list-check"></i>
                         </div>
-                        <span>View Listings</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.quick_actions.view_listings')) ?></span>
                     </a>
                     <a href="<?= $basePath ?>/admin-legacy/newsletters" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-purple">
                             <i class="fa-solid fa-paper-plane"></i>
                         </div>
-                        <span>Send Newsletter</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.quick_actions.send_newsletter')) ?></span>
                     </a>
                     <a href="<?= $basePath ?>/admin-legacy/blog" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-pink">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </div>
-                        <span>New Blog Post</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.quick_actions.new_blog_post')) ?></span>
                     </a>
                     <a href="<?= $basePath ?>/admin-legacy/gamification" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-orange">
                             <i class="fa-solid fa-trophy"></i>
                         </div>
-                        <span>Gamification</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.quick_actions.gamification')) ?></span>
                     </a>
                     <a href="<?= $basePath ?>/admin-legacy/settings" class="admin-quick-action">
                         <div class="admin-quick-action-icon admin-quick-action-icon-slate">
                             <i class="fa-solid fa-gear"></i>
                         </div>
-                        <span>Settings</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.quick_actions.settings')) ?></span>
                     </a>
                 </div>
             </div>
@@ -536,30 +536,30 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                     <i class="fa-solid fa-building-shield"></i>
                 </div>
                 <div class="admin-card-header-content">
-                    <h3 class="admin-card-title">Enterprise Suite</h3>
-                    <p class="admin-card-subtitle">Advanced controls</p>
+                    <h3 class="admin-card-title"><?= htmlspecialchars(__('admin_dashboard.enterprise.card_title')) ?></h3>
+                    <p class="admin-card-subtitle"><?= htmlspecialchars(__('admin_dashboard.enterprise.card_subtitle')) ?></p>
                 </div>
             </div>
             <div class="admin-card-body">
                 <div class="admin-enterprise-links">
                     <a href="<?= $basePath ?>/admin-legacy/enterprise" class="admin-enterprise-link">
                         <i class="fa-solid fa-chart-pie"></i>
-                        <span>Overview</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.enterprise.overview')) ?></span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                     <a href="<?= $basePath ?>/admin-legacy/enterprise/gdpr" class="admin-enterprise-link">
                         <i class="fa-solid fa-user-shield"></i>
-                        <span>GDPR Compliance</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.enterprise.gdpr')) ?></span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                     <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-enterprise-link">
                         <i class="fa-solid fa-heart-pulse"></i>
-                        <span>System Health</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.enterprise.system_health')) ?></span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                     <a href="<?= $basePath ?>/admin-legacy/enterprise/config" class="admin-enterprise-link">
                         <i class="fa-solid fa-gears"></i>
-                        <span>Configuration</span>
+                        <span><?= htmlspecialchars(__('admin_dashboard.enterprise.configuration')) ?></span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                 </div>
@@ -576,10 +576,10 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
             'api' => 'fa-plug',
         ];
         $statusLabels = [
-            'database' => 'Database',
-            'cache' => 'Cache',
-            'queue' => 'Cron Jobs',
-            'api' => 'Email API',
+            'database' => __('admin_dashboard.system_status.database'),
+            'cache' => __('admin_dashboard.system_status.cache'),
+            'queue' => __('admin_dashboard.system_status.queue'),
+            'api' => __('admin_dashboard.system_status.api'),
         ];
         $systemStatus = $systemStatus ?? [];
         $allOnline = true;
@@ -595,19 +595,19 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                     <i class="fa-solid fa-server"></i>
                 </div>
                 <div class="admin-card-header-content">
-                    <h3 class="admin-card-title">System Status</h3>
+                    <h3 class="admin-card-title"><?= htmlspecialchars(__('admin_dashboard.system_status.card_title')) ?></h3>
                     <p class="admin-card-subtitle">
                         <?php if ($allOnline): ?>
-                            All systems operational
+                            <?= htmlspecialchars(__('admin.status.all_operational')) ?>
                         <?php elseif ($hasWarning): ?>
-                            Some services need attention
+                            <?= htmlspecialchars(__('admin.status.some_attention')) ?>
                         <?php else: ?>
-                            Issues detected
+                            <?= htmlspecialchars(__('admin.status.issues_detected')) ?>
                         <?php endif; ?>
                     </p>
                 </div>
                 <a href="<?= $basePath ?>/admin-legacy/enterprise/monitoring" class="admin-card-header-action">
-                    Details <i class="fa-solid fa-arrow-right"></i>
+                    <?= htmlspecialchars(__('admin_dashboard.system_status.details')) ?> <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
             <div class="admin-card-body">
@@ -624,7 +624,7 @@ $hasAlerts = !empty($pending_users) || !empty($pending_listings) || !empty($pend
                 <div class="admin-status-footer">
                     <span class="admin-status-timestamp">
                         <i class="fa-regular fa-clock"></i>
-                        Last checked: <?= date('H:i:s') ?>
+                        <?= htmlspecialchars(__('admin.last_checked', ['time' => date('H:i:s')])) ?>
                     </span>
                 </div>
             </div>
@@ -652,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function() {
             data: {
                 labels: <?= json_encode($chartLabels) ?>,
                 datasets: [{
-                    label: 'Hours Exchanged',
+                    label: <?= json_encode(__('admin_dashboard.chart.dataset_label')) ?>,
                     data: <?= json_encode($chartData) ?>,
                     borderColor: 'rgba(139, 92, 246, 1)',
                     backgroundColor: 'rgba(139, 92, 246, 0.1)',

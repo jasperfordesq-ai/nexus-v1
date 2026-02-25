@@ -1,0 +1,14 @@
+{
+  "title": "Groups",
+  "discover": "Discover Groups",
+  "create_group": "Create Group",
+  "my_groups": "My Groups",
+  "members": "{{count}} members",
+  "join": "Join Group",
+  "joined": "Joined",
+  "leave": "Leave Group",
+  "empty": "No groups found",
+  "posts": "Posts",
+  "events": "Events",
+  "about": "About"
+}

@@ -61,9 +61,11 @@ import {
   BarChart3,
   Compass,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { api, tokenManager, API_BASE } from '@/lib/api';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface SearchSuggestion {
   id: number;
@@ -82,6 +84,7 @@ interface NavbarProps {
 export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation('common');
   const { user, isAuthenticated, logout } = useAuth();
   const { tenant, branding, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
@@ -279,22 +282,22 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   // Community dropdown items
   const communityItems = [
-    { label: 'Members', href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
-    { label: 'Events', href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
-    { label: 'Groups', href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
-    { label: 'Blog', href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' as const },
-    { label: 'Volunteering', href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
-    { label: 'Organisations', href: tenantPath('/organisations'), icon: Building2, feature: 'organisations' as const },
-    { label: 'Resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
+    { label: t('nav.members'), href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
+    { label: t('nav.events'), href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
+    { label: t('nav.groups'), href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
+    { label: t('nav.blog'), href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' as const },
+    { label: t('nav.volunteering'), href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
+    { label: t('nav.organisations'), href: tenantPath('/organisations'), icon: Building2, feature: 'organisations' as const },
+    { label: t('nav.resources'), href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
   ].filter(item => hasFeature(item.feature));
 
   // Activity dropdown items — filtered by feature flags and module flags
   const activityItems = [
-    { label: 'Exchanges', href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
-    { label: 'Group Exchanges', href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
-    { label: 'Wallet', href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
-    { label: 'Achievements', href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' as const },
-    { label: 'Goals', href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
+    { label: t('nav.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
+    { label: t('nav.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
+    { label: t('nav.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
+    { label: t('nav.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' as const },
+    { label: t('nav.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
   ].filter(item => {
     if (item.feature && !hasFeature(item.feature)) return false;
     if (item.module && !hasModule(item.module)) return false;
@@ -303,27 +306,27 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   // Federation dropdown items — only shown when federation feature is enabled
   const federationItems = hasFeature('federation') ? [
-    { label: 'Federation Hub', href: tenantPath('/federation'), icon: Globe },
-    { label: 'Partner Communities', href: tenantPath('/federation/partners'), icon: Building2 },
-    { label: 'Federated Members', href: tenantPath('/federation/members'), icon: Users },
-    { label: 'Federated Messages', href: tenantPath('/federation/messages'), icon: MessageSquare },
-    { label: 'Federated Listings', href: tenantPath('/federation/listings'), icon: ListTodo },
-    { label: 'Federated Events', href: tenantPath('/federation/events'), icon: Calendar },
+    { label: t('nav.federation_hub'), href: tenantPath('/federation'), icon: Globe },
+    { label: t('nav.partner_communities'), href: tenantPath('/federation/partners'), icon: Building2 },
+    { label: t('nav.federated_members'), href: tenantPath('/federation/members'), icon: Users },
+    { label: t('nav.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
+    { label: t('nav.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
+    { label: t('nav.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
   ] : [];
 
   // About dropdown — universal items + tenant-specific items + dynamic CMS pages
   const isHourTimebank = tenant?.slug === 'hour-timebank';
   const aboutItems = [
-    { label: 'About', href: tenantPath('/about'), icon: Info },
-    { label: 'FAQ', href: tenantPath('/faq'), icon: HelpCircle },
-    { label: 'Timebanking Guide', href: tenantPath('/timebanking-guide'), icon: BookOpen },
+    { label: t('nav.about'), href: tenantPath('/about'), icon: Info },
+    { label: t('nav.faq'), href: tenantPath('/faq'), icon: HelpCircle },
+    { label: t('nav.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },
     // Tenant 2 (hOUR Timebank) specific pages — these contain hardcoded org content
     ...(isHourTimebank ? [
-      { label: 'Partner With Us', href: tenantPath('/partner'), icon: Handshake },
-      { label: 'Social Prescribing', href: tenantPath('/social-prescribing'), icon: Stethoscope },
-      { label: 'Our Impact', href: tenantPath('/impact-summary'), icon: TrendingUp },
-      { label: 'Impact Report', href: tenantPath('/impact-report'), icon: BarChart3 },
-      { label: 'Strategic Plan', href: tenantPath('/strategic-plan'), icon: Compass },
+      { label: t('nav.partner_with_us'), href: tenantPath('/partner'), icon: Handshake },
+      { label: t('nav.social_prescribing'), href: tenantPath('/social-prescribing'), icon: Stethoscope },
+      { label: t('nav.our_impact'), href: tenantPath('/impact-summary'), icon: TrendingUp },
+      { label: t('nav.impact_report'), href: tenantPath('/impact-report'), icon: BarChart3 },
+      { label: t('nav.strategic_plan'), href: tenantPath('/strategic-plan'), icon: Compass },
     ] : []),
     ...(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => ({
       label: p.title,
@@ -395,7 +398,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 }
               >
                 <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
-                <span>Dashboard</span>
+                <span>{t('nav.dashboard')}</span>
               </NavLink>
             )}
 
@@ -412,7 +415,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 }
               >
                 <Newspaper className="w-4 h-4" aria-hidden="true" />
-                <span>Feed</span>
+                <span>{t('nav.feed')}</span>
               </NavLink>
             )}
 
@@ -429,7 +432,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 }
               >
                 <ListTodo className="w-4 h-4" aria-hidden="true" />
-                <span>Listings</span>
+                <span>{t('nav.listings')}</span>
               </NavLink>
             )}
 
@@ -446,7 +449,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 }
               >
                 <MessageSquare className="w-4 h-4" aria-hidden="true" />
-                <span>Messages</span>
+                <span>{t('nav.messages')}</span>
                 {counts.messages > 0 && isAuthenticated && (
                   <span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full">
                     {counts.messages > 99 ? '99+' : counts.messages}
@@ -470,7 +473,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     endContent={<ChevronDown className="w-3 h-3" aria-hidden="true" />}
                   >
                     <Users className="w-4 h-4" aria-hidden="true" />
-                    Community
+                    {t('nav.community')}
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu
@@ -510,7 +513,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   endContent={<ChevronDown className="w-3 h-3" aria-hidden="true" />}
                 >
                   <Menu className="w-4 h-4" aria-hidden="true" />
-                  More
+                  {t('nav.more')}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -524,7 +527,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 }}
               >
                 {activityItems.length > 0 ? (
-                  <DropdownSection title="Activity" showDivider={federationItems.length > 0 || aboutItems.length > 0}>
+                  <DropdownSection title={t('sections.activity')} showDivider={federationItems.length > 0 || aboutItems.length > 0}>
                     {activityItems.map((item) => (
                       <DropdownItem
                         key={item.href}
@@ -537,7 +540,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   </DropdownSection>
                 ) : null}
                 {federationItems.length > 0 ? (
-                  <DropdownSection title="Partner Communities" showDivider>
+                  <DropdownSection title={t('sections.partner_communities')} showDivider>
                     {federationItems.map((item) => (
                       <DropdownItem
                         key={item.href}
@@ -549,7 +552,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     ))}
                   </DropdownSection>
                 ) : null}
-                <DropdownSection title="About">
+                <DropdownSection title={t('sections.about')}>
                   {aboutItems.map((item) => (
                     <DropdownItem
                       key={item.href}
@@ -618,14 +621,14 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       key={tenantPath('/listings/create')}
                       startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
                     >
-                      New Listing
+                      {t('create.new_listing')}
                     </DropdownItem>
                     {hasFeature('events') ? (
                       <DropdownItem
                         key={tenantPath('/events/create')}
                         startContent={<Calendar className="w-4 h-4" aria-hidden="true" />}
                       >
-                        New Event
+                        {t('create.new_event')}
                       </DropdownItem>
                     ) : null}
                   </DropdownMenu>
@@ -646,6 +649,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" aria-hidden="true" />
                   )}
                 </Button>
+
+                {/* Language Switcher */}
+                <LanguageSwitcher />
 
                 {/* Notifications */}
                 <Badge
@@ -713,7 +719,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         key={tenantPath('/profile')}
                         startContent={<UserCircle className="w-4 h-4" aria-hidden="true" />}
                       >
-                        My Profile
+                        {t('user_menu.my_profile')}
                       </DropdownItem>
                       {hasModule('wallet') ? (
                         <DropdownItem
@@ -725,14 +731,14 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                             </span>
                           }
                         >
-                          Wallet
+                          {t('user_menu.wallet')}
                         </DropdownItem>
                       ) : null}
                       <DropdownItem
                         key={tenantPath('/settings')}
                         startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Settings
+                        {t('user_menu.settings')}
                       </DropdownItem>
                     </DropdownSection>
 
@@ -747,19 +753,19 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           )
                         }
                       >
-                        {resolvedTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                        {resolvedTheme === 'dark' ? t('user_menu.light_mode') : t('user_menu.dark_mode')}
                       </DropdownItem>
                       <DropdownItem
                         key={tenantPath('/help')}
                         startContent={<HelpCircle className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Help Center
+                        {t('user_menu.help_center')}
                       </DropdownItem>
                     </DropdownSection>
 
                     <DropdownSection
                       showDivider
-                      title="Admin"
+                      title={t('sections.admin')}
                       classNames={{
                         base: isAdmin ? '' : 'hidden',
                       }}
@@ -768,13 +774,13 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         key="admin-panel"
                         startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Admin Panel
+                        {t('user_menu.admin_panel')}
                       </DropdownItem>
                       <DropdownItem
                         key="legacy-admin"
                         startContent={<LayoutDashboard className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Legacy Admin
+                        {t('user_menu.legacy_admin')}
                       </DropdownItem>
                     </DropdownSection>
 
@@ -785,7 +791,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         startContent={<LogOut className="w-4 h-4" aria-hidden="true" />}
                         className="text-red-500 dark:text-red-400"
                       >
-                        Log Out
+                        {t('user_menu.log_out')}
                       </DropdownItem>
                     </DropdownSection>
                   </DropdownMenu>
@@ -795,12 +801,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               <>
                 <Link to={tenantPath('/login')}>
                   <Button variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary">
-                    Log In
+                    {t('auth.log_in')}
                   </Button>
                 </Link>
                 <Link to={tenantPath('/register')}>
                   <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium">
-                    Sign Up
+                    {t('auth.sign_up')}
                   </Button>
                 </Link>
               </>
@@ -838,7 +844,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
-                    placeholder="Search listings, members, events..."
+                    placeholder={t('search.placeholder')}
                     className="flex-1 bg-transparent text-theme-primary placeholder:text-theme-subtle outline-none text-base"
                     aria-label="Search"
                     aria-autocomplete="list"
@@ -865,14 +871,14 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 <div className="border-t border-[var(--border-default)] px-4 py-3 max-h-64 overflow-y-auto">
                   {suggestions.length > 0 ? (
                     <>
-                      <p className="text-xs text-theme-subtle mb-2">Suggestions</p>
+                      <p className="text-xs text-theme-subtle mb-2">{t('search.suggestions')}</p>
                       <div className="space-y-1" role="listbox" aria-label="Search suggestions">
                         {suggestions.map((suggestion, index) => {
                           const typeLabels: Record<string, { label: string; color: string }> = {
-                            listing: { label: 'Listing', color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
-                            user: { label: 'Member', color: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' },
-                            event: { label: 'Event', color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
-                            group: { label: 'Group', color: 'bg-purple-500/20 text-purple-600 dark:text-purple-400' },
+                            listing: { label: t('search.type_listing'), color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
+                            user: { label: t('search.type_member'), color: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' },
+                            event: { label: t('search.type_event'), color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
+                            group: { label: t('search.type_group'), color: 'bg-purple-500/20 text-purple-600 dark:text-purple-400' },
                           };
                           const typeInfo = typeLabels[suggestion.type] || { label: suggestion.type, color: 'bg-[var(--surface-elevated)] text-theme-subtle' };
                           const isSelected = index === selectedIndex;
@@ -907,17 +913,17 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   ) : isLoadingSuggestions ? (
                     <div className="flex items-center gap-2 py-2">
                       <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-xs text-theme-subtle">Searching...</span>
+                      <span className="text-xs text-theme-subtle">{t('search.searching')}</span>
                     </div>
                   ) : (
                     <>
-                      <p className="text-xs text-theme-subtle mb-2">Quick Links</p>
+                      <p className="text-xs text-theme-subtle mb-2">{t('search.quick_links')}</p>
                       <div className="flex flex-wrap gap-2">
                         {[
-                          { label: 'Listings', path: tenantPath('/listings') },
-                          { label: 'Members', path: tenantPath('/members') },
-                          { label: 'Events', path: tenantPath('/events') },
-                          { label: 'Help', path: tenantPath('/help') },
+                          { label: t('nav.listings'), path: tenantPath('/listings') },
+                          { label: t('nav.members'), path: tenantPath('/members') },
+                          { label: t('nav.events'), path: tenantPath('/events') },
+                          { label: t('support.help_center'), path: tenantPath('/help') },
                         ].map((link) => (
                           <Button
                             key={link.path}

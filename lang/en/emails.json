@@ -1,0 +1,47 @@
+{
+  "welcome": {
+    "subject": "Welcome to {{community}}!",
+    "greeting": "Welcome, {{name}}!",
+    "body": "Thank you for joining {{community}}. Your account has been created and you can now start exploring the platform.",
+    "cta": "Get Started"
+  },
+  "verification": {
+    "subject": "Verify your email address",
+    "greeting": "Hi {{name}},",
+    "body": "Please verify your email address by clicking the button below.",
+    "cta": "Verify Email",
+    "expiry": "This link expires in {{hours}} hours."
+  },
+  "password_reset": {
+    "subject": "Reset your password",
+    "greeting": "Hi {{name}},",
+    "body": "You requested a password reset. Click the button below to set a new password.",
+    "cta": "Reset Password",
+    "expiry": "This link expires in {{hours}} hours.",
+    "ignore": "If you did not request this, you can safely ignore this email."
+  },
+  "transaction": {
+    "subject": "Time credit transaction — {{amount}}h",
+    "greeting": "Hi {{name}},",
+    "sent": "You sent {{amount}} hour(s) to {{recipient}}.",
+    "received": "You received {{amount}} hour(s) from {{sender}}.",
+    "description": "Description: {{description}}"
+  },
+  "review_request": {
+    "subject": "Leave a review for {{name}}",
+    "greeting": "Hi {{name}},",
+    "body": "You recently exchanged services with {{other_party}}. Please take a moment to leave a review.",
+    "cta": "Leave Review"
+  },
+  "new_message": {
+    "subject": "New message from {{sender}}",
+    "greeting": "Hi {{name}},",
+    "body": "{{sender}} sent you a message.",
+    "cta": "View Message"
+  },
+  "footer": {
+    "unsubscribe": "Unsubscribe from these emails",
+    "sent_by": "Sent by {{community}} powered by Project NEXUS",
+    "address": "{{community}}"
+  }
+}
