@@ -173,48 +173,40 @@ class OnboardingService
             }
         }
 
-        Database::beginTransaction();
-        try {
-            // Create offer listings
-            foreach ($offers as $catId) {
-                $catId = (int)$catId;
-                $catName = $categories[$catId] ?? 'Service';
-                Database::query(
-                    "INSERT INTO listings (title, description, type, category_id, user_id, tenant_id, status, created_at)
-                     VALUES (?, ?, 'offer', ?, ?, ?, 'active', NOW())",
-                    [
-                        "I can help with {$catName}",
-                        "I'm available to help with {$catName}. Get in touch to arrange!",
-                        $catId,
-                        $userId,
-                        $tenantId,
-                    ]
-                );
-                $createdIds[] = (int)Database::lastInsertId();
-            }
+        // Create offer listings
+        foreach ($offers as $catId) {
+            $catId = (int)$catId;
+            $catName = $categories[$catId] ?? 'Service';
+            Database::query(
+                "INSERT INTO listings (title, description, type, category_id, user_id, tenant_id, status, created_at)
+                 VALUES (?, ?, 'offer', ?, ?, ?, 'active', NOW())",
+                [
+                    "I can help with {$catName}",
+                    "I'm available to help with {$catName}. Get in touch to arrange!",
+                    $catId,
+                    $userId,
+                    $tenantId,
+                ]
+            );
+            $createdIds[] = (int)Database::lastInsertId();
+        }
 
-            // Create request listings
-            foreach ($needs as $catId) {
-                $catId = (int)$catId;
-                $catName = $categories[$catId] ?? 'Service';
-                Database::query(
-                    "INSERT INTO listings (title, description, type, category_id, user_id, tenant_id, status, created_at)
-                     VALUES (?, ?, 'request', ?, ?, ?, 'active', NOW())",
-                    [
-                        "Looking for help with {$catName}",
-                        "I'm looking for someone who can help me with {$catName}.",
-                        $catId,
-                        $userId,
-                        $tenantId,
-                    ]
-                );
-                $createdIds[] = (int)Database::lastInsertId();
-            }
-
-            Database::commit();
-        } catch (\Throwable $e) {
-            Database::rollback();
-            throw $e;
+        // Create request listings
+        foreach ($needs as $catId) {
+            $catId = (int)$catId;
+            $catName = $categories[$catId] ?? 'Service';
+            Database::query(
+                "INSERT INTO listings (title, description, type, category_id, user_id, tenant_id, status, created_at)
+                 VALUES (?, ?, 'request', ?, ?, ?, 'active', NOW())",
+                [
+                    "Looking for help with {$catName}",
+                    "I'm looking for someone who can help me with {$catName}.",
+                    $catId,
+                    $userId,
+                    $tenantId,
+                ]
+            );
+            $createdIds[] = (int)Database::lastInsertId();
         }
 
         return $createdIds;

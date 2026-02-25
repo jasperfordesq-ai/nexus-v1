@@ -173,17 +173,19 @@ class OnboardingApiController extends BaseApiController
             $needs = [];
         }
 
-        // Save interests (optional — may be empty)
-        OnboardingService::saveInterests($userId, $interests);
+        // All-or-nothing: wrap interests + skills + listings + completion in one transaction
+        Database::beginTransaction();
+        try {
+            OnboardingService::saveInterests($userId, $interests);
+            OnboardingService::saveSkills($userId, $offers, $needs);
+            $listingIds = OnboardingService::autoCreateListings($userId, $offers, $needs);
+            OnboardingService::completeOnboarding($userId);
 
-        // Save final skills
-        OnboardingService::saveSkills($userId, $offers, $needs);
-
-        // Auto-create listings from selections
-        $listingIds = OnboardingService::autoCreateListings($userId, $offers, $needs);
-
-        // Mark onboarding complete
-        OnboardingService::completeOnboarding($userId);
+            Database::commit();
+        } catch (\Throwable $e) {
+            Database::rollback();
+            throw $e;
+        }
 
         $this->respondWithData([
             'message' => 'Onboarding complete!',
