@@ -15,11 +15,11 @@ import {
   Switch,
 } from '@heroui/react';
 import { Lock, Shield } from 'lucide-react';
-import PageHeader from '../../../components/PageHeader';
+import PageHeader from '../../components/PageHeader';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
-import { adminSuper } from '../../../api/adminApi';
-import type { FederationSystemControls as FederationSystemControlsType } from '../../../api/types';
+import { adminSuper } from '../../api/adminApi';
+import type { FederationSystemControls as FederationSystemControlsType } from '../../api/types';
 
 interface SystemControls {
   federation_enabled: boolean;

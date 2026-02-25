@@ -15,12 +15,12 @@ import {
   Textarea
 } from '@heroui/react';
 import { Plus, Trash2 } from 'lucide-react';
-import PageHeader from '../../../components/PageHeader';
-import ConfirmModal from '../../../components/ConfirmModal';
+import PageHeader from '../../components/PageHeader';
+import ConfirmModal from '../../components/ConfirmModal';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast, useTenant } from '@/contexts';
-import { adminSuper } from '../../../api/adminApi';
-import type { FederationWhitelistEntry, SuperAdminTenant } from '../../../api/types';
+import { adminSuper } from '../../api/adminApi';
+import type { FederationWhitelistEntry, SuperAdminTenant } from '../../api/types';
 
 interface WhitelistEntry {
   id: number;

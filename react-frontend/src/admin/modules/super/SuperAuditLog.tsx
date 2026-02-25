@@ -15,9 +15,9 @@ import { Input, Select, SelectItem, Button } from '@heroui/react';
 import { Download, X } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
-import { adminSuper } from '../../../api/adminApi';
-import { DataTable, PageHeader, StatusBadge, type Column } from '../../../components';
-import type { SuperAuditEntry } from '../../../api/types';
+import { adminSuper } from '../../api/adminApi';
+import { DataTable, PageHeader, StatusBadge, type Column } from '../../components';
+import type { SuperAuditEntry } from '../../api/types';
 
 const PAGE_SIZE = 25;
 

@@ -159,7 +159,7 @@ const CommentsModeration = lazy(() => import('./modules/moderation/CommentsModer
 const ReviewsModeration = lazy(() => import('./modules/moderation/ReviewsModeration'));
 const ReportsManagement = lazy(() => import('./modules/moderation/ReportsManagement'));
 
-// Super Admin module — primary implementations live in modules/super/
+// Super Admin module — all implementations live in modules/super/
 const SuperDashboard = lazy(() => import('./modules/super/SuperDashboard'));
 const TenantListAdmin = lazy(() => import('./modules/super/TenantList'));
 const TenantForm = lazy(() => import('./modules/super/TenantForm'));
@@ -169,11 +169,11 @@ const SuperUserList = lazy(() => import('./modules/super/SuperUserList'));
 const SuperUserForm = lazy(() => import('./modules/super/SuperUserForm'));
 const UserShow = lazy(() => import('./modules/super/UserShow'));
 const BulkOperations = lazy(() => import('./modules/super/BulkOperations'));
-const SuperAuditLog = lazy(() => import('./modules/super-admin/audit/SuperAuditLog'));
+const SuperAuditLog = lazy(() => import('./modules/super/SuperAuditLog'));
 const FederationControls = lazy(() => import('./modules/super/FederationControls'));
-const FederationSystemControls = lazy(() => import('./modules/super-admin/federation/FederationSystemControls'));
-const FederationWhitelist = lazy(() => import('./modules/super-admin/federation/FederationWhitelist'));
-const SuperPartnerships = lazy(() => import('./modules/super-admin/federation/Partnerships'));
+const FederationSystemControls = lazy(() => import('./modules/super/FederationSystemControls'));
+const FederationWhitelist = lazy(() => import('./modules/super/FederationWhitelist'));
+const SuperPartnerships = lazy(() => import('./modules/super/SuperPartnerships'));
 const FederationAuditLog = lazy(() => import('./modules/super/FederationAuditLog'));
 const FederationTenantFeatures = lazy(() => import('./modules/super/FederationTenantFeatures'));
 
