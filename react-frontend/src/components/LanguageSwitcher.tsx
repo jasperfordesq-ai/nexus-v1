@@ -5,8 +5,9 @@
 
 /**
  * Language Switcher Component
- * Toggles between English (en) and Irish/Gaeilge (ga)
- * Stores preference in localStorage as 'nexus_language'
+ * Shows only the languages supported by the current tenant.
+ * Reads tenant language config from TenantContext.
+ * Stores preference in localStorage as 'nexus_language'.
  */
 
 import { useTranslation } from 'react-i18next';
@@ -20,6 +21,7 @@ import {
 import { Globe } from 'lucide-react';
 import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { useTenantLanguages } from '@/contexts/TenantContext';
 
 interface Language {
   code: string;
@@ -28,9 +30,16 @@ interface Language {
   short: string;
 }
 
-const SUPPORTED_LANGUAGES: Language[] = [
+/**
+ * All languages the platform supports. Only those present in the tenant's
+ * supported_languages config will be shown to the user.
+ */
+const ALL_LANGUAGES: Language[] = [
   { code: 'en', label: 'English', short: 'EN' },
   { code: 'ga', label: 'Gaeilge', short: 'GA' },
+  { code: 'de', label: 'Deutsch', short: 'DE' },
+  { code: 'fr', label: 'Français', short: 'FR' },
+  { code: 'it', label: 'Italiano', short: 'IT' },
 ];
 
 interface LanguageSwitcherProps {
@@ -40,8 +49,14 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
   const { i18n } = useTranslation();
-  const currentLang = SUPPORTED_LANGUAGES.find((l) => l.code === i18n.language)
-    ?? SUPPORTED_LANGUAGES[0];
+  const tenantLanguages = useTenantLanguages();
+
+  // Only show languages this tenant supports
+  const supportedLanguages = ALL_LANGUAGES.filter(l => tenantLanguages.includes(l.code));
+
+  // If current language isn't in the tenant's list, fall back to the first supported one
+  const currentLang = supportedLanguages.find((l) => l.code === i18n.language)
+    ?? supportedLanguages[0];
 
   const handleLanguageChange = (code: string) => {
     i18n.changeLanguage(code);
@@ -81,7 +96,7 @@ export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
         selectionMode="single"
         onAction={(key) => handleLanguageChange(String(key))}
       >
-        {SUPPORTED_LANGUAGES.map((lang) => (
+        {supportedLanguages.map((lang) => (
           <DropdownItem
             key={lang.code}
             className={lang.code === currentLang.code ? 'bg-theme-active' : ''}

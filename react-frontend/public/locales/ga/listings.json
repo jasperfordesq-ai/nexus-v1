@@ -45,7 +45,9 @@
     "hours_placeholder": "1",
     "location_optional_label": "Suíomh (roghnach)",
     "location_placeholder": "e.g., Ar líne, Baile Átha Cliath, Corcaigh...",
-    "cancel": "Cealaigh"
+    "cancel": "Cealaigh",
+    "save_error_title": "Theip ar shábháil an liosta",
+    "save_error_subtitle": "Seiceáil do chuid eolais agus bain triail eile as."
   },
   "page_subtitle": "Brabhsáil seirbhísí agus iarratais ón bpobal",
   "search_placeholder": "Cuardaigh de réir teideal, cur síos, suíomh nó ainm...",
@@ -89,5 +91,14 @@
   "detail_share": "Roinn",
   "detail_offered_by": "Arna thairiscint ag",
   "detail_requested_by": "Arna iarraidh ag",
-  "detail_view_profile": "Cliceáil chun próifíl a fheiceáil"
+  "detail_view_profile": "Cliceáil chun próifíl a fheiceáil",
+  "loading": "Liosta á luchtú...",
+  "not_found_error": "Liosta gan aimsiú nó bainte",
+  "not_found_fallback": "Níl an liosta atá á lorg agat ann",
+  "exchange_status_pending_provider": "Ag fanacht le freagra",
+  "exchange_status_pending_broker": "Ag fanacht le ceadú",
+  "exchange_status_accepted": "Glactha",
+  "exchange_status_in_progress": "Ar Siúl",
+  "exchange_status_pending_confirmation": "Deimhnigh Uaireanta",
+  "exchange_status_disputed": "Faoi Athbhreithniú"
 }

@@ -82,7 +82,7 @@ export function ResetPasswordPage() {
       });
       setIsSuccess(true);
     } catch (err) {
-      setError('Failed to reset password. The link may have expired.');
+      setError(t('reset_password.link_expired_error'));
     } finally {
       setIsLoading(false);
     }

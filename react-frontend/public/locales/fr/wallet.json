@@ -1,0 +1,15 @@
+{
+  "title": "Portefeuille",
+  "balance": "Solde",
+  "time_credits": "Crédits temps",
+  "hours": "Heures",
+  "transactions": "Transactions",
+  "pending": "En attente",
+  "completed": "Effectuées",
+  "sent": "Envoyés",
+  "received": "Reçus",
+  "empty": "Aucune transaction pour l'instant",
+  "transfer": "Transférer des crédits",
+  "pending_reviews": "Évaluations en attente",
+  "review": "Laisser une évaluation"
+}

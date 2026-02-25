@@ -160,7 +160,7 @@ export function CreateListingPage() {
       navigate(tenantPath('/listings'));
     } catch (error) {
       logError('Failed to save listing', error);
-      toast.error('Failed to save listing', 'Please check your information and try again.');
+      toast.error(t('form.save_error_title'), t('form.save_error_subtitle'));
     } finally {
       setIsSubmitting(false);
     }
@@ -174,7 +174,7 @@ export function CreateListingPage() {
   }
 
   if (isLoading) {
-    return <LoadingScreen message="Loading listing..." />;
+    return <LoadingScreen message={t('loading')} />;
   }
 
   return (

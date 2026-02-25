@@ -59,5 +59,15 @@
   "message_edited_indicator": "(edited)",
   "message_edit": "Edit",
   "message_delete": "Delete",
-  "error_title": "Error"
+  "error_title": "Error",
+  "save": "Save",
+  "search_result_count": "{{current}} of {{total}}",
+  "archive_confirm_prompt": "Are you sure you want to archive this conversation with {{name}}?",
+  "aria_add_attachment": "Add attachment",
+  "aria_message_input": "Message input",
+  "aria_record_voice": "Record voice message",
+  "aria_add_reaction": "Add reaction",
+  "aria_react_with": "React with {{emoji}}",
+  "aria_message_options": "Message options",
+  "aria_toggle_reaction": "{{emoji}} reaction, click to toggle"
 }

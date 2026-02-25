@@ -1,0 +1,47 @@
+{
+  "welcome": {
+    "subject": "Bienvenue dans {{community}} !",
+    "greeting": "Bienvenue, {{name}} !",
+    "body": "Merci d'avoir rejoint {{community}}. Votre compte a été créé et vous pouvez maintenant commencer à explorer la plateforme.",
+    "cta": "Commencer"
+  },
+  "verification": {
+    "subject": "Vérifiez votre adresse e-mail",
+    "greeting": "Bonjour {{name}},",
+    "body": "Veuillez vérifier votre adresse e-mail en cliquant sur le bouton ci-dessous.",
+    "cta": "Vérifier l'e-mail",
+    "expiry": "Ce lien expire dans {{hours}} heures."
+  },
+  "password_reset": {
+    "subject": "Réinitialisez votre mot de passe",
+    "greeting": "Bonjour {{name}},",
+    "body": "Vous avez demandé une réinitialisation de mot de passe. Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe.",
+    "cta": "Réinitialiser le mot de passe",
+    "expiry": "Ce lien expire dans {{hours}} heures.",
+    "ignore": "Si vous n'avez pas effectué cette demande, vous pouvez ignorer cet e-mail."
+  },
+  "transaction": {
+    "subject": "Transaction de crédit temps — {{amount}}h",
+    "greeting": "Bonjour {{name}},",
+    "sent": "Vous avez envoyé {{amount}} heure(s) à {{recipient}}.",
+    "received": "Vous avez reçu {{amount}} heure(s) de la part de {{sender}}.",
+    "description": "Description : {{description}}"
+  },
+  "review_request": {
+    "subject": "Laissez une évaluation pour {{name}}",
+    "greeting": "Bonjour {{name}},",
+    "body": "Vous avez récemment échangé des services avec {{other_party}}. Veuillez prendre un moment pour laisser une évaluation.",
+    "cta": "Laisser une évaluation"
+  },
+  "new_message": {
+    "subject": "Nouveau message de {{sender}}",
+    "greeting": "Bonjour {{name}},",
+    "body": "{{sender}} vous a envoyé un message.",
+    "cta": "Voir le message"
+  },
+  "footer": {
+    "unsubscribe": "Se désabonner de ces e-mails",
+    "sent_by": "Envoyé par {{community}} propulsé par Project NEXUS",
+    "address": "{{community}}"
+  }
+}

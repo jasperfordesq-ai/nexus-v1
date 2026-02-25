@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "title": "Dashboard",
+    "description": "La Sua dashboard personale. Visualizzi il Suo saldo, gli annunci e l'attività."
+  },
+  "welcome_back": "Bentornato/a, {{name}}!",
+  "community_activity": "Ecco cosa sta accadendo nella comunità {{community}}",
+  "unable_to_load": "Impossibile Caricare la Dashboard",
+  "try_again": "Riprova",
+  "onboarding": {
+    "banner_title": "Completi la configurazione del Suo profilo",
+    "banner_subtitle": "Ci dica i Suoi interessi e le Sue competenze per ottenere corrispondenze personalizzate",
+    "get_started": "Inizia"
+  },
+  "new_listing": "Nuovo Annuncio",
+  "stats": {
+    "balance": "Saldo",
+    "active_listings": "Annunci Attivi",
+    "messages": "Messaggi",
+    "pending": "In Attesa"
+  },
+  "sections": {
+    "recent_listings": "Annunci Recenti",
+    "recent_activity": "Attività Recente",
+    "quick_actions": "Azioni Rapide",
+    "suggested_for_you": "Suggeriti per Lei",
+    "my_groups": "I Miei Gruppi",
+    "upcoming_events": "Prossimi Eventi",
+    "your_progress": "Il Suo Progresso",
+    "pending_reviews": "Recensioni in Attesa"
+  },
+  "view_all": "Vedi tutto",
+  "view_all_caps": "Vedi Tutto",
+  "browse_all": "Sfoglia Tutto",
+  "view_achievements": "Vedi Risultati",
+  "view_all_transactions": "Vedi Tutte le Transazioni",
+  "quick_actions": {
+    "create_listing": "Crea Annuncio",
+    "messages": "Messaggi",
+    "view_wallet": "Vedi Portafoglio",
+    "find_members": "Trova Membri",
+    "browse_events": "Sfoglia Eventi",
+    "notifications": "Notifiche"
+  },
+  "listings": {
+    "offering": "Offerta",
+    "requesting": "Richiesta",
+    "offer": "Offerta",
+    "request": "Richiesta",
+    "empty": "Nessun annuncio recente",
+    "create_first": "Crei il Suo primo annuncio"
+  },
+  "activity": {
+    "action_listing": "ha condiviso un annuncio",
+    "action_event": "ha pubblicato un evento",
+    "action_poll": "ha creato un sondaggio",
+    "action_goal": "ha fissato un nuovo obiettivo",
+    "action_post": "ha condiviso un post",
+    "empty": "Nessuna attività recente",
+    "check_feed": "Consulti il Feed"
+  },
+  "suggestions": {
+    "empty": "Ancora nessun suggerimento"
+  },
+  "groups": {
+    "members_count": "{{count}} membri",
+    "empty": "Non ha ancora aderito a nessun gruppo",
+    "discover": "Scopri i gruppi"
+  },
+  "events": {
+    "online_event": "Evento online",
+    "empty": "Nessun evento in programma",
+    "browse": "Sfoglia eventi"
+  },
+  "gamification": {
+    "level": "Livello {{level}}",
+    "badges": "Badge",
+    "streak": "Serie",
+    "xp_progress": "Progresso XP",
+    "start_earning": "Inizi a guadagnare XP partecipando alla comunità!"
+  },
+  "reviews": {
+    "sent": "Inviato {{amount}}h",
+    "received": "Ricevuto {{amount}}h",
+    "review": "Recensione"
+  }
+}

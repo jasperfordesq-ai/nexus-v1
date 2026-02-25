@@ -1,0 +1,15 @@
+{
+  "title": "Portafoglio",
+  "balance": "Saldo",
+  "time_credits": "Crediti Tempo",
+  "hours": "Ore",
+  "transactions": "Transazioni",
+  "pending": "In Attesa",
+  "completed": "Completate",
+  "sent": "Inviati",
+  "received": "Ricevuti",
+  "empty": "Nessuna transazione ancora",
+  "transfer": "Trasferisci Crediti",
+  "pending_reviews": "Recensioni in Attesa",
+  "review": "Lascia Recensione"
+}

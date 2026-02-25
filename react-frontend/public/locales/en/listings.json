@@ -45,7 +45,9 @@
     "hours_placeholder": "1",
     "location_optional_label": "Location (optional)",
     "location_placeholder": "e.g., Online, Dublin, Cork...",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "save_error_title": "Failed to save listing",
+    "save_error_subtitle": "Please check your information and try again."
   },
   "page_subtitle": "Browse services and requests from the community",
   "search_placeholder": "Search by title, description, location or name...",
@@ -89,5 +91,14 @@
   "detail_share": "Share",
   "detail_offered_by": "Offered by",
   "detail_requested_by": "Requested by",
-  "detail_view_profile": "Click to view profile"
+  "detail_view_profile": "Click to view profile",
+  "loading": "Loading listing...",
+  "not_found_error": "Listing not found or has been removed",
+  "not_found_fallback": "The listing you are looking for does not exist",
+  "exchange_status_pending_provider": "Waiting for response",
+  "exchange_status_pending_broker": "Awaiting approval",
+  "exchange_status_accepted": "Accepted",
+  "exchange_status_in_progress": "In Progress",
+  "exchange_status_pending_confirmation": "Confirm Hours",
+  "exchange_status_disputed": "Under Review"
 }

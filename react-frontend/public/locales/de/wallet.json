@@ -1,0 +1,15 @@
+{
+  "title": "Zeitkonto",
+  "balance": "Guthaben",
+  "time_credits": "Zeitguthaben",
+  "hours": "Stunden",
+  "transactions": "Transaktionen",
+  "pending": "Ausstehend",
+  "completed": "Abgeschlossen",
+  "sent": "Gesendet",
+  "received": "Empfangen",
+  "empty": "Noch keine Transaktionen",
+  "transfer": "Guthaben übertragen",
+  "pending_reviews": "Ausstehende Bewertungen",
+  "review": "Bewertung abgeben"
+}

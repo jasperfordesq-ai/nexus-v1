@@ -14,7 +14,9 @@ i18n
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',
-    supportedLngs: ['en', 'ga'],
+    // supportedLngs is intentionally not set here — tenant-aware filtering is handled
+    // in LanguageSwitcher which reads from TenantContext. fallbackLng: 'en' ensures
+    // graceful fallback for any unsupported locale.
     defaultNS: 'common',
     ns: ['common'],
     debug: import.meta.env.DEV,

@@ -872,6 +872,8 @@ export interface TenantConfig {
   menu_pages?: {
     about?: { title: string; slug: string }[];
   };
+  /** Language codes supported by this tenant (e.g. ['en', 'ga'] or ['de', 'fr', 'it', 'en']) */
+  supported_languages?: string[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

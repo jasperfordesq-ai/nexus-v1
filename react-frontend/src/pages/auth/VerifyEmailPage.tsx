@@ -76,7 +76,7 @@ export function VerifyEmailPage() {
       await api.post('/auth/resend-verification');
       setResendSuccess(true);
     } catch {
-      setErrorMessage('Failed to resend verification email. Please try again later.');
+      setErrorMessage(t('verify_email.resend_error'));
     } finally {
       setIsResending(false);
     }
@@ -187,7 +187,7 @@ export function VerifyEmailPage() {
               )
             ) : (
               <p className="text-theme-subtle text-sm">
-                Please log in to request a new verification email.
+                {t('verify_email.login_required')}
               </p>
             )}
 
@@ -197,7 +197,7 @@ export function VerifyEmailPage() {
                 className="w-full bg-theme-elevated text-theme-primary"
                 startContent={<ArrowLeft className="w-4 h-4" />}
               >
-                {isAuthenticated ? 'Back to Dashboard' : 'Back to Login'}
+                {isAuthenticated ? t('verify_email.back_to_dashboard') : t('verify_email.back_to_login')}
               </Button>
             </Link>
           </div>

@@ -1,0 +1,19 @@
+{
+  "title": "Impostazioni",
+  "account": "Account",
+  "notifications": "Notifiche",
+  "privacy": "Privacy",
+  "language": "Lingua",
+  "appearance": "Aspetto",
+  "security": "Sicurezza",
+  "save": "Salva Impostazioni",
+  "saved": "Impostazioni salvate",
+  "language_preference": "Preferenza Lingua",
+  "select_language": "Scelga la lingua preferita per l'interfaccia",
+  "theme": {
+    "title": "Tema",
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "system": "Sistema"
+  }
+}
