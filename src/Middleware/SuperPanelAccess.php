@@ -47,8 +47,13 @@ class SuperPanelAccess
     /**
      * Get full access context for current user
      * Cached per request for performance
+     *
+     * @param int|null $userId Optional user ID for stateless (JWT) API auth.
+     *                         When provided, bypasses $_SESSION lookup entirely.
+     *                         This is critical for API endpoints where session_start()
+     *                         may fail silently in containerized environments.
      */
-    public static function getAccess(): array
+    public static function getAccess(?int $userId = null): array
     {
         if (self::$currentAccess !== null) {
             return self::$currentAccess;
@@ -69,8 +74,9 @@ class SuperPanelAccess
             'reason' => 'Not authenticated'
         ];
 
-        // Must be logged in
-        if (empty($_SESSION['user_id'])) {
+        // Resolve user ID: prefer explicit param, fall back to session
+        $effectiveUserId = $userId ?? ($_SESSION['user_id'] ?? null);
+        if (empty($effectiveUserId)) {
             return self::$currentAccess;
         }
 
@@ -90,7 +96,7 @@ class SuperPanelAccess
             FROM users u
             JOIN tenants t ON u.tenant_id = t.id
             WHERE u.id = ?
-        ", [$_SESSION['user_id']])->fetch(\PDO::FETCH_ASSOC);
+        ", [$effectiveUserId])->fetch(\PDO::FETCH_ASSOC);
 
         if (!$user) {
             self::$currentAccess['reason'] = 'User not found';

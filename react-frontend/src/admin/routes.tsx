@@ -159,23 +159,23 @@ const CommentsModeration = lazy(() => import('./modules/moderation/CommentsModer
 const ReviewsModeration = lazy(() => import('./modules/moderation/ReviewsModeration'));
 const ReportsManagement = lazy(() => import('./modules/moderation/ReportsManagement'));
 
-// Super Admin module
+// Super Admin module — primary implementations live in modules/super/
 const SuperDashboard = lazy(() => import('./modules/super/SuperDashboard'));
-const TenantListAdmin = lazy(() => import('./modules/super-admin/tenants/TenantListAdmin'));
-const TenantForm = lazy(() => import('./modules/super-admin/tenants/TenantForm'));
-const TenantShow = lazy(() => import('./modules/super-admin/tenants/TenantShow'));
-const TenantHierarchy = lazy(() => import('./modules/super-admin/tenants/TenantHierarchy'));
+const TenantListAdmin = lazy(() => import('./modules/super/TenantList'));
+const TenantForm = lazy(() => import('./modules/super/TenantForm'));
+const TenantShow = lazy(() => import('./modules/super/TenantShow'));
+const TenantHierarchy = lazy(() => import('./modules/super/TenantHierarchy'));
 const SuperUserList = lazy(() => import('./modules/super/SuperUserList'));
 const SuperUserForm = lazy(() => import('./modules/super/SuperUserForm'));
 const UserShow = lazy(() => import('./modules/super/UserShow'));
 const BulkOperations = lazy(() => import('./modules/super/BulkOperations'));
 const SuperAuditLog = lazy(() => import('./modules/super-admin/audit/SuperAuditLog'));
-const FederationControls = lazy(() => import('./modules/super-admin/federation/FederationControls'));
+const FederationControls = lazy(() => import('./modules/super/FederationControls'));
 const FederationSystemControls = lazy(() => import('./modules/super-admin/federation/FederationSystemControls'));
 const FederationWhitelist = lazy(() => import('./modules/super-admin/federation/FederationWhitelist'));
 const SuperPartnerships = lazy(() => import('./modules/super-admin/federation/Partnerships'));
-const FederationAuditLog = lazy(() => import('./modules/super-admin/federation/FederationAuditLog'));
-const FederationTenantFeatures = lazy(() => import('./modules/super-admin/federation/FederationTenantFeatures'));
+const FederationAuditLog = lazy(() => import('./modules/super/FederationAuditLog'));
+const FederationTenantFeatures = lazy(() => import('./modules/super/FederationTenantFeatures'));
 
 // Content module
 const PagesAdmin = lazy(() => import('./modules/content/PagesAdmin'));
