@@ -18,9 +18,15 @@ $tenant = TenantContext::get();
 $frontendBase = TenantContext::getFrontendUrl();
 $tenantSlug = $tenant['slug'] ?? '';
 $tenantId = $tenant['id'] ?? 1;
-$backToSiteUrl = ($tenantId == 1 || empty($tenantSlug))
-    ? $frontendBase . '/dashboard'
-    : $frontendBase . '/' . $tenantSlug . '/dashboard';
+$tenantDomain = $tenant['domain'] ?? '';
+// Prefer tenant's custom domain if configured, otherwise use FRONTEND_URL + slug
+if (!empty($tenantDomain)) {
+    $backToSiteUrl = 'https://' . $tenantDomain . '/dashboard';
+} elseif ($tenantId == 1 || empty($tenantSlug)) {
+    $backToSiteUrl = $frontendBase . '/dashboard';
+} else {
+    $backToSiteUrl = $frontendBase . '/' . $tenantSlug . '/dashboard';
+}
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
 $currentPathClean = strtok($currentPath, '?');
 

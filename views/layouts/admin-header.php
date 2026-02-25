@@ -15,13 +15,18 @@ $tenant = TenantContext::get();
 $frontendBase = TenantContext::getFrontendUrl();
 $tenantSlug = $tenant['slug'] ?? '';
 $tenantId = $tenant['id'] ?? 1;
-// Build tenant-aware URLs pointing at the React frontend
-$backToSiteUrl = ($tenantId == 1 || empty($tenantSlug))
-    ? $frontendBase . '/dashboard'
-    : $frontendBase . '/' . $tenantSlug . '/dashboard';
-$notifUrl = ($tenantId == 1 || empty($tenantSlug))
-    ? $frontendBase . '/notifications'
-    : $frontendBase . '/' . $tenantSlug . '/notifications';
+$tenantDomain = $tenant['domain'] ?? '';
+// Prefer tenant's custom domain if configured, otherwise use FRONTEND_URL + slug
+if (!empty($tenantDomain)) {
+    $backToSiteUrl = 'https://' . $tenantDomain . '/dashboard';
+    $notifUrl = 'https://' . $tenantDomain . '/notifications';
+} elseif ($tenantId == 1 || empty($tenantSlug)) {
+    $backToSiteUrl = $frontendBase . '/dashboard';
+    $notifUrl = $frontendBase . '/notifications';
+} else {
+    $backToSiteUrl = $frontendBase . '/' . $tenantSlug . '/dashboard';
+    $notifUrl = $frontendBase . '/' . $tenantSlug . '/notifications';
+}
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
 $currentPathClean = strtok($currentPath, '?');
 $currentUser = $_SESSION['user_name'] ?? 'Admin';
