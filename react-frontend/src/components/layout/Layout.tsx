@@ -19,6 +19,7 @@ import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
 import { DevelopmentStatusBanner } from './DevelopmentStatusBanner';
 import { SessionExpiredModal } from '@/components/feedback';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useApiErrorHandler } from '@/hooks';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
 
@@ -134,6 +135,11 @@ export function AuthLayout() {
 
       {/* Development status banner */}
       <DevelopmentStatusBanner />
+
+      {/* Language switcher — top-right on auth pages */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSwitcher />
+      </div>
 
       {/* Main Content */}
       <main className="relative z-10 flex-1">

@@ -807,6 +807,25 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               </>
             ) : (
               <>
+                {/* Theme Toggle */}
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  className="text-theme-muted hover:text-theme-primary"
+                  onPress={toggleTheme}
+                  aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                >
+                  {resolvedTheme === 'dark' ? (
+                    <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" aria-hidden="true" />
+                  ) : (
+                    <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" aria-hidden="true" />
+                  )}
+                </Button>
+
+                {/* Language Switcher */}
+                <LanguageSwitcher />
+
                 <Link to={tenantPath('/login')}>
                   <Button variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary">
                     {t('auth.log_in')}
