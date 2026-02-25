@@ -850,6 +850,10 @@ class AdminSuperApiController extends BaseApiController
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Target tenant not found', null, 404);
         }
 
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($targetTenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the target tenant', null, 403);
+        }
+
         if ($grantSuperAdmin && !$targetTenant['allows_subtenants']) {
             $this->respondWithError(
                 ApiErrorCodes::VALIDATION_ERROR,
@@ -868,6 +872,11 @@ class AdminSuperApiController extends BaseApiController
 
             if (!$user) {
                 $errors[] = "User ID {$uid} not found";
+                continue;
+            }
+
+            if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
+                $errors[] = "No access to user ID {$uid}'s tenant";
                 continue;
             }
 
@@ -946,6 +955,11 @@ class AdminSuperApiController extends BaseApiController
             $tenant = Tenant::find($tid);
             if (!$tenant) {
                 $errors[] = "Tenant ID {$tid} not found";
+                continue;
+            }
+
+            if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($tid)) {
+                $errors[] = "No access to tenant ID {$tid}";
                 continue;
             }
 
