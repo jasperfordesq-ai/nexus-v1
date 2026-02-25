@@ -1127,6 +1127,8 @@ export interface TenantHierarchyNode {
   id: number;
   name: string;
   slug: string;
+  parent_id: number | null;
+  depth: number;
   is_active: boolean;
   allows_subtenants: boolean;
   user_count: number;
@@ -1280,9 +1282,19 @@ export interface FederationStatusOverview {
 export interface TenantFederationFeatures {
   tenant_id: number;
   tenant_name: string;
+  tenant_domain: string | null;
   is_whitelisted: boolean;
-  features: Record<string, boolean>;
-  partnerships: FederationPartnership[];
+  active_partnerships_count: number;
+  federation_enabled: boolean;
+  directory_visible: boolean;
+  profiles_enabled: boolean;
+  messaging_enabled: boolean;
+  transactions_enabled: boolean;
+  listings_enabled: boolean;
+  events_enabled: boolean;
+  groups_enabled: boolean;
+  features?: Record<string, boolean>;
+  partnerships?: FederationPartnership[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1605,18 +1617,6 @@ export interface SuperTenant {
   updated_at: string;
 }
 
-export interface TenantHierarchyNode {
-  id: number;
-  name: string;
-  slug: string;
-  parent_id: number | null;
-  depth: number;
-  is_active: boolean;
-  allows_subtenants: boolean;
-  user_count: number;
-  children: TenantHierarchyNode[];
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Super Admin - User Management
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1719,20 +1719,4 @@ export interface Partnership {
   suspended_reason?: string | null;
   terminated_at?: string | null;
   terminated_reason?: string | null;
-}
-
-export interface TenantFederationFeatures {
-  tenant_id: number;
-  tenant_name: string;
-  tenant_domain: string | null;
-  is_whitelisted: boolean;
-  active_partnerships_count: number;
-  federation_enabled: boolean;
-  directory_visible: boolean;
-  profiles_enabled: boolean;
-  messaging_enabled: boolean;
-  transactions_enabled: boolean;
-  listings_enabled: boolean;
-  events_enabled: boolean;
-  groups_enabled: boolean;
 }
