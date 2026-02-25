@@ -680,4 +680,20 @@ export async function fetchCsrfToken(): Promise<string | null> {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Public Menu API
+// ─────────────────────────────────────────────────────────────────────────────
+
+import type { ApiMenu, MenusByLocation } from '@/types/menu';
+
+export const menuApi = {
+  /** Get all menus for the current tenant, optionally filtered by location */
+  getMenus: (location?: string) => {
+    const params = location ? `?location=${encodeURIComponent(location)}` : '';
+    return api.get<ApiMenu[] | MenusByLocation>(`/menus${params}`);
+  },
+  /** Get mobile-optimized menu */
+  getMobileMenu: () => api.get<ApiMenu[]>('/menus/mobile'),
+};
+
 export default api;

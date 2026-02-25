@@ -10,12 +10,14 @@
 
 import { Card, CardBody, Button } from '@heroui/react';
 import { Wrench, LogIn } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { tenantPath } from '@/lib/tenant-routing';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Link } from 'react-router-dom';
 
 export function MaintenancePage() {
+  const { t } = useTranslation('public');
   usePageTitle('Maintenance');
   const { tenant } = useTenant();
   const tenantName = tenant?.name || 'Project NEXUS';
@@ -33,21 +35,20 @@ export function MaintenancePage() {
 
           <div className="space-y-3">
             <h1 className="text-3xl font-bold text-foreground">
-              We'll be back soon!
+              {t('maintenance.title')}
             </h1>
 
             <p className="text-lg text-default-600">
-              <strong>{tenantName}</strong> is currently undergoing scheduled maintenance
-              to improve your experience.
+              <strong>{tenantName}</strong> {t('maintenance.description')}
             </p>
 
             <p className="text-default-500">
-              We apologize for any inconvenience. Please check back in a little while.
+              {t('maintenance.apology')}
             </p>
           </div>
 
           <div className="text-sm text-default-400 mt-4">
-            Thank you for your patience!
+            {t('maintenance.thanks')}
           </div>
 
           <div className="pt-4 border-t border-divider">
@@ -59,7 +60,7 @@ export function MaintenancePage() {
               startContent={<LogIn size={18} />}
               size="sm"
             >
-              Admin Login
+              {t('maintenance.admin_login')}
             </Button>
           </div>
         </CardBody>
