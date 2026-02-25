@@ -5,6 +5,7 @@
 
 import { createContext, useContext, useMemo } from 'react';
 import { useAuth } from './AuthContext';
+import { useTenant } from './TenantContext';
 import { useMenus } from '@/hooks/useMenus';
 import type { ApiMenu, MenusByLocation } from '@/types/menu';
 
@@ -41,7 +42,8 @@ const MenuContext = createContext<MenuContextValue | null>(null);
 
 export function MenuProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  const { menus, isLoading, hasCustomMenus, refresh } = useMenus(isAuthenticated);
+  const { tenant } = useTenant();
+  const { menus, isLoading, hasCustomMenus, refresh } = useMenus(isAuthenticated, tenant?.id);
 
   const value = useMemo<MenuContextValue>(
     () => ({

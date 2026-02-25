@@ -30,6 +30,7 @@ import {
   ChevronRight,
   Mail,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
@@ -63,8 +64,9 @@ const tocSections = [
 /* ───────────────────────── Component ───────────────────────── */
 
 export function StrategicPlanPage() {
+  const { t } = useTranslation('about');
   const { tenantPath } = useTenant();
-  usePageTitle('Strategic Plan 2026\u20132030');
+  usePageTitle(t('strategic_plan.page_title'));
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -77,15 +79,15 @@ export function StrategicPlanPage() {
   return (
     <>
     <PageMeta
-      title="Strategic Plan 2026–2030"
-      description="The Power of an Hour: hOUR Timebank's five-year strategic plan for sustainable growth, national scaling, and building a connected Ireland."
+      title={t('strategic_plan.page_title')}
+      description={t('strategic_plan.meta_description')}
     />
     <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
       {/* ─── Breadcrumbs ─── */}
       <div className="px-4 sm:px-6 lg:px-8 pt-6">
         <Breadcrumbs items={[
-          { label: 'About', href: '/about' },
-          { label: 'Strategic Plan' },
+          { label: t('strategic_plan.breadcrumb_about'), href: '/about' },
+          { label: t('strategic_plan.breadcrumb_plan') },
         ]} />
       </div>
 
@@ -108,7 +110,7 @@ export function StrategicPlanPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-theme-primary mb-4"
           >
-            Strategic Plan 2026&ndash;2030
+            {t('strategic_plan.page_title')}
           </motion.h1>
 
           <motion.p
@@ -116,7 +118,7 @@ export function StrategicPlanPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg sm:text-xl text-theme-muted max-w-2xl mx-auto mb-3"
           >
-            The Power of an Hour: Building a Resilient, Connected Ireland
+            {t('strategic_plan.hero_tagline')}
           </motion.p>
 
           <motion.p
@@ -124,7 +126,7 @@ export function StrategicPlanPage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-sm text-theme-subtle max-w-xl mx-auto mb-8"
           >
-            A five-year roadmap for sustainable growth, national scaling, and deepening our social impact.
+            {t('strategic_plan.hero_subtitle')}
           </motion.p>
 
           <motion.div
@@ -139,7 +141,7 @@ export function StrategicPlanPage() {
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold"
               startContent={<Download className="w-4 h-4" aria-hidden="true" />}
             >
-              Download Full Plan (PDF)
+              {t('strategic_plan.download_plan')}
             </Button>
           </motion.div>
         </div>
@@ -155,7 +157,7 @@ export function StrategicPlanPage() {
           >
             <GlassCard className="p-4 sm:p-6">
               <h2 className="text-sm font-semibold text-theme-subtle uppercase tracking-wider mb-4">
-                Contents
+                {t('strategic_plan.toc_heading')}
               </h2>
               <div className="flex flex-wrap gap-2">
                 {tocSections.map((section, index) => (
@@ -169,7 +171,7 @@ export function StrategicPlanPage() {
                     <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
                       {index + 1}
                     </span>
-                    <span>{section.label}</span>
+                    <span>{t(`strategic_plan.toc_${section.id}`, section.label)}</span>
                   </Button>
                 ))}
               </div>
@@ -186,14 +188,12 @@ export function StrategicPlanPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={Target} number={1} title="Executive Summary" />
+            <SectionHeading icon={Target} number={1} title={t('strategic_plan.toc_executive-summary')} />
 
             <div className="space-y-6 mt-6">
               <GlassCard className="p-6">
                 <p className="text-theme-muted text-sm leading-relaxed mb-6">
-                  This strategic plan sets out how hOUR Timebank will grow from a proven community
-                  initiative into a sustainable, nationally recognised social infrastructure over the next
-                  five years. It is built on two primary goals:
+                  {t('strategic_plan.exec_summary_para')}
                 </p>
 
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -202,12 +202,10 @@ export function StrategicPlanPage() {
                       <div className="p-2 rounded-lg bg-emerald-500/15">
                         <Sprout className="w-5 h-5 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                       </div>
-                      <h3 className="font-semibold text-theme-primary">Goal 1</h3>
+                      <h3 className="font-semibold text-theme-primary">{t('strategic_plan.goal_1_heading')}</h3>
                     </div>
                     <p className="text-sm text-theme-muted leading-relaxed">
-                      <strong className="text-theme-primary">Scale reach and impact</strong> by expanding
-                      to new communities, increasing active membership, and deepening the social value
-                      delivered per member.
+                      {t('strategic_plan.goal_1_text')}
                     </p>
                   </div>
 
@@ -216,12 +214,10 @@ export function StrategicPlanPage() {
                       <div className="p-2 rounded-lg bg-indigo-500/15">
                         <DollarSign className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                       </div>
-                      <h3 className="font-semibold text-theme-primary">Goal 2</h3>
+                      <h3 className="font-semibold text-theme-primary">{t('strategic_plan.goal_2_heading')}</h3>
                     </div>
                     <p className="text-sm text-theme-muted leading-relaxed">
-                      <strong className="text-theme-primary">Build financial resilience</strong> by diversifying
-                      income, securing multi-year funding, and developing earned revenue streams to reduce
-                      dependency on grants.
+                      {t('strategic_plan.goal_2_text')}
                     </p>
                   </div>
                 </div>
@@ -239,7 +235,7 @@ export function StrategicPlanPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={Eye} number={2} title="Vision & Mission" />
+            <SectionHeading icon={Eye} number={2} title={t('strategic_plan.toc_vision-mission')} />
 
             <div className="grid sm:grid-cols-2 gap-6 mt-6">
               {/* Mission */}
@@ -250,11 +246,10 @@ export function StrategicPlanPage() {
                     <div className="p-2 rounded-lg bg-indigo-500/15">
                       <Rocket className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </div>
-                    <h3 className="text-lg font-bold text-indigo-600 dark:text-indigo-400">Our Mission</h3>
+                    <h3 className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{t('strategic_plan.mission_heading')}</h3>
                   </div>
                   <p className="text-sm text-theme-muted leading-relaxed">
-                    To create thriving, connected communities across Ireland through time-based exchange,
-                    where every person&apos;s contribution is valued equally and no one is left isolated.
+                    {t('strategic_plan.mission_text')}
                   </p>
                 </div>
               </GlassCard>
@@ -267,12 +262,10 @@ export function StrategicPlanPage() {
                     <div className="p-2 rounded-lg bg-emerald-500/15">
                       <Eye className="w-5 h-5 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                     </div>
-                    <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400">Our Vision</h3>
+                    <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{t('strategic_plan.vision_heading')}</h3>
                   </div>
                   <p className="text-sm text-theme-muted leading-relaxed">
-                    An Ireland where timebanking is a recognised pillar of community wellbeing &mdash;
-                    accessible in every county, integrated into public health systems, and empowering
-                    tens of thousands of people to live more connected, purposeful lives.
+                    {t('strategic_plan.vision_text')}
                   </p>
                 </div>
               </GlassCard>
@@ -289,63 +282,39 @@ export function StrategicPlanPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={ShieldAlert} number={3} title="SWOT Analysis" />
+            <SectionHeading icon={ShieldAlert} number={3} title={t('strategic_plan.toc_swot')} />
 
             <div className="grid sm:grid-cols-2 gap-4 mt-6">
               {/* Strengths */}
               <SwotCard
-                title="Strengths"
+                title={t('strategic_plan.swot_strengths_title')}
                 accent="emerald"
                 icon={CheckCircle2}
-                items={[
-                  'Proven social impact: €16 SROI per €1 invested',
-                  'Strong partnerships with HSE, local authorities, and community groups',
-                  'Lean operations with low overheads and volunteer commitment',
-                  'Technology-enabled platform for scalable community management',
-                  'Passionate, dedicated founding team with deep sector knowledge',
-                ]}
+                items={[0, 1, 2, 3, 4].map(i => t(`strategic_plan.swot_strengths_${i}`))}
               />
 
               {/* Weaknesses */}
               <SwotCard
-                title="Weaknesses"
+                title={t('strategic_plan.swot_weaknesses_title')}
                 accent="rose"
                 icon={AlertTriangle}
-                items={[
-                  'Financial instability due to reliance on short-term grants',
-                  'Limited human resources — core team stretched across multiple roles',
-                  'No permanent physical hub or dedicated community space',
-                  'Brand awareness low outside existing community networks',
-                  'Volunteer coordinator capacity is a single point of failure',
-                ]}
+                items={[0, 1, 2, 3, 4].map(i => t(`strategic_plan.swot_weaknesses_${i}`))}
               />
 
               {/* Opportunities */}
               <SwotCard
-                title="Opportunities"
+                title={t('strategic_plan.swot_opportunities_title')}
                 accent="indigo"
                 icon={Lightbulb}
-                items={[
-                  'Public sector interest in social prescribing and community health models',
-                  'Hybrid digital/in-person models for post-pandemic community building',
-                  'National loneliness narrative creating political and media support',
-                  'EU funding programmes for social innovation and cohesion',
-                  'Corporate social responsibility partnerships for sustainable income',
-                ]}
+                items={[0, 1, 2, 3, 4].map(i => t(`strategic_plan.swot_opportunities_${i}`))}
               />
 
               {/* Threats */}
               <SwotCard
-                title="Threats"
+                title={t('strategic_plan.swot_threats_title')}
                 accent="amber"
                 icon={ShieldAlert}
-                items={[
-                  'Funding cliff risk if current grants are not renewed',
-                  'Volunteer and coordinator burnout without adequate resources',
-                  'Competition from other wellbeing and community platforms',
-                  'Changing government priorities and policy direction',
-                  'Technology costs rising without corresponding income growth',
-                ]}
+                items={[0, 1, 2, 3, 4].map(i => t(`strategic_plan.swot_threats_${i}`))}
               />
             </div>
           </motion.div>
@@ -360,7 +329,7 @@ export function StrategicPlanPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={TrendingUp} number={4} title="Strategic Pillars" />
+            <SectionHeading icon={TrendingUp} number={4} title={t('strategic_plan.toc_pillars')} />
 
             <div className="space-y-8 mt-6">
               {/* Pillar 1 */}
@@ -371,8 +340,8 @@ export function StrategicPlanPage() {
                       <Sprout className="w-5 h-5 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                     </div>
                     <div>
-                      <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">Pillar 1</p>
-                      <h3 className="text-lg font-bold text-theme-primary">Roots & Reach (Growth)</h3>
+                      <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">{t('strategic_plan.pillar_1_label')}</p>
+                      <h3 className="text-lg font-bold text-theme-primary">{t('strategic_plan.pillar_1_title')}</h3>
                     </div>
                   </div>
                 </div>
@@ -380,28 +349,21 @@ export function StrategicPlanPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-emerald-500/5">
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">Initiative</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">Priority</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">KPI / Target</th>
+                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_initiative_header')}</th>
+                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_priority_header')}</th>
+                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_kpi_header')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme-default">
-                      {[
-                        { initiative: 'Expand to 3 new communities', priority: 'Year 1', kpi: '3 new timebank chapters launched' },
-                        { initiative: 'Active member growth programme', priority: 'Ongoing', kpi: '500 active members by 2028' },
-                        { initiative: 'HSE social prescribing pilot', priority: 'Year 1\u20132', kpi: '1 pilot GP referral partnership live' },
-                        { initiative: 'University and youth outreach', priority: 'Year 2', kpi: '50 members under 30' },
-                        { initiative: 'Regional hub model development', priority: 'Year 2\u20133', kpi: '2 regional hubs with local coordinators' },
-                        { initiative: 'National awareness campaign', priority: 'Year 1', kpi: '50% increase in website traffic' },
-                      ].map((row, idx) => (
+                      {[0, 1, 2, 3, 4, 5].map((idx) => (
                         <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
-                          <td className="px-5 py-3 text-theme-muted">{row.initiative}</td>
+                          <td className="px-5 py-3 text-theme-muted">{t(`strategic_plan.pillar_1_row_${idx}_initiative`)}</td>
                           <td className="px-5 py-3">
                             <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-                              {row.priority}
+                              {t(`strategic_plan.pillar_1_row_${idx}_priority`)}
                             </span>
                           </td>
-                          <td className="px-5 py-3 text-theme-muted">{row.kpi}</td>
+                          <td className="px-5 py-3 text-theme-muted">{t(`strategic_plan.pillar_1_row_${idx}_kpi`)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -417,8 +379,8 @@ export function StrategicPlanPage() {
                       <DollarSign className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </div>
                     <div>
-                      <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">Pillar 2</p>
-                      <h3 className="text-lg font-bold text-theme-primary">Financial Resilience</h3>
+                      <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">{t('strategic_plan.pillar_2_label')}</p>
+                      <h3 className="text-lg font-bold text-theme-primary">{t('strategic_plan.pillar_2_title')}</h3>
                     </div>
                   </div>
                 </div>
@@ -426,28 +388,21 @@ export function StrategicPlanPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-indigo-500/5">
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">Initiative</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">Priority</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">KPI / Target</th>
+                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_initiative_header')}</th>
+                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_priority_header')}</th>
+                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_kpi_header')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme-default">
-                      {[
-                        { initiative: 'Multi-year funding applications (Pobal, SSE Airtricity)', priority: 'Year 1', kpi: '2+ multi-year grants secured' },
-                        { initiative: 'Corporate partnership programme', priority: 'Year 1\u20132', kpi: '3 corporate sponsors at €5K+' },
-                        { initiative: 'Platform licensing (SaaS model)', priority: 'Year 2\u20133', kpi: '€15K annual earned revenue' },
-                        { initiative: 'Membership fee model exploration', priority: 'Year 2', kpi: 'Feasibility study complete' },
-                        { initiative: 'Fundraising events and campaigns', priority: 'Ongoing', kpi: '€10K annual fundraising income' },
-                        { initiative: 'Diversified income to 40% earned revenue', priority: 'Year 5', kpi: '40% non-grant income ratio' },
-                      ].map((row, idx) => (
+                      {[0, 1, 2, 3, 4, 5].map((idx) => (
                         <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
-                          <td className="px-5 py-3 text-theme-muted">{row.initiative}</td>
+                          <td className="px-5 py-3 text-theme-muted">{t(`strategic_plan.pillar_2_row_${idx}_initiative`)}</td>
                           <td className="px-5 py-3">
                             <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
-                              {row.priority}
+                              {t(`strategic_plan.pillar_2_row_${idx}_priority`)}
                             </span>
                           </td>
-                          <td className="px-5 py-3 text-theme-muted">{row.kpi}</td>
+                          <td className="px-5 py-3 text-theme-muted">{t(`strategic_plan.pillar_2_row_${idx}_kpi`)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -467,7 +422,7 @@ export function StrategicPlanPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={Calendar} number={5} title="Year 1 Roadmap (2026)" />
+            <SectionHeading icon={Calendar} number={5} title={t('strategic_plan.toc_roadmap')} />
 
             <div className="mt-6">
               <GlassCard className="overflow-hidden">
@@ -475,77 +430,69 @@ export function StrategicPlanPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10">
-                        <th className="px-4 py-3 text-left font-semibold text-theme-primary min-w-[160px]">Activity</th>
-                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">Q1</th>
-                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">Q2</th>
-                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">Q3</th>
-                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">Q4</th>
+                        <th className="px-4 py-3 text-left font-semibold text-theme-primary min-w-[160px]">{t('strategic_plan.roadmap_activity_header')}</th>
+                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">{t('strategic_plan.roadmap_q1')}</th>
+                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">{t('strategic_plan.roadmap_q2')}</th>
+                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">{t('strategic_plan.roadmap_q3')}</th>
+                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">{t('strategic_plan.roadmap_q4')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme-default">
                       {[
                         {
-                          activity: 'Multi-year funding applications',
-                          q1: { label: 'Submit', type: 'submit' as const },
-                          q2: { label: 'Secure', type: 'secure' as const },
+                          q1: 'submit' as const,
+                          q2: 'secure' as const,
                           q3: null,
                           q4: null,
                         },
                         {
-                          activity: 'Launch 3 new community chapters',
-                          q1: { label: 'Pitch', type: 'pitch' as const },
-                          q2: { label: 'Launch', type: 'launch' as const },
-                          q3: { label: 'Launch', type: 'launch' as const },
-                          q4: { label: 'Launch', type: 'launch' as const },
+                          q1: 'pitch' as const,
+                          q2: 'launch' as const,
+                          q3: 'launch' as const,
+                          q4: 'launch' as const,
                         },
                         {
-                          activity: 'Social prescribing pilot outreach',
                           q1: null,
-                          q2: { label: 'Pitch', type: 'pitch' as const },
-                          q3: { label: 'Ongoing', type: 'ongoing' as const },
-                          q4: { label: 'Ongoing', type: 'ongoing' as const },
+                          q2: 'pitch' as const,
+                          q3: 'ongoing' as const,
+                          q4: 'ongoing' as const,
                         },
                         {
-                          activity: 'National awareness campaign',
                           q1: null,
-                          q2: { label: 'Launch', type: 'launch' as const },
-                          q3: { label: 'Ongoing', type: 'ongoing' as const },
-                          q4: { label: 'Ongoing', type: 'ongoing' as const },
+                          q2: 'launch' as const,
+                          q3: 'ongoing' as const,
+                          q4: 'ongoing' as const,
                         },
                         {
-                          activity: 'Corporate sponsor outreach',
-                          q1: { label: 'Pitch', type: 'pitch' as const },
-                          q2: { label: 'Pitch', type: 'pitch' as const },
-                          q3: { label: 'Secure', type: 'secure' as const },
+                          q1: 'pitch' as const,
+                          q2: 'pitch' as const,
+                          q3: 'secure' as const,
                           q4: null,
                         },
                         {
-                          activity: 'Platform UX improvements',
-                          q1: { label: 'Ongoing', type: 'ongoing' as const },
-                          q2: { label: 'Ongoing', type: 'ongoing' as const },
-                          q3: { label: 'Ongoing', type: 'ongoing' as const },
-                          q4: { label: 'Ongoing', type: 'ongoing' as const },
+                          q1: 'ongoing' as const,
+                          q2: 'ongoing' as const,
+                          q3: 'ongoing' as const,
+                          q4: 'ongoing' as const,
                         },
                         {
-                          activity: 'Board recruitment & governance',
-                          q1: { label: 'Submit', type: 'submit' as const },
-                          q2: { label: 'Secure', type: 'secure' as const },
+                          q1: 'submit' as const,
+                          q2: 'secure' as const,
                           q3: null,
                           q4: null,
                         },
                         {
-                          activity: 'Annual impact report',
                           q1: null,
                           q2: null,
                           q3: null,
-                          q4: { label: 'Launch', type: 'launch' as const },
+                          q4: 'launch' as const,
                         },
                       ].map((row, idx) => (
                         <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
-                          <td className="px-4 py-3 text-theme-muted font-medium">{row.activity}</td>
-                          {[row.q1, row.q2, row.q3, row.q4].map((cell, cellIdx) => (
+                          <td className="px-4 py-3 text-theme-muted font-medium">{t(`strategic_plan.roadmap_activity_${idx}`)}</td>
+                          {([row.q1, row.q2, row.q3, row.q4] as (typeof row.q1)[]).map((cell, cellIdx) => (
                             <td key={cellIdx} className="px-4 py-3 text-center">
-                              {cell ? <RoadmapBadge label={cell.label} type={cell.type} /> : (
+                              {cell ? <RoadmapBadge label={t(`strategic_plan.badge_${cell}`)} type={cell} /> : (
                                 <span className="text-theme-subtle">&mdash;</span>
                               )}
                             </td>
@@ -559,16 +506,10 @@ export function StrategicPlanPage() {
 
               {/* Badge Legend */}
               <div className="flex flex-wrap gap-3 mt-4 justify-center">
-                {[
-                  { label: 'Submit', type: 'submit' as const },
-                  { label: 'Secure', type: 'secure' as const },
-                  { label: 'Launch', type: 'launch' as const },
-                  { label: 'Ongoing', type: 'ongoing' as const },
-                  { label: 'Pitch', type: 'pitch' as const },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-1.5">
-                    <RoadmapBadge label={item.label} type={item.type} />
-                    <span className="text-xs text-theme-subtle">{item.label}</span>
+                {(['submit', 'secure', 'launch', 'ongoing', 'pitch'] as const).map((type) => (
+                  <div key={type} className="flex items-center gap-1.5">
+                    <RoadmapBadge label={t(`strategic_plan.badge_${type}`)} type={type} />
+                    <span className="text-xs text-theme-subtle">{t(`strategic_plan.badge_${type}`)}</span>
                   </div>
                 ))}
               </div>
@@ -585,7 +526,7 @@ export function StrategicPlanPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={ShieldAlert} number={6} title="Risk & Mitigation" />
+            <SectionHeading icon={ShieldAlert} number={6} title={t('strategic_plan.toc_risks')} />
 
             <div className="mt-6">
               <GlassCard className="overflow-hidden">
@@ -593,47 +534,22 @@ export function StrategicPlanPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gradient-to-r from-rose-500/10 to-amber-500/10">
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">Risk</th>
-                        <th className="px-5 py-3 text-center font-semibold text-theme-primary w-24">Likelihood</th>
-                        <th className="px-5 py-3 text-center font-semibold text-theme-primary w-24">Impact</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">Mitigation Strategy</th>
+                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.risk_header')}</th>
+                        <th className="px-5 py-3 text-center font-semibold text-theme-primary w-24">{t('strategic_plan.likelihood_header')}</th>
+                        <th className="px-5 py-3 text-center font-semibold text-theme-primary w-24">{t('strategic_plan.impact_header')}</th>
+                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.mitigation_header')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme-default">
                       {[
-                        {
-                          risk: 'Core funding not renewed',
-                          likelihood: 'High',
-                          impact: 'Critical',
-                          mitigation: 'Diversify income streams, build reserves, pursue multi-year grants, and develop earned revenue through platform licensing.',
-                        },
-                        {
-                          risk: 'Key coordinator burnout or departure',
-                          likelihood: 'Medium',
-                          impact: 'High',
-                          mitigation: 'Document processes, cross-train volunteers, establish succession plan, invest in coordinator wellbeing support.',
-                        },
-                        {
-                          risk: 'Low adoption in new communities',
-                          likelihood: 'Medium',
-                          impact: 'Medium',
-                          mitigation: 'Start with established community partners, pilot small before scaling, use local champions and peer ambassadors.',
-                        },
-                        {
-                          risk: 'Technology platform costs exceed budget',
-                          likelihood: 'Low',
-                          impact: 'Medium',
-                          mitigation: 'Open-source infrastructure, negotiate hosting rates, explore technology partnerships with socially-minded tech firms.',
-                        },
-                        {
-                          risk: 'Volunteer fatigue across the network',
-                          likelihood: 'Medium',
-                          impact: 'High',
-                          mitigation: 'Recognition programmes, regular appreciation events, manageable time commitments, clear boundaries and expectations.',
-                        },
+                        { likelihood: 'High' as const, impact: 'Critical' as const },
+                        { likelihood: 'Medium' as const, impact: 'High' as const },
+                        { likelihood: 'Medium' as const, impact: 'Medium' as const },
+                        { likelihood: 'Low' as const, impact: 'Medium' as const },
+                        { likelihood: 'Medium' as const, impact: 'High' as const },
                       ].map((row, idx) => (
                         <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
-                          <td className="px-5 py-3 text-theme-muted font-medium">{row.risk}</td>
+                          <td className="px-5 py-3 text-theme-muted font-medium">{t(`strategic_plan.risk_${idx}_name`)}</td>
                           <td className="px-5 py-3 text-center">
                             <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
                               row.likelihood === 'High'
@@ -642,7 +558,7 @@ export function StrategicPlanPage() {
                                 ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
                                 : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
                             }`}>
-                              {row.likelihood}
+                              {t(`strategic_plan.risk_${idx}_likelihood`)}
                             </span>
                           </td>
                           <td className="px-5 py-3 text-center">
@@ -653,10 +569,10 @@ export function StrategicPlanPage() {
                                 ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
                                 : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400'
                             }`}>
-                              {row.impact}
+                              {t(`strategic_plan.risk_${idx}_impact`)}
                             </span>
                           </td>
-                          <td className="px-5 py-3 text-theme-muted text-xs leading-relaxed">{row.mitigation}</td>
+                          <td className="px-5 py-3 text-theme-muted text-xs leading-relaxed">{t(`strategic_plan.risk_${idx}_mitigation`)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -687,11 +603,10 @@ export function StrategicPlanPage() {
 
               <div className="relative z-10">
                 <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">
-                  Be Part of the Plan
+                  {t('strategic_plan.cta_heading')}
                 </h2>
                 <p className="text-theme-muted max-w-lg mx-auto mb-8">
-                  Whether you want to partner, fund, volunteer, or join as a member &mdash;
-                  there&apos;s a role for you in building a more connected Ireland.
+                  {t('strategic_plan.cta_subtitle')}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -704,7 +619,7 @@ export function StrategicPlanPage() {
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
                     startContent={<Download className="w-5 h-5" aria-hidden="true" />}
                   >
-                    Download Full Plan
+                    {t('strategic_plan.cta_download')}
                   </Button>
                   <Link to={tenantPath('/contact')}>
                     <Button
@@ -713,7 +628,7 @@ export function StrategicPlanPage() {
                       className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                       startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
                     >
-                      Get in Touch
+                      {t('strategic_plan.cta_contact')}
                     </Button>
                   </Link>
                 </div>
@@ -736,13 +651,14 @@ interface SectionHeadingProps {
 }
 
 function SectionHeading({ icon: Icon, number, title }: SectionHeadingProps) {
+  const { t } = useTranslation('about');
   return (
     <div className="flex items-center gap-3">
       <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
         <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
       </div>
       <div>
-        <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">Section {number}</p>
+        <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">{t('strategic_plan.section_label', { number })}</p>
         <h2 className="text-xl sm:text-2xl font-bold text-theme-primary">{title}</h2>
       </div>
     </div>
