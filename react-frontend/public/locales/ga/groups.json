@@ -1,14 +1,14 @@
 {
-  "title": "Groups",
-  "discover": "Discover Groups",
-  "create_group": "Create Group",
-  "my_groups": "My Groups",
-  "members": "{{count}} members",
-  "join": "Join Group",
-  "joined": "Joined",
-  "leave": "Leave Group",
-  "empty": "No groups found",
-  "posts": "Posts",
-  "events": "Events",
-  "about": "About"
+  "title": "Grúpaí",
+  "discover": "Faigh Grúpaí",
+  "create_group": "Cruthaigh Grúpa",
+  "my_groups": "Mo Ghrúpaí",
+  "members": "{{count}} comhalta",
+  "join": "Bí páirteach sa Ghrúpa",
+  "joined": "Ina bhall",
+  "leave": "Fág an Grúpa",
+  "empty": "Gan grúpaí le fáil",
+  "posts": "Postálacha",
+  "events": "Imeachtaí",
+  "about": "Faoi"
 }

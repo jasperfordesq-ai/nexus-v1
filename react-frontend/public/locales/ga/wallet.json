@@ -1,15 +1,15 @@
 {
-  "title": "Wallet",
-  "balance": "Balance",
-  "time_credits": "Time Credits",
-  "hours": "Hours",
-  "transactions": "Transactions",
-  "pending": "Pending",
-  "completed": "Completed",
-  "sent": "Sent",
-  "received": "Received",
-  "empty": "No transactions yet",
-  "transfer": "Transfer Credits",
-  "pending_reviews": "Pending Reviews",
-  "review": "Leave Review"
+  "title": "Sparán",
+  "balance": "Iarmhéid",
+  "time_credits": "Creidmheasanna Ama",
+  "hours": "Uaireanta",
+  "transactions": "Idirbhearta",
+  "pending": "Ar feitheamh",
+  "completed": "Críochnaithe",
+  "sent": "Seolta",
+  "received": "Faighte",
+  "empty": "Gan idirbhearta fós",
+  "transfer": "Aistrigh Creidmheasanna",
+  "pending_reviews": "Léirmheasanna ar Feitheamh",
+  "review": "Fág Léirmheas"
 }

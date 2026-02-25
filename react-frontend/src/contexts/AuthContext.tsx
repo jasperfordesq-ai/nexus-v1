@@ -25,6 +25,7 @@ import {
 } from 'react';
 import { api, tokenManager, SESSION_EXPIRED_EVENT } from '@/lib/api';
 import { logWarn } from '@/lib/logger';
+import i18n from '@/i18n';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { loginResponseSchema, userSchema } from '@/lib/api-schemas';
 import { setSentryUser, captureAuthEvent } from '@/lib/sentry';
@@ -127,6 +128,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Set Sentry user context
         setSentryUser(response.data);
 
+        // Apply user's server-side language preference (overrides browser detection)
+        if (response.data.preferred_language) {
+          i18n.changeLanguage(response.data.preferred_language);
+        }
+
         setState({
           user: response.data,
           status: 'authenticated',
@@ -217,6 +223,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Set Sentry user context and capture login event
     setSentryUser(loginData.user);
     captureAuthEvent('login', loginData.user.id);
+
+    // Apply user's server-side language preference (overrides browser detection)
+    if (loginData.user?.preferred_language) {
+      i18n.changeLanguage(loginData.user.preferred_language);
+    }
 
     setState({
       user: loginData.user,

@@ -1,19 +1,19 @@
 {
-  "title": "Settings",
-  "account": "Account",
-  "notifications": "Notifications",
-  "privacy": "Privacy",
-  "language": "Language",
-  "appearance": "Appearance",
-  "security": "Security",
-  "save": "Save Settings",
-  "saved": "Settings saved",
-  "language_preference": "Language Preference",
-  "select_language": "Select language",
+  "title": "Socruithe",
+  "account": "Cuntas",
+  "notifications": "Fógraí",
+  "privacy": "Príobháideachas",
+  "language": "Teanga",
+  "appearance": "Cuma",
+  "security": "Slándáil",
+  "save": "Sábháil Socruithe",
+  "saved": "Socruithe sábháilte",
+  "language_preference": "Rogha Teanga",
+  "select_language": "Roghnaigh do theanga roghnaithe don chomhéadan",
   "theme": {
-    "title": "Theme",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System"
+    "title": "Téama",
+    "light": "Solas",
+    "dark": "Dorcha",
+    "system": "Córas"
   }
 }
