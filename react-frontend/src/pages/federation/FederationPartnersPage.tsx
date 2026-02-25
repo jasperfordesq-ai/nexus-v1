@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -98,6 +98,7 @@ const PERMISSION_META: Record<string, { label: string; icon: typeof Globe }> = {
 
 export function FederationPartnersPage() {
   usePageTitle('Partner Communities');
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
 
@@ -348,25 +349,29 @@ export function FederationPartnersPage() {
               <ModalFooter className="flex gap-2">
                 {isAuthenticated && (
                   <>
-                    <Link to={tenantPath(`/federation/members?partner_id=${selectedPartner.id}`)}>
-                      <Button
-                        variant="flat"
-                        className="bg-theme-elevated text-theme-primary"
-                        startContent={<Users className="w-4 h-4" aria-hidden="true" />}
-                        onPress={closeDetail}
-                      >
-                        Browse Members
-                      </Button>
-                    </Link>
-                    <Link to={tenantPath(`/federation/listings?partner_id=${selectedPartner.id}`)}>
-                      <Button
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
-                        onPress={closeDetail}
-                      >
-                        Browse Listings
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-primary"
+                      startContent={<Users className="w-4 h-4" aria-hidden="true" />}
+                      onPress={() => {
+                        const path = tenantPath(`/federation/members?partner_id=${selectedPartner.id}`);
+                        closeDetail();
+                        navigate(path);
+                      }}
+                    >
+                      Browse Members
+                    </Button>
+                    <Button
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
+                      onPress={() => {
+                        const path = tenantPath(`/federation/listings?partner_id=${selectedPartner.id}`);
+                        closeDetail();
+                        navigate(path);
+                      }}
+                    >
+                      Browse Listings
+                    </Button>
                   </>
                 )}
                 {!isAuthenticated && (
