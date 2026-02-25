@@ -6,12 +6,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Button, Chip, Tabs, Tab } from '@heroui/react';
 import { TrendingUp, Users, MessageSquare, DollarSign, FileText, Calendar, UsersRound, Pause, XCircle } from 'lucide-react';
-import PageHeader from '../../../components/PageHeader';
-import ConfirmModal from '../../../components/ConfirmModal';
+import PageHeader from '../../components/PageHeader';
+import ConfirmModal from '../../components/ConfirmModal';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
-import { adminSuper } from '../../../api/adminApi';
-import type { FederationPartnership } from '../../../api/types';
+import { adminSuper } from '../../api/adminApi';
+import type { FederationPartnership } from '../../api/types';
 
 interface Partnership {
   id: number;
