@@ -878,6 +878,7 @@ $router->add('GET', '/api/v2/admin/federation/data', 'Nexus\Controllers\Api\Admi
 // Federation V2 (user-facing, for React frontend)
 $router->add('GET', '/api/v2/federation/status', 'Nexus\Controllers\Api\FederationV2ApiController@status');
 $router->add('POST', '/api/v2/federation/opt-in', 'Nexus\Controllers\Api\FederationV2ApiController@optIn');
+$router->add('POST', '/api/v2/federation/setup', 'Nexus\Controllers\Api\FederationV2ApiController@setup');
 $router->add('POST', '/api/v2/federation/opt-out', 'Nexus\Controllers\Api\FederationV2ApiController@optOut');
 $router->add('GET', '/api/v2/federation/partners', 'Nexus\Controllers\Api\FederationV2ApiController@partners');
 $router->add('GET', '/api/v2/federation/activity', 'Nexus\Controllers\Api\FederationV2ApiController@activity');
@@ -1958,8 +1959,6 @@ $router->add('PUT', '/api/v2/admin/impact-report/config', 'Nexus\Controllers\Api
 // ============================================
 $router->add('GET', '/api/v2/onboarding/status', 'Nexus\Controllers\Api\OnboardingApiController@status');
 $router->add('GET', '/api/v2/onboarding/categories', 'Nexus\Controllers\Api\OnboardingApiController@categories');
-$router->add('POST', '/api/v2/onboarding/interests', 'Nexus\Controllers\Api\OnboardingApiController@saveInterests');
-$router->add('POST', '/api/v2/onboarding/skills', 'Nexus\Controllers\Api\OnboardingApiController@saveSkills');
 $router->add('POST', '/api/v2/onboarding/complete', 'Nexus\Controllers\Api\OnboardingApiController@complete');
 
 // ============================================

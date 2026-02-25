@@ -143,6 +143,71 @@ class FederationV2ApiController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/federation/setup
+     *
+     * Atomically opt the user into federation AND save their initial settings
+     * in a single request. Used by the federation onboarding wizard to prevent
+     * the partial-state bug where opt-in succeeds but settings fail.
+     *
+     * Request Body: same shape as PUT /api/v2/federation/settings
+     *
+     * Response: 200 OK
+     * { "data": { "success": true, "message": "Federation enabled." } }
+     */
+    public function setup(): void
+    {
+        $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        // Check tenant-level federation is available
+        $tenantEnabled = FederationFeatureService::isGloballyEnabled()
+            && FederationFeatureService::isTenantFederationEnabled($tenantId);
+
+        if (!$tenantEnabled) {
+            $this->respondWithError(
+                'FEDERATION_NOT_AVAILABLE',
+                'Federation is not enabled for your community.',
+                null,
+                403
+            );
+            return;
+        }
+
+        $data = $this->getAllInput();
+
+        // Build full settings: opt-in flag + user's chosen preferences
+        $settings = [
+            'federation_optin' => true,
+            'profile_visible_federated' => $data['profile_visible_federated'] ?? true,
+            'appear_in_federated_search' => $data['appear_in_federated_search'] ?? true,
+            'show_skills_federated' => $data['show_skills_federated'] ?? true,
+            'show_location_federated' => $data['show_location_federated'] ?? false,
+            'show_reviews_federated' => $data['show_reviews_federated'] ?? true,
+            'messaging_enabled_federated' => $data['messaging_enabled_federated'] ?? true,
+            'transactions_enabled_federated' => $data['transactions_enabled_federated'] ?? true,
+            'email_notifications' => $data['email_notifications'] ?? true,
+            'service_reach' => $data['service_reach'] ?? 'local_only',
+            'travel_radius_km' => array_key_exists('travel_radius_km', $data) ? (int)$data['travel_radius_km'] : 25,
+        ];
+
+        $success = FederationUserService::updateSettings($userId, $settings);
+
+        if ($success) {
+            FederationAuditService::log(
+                'user_federation_optin',
+                $tenantId,
+                null,
+                $userId,
+                [],
+                FederationAuditService::LEVEL_INFO
+            );
+            $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
+        } else {
+            $this->respondWithError('SETUP_FAILED', 'Failed to enable federation. Please try again.', null, 500);
+        }
+    }
+
+    /**
      * POST /api/v2/federation/opt-out
      *
      * Disable federation for the authenticated user.

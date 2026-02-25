@@ -14,17 +14,16 @@ use Nexus\Services\OnboardingService;
 /**
  * OnboardingApiController - RESTful API v2 for user onboarding wizard
  *
- * Handles the post-registration 4-step onboarding process:
+ * Handles the post-registration 5-step onboarding process:
  * 1. Welcome (no API call needed)
- * 2. Select interests (categories)
- * 3. Select skills (offers/needs)
- * 4. Confirm and auto-create listings
+ * 2. Profile photo + bio
+ * 3. Select interests (categories)
+ * 4. Select skills (offers/needs)
+ * 5. Confirm and auto-create listings
  *
  * Endpoints:
  * - GET  /api/v2/onboarding/status       - Get onboarding completion status
  * - GET  /api/v2/onboarding/categories   - Get available categories for selection
- * - PUT  /api/v2/users/me/interests      - Save user interests
- * - PUT  /api/v2/users/me/skills         - Save user skills (offers/needs)
  * - POST /api/v2/onboarding/complete     - Complete onboarding and auto-create listings
  *
  * Response Format (v2):
@@ -96,97 +95,6 @@ class OnboardingApiController extends BaseApiController
         $categories = $stmt->fetchAll();
 
         $this->respondWithData($categories);
-    }
-
-    /**
-     * PUT /api/v2/users/me/interests
-     *
-     * Save the user's category interests (Step 2 of onboarding).
-     * Replaces any existing interest selections.
-     *
-     * Request Body:
-     * {
-     *   "category_ids": [1, 3, 5]
-     * }
-     *
-     * Response: 200 OK
-     * { "data": { "message": "Interests saved" } }
-     */
-    public function saveInterests(): void
-    {
-        $userId = $this->getUserId();
-
-        $categoryIds = $this->input('category_ids', []);
-
-        if (empty($categoryIds) || !is_array($categoryIds)) {
-            $this->respondWithError(
-                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'At least one category is required',
-                'category_ids',
-                400
-            );
-            return; // Safety return (respondWithError calls exit)
-        }
-
-        // Sanitize: ensure all IDs are integers
-        $categoryIds = array_map('intval', $categoryIds);
-        $categoryIds = array_filter($categoryIds, fn($id) => $id > 0);
-
-        if (empty($categoryIds)) {
-            $this->respondWithError(
-                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'At least one valid category ID is required',
-                'category_ids',
-                400
-            );
-            return;
-        }
-
-        OnboardingService::saveInterests($userId, $categoryIds);
-
-        $this->respondWithData(['message' => 'Interests saved']);
-    }
-
-    /**
-     * PUT /api/v2/users/me/skills
-     *
-     * Save the user's skill offers and needs (Step 3 of onboarding).
-     * Replaces any existing skill selections.
-     *
-     * Request Body:
-     * {
-     *   "offers": [1, 3],
-     *   "needs": [5, 7]
-     * }
-     *
-     * Response: 200 OK
-     * { "data": { "message": "Skills saved" } }
-     */
-    public function saveSkills(): void
-    {
-        $userId = $this->getUserId();
-
-        $offers = $this->input('offers', []);
-        $needs = $this->input('needs', []);
-
-        // Sanitize: ensure all IDs are integers
-        if (is_array($offers)) {
-            $offers = array_map('intval', $offers);
-            $offers = array_filter($offers, fn($id) => $id > 0);
-        } else {
-            $offers = [];
-        }
-
-        if (is_array($needs)) {
-            $needs = array_map('intval', $needs);
-            $needs = array_filter($needs, fn($id) => $id > 0);
-        } else {
-            $needs = [];
-        }
-
-        OnboardingService::saveSkills($userId, $offers, $needs);
-
-        $this->respondWithData(['message' => 'Skills saved']);
     }
 
     /**
