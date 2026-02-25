@@ -990,10 +990,11 @@ class AdminUsersApiController extends BaseApiController
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
                 Database::query(
-                    "INSERT INTO users (tenant_id, first_name, last_name, email, password_hash, phone, role, status, is_approved, created_at)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, 'active', 1, NOW())",
+                    "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, phone, role, status, is_approved, created_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', 1, NOW())",
                     [
                         $tenantId,
+                        trim($firstName . ' ' . $lastName),
                         $firstName,
                         $lastName,
                         $email,

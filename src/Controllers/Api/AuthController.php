@@ -373,10 +373,10 @@ class AuthController extends BaseApiController
         $firstName = $parts[0];
         $lastName = $parts[1] ?? '';
 
-        $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, password_hash, tenant_id, role) VALUES (?, ?, ?, ?, ?, 'member')");
+        $stmt = $db->prepare("INSERT INTO users (name, first_name, last_name, email, password_hash, tenant_id, role) VALUES (?, ?, ?, ?, ?, ?, 'member')");
 
         try {
-            $stmt->execute([$firstName, $lastName, $email, $hashed, $tenant_id]);
+            $stmt->execute([trim($firstName . ' ' . $lastName), $firstName, $lastName, $email, $hashed, $tenant_id]);
             $userId = (int) $db->lastInsertId();
 
             // Notify admins of new registration (including hardcoded master email)

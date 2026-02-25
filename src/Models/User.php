@@ -17,8 +17,9 @@ class User
     {
         $tenantId = TenantContext::getId();
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (tenant_id, first_name, last_name, email, password_hash, location, phone, profile_type, organization_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        Database::query($sql, [$tenantId, $firstName, $lastName, $email, $hash, $location, $phone, $profileType, $orgName]);
+        $name = trim($firstName . ' ' . $lastName);
+        $sql = "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, location, phone, profile_type, organization_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Database::query($sql, [$tenantId, $name, $firstName, $lastName, $email, $hash, $location, $phone, $profileType, $orgName]);
     }
 
     public static function findByEmail($email)
