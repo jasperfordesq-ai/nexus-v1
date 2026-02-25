@@ -1023,7 +1023,7 @@ $router->add('POST', '/api/upload', 'Nexus\Controllers\Api\UploadController@stor
 
 // Push Notifications API (Web Push / PWA)
 $router->add('GET', '/api/push/vapid-key', 'Nexus\Controllers\Api\PushApiController@vapidKey');
-$router->add('GET', '/api/push/vapid-public-key', 'Nexus\Controllers\Api\PushApiController@vapidKey'); // Alias for CivicOne
+$router->add('GET', '/api/push/vapid-public-key', 'Nexus\Controllers\Api\PushApiController@vapidKey'); // Legacy alias
 $router->add('POST', '/api/push/subscribe', 'Nexus\Controllers\Api\PushApiController@subscribe');
 $router->add('POST', '/api/push/unsubscribe', 'Nexus\Controllers\Api\PushApiController@unsubscribe');
 $router->add('POST', '/api/push/send', 'Nexus\Controllers\Api\PushApiController@send');
@@ -1106,7 +1106,7 @@ $router->add('POST', '/api/webauthn/remove-all', 'Nexus\Controllers\Api\WebAuthn
 $router->add('GET', '/api/webauthn/credentials', 'Nexus\Controllers\Api\WebAuthnApiController@credentials');
 $router->add('GET', '/api/webauthn/status', 'Nexus\Controllers\Api\WebAuthnApiController@status'); // Status endpoint
 
-// WebAuthn Aliases (for CivicOne layout compatibility)
+// WebAuthn Aliases
 $router->add('POST', '/api/webauthn/register/options', 'Nexus\Controllers\Api\WebAuthnApiController@registerChallenge');
 $router->add('POST', '/api/webauthn/register/verify', 'Nexus\Controllers\Api\WebAuthnApiController@registerVerify');
 $router->add('POST', '/api/webauthn/login/options', 'Nexus\Controllers\Api\WebAuthnApiController@authChallenge');
@@ -1148,107 +1148,11 @@ $router->add('GET', '/api/menus/mobile', 'Nexus\Controllers\Api\MenuApiControlle
 $router->add('GET', '/api/menus/{slug}', 'Nexus\Controllers\Api\MenuApiController@show');
 $router->add('POST', '/api/menus/clear-cache', 'Nexus\Controllers\Api\MenuApiController@clearCache');
 
-// Management Views
-$router->add('GET', '/notifications', 'Nexus\Controllers\NotificationController@manage');
-$router->add('POST', '/notifications', 'Nexus\Controllers\NotificationController@manage'); // Handle mark all as read form
-
-$router->add('GET', '/nexus-score', 'Nexus\Controllers\NexusScoreController@dashboard');
-$router->add('GET', '/nexus-score/report', 'Nexus\Controllers\NexusScoreController@impactReport');
-$router->add('GET', '/nexus-score/leaderboard', 'Nexus\Controllers\NexusScoreController@leaderboard');
-$router->add('GET', '/profile/{id}/score', 'Nexus\Controllers\NexusScoreController@publicProfile');
-
-$router->add('GET', '/login', 'Nexus\Controllers\AuthController@showLogin');
-$router->add('GET', '/login/oauth/redirect/{provider}', 'Nexus\Controllers\SocialAuthController@redirect');
-$router->add('GET', '/login/oauth/{provider}', 'Nexus\Controllers\SocialAuthController@redirect'); // Alias for cleaner URLs
-$router->add('GET', '/login/oauth/callback/{provider}', 'Nexus\Controllers\SocialAuthController@callback');
-$router->add('POST', '/login', 'Nexus\Controllers\AuthController@login');
-$router->add('GET', '/register', 'Nexus\Controllers\AuthController@showRegister');
-$router->add('POST', '/register', 'Nexus\Controllers\AuthController@register');
-$router->add('GET', '/logout', 'Nexus\Controllers\AuthController@logout');
-
-// Onboarding
-$router->add('GET', '/onboarding', 'Nexus\Controllers\OnboardingController@index');
-$router->add('POST', '/onboarding/store', 'Nexus\Controllers\OnboardingController@store');
-
-// Password Reset
-$router->add('GET', '/password/forgot', 'Nexus\Controllers\AuthController@showForgot');
-$router->add('POST', '/password/email', 'Nexus\Controllers\AuthController@sendResetLink');
-$router->add('GET', '/password/reset', 'Nexus\Controllers\AuthController@showReset');
-$router->add('POST', '/password/reset', 'Nexus\Controllers\AuthController@resetPassword');
-
-// Two-Factor Authentication (TOTP)
-$router->add('GET', '/auth/2fa', 'Nexus\Controllers\TotpController@showVerify');
-$router->add('POST', '/auth/2fa', 'Nexus\Controllers\TotpController@verify');
-$router->add('GET', '/auth/2fa/setup', 'Nexus\Controllers\TotpController@showSetup');
-$router->add('POST', '/auth/2fa/setup', 'Nexus\Controllers\TotpController@completeSetup');
-$router->add('GET', '/auth/2fa/backup-codes', 'Nexus\Controllers\TotpController@showBackupCodes');
-$router->add('POST', '/auth/2fa/backup-codes/regenerate', 'Nexus\Controllers\TotpController@regenerateBackupCodes');
-$router->add('GET', '/settings/2fa', 'Nexus\Controllers\TotpController@settings');
-$router->add('POST', '/settings/2fa/disable', 'Nexus\Controllers\TotpController@disable');
-$router->add('POST', '/settings/2fa/devices/revoke', 'Nexus\Controllers\TotpController@revokeDevice');
-$router->add('POST', '/settings/2fa/devices/revoke-all', 'Nexus\Controllers\TotpController@revokeAllDevices');
-$router->add('POST', '/contact/submit', 'Nexus\Controllers\ContactController@submit');
-$router->add('POST', '/contact/send', 'Nexus\Controllers\ContactController@submit');
 $router->add('POST', '/api/v2/contact', 'Nexus\Controllers\ContactController@apiSubmit');
-$router->add('GET', '/help', 'Nexus\Controllers\HelpController@index');
-$router->add('GET', '/help/search', 'Nexus\Controllers\HelpController@search');
 $router->add('POST', '/api/help/feedback', 'Nexus\Controllers\HelpController@feedback');
-$router->add('GET', '/help/{slug}', 'Nexus\Controllers\HelpController@show');
-// Legal Documents (versioned with acceptance tracking - falls back to legacy files if no DB content)
-$router->add('GET', '/terms', 'Nexus\Controllers\LegalDocumentController@terms');
-$router->add('GET', '/privacy', 'Nexus\Controllers\LegalDocumentController@privacy');
-$router->add('GET', '/accessibility', 'Nexus\Controllers\LegalDocumentController@accessibility');
-$router->add('GET', '/terms/versions', 'Nexus\Controllers\LegalDocumentController@termsVersionHistory');
-$router->add('GET', '/privacy/versions', 'Nexus\Controllers\LegalDocumentController@privacyVersionHistory');
-$router->add('GET', '/legal/version/{versionId}', 'Nexus\Controllers\LegalDocumentController@showVersion');
 $router->add('GET', '/sitemap.xml', 'Nexus\Controllers\SitemapController@index');
 $router->add('GET', '/robots.txt', 'Nexus\Controllers\RobotsController@index');
 
-// 1.5. BLOG / NEWS
-$tenantPages = [];
-foreach ([null, 'modern'] as $layout) {
-    $found = TenantContext::getCustomPages($layout);
-    foreach ($found as $p) {
-        $tenantPages[$p['url']] = $p; // Key by URL to deduplicate
-    }
-}
-
-foreach ($tenantPages as $page) {
-    // Extract slug from URL (which might include tenant prefix)
-    // Custom pages are flat files, so basename is safe and correct.
-    $slug = basename($page['url']);
-
-    // Don't overwrite existing Core Static Routes (like /about, '/contact') 
-    // because they have dedicated controllers with SEO logic.
-    // The View system will still pick up the override file content.
-    // We only need dynamic routes for NEW pages (e.g. /about-story).
-    if ($slug && !$router->hasRoute('GET', '/' . $slug)) {
-        $router->add('GET', '/' . $slug, function () use ($slug) {
-        });
-    }
-}
-
-$router->add('GET', '/listings', 'Nexus\Controllers\ListingController@index');
-$router->add('GET', '/listings/create', 'Nexus\Controllers\ListingController@create');
-$router->add('POST', '/listings/store', 'Nexus\Controllers\ListingController@store');
-$router->add('GET', '/listings/edit/{id}', 'Nexus\Controllers\ListingController@edit');
-$router->add('POST', '/listings/update', 'Nexus\Controllers\ListingController@update');
-$router->add('POST', '/listings/delete', 'Nexus\Controllers\ListingController@delete');
-// Use explicit regex for ID if Router supports it, otherwise generic wildcard
-$router->add('GET', '/listings/{id}', 'Nexus\Controllers\ListingController@show');
-$router->add('POST', '/listings/{id}', 'Nexus\Controllers\ListingController@show'); // AJAX actions (likes/comments)
-
-$router->add('GET', '/exchanges', 'Nexus\Controllers\ExchangesController@index');
-$router->add('GET', '/exchanges/request/{listingId}', 'Nexus\Controllers\ExchangesController@create');
-$router->add('POST', '/exchanges', 'Nexus\Controllers\ExchangesController@store');
-$router->add('GET', '/exchanges/{id}', 'Nexus\Controllers\ExchangesController@show');
-$router->add('POST', '/exchanges/{id}/accept', 'Nexus\Controllers\ExchangesController@accept');
-$router->add('POST', '/exchanges/{id}/decline', 'Nexus\Controllers\ExchangesController@decline');
-$router->add('POST', '/exchanges/{id}/start', 'Nexus\Controllers\ExchangesController@start');
-$router->add('POST', '/exchanges/{id}/confirm', 'Nexus\Controllers\ExchangesController@confirm');
-$router->add('POST', '/exchanges/{id}/cancel', 'Nexus\Controllers\ExchangesController@cancel');
-
-$router->add('GET', '/groups/{id}/analytics', 'Nexus\Controllers\GroupAnalyticsController@index');
 $router->add('GET', '/api/groups/{id}/analytics', 'Nexus\Controllers\GroupAnalyticsController@apiData');
 
 // Group Recommendations (Discovery Engine)
@@ -1260,26 +1164,11 @@ $router->add('POST', '/api/notifications/settings', 'Nexus\Controllers\UserPrefe
 // Consolidated API routes
 //$router->add('GET', '/api/notifications', 'Nexus\Controllers\NotificationController@index'); // Handled by CoreApiController
 //$router->add('POST', '/api/notifications/read', 'Nexus\Controllers\NotificationController@markRead'); // Handled by CoreApiController
-// NOTE: /notifications route handled by NotificationController@manage (line 53)
-
-$router->add('GET', '/federation/stream', 'Nexus\Controllers\FederationStreamController@stream');
-$router->add('GET', '/federation/stream/info', 'Nexus\Controllers\FederationStreamController@info');
-$router->add('POST', '/federation/pusher/auth', 'Nexus\Controllers\FederationStreamController@pusherAuth');
-
-$router->add('GET', '/leaderboard', 'Nexus\Controllers\LeaderboardController@index');
-$router->add('GET', '/leaderboards', 'Nexus\Controllers\LeaderboardController@index'); // Alias
 $router->add('GET', '/api/leaderboard', 'Nexus\Controllers\LeaderboardController@api');
 $router->add('GET', '/api/leaderboard/widget', 'Nexus\Controllers\LeaderboardController@widget');
 $router->add('GET', '/api/streaks', 'Nexus\Controllers\LeaderboardController@streaks');
 
-// Achievements Dashboard
-$router->add('GET', '/achievements', 'Nexus\Controllers\AchievementsController@index');
-$router->add('GET', '/achievements/badges', 'Nexus\Controllers\AchievementsController@badges');
-$router->add('GET', '/achievements/challenges', 'Nexus\Controllers\AchievementsController@challenges');
-$router->add('GET', '/achievements/collections', 'Nexus\Controllers\AchievementsController@collections');
-$router->add('GET', '/achievements/shop', 'Nexus\Controllers\AchievementsController@shop');
-$router->add('GET', '/achievements/seasons', 'Nexus\Controllers\AchievementsController@seasons');
-$router->add('POST', '/achievements/showcase', 'Nexus\Controllers\AchievementsController@updateShowcase');
+// Achievements API
 $router->add('GET', '/api/achievements', 'Nexus\Controllers\AchievementsController@api');
 $router->add('GET', '/api/achievements/progress', 'Nexus\Controllers\AchievementsController@progress');
 

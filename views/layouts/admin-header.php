@@ -11,6 +11,17 @@ if (session_status() === PHP_SESSION_NONE) {
 use Nexus\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
+$tenant = TenantContext::get();
+$frontendBase = TenantContext::getFrontendUrl();
+$tenantSlug = $tenant['slug'] ?? '';
+$tenantId = $tenant['id'] ?? 1;
+// Build tenant-aware URLs pointing at the React frontend
+$backToSiteUrl = ($tenantId == 1 || empty($tenantSlug))
+    ? $frontendBase . '/dashboard'
+    : $frontendBase . '/' . $tenantSlug . '/dashboard';
+$notifUrl = ($tenantId == 1 || empty($tenantSlug))
+    ? $frontendBase . '/notifications'
+    : $frontendBase . '/' . $tenantSlug . '/notifications';
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
 $currentPathClean = strtok($currentPath, '?');
 $currentUser = $_SESSION['user_name'] ?? 'Admin';
@@ -1729,14 +1740,14 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
                 )->fetch()['c'] ?? 0;
             } catch (\Exception $e) { /* Table may not exist */ }
             ?>
-            <a href="<?= $basePath ?>/notifications" class="admin-notif-bell" title="Notifications">
+            <a href="<?= htmlspecialchars($notifUrl) ?>" class="admin-notif-bell" title="Notifications" target="_blank" rel="noopener">
                 <i class="fa-solid fa-bell"></i>
                 <?php if ($unreadNotifications > 0): ?>
                 <span class="admin-notif-badge"><?= $unreadNotifications > 99 ? '99+' : $unreadNotifications ?></span>
                 <?php endif; ?>
             </a>
 
-            <a href="<?= $basePath ?>/" class="admin-back-link">
+            <a href="<?= htmlspecialchars($backToSiteUrl) ?>" class="admin-back-link" target="_blank" rel="noopener">
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>Back to Site</span>
             </a>

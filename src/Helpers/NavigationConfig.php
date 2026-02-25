@@ -7,9 +7,7 @@
 /**
  * NavigationConfig - Centralized Navigation Configuration
  *
- * This class serves as the single source of truth for all navigation items
- * across both Modern and CivicOne themes. It extracts and consolidates
- * navigation data from the Modern theme's premium-mega-menu.php and navbar.php.
+ * This class serves as the single source of truth for all navigation items.
  *
  * Usage:
  *   $primary = NavigationConfig::getPrimaryNav();
@@ -279,7 +277,6 @@ class NavigationConfig
 
     /**
      * Get flattened list of all navigation items for simple dropdowns
-     * Useful for CivicOne's simple "More" dropdown
      *
      * @return array Flat list of all secondary nav items
      */
@@ -300,52 +297,6 @@ class NavigationConfig
         $items = array_merge($items, self::getHelpNav());
 
         return $items;
-    }
-
-    /**
-     * Get Explore menu items for CivicOne theme (excludes gamification)
-     *
-     * CivicOne theme follows GOV.UK Design System patterns where gamification
-     * features are accessed via user dashboard/profile rather than primary navigation.
-     *
-     * @return array Navigation items without gamification category
-     */
-    public static function getExploreNavCivicOne(): array
-    {
-        return array_filter(self::getExploreNav(), function ($item) {
-            return ($item['category'] ?? '') !== 'gamification';
-        });
-    }
-
-    /**
-     * Get secondary navigation for CivicOne theme (excludes gamification from explore)
-     *
-     * @return array Grouped navigation items
-     */
-    public static function getSecondaryNavCivicOne(): array
-    {
-        return [
-            'community' => [
-                'title' => 'Community',
-                'icon' => 'fa-users',
-                'items' => self::getCommunityNav(),
-            ],
-            'explore' => [
-                'title' => 'Explore',
-                'icon' => 'fa-compass',
-                'items' => self::getExploreNavCivicOne(),
-            ],
-            'about' => [
-                'title' => 'About',
-                'icon' => 'fa-circle-info',
-                'items' => self::getAboutNav(),
-            ],
-            'help' => [
-                'title' => 'Help & Support',
-                'icon' => 'fa-life-ring',
-                'items' => self::getHelpNav(),
-            ],
-        ];
     }
 
     /**

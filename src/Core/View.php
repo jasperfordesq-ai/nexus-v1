@@ -52,15 +52,12 @@ class View
             $viewPaths[] = __DIR__ . '/../../views/tenants/' . $currentTenant['slug'] . '/' . $activeLayout . '/' . $viewPath . '.php';
         }
 
-        // 2. Try Active Layout View (modern or civicone) - PRIMARY
+        // 2. Try Active Layout View - PRIMARY
         $viewPaths[] = __DIR__ . '/../../views/' . $activeLayout . '/' . $viewPath . '.php';
 
         // 3. Try Shared/Common View (layout-agnostic views in views/ root)
         // These are views that work with any layout (e.g., error pages, emails)
         $viewPaths[] = __DIR__ . '/../../views/' . $viewPath . '.php';
-
-        // NO CROSS-LAYOUT FALLBACK - Each layout must be self-contained
-        // This prevents Modern bugs from affecting CivicOne and vice versa
 
         // Find and render the first existing view
         foreach ($viewPaths as $path) {

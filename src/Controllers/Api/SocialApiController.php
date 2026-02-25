@@ -17,11 +17,7 @@ use Nexus\Models\FeedPost;
  * MASTER PLATFORM SOCIAL MEDIA MODULE - Unified API Controller
  * =============================================================
  *
- * Handles ALL social interactions for ANY layout:
- * - Modern Layout
- * - Nexus Social Layout
- * - CivicOne Layout
- * - Future layouts
+ * Handles ALL social interactions for the React frontend and admin panels.
  *
  * V2 Endpoints (new standardized API with cursor pagination):
  * - GET  /api/v2/feed              - Load feed items (cursor paginated)
