@@ -14,7 +14,7 @@ import { Card, CardBody, CardHeader, Input, Select, SelectItem, Button, Spinner,
 import { FileText, ArrowLeft, Save, Menu, ExternalLink } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant, useToast, useAuth } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
 import { PageHeader, RichTextEditor } from '../../components';
 
@@ -35,6 +35,7 @@ export function PageBuilder() {
   usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Page`);
   const navigate = useNavigate();
   const { tenantPath, tenant } = useTenant();
+  const { user } = useAuth();
   const toast = useToast();
 
   const [formData, setFormData] = useState<PageFormData>({
@@ -168,10 +169,12 @@ export function PageBuilder() {
                 color="primary"
                 startContent={<ExternalLink size={16} />}
                 onPress={() => {
-                  // Use tenant.slug directly so the preview URL includes the tenant prefix
-                  // even when accessed from the admin panel (where effectiveTenantSlug is null).
-                  const previewUrl = tenant?.slug
-                    ? `/${tenant.slug}/page/${formData.slug}`
+                  // Use tenant.slug (from TenantContext) or user.tenant_slug (from auth JWT)
+                  // so the preview URL always includes the tenant prefix, even when the admin
+                  // panel is accessed directly via /admin without a tenant slug in the URL.
+                  const slug = tenant?.slug || user?.tenant_slug;
+                  const previewUrl = slug
+                    ? `/${slug}/page/${formData.slug}`
                     : `/page/${formData.slug}`;
                   window.open(previewUrl, '_blank');
                 }}
