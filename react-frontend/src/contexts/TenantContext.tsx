@@ -27,6 +27,7 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
+import i18n from '@/i18n';
 import { api, tokenManager, fetchCsrfToken } from '@/lib/api';
 import { detectTenantFromUrl, tenantPath as buildTenantPath } from '@/lib/tenant-routing';
 import { validateResponseIfPresent } from '@/lib/api-validation';
@@ -59,6 +60,8 @@ interface TenantContextValue extends TenantState {
   tenantPath: (path: string) => string;
   /** Language codes supported by this tenant (e.g. ['en', 'ga'] or ['de', 'fr', 'it', 'en']) */
   supportedLanguages: string[];
+  /** Default language for this tenant (e.g. 'de' for Swiss tenants) */
+  defaultLanguage: string;
 }
 
 // Default features — synced with PHP TenantBootstrapController::buildFeaturesData() defaults
@@ -282,6 +285,31 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     [state.tenant]
   );
 
+  const defaultLanguage = useMemo<string>(
+    () => state.tenant?.default_language ?? 'en',
+    [state.tenant]
+  );
+
+  // After tenant data loads, apply default language if user hasn't chosen one
+  // and browser language isn't in the supported list
+  useEffect(() => {
+    if (!state.tenant) return;
+
+    const tenantDefault = state.tenant.default_language ?? 'en';
+    const userChosen = localStorage.getItem('nexus_language');
+
+    // Only apply tenant default if user hasn't explicitly chosen a language
+    if (!userChosen && tenantDefault !== 'en') {
+      const currentLang = i18n.language;
+      const supported = state.tenant.supported_languages ?? ['en', 'ga'];
+
+      // If browser language isn't in supported list, use tenant default
+      if (!supported.includes(currentLang)) {
+        i18n.changeLanguage(tenantDefault);
+      }
+    }
+  }, [state.tenant]);
+
   const value = useMemo<TenantContextValue>(
     () => ({
       ...state,
@@ -294,8 +322,9 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       tenantSlug: effectiveTenantSlug || null,
       tenantPath,
       supportedLanguages,
+      defaultLanguage,
     }),
-    [state, features, modules, branding, hasFeature, hasModule, refreshTenant, effectiveTenantSlug, tenantPath, supportedLanguages]
+    [state, features, modules, branding, hasFeature, hasModule, refreshTenant, effectiveTenantSlug, tenantPath, supportedLanguages, defaultLanguage]
   );
 
   return (
@@ -338,6 +367,13 @@ export function useModule(module: keyof TenantModules): boolean {
  */
 export function useTenantLanguages(): string[] {
   return useTenant().supportedLanguages;
+}
+
+/**
+ * Convenience hook for tenant default language
+ */
+export function useTenantDefaultLanguage(): string {
+  return useTenant().defaultLanguage;
 }
 
 export default TenantContext;
