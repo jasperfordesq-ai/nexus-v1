@@ -13,10 +13,12 @@ return [
      * TRUE  = Use custom menu manager with React frontend integration
      * FALSE = Use original hardcoded navigation (fallback)
      *
-     * The React frontend has graceful fallback: if no custom menus exist
-     * for a tenant, hardcoded navigation renders automatically.
+     * IMPORTANT: Only enable after custom menus have been created via the
+     * admin panel. DefaultMenus fallback uses Font Awesome icons which are
+     * incompatible with the React frontend's Lucide icon renderer.
+     * The React frontend has its own hardcoded fallback when this is OFF.
      */
-    'enabled' => true,
+    'enabled' => false,
 
     /**
      * Show development warning banner in admin

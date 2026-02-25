@@ -1,0 +1,445 @@
+{
+  "home": {
+    "meta_description": "Tauschen Sie Fähigkeiten und Dienstleistungen mit Zeitguthaben. Treten Sie unserer gemeinschaftsorientierten Zeitbank-Plattform bei.",
+    "meta_keywords": "Zeitbank, Fähigkeitenaustausch, Gemeinschaft, Freiwilligenarbeit, Zeitguthaben",
+    "badge": "Die Zukunft der Zeitbank",
+    "headline_1": "Fähigkeiten tauschen,",
+    "headline_2": "Gemeinschaft aufbauen",
+    "subheadline": "{{name}} ist eine moderne Zeitbank-Plattform, auf der jede Stunde Dienstleistung gleichwertig ist. Tauschen Sie Ihre Fähigkeiten, verdienen Sie Zeitguthaben und verbinden Sie sich mit Ihrer Gemeinschaft.",
+    "cta_dashboard": "Zum Dashboard",
+    "cta_get_started": "Kostenlos starten",
+    "cta_learn_more": "Mehr erfahren",
+    "features": {
+      "0": {
+        "title": "Zeitguthaben",
+        "description": "Tauschen Sie Fähigkeiten mit Zeit als Währung"
+      },
+      "1": {
+        "title": "Gemeinschaft",
+        "description": "Verbinden Sie sich mit lokalen Dienstleistern"
+      },
+      "2": {
+        "title": "Sofort",
+        "description": "Schnelle und reibungslose Transaktionen"
+      }
+    },
+    "stats": {
+      "active_members": "Aktive Mitglieder",
+      "hours_exchanged": "Getauschte Stunden",
+      "active_listings": "Aktive Angebote",
+      "communities": "Gemeinschaften"
+    },
+    "scroll_down": "Nach unten scrollen",
+    "how_it_works": {
+      "title": "So funktioniert es",
+      "subtitle": "Starten Sie in vier einfachen Schritten",
+      "steps": {
+        "0": {
+          "title": "Kostenlos registrieren",
+          "description": "Erstellen Sie Ihr Profil in wenigen Minuten und listen Sie die Fähigkeiten auf, die Sie anbieten können."
+        },
+        "1": {
+          "title": "Durchsuchen und verbinden",
+          "description": "Finden Sie Dienstleistungen, die Sie benötigen, und verbinden Sie sich mit lokalen Gemeinschaftsmitgliedern."
+        },
+        "2": {
+          "title": "Dienstleistungen tauschen",
+          "description": "Organisieren Sie Fähigkeitenaustausche und helfen Sie sich gegenseitig."
+        },
+        "3": {
+          "title": "Guthaben verdienen",
+          "description": "Erhalten Sie ein Zeitguthaben für jede Stunde, die Sie geben. Geben Sie es frei aus."
+        }
+      }
+    },
+    "why_timebanking": {
+      "title": "Warum Zeitbank?",
+      "subtitle": "Die Grundprinzipien, die unsere Gemeinschaft funktionieren lassen",
+      "values": {
+        "0": {
+          "title": "Gleichwertigkeit",
+          "description": "Jede Stunde ist gleich viel wert. Ob Sie Klavier unterrichten oder den Rasen mähen, Ihre Zeit hat den gleichen Wert."
+        },
+        "1": {
+          "title": "Vertrauen aufbauen",
+          "description": "Bewertungen und Beurteilungen helfen Ihnen, zuverlässige Dienstleister zu finden und Ihren Ruf in der Gemeinschaft aufzubauen."
+        },
+        "2": {
+          "title": "Lokal bleiben",
+          "description": "Verbinden Sie sich mit Nachbarn und stärken Sie Ihre lokale Gemeinschaft durch sinnvollen Fähigkeitenaustausch."
+        }
+      }
+    },
+    "cta_section": {
+      "title": "Bereit loszulegen?",
+      "description": "Treten Sie Tausenden von Gemeinschaftsmitgliedern bei, die bereits Fähigkeiten austauschen und bedeutungsvolle Verbindungen aufbauen.",
+      "button": "Erstellen Sie Ihr kostenloses Konto"
+    }
+  },
+  "about": {
+    "meta_title": "Über {{name}}",
+    "meta_description": "Erfahren Sie mehr über {{name}} — eine Zeitbank-Plattform, auf der Gemeinschaften Fähigkeiten mit Zeit als Währung austauschen.",
+    "hero_title": "Über {{name}}",
+    "hero_description": "{{name}} ist eine moderne Zeitbank-Plattform, auf der jede Stunde Dienstleistung gleichwertig ist. Wir helfen Gemeinschaften, Fähigkeiten auszutauschen, Vertrauen aufzubauen und eine gerechtere lokale Wirtschaft zu schaffen — eine Stunde nach der anderen.",
+    "how_it_works": {
+      "title": "So funktioniert es",
+      "subtitle": "Der Einstieg ist einfach. Vier Schritte, um beizutreten und mit dem Fähigkeitenaustausch in Ihrer Gemeinschaft zu beginnen.",
+      "steps": {
+        "0": {
+          "title": "Erstellen Sie Ihr Profil",
+          "description": "Registrieren Sie sich kostenlos und listen Sie die Fähigkeiten auf, die Sie Ihrer Gemeinschaft anbieten können."
+        },
+        "1": {
+          "title": "Finden Sie, was Sie brauchen",
+          "description": "Durchsuchen Sie Angebote, um Dienstleistungen von Mitgliedern in Ihrer Nähe zu entdecken."
+        },
+        "2": {
+          "title": "Dienstleistungen tauschen",
+          "description": "Verbinden Sie sich mit Mitgliedern und organisieren Sie Fähigkeitenaustausche, die für beide funktionieren."
+        },
+        "3": {
+          "title": "Guthaben verdienen und ausgeben",
+          "description": "Verdienen Sie ein Zeitguthaben für jede Stunde, die Sie geben, und geben Sie es für Dienstleistungen aus, die Sie benötigen."
+        }
+      }
+    },
+    "values": {
+      "title": "Unsere Werte",
+      "subtitle": "Die Prinzipien, die alles leiten, was wir bei {{name}} tun.",
+      "items": {
+        "0": {
+          "title": "Gleichheit",
+          "description": "Die Zeit jeder Person wird gleichwertig geschätzt. Eine Stunde Gartenarbeit ist gleich viel wert wie eine Stunde Nachhilfe."
+        },
+        "1": {
+          "title": "Gemeinschaft",
+          "description": "Wir glauben an den Aufbau starker lokaler Verbindungen. Jeder Austausch stärkt das Gefüge Ihrer Nachbarschaft."
+        },
+        "2": {
+          "title": "Vertrauen und Sicherheit",
+          "description": "Bewertungen, Beurteilungen und Broker-Aufsicht gewährleisten eine sichere Umgebung für alle Mitglieder."
+        },
+        "3": {
+          "title": "Nachhaltigkeit",
+          "description": "Durch lokales Teilen von Fähigkeiten reduzieren wir Verschwendung, unterstützen Kreislaufwirtschaften und stärken die lokale Resilienz."
+        }
+      }
+    },
+    "stats": {
+      "members": "Mitglieder",
+      "hours_exchanged": "Getauschte Stunden",
+      "active_listings": "Aktive Angebote",
+      "communities": "Gemeinschaften"
+    },
+    "credits": {
+      "title": "Betrieben von Project NEXUS",
+      "subtitle": "Open-Source-Gemeinschaftsplattform, erstellt von Jasper Ford. Lizenziert unter AGPL v3.",
+      "creator": "Ersteller",
+      "founders_heading": "Gründer von hOUR Timebank CLG",
+      "contributors": "Mitwirkende",
+      "research_heading": "Forschungsgrundlage",
+      "research_description": "Basierend auf einer Studie zur sozialen Wirkung, in Auftrag gegeben von {{name}}.",
+      "acknowledgements": "Danksagungen",
+      "open_source": "Open Source",
+      "license_text": "Lizenziert unter der GNU Affero General Public License v3 (AGPL-3.0).",
+      "v1_source": "V1-Quellcode (PHP + React)",
+      "v2_source": "V2-Quellcode (ASP.NET Core)"
+    },
+    "cta": {
+      "title": "Bereit mitzumachen?",
+      "description": "Ob Sie Ihre Fähigkeiten teilen oder Hilfe bei etwas finden möchten, unsere Gemeinschaft ist für Sie da.",
+      "dashboard": "Zum Dashboard",
+      "join": "Kostenlos beitreten",
+      "help_center": "Hilfezentrum",
+      "contact_us": "Kontaktieren Sie uns"
+    }
+  },
+  "contact": {
+    "title": "Kontaktieren Sie uns",
+    "subtitle": "Haben Sie eine Frage zu {{name}}? Wir freuen uns, von Ihnen zu hören.",
+    "success_title": "Nachricht gesendet!",
+    "success_message": "Wir melden uns so schnell wie möglich bei Ihnen.",
+    "back_to_help": "Zurück zum Hilfezentrum",
+    "error_fallback": "Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "form": {
+      "name_label": "Name",
+      "name_placeholder": "Ihr Name",
+      "email_label": "E-Mail",
+      "email_placeholder": "sie@beispiel.ch",
+      "subject_label": "Betreff",
+      "subject_placeholder": "Worum geht es?",
+      "subjects": {
+        "general": "Allgemeine Anfrage",
+        "account": "Kontohilfe",
+        "technical": "Technisches Problem",
+        "feedback": "Feedback / Vorschlag",
+        "other": "Sonstiges"
+      },
+      "message_label": "Nachricht",
+      "message_placeholder": "Wie können wir helfen?",
+      "submit": "Nachricht senden",
+      "login_prompt_before": "Haben Sie bereits ein Konto?",
+      "login_link": "Anmelden",
+      "login_prompt_after": "für schnelleren Support."
+    }
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "subtitle_before_link": "Finden Sie nicht, was Sie suchen? Besuchen Sie unser",
+    "help_center_link": "Hilfezentrum",
+    "subtitle_after_link": "für ausführliche Anleitungen.",
+    "search_placeholder": "Fragen durchsuchen...",
+    "no_results": "Keine passenden Fragen gefunden. Versuchen Sie einen anderen Suchbegriff.",
+    "cta_title": "Noch Fragen?",
+    "cta_description": "Unser Support-Team ist hier, um zu helfen.",
+    "cta_button": "Support kontaktieren",
+    "categories": {
+      "getting_started": {
+        "title": "Erste Schritte",
+        "q1": {
+          "question": "Was ist Zeitbank?",
+          "answer_p1": "Zeitbank ist ein gemeinschaftliches Austauschsystem, bei dem eine Stunde Hilfe einem Zeitguthaben entspricht, unabhängig von der erbrachten Dienstleistung. Ob Sie eine Sprache unterrichten, bei der Gartenarbeit helfen oder technischen Support leisten — Ihre Zeit wird gleichwertig geschätzt.",
+          "answer_p2": "Es ist eine Möglichkeit, Gemeinschaftsverbindungen aufzubauen und gleichzeitig Fähigkeiten und Dienstleistungen ohne traditionelles Geld auszutauschen."
+        },
+        "q2": {
+          "question": "Ist die Mitgliedschaft kostenlos?",
+          "answer_p1": "Ja! Die Mitgliedschaft ist völlig kostenlos. Die einzige Währung sind Zeitguthaben, die Sie durch Hilfe für andere in der Gemeinschaft verdienen.",
+          "answer_p2": "Neue Mitglieder erhalten oft eine kleine Anzahl von Startguthaben, um ihnen den Einstieg zu erleichtern."
+        },
+        "q3": {
+          "question": "Wie fange ich an?",
+          "answer_intro": "So beginnen Sie:",
+          "step1_bold": "Vervollständigen Sie Ihr Profil",
+          "step1_text": "Fügen Sie ein Foto, eine Biografie und Ihre Fähigkeiten hinzu",
+          "step2_bold": "Durchsuchen Sie den Marktplatz",
+          "step2_text": "Sehen Sie, welche Dienstleistungen angeboten und gesucht werden",
+          "step3_bold": "Erstellen Sie ein Angebot",
+          "step3_text": "Teilen Sie mit, wobei Sie anderen helfen können",
+          "step4_bold": "Stellen Sie eine Anfrage",
+          "step4_text": "Fragen Sie nach etwas, das Sie brauchen",
+          "step5_bold": "Verbinden Sie sich mit Mitgliedern",
+          "step5_text": "Bauen Sie Ihr Netzwerk auf"
+        },
+        "q4": {
+          "question": "Welche Fähigkeiten kann ich anbieten?",
+          "answer_intro": "Fast alles! Häufige Angebote umfassen:",
+          "skill1": "Haushaltshilfe (Gartenarbeit, Reinigung, kleine Reparaturen)",
+          "skill2": "Technischer Support (Computerhilfe, Telefoneinrichtung)",
+          "skill3": "Unterricht (Sprachen, Musik, akademische Fächer)",
+          "skill4": "Kreative Dienstleistungen (Design, Fotografie, Schreiben)",
+          "skill5": "Transport (Fahrten, Besorgungen)",
+          "skill6": "Gesellschaft (Spaziergänge, Besuche, Gespräche)",
+          "skill7": "Berufliche Fähigkeiten (Buchhaltung, Rechtsberatung usw.)",
+          "answer_outro": "Jeder hat etwas Wertvolles anzubieten!"
+        }
+      },
+      "time_credits": {
+        "title": "Zeitguthaben",
+        "q1": {
+          "question": "Was ist ein Zeitguthaben?",
+          "answer_p1": "Ein Zeitguthaben entspricht einer Stunde Dienstleistung. Es ist die Währung unserer Gemeinschaft.",
+          "answer_p2": "Sie können auch Teilstunden tauschen: 30 Minuten = 0,5 Guthaben, 15 Minuten = 0,25 Guthaben."
+        },
+        "q2": {
+          "question": "Wie verdiene ich Zeitguthaben?",
+          "answer_intro": "Sie verdienen Guthaben durch:",
+          "way1_bold": "Dienstleistungen erbringen",
+          "way1_text": "für andere Mitglieder",
+          "way2_bold": "Freiwilligenstunden protokollieren",
+          "way2_text": "bei genehmigten Organisationen",
+          "way3_bold": "Spenden erhalten",
+          "way3_text": "von anderen Mitgliedern",
+          "way4_bold": "Startguthaben",
+          "way4_text": "wenn Sie sich erstmals anmelden"
+        },
+        "q3": {
+          "question": "Kann ich meine Guthaben spenden?",
+          "answer_intro": "Ja! Sie können:",
+          "option1": "Guthaben an jedes andere Mitglied überweisen",
+          "option2": "An den Gemeinschaftstopf spenden (hilft Mitgliedern, die zusätzliche Unterstützung benötigen)",
+          "answer_link_before": "Gehen Sie zu Ihrem ",
+          "wallet_link": "Portemonnaie",
+          "answer_link_after": ", um Guthaben zu senden."
+        },
+        "q4": {
+          "question": "Kann mein Guthaben negativ werden?",
+          "answer": "Einige Gemeinschaften erlauben begrenzte negative Guthaben, um neuen Mitgliedern den Einstieg zu erleichtern, bevor sie die Möglichkeit hatten, Guthaben zu verdienen. Erkundigen Sie sich bei Ihrem Gemeinschaftskoordinator nach den spezifischen Regeln in Ihrer Zeitbank."
+        },
+        "q5": {
+          "question": "Was ist, wenn ich Guthaben an die falsche Person gesendet habe?",
+          "answer_intro": "Transaktionen können nicht automatisch rückgängig gemacht werden. Wenn Sie einen Fehler gemacht haben:",
+          "step1": "Kontaktieren Sie den Empfänger und bitten Sie ihn, die Guthaben zurückzusenden",
+          "step2": "Wenn Sie es nicht lösen können, wenden Sie sich an den Support",
+          "answer_outro": "Überprüfen Sie den Empfänger immer, bevor Sie eine Überweisung bestätigen."
+        }
+      },
+      "exchanges_safety": {
+        "title": "Austausch und Sicherheit",
+        "q1": {
+          "question": "Wie organisiere ich einen Austausch?",
+          "answer_intro": "Der typische Ablauf ist:",
+          "step1": "Finden Sie ein Angebot oder eine Anfrage, die Sie interessiert",
+          "step2": "Schreiben Sie dem Mitglied, um Details zu besprechen",
+          "step3": "Einigen Sie sich auf Zeitpunkt, Ort und geschätzte Dauer",
+          "step4": "Treffen Sie sich und führen Sie den Austausch durch",
+          "step5": "Die Person, die Hilfe erhalten hat, sendet Zeitguthaben",
+          "step6": "Hinterlassen Sie gegenseitig eine Bewertung"
+        },
+        "q2": {
+          "question": "Ist es sicher, Fremde zu treffen?",
+          "answer_intro": "Wir empfehlen folgende Sicherheitspraktiken:",
+          "tip1": "Treffen Sie sich beim ersten Austausch an öffentlichen Orten",
+          "tip2": "Überprüfen Sie das Profil und die Bewertungen des Mitglieds",
+          "tip3": "Sagen Sie jemandem, wohin Sie gehen",
+          "tip4": "Vertrauen Sie Ihrem Bauchgefühl — wenn sich etwas falsch anfühlt, gehen Sie",
+          "tip5": "Beginnen Sie mit kleineren Austauschen mit geringem Risiko",
+          "answer_outro": "Melden Sie besorgniserregendes Verhalten unserem Support-Team."
+        },
+        "q3": {
+          "question": "Was ist, wenn jemand nicht erscheint oder die Dienstleistung nicht erbringt?",
+          "answer_intro": "Kommunikation ist der Schlüssel. Wenn es ein Problem gibt:",
+          "step1": "Schreiben Sie dem Mitglied, um zu besprechen, was passiert ist",
+          "step2": "Versuchen Sie gemeinsam eine Lösung zu finden",
+          "step3": "Wenn Sie es nicht lösen können, wenden Sie sich an den Support",
+          "answer_outro": "Wiederholtes Nichterscheinen oder schlechtes Verhalten kann zu Kontobeschränkungen führen."
+        },
+        "q4": {
+          "question": "Sind die Dienstleistungen versichert?",
+          "answer": "Der Austausch sind informelle Vereinbarungen zwischen Gemeinschaftsmitgliedern. Wir bieten keinen Versicherungsschutz für Dienstleistungen an. Besprechen Sie bei risikoreichen Aktivitäten die Haftung vorab mit dem anderen Mitglied. Einige Mitglieder haben ihre eigene Berufsversicherung."
+        }
+      },
+      "badges_rewards": {
+        "title": "Abzeichen und Belohnungen",
+        "q1": {
+          "question": "Was sind Abzeichen und XP?",
+          "answer_intro": "Unser Gamification-System belohnt die Gemeinschaftsteilnahme:",
+          "item1_bold": "XP (Erfahrungspunkte)",
+          "item1_text": "Verdient für verschiedene Aktivitäten, die Ihnen helfen aufzusteigen",
+          "item2_bold": "Abzeichen",
+          "item2_text": "Erfolge für das Erreichen von Meilensteinen (60+ zu sammeln!)",
+          "item3_bold": "Stufen",
+          "item3_text": "Fortschritt vom Neuling zur Zeitbank-Legende",
+          "item4_bold": "Serien",
+          "item4_text": "Belohnungen für tägliches Engagement"
+        },
+        "q2": {
+          "question": "Wie verdiene ich XP?",
+          "answer_intro": "Sie verdienen XP für viele Aktivitäten:",
+          "activity1": "Zeitguthaben senden/empfangen",
+          "activity2": "Angebote erstellen",
+          "activity3": "Freiwilligenstunden protokollieren",
+          "activity4": "An Veranstaltungen teilnehmen",
+          "activity5": "Verbindungen knüpfen",
+          "activity6": "Tägliche Anmeldungen",
+          "activity7": "Abzeichen verdienen"
+        },
+        "q3": {
+          "question": "Kann ich mich von Ranglisten abmelden?",
+          "answer_before_link": "Ja! Wenn Sie Privatsphäre bevorzugen, können Sie sich in Ihren ",
+          "settings_link": "Einstellungen",
+          "answer_after_link": " von der Anzeige in öffentlichen Ranglisten abmelden. Sie verdienen weiterhin XP und Abzeichen, sie sind nur nicht für andere in den Rankings sichtbar."
+        }
+      },
+      "account_privacy": {
+        "title": "Konto und Datenschutz",
+        "q1": {
+          "question": "Wie ändere ich mein Passwort?",
+          "answer_before_link": "Gehen Sie zu ",
+          "settings_link": "Einstellungen",
+          "answer_after_link": " > Sicherheit, um Ihr Passwort zu ändern. Sie müssen zuerst Ihr aktuelles Passwort eingeben. Wenn Sie Ihr Passwort vergessen haben, verwenden Sie den Link \"Passwort vergessen\" auf der Anmeldeseite."
+        },
+        "q2": {
+          "question": "Wer kann mein Profil sehen?",
+          "answer_intro": "Standardmässig ist Ihr Profil für andere Gemeinschaftsmitglieder sichtbar. Sie können steuern:",
+          "item1": "Welche Kontaktinformationen angezeigt werden",
+          "item2": "Ob Sie in Ranglisten erscheinen",
+          "item3": "Die Sichtbarkeit Ihres allgemeinen Standorts",
+          "answer_link_before": "Passen Sie diese in Ihren ",
+          "settings_link": "Einstellungen",
+          "answer_link_after": " an."
+        },
+        "q3": {
+          "question": "Wie lösche ich mein Konto?",
+          "answer_intro": "Wenn Sie die Gemeinschaft verlassen möchten:",
+          "step1": "Gehen Sie zu Einstellungen > Konto",
+          "step2": "Klicken Sie auf \"Konto löschen\"",
+          "step3": "Bestätigen Sie Ihre Entscheidung",
+          "answer_outro": "Hinweis: Ihre Transaktionshistorie wird für die Aufzeichnungen aufbewahrt, aber Ihre persönlichen Daten werden entfernt."
+        },
+        "q4": {
+          "question": "Wie werden meine Daten geschützt?",
+          "answer_intro": "Wir nehmen Datenschutz ernst:",
+          "item1": "Ihre Daten sind verschlüsselt und sicher gespeichert",
+          "item2": "Wir verkaufen Ihre Informationen niemals",
+          "item3": "Sie können jederzeit eine Kopie Ihrer Daten anfordern",
+          "item4": "Wir erfüllen die DSGVO und Datenschutzverordnungen"
+        }
+      }
+    }
+  },
+  "maintenance": {
+    "title": "Wir sind bald zurück!",
+    "description": "wird derzeit planmässig gewartet, um Ihre Erfahrung zu verbessern.",
+    "apology": "Wir entschuldigen uns für etwaige Unannehmlichkeiten. Bitte schauen Sie in Kürze wieder vorbei.",
+    "thanks": "Vielen Dank für Ihre Geduld!",
+    "admin_login": "Admin-Anmeldung"
+  },
+  "dev_status": {
+    "title": "Entwicklungsstatus: {{stage}}",
+    "where_we_are": {
+      "title": "Wo wir jetzt stehen",
+      "paragraph1": "Project NEXUS befindet sich derzeit im Release Candidate (RC) — der letzten Phase vor einem vollständigen öffentlichen Start. Wir haben die Feature-Vollständigkeit für V1 erreicht, und die Plattform wird aktiv von echten Gemeinschaften genutzt. Unser Fokus liegt nun auf Härtung, Leistung und dem Auffinden von Grenzfall-Fehlern, bevor wir die allgemeine Verfügbarkeit erklären.",
+      "paragraph2": "Alles, was Sie hier sehen, läuft auf Produktionsinfrastruktur (Azure, Cloudflare, MariaDB). Ihre Daten sind echt und werden ernst genommen. Wir befinden uns nicht in einer isolierten Demo-Umgebung."
+    },
+    "whats_stable": {
+      "title": "Was stabil ist und funktioniert",
+      "item1": "Mitgliederregistrierung, Anmeldung und Einführung",
+      "item2": "Zeitguthaben-Portemonnaie — Verdienen, Ausgeben und Transaktionsverlauf anzeigen",
+      "item3": "Angebote — Erstellen, Durchsuchen und Austausche anfragen",
+      "item4": "Nachrichten — Direktgespräche zwischen Mitgliedern",
+      "item5": "Veranstaltungen — Erstellen, Entdecken und Anmeldung für Gemeinschaftsveranstaltungen",
+      "item6": "Gruppen — Gemeinschaftsuntergruppen mit Mitgliederverwaltung",
+      "item7": "Erfolge und Gamification (XP, Abzeichen, Rangliste)",
+      "item8": "Admin-Panel — Mandantenkonfiguration, Benutzerverwaltung, Moderation",
+      "item9": "Multi-Mandanten-Architektur — jede Gemeinschaft hat isolierte Daten",
+      "item10": "E-Mail-Benachrichtigungen (Registrierung, Austauschanfragen, Nachrichten)",
+      "item11": "Dunkelmodus, Barrierefreiheit und mobilfreundliche Benutzeroberfläche"
+    },
+    "whats_rough": {
+      "title": "Was noch holprig sein kann",
+      "item1": "Freiwilligenmodul — neueres Feature, weniger kampferprobt",
+      "item2": "Föderationsfunktionen (gemeinschaftsübergreifend) — experimentell, mögliche Grenzfälle",
+      "item3": "KI-Chat-Assistent — abhängig von OpenAI API; Prompts und Kontext werden noch optimiert",
+      "item4": "Push-Benachrichtigungen (mobil) — mögliche Zustellverzögerungen auf einigen Geräten",
+      "item5": "Einige Admin-Berichtsdiagramme können in Grenzfällen falsche Daten anzeigen",
+      "item6": "Lokalisierung — die Plattform ist global bereit, aber derzeit nur auf Englisch"
+    },
+    "how_we_catch_bugs": {
+      "title": "Wie wir Fehler finden",
+      "intro": "Wir verwenden einen mehrschichtigen Ansatz, um Probleme schnell zu finden und zu beheben:",
+      "method1_bold": "Automatisierte Tests",
+      "method1_text": "PHP-Unit-Tests und React-Komponententests laufen bei jedem Commit",
+      "method2_bold": "Sentry-Fehlerverfolgung",
+      "method2_text": "Ausnahmen auf Frontend und Backend werden in Echtzeit erfasst",
+      "method3_bold": "Cloudflare-Analytik",
+      "method3_text": "Verkehrsanomalien und Fehlerspitzen werden überwacht",
+      "method4_bold": "Manuelle QA",
+      "method4_text": "Kern-Benutzerreisen werden vor jeder Bereitstellung getestet",
+      "method5_bold": "Community-Tests",
+      "method5_text": "Echte Benutzer helfen uns, Grenzfälle in der Produktion zu entdecken"
+    },
+    "how_to_help": {
+      "title": "Wie Sie helfen können",
+      "report_bug_title": "Einen Fehler melden",
+      "report_bug_description": "Haben Sie etwas Fehlerhaftes gefunden? Bitte eröffnen Sie ein Issue auf GitHub — das ist der schnellste Weg, uns eine Lösung vorzulegen. Beschreiben Sie, was Sie getan haben, was Sie erwartet haben und was tatsächlich passiert ist.",
+      "github_link": "Ein Issue auf GitHub eröffnen",
+      "become_tester_title": "Tester werden",
+      "become_tester_description": "Wenn Sie eine Zeitbank oder ein Gemeinschaftsnetzwerk betreiben und Project NEXUS mit Ihren Mitgliedern ausprobieren möchten, würden wir gerne mit Ihnen zusammenarbeiten. Kontaktieren Sie uns über GitHub Discussions oder die Kontaktseite."
+    },
+    "security": {
+      "title": "Sicherheitsmeldung",
+      "description_before_email": "Wenn Sie eine Sicherheitslücke entdecken, eröffnen Sie bitte kein öffentliches Issue. Kontaktieren Sie uns stattdessen vertraulich unter",
+      "description_after_email": ". Wir werden innerhalb von 72 Stunden antworten und mit Ihnen an einer verantwortungsvollen Offenlegung arbeiten."
+    }
+  }
+}

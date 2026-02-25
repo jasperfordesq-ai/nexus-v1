@@ -1,0 +1,445 @@
+{
+  "home": {
+    "meta_description": "Scambia competenze e servizi utilizzando crediti di tempo. Unisciti alla nostra piattaforma comunitaria di banca del tempo.",
+    "meta_keywords": "banca del tempo, scambio di competenze, comunità, volontariato, crediti di tempo",
+    "badge": "Il futuro della banca del tempo",
+    "headline_1": "Scambia competenze,",
+    "headline_2": "Costruisci comunità",
+    "subheadline": "{{name}} è una moderna piattaforma di banca del tempo dove ogni ora di servizio ha lo stesso valore. Scambi le Sue competenze, guadagni crediti di tempo e si connette con la Sua comunità.",
+    "cta_dashboard": "Vai alla dashboard",
+    "cta_get_started": "Inizia gratuitamente",
+    "cta_learn_more": "Scopra di più",
+    "features": {
+      "0": {
+        "title": "Crediti di tempo",
+        "description": "Scambi competenze usando il tempo come valuta"
+      },
+      "1": {
+        "title": "Comunità",
+        "description": "Si connetta con fornitori di servizi locali"
+      },
+      "2": {
+        "title": "Istantaneo",
+        "description": "Transazioni rapide e senza intoppi"
+      }
+    },
+    "stats": {
+      "active_members": "Membri attivi",
+      "hours_exchanged": "Ore scambiate",
+      "active_listings": "Annunci attivi",
+      "communities": "Comunità"
+    },
+    "scroll_down": "Scorri verso il basso",
+    "how_it_works": {
+      "title": "Come funziona",
+      "subtitle": "Inizi in quattro semplici passaggi",
+      "steps": {
+        "0": {
+          "title": "Si registri gratuitamente",
+          "description": "Crei il Suo profilo in pochi minuti e elenchi le competenze che può offrire."
+        },
+        "1": {
+          "title": "Esplori e si connetta",
+          "description": "Trovi i servizi di cui ha bisogno e si connetta con i membri locali della comunità."
+        },
+        "2": {
+          "title": "Scambi servizi",
+          "description": "Organizzi scambi di competenze e si aiutino a vicenda."
+        },
+        "3": {
+          "title": "Guadagni crediti",
+          "description": "Ottenga un credito di tempo per ogni ora che dona. Li spenda liberamente."
+        }
+      }
+    },
+    "why_timebanking": {
+      "title": "Perché la banca del tempo?",
+      "subtitle": "I principi fondamentali che fanno funzionare la nostra comunità",
+      "values": {
+        "0": {
+          "title": "Valore uguale",
+          "description": "Ogni ora ha lo stesso valore. Che Lei insegni pianoforte o tagli il prato, il Suo tempo ha lo stesso valore."
+        },
+        "1": {
+          "title": "Costruire fiducia",
+          "description": "Recensioni e valutazioni La aiutano a trovare fornitori di servizi affidabili e a costruire la Sua reputazione nella comunità."
+        },
+        "2": {
+          "title": "Restare locali",
+          "description": "Si connetta con i vicini e rafforzi la Sua comunità locale attraverso scambi di competenze significativi."
+        }
+      }
+    },
+    "cta_section": {
+      "title": "Pronto per iniziare?",
+      "description": "Si unisca a migliaia di membri della comunità che stanno già scambiando competenze e costruendo connessioni significative.",
+      "button": "Crei il Suo account gratuito"
+    }
+  },
+  "about": {
+    "meta_title": "Informazioni su {{name}}",
+    "meta_description": "Scopra {{name}} — una piattaforma di banca del tempo dove le comunità scambiano competenze utilizzando il tempo come valuta.",
+    "hero_title": "Informazioni su {{name}}",
+    "hero_description": "{{name}} è una moderna piattaforma di banca del tempo dove ogni ora di servizio ha lo stesso valore. Aiutiamo le comunità a scambiare competenze, costruire fiducia e creare un'economia locale più equa — un'ora alla volta.",
+    "how_it_works": {
+      "title": "Come funziona",
+      "subtitle": "Iniziare è semplice. Quattro passaggi per iscriversi e iniziare a scambiare competenze nella Sua comunità.",
+      "steps": {
+        "0": {
+          "title": "Crei il Suo profilo",
+          "description": "Si iscriva gratuitamente e elenchi le competenze che può offrire alla Sua comunità."
+        },
+        "1": {
+          "title": "Trovi ciò che Le serve",
+          "description": "Esplori gli annunci per scoprire i servizi offerti dai membri vicino a Lei."
+        },
+        "2": {
+          "title": "Scambi servizi",
+          "description": "Si connetta con i membri e organizzi scambi di competenze che funzionino per entrambi."
+        },
+        "3": {
+          "title": "Guadagni e spenda crediti",
+          "description": "Guadagni un credito di tempo per ogni ora che dona e li spenda per i servizi di cui ha bisogno."
+        }
+      }
+    },
+    "values": {
+      "title": "I nostri valori",
+      "subtitle": "I principi che guidano tutto ciò che facciamo presso {{name}}.",
+      "items": {
+        "0": {
+          "title": "Uguaglianza",
+          "description": "Il tempo di ogni persona ha lo stesso valore. Un'ora di giardinaggio vale quanto un'ora di tutoraggio."
+        },
+        "1": {
+          "title": "Comunità",
+          "description": "Crediamo nella costruzione di forti legami locali. Ogni scambio rafforza il tessuto del Suo quartiere."
+        },
+        "2": {
+          "title": "Fiducia e sicurezza",
+          "description": "Recensioni, valutazioni e supervisione dei broker garantiscono un ambiente sicuro per la partecipazione di tutti i membri."
+        },
+        "3": {
+          "title": "Sostenibilità",
+          "description": "Condividendo competenze a livello locale, riduciamo gli sprechi, sosteniamo le economie circolari e rafforziamo la resilienza locale."
+        }
+      }
+    },
+    "stats": {
+      "members": "Membri",
+      "hours_exchanged": "Ore scambiate",
+      "active_listings": "Annunci attivi",
+      "communities": "Comunità"
+    },
+    "credits": {
+      "title": "Alimentato da Project NEXUS",
+      "subtitle": "Piattaforma comunitaria open source creata da Jasper Ford. Con licenza AGPL v3.",
+      "creator": "Creatore",
+      "founders_heading": "Fondatori di hOUR Timebank CLG",
+      "contributors": "Contributori",
+      "research_heading": "Fondazione di ricerca",
+      "research_description": "Basato su uno studio di impatto sociale commissionato da {{name}}.",
+      "acknowledgements": "Ringraziamenti",
+      "open_source": "Open Source",
+      "license_text": "Con licenza GNU Affero General Public License v3 (AGPL-3.0).",
+      "v1_source": "Codice sorgente V1 (PHP + React)",
+      "v2_source": "Codice sorgente V2 (ASP.NET Core)"
+    },
+    "cta": {
+      "title": "Pronto a partecipare?",
+      "description": "Che Lei voglia condividere le Sue competenze o trovare aiuto con qualcosa, la nostra comunità è qui per Lei.",
+      "dashboard": "Vai alla dashboard",
+      "join": "Si unisca gratuitamente",
+      "help_center": "Centro assistenza",
+      "contact_us": "Ci contatti"
+    }
+  },
+  "contact": {
+    "title": "Ci contatti",
+    "subtitle": "Ha una domanda su {{name}}? Ci piacerebbe sentirLa.",
+    "success_title": "Messaggio inviato!",
+    "success_message": "Le risponderemo il prima possibile.",
+    "back_to_help": "Torna al centro assistenza",
+    "error_fallback": "Invio del messaggio non riuscito. La preghiamo di riprovare.",
+    "form": {
+      "name_label": "Nome",
+      "name_placeholder": "Il Suo nome",
+      "email_label": "E-mail",
+      "email_placeholder": "lei@esempio.com",
+      "subject_label": "Oggetto",
+      "subject_placeholder": "Di cosa si tratta?",
+      "subjects": {
+        "general": "Richiesta generale",
+        "account": "Assistenza account",
+        "technical": "Problema tecnico",
+        "feedback": "Feedback / Suggerimento",
+        "other": "Altro"
+      },
+      "message_label": "Messaggio",
+      "message_placeholder": "Come possiamo aiutarLa?",
+      "submit": "Invia messaggio",
+      "login_prompt_before": "Ha già un account?",
+      "login_link": "Acceda",
+      "login_prompt_after": "per un supporto più rapido."
+    }
+  },
+  "faq": {
+    "title": "Domande frequenti",
+    "subtitle_before_link": "Non trova quello che cerca? Visiti il nostro",
+    "help_center_link": "Centro assistenza",
+    "subtitle_after_link": "per guide dettagliate.",
+    "search_placeholder": "Cerca domande...",
+    "no_results": "Nessuna domanda corrispondente trovata. Provi con un termine di ricerca diverso.",
+    "cta_title": "Ha ancora domande?",
+    "cta_description": "Il nostro team di supporto è qui per aiutarLa.",
+    "cta_button": "Contatti il supporto",
+    "categories": {
+      "getting_started": {
+        "title": "Per iniziare",
+        "q1": {
+          "question": "Cos'è la banca del tempo?",
+          "answer_p1": "La banca del tempo è un sistema di scambio comunitario dove un'ora di aiuto equivale a un credito di tempo, indipendentemente dal servizio fornito. Che Lei insegni una lingua, aiuti con il giardinaggio o fornisca supporto tecnico, il Suo tempo è valutato in modo uguale.",
+          "answer_p2": "È un modo per costruire connessioni comunitarie scambiando competenze e servizi senza denaro tradizionale."
+        },
+        "q2": {
+          "question": "L'iscrizione è gratuita?",
+          "answer_p1": "Sì! L'iscrizione è completamente gratuita. L'unica valuta utilizzata sono i crediti di tempo, che si guadagnano aiutando gli altri nella comunità.",
+          "answer_p2": "I nuovi membri ricevono spesso un piccolo numero di crediti iniziali per aiutarli a iniziare."
+        },
+        "q3": {
+          "question": "Come si inizia?",
+          "answer_intro": "Ecco come iniziare:",
+          "step1_bold": "Completi il Suo profilo",
+          "step1_text": "Aggiunga una foto, una biografia e le Sue competenze",
+          "step2_bold": "Esplori il marketplace",
+          "step2_text": "Veda quali servizi sono offerti e richiesti",
+          "step3_bold": "Pubblichi un'offerta",
+          "step3_text": "Condivida in cosa può aiutare gli altri",
+          "step4_bold": "Faccia una richiesta",
+          "step4_text": "Chieda qualcosa di cui ha bisogno",
+          "step5_bold": "Si connetta con i membri",
+          "step5_text": "Costruisca la Sua rete"
+        },
+        "q4": {
+          "question": "Quali competenze posso offrire?",
+          "answer_intro": "Quasi tutto! Le offerte comuni includono:",
+          "skill1": "Aiuto domestico (giardinaggio, pulizia, piccole riparazioni)",
+          "skill2": "Supporto tecnico (assistenza informatica, configurazione telefono)",
+          "skill3": "Insegnamento (lingue, musica, materie accademiche)",
+          "skill4": "Servizi creativi (design, fotografia, scrittura)",
+          "skill5": "Trasporto (passaggi, commissioni)",
+          "skill6": "Compagnia (passeggiate, visite, conversazione)",
+          "skill7": "Competenze professionali (contabilità, consulenza legale, ecc.)",
+          "answer_outro": "Tutti hanno qualcosa di prezioso da offrire!"
+        }
+      },
+      "time_credits": {
+        "title": "Crediti di tempo",
+        "q1": {
+          "question": "Cos'è un credito di tempo?",
+          "answer_p1": "Un credito di tempo equivale a un'ora di servizio. È la valuta della nostra comunità.",
+          "answer_p2": "Si possono scambiare anche ore parziali: 30 minuti = 0,5 crediti, 15 minuti = 0,25 crediti."
+        },
+        "q2": {
+          "question": "Come si guadagnano crediti di tempo?",
+          "answer_intro": "Si guadagnano crediti:",
+          "way1_bold": "Fornendo servizi",
+          "way1_text": "ad altri membri",
+          "way2_bold": "Registrando ore di volontariato",
+          "way2_text": "presso organizzazioni approvate",
+          "way3_bold": "Ricevendo donazioni",
+          "way3_text": "da altri membri",
+          "way4_bold": "Crediti iniziali",
+          "way4_text": "quando ci si iscrive per la prima volta"
+        },
+        "q3": {
+          "question": "Posso donare i miei crediti?",
+          "answer_intro": "Sì! Può:",
+          "option1": "Trasferire crediti a qualsiasi altro membro",
+          "option2": "Donare al fondo comunitario (aiuta i membri che hanno bisogno di supporto aggiuntivo)",
+          "answer_link_before": "Vada al Suo ",
+          "wallet_link": "Portafoglio",
+          "answer_link_after": " per inviare crediti."
+        },
+        "q4": {
+          "question": "Il mio saldo può diventare negativo?",
+          "answer": "Alcune comunità consentono saldi negativi limitati per aiutare i nuovi membri a iniziare prima che abbiano avuto l'opportunità di guadagnare crediti. Verifichi con il coordinatore della Sua comunità le regole specifiche della Sua banca del tempo."
+        },
+        "q5": {
+          "question": "Cosa succede se ho inviato crediti alla persona sbagliata?",
+          "answer_intro": "Le transazioni non possono essere automaticamente annullate. Se ha commesso un errore:",
+          "step1": "Contatti il destinatario e chieda di restituire i crediti",
+          "step2": "Se non riesce a risolvere, contatti il supporto per assistenza",
+          "answer_outro": "Verifichi sempre il destinatario prima di confermare un trasferimento."
+        }
+      },
+      "exchanges_safety": {
+        "title": "Scambi e sicurezza",
+        "q1": {
+          "question": "Come si organizza uno scambio?",
+          "answer_intro": "Il processo tipico è:",
+          "step1": "Trovi un'offerta o una richiesta che La interessa",
+          "step2": "Invii un messaggio al membro per discutere i dettagli",
+          "step3": "Concordi su quando, dove e tempo stimato",
+          "step4": "Si incontri e completi lo scambio",
+          "step5": "La persona che ha ricevuto aiuto invia crediti di tempo",
+          "step6": "Lascino reciprocamente una recensione"
+        },
+        "q2": {
+          "question": "È sicuro incontrare sconosciuti?",
+          "answer_intro": "Raccomandiamo queste pratiche di sicurezza:",
+          "tip1": "Si incontri in luoghi pubblici per i primi scambi",
+          "tip2": "Controlli il profilo e le recensioni del membro",
+          "tip3": "Dica a qualcuno dove sta andando",
+          "tip4": "Si fidi del Suo istinto — se qualcosa non va, se ne vada",
+          "tip5": "Inizi con scambi più piccoli e a basso rischio",
+          "answer_outro": "Segnali qualsiasi comportamento preoccupante al nostro team di supporto."
+        },
+        "q3": {
+          "question": "Cosa succede se qualcuno non si presenta o non completa il servizio?",
+          "answer_intro": "La comunicazione è fondamentale. Se c'è un problema:",
+          "step1": "Invii un messaggio al membro per discutere l'accaduto",
+          "step2": "Cerchi di trovare una soluzione insieme",
+          "step3": "Se non riesce a risolvere, contatti il supporto",
+          "answer_outro": "Le assenze ripetute o il cattivo comportamento possono comportare restrizioni dell'account."
+        },
+        "q4": {
+          "question": "I servizi sono assicurati?",
+          "answer": "Gli scambi sono accordi informali tra membri della comunità. Non forniamo copertura assicurativa per i servizi. Per attività ad alto rischio, discuta la responsabilità con l'altro membro in anticipo. Alcuni membri hanno la propria assicurazione professionale."
+        }
+      },
+      "badges_rewards": {
+        "title": "Badge e ricompense",
+        "q1": {
+          "question": "Cosa sono i badge e gli XP?",
+          "answer_intro": "Il nostro sistema di gamification premia la partecipazione alla comunità:",
+          "item1_bold": "XP (Punti esperienza)",
+          "item1_text": "Guadagnati per varie attività, aiutandoLa a salire di livello",
+          "item2_bold": "Badge",
+          "item2_text": "Traguardi per aver raggiunto obiettivi (60+ da collezionare!)",
+          "item3_bold": "Livelli",
+          "item3_text": "Progressione da Principiante a Leggenda della banca del tempo",
+          "item4_bold": "Serie",
+          "item4_text": "Ricompense per l'impegno quotidiano"
+        },
+        "q2": {
+          "question": "Come si guadagnano XP?",
+          "answer_intro": "Si guadagnano XP per molte attività:",
+          "activity1": "Inviare/ricevere crediti di tempo",
+          "activity2": "Creare annunci",
+          "activity3": "Registrare ore di volontariato",
+          "activity4": "Partecipare a eventi",
+          "activity5": "Creare connessioni",
+          "activity6": "Accessi giornalieri",
+          "activity7": "Guadagnare badge"
+        },
+        "q3": {
+          "question": "Posso rinunciare alle classifiche?",
+          "answer_before_link": "Sì! Se preferisce la privacy, può rinunciare alla visualizzazione nelle classifiche pubbliche nelle Sue ",
+          "settings_link": "Impostazioni",
+          "answer_after_link": ". Continuerà a guadagnare XP e badge, semplicemente non saranno visibili agli altri nelle classifiche."
+        }
+      },
+      "account_privacy": {
+        "title": "Account e privacy",
+        "q1": {
+          "question": "Come si cambia la password?",
+          "answer_before_link": "Vada in ",
+          "settings_link": "Impostazioni",
+          "answer_after_link": " > Sicurezza per cambiare la Sua password. Dovrà prima inserire la Sua password attuale. Se ha dimenticato la password, utilizzi il link \"Password dimenticata\" nella pagina di accesso."
+        },
+        "q2": {
+          "question": "Chi può vedere il mio profilo?",
+          "answer_intro": "Per impostazione predefinita, il Suo profilo è visibile agli altri membri della comunità. Può controllare:",
+          "item1": "Quali informazioni di contatto vengono visualizzate",
+          "item2": "Se appare nelle classifiche",
+          "item3": "La visibilità della Sua posizione generale",
+          "answer_link_before": "Regoli queste impostazioni nelle Sue ",
+          "settings_link": "Impostazioni",
+          "answer_link_after": "."
+        },
+        "q3": {
+          "question": "Come si elimina l'account?",
+          "answer_intro": "Se desidera lasciare la comunità:",
+          "step1": "Vada in Impostazioni > Account",
+          "step2": "Clicchi su \"Elimina account\"",
+          "step3": "Confermi la Sua decisione",
+          "answer_outro": "Nota: La cronologia delle transazioni verrà conservata per la documentazione, ma le Sue informazioni personali verranno rimosse."
+        },
+        "q4": {
+          "question": "Come vengono protetti i miei dati?",
+          "answer_intro": "Prendiamo la privacy seriamente:",
+          "item1": "I Suoi dati sono crittografati e archiviati in modo sicuro",
+          "item2": "Non vendiamo mai le Sue informazioni",
+          "item3": "Può richiedere una copia dei Suoi dati in qualsiasi momento",
+          "item4": "Rispettiamo il GDPR e le normative sulla protezione dei dati"
+        }
+      }
+    }
+  },
+  "maintenance": {
+    "title": "Torneremo presto!",
+    "description": "è attualmente in manutenzione programmata per migliorare la Sua esperienza.",
+    "apology": "Ci scusiamo per l'inconveniente. La preghiamo di tornare tra poco.",
+    "thanks": "Grazie per la Sua pazienza!",
+    "admin_login": "Accesso amministratore"
+  },
+  "dev_status": {
+    "title": "Stato di sviluppo: {{stage}}",
+    "where_we_are": {
+      "title": "Dove siamo ora",
+      "paragraph1": "Project NEXUS è attualmente in Release Candidate (RC) — l'ultima fase prima del lancio pubblico completo. Abbiamo raggiunto la completezza funzionale per la V1 e la piattaforma è in uso attivo da parte di comunità reali. Il nostro focus è ora sull'hardening, le prestazioni e l'individuazione dei bug nei casi limite prima di dichiarare la disponibilità generale.",
+      "paragraph2": "Tutto ciò che vede qui funziona su infrastruttura di produzione (Azure, Cloudflare, MariaDB). I Suoi dati sono reali e trattati seriamente. Non siamo in un ambiente demo isolato."
+    },
+    "whats_stable": {
+      "title": "Cosa è stabile e funzionante",
+      "item1": "Registrazione membri, accesso e onboarding",
+      "item2": "Portafoglio crediti di tempo — guadagnare, spendere e visualizzare la cronologia delle transazioni",
+      "item3": "Annunci — pubblicare, esplorare e richiedere scambi",
+      "item4": "Messaggistica — conversazioni dirette tra membri",
+      "item5": "Eventi — creare, scoprire e iscriversi agli eventi della comunità",
+      "item6": "Gruppi — sottogruppi comunitari con gestione dei membri",
+      "item7": "Traguardi e gamification (XP, badge, classifica)",
+      "item8": "Pannello di amministrazione — configurazione del tenant, gestione utenti, moderazione",
+      "item9": "Architettura multi-tenant — ogni comunità ha dati isolati",
+      "item10": "Notifiche e-mail (registrazione, richieste di scambio, messaggi)",
+      "item11": "Modalità scura, accessibilità e interfaccia responsive per dispositivi mobili"
+    },
+    "whats_rough": {
+      "title": "Cosa potrebbe essere ancora imperfetto",
+      "item1": "Modulo opportunità di volontariato — funzionalità più recente, meno collaudata",
+      "item2": "Funzionalità di federazione (inter-comunità) — sperimentali, possibili casi limite",
+      "item3": "Assistente AI Chat — dipende dall'API OpenAI; prompt e contesto ancora in fase di ottimizzazione",
+      "item4": "Notifiche push (mobile) — possibili ritardi di consegna su alcuni dispositivi",
+      "item5": "Alcuni grafici di reportistica admin potrebbero mostrare dati errati nei casi limite",
+      "item6": "Localizzazione — la piattaforma è pronta a livello globale ma solo in inglese per ora"
+    },
+    "how_we_catch_bugs": {
+      "title": "Come individuiamo i bug",
+      "intro": "Utilizziamo un approccio multi-livello per individuare e correggere rapidamente i problemi:",
+      "method1_bold": "Test automatizzati",
+      "method1_text": "i test unitari PHP e i test dei componenti React vengono eseguiti ad ogni commit",
+      "method2_bold": "Tracciamento errori Sentry",
+      "method2_text": "le eccezioni su frontend e backend vengono catturate in tempo reale",
+      "method3_bold": "Analisi Cloudflare",
+      "method3_text": "anomalie di traffico e picchi di errori vengono monitorati",
+      "method4_bold": "QA manuale",
+      "method4_text": "i percorsi utente principali vengono testati prima di ogni distribuzione",
+      "method5_bold": "Test della comunità",
+      "method5_text": "gli utenti reali ci aiutano a scoprire casi limite in produzione"
+    },
+    "how_to_help": {
+      "title": "Come aiutare",
+      "report_bug_title": "Segnala un bug",
+      "report_bug_description": "Ha trovato qualcosa di rotto? Apra una segnalazione su GitHub — è il modo più veloce per sottoporci una correzione. Includa cosa stava facendo, cosa si aspettava e cosa è realmente accaduto.",
+      "github_link": "Apra una segnalazione su GitHub",
+      "become_tester_title": "Diventi un tester",
+      "become_tester_description": "Se gestisce una banca del tempo o una rete comunitaria e desidera provare Project NEXUS con i Suoi membri, ci piacerebbe lavorare con Lei. Ci contatti tramite le Discussioni GitHub o la pagina di contatto."
+    },
+    "security": {
+      "title": "Divulgazione di sicurezza",
+      "description_before_email": "Se scopre una vulnerabilità di sicurezza, La preghiamo di non aprire una segnalazione pubblica. Ci contatti invece in modo confidenziale a",
+      "description_after_email": ". Risponderemo entro 72 ore e lavoreremo con Lei per una divulgazione responsabile."
+    }
+  }
+}

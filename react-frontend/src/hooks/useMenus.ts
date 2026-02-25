@@ -22,9 +22,10 @@ interface UseMenusReturn {
 
 /**
  * Fetches navigation menus from the public menu API.
- * Re-fetches when authentication state changes (menus are role-filtered server-side).
+ * Re-fetches when authentication state or tenant changes (menus are role-filtered
+ * and tenant-scoped server-side).
  */
-export function useMenus(isAuthenticated: boolean): UseMenusReturn {
+export function useMenus(isAuthenticated: boolean, tenantId?: number | null): UseMenusReturn {
   const [menus, setMenus] = useState<MenusByLocation>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,11 +60,17 @@ export function useMenus(isAuthenticated: boolean): UseMenusReturn {
 
         setMenus(menusByLoc);
 
-        // Check if any menu has real items
+        // Detect real custom menus vs DefaultMenus fallback.
+        // DefaultMenus have string IDs like "default-main" and slugs like "default-main-nav".
+        // Real DB menus have numeric IDs. Only switch to API-driven rendering for real menus,
+        // since DefaultMenus use Font Awesome icons incompatible with React's Lucide renderer.
+        const isRealCustomMenu = (m: ApiMenu) =>
+          typeof m.id === 'number' && !String(m.slug).startsWith('default-');
+
         const hasItems = Object.values(menusByLoc).some(
           (locationMenus) =>
             Array.isArray(locationMenus) &&
-            locationMenus.some((m) => m.items && m.items.length > 0)
+            locationMenus.some((m) => isRealCustomMenu(m) && m.items && m.items.length > 0)
         );
         setHasCustomMenus(hasItems);
       } else {
@@ -88,7 +95,7 @@ export function useMenus(isAuthenticated: boolean): UseMenusReturn {
     return () => {
       mountedRef.current = false;
     };
-  }, [fetchMenus, isAuthenticated]);
+  }, [fetchMenus, isAuthenticated, tenantId]);
 
   return { menus, isLoading, error, hasCustomMenus, refresh: fetchMenus };
 }
