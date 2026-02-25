@@ -6,7 +6,7 @@
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTenant, useFeature, useCookieConsent } from '@/contexts';
-import { Hexagon, Mail, Phone, MapPin, Cookie } from 'lucide-react';
+import { Hexagon, Mail, Phone, MapPin, Cookie, Bug } from 'lucide-react';
 
 export interface FooterProps {
   /** Footer content/links */
@@ -105,6 +105,17 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/help')}>Help Center</FooterLink></li>
                   <li><FooterLink href={tenantPath('/contact')}>Contact Us</FooterLink></li>
                   <li><FooterLink href={tenantPath('/about')}>About</FooterLink></li>
+                  <li>
+                    <a
+                      href="https://project-nexus.canny.io/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors"
+                    >
+                      <Bug className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      Report Bug
+                    </a>
+                  </li>
                 </ul>
               </div>
 
