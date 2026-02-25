@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Select, SelectItem, DatePicker, TimeInput } from '@heroui/react';
 import type { DateInputValue, TimeInputValue } from '@heroui/react';
@@ -37,16 +38,8 @@ import { logError } from '@/lib/logger';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { Event } from '@/types/api';
 
-/** Event categories matching EventsPage */
-const EVENT_CATEGORIES = [
-  { id: 'workshop', name: 'Workshop' },
-  { id: 'social', name: 'Social' },
-  { id: 'outdoor', name: 'Outdoor' },
-  { id: 'online', name: 'Online' },
-  { id: 'meeting', name: 'Meeting' },
-  { id: 'training', name: 'Training' },
-  { id: 'other', name: 'Other' },
-];
+/** Event category IDs matching EventsPage — names resolved via t() inside the component */
+const EVENT_CATEGORY_IDS = ['workshop', 'social', 'outdoor', 'online', 'meeting', 'training', 'other'] as const;
 
 const MAX_IMAGE_SIZE_MB = 5;
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -89,12 +82,13 @@ function toJSDate(date: DateInputValue, time: TimeInputValue | null): Date {
 }
 
 export function CreateEventPage() {
-  usePageTitle('Create Event');
+  const { t } = useTranslation('events');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const isEditing = !!id;
+  usePageTitle(isEditing ? t('form.edit_title') : t('form.create_title'));
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
@@ -160,12 +154,12 @@ export function CreateEventPage() {
     if (!file) return;
 
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-      toast.error('Please select a JPEG, PNG, WebP, or GIF image');
+      toast.error(t('form.toast.image_type'));
       return;
     }
 
     if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
-      toast.error(`Image must be smaller than ${MAX_IMAGE_SIZE_MB}MB`);
+      toast.error(t('form.toast.image_size', { size: MAX_IMAGE_SIZE_MB }));
       return;
     }
 
@@ -194,12 +188,12 @@ export function CreateEventPage() {
     if (!file) return;
 
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-      toast.error('Please drop a JPEG, PNG, WebP, or GIF image');
+      toast.error(t('form.toast.drop_type'));
       return;
     }
 
     if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
-      toast.error(`Image must be smaller than ${MAX_IMAGE_SIZE_MB}MB`);
+      toast.error(t('form.toast.image_size', { size: MAX_IMAGE_SIZE_MB }));
       return;
     }
 
@@ -220,35 +214,35 @@ export function CreateEventPage() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('form.validation.title_required');
     } else if (formData.title.length < 5) {
-      newErrors.title = 'Title must be at least 5 characters';
+      newErrors.title = t('form.validation.title_min');
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = t('form.validation.description_required');
     } else if (formData.description.length < 20) {
-      newErrors.description = 'Description must be at least 20 characters';
+      newErrors.description = t('form.validation.description_min');
     }
 
     if (!formData.startDate) {
-      newErrors.startDate = 'Start date is required';
+      newErrors.startDate = t('form.validation.start_date_required');
     }
 
     if (!formData.startTime) {
-      newErrors.startTime = 'Start time is required';
+      newErrors.startTime = t('form.validation.start_time_required');
     }
 
     if (formData.startDate && formData.endDate) {
       if (formData.endDate.toString() < formData.startDate.toString()) {
-        newErrors.endDate = 'End date must be after start date';
+        newErrors.endDate = t('form.validation.end_date_before_start');
       }
     }
 
     if (formData.max_attendees) {
       const max = parseInt(formData.max_attendees);
       if (isNaN(max) || max < 1 || max > 10000) {
-        newErrors.max_attendees = 'Must be between 1 and 10,000';
+        newErrors.max_attendees = t('form.validation.max_attendees_range');
       }
     }
 
@@ -263,11 +257,11 @@ export function CreateEventPage() {
       setIsUploadingImage(true);
       const response = await api.upload(`/v2/events/${eventId}/image`, imageFile, 'image');
       if (!response.success) {
-        toast.error('Event created but image upload failed');
+        toast.error(t('form.toast.image_failed'));
       }
     } catch (err) {
       logError('Failed to upload event image', err);
-      toast.error('Event created but image upload failed');
+      toast.error(t('form.toast.image_failed'));
     } finally {
       setIsUploadingImage(false);
     }
@@ -320,21 +314,21 @@ export function CreateEventPage() {
           await uploadImage(eventId);
         }
 
-        toast.success(isEditing ? 'Event updated' : 'Event created');
+        toast.success(isEditing ? t('form.toast.updated') : t('form.toast.created'));
         navigate(tenantPath('/events'));
       } else {
-        toast.error(response.error || 'Failed to save event');
+        toast.error(response.error || t('form.toast.error'));
       }
     } catch (error) {
       logError('Failed to save event', error);
-      toast.error('Something went wrong');
+      toast.error(t('form.toast.error'));
     } finally {
       setIsSubmitting(false);
     }
   }
 
   if (isLoading) {
-    return <LoadingScreen message="Loading event..." />;
+    return <LoadingScreen message={t('form.loading')} />;
   }
 
   if (loadError) {
@@ -342,7 +336,7 @@ export function CreateEventPage() {
       <div className="max-w-2xl mx-auto">
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Event</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('form.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <div className="flex justify-center gap-3">
             <Link to={tenantPath("/events")}>
@@ -350,7 +344,7 @@ export function CreateEventPage() {
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
               >
-                Back to Events
+                {t('form.back_to_events')}
               </Button>
             </Link>
             <Button
@@ -358,7 +352,7 @@ export function CreateEventPage() {
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadEvent()}
             >
-              Try Again
+              {t('form.try_again')}
             </Button>
           </div>
         </GlassCard>
@@ -493,8 +487,8 @@ export function CreateEventPage() {
                 label: 'text-theme-muted',
               }}
             >
-              {EVENT_CATEGORIES.map((cat) => (
-                <SelectItem key={cat.id}>{cat.name}</SelectItem>
+              {EVENT_CATEGORY_IDS.map((catId) => (
+                <SelectItem key={catId}>{t(`categories.${catId}`, catId)}</SelectItem>
               ))}
             </Select>
           </div>

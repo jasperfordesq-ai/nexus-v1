@@ -414,6 +414,10 @@ class AdminSuperApiController extends BaseApiController
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s tenant', null, 403);
+        }
+
         $tenant = Tenant::find($user['tenant_id']);
 
         // Flatten: merge user fields with tenant_name at root level
@@ -438,6 +442,10 @@ class AdminSuperApiController extends BaseApiController
         $tenantId = (int) ($input['tenant_id'] ?? 0);
         if (!$tenantId) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'tenant_id is required', 'tenant_id', 422);
+        }
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($tenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
         }
 
         $firstName = trim($input['first_name'] ?? '');
@@ -498,6 +506,10 @@ class AdminSuperApiController extends BaseApiController
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s tenant', null, 403);
+        }
+
         $input = $this->getAllInput();
 
         $firstName = trim($input['first_name'] ?? $user['first_name']);
@@ -543,6 +555,10 @@ class AdminSuperApiController extends BaseApiController
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s tenant', null, 403);
+        }
+
         // Tenant must allow sub-tenants
         $tenant = Tenant::find($user['tenant_id']);
         if (!$tenant || !$tenant['allows_subtenants']) {
@@ -577,6 +593,10 @@ class AdminSuperApiController extends BaseApiController
 
         if (!$user) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+        }
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s tenant', null, 403);
         }
 
         // Cannot revoke from a global super admin unless caller is god
@@ -671,11 +691,19 @@ class AdminSuperApiController extends BaseApiController
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s source tenant', null, 403);
+        }
+
         $input = $this->getAllInput();
         $newTenantId = (int) ($input['new_tenant_id'] ?? 0);
 
         if (!$newTenantId) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'new_tenant_id is required', 'new_tenant_id', 422);
+        }
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($newTenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the destination tenant', null, 403);
         }
 
         $oldTenantId = $user['tenant_id'];
@@ -729,11 +757,19 @@ class AdminSuperApiController extends BaseApiController
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s source tenant', null, 403);
+        }
+
         $input = $this->getAllInput();
         $targetTenantId = (int) ($input['target_tenant_id'] ?? 0);
 
         if (!$targetTenantId) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'target_tenant_id is required', 'target_tenant_id', 422);
+        }
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($targetTenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the target tenant', null, 403);
         }
 
         // Target must be a hub tenant
@@ -1313,6 +1349,10 @@ class AdminSuperApiController extends BaseApiController
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Tenant not found', null, 404);
         }
 
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($tenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+        }
+
         $features = FederationFeatureService::getAllTenantFeatures($tenantId);
         $isWhitelisted = FederationFeatureService::isTenantWhitelisted($tenantId);
         $partnerships = FederationPartnershipService::getTenantPartnerships($tenantId);
@@ -1342,6 +1382,10 @@ class AdminSuperApiController extends BaseApiController
 
         if ($tenantId <= 0) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid tenant ID', 'id', 400);
+        }
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($tenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
         }
 
         $input = $this->getAllInput();
