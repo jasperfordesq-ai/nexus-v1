@@ -11,5 +11,48 @@
   "empty": "Aucune transaction pour l'instant",
   "transfer": "Transférer des crédits",
   "pending_reviews": "Évaluations en attente",
-  "review": "Laisser une évaluation"
+  "review": "Laisser une évaluation",
+  "subtitle": "Suivez vos crédits temps et transactions",
+  "unable_to_load": "Impossible de charger le portefeuille",
+  "try_again": "Réessayer",
+  "your_balance": "Votre solde",
+  "pending_in": "+{{count}}h en attente",
+  "no_pending": "Aucune transaction en attente",
+  "send_credits": "Envoyer des crédits",
+  "history": "Historique des transactions",
+  "export": "Exporter",
+  "load_more": "Charger plus",
+  "no_transactions": "Aucune transaction",
+  "no_transactions_desc": "Votre historique de transactions apparaîtra ici",
+  "stats": {
+    "earned": "Gagnés",
+    "spent": "Dépensés",
+    "pending": "En attente"
+  },
+  "filter": {
+    "all": "Tous",
+    "earned": "Gagnés",
+    "spent": "Dépensés",
+    "pending": "En attente"
+  },
+  "csv": {
+    "date": "Date",
+    "type": "Type",
+    "amount": "Montant",
+    "description": "Description",
+    "other_party": "Autre partie",
+    "status": "Statut",
+    "received": "Reçu",
+    "sent": "Envoyé"
+  },
+  "toast": {
+    "no_data": "Aucune donnée",
+    "no_export": "Aucune transaction à exporter",
+    "load_error": "Erreur",
+    "load_more_error": "Impossible de charger plus de transactions",
+    "exported": "Exporté",
+    "exported_desc": "Transactions exportées en CSV",
+    "transfer_success": "Transfert réussi",
+    "transfer_desc": "{{amount}} heures envoyées à {{recipient}}"
+  }
 }

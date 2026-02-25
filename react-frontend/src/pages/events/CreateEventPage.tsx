@@ -370,28 +370,28 @@ export function CreateEventPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Events', href: tenantPath('/events') },
-        { label: isEditing ? 'Edit Event' : 'New Event' },
+        { label: t('title'), href: tenantPath('/events') },
+        { label: isEditing ? t('form.nav_edit') : t('form.nav_new') },
       ]} />
 
       {/* Form */}
       <GlassCard className="p-6 sm:p-8">
         <h1 className="text-2xl font-bold text-theme-primary mb-6 flex items-center gap-3">
           <Calendar className="w-7 h-7 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-          {isEditing ? 'Edit Event' : 'Create New Event'}
+          {isEditing ? t('form.edit_title') : t('form.create_title')}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Cover Image Upload */}
           <div>
             <label className="block text-sm font-medium text-theme-muted mb-2">
-              Cover Image (optional)
+              {t('form.cover_label')}
             </label>
             {hasImage ? (
               <div className="relative rounded-xl overflow-hidden border border-theme-default">
                 <img
                   src={imagePreview || existingImage || ''}
-                  alt="Event cover preview"
+                  alt={t('form.cover_preview_alt')}
                   className="w-full h-48 object-cover"
                 />
                 <div className="absolute top-2 right-2 flex gap-2">
@@ -400,7 +400,7 @@ export function CreateEventPage() {
                     size="sm"
                     className="bg-black/50 text-white backdrop-blur-sm"
                     onPress={removeImage}
-                    aria-label="Remove image"
+                    aria-label={t('form.remove_image_aria')}
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -412,7 +412,7 @@ export function CreateEventPage() {
                     startContent={<ImagePlus className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={() => fileInputRef.current?.click()}
                   >
-                    Change Image
+                    {t('form.change_image')}
                   </Button>
                 </div>
               </div>
@@ -424,7 +424,7 @@ export function CreateEventPage() {
                 onDragOver={handleDragOver}
                 role="button"
                 tabIndex={0}
-                aria-label="Upload cover image"
+                aria-label={t('form.upload_aria')}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -434,10 +434,10 @@ export function CreateEventPage() {
               >
                 <ImagePlus className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
                 <p className="text-theme-muted font-medium mb-1">
-                  Click to upload or drag and drop
+                  {t('form.upload_label')}
                 </p>
                 <p className="text-theme-subtle text-sm">
-                  JPEG, PNG, WebP, or GIF up to {MAX_IMAGE_SIZE_MB}MB
+                  {t('form.upload_hint', { size: MAX_IMAGE_SIZE_MB })}
                 </p>
               </div>
             )}
@@ -454,8 +454,8 @@ export function CreateEventPage() {
           {/* Title */}
           <div>
             <Input
-              label="Event Title"
-              placeholder="e.g., Community Garden Day, Skill Share Workshop..."
+              label={t('form.title_label')}
+              placeholder={t('form.title_placeholder')}
               value={formData.title}
               onChange={(e) => {
                 setFormData((prev) => ({ ...prev, title: e.target.value }));
@@ -475,9 +475,9 @@ export function CreateEventPage() {
           {/* Category */}
           <div>
             <Select
-              label="Category (optional)"
-              placeholder="Select a category"
-              aria-label="Event category"
+              label={t('form.category_label')}
+              placeholder={t('form.category_placeholder')}
+              aria-label={t('form.category_aria')}
               selectedKeys={formData.category ? [formData.category] : []}
               onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
               startContent={<Tag className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -488,7 +488,7 @@ export function CreateEventPage() {
               }}
             >
               {EVENT_CATEGORY_IDS.map((catId) => (
-                <SelectItem key={catId}>{t(`categories.${catId}`, catId)}</SelectItem>
+                <SelectItem key={catId}>{t(`category.${catId}`)}</SelectItem>
               ))}
             </Select>
           </div>
@@ -496,8 +496,8 @@ export function CreateEventPage() {
           {/* Description */}
           <div>
             <Textarea
-              label="Description"
-              placeholder="Describe your event in detail..."
+              label={t('form.description_label')}
+              placeholder={t('form.description_placeholder')}
               value={formData.description}
               onChange={(e) => {
                 setFormData((prev) => ({ ...prev, description: e.target.value }));
@@ -519,7 +519,7 @@ export function CreateEventPage() {
             <legend className="sr-only">Start date and time</legend>
             <div>
               <DatePicker
-                label="Start Date"
+                label={t('form.start_date_label')}
                 value={formData.startDate}
                 onChange={(val) => {
                   setFormData((prev) => ({ ...prev, startDate: val }));
@@ -537,7 +537,7 @@ export function CreateEventPage() {
 
             <div>
               <TimeInput
-                label="Start Time"
+                label={t('form.start_time_label')}
                 value={formData.startTime}
                 onChange={(val) => {
                   setFormData((prev) => ({ ...prev, startTime: val }));
@@ -558,7 +558,7 @@ export function CreateEventPage() {
             <legend className="sr-only">End date and time (optional)</legend>
             <div>
               <DatePicker
-                label="End Date (optional)"
+                label={t('form.end_date_label')}
                 value={formData.endDate}
                 onChange={(val) => {
                   setFormData((prev) => ({ ...prev, endDate: val }));
@@ -576,7 +576,7 @@ export function CreateEventPage() {
 
             <div>
               <TimeInput
-                label="End Time (optional)"
+                label={t('form.end_time_label')}
                 value={formData.endTime}
                 onChange={(val) => setFormData((prev) => ({ ...prev, endTime: val }))}
                 classNames={{
@@ -591,8 +591,8 @@ export function CreateEventPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <PlaceAutocompleteInput
-                label="Location (optional)"
-                placeholder="e.g., Online, Community Center..."
+                label={t('form.location_label')}
+                placeholder={t('form.location_placeholder')}
                 value={formData.location}
                 onChange={(val) => setFormData((prev) => ({ ...prev, location: val }))}
                 onPlaceSelect={(place) => {
@@ -622,8 +622,8 @@ export function CreateEventPage() {
             <div>
               <Input
                 type="number"
-                label="Max Attendees (optional)"
-                placeholder="Leave empty for unlimited"
+                label={t('form.max_attendees_label')}
+                placeholder={t('form.max_attendees_placeholder')}
                 value={formData.max_attendees}
                 onChange={(e) => {
                   setFormData((prev) => ({ ...prev, max_attendees: e.target.value }));
@@ -656,10 +656,10 @@ export function CreateEventPage() {
               isLoading={isSubmitting || isUploadingImage}
             >
               {isSubmitting && imageFile
-                ? 'Saving & uploading image...'
+                ? t('form.submit_saving')
                 : isEditing
-                  ? 'Update Event'
-                  : 'Create Event'
+                  ? t('form.submit_update')
+                  : t('form.submit_create')
               }
             </Button>
             <Link to={tenantPath("/events")}>
@@ -668,7 +668,7 @@ export function CreateEventPage() {
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
               >
-                Cancel
+                {t('form.cancel')}
               </Button>
             </Link>
           </div>

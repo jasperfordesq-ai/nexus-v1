@@ -76,6 +76,7 @@
     "legal_hub": "Mol Dlíthiúil",
     "terms_of_service": "Téarmaí Seirbhíse",
     "privacy_policy": "Polasaí Príobháideachais",
+    "cookie_policy": "Polasaí Fianán",
     "accessibility": "Inrochtaineacht"
   },
   "admin_tools": {
@@ -117,5 +118,48 @@
     "switch_to_light": "Athraigh go mód solais",
     "switch_to_dark": "Athraigh go mód dorcha"
   },
-  "attribution": "Tógtha ar Project NEXUS le Jasper Ford"
+  "cookie_consent": {
+    "banner_label": "Toiliú fianán",
+    "title": "Úsáidimid fianáin",
+    "description": "Úsáidimid fianáin riachtanacha le haghaidh slándáil agus feidhmiúlacht an ardáin. Cabhraíonn fianáin roghnacha linn d'eispéireas a fheabhsú agus earráidí a rianú.",
+    "learn_more": "Tuilleadh eolais",
+    "essential": "Riachtanach",
+    "essential_desc": "Fíordheimhniú, slándáil, bainistíocht seisiúin",
+    "always_on": "Gníomhach i gcónaí",
+    "analytics": "Anailísíocht",
+    "analytics_desc": "Rianú earráidí, staitisticí úsáide",
+    "preferences": "Sainroghanna",
+    "preferences_desc": "Téama, teanga, socruithe taispeána",
+    "toggle_analytics": "Athraigh fianáin anailísíochta",
+    "toggle_preferences": "Athraigh fianáin sainroghanna",
+    "manage": "Bainistigh sainroghanna",
+    "hide_details": "Folaigh sonraí",
+    "accept_all": "Glac le gach ceann",
+    "essential_only": "Riachtanach amháin",
+    "save": "Sábháil sainroghanna"
+  },
+  "attribution": "Tógtha ar Project NEXUS le Jasper Ford",
+  "members": {
+    "title": "Baill",
+    "subtitle": "Nasc le baill den phobal",
+    "all": "Gach Ball",
+    "new": "Baill Nua",
+    "active": "Is Gníomhaí",
+    "showing": "Ag taispeáint {{shown}} as {{total}} ball",
+    "search_placeholder": "Cuardaigh baill...",
+    "sort_name": "Ainm",
+    "sort_newest": "Is Nuaí",
+    "sort_rated": "Rátáilte is Airde",
+    "sort_active": "Is Gníomhaí",
+    "sort_by": "Sórtáil de réir",
+    "unable_to_load": "Ní féidir Baill a Luchtú",
+    "try_again": "Triail Arís",
+    "no_members": "Gan baill le fáil",
+    "no_members_search": "Bain triail as téarma cuardaigh eile",
+    "no_members_community": "Gan baill sa phobal seo fós",
+    "load_more": "Luchtaigh Tuilleadh",
+    "results_matching": "{{shown}} as {{total}} ball ag meaitseáil \"{{query}}\"",
+    "no_location": "Gan baill le sonraí suíomh",
+    "fallback_name": "Ball"
+  }
 }

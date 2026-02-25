@@ -43,6 +43,7 @@ import {
   ExternalLink,
   Send,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState, LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
@@ -96,6 +97,7 @@ interface Review {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function OrganisationDetailPage() {
+  const { t } = useTranslation('community');
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
@@ -112,7 +114,7 @@ export function OrganisationDetailPage() {
   const [applyMessage, setApplyMessage] = useState('');
   const [isApplying, setIsApplying] = useState(false);
 
-  usePageTitle(organisation?.name ?? 'Organisation');
+  usePageTitle(organisation?.name ?? t('organisation_detail.page_title'));
 
   const loadData = useCallback(async () => {
     if (!id) return;
@@ -130,7 +132,7 @@ export function OrganisationDetailPage() {
       if (orgRes.success && orgRes.data) {
         setOrganisation(orgRes.data as OrganisationDetail);
       } else {
-        setError('Organisation not found.');
+        setError(t('organisation_detail.not_found'));
         return;
       }
 
@@ -144,7 +146,7 @@ export function OrganisationDetailPage() {
       }
     } catch (err) {
       logError('Failed to load organisation', err);
-      setError('Failed to load organisation details. Please try again.');
+      setError(t('organisation_detail.error_load_retry'));
     } finally {
       setIsLoading(false);
     }
@@ -174,19 +176,19 @@ export function OrganisationDetailPage() {
     }
   };
 
-  if (isLoading) return <LoadingScreen message="Loading organisation..." />;
+  if (isLoading) return <LoadingScreen message={t('organisation_detail.loading')} />;
 
   if (error) {
     return (
       <div className="space-y-6">
         <Breadcrumbs items={[
-          { label: 'Volunteering', href: tenantPath('/volunteering') },
-          { label: 'Organisations', href: tenantPath('/organisations') },
-          { label: 'Error' },
+          { label: t('organisation_detail.breadcrumb_volunteering'), href: tenantPath('/volunteering') },
+          { label: t('organisation_detail.breadcrumb_organisations'), href: tenantPath('/organisations') },
+          { label: t('organisation_detail.breadcrumb_error') },
         ]} />
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Organisation</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('organisation_detail.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex gap-3 justify-center">
             <Button
@@ -194,11 +196,11 @@ export function OrganisationDetailPage() {
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadData()}
             >
-              Try Again
+              {t('organisation_detail.try_again')}
             </Button>
             <Link to={tenantPath("/organisations")}>
               <Button variant="flat" className="bg-theme-elevated text-theme-muted">
-                Browse Organisations
+                {t('organisation_detail.browse_organisations')}
               </Button>
             </Link>
           </div>
@@ -215,8 +217,8 @@ export function OrganisationDetailPage() {
     <div className="space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Volunteering', href: tenantPath('/volunteering') },
-        { label: 'Organisations', href: tenantPath('/organisations') },
+        { label: t('organisation_detail.breadcrumb_volunteering'), href: tenantPath('/volunteering') },
+        { label: t('organisation_detail.breadcrumb_organisations'), href: tenantPath('/organisations') },
         { label: organisation.name },
       ]} />
 
@@ -252,7 +254,7 @@ export function OrganisationDetailPage() {
                     startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
                     endContent={<ExternalLink className="w-3 h-3" aria-hidden="true" />}
                   >
-                    Website
+                    {t('organisation_detail.website')}
                   </Button>
                 </a>
               )}
@@ -263,7 +265,7 @@ export function OrganisationDetailPage() {
                     className="bg-theme-elevated text-theme-muted"
                     startContent={<Mail className="w-4 h-4" aria-hidden="true" />}
                   >
-                    Contact
+                    {t('organisation_detail.contact')}
                   </Button>
                 </a>
               )}
@@ -279,7 +281,7 @@ export function OrganisationDetailPage() {
             <Heart className="w-5 h-5 text-rose-400" aria-hidden="true" />
           </div>
           <p className="text-xl font-bold text-theme-primary">{organisation.opportunity_count}</p>
-          <p className="text-xs text-theme-muted">Opportunities</p>
+          <p className="text-xs text-theme-muted">{t('organisation_detail.opportunities')}</p>
         </GlassCard>
 
         <GlassCard className="p-4 text-center">
@@ -287,7 +289,7 @@ export function OrganisationDetailPage() {
             <Users className="w-5 h-5 text-indigo-400" aria-hidden="true" />
           </div>
           <p className="text-xl font-bold text-theme-primary">{organisation.volunteer_count}</p>
-          <p className="text-xs text-theme-muted">Volunteers</p>
+          <p className="text-xs text-theme-muted">{t('organisation_detail.volunteers')}</p>
         </GlassCard>
 
         <GlassCard className="p-4 text-center">
@@ -295,7 +297,7 @@ export function OrganisationDetailPage() {
             <Clock className="w-5 h-5 text-emerald-400" aria-hidden="true" />
           </div>
           <p className="text-xl font-bold text-theme-primary">{organisation.total_hours}</p>
-          <p className="text-xs text-theme-muted">Hours Logged</p>
+          <p className="text-xs text-theme-muted">{t('organisation_detail.hours_logged')}</p>
         </GlassCard>
 
         <GlassCard className="p-4 text-center">
@@ -306,7 +308,7 @@ export function OrganisationDetailPage() {
             {organisation.average_rating ? organisation.average_rating.toFixed(1) : '—'}
           </p>
           <p className="text-xs text-theme-muted">
-            {organisation.review_count > 0 ? `${organisation.review_count} reviews` : 'No reviews'}
+            {organisation.review_count > 0 ? t('organisation_detail.review_count', { count: organisation.review_count }) : t('organisation_detail.no_reviews')}
           </p>
         </GlassCard>
       </div>
@@ -315,7 +317,7 @@ export function OrganisationDetailPage() {
       <div>
         <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
           <Briefcase className="w-5 h-5 text-rose-400" aria-hidden="true" />
-          Active Opportunities
+          {t('organisation_detail.active_opportunities')}
           {activeOpps.length > 0 && (
             <Chip size="sm" variant="flat" className="text-theme-subtle">{activeOpps.length}</Chip>
           )}
@@ -324,8 +326,8 @@ export function OrganisationDetailPage() {
         {activeOpps.length === 0 ? (
           <EmptyState
             icon={<Briefcase className="w-12 h-12" aria-hidden="true" />}
-            title="No active opportunities"
-            description="This organisation has no open volunteer opportunities right now"
+            title={t('organisation_detail.no_active_opportunities')}
+            description={t('organisation_detail.no_opportunities_description')}
           />
         ) : (
           <motion.div
@@ -351,7 +353,7 @@ export function OrganisationDetailPage() {
                       )}
                       {opp.is_remote && (
                         <Chip size="sm" variant="flat" color="primary" startContent={<Globe className="w-3 h-3" />}>
-                          Remote
+                          {t('organisation_detail.remote')}
                         </Chip>
                       )}
                       {opp.start_date && (
@@ -368,7 +370,7 @@ export function OrganisationDetailPage() {
 
                     {opp.has_applied && (
                       <Chip size="sm" color="success" variant="flat" className="mt-2">
-                        Applied
+                        {t('organisation_detail.applied')}
                       </Chip>
                     )}
                   </div>
@@ -384,7 +386,7 @@ export function OrganisationDetailPage() {
                         applyModal.onOpen();
                       }}
                     >
-                      Apply
+                      {t('organisation_detail.apply')}
                     </Button>
                   )}
                 </div>
@@ -399,7 +401,7 @@ export function OrganisationDetailPage() {
         <div>
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Star className="w-5 h-5 text-amber-400" aria-hidden="true" />
-            Reviews
+            {t('organisation_detail.reviews')}
             <Chip size="sm" variant="flat" className="text-theme-subtle">{reviews.length}</Chip>
           </h2>
 
@@ -452,7 +454,7 @@ export function OrganisationDetailPage() {
       }}>
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            Apply to Volunteer
+            {t('organisation_detail.apply_to_volunteer')}
           </ModalHeader>
           <ModalBody className="space-y-4">
             {selectedOpp && (
@@ -462,8 +464,8 @@ export function OrganisationDetailPage() {
               </div>
             )}
             <Textarea
-              label="Cover Message (optional)"
-              placeholder="Tell the organisation why you'd like to volunteer..."
+              label={t('organisation_detail.cover_message_label')}
+              placeholder={t('organisation_detail.cover_message_placeholder')}
               value={applyMessage}
               onChange={(e) => setApplyMessage(e.target.value)}
               classNames={{
@@ -473,14 +475,14 @@ export function OrganisationDetailPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={applyModal.onClose} className="text-theme-muted">Cancel</Button>
+            <Button variant="flat" onPress={applyModal.onClose} className="text-theme-muted">{t('organisation_detail.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleApply}
               isLoading={isApplying}
               startContent={<Send className="w-4 h-4" aria-hidden="true" />}
             >
-              Submit Application
+              {t('organisation_detail.submit_application')}
             </Button>
           </ModalFooter>
         </ModalContent>

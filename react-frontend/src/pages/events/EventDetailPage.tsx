@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
@@ -59,7 +60,8 @@ interface AttendeeWithCheckIn extends User {
 }
 
 export function EventDetailPage() {
-  usePageTitle('Event');
+  const { t } = useTranslation('events');
+  usePageTitle(t('title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -101,14 +103,14 @@ export function EventDetailPage() {
         setEvent(eventRes.data);
         setRsvpStatus(normalizeRsvpStatus(eventRes.data.rsvp_status));
       } else {
-        setError('Event not found or has been removed');
+        setError(t('detail.not_found_desc'));
       }
       if (attendeesRes.success && attendeesRes.data) {
         setAttendees(attendeesRes.data);
       }
     } catch (err) {
       logError('Failed to load event', err);
-      setError('Failed to load event. Please try again.');
+      setError(t('detail.unable_to_load'));
     } finally {
       setIsLoading(false);
     }
@@ -137,13 +139,13 @@ export function EventDetailPage() {
               interested_count: prevStatus === 'interested' ? Math.max(0, (prev.interested_count ?? 1) - 1) : prev.interested_count,
             };
           });
-          toast.success('RSVP removed');
+          toast.success(t('toast.rsvp_removed'));
         } else {
-          toast.error('Failed to cancel RSVP');
+          toast.error(t('toast.rsvp_cancel_failed'));
         }
       } catch (err) {
         logError('Failed to cancel RSVP', err);
-        toast.error('Something went wrong');
+        toast.error(t('toast.something_wrong'));
       } finally {
         setIsSubmitting(false);
       }
@@ -179,17 +181,17 @@ export function EventDetailPage() {
         });
 
         const messages: Record<RsvpOption, string> = {
-          going: "You're going!",
-          interested: "Marked as interested",
-          not_going: "Marked as not going",
+          going: t('toast.rsvp_going'),
+          interested: t('toast.rsvp_interested'),
+          not_going: t('toast.rsvp_not_going'),
         };
         toast.success(messages[newStatus]);
       } else {
-        toast.error('Failed to update RSVP');
+        toast.error(t('toast.rsvp_failed'));
       }
     } catch (err) {
       logError('Failed to update RSVP', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setIsSubmitting(false);
     }
@@ -199,10 +201,10 @@ export function EventDetailPage() {
     const url = window.location.href;
     try {
       await navigator.clipboard.writeText(url);
-      toast.success('Event link copied to clipboard');
+      toast.success(t('toast.share_copied'));
     } catch {
       // Fallback for older browsers
-      toast.error('Failed to copy link');
+      toast.error(t('toast.share_failed'));
     }
   }
 
@@ -213,14 +215,14 @@ export function EventDetailPage() {
       setIsDeleting(true);
       const response = await api.delete(`/v2/events/${event.id}`);
       if (response.success) {
-        toast.success('Event deleted');
+        toast.success(t('toast.deleted'));
         navigate(tenantPath('/events'));
       } else {
-        toast.error('Failed to delete event');
+        toast.error(t('toast.delete_failed'));
       }
     } catch (err) {
       logError('Failed to delete event', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);
@@ -238,13 +240,13 @@ export function EventDetailPage() {
         setAttendees((prev) =>
           prev.map((a) => a.id === attendeeId ? { ...a, checked_in: true } : a)
         );
-        toast.success('Attendee checked in');
+        toast.success(t('toast.checkin_success'));
       } else {
-        toast.error('Failed to check in attendee');
+        toast.error(t('toast.checkin_failed'));
       }
     } catch (err) {
       logError('Failed to check in attendee', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setCheckingInUserId(null);
     }
@@ -255,7 +257,7 @@ export function EventDetailPage() {
   const checkedInCount = attendees.filter((a) => a.checked_in).length;
 
   if (isLoading) {
-    return <LoadingScreen message="Loading event..." />;
+    return <LoadingScreen message={t('detail.loading')} />;
   }
 
   if (error && !event) {
@@ -263,7 +265,7 @@ export function EventDetailPage() {
       <div className="max-w-4xl mx-auto">
         <GlassCard className="p-8 text-center">
           <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Event</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('detail.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex justify-center gap-3">
             <Link to={tenantPath("/events")}>
@@ -271,7 +273,7 @@ export function EventDetailPage() {
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
               >
-                Browse Events
+                {t('detail.browse_events')}
               </Button>
             </Link>
             <Button
@@ -279,7 +281,7 @@ export function EventDetailPage() {
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadEvent()}
             >
-              Try Again
+              {t('detail.try_again')}
             </Button>
           </div>
         </GlassCard>
@@ -291,12 +293,12 @@ export function EventDetailPage() {
     return (
       <EmptyState
         icon={<AlertCircle className="w-12 h-12" aria-hidden="true" />}
-        title="Event Not Found"
-        description="The event you are looking for does not exist"
+        title={t('detail.not_found')}
+        description={t('detail.not_found_desc')}
         action={
           <Link to={tenantPath("/events")}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              Browse Events
+              {t('detail.browse_events')}
             </Button>
           </Link>
         }
@@ -318,8 +320,8 @@ export function EventDetailPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Events', href: tenantPath('/events') },
-        { label: event?.title || 'Event' },
+        { label: t('title'), href: tenantPath('/events') },
+        { label: event?.title || t('title') },
       ]} />
 
       {/* Cover Image */}
@@ -327,7 +329,7 @@ export function EventDetailPage() {
         <div className="rounded-xl overflow-hidden">
           <img
             src={event.cover_image}
-            alt={`Cover for ${event.title}`}
+            alt={t('detail.cover_alt', { title: event.title })}
             className="w-full h-48 sm:h-64 object-cover"
           />
         </div>
@@ -351,7 +353,7 @@ export function EventDetailPage() {
             <div className="flex flex-wrap gap-2">
               {isPast && (
                 <Chip variant="flat" color="default" size="sm">
-                  Past Event
+                  {t('detail.past_event')}
                 </Chip>
               )}
               {event.category_name && (
@@ -371,7 +373,7 @@ export function EventDetailPage() {
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Edit
+                  {t('detail.edit')}
                 </Button>
               </Link>
               <Button
@@ -381,7 +383,7 @@ export function EventDetailPage() {
                 startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => setShowDeleteModal(true)}
               >
-                Delete
+                {t('detail.delete')}
               </Button>
             </div>
           )}
@@ -405,7 +407,7 @@ export function EventDetailPage() {
                     : <XCircle className="w-4 h-4" aria-hidden="true" />
               }
             >
-              {rsvpStatus === 'going' ? "You're Going" : rsvpStatus === 'interested' ? "You're Interested" : "Not Going"}
+              {rsvpStatus === 'going' ? t('detail.rsvp_going') : rsvpStatus === 'interested' ? t('detail.rsvp_interested') : t('detail.rsvp_not_going')}
             </Chip>
           </div>
         )}
@@ -415,19 +417,19 @@ export function EventDetailPage() {
           <div className="flex items-center gap-2 text-sm">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
             <span className="text-theme-primary font-medium">{goingCount}</span>
-            <span className="text-theme-muted">going</span>
+            <span className="text-theme-muted">{t('detail.going_count')}</span>
           </div>
           {interestedCount > 0 && (
             <div className="flex items-center gap-2 text-sm">
               <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
               <span className="text-theme-primary font-medium">{interestedCount}</span>
-              <span className="text-theme-muted">interested</span>
+              <span className="text-theme-muted">{t('detail.interested_count')}</span>
             </div>
           )}
           {event.max_attendees && (
             <div className="flex items-center gap-2 text-sm">
               <div className="w-2.5 h-2.5 rounded-full bg-gray-400" />
-              <span className="text-theme-muted">{event.max_attendees} max capacity</span>
+              <span className="text-theme-muted">{t('detail.max_capacity', { count: event.max_attendees })}</span>
             </div>
           )}
         </div>
@@ -439,7 +441,7 @@ export function EventDetailPage() {
               <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
             </div>
             <div>
-              <div className="text-xs text-theme-subtle">Date</div>
+              <div className="text-xs text-theme-subtle">{t('detail.date_label')}</div>
               <time dateTime={event.start_date} className="text-theme-primary block">
                 {startDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </time>
@@ -451,7 +453,7 @@ export function EventDetailPage() {
               <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
             </div>
             <div>
-              <div className="text-xs text-theme-subtle">Time</div>
+              <div className="text-xs text-theme-subtle">{t('detail.time_label')}</div>
               <div className="text-theme-primary">
                 <time dateTime={event.start_date}>
                   {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -474,7 +476,7 @@ export function EventDetailPage() {
                 <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               </div>
               <div>
-                <div className="text-xs text-theme-subtle">Location</div>
+                <div className="text-xs text-theme-subtle">{t('detail.location_label')}</div>
                 <div className="text-theme-primary">{event.location}</div>
               </div>
             </div>
@@ -484,7 +486,7 @@ export function EventDetailPage() {
         {/* Location Map */}
         {event.location && !event.is_online && event.coordinates?.lat && event.coordinates?.lng && (
           <LocationMapCard
-            title="Event Location"
+            title={t('detail.event_location')}
             locationText={event.location}
             markers={[{
               id: event.id,
@@ -510,12 +512,12 @@ export function EventDetailPage() {
             cursor: 'bg-gradient-to-r from-indigo-500 to-purple-600',
           }}
         >
-          <Tab key="details" title="Details" />
+          <Tab key="details" title={t('detail.tab_details')} />
           <Tab
             key="attendees"
             title={
               <span className="flex items-center gap-2">
-                Attendees
+                {t('detail.tab_attendees')}
                 <Chip size="sm" variant="flat" color="default">{goingCount + interestedCount}</Chip>
               </span>
             }
@@ -526,7 +528,7 @@ export function EventDetailPage() {
               title={
                 <span className="flex items-center gap-2">
                   <ClipboardCheck className="w-4 h-4" aria-hidden="true" />
-                  Check-in
+                  {t('detail.tab_checkin')}
                   {checkedInCount > 0 && (
                     <Chip size="sm" variant="flat" color="success">{checkedInCount}</Chip>
                   )}
@@ -547,7 +549,7 @@ export function EventDetailPage() {
             >
               {/* Description */}
               <div className="mb-8">
-                <h2 className="text-lg font-semibold text-theme-primary mb-3">About this event</h2>
+                <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail.about')}</h2>
                 <div className="prose prose-invert max-w-none">
                   <p className="text-theme-muted whitespace-pre-wrap">{event.description}</p>
                 </div>
@@ -556,7 +558,7 @@ export function EventDetailPage() {
               {/* Organizer */}
               {event.organizer && (
                 <div className="mb-8">
-                  <h2 className="text-lg font-semibold text-theme-primary mb-3">Organized by</h2>
+                  <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail.organized_by')}</h2>
                   <div className="flex items-center gap-3">
                     <Avatar
                       src={resolveAvatarUrl(event.organizer.avatar)}
@@ -575,7 +577,7 @@ export function EventDetailPage() {
                 <div className="mb-8">
                   <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                     <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-                    Attendees
+                    {t('detail.attendees')}
                   </h2>
                   <div className="flex items-center gap-4">
                     <AvatarGroup max={8}>
@@ -591,7 +593,7 @@ export function EventDetailPage() {
                     </AvatarGroup>
                     {(goingCount + interestedCount) > attendees.length && (
                       <span className="text-theme-subtle text-sm">
-                        +{(goingCount + interestedCount) - attendees.length} more
+                        {t('detail.more_attendees', { count: (goingCount + interestedCount) - attendees.length })}
                       </span>
                     )}
                   </div>
@@ -611,7 +613,7 @@ export function EventDetailPage() {
               {attendees.length === 0 ? (
                 <div className="text-center py-8">
                   <Users className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-                  <p className="text-theme-muted">No attendees yet. Be the first to RSVP!</p>
+                  <p className="text-theme-muted">{t('detail.no_attendees')}</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -639,14 +641,14 @@ export function EventDetailPage() {
                         }
                       >
                         {attendee.rsvp_status === 'going' || attendee.rsvp_status === 'attending'
-                          ? 'Going'
+                          ? t('detail.attendee_going')
                           : attendee.rsvp_status === 'interested' || attendee.rsvp_status === 'maybe'
-                            ? 'Interested'
-                            : 'RSVP'}
+                            ? t('detail.attendee_interested')
+                            : t('detail.attendee_rsvp')}
                       </Chip>
                       {attendee.checked_in && (
                         <Chip size="sm" variant="flat" color="success" startContent={<UserCheck className="w-3 h-3" aria-hidden="true" />}>
-                          Checked in
+                          {t('detail.attendee_checked_in')}
                         </Chip>
                       )}
                     </div>
@@ -668,7 +670,7 @@ export function EventDetailPage() {
               <GlassCard className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-theme-muted text-sm">Check-in Progress</p>
+                    <p className="text-theme-muted text-sm">{t('detail.checkin_progress')}</p>
                     <p className="text-2xl font-bold text-theme-primary">
                       {checkedInCount} <span className="text-base font-normal text-theme-muted">/ {goingAttendees.length}</span>
                     </p>
@@ -709,7 +711,7 @@ export function EventDetailPage() {
               {goingAttendees.length === 0 ? (
                 <div className="text-center py-8">
                   <UserCheck className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-                  <p className="text-theme-muted">No attendees to check in yet.</p>
+                  <p className="text-theme-muted">{t('detail.no_checkin_attendees')}</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -732,7 +734,7 @@ export function EventDetailPage() {
                           color="success"
                           startContent={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
                         >
-                          Checked in
+                          {t('detail.attendee_checked_in')}
                         </Chip>
                       ) : (
                         <Button
@@ -742,7 +744,7 @@ export function EventDetailPage() {
                           isLoading={checkingInUserId === attendee.id}
                           onPress={() => handleCheckIn(attendee.id)}
                         >
-                          Check in
+                          {t('detail.check_in')}
                         </Button>
                       )}
                     </div>
@@ -757,7 +759,7 @@ export function EventDetailPage() {
         {isAuthenticated && !isPast && (
           <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-theme-default mt-8">
             {/* RSVP Options */}
-            <div className="flex gap-2" role="group" aria-label="RSVP options">
+            <div className="flex gap-2" role="group" aria-label={t('detail.rsvp_aria')}>
               <Button
                 className={
                   rsvpStatus === 'going'
@@ -769,7 +771,7 @@ export function EventDetailPage() {
                 isLoading={isSubmitting}
                 aria-pressed={rsvpStatus === 'going'}
               >
-                Going
+                {t('detail.going_btn')}
               </Button>
               <Button
                 className={
@@ -782,7 +784,7 @@ export function EventDetailPage() {
                 isLoading={isSubmitting}
                 aria-pressed={rsvpStatus === 'interested'}
               >
-                Interested
+                {t('detail.interested_btn')}
               </Button>
               <Button
                 className={
@@ -796,7 +798,7 @@ export function EventDetailPage() {
                 isLoading={isSubmitting}
                 aria-pressed={rsvpStatus === 'not_going'}
               >
-                Not Going
+                {t('detail.not_going_btn')}
               </Button>
             </div>
 
@@ -807,7 +809,7 @@ export function EventDetailPage() {
               startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
               onPress={handleShare}
             >
-              Share
+              {t('detail.share')}
             </Button>
 
             {/* Online event link */}
@@ -818,7 +820,7 @@ export function EventDetailPage() {
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Event Link
+                  {t('detail.event_link')}
                 </Button>
               </a>
             )}
@@ -838,10 +840,10 @@ export function EventDetailPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Delete Event</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('detail.delete_modal_title')}</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              Are you sure you want to delete &ldquo;{event.title}&rdquo;? This action cannot be undone.
+              {t('detail.delete_confirm', { title: event.title })}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -850,14 +852,14 @@ export function EventDetailPage() {
               className="bg-theme-elevated text-theme-primary"
               onPress={() => setShowDeleteModal(false)}
             >
-              Cancel
+              {t('detail.cancel')}
             </Button>
             <Button
               className="bg-red-500 text-white"
               onPress={handleDelete}
               isLoading={isDeleting}
             >
-              Delete Event
+              {t('detail.delete_confirm_btn')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -29,6 +29,7 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
 import { PlaceAutocompleteInput } from '@/components/location';
+import { useTranslation } from 'react-i18next';
 import { useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -53,12 +54,13 @@ const initialFormData: FormData = {
 };
 
 export function CreateGroupPage() {
-  usePageTitle('Create Group');
   const { id } = useParams<{ id: string }>();
+  const { t } = useTranslation('groups');
+  const isEditing = !!id;
+  usePageTitle(isEditing ? t('form.edit_title') : t('form.create_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const isEditing = !!id;
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
@@ -96,11 +98,11 @@ export function CreateGroupPage() {
           setExistingImage(resolveAssetUrl(imgUrl));
         }
       } else {
-        setLoadError('Group not found');
+        setLoadError(t('form.error_not_found'));
       }
     } catch (error) {
       logError('Failed to load group', error);
-      setLoadError('Failed to load group. Please try again.');
+      setLoadError(t('form.error_load_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -128,13 +130,13 @@ export function CreateGroupPage() {
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Please select a valid image (JPEG, PNG, GIF, or WebP)');
+      toast.error(t('form.toast.image_type'));
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be under 5MB');
+      toast.error(t('form.toast.image_size'));
       return;
     }
 
@@ -169,11 +171,11 @@ export function CreateGroupPage() {
       if (response.success) {
         return true;
       }
-      toast.warning('Group saved but image upload failed. You can try again from group settings.');
+      toast.warning(t('form.toast.image_failed'));
       return false;
     } catch (err) {
       logError('Failed to upload group image', err);
-      toast.warning('Group saved but image upload failed');
+      toast.warning(t('form.toast.image_failed_short'));
       return false;
     } finally {
       setIsUploadingImage(false);
@@ -184,19 +186,19 @@ export function CreateGroupPage() {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Group name is required';
+      newErrors.name = t('form.validation.name_required');
     } else if (formData.name.length < 3) {
-      newErrors.name = 'Name must be at least 3 characters';
+      newErrors.name = t('form.validation.name_min');
     } else if (formData.name.length > 100) {
-      newErrors.name = 'Name must be less than 100 characters';
+      newErrors.name = t('form.validation.name_max');
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = t('form.validation.description_required');
     } else if (formData.description.length < 20) {
-      newErrors.description = 'Description must be at least 20 characters';
+      newErrors.description = t('form.validation.description_min');
     } else if (formData.description.length > 2000) {
-      newErrors.description = 'Description must be less than 2000 characters';
+      newErrors.description = t('form.validation.description_max');
     }
 
     setErrors(newErrors);
@@ -233,14 +235,14 @@ export function CreateGroupPage() {
         if (imageFile && groupId) {
           await uploadGroupImage(groupId);
         }
-        toast.success(isEditing ? 'Group updated' : 'Group created');
+        toast.success(isEditing ? t('form.toast.updated') : t('form.toast.created'));
         navigate(tenantPath('/groups'));
       } else {
-        toast.error(response.error || 'Failed to save group');
+        toast.error(response.error || t('form.toast.save_failed'));
       }
     } catch (error) {
       logError('Failed to save group', error);
-      toast.error('Something went wrong');
+      toast.error(t('form.toast.something_wrong'));
     } finally {
       setIsSubmitting(false);
     }
@@ -256,7 +258,7 @@ export function CreateGroupPage() {
   const displayImage = imagePreview || existingImage;
 
   if (isLoading) {
-    return <LoadingScreen message="Loading group..." />;
+    return <LoadingScreen message={t('form.loading')} />;
   }
 
   if (loadError) {
@@ -264,7 +266,7 @@ export function CreateGroupPage() {
       <div className="max-w-2xl mx-auto">
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Group</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('form.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <div className="flex justify-center gap-3">
             <Link to={tenantPath("/groups")}>
@@ -273,7 +275,7 @@ export function CreateGroupPage() {
                 className="bg-theme-elevated text-theme-primary"
                 startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               >
-                Back to Groups
+                {t('form.back_to_groups')}
               </Button>
             </Link>
             <Button
@@ -281,7 +283,7 @@ export function CreateGroupPage() {
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadGroup()}
             >
-              Try Again
+              {t('form.try_again')}
             </Button>
           </div>
         </GlassCard>
@@ -297,22 +299,22 @@ export function CreateGroupPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Groups', href: tenantPath('/groups') },
-        { label: isEditing ? 'Edit Group' : 'New Group' },
+        { label: t('title'), href: tenantPath('/groups') },
+        { label: isEditing ? t('form.nav_edit') : t('form.nav_new') },
       ]} />
 
       {/* Form */}
       <GlassCard className="p-6 sm:p-8">
         <h1 className="text-2xl font-bold text-theme-primary mb-6 flex items-center gap-3">
           <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-          {isEditing ? 'Edit Group' : 'Create New Group'}
+          {isEditing ? t('form.edit_title') : t('form.create_title')}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Group Image Upload */}
           <div>
             <label className="block text-sm font-medium text-theme-muted mb-2">
-              Group Image
+              {t('form.image_label')}
             </label>
             <div className="flex items-center gap-4">
               {displayImage ? (
@@ -321,14 +323,14 @@ export function CreateGroupPage() {
                     src={displayImage}
                     className="w-20 h-20 ring-2 ring-white/20"
                     radius="lg"
-                    alt="Group image preview"
+                    alt={t('form.image_preview_alt')}
                   />
                   <Button
                     isIconOnly
                     size="sm"
                     variant="flat"
                     className="absolute -top-2 -right-2 bg-red-500/80 text-white rounded-full min-w-6 w-6 h-6"
-                    aria-label="Remove image"
+                    aria-label={t('form.remove_image_aria')}
                     onPress={clearImage}
                   >
                     <X className="w-3 h-3" />
@@ -346,10 +348,10 @@ export function CreateGroupPage() {
                   startContent={<ImagePlus className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => fileInputRef.current?.click()}
                 >
-                  {displayImage ? 'Change Image' : 'Upload Image'}
+                  {displayImage ? t('form.change_image') : t('form.upload_image')}
                 </Button>
                 <p className="text-xs text-theme-subtle mt-1">
-                  JPEG, PNG, GIF, or WebP. Max 5MB.
+                  {t('form.image_hint')}
                 </p>
                 {/* Hidden file input */}
                 <input
@@ -358,7 +360,7 @@ export function CreateGroupPage() {
                   accept="image/jpeg,image/png,image/gif,image/webp"
                   className="hidden"
                   onChange={handleImageSelect}
-                  aria-label="Upload group image"
+                  aria-label={t('form.upload_image_aria')}
                 />
               </div>
             </div>
@@ -367,8 +369,8 @@ export function CreateGroupPage() {
           {/* Group Name */}
           <div>
             <Input
-              label="Group Name"
-              placeholder="e.g., Gardening Enthusiasts, Tech Help..."
+              label={t('form.name_label')}
+              placeholder={t('form.name_placeholder')}
               value={formData.name}
               onChange={(e) => updateField('name', e.target.value)}
               isInvalid={!!errors.name}
@@ -385,8 +387,8 @@ export function CreateGroupPage() {
           {/* Description */}
           <div>
             <Textarea
-              label="Description"
-              placeholder="Describe what your group is about..."
+              label={t('form.description_label')}
+              placeholder={t('form.description_placeholder')}
               value={formData.description}
               onChange={(e) => updateField('description', e.target.value)}
               minRows={4}
@@ -403,8 +405,8 @@ export function CreateGroupPage() {
           {/* Location */}
           <div>
             <PlaceAutocompleteInput
-              label="Location"
-              placeholder="e.g., Dublin, Ireland (optional)"
+              label={t('form.location_label')}
+              placeholder={t('form.location_placeholder')}
               value={formData.location}
               onChange={(val) => updateField('location', val)}
               onPlaceSelect={(place) => {
@@ -442,17 +444,17 @@ export function CreateGroupPage() {
                 )}
                 <div>
                   <p className="font-medium text-theme-primary">
-                    {formData.is_private ? 'Private Group' : 'Public Group'}
+                    {formData.is_private ? t('form.private_group') : t('form.public_group')}
                   </p>
                   <p className="text-sm text-theme-subtle">
                     {formData.is_private
-                      ? 'Only approved members can see posts and join'
-                      : 'Anyone can see posts and join this group'}
+                      ? t('form.private_desc')
+                      : t('form.public_desc')}
                   </p>
                 </div>
               </div>
               <Switch
-                aria-label={formData.is_private ? 'Make group public' : 'Make group private'}
+                aria-label={formData.is_private ? t('form.make_public_aria') : t('form.make_private_aria')}
                 isSelected={formData.is_private}
                 onValueChange={(checked) => updateField('is_private', checked)}
                 classNames={{
@@ -470,7 +472,7 @@ export function CreateGroupPage() {
               startContent={isEditing ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting || isUploadingImage}
             >
-              {isUploadingImage ? 'Uploading image...' : isEditing ? 'Update Group' : 'Create Group'}
+              {isUploadingImage ? t('form.submit_uploading') : isEditing ? t('form.submit_update') : t('form.submit_create')}
             </Button>
             <Button
               type="button"
@@ -478,7 +480,7 @@ export function CreateGroupPage() {
               className="bg-theme-elevated text-theme-primary"
               onPress={() => navigate(tenantPath('/groups'))}
             >
-              Cancel
+              {t('form.cancel')}
             </Button>
           </div>
         </form>

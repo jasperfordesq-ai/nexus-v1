@@ -18,7 +18,12 @@ i18n
     // in LanguageSwitcher which reads from TenantContext. fallbackLng: 'en' ensures
     // graceful fallback for any unsupported locale.
     defaultNS: 'common',
-    ns: ['common'],
+    ns: [
+      'common', 'events', 'groups', 'profile', 'wallet',
+      'exchanges', 'group_exchanges', 'feed', 'notifications',
+      'search_page', 'onboarding', 'gamification', 'blog',
+      'community', 'utility',
+    ],
     debug: import.meta.env.DEV,
 
     interpolation: {

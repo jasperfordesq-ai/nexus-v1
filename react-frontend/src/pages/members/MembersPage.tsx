@@ -26,6 +26,7 @@ import {
   Sparkles,
   TrendingUp,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard, MemberCardSkeleton } from '@/components/ui';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
@@ -45,7 +46,8 @@ const ITEMS_PER_PAGE = 24;
 const SEARCH_DEBOUNCE_MS = 300;
 
 export function MembersPage() {
-  usePageTitle('Members');
+  const { t } = useTranslation('common');
+  usePageTitle(t('members.title'));
   const [searchParams, setSearchParams] = useSearchParams();
   const toast = useToast();
 
@@ -215,10 +217,10 @@ export function MembersPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Users className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-            Members
+            {t('members.title')}
           </h1>
           <p className="text-theme-muted mt-1">
-            Connect with members of the community
+            {t('members.subtitle')}
           </p>
         </div>
       </div>
@@ -237,7 +239,7 @@ export function MembersPage() {
           onPress={() => handleQuickFilter('all')}
           aria-pressed={quickFilter === 'all'}
         >
-          All Members
+          {t('members.all')}
         </Button>
         <Button
           size="sm"
@@ -251,7 +253,7 @@ export function MembersPage() {
           onPress={() => handleQuickFilter('new')}
           aria-pressed={quickFilter === 'new'}
         >
-          New Members
+          {t('members.new')}
         </Button>
         <Button
           size="sm"
@@ -265,7 +267,7 @@ export function MembersPage() {
           onPress={() => handleQuickFilter('active')}
           aria-pressed={quickFilter === 'active'}
         >
-          Most Active
+          {t('members.active')}
         </Button>
 
         {/* Member count */}
@@ -275,7 +277,7 @@ export function MembersPage() {
             size="sm"
             className="bg-theme-elevated text-theme-muted ml-auto"
           >
-            Showing {members.length.toLocaleString()} of {totalCount.toLocaleString()} members
+            {t('members.showing', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString() })}
           </Chip>
         )}
       </div>
@@ -285,11 +287,11 @@ export function MembersPage() {
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <Input
-              placeholder="Search members..."
+              placeholder={t('members.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-              aria-label="Search members by name"
+              aria-label={t('members.search_placeholder')}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -299,21 +301,21 @@ export function MembersPage() {
 
           <div className="flex gap-3">
             <Select
-              placeholder="Sort by"
+              placeholder={t('members.sort_by')}
               selectedKeys={[sortBy]}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
               className="w-36 sm:w-44"
-              aria-label="Sort members by"
+              aria-label={t('members.sort_by')}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
               }}
               startContent={<Filter className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
-              <SelectItem key="name">Name</SelectItem>
-              <SelectItem key="joined">Newest</SelectItem>
-              <SelectItem key="rating">Highest Rated</SelectItem>
-              <SelectItem key="hours_given">Most Active</SelectItem>
+              <SelectItem key="name">{t('members.sort_name')}</SelectItem>
+              <SelectItem key="joined">{t('members.sort_newest')}</SelectItem>
+              <SelectItem key="rating">{t('members.sort_rated')}</SelectItem>
+              <SelectItem key="hours_given">{t('members.sort_active')}</SelectItem>
             </Select>
 
             <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label="View mode">
@@ -361,14 +363,14 @@ export function MembersPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Members</h3>
+          <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('members.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadMembers()}
           >
-            Try Again
+            {t('members.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -385,17 +387,17 @@ export function MembersPage() {
           ) : members.length === 0 ? (
             <EmptyState
               icon={<Users className="w-12 h-12" />}
-              title="No members found"
-              description={debouncedQuery ? 'Try a different search term' : 'No members in this community yet'}
+              title={t('members.no_members')}
+              description={debouncedQuery ? t('members.no_members_search') : t('members.no_members_community')}
             />
           ) : (
             <>
               {/* Results count with search context */}
               {debouncedQuery && (
                 <p className="text-sm text-theme-muted">
-                  {members.length.toLocaleString()}
-                  {totalCount !== null && ` of ${totalCount.toLocaleString()}`} members
-                  {` matching "${debouncedQuery}"`}
+                  {totalCount !== null
+                    ? t('members.results_matching', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString(), query: debouncedQuery })
+                    : `${members.length.toLocaleString()} members matching "${debouncedQuery}"`}
                 </p>
               )}
 
@@ -427,7 +429,7 @@ export function MembersPage() {
                     </div>
                   )}
                   isLoading={isLoading}
-                  emptyMessage="No members with location data"
+                  emptyMessage={t('members.no_location')}
                 />
               ) : (
                 <motion.div
@@ -453,7 +455,7 @@ export function MembersPage() {
                     onPress={loadMoreMembers}
                     isLoading={isLoadingMore}
                   >
-                    Load More
+                    {t('members.load_more')}
                   </Button>
                 </div>
               )}
@@ -471,11 +473,12 @@ interface MemberCardProps {
 }
 
 const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProps) {
+  const { t } = useTranslation('common');
   const { tenantPath } = useTenant();
   // Handle empty names gracefully - fallback to "Member" or first_name/last_name
   const displayName = member.name?.trim()
     || `${member.first_name || ''} ${member.last_name || ''}`.trim()
-    || 'Member';
+    || t('members.fallback_name');
 
   if (viewMode === 'list') {
     return (

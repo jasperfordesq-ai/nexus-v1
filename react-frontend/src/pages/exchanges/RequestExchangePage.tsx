@@ -18,6 +18,7 @@ import {
   Tag,
   Send,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
@@ -30,7 +31,8 @@ import { MAX_EXCHANGE_HOURS } from '@/lib/exchange-status';
 import type { Listing, ExchangeConfig } from '@/types/api';
 
 export function RequestExchangePage() {
-  usePageTitle('Request Exchange');
+  const { t } = useTranslation('exchanges');
+  usePageTitle(t('request.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -67,17 +69,17 @@ export function RequestExchangePage() {
           setProposedHours(estimatedHours.toString());
         }
       } else {
-        setError('Listing not found');
+        setError(t('request.listing_not_found'));
       }
 
       if (configResponse.success && configResponse.data) {
         setConfig(configResponse.data);
         if (!configResponse.data.exchange_workflow_enabled) {
-          setError('Exchange workflow is not enabled');
+          setError(t('request.workflow_not_enabled'));
         }
       }
     } catch (err) {
-      setError('Failed to load listing');
+      setError(t('request.load_failed'));
       logError('Failed to load listing', err);
     } finally {
       setIsLoading(false);
@@ -95,12 +97,12 @@ export function RequestExchangePage() {
 
     const hours = parseFloat(proposedHours);
     if (isNaN(hours) || hours <= 0) {
-      toast.error('Please enter valid hours');
+      toast.error(t('toast.invalid_hours'));
       return;
     }
 
     if (hours > MAX_EXCHANGE_HOURS) {
-      toast.error(`Maximum ${MAX_EXCHANGE_HOURS} hours per exchange`);
+      toast.error(t('toast.max_hours', { max: MAX_EXCHANGE_HOURS }));
       return;
     }
 
@@ -113,11 +115,11 @@ export function RequestExchangePage() {
       });
 
       if (response.success && response.data) {
-        toast.success('Exchange request sent!');
+        toast.success(t('toast.request_sent'));
         navigate(tenantPath(`/exchanges/${response.data.id}`));
       }
     } catch (err) {
-      toast.error('Failed to create exchange request');
+      toast.error(t('toast.request_failed'));
       logError('Failed to create exchange request', err);
     } finally {
       setIsSubmitting(false);
@@ -125,19 +127,19 @@ export function RequestExchangePage() {
   }
 
   if (isLoading) {
-    return <LoadingScreen message="Loading..." />;
+    return <LoadingScreen message={t('request.loading')} />;
   }
 
   if (error || !listing || !config?.exchange_workflow_enabled) {
     return (
       <EmptyState
         icon={<ArrowRightLeft className="w-12 h-12" />}
-        title={error || 'Cannot Request Exchange'}
-        description="This listing is not available for exchange requests."
+        title={error || t('request.cannot_request')}
+        description={t('request.not_available')}
         action={
           <Link to={tenantPath("/listings")}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              Browse Listings
+              {t('browse_listings')}
             </Button>
           </Link>
         }
@@ -150,12 +152,12 @@ export function RequestExchangePage() {
     return (
       <EmptyState
         icon={<ArrowRightLeft className="w-12 h-12" />}
-        title="This is Your Listing"
-        description="You cannot request an exchange for your own listing."
+        title={t('request.own_listing_title')}
+        description={t('request.own_listing_description')}
         action={
           <Link to={tenantPath(`/listings/${listing.id}`)}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              View Listing
+              {t('request.view_listing')}
             </Button>
           </Link>
         }
@@ -171,9 +173,9 @@ export function RequestExchangePage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Listings', href: tenantPath('/listings') },
-        { label: listing?.title || 'Listing', href: id ? tenantPath(`/listings/${id}`) : tenantPath('/listings') },
-        { label: 'Request Exchange' },
+        { label: t('request.breadcrumb_listings'), href: tenantPath('/listings') },
+        { label: listing?.title || t('request.breadcrumb_listing'), href: id ? tenantPath(`/listings/${id}`) : tenantPath('/listings') },
+        { label: t('request.breadcrumb_request') },
       ]} />
 
       {/* Header */}
@@ -182,10 +184,10 @@ export function RequestExchangePage() {
           <ArrowRightLeft className="w-8 h-8 text-emerald-400" aria-hidden="true" />
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">
-          Request Exchange
+          {t('request.title')}
         </h1>
         <p className="text-theme-muted mt-2">
-          Send a request to exchange time credits for this service
+          {t('request.subtitle')}
         </p>
       </div>
 
@@ -194,7 +196,7 @@ export function RequestExchangePage() {
         <div className="flex items-start gap-4">
           <Avatar
             src={resolveAvatarUrl(listing.user?.avatar)}
-            name={listing.user?.name || 'Unknown'}
+            name={listing.user?.name || t('unknown')}
             size="lg"
           />
           <div className="flex-1 min-w-0">
@@ -204,7 +206,7 @@ export function RequestExchangePage() {
             <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-theme-muted">
               <span className="flex items-center gap-1">
                 <User className="w-4 h-4" aria-hidden="true" />
-                {listing.user?.name || 'Unknown'}
+                {listing.user?.name || t('unknown')}
               </span>
               {listing.category_name && (
                 <span className="flex items-center gap-1">
@@ -214,14 +216,14 @@ export function RequestExchangePage() {
               )}
               <span className="flex items-center gap-1">
                 <Clock className="w-4 h-4" aria-hidden="true" />
-                ~{listing.hours_estimate || listing.estimated_hours || '?'} hours
+                {t('request.estimated_hours', { hours: listing.hours_estimate || listing.estimated_hours || '?' })}
               </span>
             </div>
             <span className={`
               inline-block mt-2 text-xs px-2 py-1 rounded-full
               ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}
             `}>
-              {listing.type === 'offer' ? 'Service Offer' : 'Service Request'}
+              {listing.type === 'offer' ? t('request.service_offer') : t('request.service_request')}
             </span>
           </div>
         </div>
@@ -233,16 +235,16 @@ export function RequestExchangePage() {
           <div>
             <Input
               type="number"
-              label="Proposed Hours"
-              placeholder="How many hours do you need?"
+              label={t('request.proposed_hours_label')}
+              placeholder={t('request.proposed_hours_placeholder')}
               value={proposedHours}
               onChange={(e) => setProposedHours(e.target.value)}
               min="0.5"
               max={MAX_EXCHANGE_HOURS}
               step="0.5"
               isRequired
-              endContent={<span className="text-theme-muted">hours</span>}
-              description={`The estimated time for this service (max: ${MAX_EXCHANGE_HOURS})`}
+              endContent={<span className="text-theme-muted">{t('request.hours_unit')}</span>}
+              description={t('request.proposed_hours_description', { max: MAX_EXCHANGE_HOURS })}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -252,13 +254,13 @@ export function RequestExchangePage() {
 
           <div>
             <Textarea
-              label="Message (optional)"
-              placeholder="Add a message to the service provider..."
+              label={t('request.message_label')}
+              placeholder={t('request.message_placeholder')}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               minRows={3}
               maxRows={6}
-              description="Explain your needs or ask any questions"
+              description={t('request.message_description')}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -268,9 +270,9 @@ export function RequestExchangePage() {
 
           {config.require_broker_approval && (
             <div className="bg-amber-500/10 rounded-lg p-4 text-sm">
-              <p className="text-amber-400 font-medium">Broker Approval Required</p>
+              <p className="text-amber-400 font-medium">{t('request.broker_approval_title')}</p>
               <p className="text-theme-muted mt-1">
-                This exchange will need to be approved by a community coordinator before it can proceed.
+                {t('request.broker_approval_description')}
               </p>
             </div>
           )}
@@ -282,7 +284,7 @@ export function RequestExchangePage() {
               className="flex-1 bg-theme-elevated text-theme-primary"
               onClick={() => navigate(tenantPath(id ? `/listings/${id}` : '/listings'))}
             >
-              Cancel
+              {t('request.cancel')}
             </Button>
             <Button
               type="submit"
@@ -290,7 +292,7 @@ export function RequestExchangePage() {
               startContent={<Send className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting}
             >
-              Send Request
+              {t('request.send_request')}
             </Button>
           </div>
         </form>

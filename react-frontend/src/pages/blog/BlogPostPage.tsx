@@ -42,6 +42,7 @@ import {
   Angry,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
@@ -109,12 +110,13 @@ const REACTION_EMOJIS = [
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function BlogPostPage() {
+  const { t } = useTranslation('blog');
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated, user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [post, setPost] = useState<BlogPostDetail | null>(null);
-  usePageTitle(post?.title || 'Blog');
+  usePageTitle(post?.title || t('page_title'));
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -137,11 +139,11 @@ export function BlogPostPage() {
       if (response.success && response.data) {
         setPost(response.data);
       } else {
-        setError('Blog post not found.');
+        setError(t('post.not_found'));
       }
     } catch (err) {
       logError('Failed to load blog post', err);
-      setError('Failed to load this blog post. Please try again.');
+      setError(t('post.error_load'));
     } finally {
       setIsLoading(false);
     }
@@ -200,7 +202,7 @@ export function BlogPostPage() {
           is_own: true,
           author: {
             id: user?.id ?? 0,
-            name: user ? `${user.first_name} ${user.last_name}` : 'You',
+            name: user ? `${user.first_name} ${user.last_name}` : t('post.you'),
             avatar: user?.avatar ?? null,
           },
           reactions: {},
@@ -210,13 +212,13 @@ export function BlogPostPage() {
         setComments((prev) => [optimisticComment, ...prev]);
         setCommentCount((prev) => prev + 1);
         setNewComment('');
-        toast.success('Comment posted!');
+        toast.success(t('post.comment_posted'));
         // Reload to get server data
         loadComments(post.id);
       }
     } catch (err) {
       logError('Failed to submit comment', err);
-      toast.error('Failed to post comment');
+      toast.error(t('post.comment_failed'));
     } finally {
       setIsSubmittingComment(false);
     }
@@ -275,10 +277,10 @@ export function BlogPostPage() {
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
-            {error || 'Post not found'}
+            {error || t('post.not_found')}
           </h2>
           <p className="text-theme-muted mb-4">
-            This post may have been removed or the link may be incorrect.
+            {t('post.not_found_desc')}
           </p>
           <div className="flex gap-3 justify-center">
             <Button
@@ -288,14 +290,14 @@ export function BlogPostPage() {
               className="text-theme-muted"
               startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
             >
-              Back to Blog
+              {t('post.back_to_blog')}
             </Button>
             <Button
               className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={loadPost}
             >
-              Try Again
+              {t('try_again')}
             </Button>
           </div>
         </GlassCard>
@@ -315,7 +317,7 @@ export function BlogPostPage() {
       <article className="max-w-3xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[
-          { label: 'Blog', href: tenantPath('/blog') },
+          { label: t('page_title'), href: tenantPath('/blog') },
           { label: post.title },
         ]} />
 
@@ -380,19 +382,19 @@ export function BlogPostPage() {
 
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" aria-hidden="true" />
-              {post.reading_time} min read
+              {t('post.min_read', { count: post.reading_time })}
             </span>
 
             {post.views > 0 && (
               <span className="flex items-center gap-1">
                 <Eye className="w-4 h-4" aria-hidden="true" />
-                {post.views} views
+                {t('post.views_count', { count: post.views })}
               </span>
             )}
 
             <span className="flex items-center gap-1">
               <MessageCircle className="w-4 h-4" aria-hidden="true" />
-              {commentCount} {commentCount === 1 ? 'comment' : 'comments'}
+              {t('post.comment_count', { count: commentCount })}
             </span>
           </div>
         </motion.div>
@@ -433,21 +435,21 @@ export function BlogPostPage() {
           <GlassCard className="p-6 sm:p-8">
             <h2 className="text-xl font-bold text-theme-primary flex items-center gap-2 mb-6">
               <MessageCircle className="w-5 h-5 text-blue-400" aria-hidden="true" />
-              Comments ({commentCount})
+              {t('post.comments_heading', { count: commentCount })}
             </h2>
 
             {/* Add Comment Form */}
             {isAuthenticated ? (
               <div className="flex items-start gap-3 mb-6">
                 <Avatar
-                  name={user ? `${user.first_name} ${user.last_name}` : 'You'}
+                  name={user ? `${user.first_name} ${user.last_name}` : t('post.you')}
                   src={resolveAvatarUrl(user?.avatar)}
                   size="sm"
                   className="mt-1 flex-shrink-0"
                 />
                 <div className="flex-1">
                   <Textarea
-                    placeholder="Share your thoughts..."
+                    placeholder={t('post.comment_placeholder')}
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     minRows={2}
@@ -466,14 +468,14 @@ export function BlogPostPage() {
                       isDisabled={!newComment.trim()}
                       startContent={<Send className="w-4 h-4" aria-hidden="true" />}
                     >
-                      Post Comment
+                      {t('post.post_comment')}
                     </Button>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-4 mb-6 bg-theme-elevated rounded-xl">
-                <p className="text-sm text-theme-muted mb-2">Sign in to join the conversation</p>
+                <p className="text-sm text-theme-muted mb-2">{t('post.sign_in_prompt')}</p>
                 <Button
                   as={Link}
                   to={tenantPath("/login")}
@@ -481,7 +483,7 @@ export function BlogPostPage() {
                   variant="flat"
                   className="text-indigo-500"
                 >
-                  Sign In
+                  {t('post.sign_in')}
                 </Button>
               </div>
             )}
@@ -503,7 +505,7 @@ export function BlogPostPage() {
             ) : comments.length === 0 ? (
               <div className="text-center py-8">
                 <MessageCircle className="w-10 h-10 text-theme-subtle mx-auto mb-3 opacity-50" aria-hidden="true" />
-                <p className="text-sm text-theme-subtle">No comments yet. Be the first to share your thoughts!</p>
+                <p className="text-sm text-theme-subtle">{t('post.no_comments')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -532,7 +534,7 @@ export function BlogPostPage() {
             className="bg-theme-elevated text-theme-muted"
             startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
           >
-            Back to Blog
+            {t('post.back_to_blog')}
           </Button>
         </div>
       </article>
@@ -561,6 +563,7 @@ function CommentItem({
   onReplySubmitted,
   depth = 0,
 }: CommentItemProps) {
+  const { t } = useTranslation('blog');
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [showReplies, setShowReplies] = useState(depth === 0);
@@ -587,12 +590,12 @@ function CommentItem({
       if (response.success) {
         setReplyContent('');
         setShowReplyInput(false);
-        toast.success('Reply posted!');
+        toast.success(t('post.reply_posted'));
         onReplySubmitted();
       }
     } catch (err) {
       logError('Failed to submit reply', err);
-      toast.error('Failed to post reply');
+      toast.error(t('post.reply_failed'));
     } finally {
       setIsSubmittingReply(false);
     }
@@ -628,7 +631,7 @@ function CommentItem({
                 {comment.author.name}
               </Link>
               {comment.edited && (
-                <span className="text-xs text-theme-subtle">(edited)</span>
+                <span className="text-xs text-theme-subtle">{t('post.edited')}</span>
               )}
             </div>
             <p className="text-sm text-theme-muted whitespace-pre-wrap">{comment.content}</p>
@@ -674,7 +677,7 @@ function CommentItem({
                   size="sm"
                   className="text-xs text-theme-subtle p-0 min-w-0 h-auto hover:text-indigo-400"
                   onPress={() => setShowEmojiPicker(!showEmojiPicker)}
-                  aria-label="Add reaction"
+                  aria-label={t('post.aria_add_reaction')}
                 >
                   <Smile className="w-3.5 h-3.5" aria-hidden="true" />
                 </Button>
@@ -699,7 +702,7 @@ function CommentItem({
                               onReaction(comment.id, r.emoji);
                               setShowEmojiPicker(false);
                             }}
-                            aria-label={r.label}
+                            aria-label={t('post.reaction_' + r.emoji)}
                           >
                             <IconComp className="w-4 h-4" />
                           </Button>
@@ -720,7 +723,7 @@ function CommentItem({
                 onPress={() => setShowReplyInput(!showReplyInput)}
                 startContent={<Reply className="w-3.5 h-3.5" aria-hidden="true" />}
               >
-                Reply
+                {t('post.reply')}
               </Button>
             )}
 
@@ -737,7 +740,7 @@ function CommentItem({
                     : <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
                 }
               >
-                {showReplies ? 'Hide' : `${comment.replies.length}`} {comment.replies.length === 1 ? 'reply' : 'replies'}
+                {showReplies ? t('post.hide') : t('post.reply_count', { count: comment.replies.length })}
               </Button>
             )}
           </div>
@@ -753,14 +756,14 @@ function CommentItem({
               >
                 <div className="flex items-start gap-2">
                   <Avatar
-                    name={currentUser ? `${currentUser.first_name ?? ''} ${currentUser.last_name ?? ''}`.trim() || 'You' : 'You'}
+                    name={currentUser ? `${currentUser.first_name ?? ''} ${currentUser.last_name ?? ''}`.trim() || t('post.you') : t('post.you')}
                     src={resolveAvatarUrl(currentUser?.avatar)}
                     size="sm"
                     className="w-6 h-6 mt-1 flex-shrink-0"
                   />
                   <div className="flex-1">
                     <Input
-                      placeholder={`Reply to ${comment.author.name}...`}
+                      placeholder={t('post.reply_to', { name: comment.author.name })}
                       value={replyContent}
                       onChange={(e) => setReplyContent(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmitReply()}
@@ -778,7 +781,7 @@ function CommentItem({
                           onPress={handleSubmitReply}
                           isDisabled={!replyContent.trim() || isSubmittingReply}
                           isLoading={isSubmittingReply}
-                          aria-label="Send reply"
+                          aria-label={t('post.aria_send_reply')}
                         >
                           <Send className="w-4 h-4" />
                         </Button>

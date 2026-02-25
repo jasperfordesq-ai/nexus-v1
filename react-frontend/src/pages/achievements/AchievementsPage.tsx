@@ -45,6 +45,7 @@ import {
   Zap,
   Package,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
@@ -140,6 +141,7 @@ interface DailyRewardStatus {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function DailyRewardWidget() {
+  const { t } = useTranslation('gamification');
   const toast = useToast();
   const [status, setStatus] = useState<DailyRewardStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -170,7 +172,7 @@ function DailyRewardWidget() {
       const res = await api.post<{ xp_earned: number; new_streak: number }>('/v2/gamification/daily-reward');
       if (res.success) {
         setJustClaimed(true);
-        toast.success('Daily Reward Claimed!', `You earned ${status?.reward_xp ?? 0} XP!`);
+        toast.success(t('achievements.daily_reward.claimed_title'), t('achievements.daily_reward.claimed_message', { xp: status?.reward_xp ?? 0 }));
         // Update status
         setStatus((prev) =>
           prev
@@ -184,11 +186,11 @@ function DailyRewardWidget() {
         // Reset animation after 2s
         setTimeout(() => setJustClaimed(false), 2000);
       } else {
-        toast.error('Claim Failed', res.error ?? 'Could not claim daily reward.');
+        toast.error(t('achievements.daily_reward.claim_failed'), res.error ?? t('achievements.daily_reward.claim_failed_desc'));
       }
     } catch (err) {
       logError('Failed to claim daily reward', err);
-      toast.error('Claim Failed', 'Something went wrong. Please try again.');
+      toast.error(t('achievements.daily_reward.claim_failed'), t('achievements.daily_reward.claim_error'));
     } finally {
       setIsClaiming(false);
     }
@@ -268,22 +270,22 @@ function DailyRewardWidget() {
             </motion.div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-theme-primary">Daily Reward</h3>
+              <h3 className="font-semibold text-theme-primary">{t('achievements.daily_reward.title')}</h3>
               {status.claimed_today ? (
                 <p className="text-sm text-theme-muted">
-                  Come back tomorrow for <strong className="text-amber-400">{status.next_reward_xp} XP</strong>!
+                  {t('achievements.daily_reward.come_back_tomorrow', { xp: status.next_reward_xp })}
                   {status.current_streak > 1 && (
                     <span className="ml-2">
-                      <Zap className="w-3 h-3 inline text-amber-400" aria-hidden="true" /> {status.current_streak} day streak
+                      <Zap className="w-3 h-3 inline text-amber-400" aria-hidden="true" /> {t('achievements.daily_reward.day_streak', { count: status.current_streak })}
                     </span>
                   )}
                 </p>
               ) : (
                 <p className="text-sm text-theme-muted">
-                  Claim <strong className="text-amber-400">{status.reward_xp} XP</strong> today!
+                  {t('achievements.daily_reward.claim_today', { xp: status.reward_xp })}
                   {status.current_streak > 0 && (
                     <span className="ml-2">
-                      <Zap className="w-3 h-3 inline text-amber-400" aria-hidden="true" /> {status.current_streak} day streak
+                      <Zap className="w-3 h-3 inline text-amber-400" aria-hidden="true" /> {t('achievements.daily_reward.day_streak', { count: status.current_streak })}
                     </span>
                   )}
                 </p>
@@ -304,7 +306,7 @@ function DailyRewardWidget() {
                   onPress={claimReward}
                   isDisabled={isClaiming}
                 >
-                  {isClaiming ? 'Claiming...' : 'Claim Reward'}
+                  {isClaiming ? t('achievements.daily_reward.claiming') : t('achievements.daily_reward.claim_reward')}
                 </Button>
               </motion.div>
             ) : (
@@ -313,7 +315,7 @@ function DailyRewardWidget() {
                 variant="flat"
                 startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}
               >
-                Claimed
+                {t('achievements.daily_reward.claimed')}
               </Chip>
             )}
           </div>
@@ -328,6 +330,7 @@ function DailyRewardWidget() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ChallengesTab() {
+  const { t } = useTranslation('gamification');
   const toast = useToast();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -342,11 +345,11 @@ function ChallengesTab() {
       }
     } catch (err) {
       logError('Failed to load challenges', err);
-      toast.error('Load Failed', 'Could not load challenges.');
+      toast.error(t('achievements.challenges.load_failed'), t('achievements.challenges.load_failed_desc'));
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     loadChallenges();
@@ -357,16 +360,16 @@ function ChallengesTab() {
       setClaimingId(challengeId);
       const res = await api.post('/v2/gamification/challenges/' + challengeId + '/claim');
       if (res.success) {
-        toast.success('Reward Claimed!', 'Challenge reward has been added to your XP.');
+        toast.success(t('achievements.challenges.reward_claimed'), t('achievements.challenges.reward_claimed_desc'));
         setChallenges((prev) =>
           prev.map((c) => (c.id === challengeId ? { ...c, status: 'claimed' as const } : c))
         );
       } else {
-        toast.error('Claim Failed', res.error ?? 'Could not claim reward.');
+        toast.error(t('achievements.challenges.claim_failed'), res.error ?? t('achievements.challenges.claim_failed_desc'));
       }
     } catch (err) {
       logError('Failed to claim challenge reward', err);
-      toast.error('Claim Failed', 'Something went wrong.');
+      toast.error(t('achievements.challenges.claim_failed'), t('achievements.challenges.claim_error'));
     } finally {
       setClaimingId(null);
     }
@@ -407,8 +410,8 @@ function ChallengesTab() {
       <div className="mt-4">
         <EmptyState
           icon={<Target className="w-12 h-12" aria-hidden="true" />}
-          title="No active challenges"
-          description="Check back soon for new challenges to complete!"
+          title={t('achievements.challenges.empty_title')}
+          description={t('achievements.challenges.empty_description')}
         />
       </div>
     );
@@ -424,7 +427,7 @@ function ChallengesTab() {
         <div>
           <h3 className="text-lg font-semibold text-theme-primary mb-3 flex items-center gap-2">
             <Target className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-            Active Challenges
+            {t('achievements.challenges.active_challenges')}
           </h3>
           <motion.div
             variants={containerVariants}
@@ -487,7 +490,7 @@ function ChallengesTab() {
         <div>
           <h3 className="text-lg font-semibold text-theme-primary mb-3 flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-emerald-400" aria-hidden="true" />
-            Completed
+            {t('achievements.challenges.completed')}
           </h3>
           <motion.div
             variants={containerVariants}
@@ -519,12 +522,12 @@ function ChallengesTab() {
                             onPress={() => claimReward(challenge.id)}
                             isDisabled={claimingId === challenge.id}
                           >
-                            Claim {challenge.reward_xp} XP
+                            {t('achievements.challenges.claim_xp', { xp: challenge.reward_xp })}
                           </Button>
                         ) : (
                           <Chip size="sm" color="success" variant="flat">
                             <CheckCircle className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                            Claimed
+                            {t('achievements.challenges.claimed')}
                           </Chip>
                         )}
                       </div>
@@ -546,6 +549,7 @@ function ChallengesTab() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function CollectionsTab() {
+  const { t } = useTranslation('gamification');
   const toast = useToast();
   const [collections, setCollections] = useState<BadgeCollection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -559,11 +563,11 @@ function CollectionsTab() {
       }
     } catch (err) {
       logError('Failed to load collections', err);
-      toast.error('Load Failed', 'Could not load collections.');
+      toast.error(t('achievements.collections.load_failed'), t('achievements.collections.load_failed_desc'));
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     loadCollections();
@@ -603,8 +607,8 @@ function CollectionsTab() {
       <div className="mt-4">
         <EmptyState
           icon={<Layers className="w-12 h-12" aria-hidden="true" />}
-          title="No collections available"
-          description="Badge collections will appear here as they become available."
+          title={t('achievements.collections.empty_title')}
+          description={t('achievements.collections.empty_description')}
         />
       </div>
     );
@@ -631,7 +635,7 @@ function CollectionsTab() {
                     <Layers className="w-4 h-4 text-indigo-400" aria-hidden="true" />
                     {collection.name}
                     {collection.completed && (
-                      <Chip size="sm" color="success" variant="flat">Complete</Chip>
+                      <Chip size="sm" color="success" variant="flat">{t('achievements.collections.complete')}</Chip>
                     )}
                   </h4>
                   <p className="text-sm text-theme-muted mt-1">{collection.description}</p>
@@ -657,7 +661,7 @@ function CollectionsTab() {
                 aria-label={`Collection progress: ${progressPct}%`}
               />
               <p className="text-xs text-theme-subtle mb-3">
-                {collection.earned_count} / {collection.total_count} badges collected
+                {t('achievements.collections.badges_collected', { earned: collection.earned_count, total: collection.total_count })}
               </p>
 
               {/* Badge thumbnails */}
@@ -693,6 +697,7 @@ function CollectionsTab() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function XpShopTab({ userXp }: { userXp: number }) {
+  const { t } = useTranslation('gamification');
   const toast = useToast();
   const [items, setItems] = useState<ShopItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -712,11 +717,11 @@ function XpShopTab({ userXp }: { userXp: number }) {
       }
     } catch (err) {
       logError('Failed to load shop', err);
-      toast.error('Load Failed', 'Could not load the XP shop.');
+      toast.error(t('achievements.shop.load_failed'), t('achievements.shop.load_failed_desc'));
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     loadShop();
@@ -724,7 +729,7 @@ function XpShopTab({ userXp }: { userXp: number }) {
 
   const purchaseItem = async (item: ShopItem) => {
     if (currentXp < item.cost_xp) {
-      toast.warning('Not Enough XP', `You need ${item.cost_xp - currentXp} more XP to purchase this item.`);
+      toast.warning(t('achievements.shop.not_enough_xp'), t('achievements.shop.not_enough_xp_desc', { xp: item.cost_xp - currentXp }));
       return;
     }
 
@@ -732,17 +737,17 @@ function XpShopTab({ userXp }: { userXp: number }) {
       setPurchasingId(item.id);
       const res = await api.post('/v2/gamification/shop/purchase', { item_id: item.id });
       if (res.success) {
-        toast.success('Purchase Complete!', `You purchased "${item.name}".`);
+        toast.success(t('achievements.shop.purchase_complete'), t('achievements.shop.purchase_complete_desc', { name: item.name }));
         setItems((prev) =>
           prev.map((i) => (i.id === item.id ? { ...i, owned: true } : i))
         );
         setCurrentXp((prev) => prev - item.cost_xp);
       } else {
-        toast.error('Purchase Failed', res.error ?? 'Could not complete purchase.');
+        toast.error(t('achievements.shop.purchase_failed'), res.error ?? t('achievements.shop.purchase_failed_desc'));
       }
     } catch (err) {
       logError('Failed to purchase shop item', err);
-      toast.error('Purchase Failed', 'Something went wrong.');
+      toast.error(t('achievements.shop.purchase_failed'), t('achievements.shop.purchase_error'));
     } finally {
       setPurchasingId(null);
     }
@@ -785,7 +790,7 @@ function XpShopTab({ userXp }: { userXp: number }) {
         <div className="flex items-center gap-3">
           <Gem className="w-5 h-5 text-indigo-400" aria-hidden="true" />
           <span className="text-theme-primary font-medium">
-            Your balance: <strong className="text-indigo-400">{currentXp.toLocaleString()} XP</strong>
+            {t('achievements.shop.your_balance')}: <strong className="text-indigo-400">{currentXp.toLocaleString()} XP</strong>
           </span>
         </div>
       </GlassCard>
@@ -793,8 +798,8 @@ function XpShopTab({ userXp }: { userXp: number }) {
       {items.length === 0 ? (
         <EmptyState
           icon={<ShoppingBag className="w-12 h-12" aria-hidden="true" />}
-          title="Shop is empty"
-          description="No items available in the XP shop right now. Check back later!"
+          title={t('achievements.shop.empty_title')}
+          description={t('achievements.shop.empty_description')}
         />
       ) : (
         <motion.div
@@ -840,7 +845,7 @@ function XpShopTab({ userXp }: { userXp: number }) {
                       {item.cost_xp.toLocaleString()} XP
                     </Chip>
                     {item.stock !== null && !item.owned && (
-                      <p className="text-xs text-theme-subtle mt-1">{item.stock} left in stock</p>
+                      <p className="text-xs text-theme-subtle mt-1">{t('achievements.shop.stock_left', { count: item.stock })}</p>
                     )}
                   </div>
 
@@ -848,10 +853,10 @@ function XpShopTab({ userXp }: { userXp: number }) {
                   {item.owned ? (
                     <Chip color="success" variant="flat">
                       <CheckCircle className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                      Owned
+                      {t('achievements.shop.owned')}
                     </Chip>
                   ) : !isAvailable ? (
-                    <Chip color="default" variant="flat">Unavailable</Chip>
+                    <Chip color="default" variant="flat">{t('achievements.shop.unavailable')}</Chip>
                   ) : (
                     <Button
                       size="sm"
@@ -870,7 +875,7 @@ function XpShopTab({ userXp }: { userXp: number }) {
                       onPress={() => purchaseItem(item)}
                       isDisabled={!canAfford || purchasingId === item.id}
                     >
-                      {purchasingId === item.id ? 'Buying...' : 'Purchase'}
+                      {purchasingId === item.id ? t('achievements.shop.buying') : t('achievements.shop.purchase')}
                     </Button>
                   )}
                 </GlassCard>
@@ -896,6 +901,7 @@ interface ShowcaseModalProps {
 }
 
 function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseModalProps) {
+  const { t } = useTranslation('gamification');
   const earnedBadges = badges.filter((b) => b.earned_at || b.earned !== false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(
     new Set(badges.filter((b) => b.is_showcased).map((b) => b.badge_key))
@@ -935,16 +941,16 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
           <Star className="w-5 h-5 text-amber-400" aria-hidden="true" />
-          Manage Badge Showcase
+          {t('achievements.showcase.manage_title')}
         </ModalHeader>
         <ModalBody>
           <p className="text-sm text-theme-muted mb-4">
-            Select up to <strong>5 badges</strong> to showcase on your profile. ({selectedKeys.size}/5 selected)
+            {t('achievements.showcase.select_badges', { count: selectedKeys.size })}
           </p>
           {earnedBadges.length === 0 ? (
             <div className="text-center py-8">
               <Medal className="w-10 h-10 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-              <p className="text-theme-muted">You haven&apos;t earned any badges yet.</p>
+              <p className="text-theme-muted">{t('achievements.showcase.no_badges_earned')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1">
@@ -978,7 +984,7 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
                       isSelected={isSelected}
                       isDisabled={isDisabled}
                       onValueChange={() => toggleBadge(badge.badge_key)}
-                      aria-label={`Showcase ${badge.name}`}
+                      aria-label={t('achievements.showcase.showcase_badge', { name: badge.name })}
                       classNames={{
                         wrapper: 'flex-shrink-0',
                       }}
@@ -1003,7 +1009,7 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
         </ModalBody>
         <ModalFooter>
           <Button variant="flat" onPress={onClose} className="text-theme-muted">
-            Cancel
+            {t('achievements.showcase.cancel')}
           </Button>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -1017,7 +1023,7 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
             onPress={() => onSave(Array.from(selectedKeys))}
             isDisabled={isSaving}
           >
-            {isSaving ? 'Saving...' : 'Save Showcase'}
+            {isSaving ? t('achievements.showcase.saving') : t('achievements.showcase.save')}
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -1030,7 +1036,8 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function AchievementsPage() {
-  usePageTitle('Achievements');
+  const { t } = useTranslation('gamification');
+  usePageTitle(t('achievements.page_title'));
   const toast = useToast();
   const [profile, setProfile] = useState<GamificationProfile | null>(null);
   const [badges, setBadges] = useState<BadgeEntry[]>([]);
@@ -1079,7 +1086,7 @@ export function AchievementsPage() {
       setIsSavingShowcase(true);
       const res = await api.put('/v2/gamification/showcase', { badge_keys: badgeKeys });
       if (res.success) {
-        toast.success('Showcase Updated', 'Your badge showcase has been saved.');
+        toast.success(t('achievements.showcase.updated'), t('achievements.showcase.updated_desc'));
         // Update badge showcase state
         setBadges((prev) =>
           prev.map((b) => ({
@@ -1089,11 +1096,11 @@ export function AchievementsPage() {
         );
         setIsShowcaseOpen(false);
       } else {
-        toast.error('Save Failed', res.error ?? 'Could not update showcase.');
+        toast.error(t('achievements.showcase.save_failed'), res.error ?? t('achievements.showcase.save_failed_desc'));
       }
     } catch (err) {
       logError('Failed to save showcase', err);
-      toast.error('Save Failed', 'Something went wrong.');
+      toast.error(t('achievements.showcase.save_failed'), t('achievements.showcase.save_error'));
     } finally {
       setIsSavingShowcase(false);
     }
@@ -1119,23 +1126,23 @@ export function AchievementsPage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Trophy className="w-7 h-7 text-amber-400" aria-hidden="true" />
-          Achievements
+          {t('achievements.title')}
         </h1>
-        <p className="text-theme-muted mt-1">Track your badges, XP, and progress</p>
+        <p className="text-theme-muted mt-1">{t('achievements.subtitle')}</p>
       </div>
 
       {/* Error State */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Achievements</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('achievements.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadData}
           >
-            Try Again
+            {t('achievements.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -1193,9 +1200,9 @@ export function AchievementsPage() {
                         <Sparkles className="w-5 h-5 text-amber-400 absolute -top-1 -right-1" aria-hidden="true" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h2 className="text-lg font-bold text-theme-primary">Level {profile.level}</h2>
+                        <h2 className="text-lg font-bold text-theme-primary">{t('achievements.level', { level: profile.level })}</h2>
                         <p className="text-sm text-theme-muted">
-                          {profile.xp.toLocaleString()} XP total
+                          {t('achievements.xp_total', { xp: profile.xp.toLocaleString() })}
                         </p>
                         <div className="mt-2">
                           <Progress
@@ -1206,10 +1213,10 @@ export function AchievementsPage() {
                               track: 'bg-theme-hover',
                             }}
                             size="sm"
-                            aria-label="Level progress"
+                            aria-label={t('achievements.level_progress_aria')}
                           />
                           <p className="text-xs text-theme-subtle mt-1">
-                            {profile.level_progress.current_xp} / {profile.level_progress.xp_for_next_level} XP to next level
+                            {t('achievements.xp_to_next_level', { current: profile.level_progress.current_xp, next: profile.level_progress.xp_for_next_level })}
                           </p>
                         </div>
                       </div>
@@ -1217,7 +1224,7 @@ export function AchievementsPage() {
                     <div className="flex gap-4">
                       <div className="text-center">
                         <p className="text-2xl font-bold text-amber-400">{profile.badges_count}</p>
-                        <p className="text-xs text-theme-subtle">Badges</p>
+                        <p className="text-xs text-theme-subtle">{t('achievements.badges_label')}</p>
                       </div>
                     </div>
                   </div>
@@ -1228,7 +1235,7 @@ export function AchievementsPage() {
               <Tabs
                 selectedKey={activeTab}
                 onSelectionChange={(key) => setActiveTab(key as string)}
-                aria-label="Achievement sections"
+                aria-label={t('achievements.sections_aria')}
                 classNames={{
                   tabList: 'bg-theme-elevated border border-white/10 rounded-lg p-1',
                   cursor: 'bg-gradient-to-r from-indigo-500 to-purple-600',
@@ -1242,7 +1249,7 @@ export function AchievementsPage() {
                   title={
                     <div className="flex items-center gap-2">
                       <Medal className="w-4 h-4" aria-hidden="true" />
-                      <span>Badges</span>
+                      <span>{t('achievements.tab_badges')}</span>
                     </div>
                   }
                 />
@@ -1251,7 +1258,7 @@ export function AchievementsPage() {
                   title={
                     <div className="flex items-center gap-2">
                       <Target className="w-4 h-4" aria-hidden="true" />
-                      <span>Challenges</span>
+                      <span>{t('achievements.tab_challenges')}</span>
                     </div>
                   }
                 />
@@ -1260,7 +1267,7 @@ export function AchievementsPage() {
                   title={
                     <div className="flex items-center gap-2">
                       <Layers className="w-4 h-4" aria-hidden="true" />
-                      <span>Collections</span>
+                      <span>{t('achievements.tab_collections')}</span>
                     </div>
                   }
                 />
@@ -1269,7 +1276,7 @@ export function AchievementsPage() {
                   title={
                     <div className="flex items-center gap-2">
                       <ShoppingBag className="w-4 h-4" aria-hidden="true" />
-                      <span>XP Shop</span>
+                      <span>{t('achievements.tab_shop')}</span>
                     </div>
                   }
                 />
@@ -1285,8 +1292,8 @@ export function AchievementsPage() {
                         <>
                           <Filter className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
                           <Select
-                            placeholder="Filter by type"
-                            aria-label="Filter badges by type"
+                            placeholder={t('achievements.filter_by_type')}
+                            aria-label={t('achievements.filter_badges_aria')}
                             selectedKeys={[filterType]}
                             onChange={(e) => setFilterType(e.target.value || 'all')}
                             className="w-48"
@@ -1295,7 +1302,7 @@ export function AchievementsPage() {
                               value: 'text-theme-primary',
                             }}
                             items={[
-                              { key: 'all', label: 'All Types' },
+                              { key: 'all', label: t('achievements.all_types') },
                               ...availableTypes.map((t) => ({
                                 key: t,
                                 label: t.charAt(0).toUpperCase() + t.slice(1),
@@ -1314,7 +1321,7 @@ export function AchievementsPage() {
                       startContent={<Star className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => setIsShowcaseOpen(true)}
                     >
-                      Manage Showcase
+                      {t('achievements.manage_showcase')}
                     </Button>
                   </div>
 
@@ -1322,8 +1329,8 @@ export function AchievementsPage() {
                   {filteredBadges.length === 0 ? (
                     <EmptyState
                       icon={<Medal className="w-12 h-12" aria-hidden="true" />}
-                      title="No badges yet"
-                      description="Complete activities and challenges to earn badges!"
+                      title={t('achievements.empty_title')}
+                      description={t('achievements.empty_description')}
                     />
                   ) : (
                     <motion.div
@@ -1345,18 +1352,18 @@ export function AchievementsPage() {
                             {badge.is_showcased && (
                               <Chip size="sm" color="warning" variant="flat" className="mt-2">
                                 <Star className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                                Showcased
+                                {t('achievements.showcased')}
                               </Chip>
                             )}
                             {badge.earned_at && (
                               <p className="text-xs text-theme-subtle mt-2">
-                                Earned {new Date(badge.earned_at).toLocaleDateString()}
+                                {t('achievements.earned_date', { date: new Date(badge.earned_at).toLocaleDateString() })}
                               </p>
                             )}
                             {!badge.earned_at && badge.earned === false && (
                               <div className="flex items-center justify-center gap-1 mt-2 text-xs text-theme-subtle">
                                 <Lock className="w-3 h-3" aria-hidden="true" />
-                                Locked
+                                {t('achievements.locked')}
                               </div>
                             )}
                           </GlassCard>

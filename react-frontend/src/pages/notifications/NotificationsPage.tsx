@@ -25,6 +25,7 @@ import {
   Trash2,
   Settings,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant } from '@/contexts';
@@ -37,7 +38,8 @@ import type { Notification } from '@/types/api';
 type NotificationFilter = 'all' | 'unread';
 
 export function NotificationsPage() {
-  usePageTitle('Notifications');
+  const { t } = useTranslation('notifications');
+  usePageTitle(t('page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -70,7 +72,7 @@ export function NotificationsPage() {
       );
     } catch (error) {
       logError('Failed to mark as read', error);
-      toast.error('Failed to mark notification as read');
+      toast.error(t('toast.mark_read_failed'));
     }
   }
 
@@ -80,10 +82,10 @@ export function NotificationsPage() {
       setNotifications((prev) =>
         prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
       );
-      toast.success('All notifications marked as read');
+      toast.success(t('toast.all_read'));
     } catch (error) {
       logError('Failed to mark all as read', error);
-      toast.error('Failed to mark all as read');
+      toast.error(t('toast.mark_all_failed'));
     }
   }
 
@@ -93,7 +95,7 @@ export function NotificationsPage() {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     } catch (error) {
       logError('Failed to delete notification', error);
-      toast.error('Failed to delete notification');
+      toast.error(t('toast.delete_failed'));
     }
   }
 
@@ -123,14 +125,14 @@ export function NotificationsPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Bell className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-            Notifications
+            {t('title')}
             {unreadCount > 0 && (
               <span className="text-sm px-2 py-1 rounded-full bg-indigo-500 text-white font-medium">
-                {unreadCount} new
+                {t('unread_badge', { count: unreadCount })}
               </span>
             )}
           </h1>
-          <p className="text-theme-muted mt-1">Stay updated with your activity</p>
+          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
         </div>
 
         <div className="flex gap-2">
@@ -142,7 +144,7 @@ export function NotificationsPage() {
               startContent={<CheckCheck className="w-4 h-4" aria-hidden="true" />}
               onClick={markAllAsRead}
             >
-              Mark all read
+              {t('mark_all_read')}
             </Button>
           )}
           <Link to={tenantPath("/settings")}>
@@ -151,7 +153,7 @@ export function NotificationsPage() {
               size="sm"
               className="bg-theme-elevated text-theme-primary"
               isIconOnly
-              aria-label="Notification settings"
+              aria-label={t('settings_aria')}
             >
               <Settings className="w-4 h-4" aria-hidden="true" />
             </Button>
@@ -167,7 +169,7 @@ export function NotificationsPage() {
           className={filter === 'all' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
           onClick={() => setFilter('all')}
         >
-          All
+          {t('filter_all')}
         </Button>
         <Button
           size="sm"
@@ -175,7 +177,7 @@ export function NotificationsPage() {
           className={filter === 'unread' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
           onClick={() => setFilter('unread')}
         >
-          Unread ({unreadCount})
+          {t('filter_unread', { count: unreadCount })}
         </Button>
       </div>
 
@@ -197,8 +199,8 @@ export function NotificationsPage() {
       ) : filteredNotifications.length === 0 ? (
         <EmptyState
           icon={<Bell className="w-12 h-12" />}
-          title={filter === 'unread' ? 'All caught up!' : 'No notifications'}
-          description={filter === 'unread' ? "You've read all your notifications" : "You'll see new notifications here"}
+          title={filter === 'unread' ? t('empty_caught_up') : t('empty_title')}
+          description={filter === 'unread' ? t('empty_caught_up_desc') : t('empty_desc')}
         />
       ) : (
         <motion.div
@@ -229,6 +231,7 @@ interface NotificationCardProps {
 }
 
 function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCardProps) {
+  const { t } = useTranslation('notifications');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const isUnread = !notification.read_at;
@@ -297,7 +300,7 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
               size="sm"
               className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
               onClick={onMarkRead}
-              aria-label="Mark as read"
+              aria-label={t('mark_read_aria')}
             >
               <Check className="w-4 h-4" aria-hidden="true" />
             </Button>
@@ -308,7 +311,7 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
             size="sm"
             className="bg-theme-elevated text-theme-muted hover:text-red-500 dark:hover:text-red-400"
             onClick={onDelete}
-            aria-label="Delete notification"
+            aria-label={t('delete_aria')}
           >
             <Trash2 className="w-4 h-4" aria-hidden="true" />
           </Button>

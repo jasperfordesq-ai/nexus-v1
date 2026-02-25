@@ -76,6 +76,7 @@
     "legal_hub": "Hub juridique",
     "terms_of_service": "Conditions d'utilisation",
     "privacy_policy": "Politique de confidentialité",
+    "cookie_policy": "Politique des cookies",
     "accessibility": "Accessibilité"
   },
   "admin_tools": {
@@ -117,5 +118,48 @@
     "switch_to_light": "Passer en mode clair",
     "switch_to_dark": "Passer en mode sombre"
   },
-  "attribution": "Propulsé par Project NEXUS de Jasper Ford"
+  "cookie_consent": {
+    "banner_label": "Consentement aux cookies",
+    "title": "Nous utilisons des cookies",
+    "description": "Nous utilisons des cookies essentiels pour la sécurité et le fonctionnement de la plateforme. Les cookies optionnels nous aident à améliorer votre expérience et à suivre les erreurs.",
+    "learn_more": "En savoir plus",
+    "essential": "Essentiels",
+    "essential_desc": "Authentification, sécurité, gestion de session",
+    "always_on": "Toujours actifs",
+    "analytics": "Analytique",
+    "analytics_desc": "Suivi des erreurs, statistiques d'utilisation",
+    "preferences": "Préférences",
+    "preferences_desc": "Thème, langue, paramètres d'affichage",
+    "toggle_analytics": "Activer/désactiver les cookies analytiques",
+    "toggle_preferences": "Activer/désactiver les cookies de préférence",
+    "manage": "Gérer les préférences",
+    "hide_details": "Masquer les détails",
+    "accept_all": "Tout accepter",
+    "essential_only": "Essentiels uniquement",
+    "save": "Enregistrer les préférences"
+  },
+  "attribution": "Propulsé par Project NEXUS de Jasper Ford",
+  "members": {
+    "title": "Membres",
+    "subtitle": "Connectez-vous avec les membres de la communauté",
+    "all": "Tous les membres",
+    "new": "Nouveaux membres",
+    "active": "Les plus actifs",
+    "showing": "Affichage de {{shown}} sur {{total}} membres",
+    "search_placeholder": "Rechercher des membres...",
+    "sort_name": "Nom",
+    "sort_newest": "Plus récents",
+    "sort_rated": "Mieux notés",
+    "sort_active": "Les plus actifs",
+    "sort_by": "Trier par",
+    "unable_to_load": "Impossible de charger les membres",
+    "try_again": "Réessayer",
+    "no_members": "Aucun membre trouvé",
+    "no_members_search": "Essayez un autre terme de recherche",
+    "no_members_community": "Aucun membre dans cette communauté pour l'instant",
+    "load_more": "Charger plus",
+    "results_matching": "{{shown}} sur {{total}} membres correspondant à \"{{query}}\"",
+    "no_location": "Aucun membre avec des données de localisation",
+    "fallback_name": "Membre"
+  }
 }

@@ -43,6 +43,7 @@ import {
   X,
   CheckCircle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
@@ -111,7 +112,8 @@ function formatFileSize(bytes: number): string {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function ResourcesPage() {
-  usePageTitle('Resources');
+  const { t } = useTranslation('utility');
+  usePageTitle(t('resources.page_title'));
   const { isAuthenticated } = useAuth();
   const toast = useToast();
   const [resources, setResources] = useState<Resource[]>([]);
@@ -180,11 +182,11 @@ export function ResourcesPage() {
         setHasMore(response.meta?.has_more ?? false);
         setCursor(response.meta?.cursor ?? undefined);
       } else {
-        if (!append) setError('Failed to load resources.');
+        if (!append) setError(t('resources.error_load'));
       }
     } catch (err) {
       logError('Failed to load resources', err);
-      if (!append) setError('Failed to load resources. Please try again.');
+      if (!append) setError(t('resources.error_load_retry'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -201,10 +203,10 @@ export function ResourcesPage() {
   function validateFile(file: File): string | null {
     const ext = file.name.split('.').pop()?.toLowerCase() || '';
     if (!ALLOWED_EXTENSIONS.includes(ext)) {
-      return `File type .${ext} is not allowed. Supported: ${ALLOWED_EXTENSIONS.join(', ')}`;
+      return t('resources.file_type_not_allowed', { ext, supported: ALLOWED_EXTENSIONS.join(', ') });
     }
     if (file.size > MAX_FILE_SIZE) {
-      return `File is too large (${formatFileSize(file.size)}). Maximum size is 10MB.`;
+      return t('resources.file_too_large', { size: formatFileSize(file.size) });
     }
     return null;
   }
@@ -212,7 +214,7 @@ export function ResourcesPage() {
   function handleFileSelect(file: File) {
     const validationError = validateFile(file);
     if (validationError) {
-      toast.error('Invalid file', validationError);
+      toast.error(t('resources.invalid_file'), validationError);
       return;
     }
     setUploadFile(file);
@@ -256,11 +258,11 @@ export function ResourcesPage() {
 
   async function handleUploadSubmit() {
     if (!uploadFile) {
-      toast.error('No file selected', 'Please select a file to upload');
+      toast.error(t('resources.no_file_selected'), t('resources.please_select_file'));
       return;
     }
     if (!uploadTitle.trim()) {
-      toast.error('Title required', 'Please enter a title for the resource');
+      toast.error(t('resources.title_required'), t('resources.please_enter_title'));
       return;
     }
 
@@ -285,18 +287,18 @@ export function ResourcesPage() {
       setUploadProgress(100);
 
       if (response.success) {
-        toast.success('Resource uploaded', 'Your resource has been shared with the community');
+        toast.success(t('resources.upload_success'), t('resources.upload_success_description'));
         uploadModal.onClose();
         resetUploadForm();
         // Reload resources list
         setCursor(undefined);
         loadResources();
       } else {
-        toast.error('Upload failed', response.error || 'Failed to upload resource. Please try again.');
+        toast.error(t('resources.upload_failed'), response.error || t('resources.upload_failed_description'));
       }
     } catch (err) {
       logError('Failed to upload resource', err);
-      toast.error('Upload failed', 'Failed to upload resource. Please try again.');
+      toast.error(t('resources.upload_failed'), t('resources.upload_failed_description'));
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -336,9 +338,9 @@ export function ResourcesPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <FolderOpen className="w-7 h-7 text-amber-400" aria-hidden="true" />
-            Resources
+            {t('resources.heading')}
           </h1>
-          <p className="text-theme-muted mt-1">Shared documents and files for the community</p>
+          <p className="text-theme-muted mt-1">{t('resources.subtitle')}</p>
         </div>
 
         {isAuthenticated && (
@@ -347,7 +349,7 @@ export function ResourcesPage() {
             startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
             onPress={uploadModal.onOpen}
           >
-            Upload Resource
+            {t('resources.upload_resource')}
           </Button>
         )}
       </div>
@@ -356,7 +358,7 @@ export function ResourcesPage() {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 max-w-md">
           <Input
-            placeholder="Search resources..."
+            placeholder={t('resources.search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
@@ -375,7 +377,7 @@ export function ResourcesPage() {
               className={!selectedCategory ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setSelectedCategory(null)}
             >
-              All
+              {t('resources.filter_all')}
             </Button>
             {categories.map((cat) => (
               <Button
@@ -400,14 +402,14 @@ export function ResourcesPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Resources</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('resources.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-amber-500 to-orange-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadResources()}
           >
-            Try Again
+            {t('resources.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -433,11 +435,11 @@ export function ResourcesPage() {
           ) : resources.length === 0 ? (
             <EmptyState
               icon={<FolderOpen className="w-12 h-12" aria-hidden="true" />}
-              title="No resources found"
+              title={t('resources.no_resources_found')}
               description={
                 searchQuery || selectedCategory
-                  ? 'Try different search terms or clear your filters'
-                  : 'No resources have been shared yet'
+                  ? t('resources.try_different_search')
+                  : t('resources.no_resources_shared')
               }
             />
           ) : (
@@ -507,7 +509,7 @@ export function ResourcesPage() {
                           className="bg-theme-elevated text-theme-muted"
                           startContent={<Download className="w-3.5 h-3.5" aria-hidden="true" />}
                         >
-                          Open
+                          {t('resources.open')}
                         </Button>
                       </a>
                     </div>
@@ -523,7 +525,7 @@ export function ResourcesPage() {
                     onPress={() => loadResources(true)}
                     isLoading={isLoadingMore}
                   >
-                    Load More
+                    {t('resources.load_more')}
                   </Button>
                 </div>
               )}
@@ -552,14 +554,14 @@ export function ResourcesPage() {
         <ModalContent>
           <ModalHeader className="text-theme-primary flex items-center gap-2">
             <Upload className="w-5 h-5 text-amber-500" aria-hidden="true" />
-            Upload Resource
+            {t('resources.upload_resource')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               {/* Title */}
               <Input
-                label="Title"
-                placeholder="Resource title"
+                label={t('resources.title_label')}
+                placeholder={t('resources.title_placeholder')}
                 value={uploadTitle}
                 onChange={(e) => setUploadTitle(e.target.value)}
                 isRequired
@@ -569,8 +571,8 @@ export function ResourcesPage() {
 
               {/* Description */}
               <Textarea
-                label="Description"
-                placeholder="Brief description of this resource..."
+                label={t('resources.description_label')}
+                placeholder={t('resources.description_placeholder')}
                 value={uploadDescription}
                 onChange={(e) => setUploadDescription(e.target.value)}
                 minRows={2}
@@ -586,8 +588,8 @@ export function ResourcesPage() {
               {/* Category */}
               {categories.length > 0 && (
                 <Select
-                  label="Category"
-                  placeholder="Select a category"
+                  label={t('resources.category_label')}
+                  placeholder={t('resources.category_placeholder')}
                   selectedKeys={uploadCategoryId ? [uploadCategoryId] : []}
                   onSelectionChange={(keys) => {
                     const value = Array.from(keys)[0] as string;
@@ -608,14 +610,14 @@ export function ResourcesPage() {
 
               {/* File Upload Area */}
               <div>
-                <p className="text-sm text-theme-muted mb-2">File</p>
+                <p className="text-sm text-theme-muted mb-2">{t('resources.file_label')}</p>
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept={ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(',')}
                   onChange={handleFileInputChange}
                   className="hidden"
-                  aria-label="Select file to upload"
+                  aria-label={t('resources.select_file_aria')}
                 />
 
                 {uploadFile ? (
@@ -634,7 +636,7 @@ export function ResourcesPage() {
                       className="text-theme-muted hover:text-red-500 min-w-0 w-8 h-8"
                       onPress={() => setUploadFile(null)}
                       isDisabled={isUploading}
-                      aria-label="Remove file"
+                      aria-label={t('resources.remove_file_aria')}
                     >
                       <X className="w-4 h-4" aria-hidden="true" />
                     </Button>
@@ -660,14 +662,14 @@ export function ResourcesPage() {
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
-                    aria-label="Drop file here or click to browse"
+                    aria-label={t('resources.drop_file_aria')}
                   >
                     <Upload className="w-8 h-8 text-theme-subtle mb-3" aria-hidden="true" />
                     <p className="text-sm font-medium text-theme-primary mb-1">
-                      {isDragging ? 'Drop your file here' : 'Drag and drop or click to browse'}
+                      {isDragging ? t('resources.drop_file_here') : t('resources.drag_and_drop')}
                     </p>
                     <p className="text-xs text-theme-subtle text-center">
-                      PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, JPG, PNG, GIF, SVG (max 10MB)
+                      {t('resources.allowed_file_types')}
                     </p>
                   </div>
                 )}
@@ -686,7 +688,7 @@ export function ResourcesPage() {
                     aria-label="Upload progress"
                   />
                   <p className="text-xs text-theme-subtle text-center">
-                    Uploading... {uploadProgress}%
+                    {t('resources.uploading_progress', { progress: uploadProgress })}
                   </p>
                 </div>
               )}
@@ -702,7 +704,7 @@ export function ResourcesPage() {
               }}
               isDisabled={isUploading}
             >
-              Cancel
+              {t('resources.cancel')}
             </Button>
             <Button
               className="bg-gradient-to-r from-amber-500 to-orange-600 text-white"
@@ -711,7 +713,7 @@ export function ResourcesPage() {
               isLoading={isUploading}
               isDisabled={!uploadFile || !uploadTitle.trim()}
             >
-              Upload
+              {t('resources.upload')}
             </Button>
           </ModalFooter>
         </ModalContent>

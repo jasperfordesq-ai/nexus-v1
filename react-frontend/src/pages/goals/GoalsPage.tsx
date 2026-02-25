@@ -59,6 +59,7 @@ import {
   Sparkles,
   PartyPopper,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
@@ -154,7 +155,8 @@ function ConfettiCelebration({ show }: { show: boolean }) {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function GoalsPage() {
-  usePageTitle('Goals');
+  const { t } = useTranslation('gamification');
+  usePageTitle(t('goals.page_title'));
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -260,12 +262,12 @@ export function GoalsPage() {
       if (response.success) {
         onClose();
         setNewGoal({ title: '', description: '', target_value: 100, deadline: '', is_public: false });
-        toast.success('Goal created!');
+        toast.success(t('goals.toast.created'));
         loadGoals();
       }
     } catch (err) {
       logError('Failed to create goal', err);
-      toast.error('Failed to create goal');
+      toast.error(t('goals.toast.create_failed'));
     } finally {
       setIsCreating(false);
     }
@@ -275,12 +277,12 @@ export function GoalsPage() {
     try {
       const response = await api.post(`/v2/goals/${goalId}/progress`, { increment });
       if (response.success) {
-        toast.success('Progress updated!');
+        toast.success(t('goals.toast.progress_updated'));
         loadGoals();
       }
     } catch (err) {
       logError('Failed to update progress', err);
-      toast.error('Failed to update progress');
+      toast.error(t('goals.toast.progress_failed'));
     }
   };
 
@@ -313,12 +315,12 @@ export function GoalsPage() {
       if (response.success) {
         onEditClose();
         setEditGoal(null);
-        toast.success('Goal updated!');
+        toast.success(t('goals.toast.updated'));
         loadGoals();
       }
     } catch (err) {
       logError('Failed to update goal', err);
-      toast.error('Failed to update goal');
+      toast.error(t('goals.toast.update_failed'));
     } finally {
       setIsSavingEdit(false);
     }
@@ -341,11 +343,11 @@ export function GoalsPage() {
         onDeleteClose();
         setGoals((prev) => prev.filter((g) => g.id !== deleteGoal.id));
         setDeleteGoal(null);
-        toast.success('Goal deleted');
+        toast.success(t('goals.toast.deleted'));
       }
     } catch (err) {
       logError('Failed to delete goal', err);
-      toast.error('Failed to delete goal');
+      toast.error(t('goals.toast.delete_failed'));
     } finally {
       setIsDeleting(false);
     }
@@ -366,13 +368,13 @@ export function GoalsPage() {
               : g
           )
         );
-        toast.success('Goal completed! Congratulations!');
+        toast.success(t('goals.toast.completed'));
         // Clear celebration after animation
         setTimeout(() => setCelebratingId(null), 2000);
       }
     } catch (err) {
       logError('Failed to complete goal', err);
-      toast.error('Failed to mark goal as complete');
+      toast.error(t('goals.toast.complete_failed'));
     }
   };
 
@@ -382,7 +384,7 @@ export function GoalsPage() {
       const response = await api.post(`/v2/goals/${goal.id}/buddy`, {});
 
       if (response.success) {
-        toast.success('You are now a buddy!');
+        toast.success(t('goals.toast.buddy_joined'));
         // Update local state
         setGoals((prev) =>
           prev.map((g) =>
@@ -394,7 +396,7 @@ export function GoalsPage() {
       }
     } catch (err) {
       logError('Failed to become buddy', err);
-      toast.error('Failed to become buddy');
+      toast.error(t('goals.toast.buddy_failed'));
     }
   };
 
@@ -450,9 +452,9 @@ export function GoalsPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Target className="w-7 h-7 text-emerald-400" aria-hidden="true" />
-            Goals
+            {t('goals.title')}
           </h1>
-          <p className="text-theme-muted mt-1">Set goals and track your progress</p>
+          <p className="text-theme-muted mt-1">{t('goals.subtitle')}</p>
         </div>
         {isAuthenticated && (
           <Button
@@ -460,7 +462,7 @@ export function GoalsPage() {
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={onOpen}
           >
-            New Goal
+            {t('goals.new_goal')}
           </Button>
         )}
       </div>
@@ -473,7 +475,7 @@ export function GoalsPage() {
           onPress={() => setTab('my')}
           startContent={<Target className="w-4 h-4" aria-hidden="true" />}
         >
-          My Goals
+          {t('goals.tab_my')}
         </Button>
         <Button
           variant={tab === 'discover' ? 'solid' : 'flat'}
@@ -481,7 +483,7 @@ export function GoalsPage() {
           onPress={() => setTab('discover')}
           startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
         >
-          Discover
+          {t('goals.tab_discover')}
         </Button>
       </div>
 
@@ -489,14 +491,14 @@ export function GoalsPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Goals</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('goals.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadGoals()}
           >
-            Try Again
+            {t('goals.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -518,15 +520,15 @@ export function GoalsPage() {
           ) : goals.length === 0 ? (
             <EmptyState
               icon={<Target className="w-12 h-12" aria-hidden="true" />}
-              title={tab === 'my' ? 'No goals yet' : 'No goals to discover'}
-              description={tab === 'my' ? 'Create your first goal to start tracking progress' : 'No public goals available right now'}
+              title={tab === 'my' ? t('goals.empty_my_title') : t('goals.empty_discover_title')}
+              description={tab === 'my' ? t('goals.empty_my_description') : t('goals.empty_discover_description')}
               action={
                 tab === 'my' && isAuthenticated && (
                   <Button
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                     onPress={onOpen}
                   >
-                    Create Goal
+                    {t('goals.create_goal')}
                   </Button>
                 )
               }
@@ -566,7 +568,7 @@ export function GoalsPage() {
                     className="bg-theme-elevated text-theme-muted"
                     onPress={() => loadGoals(true)}
                   >
-                    Load More
+                    {t('goals.load_more')}
                   </Button>
                 </div>
               )}
@@ -578,26 +580,26 @@ export function GoalsPage() {
       {/* ─── Create Goal Modal ─── */}
       <Modal isOpen={isOpen} onClose={onClose} size="lg" classNames={modalClasses}>
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Create New Goal</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('goals.modal.create_title')}</ModalHeader>
           <ModalBody className="space-y-4">
             <Input
-              label="Goal Title"
-              placeholder="e.g., Give 10 hours this month"
+              label={t('goals.modal.goal_title_label')}
+              placeholder={t('goals.modal.goal_title_placeholder')}
               value={newGoal.title}
               onChange={(e) => setNewGoal((prev) => ({ ...prev, title: e.target.value }))}
               isRequired
               classNames={inputClasses}
             />
             <Textarea
-              label="Description"
-              placeholder="Describe your goal..."
+              label={t('goals.modal.description_label')}
+              placeholder={t('goals.modal.description_placeholder')}
               value={newGoal.description}
               onChange={(e) => setNewGoal((prev) => ({ ...prev, description: e.target.value }))}
               classNames={inputClasses}
             />
             <Input
               type="number"
-              label="Target Value"
+              label={t('goals.modal.target_value_label')}
               placeholder="100"
               value={String(newGoal.target_value)}
               onChange={(e) => setNewGoal((prev) => ({ ...prev, target_value: parseInt(e.target.value) || 0 }))}
@@ -605,15 +607,15 @@ export function GoalsPage() {
             />
             <Input
               type="date"
-              label="Deadline (optional)"
+              label={t('goals.modal.deadline_label')}
               value={newGoal.deadline}
               onChange={(e) => setNewGoal((prev) => ({ ...prev, deadline: e.target.value }))}
               classNames={inputClasses}
             />
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-theme-primary">Make Public</p>
-                <p className="text-xs text-theme-muted">Others can see and support your goal</p>
+                <p className="text-sm font-medium text-theme-primary">{t('goals.modal.make_public')}</p>
+                <p className="text-xs text-theme-muted">{t('goals.modal.make_public_desc')}</p>
               </div>
               <Switch
                 isSelected={newGoal.is_public}
@@ -622,14 +624,14 @@ export function GoalsPage() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">Cancel</Button>
+            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('goals.modal.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={handleCreate}
               isLoading={isCreating}
               isDisabled={!newGoal.title.trim()}
             >
-              Create Goal
+              {t('goals.create_goal')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -638,26 +640,26 @@ export function GoalsPage() {
       {/* ─── Edit Goal Modal ─── */}
       <Modal isOpen={isEditOpen} onClose={onEditClose} size="lg" classNames={modalClasses}>
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Edit Goal</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('goals.modal.edit_title')}</ModalHeader>
           <ModalBody className="space-y-4">
             <Input
-              label="Goal Title"
-              placeholder="e.g., Give 10 hours this month"
+              label={t('goals.modal.goal_title_label')}
+              placeholder={t('goals.modal.goal_title_placeholder')}
               value={editForm.title}
               onChange={(e) => setEditForm((prev) => ({ ...prev, title: e.target.value }))}
               isRequired
               classNames={inputClasses}
             />
             <Textarea
-              label="Description"
-              placeholder="Describe your goal..."
+              label={t('goals.modal.description_label')}
+              placeholder={t('goals.modal.description_placeholder')}
               value={editForm.description}
               onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))}
               classNames={inputClasses}
             />
             <Input
               type="number"
-              label="Target Value"
+              label={t('goals.modal.target_value_label')}
               placeholder="100"
               value={String(editForm.target_value)}
               onChange={(e) => setEditForm((prev) => ({ ...prev, target_value: parseInt(e.target.value) || 0 }))}
@@ -665,15 +667,15 @@ export function GoalsPage() {
             />
             <Input
               type="date"
-              label="Deadline (optional)"
+              label={t('goals.modal.deadline_label')}
               value={editForm.deadline}
               onChange={(e) => setEditForm((prev) => ({ ...prev, deadline: e.target.value }))}
               classNames={inputClasses}
             />
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-theme-primary">Make Public</p>
-                <p className="text-xs text-theme-muted">Others can see and support your goal</p>
+                <p className="text-sm font-medium text-theme-primary">{t('goals.modal.make_public')}</p>
+                <p className="text-xs text-theme-muted">{t('goals.modal.make_public_desc')}</p>
               </div>
               <Switch
                 isSelected={editForm.is_public}
@@ -682,14 +684,14 @@ export function GoalsPage() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onEditClose} className="text-theme-muted">Cancel</Button>
+            <Button variant="flat" onPress={onEditClose} className="text-theme-muted">{t('goals.modal.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={handleSaveEdit}
               isLoading={isSavingEdit}
               isDisabled={!editForm.title.trim()}
             >
-              Save Changes
+              {t('goals.modal.save_changes')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -698,24 +700,24 @@ export function GoalsPage() {
       {/* ─── Delete Confirmation Modal ─── */}
       <Modal isOpen={isDeleteOpen} onClose={onDeleteClose} size="sm" classNames={modalClasses}>
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Delete Goal</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('goals.modal.delete_title')}</ModalHeader>
           <ModalBody>
             <div className="text-center py-2">
               <Trash2 className="w-12 h-12 text-red-400 mx-auto mb-3" aria-hidden="true" />
               <p className="text-theme-primary font-medium mb-1">
-                Are you sure you want to delete &ldquo;{deleteGoal?.title}&rdquo;?
+                {t('goals.modal.delete_confirm', { title: deleteGoal?.title })}
               </p>
-              <p className="text-sm text-theme-muted">This cannot be undone.</p>
+              <p className="text-sm text-theme-muted">{t('goals.modal.delete_warning')}</p>
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onDeleteClose} className="text-theme-muted">Cancel</Button>
+            <Button variant="flat" onPress={onDeleteClose} className="text-theme-muted">{t('goals.modal.cancel')}</Button>
             <Button
               color="danger"
               onPress={handleDelete}
               isLoading={isDeleting}
             >
-              Delete Goal
+              {t('goals.modal.delete_goal')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -734,18 +736,18 @@ export function GoalsPage() {
                 <div className="flex items-center gap-2 flex-wrap">
                   {detailGoal.status === 'completed' ? (
                     <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle className="w-3 h-3" />}>
-                      Completed
+                      {t('goals.status.completed')}
                     </Chip>
                   ) : (
-                    <Chip size="sm" color="primary" variant="flat">Active</Chip>
+                    <Chip size="sm" color="primary" variant="flat">{t('goals.status.active')}</Chip>
                   )}
                   {detailGoal.is_public ? (
                     <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Globe className="w-3 h-3" />}>
-                      Public
+                      {t('goals.visibility.public')}
                     </Chip>
                   ) : (
                     <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Lock className="w-3 h-3" />}>
-                      Private
+                      {t('goals.visibility.private')}
                     </Chip>
                   )}
                 </div>
@@ -754,14 +756,14 @@ export function GoalsPage() {
                 {/* Description */}
                 {detailGoal.description && (
                   <div>
-                    <h4 className="text-sm font-semibold text-theme-primary mb-1">Description</h4>
+                    <h4 className="text-sm font-semibold text-theme-primary mb-1">{t('goals.detail.description')}</h4>
                     <p className="text-sm text-theme-muted whitespace-pre-wrap">{detailGoal.description}</p>
                   </div>
                 )}
 
                 {/* Progress Visualization */}
                 <div>
-                  <h4 className="text-sm font-semibold text-theme-primary mb-2">Progress</h4>
+                  <h4 className="text-sm font-semibold text-theme-primary mb-2">{t('goals.detail.progress')}</h4>
                   <div className="flex justify-between text-xs text-theme-subtle mb-1">
                     <span>{detailGoal.current_value} / {detailGoal.target_value}</span>
                     <span>{Math.min(100, Math.round(detailGoal.progress_percentage))}%</span>
@@ -775,7 +777,7 @@ export function GoalsPage() {
                       track: 'bg-theme-hover',
                     }}
                     size="lg"
-                    aria-label={`Goal progress: ${Math.round(detailGoal.progress_percentage)}%`}
+                    aria-label={t('goals.detail.progress_aria', { percent: Math.round(detailGoal.progress_percentage) })}
                   />
                 </div>
 
@@ -785,7 +787,7 @@ export function GoalsPage() {
                     <div className="bg-theme-elevated rounded-xl p-3">
                       <div className="flex items-center gap-2 text-xs text-theme-subtle mb-1">
                         <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
-                        Deadline
+                        {t('goals.detail.deadline')}
                       </div>
                       <p className="text-sm text-theme-primary font-medium">
                         {new Date(detailGoal.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -795,7 +797,7 @@ export function GoalsPage() {
                   <div className="bg-theme-elevated rounded-xl p-3">
                     <div className="flex items-center gap-2 text-xs text-theme-subtle mb-1">
                       <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-                      Created
+                      {t('goals.detail.created')}
                     </div>
                     <p className="text-sm text-theme-primary font-medium">
                       {new Date(detailGoal.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -805,7 +807,7 @@ export function GoalsPage() {
                     <div className="bg-theme-elevated rounded-xl p-3">
                       <div className="flex items-center gap-2 text-xs text-theme-subtle mb-1">
                         <Users className="w-3.5 h-3.5" aria-hidden="true" />
-                        Buddy
+                        {t('goals.detail.buddy')}
                       </div>
                       <div className="flex items-center gap-2">
                         <Avatar
@@ -822,7 +824,7 @@ export function GoalsPage() {
                     <div className="bg-theme-elevated rounded-xl p-3">
                       <div className="flex items-center gap-2 text-xs text-theme-subtle mb-1">
                         <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                        Social
+                        {t('goals.detail.social')}
                       </div>
                       <div className="flex items-center gap-3 text-sm text-theme-primary font-medium">
                         {detailGoal.likes_count !== undefined && (
@@ -850,14 +852,14 @@ export function GoalsPage() {
                     />
                     <div>
                       <p className="text-sm font-medium text-theme-primary">{detailGoal.user_name}</p>
-                      <p className="text-xs text-theme-subtle">Goal Owner</p>
+                      <p className="text-xs text-theme-subtle">{t('goals.detail.goal_owner')}</p>
                     </div>
                   </div>
                 )}
 
                 {/* Progress Timeline */}
                 <div>
-                  <h4 className="text-sm font-semibold text-theme-primary mb-3">Progress Timeline</h4>
+                  <h4 className="text-sm font-semibold text-theme-primary mb-3">{t('goals.detail.progress_timeline')}</h4>
                   {isLoadingDetail ? (
                     <div className="space-y-2">
                       {[1, 2, 3].map((i) => (
@@ -890,12 +892,12 @@ export function GoalsPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-theme-subtle text-center py-4">No progress updates recorded yet.</p>
+                    <p className="text-sm text-theme-subtle text-center py-4">{t('goals.detail.no_progress')}</p>
                   )}
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onDetailClose} className="text-theme-muted">Close</Button>
+                <Button variant="flat" onPress={onDetailClose} className="text-theme-muted">{t('goals.modal.close')}</Button>
               </ModalFooter>
             </>
           )}
@@ -934,6 +936,7 @@ function GoalCard({
   onBecomeBuddy,
   onOpenDetail,
 }: GoalCardProps) {
+  const { t } = useTranslation('gamification');
   const isCompleted = goal.status === 'completed' || goal.progress_percentage >= 100;
   const deadlineDate = goal.deadline ? new Date(goal.deadline) : null;
   const isOverdue = deadlineDate && deadlineDate < new Date() && !isCompleted;
@@ -958,21 +961,21 @@ function GoalCard({
             </Button>
             {isCompleted && (
               <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle className="w-3 h-3" />}>
-                Completed
+                {t('goals.status.completed')}
               </Chip>
             )}
             {goal.is_public ? (
               <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Globe className="w-3 h-3" />}>
-                Public
+                {t('goals.visibility.public')}
               </Chip>
             ) : (
               <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Lock className="w-3 h-3" />}>
-                Private
+                {t('goals.visibility.private')}
               </Chip>
             )}
             {isBuddy && (
               <Chip size="sm" color="secondary" variant="flat" startContent={<Users className="w-3 h-3" />}>
-                You&apos;re a buddy!
+                {t('goals.youre_a_buddy')}
               </Chip>
             )}
           </div>
@@ -996,7 +999,7 @@ function GoalCard({
                 track: 'bg-theme-hover',
               }}
               size="md"
-              aria-label={`Goal progress: ${Math.round(goal.progress_percentage)}%`}
+              aria-label={t('goals.detail.progress_aria', { percent: Math.round(goal.progress_percentage) })}
             />
           </div>
 
@@ -1005,13 +1008,13 @@ function GoalCard({
             {deadlineDate && (
               <span className={`flex items-center gap-1 ${isOverdue ? 'text-red-400' : ''}`}>
                 <Calendar className="w-3 h-3" aria-hidden="true" />
-                {isOverdue ? 'Overdue: ' : 'Due: '}{deadlineDate.toLocaleDateString()}
+                {isOverdue ? t('goals.overdue') : t('goals.due')}{deadlineDate.toLocaleDateString()}
               </span>
             )}
             {goal.buddy_name && (
               <span className="flex items-center gap-1">
                 <Users className="w-3 h-3" aria-hidden="true" />
-                Buddy: {goal.buddy_name}
+                {t('goals.buddy_label')}: {goal.buddy_name}
               </span>
             )}
             {!isOwner && (
@@ -1042,13 +1045,13 @@ function GoalCard({
                   size="sm"
                   variant="light"
                   className="text-theme-muted"
-                  aria-label="Goal actions"
+                  aria-label={t('goals.actions_aria')}
                 >
                   <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
-                aria-label="Goal actions"
+                aria-label={t('goals.actions_aria')}
                 onAction={(key) => {
                   if (key === 'edit') onEdit(goal);
                   if (key === 'delete') onDelete(goal);
@@ -1058,7 +1061,7 @@ function GoalCard({
                   key="edit"
                   startContent={<Edit3 className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Edit
+                  {t('goals.action_edit')}
                 </DropdownItem>
                 <DropdownItem
                   key="delete"
@@ -1066,7 +1069,7 @@ function GoalCard({
                   color="danger"
                   startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Delete
+                  {t('goals.action_delete')}
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -1093,7 +1096,7 @@ function GoalCard({
               startContent={<Award className="w-4 h-4" aria-hidden="true" />}
               onPress={() => onComplete(goal)}
             >
-              Mark Complete
+              {t('goals.mark_complete')}
             </Button>
           )}
 
@@ -1106,7 +1109,7 @@ function GoalCard({
               startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => onBecomeBuddy(goal)}
             >
-              Become Buddy
+              {t('goals.become_buddy')}
             </Button>
           )}
         </div>
