@@ -22,7 +22,7 @@ i18n
       'common', 'events', 'groups', 'profile', 'wallet',
       'exchanges', 'group_exchanges', 'feed', 'notifications',
       'search_page', 'onboarding', 'gamification', 'blog',
-      'community', 'utility', 'public',
+      'community', 'utility', 'public', 'legal', 'about',
     ],
     debug: import.meta.env.DEV,
 
