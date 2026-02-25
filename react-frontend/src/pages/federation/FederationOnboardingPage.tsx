@@ -153,18 +153,10 @@ export function FederationOnboardingPage() {
     try {
       setIsSubmitting(true);
 
-      // 1. Opt in
-      const optInResponse = await api.post('/v2/federation/opt-in');
-      if (!optInResponse.success) {
-        toast.error('Setup failed', optInResponse.error || 'Failed to enable federation.');
-        return;
-      }
-
-      // 2. Save settings
-      const settingsResponse = await api.put('/v2/federation/settings', settings);
-      if (!settingsResponse.success) {
-        toast.error('Settings save failed', settingsResponse.error || 'Federation enabled, but settings could not be saved.');
-        navigate(tenantPath('/federation'));
+      // Single atomic request: opt in + save settings together
+      const response = await api.post('/v2/federation/setup', settings);
+      if (!response.success) {
+        toast.error('Setup failed', response.error || 'Failed to enable federation.');
         return;
       }
 

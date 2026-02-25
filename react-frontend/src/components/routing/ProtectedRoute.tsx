@@ -51,7 +51,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     !user.avatar_url ||
     !user.bio
   );
-  if (needsOnboarding && lastSegment !== 'onboarding' && lastSegment !== 'settings') {
+  if (needsOnboarding && lastSegment !== 'onboarding') {
     return <Navigate to={tenantPath('/onboarding')} replace />;
   }
 
