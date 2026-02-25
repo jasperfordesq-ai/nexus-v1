@@ -49,6 +49,16 @@ export function PageBuilder() {
   });
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(isEdit);
+
+  const toSlug = (text: string): string =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
 
   useEffect(() => {
     if (isEdit) {
@@ -80,6 +90,10 @@ export function PageBuilder() {
   const handleSave = async () => {
     if (!formData.title.trim()) {
       toast.warning('Page title is required');
+      return;
+    }
+    if (!formData.slug.trim() || formData.slug !== toSlug(formData.slug)) {
+      toast.warning('Slug must be URL-safe (lowercase letters, numbers, and hyphens only)');
       return;
     }
     setSaving(true);
@@ -153,15 +167,21 @@ export function PageBuilder() {
               isRequired
               variant="bordered"
               value={formData.title}
-              onValueChange={(v) => handleChange('title', v)}
+              onValueChange={(v) => {
+                handleChange('title', v);
+                if (!slugTouched) handleChange('slug', toSlug(v));
+              }}
             />
             <Input
               label="URL Slug"
               placeholder="e.g., about-us"
               variant="bordered"
-              description="The URL path for this page (e.g. /page/about-us)"
+              description="The URL path for this page (e.g. /page/about-us). Auto-generated from title."
               value={formData.slug}
-              onValueChange={(v) => handleChange('slug', v)}
+              onValueChange={(v) => {
+                setSlugTouched(true);
+                handleChange('slug', toSlug(v));
+              }}
             />
             <RichTextEditor
               label="Page Content"
