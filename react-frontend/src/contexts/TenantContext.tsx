@@ -290,23 +290,17 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     [state.tenant]
   );
 
-  // After tenant data loads, apply default language if user hasn't chosen one
-  // and browser language isn't in the supported list
+  // After tenant data loads, apply tenant default language if user hasn't
+  // explicitly chosen one via the language switcher (no localStorage).
+  // Tenant default takes priority over browser detection for new visitors.
   useEffect(() => {
     if (!state.tenant) return;
 
     const tenantDefault = state.tenant.default_language ?? 'en';
     const userChosen = localStorage.getItem('nexus_language');
 
-    // Only apply tenant default if user hasn't explicitly chosen a language
-    if (!userChosen && tenantDefault !== 'en') {
-      const currentLang = i18n.language;
-      const supported = state.tenant.supported_languages ?? ['en', 'ga'];
-
-      // If browser language isn't in supported list, use tenant default
-      if (!supported.includes(currentLang)) {
-        i18n.changeLanguage(tenantDefault);
-      }
+    if (!userChosen && i18n.language !== tenantDefault) {
+      i18n.changeLanguage(tenantDefault);
     }
   }, [state.tenant]);
 
