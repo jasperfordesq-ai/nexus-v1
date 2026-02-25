@@ -35,6 +35,7 @@ import {
   Car,
   Home,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
@@ -61,11 +62,7 @@ const SERVICE_REACH_OPTIONS: { key: ServiceReachFilter; label: string; icon: typ
   { key: 'travel_ok', label: 'Will Travel', icon: Car },
 ];
 
-const SERVICE_REACH_LABELS: Record<string, string> = {
-  local_only: 'Local Only',
-  remote_ok: 'Remote OK',
-  travel_ok: 'Will Travel',
-};
+
 
 const SERVICE_REACH_ICONS: Record<string, typeof Home> = {
   local_only: Home,
@@ -78,7 +75,8 @@ const SERVICE_REACH_ICONS: Record<string, typeof Home> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function FederationMembersPage() {
-  usePageTitle('Federated Members');
+  const { t } = useTranslation('federation');
+  usePageTitle(t('members.page_title'));
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { hasFeature, tenantPath } = useTenant();
@@ -88,7 +86,7 @@ export function FederationMembersPage() {
   const federationEnabled = hasFeature('federation');
   useEffect(() => {
     if (!federationEnabled) {
-      toast.warning('Federation is not enabled for your community.');
+      toast.warning(t('members.federation_not_enabled'));
       navigate(tenantPath('/federation'), { replace: true });
     }
   }, [federationEnabled, navigate, toast]);
@@ -188,17 +186,17 @@ export function FederationMembersPage() {
         }
       } else {
         if (!append) {
-          setError('Failed to load federated members. Please try again.');
+          setError(t('members.load_error'));
         } else {
-          toast.error('Failed to load more members');
+          toast.error(t('members.load_more_error'));
         }
       }
     } catch (err) {
       logError('Failed to load federated members', err);
       if (!append) {
-        setError('Failed to load federated members. Please try again.');
+        setError(t('members.load_error'));
       } else {
-        toast.error('Failed to load more members');
+        toast.error(t('members.load_more_error'));
       }
     } finally {
       setIsLoading(false);
@@ -254,8 +252,8 @@ export function FederationMembersPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Federation', href: tenantPath('/federation') },
-          { label: 'Members' },
+          { label: t('members.breadcrumb_federation'), href: tenantPath('/federation') },
+          { label: t('members.breadcrumb_members') },
         ]}
       />
 
@@ -263,10 +261,10 @@ export function FederationMembersPage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Globe className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-          Federated Members
+          {t('members.title')}
         </h1>
         <p className="text-theme-muted mt-1">
-          Discover members from partner communities
+          {t('members.subtitle')}
         </p>
       </div>
 
@@ -277,7 +275,7 @@ export function FederationMembersPage() {
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <Input
-                placeholder="Search by name, skills, or location..."
+                placeholder={t('members.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -290,7 +288,7 @@ export function FederationMembersPage() {
             </div>
 
             <Select
-              placeholder="All Communities"
+              placeholder={t('members.all_communities')}
               selectedKeys={selectedPartner ? [selectedPartner] : []}
               onChange={(e) => setSelectedPartner(e.target.value)}
               className="w-full lg:w-56"
@@ -309,7 +307,7 @@ export function FederationMembersPage() {
 
           {/* Row 2: Service reach chips + Skills filter */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Service reach filter">
+            <div className="flex flex-wrap gap-2" role="group" aria-label={t('members.service_reach_filter')}>
               {SERVICE_REACH_OPTIONS.map((option) => {
                 const isSelected = serviceReach === option.key;
                 const Icon = option.icon;
@@ -326,7 +324,7 @@ export function FederationMembersPage() {
                     onClick={() => setServiceReach(option.key)}
                     aria-pressed={isSelected}
                   >
-                    {option.label}
+                    {t(`members.reach_${option.key}`)}
                   </Chip>
                 );
               })}
@@ -334,7 +332,7 @@ export function FederationMembersPage() {
 
             <div className="flex-1 w-full sm:w-auto">
               <Input
-                placeholder="Filter by skills (comma separated)"
+                placeholder={t('members.skills_filter_placeholder')}
                 value={skillsFilter}
                 onChange={(e) => setSkillsFilter(e.target.value)}
                 size="sm"
@@ -357,7 +355,7 @@ export function FederationMembersPage() {
             size="sm"
             className="bg-theme-elevated text-theme-muted"
           >
-            Showing {members.length.toLocaleString()} of {totalCount.toLocaleString()} members
+            {t('members.showing_count', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString() })}
           </Chip>
         </div>
       )}
@@ -367,7 +365,7 @@ export function FederationMembersPage() {
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">
-            Unable to Load Federated Members
+            {t('members.unable_to_load')}
           </h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
@@ -375,7 +373,7 @@ export function FederationMembersPage() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadMembers()}
           >
-            Try Again
+            {t('members.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -383,7 +381,7 @@ export function FederationMembersPage() {
       {/* Loading State */}
       {isLoading && (
         <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" label="Loading federated members..." />
+          <Spinner size="lg" label={t('members.loading')} />
         </div>
       )}
 
@@ -393,17 +391,17 @@ export function FederationMembersPage() {
           {partners.length === 0 ? (
             <EmptyState
               icon={<Globe className="w-12 h-12 text-theme-subtle" />}
-              title="No Partner Communities"
-              description="Your community hasn't connected with any partner timebanks yet."
+              title={t('members.no_partner_communities')}
+              description={t('members.no_partner_communities_description')}
             />
           ) : (
             <EmptyState
               icon={<Users className="w-12 h-12 text-theme-subtle" />}
-              title="No Federated Members Found"
+              title={t('members.no_members_found')}
               description={
                 debouncedQuery || skillsFilter || selectedPartner || serviceReach !== 'all'
-                  ? 'No federated members match your search. Try adjusting your filters.'
-                  : 'No federated members are available at this time.'
+                  ? t('members.no_members_search')
+                  : t('members.no_members_available')
               }
             />
           )}
@@ -440,7 +438,7 @@ export function FederationMembersPage() {
                 onPress={handleLoadMore}
                 isLoading={isLoadingMore}
               >
-                Load More
+                {t('members.load_more')}
               </Button>
             </div>
           )}
@@ -467,6 +465,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
   onViewProfile,
   onSendMessage,
 }: FederatedMemberCardProps) {
+  const { t } = useTranslation('federation');
   const displayName =
     member.name?.trim() ||
     `${member.first_name || ''} ${member.last_name || ''}`.trim() ||
@@ -478,7 +477,6 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
 
   const reachKey = member.service_reach ?? 'local_only';
   const ReachIcon = SERVICE_REACH_ICONS[reachKey] ?? Home;
-  const reachLabel = SERVICE_REACH_LABELS[reachKey] ?? 'Local Only';
 
   return (
     <GlassCard className="p-5 flex flex-col h-full">
@@ -540,7 +538,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
               variant="flat"
               className="bg-theme-elevated text-theme-subtle text-xs"
             >
-              +{remainingSkillsCount} more
+              {t('members.more_skills', { count: remainingSkillsCount })}
             </Chip>
           )}
         </div>
@@ -556,7 +554,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
         )}
         <span className="flex items-center gap-1">
           <ReachIcon className="w-3.5 h-3.5" aria-hidden="true" />
-          <span>{reachLabel}</span>
+          <span>{t(`members.reach_${reachKey}`)}</span>
         </span>
       </div>
 
@@ -569,7 +567,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
           startContent={<User className="w-3.5 h-3.5" aria-hidden="true" />}
           onPress={() => onViewProfile(member)}
         >
-          View Profile
+          {t('members.view_profile')}
         </Button>
         {isAuthenticated && member.messaging_enabled && (
           <Button
@@ -578,7 +576,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
             startContent={<MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />}
             onPress={() => onSendMessage(member)}
           >
-            Send Message
+            {t('members.send_message')}
           </Button>
         )}
       </div>

@@ -48,6 +48,7 @@ import {
   HandHeart,
   Network,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -91,18 +92,13 @@ const DEFAULT_SETTINGS: OnboardingSettings = {
 
 const TOTAL_STEPS = 4;
 
-const SERVICE_REACH_LABELS: Record<ServiceReach, string> = {
-  local_only: 'Local Only',
-  remote_ok: 'Remote OK',
-  travel_ok: 'Will Travel',
-};
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function FederationOnboardingPage() {
-  usePageTitle('Set Up Federation');
+  const { t } = useTranslation('federation');
+  usePageTitle(t('onboarding.page_title'));
   const navigate = useNavigate();
   useAuth(); // Ensure authenticated
   const { tenantPath } = useTenant();
@@ -156,15 +152,15 @@ export function FederationOnboardingPage() {
       // Single atomic request: opt in + save settings together
       const response = await api.post('/v2/federation/setup', settings);
       if (!response.success) {
-        toast.error('Setup failed', response.error || 'Failed to enable federation.');
+        toast.error(t('onboarding.toast_setup_failed'), response.error || t('onboarding.toast_enable_error'));
         return;
       }
 
-      toast.success('Federation enabled!', 'Welcome to the network.');
+      toast.success(t('onboarding.toast_enabled'), t('onboarding.toast_welcome'));
       navigate(tenantPath('/federation'));
     } catch (error) {
       logError('Failed to complete federation onboarding', error);
-      toast.error('Setup failed', 'Something went wrong. Please try again.');
+      toast.error(t('onboarding.toast_setup_failed'), t('onboarding.toast_generic_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -228,8 +224,8 @@ export function FederationOnboardingPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <h1 className="text-2xl font-bold text-theme-primary">Set Up Federation</h1>
-        <p className="text-theme-muted mt-1">Connect with partner communities in a few easy steps</p>
+        <h1 className="text-2xl font-bold text-theme-primary">{t('onboarding.title')}</h1>
+        <p className="text-theme-muted mt-1">{t('onboarding.subtitle')}</p>
       </motion.div>
 
       {/* Progress Bar */}
@@ -239,12 +235,12 @@ export function FederationOnboardingPage() {
         transition={{ delay: 0.1 }}
       >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-theme-subtle">Step {currentStep} of {TOTAL_STEPS}</span>
+          <span className="text-sm text-theme-subtle">{t('onboarding.step_of', { current: currentStep, total: TOTAL_STEPS })}</span>
           <span className="text-sm text-theme-subtle">
-            {currentStep === 1 && 'Welcome'}
-            {currentStep === 2 && 'Privacy'}
-            {currentStep === 3 && 'Communication'}
-            {currentStep === 4 && 'Confirm'}
+            {currentStep === 1 && t('onboarding.step_welcome')}
+            {currentStep === 2 && t('onboarding.step_privacy')}
+            {currentStep === 3 && t('onboarding.step_communication')}
+            {currentStep === 4 && t('onboarding.step_confirm')}
           </span>
         </div>
         <Progress
@@ -298,11 +294,10 @@ export function FederationOnboardingPage() {
                 </div>
 
                 <h2 className="text-xl font-bold text-theme-primary mb-2">
-                  Connect with Partner Communities
+                  {t('onboarding.welcome_title')}
                 </h2>
                 <p className="text-theme-muted max-w-md mx-auto">
-                  Federation lets you interact with members from other timebanking
-                  communities, expanding your network and opportunities.
+                  {t('onboarding.welcome_description')}
                 </p>
               </GlassCard>
 
@@ -310,18 +305,18 @@ export function FederationOnboardingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <BenefitCard
                   icon={<Sparkles className="w-6 h-6 text-indigo-500" />}
-                  title="Discover new services"
-                  description="Browse listings from partner communities and find unique skills"
+                  title={t('onboarding.benefit_discover_title')}
+                  description={t('onboarding.benefit_discover_description')}
                 />
                 <BenefitCard
                   icon={<HandHeart className="w-6 h-6 text-purple-500" />}
-                  title="Meet new members"
-                  description="Connect with members from other communities nearby"
+                  title={t('onboarding.benefit_meet_title')}
+                  description={t('onboarding.benefit_meet_description')}
                 />
                 <BenefitCard
                   icon={<Network className="w-6 h-6 text-emerald-500" />}
-                  title="Exchange across boundaries"
-                  description="Transfer time credits between partner communities"
+                  title={t('onboarding.benefit_exchange_title')}
+                  description={t('onboarding.benefit_exchange_description')}
                 />
               </div>
 
@@ -333,7 +328,7 @@ export function FederationOnboardingPage() {
                   endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                   onPress={goNextAnimated}
                 >
-                  Get Started
+                  {t('onboarding.get_started')}
                 </Button>
               </div>
             </div>
@@ -345,46 +340,45 @@ export function FederationOnboardingPage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <Eye className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                  Profile Visibility
+                  {t('onboarding.profile_visibility')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Choose what partner community members can see about you.
-                  You can change these settings at any time.
+                  {t('onboarding.profile_visibility_description')}
                 </p>
 
                 <div className="space-y-1">
                   <OnboardingToggle
                     icon={<Globe className="w-4 h-4 text-indigo-500" />}
-                    label="Show my profile to federated members"
-                    description="Allow members from partner communities to view your profile"
+                    label={t('onboarding.toggle_profile_visible')}
+                    description={t('onboarding.toggle_profile_visible_desc')}
                     checked={settings.profile_visible_federated}
                     onChange={(v) => updateSetting('profile_visible_federated', v)}
                   />
                   <OnboardingToggle
                     icon={<Search className="w-4 h-4 text-indigo-500" />}
-                    label="Appear in federated search results"
-                    description="Let partner community members find you via search"
+                    label={t('onboarding.toggle_search_visible')}
+                    description={t('onboarding.toggle_search_visible_desc')}
                     checked={settings.appear_in_federated_search}
                     onChange={(v) => updateSetting('appear_in_federated_search', v)}
                   />
                   <OnboardingToggle
                     icon={<Zap className="w-4 h-4 text-indigo-500" />}
-                    label="Share my skills across communities"
-                    description="Display your skills and expertise to federated members"
+                    label={t('onboarding.toggle_skills_shared')}
+                    description={t('onboarding.toggle_skills_shared_desc')}
                     checked={settings.show_skills_federated}
                     onChange={(v) => updateSetting('show_skills_federated', v)}
                   />
                   <OnboardingToggle
                     icon={<MapPin className="w-4 h-4 text-indigo-500" />}
-                    label="Share my location"
-                    description="Show your general location to partner community members"
+                    label={t('onboarding.toggle_location_shared')}
+                    description={t('onboarding.toggle_location_shared_desc')}
                     checked={settings.show_location_federated}
                     onChange={(v) => updateSetting('show_location_federated', v)}
                   />
                   <OnboardingToggle
                     icon={<Star className="w-4 h-4 text-indigo-500" />}
-                    label="Show my reviews"
-                    description="Allow federated members to see your review history"
+                    label={t('onboarding.toggle_reviews_visible')}
+                    description={t('onboarding.toggle_reviews_visible_desc')}
                     checked={settings.show_reviews_federated}
                     onChange={(v) => updateSetting('show_reviews_federated', v)}
                   />
@@ -404,31 +398,31 @@ export function FederationOnboardingPage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <Shield className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                  Communication Preferences
+                  {t('onboarding.communication_preferences')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Control how you communicate and transact with federated members.
+                  {t('onboarding.communication_preferences_description')}
                 </p>
 
                 <div className="space-y-1">
                   <OnboardingToggle
                     icon={<Send className="w-4 h-4 text-indigo-500" />}
-                    label="Allow federated messaging"
-                    description="Let members from partner communities send you messages"
+                    label={t('onboarding.toggle_messaging')}
+                    description={t('onboarding.toggle_messaging_desc')}
                     checked={settings.messaging_enabled_federated}
                     onChange={(v) => updateSetting('messaging_enabled_federated', v)}
                   />
                   <OnboardingToggle
                     icon={<CreditCard className="w-4 h-4 text-indigo-500" />}
-                    label="Allow federated transactions"
-                    description="Accept time credit transfers from partner communities"
+                    label={t('onboarding.toggle_transactions')}
+                    description={t('onboarding.toggle_transactions_desc')}
                     checked={settings.transactions_enabled_federated}
                     onChange={(v) => updateSetting('transactions_enabled_federated', v)}
                   />
                   <OnboardingToggle
                     icon={<Mail className="w-4 h-4 text-indigo-500" />}
-                    label="Email notifications"
-                    description="Receive email alerts for federation activity"
+                    label={t('onboarding.toggle_email_notifications')}
+                    description={t('onboarding.toggle_email_notifications_desc')}
                     checked={settings.email_notifications}
                     onChange={(v) => updateSetting('email_notifications', v)}
                   />
@@ -438,15 +432,15 @@ export function FederationOnboardingPage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                  Service Reach
+                  {t('onboarding.service_reach')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  How far are you willing to go to provide or receive services?
+                  {t('onboarding.service_reach_description')}
                 </p>
 
                 <div className="space-y-4">
                   <Select
-                    label="Service Availability"
+                    label={t('onboarding.service_availability')}
                     selectedKeys={[settings.service_reach]}
                     onSelectionChange={(keys) => {
                       const value = Array.from(keys)[0] as string;
@@ -456,9 +450,9 @@ export function FederationOnboardingPage() {
                     }}
                     classNames={selectClassNames}
                   >
-                    <SelectItem key="local_only">Local Only -- I only provide services in my area</SelectItem>
-                    <SelectItem key="remote_ok">Remote OK -- I can provide services remotely</SelectItem>
-                    <SelectItem key="travel_ok">Will Travel -- I am willing to travel for services</SelectItem>
+                    <SelectItem key="local_only">{t('onboarding.reach_local_only')}</SelectItem>
+                    <SelectItem key="remote_ok">{t('onboarding.reach_remote_ok')}</SelectItem>
+                    <SelectItem key="travel_ok">{t('onboarding.reach_travel_ok')}</SelectItem>
                   </Select>
 
                   {settings.service_reach === 'travel_ok' && (
@@ -470,7 +464,7 @@ export function FederationOnboardingPage() {
                     >
                       <Input
                         type="number"
-                        label="Travel Radius"
+                        label={t('onboarding.travel_radius')}
                         placeholder="25"
                         value={String(settings.travel_radius_km)}
                         onChange={(e) => {
@@ -481,7 +475,7 @@ export function FederationOnboardingPage() {
                           <span className="text-theme-subtle text-sm">km</span>
                         }
                         classNames={inputClassNames}
-                        description="Maximum distance you are willing to travel"
+                        description={t('onboarding.travel_radius_description')}
                       />
                     </motion.div>
                   )}
@@ -501,10 +495,10 @@ export function FederationOnboardingPage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                  Review Your Settings
+                  {t('onboarding.review_settings')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Here is a summary of your federation preferences.
+                  {t('onboarding.review_settings_description')}
                 </p>
 
                 {/* Summary sections */}
@@ -513,27 +507,27 @@ export function FederationOnboardingPage() {
                   <div>
                     <h3 className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-2">
                       <Eye className="w-4 h-4" aria-hidden="true" />
-                      Profile Visibility
+                      {t('onboarding.profile_visibility')}
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       <SummaryChip
-                        label="Profile visible"
+                        label={t('onboarding.summary_profile_visible')}
                         enabled={settings.profile_visible_federated}
                       />
                       <SummaryChip
-                        label="In search results"
+                        label={t('onboarding.summary_in_search')}
                         enabled={settings.appear_in_federated_search}
                       />
                       <SummaryChip
-                        label="Skills shared"
+                        label={t('onboarding.summary_skills_shared')}
                         enabled={settings.show_skills_federated}
                       />
                       <SummaryChip
-                        label="Location shared"
+                        label={t('onboarding.summary_location_shared')}
                         enabled={settings.show_location_federated}
                       />
                       <SummaryChip
-                        label="Reviews visible"
+                        label={t('onboarding.summary_reviews_visible')}
                         enabled={settings.show_reviews_federated}
                       />
                     </div>
@@ -545,19 +539,19 @@ export function FederationOnboardingPage() {
                   <div>
                     <h3 className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-2">
                       <Shield className="w-4 h-4" aria-hidden="true" />
-                      Communication
+                      {t('onboarding.summary_communication')}
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       <SummaryChip
-                        label="Messaging"
+                        label={t('onboarding.summary_messaging')}
                         enabled={settings.messaging_enabled_federated}
                       />
                       <SummaryChip
-                        label="Transactions"
+                        label={t('onboarding.summary_transactions')}
                         enabled={settings.transactions_enabled_federated}
                       />
                       <SummaryChip
-                        label="Email alerts"
+                        label={t('onboarding.summary_email_alerts')}
                         enabled={settings.email_notifications}
                       />
                     </div>
@@ -569,12 +563,12 @@ export function FederationOnboardingPage() {
                   <div>
                     <h3 className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-2">
                       <MapPin className="w-4 h-4" aria-hidden="true" />
-                      Service Reach
+                      {t('onboarding.service_reach')}
                     </h3>
                     <p className="text-theme-primary">
-                      {SERVICE_REACH_LABELS[settings.service_reach]}
+                      {t(`onboarding.reach_label_${settings.service_reach}`)}
                       {settings.service_reach === 'travel_ok' && (
-                        <span className="text-theme-subtle"> -- up to {settings.travel_radius_km} km</span>
+                        <span className="text-theme-subtle"> {t('onboarding.up_to_km', { km: settings.travel_radius_km })}</span>
                       )}
                     </p>
                   </div>
@@ -585,7 +579,7 @@ export function FederationOnboardingPage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                   <Globe className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                  Partner Communities
+                  {t('onboarding.partner_communities')}
                 </h2>
 
                 {partnersLoading ? (
@@ -595,7 +589,7 @@ export function FederationOnboardingPage() {
                 ) : partners.length > 0 ? (
                   <div className="space-y-3">
                     <p className="text-theme-muted text-sm">
-                      {partners.length} partner {partners.length === 1 ? 'community' : 'communities'} available
+                      {t('onboarding.partners_available', { count: partners.length })}
                     </p>
                     <div className="space-y-2">
                       {partners.slice(0, 5).map((partner) => (
@@ -615,13 +609,13 @@ export function FederationOnboardingPage() {
                             </div>
                           </div>
                           <Chip size="sm" variant="flat" color="primary">
-                            {partner.member_count} members
+                            {t('onboarding.member_count', { count: partner.member_count })}
                           </Chip>
                         </div>
                       ))}
                       {partners.length > 5 && (
                         <p className="text-sm text-theme-subtle text-center pt-2">
-                          and {partners.length - 5} more...
+                          {t('onboarding.and_more', { count: partners.length - 5 })}
                         </p>
                       )}
                     </div>
@@ -630,7 +624,7 @@ export function FederationOnboardingPage() {
                   <div className="text-center py-4">
                     <Globe className="w-10 h-10 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
                     <p className="text-theme-muted text-sm">
-                      Partner communities will appear here once your community joins the federation network.
+                      {t('onboarding.no_partners_yet')}
                     </p>
                   </div>
                 )}
@@ -644,7 +638,7 @@ export function FederationOnboardingPage() {
                   onPress={goBackAnimated}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Back
+                  {t('onboarding.back')}
                 </Button>
 
                 <div className="flex items-center gap-3">
@@ -653,7 +647,7 @@ export function FederationOnboardingPage() {
                     className="text-theme-subtle"
                     onPress={handleSkip}
                   >
-                    I'll do this later
+                    {t('onboarding.do_this_later')}
                   </Button>
                   <Button
                     size="lg"
@@ -662,7 +656,7 @@ export function FederationOnboardingPage() {
                     isLoading={isSubmitting}
                     startContent={!isSubmitting && <CheckCircle className="w-5 h-5" aria-hidden="true" />}
                   >
-                    Enable Federation
+                    {t('onboarding.enable_federation')}
                   </Button>
                 </div>
               </div>
@@ -734,6 +728,7 @@ interface SummaryChipProps {
 }
 
 function SummaryChip({ label, enabled }: SummaryChipProps) {
+  const { t } = useTranslation('federation');
   return (
     <Chip
       size="sm"
@@ -741,7 +736,7 @@ function SummaryChip({ label, enabled }: SummaryChipProps) {
       color={enabled ? 'success' : 'default'}
       className={!enabled ? 'opacity-60' : ''}
     >
-      {label}: {enabled ? 'On' : 'Off'}
+      {label}: {enabled ? t('onboarding.on') : t('onboarding.off')}
     </Chip>
   );
 }
@@ -753,7 +748,9 @@ interface StepNavigationProps {
   isLoading?: boolean;
 }
 
-function StepNavigation({ onBack, onNext, nextLabel = 'Next', isLoading }: StepNavigationProps) {
+function StepNavigation({ onBack, onNext, nextLabel, isLoading }: StepNavigationProps) {
+  const { t } = useTranslation('federation');
+  const resolvedNextLabel = nextLabel || t('onboarding.next');
   return (
     <div className="flex items-center justify-between">
       <Button
@@ -762,7 +759,7 @@ function StepNavigation({ onBack, onNext, nextLabel = 'Next', isLoading }: StepN
         onPress={onBack}
         startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
       >
-        Back
+        {t('onboarding.back')}
       </Button>
       <Button
         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -770,7 +767,7 @@ function StepNavigation({ onBack, onNext, nextLabel = 'Next', isLoading }: StepN
         onPress={onNext}
         isLoading={isLoading}
       >
-        {nextLabel}
+        {resolvedNextLabel}
       </Button>
     </div>
   );

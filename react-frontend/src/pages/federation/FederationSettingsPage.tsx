@@ -39,6 +39,7 @@ import {
   CreditCard,
   Mail,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { usePageTitle } from '@/hooks';
@@ -84,7 +85,8 @@ const DEFAULT_SETTINGS: SettingsFormData = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function FederationSettingsPage() {
-  usePageTitle('Federation Settings');
+  const { t } = useTranslation('federation');
+  usePageTitle(t('settings.page_title'));
   const toast = useToast();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -131,11 +133,11 @@ export function FederationSettingsPage() {
         setOriginalSettings(formData);
         setFederationOptedIn(response.data.enabled ?? s.federation_optin ?? false);
       } else {
-        setLoadError('Failed to load federation settings');
+        setLoadError(t('settings.load_error'));
       }
     } catch (error) {
       logError('Failed to load federation settings', error);
-      setLoadError('Failed to load federation settings. Please try again.');
+      setLoadError(t('settings.load_error_retry'));
     } finally {
       setIsLoading(false);
     }
@@ -158,13 +160,16 @@ export function FederationSettingsPage() {
       const response = await api.post(endpoint);
       if (response.success) {
         setFederationOptedIn(!federationOptedIn);
-        toast.success(`Federation ${action}`, `Federation has been ${action} for your account.`);
+        toast.success(
+          t('settings.federation_toggled_title', { action }),
+          t('settings.federation_toggled_description', { action })
+        );
       } else {
-        toast.error('Action failed', response.error || `Failed to ${federationOptedIn ? 'disable' : 'enable'} federation.`);
+        toast.error(t('settings.action_failed'), response.error || t('settings.toggle_error', { action: federationOptedIn ? t('settings.disable') : t('settings.enable') }));
       }
     } catch (error) {
       logError(`Failed to toggle federation`, error);
-      toast.error('Action failed', `Failed to ${federationOptedIn ? 'disable' : 'enable'} federation.`);
+      toast.error(t('settings.action_failed'), t('settings.toggle_error', { action: federationOptedIn ? t('settings.disable') : t('settings.enable') }));
     } finally {
       setIsTogglingStatus(false);
     }
@@ -176,13 +181,13 @@ export function FederationSettingsPage() {
       const response = await api.put('/v2/federation/settings', settings);
       if (response.success) {
         setOriginalSettings({ ...settings });
-        toast.success('Settings saved', 'Your federation settings have been updated.');
+        toast.success(t('settings.save_success_title'), t('settings.save_success_description'));
       } else {
-        toast.error('Save failed', response.error || 'Failed to save settings.');
+        toast.error(t('settings.save_failed_title'), response.error || t('settings.save_failed_description'));
       }
     } catch (error) {
       logError('Failed to save federation settings', error);
-      toast.error('Save failed', 'Failed to save federation settings. Please try again.');
+      toast.error(t('settings.save_failed_title'), t('settings.save_failed_retry'));
     } finally {
       setIsSaving(false);
     }
@@ -238,8 +243,8 @@ export function FederationSettingsPage() {
     return (
       <div className="max-w-3xl mx-auto">
         <Breadcrumbs items={[
-          { label: 'Federation', href: '/federation' },
-          { label: 'Settings' },
+          { label: t('settings.breadcrumb_federation'), href: '/federation' },
+          { label: t('settings.breadcrumb_settings') },
         ]} />
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
@@ -248,7 +253,7 @@ export function FederationSettingsPage() {
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             onPress={loadSettings}
           >
-            Try Again
+            {t('settings.try_again')}
           </Button>
         </GlassCard>
       </div>
@@ -268,18 +273,18 @@ export function FederationSettingsPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Federation', href: '/federation' },
-        { label: 'Settings' },
+        { label: t('settings.breadcrumb_federation'), href: '/federation' },
+        { label: t('settings.breadcrumb_settings') },
       ]} />
 
       {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Settings className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-          Federation Settings
+          {t('settings.heading')}
         </h1>
         <p className="text-theme-muted mt-1">
-          Control how you appear and interact across partner communities
+          {t('settings.subheading')}
         </p>
       </motion.div>
 
@@ -293,9 +298,9 @@ export function FederationSettingsPage() {
                   <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-medium text-emerald-700 dark:text-emerald-300">Federation is active</p>
+                  <p className="font-medium text-emerald-700 dark:text-emerald-300">{t('settings.federation_active')}</p>
                   <p className="text-sm text-theme-subtle">
-                    Your profile is visible to partner communities
+                    {t('settings.federation_active_description')}
                   </p>
                 </div>
               </div>
@@ -305,7 +310,7 @@ export function FederationSettingsPage() {
                 onPress={handleToggleFederation}
                 isLoading={isTogglingStatus}
               >
-                Disable Federation
+                {t('settings.disable_federation')}
               </Button>
             </div>
           </GlassCard>
@@ -317,9 +322,9 @@ export function FederationSettingsPage() {
                   <ShieldOff className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-medium text-amber-700 dark:text-amber-300">Federation is disabled</p>
+                  <p className="font-medium text-amber-700 dark:text-amber-300">{t('settings.federation_disabled')}</p>
                   <p className="text-sm text-theme-subtle">
-                    You are not visible to partner communities
+                    {t('settings.federation_disabled_description')}
                   </p>
                 </div>
               </div>
@@ -328,7 +333,7 @@ export function FederationSettingsPage() {
                 onPress={handleToggleFederation}
                 isLoading={isTogglingStatus}
               >
-                Enable Federation
+                {t('settings.enable_federation')}
               </Button>
             </div>
           </GlassCard>
@@ -340,42 +345,42 @@ export function FederationSettingsPage() {
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
             <Eye className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-            Profile Visibility
+            {t('settings.profile_visibility')}
           </h2>
 
           <div className="space-y-1">
             <SettingToggle
               icon={<Globe className="w-4 h-4 text-indigo-500" />}
-              label="Show my profile to federated members"
-              description="Allow members from partner communities to view your profile"
+              label={t('settings.show_profile_label')}
+              description={t('settings.show_profile_description')}
               checked={settings.profile_visible_federated}
               onChange={(v) => updateSetting('profile_visible_federated', v)}
             />
             <SettingToggle
               icon={<Search className="w-4 h-4 text-indigo-500" />}
-              label="Appear in federated search results"
-              description="Let partner community members find you via search"
+              label={t('settings.appear_search_label')}
+              description={t('settings.appear_search_description')}
               checked={settings.appear_in_federated_search}
               onChange={(v) => updateSetting('appear_in_federated_search', v)}
             />
             <SettingToggle
               icon={<Zap className="w-4 h-4 text-indigo-500" />}
-              label="Share my skills across communities"
-              description="Display your skills and expertise to federated members"
+              label={t('settings.share_skills_label')}
+              description={t('settings.share_skills_description')}
               checked={settings.show_skills_federated}
               onChange={(v) => updateSetting('show_skills_federated', v)}
             />
             <SettingToggle
               icon={<MapPin className="w-4 h-4 text-indigo-500" />}
-              label="Share my location with partner communities"
-              description="Show your general location to federated members"
+              label={t('settings.share_location_label')}
+              description={t('settings.share_location_description')}
               checked={settings.show_location_federated}
               onChange={(v) => updateSetting('show_location_federated', v)}
             />
             <SettingToggle
               icon={<Star className="w-4 h-4 text-indigo-500" />}
-              label="Show my reviews to federated members"
-              description="Allow partner community members to see your review history"
+              label={t('settings.show_reviews_label')}
+              description={t('settings.show_reviews_description')}
               checked={settings.show_reviews_federated}
               onChange={(v) => updateSetting('show_reviews_federated', v)}
             />
@@ -388,28 +393,28 @@ export function FederationSettingsPage() {
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-            Communication
+            {t('settings.communication')}
           </h2>
 
           <div className="space-y-1">
             <SettingToggle
               icon={<Send className="w-4 h-4 text-indigo-500" />}
-              label="Allow federated messaging"
-              description="Let members from partner communities send you messages"
+              label={t('settings.allow_messaging_label')}
+              description={t('settings.allow_messaging_description')}
               checked={settings.messaging_enabled_federated}
               onChange={(v) => updateSetting('messaging_enabled_federated', v)}
             />
             <SettingToggle
               icon={<CreditCard className="w-4 h-4 text-indigo-500" />}
-              label="Allow federated transactions"
-              description="Accept time credit transfers from partner communities"
+              label={t('settings.allow_transactions_label')}
+              description={t('settings.allow_transactions_description')}
               checked={settings.transactions_enabled_federated}
               onChange={(v) => updateSetting('transactions_enabled_federated', v)}
             />
             <SettingToggle
               icon={<Mail className="w-4 h-4 text-indigo-500" />}
-              label="Email notifications for federation activity"
-              description="Receive email alerts for federated messages and transactions"
+              label={t('settings.email_notifications_label')}
+              description={t('settings.email_notifications_description')}
               checked={settings.email_notifications}
               onChange={(v) => updateSetting('email_notifications', v)}
             />
@@ -422,12 +427,12 @@ export function FederationSettingsPage() {
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
             <MapPin className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-            Service Reach
+            {t('settings.service_reach')}
           </h2>
 
           <div className="space-y-4">
             <Select
-              label="Service Availability"
+              label={t('settings.service_availability')}
               selectedKeys={[settings.service_reach]}
               onSelectionChange={(keys) => {
                 const value = Array.from(keys)[0] as string;
@@ -437,9 +442,9 @@ export function FederationSettingsPage() {
               }}
               classNames={selectClassNames}
             >
-              <SelectItem key="local_only">Local Only -- I only provide services in my area</SelectItem>
-              <SelectItem key="remote_ok">Remote OK -- I can provide services remotely</SelectItem>
-              <SelectItem key="travel_ok">Will Travel -- I am willing to travel for services</SelectItem>
+              <SelectItem key="local_only">{t('settings.reach_local_only')}</SelectItem>
+              <SelectItem key="remote_ok">{t('settings.reach_remote_ok')}</SelectItem>
+              <SelectItem key="travel_ok">{t('settings.reach_travel_ok')}</SelectItem>
             </Select>
 
             {settings.service_reach === 'travel_ok' && (
@@ -451,7 +456,7 @@ export function FederationSettingsPage() {
               >
                 <Input
                   type="number"
-                  label="Travel Radius"
+                  label={t('settings.travel_radius')}
                   placeholder="25"
                   value={String(settings.travel_radius_km)}
                   onChange={(e) => {
@@ -462,7 +467,7 @@ export function FederationSettingsPage() {
                     <span className="text-theme-subtle text-sm">km</span>
                   }
                   classNames={inputClassNames}
-                  description="Maximum distance you are willing to travel for services"
+                  description={t('settings.travel_radius_description')}
                 />
               </motion.div>
             )}
@@ -479,7 +484,7 @@ export function FederationSettingsPage() {
           isLoading={isSaving}
           isDisabled={!isDirty}
         >
-          Save Settings
+          {t('settings.save_settings')}
         </Button>
       </motion.div>
     </motion.div>
