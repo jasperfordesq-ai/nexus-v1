@@ -8,22 +8,34 @@
  * Displays when the user's session has expired and they need to log in again
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { LogIn, Clock } from 'lucide-react';
 import { SESSION_EXPIRED_EVENT } from '@/lib/api';
-import { useTenant } from '@/contexts';
+import { useTenant, useAuth } from '@/contexts';
 
 export function SessionExpiredModal() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
+  const { status } = useAuth();
+  const wasAuthenticated = useRef(false);
+
+  // Track if user was ever authenticated in this session
+  useEffect(() => {
+    if (status === 'authenticated') {
+      wasAuthenticated.current = true;
+    }
+  }, [status]);
 
   useEffect(() => {
     function handleSessionExpired() {
-      setIsOpen(true);
+      // Only show modal if user had an active session — not for stale tokens on first visit
+      if (wasAuthenticated.current) {
+        setIsOpen(true);
+      }
     }
 
     window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
