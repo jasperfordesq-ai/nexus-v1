@@ -60,6 +60,21 @@ export function PageBuilder() {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
 
+  // Slugs that conflict with built-in React routes — cannot be used as page slugs
+  const RESERVED_SLUGS = new Set([
+    'login', 'register', 'password', 'logout', 'dashboard', 'listings',
+    'events', 'groups', 'messages', 'notifications', 'wallet', 'feed',
+    'search', 'members', 'profile', 'settings', 'exchanges', 'achievements',
+    'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
+    'organisations', 'federation', 'onboarding', 'group-exchanges', 'matches', 'newsletter',
+    'help', 'contact', 'about', 'faq', 'legal', 'terms',
+    'privacy', 'accessibility', 'cookies', 'development-status',
+    'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
+    'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
+    'uploads', 'classic', 'health', 'page',
+  ]);
+  const isReservedSlug = RESERVED_SLUGS.has(formData.slug.toLowerCase());
+
   useEffect(() => {
     if (isEdit) {
       adminPages.get(Number(id))
@@ -96,6 +111,10 @@ export function PageBuilder() {
       toast.warning('Slug must be URL-safe (lowercase letters, numbers, and hyphens only)');
       return;
     }
+    if (isReservedSlug) {
+      toast.warning(`The slug "${formData.slug}" is reserved by the system. Please choose a different slug.`);
+      return;
+    }
     setSaving(true);
     try {
       const payload = {
@@ -108,7 +127,7 @@ export function PageBuilder() {
           toast.success('Page updated successfully');
           navigate(tenantPath('/admin/pages'));
         } else {
-          toast.error('Failed to update page');
+          toast.error((res as unknown as Record<string, unknown>)?.error as string || 'Failed to update page');
         }
       } else {
         const res = await adminPages.create(payload);
@@ -116,7 +135,7 @@ export function PageBuilder() {
           toast.success('Page created successfully');
           navigate(tenantPath('/admin/pages'));
         } else {
-          toast.error('Failed to create page');
+          toast.error((res as unknown as Record<string, unknown>)?.error as string || 'Failed to create page');
         }
       }
     } catch {
@@ -176,7 +195,9 @@ export function PageBuilder() {
               label="URL Slug"
               placeholder="e.g., about-us"
               variant="bordered"
-              description="The URL path for this page (e.g. /page/about-us). Auto-generated from title."
+              description={isReservedSlug ? undefined : 'The URL path for this page (e.g. /page/about-us). Auto-generated from title.'}
+              isInvalid={isReservedSlug}
+              errorMessage={isReservedSlug ? `"${formData.slug}" is a reserved system route. Choose a different slug.` : undefined}
               value={formData.slug}
               onValueChange={(v) => {
                 setSlugTouched(true);
