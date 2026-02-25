@@ -87,13 +87,23 @@ class TenantHierarchyService
         try {
             Database::beginTransaction();
 
-            // Insert tenant
+            // Encode features JSON if provided
+            $featuresJson = null;
+            if (!empty($data['features'])) {
+                $featuresJson = is_string($data['features']) ? $data['features'] : json_encode($data['features']);
+            }
+
+            // Insert tenant with all fields
             Database::query("
                 INSERT INTO tenants (
                     name, slug, domain, tagline, description,
                     parent_id, depth, allows_subtenants, max_depth,
-                    is_active, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    is_active, features, contact_email, contact_phone, address,
+                    meta_title, meta_description, h1_headline, hero_intro, og_image_url, robots_directive,
+                    location_name, country_code, service_area, latitude, longitude,
+                    social_facebook, social_twitter, social_instagram, social_linkedin, social_youtube,
+                    created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ", [
                 $name,
                 $slug,
@@ -104,7 +114,30 @@ class TenantHierarchyService
                 $newDepth,
                 $allowsSubtenants ? 1 : 0,
                 $maxDepth,
-                isset($data['is_active']) ? (int)$data['is_active'] : 1
+                isset($data['is_active']) ? (int)$data['is_active'] : 1,
+                $featuresJson,
+                trim($data['contact_email'] ?? '') ?: null,
+                trim($data['contact_phone'] ?? '') ?: null,
+                trim($data['address'] ?? '') ?: null,
+                // SEO
+                trim($data['meta_title'] ?? '') ?: null,
+                trim($data['meta_description'] ?? '') ?: null,
+                trim($data['h1_headline'] ?? '') ?: null,
+                trim($data['hero_intro'] ?? '') ?: null,
+                trim($data['og_image_url'] ?? '') ?: null,
+                trim($data['robots_directive'] ?? '') ?: null,
+                // Location
+                trim($data['location_name'] ?? '') ?: null,
+                trim($data['country_code'] ?? '') ?: null,
+                trim($data['service_area'] ?? '') ?: null,
+                ($data['latitude'] ?? '') !== '' ? (float)$data['latitude'] : null,
+                ($data['longitude'] ?? '') !== '' ? (float)$data['longitude'] : null,
+                // Social
+                trim($data['social_facebook'] ?? '') ?: null,
+                trim($data['social_twitter'] ?? '') ?: null,
+                trim($data['social_instagram'] ?? '') ?: null,
+                trim($data['social_linkedin'] ?? '') ?: null,
+                trim($data['social_youtube'] ?? '') ?: null,
             ]);
 
             $tenantId = Database::lastInsertId();
@@ -278,13 +311,13 @@ class TenantHierarchyService
         // Configuration JSON field
         if (array_key_exists('configuration', $data)) {
             $updates[] = "configuration = ?";
-            $params[] = $data['configuration'];
+            $params[] = is_string($data['configuration']) ? $data['configuration'] : json_encode($data['configuration']);
         }
 
         // Features JSON field (platform modules)
         if (array_key_exists('features', $data)) {
             $updates[] = "features = ?";
-            $params[] = $data['features'];
+            $params[] = is_string($data['features']) ? $data['features'] : json_encode($data['features']);
         }
 
         if (empty($updates)) {
@@ -313,8 +346,11 @@ class TenantHierarchyService
             return ['success' => true, 'error' => null];
 
         } catch (\Exception $e) {
-            error_log("TenantHierarchyService::updateTenant error: " . $e->getMessage());
-            return ['success' => false, 'error' => 'Database error'];
+            error_log("TenantHierarchyService::updateTenant error for tenant {$tenantId}: " . $e->getMessage());
+            $safeMessage = (getenv('APP_ENV') === 'development' || getenv('APP_ENV') === 'local')
+                ? 'Database error: ' . $e->getMessage()
+                : 'Database error updating tenant';
+            return ['success' => false, 'error' => $safeMessage];
         }
     }
 
@@ -410,7 +446,7 @@ class TenantHierarchyService
         }
 
         // Cannot move to self or descendant
-        $tenant = Database::query("SELECT path FROM tenants WHERE id = ?", [$tenantId])->fetch(\PDO::FETCH_ASSOC);
+        $tenant = Database::query("SELECT path, depth FROM tenants WHERE id = ?", [$tenantId])->fetch(\PDO::FETCH_ASSOC);
         $newParent = Database::query("SELECT path, depth FROM tenants WHERE id = ?", [$newParentId])->fetch(\PDO::FETCH_ASSOC);
 
         if (!$tenant || !$newParent) {
@@ -444,7 +480,7 @@ class TenantHierarchyService
             foreach ($descendants as $desc) {
                 // Replace old path prefix with new path prefix
                 $descNewPath = $newPath . substr($desc['path'], strlen($oldPath));
-                $depthDiff = $newDepth - ((int)$tenant['depth'] ?? 0);
+                $depthDiff = $newDepth - (int)$tenant['depth'];
                 $descNewDepth = (int)$desc['depth'] + $depthDiff;
 
                 Database::query(
@@ -472,8 +508,11 @@ class TenantHierarchyService
 
         } catch (\Exception $e) {
             Database::rollback();
-            error_log("TenantHierarchyService::moveTenant error: " . $e->getMessage());
-            return ['success' => false, 'error' => 'Database error'];
+            error_log("TenantHierarchyService::moveTenant error for tenant {$tenantId}: " . $e->getMessage());
+            $safeMessage = (getenv('APP_ENV') === 'development' || getenv('APP_ENV') === 'local')
+                ? 'Database error: ' . $e->getMessage()
+                : 'Database error moving tenant';
+            return ['success' => false, 'error' => $safeMessage];
         }
     }
 
@@ -507,7 +546,11 @@ class TenantHierarchyService
             return ['success' => true, 'error' => null];
 
         } catch (\Exception $e) {
-            return ['success' => false, 'error' => 'Database error'];
+            error_log("TenantHierarchyService::toggleSubtenantCapability error for tenant {$tenantId}: " . $e->getMessage());
+            $safeMessage = (getenv('APP_ENV') === 'development' || getenv('APP_ENV') === 'local')
+                ? 'Database error: ' . $e->getMessage()
+                : 'Database error toggling hub status';
+            return ['success' => false, 'error' => $safeMessage];
         }
     }
 
@@ -555,7 +598,11 @@ class TenantHierarchyService
             return ['success' => true, 'error' => null];
 
         } catch (\Exception $e) {
-            return ['success' => false, 'error' => 'Database error'];
+            error_log("TenantHierarchyService::assignTenantSuperAdmin error for user {$userId}: " . $e->getMessage());
+            $safeMessage = (getenv('APP_ENV') === 'development' || getenv('APP_ENV') === 'local')
+                ? 'Database error: ' . $e->getMessage()
+                : 'Database error granting super admin';
+            return ['success' => false, 'error' => $safeMessage];
         }
     }
 
@@ -598,7 +645,11 @@ class TenantHierarchyService
             return ['success' => true, 'error' => null];
 
         } catch (\Exception $e) {
-            return ['success' => false, 'error' => 'Database error'];
+            error_log("TenantHierarchyService::revokeTenantSuperAdmin error for user {$userId}: " . $e->getMessage());
+            $safeMessage = (getenv('APP_ENV') === 'development' || getenv('APP_ENV') === 'local')
+                ? 'Database error: ' . $e->getMessage()
+                : 'Database error revoking super admin';
+            return ['success' => false, 'error' => $safeMessage];
         }
     }
 

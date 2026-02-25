@@ -112,10 +112,6 @@ export function TenantForm() {
     social_instagram: '',
     social_linkedin: '',
     social_youtube: '',
-    // Legal / Footer
-    footer_text: '',
-    privacy_text: '',
-    terms_text: '',
     // Features
     features: {} as Record<string, boolean>,
   });
@@ -160,9 +156,6 @@ export function TenantForm() {
           social_instagram: tenant.social_instagram || '',
           social_linkedin: tenant.social_linkedin || '',
           social_youtube: tenant.social_youtube || '',
-          footer_text: (tenant as unknown as Record<string, unknown>).footer_text as string || '',
-          privacy_text: (tenant as unknown as Record<string, unknown>).privacy_text as string || '',
-          terms_text: (tenant as unknown as Record<string, unknown>).terms_text as string || '',
           features: tenant.features || {},
         });
       }
@@ -220,7 +213,7 @@ export function TenantForm() {
           navigate(tenantPath(`/admin/super/tenants/${id}`));
         } else {
           // Navigate to the new tenant's show page if ID is returned, otherwise go to list
-          const newId = (res as { data?: { id?: number } }).data?.id;
+          const newId = (res as { data?: { tenant_id?: number } }).data?.tenant_id;
           navigate(tenantPath(newId ? `/admin/super/tenants/${newId}` : '/admin/super/tenants'));
         }
       } else {
@@ -514,33 +507,6 @@ export function TenantForm() {
                 placeholder="https://youtube.com/..."
                 value={form.social_youtube}
                 onValueChange={(v) => updateField('social_youtube', v)}
-              />
-            </CardBody>
-          </Card>
-        </Tab>
-
-        <Tab key="legal" title="Legal & Footer">
-          <Card shadow="sm">
-            <CardBody className="space-y-4 p-6">
-              <Input
-                label="Footer Text"
-                placeholder="Custom footer copyright or message"
-                value={form.footer_text}
-                onValueChange={(v) => updateField('footer_text', v)}
-              />
-              <Textarea
-                label="Privacy Policy"
-                placeholder="Privacy policy content for this tenant..."
-                value={form.privacy_text}
-                onValueChange={(v) => updateField('privacy_text', v)}
-                minRows={6}
-              />
-              <Textarea
-                label="Terms of Service"
-                placeholder="Terms of service content for this tenant..."
-                value={form.terms_text}
-                onValueChange={(v) => updateField('terms_text', v)}
-                minRows={6}
               />
             </CardBody>
           </Card>
