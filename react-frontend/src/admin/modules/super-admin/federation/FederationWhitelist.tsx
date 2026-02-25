@@ -137,7 +137,10 @@ export default function FederationWhitelist() {
             label="Tenant"
             placeholder="Select a tenant"
             selectedKeys={selectedTenantId ? [selectedTenantId] : []}
-            onChange={(e) => setSelectedTenantId(e.target.value)}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0];
+              setSelectedTenantId(selected ? String(selected) : '');
+            }}
             variant="bordered"
           >
             {availableTenants.map(tenant => (

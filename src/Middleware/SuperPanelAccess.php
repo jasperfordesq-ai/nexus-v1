@@ -184,16 +184,18 @@ class SuperPanelAccess
             return false;
         }
 
+        // Check god status via DB (session-free for JWT compatibility)
+        $isGod = !empty($access['user_id']) && \Nexus\Models\User::isGod($access['user_id']);
+
         // Cannot manage own tenant (only view) - unless god
         if ($targetTenantId === $access['tenant_id']) {
-            // God can manage users in their own tenant
-            return !empty($_SESSION['is_god']);
+            return $isGod;
         }
 
         // Master can manage everything except Master itself (unless god)
         if ($access['level'] === 'master') {
             if ($targetTenantId === 1) {
-                return !empty($_SESSION['is_god']); // God can manage Master tenant
+                return $isGod;
             }
             return true;
         }

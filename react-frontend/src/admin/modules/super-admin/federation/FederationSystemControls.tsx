@@ -12,6 +12,7 @@ import {
   Input,
   Select,
   SelectItem,
+  Switch,
 } from '@heroui/react';
 import { Lock, Shield } from 'lucide-react';
 import PageHeader from '../../../components/PageHeader';
@@ -226,15 +227,10 @@ export default function FederationSystemControls() {
                 Enable or disable the entire federation system
               </p>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={controls.federation_enabled}
-                onChange={(e) => handleToggleControl('federation_enabled', e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-default-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-default-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-default-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-default-600 peer-checked:bg-success-600"></div>
-            </label>
+            <Switch
+              isSelected={controls.federation_enabled}
+              onValueChange={(v) => handleToggleControl('federation_enabled', v)}
+            />
           </div>
 
           {/* Whitelist Mode */}
@@ -245,15 +241,10 @@ export default function FederationSystemControls() {
                 Only allow whitelisted tenants to use federation
               </p>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={controls.whitelist_mode}
-                onChange={(e) => handleToggleControl('whitelist_mode', e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-default-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-default-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-default-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-default-600 peer-checked:bg-success-600"></div>
-            </label>
+            <Switch
+              isSelected={controls.whitelist_mode}
+              onValueChange={(v) => handleToggleControl('whitelist_mode', v)}
+            />
           </div>
 
           {/* Max Level */}
@@ -261,7 +252,10 @@ export default function FederationSystemControls() {
             <Select
               label="Maximum Partnership Level"
               selectedKeys={[controls.max_level.toString()]}
-              onChange={(e) => handleToggleControl('max_level', parseInt(e.target.value))}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0];
+                if (selected) handleToggleControl('max_level', parseInt(String(selected)));
+              }}
               variant="bordered"
               description="Highest level allowed for new partnerships"
             >
@@ -293,15 +287,10 @@ export default function FederationSystemControls() {
                 <p className="font-medium">{feature.label}</p>
                 <p className="text-sm text-default-500">{feature.description}</p>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={features[feature.key as keyof FeatureToggles]}
-                  onChange={(e) => handleToggleFeature(feature.key as keyof FeatureToggles, e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-default-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-default-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-default-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-default-600 peer-checked:bg-success-600"></div>
-              </label>
+              <Switch
+                isSelected={features[feature.key as keyof FeatureToggles]}
+                onValueChange={(v) => handleToggleFeature(feature.key as keyof FeatureToggles, v)}
+              />
             </div>
           ))}
         </CardBody>

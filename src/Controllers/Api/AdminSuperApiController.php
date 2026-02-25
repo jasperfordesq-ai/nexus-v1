@@ -228,6 +228,11 @@ class AdminSuperApiController extends BaseApiController
             }
         }
 
+        // Verify access to parent tenant regardless of source
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($parentId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the parent tenant', null, 403);
+        }
+
         $name = trim($input['name'] ?? '');
         if (empty($name)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'name is required', 'name', 422);
@@ -264,6 +269,11 @@ class AdminSuperApiController extends BaseApiController
         $this->requireSuperAdmin();
 
         $tenantId = $this->extractId('tenants');
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($tenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+        }
+
         $input = $this->getAllInput();
 
         if (empty($input)) {
@@ -287,6 +297,11 @@ class AdminSuperApiController extends BaseApiController
         $this->requireSuperAdmin();
 
         $tenantId = $this->extractId('tenants');
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($tenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+        }
+
         $input = $this->getAllInput();
         $hardDelete = !empty($input['hard_delete']);
 
@@ -308,6 +323,10 @@ class AdminSuperApiController extends BaseApiController
 
         $tenantId = $this->extractId('tenants');
 
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($tenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+        }
+
         $result = TenantHierarchyService::updateTenant($tenantId, ['is_active' => 1]);
 
         if ($result['success']) {
@@ -327,6 +346,11 @@ class AdminSuperApiController extends BaseApiController
         $this->requireSuperAdmin();
 
         $tenantId = $this->extractId('tenants');
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($tenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+        }
+
         $input = $this->getAllInput();
         $enable = !empty($input['enable']);
 
@@ -352,11 +376,20 @@ class AdminSuperApiController extends BaseApiController
         $this->requireSuperAdmin();
 
         $tenantId = $this->extractId('tenants');
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($tenantId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+        }
+
         $input = $this->getAllInput();
         $newParentId = (int) ($input['new_parent_id'] ?? 0);
 
         if (!$newParentId) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'new_parent_id is required', 'new_parent_id', 422);
+        }
+
+        if (!\Nexus\Middleware\SuperPanelAccess::canAccessTenant($newParentId)) {
+            $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the destination tenant', null, 403);
         }
 
         $result = TenantHierarchyService::moveTenant($tenantId, $newParentId);
