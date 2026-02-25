@@ -62,7 +62,7 @@ function lazyWithRetry(
 import { HelmetProvider } from 'react-helmet-async';
 
 // Contexts (app-wide only — tenant-scoped contexts are inside TenantShell)
-import { ToastProvider, ThemeProvider, useTenant } from '@/contexts';
+import { ToastProvider, ThemeProvider, CookieConsentProvider, useTenant } from '@/contexts';
 
 // Google Maps Provider (loads API key, enables PlaceAutocompleteInput)
 import { GoogleMapsProvider } from '@/components/location';
@@ -142,6 +142,7 @@ const LegalHubPage = lazyWithRetry(() => import('@/pages/public/LegalHubPage'));
 const LegalVersionHistoryPage = lazyWithRetry(() => import('@/pages/public/LegalVersionHistoryPage'));
 const FaqPage = lazyWithRetry(() => import('@/pages/public/FaqPage'));
 const HelpCenterPage = lazyWithRetry(() => import('@/pages/help/HelpCenterPage'));
+const CustomPage = lazyWithRetry(() => import('@/pages/public/CustomPage'));
 
 // About Sub-Pages
 const TimebankingGuidePage = lazyWithRetry(() => import('@/pages/about/TimebankingGuidePage'));
@@ -213,6 +214,9 @@ function AppRoutes() {
         <Route path="impact-summary" element={<TenantSlugGate slug="hour-timebank"><ImpactSummaryPage /></TenantSlugGate>} />
         <Route path="impact-report" element={<TenantSlugGate slug="hour-timebank"><ImpactReportPage /></TenantSlugGate>} />
         <Route path="strategic-plan" element={<TenantSlugGate slug="hour-timebank"><StrategicPlanPage /></TenantSlugGate>} />
+
+        {/* Dynamic CMS pages created via admin Page Builder */}
+        <Route path="page/:slug" element={<CustomPage />} />
 
         {/* Public: Blog (feature-gated) */}
         <Route path="blog" element={
@@ -599,22 +603,24 @@ function App() {
             <BrowserRouter>
               <HeroUIRouterProvider>
                 <ScrollToTop />
-                <ToastProvider>
-                  <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                    <Routes>
-                      {/* Single catch-all route — TenantShell detects tenant slug from
-                          the first path segment (if it's not reserved like "admin").
-                          When a slug IS found, TenantShell renders a nested <Routes>
-                          with the slug stripped so child routes match correctly.
-                          This avoids the `:tenantSlug/*` dynamic param route which caused
-                          React Router v6 to rank `/:tenantSlug/listings` higher than
-                          `/admin/*` (splat routes rank lowest in RRv6). */}
-                      <Route path="/*" element={<TenantShell appRoutes={AppRoutes} />}>
-                        {AppRoutes()}
-                      </Route>
-                    </Routes>
-                  </Suspense>
-                </ToastProvider>
+                <CookieConsentProvider>
+                  <ToastProvider>
+                    <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                      <Routes>
+                        {/* Single catch-all route — TenantShell detects tenant slug from
+                            the first path segment (if it's not reserved like "admin").
+                            When a slug IS found, TenantShell renders a nested <Routes>
+                            with the slug stripped so child routes match correctly.
+                            This avoids the `:tenantSlug/*` dynamic param route which caused
+                            React Router v6 to rank `/:tenantSlug/listings` higher than
+                            `/admin/*` (splat routes rank lowest in RRv6). */}
+                        <Route path="/*" element={<TenantShell appRoutes={AppRoutes} />}>
+                          {AppRoutes()}
+                        </Route>
+                      </Routes>
+                    </Suspense>
+                  </ToastProvider>
+                </CookieConsentProvider>
               </HeroUIRouterProvider>
             </BrowserRouter>
           </GoogleMapsProvider>

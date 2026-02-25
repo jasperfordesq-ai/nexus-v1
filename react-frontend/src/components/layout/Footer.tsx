@@ -114,10 +114,25 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/legal')}>Legal Hub</FooterLink></li>
                   <li><FooterLink href={tenantPath('/terms')}>Terms of Service</FooterLink></li>
                   <li><FooterLink href={tenantPath('/privacy')}>Privacy Policy</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/cookies')}>Cookie Policy</FooterLink></li>
                   <li><FooterLink href={tenantPath('/accessibility')}>Accessibility</FooterLink></li>
                 </ul>
               </div>
             </div>
+
+            {/* Dynamic footer pages from admin CMS */}
+            {tenant?.menu_pages?.footer?.length ? (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+                <div>
+                  <h3 className="text-sm font-semibold text-theme-primary mb-3">Pages</h3>
+                  <ul className="space-y-2">
+                    {tenant.menu_pages.footer.map((p) => (
+                      <li key={p.slug}><FooterLink href={tenantPath(`/page/${p.slug}`)}>{p.title}</FooterLink></li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ) : null}
 
             {/* Bottom Bar */}
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">

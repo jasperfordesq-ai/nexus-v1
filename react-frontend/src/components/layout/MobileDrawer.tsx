@@ -366,7 +366,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 {tenant?.slug === 'hour-timebank' && hourTimebankAboutItems.map(renderNavLink)}
                 {(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => renderNavLink({
                   label: p.title,
-                  href: `/${p.slug}`,
+                  href: `/page/${p.slug}`,
                   icon: FileText,
                 }))}
               </div>

@@ -10,13 +10,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem, Button, Spinner } from '@heroui/react';
-import { FileText, ArrowLeft, Save } from 'lucide-react';
+import { Card, CardBody, CardHeader, Input, Select, SelectItem, Button, Spinner, Switch } from '@heroui/react';
+import { FileText, ArrowLeft, Save, Menu, ExternalLink } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader, RichTextEditor } from '../../components';
 
 interface PageFormData {
   title: string;
@@ -24,6 +24,9 @@ interface PageFormData {
   content: string;
   meta_description: string;
   status: string;
+  show_in_menu: boolean;
+  menu_location: string;
+  menu_order: number;
 }
 
 export function PageBuilder() {
@@ -40,6 +43,9 @@ export function PageBuilder() {
     content: '',
     meta_description: '',
     status: 'draft',
+    show_in_menu: false,
+    menu_location: 'about',
+    menu_order: 0,
   });
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -56,6 +62,9 @@ export function PageBuilder() {
               content: (page.content as string) || '',
               meta_description: (page.meta_description as string) || '',
               status: (page.status as string) || 'draft',
+              show_in_menu: !!(page.show_in_menu),
+              menu_location: (page.menu_location as string) || 'about',
+              menu_order: Number(page.menu_order) || 0,
             });
           }
         })
@@ -64,7 +73,7 @@ export function PageBuilder() {
     }
   }, [id, isEdit]);
 
-  const handleChange = (field: keyof PageFormData, value: string) => {
+  const handleChange = (field: keyof PageFormData, value: string | boolean | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -75,8 +84,12 @@ export function PageBuilder() {
     }
     setSaving(true);
     try {
+      const payload = {
+        ...formData,
+        show_in_menu: formData.show_in_menu ? 1 : 0,
+      };
       if (isEdit) {
-        const res = await adminPages.update(Number(id), formData as unknown as Record<string, unknown>);
+        const res = await adminPages.update(Number(id), payload as unknown as Record<string, unknown>);
         if (res?.success) {
           toast.success('Page updated successfully');
           navigate(tenantPath('/admin/pages'));
@@ -84,7 +97,7 @@ export function PageBuilder() {
           toast.error('Failed to update page');
         }
       } else {
-        const res = await adminPages.create(formData);
+        const res = await adminPages.create(payload);
         if (res?.success) {
           toast.success('Page created successfully');
           navigate(tenantPath('/admin/pages'));
@@ -113,68 +126,121 @@ export function PageBuilder() {
       <PageHeader
         title={isEdit ? 'Edit Page' : 'Page Builder'}
         description="Create or edit a CMS page"
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/pages'))}>Back</Button>}
+        actions={
+          <div className="flex gap-2">
+            <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/pages'))}>Back</Button>
+            {isEdit && formData.slug && (
+              <Button
+                variant="flat"
+                color="primary"
+                startContent={<ExternalLink size={16} />}
+                onPress={() => window.open(tenantPath(`/page/${formData.slug}`), '_blank')}
+              >
+                Preview
+              </Button>
+            )}
+          </div>
+        }
       />
 
-      <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><FileText size={20} /> Page Content</h3></CardHeader>
-        <CardBody className="gap-4">
-          <Input
-            label="Page Title"
-            placeholder="e.g., About Us"
-            isRequired
-            variant="bordered"
-            value={formData.title}
-            onValueChange={(v) => handleChange('title', v)}
-          />
-          <Input
-            label="URL Slug"
-            placeholder="e.g., about-us"
-            variant="bordered"
-            description="The URL path for this page"
-            value={formData.slug}
-            onValueChange={(v) => handleChange('slug', v)}
-          />
-          <Textarea
-            label="Page Content"
-            placeholder="Write your page content here..."
-            variant="bordered"
-            minRows={10}
-            value={formData.content}
-            onValueChange={(v) => handleChange('content', v)}
-          />
-          <Input
-            label="Meta Description"
-            placeholder="SEO meta description..."
-            variant="bordered"
-            value={formData.meta_description}
-            onValueChange={(v) => handleChange('meta_description', v)}
-          />
-          <Select
-            label="Status"
-            variant="bordered"
-            selectedKeys={[formData.status]}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0] as string;
-              if (selected) handleChange('status', selected);
-            }}
-          >
-            <SelectItem key="draft">Draft</SelectItem>
-            <SelectItem key="published">Published</SelectItem>
-          </Select>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/pages'))}>Cancel</Button>
-            <Button
-              color="primary"
-              startContent={<Save size={16} />}
-              onPress={handleSave}
-              isLoading={saving}
+      <div className="flex flex-col gap-4">
+        <Card shadow="sm">
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><FileText size={20} /> Page Content</h3></CardHeader>
+          <CardBody className="gap-4">
+            <Input
+              label="Page Title"
+              placeholder="e.g., About Us"
+              isRequired
+              variant="bordered"
+              value={formData.title}
+              onValueChange={(v) => handleChange('title', v)}
+            />
+            <Input
+              label="URL Slug"
+              placeholder="e.g., about-us"
+              variant="bordered"
+              description="The URL path for this page (e.g. /page/about-us)"
+              value={formData.slug}
+              onValueChange={(v) => handleChange('slug', v)}
+            />
+            <RichTextEditor
+              label="Page Content"
+              placeholder="Write your page content here..."
+              value={formData.content}
+              onChange={(html) => handleChange('content', html)}
+              isDisabled={saving}
+            />
+            <Input
+              label="Meta Description"
+              placeholder="SEO meta description..."
+              variant="bordered"
+              value={formData.meta_description}
+              onValueChange={(v) => handleChange('meta_description', v)}
+            />
+            <Select
+              label="Status"
+              variant="bordered"
+              selectedKeys={[formData.status]}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                if (selected) handleChange('status', selected);
+              }}
             >
-              {isEdit ? 'Update' : 'Save'} Page
-            </Button>
-          </div>
-        </CardBody>
-      </Card>
+              <SelectItem key="draft">Draft</SelectItem>
+              <SelectItem key="published">Published</SelectItem>
+            </Select>
+          </CardBody>
+        </Card>
+
+        <Card shadow="sm">
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Menu size={20} /> Navigation Settings</h3></CardHeader>
+          <CardBody className="gap-4">
+            <Switch
+              isSelected={formData.show_in_menu}
+              onValueChange={(v) => handleChange('show_in_menu', v)}
+            >
+              Show in navigation menu
+            </Switch>
+            {formData.show_in_menu && (
+              <>
+                <Select
+                  label="Menu Location"
+                  variant="bordered"
+                  description="Where this page appears in the navigation"
+                  selectedKeys={[formData.menu_location]}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    if (selected) handleChange('menu_location', selected);
+                  }}
+                >
+                  <SelectItem key="about">About section (More dropdown)</SelectItem>
+                  <SelectItem key="footer">Footer</SelectItem>
+                </Select>
+                <Input
+                  type="number"
+                  label="Menu Order"
+                  variant="bordered"
+                  description="Lower numbers appear first (0 = default)"
+                  value={String(formData.menu_order)}
+                  onValueChange={(v) => handleChange('menu_order', parseInt(v, 10) || 0)}
+                />
+              </>
+            )}
+          </CardBody>
+        </Card>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="flat" onPress={() => navigate(tenantPath('/admin/pages'))}>Cancel</Button>
+          <Button
+            color="primary"
+            startContent={<Save size={16} />}
+            onPress={handleSave}
+            isLoading={saving}
+          >
+            {isEdit ? 'Update' : 'Save'} Page
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
