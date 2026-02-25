@@ -22,6 +22,7 @@ import {
   Select,
   SelectItem,
   Spinner,
+  Checkbox,
 } from '@heroui/react';
 import { Building2, Save, ArrowLeft } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
@@ -64,6 +65,14 @@ const SERVICE_AREAS = [
   { key: 'regional', label: 'Regional' },
   { key: 'national', label: 'National' },
   { key: 'international', label: 'International' },
+];
+
+const PLATFORM_LANGUAGES = [
+  { code: 'en', label: 'English', short: 'EN' },
+  { code: 'ga', label: 'Gaeilge', short: 'GA' },
+  { code: 'de', label: 'Deutsch', short: 'DE' },
+  { code: 'fr', label: 'Français', short: 'FR' },
+  { code: 'it', label: 'Italiano', short: 'IT' },
 ];
 
 export function TenantForm() {
@@ -114,6 +123,9 @@ export function TenantForm() {
     social_youtube: '',
     // Features
     features: {} as Record<string, boolean>,
+    // Languages
+    default_language: 'en',
+    supported_languages: ['en', 'ga', 'de', 'fr', 'it'] as string[],
   });
 
   const updateField = (field: string, value: unknown) => {
@@ -157,6 +169,8 @@ export function TenantForm() {
           social_linkedin: tenant.social_linkedin || '',
           social_youtube: tenant.social_youtube || '',
           features: tenant.features || {},
+          default_language: (tenant.configuration as Record<string, unknown>)?.default_language as string || 'en',
+          supported_languages: (tenant.configuration as Record<string, unknown>)?.supported_languages as string[] || ['en'],
         });
       }
     } catch {
@@ -199,6 +213,16 @@ export function TenantForm() {
       } else {
         delete payload.parent_id;
       }
+
+      // Merge language settings into configuration JSON
+      const existingConfig = (payload.configuration ?? {}) as Record<string, unknown>;
+      payload.configuration = {
+        ...existingConfig,
+        default_language: form.default_language,
+        supported_languages: form.supported_languages,
+      };
+      delete payload.default_language;
+      delete payload.supported_languages;
 
       let res;
       if (isEdit) {
@@ -508,6 +532,63 @@ export function TenantForm() {
                 value={form.social_youtube}
                 onValueChange={(v) => updateField('social_youtube', v)}
               />
+            </CardBody>
+          </Card>
+        </Tab>
+
+        <Tab key="languages" title="Languages">
+          <Card shadow="sm">
+            <CardBody className="space-y-4 p-6">
+              <Select
+                label="Default Language"
+                description="Shown to new visitors without a preference"
+                selectedKeys={[form.default_language]}
+                onSelectionChange={(keys) => {
+                  const val = Array.from(keys)[0] as string;
+                  if (val) updateField('default_language', val);
+                }}
+                className="max-w-xs"
+              >
+                {PLATFORM_LANGUAGES.filter((l) =>
+                  form.supported_languages.includes(l.code)
+                ).map((lang) => (
+                  <SelectItem key={lang.code}>
+                    {lang.label} ({lang.short})
+                  </SelectItem>
+                ))}
+              </Select>
+              <div>
+                <p className="text-sm font-medium mb-1">Available Languages</p>
+                <p className="text-xs text-default-400 mb-3">
+                  Languages shown in the language switcher
+                </p>
+                <div className="space-y-2">
+                  {PLATFORM_LANGUAGES.map((lang) => (
+                    <Checkbox
+                      key={lang.code}
+                      isSelected={form.supported_languages.includes(lang.code)}
+                      isDisabled={lang.code === 'en'}
+                      onValueChange={(checked) => {
+                        const updated = checked
+                          ? [...form.supported_languages, lang.code]
+                          : form.supported_languages.filter((c) => c !== lang.code);
+                        updateField('supported_languages', updated);
+                        // Reset default to English if it was unchecked
+                        if (!checked && form.default_language === lang.code) {
+                          updateField('default_language', 'en');
+                        }
+                      }}
+                    >
+                      <span className="text-sm">
+                        {lang.label} ({lang.short})
+                        {lang.code === 'en' && (
+                          <span className="ml-2 text-xs text-default-400">always enabled</span>
+                        )}
+                      </span>
+                    </Checkbox>
+                  ))}
+                </div>
+              </div>
             </CardBody>
           </Card>
         </Tab>

@@ -197,10 +197,20 @@ class AdminSuperApiController extends BaseApiController
         }
         unset($tenant['features']);
 
+        // Decode configuration JSON for the frontend
+        $configuration = [];
+        if (!empty($tenant['configuration'])) {
+            $configuration = is_string($tenant['configuration'])
+                ? (json_decode($tenant['configuration'], true) ?: [])
+                : $tenant['configuration'];
+        }
+        unset($tenant['configuration']);
+
         // Flatten: merge tenant fields with children/admins/breadcrumb at root level
         // React SuperAdminTenantDetail expects all fields flat, not nested under 'tenant' key
         $this->respondWithData(array_merge($tenant, [
             'features' => $features,
+            'configuration' => $configuration,
             'children' => $children,
             'admins' => $admins,
             'breadcrumb' => $breadcrumb,
