@@ -156,6 +156,12 @@ class AdminContentApiController extends BaseApiController
             return;
         }
 
+        // Block reserved slugs that conflict with React routes
+        if ($this->isReservedPageSlug($slug)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, "The slug \"{$slug}\" is reserved and cannot be used for a page. Please choose a different title or slug.", 'slug', 422);
+            return;
+        }
+
         $isPublished = ($status === 'published') ? 1 : 0;
 
         // Ensure slug is unique within tenant
@@ -226,6 +232,11 @@ class AdminContentApiController extends BaseApiController
         }
         if (isset($input['slug'])) {
             $slug = $this->generateSlug($input['slug']);
+            // Block reserved slugs that conflict with React routes
+            if ($this->isReservedPageSlug($slug)) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, "The slug \"{$slug}\" is reserved and cannot be used for a page. Please choose a different slug.", 'slug', 422);
+                return;
+            }
             // Check uniqueness excluding current page
             $conflict = Database::query(
                 "SELECT id FROM pages WHERE slug = ? AND tenant_id = ? AND id != ?",
@@ -1271,6 +1282,32 @@ class AdminContentApiController extends BaseApiController
     private function generateSlug(string $value): string
     {
         return strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '-', $value), '-'));
+    }
+
+    /**
+     * Reserved page slugs that conflict with React routes.
+     * These cannot be used as custom page slugs because they would collide
+     * with built-in routes (e.g. /page/admin would conflict with /admin).
+     */
+    private const RESERVED_PAGE_SLUGS = [
+        'login', 'register', 'password', 'logout', 'dashboard', 'listings',
+        'events', 'groups', 'messages', 'notifications', 'wallet', 'feed',
+        'search', 'members', 'profile', 'settings', 'exchanges', 'achievements',
+        'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
+        'organisations', 'federation', 'onboarding', 'group-exchanges', 'matches', 'newsletter',
+        'help', 'contact', 'about', 'faq', 'legal', 'terms',
+        'privacy', 'accessibility', 'cookies', 'development-status',
+        'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
+        'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
+        'uploads', 'classic', 'health', 'page',
+    ];
+
+    /**
+     * Check if a page slug conflicts with reserved React routes.
+     */
+    private function isReservedPageSlug(string $slug): bool
+    {
+        return in_array(strtolower($slug), self::RESERVED_PAGE_SLUGS, true);
     }
 
     /**
