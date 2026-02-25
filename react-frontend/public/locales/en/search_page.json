@@ -1,0 +1,28 @@
+{
+  "page_title": "Search",
+  "title": "Search",
+  "subtitle": "Find listings, members, events, and groups",
+  "search_placeholder": "Search for anything...",
+  "tab_all": "All ({{count}})",
+  "tab_listings": "Listings ({{count}})",
+  "tab_members": "Members ({{count}})",
+  "tab_events": "Events ({{count}})",
+  "tab_groups": "Groups ({{count}})",
+  "error_title": "Search Error",
+  "error_message": "Search failed. Please try again.",
+  "try_again": "Try Again",
+  "no_results_title": "No results found",
+  "no_results_desc": "No results for \"{{query}}\". Try a different search term.",
+  "section_listings": "Listings ({{count}})",
+  "section_members": "Members ({{count}})",
+  "section_events": "Events ({{count}})",
+  "section_groups": "Groups ({{count}})",
+  "listing_offering": "Offering",
+  "listing_requesting": "Requesting",
+  "members_count": "{{count}} members",
+  "initial_title": "Start searching",
+  "initial_desc": "Enter a search term to find listings, members, events, and groups",
+  "toast": {
+    "search_failed": "Search failed"
+  }
+}

@@ -46,6 +46,7 @@ import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { ReviewModal } from '@/components/reviews';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useFeature, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -74,6 +75,7 @@ interface GamificationSummary {
 }
 
 export function ProfilePage() {
+  const { t } = useTranslation('profile');
   const { id } = useParams<{ id: string }>();
   const { user: currentUser, isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
@@ -220,18 +222,18 @@ export function ProfilePage() {
         if (response.success) {
           setConnectionStatus('pending_sent');
           setConnectionId(response.data?.connection_id ?? null);
-          toast.success('Request sent', 'Connection request sent successfully');
+          toast.success(t('toast.request_sent_title'), t('toast.request_sent'));
         } else {
-          toast.error('Failed', response.error || 'Failed to send request');
+          toast.error(t('toast.failed'), response.error || t('toast.failed'));
         }
       } else if (connectionStatus === 'pending_received' && connectionId) {
         // Accept connection request
         const response = await api.post(`/v2/connections/${connectionId}/accept`);
         if (response.success) {
           setConnectionStatus('connected');
-          toast.success('Connected', 'You are now connected');
+          toast.success(t('toast.connected_title'), t('toast.connected'));
         } else {
-          toast.error('Failed', response.error || 'Failed to accept request');
+          toast.error(t('toast.failed'), response.error || t('toast.failed'));
         }
       } else if ((connectionStatus === 'pending_sent' || connectionStatus === 'connected') && connectionId) {
         // Cancel/Remove connection
@@ -239,21 +241,21 @@ export function ProfilePage() {
         if (response.success) {
           setConnectionStatus('none');
           setConnectionId(null);
-          toast.info('Removed', 'Connection removed');
+          toast.info(t('toast.removed_title'), t('toast.removed'));
         } else {
-          toast.error('Failed', response.error || 'Failed to remove connection');
+          toast.error(t('toast.failed'), response.error || t('toast.failed'));
         }
       }
     } catch (error) {
       logError('Connection action failed', error);
-      toast.error('Error', 'Something went wrong');
+      toast.error(t('toast.failed'), t('toast.error'));
     } finally {
       setIsConnecting(false);
     }
   }, [profile?.id, connectionStatus, connectionId, toast]);
 
   if (isLoading) {
-    return <LoadingScreen message="Loading profile..." />;
+    return <LoadingScreen message={t('loading')} />;
   }
 
   // Error state with retry
@@ -262,7 +264,7 @@ export function ProfilePage() {
       <div className="max-w-4xl mx-auto">
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Profile</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex justify-center gap-3">
             <Link to={tenantPath('/members')}>
@@ -271,7 +273,7 @@ export function ProfilePage() {
                 className="bg-theme-elevated text-theme-primary"
                 startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               >
-                Browse Members
+                {t('browse_members')}
               </Button>
             </Link>
             <Button
@@ -279,7 +281,7 @@ export function ProfilePage() {
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadProfile()}
             >
-              Try Again
+              {t('try_again')}
             </Button>
           </div>
         </GlassCard>
@@ -292,8 +294,8 @@ export function ProfilePage() {
     return (
       <EmptyState
         icon={<User className="w-12 h-12" aria-hidden="true" />}
-        title="Profile not found"
-        description="This user profile does not exist or has been removed"
+        title={t('not_found')}
+        description={t('not_found_desc')}
         action={
           <Link to={tenantPath('/members')}>
             <Button
@@ -301,7 +303,7 @@ export function ProfilePage() {
               className="bg-theme-elevated text-theme-primary"
               startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
             >
-              Browse Members
+              {t('browse_members')}
             </Button>
           </Link>
         }
@@ -342,7 +344,7 @@ export function ProfilePage() {
               />
               {hasGamification && profile.level && (
                 <div className="absolute -bottom-2 -right-2 px-2 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold">
-                  Lvl {profile.level}
+                  {t('level', { level: profile.level })}
                 </div>
               )}
             </div>
@@ -360,7 +362,7 @@ export function ProfilePage() {
                     startContent={<UserCheck className="w-3 h-3" />}
                     className="mt-1"
                   >
-                    Connected
+                    {t('connected')}
                   </Chip>
                 )}
               </div>
@@ -379,9 +381,8 @@ export function ProfilePage() {
                 {profile.created_at && (
                   <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" aria-hidden="true" />
-                    Joined{' '}
                     <time dateTime={profile.created_at}>
-                      {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      {t('joined', { date: new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) })}
                     </time>
                   </span>
                 )}
@@ -402,7 +403,7 @@ export function ProfilePage() {
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                         startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Edit Profile
+                        {t('edit_profile')}
                       </Button>
                     </Link>
                     <Link to={tenantPath('/settings')}>
@@ -411,7 +412,7 @@ export function ProfilePage() {
                         className="bg-theme-elevated text-theme-primary"
                         startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Settings
+                        {t('settings')}
                       </Button>
                     </Link>
                   </>
@@ -422,7 +423,7 @@ export function ProfilePage() {
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                         startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Send Message
+                        {t('send_message')}
                       </Button>
                     </Link>
                     {isAuthenticated && connectionStatus !== 'connected' && (
@@ -448,10 +449,10 @@ export function ProfilePage() {
                         isLoading={isConnecting}
                       >
                         {connectionStatus === 'pending_sent'
-                          ? 'Pending'
+                          ? t('pending')
                           : connectionStatus === 'pending_received'
-                          ? 'Accept'
-                          : 'Connect'}
+                          ? t('accept')
+                          : t('connect')}
                       </Button>
                     )}
                     {/* Write Review */}
@@ -462,7 +463,7 @@ export function ProfilePage() {
                         startContent={<Star className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => setIsReviewModalOpen(true)}
                       >
-                        Write Review
+                        {t('write_review')}
                       </Button>
                     )}
                     {/* Send credits */}
@@ -473,7 +474,7 @@ export function ProfilePage() {
                           className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                           startContent={<ArrowUpRight className="w-4 h-4" aria-hidden="true" />}
                         >
-                          Send Credits
+                          {t('send_credits')}
                         </Button>
                       </Link>
                     )}
@@ -487,7 +488,7 @@ export function ProfilePage() {
         {/* Location Map */}
         {profile.location && profile.latitude && profile.longitude && (
           <LocationMapCard
-            title="Location"
+            title={t('location_title')}
             locationText={profile.location}
             markers={[{
               id: profile.id,
@@ -507,31 +508,31 @@ export function ProfilePage() {
       <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <ProfileStatCard
           icon={<ArrowUpRight className="w-5 h-5" aria-hidden="true" />}
-          label="Hours Given"
+          label={t('stats.hours_given')}
           value={profile.total_hours_given ?? 0}
           color="emerald"
         />
         <ProfileStatCard
           icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
-          label="Hours Received"
+          label={t('stats.hours_received')}
           value={profile.total_hours_received ?? 0}
           color="indigo"
         />
         <ProfileStatCard
           icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}
-          label="Active Listings"
+          label={t('stats.active_listings')}
           value={listings.length}
           color="purple"
         />
         <ProfileStatCard
           icon={<Users className="w-5 h-5" aria-hidden="true" />}
-          label="Groups"
+          label={t('stats.groups')}
           value={profile.groups_count ?? 0}
           color="amber"
         />
         <ProfileStatCard
           icon={<CalendarCheck className="w-5 h-5" aria-hidden="true" />}
-          label="Events"
+          label={t('stats.events')}
           value={profile.events_attended ?? 0}
           color="rose"
         />
@@ -555,7 +556,7 @@ export function ProfilePage() {
             title={
               <span className="flex items-center gap-2">
                 <User className="w-4 h-4" aria-hidden="true" />
-                About
+                {t('tabs.about')}
               </span>
             }
           />
@@ -565,7 +566,7 @@ export function ProfilePage() {
             title={
               <span className="flex items-center gap-2">
                 <ListTodo className="w-4 h-4" aria-hidden="true" />
-                Listings
+                {t('tabs.listings')}
               </span>
             }
           />
@@ -576,7 +577,7 @@ export function ProfilePage() {
               title={
                 <span className="flex items-center gap-2">
                   <Star className="w-4 h-4" aria-hidden="true" />
-                  Reviews
+                  {t('tabs.reviews')}
                 </span>
               }
             />
@@ -588,7 +589,7 @@ export function ProfilePage() {
               title={
                 <span className="flex items-center gap-2">
                   <Award className="w-4 h-4" aria-hidden="true" />
-                  Achievements
+                  {t('tabs.achievements')}
                 </span>
               }
             />
@@ -598,7 +599,7 @@ export function ProfilePage() {
         <div className="mt-6">
           {activeTab === 'about' && (
             <GlassCard className="p-6">
-              <h2 className="text-lg font-semibold text-theme-primary mb-4">About</h2>
+              <h2 className="text-lg font-semibold text-theme-primary mb-4">{t('about.heading')}</h2>
               {profile.bio ? (
                 <div
                   className="text-theme-muted whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert"
@@ -609,12 +610,12 @@ export function ProfilePage() {
                   }}
                 />
               ) : (
-                <p className="text-theme-subtle italic">No bio added yet.</p>
+                <p className="text-theme-subtle italic">{t('about.no_bio')}</p>
               )}
 
               {profile.skills && profile.skills.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-sm font-medium text-theme-muted mb-3">Skills</h3>
+                  <h3 className="text-sm font-medium text-theme-muted mb-3">{t('about.skills')}</h3>
                   <div className="flex flex-wrap gap-2">
                     {profile.skills.map((skill, index) => (
                       <Chip
@@ -653,7 +654,7 @@ export function ProfilePage() {
                                 : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
                             }
                           >
-                            {listing.type === 'offer' ? 'Offering' : 'Requesting'}
+                            {listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}
                           </Chip>
                         </div>
                         <h3 className="font-medium text-theme-primary mb-1">{listing.title}</h3>
@@ -670,13 +671,13 @@ export function ProfilePage() {
                 <div className="col-span-2">
                   <EmptyState
                     icon={<ListTodo className="w-12 h-12" aria-hidden="true" />}
-                    title="No listings"
-                    description={isOwnProfile ? "You haven't created any listings yet" : "This user hasn't created any listings"}
+                    title={t('no_listings')}
+                    description={isOwnProfile ? t('no_listings_own') : t('no_listings_other')}
                     action={
                       isOwnProfile && (
                         <Link to={tenantPath('/listings/create')}>
                           <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                            Create Listing
+                            {t('create_listing')}
                           </Button>
                         </Link>
                       )
@@ -728,7 +729,7 @@ export function ProfilePage() {
                             ))}
                           </div>
                           <p className="text-xs text-theme-subtle mt-1">
-                            {reviews.length} review{reviews.length !== 1 ? 's' : ''}
+                            {t('reviews_count', { count: reviews.length })}
                           </p>
                         </div>
                       </div>
@@ -744,11 +745,11 @@ export function ProfilePage() {
                 <GlassCard className="p-6">
                   <EmptyState
                     icon={<Star className="w-12 h-12" aria-hidden="true" />}
-                    title="No reviews yet"
+                    title={t('no_reviews')}
                     description={
                       isOwnProfile
-                        ? 'Complete exchanges to receive reviews from other members'
-                        : 'This member has not received any reviews yet'
+                        ? t('no_reviews_own')
+                        : t('no_reviews_other')
                     }
                   />
                 </GlassCard>
@@ -769,17 +770,17 @@ export function ProfilePage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-theme-primary">
-                            {gamification.total_badges} Badge{gamification.total_badges !== 1 ? 's' : ''} Earned
+                            {t('achievements.badges', { count: gamification.total_badges })}
                           </p>
                           {profile.level && (
-                            <p className="text-xs text-theme-subtle">Level {profile.level}</p>
+                            <p className="text-xs text-theme-subtle">{t('achievements.level', { level: profile.level })}</p>
                           )}
                         </div>
                       </div>
                       {isOwnProfile && (
                         <Link to={tenantPath('/achievements')}>
                           <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-muted">
-                            View All
+                            {t('achievements.view_all')}
                           </Button>
                         </Link>
                       )}
@@ -797,10 +798,10 @@ export function ProfilePage() {
                         <p className="text-sm font-medium text-theme-primary truncate">{badge.name}</p>
                         <p className="text-xs text-theme-subtle mt-1 line-clamp-2">{badge.description}</p>
                         {badge.earned ? (
-                          <span className="inline-block mt-2 text-xs text-emerald-500 font-medium">Earned</span>
+                          <span className="inline-block mt-2 text-xs text-emerald-500 font-medium">{t('achievements.badge_earned')}</span>
                         ) : (
                           <span className="inline-flex items-center gap-1 mt-2 text-xs text-theme-subtle">
-                            <Lock className="w-3 h-3" aria-hidden="true" /> Locked
+                            <Lock className="w-3 h-3" aria-hidden="true" /> {t('achievements.badge_locked')}
                           </span>
                         )}
                       </GlassCard>
@@ -811,12 +812,12 @@ export function ProfilePage() {
                 <GlassCard className="p-6">
                   <EmptyState
                     icon={<Award className="w-12 h-12" aria-hidden="true" />}
-                    title="No achievements yet"
-                    description={isOwnProfile ? "Start participating to earn badges and achievements!" : "This user hasn't earned any achievements yet"}
+                    title={t('achievements.no_achievements')}
+                    description={isOwnProfile ? t('achievements.no_achievements_own') : t('achievements.no_achievements_other')}
                     action={isOwnProfile && (
                       <Link to={tenantPath('/achievements')}>
                         <Button className="bg-gradient-to-r from-amber-500 to-orange-600 text-white">
-                          View Available Badges
+                          {t('achievements.view_badges')}
                         </Button>
                       </Link>
                     )}
@@ -886,9 +887,10 @@ interface ReviewCardProps {
 }
 
 function ReviewCard({ review }: ReviewCardProps) {
+  const { t } = useTranslation('profile');
   const reviewerName = review.reviewer
     ? `${review.reviewer.first_name} ${review.reviewer.last_name}`.trim()
-    : 'Anonymous';
+    : t('anonymous');
 
   return (
     <GlassCard className="p-5">
@@ -905,7 +907,7 @@ function ReviewCard({ review }: ReviewCardProps) {
               <p className="font-medium text-theme-primary text-sm">{reviewerName}</p>
               {review.listing_title && (
                 <p className="text-xs text-theme-subtle truncate">
-                  For: {review.listing_title}
+                  {t('for_listing', { title: review.listing_title })}
                 </p>
               )}
             </div>

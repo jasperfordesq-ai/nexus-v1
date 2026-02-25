@@ -1,0 +1,46 @@
+{
+  "page_title": "Feed",
+  "title": "Community-Feed",
+  "subtitle": "Sehen Sie, was in Ihrer Gemeinschaft passiert",
+  "new_post": "Neuer Beitrag",
+  "whats_on_your_mind": "Was beschäftigt Sie?",
+  "add_image_aria": "Bild hinzufügen",
+  "create_poll_aria": "Umfrage erstellen",
+  "create_post": "Beitrag erstellen",
+  "load_more": "Mehr laden",
+  "unable_to_load": "Feed konnte nicht geladen werden",
+  "try_again": "Erneut versuchen",
+  "error_load": "Feed konnte nicht geladen werden.",
+  "error_load_retry": "Feed konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+  "empty_title": "Noch keine Beiträge",
+  "empty_desc": "Seien Sie die erste Person, die etwas mit Ihrer Gemeinschaft teilt!",
+  "empty_filtered": "Keine {{filter}} im Feed vorhanden. Versuchen Sie einen anderen Filter!",
+  "filter": {
+    "all": "Alle",
+    "posts": "Beiträge",
+    "listings": "Angebote",
+    "events": "Veranstaltungen",
+    "polls": "Umfragen",
+    "goals": "Ziele"
+  },
+  "report": {
+    "title": "Beitrag melden",
+    "description": "Bitte beschreiben Sie, warum Sie diesen Beitrag melden. Unsere Moderatoren werden Ihre Meldung prüfen.",
+    "reason_label": "Grund",
+    "reason_placeholder": "Beschreiben Sie das Problem...",
+    "cancel": "Abbrechen",
+    "submit": "Meldung absenden"
+  },
+  "toast": {
+    "post_hidden": "Beitrag ausgeblendet",
+    "hide_failed": "Beitrag konnte nicht ausgeblendet werden",
+    "user_muted": "Benutzer stummgeschaltet",
+    "mute_failed": "Benutzer konnte nicht stummgeschaltet werden",
+    "provide_reason": "Bitte geben Sie einen Grund an",
+    "reported": "Beitrag gemeldet. Vielen Dank, dass Sie helfen, unsere Gemeinschaft sicher zu halten.",
+    "report_failed": "Beitrag konnte nicht gemeldet werden",
+    "deleted": "Beitrag gelöscht",
+    "delete_failed": "Beitrag konnte nicht gelöscht werden",
+    "vote_failed": "Abstimmung konnte nicht abgegeben werden"
+  }
+}

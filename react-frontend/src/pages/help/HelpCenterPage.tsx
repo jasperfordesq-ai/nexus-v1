@@ -26,6 +26,7 @@ import {
   Calendar,
   ArrowRightLeft,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -177,8 +178,9 @@ const faqCategories: FaqCategory[] = [
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function HelpCenterPage() {
+  const { t } = useTranslation('utility');
   const { branding, tenantPath } = useTenant();
-  usePageTitle('Help Center');
+  usePageTitle(t('help.page_title'));
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter FAQ items by search
@@ -203,16 +205,16 @@ export function HelpCenterPage() {
           <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
             <HelpCircle className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">Help Center</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">{t('help.heading')}</h1>
           <p className="text-theme-muted mt-2 max-w-lg mx-auto">
-            Find answers to common questions about {branding.name}
+            {t('help.subtitle', { name: branding.name })}
           </p>
         </div>
 
         {/* Search */}
         <div className="max-w-md mx-auto mb-8">
           <Input
-            placeholder="Search for help..."
+            placeholder={t('help.search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
@@ -232,10 +234,10 @@ export function HelpCenterPage() {
         transition={{ delay: 0.1 }}
         className="grid grid-cols-2 sm:grid-cols-4 gap-3"
       >
-        <QuickLink to={tenantPath("/listings")} icon={<BookOpen />} label="Browse Listings" />
-        <QuickLink to={tenantPath("/wallet")} icon={<Wallet />} label="My Wallet" />
-        <QuickLink to={tenantPath("/events")} icon={<Calendar />} label="Events" />
-        <QuickLink to={tenantPath("/contact")} icon={<MessageSquare />} label="Contact Us" />
+        <QuickLink to={tenantPath("/listings")} icon={<BookOpen />} label={t('help.quick_browse_listings')} />
+        <QuickLink to={tenantPath("/wallet")} icon={<Wallet />} label={t('help.quick_my_wallet')} />
+        <QuickLink to={tenantPath("/events")} icon={<Calendar />} label={t('help.quick_events')} />
+        <QuickLink to={tenantPath("/contact")} icon={<MessageSquare />} label={t('help.quick_contact_us')} />
       </motion.div>
 
       {/* FAQ Categories */}
@@ -248,13 +250,13 @@ export function HelpCenterPage() {
         {filteredCategories.length === 0 ? (
           <GlassCard className="p-8 text-center">
             <Search className="w-12 h-12 text-theme-subtle mx-auto mb-4 opacity-50" aria-hidden="true" />
-            <h2 className="text-lg font-semibold text-theme-primary mb-2">No results found</h2>
+            <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('help.no_results_found')}</h2>
             <p className="text-theme-muted mb-4">
-              Try different search terms or{' '}
+              {t('help.no_results_description_before')}{' '}
               <Link to={tenantPath("/contact")} className="text-indigo-500 hover:underline">
-                contact us
+                {t('help.no_results_contact_link')}
               </Link>{' '}
-              for help.
+              {t('help.no_results_description_after')}
             </p>
           </GlassCard>
         ) : (
@@ -274,9 +276,9 @@ export function HelpCenterPage() {
             {filteredCategories.map((category, catIdx) => (
               <AccordionItem
                 key={String(catIdx)}
-                aria-label={category.title}
-                title={category.title}
-                subtitle={`${category.items.length} articles`}
+                aria-label={t('help.faq_cat_' + catIdx + '_title')}
+                title={t('help.faq_cat_' + catIdx + '_title')}
+                subtitle={t('help.articles_count', { count: category.items.length })}
                 startContent={
                   <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400">
                     {category.icon}
@@ -294,13 +296,13 @@ export function HelpCenterPage() {
                     indicator: 'text-theme-muted',
                   }}
                 >
-                  {category.items.map((item, itemIdx) => (
+                  {category.items.map((_item, itemIdx) => (
                     <AccordionItem
                       key={`${catIdx}-${itemIdx}`}
-                      aria-label={item.question}
-                      title={item.question}
+                      aria-label={t('help.faq_cat_' + catIdx + '_q_' + itemIdx)}
+                      title={t('help.faq_cat_' + catIdx + '_q_' + itemIdx)}
                     >
-                      {item.answer}
+                      {t('help.faq_cat_' + catIdx + '_a_' + itemIdx)}
                     </AccordionItem>
                   ))}
                 </Accordion>
@@ -317,16 +319,16 @@ export function HelpCenterPage() {
         transition={{ delay: 0.3 }}
       >
         <GlassCard className="p-6 text-center">
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Still need help?</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('help.still_need_help')}</h2>
           <p className="text-sm text-theme-muted mb-4">
-            Can&apos;t find what you&apos;re looking for? Our team is here to help.
+            {t('help.still_need_help_description')}
           </p>
           <Link to={tenantPath("/contact")}>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
             >
-              Contact Support
+              {t('help.contact_support')}
             </Button>
           </Link>
         </GlassCard>

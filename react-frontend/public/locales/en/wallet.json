@@ -11,5 +11,48 @@
   "empty": "No transactions yet",
   "transfer": "Transfer Credits",
   "pending_reviews": "Pending Reviews",
-  "review": "Leave Review"
+  "review": "Leave Review",
+  "subtitle": "Track your time credits and transactions",
+  "unable_to_load": "Unable to Load Wallet",
+  "try_again": "Try Again",
+  "your_balance": "Your Balance",
+  "pending_in": "+{{count}}h pending",
+  "no_pending": "No pending transactions",
+  "send_credits": "Send Credits",
+  "history": "Transaction History",
+  "export": "Export",
+  "load_more": "Load More",
+  "no_transactions": "No transactions",
+  "no_transactions_desc": "Your transaction history will appear here",
+  "stats": {
+    "earned": "Earned",
+    "spent": "Spent",
+    "pending": "Pending"
+  },
+  "filter": {
+    "all": "All",
+    "earned": "Earned",
+    "spent": "Spent",
+    "pending": "Pending"
+  },
+  "csv": {
+    "date": "Date",
+    "type": "Type",
+    "amount": "Amount",
+    "description": "Description",
+    "other_party": "Other Party",
+    "status": "Status",
+    "received": "Received",
+    "sent": "Sent"
+  },
+  "toast": {
+    "no_data": "No data",
+    "no_export": "No transactions to export",
+    "load_error": "Error",
+    "load_more_error": "Failed to load more transactions",
+    "exported": "Exported",
+    "exported_desc": "Transactions exported to CSV",
+    "transfer_success": "Transfer successful",
+    "transfer_desc": "Sent {{amount}} hours to {{recipient}}"
+  }
 }

@@ -11,5 +11,48 @@
   "empty": "Noch keine Transaktionen",
   "transfer": "Guthaben übertragen",
   "pending_reviews": "Ausstehende Bewertungen",
-  "review": "Bewertung abgeben"
+  "review": "Bewertung abgeben",
+  "subtitle": "Verfolgen Sie Ihre Zeitguthaben und Transaktionen",
+  "unable_to_load": "Zeitkonto kann nicht geladen werden",
+  "try_again": "Erneut versuchen",
+  "your_balance": "Ihr Guthaben",
+  "pending_in": "+{{count}}h ausstehend",
+  "no_pending": "Keine ausstehenden Transaktionen",
+  "send_credits": "Guthaben senden",
+  "history": "Transaktionshistorie",
+  "export": "Exportieren",
+  "load_more": "Mehr laden",
+  "no_transactions": "Keine Transaktionen",
+  "no_transactions_desc": "Ihre Transaktionshistorie erscheint hier",
+  "stats": {
+    "earned": "Erhalten",
+    "spent": "Ausgegeben",
+    "pending": "Ausstehend"
+  },
+  "filter": {
+    "all": "Alle",
+    "earned": "Erhalten",
+    "spent": "Ausgegeben",
+    "pending": "Ausstehend"
+  },
+  "csv": {
+    "date": "Datum",
+    "type": "Typ",
+    "amount": "Betrag",
+    "description": "Beschreibung",
+    "other_party": "Andere Partei",
+    "status": "Status",
+    "received": "Empfangen",
+    "sent": "Gesendet"
+  },
+  "toast": {
+    "no_data": "Keine Daten",
+    "no_export": "Keine Transaktionen zum Exportieren",
+    "load_error": "Fehler",
+    "load_more_error": "Weitere Transaktionen konnten nicht geladen werden",
+    "exported": "Exportiert",
+    "exported_desc": "Transaktionen als CSV exportiert",
+    "transfer_success": "Übertragung erfolgreich",
+    "transfer_desc": "{{amount}} Stunden an {{recipient}} gesendet"
+  }
 }

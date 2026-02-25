@@ -1,0 +1,165 @@
+{
+  "page_title": "Malartuithe",
+  "title": "Mo Mhalartuithe",
+  "subtitle": "Lean lorg ar d'iarratais mhalartaithe seirbhíse agus dearbhuithe",
+  "browse_listings": "Brabhsáil Liostuithe",
+  "load_more": "Lódáil Tuilleadh",
+  "try_again": "Bain Triail Eile As",
+  "service_exchange": "Malartú Seirbhíse",
+  "unknown": "Anaithnid",
+  "hours_count": "{{count}} uair",
+  "hours_count_other": "{{count}} uair",
+
+  "workflow_not_enabled_title": "Sreabhadh Oibre Malartaithe Gan Cur ar Siúl",
+  "workflow_not_enabled_description": "Níl an córas sreabhadh oibre malartaithe cumasaithe don phobal seo. Déan teagmháil le do chomhordaitheoir le haghaidh tuilleadh eolais.",
+
+  "tabs": {
+    "aria_label": "Scagaire stádais malartaithe",
+    "active": "Gníomhach",
+    "active_aria": "Taispeáin malartuithe gníomhacha",
+    "needs_confirmation": "Dearbhú de Dhíth",
+    "needs_confirmation_aria": "Taispeáin malartuithe a dteastaíonn dearbhú uathu",
+    "completed": "Críochnaithe",
+    "completed_aria": "Taispeáin malartuithe críochnaithe",
+    "all": "Gach Ceann",
+    "all_aria": "Taispeáin gach malartú"
+  },
+
+  "error": {
+    "load_failed": "Theip ar lódáil na malartuithe. Bain triail eile as.",
+    "unable_to_load": "Ní Féidir Malartuithe a Lódáil"
+  },
+
+  "empty": {
+    "title": "Níor Aimsíodh Malartuithe",
+    "active_description": "Níl aon mhalartuithe gníomhacha agat. Brabhsáil liostuithe chun seirbhís a iarraidh.",
+    "filter_description": "Ní mheaitseálann aon mhalartuithe leis an scagaire seo."
+  },
+
+  "card": {
+    "aria_label": "Malartú: {{title}} - {{status}}",
+    "with_party": "Le {{name}}",
+    "from_party": "Ó {{name}}",
+    "you_requested": "D'iarr tú",
+    "you_providing": "Tá tú ag soláthar",
+    "confirm_hours": "Dearbhaigh Uaireanta",
+    "waiting_for_other": "Ag fanacht leis an duine eile",
+    "respond": "Freagair"
+  },
+
+  "breadcrumb": {
+    "exchanges": "Malartuithe",
+    "exchange": "Malartú"
+  },
+
+  "toast": {
+    "load_more_failed": "Theip ar lódáil tuilleadh malartuithe",
+    "accepted": "Malartú glactha!",
+    "accept_failed": "Theip ar ghlacadh leis an malartú",
+    "declined": "Malartú diúltaithe",
+    "decline_failed": "Theip ar dhiúltú don mhalartú",
+    "started": "Malartú tosaithe!",
+    "start_failed": "Theip ar thosú an mhalartaithe",
+    "completed": "Malartú marcáilte mar chríochnaithe. Dearbhaigh uaireanta le do thoil.",
+    "complete_failed": "Theip ar chríochnú an mhalartaithe",
+    "invalid_hours": "Cuir uaireanta bailí isteach le do thoil",
+    "max_hours": "Uasmhéid {{max}} uair in aghaidh an mhalartaithe",
+    "hours_confirmed": "Uaireanta dearbhaithe!",
+    "confirm_failed": "Theip ar dhearbhú na n-uaireanta",
+    "cancelled": "Malartú cealaithe",
+    "cancel_failed": "Theip ar chealú an mhalartaithe",
+    "request_sent": "Iarratas malartaithe seolta!",
+    "request_failed": "Theip ar chruthú an iarratais mhalartaithe"
+  },
+
+  "detail": {
+    "page_title": "Sonraí Malartaithe",
+    "loading": "Ag lódáil malartaithe...",
+    "not_found": "Malartú gan aimsiú",
+    "not_found_title": "Malartú Gan Aimsiú",
+    "not_found_description": "Níl an malartú atá á lorg agat ann",
+    "view_exchanges": "Féach ar Mo Mhalartuithe",
+    "exchange_details": "Sonraí Malartaithe",
+    "service": "Seirbhís",
+    "requester": "Iarrthóir",
+    "provider": "Soláthraí",
+    "you": "Tú",
+    "other_party": "An Páirtí Eile",
+    "confirmed_hours": "Dearbhaithe {{hours}}u",
+    "message_party": "Teachtaireacht chuig {{name}}",
+    "proposed_hours": "Uaireanta Molta",
+    "final_hours": "Uaireanta Deiridh",
+    "created": "Cruthaithe",
+    "message_from_requester": "Teachtaireacht ón iarrthóir",
+    "broker_notes": "Nótaí an Bhróicéara",
+    "accept_request": "Glac leis an Iarratas",
+    "decline": "Diúltaigh",
+    "start_exchange": "Tosaigh Malartú",
+    "mark_complete": "Marcáil mar Chríochnaithe",
+    "confirm_hours": "Dearbhaigh Uaireanta",
+    "cancel_exchange": "Cealaigh Malartú",
+    "timeline_title": "Amlíne Malartaithe",
+    "timeline": {
+      "created": "Malartú Cruthaithe",
+      "accepted": "Malartú Glactha",
+      "declined": "Malartú Diúltaithe",
+      "started": "Malartú Tosaithe",
+      "completed": "Malartú Críochnaithe",
+      "confirmed": "Uaireanta Dearbhaithe",
+      "cancelled": "Malartú Cealaithe",
+      "awaiting_confirmation": "Ag Fanacht le Dearbhú",
+      "sent_to_broker": "Seolta chuig an mBróicéir",
+      "disputed": "Malartú faoi Dhíospóid",
+      "fallback": "Stádas Nuashonraithe"
+    }
+  },
+
+  "modal": {
+    "decline_title": "Diúltaigh d'Iarratas Malartaithe",
+    "decline_reason_label": "Cúis (roghnach)",
+    "decline_reason_placeholder": "Inis dóibh cén fáth a bhfuil tú ag diúltú...",
+    "decline_confirm": "Diúltaigh don Iarratas",
+    "cancel": "Cealaigh",
+    "confirm_title": "Dearbhaigh Uaireanta Oibre",
+    "confirm_description": "Cé mhéad uair a oibríodh i ndáiríre don mhalartú seo?",
+    "hours_label": "Uaireanta",
+    "hours_placeholder": "Cuir uaireanta isteach",
+    "hours_unit": "uaireanta",
+    "originally_proposed": "Molta ar dtús: {{hours}} uair (uasmhéid: {{max}})",
+    "cancel_title": "Cealaigh an Malartú?",
+    "cancel_description": "An bhfuil tú cinnte gur mian leat an malartú seo a chealú? Ní féidir an gníomh seo a chur ar ais.",
+    "keep_exchange": "Coinnigh an Malartú"
+  },
+
+  "request": {
+    "page_title": "Iarr Malartú",
+    "title": "Iarr Malartú",
+    "subtitle": "Seol iarratas chun creidmheasanna ama a mhalartú don tseirbhís seo",
+    "loading": "Ag lódáil...",
+    "listing_not_found": "Liostú gan aimsiú",
+    "workflow_not_enabled": "Níl sreabhadh oibre malartaithe cumasaithe",
+    "load_failed": "Theip ar lódáil an liostaithe",
+    "cannot_request": "Ní Féidir Malartú a Iarraidh",
+    "not_available": "Níl an liostú seo ar fáil d'iarratais mhalartaithe.",
+    "own_listing_title": "Is Leatsa an Liostú Seo",
+    "own_listing_description": "Ní féidir leat malartú a iarraidh ar do liostú féin.",
+    "view_listing": "Féach ar Liostú",
+    "breadcrumb_listings": "Liostuithe",
+    "breadcrumb_listing": "Liostú",
+    "breadcrumb_request": "Iarr Malartú",
+    "estimated_hours": "~{{hours}} uair",
+    "service_offer": "Tairiscint Seirbhíse",
+    "service_request": "Iarratas Seirbhíse",
+    "proposed_hours_label": "Uaireanta Molta",
+    "proposed_hours_placeholder": "Cé mhéad uair atá de dhíth ort?",
+    "proposed_hours_description": "An t-am measta don tseirbhís seo (uasmhéid: {{max}})",
+    "hours_unit": "uaireanta",
+    "message_label": "Teachtaireacht (roghnach)",
+    "message_placeholder": "Cuir teachtaireacht leis chuig soláthraí na seirbhíse...",
+    "message_description": "Mínigh do riachtanais nó cuir ceisteanna",
+    "broker_approval_title": "Faomhadh Bróicéara de Dhíth",
+    "broker_approval_description": "Beidh gá le faomhadh ó chomhordaitheoir pobail sula bhféadfaidh an malartú seo dul ar aghaidh.",
+    "cancel": "Cealaigh",
+    "send_request": "Seol Iarratas"
+  }
+}

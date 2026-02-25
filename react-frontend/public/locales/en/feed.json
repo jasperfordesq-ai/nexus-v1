@@ -1,0 +1,46 @@
+{
+  "page_title": "Feed",
+  "title": "Community Feed",
+  "subtitle": "See what's happening in your community",
+  "new_post": "New Post",
+  "whats_on_your_mind": "What's on your mind?",
+  "add_image_aria": "Add image",
+  "create_poll_aria": "Create poll",
+  "create_post": "Create Post",
+  "load_more": "Load More",
+  "unable_to_load": "Unable to Load Feed",
+  "try_again": "Try Again",
+  "error_load": "Failed to load feed.",
+  "error_load_retry": "Failed to load feed. Please try again.",
+  "empty_title": "No posts yet",
+  "empty_desc": "Be the first to share something with your community!",
+  "empty_filtered": "No {{filter}} in the feed right now. Try a different filter!",
+  "filter": {
+    "all": "All",
+    "posts": "Posts",
+    "listings": "Listings",
+    "events": "Events",
+    "polls": "Polls",
+    "goals": "Goals"
+  },
+  "report": {
+    "title": "Report Post",
+    "description": "Please describe why you are reporting this post. Our moderators will review your report.",
+    "reason_label": "Reason",
+    "reason_placeholder": "Describe the issue...",
+    "cancel": "Cancel",
+    "submit": "Submit Report"
+  },
+  "toast": {
+    "post_hidden": "Post hidden",
+    "hide_failed": "Failed to hide post",
+    "user_muted": "User muted",
+    "mute_failed": "Failed to mute user",
+    "provide_reason": "Please provide a reason",
+    "reported": "Post reported. Thank you for helping keep our community safe.",
+    "report_failed": "Failed to report post",
+    "deleted": "Post deleted",
+    "delete_failed": "Failed to delete post",
+    "vote_failed": "Failed to submit vote"
+  }
+}

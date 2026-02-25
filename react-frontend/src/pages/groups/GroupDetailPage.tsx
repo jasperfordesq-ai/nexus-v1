@@ -66,6 +66,7 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -154,7 +155,8 @@ function isGroupAdmin(group: GroupDetails): boolean {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GroupDetailPage() {
-  usePageTitle('Group');
+  const { t } = useTranslation('groups');
+  usePageTitle(t('title'));
   const { id } = useParams<{ id: string }>();
   const { user: currentUser, isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
@@ -232,11 +234,11 @@ export function GroupDetailPage() {
           setActiveTab('subgroups');
         }
       } else {
-        setError('Group not found or has been removed');
+        setError(t('detail.not_found_desc'));
       }
     } catch (err) {
       logError('Failed to load group', err);
-      setError('Failed to load group. Please try again.');
+      setError(t('detail.error_load_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -276,7 +278,7 @@ export function GroupDetailPage() {
     } catch (err) {
       logError('Failed to load discussions', err);
       if (!append) {
-        toast.error('Failed to load discussions');
+        toast.error(t('toast.discussions_load_failed'));
       }
     } finally {
       setDiscussionsLoading(false);
@@ -386,9 +388,9 @@ export function GroupDetailPage() {
             member_count: memberCount - 1,
             members_count: memberCount - 1,
           } : null);
-          toast.success('Left the group');
+          toast.success(t('toast.left'));
         } else {
-          toast.error('Failed to leave group');
+          toast.error(t('toast.leave_failed'));
         }
       } else {
         const response = await api.post(`/v2/groups/${group.id}/join`);
@@ -400,14 +402,14 @@ export function GroupDetailPage() {
             member_count: memberCount + 1,
             members_count: memberCount + 1,
           } : null);
-          toast.success('Joined the group!');
+          toast.success(t('toast.joined'));
         } else {
-          toast.error('Failed to join group');
+          toast.error(t('toast.join_failed'));
         }
       }
     } catch (err) {
       logError('Failed to update membership', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setIsJoining(false);
     }
@@ -431,13 +433,13 @@ export function GroupDetailPage() {
         setNewDiscussionTitle('');
         setNewDiscussionContent('');
         setShowNewDiscussion(false);
-        toast.success('Discussion created');
+        toast.success(t('toast.discussion_created'));
       } else {
-        toast.error(response.error || 'Failed to create discussion');
+        toast.error(response.error || t('toast.discussion_failed'));
       }
     } catch (err) {
       logError('Failed to create discussion', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setCreatingDiscussion(false);
     }
@@ -464,12 +466,12 @@ export function GroupDetailPage() {
       if (response.success && response.data) {
         setExpandedDiscussion(response.data);
       } else {
-        toast.error('Failed to load discussion');
+        toast.error(t('toast.discussion_load_failed'));
         setExpandedDiscussionId(null);
       }
     } catch (err) {
       logError('Failed to load discussion', err);
-      toast.error('Failed to load discussion');
+      toast.error(t('toast.discussion_load_failed'));
       setExpandedDiscussionId(null);
     } finally {
       setExpandedLoading(false);
@@ -502,13 +504,13 @@ export function GroupDetailPage() {
           )
         );
         setReplyContent('');
-        toast.success('Reply sent');
+        toast.success(t('toast.reply_sent'));
       } else {
-        toast.error(response.error || 'Failed to send reply');
+        toast.error(response.error || t('toast.reply_failed'));
       }
     } catch (err) {
       logError('Failed to send reply', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setSendingReply(false);
     }
@@ -543,12 +545,12 @@ export function GroupDetailPage() {
           ...prev,
           ...(type === 'avatar' ? { image_url: url } : { cover_image_url: url }),
         } : null);
-        toast.success(`Group ${type === 'avatar' ? 'image' : 'cover'} updated`);
+        toast.success(type === 'avatar' ? t('toast.image_avatar_updated') : t('toast.image_cover_updated'));
       } else {
-        toast.error(response.error || 'Failed to upload image');
+        toast.error(response.error || t('toast.image_upload_failed'));
       }
     } catch (err) {
-      toast.error('Failed to upload image');
+      toast.error(t('toast.image_upload_failed'));
     } finally {
       setUploadingImage(false);
       e.target.value = '';
@@ -575,13 +577,13 @@ export function GroupDetailPage() {
           ...(settingsLocation.trim() ? { location: settingsLocation.trim() } : {}),
         } : null);
         setShowSettingsModal(false);
-        toast.success('Group settings updated');
+        toast.success(t('toast.settings_updated'));
       } else {
-        toast.error(response.error || 'Failed to update settings');
+        toast.error(response.error || t('toast.settings_failed'));
       }
     } catch (err) {
       logError('Failed to update group settings', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setSavingSettings(false);
     }
@@ -598,15 +600,15 @@ export function GroupDetailPage() {
       setDeletingGroup(true);
       const response = await api.delete(`/v2/groups/${id}`);
       if (response.success) {
-        toast.success('Group deleted');
+        toast.success(t('toast.deleted'));
         // Navigate away after deletion
         window.location.href = tenantPath('/groups');
       } else {
-        toast.error(response.error || 'Failed to delete group');
+        toast.error(response.error || t('toast.delete_failed'));
       }
     } catch (err) {
       logError('Failed to delete group', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setDeletingGroup(false);
       setShowDeleteModal(false);
@@ -625,7 +627,7 @@ export function GroupDetailPage() {
       const response = await api.post(`/v2/groups/${id}/requests/${userId}`, { action });
       if (response.success) {
         setJoinRequests((prev) => prev.filter((r) => r.user_id !== userId));
-        toast.success(action === 'accept' ? 'Request accepted' : 'Request rejected');
+        toast.success(action === 'accept' ? t('toast.request_accepted') : t('toast.request_rejected'));
         if (action === 'accept') {
           setGroup((prev) => prev ? {
             ...prev,
@@ -638,11 +640,11 @@ export function GroupDetailPage() {
           }
         }
       } else {
-        toast.error(response.error || `Failed to ${action} request`);
+        toast.error(response.error || t('toast.request_failed', { action }));
       }
     } catch (err) {
       logError(`Failed to ${action} join request`, err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setProcessingRequest(null);
     }
@@ -662,13 +664,13 @@ export function GroupDetailPage() {
         setMembers((prev) =>
           prev.map((m) => (m.id === userId ? { ...m, role: newRole } : m))
         );
-        toast.success(`Role updated to ${newRole}`);
+        toast.success(t('toast.role_updated', { role: newRole }));
       } else {
-        toast.error(response.error || 'Failed to update role');
+        toast.error(response.error || t('toast.role_update_failed'));
       }
     } catch (err) {
       logError('Failed to update member role', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setUpdatingMember(null);
     }
@@ -691,13 +693,13 @@ export function GroupDetailPage() {
           member_count: Math.max(0, (prev.member_count ?? prev.members_count ?? 0) - 1),
           members_count: Math.max(0, (prev.member_count ?? prev.members_count ?? 0) - 1),
         } : null);
-        toast.success('Member removed');
+        toast.success(t('toast.member_removed'));
       } else {
-        toast.error(response.error || 'Failed to remove member');
+        toast.error(response.error || t('toast.member_remove_failed'));
       }
     } catch (err) {
       logError('Failed to remove member', err);
-      toast.error('Something went wrong');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setUpdatingMember(null);
     }
@@ -717,7 +719,7 @@ export function GroupDetailPage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   if (isLoading) {
-    return <LoadingScreen message="Loading group..." />;
+    return <LoadingScreen message={t('detail.loading')} />;
   }
 
   if (error || !group) {
@@ -725,8 +727,8 @@ export function GroupDetailPage() {
       <div className="max-w-4xl mx-auto">
         <GlassCard className="p-8 text-center">
           <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Group</h2>
-          <p className="text-theme-muted mb-4">{error || 'The group you are looking for does not exist'}</p>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('detail.unable_to_load')}</h2>
+          <p className="text-theme-muted mb-4">{error || t('detail.not_found_desc')}</p>
           <div className="flex justify-center gap-3">
             <Link to={tenantPath("/groups")}>
               <Button
@@ -734,7 +736,7 @@ export function GroupDetailPage() {
                 className="bg-theme-elevated text-theme-primary"
                 startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               >
-                Browse Groups
+                {t('detail.browse_groups')}
               </Button>
             </Link>
             <Button
@@ -742,7 +744,7 @@ export function GroupDetailPage() {
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadGroup()}
             >
-              Try Again
+              {t('detail.try_again')}
             </Button>
           </div>
         </GlassCard>
@@ -762,8 +764,8 @@ export function GroupDetailPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Groups', href: tenantPath('/groups') },
-        { label: group?.name || 'Group' },
+        { label: t('title'), href: tenantPath('/groups') },
+        { label: group?.name || t('title') },
       ]} />
 
       {/* Group Header */}
@@ -783,14 +785,14 @@ export function GroupDetailPage() {
                 )}
               </div>
               <p className="text-theme-muted text-sm mt-1">
-                {getMemberCount(group)} members
+                {t('detail.members_count', { count: getMemberCount(group) })}
                 {group.location && (
                   <>
                     {' '}<span aria-hidden="true">&#183;</span>{' '}
                     <MapPin className="w-3.5 h-3.5 inline" aria-hidden="true" /> {group.location}
                   </>
                 )}
-                {' '}<span aria-hidden="true">&#183;</span>{' '}Created{' '}
+                {' '}<span aria-hidden="true">&#183;</span>{' '}{t('detail.created')}{' '}
                 <time dateTime={group.created_at}>{new Date(group.created_at).toLocaleDateString()}</time>
               </p>
             </div>
@@ -805,7 +807,7 @@ export function GroupDetailPage() {
                   startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
                   onPress={openSettingsModal}
                 >
-                  Settings
+                  {t('detail.settings')}
                 </Button>
                 <Button
                   variant="flat"
@@ -813,7 +815,7 @@ export function GroupDetailPage() {
                   startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => setShowDeleteModal(true)}
                 >
-                  Delete
+                  {t('detail.delete')}
                 </Button>
               </>
             )}
@@ -827,7 +829,7 @@ export function GroupDetailPage() {
                 onPress={handleJoinLeave}
                 isLoading={isJoining}
               >
-                {userIsMember ? 'Leave Group' : 'Join Group'}
+                {userIsMember ? t('detail.leave_group') : t('detail.join_group')}
               </Button>
             )}
           </div>
@@ -835,31 +837,31 @@ export function GroupDetailPage() {
 
         {/* Description */}
         <p className="text-theme-muted mb-6">
-          {group.description || 'No description provided for this group.'}
+          {group.description || t('detail.no_description')}
         </p>
 
         {/* Quick Stats */}
         <div className="flex flex-wrap gap-3 sm:gap-6">
           <div className="flex items-center gap-2 text-theme-muted">
             <Users className="w-5 h-5" aria-hidden="true" />
-            <span>{getMemberCount(group)} members</span>
+            <span>{t('detail.members_count', { count: getMemberCount(group) })}</span>
           </div>
           {group.posts_count !== undefined && (
             <div className="flex items-center gap-2 text-theme-muted">
               <MessageSquare className="w-5 h-5" aria-hidden="true" />
-              <span>{group.posts_count} posts</span>
+              <span>{t('detail.posts_count', { count: group.posts_count })}</span>
             </div>
           )}
           <div className="flex items-center gap-2 text-theme-muted">
             <Calendar className="w-5 h-5" aria-hidden="true" />
-            <span>Created <time dateTime={group.created_at}>{new Date(group.created_at).toLocaleDateString()}</time></span>
+            <span>{t('detail.created')} <time dateTime={group.created_at}>{new Date(group.created_at).toLocaleDateString()}</time></span>
           </div>
         </div>
 
         {/* Location Map */}
         {group.location && group.latitude && group.longitude && (
           <LocationMapCard
-            title="Group Location"
+            title={t('detail.location_title')}
             locationText={group.location}
             markers={[{
               id: group.id,
@@ -884,7 +886,7 @@ export function GroupDetailPage() {
               startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => { loadJoinRequests(); }}
             >
-              View Pending Join Requests
+              {t('detail.view_pending_requests')}
             </Button>
           </div>
         )}
@@ -894,14 +896,14 @@ export function GroupDetailPage() {
           <div className="mt-4 pt-4 border-t border-theme-default">
             <h3 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">
               <UserPlus className="w-4 h-4" aria-hidden="true" />
-              Pending Join Requests ({joinRequests.length})
+              {t('detail.pending_requests_title')} ({joinRequests.length})
             </h3>
             {requestsLoading ? (
               <div className="flex justify-center py-4">
                 <Spinner size="sm" />
               </div>
             ) : joinRequests.length === 0 ? (
-              <p className="text-sm text-theme-subtle">No pending requests</p>
+              <p className="text-sm text-theme-subtle">{t('detail.no_pending_requests')}</p>
             ) : (
               <div className="space-y-2">
                 {joinRequests.map((request) => (
@@ -927,7 +929,7 @@ export function GroupDetailPage() {
                         isLoading={processingRequest === request.user_id}
                         onPress={() => handleJoinRequest(request.user_id, 'accept')}
                       >
-                        Accept
+                        {t('detail.accept')}
                       </Button>
                       <Button
                         size="sm"
@@ -937,7 +939,7 @@ export function GroupDetailPage() {
                         isLoading={processingRequest === request.user_id}
                         onPress={() => handleJoinRequest(request.user_id, 'reject')}
                       >
-                        Reject
+                        {t('detail.reject')}
                       </Button>
                     </div>
                   </div>
@@ -963,7 +965,7 @@ export function GroupDetailPage() {
           title={
             <span className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" aria-hidden="true" />
-              Discussion
+              {t('detail.tab_discussion')}
             </span>
           }
         />
@@ -972,7 +974,7 @@ export function GroupDetailPage() {
           title={
             <span className="flex items-center gap-2">
               <Users className="w-4 h-4" aria-hidden="true" />
-              Members
+              {t('detail.tab_members')}
             </span>
           }
         />
@@ -981,7 +983,7 @@ export function GroupDetailPage() {
           title={
             <span className="flex items-center gap-2">
               <Calendar className="w-4 h-4" aria-hidden="true" />
-              Events
+              {t('detail.tab_events')}
             </span>
           }
         />
@@ -991,7 +993,7 @@ export function GroupDetailPage() {
             title={
               <span className="flex items-center gap-2">
                 <FolderTree className="w-4 h-4" aria-hidden="true" />
-                Subgroups ({group.sub_groups?.length})
+                {t('detail.tab_subgroups')} ({group.sub_groups?.length})
               </span>
             }
           />
@@ -1007,14 +1009,14 @@ export function GroupDetailPage() {
               <div className="space-y-4">
                 {/* New Discussion Button */}
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-theme-primary">Discussions</h2>
+                  <h2 className="text-lg font-semibold text-theme-primary">{t('detail.discussions_heading')}</h2>
                   <Button
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                     size="sm"
                     startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                     onPress={() => setShowNewDiscussion(true)}
                   >
-                    New Discussion
+                    {t('detail.new_discussion')}
                   </Button>
                 </div>
 
@@ -1026,15 +1028,15 @@ export function GroupDetailPage() {
                 ) : discussions.length === 0 ? (
                   <EmptyState
                     icon={<MessageSquare className="w-12 h-12" aria-hidden="true" />}
-                    title="No discussions yet"
-                    description="Be the first to start a discussion in this group"
+                    title={t('detail.no_discussions_title')}
+                    description={t('detail.no_discussions_desc')}
                     action={
                       <Button
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                         onPress={() => setShowNewDiscussion(true)}
                         startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Start a Discussion
+                        {t('detail.start_discussion')}
                       </Button>
                     }
                   />
@@ -1072,7 +1074,7 @@ export function GroupDetailPage() {
                                   <span>{discussion.author.name}</span>
                                   <span className="flex items-center gap-1">
                                     <MessageSquare className="w-3 h-3" aria-hidden="true" />
-                                    {discussion.reply_count} {discussion.reply_count === 1 ? 'reply' : 'replies'}
+                                    {t('detail.reply_count', { count: discussion.reply_count })}
                                   </span>
                                   <span className="flex items-center gap-1">
                                     <Clock className="w-3 h-3" aria-hidden="true" />
@@ -1134,8 +1136,8 @@ export function GroupDetailPage() {
                                     {/* Reply Form */}
                                     <div className="flex flex-col sm:flex-row gap-2 items-end">
                                       <Textarea
-                                        placeholder="Write a reply..."
-                                        aria-label="Reply to discussion"
+                                        placeholder={t('detail.reply_placeholder')}
+                                        aria-label={t('detail.reply_aria')}
                                         value={replyContent}
                                         onChange={(e) => setReplyContent(e.target.value)}
                                         minRows={1}
@@ -1148,7 +1150,7 @@ export function GroupDetailPage() {
                                       <Button
                                         isIconOnly
                                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex-shrink-0"
-                                        aria-label="Send reply"
+                                        aria-label={t('detail.send_reply_aria')}
                                         isLoading={sendingReply}
                                         isDisabled={!replyContent.trim()}
                                         onPress={handleReply}
@@ -1175,7 +1177,7 @@ export function GroupDetailPage() {
                           isLoading={discussionsLoading}
                           onPress={() => loadDiscussions(true)}
                         >
-                          Load More Discussions
+                          {t('detail.load_more_discussions')}
                         </Button>
                       </div>
                     )}
@@ -1185,8 +1187,8 @@ export function GroupDetailPage() {
             ) : (
               <EmptyState
                 icon={<Lock className="w-12 h-12" aria-hidden="true" />}
-                title="Join to see discussion"
-                description="You need to be a member to view and participate in discussions"
+                title={t('detail.join_to_discuss_title')}
+                description={t('detail.join_to_discuss_desc')}
                 action={
                   isAuthenticated && (
                     <Button
@@ -1194,7 +1196,7 @@ export function GroupDetailPage() {
                       onPress={handleJoinLeave}
                       isLoading={isJoining}
                     >
-                      Join Group
+                      {t('detail.join_group')}
                     </Button>
                   )
                 }
@@ -1234,12 +1236,12 @@ export function GroupDetailPage() {
                           <div className="flex items-center gap-2 mt-1">
                             {memberIsOwner && (
                               <Chip size="sm" variant="flat" className="bg-amber-500/20 text-amber-600 dark:text-amber-400" startContent={<ShieldCheck className="w-3 h-3" />}>
-                                Owner
+                                {t('detail.member_owner')}
                               </Chip>
                             )}
                             {memberIsAdmin && !memberIsOwner && (
                               <Chip size="sm" variant="flat" className="bg-purple-500/20 text-purple-600 dark:text-purple-400" startContent={<Shield className="w-3 h-3" />}>
-                                Admin
+                                {t('detail.member_admin')}
                               </Chip>
                             )}
                           </div>
@@ -1254,7 +1256,7 @@ export function GroupDetailPage() {
                               isIconOnly
                               variant="light"
                               size="sm"
-                              aria-label={`Manage ${member.name}`}
+                              aria-label={t('detail.manage_member_aria', { name: member.name })}
                               isLoading={updatingMember === member.id}
                             >
                               <MoreVertical className="w-4 h-4" />
@@ -1267,7 +1269,7 @@ export function GroupDetailPage() {
                                 startContent={<Users className="w-4 h-4" />}
                                 onPress={() => handleUpdateMemberRole(member.id, 'member')}
                               >
-                                Demote to Member
+                                {t('detail.demote_to_member')}
                               </DropdownItem>
                             ) : (
                               <DropdownItem
@@ -1275,7 +1277,7 @@ export function GroupDetailPage() {
                                 startContent={<Shield className="w-4 h-4" />}
                                 onPress={() => handleUpdateMemberRole(member.id, 'admin')}
                               >
-                                Promote to Admin
+                                {t('detail.promote_to_admin')}
                               </DropdownItem>
                             )}
                             <DropdownItem
@@ -1285,7 +1287,7 @@ export function GroupDetailPage() {
                               startContent={<UserX className="w-4 h-4" />}
                               onPress={() => handleRemoveMember(member.id)}
                             >
-                              Remove from Group
+                              {t('detail.remove_from_group')}
                             </DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
@@ -1297,8 +1299,8 @@ export function GroupDetailPage() {
             ) : (
               <EmptyState
                 icon={<Users className="w-12 h-12" aria-hidden="true" />}
-                title="No members yet"
-                description="Be the first to join this group"
+                title={t('detail.no_members_title')}
+                description={t('detail.no_members_desc')}
               />
             )}
           </GlassCard>
@@ -1308,7 +1310,7 @@ export function GroupDetailPage() {
         {activeTab === 'events' && (
           <GlassCard className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-theme-primary">Group Events</h2>
+              <h2 className="text-lg font-semibold text-theme-primary">{t('detail.group_events_heading')}</h2>
               {userIsMember && isAuthenticated && (
                 <Link to={tenantPath(`/events/create?group_id=${group.id}`)}>
                   <Button
@@ -1316,7 +1318,7 @@ export function GroupDetailPage() {
                     size="sm"
                     startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                   >
-                    Create Event
+                    {t('detail.create_event')}
                   </Button>
                 </Link>
               )}
@@ -1329,8 +1331,8 @@ export function GroupDetailPage() {
             ) : events.length === 0 ? (
               <EmptyState
                 icon={<Calendar className="w-12 h-12" aria-hidden="true" />}
-                title="No events yet"
-                description="Create an event to bring this group together"
+                title={t('detail.no_events_title')}
+                description={t('detail.no_events_desc')}
                 action={
                   userIsMember && isAuthenticated && (
                     <Link to={tenantPath(`/events/create?group_id=${group.id}`)}>
@@ -1338,7 +1340,7 @@ export function GroupDetailPage() {
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                         startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Create Event
+                        {t('detail.create_event')}
                       </Button>
                     </Link>
                   )
@@ -1378,14 +1380,14 @@ export function GroupDetailPage() {
                             )}
                             <span className="flex items-center gap-1">
                               <Users className="w-3 h-3" aria-hidden="true" />
-                              {event.attendees_count} attending
+                              {event.attendees_count} {t('detail.attending')}
                             </span>
                           </div>
                         </div>
 
                         {isPast && (
                           <Chip size="sm" variant="flat" className="bg-theme-hover text-theme-subtle">
-                            Past
+                            {t('detail.past_chip')}
                           </Chip>
                         )}
 
@@ -1413,7 +1415,7 @@ export function GroupDetailPage() {
                       <div>
                         <p className="font-medium text-theme-primary">{subGroup.name}</p>
                         <p className="text-sm text-theme-subtle">
-                          {subGroup.member_count} members
+                          {t('detail.members_count', { count: subGroup.member_count })}
                         </p>
                       </div>
                     </div>
@@ -1441,12 +1443,12 @@ export function GroupDetailPage() {
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-purple-400" aria-hidden="true" />
-                New Discussion
+                {t('detail.new_discussion_modal_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label="Title"
-                  placeholder="What do you want to discuss?"
+                  label={t('detail.discussion_title_label')}
+                  placeholder={t('detail.discussion_title_placeholder')}
                   value={newDiscussionTitle}
                   onChange={(e) => setNewDiscussionTitle(e.target.value)}
                   startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -1457,8 +1459,8 @@ export function GroupDetailPage() {
                   }}
                 />
                 <Textarea
-                  label="Content"
-                  placeholder="Share your thoughts..."
+                  label={t('detail.discussion_content_label')}
+                  placeholder={t('detail.discussion_content_placeholder')}
                   value={newDiscussionContent}
                   onChange={(e) => setNewDiscussionContent(e.target.value)}
                   minRows={4}
@@ -1471,7 +1473,7 @@ export function GroupDetailPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={onClose}>
-                  Cancel
+                  {t('detail.cancel')}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -1479,7 +1481,7 @@ export function GroupDetailPage() {
                   isDisabled={!newDiscussionTitle.trim() || !newDiscussionContent.trim()}
                   onPress={handleCreateDiscussion}
                 >
-                  Create Discussion
+                  {t('detail.create_discussion_btn')}
                 </Button>
               </ModalFooter>
             </>
@@ -1503,12 +1505,12 @@ export function GroupDetailPage() {
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
                 <Settings className="w-5 h-5 text-purple-400" aria-hidden="true" />
-                Group Settings
+                {t('detail.settings_modal_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label="Group Name"
-                  placeholder="Enter group name"
+                  label={t('detail.settings_name_label')}
+                  placeholder={t('detail.settings_name_placeholder')}
                   value={settingsName}
                   onChange={(e) => setSettingsName(e.target.value)}
                   startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -1519,8 +1521,8 @@ export function GroupDetailPage() {
                   }}
                 />
                 <Textarea
-                  label="Description"
-                  placeholder="Describe your group..."
+                  label={t('detail.settings_desc_label')}
+                  placeholder={t('detail.settings_desc_placeholder')}
                   value={settingsDescription}
                   onChange={(e) => setSettingsDescription(e.target.value)}
                   minRows={3}
@@ -1531,8 +1533,8 @@ export function GroupDetailPage() {
                   }}
                 />
                 <Input
-                  label="Location"
-                  placeholder="e.g. Skibbereen, Co Cork"
+                  label={t('detail.settings_location_label')}
+                  placeholder={t('detail.settings_location_placeholder')}
                   value={settingsLocation}
                   onChange={(e) => setSettingsLocation(e.target.value)}
                   startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -1547,14 +1549,14 @@ export function GroupDetailPage() {
                   <div className="p-3 rounded-lg bg-theme-elevated border border-theme-default">
                     <p className="text-sm font-medium text-theme-primary mb-2 flex items-center gap-1.5">
                       <Image className="w-4 h-4" aria-hidden="true" />
-                      Group Image
+                      {t('detail.settings_image_label')}
                     </p>
                     {group?.image_url && (
                       <img src={group.image_url} alt="Group" className="w-12 h-12 rounded-full object-cover mb-2" />
                     )}
                     <label className="flex items-center gap-1.5 text-xs text-primary cursor-pointer hover:underline">
                       <Upload className="w-3 h-3" aria-hidden="true" />
-                      {uploadingImage ? 'Uploading...' : 'Upload image'}
+                      {uploadingImage ? t('detail.uploading') : t('detail.upload_image')}
                       <input
                         type="file"
                         accept="image/*"
@@ -1567,14 +1569,14 @@ export function GroupDetailPage() {
                   <div className="p-3 rounded-lg bg-theme-elevated border border-theme-default">
                     <p className="text-sm font-medium text-theme-primary mb-2 flex items-center gap-1.5">
                       <Image className="w-4 h-4" aria-hidden="true" />
-                      Cover Image
+                      {t('detail.settings_cover_label')}
                     </p>
                     {group?.cover_image_url && (
                       <img src={group.cover_image_url} alt="Cover" className="w-full h-10 rounded object-cover mb-2" />
                     )}
                     <label className="flex items-center gap-1.5 text-xs text-primary cursor-pointer hover:underline">
                       <Upload className="w-3 h-3" aria-hidden="true" />
-                      {uploadingImage ? 'Uploading...' : 'Upload cover'}
+                      {uploadingImage ? t('detail.uploading') : t('detail.upload_cover')}
                       <input
                         type="file"
                         accept="image/*"
@@ -1595,17 +1597,17 @@ export function GroupDetailPage() {
                       )}
                       <div>
                         <p className="font-medium text-theme-primary">
-                          {settingsPrivate ? 'Private Group' : 'Public Group'}
+                          {settingsPrivate ? t('detail.private_group') : t('detail.public_group')}
                         </p>
                         <p className="text-sm text-theme-subtle">
                           {settingsPrivate
-                            ? 'Only approved members can see posts and join'
-                            : 'Anyone can see posts and join this group'}
+                            ? t('detail.private_desc')
+                            : t('detail.public_desc')}
                         </p>
                       </div>
                     </div>
                     <Switch
-                      aria-label={settingsPrivate ? 'Make group public' : 'Make group private'}
+                      aria-label={settingsPrivate ? t('detail.make_public_aria') : t('detail.make_private_aria')}
                       isSelected={settingsPrivate}
                       onValueChange={setSettingsPrivate}
                       classNames={{
@@ -1617,7 +1619,7 @@ export function GroupDetailPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={onClose}>
-                  Cancel
+                  {t('detail.cancel')}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -1625,7 +1627,7 @@ export function GroupDetailPage() {
                   isDisabled={!settingsName.trim()}
                   onPress={handleSaveSettings}
                 >
-                  Save Changes
+                  {t('detail.save_changes')}
                 </Button>
               </ModalFooter>
             </>
@@ -1648,7 +1650,7 @@ export function GroupDetailPage() {
             <>
               <ModalHeader className="text-red-500 flex items-center gap-2">
                 <Trash2 className="w-5 h-5" aria-hidden="true" />
-                Delete Group
+                {t('detail.delete_modal_title')}
               </ModalHeader>
               <ModalBody>
                 <div className="text-center py-4">
@@ -1656,16 +1658,16 @@ export function GroupDetailPage() {
                     <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                   </div>
                   <p className="text-theme-primary font-medium mb-2">
-                    Are you sure you want to delete &ldquo;{group.name}&rdquo;?
+                    {t('detail.delete_confirm', { name: group.name })}
                   </p>
                   <p className="text-sm text-theme-muted">
-                    This action cannot be undone. All discussions, members, and group data will be permanently removed.
+                    {t('detail.delete_desc')}
                   </p>
                 </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={onClose}>
-                  Cancel
+                  {t('detail.cancel')}
                 </Button>
                 <Button
                   className="bg-red-500 text-white"
@@ -1673,7 +1675,7 @@ export function GroupDetailPage() {
                   onPress={handleDeleteGroup}
                   startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Delete Group
+                  {t('detail.delete_btn')}
                 </Button>
               </ModalFooter>
             </>

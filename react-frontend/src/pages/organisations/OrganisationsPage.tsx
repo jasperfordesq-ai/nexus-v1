@@ -25,6 +25,7 @@ import {
   Star,
   Users,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
@@ -56,7 +57,8 @@ const SEARCH_DEBOUNCE_MS = 300;
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function OrganisationsPage() {
-  usePageTitle('Organisations');
+  const { t } = useTranslation('community');
+  usePageTitle(t('organisations.page_title'));
 
   const [organisations, setOrganisations] = useState<Organisation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -109,11 +111,11 @@ export function OrganisationsPage() {
         setHasMore(response.meta?.has_more ?? false);
         setCursor(response.meta?.cursor ?? undefined);
       } else {
-        if (!append) setError('Failed to load organisations.');
+        if (!append) setError(t('organisations.error_load'));
       }
     } catch (err) {
       logError('Failed to load organisations', err);
-      if (!append) setError('Failed to load organisations. Please try again.');
+      if (!append) setError(t('organisations.error_load_retry'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -140,8 +142,8 @@ export function OrganisationsPage() {
     <div className="space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Volunteering', href: '/volunteering' },
-        { label: 'Organisations' },
+        { label: t('organisations.breadcrumb_volunteering'), href: '/volunteering' },
+        { label: t('organisations.breadcrumb_organisations') },
       ]} />
 
       {/* Header */}
@@ -149,16 +151,16 @@ export function OrganisationsPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Building2 className="w-7 h-7 text-indigo-400" aria-hidden="true" />
-            Organisations
+            {t('organisations.heading')}
           </h1>
-          <p className="text-theme-muted mt-1">Discover volunteer organisations in your community</p>
+          <p className="text-theme-muted mt-1">{t('organisations.subtitle')}</p>
         </div>
       </div>
 
       {/* Search */}
       <div className="w-full sm:max-w-md">
         <Input
-          placeholder="Search organisations..."
+          placeholder={t('organisations.search_placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
@@ -173,14 +175,14 @@ export function OrganisationsPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Organisations</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('organisations.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadOrganisations()}
           >
-            Try Again
+            {t('organisations.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -207,8 +209,8 @@ export function OrganisationsPage() {
           ) : organisations.length === 0 ? (
             <EmptyState
               icon={<Building2 className="w-12 h-12" aria-hidden="true" />}
-              title="No organisations found"
-              description={debouncedQuery ? 'Try a different search term' : 'No volunteer organisations available yet'}
+              title={t('organisations.no_organisations_found')}
+              description={debouncedQuery ? t('organisations.try_different_search') : t('organisations.no_organisations_available')}
             />
           ) : (
             <>
@@ -233,7 +235,7 @@ export function OrganisationsPage() {
                     onPress={() => loadOrganisations(true)}
                     isLoading={isLoadingMore}
                   >
-                    Load More
+                    {t('organisations.load_more')}
                   </Button>
                 </div>
               )}
@@ -252,6 +254,7 @@ interface OrganisationCardProps {
 }
 
 function OrganisationCard({ organisation }: OrganisationCardProps) {
+  const { t } = useTranslation('community');
   const { tenantPath } = useTenant();
   return (
     <Link to={tenantPath(`/organisations/${organisation.id}`)}>
@@ -283,19 +286,19 @@ function OrganisationCard({ organisation }: OrganisationCardProps) {
           {organisation.opportunity_count > 0 && (
             <span className="flex items-center gap-1">
               <Heart className="w-3 h-3 text-rose-400" aria-hidden="true" />
-              {organisation.opportunity_count} {organisation.opportunity_count === 1 ? 'opportunity' : 'opportunities'}
+              {t('organisations.opportunity_count', { count: organisation.opportunity_count })}
             </span>
           )}
           {organisation.volunteer_count > 0 && (
             <span className="flex items-center gap-1">
               <Users className="w-3 h-3 text-indigo-400" aria-hidden="true" />
-              {organisation.volunteer_count} volunteers
+              {t('organisations.volunteer_count', { count: organisation.volunteer_count })}
             </span>
           )}
           {organisation.total_hours > 0 && (
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3 text-emerald-400" aria-hidden="true" />
-              {organisation.total_hours}h logged
+              {t('organisations.hours_logged', { hours: organisation.total_hours })}
             </span>
           )}
           {organisation.average_rating && organisation.average_rating > 0 && (
@@ -307,7 +310,7 @@ function OrganisationCard({ organisation }: OrganisationCardProps) {
           {organisation.website && (
             <span className="flex items-center gap-1">
               <Globe className="w-3 h-3 text-blue-400" aria-hidden="true" />
-              Website
+              {t('organisations.website')}
             </span>
           )}
         </div>

@@ -76,6 +76,7 @@
     "legal_hub": "Hub Legale",
     "terms_of_service": "Termini di Servizio",
     "privacy_policy": "Informativa sulla Privacy",
+    "cookie_policy": "Politica sui Cookie",
     "accessibility": "Accessibilità"
   },
   "admin_tools": {
@@ -117,5 +118,48 @@
     "switch_to_light": "Passa alla modalità chiara",
     "switch_to_dark": "Passa alla modalità scura"
   },
-  "attribution": "Realizzato su Project NEXUS di Jasper Ford"
+  "cookie_consent": {
+    "banner_label": "Consenso cookie",
+    "title": "Utilizziamo i cookie",
+    "description": "Utilizziamo cookie essenziali per la sicurezza e il funzionamento della piattaforma. I cookie opzionali ci aiutano a migliorare la tua esperienza e a monitorare gli errori.",
+    "learn_more": "Scopri di più",
+    "essential": "Essenziali",
+    "essential_desc": "Autenticazione, sicurezza, gestione sessione",
+    "always_on": "Sempre attivi",
+    "analytics": "Analitici",
+    "analytics_desc": "Monitoraggio errori, statistiche di utilizzo",
+    "preferences": "Preferenze",
+    "preferences_desc": "Tema, lingua, impostazioni di visualizzazione",
+    "toggle_analytics": "Attiva/disattiva cookie analitici",
+    "toggle_preferences": "Attiva/disattiva cookie preferenze",
+    "manage": "Gestisci preferenze",
+    "hide_details": "Nascondi dettagli",
+    "accept_all": "Accetta tutti",
+    "essential_only": "Solo essenziali",
+    "save": "Salva preferenze"
+  },
+  "attribution": "Realizzato su Project NEXUS di Jasper Ford",
+  "members": {
+    "title": "Membri",
+    "subtitle": "Connettiti con i membri della comunità",
+    "all": "Tutti i Membri",
+    "new": "Nuovi Membri",
+    "active": "Più Attivi",
+    "showing": "Visualizzando {{shown}} di {{total}} membri",
+    "search_placeholder": "Cerca membri...",
+    "sort_name": "Nome",
+    "sort_newest": "Più recenti",
+    "sort_rated": "Meglio valutati",
+    "sort_active": "Più Attivi",
+    "sort_by": "Ordina per",
+    "unable_to_load": "Impossibile Caricare i Membri",
+    "try_again": "Riprova",
+    "no_members": "Nessun membro trovato",
+    "no_members_search": "Prova un termine di ricerca diverso",
+    "no_members_community": "Nessun membro in questa comunità ancora",
+    "load_more": "Carica altro",
+    "results_matching": "{{shown}} di {{total}} membri che corrispondono a \"{{query}}\"",
+    "no_location": "Nessun membro con dati di posizione",
+    "fallback_name": "Membro"
+  }
 }

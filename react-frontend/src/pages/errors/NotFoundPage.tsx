@@ -11,13 +11,15 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { Home, ArrowLeft, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 
 export function NotFoundPage() {
+  const { t } = useTranslation('utility');
   const { tenantPath } = useTenant();
-  usePageTitle('Page Not Found');
+  usePageTitle(t('not_found.page_title'));
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <motion.div
@@ -30,9 +32,9 @@ export function NotFoundPage() {
             <span className="text-5xl font-bold text-gradient">404</span>
           </div>
 
-          <h1 className="text-2xl font-bold text-theme-primary mb-2">Page Not Found</h1>
+          <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('not_found.heading')}</h1>
           <p className="text-theme-muted mb-8">
-            The page you&apos;re looking for doesn&apos;t exist or has been moved.
+            {t('not_found.description')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
@@ -41,7 +43,7 @@ export function NotFoundPage() {
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<Home className="w-4 h-4" />}
               >
-                Go Home
+                {t('not_found.go_home')}
               </Button>
             </Link>
             <Link to={tenantPath('/search')} className="flex-1">
@@ -50,7 +52,7 @@ export function NotFoundPage() {
                 className="w-full bg-theme-elevated text-theme-muted"
                 startContent={<Search className="w-4 h-4" />}
               >
-                Search
+                {t('not_found.search')}
               </Button>
             </Link>
           </div>
@@ -62,7 +64,7 @@ export function NotFoundPage() {
             startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
             onPress={() => window.history.back()}
           >
-            Go back
+            {t('not_found.go_back')}
           </Button>
         </GlassCard>
       </motion.div>

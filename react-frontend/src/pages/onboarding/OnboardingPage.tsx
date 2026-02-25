@@ -47,6 +47,7 @@ import {
   Users,
   Star,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant, useAuth } from '@/contexts';
@@ -69,14 +70,15 @@ interface Category {
 const TOTAL_STEPS = 5;
 const MIN_BIO_LENGTH = 10;
 
-const STEP_LABELS = ['Welcome', 'Profile', 'Interests', 'Skills', 'Confirm'];
+const STEP_LABEL_KEYS = ['step_welcome', 'step_profile', 'step_interests', 'step_skills', 'step_confirm'];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function OnboardingPage() {
-  usePageTitle('Get Started');
+  const { t } = useTranslation('onboarding');
+  usePageTitle(t('page_title'));
   const navigate = useNavigate();
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();
@@ -171,7 +173,7 @@ export function OnboardingPage() {
       }
     } catch (error) {
       logError('Failed to load onboarding categories', error);
-      toast.error('Failed to load categories', 'Please try again.');
+      toast.error(t('toast_categories_failed'), t('toast_try_again'));
     } finally {
       setCategoriesLoading(false);
     }
@@ -199,12 +201,12 @@ export function OnboardingPage() {
 
   const processAvatarFile = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      toast.error('Invalid file type', 'Please upload an image file (JPG, PNG or GIF).');
+      toast.error(t('toast_invalid_file_type'), t('toast_invalid_file_type_desc'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File too large', 'Please upload an image smaller than 5 MB.');
+      toast.error(t('toast_file_too_large'), t('toast_file_too_large_desc'));
       return;
     }
 
@@ -217,13 +219,13 @@ export function OnboardingPage() {
 
       if (response.success && response.data) {
         await refreshUser();
-        toast.success('Photo uploaded', 'Looking great!');
+        toast.success(t('toast_photo_uploaded'), t('toast_photo_uploaded_desc'));
       } else {
-        toast.error('Upload failed', response.error || 'Failed to upload photo. Please try again.');
+        toast.error(t('toast_upload_failed'), response.error || t('toast_upload_failed_desc'));
       }
     } catch (error) {
       logError('Failed to upload avatar during onboarding', error);
-      toast.error('Upload failed', 'Failed to upload photo. Please try again.');
+      toast.error(t('toast_upload_failed'), t('toast_upload_failed_desc'));
     } finally {
       setIsUploadingAvatar(false);
       if (fileInputRef.current) {
@@ -262,11 +264,11 @@ export function OnboardingPage() {
 
   const handleSaveProfileAndProceed = useCallback(async () => {
     if (!user?.avatar_url) {
-      toast.error('Photo required', 'Please upload a profile photo to continue.');
+      toast.error(t('toast_photo_required'), t('toast_photo_required_desc'));
       return;
     }
     if (bio.trim().length < MIN_BIO_LENGTH) {
-      toast.error('Bio required', `Please write at least ${MIN_BIO_LENGTH} characters about yourself.`);
+      toast.error(t('toast_bio_required'), t('toast_bio_required_desc', { min: MIN_BIO_LENGTH }));
       return;
     }
 
@@ -278,11 +280,11 @@ export function OnboardingPage() {
         await refreshUser();
         goNextAnimated();
       } else {
-        toast.error('Save failed', 'Failed to save your bio. Please try again.');
+        toast.error(t('toast_save_failed'), t('toast_save_failed_desc'));
       }
     } catch (error) {
       logError('Failed to save bio during onboarding', error);
-      toast.error('Save failed', 'Failed to save your bio. Please try again.');
+      toast.error(t('toast_save_failed'), t('toast_save_failed_desc'));
     } finally {
       setIsSavingProfile(false);
     }
@@ -355,13 +357,13 @@ export function OnboardingPage() {
 
       if (!response.success) {
         // Surface the backend error clearly
-        const message = response.error || 'Something went wrong. Please try again.';
+        const message = response.error || t('toast_something_went_wrong');
         // If it's a profile-related issue, guide back to step 2
         if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
-          toast.error('Profile incomplete', message);
+          toast.error(t('toast_profile_incomplete'), message);
           goToStep(2);
         } else {
-          toast.error('Setup failed', message);
+          toast.error(t('toast_setup_failed'), message);
         }
         return;
       }
@@ -378,17 +380,17 @@ export function OnboardingPage() {
       setTimeout(() => {
         if (listingsCreated > 0) {
           toast.success(
-            'Welcome aboard!',
-            `${listingsCreated} listing${listingsCreated === 1 ? '' : 's'} created for you.`
+            t('toast_welcome_aboard'),
+            t('toast_listings_created', { count: listingsCreated })
           );
         } else {
-          toast.success('Welcome aboard!', 'Your profile is all set.');
+          toast.success(t('toast_welcome_aboard'), t('toast_profile_all_set'));
         }
         navigate(tenantPath('/dashboard'));
       }, 1800);
     } catch (error) {
       logError('Failed to complete onboarding', error);
-      toast.error('Setup failed', 'Something went wrong. Please try again.');
+      toast.error(t('toast_setup_failed'), t('toast_something_went_wrong'));
     } finally {
       setIsSubmitting(false);
     }
@@ -402,12 +404,12 @@ export function OnboardingPage() {
       const response = await api.post('/v2/onboarding/complete', { interests: [], offers: [], needs: [] });
 
       if (!response.success) {
-        const message = response.error || 'Something went wrong.';
+        const message = response.error || t('toast_something_went_wrong');
         if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
-          toast.error('Profile incomplete', message);
+          toast.error(t('toast_profile_incomplete'), message);
           goToStep(2);
         } else {
-          toast.error('Setup failed', message);
+          toast.error(t('toast_setup_failed'), message);
         }
         return;
       }
@@ -416,12 +418,12 @@ export function OnboardingPage() {
       await refreshUser();
 
       setTimeout(() => {
-        toast.success('Welcome aboard!', 'Your profile is all set.');
+        toast.success(t('toast_welcome_aboard'), t('toast_profile_all_set'));
         navigate(tenantPath('/dashboard'));
       }, 1800);
     } catch (error) {
       logError('Failed to skip onboarding', error);
-      toast.error('Setup failed', 'Something went wrong. Please try again.');
+      toast.error(t('toast_setup_failed'), t('toast_something_went_wrong'));
     } finally {
       setIsSubmitting(false);
     }
@@ -477,10 +479,10 @@ export function OnboardingPage() {
             transition={{ delay: 0.5, duration: 0.4 }}
           >
             <h1 className="text-3xl font-bold text-theme-primary mb-2">
-              You're all set!
+              {t('complete_all_set')}
             </h1>
             <p className="text-theme-muted text-lg">
-              Welcome to {tenantName}
+              {t('complete_welcome_to', { name: tenantName })}
             </p>
           </motion.div>
 
@@ -490,7 +492,7 @@ export function OnboardingPage() {
             transition={{ delay: 1.0 }}
           >
             <Spinner size="sm" color="success" />
-            <p className="text-sm text-theme-subtle mt-2">Taking you to your dashboard...</p>
+            <p className="text-sm text-theme-subtle mt-2">{t('complete_redirecting')}</p>
           </motion.div>
         </motion.div>
       </div>
@@ -513,9 +515,9 @@ export function OnboardingPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <h1 className="text-2xl font-bold text-theme-primary">Get Started</h1>
+        <h1 className="text-2xl font-bold text-theme-primary">{t('page_title')}</h1>
         <p className="text-theme-muted mt-1 text-sm">
-          Set up your profile in a few easy steps
+          {t('subtitle')}
         </p>
       </motion.div>
 
@@ -541,7 +543,7 @@ export function OnboardingPage() {
             // Never allow skipping step 2 (profile) if incomplete
             if (step <= currentStep || visitedSteps.has(step)) {
               if (step > 2 && !profileStepComplete) {
-                toast.error('Complete your profile first', 'Photo and bio are required.');
+                toast.error(t('toast_complete_profile_first'), t('toast_photo_bio_required'));
                 goToStep(2);
                 return;
               }
@@ -600,11 +602,10 @@ export function OnboardingPage() {
                 </div>
 
                 <h2 className="text-xl font-bold text-theme-primary mb-2">
-                  Welcome to {tenantName}!
+                  {t('welcome_title', { name: tenantName })}
                 </h2>
                 <p className="text-theme-muted max-w-md mx-auto">
-                  Let's set up your profile so you can start connecting with your
-                  community and exchanging time credits.
+                  {t('welcome_description')}
                 </p>
               </GlassCard>
 
@@ -612,18 +613,18 @@ export function OnboardingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <BenefitCard
                   icon={<Clock className="w-6 h-6 text-emerald-500" />}
-                  title="Earn Time Credits"
-                  description="Help others and earn credits you can spend on services you need"
+                  title={t('benefit_earn_title')}
+                  description={t('benefit_earn_desc')}
                 />
                 <BenefitCard
                   icon={<Users className="w-6 h-6 text-rose-500" />}
-                  title="Build Community"
-                  description="Connect with neighbours and strengthen local bonds"
+                  title={t('benefit_community_title')}
+                  description={t('benefit_community_desc')}
                 />
                 <BenefitCard
                   icon={<Star className="w-6 h-6 text-amber-500" />}
-                  title="Share Your Skills"
-                  description="Offer your talents and discover what your community can do"
+                  title={t('benefit_skills_title')}
+                  description={t('benefit_skills_desc')}
                 />
               </div>
 
@@ -634,7 +635,7 @@ export function OnboardingPage() {
                   endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                   onPress={goNextAnimated}
                 >
-                  Let's Get Started
+                  {t('lets_get_started')}
                 </Button>
               </div>
             </div>
@@ -649,11 +650,10 @@ export function OnboardingPage() {
                     className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
                     aria-hidden="true"
                   />
-                  Your Profile
+                  {t('profile_title')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Add a photo and tell the community about yourself. This helps
-                  members recognise and trust you.
+                  {t('profile_description')}
                 </p>
 
                 {/* Avatar upload zone */}
@@ -685,7 +685,7 @@ export function OnboardingPage() {
                       accept="image/*"
                       onChange={handleAvatarUpload}
                       className="hidden"
-                      aria-label="Upload profile photo"
+                      aria-label={t('aria_upload_photo')}
                     />
                     <Button
                       isIconOnly
@@ -694,7 +694,7 @@ export function OnboardingPage() {
                       onPress={() => fileInputRef.current?.click()}
                       isDisabled={isUploadingAvatar}
                       isLoading={isUploadingAvatar}
-                      aria-label="Upload profile photo"
+                      aria-label={t('aria_upload_photo')}
                     >
                       {hasAvatar ? (
                         <Camera className="w-4 h-4" aria-hidden="true" />
@@ -706,20 +706,20 @@ export function OnboardingPage() {
 
                   {isUploadingAvatar ? (
                     <p className="text-sm text-theme-muted flex items-center gap-2">
-                      <Spinner size="sm" /> Uploading...
+                      <Spinner size="sm" /> {t('uploading')}
                     </p>
                   ) : hasAvatar ? (
                     <div className="text-center">
                       <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 justify-center font-medium">
                         <CheckCircle className="w-4 h-4" aria-hidden="true" />
-                        Photo uploaded
+                        {t('photo_uploaded')}
                       </p>
                       <button
                         className="text-xs text-theme-subtle hover:text-theme-muted underline mt-1"
                         onClick={() => fileInputRef.current?.click()}
                         type="button"
                       >
-                        Change photo
+                        {t('change_photo')}
                       </button>
                     </div>
                   ) : (
@@ -731,10 +731,10 @@ export function OnboardingPage() {
                         startContent={<Upload className="w-4 h-4" />}
                         onPress={() => fileInputRef.current?.click()}
                       >
-                        Choose a photo
+                        {t('choose_photo')}
                       </Button>
                       <p className="text-xs text-theme-subtle">
-                        or drag and drop — JPG, PNG or GIF, max 5 MB
+                        {t('photo_drag_hint')}
                       </p>
                     </div>
                   )}
@@ -743,8 +743,8 @@ export function OnboardingPage() {
                 {/* Bio textarea */}
                 <div className="space-y-2">
                   <Textarea
-                    label="About you"
-                    placeholder="Tell the community about yourself — your interests, skills, or what you hope to get from timebanking..."
+                    label={t('bio_label')}
+                    placeholder={t('bio_placeholder')}
                     value={bio}
                     onValueChange={setBio}
                     isDisabled={isSavingProfile}
@@ -753,8 +753,8 @@ export function OnboardingPage() {
                     maxLength={5000}
                     description={
                       bio.trim().length < MIN_BIO_LENGTH
-                        ? `At least ${MIN_BIO_LENGTH} characters required (${bio.trim().length}/${MIN_BIO_LENGTH})`
-                        : `${bio.trim().length} characters`
+                        ? t('bio_min_chars', { min: MIN_BIO_LENGTH, current: bio.trim().length })
+                        : t('bio_char_count', { count: bio.trim().length })
                     }
                     classNames={{
                       inputWrapper: 'bg-theme-elevated',
@@ -765,11 +765,11 @@ export function OnboardingPage() {
                 {/* Validation checklist */}
                 <div className="mt-4 p-3 rounded-lg bg-theme-elevated">
                   <p className="text-xs font-medium text-theme-muted mb-2">
-                    Required to continue:
+                    {t('required_to_continue')}
                   </p>
                   <div className="flex flex-col gap-1.5">
-                    <ValidationItem checked={hasAvatar} label="Profile photo" />
-                    <ValidationItem checked={hasBio} label={`Bio (${MIN_BIO_LENGTH}+ characters)`} />
+                    <ValidationItem checked={hasAvatar} label={t('validation_photo')} />
+                    <ValidationItem checked={hasBio} label={t('validation_bio', { min: MIN_BIO_LENGTH })} />
                   </div>
                 </div>
               </GlassCard>
@@ -782,7 +782,7 @@ export function OnboardingPage() {
                   onPress={goBackAnimated}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Back
+                  {t('back')}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium"
@@ -791,7 +791,7 @@ export function OnboardingPage() {
                   isLoading={isSavingProfile}
                   isDisabled={!profileStepComplete || isSavingProfile}
                 >
-                  Next
+                  {t('next')}
                 </Button>
               </div>
             </div>
@@ -806,11 +806,10 @@ export function OnboardingPage() {
                     className="w-5 h-5 text-rose-500"
                     aria-hidden="true"
                   />
-                  What are you interested in?
+                  {t('interests_title')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Select categories that interest you. This helps us personalise
-                  your experience and suggest relevant listings.
+                  {t('interests_description')}
                 </p>
 
                 {categoriesLoading ? (
@@ -824,8 +823,7 @@ export function OnboardingPage() {
                       aria-hidden="true"
                     />
                     <p className="text-theme-muted text-sm">
-                      No categories available yet. You can skip this step and
-                      set your interests later in Settings.
+                      {t('no_categories_available')}
                     </p>
                   </div>
                 ) : (
@@ -859,8 +857,8 @@ export function OnboardingPage() {
                 {categories.length > 0 && (
                   <p className="text-xs text-theme-subtle mt-4">
                     {selectedInterests.length === 0
-                      ? 'Select one or more, or skip this step'
-                      : `${selectedInterests.length} selected`}
+                      ? t('select_or_skip')
+                      : t('count_selected', { count: selectedInterests.length })}
                   </p>
                 )}
               </GlassCard>
@@ -872,7 +870,7 @@ export function OnboardingPage() {
                   onPress={goBackAnimated}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Back
+                  {t('back')}
                 </Button>
                 <div className="flex items-center gap-2">
                   <Button
@@ -881,7 +879,7 @@ export function OnboardingPage() {
                     onPress={goNextAnimated}
                     endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
                   >
-                    Skip
+                    {t('skip')}
                   </Button>
                   <Button
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium"
@@ -889,7 +887,7 @@ export function OnboardingPage() {
                     onPress={handleSaveInterestsAndProceed}
                     isDisabled={selectedInterests.length === 0}
                   >
-                    Next
+                    {t('next')}
                   </Button>
                 </div>
               </div>
@@ -906,10 +904,10 @@ export function OnboardingPage() {
                     className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
                     aria-hidden="true"
                   />
-                  I can offer
+                  {t('skills_offer_title')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-4">
-                  Select skills you can offer to others. We'll create listings for you.
+                  {t('skills_offer_description')}
                 </p>
 
                 {categoriesLoading ? (
@@ -918,7 +916,7 @@ export function OnboardingPage() {
                   </div>
                 ) : categories.length === 0 ? (
                   <p className="text-theme-subtle text-sm py-4">
-                    No categories available. You can skip this step.
+                    {t('no_categories_skip')}
                   </p>
                 ) : (
                   <div className="flex flex-wrap gap-2">
@@ -950,7 +948,7 @@ export function OnboardingPage() {
 
                 {skillOffers.length > 0 && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-3 font-medium">
-                    {skillOffers.length} skill{skillOffers.length !== 1 ? 's' : ''} to offer
+                    {t('skills_to_offer_count', { count: skillOffers.length })}
                   </p>
                 )}
               </GlassCard>
@@ -962,10 +960,10 @@ export function OnboardingPage() {
                     className="w-5 h-5 text-amber-600 dark:text-amber-400"
                     aria-hidden="true"
                   />
-                  I need help with
+                  {t('skills_need_title')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-4">
-                  Select categories you need help with. We'll create request listings for you.
+                  {t('skills_need_description')}
                 </p>
 
                 {categoriesLoading ? (
@@ -974,7 +972,7 @@ export function OnboardingPage() {
                   </div>
                 ) : categories.length === 0 ? (
                   <p className="text-theme-subtle text-sm py-4">
-                    No categories available. You can skip this step.
+                    {t('no_categories_skip')}
                   </p>
                 ) : (
                   <div className="flex flex-wrap gap-2">
@@ -1006,7 +1004,7 @@ export function OnboardingPage() {
 
                 {skillNeeds.length > 0 && (
                   <p className="text-xs text-amber-600 dark:text-amber-400 mt-3 font-medium">
-                    {skillNeeds.length} skill{skillNeeds.length !== 1 ? 's' : ''} needed
+                    {t('skills_needed_count', { count: skillNeeds.length })}
                   </p>
                 )}
               </GlassCard>
@@ -1018,7 +1016,7 @@ export function OnboardingPage() {
                   onPress={goBackAnimated}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Back
+                  {t('back')}
                 </Button>
                 <div className="flex items-center gap-2">
                   <Button
@@ -1027,14 +1025,14 @@ export function OnboardingPage() {
                     onPress={goNextAnimated}
                     endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
                   >
-                    Skip
+                    {t('skip')}
                   </Button>
                   <Button
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium"
                     endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
                     onPress={goNextAnimated}
                   >
-                    Next
+                    {t('next')}
                   </Button>
                 </div>
               </div>
@@ -1051,7 +1049,7 @@ export function OnboardingPage() {
                     className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
                     aria-hidden="true"
                   />
-                  Review Your Setup
+                  {t('confirm_title')}
                 </h2>
 
                 {/* Mini profile card */}
@@ -1068,14 +1066,14 @@ export function OnboardingPage() {
                       {user?.first_name} {user?.last_name}
                     </p>
                     <p className="text-sm text-theme-muted line-clamp-2 mt-0.5">
-                      {bio || user?.bio || 'No bio yet'}
+                      {bio || user?.bio || t('no_bio_yet')}
                     </p>
                     <button
                       type="button"
                       className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline mt-1"
                       onClick={() => goToStep(2)}
                     >
-                      Edit profile
+                      {t('edit_profile')}
                     </button>
                   </div>
                 </div>
@@ -1086,11 +1084,11 @@ export function OnboardingPage() {
                 <div className="space-y-4">
                   <SummarySection
                     icon={<Heart className="w-4 h-4 text-rose-500" />}
-                    title="Your Interests"
+                    title={t('summary_interests')}
                     items={selectedInterests}
                     getCategoryName={getCategoryName}
                     chipColor="primary"
-                    emptyText="None selected"
+                    emptyText={t('none_selected')}
                     onEdit={() => goToStep(3)}
                   />
 
@@ -1098,11 +1096,11 @@ export function OnboardingPage() {
 
                   <SummarySection
                     icon={<HandHeart className="w-4 h-4 text-emerald-500" />}
-                    title="Skills You Offer"
+                    title={t('summary_offers')}
                     items={skillOffers}
                     getCategoryName={getCategoryName}
                     chipColor="success"
-                    emptyText="None selected"
+                    emptyText={t('none_selected')}
                     onEdit={() => goToStep(4)}
                   />
 
@@ -1110,11 +1108,11 @@ export function OnboardingPage() {
 
                   <SummarySection
                     icon={<HelpCircle className="w-4 h-4 text-amber-500" />}
-                    title="Skills You Need"
+                    title={t('summary_needs')}
                     items={skillNeeds}
                     getCategoryName={getCategoryName}
                     chipColor="warning"
-                    emptyText="None selected"
+                    emptyText={t('none_selected')}
                     onEdit={() => goToStep(4)}
                   />
                 </div>
@@ -1128,7 +1126,7 @@ export function OnboardingPage() {
                       className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
                       aria-hidden="true"
                     />
-                    We'll create {totalListingsToCreate} listing{totalListingsToCreate !== 1 ? 's' : ''} for you
+                    {t('listings_to_create', { count: totalListingsToCreate })}
                   </h2>
                   <div className="space-y-2">
                     {skillOffers.map((catId) => (
@@ -1157,7 +1155,7 @@ export function OnboardingPage() {
                   onPress={goBackAnimated}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Back
+                  {t('back')}
                 </Button>
 
                 <div className="flex items-center gap-3">
@@ -1169,7 +1167,7 @@ export function OnboardingPage() {
                       isDisabled={isSubmitting}
                       endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
                     >
-                      Skip for now
+                      {t('skip_for_now')}
                     </Button>
                   )}
                   <Button
@@ -1183,7 +1181,7 @@ export function OnboardingPage() {
                       )
                     }
                   >
-                    {totalListingsToCreate > 0 ? 'Complete Setup' : 'Finish'}
+                    {totalListingsToCreate > 0 ? t('complete_setup') : t('finish')}
                   </Button>
                 </div>
               </div>
@@ -1229,6 +1227,7 @@ interface StepIndicatorProps {
 }
 
 function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, onStepClick }: StepIndicatorProps) {
+  const { t } = useTranslation('onboarding');
   return (
     <div className="flex items-center justify-between">
       {Array.from({ length: totalSteps }, (_, i) => {
@@ -1248,7 +1247,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
                 ${isClickable ? 'cursor-pointer' : 'cursor-default'}
               `}
               onClick={() => isClickable && onStepClick(step)}
-              aria-label={`Step ${step}: ${STEP_LABELS[i]}${isCompleted ? ' (completed)' : isCurrent ? ' (current)' : ''}`}
+              aria-label={t('aria_step', { step, label: t(STEP_LABEL_KEYS[i]), status: isCompleted ? t('aria_completed') : isCurrent ? t('aria_current') : '' })}
               aria-current={isCurrent ? 'step' : undefined}
             >
               <div
@@ -1274,7 +1273,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
                   ${isCurrent ? 'text-emerald-600 dark:text-emerald-400' : 'text-theme-subtle'}
                 `}
               >
-                {STEP_LABELS[i]}
+                {t(STEP_LABEL_KEYS[i])}
               </span>
             </button>
 
@@ -1348,6 +1347,7 @@ interface SummarySectionProps {
 }
 
 function SummarySection({ icon, title, items, getCategoryName, chipColor, emptyText, onEdit }: SummarySectionProps) {
+  const { t } = useTranslation('onboarding');
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
@@ -1360,7 +1360,7 @@ function SummarySection({ icon, title, items, getCategoryName, chipColor, emptyT
           className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
           onClick={onEdit}
         >
-          Edit
+          {t('edit')}
         </button>
       </div>
       <div className="flex flex-wrap gap-1.5">
@@ -1381,6 +1381,7 @@ function SummarySection({ icon, title, items, getCategoryName, chipColor, emptyT
 // ── Listing Preview Item (Step 5) ────────────────────────────────────────────
 
 function ListingPreviewItem({ type, name }: { type: 'offer' | 'need'; name: string }) {
+  const { t } = useTranslation('onboarding');
   const isOffer = type === 'offer';
   return (
     <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
@@ -1393,10 +1394,10 @@ function ListingPreviewItem({ type, name }: { type: 'offer' | 'need'; name: stri
       </div>
       <div className="min-w-0">
         <p className="font-medium text-theme-primary text-sm">
-          {isOffer ? `I can help with ${name}` : `Looking for help with ${name}`}
+          {isOffer ? t('listing_offer_help', { name }) : t('listing_need_help', { name })}
         </p>
         <p className="text-xs text-theme-subtle">
-          {isOffer ? 'Offer listing' : 'Request listing'}
+          {isOffer ? t('listing_type_offer') : t('listing_type_request')}
         </p>
       </div>
     </div>

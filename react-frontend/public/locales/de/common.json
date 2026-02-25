@@ -76,6 +76,7 @@
     "legal_hub": "Rechtliches",
     "terms_of_service": "Nutzungsbedingungen",
     "privacy_policy": "Datenschutzerklärung",
+    "cookie_policy": "Cookie-Richtlinie",
     "accessibility": "Barrierefreiheit"
   },
   "admin_tools": {
@@ -117,5 +118,48 @@
     "switch_to_light": "Zum hellen Modus wechseln",
     "switch_to_dark": "Zum dunklen Modus wechseln"
   },
-  "attribution": "Erstellt auf Basis von Project NEXUS von Jasper Ford"
+  "cookie_consent": {
+    "banner_label": "Cookie-Zustimmung",
+    "title": "Wir verwenden Cookies",
+    "description": "Wir verwenden essenzielle Cookies für Plattformsicherheit und Funktionalität. Optionale Cookies helfen uns, Ihre Erfahrung zu verbessern und Fehler zu verfolgen.",
+    "learn_more": "Mehr erfahren",
+    "essential": "Essenziell",
+    "essential_desc": "Authentifizierung, Sicherheit, Sitzungsverwaltung",
+    "always_on": "Immer aktiv",
+    "analytics": "Analytik",
+    "analytics_desc": "Fehlerverfolgung, Nutzungsstatistiken",
+    "preferences": "Präferenzen",
+    "preferences_desc": "Thema, Sprache, Anzeigeeinstellungen",
+    "toggle_analytics": "Analytik-Cookies umschalten",
+    "toggle_preferences": "Präferenz-Cookies umschalten",
+    "manage": "Einstellungen verwalten",
+    "hide_details": "Details ausblenden",
+    "accept_all": "Alle akzeptieren",
+    "essential_only": "Nur essenzielle",
+    "save": "Einstellungen speichern"
+  },
+  "attribution": "Erstellt auf Basis von Project NEXUS von Jasper Ford",
+  "members": {
+    "title": "Mitglieder",
+    "subtitle": "Vernetzen Sie sich mit Mitgliedern der Gemeinschaft",
+    "all": "Alle Mitglieder",
+    "new": "Neue Mitglieder",
+    "active": "Aktivste",
+    "showing": "{{shown}} von {{total}} Mitgliedern angezeigt",
+    "search_placeholder": "Mitglieder suchen...",
+    "sort_name": "Name",
+    "sort_newest": "Neueste",
+    "sort_rated": "Bestbewertet",
+    "sort_active": "Aktivste",
+    "sort_by": "Sortieren nach",
+    "unable_to_load": "Mitglieder können nicht geladen werden",
+    "try_again": "Erneut versuchen",
+    "no_members": "Keine Mitglieder gefunden",
+    "no_members_search": "Versuchen Sie einen anderen Suchbegriff",
+    "no_members_community": "Noch keine Mitglieder in dieser Gemeinschaft",
+    "load_more": "Mehr laden",
+    "results_matching": "{{shown}} von {{total}} Mitgliedern, die \"{{query}}\" entsprechen",
+    "no_location": "Keine Mitglieder mit Standortdaten",
+    "fallback_name": "Mitglied"
+  }
 }

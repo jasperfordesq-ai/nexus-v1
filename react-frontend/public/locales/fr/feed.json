@@ -1,0 +1,46 @@
+{
+  "page_title": "Fil",
+  "title": "Fil communautaire",
+  "subtitle": "Découvrez ce qui se passe dans votre communauté",
+  "new_post": "Nouvelle publication",
+  "whats_on_your_mind": "Qu'avez-vous en tête ?",
+  "add_image_aria": "Ajouter une image",
+  "create_poll_aria": "Créer un sondage",
+  "create_post": "Créer une publication",
+  "load_more": "Charger plus",
+  "unable_to_load": "Impossible de charger le fil",
+  "try_again": "Réessayer",
+  "error_load": "Échec du chargement du fil.",
+  "error_load_retry": "Échec du chargement du fil. Veuillez réessayer.",
+  "empty_title": "Aucune publication pour le moment",
+  "empty_desc": "Soyez la première personne à partager quelque chose avec votre communauté !",
+  "empty_filtered": "Aucun(e) {{filter}} dans le fil pour le moment. Essayez un autre filtre !",
+  "filter": {
+    "all": "Tout",
+    "posts": "Publications",
+    "listings": "Annonces",
+    "events": "Événements",
+    "polls": "Sondages",
+    "goals": "Objectifs"
+  },
+  "report": {
+    "title": "Signaler la publication",
+    "description": "Veuillez décrire la raison pour laquelle vous signalez cette publication. Nos modérateurs examineront votre signalement.",
+    "reason_label": "Motif",
+    "reason_placeholder": "Décrivez le problème...",
+    "cancel": "Annuler",
+    "submit": "Envoyer le signalement"
+  },
+  "toast": {
+    "post_hidden": "Publication masquée",
+    "hide_failed": "Impossible de masquer la publication",
+    "user_muted": "Utilisateur mis en sourdine",
+    "mute_failed": "Impossible de mettre l'utilisateur en sourdine",
+    "provide_reason": "Veuillez fournir un motif",
+    "reported": "Publication signalée. Merci de contribuer à la sécurité de notre communauté.",
+    "report_failed": "Impossible de signaler la publication",
+    "deleted": "Publication supprimée",
+    "delete_failed": "Impossible de supprimer la publication",
+    "vote_failed": "Impossible de soumettre le vote"
+  }
+}
