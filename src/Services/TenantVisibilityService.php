@@ -226,9 +226,10 @@ class TenantVisibilityService
 
         $sql .= " ORDER BY t.path, u.last_name, u.first_name";
 
-        // Apply limit
+        // Apply limit and offset
         $limit = $filters['limit'] ?? 100;
-        $sql .= " LIMIT " . (int)$limit;
+        $offset = $filters['offset'] ?? 0;
+        $sql .= " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
 
         return Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
     }
