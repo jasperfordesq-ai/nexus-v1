@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "copy-locales": "node -e \"const fs=require('fs');fs.cpSync('../lang','public/locales',{recursive:true,force:true});console.log('[i18n] lang/ copied to public/locales/')\"",
+    "copy-locales": "node -e \"const fs=require('fs');if(fs.existsSync('../lang')){fs.cpSync('../lang','public/locales',{recursive:true,force:true});console.log('[i18n] lang/ copied to public/locales/')}else{console.log('[i18n] ../lang not found, using committed locales')}\"",
     "prebuild": "npm run copy-locales",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
