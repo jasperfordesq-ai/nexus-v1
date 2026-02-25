@@ -520,6 +520,11 @@ $router->add('GET', '/api/v2/blog/categories', 'Nexus\Controllers\Api\BlogPublic
 $router->add('GET', '/api/v2/blog/{slug}', 'Nexus\Controllers\Api\BlogPublicApiController@show');
 
 // ============================================
+// API V2 - PAGES (Public, for React frontend)
+// ============================================
+$router->add('GET', '/api/v2/pages/{slug}', 'Nexus\Controllers\Api\PagesPublicApiController@show');
+
+// ============================================
 // API V2 - RESOURCES (Public, for React frontend)
 // ============================================
 $router->add('GET', '/api/v2/resources', 'Nexus\Controllers\Api\ResourcesPublicApiController@index');

@@ -330,7 +330,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     ] : []),
     ...(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => ({
       label: p.title,
-      href: tenantPath(`/${p.slug}`),
+      href: tenantPath(`/page/${p.slug}`),
       icon: FileText,
     })),
   ];

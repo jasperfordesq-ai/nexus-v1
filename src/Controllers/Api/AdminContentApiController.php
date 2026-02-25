@@ -9,6 +9,7 @@ namespace Nexus\Controllers\Api;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
+use Nexus\Services\RedisCache;
 
 /**
  * AdminContentApiController - V2 API for Pages, Menus, and Plans admin management
@@ -65,7 +66,7 @@ class AdminContentApiController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $rows = Database::query(
-            "SELECT id, tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, publish_at, created_at, updated_at
+            "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages
              WHERE tenant_id = ?
              ORDER BY sort_order ASC, created_at DESC",
@@ -102,7 +103,7 @@ class AdminContentApiController extends BaseApiController
         }
 
         $row = Database::query(
-            "SELECT id, tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, publish_at, created_at, updated_at
+            "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages
              WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
@@ -142,10 +143,12 @@ class AdminContentApiController extends BaseApiController
 
         $slug = $this->generateSlug($title);
         $content = $input['content'] ?? '';
+        $metaDescription = $input['meta_description'] ?? '';
         $status = $input['status'] ?? 'draft';
         $sortOrder = (int)($input['sort_order'] ?? 0);
         $showInMenu = (int)($input['show_in_menu'] ?? 0);
         $menuLocation = $input['menu_location'] ?? 'about';
+        $menuOrder = (int)($input['menu_order'] ?? 0);
 
         // Validate status
         if (!in_array($status, ['draft', 'published'], true)) {
@@ -159,21 +162,24 @@ class AdminContentApiController extends BaseApiController
         $slug = $this->ensureUniqueSlug('pages', $slug, $tenantId);
 
         Database::query(
-            "INSERT INTO pages (tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
-            [$tenantId, $title, $slug, $content, $isPublished, $sortOrder, $showInMenu, $menuLocation]
+            "INSERT INTO pages (tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+            [$tenantId, $title, $slug, $content, $metaDescription, $isPublished, $sortOrder, $showInMenu, $menuLocation, $menuOrder]
         );
 
         $newId = Database::lastInsertId();
 
         $row = Database::query(
-            "SELECT id, tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, publish_at, created_at, updated_at
+            "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE id = ?",
             [$newId]
         )->fetch();
 
         $row['status'] = $row['is_published'] ? 'published' : 'draft';
         unset($row['is_published']);
+
+        // Clear bootstrap cache so menu_pages reflects changes
+        try { RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
         $this->respondWithData($row, null, 201);
     }
@@ -256,6 +262,14 @@ class AdminContentApiController extends BaseApiController
             $updates[] = 'menu_location = ?';
             $params[] = $input['menu_location'];
         }
+        if (array_key_exists('meta_description', $input)) {
+            $updates[] = 'meta_description = ?';
+            $params[] = $input['meta_description'];
+        }
+        if (isset($input['menu_order'])) {
+            $updates[] = 'menu_order = ?';
+            $params[] = (int)$input['menu_order'];
+        }
 
         if (empty($updates)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'No fields to update', null, 422);
@@ -272,13 +286,16 @@ class AdminContentApiController extends BaseApiController
         );
 
         $row = Database::query(
-            "SELECT id, tenant_id, title, slug, content, is_published, sort_order, show_in_menu, menu_location, publish_at, created_at, updated_at
+            "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         )->fetch();
 
         $row['status'] = $row['is_published'] ? 'published' : 'draft';
         unset($row['is_published']);
+
+        // Clear bootstrap cache so menu_pages reflects changes
+        try { RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
         $this->respondWithData($row);
     }
@@ -316,6 +333,9 @@ class AdminContentApiController extends BaseApiController
             "DELETE FROM pages WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         );
+
+        // Clear bootstrap cache so menu_pages reflects deletion
+        try { RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
         $this->respondWithData(['deleted' => true]);
     }

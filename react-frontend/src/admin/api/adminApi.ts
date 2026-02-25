@@ -909,9 +909,9 @@ export const adminFederation = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminPages = {
-  list: () => api.get<Array<{ id: number; title: string; slug: string; status: string; sort_order: number; created_at: string }>>('/v2/admin/pages'),
+  list: () => api.get<Array<{ id: number; title: string; slug: string; status: string; sort_order: number; show_in_menu: number; menu_location: string; menu_order: number; created_at: string }>>('/v2/admin/pages'),
   get: (id: number) => api.get('/v2/admin/pages/' + id),
-  create: (data: { title: string; content?: string; meta_description?: string; status?: string }) =>
+  create: (data: { title: string; content?: string; meta_description?: string; status?: string; show_in_menu?: number; menu_location?: string; menu_order?: number }) =>
     api.post('/v2/admin/pages', data),
   update: (id: number, data: Record<string, unknown>) =>
     api.put('/v2/admin/pages/' + id, data),
