@@ -34,7 +34,7 @@ export function PageBuilder() {
   const isEdit = id !== undefined && id !== 'new';
   usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Page`);
   const navigate = useNavigate();
-  const { tenantPath } = useTenant();
+  const { tenantPath, tenant } = useTenant();
   const toast = useToast();
 
   const [formData, setFormData] = useState<PageFormData>({
@@ -167,7 +167,14 @@ export function PageBuilder() {
                 variant="flat"
                 color="primary"
                 startContent={<ExternalLink size={16} />}
-                onPress={() => window.open(tenantPath(`/page/${formData.slug}`), '_blank')}
+                onPress={() => {
+                  // Use tenant.slug directly so the preview URL includes the tenant prefix
+                  // even when accessed from the admin panel (where effectiveTenantSlug is null).
+                  const previewUrl = tenant?.slug
+                    ? `/${tenant.slug}/page/${formData.slug}`
+                    : `/page/${formData.slug}`;
+                  window.open(previewUrl, '_blank');
+                }}
               >
                 Preview
               </Button>

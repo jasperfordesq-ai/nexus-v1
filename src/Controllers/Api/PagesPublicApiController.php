@@ -28,6 +28,17 @@ class PagesPublicApiController extends BaseApiController
     {
         $tenantId = TenantContext::getId();
 
+        // If resolved to master tenant (1) and an explicit context_tenant is provided by the
+        // React frontend, use it. This handles unauthenticated public page requests where
+        // the X-Tenant-ID header is unavailable (no JWT), but the React app knows the tenant
+        // from the URL (e.g. /hour-timebank/page/test) and passes it as a query param.
+        if ($tenantId === 1 && !empty($_GET['context_tenant']) && is_numeric($_GET['context_tenant'])) {
+            $contextTenantId = (int) $_GET['context_tenant'];
+            if ($contextTenantId > 1) {
+                $tenantId = $contextTenantId;
+            }
+        }
+
         $page = Page::findBySlug($slug, $tenantId);
 
         if (!$page) {
