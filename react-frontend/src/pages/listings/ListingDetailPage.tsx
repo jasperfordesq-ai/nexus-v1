@@ -89,7 +89,7 @@ export function ListingDetailPage() {
         setListing(response.data);
         setIsSaved(response.data.is_favorited ?? false);
       } else {
-        setError('Listing not found or has been removed');
+        setError(t('not_found_error'));
       }
     } catch (err) {
       logError('Failed to load listing', err);
@@ -164,7 +164,7 @@ export function ListingDetailPage() {
   const isOwner = user && listing && user.id === listing.user_id;
 
   if (isLoading) {
-    return <LoadingScreen message="Loading listing..." />;
+    return <LoadingScreen message={t('loading')} />;
   }
 
   if (error || !listing) {
@@ -172,7 +172,7 @@ export function ListingDetailPage() {
       <EmptyState
         icon={<AlertCircle className="w-12 h-12" />}
         title={t('not_found_title')}
-        description={error || 'The listing you are looking for does not exist'}
+        description={error || t('not_found_fallback')}
         action={
           <Link to={tenantPath('/listings')}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
@@ -341,12 +341,12 @@ export function ListingDetailPage() {
                         activeExchange.status === 'pending_confirmation' ? 'primary' :
                         'default'
                       }>
-                        {activeExchange.status === 'pending_provider' ? 'Waiting for response' :
-                         activeExchange.status === 'pending_broker' ? 'Awaiting approval' :
-                         activeExchange.status === 'accepted' ? 'Accepted' :
-                         activeExchange.status === 'in_progress' ? 'In Progress' :
-                         activeExchange.status === 'pending_confirmation' ? 'Confirm Hours' :
-                         activeExchange.status === 'disputed' ? 'Under Review' :
+                        {activeExchange.status === 'pending_provider' ? t('exchange_status_pending_provider') :
+                         activeExchange.status === 'pending_broker' ? t('exchange_status_pending_broker') :
+                         activeExchange.status === 'accepted' ? t('exchange_status_accepted') :
+                         activeExchange.status === 'in_progress' ? t('exchange_status_in_progress') :
+                         activeExchange.status === 'pending_confirmation' ? t('exchange_status_pending_confirmation') :
+                         activeExchange.status === 'disputed' ? t('exchange_status_disputed') :
                          activeExchange.status.replace(/_/g, ' ')}
                       </Chip>
                     }

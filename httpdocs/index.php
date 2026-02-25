@@ -385,7 +385,7 @@ TenantContext::resolve();
 // Initialise i18n Translator for PHP admin views
 use Nexus\I18n\Translator;
 Translator::init(__DIR__ . '/../lang');
-$_supportedLocales = ['en', 'ga'];
+$_supportedLocales = \Nexus\Core\TenantContext::getSetting('supported_languages', ['en', 'ga']);
 
 // Locale priority: session → logged-in user's DB preference → cookie → Accept-Language header
 $_locale = $_SESSION['locale'] ?? null;

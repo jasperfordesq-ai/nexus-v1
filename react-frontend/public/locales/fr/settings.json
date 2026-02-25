@@ -1,0 +1,19 @@
+{
+  "title": "Paramètres",
+  "account": "Compte",
+  "notifications": "Notifications",
+  "privacy": "Confidentialité",
+  "language": "Langue",
+  "appearance": "Apparence",
+  "security": "Sécurité",
+  "save": "Enregistrer les paramètres",
+  "saved": "Paramètres enregistrés",
+  "language_preference": "Préférence de langue",
+  "select_language": "Choisissez votre langue préférée pour l'interface",
+  "theme": {
+    "title": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  }
+}

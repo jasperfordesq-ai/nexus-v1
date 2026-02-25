@@ -232,6 +232,9 @@ class TenantBootstrapController extends BaseApiController
             'insurance_enabled' => BrokerControlConfigService::isInsuranceEnabled(),
         ];
 
+        // Supported languages for this tenant (used by the frontend language switcher)
+        $data['supported_languages'] = $config['supported_languages'] ?? ['en', 'ga'];
+
         return $data;
     }
 

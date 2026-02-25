@@ -765,11 +765,11 @@ class UsersApiController extends BaseApiController
         $data = $this->getAllInput();
         $language = $data['language'] ?? null;
 
-        $validLanguages = ['en', 'ga'];
+        $validLanguages = \Nexus\Core\TenantContext::getSetting('supported_languages', ['en', 'ga']);
         if (!$language || !in_array($language, $validLanguages, true)) {
             $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid language. Must be one of: en, ga',
+                'Invalid language. Must be one of: ' . implode(', ', $validLanguages),
                 'language',
                 400
             );

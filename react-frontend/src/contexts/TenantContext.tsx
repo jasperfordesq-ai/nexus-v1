@@ -57,6 +57,8 @@ interface TenantContextValue extends TenantState {
   tenantSlug: string | null;
   /** Build a path with the tenant slug prefix (if present). */
   tenantPath: (path: string) => string;
+  /** Language codes supported by this tenant (e.g. ['en', 'ga'] or ['de', 'fr', 'it', 'en']) */
+  supportedLanguages: string[];
 }
 
 // Default features — synced with PHP TenantBootstrapController::buildFeaturesData() defaults
@@ -275,6 +277,11 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     return buildTenantPath(path, effectiveTenantSlug);
   }, [effectiveTenantSlug]);
 
+  const supportedLanguages = useMemo<string[]>(
+    () => state.tenant?.supported_languages ?? ['en', 'ga'],
+    [state.tenant]
+  );
+
   const value = useMemo<TenantContextValue>(
     () => ({
       ...state,
@@ -286,8 +293,9 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       refreshTenant,
       tenantSlug: effectiveTenantSlug || null,
       tenantPath,
+      supportedLanguages,
     }),
-    [state, features, modules, branding, hasFeature, hasModule, refreshTenant, effectiveTenantSlug, tenantPath]
+    [state, features, modules, branding, hasFeature, hasModule, refreshTenant, effectiveTenantSlug, tenantPath, supportedLanguages]
   );
 
   return (
@@ -323,6 +331,13 @@ export function useFeature(feature: keyof TenantFeatures): boolean {
 export function useModule(module: keyof TenantModules): boolean {
   const { hasModule } = useTenant();
   return hasModule(module);
+}
+
+/**
+ * Convenience hook for tenant-supported languages
+ */
+export function useTenantLanguages(): string[] {
+  return useTenant().supportedLanguages;
 }
 
 export default TenantContext;

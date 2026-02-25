@@ -1081,7 +1081,7 @@ export function ConversationPage() {
             {searchResults.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-theme-subtle">
-                  {currentSearchIndex + 1} of {searchResults.length}
+                  {t('search_result_count', { current: currentSearchIndex + 1, total: searchResults.length })}
                 </span>
                 <Button
                   isIconOnly
@@ -1369,7 +1369,7 @@ export function ConversationPage() {
                 variant="flat"
                 className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
                 onPress={() => fileInputRef.current?.click()}
-                aria-label="Add attachment"
+                aria-label={t('aria_add_attachment')}
                 isDisabled={attachments.length >= 5}
               >
                 <Paperclip className="w-4 h-4" />
@@ -1406,7 +1406,7 @@ export function ConversationPage() {
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 }}
-                aria-label="Message input"
+                aria-label={t('aria_message_input')}
               />
               {/* Voice recording button - show when no text and no attachments */}
               {!newMessage.trim() && attachments.length === 0 && (
@@ -1416,7 +1416,7 @@ export function ConversationPage() {
                   variant="flat"
                   className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
                   onPress={startRecording}
-                  aria-label="Record voice message"
+                  aria-label={t('aria_record_voice')}
                 >
                   <Mic className="w-4 h-4" />
                 </Button>
@@ -1454,8 +1454,7 @@ export function ConversationPage() {
           </ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              Are you sure you want to archive this conversation with{' '}
-              <span className="font-semibold text-theme-primary">{other_user.name}</span>?
+              {t('archive_confirm_prompt', { name: other_user.name })}
             </p>
             <p className="text-theme-subtle text-sm mt-2">
               {t('archive_confirm_body')}
@@ -1615,7 +1614,7 @@ function MessageBubble({
                   {t('cancel')}
                 </Button>
                 <Button size="sm" className="bg-black/20 dark:bg-white/20 text-inherit" onPress={onSaveEdit}>
-                  Save
+                  {t('save')}
                 </Button>
               </div>
             </div>
@@ -1678,7 +1677,7 @@ function MessageBubble({
                 variant="light"
                 className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
                 onPress={() => setShowReactionPicker(!showReactionPicker)}
-                aria-label="Add reaction"
+                aria-label={t('aria_add_reaction')}
               >
                 <SmilePlus className="w-3 h-3 text-theme-muted" aria-hidden="true" />
               </Button>
@@ -1691,7 +1690,7 @@ function MessageBubble({
                   variant="light"
                   className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
                   onPress={() => setShowMessageMenu(!showMessageMenu)}
-                  aria-label="Message options"
+                  aria-label={t('aria_message_options')}
                 >
                   <MoreVertical className="w-3 h-3 text-theme-muted" aria-hidden="true" />
                 </Button>
@@ -1709,7 +1708,7 @@ function MessageBubble({
                 shadow-lg z-10
               `}
               role="menu"
-              aria-label="Add reaction"
+              aria-label={t('aria_add_reaction')}
             >
               {REACTION_EMOJIS.map((emoji) => (
                 <Button
@@ -1722,7 +1721,7 @@ function MessageBubble({
                     onReact?.(message.id, emoji);
                     setShowReactionPicker(false);
                   }}
-                  aria-label={`React with ${emoji}`}
+                  aria-label={t('aria_react_with', { emoji })}
                 >
                   {emoji}
                 </Button>
@@ -1740,7 +1739,7 @@ function MessageBubble({
                 shadow-lg z-10 min-w-[100px]
               `}
               role="menu"
-              aria-label="Message options"
+              aria-label={t('aria_message_options')}
             >
               <Button
                 variant="light"
@@ -1782,7 +1781,7 @@ function MessageBubble({
                 variant="light"
                 className="min-w-0 h-auto px-1.5 py-0.5 bg-theme-elevated rounded-full text-xs gap-0.5"
                 onPress={() => onReact?.(message.id, emoji)}
-                aria-label={`${emoji} reaction, click to toggle`}
+                aria-label={t('aria_toggle_reaction', { emoji })}
               >
                 <span>{emoji}</span>
                 {typeof count === 'number' && count > 1 && (

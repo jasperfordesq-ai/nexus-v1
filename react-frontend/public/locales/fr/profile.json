@@ -1,0 +1,23 @@
+{
+  "title": "Profil",
+  "edit_profile": "Modifier le profil",
+  "joined": "Membre depuis le {{date}}",
+  "bio": "À propos",
+  "skills": "Compétences",
+  "interests": "Intérêts",
+  "listings": "Annonces",
+  "reviews": "Évaluations",
+  "badges": "Badges",
+  "credits": "Crédits temps",
+  "send_message": "Envoyer un message",
+  "connect": "Se connecter",
+  "connected": "Connecté(e)",
+  "form": {
+    "first_name": "Prénom",
+    "last_name": "Nom de famille",
+    "bio": "À propos de moi",
+    "location": "Localisation",
+    "phone": "Téléphone",
+    "save": "Enregistrer les modifications"
+  }
+}

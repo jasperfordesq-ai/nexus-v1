@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "feed": "Feed",
+    "listings": "Annunci",
+    "messages": "Messaggi",
+    "community": "Comunità",
+    "members": "Membri",
+    "events": "Eventi",
+    "groups": "Gruppi",
+    "blog": "Blog",
+    "volunteering": "Volontariato",
+    "organisations": "Organizzazioni",
+    "resources": "Risorse",
+    "exchanges": "Scambi",
+    "group_exchanges": "Scambi di Gruppo",
+    "wallet": "Portafoglio",
+    "achievements": "Risultati",
+    "goals": "Obiettivi",
+    "more": "Altro",
+    "activity": "Attività",
+    "federation": "Federazione",
+    "federation_hub": "Hub Federazione",
+    "partner_communities": "Comunità Partner",
+    "federated_members": "Membri Federati",
+    "federated_messages": "Messaggi Federati",
+    "federated_listings": "Annunci Federati",
+    "federated_events": "Eventi Federati",
+    "about": "Chi Siamo",
+    "faq": "FAQ",
+    "timebanking_guide": "Guida al Timebanking",
+    "partner_with_us": "Diventa Partner",
+    "social_prescribing": "Prescrizione Sociale",
+    "our_impact": "Il Nostro Impatto",
+    "impact_report": "Report d'Impatto",
+    "strategic_plan": "Piano Strategico",
+    "home": "Home",
+    "leaderboard": "Classifica"
+  },
+  "user_menu": {
+    "my_profile": "Il Mio Profilo",
+    "wallet": "Portafoglio",
+    "settings": "Impostazioni",
+    "light_mode": "Modalità Chiara",
+    "dark_mode": "Modalità Scura",
+    "help_center": "Centro Assistenza",
+    "admin": "Admin",
+    "admin_panel": "Pannello Admin",
+    "legacy_admin": "Legacy Admin",
+    "log_out": "Esci"
+  },
+  "auth": {
+    "log_in": "Accedi",
+    "sign_up": "Registrati"
+  },
+  "create": {
+    "new_listing": "Nuovo Annuncio",
+    "new_event": "Nuovo Evento"
+  },
+  "search": {
+    "placeholder": "Cerca annunci, membri, eventi...",
+    "searching": "Ricerca in corso...",
+    "suggestions": "Suggerimenti",
+    "quick_links": "Link Rapidi",
+    "clear": "Cancella ricerca",
+    "type_listing": "Annuncio",
+    "type_member": "Membro",
+    "type_event": "Evento",
+    "type_group": "Gruppo"
+  },
+  "support": {
+    "help_center": "Centro Assistenza",
+    "contact": "Contatti"
+  },
+  "legal": {
+    "legal_hub": "Hub Legale",
+    "terms_of_service": "Termini di Servizio",
+    "privacy_policy": "Informativa sulla Privacy",
+    "accessibility": "Accessibilità"
+  },
+  "admin_tools": {
+    "section": "Strumenti Admin",
+    "admin_panel": "Pannello Admin",
+    "legacy_admin": "Legacy Admin"
+  },
+  "account": {
+    "section": "Account",
+    "settings": "Impostazioni",
+    "log_out": "Esci"
+  },
+  "stats": {
+    "credits": "Crediti",
+    "messages": "Messaggi",
+    "alerts": "Avvisi"
+  },
+  "sections": {
+    "community": "Comunità",
+    "explore": "Esplora",
+    "federation": "Federazione",
+    "activity": "Attività",
+    "partner_communities": "Comunità Partner",
+    "about": "Chi Siamo",
+    "support": "Assistenza",
+    "legal": "Legale",
+    "admin": "Admin",
+    "account": "Account",
+    "language": "Lingua"
+  },
+  "accessibility": {
+    "open_menu": "Apri menu",
+    "close_menu": "Chiudi menu",
+    "search": "Cerca",
+    "search_ctrl_k": "Cerca (Ctrl+K)",
+    "create_new": "Crea nuovo",
+    "notifications": "Notifiche",
+    "notifications_unread": "Notifiche, {{count}} non lette",
+    "switch_to_light": "Passa alla modalità chiara",
+    "switch_to_dark": "Passa alla modalità scura"
+  },
+  "attribution": "Realizzato su Project NEXUS di Jasper Ford"
+}

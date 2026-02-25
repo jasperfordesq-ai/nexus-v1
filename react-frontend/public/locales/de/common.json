@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "feed": "Feed",
+    "listings": "Inserate",
+    "messages": "Nachrichten",
+    "community": "Community",
+    "members": "Mitglieder",
+    "events": "Veranstaltungen",
+    "groups": "Gruppen",
+    "blog": "Blog",
+    "volunteering": "Freiwilligenarbeit",
+    "organisations": "Organisationen",
+    "resources": "Ressourcen",
+    "exchanges": "Austausche",
+    "group_exchanges": "Gruppenaustaüsche",
+    "wallet": "Zeitkonto",
+    "achievements": "Erfolge",
+    "goals": "Ziele",
+    "more": "Mehr",
+    "activity": "Aktivität",
+    "federation": "Federation",
+    "federation_hub": "Federation Hub",
+    "partner_communities": "Partnergemeinschaften",
+    "federated_members": "Verbundene Mitglieder",
+    "federated_messages": "Verbundene Nachrichten",
+    "federated_listings": "Verbundene Inserate",
+    "federated_events": "Verbundene Veranstaltungen",
+    "about": "Über uns",
+    "faq": "FAQ",
+    "timebanking_guide": "Timebanking-Leitfaden",
+    "partner_with_us": "Partner werden",
+    "social_prescribing": "Social Prescribing",
+    "our_impact": "Unsere Wirkung",
+    "impact_report": "Wirkungsbericht",
+    "strategic_plan": "Strategischer Plan",
+    "home": "Startseite",
+    "leaderboard": "Rangliste"
+  },
+  "user_menu": {
+    "my_profile": "Mein Profil",
+    "wallet": "Zeitkonto",
+    "settings": "Einstellungen",
+    "light_mode": "Heller Modus",
+    "dark_mode": "Dunkler Modus",
+    "help_center": "Hilfezentrum",
+    "admin": "Admin",
+    "admin_panel": "Admin-Panel",
+    "legacy_admin": "Legacy-Admin",
+    "log_out": "Abmelden"
+  },
+  "auth": {
+    "log_in": "Anmelden",
+    "sign_up": "Registrieren"
+  },
+  "create": {
+    "new_listing": "Neues Inserat",
+    "new_event": "Neue Veranstaltung"
+  },
+  "search": {
+    "placeholder": "Inserate, Mitglieder, Veranstaltungen suchen...",
+    "searching": "Suche läuft...",
+    "suggestions": "Vorschläge",
+    "quick_links": "Schnelllinks",
+    "clear": "Suche löschen",
+    "type_listing": "Inserat",
+    "type_member": "Mitglied",
+    "type_event": "Veranstaltung",
+    "type_group": "Gruppe"
+  },
+  "support": {
+    "help_center": "Hilfezentrum",
+    "contact": "Kontakt"
+  },
+  "legal": {
+    "legal_hub": "Rechtliches",
+    "terms_of_service": "Nutzungsbedingungen",
+    "privacy_policy": "Datenschutzerklärung",
+    "accessibility": "Barrierefreiheit"
+  },
+  "admin_tools": {
+    "section": "Admin-Werkzeuge",
+    "admin_panel": "Admin-Panel",
+    "legacy_admin": "Legacy-Admin"
+  },
+  "account": {
+    "section": "Konto",
+    "settings": "Einstellungen",
+    "log_out": "Abmelden"
+  },
+  "stats": {
+    "credits": "Guthaben",
+    "messages": "Nachrichten",
+    "alerts": "Benachrichtigungen"
+  },
+  "sections": {
+    "community": "Community",
+    "explore": "Entdecken",
+    "federation": "Federation",
+    "activity": "Aktivität",
+    "partner_communities": "Partnergemeinschaften",
+    "about": "Über uns",
+    "support": "Support",
+    "legal": "Rechtliches",
+    "admin": "Admin",
+    "account": "Konto",
+    "language": "Sprache"
+  },
+  "accessibility": {
+    "open_menu": "Menü öffnen",
+    "close_menu": "Menü schliessen",
+    "search": "Suchen",
+    "search_ctrl_k": "Suchen (Strg+K)",
+    "create_new": "Neu erstellen",
+    "notifications": "Benachrichtigungen",
+    "notifications_unread": "Benachrichtigungen, {{count}} ungelesen",
+    "switch_to_light": "Zum hellen Modus wechseln",
+    "switch_to_dark": "Zum dunklen Modus wechseln"
+  },
+  "attribution": "Erstellt auf Basis von Project NEXUS von Jasper Ford"
+}
