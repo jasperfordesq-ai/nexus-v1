@@ -35,6 +35,7 @@ import {
   Target,
   Lightbulb,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
@@ -142,21 +143,22 @@ const stagger = {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function PartnerPage() {
-  usePageTitle('Partner With Us');
+  const { t } = useTranslation('about');
+  usePageTitle(t('partner.page_title'));
   const { tenantPath } = useTenant();
 
   return (
     <>
     <PageMeta
-      title="Partner With Us"
-      description="Partner with hOUR Timebank to create measurable social value. Our 16:1 SROI means every euro invested generates sixteen in community impact."
+      title={t('partner.page_title')}
+      description={t('partner.meta_description')}
     />
     <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
       {/* ─── Breadcrumbs ─── */}
       <div className="px-4 sm:px-6 lg:px-8 pt-6">
         <Breadcrumbs items={[
-          { label: 'About', href: '/about' },
-          { label: 'Partner With Us' },
+          { label: t('partner.breadcrumb_about'), href: '/about' },
+          { label: t('partner.page_title') },
         ]} />
       </div>
 
@@ -180,7 +182,7 @@ export function PartnerPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-theme-primary mb-6"
           >
-            Partner With Us
+            {t('partner.page_title')}
           </motion.h1>
 
           <motion.p
@@ -188,8 +190,7 @@ export function PartnerPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg sm:text-xl text-theme-muted max-w-2xl mx-auto"
           >
-            Invest in your community with a proven 1:16 social return. Together, we build
-            stronger, more connected neighbourhoods.
+            {t('partner.hero_subtitle')}
           </motion.p>
         </div>
       </section>
@@ -215,17 +216,13 @@ export function PartnerPage() {
                 </div>
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-3">
-                    Addressing the Funding Gap
+                    {t('partner.funding_gap_heading')}
                   </h2>
                   <p className="text-theme-muted leading-relaxed mb-4">
-                    Timebanks thrive when they have a dedicated <strong className="text-theme-primary">Hub Coordinator</strong> \u2014
-                    someone who onboards new members, facilitates connections, and ensures the community stays
-                    vibrant and inclusive.
+                    {t('partner.funding_gap_para1')}
                   </p>
                   <p className="text-theme-muted leading-relaxed">
-                    The single biggest challenge facing timebanking in Ireland is securing sustainable
-                    funding for these coordinator roles. With your partnership, we can bridge this gap and
-                    unlock extraordinary social value for communities that need it most.
+                    {t('partner.funding_gap_para2')}
                   </p>
                 </div>
               </div>
@@ -244,10 +241,10 @@ export function PartnerPage() {
             className="text-center mb-10"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              Why Partner With Us?
+              {t('partner.why_partner_heading')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              Evidence-based impact you can stand behind.
+              {t('partner.why_partner_subtitle')}
             </p>
           </motion.div>
 
@@ -258,7 +255,7 @@ export function PartnerPage() {
             variants={stagger}
             className="grid sm:grid-cols-3 gap-6"
           >
-            {impactCards.map((card) => (
+            {impactCards.map((card, index) => (
               <motion.div key={card.title} variants={fadeInUp}>
                 <GlassCard className="p-6 h-full text-center relative overflow-hidden group hover:scale-[1.02] transition-transform">
                   {/* Gradient top bar */}
@@ -272,10 +269,10 @@ export function PartnerPage() {
                   </div>
 
                   <p className={`text-lg font-extrabold ${card.textAccent} mb-1`}>
-                    {card.highlight}
+                    {t(`partner.impact_card_${index}_highlight`, card.highlight)}
                   </p>
-                  <h3 className="font-semibold text-theme-primary mb-2">{card.title}</h3>
-                  <p className="text-sm text-theme-muted leading-relaxed">{card.description}</p>
+                  <h3 className="font-semibold text-theme-primary mb-2">{t(`partner.impact_card_${index}_title`, card.title)}</h3>
+                  <p className="text-sm text-theme-muted leading-relaxed">{t(`partner.impact_card_${index}_description`, card.description)}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -293,10 +290,10 @@ export function PartnerPage() {
             className="text-center mb-12"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              Partnership Opportunities
+              {t('partner.partnership_opportunities_heading')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              Multiple ways to create impact alongside our community.
+              {t('partner.partnership_opportunities_subtitle')}
             </p>
           </motion.div>
 
@@ -315,8 +312,8 @@ export function PartnerPage() {
                       <type.icon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-theme-primary text-lg mb-1">{type.title}</h3>
-                      <p className="text-theme-muted text-sm leading-relaxed">{type.description}</p>
+                      <h3 className="font-semibold text-theme-primary text-lg mb-1">{t(`partner.partnership_type_${index}_title`, type.title)}</h3>
+                      <p className="text-theme-muted text-sm leading-relaxed">{t(`partner.partnership_type_${index}_description`, type.description)}</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -336,18 +333,18 @@ export function PartnerPage() {
             className="text-center mb-8"
           >
             <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-2">
-              Learn More
+              {t('partner.learn_more_heading')}
             </h2>
           </motion.div>
 
           <div className="grid gap-4">
-            {learnMoreLinks.map((link, index) => (
+            {learnMoreLinks.map((link, linkIndex) => (
               <motion.div
                 key={link.title}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.08 }}
+                transition={{ delay: linkIndex * 0.08 }}
               >
                 <Link to={tenantPath(link.to)}>
                   <GlassCard className="p-5 flex items-center gap-4 group hover:scale-[1.01] transition-transform">
@@ -355,8 +352,8 @@ export function PartnerPage() {
                       <link.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-theme-primary">{link.title}</h3>
-                      <p className="text-sm text-theme-muted">{link.description}</p>
+                      <h3 className="font-semibold text-theme-primary">{t(`partner.learn_more_${linkIndex}_title`, link.title)}</h3>
+                      <p className="text-sm text-theme-muted">{t(`partner.learn_more_${linkIndex}_description`, link.description)}</p>
                     </div>
                     <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-indigo-500 transition-colors flex-shrink-0" aria-hidden="true" />
                   </GlassCard>
@@ -391,11 +388,10 @@ export function PartnerPage() {
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">
-                  Let&apos;s Build Something Together
+                  {t('partner.cta_heading')}
                 </h2>
                 <p className="text-theme-muted max-w-lg mx-auto mb-8">
-                  Whether you represent a business, foundation, or public body \u2014 we&apos;d love to
-                  explore how we can create social value together.
+                  {t('partner.cta_subtitle')}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -405,7 +401,7 @@ export function PartnerPage() {
                       className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold px-8"
                       endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                     >
-                      Get in Touch
+                      {t('partner.cta_contact')}
                     </Button>
                   </Link>
 
@@ -416,7 +412,7 @@ export function PartnerPage() {
                       className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                       startContent={<Target className="w-5 h-5" aria-hidden="true" />}
                     >
-                      View Strategic Plan
+                      {t('partner.cta_view_plan')}
                     </Button>
                   </Link>
                 </div>

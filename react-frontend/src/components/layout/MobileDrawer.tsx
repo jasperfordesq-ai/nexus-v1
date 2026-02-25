@@ -52,13 +52,16 @@ import {
   TrendingUp,
   BarChart3,
   Compass,
+  Cookie,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant, useNotifications } from '@/contexts';
+import { useAuth, useTenant, useNotifications, useCookieConsent } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { tokenManager, API_BASE } from '@/lib/api';
 import type { TenantFeatures, TenantModules } from '@/types/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { useMenuContext } from '@/contexts';
+import { MobileMenuItems } from '@/components/navigation';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -73,6 +76,11 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const { user, isAuthenticated, logout } = useAuth();
   const { tenant, branding, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
+  const { resetConsent } = useCookieConsent();
+  const { mobileMenus, headerMenus, hasCustomMenus } = useMenuContext();
+
+  // Use mobile-specific menus if available, fall back to header menus
+  const apiMenus = mobileMenus.length > 0 ? mobileMenus : headerMenus;
 
   // Nav item arrays — defined inside component so t() is available
   const mainNavItems = [
@@ -136,6 +144,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('legal.legal_hub'), href: '/legal', icon: FileText },
     { label: t('legal.terms_of_service'), href: '/terms', icon: FileText },
     { label: t('legal.privacy_policy'), href: '/privacy', icon: FileText },
+    { label: t('legal.cookie_policy', 'Cookie Policy'), href: '/cookies', icon: Cookie },
     { label: t('legal.accessibility'), href: '/accessibility', icon: FileText },
   ];
 
@@ -314,6 +323,13 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
           {/* Navigation */}
           <nav className="p-4 space-y-6" aria-label="Mobile navigation">
+            {hasCustomMenus ? (
+              /* API-driven navigation when custom menus exist */
+              <div className="space-y-1">
+                <MobileMenuItems menus={apiMenus} />
+              </div>
+            ) : (
+            <>
             {/* Main */}
             <div className="space-y-1">
               {mainNavItems.map(renderNavLink)}
@@ -371,8 +387,10 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 }))}
               </div>
             </div>
+            </>
+            )}
 
-            {/* Support */}
+            {/* Support — always hardcoded */}
             <div>
               <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
                 {t('sections.support')}
@@ -389,6 +407,13 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </p>
               <div className="space-y-1">
                 {legalNavItems.map(renderNavLink)}
+                <button
+                  onClick={() => { resetConsent(); onClose(); }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full text-left"
+                >
+                  <Settings className="w-5 h-5" aria-hidden="true" />
+                  <span>{t('cookie_consent.manage', 'Cookie Settings')}</span>
+                </button>
               </div>
             </div>
 

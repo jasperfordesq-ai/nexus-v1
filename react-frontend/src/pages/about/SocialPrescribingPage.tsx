@@ -33,6 +33,7 @@ import {
   Stethoscope,
   Mail,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
@@ -133,21 +134,22 @@ const stagger = {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function SocialPrescribingPage() {
-  usePageTitle('Social Prescribing');
+  const { t } = useTranslation('about');
+  usePageTitle(t('social_prescribing.page_title'));
   const { tenantPath } = useTenant();
 
   return (
     <>
     <PageMeta
-      title="Social Prescribing"
-      description="Evidence-based social prescribing through timebanking: 100% improved wellbeing, 95% increased connection, and a structured referral pathway."
+      title={t('social_prescribing.page_title')}
+      description={t('social_prescribing.meta_description')}
     />
     <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
       {/* ─── Breadcrumbs ─── */}
       <div className="px-4 sm:px-6 lg:px-8 pt-6">
         <Breadcrumbs items={[
-          { label: 'About', href: '/about' },
-          { label: 'Social Prescribing' },
+          { label: t('social_prescribing.breadcrumb_about'), href: '/about' },
+          { label: t('social_prescribing.page_title') },
         ]} />
       </div>
 
@@ -171,7 +173,7 @@ export function SocialPrescribingPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-theme-primary mb-6"
           >
-            Social Prescribing Partner
+            {t('social_prescribing.hero_title')}
           </motion.h1>
 
           <motion.p
@@ -179,7 +181,7 @@ export function SocialPrescribingPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg sm:text-xl text-theme-muted max-w-2xl mx-auto"
           >
-            Evidence-based, community-led, and 100% effective for wellbeing.
+            {t('social_prescribing.hero_subtitle')}
           </motion.p>
         </div>
       </section>
@@ -194,10 +196,10 @@ export function SocialPrescribingPage() {
             className="text-center mb-10"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              Validated Outcomes
+              {t('social_prescribing.validated_outcomes_heading')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              Our wellbeing impact is independently verified and consistently exceptional.
+              {t('social_prescribing.validated_outcomes_subtitle')}
             </p>
           </motion.div>
 
@@ -208,7 +210,7 @@ export function SocialPrescribingPage() {
             variants={stagger}
             className="grid sm:grid-cols-3 gap-6"
           >
-            {outcomeStats.map((stat) => (
+            {outcomeStats.map((stat, index) => (
               <motion.div key={stat.label} variants={fadeInUp}>
                 <GlassCard className="p-6 text-center h-full relative overflow-hidden group hover:scale-[1.02] transition-transform">
                   {/* Gradient top bar */}
@@ -224,8 +226,8 @@ export function SocialPrescribingPage() {
                   <p className={`text-4xl sm:text-5xl font-extrabold ${stat.textAccent} mb-2`}>
                     {stat.value}
                   </p>
-                  <p className="font-semibold text-theme-primary mb-1">{stat.label}</p>
-                  <p className="text-sm text-theme-muted">{stat.description}</p>
+                  <p className="font-semibold text-theme-primary mb-1">{t(`social_prescribing.outcome_${index}_label`, stat.label)}</p>
+                  <p className="text-sm text-theme-muted">{t(`social_prescribing.outcome_${index}_description`, stat.description)}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -244,14 +246,14 @@ export function SocialPrescribingPage() {
                   <ShieldCheck className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-theme-primary pt-2">
-                  Strategic Fit
+                  {t('social_prescribing.strategic_fit_heading')}
                 </h3>
               </div>
               <ul className="space-y-3 ml-1">
-                {strategicFitPoints.map((point) => (
+                {strategicFitPoints.map((point, index) => (
                   <li key={point} className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                    <span className="text-theme-muted text-sm leading-relaxed">{point}</span>
+                    <span className="text-theme-muted text-sm leading-relaxed">{t(`social_prescribing.strategic_fit_${index}`, point)}</span>
                   </li>
                 ))}
               </ul>
@@ -281,9 +283,7 @@ export function SocialPrescribingPage() {
 
               <blockquote className="text-center">
                 <p className="text-lg sm:text-xl text-theme-primary leading-relaxed italic mb-6">
-                  &ldquo;Before I joined the timebank, I barely left the house. Now I help with gardening for
-                  two neighbours, and in return someone helps me with my shopping. I&apos;ve made real
-                  friends. It&apos;s given me a reason to get up in the morning.&rdquo;
+                  {t('social_prescribing.testimonial_quote')}
                 </p>
                 <footer>
                   <div className="inline-flex items-center gap-3">
@@ -291,8 +291,8 @@ export function SocialPrescribingPage() {
                       M
                     </div>
                     <div className="text-left">
-                      <cite className="not-italic font-semibold text-theme-primary">Monica</cite>
-                      <p className="text-sm text-theme-muted">hOUR Timebank Member</p>
+                      <cite className="not-italic font-semibold text-theme-primary">{t('social_prescribing.testimonial_name')}</cite>
+                      <p className="text-sm text-theme-muted">{t('social_prescribing.testimonial_role')}</p>
                     </div>
                   </div>
                 </footer>
@@ -312,10 +312,10 @@ export function SocialPrescribingPage() {
             className="text-center mb-12"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              The Managed Referral Pathway
+              {t('social_prescribing.referral_pathway_heading')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              A structured, supported journey from referral to measurable wellbeing outcomes.
+              {t('social_prescribing.referral_pathway_subtitle')}
             </p>
           </motion.div>
 
@@ -340,10 +340,10 @@ export function SocialPrescribingPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-theme-primary text-lg mb-2">
-                        {step.title}
+                        {t(`social_prescribing.referral_step_${index}_title`, step.title)}
                       </h3>
                       <p className="text-theme-muted text-sm leading-relaxed">
-                        {step.description}
+                        {t(`social_prescribing.referral_step_${index}_description`, step.description)}
                       </p>
                     </div>
                   </div>
@@ -378,17 +378,13 @@ export function SocialPrescribingPage() {
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">
-                  Seeking a Public Sector Contract Partner
+                  {t('social_prescribing.cta_heading')}
                 </h2>
                 <p className="text-theme-muted max-w-lg mx-auto mb-4">
-                  We&apos;re actively seeking partnerships with HSE Community Healthcare
-                  Organisations, local authorities, and social prescribing link workers to deliver
-                  this evidence-based model at scale.
+                  {t('social_prescribing.cta_para1')}
                 </p>
                 <p className="text-theme-muted max-w-lg mx-auto mb-8">
-                  If you commission community health services or operate a social prescribing
-                  programme, we&apos;d welcome the opportunity to discuss how hOUR Timebank can
-                  support your outcomes.
+                  {t('social_prescribing.cta_para2')}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -398,7 +394,7 @@ export function SocialPrescribingPage() {
                       className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold px-8"
                       endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                     >
-                      Contact Us
+                      {t('social_prescribing.cta_contact')}
                     </Button>
                   </Link>
 
@@ -409,7 +405,7 @@ export function SocialPrescribingPage() {
                       className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                       startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
                     >
-                      Partnership Details
+                      {t('social_prescribing.cta_partnership')}
                     </Button>
                   </Link>
                 </div>

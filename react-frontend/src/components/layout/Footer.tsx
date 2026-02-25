@@ -5,8 +5,8 @@
 
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { useTenant, useFeature } from '@/contexts';
-import { Hexagon, Mail, Phone, MapPin } from 'lucide-react';
+import { useTenant, useFeature, useCookieConsent } from '@/contexts';
+import { Hexagon, Mail, Phone, MapPin, Cookie } from 'lucide-react';
 
 export interface FooterProps {
   /** Footer content/links */
@@ -24,6 +24,7 @@ export function Footer({ children, copyright }: FooterProps) {
   const { tenant, branding, tenantPath } = useTenant();
   const hasEvents = useFeature('events');
   const hasBlog = useFeature('blog');
+  const { resetConsent } = useCookieConsent();
   const year = new Date().getFullYear();
 
   // Use tenant's footer_text from config if set, otherwise build a default
@@ -138,6 +139,15 @@ export function Footer({ children, copyright }: FooterProps) {
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-sm text-theme-subtle">{footerText}</p>
               <div className="flex items-center gap-3">
+                <button
+                  onClick={resetConsent}
+                  className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors cursor-pointer"
+                  aria-label="Cookie settings"
+                >
+                  <Cookie className="w-3 h-3" aria-hidden="true" />
+                  Cookie Settings
+                </button>
+                <span className="text-theme-subtle/30">|</span>
                 <a
                   href="https://github.com/jasperfordesq-ai/nexus-v1"
                   target="_blank"

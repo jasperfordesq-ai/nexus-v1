@@ -27,6 +27,7 @@ import {
   Info,
   Monitor,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { useTenant } from '@/contexts';
@@ -46,128 +47,78 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const quickNavItems = [
-  { id: 'what-are-cookies', label: 'What Are Cookies', icon: Cookie },
-  { id: 'cookie-categories', label: 'Categories', icon: Settings },
-  { id: 'cookie-list', label: 'Cookie List', icon: BarChart3 },
-  { id: 'manage-cookies', label: 'Manage Cookies', icon: Monitor },
+const quickNavIcons = [
+  { id: 'what-are-cookies', key: 'cookies.nav_what_are', icon: Cookie },
+  { id: 'cookie-categories', key: 'cookies.nav_categories', icon: Settings },
+  { id: 'cookie-list', key: 'cookies.nav_cookie_list', icon: BarChart3 },
+  { id: 'manage-cookies', key: 'cookies.nav_manage', icon: Monitor },
 ];
 
-const cookieCategories = [
+const cookieCategoryDefs = [
   {
-    name: 'Essential Cookies',
+    nameKey: 'cookies.cat_essential_name',
     icon: Lock,
     color: 'text-emerald-500',
     bg: 'bg-emerald-500/20',
     borderColor: 'border-emerald-500/20',
     required: true,
-    description:
-      'These cookies are strictly necessary for the platform to function. They enable core functionality such as authentication, security, and session management. Without these cookies, the platform cannot operate properly.',
-    examples: [
-      'User authentication and session tokens',
-      'CSRF protection tokens',
-      'Security preferences',
-      'Load balancing',
+    descKey: 'cookies.cat_essential_desc',
+    exampleKeys: [
+      'cookies.cat_essential_ex1',
+      'cookies.cat_essential_ex2',
+      'cookies.cat_essential_ex3',
+      'cookies.cat_essential_ex4',
     ],
   },
   {
-    name: 'Analytics Cookies',
+    nameKey: 'cookies.cat_analytics_name',
     icon: BarChart3,
     color: 'text-blue-500',
     bg: 'bg-blue-500/20',
     borderColor: 'border-blue-500/20',
     required: false,
-    description:
-      'These cookies help us understand how visitors interact with the platform by collecting and reporting information anonymously. This helps us improve the platform experience for everyone.',
-    examples: [
-      'Pages visited and time spent',
-      'Features used most frequently',
-      'Error tracking and performance monitoring',
-      'Aggregated usage statistics',
+    descKey: 'cookies.cat_analytics_desc',
+    exampleKeys: [
+      'cookies.cat_analytics_ex1',
+      'cookies.cat_analytics_ex2',
+      'cookies.cat_analytics_ex3',
+      'cookies.cat_analytics_ex4',
     ],
   },
   {
-    name: 'Preference Cookies',
+    nameKey: 'cookies.cat_preference_name',
     icon: Settings,
     color: 'text-purple-500',
     bg: 'bg-purple-500/20',
     borderColor: 'border-purple-500/20',
     required: false,
-    description:
-      'These cookies remember your preferences and settings to provide a more personalised experience. They allow the platform to remember choices you make such as theme, language, and display options.',
-    examples: [
-      'Light/dark theme preference',
-      'Language and locale settings',
-      'Display density preferences',
-      'Notification preferences',
+    descKey: 'cookies.cat_preference_desc',
+    exampleKeys: [
+      'cookies.cat_preference_ex1',
+      'cookies.cat_preference_ex2',
+      'cookies.cat_preference_ex3',
+      'cookies.cat_preference_ex4',
     ],
   },
 ];
 
-const cookieTable = [
-  {
-    name: 'nexus_session',
-    provider: 'Platform',
-    purpose: 'Maintains your authenticated session across page loads',
-    expiry: 'Session',
-    type: 'Essential',
-  },
-  {
-    name: 'nexus_csrf',
-    provider: 'Platform',
-    purpose: 'Protects against cross-site request forgery attacks',
-    expiry: 'Session',
-    type: 'Essential',
-  },
-  {
-    name: 'nexus_token',
-    provider: 'Platform',
-    purpose: 'JWT authentication token for API requests',
-    expiry: '7 days',
-    type: 'Essential',
-  },
-  {
-    name: 'nexus_refresh',
-    provider: 'Platform',
-    purpose: 'Refresh token for seamless session renewal',
-    expiry: '30 days',
-    type: 'Essential',
-  },
-  {
-    name: 'nexus_theme',
-    provider: 'Platform',
-    purpose: 'Stores your light/dark mode preference',
-    expiry: '1 year',
-    type: 'Preference',
-  },
-  {
-    name: 'nexus_tenant',
-    provider: 'Platform',
-    purpose: 'Remembers your selected community/tenant',
-    expiry: '30 days',
-    type: 'Preference',
-  },
-  {
-    name: 'nexus_locale',
-    provider: 'Platform',
-    purpose: 'Stores language and regional format preference',
-    expiry: '1 year',
-    type: 'Preference',
-  },
-  {
-    name: '_ga / _gid',
-    provider: 'Google Analytics',
-    purpose: 'Distinguishes unique users and tracks page views (anonymised)',
-    expiry: '2 years / 24 hours',
-    type: 'Analytics',
-  },
+const cookieTableDefs = [
+  { name: 'nexus_session', providerKey: 'cookies.provider_platform', purposeKey: 'cookies.cookie_session_purpose', expiryKey: 'cookies.expiry_session', typeKey: 'cookies.type_essential', rawType: 'Essential' as const },
+  { name: 'nexus_csrf', providerKey: 'cookies.provider_platform', purposeKey: 'cookies.cookie_csrf_purpose', expiryKey: 'cookies.expiry_session', typeKey: 'cookies.type_essential', rawType: 'Essential' as const },
+  { name: 'nexus_token', providerKey: 'cookies.provider_platform', purposeKey: 'cookies.cookie_token_purpose', expiryKey: 'cookies.expiry_7_days', typeKey: 'cookies.type_essential', rawType: 'Essential' as const },
+  { name: 'nexus_refresh', providerKey: 'cookies.provider_platform', purposeKey: 'cookies.cookie_refresh_purpose', expiryKey: 'cookies.expiry_30_days', typeKey: 'cookies.type_essential', rawType: 'Essential' as const },
+  { name: 'nexus_theme', providerKey: 'cookies.provider_platform', purposeKey: 'cookies.cookie_theme_purpose', expiryKey: 'cookies.expiry_1_year', typeKey: 'cookies.type_preference', rawType: 'Preference' as const },
+  { name: 'nexus_tenant', providerKey: 'cookies.provider_platform', purposeKey: 'cookies.cookie_tenant_purpose', expiryKey: 'cookies.expiry_30_days', typeKey: 'cookies.type_preference', rawType: 'Preference' as const },
+  { name: 'nexus_locale', providerKey: 'cookies.provider_platform', purposeKey: 'cookies.cookie_locale_purpose', expiryKey: 'cookies.expiry_1_year', typeKey: 'cookies.type_preference', rawType: 'Preference' as const },
+  { name: 'nexus_cookie_consent', providerKey: 'cookies.provider_platform', purposeKey: 'cookies.cookie_consent_purpose', expiryKey: 'cookies.expiry_6_months', typeKey: 'cookies.type_essential', rawType: 'Essential' as const },
+  { name: 'sentry-*', providerKey: 'cookies.provider_sentry', purposeKey: 'cookies.cookie_sentry_purpose', expiryKey: 'cookies.expiry_session', typeKey: 'cookies.type_analytics', rawType: 'Analytics' as const },
 ];
 
-const browserInstructions = [
-  { name: 'Chrome', path: 'Settings > Privacy and security > Cookies and other site data' },
-  { name: 'Firefox', path: 'Settings > Privacy & Security > Cookies and Site Data' },
-  { name: 'Safari', path: 'Preferences > Privacy > Manage Website Data' },
-  { name: 'Edge', path: 'Settings > Cookies and site permissions > Cookies and site data' },
+const browserInstructionKeys = [
+  { nameKey: 'cookies.browser_chrome', pathKey: 'cookies.browser_chrome_path' },
+  { nameKey: 'cookies.browser_firefox', pathKey: 'cookies.browser_firefox_path' },
+  { nameKey: 'cookies.browser_safari', pathKey: 'cookies.browser_safari_path' },
+  { nameKey: 'cookies.browser_edge', pathKey: 'cookies.browser_edge_path' },
 ];
 
 function scrollToSection(id: string) {
@@ -191,7 +142,8 @@ function getTypeColor(type: string): 'success' | 'primary' | 'secondary' {
 }
 
 export function CookiesPage() {
-  usePageTitle('Cookie Policy');
+  const { t } = useTranslation('legal');
+  usePageTitle(t('cookies.page_title'));
   const { branding, tenantPath } = useTenant();
   const { document: customDoc, loading } = useLegalDocument('cookies');
 
@@ -220,21 +172,21 @@ export function CookiesPage() {
           <Cookie className="w-10 h-10 text-amber-500 dark:text-amber-400" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
-          Cookie Policy
+          {t('cookies.heading')}
         </h1>
         <p className="text-theme-muted text-lg max-w-2xl mx-auto">
-          How we use cookies and similar technologies on our platform
+          {t('cookies.subtitle')}
         </p>
         <div className="flex items-center justify-center gap-2 mt-3 text-sm text-theme-subtle">
           <CalendarDays className="w-4 h-4" aria-hidden="true" />
-          <span>Last updated: February 2026</span>
+          <span>{t('cookies.last_updated')}</span>
         </div>
       </motion.div>
 
       {/* Quick Navigation */}
       <motion.div variants={itemVariants}>
         <div className="flex flex-wrap justify-center gap-3">
-          {quickNavItems.map((item) => (
+          {quickNavIcons.map((item) => (
             <Button
               key={item.id}
               variant="light"
@@ -242,7 +194,7 @@ export function CookiesPage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-amber-500/10 text-theme-primary text-sm font-medium transition-colors h-auto min-w-0"
             >
               <item.icon className="w-4 h-4 text-amber-500" aria-hidden="true" />
-              {item.label}
+              {t(item.key)}
             </Button>
           ))}
         </div>
@@ -254,18 +206,14 @@ export function CookiesPage() {
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
             <h2 className="text-xl font-semibold text-theme-primary mb-3 flex items-center gap-2">
               <Cookie className="w-5 h-5 text-amber-500" aria-hidden="true" />
-              What Are Cookies?
+              {t('cookies.what_are_title')}
             </h2>
             <div className="space-y-3 text-theme-muted">
               <p>
-                Cookies are small text files that are placed on your device when you visit a
-                website. They are widely used to make websites work more efficiently and to
-                provide information to the owners of the site.
+                {t('cookies.what_are_body_1')}
               </p>
               <p>
-                {branding.name} uses cookies and similar technologies to ensure you get the
-                best experience on our platform. This policy explains which cookies we use,
-                why we use them, and how you can control them.
+                {t('cookies.what_are_body_2', { name: branding.name })}
               </p>
             </div>
           </div>
@@ -277,13 +225,13 @@ export function CookiesPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-2">
             <Settings className="w-5 h-5 text-amber-500" aria-hidden="true" />
-            Cookie Categories
+            {t('cookies.categories_title')}
           </h2>
 
           <div className="space-y-6">
-            {cookieCategories.map((cat) => (
+            {cookieCategoryDefs.map((cat) => (
               <div
-                key={cat.name}
+                key={cat.nameKey}
                 className={`p-5 rounded-xl bg-theme-elevated border ${cat.borderColor}`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
@@ -291,7 +239,7 @@ export function CookiesPage() {
                     <div className={`p-1.5 rounded-lg ${cat.bg}`}>
                       <cat.icon className={`w-4 h-4 ${cat.color}`} aria-hidden="true" />
                     </div>
-                    {cat.name}
+                    {t(cat.nameKey)}
                   </h3>
                   <Chip
                     size="sm"
@@ -299,17 +247,17 @@ export function CookiesPage() {
                     color={cat.required ? 'warning' : 'default'}
                     className="text-xs"
                   >
-                    {cat.required ? 'Always Active' : 'Optional'}
+                    {cat.required ? t('cookies.always_active') : t('cookies.optional')}
                   </Chip>
                 </div>
 
-                <p className="text-sm text-theme-muted mb-3">{cat.description}</p>
+                <p className="text-sm text-theme-muted mb-3">{t(cat.descKey)}</p>
 
                 <div className="space-y-1.5">
-                  {cat.examples.map((example) => (
-                    <div key={example} className="flex items-center gap-2 text-sm text-theme-subtle">
+                  {cat.exampleKeys.map((exKey) => (
+                    <div key={exKey} className="flex items-center gap-2 text-sm text-theme-subtle">
                       <CheckCircle className={`w-3.5 h-3.5 ${cat.color} flex-shrink-0`} aria-hidden="true" />
-                      <span>{example}</span>
+                      <span>{t(exKey)}</span>
                     </div>
                   ))}
                 </div>
@@ -319,8 +267,7 @@ export function CookiesPage() {
 
           <div className="mt-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
             <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-              We do not use marketing or advertising cookies. We never share your data with
-              advertisers or ad networks.
+              {t('cookies.no_marketing')}
             </p>
           </div>
         </GlassCard>
@@ -331,12 +278,12 @@ export function CookiesPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-amber-500" aria-hidden="true" />
-            Cookies We Use
+            {t('cookies.list_title')}
           </h2>
 
           {/* Responsive card-based table */}
           <div className="space-y-3">
-            {cookieTable.map((cookie) => (
+            {cookieTableDefs.map((cookie) => (
               <div
                 key={cookie.name}
                 className="p-4 rounded-xl bg-theme-elevated border border-default-200 dark:border-default-100"
@@ -345,17 +292,17 @@ export function CookiesPage() {
                   <code className="text-sm font-mono font-semibold text-theme-primary bg-default-100 dark:bg-default-50 px-2 py-0.5 rounded">
                     {cookie.name}
                   </code>
-                  <Chip size="sm" variant="flat" color={getTypeColor(cookie.type)} className="text-xs">
-                    {cookie.type}
+                  <Chip size="sm" variant="flat" color={getTypeColor(cookie.rawType)} className="text-xs">
+                    {t(cookie.typeKey)}
                   </Chip>
                 </div>
-                <p className="text-sm text-theme-muted mb-2">{cookie.purpose}</p>
+                <p className="text-sm text-theme-muted mb-2">{t(cookie.purposeKey)}</p>
                 <div className="flex flex-wrap gap-4 text-xs text-theme-subtle">
                   <span>
-                    <strong className="text-theme-primary">Provider:</strong> {cookie.provider}
+                    <strong className="text-theme-primary">{t('cookies.provider_label')}:</strong> {t(cookie.providerKey)}
                   </span>
                   <span>
-                    <strong className="text-theme-primary">Expiry:</strong> {cookie.expiry}
+                    <strong className="text-theme-primary">{t('cookies.expiry_label')}:</strong> {t(cookie.expiryKey)}
                   </span>
                 </div>
               </div>
@@ -369,30 +316,27 @@ export function CookiesPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Globe className="w-5 h-5 text-amber-500" aria-hidden="true" />
-            Third-Party Cookies
+            {t('cookies.third_party_title')}
           </h2>
           <div className="space-y-3 text-theme-muted">
             <p>
-              In some cases, we use third-party services that may set their own cookies.
-              These services include:
+              {t('cookies.third_party_intro')}
             </p>
             <ul className="space-y-2">
-              {[
-                { label: 'Google Analytics', desc: 'To understand how visitors use the platform (anonymised IP addresses)' },
-                { label: 'Pusher', desc: 'For real-time notifications and messaging functionality' },
-              ].map((item) => (
-                <li key={item.label} className="flex items-start gap-3">
+              {([
+                { labelKey: 'cookies.third_party_sentry_label', descKey: 'cookies.third_party_sentry_desc' },
+                { labelKey: 'cookies.third_party_pusher_label', descKey: 'cookies.third_party_pusher_desc' },
+              ] as const).map((item) => (
+                <li key={item.labelKey} className="flex items-start gap-3">
                   <div className="mt-1 w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
                   <span>
-                    <strong className="text-theme-primary">{item.label}:</strong> {item.desc}
+                    <strong className="text-theme-primary">{t(item.labelKey)}:</strong> {t(item.descKey)}
                   </span>
                 </li>
               ))}
             </ul>
             <p>
-              We carefully select our third-party partners and ensure they comply with
-              applicable data protection regulations. Third-party cookies are governed by
-              the respective third party's privacy policy.
+              {t('cookies.third_party_compliance')}
             </p>
           </div>
         </GlassCard>
@@ -403,39 +347,35 @@ export function CookiesPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Monitor className="w-5 h-5 text-amber-500" aria-hidden="true" />
-            How to Manage Cookies
+            {t('cookies.manage_title')}
           </h2>
           <div className="space-y-4 text-theme-muted">
             <p>
-              You can control and manage cookies in several ways. Please note that removing
-              or blocking cookies may impact your user experience and some functionality may
-              no longer be available.
+              {t('cookies.manage_intro')}
             </p>
 
             <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
               <Info className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
               <p className="text-sm text-theme-muted">
-                Disabling essential cookies will prevent you from logging in and using core
-                platform features. We recommend keeping essential cookies enabled.
+                {t('cookies.manage_warning')}
               </p>
             </div>
 
-            <h3 className="font-semibold text-theme-primary mt-6 mb-3">Browser Cookie Settings</h3>
+            <h3 className="font-semibold text-theme-primary mt-6 mb-3">{t('cookies.browser_settings_title')}</h3>
             <p className="text-sm">
-              Most web browsers allow you to manage cookies through their settings. Here is
-              where to find cookie settings in popular browsers:
+              {t('cookies.browser_settings_intro')}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-              {browserInstructions.map((browser) => (
+              {browserInstructionKeys.map((browser) => (
                 <div
-                  key={browser.name}
+                  key={browser.nameKey}
                   className="flex items-start gap-3 p-3 rounded-xl bg-theme-elevated"
                 >
                   <Monitor className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
                   <div>
-                    <p className="font-medium text-theme-primary text-sm">{browser.name}</p>
-                    <p className="text-xs text-theme-subtle mt-0.5">{browser.path}</p>
+                    <p className="font-medium text-theme-primary text-sm">{t(browser.nameKey)}</p>
+                    <p className="text-xs text-theme-subtle mt-0.5">{t(browser.pathKey)}</p>
                   </div>
                 </div>
               ))}
@@ -452,11 +392,10 @@ export function CookiesPage() {
               <MessageSquare className="w-8 h-8 text-amber-500 dark:text-amber-400" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-semibold text-theme-primary mb-2">
-              Questions About Cookies?
+              {t('cookies.cta_title')}
             </h2>
             <p className="text-theme-muted text-sm mb-6 max-w-lg mx-auto">
-              If you have any questions about our use of cookies or this policy, please
-              do not hesitate to contact us.
+              {t('cookies.cta_body')}
             </p>
             <Divider className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
@@ -465,7 +404,7 @@ export function CookiesPage() {
                   className="bg-gradient-to-r from-amber-500 to-orange-600 text-white"
                   startContent={<Send className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Contact Us
+                  {t('cookies.contact_us')}
                 </Button>
               </Link>
               <Link to={tenantPath('/privacy')}>
@@ -474,7 +413,7 @@ export function CookiesPage() {
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Privacy Policy
+                  {t('cookies.privacy_policy_link')}
                 </Button>
               </Link>
             </div>

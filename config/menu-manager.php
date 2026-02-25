@@ -10,13 +10,13 @@ return [
     /**
      * Enable/Disable Menu Manager
      *
-     * TRUE  = Use custom menu manager (EXPERIMENTAL - UNDER DEVELOPMENT)
-     * FALSE = Use original hardcoded navigation (STABLE)
+     * TRUE  = Use custom menu manager with React frontend integration
+     * FALSE = Use original hardcoded navigation (fallback)
      *
-     * IMPORTANT: Menu Manager is currently UNSTABLE and under active development.
-     * For production sites, keep this set to FALSE until stable release.
+     * The React frontend has graceful fallback: if no custom menus exist
+     * for a tenant, hardcoded navigation renders automatically.
      */
-    'enabled' => false,
+    'enabled' => true,
 
     /**
      * Show development warning banner in admin
@@ -46,9 +46,9 @@ return [
     /**
      * Feature status
      */
-    'status' => 'BETA',
-    'version' => '0.7.0-beta',
-    'stable_release' => false,
+    'status' => 'STABLE',
+    'version' => '1.0.0',
+    'stable_release' => true,
 
     /**
      * Known issues

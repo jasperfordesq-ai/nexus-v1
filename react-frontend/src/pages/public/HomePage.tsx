@@ -23,6 +23,7 @@ import {
   Handshake,
   Coins,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant, useAuth } from '@/contexts';
 import { PageMeta } from '@/components/seo';
@@ -129,6 +130,7 @@ const howItWorks = [
 ];
 
 export function HomePage() {
+  const { t } = useTranslation('public');
   usePageTitle('Home');
   const { branding, tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
@@ -152,16 +154,16 @@ export function HomePage() {
 
   const stats = platformStats
     ? [
-        { value: formatStatNumber(platformStats.members), label: 'Active Members' },
-        { value: formatStatNumber(platformStats.hours_exchanged), label: 'Hours Exchanged' },
-        { value: formatStatNumber(platformStats.listings), label: 'Active Listings' },
-        { value: formatStatNumber(platformStats.communities), label: 'Communities' },
+        { value: formatStatNumber(platformStats.members), label: t('home.stats.active_members') },
+        { value: formatStatNumber(platformStats.hours_exchanged), label: t('home.stats.hours_exchanged') },
+        { value: formatStatNumber(platformStats.listings), label: t('home.stats.active_listings') },
+        { value: formatStatNumber(platformStats.communities), label: t('home.stats.communities') },
       ]
     : [
-        { value: '—', label: 'Active Members' },
-        { value: '—', label: 'Hours Exchanged' },
-        { value: '—', label: 'Active Listings' },
-        { value: '—', label: 'Communities' },
+        { value: '—', label: t('home.stats.active_members') },
+        { value: '—', label: t('home.stats.hours_exchanged') },
+        { value: '—', label: t('home.stats.active_listings') },
+        { value: '—', label: t('home.stats.communities') },
       ];
 
   const scrollToSection = () => {
@@ -171,8 +173,8 @@ export function HomePage() {
   return (
     <>
       <PageMeta
-        description="Exchange skills and services using time credits. Join our community-driven time banking platform."
-        keywords="time banking, skill exchange, community, volunteer, time credits"
+        description={t('home.meta_description')}
+        keywords={t('home.meta_keywords')}
       />
       <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
         {/* Hero Section */}
@@ -188,7 +190,7 @@ export function HomePage() {
             <motion.div variants={fadeInUp} className="mb-6">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm text-theme-muted">
                 <span className="text-indigo-500 dark:text-indigo-400">✨</span>
-                <span>The Future of Time Banking</span>
+                <span>{t('home.badge')}</span>
               </span>
             </motion.div>
 
@@ -197,9 +199,9 @@ export function HomePage() {
               variants={fadeInUp}
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight"
             >
-              <span className="text-theme-primary">Exchange Skills,</span>
+              <span className="text-theme-primary">{t('home.headline_1')}</span>
               <br />
-              <span className="text-gradient">Build Community</span>
+              <span className="text-gradient">{t('home.headline_2')}</span>
             </motion.h1>
 
             {/* Subheadline */}
@@ -207,9 +209,7 @@ export function HomePage() {
               variants={fadeInUp}
               className="mt-6 text-lg sm:text-xl text-theme-muted max-w-2xl mx-auto"
             >
-              {branding.name} is a modern time banking platform where every hour of service
-              is valued equally. Trade your skills, earn time credits, and connect
-              with your community.
+              {t('home.subheadline', { name: branding.name })}
             </motion.p>
 
             {/* CTAs */}
@@ -224,7 +224,7 @@ export function HomePage() {
                     className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
                     endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                   >
-                    Go to Dashboard
+                    {t('home.cta_dashboard')}
                   </Button>
                 </Link>
               ) : (
@@ -235,7 +235,7 @@ export function HomePage() {
                       className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
                       endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                     >
-                      Get Started Free
+                      {t('home.cta_get_started')}
                     </Button>
                   </Link>
                   <Link to={tenantPath("/about")}>
@@ -244,7 +244,7 @@ export function HomePage() {
                       variant="bordered"
                       className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                     >
-                      Learn More
+                      {t('home.cta_learn_more')}
                     </Button>
                   </Link>
                 </>
@@ -268,8 +268,8 @@ export function HomePage() {
                     <feature.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-theme-primary">{feature.title}</p>
-                    <p className="text-sm text-theme-subtle">{feature.description}</p>
+                    <p className="font-medium text-theme-primary">{t(`home.features.${index}.title`)}</p>
+                    <p className="text-sm text-theme-subtle">{t(`home.features.${index}.description`)}</p>
                   </div>
                 </motion.div>
               ))}
@@ -311,7 +311,7 @@ export function HomePage() {
             className="text-theme-subtle hover:text-theme-primary animate-bounce"
             onPress={scrollToSection}
             isIconOnly
-            aria-label="Scroll down"
+            aria-label={t('home.scroll_down')}
           >
             <ChevronDown className="w-6 h-6" aria-hidden="true" />
           </Button>
@@ -328,10 +328,10 @@ export function HomePage() {
             className="text-center mb-12"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              How It Works
+              {t('home.how_it_works.title')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              Get started in four simple steps
+              {t('home.how_it_works.subtitle')}
             </p>
           </motion.div>
 
@@ -351,8 +351,8 @@ export function HomePage() {
                   <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${step.color} mb-4`}>
                     <step.icon className="w-7 h-7 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-semibold text-theme-primary mb-2">{step.title}</h3>
-                  <p className="text-sm text-theme-muted">{step.description}</p>
+                  <h3 className="font-semibold text-theme-primary mb-2">{t(`home.how_it_works.steps.${index}.title`)}</h3>
+                  <p className="text-sm text-theme-muted">{t(`home.how_it_works.steps.${index}.description`)}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -370,10 +370,10 @@ export function HomePage() {
             className="text-center mb-12"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              Why Time Banking?
+              {t('home.why_timebanking.title')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              The core principles that make our community work
+              {t('home.why_timebanking.subtitle')}
             </p>
           </motion.div>
 
@@ -402,9 +402,9 @@ export function HomePage() {
                     </span>
                   </div>
                   <h3 className="text-xl font-semibold text-theme-primary mb-3">
-                    {feature.title}
+                    {t(`home.why_timebanking.values.${index}.title`)}
                   </h3>
-                  <p className="text-theme-muted">{feature.description}</p>
+                  <p className="text-theme-muted">{t(`home.why_timebanking.values.${index}.description`)}</p>
                 </div>
               </motion.article>
             ))}
@@ -423,11 +423,10 @@ export function HomePage() {
               className="p-6 sm:p-8 lg:p-12 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-theme-default"
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">
-                Ready to get started?
+                {t('home.cta_section.title')}
               </h2>
               <p className="text-theme-muted mb-8 max-w-xl mx-auto">
-                Join thousands of community members who are already exchanging
-                skills and building meaningful connections.
+                {t('home.cta_section.description')}
               </p>
               <Link to={tenantPath("/register")}>
                 <Button
@@ -435,7 +434,7 @@ export function HomePage() {
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-10"
                   endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                 >
-                  Create Your Free Account
+                  {t('home.cta_section.button')}
                 </Button>
               </Link>
             </motion.div>

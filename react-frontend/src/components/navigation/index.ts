@@ -4,3 +4,4 @@
 // See NOTICE file for attribution and acknowledgements.
 
 export { Breadcrumbs, type BreadcrumbItem } from './Breadcrumbs';
+export { DesktopMenuItems, MobileMenuItems } from './MenuNavItems';

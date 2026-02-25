@@ -41,6 +41,7 @@ import {
   Award,
   BookOpen,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useAuth } from '@/contexts';
@@ -141,6 +142,7 @@ const stagger = {
 /* ─────────────── Component ─────────────── */
 
 export function AboutPage() {
+  const { t } = useTranslation('public');
   usePageTitle('About');
   const { branding, tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
@@ -163,18 +165,18 @@ export function AboutPage() {
 
   const statItems = stats
     ? [
-        { icon: Users, value: formatStatNumber(stats.members), label: 'Members' },
-        { icon: Clock, value: formatStatNumber(stats.hours_exchanged), label: 'Hours Exchanged' },
-        { icon: ListTodo, value: formatStatNumber(stats.listings), label: 'Active Listings' },
-        { icon: Globe, value: formatStatNumber(stats.communities), label: 'Communities' },
+        { icon: Users, value: formatStatNumber(stats.members), label: t('about.stats.members') },
+        { icon: Clock, value: formatStatNumber(stats.hours_exchanged), label: t('about.stats.hours_exchanged') },
+        { icon: ListTodo, value: formatStatNumber(stats.listings), label: t('about.stats.active_listings') },
+        { icon: Globe, value: formatStatNumber(stats.communities), label: t('about.stats.communities') },
       ]
     : null;
 
   return (
     <>
       <PageMeta
-        title={`About ${branding.name}`}
-        description={`Learn about ${branding.name} — a time banking platform where communities exchange skills using time as currency.`}
+        title={t('about.meta_title', { name: branding.name })}
+        description={t('about.meta_description', { name: branding.name })}
       />
 
       <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
@@ -198,7 +200,7 @@ export function AboutPage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-3xl sm:text-4xl md:text-5xl font-bold text-theme-primary mb-6"
             >
-              About {branding.name}
+              {t('about.hero_title', { name: branding.name })}
             </motion.h1>
 
             <motion.p
@@ -206,9 +208,7 @@ export function AboutPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-lg sm:text-xl text-theme-muted max-w-2xl mx-auto"
             >
-              {branding.name} is a modern time banking platform where every hour of service is
-              valued equally. We help communities exchange skills, build trust, and create a fairer
-              local economy — one hour at a time.
+              {t('about.hero_description', { name: branding.name })}
             </motion.p>
           </div>
         </section>
@@ -223,10 +223,10 @@ export function AboutPage() {
               className="text-center mb-12"
             >
               <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-                How It Works
+                {t('about.how_it_works.title')}
               </h2>
               <p className="text-theme-muted max-w-lg mx-auto">
-                Getting started is simple. Four steps to join and begin exchanging skills in your community.
+                {t('about.how_it_works.subtitle')}
               </p>
             </motion.div>
 
@@ -249,8 +249,8 @@ export function AboutPage() {
                       <step.icon className="w-7 h-7 text-white" aria-hidden="true" />
                     </div>
 
-                    <h3 className="font-semibold text-theme-primary mb-2">{step.title}</h3>
-                    <p className="text-sm text-theme-muted">{step.description}</p>
+                    <h3 className="font-semibold text-theme-primary mb-2">{t(`about.how_it_works.steps.${index}.title`)}</h3>
+                    <p className="text-sm text-theme-muted">{t(`about.how_it_works.steps.${index}.description`)}</p>
                   </GlassCard>
                 </motion.div>
               ))}
@@ -268,10 +268,10 @@ export function AboutPage() {
               className="text-center mb-12"
             >
               <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-                Our Values
+                {t('about.values.title')}
               </h2>
               <p className="text-theme-muted max-w-lg mx-auto">
-                The principles that guide everything we do at {branding.name}.
+                {t('about.values.subtitle', { name: branding.name })}
               </p>
             </motion.div>
 
@@ -290,8 +290,8 @@ export function AboutPage() {
                         <value.icon className={`w-6 h-6 ${value.color}`} aria-hidden="true" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-theme-primary text-lg mb-1">{value.title}</h3>
-                        <p className="text-theme-muted text-sm leading-relaxed">{value.description}</p>
+                        <h3 className="font-semibold text-theme-primary text-lg mb-1">{t(`about.values.items.${index}.title`)}</h3>
+                        <p className="text-theme-muted text-sm leading-relaxed">{t(`about.values.items.${index}.description`)}</p>
                       </div>
                     </div>
                   </GlassCard>
@@ -338,10 +338,10 @@ export function AboutPage() {
               className="text-center mb-12"
             >
               <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-                Powered by Project NEXUS
+                {t('about.credits.title')}
               </h2>
               <p className="text-theme-muted max-w-lg mx-auto">
-                Open-source community platform created by Jasper Ford. Licensed under AGPL v3.
+                {t('about.credits.subtitle')}
               </p>
             </motion.div>
 
@@ -357,13 +357,13 @@ export function AboutPage() {
                     <div className="p-2.5 rounded-xl bg-indigo-500/15">
                       <Crown className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </div>
-                    <h3 className="font-semibold text-theme-primary text-lg">Creator</h3>
+                    <h3 className="font-semibold text-theme-primary text-lg">{t('about.credits.creator')}</h3>
                   </div>
                   {contributors.filter(c => c.type === 'creator').map(c => (
                     <p key={c.name} className="text-theme-primary font-medium mb-4">{c.name}</p>
                   ))}
 
-                  <h4 className="text-sm font-semibold text-theme-muted mb-2">Founders of hOUR Timebank CLG</h4>
+                  <h4 className="text-sm font-semibold text-theme-muted mb-2">{t('about.credits.founders_heading')}</h4>
                   <ul className="space-y-1 text-sm text-theme-muted">
                     {contributors.filter(c => c.type === 'creator' || c.type === 'founder').map(c => (
                       <li key={c.name}>{c.name}</li>
@@ -383,7 +383,7 @@ export function AboutPage() {
                     <div className="p-2.5 rounded-xl bg-purple-500/15">
                       <Star className="w-5 h-5 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                     </div>
-                    <h3 className="font-semibold text-theme-primary text-lg">Contributors</h3>
+                    <h3 className="font-semibold text-theme-primary text-lg">{t('about.credits.contributors')}</h3>
                   </div>
                   <ul className="space-y-2 text-sm text-theme-muted mb-4">
                     {contributors.filter(c => c.type === 'contributor').map(c => (
@@ -393,12 +393,9 @@ export function AboutPage() {
 
                   {contributors.some(c => c.note?.includes('social impact study')) && (
                     <>
-                      <h4 className="text-sm font-semibold text-theme-muted mb-2">Research Foundation</h4>
+                      <h4 className="text-sm font-semibold text-theme-muted mb-2">{t('about.credits.research_heading')}</h4>
                       <p className="text-sm text-theme-muted">
-                        Informed by a social impact study commissioned by the{' '}
-                        <span className="text-theme-primary font-medium">
-                          {contributors.find(c => c.note?.includes('social impact study'))?.name}
-                        </span>.
+                        {t('about.credits.research_description', { name: contributors.find(c => c.note?.includes('social impact study'))?.name })}
                       </p>
                     </>
                   )}
@@ -418,7 +415,7 @@ export function AboutPage() {
                     <div className="p-2.5 rounded-xl bg-amber-500/15">
                       <Award className="w-5 h-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
                     </div>
-                    <h3 className="font-semibold text-theme-primary text-lg">Acknowledgements</h3>
+                    <h3 className="font-semibold text-theme-primary text-lg">{t('about.credits.acknowledgements')}</h3>
                   </div>
                   <ul className="space-y-1 text-sm text-theme-muted">
                     {contributors.filter(c => c.type === 'acknowledgement').map(c => (
@@ -439,10 +436,10 @@ export function AboutPage() {
                     <div className="p-2.5 rounded-xl bg-emerald-500/15">
                       <Code className="w-5 h-5 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                     </div>
-                    <h3 className="font-semibold text-theme-primary text-lg">Open Source</h3>
+                    <h3 className="font-semibold text-theme-primary text-lg">{t('about.credits.open_source')}</h3>
                   </div>
                   <p className="text-sm text-theme-muted mb-3">
-                    Licensed under the GNU Affero General Public License v3 (AGPL-3.0).
+                    {t('about.credits.license_text')}
                   </p>
                   <div className="flex flex-col gap-2">
                     <a
@@ -452,7 +449,7 @@ export function AboutPage() {
                       className="inline-flex items-center gap-2 text-sm font-medium text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
                     >
                       <BookOpen className="w-4 h-4" aria-hidden="true" />
-                      V1 Source Code (PHP + React)
+                      {t('about.credits.v1_source')}
                     </a>
                     <a
                       href="https://github.com/jasperfordesq-ai/api.project-nexus.net"
@@ -461,7 +458,7 @@ export function AboutPage() {
                       className="inline-flex items-center gap-2 text-sm font-medium text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
                     >
                       <BookOpen className="w-4 h-4" aria-hidden="true" />
-                      V2 Source Code (ASP.NET Core)
+                      {t('about.credits.v2_source')}
                     </a>
                   </div>
                 </GlassCard>
@@ -487,10 +484,10 @@ export function AboutPage() {
 
                 <div className="relative z-10">
                   <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">
-                    Ready to Get Involved?
+                    {t('about.cta.title')}
                   </h2>
                   <p className="text-theme-muted max-w-lg mx-auto mb-8">
-                    Whether you want to share your skills or find help with something, our community is here for you.
+                    {t('about.cta.description')}
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -501,7 +498,7 @@ export function AboutPage() {
                           className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
                           endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                         >
-                          Go to Dashboard
+                          {t('about.cta.dashboard')}
                         </Button>
                       </Link>
                     ) : (
@@ -511,7 +508,7 @@ export function AboutPage() {
                           className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
                           endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                         >
-                          Join for Free
+                          {t('about.cta.join')}
                         </Button>
                       </Link>
                     )}
@@ -523,7 +520,7 @@ export function AboutPage() {
                         className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                         startContent={<HelpCircle className="w-5 h-5" aria-hidden="true" />}
                       >
-                        Help Center
+                        {t('about.cta.help_center')}
                       </Button>
                     </Link>
 
@@ -534,7 +531,7 @@ export function AboutPage() {
                         className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                         startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
                       >
-                        Contact Us
+                        {t('about.cta.contact_us')}
                       </Button>
                     </Link>
                   </div>

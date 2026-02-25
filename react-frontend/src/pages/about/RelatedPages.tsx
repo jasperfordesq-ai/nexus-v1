@@ -20,6 +20,7 @@ import {
   Compass,
   ArrowRight,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 
@@ -50,6 +51,7 @@ interface RelatedPagesProps {
 }
 
 export function RelatedPages({ current }: RelatedPagesProps) {
+  const { t } = useTranslation('about');
   const { tenant, tenantPath } = useTenant();
   const isHourTimebank = tenant?.slug === 'hour-timebank';
   const aboutPages = [
@@ -62,7 +64,7 @@ export function RelatedPages({ current }: RelatedPagesProps) {
     <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-sm font-semibold text-theme-subtle uppercase tracking-wider mb-4 px-1">
-          Related Pages
+          {t('related.heading')}
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {links.map((link) => (
@@ -72,8 +74,8 @@ export function RelatedPages({ current }: RelatedPagesProps) {
                   <link.icon className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-theme-primary truncate">{link.label}</p>
-                  <p className="text-xs text-theme-subtle truncate">{link.description}</p>
+                  <p className="text-sm font-medium text-theme-primary truncate">{t(`related.link_${link.href.replace('/', '')}_label`, link.label)}</p>
+                  <p className="text-xs text-theme-subtle truncate">{t(`related.link_${link.href.replace('/', '')}_description`, link.description)}</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-indigo-500 transition-colors flex-shrink-0" aria-hidden="true" />
               </GlassCard>

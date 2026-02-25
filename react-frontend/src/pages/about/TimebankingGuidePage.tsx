@@ -31,6 +31,7 @@ import {
   RefreshCw,
   Network,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
@@ -143,22 +144,23 @@ const stagger = {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function TimebankingGuidePage() {
-  usePageTitle('Timebanking Guide');
+  const { t } = useTranslation('about');
+  usePageTitle(t('timebanking_guide.page_title'));
   const { tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
 
   return (
     <>
     <PageMeta
-      title="Timebanking Guide"
-      description="Learn how timebanking works: give an hour, earn a credit, get help. Discover the values and proven impact behind community timebanking."
+      title={t('timebanking_guide.page_title')}
+      description={t('timebanking_guide.meta_description')}
     />
     <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
       {/* ─── Breadcrumbs ─── */}
       <div className="px-4 sm:px-6 lg:px-8 pt-6">
         <Breadcrumbs items={[
-          { label: 'About', href: '/about' },
-          { label: 'Timebanking Guide' },
+          { label: t('timebanking_guide.breadcrumb_about'), href: '/about' },
+          { label: t('timebanking_guide.page_title') },
         ]} />
       </div>
 
@@ -182,7 +184,7 @@ export function TimebankingGuidePage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-theme-primary mb-6"
           >
-            Timebanking Guide
+            {t('timebanking_guide.page_title')}
           </motion.h1>
 
           <motion.p
@@ -190,7 +192,7 @@ export function TimebankingGuidePage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg sm:text-xl text-theme-muted max-w-2xl mx-auto"
           >
-            Give an hour, get an hour. It&apos;s that simple.
+            {t('timebanking_guide.hero_subtitle')}
           </motion.p>
         </div>
       </section>
@@ -205,10 +207,10 @@ export function TimebankingGuidePage() {
             className="text-center mb-10"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              Proven Impact
+              {t('timebanking_guide.proven_impact_heading')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              Independent research confirms the transformative power of timebanking.
+              {t('timebanking_guide.proven_impact_subtitle')}
             </p>
           </motion.div>
 
@@ -235,8 +237,8 @@ export function TimebankingGuidePage() {
                   <p className={`text-4xl sm:text-5xl font-extrabold ${stat.textAccent} mb-2`}>
                     {stat.value}
                   </p>
-                  <p className="font-semibold text-theme-primary mb-1">{stat.label}</p>
-                  <p className="text-sm text-theme-muted">{stat.description}</p>
+                  <p className="font-semibold text-theme-primary mb-1">{t(`timebanking_guide.stat_${stat.value.replace(/[:%]/g, '')}_label`, stat.label)}</p>
+                  <p className="text-sm text-theme-muted">{t(`timebanking_guide.stat_${stat.value.replace(/[:%]/g, '')}_description`, stat.description)}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -254,10 +256,10 @@ export function TimebankingGuidePage() {
             className="text-center mb-12"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              How It Works: 3 Simple Steps
+              {t('timebanking_guide.how_it_works_heading')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              Timebanking is easy. Everyone&apos;s hour is worth the same, no matter what skill you share.
+              {t('timebanking_guide.how_it_works_subtitle')}
             </p>
           </motion.div>
 
@@ -282,8 +284,8 @@ export function TimebankingGuidePage() {
                     <step.icon className="w-8 h-8 text-white" aria-hidden="true" />
                   </div>
 
-                  <h3 className="text-lg font-semibold text-theme-primary mb-3">{step.title}</h3>
-                  <p className="text-theme-muted leading-relaxed">{step.description}</p>
+                  <h3 className="text-lg font-semibold text-theme-primary mb-3">{t(`timebanking_guide.step_${index}_title`, step.title)}</h3>
+                  <p className="text-theme-muted leading-relaxed">{t(`timebanking_guide.step_${index}_description`, step.description)}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -301,10 +303,10 @@ export function TimebankingGuidePage() {
             className="text-center mb-12"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              Our Fundamental Values
+              {t('timebanking_guide.values_heading')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              The principles that guide every hour shared in our community.
+              {t('timebanking_guide.values_subtitle')}
             </p>
           </motion.div>
 
@@ -324,10 +326,10 @@ export function TimebankingGuidePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-theme-primary text-lg mb-1">
-                        {value.title}
+                        {t(`timebanking_guide.value_${index}_title`, value.title)}
                       </h3>
                       <p className="text-theme-muted text-sm leading-relaxed">
-                        {value.description}
+                        {t(`timebanking_guide.value_${index}_description`, value.description)}
                       </p>
                     </div>
                   </div>
@@ -362,11 +364,10 @@ export function TimebankingGuidePage() {
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">
-                  Ready to Start Sharing?
+                  {t('timebanking_guide.cta_heading')}
                 </h2>
                 <p className="text-theme-muted max-w-lg mx-auto mb-8">
-                  Join a community where your time truly matters. Every hour you give creates a
-                  ripple of positive change.
+                  {t('timebanking_guide.cta_subtitle')}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -377,7 +378,7 @@ export function TimebankingGuidePage() {
                         className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
                         endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                       >
-                        Browse Listings
+                        {t('timebanking_guide.cta_browse_listings')}
                       </Button>
                     </Link>
                   ) : (
@@ -387,7 +388,7 @@ export function TimebankingGuidePage() {
                         className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
                         endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                       >
-                        Join for Free
+                        {t('timebanking_guide.cta_join_free')}
                       </Button>
                     </Link>
                   )}
@@ -399,7 +400,7 @@ export function TimebankingGuidePage() {
                       className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                       startContent={<Handshake className="w-5 h-5" aria-hidden="true" />}
                     >
-                      Partner With Us
+                      {t('timebanking_guide.cta_partner')}
                     </Button>
                   </Link>
                 </div>

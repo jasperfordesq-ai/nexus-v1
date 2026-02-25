@@ -62,10 +62,11 @@ import {
   Compass,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant, useNotifications, useTheme } from '@/contexts';
+import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { api, tokenManager, API_BASE } from '@/lib/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { DesktopMenuItems } from '@/components/navigation';
 
 interface SearchSuggestion {
   id: number;
@@ -89,6 +90,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const { tenant, branding, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
   const { resolvedTheme, toggleTheme } = useTheme();
+  const { headerMenus, hasCustomMenus } = useMenuContext();
 
   // Compute admin status once — used for admin links in dropdown
   const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin);
@@ -383,8 +385,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
             </Link>
           </div>
 
-          {/* Desktop Navigation - Reorganized with Dropdowns */}
+          {/* Desktop Navigation — API-driven when custom menus exist, hardcoded fallback otherwise */}
           <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
+            {hasCustomMenus ? (
+              <DesktopMenuItems menus={headerMenus} />
+            ) : (
+            <>
             {/* Dashboard - Direct Link (module-gated) */}
             {hasModule('dashboard') && (
               <NavLink
@@ -565,6 +571,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </DropdownSection>
               </DropdownMenu>
             </Dropdown>
+            </>
+            )}
           </nav>
 
           {/* User Actions */}

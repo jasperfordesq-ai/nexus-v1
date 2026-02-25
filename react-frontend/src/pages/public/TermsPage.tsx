@@ -33,6 +33,7 @@ import {
   Info,
   CircleSlash,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { useTenant } from '@/contexts';
@@ -53,7 +54,8 @@ const itemVariants = {
 };
 
 export function TermsPage() {
-  usePageTitle('Terms of Service');
+  const { t } = useTranslation('legal');
+  usePageTitle(t('terms.page_title'));
   const { branding, tenantPath } = useTenant();
   const { document: customDoc, loading } = useLegalDocument('terms');
 
@@ -77,20 +79,11 @@ export function TermsPage() {
 // Default Terms Content (shown when no custom document exists)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const quickNavItems = [
-  { id: 'time-credits', label: 'Time Credits', icon: Clock },
-  { id: 'community', label: 'Community Rules', icon: Users },
-  { id: 'prohibited', label: 'Prohibited', icon: Ban },
-  { id: 'liability', label: 'Liability', icon: Shield },
-];
-
-const prohibitedItems = [
-  'Harassment or discrimination',
-  'Fraudulent exchanges',
-  'Illegal services or activities',
-  'Spam or solicitation',
-  'Impersonation',
-  'Sharing others\' private information',
+const quickNavIcons = [
+  { id: 'time-credits', key: 'terms.nav_time_credits', icon: Clock },
+  { id: 'community', key: 'terms.nav_community_rules', icon: Users },
+  { id: 'prohibited', key: 'terms.nav_prohibited', icon: Ban },
+  { id: 'liability', key: 'terms.nav_liability', icon: Shield },
 ];
 
 function scrollToSection(id: string) {
@@ -101,6 +94,17 @@ function scrollToSection(id: string) {
 }
 
 function DefaultTermsContent({ branding, tenantPath }: { branding: { name: string }; tenantPath: (path: string) => string }) {
+  const { t } = useTranslation('legal');
+
+  const prohibitedKeys = [
+    'terms.prohibited_harassment',
+    'terms.prohibited_fraud',
+    'terms.prohibited_illegal',
+    'terms.prohibited_spam',
+    'terms.prohibited_impersonation',
+    'terms.prohibited_sharing_private',
+  ] as const;
+
   return (
     <motion.div
       variants={containerVariants}
@@ -114,21 +118,21 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <FileText className="w-10 h-10 text-blue-500 dark:text-blue-400" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
-          Terms of Service
+          {t('terms.heading')}
         </h1>
         <p className="text-theme-muted text-lg max-w-2xl mx-auto">
-          The rules and guidelines for using our platform
+          {t('terms.subtitle')}
         </p>
         <div className="flex items-center justify-center gap-2 mt-3 text-sm text-theme-subtle">
           <CalendarDays className="w-4 h-4" aria-hidden="true" />
-          <span>Last updated: February 2026</span>
+          <span>{t('terms.last_updated')}</span>
         </div>
       </motion.div>
 
       {/* Quick Navigation */}
       <motion.div variants={itemVariants}>
         <div className="flex flex-wrap justify-center gap-3">
-          {quickNavItems.map((item) => (
+          {quickNavIcons.map((item) => (
             <Button
               key={item.id}
               variant="light"
@@ -136,7 +140,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-blue-500/10 text-theme-primary text-sm font-medium transition-colors h-auto min-w-0"
             >
               <item.icon className="w-4 h-4 text-blue-500" aria-hidden="true" />
-              {item.label}
+              {t(item.key)}
             </Button>
           ))}
         </div>
@@ -148,18 +152,16 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
             <h2 className="text-xl font-semibold text-theme-primary mb-3 flex items-center gap-2">
               <Handshake className="w-5 h-5 text-blue-500" aria-hidden="true" />
-              Welcome to {branding.name}
+              {t('terms.welcome_title', { name: branding.name })}
             </h2>
             <div className="space-y-3 text-theme-muted">
               <p>
-                By accessing or using our platform, you agree to be bound by these Terms of
-                Service. Please read them carefully before participating in our community.
+                {t('terms.welcome_body_1')}
               </p>
               <p>
-                These terms establish a framework for{' '}
-                <strong className="text-theme-primary">fair, respectful, and meaningful exchanges</strong>{' '}
-                between community members. Our goal is to create a trusted environment where
-                everyone's time is valued equally.
+                {t('terms.welcome_body_2_before')}{' '}
+                <strong className="text-theme-primary">{t('terms.welcome_body_2_emphasis')}</strong>{' '}
+                {t('terms.welcome_body_2_after')}
               </p>
             </div>
           </div>
@@ -172,11 +174,11 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">1</Chip>
             <Clock className="w-5 h-5 text-blue-500" aria-hidden="true" />
-            Time Credit System
+            {t('terms.section1_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            Our platform operates on a simple but powerful principle:{' '}
-            <strong className="text-theme-primary">everyone's time is equal</strong>.
+            {t('terms.section1_intro_before')}{' '}
+            <strong className="text-theme-primary">{t('terms.section1_intro_emphasis')}</strong>.
           </p>
 
           {/* Visual equality display */}
@@ -185,14 +187,14 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
               <div className="p-2 rounded-lg bg-blue-500/20">
                 <Clock className="w-6 h-6 text-blue-500" aria-hidden="true" />
               </div>
-              <span className="font-medium text-theme-primary">1 Hour of Service</span>
+              <span className="font-medium text-theme-primary">{t('terms.one_hour_service')}</span>
             </div>
             <span className="text-2xl font-bold text-blue-500">=</span>
             <div className="flex items-center gap-3 p-4 rounded-xl bg-theme-elevated">
               <div className="p-2 rounded-lg bg-blue-500/20">
                 <Gem className="w-6 h-6 text-blue-500" aria-hidden="true" />
               </div>
-              <span className="font-medium text-theme-primary">1 Time Credit</span>
+              <span className="font-medium text-theme-primary">{t('terms.one_time_credit')}</span>
             </div>
           </div>
 
@@ -200,24 +202,23 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-4 flex items-start gap-3">
             <Info className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
             <div>
-              <h4 className="font-medium text-amber-600 dark:text-amber-400 text-sm mb-1">Important</h4>
+              <h4 className="font-medium text-amber-600 dark:text-amber-400 text-sm mb-1">{t('terms.important')}</h4>
               <p className="text-sm text-theme-muted">
-                Time Credits have no monetary value and cannot be exchanged for cash.
-                They exist solely to facilitate community exchanges.
+                {t('terms.credits_no_monetary_value')}
               </p>
             </div>
           </div>
 
           <ul className="space-y-2 text-theme-muted">
-            {[
-              'One hour of service provided equals one Time Credit earned',
-              'Credits can be used to receive services from other members',
-              'The type of service does not affect the credit value',
-              'Credits are tracked automatically through the platform',
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-3">
+            {([
+              'terms.credit_rule_1',
+              'terms.credit_rule_2',
+              'terms.credit_rule_3',
+              'terms.credit_rule_4',
+            ] as const).map((key) => (
+              <li key={key} className="flex items-start gap-3">
                 <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
-                <span>{item}</span>
+                <span>{t(key)}</span>
               </li>
             ))}
           </ul>
@@ -230,23 +231,23 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">2</Chip>
             <UserCog className="w-5 h-5 text-blue-500" aria-hidden="true" />
-            Account Responsibilities
+            {t('terms.section2_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            When you create an account, you agree to:
+            {t('terms.section2_intro')}
           </p>
           <ul className="space-y-3 text-theme-muted">
-            {[
-              { label: 'Provide accurate information', desc: 'Your profile must reflect your true identity and skills' },
-              { label: 'Maintain security', desc: 'Keep your login credentials confidential and secure' },
-              { label: 'Use one account', desc: 'Each person may only maintain one active account' },
-              { label: 'Stay current', desc: 'Update your profile when your skills or availability change' },
-              { label: 'Be reachable', desc: 'Respond to messages and requests in a timely manner' },
-            ].map((item) => (
-              <li key={item.label} className="flex items-start gap-3">
+            {([
+              { labelKey: 'terms.account_accurate_label', descKey: 'terms.account_accurate_desc' },
+              { labelKey: 'terms.account_security_label', descKey: 'terms.account_security_desc' },
+              { labelKey: 'terms.account_one_account_label', descKey: 'terms.account_one_account_desc' },
+              { labelKey: 'terms.account_current_label', descKey: 'terms.account_current_desc' },
+              { labelKey: 'terms.account_reachable_label', descKey: 'terms.account_reachable_desc' },
+            ] as const).map((item) => (
+              <li key={item.labelKey} className="flex items-start gap-3">
                 <div className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
                 <span>
-                  <strong className="text-theme-primary">{item.label}:</strong> {item.desc}
+                  <strong className="text-theme-primary">{t(item.labelKey)}:</strong> {t(item.descKey)}
                 </span>
               </li>
             ))}
@@ -261,29 +262,29 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
             <h2 className="text-xl font-semibold text-theme-primary mb-2 flex items-center gap-2">
               <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">3</Chip>
               <Users className="w-5 h-5 text-blue-500" aria-hidden="true" />
-              Community Guidelines
+              {t('terms.section3_title')}
             </h2>
             <p className="text-theme-muted text-sm">
-              Our community is built on{' '}
-              <strong className="text-theme-primary">trust, respect, and mutual support</strong>.
-              All members must:
+              {t('terms.section3_intro_before')}{' '}
+              <strong className="text-theme-primary">{t('terms.section3_intro_emphasis')}</strong>.
+              {' '}{t('terms.section3_intro_after')}
             </p>
           </div>
 
           <ol className="space-y-3 text-theme-muted">
-            {[
-              { label: 'Treat everyone with respect', desc: 'Be kind and courteous in all interactions' },
-              { label: 'Honour your commitments', desc: 'If you agree to an exchange, follow through' },
-              { label: 'Communicate clearly', desc: 'Keep other members informed about your availability' },
-              { label: 'Be inclusive', desc: 'Welcome members of all backgrounds and abilities' },
-              { label: 'Give honest feedback', desc: 'Help the community by providing fair reviews' },
-            ].map((item, index) => (
-              <li key={item.label} className="flex items-start gap-3">
+            {([
+              { labelKey: 'terms.guideline_respect_label', descKey: 'terms.guideline_respect_desc' },
+              { labelKey: 'terms.guideline_honour_label', descKey: 'terms.guideline_honour_desc' },
+              { labelKey: 'terms.guideline_communicate_label', descKey: 'terms.guideline_communicate_desc' },
+              { labelKey: 'terms.guideline_inclusive_label', descKey: 'terms.guideline_inclusive_desc' },
+              { labelKey: 'terms.guideline_feedback_label', descKey: 'terms.guideline_feedback_desc' },
+            ] as const).map((item, index) => (
+              <li key={item.labelKey} className="flex items-start gap-3">
                 <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
                   <span className="text-xs font-bold text-blue-500">{index + 1}</span>
                 </div>
                 <span>
-                  <strong className="text-theme-primary">{item.label}</strong> — {item.desc}
+                  <strong className="text-theme-primary">{t(item.labelKey)}</strong> — {t(item.descKey)}
                 </span>
               </li>
             ))}
@@ -297,20 +298,20 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">4</Chip>
             <Ban className="w-5 h-5 text-red-500" aria-hidden="true" />
-            Prohibited Activities
+            {t('terms.section4_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            The following activities are strictly prohibited and may result in account termination:
+            {t('terms.section4_intro')}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {prohibitedItems.map((item) => (
+            {prohibitedKeys.map((key) => (
               <div
-                key={item}
+                key={key}
                 className="flex items-center gap-3 p-3 rounded-xl bg-red-500/5 border border-red-500/10"
               >
                 <CircleSlash className="w-4 h-4 text-red-500 flex-shrink-0" aria-hidden="true" />
-                <span className="text-sm text-theme-muted">{item}</span>
+                <span className="text-sm text-theme-muted">{t(key)}</span>
               </div>
             ))}
           </div>
@@ -323,23 +324,23 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">5</Chip>
             <MapPin className="w-5 h-5 text-blue-500" aria-hidden="true" />
-            Safety &amp; Meetings
+            {t('terms.section5_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            Your safety is important. We recommend following these guidelines:
+            {t('terms.section5_intro')}
           </p>
           <ul className="space-y-3 text-theme-muted">
-            {[
-              { label: 'First meetings', desc: 'Meet in public places for initial exchanges' },
-              { label: 'Verify identity', desc: 'Confirm the member\'s profile before meeting' },
-              { label: 'Trust your instincts', desc: 'If something feels wrong, do not proceed' },
-              { label: 'Report concerns', desc: 'Let us know about any suspicious behaviour' },
-              { label: 'Keep records', desc: 'Document exchanges through the platform' },
-            ].map((item) => (
-              <li key={item.label} className="flex items-start gap-3">
+            {([
+              { labelKey: 'terms.safety_first_meetings_label', descKey: 'terms.safety_first_meetings_desc' },
+              { labelKey: 'terms.safety_verify_label', descKey: 'terms.safety_verify_desc' },
+              { labelKey: 'terms.safety_instincts_label', descKey: 'terms.safety_instincts_desc' },
+              { labelKey: 'terms.safety_report_label', descKey: 'terms.safety_report_desc' },
+              { labelKey: 'terms.safety_records_label', descKey: 'terms.safety_records_desc' },
+            ] as const).map((item) => (
+              <li key={item.labelKey} className="flex items-start gap-3">
                 <div className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
                 <span>
-                  <strong className="text-theme-primary">{item.label}:</strong> {item.desc}
+                  <strong className="text-theme-primary">{t(item.labelKey)}:</strong> {t(item.descKey)}
                 </span>
               </li>
             ))}
@@ -353,30 +354,28 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">6</Chip>
             <Scale className="w-5 h-5 text-blue-500" aria-hidden="true" />
-            Limitation of Liability
+            {t('terms.section6_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            {branding.name} provides a platform for community members to connect and exchange
-            services. However:
+            {t('terms.section6_intro', { name: branding.name })}
           </p>
           <ul className="space-y-3 text-theme-muted">
-            {[
-              'We do not guarantee the quality or safety of any services exchanged',
-              'We are not responsible for disputes between members',
-              'Members exchange services at their own risk',
-              'We recommend obtaining appropriate insurance for professional services',
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-3">
+            {([
+              'terms.liability_no_guarantee',
+              'terms.liability_no_disputes',
+              'terms.liability_own_risk',
+              'terms.liability_insurance',
+            ] as const).map((key) => (
+              <li key={key} className="flex items-start gap-3">
                 <div className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
-                <span>{item}</span>
+                <span>{t(key)}</span>
               </li>
             ))}
           </ul>
 
           <div className="mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
             <p className="text-sm text-theme-muted">
-              By using the platform, you agree to hold {branding.name} harmless from any
-              claims arising from your participation in service exchanges.
+              {t('terms.liability_hold_harmless', { name: branding.name })}
             </p>
           </div>
         </GlassCard>
@@ -388,28 +387,27 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">7</Chip>
             <AlertTriangle className="w-5 h-5 text-amber-500" aria-hidden="true" />
-            Account Termination
+            {t('terms.section7_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            We reserve the right to suspend or terminate accounts that violate these terms.
-            Reasons for termination include:
+            {t('terms.section7_intro')}
           </p>
           <ul className="space-y-2 text-theme-muted">
-            {[
-              'Repeated violation of community guidelines',
-              'Fraudulent or deceptive behaviour',
-              'Harassment of other members',
-              'Extended inactivity (over 12 months)',
-              'Providing false information',
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-3">
+            {([
+              'terms.termination_guidelines',
+              'terms.termination_fraud',
+              'terms.termination_harassment',
+              'terms.termination_inactivity',
+              'terms.termination_false_info',
+            ] as const).map((key) => (
+              <li key={key} className="flex items-start gap-3">
                 <div className="mt-1 w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                <span>{item}</span>
+                <span>{t(key)}</span>
               </li>
             ))}
           </ul>
           <p className="text-sm text-theme-muted mt-4">
-            You may also close your account at any time through your account settings.
+            {t('terms.termination_self_close')}
           </p>
         </GlassCard>
       </motion.div>
@@ -420,21 +418,20 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">8</Chip>
             <RefreshCw className="w-5 h-5 text-blue-500" aria-hidden="true" />
-            Changes to These Terms
+            {t('terms.section8_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            We may update these terms from time to time to reflect changes in our practices
-            or for legal reasons. When we make significant changes:
+            {t('terms.section8_intro')}
           </p>
           <ul className="space-y-2 text-theme-muted">
-            {[
-              'We will notify you via email or platform notification',
-              'The updated date will be shown at the top of this page',
-              'Continued use of the platform constitutes acceptance of the new terms',
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-3">
+            {([
+              'terms.changes_notify',
+              'terms.changes_date_shown',
+              'terms.changes_continued_use',
+            ] as const).map((key) => (
+              <li key={key} className="flex items-start gap-3">
                 <div className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
-                <span>{item}</span>
+                <span>{t(key)}</span>
               </li>
             ))}
           </ul>
@@ -449,11 +446,10 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
               <MessageSquare className="w-8 h-8 text-blue-500 dark:text-blue-400" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-semibold text-theme-primary mb-2">
-              Have Questions?
+              {t('terms.cta_title')}
             </h2>
             <p className="text-theme-muted text-sm mb-6 max-w-lg mx-auto">
-              If you have any questions about these Terms of Service or need clarification
-              on any points, our team is here to help.
+              {t('terms.cta_body')}
             </p>
             <Divider className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
@@ -462,7 +458,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
                   className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white"
                   startContent={<Send className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Contact Us
+                  {t('terms.contact_us')}
                 </Button>
               </Link>
               <Link to={tenantPath('/privacy')}>
@@ -471,7 +467,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Privacy Policy
+                  {t('terms.privacy_policy_link')}
                 </Button>
               </Link>
             </div>
