@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "feed": "Feed",
+    "listings": "Listings",
+    "messages": "Messages",
+    "community": "Community",
+    "members": "Members",
+    "events": "Events",
+    "groups": "Groups",
+    "blog": "Blog",
+    "volunteering": "Volunteering",
+    "organisations": "Organisations",
+    "resources": "Resources",
+    "exchanges": "Exchanges",
+    "group_exchanges": "Group Exchanges",
+    "wallet": "Wallet",
+    "achievements": "Achievements",
+    "goals": "Goals",
+    "more": "More",
+    "activity": "Activity",
+    "federation": "Federation",
+    "federation_hub": "Federation Hub",
+    "partner_communities": "Partner Communities",
+    "federated_members": "Federated Members",
+    "federated_messages": "Federated Messages",
+    "federated_listings": "Federated Listings",
+    "federated_events": "Federated Events",
+    "about": "About",
+    "faq": "FAQ",
+    "timebanking_guide": "Timebanking Guide",
+    "partner_with_us": "Partner With Us",
+    "social_prescribing": "Social Prescribing",
+    "our_impact": "Our Impact",
+    "impact_report": "Impact Report",
+    "strategic_plan": "Strategic Plan",
+    "home": "Home",
+    "leaderboard": "Leaderboard"
+  },
+  "user_menu": {
+    "my_profile": "My Profile",
+    "wallet": "Wallet",
+    "settings": "Settings",
+    "light_mode": "Light Mode",
+    "dark_mode": "Dark Mode",
+    "help_center": "Help Center",
+    "admin": "Admin",
+    "admin_panel": "Admin Panel",
+    "legacy_admin": "Legacy Admin",
+    "log_out": "Log Out"
+  },
+  "auth": {
+    "log_in": "Log In",
+    "sign_up": "Sign Up"
+  },
+  "create": {
+    "new_listing": "New Listing",
+    "new_event": "New Event"
+  },
+  "search": {
+    "placeholder": "Search listings, members, events...",
+    "searching": "Searching...",
+    "suggestions": "Suggestions",
+    "quick_links": "Quick Links",
+    "clear": "Clear search",
+    "type_listing": "Listing",
+    "type_member": "Member",
+    "type_event": "Event",
+    "type_group": "Group"
+  },
+  "support": {
+    "help_center": "Help Center",
+    "contact": "Contact"
+  },
+  "legal": {
+    "legal_hub": "Legal Hub",
+    "terms_of_service": "Terms of Service",
+    "privacy_policy": "Privacy Policy",
+    "accessibility": "Accessibility"
+  },
+  "admin_tools": {
+    "section": "Admin Tools",
+    "admin_panel": "Admin Panel",
+    "legacy_admin": "Legacy Admin"
+  },
+  "account": {
+    "section": "Account",
+    "settings": "Settings",
+    "log_out": "Log Out"
+  },
+  "stats": {
+    "credits": "Credits",
+    "messages": "Messages",
+    "alerts": "Alerts"
+  },
+  "sections": {
+    "community": "Community",
+    "explore": "Explore",
+    "federation": "Federation",
+    "activity": "Activity",
+    "partner_communities": "Partner Communities",
+    "about": "About",
+    "support": "Support",
+    "legal": "Legal",
+    "admin": "Admin",
+    "account": "Account",
+    "language": "Language"
+  },
+  "accessibility": {
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "search": "Search",
+    "search_ctrl_k": "Search (Ctrl+K)",
+    "create_new": "Create new",
+    "notifications": "Notifications",
+    "notifications_unread": "Notifications, {{count}} unread",
+    "switch_to_light": "Switch to light mode",
+    "switch_to_dark": "Switch to dark mode"
+  },
+  "attribution": "Built on Project NEXUS by Jasper Ford"
+}

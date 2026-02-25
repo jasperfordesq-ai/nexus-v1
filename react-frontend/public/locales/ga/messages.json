@@ -1,0 +1,11 @@
+{
+  "title": "Messages",
+  "new_message": "New Message",
+  "search_placeholder": "Search conversations...",
+  "empty": "No messages yet",
+  "empty_subtitle": "Start a conversation with a community member",
+  "type_placeholder": "Type a message...",
+  "send": "Send",
+  "you": "You",
+  "unread": "{{count}} unread"
+}

@@ -167,6 +167,7 @@ class UserService
             $profile['privacy_search'] = (bool)($user['privacy_search'] ?? true);
             $profile['privacy_contact'] = (bool)($user['privacy_contact'] ?? true);
             $profile['onboarding_completed'] = (bool)($user['onboarding_completed'] ?? false);
+            $profile['preferred_language'] = $user['preferred_language'] ?? 'en';
         }
 
         return $profile;

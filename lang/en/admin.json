@@ -1,0 +1,19 @@
+{
+  "review": "Review",
+  "view_all": "View All",
+  "details": "Details",
+  "live": "LIVE",
+  "active": "Active",
+  "completed": "Completed",
+  "new": "NEW",
+  "last_checked": "Last checked: {{time}}",
+  "no_data": "No data available",
+  "status": {
+    "online": "Online",
+    "warning": "Warning",
+    "offline": "Offline",
+    "all_operational": "All systems operational",
+    "some_attention": "Some services need attention",
+    "issues_detected": "Issues detected"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "title": "Wallet",
+  "balance": "Balance",
+  "time_credits": "Time Credits",
+  "hours": "Hours",
+  "transactions": "Transactions",
+  "pending": "Pending",
+  "completed": "Completed",
+  "sent": "Sent",
+  "received": "Received",
+  "empty": "No transactions yet",
+  "transfer": "Transfer Credits",
+  "pending_reviews": "Pending Reviews",
+  "review": "Leave Review"
+}

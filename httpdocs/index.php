@@ -382,6 +382,16 @@ if (isset($_GET['debug_tenant'])) {
 
 TenantContext::resolve();
 
+// Initialise i18n Translator for PHP admin views
+use Nexus\I18n\Translator;
+Translator::init(__DIR__ . '/../lang');
+$_supportedLocales = ['en', 'ga'];
+$_locale = $_SESSION['locale']
+    ?? $_COOKIE['nexus_language']
+    ?? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'en', 0, 2);
+Translator::setLocale(in_array($_locale, $_supportedLocales, true) ? $_locale : 'en');
+unset($_supportedLocales, $_locale);
+
 // Set Sentry tenant context (after tenant resolution)
 if (class_exists('\Nexus\Services\SentryService') && \Nexus\Services\SentryService::isEnabled()) {
     $tenantId = TenantContext::getId();

@@ -1,0 +1,28 @@
+{
+  "title": "Listings",
+  "browse": "Browse Listings",
+  "create": "Create Listing",
+  "my_listings": "My Listings",
+  "offer": "Offer",
+  "request": "Request",
+  "offering": "Offering",
+  "requesting": "Requesting",
+  "all": "All",
+  "empty": "No listings found",
+  "create_first": "Create your first listing",
+  "filters": {
+    "all": "All",
+    "offers": "Offers",
+    "requests": "Requests"
+  },
+  "form": {
+    "title_label": "Title",
+    "description_label": "Description",
+    "type_label": "Type",
+    "category_label": "Category",
+    "hours_label": "Hours",
+    "location_label": "Location",
+    "submit": "Post Listing",
+    "update": "Update Listing"
+  }
+}

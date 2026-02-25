@@ -53,10 +53,12 @@ import {
   BarChart3,
   Compass,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { tokenManager, API_BASE } from '@/lib/api';
 import type { TenantFeatures, TenantModules } from '@/types/api';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -64,76 +66,78 @@ interface MobileDrawerProps {
   onSearchOpen?: () => void;
 }
 
-const mainNavItems = [
-  { label: 'Home', href: '/', icon: Home },
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
-  { label: 'Feed', href: '/feed', icon: Newspaper, auth: true, module: 'feed' as keyof TenantModules },
-  { label: 'Listings', href: '/listings', icon: ListTodo, module: 'listings' as keyof TenantModules },
-  { label: 'Messages', href: '/messages', icon: MessageSquare, auth: true, module: 'messages' as keyof TenantModules },
-  { label: 'Wallet', href: '/wallet', icon: Wallet, auth: true, module: 'wallet' as keyof TenantModules },
-];
-
-const communityNavItems = [
-  { label: 'Exchanges', href: '/exchanges', icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
-  { label: 'Group Exchanges', href: '/group-exchanges', icon: Users, feature: 'group_exchanges' as keyof TenantFeatures },
-  { label: 'Members', href: '/members', icon: Users, feature: 'connections' as const },
-  { label: 'Events', href: '/events', icon: Calendar, feature: 'events' as const },
-  { label: 'Groups', href: '/groups', icon: Users, feature: 'groups' as const },
-  { label: 'Blog', href: '/blog', icon: BookOpen, feature: 'blog' as const },
-  { label: 'Volunteering', href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
-  { label: 'Organisations', href: '/organisations', icon: Building2, feature: 'organisations' as const },
-  { label: 'Resources', href: '/resources', icon: FolderOpen, feature: 'resources' as const },
-];
-
-const exploreNavItems = [
-  { label: 'Achievements', href: '/achievements', icon: Trophy, feature: 'gamification' as const },
-  { label: 'Leaderboard', href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
-  { label: 'Goals', href: '/goals', icon: Target, feature: 'goals' as const },
-];
-
-const federationNavItems = [
-  { label: 'Federation Hub', href: '/federation', icon: Globe, feature: 'federation' as keyof TenantFeatures },
-  { label: 'Partner Communities', href: '/federation/partners', icon: Building2, feature: 'federation' as keyof TenantFeatures },
-  { label: 'Federated Members', href: '/federation/members', icon: Users, feature: 'federation' as keyof TenantFeatures },
-  { label: 'Federated Messages', href: '/federation/messages', icon: MessageSquare, feature: 'federation' as keyof TenantFeatures },
-  { label: 'Federated Listings', href: '/federation/listings', icon: ListTodo, feature: 'federation' as keyof TenantFeatures },
-  { label: 'Federated Events', href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
-];
-
-// Universal about items — shown for all tenants
-const aboutNavItems = [
-  { label: 'About', href: '/about', icon: Info },
-  { label: 'FAQ', href: '/faq', icon: HelpCircle },
-  { label: 'Timebanking Guide', href: '/timebanking-guide', icon: BookOpen },
-];
-
-// Tenant 2 (hOUR Timebank) specific pages — contain hardcoded org content
-const hourTimebankAboutItems = [
-  { label: 'Partner With Us', href: '/partner', icon: Handshake },
-  { label: 'Social Prescribing', href: '/social-prescribing', icon: Stethoscope },
-  { label: 'Our Impact', href: '/impact-summary', icon: TrendingUp },
-  { label: 'Impact Report', href: '/impact-report', icon: BarChart3 },
-  { label: 'Strategic Plan', href: '/strategic-plan', icon: Compass },
-];
-
-const supportNavItems = [
-  { label: 'Help Center', href: '/help', icon: HelpCircle },
-  { label: 'Contact', href: '/contact', icon: MessageSquare },
-];
-
-const legalNavItems = [
-  { label: 'Legal Hub', href: '/legal', icon: FileText },
-  { label: 'Terms of Service', href: '/terms', icon: FileText },
-  { label: 'Privacy Policy', href: '/privacy', icon: FileText },
-  { label: 'Accessibility', href: '/accessibility', icon: FileText },
-];
-
 export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation('common');
   const { user, isAuthenticated, logout } = useAuth();
   const { tenant, branding, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
+
+  // Nav item arrays — defined inside component so t() is available
+  const mainNavItems = [
+    { label: t('nav.home'), href: '/', icon: Home },
+    { label: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
+    { label: t('nav.feed'), href: '/feed', icon: Newspaper, auth: true, module: 'feed' as keyof TenantModules },
+    { label: t('nav.listings'), href: '/listings', icon: ListTodo, module: 'listings' as keyof TenantModules },
+    { label: t('nav.messages'), href: '/messages', icon: MessageSquare, auth: true, module: 'messages' as keyof TenantModules },
+    { label: t('nav.wallet'), href: '/wallet', icon: Wallet, auth: true, module: 'wallet' as keyof TenantModules },
+  ];
+
+  const communityNavItems = [
+    { label: t('nav.exchanges'), href: '/exchanges', icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
+    { label: t('nav.group_exchanges'), href: '/group-exchanges', icon: Users, feature: 'group_exchanges' as keyof TenantFeatures },
+    { label: t('nav.members'), href: '/members', icon: Users, feature: 'connections' as const },
+    { label: t('nav.events'), href: '/events', icon: Calendar, feature: 'events' as const },
+    { label: t('nav.groups'), href: '/groups', icon: Users, feature: 'groups' as const },
+    { label: t('nav.blog'), href: '/blog', icon: BookOpen, feature: 'blog' as const },
+    { label: t('nav.volunteering'), href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
+    { label: t('nav.organisations'), href: '/organisations', icon: Building2, feature: 'organisations' as const },
+    { label: t('nav.resources'), href: '/resources', icon: FolderOpen, feature: 'resources' as const },
+  ];
+
+  const exploreNavItems = [
+    { label: t('nav.achievements'), href: '/achievements', icon: Trophy, feature: 'gamification' as const },
+    { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
+    { label: t('nav.goals'), href: '/goals', icon: Target, feature: 'goals' as const },
+  ];
+
+  const federationNavItems = [
+    { label: t('nav.federation_hub'), href: '/federation', icon: Globe, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.partner_communities'), href: '/federation/partners', icon: Building2, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federated_members'), href: '/federation/members', icon: Users, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federated_messages'), href: '/federation/messages', icon: MessageSquare, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federated_listings'), href: '/federation/listings', icon: ListTodo, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federated_events'), href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
+  ];
+
+  // Universal about items — shown for all tenants
+  const aboutNavItems = [
+    { label: t('nav.about'), href: '/about', icon: Info },
+    { label: t('nav.faq'), href: '/faq', icon: HelpCircle },
+    { label: t('nav.timebanking_guide'), href: '/timebanking-guide', icon: BookOpen },
+  ];
+
+  // Tenant 2 (hOUR Timebank) specific pages — contain hardcoded org content
+  const hourTimebankAboutItems = [
+    { label: t('nav.partner_with_us'), href: '/partner', icon: Handshake },
+    { label: t('nav.social_prescribing'), href: '/social-prescribing', icon: Stethoscope },
+    { label: t('nav.our_impact'), href: '/impact-summary', icon: TrendingUp },
+    { label: t('nav.impact_report'), href: '/impact-report', icon: BarChart3 },
+    { label: t('nav.strategic_plan'), href: '/strategic-plan', icon: Compass },
+  ];
+
+  const supportNavItems = [
+    { label: t('support.help_center'), href: '/help', icon: HelpCircle },
+    { label: t('support.contact'), href: '/contact', icon: MessageSquare },
+  ];
+
+  const legalNavItems = [
+    { label: t('legal.legal_hub'), href: '/legal', icon: FileText },
+    { label: t('legal.terms_of_service'), href: '/terms', icon: FileText },
+    { label: t('legal.privacy_policy'), href: '/privacy', icon: FileText },
+    { label: t('legal.accessibility'), href: '/accessibility', icon: FileText },
+  ];
 
   // Track previous pathname to only close on actual navigation
   const prevPathRef = useRef(location.pathname);
@@ -243,7 +247,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 aria-label="Open search"
               >
                 <Search className="w-4 h-4" aria-hidden="true" />
-                <span>Search...</span>
+                <span>{t('search.placeholder')}</span>
               </Button>
             </div>
           )}
@@ -278,7 +282,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <p className="text-lg font-bold text-theme-primary">
                     {user.balance ?? 0}
                   </p>
-                  <p className="text-xs text-theme-subtle">Credits</p>
+                  <p className="text-xs text-theme-subtle">{t('stats.credits')}</p>
                 </Link>
                 <Link
                   to={tenantPath('/messages')}
@@ -287,7 +291,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <p className="text-lg font-bold text-theme-primary">
                     {counts.messages > 0 ? counts.messages : 0}
                   </p>
-                  <p className="text-xs text-theme-subtle">Messages</p>
+                  <p className="text-xs text-theme-subtle">{t('stats.messages')}</p>
                   {counts.messages > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
@@ -299,7 +303,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <p className="text-lg font-bold text-theme-primary">
                     {unreadCount > 0 ? unreadCount : 0}
                   </p>
-                  <p className="text-xs text-theme-subtle">Alerts</p>
+                  <p className="text-xs text-theme-subtle">{t('stats.alerts')}</p>
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
@@ -319,7 +323,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {communityNavItems.filter(item => !item.feature || hasFeature(item.feature)).length > 0 && (
               <div>
                 <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                  Community
+                  {t('sections.community')}
                 </p>
                 <div className="space-y-1">
                   {communityNavItems.map(renderNavLink)}
@@ -331,7 +335,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {(hasFeature('gamification') || hasFeature('goals')) && (
               <div>
                 <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                  Explore
+                  {t('sections.explore')}
                 </p>
                 <div className="space-y-1">
                   {exploreNavItems.map(renderNavLink)}
@@ -344,7 +348,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <div>
                 <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider flex items-center gap-2">
                   <Globe className="w-3 h-3" aria-hidden="true" />
-                  Federation
+                  {t('sections.federation')}
                 </p>
                 <div className="space-y-1">
                   {federationNavItems.map(renderNavLink)}
@@ -355,7 +359,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {/* About */}
             <div>
               <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                About
+                {t('sections.about')}
               </p>
               <div className="space-y-1">
                 {aboutNavItems.map(renderNavLink)}
@@ -371,7 +375,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {/* Support */}
             <div>
               <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                Support
+                {t('sections.support')}
               </p>
               <div className="space-y-1">
                 {supportNavItems.map(renderNavLink)}
@@ -381,7 +385,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {/* Legal */}
             <div>
               <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                Legal
+                {t('sections.legal')}
               </p>
               <div className="space-y-1">
                 {legalNavItems.map(renderNavLink)}
@@ -394,7 +398,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <Divider className="bg-theme-elevated mb-4" />
                 <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider flex items-center gap-2">
                   <Shield className="w-3 h-3" aria-hidden="true" />
-                  Admin Tools
+                  {t('admin_tools.section')}
                 </p>
                 <div className="space-y-1">
                   <a
@@ -402,15 +406,15 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
                   >
                     <LayoutDashboard className="w-5 h-5" aria-hidden="true" />
-                    <span>Admin Panel</span>
+                    <span>{t('admin_tools.admin_panel')}</span>
                   </a>
                   <a
                     href={(API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin) + '/admin-legacy'}
-                    onClick={(e) => { e.preventDefault(); const t = tokenManager.getAccessToken(); const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin; if (t) { const f = document.createElement('form'); f.method = 'POST'; f.action = `${phpOrigin}/api/auth/admin-session`; f.style.display = 'none'; const ti = document.createElement('input'); ti.name = 'token'; ti.value = t; f.appendChild(ti); const ri = document.createElement('input'); ri.name = 'redirect'; ri.value = '/admin-legacy'; f.appendChild(ri); document.body.appendChild(f); f.submit(); } else { window.location.href = `${phpOrigin}/admin-legacy`; } }}
+                    onClick={(e) => { e.preventDefault(); const token = tokenManager.getAccessToken(); const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin; if (token) { const f = document.createElement('form'); f.method = 'POST'; f.action = `${phpOrigin}/api/auth/admin-session`; f.style.display = 'none'; const ti = document.createElement('input'); ti.name = 'token'; ti.value = token; f.appendChild(ti); const ri = document.createElement('input'); ri.name = 'redirect'; ri.value = '/admin-legacy'; f.appendChild(ri); document.body.appendChild(f); f.submit(); } else { window.location.href = `${phpOrigin}/admin-legacy`; } }}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
                   >
                     <Shield className="w-5 h-5" aria-hidden="true" />
-                    <span>Legacy Admin</span>
+                    <span>{t('admin_tools.legacy_admin')}</span>
                   </a>
                 </div>
               </div>
@@ -420,7 +424,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {isAuthenticated && (
               <div>
                 <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                  Account
+                  {t('sections.account')}
                 </p>
                 <div className="space-y-1">
                   <NavLink
@@ -434,15 +438,22 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     }
                   >
                     <Settings className="w-5 h-5" aria-hidden="true" />
-                    <span>Settings</span>
+                    <span>{t('account.settings')}</span>
                   </NavLink>
+                  <div className="flex items-center gap-3 px-4 py-2">
+                    <Globe className="w-5 h-5 text-theme-muted shrink-0" aria-hidden="true" />
+                    <span className="text-base font-medium text-theme-muted">{t('sections.language')}</span>
+                    <div className="ml-auto">
+                      <LanguageSwitcher compact={false} />
+                    </div>
+                  </div>
                   <Button
                     variant="light"
                     onPress={handleLogout}
                     className="flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-base font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 transition-all w-full h-auto"
                   >
                     <LogOut className="w-5 h-5" aria-hidden="true" />
-                    <span>Log Out</span>
+                    <span>{t('account.log_out')}</span>
                   </Button>
                 </div>
               </div>
@@ -457,12 +468,12 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     variant="flat"
                     className="w-full bg-theme-elevated text-theme-secondary"
                   >
-                    Log In
+                    {t('auth.log_in')}
                   </Button>
                 </Link>
                 <Link to={tenantPath('/register')}>
                   <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium">
-                    Sign Up
+                    {t('auth.sign_up')}
                   </Button>
                 </Link>
               </div>

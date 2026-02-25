@@ -1,0 +1,31 @@
+{
+  "dashboard": "Dashboard",
+  "users": "Users",
+  "listings": "Listings",
+  "transactions": "Transactions",
+  "events": "Events",
+  "groups": "Groups",
+  "organizations": "Organizations",
+  "volunteering": "Volunteering",
+  "messages": "Messages",
+  "reviews": "Reviews",
+  "reports": "Reports",
+  "blog": "Blog",
+  "pages": "Pages",
+  "newsletters": "Newsletters",
+  "settings": "Settings",
+  "activity_log": "Activity Log",
+  "federation": "Federation",
+  "gamification": "Gamification",
+  "enterprise": "Enterprise",
+  "super_admin": "Super Admin",
+  "back_to_site": "Back to Site",
+  "logout": "Log Out",
+  "sections": {
+    "content": "Content",
+    "community": "Community",
+    "intelligence": "Intelligence",
+    "engagement": "Engagement",
+    "system": "System"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "title": "Profile",
+  "edit_profile": "Edit Profile",
+  "joined": "Joined {{date}}",
+  "bio": "About",
+  "skills": "Skills",
+  "interests": "Interests",
+  "listings": "Listings",
+  "reviews": "Reviews",
+  "badges": "Badges",
+  "credits": "Time Credits",
+  "send_message": "Send Message",
+  "connect": "Connect",
+  "connected": "Connected",
+  "form": {
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "bio": "About Me",
+    "location": "Location",
+    "phone": "Phone",
+    "save": "Save Changes"
+  }
+}

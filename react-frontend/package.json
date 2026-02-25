@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "copy-locales": "node -e \"const fs=require('fs');fs.cpSync('../lang','public/locales',{recursive:true,force:true});console.log('[i18n] lang/ copied to public/locales/')\"",
+    "prebuild": "npm run copy-locales",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
@@ -28,6 +30,9 @@
     "@vis.gl/react-google-maps": "^1.7.1",
     "dompurify": "^3.3.1",
     "framer-motion": "^11.0.0",
+    "i18next": "^25.8.13",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "i18next-http-backend": "^3.0.2",
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "lexical": "^0.40.0",
@@ -36,6 +41,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet-async": "^2.0.5",
+    "react-i18next": "^16.5.4",
     "react-router-dom": "^6.28.0",
     "recharts": "^3.7.0",
     "zod": "^4.3.6"

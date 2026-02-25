@@ -3,10 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { StrictMode } from 'react';
+import { StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
+import './i18n'; // Initialize i18n before App renders
 
 // Log build version to console for deployment verification
 console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
@@ -18,12 +19,15 @@ initSentry();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <SentryErrorBoundary fallback={<ErrorFallback />}>
-      <App />
+      <Suspense fallback={null}>
+        <App />
+      </Suspense>
     </SentryErrorBoundary>
   </StrictMode>
 );
 
 // Error fallback component
+// Note: This renders BEFORE i18n loads — intentionally not translated
 function ErrorFallback() {
   return (
     <div style={{
