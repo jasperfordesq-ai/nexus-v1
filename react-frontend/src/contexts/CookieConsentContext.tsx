@@ -99,7 +99,7 @@ export function readStoredConsent(): CookieConsent | null {
 function syncConsentToServer(consent: CookieConsent): void {
   if (!tokenManager.getAccessToken()) return; // Only sync for authenticated users
 
-  api.post('/api/cookie-consent', {
+  api.post('/cookie-consent', {
     functional: consent.preferences,
     analytics: consent.analytics,
     marketing: false,
@@ -124,7 +124,7 @@ async function fetchServerConsent(): Promise<CookieConsent | null> {
         functional: boolean;
         created_at: string;
       } | null;
-    }>('/api/cookie-consent');
+    }>('/cookie-consent');
 
     const data = 'data' in response ? (response as any).data : response;
     if (data?.success && data.consent) {
