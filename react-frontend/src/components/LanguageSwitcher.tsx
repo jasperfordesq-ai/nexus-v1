@@ -60,7 +60,9 @@ export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
 
   const handleLanguageChange = (code: string) => {
     i18n.changeLanguage(code);
-    // localStorage is handled by i18next-browser-languagedetector via caches config
+    // Mark that the user explicitly chose a language (not auto-detected).
+    // TenantContext checks this flag to decide whether to apply the tenant default.
+    localStorage.setItem('nexus_language_user_chosen', 'true');
 
     // Persist to user profile if authenticated
     if (tokenManager.hasAccessToken()) {

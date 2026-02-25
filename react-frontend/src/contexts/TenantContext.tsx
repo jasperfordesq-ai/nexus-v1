@@ -291,15 +291,18 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   );
 
   // After tenant data loads, apply tenant default language if user hasn't
-  // explicitly chosen one via the language switcher (no localStorage).
-  // Tenant default takes priority over browser detection for new visitors.
+  // explicitly chosen one via the language switcher.
+  // Note: We check 'nexus_language_user_chosen' (set by LanguageSwitcher), NOT
+  // 'nexus_language' (auto-written by i18next's caches:['localStorage'] on init).
+  // Without this distinction, the browser-detected language gets auto-cached and
+  // the tenant default would never apply.
   useEffect(() => {
     if (!state.tenant) return;
 
     const tenantDefault = state.tenant.default_language ?? 'en';
-    const userChosen = localStorage.getItem('nexus_language');
+    const userExplicitlyChose = localStorage.getItem('nexus_language_user_chosen');
 
-    if (!userChosen && i18n.language !== tenantDefault) {
+    if (!userExplicitlyChose && i18n.language !== tenantDefault) {
       i18n.changeLanguage(tenantDefault);
     }
   }, [state.tenant]);
