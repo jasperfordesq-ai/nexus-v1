@@ -251,6 +251,20 @@ export const adminConfig = {
 
   runJob: (jobId: string) =>
     api.post(`/v2/admin/jobs/${jobId}/run`),
+
+  getLanguageConfig: () =>
+    api.get<{ default_language: string; supported_languages: string[] }>(
+      '/v2/admin/config/languages'
+    ),
+
+  updateLanguageConfig: (config: {
+    default_language?: string;
+    supported_languages?: string[];
+  }) =>
+    api.put<{ default_language: string; supported_languages: string[] }>(
+      '/v2/admin/config/languages',
+      config
+    ),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

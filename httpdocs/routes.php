@@ -616,6 +616,10 @@ $router->add('PUT', '/api/v2/admin/config/images', 'Nexus\Controllers\Api\AdminC
 $router->add('GET', '/api/v2/admin/config/seo', 'Nexus\Controllers\Api\AdminConfigApiController@getSeoConfig');
 $router->add('PUT', '/api/v2/admin/config/seo', 'Nexus\Controllers\Api\AdminConfigApiController@updateSeoConfig');
 
+// Admin Config - Languages
+$router->add('GET', '/api/v2/admin/config/languages', 'Nexus\Controllers\Api\AdminConfigApiController@getLanguageConfig');
+$router->add('PUT', '/api/v2/admin/config/languages', 'Nexus\Controllers\Api\AdminConfigApiController@updateLanguageConfig');
+
 // Admin Config - Native App / PWA
 $router->add('GET', '/api/v2/admin/config/native-app', 'Nexus\Controllers\Api\AdminConfigApiController@getNativeAppConfig');
 $router->add('PUT', '/api/v2/admin/config/native-app', 'Nexus\Controllers\Api\AdminConfigApiController@updateNativeAppConfig');

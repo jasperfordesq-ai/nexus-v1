@@ -28,6 +28,7 @@ import {
   ArrowLeft,
   Edit,
   Globe,
+  Languages,
   MapPin,
   Search,
   Users,
@@ -53,6 +54,14 @@ const FEATURE_OPTIONS = [
   'volunteering', 'exchange_workflow', 'federation', 'organisations',
   'listings', 'wallet', 'messages', 'dashboard', 'feed',
 ];
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  en: 'English',
+  ga: 'Gaeilge',
+  de: 'Deutsch',
+  fr: 'Français',
+  it: 'Italiano',
+};
 
 export function TenantShow() {
   const { id } = useParams<{ id: string }>();
@@ -362,6 +371,43 @@ export function TenantShow() {
               ) : (
                 <p className="text-sm text-default-400">No social media links configured.</p>
               )}
+            </CardBody>
+          </Card>
+
+          {/* Languages */}
+          <Card shadow="sm">
+            <CardHeader className="pb-0">
+              <div className="flex items-center gap-2">
+                <Languages size={18} className="text-primary" />
+                <h3 className="text-lg font-semibold">Languages</h3>
+              </div>
+            </CardHeader>
+            <CardBody className="pt-3">
+              <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <DetailField
+                  label="Default Language"
+                  value={
+                    (() => {
+                      const code = (tenant.configuration as Record<string, unknown>)?.default_language as string | undefined;
+                      return code ? `${LANGUAGE_LABELS[code] || code} (${code.toUpperCase()})` : 'English (EN)';
+                    })()
+                  }
+                />
+                <div>
+                  <dt className="text-xs font-medium uppercase text-default-400">Supported Languages</dt>
+                  <dd className="mt-1 flex flex-wrap gap-1.5">
+                    {(() => {
+                      const langs = (tenant.configuration as Record<string, unknown>)?.supported_languages as string[] | undefined;
+                      const codes = langs ?? ['en'];
+                      return codes.map((code) => (
+                        <Chip key={code} size="sm" variant="flat" color="primary">
+                          {LANGUAGE_LABELS[code] || code}
+                        </Chip>
+                      ));
+                    })()}
+                  </dd>
+                </div>
+              </dl>
             </CardBody>
           </Card>
 
