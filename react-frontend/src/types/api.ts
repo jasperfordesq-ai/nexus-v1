@@ -875,6 +875,8 @@ export interface TenantConfig {
   };
   /** Language codes supported by this tenant (e.g. ['en', 'ga'] or ['de', 'fr', 'it', 'en']) */
   supported_languages?: string[];
+  /** Default language for this tenant (e.g. 'de' for Swiss tenants) */
+  default_language?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

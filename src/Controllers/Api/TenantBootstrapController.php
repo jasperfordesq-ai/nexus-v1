@@ -235,6 +235,9 @@ class TenantBootstrapController extends BaseApiController
         // Supported languages for this tenant (used by the frontend language switcher)
         $data['supported_languages'] = $config['supported_languages'] ?? ['en', 'ga'];
 
+        // Default language for this tenant (e.g. 'de' for Swiss tenants)
+        $data['default_language'] = $config['default_language'] ?? 'en';
+
         // Menu pages — published pages marked for navigation display
         $menuPages = $this->buildMenuPages((int) $tenant['id']);
         if (!empty($menuPages)) {
