@@ -36,7 +36,7 @@ interface PageData {
 
 export function CustomPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { tenantPath, branding } = useTenant();
+  const { tenantPath, branding, tenant } = useTenant();
 
   const [page, setPage] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +50,10 @@ export function CustomPage() {
     setNotFound(false);
 
     try {
-      const res = await api.get<PageData>(`/v2/pages/${encodeURIComponent(slug)}`);
+      // Include context_tenant so the PHP API can resolve the correct tenant for
+      // unauthenticated requests (where X-Tenant-ID header is not available).
+      const tenantParam = tenant?.id ? `?context_tenant=${tenant.id}` : '';
+      const res = await api.get<PageData>(`/v2/pages/${encodeURIComponent(slug)}${tenantParam}`);
       if (res.success && res.data) {
         setPage(res.data);
       } else {
