@@ -66,9 +66,11 @@ export function TenantList() {
       const res = await adminSuper.listTenants(params as { search?: string; is_active?: boolean; hub?: boolean });
       if (res.success && res.data) {
         setTenants(Array.isArray(res.data) ? res.data : []);
+      } else if (!res.success) {
+        toast.error(`Tenants: ${res.error || 'Failed to load tenant list'}`);
       }
-    } catch {
-      toast.error('Failed to load tenants');
+    } catch (err) {
+      toast.error(`Tenants error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
     setLoading(false);
   }, [filter, search, toast]);

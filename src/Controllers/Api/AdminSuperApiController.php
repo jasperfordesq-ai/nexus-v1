@@ -55,45 +55,25 @@ class AdminSuperApiController extends BaseApiController
     }
 
     /**
-     * Override requireSuperAdmin to also sync JWT context to $_SESSION.
+     * Override requireSuperAdmin for stateless JWT API auth.
      *
-     * SuperPanelAccess::getAccess() reads from $_SESSION to determine visibility scope.
-     * When using Bearer token auth (stateless), $_SESSION is empty. This method bridges
-     * the gap by populating $_SESSION with the JWT user's data so TenantVisibilityService
-     * and other session-dependent services work correctly with API requests.
+     * Passes the JWT user ID directly to SuperPanelAccess::getAccess($userId),
+     * completely bypassing $_SESSION dependency. This is critical because
+     * session_start() can fail silently in containerized/Docker environments,
+     * causing all super admin API calls to return 403.
+     *
+     * Also syncs to $_SESSION as a fallback for any code that still reads it.
      */
     protected function requireSuperAdmin(): int
     {
         $userId = parent::requireSuperAdmin();
 
-        // Sync JWT context to session for SuperPanelAccess compatibility
-        if (session_status() === PHP_SESSION_NONE) {
-            @session_start();
-        }
+        // Reset any stale cached access from earlier in this request
+        \Nexus\Middleware\SuperPanelAccess::reset();
 
-        if (empty($_SESSION['user_id'])) {
-            $user = Database::query(
-                "SELECT id, tenant_id, role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
-                [$userId]
-            )->fetch(\PDO::FETCH_ASSOC);
+        // Pass user ID directly — no session dependency
+        $access = \Nexus\Middleware\SuperPanelAccess::getAccess($userId);
 
-            if ($user) {
-                $_SESSION['user_id'] = (int) $user['id'];
-                $_SESSION['tenant_id'] = (int) $user['tenant_id'];
-                $_SESSION['user_role'] = $user['role'];
-                $_SESSION['is_super_admin'] = (int) $user['is_super_admin'];
-                $_SESSION['is_tenant_super_admin'] = (int) $user['is_tenant_super_admin'];
-
-                // Reset cached access so it re-evaluates with session data
-                \Nexus\Middleware\SuperPanelAccess::reset();
-            }
-        }
-
-        // After session sync, verify SuperPanelAccess grants access.
-        // A user can be is_super_admin but their tenant may lack sub-tenant
-        // capability (allows_subtenants=0), which means no Super Panel access.
-        // Return a clear 403 instead of silently returning empty data.
-        $access = \Nexus\Middleware\SuperPanelAccess::getAccess();
         if (!$access['granted']) {
             $this->respondWithError(
                 ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED,
@@ -101,6 +81,22 @@ class AdminSuperApiController extends BaseApiController
                 null,
                 403
             );
+        }
+
+        // Best-effort session sync for any legacy code that reads $_SESSION
+        try {
+            if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+                @session_start();
+            }
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                $_SESSION['user_id'] = $userId;
+                $_SESSION['tenant_id'] = $access['tenant_id'];
+                $_SESSION['user_role'] = 'admin';
+                $_SESSION['is_super_admin'] = 1;
+                $_SESSION['is_tenant_super_admin'] = 1;
+            }
+        } catch (\Throwable $e) {
+            // Session sync is best-effort — API works without it
         }
 
         return $userId;
@@ -219,7 +215,17 @@ class AdminSuperApiController extends BaseApiController
 
         $parentId = (int) ($input['parent_id'] ?? 0);
         if (!$parentId) {
-            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'parent_id is required', 'parent_id', 422);
+            // Default to Master tenant (ID 1) for god/master-level admins
+            $access = \Nexus\Middleware\SuperPanelAccess::getAccess();
+            if ($access['level'] === 'master') {
+                $parentId = 1;
+            } else {
+                // Regional admins must specify their own tenant as parent
+                $parentId = $access['tenant_id'] ?? 0;
+            }
+            if (!$parentId) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'parent_id is required', 'parent_id', 422);
+            }
         }
 
         $name = trim($input['name'] ?? '');
