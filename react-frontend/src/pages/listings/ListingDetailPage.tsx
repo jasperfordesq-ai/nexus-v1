@@ -216,7 +216,7 @@ export function ListingDetailPage() {
           </div>
 
           {isOwner && (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Link to={tenantPath(`/listings/edit/${listing.id}`)}>
                 <Button
                   size="sm"
@@ -321,7 +321,7 @@ export function ListingDetailPage() {
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail_description')}</h2>
           <div className="prose prose-invert max-w-none">
-            <p className="text-theme-muted whitespace-pre-wrap">{listing.description}</p>
+            <p className="text-theme-muted whitespace-pre-wrap wrap-break-word">{listing.description}</p>
           </div>
         </div>
 

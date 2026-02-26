@@ -204,12 +204,12 @@ export function CreateListingPage() {
             <RadioGroup
               value={formData.type}
               onValueChange={(value) => updateField('type', value as 'offer' | 'request')}
-              orientation="horizontal"
+              classNames={{ wrapper: 'sm:flex-row gap-3' }}
             >
               <Radio
                 value="offer"
                 classNames={{
-                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-emerald-500',
+                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-emerald-500 sm:flex-1',
                   label: 'text-theme-primary',
                 }}
               >
@@ -221,7 +221,7 @@ export function CreateListingPage() {
               <Radio
                 value="request"
                 classNames={{
-                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-amber-500',
+                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-amber-500 sm:flex-1',
                   label: 'text-theme-primary',
                 }}
               >
@@ -359,7 +359,7 @@ export function CreateListingPage() {
               <Button
                 type="button"
                 variant="flat"
-                className="bg-theme-elevated text-theme-primary"
+                className="bg-theme-elevated text-theme-primary min-w-[80px]"
               >
                 {t('form.cancel')}
               </Button>

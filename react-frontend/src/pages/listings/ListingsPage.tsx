@@ -227,9 +227,8 @@ export function ListingsPage() {
             <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label="View mode">
               <Button
                 isIconOnly
-                size="sm"
                 variant="light"
-                className={`rounded-none ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
+                className={`rounded-none min-w-[44px] min-h-[44px] ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
                 aria-label={t('aria_grid_view')}
                 aria-pressed={viewMode === 'grid'}
                 onPress={() => setViewMode('grid')}
@@ -238,9 +237,8 @@ export function ListingsPage() {
               </Button>
               <Button
                 isIconOnly
-                size="sm"
                 variant="light"
-                className={`rounded-none ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
+                className={`rounded-none min-w-[44px] min-h-[44px] ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
                 aria-label={t('aria_list_view')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
@@ -250,9 +248,8 @@ export function ListingsPage() {
               {MAPS_ENABLED && (
                 <Button
                   isIconOnly
-                  size="sm"
                   variant="light"
-                  className={`rounded-none rounded-r-lg ${viewMode === 'map' ? 'bg-primary/10 text-primary' : 'bg-theme-elevated'}`}
+                  className={`rounded-none rounded-r-lg min-w-[44px] min-h-[44px] ${viewMode === 'map' ? 'bg-primary/10 text-primary' : 'bg-theme-elevated'}`}
                   aria-label={t('aria_map_view')}
                   aria-pressed={viewMode === 'map'}
                   onPress={() => setViewMode('map')}
@@ -419,7 +416,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
               {listing.location && (
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3 h-3" aria-hidden="true" />
-                  <span className="truncate max-w-[80px]">{listing.location}</span>
+                  <span className="truncate max-w-[120px]">{listing.location}</span>
                 </span>
               )}
             </div>
