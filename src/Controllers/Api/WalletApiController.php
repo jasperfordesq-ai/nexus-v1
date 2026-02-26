@@ -68,8 +68,9 @@ class WalletApiController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('wallet_transactions', 30, 60);
 
+        $perPage = $this->queryInt('per_page', 0, 1, 100) ?: $this->queryInt('limit', 20, 1, 100);
         $filters = [
-            'limit' => $this->queryInt('per_page', 20, 1, 100),
+            'limit' => $perPage,
         ];
 
         if ($this->query('type')) {
