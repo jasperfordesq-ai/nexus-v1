@@ -5182,13 +5182,17 @@ DROP TABLE IF EXISTS `user_interests`;
 CREATE TABLE `user_interests` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
+  `tenant_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `interest_type` enum('interest','skill_offer','skill_need') NOT NULL DEFAULT 'interest',
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_user_category_type` (`user_id`,`category_id`,`interest_type`),
+  UNIQUE KEY `uk_tenant_user_category_type` (`tenant_id`,`user_id`,`category_id`,`interest_type`),
   KEY `idx_user_id` (`user_id`),
-  KEY `idx_category_id` (`category_id`)
+  KEY `idx_category_id` (`category_id`),
+  KEY `idx_tenant_id` (`tenant_id`),
+  CONSTRAINT `fk_ui_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ui_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_legal_acceptances`;
