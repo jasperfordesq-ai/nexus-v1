@@ -42,15 +42,15 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to={tenantPath('/login')} state={{ from: location.pathname }} replace />;
   }
 
-  // Redirect to onboarding if not completed OR if profile photo/bio are missing.
-  // Legacy PHP enforced photo+bio as a hard lockout; React must match this.
+  // Redirect to onboarding only if the flag is not set.
+  // onboarding_completed is the authoritative source of truth — the backend
+  // already requires avatar+bio before it will set this flag, so we do not
+  // need to re-check those fields here. Doing so caused a regression where
+  // users who edited their profile (removed avatar or bio) were permanently
+  // sent back to onboarding on every login.
   const pathSegments = location.pathname.replace(/\/+$/, '').split('/');
   const lastSegment = pathSegments[pathSegments.length - 1];
-  const needsOnboarding = user && (
-    user.onboarding_completed === false ||
-    !user.avatar_url ||
-    !user.bio
-  );
+  const needsOnboarding = user && !user.onboarding_completed;
   if (needsOnboarding && lastSegment !== 'onboarding') {
     return <Navigate to={tenantPath('/onboarding')} replace />;
   }
