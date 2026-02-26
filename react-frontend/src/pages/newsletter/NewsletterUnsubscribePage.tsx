@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@heroui/react';
 import { CheckCircle, XCircle, Loader2, Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
@@ -23,7 +24,8 @@ type State = 'loading' | 'success' | 'already_done' | 'invalid' | 'error';
  * No authentication required — the token acts as the credential.
  */
 export default function NewsletterUnsubscribePage() {
-  usePageTitle('Unsubscribe from Newsletter');
+  const { t } = useTranslation('utility');
+  usePageTitle(t('newsletter.page_title'));
 
   const [searchParams] = useSearchParams();
   const { tenantPath } = useTenant();
@@ -65,17 +67,17 @@ export default function NewsletterUnsubscribePage() {
         {state === 'loading' && (
           <>
             <Loader2 className="mx-auto animate-spin text-primary mb-4" size={32} />
-            <h1 className="text-xl font-semibold text-foreground">Processing…</h1>
-            <p className="mt-2 text-default-500 text-sm">Removing you from the mailing list.</p>
+            <h1 className="text-xl font-semibold text-foreground">{t('newsletter.processing')}</h1>
+            <p className="mt-2 text-default-500 text-sm">{t('newsletter.removing_from_list')}</p>
           </>
         )}
 
         {state === 'success' && (
           <>
             <CheckCircle className="mx-auto text-success mb-4" size={36} />
-            <h1 className="text-xl font-semibold text-foreground">You're unsubscribed</h1>
+            <h1 className="text-xl font-semibold text-foreground">{t('newsletter.unsubscribed')}</h1>
             <p className="mt-2 text-default-500 text-sm">
-              You've been removed from our newsletter. You'll still receive important account notifications.
+              {t('newsletter.unsubscribed_description')}
             </p>
             <Button
               className="mt-6"
@@ -84,7 +86,7 @@ export default function NewsletterUnsubscribePage() {
               as="a"
               href={tenantPath('/settings')}
             >
-              Manage all preferences
+              {t('newsletter.manage_preferences')}
             </Button>
           </>
         )}
@@ -92,9 +94,9 @@ export default function NewsletterUnsubscribePage() {
         {state === 'already_done' && (
           <>
             <CheckCircle className="mx-auto text-success mb-4" size={36} />
-            <h1 className="text-xl font-semibold text-foreground">Already unsubscribed</h1>
+            <h1 className="text-xl font-semibold text-foreground">{t('newsletter.already_unsubscribed')}</h1>
             <p className="mt-2 text-default-500 text-sm">
-              You're already off our mailing list. No further action needed.
+              {t('newsletter.already_unsubscribed_description')}
             </p>
           </>
         )}
@@ -102,10 +104,9 @@ export default function NewsletterUnsubscribePage() {
         {state === 'invalid' && (
           <>
             <XCircle className="mx-auto text-danger mb-4" size={36} />
-            <h1 className="text-xl font-semibold text-foreground">Invalid link</h1>
+            <h1 className="text-xl font-semibold text-foreground">{t('newsletter.invalid_link')}</h1>
             <p className="mt-2 text-default-500 text-sm">
-              This unsubscribe link is invalid or has already been used. If you still want to unsubscribe,
-              you can manage your email preferences from your settings.
+              {t('newsletter.invalid_link_description')}
             </p>
             <Button
               className="mt-6"
@@ -114,7 +115,7 @@ export default function NewsletterUnsubscribePage() {
               as="a"
               href={tenantPath('/settings')}
             >
-              Go to Settings
+              {t('newsletter.go_to_settings')}
             </Button>
           </>
         )}
@@ -122,9 +123,9 @@ export default function NewsletterUnsubscribePage() {
         {state === 'error' && (
           <>
             <XCircle className="mx-auto text-danger mb-4" size={36} />
-            <h1 className="text-xl font-semibold text-foreground">Something went wrong</h1>
+            <h1 className="text-xl font-semibold text-foreground">{t('newsletter.something_went_wrong')}</h1>
             <p className="mt-2 text-default-500 text-sm">
-              We couldn't process your request. Please try again or contact support.
+              {t('newsletter.error_description')}
             </p>
             <Button
               className="mt-6"
@@ -132,7 +133,7 @@ export default function NewsletterUnsubscribePage() {
               variant="flat"
               onPress={() => window.location.reload()}
             >
-              Try again
+              {t('newsletter.try_again')}
             </Button>
           </>
         )}

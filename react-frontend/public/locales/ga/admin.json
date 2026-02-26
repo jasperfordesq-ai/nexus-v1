@@ -1,0 +1,19 @@
+{
+  "review": "Athbhreithnigh",
+  "view_all": "Féach ar Gach",
+  "details": "Sonraí",
+  "live": "BEO",
+  "active": "Gníomhach",
+  "completed": "Críochnaithe",
+  "new": "NUA",
+  "last_checked": "Seiceáilte go deireanach: {{time}}",
+  "no_data": "Níl sonraí ar fáil",
+  "status": {
+    "online": "Ar líne",
+    "warning": "Rabhadh",
+    "offline": "As líne",
+    "all_operational": "Gach córas ag feidhmiú",
+    "some_attention": "Teastaíonn aird ar roinnt seirbhísí",
+    "issues_detected": "Saincheisteanna aitheanta"
+  }
+}

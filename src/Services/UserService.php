@@ -167,6 +167,7 @@ class UserService
             $profile['privacy_search'] = (bool)($user['privacy_search'] ?? true);
             $profile['privacy_contact'] = (bool)($user['privacy_contact'] ?? true);
             $profile['onboarding_completed'] = (bool)($user['onboarding_completed'] ?? false);
+            $profile['preferred_language'] = $user['preferred_language'] ?? 'en';
         }
 
         return $profile;
@@ -378,7 +379,16 @@ class UserService
             return true; // Nothing to update
         }
 
-        User::update($userId, $updateData);
+        $updated = User::update($userId, $updateData);
+
+        if (!$updated) {
+            self::$errors[] = [
+                'code' => 'UPDATE_FAILED',
+                'message' => 'Failed to update profile in database',
+                'field' => 'profile'
+            ];
+            return false;
+        }
 
         return true;
     }
@@ -522,11 +532,18 @@ class UserService
             return null;
         }
 
-        // Create upload directory
+        // Create upload directory (ensure www-data can write)
         $tenantId = TenantContext::getId();
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/{$tenantId}/avatars/";
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+            if (!@mkdir($uploadDir, 0755, true)) {
+                self::$errors[] = ['code' => 'UPLOAD_FAILED', 'message' => 'Failed to create upload directory', 'field' => 'avatar'];
+                return null;
+            }
+        }
+        if (!is_writable($uploadDir)) {
+            self::$errors[] = ['code' => 'UPLOAD_FAILED', 'message' => 'Upload directory is not writable', 'field' => 'avatar'];
+            return null;
         }
 
         // Generate secure filename
@@ -539,9 +556,14 @@ class UserService
             return null;
         }
 
-        // Update user record
+        // Update user record — verify the DB row was actually updated
         $avatarUrl = "/uploads/{$tenantId}/avatars/{$filename}";
-        User::updateAvatar($userId, $avatarUrl);
+        if (!User::updateAvatar($userId, $avatarUrl)) {
+            self::$errors[] = ['code' => 'UPLOAD_FAILED', 'message' => 'Failed to update avatar in database', 'field' => 'avatar'];
+            // Clean up the orphaned file
+            @unlink($filepath);
+            return null;
+        }
 
         return $avatarUrl;
     }

@@ -12,12 +12,14 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input } from '@heroui/react';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 
 export function ForgotPasswordPage() {
+  const { t } = useTranslation('auth');
   usePageTitle('Reset Password');
   const { branding, tenantPath } = useTenant();
   const [email, setEmail] = useState('');
@@ -52,13 +54,12 @@ export function ForgotPasswordPage() {
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-emerald-400" />
             </div>
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">Check your email</h1>
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('forgot_password.success_title')}</h1>
             <p className="text-theme-muted mb-6">
-              If an account exists with that email address,
-              we've sent instructions to reset your password.
+              {t('forgot_password.success_subtitle')}
             </p>
             <p className="text-theme-subtle text-sm mb-6">
-              Didn't receive the email? Check your spam folder or try again.
+              {t('forgot_password.help_text')}
             </p>
             <div className="flex flex-col gap-3">
               <Button
@@ -66,7 +67,7 @@ export function ForgotPasswordPage() {
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
               >
-                Try another email
+                {t('forgot_password.try_again')}
               </Button>
               <Link to={tenantPath('/login')}>
                 <Button
@@ -74,7 +75,7 @@ export function ForgotPasswordPage() {
                   className="w-full bg-theme-elevated text-theme-primary"
                   startContent={<ArrowLeft className="w-4 h-4" />}
                 >
-                  Back to login
+                  {t('forgot_password.back_to_login')}
                 </Button>
               </Link>
             </div>
@@ -97,15 +98,15 @@ export function ForgotPasswordPage() {
           className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to login
+          {t('forgot_password.back_to_login')}
         </Link>
 
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">Reset your password</h1>
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('forgot_password.page_title')}</h1>
             <p className="text-theme-muted">
-              Enter your email and we'll send you instructions to reset your password.
+              {t('forgot_password.page_subtitle')}
             </p>
           </div>
 
@@ -113,7 +114,7 @@ export function ForgotPasswordPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
               type="email"
-              label="Email address"
+              label={t('forgot_password.email_address_label')}
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -132,15 +133,15 @@ export function ForgotPasswordPage() {
               isLoading={isLoading}
               isDisabled={!email.trim()}
             >
-              Send reset instructions
+              {t('forgot_password.send_button')}
             </Button>
           </form>
 
           {/* Footer */}
           <div className="mt-6 text-center text-sm text-theme-subtle">
-            Remember your password?{' '}
+            {t('forgot_password.remember_password')}{' '}
             <Link to={tenantPath('/login')} className="text-indigo-600 dark:text-indigo-400 hover:underline">
-              Sign in
+              {t('forgot_password.sign_in_link')}
             </Link>
           </div>
         </GlassCard>

@@ -6,8 +6,8 @@
 /**
  * useLegalGate - Check and manage legal document acceptance for the current user.
  *
- * Polls GET /api/v2/legal/acceptance/status after the user is authenticated.
- * Provides an acceptAll() function that posts to /api/v2/legal/acceptance/accept-all.
+ * Polls GET /v2/legal/acceptance/status after the user is authenticated.
+ * Provides an acceptAll() function that posts to /v2/legal/acceptance/accept-all.
  *
  * If the tenant has no legal documents requiring acceptance, has_pending will
  * always be false and the gate will not appear.
@@ -68,7 +68,7 @@ export function useLegalGate(): LegalGateState {
     setIsLoading(true);
 
     api
-      .get<LegalStatusResponse>('/api/v2/legal/acceptance/status')
+      .get<LegalStatusResponse>('/v2/legal/acceptance/status')
       .then((result) => {
         if (cancelled) return;
         if (result.success && result.data) {
@@ -100,7 +100,7 @@ export function useLegalGate(): LegalGateState {
   const acceptAll = useCallback(async () => {
     setIsAccepting(true);
     try {
-      const result = await api.post('/api/v2/legal/acceptance/accept-all', {});
+      const result = await api.post('/v2/legal/acceptance/accept-all', {});
       if (result.success) {
         setHasPending(false);
         setPendingDocs([]);

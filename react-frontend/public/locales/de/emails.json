@@ -1,0 +1,47 @@
+{
+  "welcome": {
+    "subject": "Willkommen bei {{community}}!",
+    "greeting": "Willkommen, {{name}}!",
+    "body": "Vielen Dank, dass Sie {{community}} beigetreten sind. Ihr Konto wurde erstellt und Sie können nun beginnen, die Plattform zu erkunden.",
+    "cta": "Jetzt starten"
+  },
+  "verification": {
+    "subject": "E-Mail-Adresse bestätigen",
+    "greeting": "Sehr geehrte/r {{name}},",
+    "body": "Bitte bestätigen Sie Ihre E-Mail-Adresse, indem Sie auf die Schaltfläche unten klicken.",
+    "cta": "E-Mail bestätigen",
+    "expiry": "Dieser Link läuft in {{hours}} Stunden ab."
+  },
+  "password_reset": {
+    "subject": "Passwort zurücksetzen",
+    "greeting": "Sehr geehrte/r {{name}},",
+    "body": "Sie haben das Zurücksetzen Ihres Passworts angefordert. Klicken Sie auf die Schaltfläche unten, um ein neues Passwort festzulegen.",
+    "cta": "Passwort zurücksetzen",
+    "expiry": "Dieser Link läuft in {{hours}} Stunden ab.",
+    "ignore": "Falls Sie dies nicht angefordert haben, können Sie diese E-Mail ignorieren."
+  },
+  "transaction": {
+    "subject": "Zeitguthaben-Transaktion — {{amount}}h",
+    "greeting": "Sehr geehrte/r {{name}},",
+    "sent": "Sie haben {{amount}} Stunde(n) an {{recipient}} gesendet.",
+    "received": "Sie haben {{amount}} Stunde(n) von {{sender}} erhalten.",
+    "description": "Beschreibung: {{description}}"
+  },
+  "review_request": {
+    "subject": "Bewertung für {{name}} abgeben",
+    "greeting": "Sehr geehrte/r {{name}},",
+    "body": "Sie haben kürzlich Dienstleistungen mit {{other_party}} ausgetauscht. Bitte nehmen Sie sich einen Moment Zeit, eine Bewertung abzugeben.",
+    "cta": "Bewertung abgeben"
+  },
+  "new_message": {
+    "subject": "Neue Nachricht von {{sender}}",
+    "greeting": "Sehr geehrte/r {{name}},",
+    "body": "{{sender}} hat Ihnen eine Nachricht gesendet.",
+    "cta": "Nachricht anzeigen"
+  },
+  "footer": {
+    "unsubscribe": "Von diesen E-Mails abmelden",
+    "sent_by": "Gesendet von {{community}}, betrieben durch Project NEXUS",
+    "address": "{{community}}"
+  }
+}

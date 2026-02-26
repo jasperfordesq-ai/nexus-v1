@@ -1,0 +1,47 @@
+{
+  "welcome": {
+    "subject": "Benvenuto/a su {{community}}!",
+    "greeting": "Benvenuto/a, {{name}}!",
+    "body": "La ringraziamo per essersi iscritto/a a {{community}}. Il Suo account è stato creato e ora può iniziare a esplorare la piattaforma.",
+    "cta": "Inizia"
+  },
+  "verification": {
+    "subject": "Verifichi il Suo indirizzo email",
+    "greeting": "Gentile {{name}},",
+    "body": "Verifichi il Suo indirizzo email cliccando sul pulsante in basso.",
+    "cta": "Verifica Email",
+    "expiry": "Questo link scade tra {{hours}} ore."
+  },
+  "password_reset": {
+    "subject": "Reimposti la Sua password",
+    "greeting": "Gentile {{name}},",
+    "body": "Ha richiesto la reimpostazione della password. Clicchi sul pulsante in basso per impostare una nuova password.",
+    "cta": "Reimposta Password",
+    "expiry": "Questo link scade tra {{hours}} ore.",
+    "ignore": "Se non ha richiesto questa operazione, ignori pure questa email."
+  },
+  "transaction": {
+    "subject": "Transazione crediti tempo — {{amount}}h",
+    "greeting": "Gentile {{name}},",
+    "sent": "Ha inviato {{amount}} ora/e a {{recipient}}.",
+    "received": "Ha ricevuto {{amount}} ora/e da {{sender}}.",
+    "description": "Descrizione: {{description}}"
+  },
+  "review_request": {
+    "subject": "Lasci una recensione per {{name}}",
+    "greeting": "Gentile {{name}},",
+    "body": "Ha recentemente scambiato servizi con {{other_party}}. La preghiamo di dedicare un momento per lasciare una recensione.",
+    "cta": "Lascia Recensione"
+  },
+  "new_message": {
+    "subject": "Nuovo messaggio da {{sender}}",
+    "greeting": "Gentile {{name}},",
+    "body": "{{sender}} Le ha inviato un messaggio.",
+    "cta": "Vedi Messaggio"
+  },
+  "footer": {
+    "unsubscribe": "Annulla l'iscrizione a queste email",
+    "sent_by": "Inviato da {{community}} basato su Project NEXUS",
+    "address": "{{community}}"
+  }
+}

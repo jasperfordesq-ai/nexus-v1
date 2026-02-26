@@ -48,13 +48,17 @@ export function SuperDashboard() {
 
       if (dashRes.success && dashRes.data) {
         setStats(dashRes.data);
+      } else if (!dashRes.success) {
+        toast.error(`Dashboard: ${dashRes.error || 'Failed to load stats'}`);
       }
 
       if (tenantsRes.success && tenantsRes.data) {
         setTenants(Array.isArray(tenantsRes.data) ? tenantsRes.data : []);
+      } else if (!tenantsRes.success) {
+        toast.error(`Tenants: ${tenantsRes.error || 'Failed to load tenant list'}`);
       }
-    } catch {
-      toast.error('Failed to load dashboard data');
+    } catch (err) {
+      toast.error(`Dashboard error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }

@@ -232,6 +232,18 @@ class TenantBootstrapController extends BaseApiController
             'insurance_enabled' => BrokerControlConfigService::isInsuranceEnabled(),
         ];
 
+        // Supported languages for this tenant (used by the frontend language switcher)
+        $data['supported_languages'] = $config['supported_languages'] ?? ['en', 'ga'];
+
+        // Default language for this tenant (e.g. 'de' for Swiss tenants)
+        $data['default_language'] = $config['default_language'] ?? 'en';
+
+        // Menu pages — published pages marked for navigation display
+        $menuPages = $this->buildMenuPages((int) $tenant['id']);
+        if (!empty($menuPages)) {
+            $data['menu_pages'] = $menuPages;
+        }
+
         return $data;
     }
 
@@ -268,6 +280,36 @@ class TenantBootstrapController extends BaseApiController
         }
 
         return $settings;
+    }
+
+    /**
+     * Build menu pages — published pages flagged for navigation display
+     * Groups by menu_location so frontend can render them in the right section
+     */
+    private function buildMenuPages(int $tenantId): array
+    {
+        $result = [];
+
+        try {
+            $rows = Database::query(
+                "SELECT title, slug, menu_location FROM pages
+                 WHERE tenant_id = ? AND is_published = 1 AND show_in_menu = 1
+                 ORDER BY menu_order ASC, sort_order ASC, title ASC",
+                [$tenantId]
+            )->fetchAll();
+
+            foreach ($rows as $row) {
+                $location = $row['menu_location'] ?: 'about';
+                $result[$location][] = [
+                    'title' => $row['title'],
+                    'slug' => $row['slug'],
+                ];
+            }
+        } catch (\Exception $e) {
+            // pages table may not exist yet
+        }
+
+        return $result;
     }
 
     /**

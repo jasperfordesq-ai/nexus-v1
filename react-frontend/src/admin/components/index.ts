@@ -12,3 +12,5 @@ export { ConfirmModal } from './ConfirmModal';
 export { EmptyState } from './EmptyState';
 export { PageHeader } from './PageHeader';
 export { RichTextEditor } from './RichTextEditor';
+export { IconPicker } from './IconPicker';
+export { VisibilityRulesEditor } from './VisibilityRulesEditor';

@@ -28,6 +28,7 @@ import {
   Tag,
   Star,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
@@ -43,24 +44,30 @@ type EventFilter = 'upcoming' | 'past' | 'all';
 const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
-/** Hardcoded event categories with display metadata */
-const EVENT_CATEGORIES = [
-  { id: 'all', name: 'All', icon: Star, color: 'default' as const },
-  { id: 'workshop', name: 'Workshop', icon: Tag, color: 'secondary' as const },
-  { id: 'social', name: 'Social', icon: Users, color: 'success' as const },
-  { id: 'outdoor', name: 'Outdoor', icon: MapPin, color: 'warning' as const },
-  { id: 'online', name: 'Online', icon: CalendarDays, color: 'primary' as const },
-  { id: 'meeting', name: 'Meeting', icon: Calendar, color: 'danger' as const },
-  { id: 'training', name: 'Training', icon: Clock, color: 'secondary' as const },
-  { id: 'other', name: 'Other', icon: Filter, color: 'default' as const },
+/** Event category metadata — names resolved via t() inside the component */
+const EVENT_CATEGORY_IDS = [
+  { id: 'all', icon: Star, color: 'default' as const },
+  { id: 'workshop', icon: Tag, color: 'secondary' as const },
+  { id: 'social', icon: Users, color: 'success' as const },
+  { id: 'outdoor', icon: MapPin, color: 'warning' as const },
+  { id: 'online', icon: CalendarDays, color: 'primary' as const },
+  { id: 'meeting', icon: Calendar, color: 'danger' as const },
+  { id: 'training', icon: Clock, color: 'secondary' as const },
+  { id: 'other', icon: Filter, color: 'default' as const },
 ] as const;
 
 export function EventsPage() {
-  usePageTitle('Events');
+  const { t } = useTranslation('events');
+  usePageTitle(t('title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const EVENT_CATEGORIES = EVENT_CATEGORY_IDS.map((cat) => ({
+    ...cat,
+    name: t(`category.${cat.id}`),
+  }));
 
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -120,15 +127,15 @@ export function EventsPage() {
         setHasMore(response.data.length >= ITEMS_PER_PAGE);
       } else {
         if (!append) {
-          setError('Failed to load events. Please try again.');
+          setError(t('unable_to_load'));
         }
       }
     } catch (err) {
       logError('Failed to load events', err);
       if (!append) {
-        setError('Failed to load events. Please try again.');
+        setError(t('unable_to_load'));
       } else {
-        toast.error('Failed to load more events');
+        toast.error(t('error_load_more'));
       }
     } finally {
       setIsLoading(false);
@@ -184,9 +191,9 @@ export function EventsPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Calendar className="w-7 h-7 text-amber-400" aria-hidden="true" />
-            Events
+            {t('title')}
           </h1>
-          <p className="text-theme-muted mt-1">Discover and join community events</p>
+          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
         </div>
         {isAuthenticated && (
           <Link to={tenantPath('/events/create')}>
@@ -194,7 +201,7 @@ export function EventsPage() {
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             >
-              Create Event
+              {t('create_event')}
             </Button>
           </Link>
         )}
@@ -205,8 +212,8 @@ export function EventsPage() {
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <Input
-              placeholder="Search events..."
-              aria-label="Search events"
+              placeholder={t('search_placeholder')}
+              aria-label={t('search_aria')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -218,8 +225,8 @@ export function EventsPage() {
           </div>
 
           <Select
-            placeholder="Filter"
-            aria-label="Filter events by time"
+            placeholder={t('filter_placeholder')}
+            aria-label={t('filter_aria')}
             selectedKeys={[filter]}
             onChange={(e) => setFilter(e.target.value as EventFilter)}
             className="w-32 sm:w-40"
@@ -229,19 +236,19 @@ export function EventsPage() {
             }}
             startContent={<Filter className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           >
-            <SelectItem key="upcoming">Upcoming</SelectItem>
-            <SelectItem key="past">Past</SelectItem>
-            <SelectItem key="all">All Events</SelectItem>
+            <SelectItem key="upcoming">{t('filter_upcoming')}</SelectItem>
+            <SelectItem key="past">{t('filter_past')}</SelectItem>
+            <SelectItem key="all">{t('filter_all')}</SelectItem>
           </Select>
 
           {MAPS_ENABLED && (
-            <div className="flex rounded-lg overflow-hidden border border-default-200" role="group" aria-label="View mode">
+            <div className="flex rounded-lg overflow-hidden border border-default-200" role="group" aria-label={t('view_mode_aria')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="light"
                 className={`rounded-none ${viewMode === 'list' ? 'bg-primary/10 text-primary' : ''}`}
-                aria-label="List view"
+                aria-label={t('view_list')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
               >
@@ -252,7 +259,7 @@ export function EventsPage() {
                 size="sm"
                 variant="light"
                 className={`rounded-none ${viewMode === 'map' ? 'bg-primary/10 text-primary' : ''}`}
-                aria-label="Map view"
+                aria-label={t('view_map')}
                 aria-pressed={viewMode === 'map'}
                 onPress={() => setViewMode('map')}
               >
@@ -264,7 +271,7 @@ export function EventsPage() {
       </GlassCard>
 
       {/* Category Filter Chips */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t('category_aria')}>
         {EVENT_CATEGORIES.map((cat) => {
           const isSelected = selectedCategory === cat.id;
           const IconComp = cat.icon;
@@ -292,14 +299,14 @@ export function EventsPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Events</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadEvents()}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -325,19 +332,19 @@ export function EventsPage() {
           ) : events.length === 0 ? (
             <EmptyState
               icon={<Calendar className="w-12 h-12" aria-hidden="true" />}
-              title="No events found"
+              title={t('no_events')}
               description={
                 selectedCategory !== 'all'
-                  ? `No events in the "${EVENT_CATEGORIES.find((c) => c.id === selectedCategory)?.name}" category`
+                  ? t('no_events_category', { category: EVENT_CATEGORIES.find((c) => c.id === selectedCategory)?.name })
                   : filter === 'upcoming'
-                    ? 'No upcoming events scheduled'
-                    : 'No events match your search'
+                    ? t('no_events_upcoming')
+                    : t('no_events_search')
               }
               action={
                 isAuthenticated && (
                   <Link to={tenantPath('/events/create')}>
                     <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                      Create Event
+                      {t('create_event')}
                     </Button>
                   </Link>
                 )
@@ -363,7 +370,7 @@ export function EventsPage() {
                 </div>
               )}
               isLoading={isLoading}
-              emptyMessage="No events with location data"
+              emptyMessage={t('no_location')}
             />
           ) : (
             <motion.div
@@ -397,7 +404,7 @@ export function EventsPage() {
                     onPress={loadMoreEvents}
                     isLoading={isLoadingMore}
                   >
-                    Load More Events
+                    {t('load_more')}
                   </Button>
                 </div>
               )}
@@ -414,6 +421,7 @@ interface EventCardProps {
 }
 
 const EventCard = memo(function EventCard({ event }: EventCardProps) {
+  const { t } = useTranslation('events');
   const { tenantPath } = useTenant();
   const startDate = new Date(event.start_date);
   const isPast = startDate < new Date();
@@ -465,9 +473,9 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                 )}
                 <span className="flex items-center gap-1">
                   <Users className="w-4 h-4" aria-hidden="true" />
-                  {event.attendees_count ?? 0} going
+                  {t('going', { count: event.attendees_count ?? 0 })}
                   {(event.interested_count ?? 0) > 0 && (
-                    <span className="text-theme-subtle">&middot; {event.interested_count} interested</span>
+                    <span className="text-theme-subtle">&middot; {t('interested', { count: event.interested_count })}</span>
                   )}
                 </span>
               </div>

@@ -16,6 +16,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { CheckCircle, XCircle, Loader2, ArrowLeft, Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -24,6 +25,7 @@ import { api } from '@/lib/api';
 type VerifyState = 'loading' | 'success' | 'error';
 
 export function VerifyEmailPage() {
+  const { t } = useTranslation('auth');
   usePageTitle('Verify Email');
   const { branding, tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
@@ -39,7 +41,7 @@ export function VerifyEmailPage() {
   useEffect(() => {
     if (!token) {
       setState('error');
-      setErrorMessage('No verification token found. Please check your email link.');
+      setErrorMessage(t('verify_email.no_token_error'));
       return;
     }
 
@@ -54,7 +56,7 @@ export function VerifyEmailPage() {
       } catch {
         if (!cancelled) {
           setState('error');
-          setErrorMessage('This verification link is invalid or has expired.');
+          setErrorMessage(t('verify_email.expired_error'));
         }
       }
     }
@@ -74,7 +76,7 @@ export function VerifyEmailPage() {
       await api.post('/auth/resend-verification');
       setResendSuccess(true);
     } catch {
-      setErrorMessage('Failed to resend verification email. Please try again later.');
+      setErrorMessage(t('verify_email.resend_error'));
     } finally {
       setIsResending(false);
     }
@@ -93,9 +95,9 @@ export function VerifyEmailPage() {
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
               <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
             </div>
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">Verifying your email</h1>
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.loading_title')}</h1>
             <p className="text-theme-muted">
-              Please wait while we verify your email address...
+              {t('verify_email.loading_subtitle')}
             </p>
           </GlassCard>
 
@@ -121,20 +123,20 @@ export function VerifyEmailPage() {
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-emerald-400" />
             </div>
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">Email verified</h1>
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.success_title')}</h1>
             <p className="text-theme-muted mb-6">
-              Your email address has been successfully verified. You're all set!
+              {t('verify_email.success_subtitle')}
             </p>
             {isAuthenticated ? (
               <Link to={tenantPath('/dashboard')}>
                 <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                  Go to Dashboard
+                  {t('verify_email.go_to_dashboard')}
                 </Button>
               </Link>
             ) : (
               <Link to={tenantPath('/login')}>
                 <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                  Go to Login
+                  {t('verify_email.go_to_login')}
                 </Button>
               </Link>
             )}
@@ -161,7 +163,7 @@ export function VerifyEmailPage() {
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
             <XCircle className="w-8 h-8 text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-theme-primary mb-2">Verification failed</h1>
+          <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.error_title')}</h1>
           <p className="text-theme-muted mb-6">
             {errorMessage}
           </p>
@@ -171,7 +173,7 @@ export function VerifyEmailPage() {
             {isAuthenticated ? (
               resendSuccess ? (
                 <div className="p-3 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm">
-                  A new verification email has been sent. Please check your inbox.
+                  {t('verify_email.resend_success')}
                 </div>
               ) : (
                 <Button
@@ -180,12 +182,12 @@ export function VerifyEmailPage() {
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                   startContent={!isResending ? <Mail className="w-4 h-4" /> : undefined}
                 >
-                  Resend verification email
+                  {t('verify_email.resend')}
                 </Button>
               )
             ) : (
               <p className="text-theme-subtle text-sm">
-                Please log in to request a new verification email.
+                {t('verify_email.login_required')}
               </p>
             )}
 
@@ -195,7 +197,7 @@ export function VerifyEmailPage() {
                 className="w-full bg-theme-elevated text-theme-primary"
                 startContent={<ArrowLeft className="w-4 h-4" />}
               >
-                {isAuthenticated ? 'Back to Dashboard' : 'Back to Login'}
+                {isAuthenticated ? t('verify_email.back_to_dashboard') : t('verify_email.back_to_login')}
               </Button>
             </Link>
           </div>

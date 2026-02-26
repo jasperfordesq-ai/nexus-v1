@@ -68,11 +68,12 @@ class SocialAuthService
         }
 
         // 3. Create New User (is_approved = 0 to match v2 registration — requires admin approval)
-        $sql = "INSERT INTO users (tenant_id, first_name, last_name, email, password_hash, is_approved, role, profile_type, avatar_url, created_at)
-                VALUES (?, ?, ?, ?, NULL, 0, 'member', 'individual', ?, NOW())";
+        $sql = "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, is_approved, role, profile_type, avatar_url, created_at)
+                VALUES (?, ?, ?, ?, ?, NULL, 0, 'member', 'individual', ?, NOW())";
 
         Database::query($sql, [
             $tenantId,
+            trim($collabUser['first_name'] . ' ' . $collabUser['last_name']),
             $collabUser['first_name'],
             $collabUser['last_name'],
             $email,

@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner, Chip } from '@heroui/react';
-import { Menu, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Menu, Plus, Pencil, Trash2, Info, AlertTriangle, CheckCircle2, Circle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -37,6 +37,12 @@ export function MenusAdmin() {
   const [loading, setLoading] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState<MenuItem | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [locationFilter, setLocationFilter] = useState<string | null>(null);
+
+  const LOCATIONS = ['header-main', 'header-secondary', 'footer', 'sidebar', 'mobile'];
+  const filteredData = locationFilter
+    ? data.filter((m) => m.location === locationFilter)
+    : data;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -173,6 +179,91 @@ export function MenusAdmin() {
         }
       />
 
+      {/* Developer status notice */}
+      <div className="p-4 mb-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
+        <div className="flex items-start gap-3">
+          <AlertTriangle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+          <div className="text-sm space-y-2">
+            <p className="font-medium text-theme-primary">Menu Manager — Development Status</p>
+            <p className="text-theme-muted">
+              The admin builder is fully functional (create, edit, reorder, delete menus and items). However,
+              custom menus do not yet appear on the live site. The menu system kill switch is currently
+              <strong className="text-amber-600 dark:text-amber-400"> OFF</strong> — the frontend uses hardcoded
+              navigation until custom menus are created and the switch is enabled.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 pt-1">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-green-500 shrink-0" />
+                <span className="text-theme-muted">Admin CRUD &amp; drag-drop reordering</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-green-500 shrink-0" />
+                <span className="text-theme-muted">Icon picker &amp; visibility rules</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-green-500 shrink-0" />
+                <span className="text-theme-muted">Tenant-scoped API (backend ready)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-green-500 shrink-0" />
+                <span className="text-theme-muted">Frontend integration code (ready)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Circle size={14} className="text-amber-500 shrink-0" />
+                <span className="text-theme-muted">Kill switch OFF (enable after creating menus)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Circle size={14} className="text-amber-500 shrink-0" />
+                <span className="text-theme-muted">Production testing pending</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Location filter chips */}
+      {data.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          <Chip
+            variant={locationFilter === null ? 'solid' : 'flat'}
+            color={locationFilter === null ? 'primary' : 'default'}
+            className="cursor-pointer"
+            onClick={() => setLocationFilter(null)}
+          >
+            All ({data.length})
+          </Chip>
+          {LOCATIONS.map((loc) => {
+            const count = data.filter((m) => m.location === loc).length;
+            if (count === 0) return null;
+            return (
+              <Chip
+                key={loc}
+                variant={locationFilter === loc ? 'solid' : 'flat'}
+                color={locationFilter === loc ? 'primary' : 'default'}
+                className="cursor-pointer capitalize"
+                onClick={() => setLocationFilter(locationFilter === loc ? null : loc)}
+              >
+                {loc} ({count})
+              </Chip>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Info notice when no custom menus exist */}
+      {data.length === 0 && (
+        <div className="flex items-start gap-3 p-4 mb-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
+          <Info size={18} className="text-blue-500 shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-medium text-theme-primary">Default menus are active</p>
+            <p className="text-theme-muted mt-0.5">
+              The navigation is currently using hardcoded defaults. Create custom menus below to
+              override the default navigation for your community.
+            </p>
+          </div>
+        </div>
+      )}
+
       {data.length === 0 ? (
         <EmptyState
           icon={Menu}
@@ -184,7 +275,7 @@ export function MenusAdmin() {
       ) : (
         <DataTable
           columns={columns}
-          data={data}
+          data={filteredData}
           searchPlaceholder="Search menus..."
           onRefresh={fetchData}
         />

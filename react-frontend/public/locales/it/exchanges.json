@@ -1,0 +1,165 @@
+{
+  "page_title": "Scambi",
+  "title": "I miei scambi",
+  "subtitle": "Segua le Sue richieste di scambio servizi e le conferme",
+  "browse_listings": "Sfoglia annunci",
+  "load_more": "Carica altri",
+  "try_again": "Riprova",
+  "service_exchange": "Scambio di servizio",
+  "unknown": "Sconosciuto",
+  "hours_count": "{{count}} ora",
+  "hours_count_other": "{{count}} ore",
+
+  "workflow_not_enabled_title": "Flusso di scambio non attivato",
+  "workflow_not_enabled_description": "Il sistema di flusso di scambio non \u00e8 attivato per questa comunit\u00e0. Contatti il Suo coordinatore per maggiori informazioni.",
+
+  "tabs": {
+    "aria_label": "Filtro stato scambi",
+    "active": "Attivi",
+    "active_aria": "Mostra scambi attivi",
+    "needs_confirmation": "Conferma necessaria",
+    "needs_confirmation_aria": "Mostra scambi che necessitano di conferma",
+    "completed": "Completati",
+    "completed_aria": "Mostra scambi completati",
+    "all": "Tutti",
+    "all_aria": "Mostra tutti gli scambi"
+  },
+
+  "error": {
+    "load_failed": "Impossibile caricare gli scambi. La preghiamo di riprovare.",
+    "unable_to_load": "Impossibile caricare gli scambi"
+  },
+
+  "empty": {
+    "title": "Nessuno scambio trovato",
+    "active_description": "Non ha scambi attivi. Sfoglia gli annunci per richiedere un servizio.",
+    "filter_description": "Nessuno scambio corrisponde a questo filtro."
+  },
+
+  "card": {
+    "aria_label": "Scambio: {{title}} \u2013 {{status}}",
+    "with_party": "Con {{name}}",
+    "from_party": "Da {{name}}",
+    "you_requested": "Lei ha richiesto",
+    "you_providing": "Lei sta fornendo",
+    "confirm_hours": "Conferma ore",
+    "waiting_for_other": "In attesa dell'altra parte",
+    "respond": "Rispondi"
+  },
+
+  "breadcrumb": {
+    "exchanges": "Scambi",
+    "exchange": "Scambio"
+  },
+
+  "toast": {
+    "load_more_failed": "Impossibile caricare altri scambi",
+    "accepted": "Scambio accettato!",
+    "accept_failed": "Impossibile accettare lo scambio",
+    "declined": "Scambio rifiutato",
+    "decline_failed": "Impossibile rifiutare lo scambio",
+    "started": "Scambio avviato!",
+    "start_failed": "Impossibile avviare lo scambio",
+    "completed": "Scambio contrassegnato come completato. La preghiamo di confermare le ore.",
+    "complete_failed": "Impossibile completare lo scambio",
+    "invalid_hours": "La preghiamo di inserire ore valide",
+    "max_hours": "Massimo {{max}} ore per scambio",
+    "hours_confirmed": "Ore confermate!",
+    "confirm_failed": "Impossibile confermare le ore",
+    "cancelled": "Scambio annullato",
+    "cancel_failed": "Impossibile annullare lo scambio",
+    "request_sent": "Richiesta di scambio inviata!",
+    "request_failed": "Impossibile creare la richiesta di scambio"
+  },
+
+  "detail": {
+    "page_title": "Dettagli dello scambio",
+    "loading": "Caricamento dello scambio\u2026",
+    "not_found": "Scambio non trovato",
+    "not_found_title": "Scambio non trovato",
+    "not_found_description": "Lo scambio che sta cercando non esiste",
+    "view_exchanges": "Vedi i miei scambi",
+    "exchange_details": "Dettagli dello scambio",
+    "service": "Servizio",
+    "requester": "Richiedente",
+    "provider": "Fornitore",
+    "you": "Lei",
+    "other_party": "Altra parte",
+    "confirmed_hours": "Confermato {{hours}}h",
+    "message_party": "Invia messaggio a {{name}}",
+    "proposed_hours": "Ore proposte",
+    "final_hours": "Ore finali",
+    "created": "Creato",
+    "message_from_requester": "Messaggio del richiedente",
+    "broker_notes": "Note del coordinatore",
+    "accept_request": "Accetta richiesta",
+    "decline": "Rifiuta",
+    "start_exchange": "Avvia scambio",
+    "mark_complete": "Segna come completato",
+    "confirm_hours": "Conferma ore",
+    "cancel_exchange": "Annulla scambio",
+    "timeline_title": "Cronologia dello scambio",
+    "timeline": {
+      "created": "Scambio creato",
+      "accepted": "Scambio accettato",
+      "declined": "Scambio rifiutato",
+      "started": "Scambio avviato",
+      "completed": "Scambio completato",
+      "confirmed": "Ore confermate",
+      "cancelled": "Scambio annullato",
+      "awaiting_confirmation": "In attesa di conferma",
+      "sent_to_broker": "Inviato al coordinatore",
+      "disputed": "Scambio contestato",
+      "fallback": "Stato aggiornato"
+    }
+  },
+
+  "modal": {
+    "decline_title": "Rifiuta richiesta di scambio",
+    "decline_reason_label": "Motivazione (facoltativo)",
+    "decline_reason_placeholder": "Comunichi il motivo del Suo rifiuto\u2026",
+    "decline_confirm": "Rifiuta richiesta",
+    "cancel": "Annulla",
+    "confirm_title": "Conferma ore lavorate",
+    "confirm_description": "Quante ore sono state effettivamente lavorate per questo scambio?",
+    "hours_label": "Ore",
+    "hours_placeholder": "Inserisca le ore",
+    "hours_unit": "ore",
+    "originally_proposed": "Inizialmente proposte: {{hours}} ore (max: {{max}})",
+    "cancel_title": "Annullare lo scambio?",
+    "cancel_description": "\u00c8 sicuro di voler annullare questo scambio? Questa azione non pu\u00f2 essere annullata.",
+    "keep_exchange": "Mantieni lo scambio"
+  },
+
+  "request": {
+    "page_title": "Richiedi scambio",
+    "title": "Richiedi scambio",
+    "subtitle": "Invii una richiesta per scambiare crediti-tempo per questo servizio",
+    "loading": "Caricamento\u2026",
+    "listing_not_found": "Annuncio non trovato",
+    "workflow_not_enabled": "Il flusso di scambio non \u00e8 attivato",
+    "load_failed": "Impossibile caricare l'annuncio",
+    "cannot_request": "Impossibile richiedere uno scambio",
+    "not_available": "Questo annuncio non \u00e8 disponibile per le richieste di scambio.",
+    "own_listing_title": "Questo \u00e8 il Suo annuncio",
+    "own_listing_description": "Non \u00e8 possibile richiedere uno scambio per il proprio annuncio.",
+    "view_listing": "Vedi annuncio",
+    "breadcrumb_listings": "Annunci",
+    "breadcrumb_listing": "Annuncio",
+    "breadcrumb_request": "Richiedi scambio",
+    "estimated_hours": "~{{hours}} ore",
+    "service_offer": "Offerta di servizio",
+    "service_request": "Richiesta di servizio",
+    "proposed_hours_label": "Ore proposte",
+    "proposed_hours_placeholder": "Quante ore Le servono?",
+    "proposed_hours_description": "Il tempo stimato per questo servizio (max: {{max}})",
+    "hours_unit": "ore",
+    "message_label": "Messaggio (facoltativo)",
+    "message_placeholder": "Aggiunga un messaggio al fornitore del servizio\u2026",
+    "message_description": "Spieghi le Sue esigenze o ponga le Sue domande",
+    "broker_approval_title": "Approvazione del coordinatore necessaria",
+    "broker_approval_description": "Questo scambio dovr\u00e0 essere approvato da un coordinatore della comunit\u00e0 prima di poter procedere.",
+    "cancel": "Annulla",
+    "send_request": "Invia richiesta"
+  }
+}

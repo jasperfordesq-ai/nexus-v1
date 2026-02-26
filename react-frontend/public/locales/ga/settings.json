@@ -1,0 +1,19 @@
+{
+  "title": "Socruithe",
+  "account": "Cuntas",
+  "notifications": "Fógraí",
+  "privacy": "Príobháideachas",
+  "language": "Teanga",
+  "appearance": "Cuma",
+  "security": "Slándáil",
+  "save": "Sábháil Socruithe",
+  "saved": "Socruithe sábháilte",
+  "language_preference": "Rogha Teanga",
+  "select_language": "Roghnaigh do theanga roghnaithe don chomhéadan",
+  "theme": {
+    "title": "Téama",
+    "light": "Solas",
+    "dark": "Dorcha",
+    "system": "Córas"
+  }
+}

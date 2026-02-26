@@ -1,0 +1,46 @@
+{
+  "page_title": "Feed",
+  "title": "Feed della comunità",
+  "subtitle": "Scopra cosa succede nella Sua comunità",
+  "new_post": "Nuovo post",
+  "whats_on_your_mind": "Cosa Le passa per la mente?",
+  "add_image_aria": "Aggiungi immagine",
+  "create_poll_aria": "Crea sondaggio",
+  "create_post": "Crea post",
+  "load_more": "Carica altro",
+  "unable_to_load": "Impossibile caricare il feed",
+  "try_again": "Riprova",
+  "error_load": "Impossibile caricare il feed.",
+  "error_load_retry": "Impossibile caricare il feed. La preghiamo di riprovare.",
+  "empty_title": "Nessun post ancora",
+  "empty_desc": "Sia la prima persona a condividere qualcosa con la Sua comunità!",
+  "empty_filtered": "Nessun {{filter}} nel feed al momento. Provi un filtro diverso!",
+  "filter": {
+    "all": "Tutto",
+    "posts": "Post",
+    "listings": "Annunci",
+    "events": "Eventi",
+    "polls": "Sondaggi",
+    "goals": "Obiettivi"
+  },
+  "report": {
+    "title": "Segnala post",
+    "description": "La preghiamo di descrivere il motivo per cui sta segnalando questo post. I nostri moderatori esamineranno la Sua segnalazione.",
+    "reason_label": "Motivo",
+    "reason_placeholder": "Descriva il problema...",
+    "cancel": "Annulla",
+    "submit": "Invia segnalazione"
+  },
+  "toast": {
+    "post_hidden": "Post nascosto",
+    "hide_failed": "Impossibile nascondere il post",
+    "user_muted": "Utente silenziato",
+    "mute_failed": "Impossibile silenziare l'utente",
+    "provide_reason": "La preghiamo di fornire un motivo",
+    "reported": "Post segnalato. Grazie per contribuire a mantenere sicura la nostra comunità.",
+    "report_failed": "Impossibile segnalare il post",
+    "deleted": "Post eliminato",
+    "delete_failed": "Impossibile eliminare il post",
+    "vote_failed": "Impossibile inviare il voto"
+  }
+}

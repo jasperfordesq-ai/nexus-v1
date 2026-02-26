@@ -69,3 +69,20 @@ if (!function_exists('webp_avatar')) {
     }
 }
 
+if (!function_exists('__')) {
+    /**
+     * Translate a string using the active locale.
+     *
+     * Key format: "namespace.key" (e.g. "admin_dashboard.title")
+     * Substitution params use {{name}} placeholders in JSON values.
+     *
+     * @param string $key    Dot-separated namespace.key
+     * @param array  $params Named substitution params (e.g. ['name' => 'Alice'])
+     * @return string Translated string, or the key itself if not found
+     */
+    function __(string $key, array $params = []): string
+    {
+        return \Nexus\I18n\Translator::get($key, $params);
+    }
+}
+

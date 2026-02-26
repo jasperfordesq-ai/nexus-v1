@@ -38,6 +38,7 @@ import {
   Wifi,
   ChevronRight,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
@@ -52,7 +53,8 @@ const SEARCH_DEBOUNCE_MS = 300;
 const PER_PAGE = 20;
 
 export function FederationEventsPage() {
-  usePageTitle('Federated Events');
+  const { t } = useTranslation('federation');
+  usePageTitle(t('events.page_title'));
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -145,9 +147,9 @@ export function FederationEventsPage() {
       } catch (error) {
         logError('Failed to load federated events', error);
         if (!append) {
-          setLoadError('Failed to load federated events. Please try again.');
+          setLoadError(t('events.load_error'));
         } else {
-          toast.error('Failed to load more events');
+          toast.error(t('events.load_more_error'));
         }
       } finally {
         setIsLoading(false);
@@ -197,8 +199,8 @@ export function FederationEventsPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Federation', href: '/federation' },
-          { label: 'Events' },
+          { label: t('events.breadcrumb_federation'), href: '/federation' },
+          { label: t('events.breadcrumb_events') },
         ]}
       />
 
@@ -206,10 +208,10 @@ export function FederationEventsPage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Calendar className="w-7 h-7 text-amber-400" aria-hidden="true" />
-          Federated Events
+          {t('events.heading')}
         </h1>
         <p className="text-theme-muted mt-1">
-          Events from communities across your network
+          {t('events.subheading')}
         </p>
       </div>
 
@@ -219,8 +221,8 @@ export function FederationEventsPage() {
           {/* Search */}
           <div className="flex-1">
             <Input
-              placeholder="Search federated events..."
-              aria-label="Search federated events"
+              placeholder={t('events.search_placeholder')}
+              aria-label={t('events.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -233,8 +235,8 @@ export function FederationEventsPage() {
 
           {/* Partner filter */}
           <Select
-            placeholder="All Communities"
-            aria-label="Filter by community"
+            placeholder={t('events.all_communities')}
+            aria-label={t('events.filter_by_community')}
             selectedKeys={selectedPartner ? [selectedPartner] : []}
             onChange={(e) => setSelectedPartner(e.target.value)}
             className="w-full lg:w-52"
@@ -245,7 +247,7 @@ export function FederationEventsPage() {
             startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           >
             {[
-              { id: '', name: 'All Communities' },
+              { id: '', name: t('events.all_communities') },
               ...partners.map((p) => ({ id: String(p.id), name: p.name })),
             ].map((item) => (
               <SelectItem key={item.id}>{item.name}</SelectItem>
@@ -263,7 +265,7 @@ export function FederationEventsPage() {
             onClick={() => setUpcomingOnly(!upcomingOnly)}
             aria-pressed={upcomingOnly}
           >
-            Upcoming Only
+            {t('events.upcoming_only')}
           </Chip>
         </div>
       </GlassCard>
@@ -291,7 +293,7 @@ export function FederationEventsPage() {
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
-            Unable to Load Events
+            {t('events.unable_to_load')}
           </h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
@@ -299,7 +301,7 @@ export function FederationEventsPage() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => { setCursor(null); loadEvents(false); }}
           >
-            Try Again
+            {t('events.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -308,11 +310,11 @@ export function FederationEventsPage() {
       {!isLoading && !loadError && events.length === 0 && (
         <EmptyState
           icon={<Calendar className="w-12 h-12" />}
-          title="No federated events found"
+          title={t('events.empty_title')}
           description={
             upcomingOnly
-              ? 'No upcoming events from partner communities. Try showing past events too.'
-              : 'Try adjusting your filters or check back later.'
+              ? t('events.empty_description_upcoming')
+              : t('events.empty_description_general')
           }
         />
       )}
@@ -342,7 +344,7 @@ export function FederationEventsPage() {
                 onPress={handleLoadMore}
                 isLoading={isLoadingMore}
               >
-                Load More
+                {t('events.load_more')}
               </Button>
             </div>
           )}
@@ -361,6 +363,7 @@ interface FederatedEventCardProps {
 }
 
 function FederatedEventCard({ event }: FederatedEventCardProps) {
+  const { t } = useTranslation('federation');
   const startDate = new Date(event.start_date);
   const isPast = startDate < new Date();
   const avatarSrc = resolveAvatarUrl(event.organizer?.avatar);
@@ -422,7 +425,7 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
                   className="bg-cyan-500/20 text-cyan-600 dark:text-cyan-400"
                   startContent={<Wifi className="w-3 h-3" aria-hidden="true" />}
                 >
-                  Online
+                  {t('events.online')}
                 </Chip>
               )}
             </div>
@@ -436,7 +439,7 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
               <span className="flex items-center gap-1">
                 <Clock className="w-4 h-4" aria-hidden="true" />
                 <time dateTime={event.start_date}>
-                  {formattedDate} at {formattedTime}
+                  {t('events.date_at_time', { date: formattedDate, time: formattedTime })}
                 </time>
               </span>
 
@@ -449,7 +452,7 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
 
               <span className="flex items-center gap-1">
                 <Users className="w-4 h-4" aria-hidden="true" />
-                {event.attendees_count} going
+                {t('events.attendees_going', { count: event.attendees_count })}
               </span>
             </div>
 

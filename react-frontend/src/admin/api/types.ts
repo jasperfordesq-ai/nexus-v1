@@ -157,6 +157,7 @@ export interface UserListParams {
   search?: string;
   sort?: string;
   order?: 'asc' | 'desc';
+  tenant_id?: number | string;
 }
 
 export interface CreateUserPayload {
@@ -1043,6 +1044,7 @@ export interface SuperAdminTenant {
   description?: string;
   parent_id: number | null;
   parent_name?: string;
+  depth: number;
   is_active: boolean;
   allows_subtenants: boolean;
   max_depth: number;
@@ -1089,6 +1091,26 @@ export interface CreateTenantPayload {
   allows_subtenants?: boolean;
   max_depth?: number;
   is_active?: boolean;
+  features?: Record<string, boolean>;
+  contact_email?: string;
+  contact_phone?: string;
+  address?: string;
+  meta_title?: string;
+  meta_description?: string;
+  h1_headline?: string;
+  hero_intro?: string;
+  og_image_url?: string;
+  robots_directive?: string;
+  location_name?: string;
+  country_code?: string;
+  service_area?: string;
+  latitude?: string;
+  longitude?: string;
+  social_facebook?: string;
+  social_twitter?: string;
+  social_instagram?: string;
+  social_linkedin?: string;
+  social_youtube?: string;
 }
 
 export interface UpdateTenantPayload {
@@ -1126,6 +1148,8 @@ export interface TenantHierarchyNode {
   id: number;
   name: string;
   slug: string;
+  parent_id: number | null;
+  depth: number;
   is_active: boolean;
   allows_subtenants: boolean;
   user_count: number;
@@ -1279,9 +1303,19 @@ export interface FederationStatusOverview {
 export interface TenantFederationFeatures {
   tenant_id: number;
   tenant_name: string;
+  tenant_domain: string | null;
   is_whitelisted: boolean;
-  features: Record<string, boolean>;
-  partnerships: FederationPartnership[];
+  active_partnerships_count: number;
+  federation_enabled: boolean;
+  directory_visible: boolean;
+  profiles_enabled: boolean;
+  messaging_enabled: boolean;
+  transactions_enabled: boolean;
+  listings_enabled: boolean;
+  events_enabled: boolean;
+  groups_enabled: boolean;
+  features?: Record<string, boolean>;
+  partnerships?: FederationPartnership[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1483,6 +1517,8 @@ export interface MatchStats {
 export interface AdminFeedPost {
   id: number;
   user_id: number;
+  tenant_id: number;
+  tenant_name: string;
   user_name: string;
   user_avatar?: string | null;
   content: string;
@@ -1499,6 +1535,8 @@ export interface AdminFeedPost {
 export interface AdminComment {
   id: number;
   user_id: number;
+  tenant_id: number;
+  tenant_name: string;
   user_name: string;
   user_avatar?: string | null;
   content_type: 'listing' | 'event' | 'post' | 'blog';
@@ -1514,6 +1552,8 @@ export interface AdminComment {
 export interface AdminReview {
   id: number;
   reviewer_id: number;
+  tenant_id: number;
+  tenant_name: string;
   reviewer_name: string;
   reviewer_avatar?: string | null;
   reviewee_id: number;
@@ -1530,6 +1570,8 @@ export interface AdminReview {
 export interface AdminReport {
   id: number;
   reporter_id: number;
+  tenant_id: number;
+  tenant_name: string;
   reporter_name: string;
   reporter_avatar?: string | null;
   content_type: 'listing' | 'event' | 'post' | 'comment' | 'review' | 'user';
@@ -1594,18 +1636,6 @@ export interface SuperTenant {
   instagram_url?: string | null;
   created_at: string;
   updated_at: string;
-}
-
-export interface TenantHierarchyNode {
-  id: number;
-  name: string;
-  slug: string;
-  parent_id: number | null;
-  depth: number;
-  is_active: boolean;
-  allows_subtenants: boolean;
-  user_count: number;
-  children: TenantHierarchyNode[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1710,20 +1740,4 @@ export interface Partnership {
   suspended_reason?: string | null;
   terminated_at?: string | null;
   terminated_reason?: string | null;
-}
-
-export interface TenantFederationFeatures {
-  tenant_id: number;
-  tenant_name: string;
-  tenant_domain: string | null;
-  is_whitelisted: boolean;
-  active_partnerships_count: number;
-  federation_enabled: boolean;
-  directory_visible: boolean;
-  profiles_enabled: boolean;
-  messaging_enabled: boolean;
-  transactions_enabled: boolean;
-  listings_enabled: boolean;
-  events_enabled: boolean;
-  groups_enabled: boolean;
 }

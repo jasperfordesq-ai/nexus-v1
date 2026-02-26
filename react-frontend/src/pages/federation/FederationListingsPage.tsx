@@ -43,6 +43,7 @@ import {
   MessageSquare,
   User,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
@@ -59,7 +60,8 @@ const SEARCH_DEBOUNCE_MS = 300;
 const PER_PAGE = 20;
 
 export function FederationListingsPage() {
-  usePageTitle('Federated Listings');
+  const { t } = useTranslation('federation');
+  usePageTitle(t('listings.page_title'));
   const toast = useToast();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -159,9 +161,9 @@ export function FederationListingsPage() {
       } catch (error) {
         logError('Failed to load federated listings', error);
         if (!append) {
-          setLoadError('Failed to load federated listings. Please try again.');
+          setLoadError(t('listings.load_error'));
         } else {
-          toast.error('Failed to load more listings');
+          toast.error(t('listings.load_more_error'));
         }
       } finally {
         setIsLoading(false);
@@ -211,8 +213,8 @@ export function FederationListingsPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Federation', href: '/federation' },
-          { label: 'Listings' },
+          { label: t('listings.breadcrumb_federation'), href: '/federation' },
+          { label: t('listings.breadcrumb_listings') },
         ]}
       />
 
@@ -220,10 +222,10 @@ export function FederationListingsPage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <ListTodo className="w-7 h-7 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-          Federated Listings
+          {t('listings.title')}
         </h1>
         <p className="text-theme-muted mt-1">
-          Services offered across partner communities
+          {t('listings.subtitle')}
         </p>
       </div>
 
@@ -233,8 +235,8 @@ export function FederationListingsPage() {
           {/* Search */}
           <div className="flex-1">
             <Input
-              placeholder="Search federated listings..."
-              aria-label="Search federated listings"
+              placeholder={t('listings.search_placeholder')}
+              aria-label={t('listings.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -247,8 +249,8 @@ export function FederationListingsPage() {
 
           {/* Partner filter */}
           <Select
-            placeholder="All Communities"
-            aria-label="Filter by community"
+            placeholder={t('listings.all_communities')}
+            aria-label={t('listings.filter_by_community')}
             selectedKeys={selectedPartner ? [selectedPartner] : []}
             onChange={(e) => setSelectedPartner(e.target.value)}
             className="w-full lg:w-52"
@@ -259,7 +261,7 @@ export function FederationListingsPage() {
             startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           >
             {[
-              { id: '', name: 'All Communities' },
+              { id: '', name: t('listings.all_communities') },
               ...partners.map((p) => ({ id: String(p.id), name: p.name })),
             ].map((item) => (
               <SelectItem key={item.id}>{item.name}</SelectItem>
@@ -268,11 +270,11 @@ export function FederationListingsPage() {
         </div>
 
         {/* Type Chips */}
-        <div className="flex flex-wrap gap-2 mt-3" role="group" aria-label="Filter by listing type">
+        <div className="flex flex-wrap gap-2 mt-3" role="group" aria-label={t('listings.filter_by_type')}>
           {[
-            { key: 'all' as const, label: 'All' },
-            { key: 'offer' as const, label: 'Offers' },
-            { key: 'request' as const, label: 'Requests' },
+            { key: 'all' as const, label: t('listings.type_all') },
+            { key: 'offer' as const, label: t('listings.type_offers') },
+            { key: 'request' as const, label: t('listings.type_requests') },
           ].map((item) => {
             const isActive = selectedType === item.key;
             return (
@@ -313,7 +315,7 @@ export function FederationListingsPage() {
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
-            Unable to Load Listings
+            {t('listings.unable_to_load')}
           </h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
@@ -321,7 +323,7 @@ export function FederationListingsPage() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => { setCursor(null); loadListings(false); }}
           >
-            Try Again
+            {t('listings.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -330,8 +332,8 @@ export function FederationListingsPage() {
       {!isLoading && !loadError && listings.length === 0 && (
         <EmptyState
           icon={<Search className="w-12 h-12" />}
-          title="No federated listings found"
-          description="Try adjusting your filters or check back later for new listings from partner communities."
+          title={t('listings.no_listings_found')}
+          description={t('listings.no_listings_description')}
         />
       )}
 
@@ -366,7 +368,7 @@ export function FederationListingsPage() {
                 onPress={handleLoadMore}
                 isLoading={isLoadingMore}
               >
-                Load More
+                {t('listings.load_more')}
               </Button>
             </div>
           )}
@@ -427,7 +429,7 @@ export function FederationListingsPage() {
                             : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
                         }
                       >
-                        {isOffer ? 'Offer' : 'Request'}
+                        {isOffer ? t('listings.offer') : t('listings.request')}
                       </Chip>
                       {selectedListing.category_name && (
                         <Chip size="sm" variant="flat" className="bg-theme-hover text-theme-muted">
@@ -462,7 +464,7 @@ export function FederationListingsPage() {
                       {selectedListing.estimated_hours && (
                         <span className="flex items-center gap-1.5 text-theme-muted">
                           <Clock className="w-4 h-4" aria-hidden="true" />
-                          {selectedListing.estimated_hours} hours estimated
+                          {t('listings.hours_estimated', { hours: selectedListing.estimated_hours })}
                         </span>
                       )}
                       {selectedListing.location && (
@@ -495,7 +497,7 @@ export function FederationListingsPage() {
                           <p className="text-sm font-medium text-theme-primary">
                             {selectedListing.author?.name || 'Unknown'}
                           </p>
-                          <p className="text-xs text-theme-subtle">View Profile</p>
+                          <p className="text-xs text-theme-subtle">{t('listings.view_profile')}</p>
                         </div>
                       </Button>
                       <Chip
@@ -522,7 +524,7 @@ export function FederationListingsPage() {
                           navigate(tenantPath(`/federation/members/${selectedListing.author!.id}`));
                         }}
                       >
-                        View Profile
+                        {t('listings.view_profile')}
                       </Button>
                       <Button
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -535,7 +537,7 @@ export function FederationListingsPage() {
                           );
                         }}
                       >
-                        Contact Author
+                        {t('listings.contact_author')}
                       </Button>
                     </>
                   )}
@@ -548,7 +550,7 @@ export function FederationListingsPage() {
                         setSelectedListing(null);
                       }}
                     >
-                      Close
+                      {t('listings.close')}
                     </Button>
                   )}
                 </ModalFooter>
@@ -571,6 +573,7 @@ interface FederatedListingCardProps {
 }
 
 function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardProps) {
+  const { t } = useTranslation('federation');
   const isOffer = listing.type === 'offer';
   const avatarSrc = resolveAvatarUrl(listing.author?.avatar);
   const imageSrc = listing.image_url ? resolveAssetUrl(listing.image_url) : null;
@@ -620,7 +623,7 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
               : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
           }
         >
-          {isOffer ? 'Offer' : 'Request'}
+          {isOffer ? t('listings.offer') : t('listings.request')}
         </Chip>
         {listing.category_name && (
           <Chip size="sm" variant="flat" className="bg-theme-hover text-theme-muted">

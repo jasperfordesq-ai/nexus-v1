@@ -41,6 +41,7 @@ import {
   UserPlus,
   ArrowLeftRight,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { usePageTitle } from '@/hooks';
@@ -102,7 +103,8 @@ const SPLIT_TYPE_CARDS: { value: SplitType; title: string; description: string; 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CreateGroupExchangePage() {
-  usePageTitle('Create Group Exchange');
+  const { t } = useTranslation('group_exchanges');
+  usePageTitle(t('create.page_title'));
   const navigate = useNavigate();
   const { user } = useAuth();
   const { tenantPath } = useTenant();
@@ -322,14 +324,14 @@ export function CreateGroupExchangePage() {
 
       if (response.success && response.data) {
         const newId = response.data.id;
-        toast.success('Group exchange created!', 'Your exchange has been created successfully.');
+        toast.success(t('toast.created'), t('toast.created_desc'));
         navigate(tenantPath(`/group-exchanges/${newId}`));
       } else {
-        toast.error('Failed to create exchange', response.error || 'An error occurred.');
+        toast.error(t('toast.create_failed'), response.error || t('toast.error_occurred'));
       }
     } catch (err) {
       logError('Failed to create group exchange', err);
-      toast.error('Failed to create exchange', 'Something went wrong. Please try again.');
+      toast.error(t('toast.create_failed'), t('toast.something_wrong'));
     } finally {
       setIsSubmitting(false);
     }
@@ -369,8 +371,8 @@ export function CreateGroupExchangePage() {
     <div className="max-w-2xl mx-auto py-6 space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Group Exchanges', href: tenantPath('/group-exchanges') },
-        { label: 'Create' },
+        { label: t('title'), href: tenantPath('/group-exchanges') },
+        { label: t('create.breadcrumb') },
       ]} />
 
       {/* Title */}
@@ -379,8 +381,8 @@ export function CreateGroupExchangePage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <h1 className="text-2xl font-bold text-theme-primary">Create Group Exchange</h1>
-        <p className="text-theme-muted mt-1">Set up a multi-participant exchange in a few steps</p>
+        <h1 className="text-2xl font-bold text-theme-primary">{t('create.title')}</h1>
+        <p className="text-theme-muted mt-1">{t('create.subtitle')}</p>
       </motion.div>
 
       {/* Progress Bar */}
@@ -390,12 +392,12 @@ export function CreateGroupExchangePage() {
         transition={{ delay: 0.1 }}
       >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-theme-subtle">Step {currentStep} of {TOTAL_STEPS}</span>
+          <span className="text-sm text-theme-subtle">{t('create.step_of', { current: currentStep, total: TOTAL_STEPS })}</span>
           <span className="text-sm text-theme-subtle">
-            {currentStep === 1 && 'Details'}
-            {currentStep === 2 && 'Participants'}
-            {currentStep === 3 && 'Review Split'}
-            {currentStep === 4 && 'Confirm'}
+            {currentStep === 1 && t('create.step_details')}
+            {currentStep === 2 && t('create.step_participants')}
+            {currentStep === 3 && t('create.step_review_split')}
+            {currentStep === 4 && t('create.step_confirm')}
           </span>
         </div>
         <Progress
@@ -404,7 +406,7 @@ export function CreateGroupExchangePage() {
             indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
             track: 'bg-theme-elevated',
           }}
-          aria-label={`Step ${currentStep} of ${TOTAL_STEPS}`}
+          aria-label={t('create.step_of', { current: currentStep, total: TOTAL_STEPS })}
         />
       </motion.div>
 
@@ -425,16 +427,16 @@ export function CreateGroupExchangePage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <ArrowLeftRight className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                  Exchange Details
+                  {t('create.exchange_details')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Provide the basic details for your group exchange.
+                  {t('create.exchange_details_desc')}
                 </p>
 
                 <div className="space-y-4">
                   <Input
-                    label="Title"
-                    placeholder="e.g., Community Garden Workday"
+                    label={t('create.title_label')}
+                    placeholder={t('create.title_placeholder')}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     isRequired
@@ -442,8 +444,8 @@ export function CreateGroupExchangePage() {
                   />
 
                   <Textarea
-                    label="Description (optional)"
-                    placeholder="Describe the exchange..."
+                    label={t('create.description_label')}
+                    placeholder={t('create.description_placeholder')}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     classNames={{
@@ -455,14 +457,14 @@ export function CreateGroupExchangePage() {
 
                   <Input
                     type="number"
-                    label="Total Hours"
-                    placeholder="e.g., 10"
+                    label={t('create.total_hours_label')}
+                    placeholder={t('create.total_hours_placeholder')}
                     value={totalHours}
                     onChange={(e) => setTotalHours(e.target.value)}
                     min="0.25"
                     step="0.25"
                     isRequired
-                    endContent={<span className="text-theme-subtle text-sm">hours</span>}
+                    endContent={<span className="text-theme-subtle text-sm">{t('create.hours_unit')}</span>}
                     classNames={inputClassNames}
                   />
                 </div>
@@ -472,10 +474,10 @@ export function CreateGroupExchangePage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <Scale className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                  Split Type
+                  {t('create.split_type_heading')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-4">
-                  How should hours be distributed among participants?
+                  {t('create.split_type_desc')}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -497,10 +499,10 @@ export function CreateGroupExchangePage() {
                         {card.icon}
                       </div>
                       <h3 className="font-semibold text-theme-primary text-sm text-center mb-1">
-                        {card.title}
+                        {t('create.split_' + card.value + '_title')}
                       </h3>
                       <p className="text-xs text-theme-subtle text-center">
-                        {card.description}
+                        {t('create.split_' + card.value + '_desc')}
                       </p>
                     </Button>
                   ))}
@@ -515,7 +517,7 @@ export function CreateGroupExchangePage() {
                   onPress={goNext}
                   isDisabled={!canProceedStep1}
                 >
-                  Next
+                  {t('create.next')}
                 </Button>
               </div>
             </div>
@@ -528,22 +530,21 @@ export function CreateGroupExchangePage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <UserPlus className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                  Add Participants
+                  {t('create.add_participants')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-4">
-                  Search for members and add them as providers or receivers.
-                  You need at least 1 provider and 1 receiver.
+                  {t('create.add_participants_desc')}
                 </p>
 
                 <div className="relative">
                   <Input
-                    placeholder="Search members by name..."
+                    placeholder={t('detail.search_members_placeholder')}
                     value={searchQuery}
                     onChange={(e) => handleSearchChange(e.target.value)}
                     startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
                     endContent={isSearching ? <Spinner size="sm" /> : null}
                     classNames={inputClassNames}
-                    aria-label="Search members"
+                    aria-label={t('detail.search_members_aria')}
                   />
                 </div>
 
@@ -578,7 +579,7 @@ export function CreateGroupExchangePage() {
                               onPress={() => addParticipant(result, 'provider')}
                               startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
                             >
-                              Provider
+                              {t('detail.role_provider')}
                             </Button>
                             <Button
                               size="sm"
@@ -587,7 +588,7 @@ export function CreateGroupExchangePage() {
                               onPress={() => addParticipant(result, 'receiver')}
                               startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
                             >
-                              Receiver
+                              {t('detail.role_receiver')}
                             </Button>
                           </div>
                         </div>
@@ -602,14 +603,14 @@ export function CreateGroupExchangePage() {
                 <GlassCard className="p-6">
                   <h3 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                     <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                    Participants ({participants.length})
+                    {t('detail.participants_heading', { count: participants.length })}
                   </h3>
 
                   {/* Providers */}
                   {providers.length > 0 && (
                     <div className="mb-4">
                       <h4 className="text-sm font-medium text-emerald-400 mb-2">
-                        Providers ({providers.length})
+                        {t('create.providers_count', { count: providers.length })}
                       </h4>
                       <div className="space-y-2">
                         {providers.map((p) => (
@@ -631,7 +632,7 @@ export function CreateGroupExchangePage() {
                   {receivers.length > 0 && (
                     <div>
                       <h4 className="text-sm font-medium text-amber-400 mb-2">
-                        Receivers ({receivers.length})
+                        {t('create.receivers_count', { count: receivers.length })}
                       </h4>
                       <div className="space-y-2">
                         {receivers.map((p) => (
@@ -654,7 +655,7 @@ export function CreateGroupExchangePage() {
               {/* Validation message */}
               {!canProceedStep2 && participants.length > 0 && (
                 <div className="text-center text-sm text-amber-400">
-                  You need at least 1 provider and 1 receiver to continue.
+                  {t('create.validation_min_participants')}
                 </div>
               )}
 
@@ -673,33 +674,30 @@ export function CreateGroupExchangePage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <Scale className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                  Hour Split Preview
+                  {t('create.hour_split_preview')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Review how hours will be distributed between participants.
+                  {t('create.hour_split_preview_desc')}
                 </p>
 
                 {/* Summary */}
                 <div className="grid grid-cols-3 gap-4 mb-6">
                   <div className="bg-theme-elevated rounded-lg p-4 text-center">
-                    <p className="text-sm text-theme-muted">Providers</p>
+                    <p className="text-sm text-theme-muted">{t('detail.providers')}</p>
                     <p className="text-2xl font-bold text-emerald-400">{providers.length}</p>
                   </div>
                   <div className="bg-theme-elevated rounded-lg p-4 text-center">
-                    <p className="text-sm text-theme-muted">Total Hours</p>
+                    <p className="text-sm text-theme-muted">{t('detail.total_hours')}</p>
                     <p className="text-2xl font-bold text-theme-primary">{totalHours}</p>
                   </div>
                   <div className="bg-theme-elevated rounded-lg p-4 text-center">
-                    <p className="text-sm text-theme-muted">Receivers</p>
+                    <p className="text-sm text-theme-muted">{t('detail.receivers')}</p>
                     <p className="text-2xl font-bold text-amber-400">{receivers.length}</p>
                   </div>
                 </div>
 
                 <div className="text-center mb-6 text-sm text-theme-muted">
-                  {providers.length} provider{providers.length !== 1 ? 's' : ''} will transfer{' '}
-                  {totalHours} hour{parseFloat(totalHours) !== 1 ? 's' : ''} to{' '}
-                  {receivers.length} receiver{receivers.length !== 1 ? 's' : ''} via{' '}
-                  <span className="font-medium text-theme-primary capitalize">{splitType}</span> split.
+                  {t('create.transfer_summary', { providerCount: providers.length, hours: totalHours, receiverCount: receivers.length, splitType })}
                 </div>
 
                 {/* Split Table */}
@@ -708,10 +706,10 @@ export function CreateGroupExchangePage() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-theme-default">
-                          <th className="text-left py-2 px-3 text-theme-muted font-medium">Provider</th>
+                          <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_provider')}</th>
                           <th className="text-center py-2 px-3 text-theme-muted font-medium" aria-hidden="true" />
-                          <th className="text-left py-2 px-3 text-theme-muted font-medium">Receiver</th>
-                          <th className="text-right py-2 px-3 text-theme-muted font-medium">Hours</th>
+                          <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_receiver')}</th>
+                          <th className="text-right py-2 px-3 text-theme-muted font-medium">{t('detail.col_hours')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -719,7 +717,7 @@ export function CreateGroupExchangePage() {
                           <tr key={idx} className="border-b border-theme-default/50">
                             <td className="py-2 px-3 text-emerald-400">{split.providerName}</td>
                             <td className="py-2 px-3 text-center text-theme-subtle">
-                              <ArrowRight className="w-4 h-4 inline" aria-label="gives to" />
+                              <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
                             </td>
                             <td className="py-2 px-3 text-amber-400">{split.receiverName}</td>
                             <td className="py-2 px-3 text-right font-medium text-theme-primary">{split.amount}h</td>
@@ -730,14 +728,14 @@ export function CreateGroupExchangePage() {
                   </div>
                 ) : (
                   <div className="text-center py-6 text-theme-muted">
-                    Unable to calculate split. Check participant hours or weights.
+                    {t('create.unable_to_calculate')}
                   </div>
                 )}
               </GlassCard>
 
               {/* Participant Details */}
               <GlassCard className="p-6">
-                <h3 className="text-sm font-medium text-theme-muted mb-3">Per-Participant Summary</h3>
+                <h3 className="text-sm font-medium text-theme-muted mb-3">{t('create.per_participant_summary')}</h3>
                 <div className="space-y-2">
                   {participants.map((p) => {
                     let totalForParticipant = 0;
@@ -773,7 +771,7 @@ export function CreateGroupExchangePage() {
                         <div className="text-right">
                           <p className="font-bold text-theme-primary">{totalForParticipant}h</p>
                           <p className="text-xs text-theme-subtle">
-                            {p.role === 'provider' ? 'giving' : 'receiving'}
+                            {p.role === 'provider' ? t('create.giving') : t('create.receiving')}
                           </p>
                         </div>
                       </div>
@@ -782,7 +780,7 @@ export function CreateGroupExchangePage() {
                 </div>
               </GlassCard>
 
-              <StepNavigation onBack={goBack} onNext={goNext} nextLabel="Review" />
+              <StepNavigation onBack={goBack} onNext={goNext} nextLabel={t('create.review')} />
             </div>
           )}
 
@@ -792,22 +790,22 @@ export function CreateGroupExchangePage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                  Review Your Exchange
+                  {t('create.review_your_exchange')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
-                  Everything looks good? Create your group exchange.
+                  {t('create.review_your_exchange_desc')}
                 </p>
 
                 <div className="space-y-4">
                   {/* Title & Description */}
                   <div>
-                    <h3 className="text-sm font-medium text-theme-muted mb-1">Title</h3>
+                    <h3 className="text-sm font-medium text-theme-muted mb-1">{t('create.title_label')}</h3>
                     <p className="text-theme-primary font-semibold">{title}</p>
                   </div>
 
                   {description && (
                     <div>
-                      <h3 className="text-sm font-medium text-theme-muted mb-1">Description</h3>
+                      <h3 className="text-sm font-medium text-theme-muted mb-1">{t('create.description_heading')}</h3>
                       <p className="text-theme-primary">{description}</p>
                     </div>
                   )}
@@ -817,15 +815,15 @@ export function CreateGroupExchangePage() {
                   {/* Split & Hours */}
                   <div className="flex flex-wrap gap-4">
                     <div>
-                      <h3 className="text-sm font-medium text-theme-muted mb-1">Split Type</h3>
+                      <h3 className="text-sm font-medium text-theme-muted mb-1">{t('create.split_type_heading')}</h3>
                       <Chip size="sm" variant="flat" color="primary" className="capitalize">{splitType}</Chip>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-theme-muted mb-1">Total Hours</h3>
+                      <h3 className="text-sm font-medium text-theme-muted mb-1">{t('detail.total_hours')}</h3>
                       <p className="text-theme-primary font-semibold">{totalHours}h</p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-theme-muted mb-1">Participants</h3>
+                      <h3 className="text-sm font-medium text-theme-muted mb-1">{t('create.participants_label')}</h3>
                       <p className="text-theme-primary font-semibold">{participants.length}</p>
                     </div>
                   </div>
@@ -834,7 +832,7 @@ export function CreateGroupExchangePage() {
 
                   {/* Participants summary */}
                   <div>
-                    <h3 className="text-sm font-medium text-theme-muted mb-2">Participants</h3>
+                    <h3 className="text-sm font-medium text-theme-muted mb-2">{t('create.participants_label')}</h3>
                     <div className="flex flex-wrap gap-2">
                       {participants.map((p) => (
                         <Chip
@@ -866,7 +864,7 @@ export function CreateGroupExchangePage() {
                   onPress={goBack}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Back
+                  {t('create.back')}
                 </Button>
                 <Button
                   size="lg"
@@ -875,7 +873,7 @@ export function CreateGroupExchangePage() {
                   isLoading={isSubmitting}
                   startContent={!isSubmitting && <CheckCircle className="w-5 h-5" aria-hidden="true" />}
                 >
-                  Create Group Exchange
+                  {t('create.create_exchange')}
                 </Button>
               </div>
             </div>
@@ -900,6 +898,7 @@ interface ParticipantRowProps {
 }
 
 function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWeightChange, inputClassNames }: ParticipantRowProps) {
+  const { t } = useTranslation('group_exchanges');
   return (
     <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
       <Avatar
@@ -923,14 +922,14 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
         <Input
           type="number"
           size="sm"
-          placeholder="Hours"
+          placeholder={t('create.hours_placeholder')}
           value={participant.hours > 0 ? participant.hours.toString() : ''}
           onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
           min="0"
           step="0.25"
           className="w-24"
           classNames={inputClassNames}
-          aria-label={`Hours for ${participant.name}`}
+          aria-label={t('create.hours_for', { name: participant.name })}
           endContent={<span className="text-theme-subtle text-xs">h</span>}
         />
       )}
@@ -940,14 +939,14 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
         <Input
           type="number"
           size="sm"
-          placeholder="Weight"
+          placeholder={t('create.weight_placeholder')}
           value={participant.weight > 0 ? participant.weight.toString() : ''}
           onChange={(e) => onWeightChange(parseFloat(e.target.value) || 0)}
           min="0.1"
           step="0.1"
           className="w-24"
           classNames={inputClassNames}
-          aria-label={`Weight for ${participant.name}`}
+          aria-label={t('create.weight_for', { name: participant.name })}
           endContent={<span className="text-theme-subtle text-xs">x</span>}
         />
       )}
@@ -958,7 +957,7 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
         variant="flat"
         className="bg-red-500/20 text-red-400"
         onPress={onRemove}
-        aria-label={`Remove ${participant.name}`}
+        aria-label={t('detail.remove_participant', { name: participant.name })}
       >
         <X className="w-4 h-4" />
       </Button>
@@ -974,7 +973,8 @@ interface StepNavigationProps {
   isNextDisabled?: boolean;
 }
 
-function StepNavigation({ onBack, onNext, nextLabel = 'Next', isLoading, isNextDisabled }: StepNavigationProps) {
+function StepNavigation({ onBack, onNext, nextLabel, isLoading, isNextDisabled }: StepNavigationProps) {
+  const { t } = useTranslation('group_exchanges');
   return (
     <div className="flex items-center justify-between">
       <Button
@@ -983,7 +983,7 @@ function StepNavigation({ onBack, onNext, nextLabel = 'Next', isLoading, isNextD
         onPress={onBack}
         startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
       >
-        Back
+        {t('create.back')}
       </Button>
       <Button
         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -992,7 +992,7 @@ function StepNavigation({ onBack, onNext, nextLabel = 'Next', isLoading, isNextD
         isLoading={isLoading}
         isDisabled={isNextDisabled}
       >
-        {nextLabel}
+        {nextLabel || t('create.next')}
       </Button>
     </div>
   );

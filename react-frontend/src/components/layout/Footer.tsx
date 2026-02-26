@@ -5,8 +5,8 @@
 
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { useTenant, useFeature } from '@/contexts';
-import { Hexagon, Mail, Phone, MapPin } from 'lucide-react';
+import { useTenant, useFeature, useCookieConsent } from '@/contexts';
+import { Hexagon, Mail, Phone, MapPin, Cookie, Bug } from 'lucide-react';
 
 export interface FooterProps {
   /** Footer content/links */
@@ -24,6 +24,7 @@ export function Footer({ children, copyright }: FooterProps) {
   const { tenant, branding, tenantPath } = useTenant();
   const hasEvents = useFeature('events');
   const hasBlog = useFeature('blog');
+  const { resetConsent } = useCookieConsent();
   const year = new Date().getFullYear();
 
   // Use tenant's footer_text from config if set, otherwise build a default
@@ -104,6 +105,17 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/help')}>Help Center</FooterLink></li>
                   <li><FooterLink href={tenantPath('/contact')}>Contact Us</FooterLink></li>
                   <li><FooterLink href={tenantPath('/about')}>About</FooterLink></li>
+                  <li>
+                    <a
+                      href="https://project-nexus.canny.io/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors"
+                    >
+                      <Bug className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      Report Bug
+                    </a>
+                  </li>
                 </ul>
               </div>
 
@@ -114,15 +126,39 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/legal')}>Legal Hub</FooterLink></li>
                   <li><FooterLink href={tenantPath('/terms')}>Terms of Service</FooterLink></li>
                   <li><FooterLink href={tenantPath('/privacy')}>Privacy Policy</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/cookies')}>Cookie Policy</FooterLink></li>
                   <li><FooterLink href={tenantPath('/accessibility')}>Accessibility</FooterLink></li>
                 </ul>
               </div>
             </div>
 
+            {/* Dynamic footer pages from admin CMS */}
+            {tenant?.menu_pages?.footer?.length ? (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+                <div>
+                  <h3 className="text-sm font-semibold text-theme-primary mb-3">Pages</h3>
+                  <ul className="space-y-2">
+                    {tenant.menu_pages.footer.map((p) => (
+                      <li key={p.slug}><FooterLink href={tenantPath(`/page/${p.slug}`)}>{p.title}</FooterLink></li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ) : null}
+
             {/* Bottom Bar */}
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-sm text-theme-subtle">{footerText}</p>
               <div className="flex items-center gap-3">
+                <button
+                  onClick={resetConsent}
+                  className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors cursor-pointer"
+                  aria-label="Cookie settings"
+                >
+                  <Cookie className="w-3 h-3" aria-hidden="true" />
+                  Cookie Settings
+                </button>
+                <span className="text-theme-subtle/30">|</span>
                 <a
                   href="https://github.com/jasperfordesq-ai/nexus-v1"
                   target="_blank"

@@ -20,11 +20,13 @@ import {
   useState,
   useEffect,
   useCallback,
+  useRef,
   useMemo,
   type ReactNode,
 } from 'react';
 import { api, tokenManager, SESSION_EXPIRED_EVENT } from '@/lib/api';
 import { logWarn } from '@/lib/logger';
+import i18n from '@/i18n';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { loginResponseSchema, userSchema } from '@/lib/api-schemas';
 import { setSentryUser, captureAuthEvent } from '@/lib/sentry';
@@ -97,6 +99,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     twoFactorMethods: [],
   });
 
+  // Track whether user was ever authenticated (prevents false "session expired" on first visit)
+  const wasAuthenticated = useRef(false);
+
   // ─────────────────────────────────────────────────────────────────────────
   // User Refresh
   // ─────────────────────────────────────────────────────────────────────────
@@ -127,6 +132,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Set Sentry user context
         setSentryUser(response.data);
 
+        // Apply user's server-side language preference (overrides browser detection)
+        if (response.data.preferred_language) {
+          i18n.changeLanguage(response.data.preferred_language);
+        }
+
+        wasAuthenticated.current = true;
         setState({
           user: response.data,
           status: 'authenticated',
@@ -218,6 +229,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setSentryUser(loginData.user);
     captureAuthEvent('login', loginData.user.id);
 
+    // Apply user's server-side language preference (overrides browser detection)
+    if (loginData.user?.preferred_language) {
+      i18n.changeLanguage(loginData.user.preferred_language);
+    }
+
+    wasAuthenticated.current = true;
     setState({
       user: loginData.user,
       status: 'authenticated',
@@ -290,6 +307,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       tokenManager.setTenantId(data.user.tenant_id);
     }
 
+    wasAuthenticated.current = true;
     setState({
       user: data.user,
       status: 'authenticated',
@@ -350,6 +368,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       tokenManager.setTenantId(responseData.user.tenant_id);
     }
 
+    wasAuthenticated.current = true;
     setState({
       user: responseData.user,
       status: 'authenticated',
@@ -416,13 +435,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const handleSessionExpired = () => {
-      setState({
-        user: null,
-        status: 'idle',
-        error: 'Your session has expired. Please log in again.',
-        twoFactorToken: null,
-        twoFactorMethods: [],
-      });
+      // Only set error message if user had an active session — stale tokens
+      // on first visit should silently clear without showing "session expired"
+      if (wasAuthenticated.current) {
+        setState({
+          user: null,
+          status: 'idle',
+          error: 'Your session has expired. Please log in again.',
+          twoFactorToken: null,
+          twoFactorMethods: [],
+        });
+      } else {
+        // Stale tokens from a previous session — just silently clear
+        setState({
+          user: null,
+          status: 'idle',
+          error: null,
+          twoFactorToken: null,
+          twoFactorMethods: [],
+        });
+      }
     };
 
     window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);

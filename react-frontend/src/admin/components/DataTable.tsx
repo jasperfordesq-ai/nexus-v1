@@ -228,7 +228,7 @@ export default DataTable;
 // Status Badge helper
 // ─────────────────────────────────────────────────────────────────────────────
 
-const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default' | 'primary'> = {
+const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default' | 'primary' | 'secondary'> = {
   active: 'success',
   approved: 'success',
   completed: 'success',
@@ -243,6 +243,15 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
   failed: 'danger',
   inactive: 'default',
   idle: 'default',
+  // Super admin audit action types
+  user_created: 'success',
+  user_moved: 'primary',
+  tenant_created: 'success',
+  tenant_updated: 'primary',
+  bulk_users_moved: 'warning',
+  bulk_tenants_updated: 'warning',
+  federation_lockdown: 'danger',
+  federation_updated: 'secondary',
 };
 
 export function StatusBadge({ status }: { status: string }) {

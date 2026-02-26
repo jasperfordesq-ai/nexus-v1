@@ -1544,4 +1544,107 @@ class AdminConfigApiController extends BaseApiController
             'keys_updated' => $updated,
         ]);
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Language Configuration
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** All platform-supported language codes */
+    private const VALID_LANGUAGES = ['en', 'ga', 'de', 'fr', 'it'];
+
+    /**
+     * GET /api/v2/admin/config/languages
+     */
+    public function getLanguageConfig(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $tenant = Database::query(
+            "SELECT configuration FROM tenants WHERE id = ?",
+            [$tenantId]
+        )->fetch();
+
+        $config = [];
+        if ($tenant && !empty($tenant['configuration'])) {
+            $config = json_decode($tenant['configuration'], true) ?: [];
+        }
+
+        $this->respondWithData([
+            'default_language' => $config['default_language'] ?? 'en',
+            'supported_languages' => $config['supported_languages'] ?? ['en'],
+        ]);
+    }
+
+    /**
+     * PUT /api/v2/admin/config/languages
+     */
+    public function updateLanguageConfig(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $input = $this->getAllInput();
+
+        if (isset($input['default_language'])) {
+            if (!in_array($input['default_language'], self::VALID_LANGUAGES, true)) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid default language', 'default_language', 400);
+                return;
+            }
+        }
+
+        if (isset($input['supported_languages'])) {
+            if (!is_array($input['supported_languages'])) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'supported_languages must be an array', 'supported_languages', 400);
+                return;
+            }
+            // English is always required
+            if (!in_array('en', $input['supported_languages'], true)) {
+                $input['supported_languages'][] = 'en';
+            }
+            foreach ($input['supported_languages'] as $lang) {
+                if (!in_array($lang, self::VALID_LANGUAGES, true)) {
+                    $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, "Invalid language: $lang", 'supported_languages', 400);
+                    return;
+                }
+            }
+        }
+
+        // Read current configuration
+        $tenant = Database::query(
+            "SELECT configuration FROM tenants WHERE id = ?",
+            [$tenantId]
+        )->fetch();
+
+        $config = [];
+        if ($tenant && !empty($tenant['configuration'])) {
+            $config = json_decode($tenant['configuration'], true) ?: [];
+        }
+
+        if (isset($input['supported_languages'])) {
+            $config['supported_languages'] = array_values($input['supported_languages']);
+        }
+
+        if (isset($input['default_language'])) {
+            // Ensure default language is in the supported list
+            $supported = $config['supported_languages'] ?? ['en'];
+            if (!in_array($input['default_language'], $supported, true)) {
+                $config['default_language'] = 'en';
+            } else {
+                $config['default_language'] = $input['default_language'];
+            }
+        }
+
+        Database::query(
+            "UPDATE tenants SET configuration = ? WHERE id = ?",
+            [json_encode($config), $tenantId]
+        );
+
+        $this->clearBootstrapCache($tenantId);
+
+        $this->respondWithData([
+            'default_language' => $config['default_language'] ?? 'en',
+            'supported_languages' => $config['supported_languages'] ?? ['en'],
+        ]);
+    }
 }

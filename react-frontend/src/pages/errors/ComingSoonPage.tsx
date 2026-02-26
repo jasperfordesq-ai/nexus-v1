@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { Home, ArrowLeft, Construction } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -20,8 +21,9 @@ interface ComingSoonPageProps {
 }
 
 export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps) {
+  const { t } = useTranslation('utility');
   const { tenantPath } = useTenant();
-  usePageTitle('Coming Soon');
+  usePageTitle(t('coming_soon.page_title'));
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <motion.div
@@ -34,9 +36,9 @@ export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps
             <Construction className="w-10 h-10 text-amber-400" />
           </div>
 
-          <h1 className="text-2xl font-bold text-theme-primary mb-2">Coming Soon</h1>
+          <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('coming_soon.heading')}</h1>
           <p className="text-theme-muted mb-8">
-            {feature} is currently under development. Check back soon!
+            {t('coming_soon.description', { feature })}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
@@ -45,7 +47,7 @@ export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<Home className="w-4 h-4" />}
               >
-                Dashboard
+                {t('coming_soon.dashboard')}
               </Button>
             </Link>
             <Button
@@ -54,7 +56,7 @@ export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps
               startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               onPress={() => window.history.back()}
             >
-              Go Back
+              {t('coming_soon.go_back')}
             </Button>
           </div>
         </GlassCard>

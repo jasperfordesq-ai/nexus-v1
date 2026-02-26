@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Input,
@@ -25,10 +25,12 @@ import {
 import { Search, RefreshCw, CheckCircle2, XCircle, AlertCircle, Flag } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
 import { adminModeration } from '@/admin/api/adminApi';
+import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminReport, ModerationStats } from '@/admin/api/types';
 
 const CONTENT_TYPES = [
@@ -51,18 +53,43 @@ export default function ReportsManagement() {
   usePageTitle('Reports Management');
 
   const toast = useToast();
+  const { user } = useAuth();
+  const userRecord = user as Record<string, unknown> | null;
+  const isSuperAdmin =
+    (user?.role as string) === 'super_admin' ||
+    userRecord?.is_super_admin === true ||
+    userRecord?.is_tenant_super_admin === true;
+
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [tenantFilter, setTenantFilter] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
   const [activeType, setActiveType] = useState('');
   const [activeStatus, setActiveStatus] = useState('');
+  const [activeTenant, setActiveTenant] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'resolve' | 'dismiss';
     report: AdminReport;
   } | null>(null);
+  const [tenants, setTenants] = useState<Array<{ id: number; name: string }>>([]);
+
+  // Load tenants list for super admin filter
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    adminSuper.listTenants().then((res) => {
+      if (res.success && Array.isArray(res.data)) {
+        setTenants(res.data.map((t) => ({
+          id: Number(t.id),
+          name: String(t.name || 'Unknown'),
+        })));
+      }
+    }).catch(() => {
+      // Tenant list is optional; silently fail
+    });
+  }, [isSuperAdmin]);
 
   const { data: stats, execute: refetchStats } = useApi<ModerationStats>(
     '/v2/admin/reports/stats',
@@ -77,18 +104,20 @@ export default function ReportsManagement() {
     if (activeSearch) params.append('search', activeSearch);
     if (activeType) params.append('type', activeType);
     if (activeStatus) params.append('status', activeStatus);
+    if (activeTenant && activeTenant !== 'all') params.append('tenant_id', activeTenant);
     return params.toString();
   };
 
   const { data, isLoading, error, execute, meta } = useApi<AdminReport[]>(
     `/v2/admin/reports?${buildQueryString()}`,
-    { immediate: true, deps: [page, activeSearch, activeType, activeStatus] }
+    { immediate: true, deps: [page, activeSearch, activeType, activeStatus, activeTenant] }
   );
 
   const handleSearch = () => {
     setActiveSearch(search);
     setActiveType(typeFilter);
     setActiveStatus(statusFilter);
+    setActiveTenant(tenantFilter);
     setPage(1);
   };
 
@@ -96,9 +125,11 @@ export default function ReportsManagement() {
     setSearch('');
     setTypeFilter('');
     setStatusFilter('');
+    setTenantFilter('');
     setActiveSearch('');
     setActiveType('');
     setActiveStatus('');
+    setActiveTenant('');
     setPage(1);
   };
 
@@ -133,11 +164,107 @@ export default function ReportsManagement() {
   const reports = data || [];
   const totalPages = meta?.total_pages || 1;
 
+  // Build cell content for a report row
+  const renderCells = (report: AdminReport): React.ReactElement[] => {
+    const cells: React.ReactElement[] = [
+      <TableCell key="reporter">
+        <div className="flex items-center gap-3">
+          <Avatar
+            src={report.reporter_avatar || undefined}
+            name={report.reporter_name}
+            size="sm"
+            className="flex-shrink-0"
+          />
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{report.reporter_name}</span>
+            <span className="text-xs text-default-400">ID: {report.reporter_id}</span>
+          </div>
+        </div>
+      </TableCell>,
+    ];
+
+    if (isSuperAdmin) {
+      cells.push(
+        <TableCell key="tenant">
+          <Chip size="sm" variant="flat" color="secondary">
+            {report.tenant_name}
+          </Chip>
+        </TableCell>
+      );
+    }
+
+    cells.push(
+      <TableCell key="contentType">
+        <Chip size="sm" variant="flat">
+          {report.content_type}
+        </Chip>
+      </TableCell>,
+      <TableCell key="reason">
+        <span className="text-sm">{report.reason}</span>
+      </TableCell>,
+      <TableCell key="description">
+        <p className="text-sm line-clamp-2 max-w-md">{report.description}</p>
+      </TableCell>,
+      <TableCell key="status">
+        {report.status === 'pending' && (
+          <Chip size="sm" color="warning" variant="flat">Pending</Chip>
+        )}
+        {report.status === 'resolved' && (
+          <Chip size="sm" color="success" variant="flat">Resolved</Chip>
+        )}
+        {report.status === 'dismissed' && (
+          <Chip size="sm" color="default" variant="flat">Dismissed</Chip>
+        )}
+      </TableCell>,
+      <TableCell key="created">
+        <span className="text-sm text-default-500">
+          {new Date(report.created_at).toLocaleDateString()}
+        </span>
+      </TableCell>,
+      <TableCell key="actions">
+        {report.status === 'pending' && (
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="flat"
+              color="success"
+              startContent={<CheckCircle2 className="w-4 h-4" />}
+              onPress={() => setConfirmAction({ type: 'resolve', report })}
+            >
+              Resolve
+            </Button>
+            <Button
+              size="sm"
+              variant="flat"
+              color="default"
+              startContent={<XCircle className="w-4 h-4" />}
+              onPress={() => setConfirmAction({ type: 'dismiss', report })}
+            >
+              Dismiss
+            </Button>
+          </div>
+        )}
+        {report.status !== 'pending' && (
+          <div className="text-sm text-default-400">
+            {report.resolved_by && `By ${report.resolved_by}`}
+          </div>
+        )}
+      </TableCell>
+    );
+
+    return cells;
+  };
+
+  // Determine columns based on super admin status
+  const columns = isSuperAdmin
+    ? ['REPORTER', 'TENANT', 'CONTENT TYPE', 'REASON', 'DESCRIPTION', 'STATUS', 'CREATED', 'ACTIONS']
+    : ['REPORTER', 'CONTENT TYPE', 'REASON', 'DESCRIPTION', 'STATUS', 'CREATED', 'ACTIONS'];
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Reports Management"
-        description="Manage user-submitted reports and flagged content"
+        description={isSuperAdmin ? 'Manage reports across all tenants' : 'Manage user-submitted reports and flagged content'}
         actions={
           <Button
             color="primary"
@@ -238,6 +365,23 @@ export default function ReportsManagement() {
             </SelectItem>
           ))}
         </Select>
+        {isSuperAdmin && (
+          <Select
+            label="Tenant"
+            selectedKeys={tenantFilter ? [tenantFilter] : []}
+            onChange={(e) => setTenantFilter(e.target.value)}
+            className="w-full sm:w-56"
+          >
+            {[
+              <SelectItem key="all">All Tenants</SelectItem>,
+              ...tenants.map((t) => (
+                <SelectItem key={t.id.toString()}>
+                  {t.name}
+                </SelectItem>
+              )),
+            ]}
+          </Select>
+        )}
         <div className="flex gap-2">
           <Button color="primary" onPress={handleSearch}>
             Apply
@@ -252,6 +396,7 @@ export default function ReportsManagement() {
       {meta && (
         <div className="text-sm text-default-500">
           Showing {reports.length} of {meta.total ?? reports.length} reports
+          {isSuperAdmin && !activeTenant && ' (all tenants)'}
         </div>
       )}
 
@@ -265,13 +410,9 @@ export default function ReportsManagement() {
       {/* Table */}
       <Table aria-label="Reports table">
         <TableHeader>
-          <TableColumn>REPORTER</TableColumn>
-          <TableColumn>CONTENT TYPE</TableColumn>
-          <TableColumn>REASON</TableColumn>
-          <TableColumn>DESCRIPTION</TableColumn>
-          <TableColumn>STATUS</TableColumn>
-          <TableColumn>CREATED</TableColumn>
-          <TableColumn>ACTIONS</TableColumn>
+          {columns.map((col) => (
+            <TableColumn key={col}>{col}</TableColumn>
+          ))}
         </TableHeader>
         <TableBody
           items={reports}
@@ -287,76 +428,7 @@ export default function ReportsManagement() {
         >
           {(report) => (
             <TableRow key={report.id}>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Avatar
-                    src={report.reporter_avatar || undefined}
-                    name={report.reporter_name}
-                    size="sm"
-                    className="flex-shrink-0"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{report.reporter_name}</span>
-                    <span className="text-xs text-default-400">ID: {report.reporter_id}</span>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Chip size="sm" variant="flat">
-                  {report.content_type}
-                </Chip>
-              </TableCell>
-              <TableCell>
-                <span className="text-sm">{report.reason}</span>
-              </TableCell>
-              <TableCell>
-                <p className="text-sm line-clamp-2 max-w-md">{report.description}</p>
-              </TableCell>
-              <TableCell>
-                {report.status === 'pending' && (
-                  <Chip size="sm" color="warning" variant="flat">Pending</Chip>
-                )}
-                {report.status === 'resolved' && (
-                  <Chip size="sm" color="success" variant="flat">Resolved</Chip>
-                )}
-                {report.status === 'dismissed' && (
-                  <Chip size="sm" color="default" variant="flat">Dismissed</Chip>
-                )}
-              </TableCell>
-              <TableCell>
-                <span className="text-sm text-default-500">
-                  {new Date(report.created_at).toLocaleDateString()}
-                </span>
-              </TableCell>
-              <TableCell>
-                {report.status === 'pending' && (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="flat"
-                      color="success"
-                      startContent={<CheckCircle2 className="w-4 h-4" />}
-                      onPress={() => setConfirmAction({ type: 'resolve', report })}
-                    >
-                      Resolve
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="flat"
-                      color="default"
-                      startContent={<XCircle className="w-4 h-4" />}
-                      onPress={() => setConfirmAction({ type: 'dismiss', report })}
-                    >
-                      Dismiss
-                    </Button>
-                  </div>
-                )}
-                {report.status !== 'pending' && (
-                  <div className="text-sm text-default-400">
-                    {report.resolved_by && `By ${report.resolved_by}`}
-                  </div>
-                )}
-              </TableCell>
+              {renderCells(report)}
             </TableRow>
           )}
         </TableBody>
@@ -383,8 +455,8 @@ export default function ReportsManagement() {
         title={confirmAction?.type === 'resolve' ? 'Resolve Report' : 'Dismiss Report'}
         message={
           confirmAction?.type === 'resolve'
-            ? 'Are you sure you want to mark this report as resolved? This indicates you have taken appropriate action.'
-            : 'Are you sure you want to dismiss this report? This indicates no action is needed.'
+            ? `Are you sure you want to mark this report${isSuperAdmin && confirmAction?.report ? ` from ${confirmAction.report.tenant_name}` : ''} as resolved? This indicates you have taken appropriate action.`
+            : `Are you sure you want to dismiss this report${isSuperAdmin && confirmAction?.report ? ` from ${confirmAction.report.tenant_name}` : ''}? This indicates no action is needed.`
         }
         confirmLabel={confirmAction?.type === 'resolve' ? 'Resolve Report' : 'Dismiss Report'}
         confirmColor={confirmAction?.type === 'resolve' ? 'primary' : 'warning'}

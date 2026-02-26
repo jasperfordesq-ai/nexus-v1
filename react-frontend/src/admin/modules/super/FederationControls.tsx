@@ -32,16 +32,21 @@ export function FederationControls() {
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    const [ctrlRes, wlRes, pRes] = await Promise.all([
-      adminSuper.getSystemControls(),
-      adminSuper.getWhitelist(),
-      adminSuper.getFederationPartnerships(),
-    ]);
-    if (ctrlRes.success && ctrlRes.data) setControls(ctrlRes.data);
-    if (wlRes.success && wlRes.data) setWhitelist(Array.isArray(wlRes.data) ? wlRes.data : []);
-    if (pRes.success && pRes.data) setPartnerships(Array.isArray(pRes.data) ? pRes.data : []);
+    try {
+      const [ctrlRes, wlRes, pRes] = await Promise.all([
+        adminSuper.getSystemControls(),
+        adminSuper.getWhitelist(),
+        adminSuper.getFederationPartnerships(),
+      ]);
+      if (ctrlRes.success && ctrlRes.data) setControls(ctrlRes.data);
+      else if (!ctrlRes.success) toast.error(`Controls: ${ctrlRes.error || 'Failed to load'}`);
+      if (wlRes.success && wlRes.data) setWhitelist(Array.isArray(wlRes.data) ? wlRes.data : []);
+      if (pRes.success && pRes.data) setPartnerships(Array.isArray(pRes.data) ? pRes.data : []);
+    } catch (err) {
+      toast.error(`Federation error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
     setLoading(false);
-  }, []);
+  }, [toast]);
 
   useEffect(() => { loadData(); }, [loadData]);
 

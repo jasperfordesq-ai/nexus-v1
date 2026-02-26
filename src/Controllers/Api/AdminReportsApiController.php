@@ -40,6 +40,7 @@ class AdminReportsApiController extends BaseApiController
     public function index(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -49,8 +50,15 @@ class AdminReportsApiController extends BaseApiController
         $status = $_GET['status'] ?? null;
         $search = $_GET['search'] ?? null;
 
-        $conditions = ['r.tenant_id = ?'];
-        $params = [$tenantId];
+        $conditions = [];
+        $params = [];
+
+        // Tenant scoping: defaults to current tenant, super admins can explicitly request all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        if ($effectiveTenantId !== null) {
+            $conditions[] = 'r.tenant_id = ?';
+            $params[] = $effectiveTenantId;
+        }
 
         // Type filter (listing, user, message)
         if ($type && in_array($type, ['listing', 'user', 'message'], true)) {
@@ -72,7 +80,7 @@ class AdminReportsApiController extends BaseApiController
             $params[] = $searchPattern;
         }
 
-        $where = implode(' AND ', $conditions);
+        $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
         // Get total count
         $countQuery = "SELECT COUNT(*) as total
@@ -82,12 +90,14 @@ class AdminReportsApiController extends BaseApiController
         $countStmt = Database::query($countQuery, $params);
         $total = (int) $countStmt->fetch()['total'];
 
-        // Get paginated results
+        // Get paginated results — join tenants table for cross-tenant name display
         $query = "SELECT r.*,
                          reporter.name as reporter_name,
-                         reporter.avatar_url as reporter_avatar
+                         reporter.avatar_url as reporter_avatar,
+                         t.name as tenant_name
                   FROM reports r
                   LEFT JOIN users reporter ON r.reporter_id = reporter.id
+                  LEFT JOIN tenants t ON r.tenant_id = t.id
                   WHERE {$where}
                   ORDER BY r.created_at DESC
                   LIMIT ? OFFSET ?";
@@ -101,6 +111,8 @@ class AdminReportsApiController extends BaseApiController
         $formatted = array_map(function ($report) {
             return [
                 'id' => (int) $report['id'],
+                'tenant_id' => (int) $report['tenant_id'],
+                'tenant_name' => $report['tenant_name'] ?? 'Unknown',
                 'reporter_id' => (int) $report['reporter_id'],
                 'reporter_name' => $report['reporter_name'] ?? 'Unknown',
                 'reporter_avatar' => $report['reporter_avatar'],
@@ -123,16 +135,31 @@ class AdminReportsApiController extends BaseApiController
     public function show(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $query = "SELECT r.*,
-                         reporter.name as reporter_name,
-                         reporter.avatar_url as reporter_avatar
-                  FROM reports r
-                  LEFT JOIN users reporter ON r.reporter_id = reporter.id
-                  WHERE r.id = ? AND r.tenant_id = ?";
-
-        $stmt = Database::query($query, [$id, $tenantId]);
+        // Super admins can view reports from any tenant
+        if ($isSuperAdmin) {
+            $query = "SELECT r.*,
+                             reporter.name as reporter_name,
+                             reporter.avatar_url as reporter_avatar,
+                             t.name as tenant_name
+                      FROM reports r
+                      LEFT JOIN users reporter ON r.reporter_id = reporter.id
+                      LEFT JOIN tenants t ON r.tenant_id = t.id
+                      WHERE r.id = ?";
+            $stmt = Database::query($query, [$id]);
+        } else {
+            $query = "SELECT r.*,
+                             reporter.name as reporter_name,
+                             reporter.avatar_url as reporter_avatar,
+                             t.name as tenant_name
+                      FROM reports r
+                      LEFT JOIN users reporter ON r.reporter_id = reporter.id
+                      LEFT JOIN tenants t ON r.tenant_id = t.id
+                      WHERE r.id = ? AND r.tenant_id = ?";
+            $stmt = Database::query($query, [$id, $tenantId]);
+        }
         $report = $stmt->fetch();
 
         if (!$report) {
@@ -142,6 +169,8 @@ class AdminReportsApiController extends BaseApiController
 
         $formatted = [
             'id' => (int) $report['id'],
+            'tenant_id' => (int) $report['tenant_id'],
+            'tenant_name' => $report['tenant_name'] ?? 'Unknown',
             'reporter_id' => (int) $report['reporter_id'],
             'reporter_name' => $report['reporter_name'] ?? 'Unknown',
             'reporter_avatar' => $report['reporter_avatar'],
@@ -163,14 +192,22 @@ class AdminReportsApiController extends BaseApiController
     public function resolve(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Check report exists and is not already resolved
-        $stmt = Database::query(
-            "SELECT id, status FROM reports WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
-        );
+        // Check report exists — super admins can resolve reports from any tenant
+        if ($isSuperAdmin) {
+            $stmt = Database::query(
+                "SELECT id, status, tenant_id FROM reports WHERE id = ?",
+                [$id]
+            );
+        } else {
+            $stmt = Database::query(
+                "SELECT id, status, tenant_id FROM reports WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+        }
         $report = $stmt->fetch();
 
         if (!$report) {
@@ -183,14 +220,21 @@ class AdminReportsApiController extends BaseApiController
             return;
         }
 
+        // Use the report's own tenant_id for the update (safety: always include tenant_id in UPDATE)
+        $reportTenantId = (int) $report['tenant_id'];
+
         // Update status to resolved
         Database::query(
             "UPDATE reports SET status = 'resolved', updated_at = NOW() WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $reportTenantId]
         );
 
-        // Log activity
-        ActivityLog::log($adminId, 'resolve_report', "Resolved report ID {$id}");
+        // Log activity — include tenant info for super admin actions
+        ActivityLog::log(
+            $adminId,
+            'resolve_report',
+            "Resolved report ID {$id}" . ($isSuperAdmin ? " (tenant {$reportTenantId})" : '')
+        );
 
         $this->respondWithData(['success' => true, 'message' => 'Report resolved']);
     }
@@ -201,14 +245,22 @@ class AdminReportsApiController extends BaseApiController
     public function dismiss(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Check report exists and is not already dismissed
-        $stmt = Database::query(
-            "SELECT id, status FROM reports WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
-        );
+        // Check report exists — super admins can dismiss reports from any tenant
+        if ($isSuperAdmin) {
+            $stmt = Database::query(
+                "SELECT id, status, tenant_id FROM reports WHERE id = ?",
+                [$id]
+            );
+        } else {
+            $stmt = Database::query(
+                "SELECT id, status, tenant_id FROM reports WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+        }
         $report = $stmt->fetch();
 
         if (!$report) {
@@ -221,14 +273,21 @@ class AdminReportsApiController extends BaseApiController
             return;
         }
 
+        // Use the report's own tenant_id for the update (safety: always include tenant_id in UPDATE)
+        $reportTenantId = (int) $report['tenant_id'];
+
         // Update status to dismissed
         Database::query(
             "UPDATE reports SET status = 'dismissed', updated_at = NOW() WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $reportTenantId]
         );
 
-        // Log activity
-        ActivityLog::log($adminId, 'dismiss_report', "Dismissed report ID {$id}");
+        // Log activity — include tenant info for super admin actions
+        ActivityLog::log(
+            $adminId,
+            'dismiss_report',
+            "Dismissed report ID {$id}" . ($isSuperAdmin ? " (tenant {$reportTenantId})" : '')
+        );
 
         $this->respondWithData(['success' => true, 'message' => 'Report dismissed']);
     }
@@ -239,7 +298,12 @@ class AdminReportsApiController extends BaseApiController
     public function stats(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
+        // Tenant scoping: defaults to current tenant, super admins can explicitly request all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         $query = "SELECT
                     COUNT(*) as total,
@@ -247,9 +311,9 @@ class AdminReportsApiController extends BaseApiController
                     SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved,
                     SUM(CASE WHEN status = 'dismissed' THEN 1 ELSE 0 END) as dismissed
                   FROM reports
-                  WHERE tenant_id = ?";
+                  WHERE {$tenantWhere}";
+        $stmt = Database::query($query, $tenantParams);
 
-        $stmt = Database::query($query, [$tenantId]);
         $stats = $stmt->fetch();
 
         $formatted = [

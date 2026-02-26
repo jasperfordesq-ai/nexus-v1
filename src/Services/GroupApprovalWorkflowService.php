@@ -464,7 +464,7 @@ class GroupApprovalWorkflowService
                     0,
                     'group_approval_request',
                     "A new group '{$group['name']}' is awaiting approval.",
-                    '/admin/groups',
+                    '/admin/groups/approvals',
                     null
                 );
             }

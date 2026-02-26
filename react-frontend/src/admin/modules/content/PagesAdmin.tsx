@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Spinner } from '@heroui/react';
+import { Button, Chip, Spinner } from '@heroui/react';
 import { FileText, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
@@ -24,6 +24,8 @@ interface PageItem {
   slug: string;
   status: string;
   sort_order: number;
+  show_in_menu: number;
+  menu_location: string;
   created_at: string;
 }
 
@@ -108,6 +110,18 @@ export function PagesAdmin() {
       label: 'Status',
       sortable: true,
       render: (item) => <StatusBadge status={item.status || 'draft'} />,
+    },
+    {
+      key: 'show_in_menu',
+      label: 'In Menu',
+      sortable: true,
+      render: (item) => item.show_in_menu ? (
+        <Chip size="sm" variant="flat" color="primary">
+          {item.menu_location === 'footer' ? 'Footer' : 'About'}
+        </Chip>
+      ) : (
+        <span className="text-sm text-default-400">No</span>
+      ),
     },
     {
       key: 'created_at',

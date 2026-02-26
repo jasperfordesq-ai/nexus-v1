@@ -39,24 +39,34 @@ export function SuperUserList() {
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
-    const res = await adminSuper.listUsers({
-      page,
-      search: search || undefined,
-      tenant_id: tenantFilter,
-      role: roleFilter,
-      super_admins: superAdminsOnly || undefined,
-      limit: 100,
-    });
-    if (res.success && res.data) {
-      setUsers(Array.isArray(res.data) ? res.data : []);
+    try {
+      const res = await adminSuper.listUsers({
+        page,
+        search: search || undefined,
+        tenant_id: tenantFilter,
+        role: roleFilter,
+        super_admins: superAdminsOnly || undefined,
+        limit: 100,
+      });
+      if (res.success && res.data) {
+        setUsers(Array.isArray(res.data) ? res.data : []);
+      } else if (!res.success) {
+        toast.error(`Users: ${res.error || 'Failed to load user list'}`);
+      }
+    } catch (err) {
+      toast.error(`Users error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
     setLoading(false);
-  }, [page, search, tenantFilter, roleFilter, superAdminsOnly]);
+  }, [page, search, tenantFilter, roleFilter, superAdminsOnly, toast]);
 
   const loadTenants = useCallback(async () => {
-    const res = await adminSuper.listTenants();
-    if (res.success && res.data) {
-      setTenants(Array.isArray(res.data) ? res.data.map((t) => ({ id: t.id, name: t.name })) : []);
+    try {
+      const res = await adminSuper.listTenants();
+      if (res.success && res.data) {
+        setTenants(Array.isArray(res.data) ? res.data.map((t) => ({ id: t.id, name: t.name })) : []);
+      }
+    } catch {
+      // Tenant list for filter dropdown - non-critical
     }
   }, []);
 

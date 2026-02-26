@@ -1,0 +1,46 @@
+{
+  "page_title": "Fotha",
+  "title": "Fotha an Phobail",
+  "subtitle": "Feic cad atá ag tarlú i do phobal",
+  "new_post": "Postáil Nua",
+  "whats_on_your_mind": "Cad atá ar d'intinn?",
+  "add_image_aria": "Cuir íomhá leis",
+  "create_poll_aria": "Cruthaigh vóta",
+  "create_post": "Cruthaigh Postáil",
+  "load_more": "Lódáil Tuilleadh",
+  "unable_to_load": "Ní Féidir an Fotha a Lódáil",
+  "try_again": "Bain Triail Eile As",
+  "error_load": "Theip ar lódáil an fhotha.",
+  "error_load_retry": "Theip ar lódáil an fhotha. Bain triail eile as.",
+  "empty_title": "Níl aon phostálacha fós",
+  "empty_desc": "Bí ar an gcéad duine rud éigin a roinnt le do phobal!",
+  "empty_filtered": "Níl aon {{filter}} san fhotha faoi láthair. Bain triail as scagaire eile!",
+  "filter": {
+    "all": "Uile",
+    "posts": "Postálacha",
+    "listings": "Liostálacha",
+    "events": "Imeachtaí",
+    "polls": "Vótaí",
+    "goals": "Spriocanna"
+  },
+  "report": {
+    "title": "Tuairiscigh Postáil",
+    "description": "Déan cur síos ar an bhfáth a bhfuil tú ag tuairisciú na postála seo. Déanfaidh ár moderadóirí athbhreithniú ar do thuairisc.",
+    "reason_label": "Cúis",
+    "reason_placeholder": "Déan cur síos ar an bhfadhb...",
+    "cancel": "Cealaigh",
+    "submit": "Seol Tuairisc"
+  },
+  "toast": {
+    "post_hidden": "Postáil curtha i bhfolach",
+    "hide_failed": "Theip ar an bpostáil a chur i bhfolach",
+    "user_muted": "Úsáideoir balbhaithe",
+    "mute_failed": "Theip ar an úsáideoir a bhalbhú",
+    "provide_reason": "Tabhair cúis le do thoil",
+    "reported": "Postáil tuairiscithe. Go raibh maith agat as cabhrú lenár bpobal a choinneáil sábháilte.",
+    "report_failed": "Theip ar an bpostáil a thuairisciú",
+    "deleted": "Postáil scriosta",
+    "delete_failed": "Theip ar an bpostáil a scriosadh",
+    "vote_failed": "Theip ar an vóta a sheoladh"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "generic": "Si è verificato un errore. La preghiamo di riprovare.",
+  "not_found": "Pagina non trovata",
+  "unauthorized": "Non dispone dei permessi per visualizzare questa pagina",
+  "network": "Errore di rete. Verifichi la Sua connessione.",
+  "loading_failed": "Impossibile caricare il contenuto. Aggiorni la pagina.",
+  "session_expired": "La Sua sessione è scaduta. Effettui nuovamente l'accesso.",
+  "validation": {
+    "required": "Questo campo è obbligatorio",
+    "email": "Inserisca un indirizzo email valido",
+    "phone": "Inserisca un numero di telefono valido",
+    "min_length": "Deve contenere almeno {{min}} caratteri",
+    "max_length": "Non deve superare {{max}} caratteri"
+  }
+}

@@ -36,6 +36,7 @@ import {
   Wallet,
   Mail,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
@@ -71,8 +72,9 @@ const tocSections = [
 /* ───────────────────────── Component ───────────────────────── */
 
 export function ImpactReportPage() {
+  const { t } = useTranslation('about');
   const { tenantPath } = useTenant();
-  usePageTitle('Impact Report');
+  usePageTitle(t('impact_report.page_title'));
   const [activeSection, setActiveSection] = useState('introduction');
 
   const handleScroll = useCallback(() => {
@@ -108,15 +110,15 @@ export function ImpactReportPage() {
   return (
     <>
     <PageMeta
-      title="Impact Report"
-      description="Full 2023 Social Impact Study for hOUR Timebank: SROI analysis showing sixteen euros returned for every euro invested, with member outcomes and case studies."
+      title={t('impact_report.page_title')}
+      description={t('impact_report.meta_description')}
     />
     <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
       {/* ─── Breadcrumbs ─── */}
       <div className="px-4 sm:px-6 lg:px-8 pt-6">
         <Breadcrumbs items={[
-          { label: 'About', href: '/about' },
-          { label: 'Impact Report' },
+          { label: t('impact_report.breadcrumb_about'), href: '/about' },
+          { label: t('impact_report.page_title') },
         ]} />
       </div>
 
@@ -139,7 +141,7 @@ export function ImpactReportPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-theme-primary mb-4"
           >
-            Social Impact Study
+            {t('impact_report.hero_title')}
           </motion.h1>
 
           <motion.p
@@ -147,7 +149,7 @@ export function ImpactReportPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-theme-muted mb-2"
           >
-            hOUR Timebank &mdash; 2023
+            {t('impact_report.hero_org_year')}
           </motion.p>
 
           <motion.p
@@ -155,8 +157,7 @@ export function ImpactReportPage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-sm text-theme-subtle max-w-xl mx-auto mb-8"
           >
-            A comprehensive Social Return on Investment (SROI) analysis examining
-            the social, economic, and wellbeing outcomes of timebanking in Ireland.
+            {t('impact_report.hero_description')}
           </motion.p>
 
           <motion.div
@@ -172,7 +173,7 @@ export function ImpactReportPage() {
               className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold"
               startContent={<Download className="w-4 h-4" aria-hidden="true" />}
             >
-              Download Full Report (PDF)
+              {t('impact_report.download_full_report')}
             </Button>
             <Button
               as="a"
@@ -183,7 +184,7 @@ export function ImpactReportPage() {
               className="border-theme-default text-theme-primary hover:bg-theme-hover"
               startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
             >
-              Executive Summary (PDF)
+              {t('impact_report.executive_summary_pdf')}
             </Button>
           </motion.div>
         </div>
@@ -199,7 +200,7 @@ export function ImpactReportPage() {
           >
             <GlassCard className="p-4 sm:p-6">
               <h2 className="text-sm font-semibold text-theme-subtle uppercase tracking-wider mb-4">
-                Contents
+                {t('impact_report.toc_heading')}
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {tocSections.map((section, index) => (
@@ -217,7 +218,7 @@ export function ImpactReportPage() {
                     <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-400">
                       {index + 1}
                     </span>
-                    <span className="truncate">{section.label}</span>
+                    <span className="truncate">{t(`impact_report.toc_${section.id}`, section.label)}</span>
                   </Button>
                 ))}
               </div>
@@ -234,29 +235,20 @@ export function ImpactReportPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={BookOpen} number={1} title="Introduction & Context" />
+            <SectionHeading icon={BookOpen} number={1} title={t('impact_report.toc_introduction')} />
 
             <div className="space-y-6 mt-6">
               <GlassCard className="p-6">
                 <p className="text-theme-muted text-sm leading-relaxed mb-4">
-                  hOUR Timebank Ireland (TBI) was established to address social isolation and
-                  promote community resilience through a time-based exchange system. This study
-                  was conducted to independently measure the social return on investment of timebanking
-                  activities during the 2021&ndash;2022 period.
+                  {t('impact_report.intro_para')}
                 </p>
 
-                <h3 className="text-base font-semibold text-theme-primary mb-3">Study Objectives</h3>
+                <h3 className="text-base font-semibold text-theme-primary mb-3">{t('impact_report.study_objectives_heading')}</h3>
                 <ul className="space-y-2">
-                  {[
-                    'Measure the social value generated by hOUR Timebank activities',
-                    'Quantify wellbeing and community connection improvements for members',
-                    'Calculate Social Return on Investment (SROI) ratio',
-                    'Identify key success factors and areas for improvement',
-                    'Provide evidence to inform future funding and strategic decisions',
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-theme-muted">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-theme-muted">
                       <ChevronRight className="w-4 h-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                      <span>{item}</span>
+                      <span>{t(`impact_report.study_objective_${i}`)}</span>
                     </li>
                   ))}
                 </ul>
@@ -264,11 +256,8 @@ export function ImpactReportPage() {
 
               {/* Case Study: Monica */}
               <CaseStudyCard
-                name="Monica"
-                quote="Before joining hOUR Timebank, I was barely leaving the house. Now I have a reason
-                  to get up in the morning. I teach Italian to a group of members every week and in return
-                  I've had help with my garden, lifts to appointments, and most importantly &mdash;
-                  real friendships."
+                name={t('impact_report.case_study_monica_name')}
+                quote={t('impact_report.case_study_monica_quote')}
                 accent="emerald"
               />
             </div>
@@ -284,46 +273,36 @@ export function ImpactReportPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={FileText} number={2} title="Literature Review" />
+            <SectionHeading icon={FileText} number={2} title={t('impact_report.toc_literature')} />
 
             <div className="mt-6">
               <GlassCard className="p-6">
                 <p className="text-theme-muted text-sm leading-relaxed mb-4">
-                  International research consistently demonstrates that timebanking delivers
-                  measurable benefits across multiple domains. The literature review for this study
-                  examined evidence from the UK, US, Japan, and New Zealand.
+                  {t('impact_report.literature_para')}
                 </p>
 
                 <div className="grid sm:grid-cols-2 gap-4 mt-4">
                   {[
                     {
-                      title: 'Social Isolation',
-                      description: 'Timebanking reduces loneliness by creating structured opportunities for regular social interaction and reciprocal relationships.',
                       color: 'text-indigo-500 dark:text-indigo-400',
                       bg: 'bg-indigo-500/10',
                     },
                     {
-                      title: 'Mental Health',
-                      description: 'Members report improved self-esteem, sense of purpose, and reduced symptoms of depression and anxiety through meaningful contribution.',
                       color: 'text-rose-500 dark:text-rose-400',
                       bg: 'bg-rose-500/10',
                     },
                     {
-                      title: 'Community Resilience',
-                      description: 'Time-based exchange systems strengthen neighbourhood bonds and create informal support networks that persist beyond formal activities.',
                       color: 'text-amber-500 dark:text-amber-400',
                       bg: 'bg-amber-500/10',
                     },
                     {
-                      title: 'Economic Value',
-                      description: 'SROI analyses in the UK have found returns of between £3 and £8 per £1 invested, making timebanking a cost-effective social intervention.',
                       color: 'text-emerald-500 dark:text-emerald-400',
                       bg: 'bg-emerald-500/10',
                     },
-                  ].map((item) => (
-                    <div key={item.title} className={`p-4 rounded-xl ${item.bg}`}>
-                      <h4 className={`text-sm font-semibold ${item.color} mb-1`}>{item.title}</h4>
-                      <p className="text-xs text-theme-muted leading-relaxed">{item.description}</p>
+                  ].map((item, index) => (
+                    <div key={index} className={`p-4 rounded-xl ${item.bg}`}>
+                      <h4 className={`text-sm font-semibold ${item.color} mb-1`}>{t(`impact_report.lit_review_${index}_title`)}</h4>
+                      <p className="text-xs text-theme-muted leading-relaxed">{t(`impact_report.lit_review_${index}_description`)}</p>
                     </div>
                   ))}
                 </div>
@@ -341,12 +320,11 @@ export function ImpactReportPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={Activity} number={3} title="TBI Activity 2021\u201322" />
+            <SectionHeading icon={Activity} number={3} title={t('impact_report.toc_activity')} />
 
             <div className="space-y-6 mt-6">
               <p className="text-theme-muted text-sm leading-relaxed">
-                The study period captured a comprehensive view of platform usage across the hOUR Timebank
-                network during 2021&ndash;2022. The following metrics reflect the breadth of community engagement.
+                {t('impact_report.activity_para')}
               </p>
 
               {/* Activity Stats Table */}
@@ -355,16 +333,16 @@ export function ImpactReportPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10">
-                        <th className="px-6 py-4 text-left font-semibold text-theme-primary">Metric</th>
-                        <th className="px-6 py-4 text-right font-semibold text-theme-primary">Value</th>
+                        <th className="px-6 py-4 text-left font-semibold text-theme-primary">{t('impact_report.activity_metric_header')}</th>
+                        <th className="px-6 py-4 text-right font-semibold text-theme-primary">{t('impact_report.activity_value_header')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme-default">
                       {[
-                        { icon: Wallet, metric: 'Gross Income', value: '1,941.10 credits', highlight: false },
-                        { icon: ArrowRightLeft, metric: 'Transfers Completed', value: '559', highlight: false },
-                        { icon: LogIn, metric: 'Member Logins', value: '1,560', highlight: false },
-                        { icon: Clock, metric: 'Community Account Balance', value: '1,007,748.95 credits', highlight: true },
+                        { icon: Wallet, metric: t('impact_report.activity_metric_0'), value: t('impact_report.activity_value_0'), highlight: false },
+                        { icon: ArrowRightLeft, metric: t('impact_report.activity_metric_1'), value: t('impact_report.activity_value_1'), highlight: false },
+                        { icon: LogIn, metric: t('impact_report.activity_metric_2'), value: t('impact_report.activity_value_2'), highlight: false },
+                        { icon: Clock, metric: t('impact_report.activity_metric_3'), value: t('impact_report.activity_value_3'), highlight: true },
                       ].map((row) => (
                         <tr key={row.metric} className={row.highlight ? 'bg-emerald-500/5' : ''}>
                           <td className="px-6 py-4">
@@ -386,8 +364,7 @@ export function ImpactReportPage() {
               </GlassCard>
 
               <p className="text-xs text-theme-subtle leading-relaxed">
-                Note: The Community Account balance reflects cumulative time credits across the entire
-                network, demonstrating the scale of social capital generated through the platform.
+                {t('impact_report.activity_note')}
               </p>
             </div>
           </motion.div>
@@ -402,15 +379,13 @@ export function ImpactReportPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={Users} number={4} title="Impact & Demographics" />
+            <SectionHeading icon={Users} number={4} title={t('impact_report.toc_impact')} />
 
             <div className="space-y-6 mt-6">
               <GlassCard className="p-6">
-                <h3 className="text-base font-semibold text-theme-primary mb-4">Member Demographics</h3>
+                <h3 className="text-base font-semibold text-theme-primary mb-4">{t('impact_report.demographics_heading')}</h3>
                 <p className="text-theme-muted text-sm leading-relaxed mb-4">
-                  The survey captured responses from members across a range of age groups, with the strongest
-                  representation in the 45&ndash;64 and 65+ categories &mdash; demographics most at risk of
-                  social isolation.
+                  {t('impact_report.demographics_para')}
                 </p>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -437,12 +412,11 @@ export function ImpactReportPage() {
                       <div className="p-2 rounded-lg bg-emerald-500/15">
                         <Users className="w-5 h-5 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                       </div>
-                      <h3 className="font-semibold text-theme-primary">Social Connection</h3>
+                      <h3 className="font-semibold text-theme-primary">{t('impact_report.outcome_connection_heading')}</h3>
                     </div>
                     <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">95%</p>
                     <p className="text-sm text-theme-muted">
-                      of members reported feeling more socially connected as a result of participating
-                      in hOUR Timebank.
+                      {t('impact_report.outcome_connection_text')}
                     </p>
                   </div>
                 </GlassCard>
@@ -454,12 +428,11 @@ export function ImpactReportPage() {
                       <div className="p-2 rounded-lg bg-rose-500/15">
                         <Heart className="w-5 h-5 text-rose-500 dark:text-rose-400" aria-hidden="true" />
                       </div>
-                      <h3 className="font-semibold text-theme-primary">Wellbeing</h3>
+                      <h3 className="font-semibold text-theme-primary">{t('impact_report.outcome_wellbeing_heading')}</h3>
                     </div>
                     <p className="text-4xl font-bold text-rose-600 dark:text-rose-400 mb-1">100%</p>
                     <p className="text-sm text-theme-muted">
-                      of participants reported improved wellbeing, spanning mental health,
-                      confidence, and sense of purpose.
+                      {t('impact_report.outcome_wellbeing_text')}
                     </p>
                   </div>
                 </GlassCard>
@@ -467,10 +440,8 @@ export function ImpactReportPage() {
 
               {/* Case Study: Elaine */}
               <CaseStudyCard
-                name="Elaine"
-                quote="I was going through a very difficult time after losing my partner. The timebank gave
-                  me a lifeline. I started offering baking lessons and in return received company, conversation,
-                  and a sense that I still had something valuable to give. It quite literally saved my life."
+                name={t('impact_report.case_study_elaine_name')}
+                quote={t('impact_report.case_study_elaine_quote')}
                 accent="indigo"
               />
             </div>
@@ -486,7 +457,7 @@ export function ImpactReportPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={Calculator} number={5} title="SROI Calculation" />
+            <SectionHeading icon={Calculator} number={5} title={t('impact_report.toc_sroi')} />
 
             <div className="space-y-6 mt-6">
               {/* Big SROI result */}
@@ -500,13 +471,12 @@ export function ImpactReportPage() {
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 mb-4">
                     <TrendingUp className="w-7 h-7 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="text-lg font-semibold text-theme-primary mb-2">Social Return on Investment</h3>
+                  <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('impact_report.sroi_heading')}</h3>
                   <p className="text-5xl sm:text-6xl font-extrabold text-gradient mb-3">
                     &euro;16 : &euro;1
                   </p>
                   <p className="text-theme-muted text-sm max-w-md mx-auto">
-                    For every &euro;1 invested in hOUR Timebank, &euro;16 of social value
-                    is generated for members and the wider community.
+                    {t('impact_report.sroi_description')}
                   </p>
                 </div>
               </GlassCard>
@@ -514,31 +484,31 @@ export function ImpactReportPage() {
               {/* Breakdown table */}
               <GlassCard className="overflow-hidden">
                 <div className="p-4 sm:p-6 border-b border-theme-default">
-                  <h3 className="text-base font-semibold text-theme-primary">SROI Breakdown</h3>
+                  <h3 className="text-base font-semibold text-theme-primary">{t('impact_report.sroi_breakdown_heading')}</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10">
-                        <th className="px-6 py-3 text-left font-semibold text-theme-primary">Component</th>
-                        <th className="px-6 py-3 text-right font-semibold text-theme-primary">Value</th>
+                        <th className="px-6 py-3 text-left font-semibold text-theme-primary">{t('impact_report.sroi_component_header')}</th>
+                        <th className="px-6 py-3 text-right font-semibold text-theme-primary">{t('impact_report.sroi_value_header')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme-default">
                       <tr>
-                        <td className="px-6 py-3 text-theme-muted">Total Investment (Input)</td>
+                        <td className="px-6 py-3 text-theme-muted">{t('impact_report.sroi_total_investment')}</td>
                         <td className="px-6 py-3 text-right font-semibold text-theme-primary">&euro;50,000</td>
                       </tr>
                       <tr>
-                        <td className="px-6 py-3 text-theme-muted">Total Present Value (Social Outcomes)</td>
+                        <td className="px-6 py-3 text-theme-muted">{t('impact_report.sroi_total_present_value')}</td>
                         <td className="px-6 py-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">&euro;803,184</td>
                       </tr>
                       <tr className="bg-emerald-500/5">
-                        <td className="px-6 py-3 font-semibold text-theme-primary">Net Social Value</td>
+                        <td className="px-6 py-3 font-semibold text-theme-primary">{t('impact_report.sroi_net_social_value')}</td>
                         <td className="px-6 py-3 text-right font-bold text-emerald-600 dark:text-emerald-400">&euro;753,184</td>
                       </tr>
                       <tr className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10">
-                        <td className="px-6 py-3 font-bold text-theme-primary">SROI Ratio</td>
+                        <td className="px-6 py-3 font-bold text-theme-primary">{t('impact_report.sroi_ratio_label')}</td>
                         <td className="px-6 py-3 text-right font-extrabold text-emerald-600 dark:text-emerald-400 text-lg">&euro;16.06 : &euro;1</td>
                       </tr>
                     </tbody>
@@ -552,9 +522,7 @@ export function ImpactReportPage() {
                     <ArrowUp className="w-4 h-4 text-amber-500 dark:text-amber-400" aria-hidden="true" />
                   </div>
                   <p className="text-sm text-theme-muted leading-relaxed">
-                    This SROI ratio of <strong className="text-theme-primary">&euro;16 for every &euro;1</strong> significantly
-                    exceeds international benchmarks for timebanking programmes and places hOUR Timebank
-                    among the highest-performing social interventions documented in Ireland.
+                    {t('impact_report.sroi_benchmark_note')}
                   </p>
                 </div>
               </GlassCard>
@@ -571,38 +539,21 @@ export function ImpactReportPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={MessageSquare} number={6} title="Discussion & Learning" />
+            <SectionHeading icon={MessageSquare} number={6} title={t('impact_report.toc_discussion')} />
 
             <div className="space-y-6 mt-6">
               <GlassCard className="p-6">
                 <p className="text-theme-muted text-sm leading-relaxed mb-4">
-                  The study identified several key factors that contribute to the exceptional impact of hOUR Timebank:
+                  {t('impact_report.discussion_para')}
                 </p>
 
                 <div className="space-y-4">
-                  {[
-                    {
-                      title: 'Reciprocity as empowerment',
-                      description: 'Unlike one-directional volunteering, timebanking enables members to both give and receive, preserving dignity and fostering mutual respect.',
-                    },
-                    {
-                      title: 'Low-barrier participation',
-                      description: 'The simplicity of the time-credit model makes it accessible to people of all backgrounds, including those who may feel excluded from traditional economic systems.',
-                    },
-                    {
-                      title: 'Broker-supported coordination',
-                      description: 'The role of the timebank broker/coordinator was highlighted as critical to success, providing personal introductions, conflict resolution, and continuity.',
-                    },
-                    {
-                      title: 'Digital and in-person hybrid',
-                      description: 'The combination of a digital platform with real-world meetups and events creates both convenience and meaningful human connection.',
-                    },
-                  ].map((item) => (
-                    <div key={item.title} className="flex items-start gap-3">
+                  {[0, 1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-start gap-3">
                       <ChevronRight className="w-4 h-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0 mt-1" aria-hidden="true" />
                       <div>
-                        <h4 className="text-sm font-semibold text-theme-primary">{item.title}</h4>
-                        <p className="text-sm text-theme-muted leading-relaxed">{item.description}</p>
+                        <h4 className="text-sm font-semibold text-theme-primary">{t(`impact_report.discussion_factor_${i}_title`)}</h4>
+                        <p className="text-sm text-theme-muted leading-relaxed">{t(`impact_report.discussion_factor_${i}_description`)}</p>
                       </div>
                     </div>
                   ))}
@@ -621,7 +572,7 @@ export function ImpactReportPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <SectionHeading icon={Lightbulb} number={7} title="Recommendations" />
+            <SectionHeading icon={Lightbulb} number={7} title={t('impact_report.toc_recommendations')} />
 
             <div className="space-y-6 mt-6">
               <GlassCard className="overflow-hidden">
@@ -630,22 +581,22 @@ export function ImpactReportPage() {
                     <thead>
                       <tr className="bg-gradient-to-r from-amber-500/10 to-orange-500/10">
                         <th className="px-6 py-4 text-left font-semibold text-theme-primary w-8">#</th>
-                        <th className="px-6 py-4 text-left font-semibold text-theme-primary">Recommendation</th>
-                        <th className="px-6 py-4 text-left font-semibold text-theme-primary">Priority</th>
+                        <th className="px-6 py-4 text-left font-semibold text-theme-primary">{t('impact_report.rec_header')}</th>
+                        <th className="px-6 py-4 text-left font-semibold text-theme-primary">{t('impact_report.rec_priority_header')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme-default">
                       {[
-                        { rec: 'Secure sustainable, multi-year funding to enable long-term planning and scaling', priority: 'Critical' },
-                        { rec: 'Increase membership through partnerships with HSE, local authorities, and community organisations', priority: 'High' },
-                        { rec: 'Explore integration with social prescribing networks and GP referral pathways', priority: 'High' },
-                        { rec: 'Invest in the digital platform to improve member experience and data collection', priority: 'Medium' },
-                        { rec: 'Develop a national scaling plan with regional hubs and local coordinators', priority: 'Medium' },
-                        { rec: 'Commission follow-up SROI studies at regular intervals to track ongoing impact', priority: 'Medium' },
+                        { priority: 'Critical' },
+                        { priority: 'High' },
+                        { priority: 'High' },
+                        { priority: 'Medium' },
+                        { priority: 'Medium' },
+                        { priority: 'Medium' },
                       ].map((row, idx) => (
                         <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
                           <td className="px-6 py-3 text-theme-subtle font-medium">{idx + 1}</td>
-                          <td className="px-6 py-3 text-theme-muted">{row.rec}</td>
+                          <td className="px-6 py-3 text-theme-muted">{t(`impact_report.rec_${idx}`)}</td>
                           <td className="px-6 py-3">
                             <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               row.priority === 'Critical'
@@ -687,10 +638,10 @@ export function ImpactReportPage() {
 
               <div className="relative z-10">
                 <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">
-                  Download the Full Report
+                  {t('impact_report.cta_heading')}
                 </h2>
                 <p className="text-theme-muted max-w-lg mx-auto mb-8">
-                  Access the complete Social Impact Study with full methodology, data tables, and appendices.
+                  {t('impact_report.cta_subtitle')}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
@@ -703,7 +654,7 @@ export function ImpactReportPage() {
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold"
                     startContent={<Download className="w-5 h-5" aria-hidden="true" />}
                   >
-                    Full Report (PDF)
+                    {t('impact_report.cta_full_report')}
                   </Button>
                   <Button
                     as="a"
@@ -715,19 +666,19 @@ export function ImpactReportPage() {
                     className="border-theme-default text-theme-primary hover:bg-theme-hover"
                     startContent={<ExternalLink className="w-5 h-5" aria-hidden="true" />}
                   >
-                    Executive Summary (PDF)
+                    {t('impact_report.cta_exec_summary')}
                   </Button>
                 </div>
 
                 <div className="pt-4 border-t border-theme-default">
-                  <p className="text-sm text-theme-subtle mb-3">Have questions about our impact?</p>
+                  <p className="text-sm text-theme-subtle mb-3">{t('impact_report.cta_questions')}</p>
                   <Link to={tenantPath('/contact')}>
                     <Button
                       variant="light"
                       className="text-emerald-600 dark:text-emerald-400"
                       startContent={<Mail className="w-4 h-4" aria-hidden="true" />}
                     >
-                      Contact Us
+                      {t('impact_report.cta_contact')}
                     </Button>
                   </Link>
                 </div>
@@ -750,13 +701,14 @@ interface SectionHeadingProps {
 }
 
 function SectionHeading({ icon: Icon, number, title }: SectionHeadingProps) {
+  const { t } = useTranslation('about');
   return (
     <div className="flex items-center gap-3">
       <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
         <Icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
       </div>
       <div>
-        <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">Section {number}</p>
+        <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">{t('impact_report.section_label', { number })}</p>
         <h2 className="text-xl sm:text-2xl font-bold text-theme-primary">{title}</h2>
       </div>
     </div>
@@ -770,6 +722,7 @@ interface CaseStudyCardProps {
 }
 
 function CaseStudyCard({ name, quote, accent }: CaseStudyCardProps) {
+  const { t } = useTranslation('about');
   const colorMap = {
     emerald: {
       bg: 'bg-emerald-500/5',
@@ -797,7 +750,7 @@ function CaseStudyCard({ name, quote, accent }: CaseStudyCardProps) {
     <GlassCard className={`p-6 ${colors.bg} border ${colors.border}`}>
       <div className="flex items-center gap-2 mb-3">
         <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${colors.badge}`}>
-          Case Study
+          {t('impact_report.case_study_label')}
         </span>
         <span className="text-sm font-medium text-theme-primary">{name}</span>
       </div>

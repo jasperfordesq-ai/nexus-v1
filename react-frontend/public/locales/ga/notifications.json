@@ -1,0 +1,22 @@
+{
+  "page_title": "Fógraí",
+  "title": "Fógraí",
+  "subtitle": "Fan ar an eolas le do ghníomhaíocht",
+  "unread_badge": "{{count}} nua",
+  "mark_all_read": "Marcáil uile mar léite",
+  "settings_aria": "Socruithe fógraí",
+  "filter_all": "Uile",
+  "filter_unread": "Neamhléite ({{count}})",
+  "empty_title": "Níl aon fhógraí ann",
+  "empty_desc": "Feicfidh tú fógraí nua anseo",
+  "empty_caught_up": "Tá tú ar an eolas!",
+  "empty_caught_up_desc": "Tá do chuid fógraí uile léite agat",
+  "mark_read_aria": "Marcáil mar léite",
+  "delete_aria": "Scrios fógra",
+  "toast": {
+    "mark_read_failed": "Theip ar an bhfógra a mharcáil mar léite",
+    "all_read": "Gach fógra marcáilte mar léite",
+    "mark_all_failed": "Theip ar gach fógra a mharcáil mar léite",
+    "delete_failed": "Theip ar an bhfógra a scriosadh"
+  }
+}

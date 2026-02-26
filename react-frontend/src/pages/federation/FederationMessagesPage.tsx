@@ -43,6 +43,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { usePageTitle } from '@/hooks';
@@ -165,7 +166,8 @@ const bubbleVariants = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function FederationMessagesPage() {
-  usePageTitle('Federated Messages');
+  const { t } = useTranslation('federation');
+  usePageTitle(t('messages.page_title'));
 
   const { user } = useAuth();
   const { hasFeature } = useTenant();
@@ -233,12 +235,12 @@ export function FederationMessagesPage() {
         setAllMessages(response.data);
       } else {
         setLoadError(true);
-        toast.error('Error', 'Failed to load federated messages.');
+        toast.error(t('messages.toast_error'), t('messages.load_error'));
       }
     } catch (err) {
       logError('Failed to load federated messages', err);
       setLoadError(true);
-      toast.error('Error', 'Failed to load federated messages. Please try again.');
+      toast.error(t('messages.toast_error'), t('messages.load_error_retry'));
     } finally {
       setIsLoading(false);
     }
@@ -353,18 +355,18 @@ export function FederationMessagesPage() {
       if (response.success && response.data) {
         setAllMessages((prev) => [...prev, response.data!]);
         setReplyText('');
-        toast.success('Message sent!', 'Your reply has been delivered.');
+        toast.success(t('messages.toast_sent'), t('messages.toast_reply_delivered'));
 
         // Scroll to bottom
         setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
       } else {
-        toast.error('Error', response.error || 'Failed to send message.');
+        toast.error(t('messages.toast_error'), response.error || t('messages.send_error'));
       }
     } catch (err) {
       logError('Failed to send federated reply', err);
-      toast.error('Error', 'Failed to send message. Please try again.');
+      toast.error(t('messages.toast_error'), t('messages.send_error_retry'));
     } finally {
       setIsSending(false);
     }
@@ -412,7 +414,7 @@ export function FederationMessagesPage() {
 
       if (response.success && response.data) {
         setAllMessages((prev) => [...prev, response.data!]);
-        toast.success('Message sent!', `Your message to ${selectedRecipient.name || 'the recipient'} has been sent.`);
+        toast.success(t('messages.toast_sent'), t('messages.toast_compose_sent', { name: selectedRecipient.name || t('messages.the_recipient') }));
 
         // Close modal and reset
         setIsComposeOpen(false);
@@ -427,11 +429,11 @@ export function FederationMessagesPage() {
         setActiveThreadKey(key);
         setMobileShowThread(true);
       } else {
-        toast.error('Error', response.error || 'Failed to send message.');
+        toast.error(t('messages.toast_error'), response.error || t('messages.send_error'));
       }
     } catch (err) {
       logError('Failed to send federated message', err);
-      toast.error('Error', 'Failed to send message. Please try again.');
+      toast.error(t('messages.toast_error'), t('messages.send_error_retry'));
     } finally {
       setIsComposeSending(false);
     }
@@ -449,8 +451,8 @@ export function FederationMessagesPage() {
 
   // ── Breadcrumbs ──
   const breadcrumbItems = [
-    { label: 'Federation', href: '/federation' },
-    { label: 'Messages' },
+    { label: t('messages.breadcrumb_federation'), href: '/federation' },
+    { label: t('messages.breadcrumb_messages') },
   ];
 
   // ── Check federation feature ──
@@ -466,9 +468,9 @@ export function FederationMessagesPage() {
           <div className="flex items-start gap-3">
             <Globe className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1">
-              <h3 className="font-semibold text-theme-primary">Federation Not Enabled</h3>
+              <h3 className="font-semibold text-theme-primary">{t('messages.federation_not_enabled')}</h3>
               <p className="text-sm text-theme-muted mt-1">
-                Cross-community federation is not enabled for this community. Contact your administrator to enable it.
+                {t('messages.federation_not_enabled_description')}
               </p>
             </div>
           </div>
@@ -480,9 +482,9 @@ export function FederationMessagesPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Globe className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-            Federated Messages
+            {t('messages.title')}
           </h1>
-          <p className="text-theme-muted mt-1">Messages with members from partner communities</p>
+          <p className="text-theme-muted mt-1">{t('messages.subtitle')}</p>
         </div>
         <Button
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -490,7 +492,7 @@ export function FederationMessagesPage() {
           onPress={() => setIsComposeOpen(true)}
           isDisabled={!isFederationEnabled}
         >
-          Compose
+          {t('messages.compose')}
         </Button>
       </div>
 
@@ -498,18 +500,18 @@ export function FederationMessagesPage() {
       {isLoading ? (
         <GlassCard className="p-12 flex flex-col items-center justify-center gap-4">
           <Spinner size="lg" color="primary" />
-          <p className="text-theme-muted">Loading federated messages...</p>
+          <p className="text-theme-muted">{t('messages.loading')}</p>
         </GlassCard>
       ) : loadError ? (
         <GlassCard className="p-8 text-center">
           <Globe className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Messages</h3>
-          <p className="text-theme-muted mb-4">Something went wrong loading your federated messages.</p>
+          <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('messages.unable_to_load')}</h3>
+          <p className="text-theme-muted mb-4">{t('messages.unable_to_load_description')}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             onPress={loadMessages}
           >
-            Try Again
+            {t('messages.try_again')}
           </Button>
         </GlassCard>
       ) : threads.length === 0 && !searchQuery ? (
@@ -518,9 +520,9 @@ export function FederationMessagesPage() {
             <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center">
               <MessageSquare className="w-8 h-8 text-indigo-500" aria-hidden="true" />
             </div>
-            <h3 className="text-lg font-semibold text-theme-primary">No federated messages yet</h3>
+            <h3 className="text-lg font-semibold text-theme-primary">{t('messages.no_messages_yet')}</h3>
             <p className="text-theme-muted max-w-md">
-              Connect with members from partner communities! Start a conversation by clicking Compose.
+              {t('messages.no_messages_description')}
             </p>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white mt-2"
@@ -528,7 +530,7 @@ export function FederationMessagesPage() {
               onPress={() => setIsComposeOpen(true)}
               isDisabled={!isFederationEnabled}
             >
-              Compose Message
+              {t('messages.compose_message')}
             </Button>
           </div>
         </GlassCard>
@@ -544,7 +546,7 @@ export function FederationMessagesPage() {
             {/* Search */}
             <div className="p-3 border-b border-theme-default">
               <Input
-                placeholder="Search conversations..."
+                placeholder={t('messages.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -561,7 +563,7 @@ export function FederationMessagesPage() {
               {filteredThreads.length === 0 ? (
                 <div className="p-6 text-center">
                   <Search className="w-8 h-8 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-                  <p className="text-theme-subtle text-sm">No conversations match your search</p>
+                  <p className="text-theme-subtle text-sm">{t('messages.no_conversations_match')}</p>
                 </div>
               ) : (
                 <motion.div
@@ -637,7 +639,7 @@ export function FederationMessagesPage() {
                                   thread.unreadCount > 0 ? 'text-theme-muted font-medium' : 'text-theme-subtle'
                                 }`}
                               >
-                                {thread.lastMessage.direction === 'outbound' ? 'You: ' : ''}
+                                {thread.lastMessage.direction === 'outbound' ? t('messages.you_prefix') : ''}
                                 {thread.lastMessage.body}
                               </p>
                             </div>
@@ -798,7 +800,7 @@ export function FederationMessagesPage() {
                 <div className="p-4 border-t border-theme-default">
                   <div className="flex gap-3">
                     <Textarea
-                      placeholder="Type your reply..."
+                      placeholder={t('messages.reply_placeholder')}
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
                       minRows={1}
@@ -834,9 +836,9 @@ export function FederationMessagesPage() {
                 <div className="w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center">
                   <MessageSquare className="w-10 h-10 text-indigo-500/50" aria-hidden="true" />
                 </div>
-                <h3 className="text-lg font-semibold text-theme-muted">Select a conversation</h3>
+                <h3 className="text-lg font-semibold text-theme-muted">{t('messages.select_conversation')}</h3>
                 <p className="text-theme-subtle text-sm text-center max-w-xs">
-                  Choose a conversation from the list to view messages, or compose a new message.
+                  {t('messages.select_conversation_description')}
                 </p>
               </div>
             )}
@@ -859,7 +861,7 @@ export function FederationMessagesPage() {
         <ModalContent>
           <ModalHeader className="text-theme-primary flex items-center gap-2">
             <Globe className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-            New Federated Message
+            {t('messages.new_federated_message')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
@@ -899,14 +901,14 @@ export function FederationMessagesPage() {
                       setComposeRecipientQuery('');
                     }}
                   >
-                    Change
+                    {t('messages.change')}
                   </Button>
                 </div>
               ) : (
                 <>
                   <Input
-                    label="Recipient"
-                    placeholder="Search for a member in partner communities..."
+                    label={t('messages.recipient_label')}
+                    placeholder={t('messages.recipient_placeholder')}
                     value={composeRecipientQuery}
                     onChange={(e) => setComposeRecipientQuery(e.target.value)}
                     startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -953,7 +955,7 @@ export function FederationMessagesPage() {
                   )}
                   {composeRecipientQuery.trim() && !isSearchingRecipients && composeRecipientResults.length === 0 && (
                     <p className="text-sm text-theme-subtle text-center py-2">
-                      No members found in partner communities
+                      {t('messages.no_members_found')}
                     </p>
                   )}
                 </>
@@ -961,8 +963,8 @@ export function FederationMessagesPage() {
 
               {/* Subject */}
               <Input
-                label="Subject"
-                placeholder="Enter a subject..."
+                label={t('messages.subject_label')}
+                placeholder={t('messages.subject_placeholder')}
                 value={composeSubject}
                 onChange={(e) => setComposeSubject(e.target.value)}
                 classNames={{
@@ -974,8 +976,8 @@ export function FederationMessagesPage() {
 
               {/* Body */}
               <Textarea
-                label="Message"
-                placeholder="Write your message..."
+                label={t('messages.message_label')}
+                placeholder={t('messages.message_placeholder')}
                 value={composeBody}
                 onChange={(e) => setComposeBody(e.target.value)}
                 minRows={4}
@@ -994,7 +996,7 @@ export function FederationMessagesPage() {
               className="bg-theme-elevated text-theme-muted"
               onPress={closeCompose}
             >
-              Cancel
+              {t('messages.cancel')}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -1003,7 +1005,7 @@ export function FederationMessagesPage() {
               isLoading={isComposeSending}
               isDisabled={!selectedRecipient || !composeSubject.trim() || !composeBody.trim()}
             >
-              Send Message
+              {t('messages.send_message')}
             </Button>
           </ModalFooter>
         </ModalContent>

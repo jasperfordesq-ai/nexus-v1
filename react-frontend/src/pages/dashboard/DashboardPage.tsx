@@ -14,6 +14,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Chip, Progress } from '@heroui/react';
@@ -91,18 +92,18 @@ interface DashboardStats {
 // Helper: format feed action text
 // ─────────────────────────────────────────────────────────────────────────────
 
-function formatActivityAction(item: FeedActivityItem): string {
+function formatActivityAction(item: FeedActivityItem, t: (key: string) => string): string {
   switch (item.type) {
     case 'listing':
-      return 'shared a listing';
+      return t('activity.action_listing');
     case 'event':
-      return 'posted about an event';
+      return t('activity.action_event');
     case 'poll':
-      return 'created a poll';
+      return t('activity.action_poll');
     case 'goal':
-      return 'set a new goal';
+      return t('activity.action_goal');
     default:
-      return 'shared a post';
+      return t('activity.action_post');
   }
 }
 
@@ -112,6 +113,7 @@ function formatActivityAction(item: FeedActivityItem): string {
 
 export function DashboardPage() {
   usePageTitle('Dashboard');
+  const { t } = useTranslation('dashboard');
   const { user } = useAuth();
   const { branding, tenantPath } = useTenant();
   const { counts: notificationCounts } = useNotifications();
@@ -286,7 +288,7 @@ export function DashboardPage() {
       });
     } catch (err) {
       logError('Failed to load dashboard data', err);
-      setError('Failed to load dashboard data. Please try again.');
+      setError(t('unable_to_load'));
     } finally {
       setIsLoading(false);
       setActivityLoading(false);
@@ -294,7 +296,7 @@ export function DashboardPage() {
       setGroupsLoading(false);
       setEventsLoading(false);
     }
-  }, [hasGamification, hasFeedModule, hasListingsModule, hasGroups, hasEvents]);
+  }, [hasGamification, hasFeedModule, hasListingsModule, hasGroups, hasEvents, t]);
 
   useEffect(() => {
     loadDashboardData();
@@ -317,20 +319,20 @@ export function DashboardPage() {
     return (
       <>
         <PageMeta
-          title="Dashboard"
-          description="Your personal dashboard. View your balance, listings, and activity."
+          title={t('meta.title')}
+          description={t('meta.description')}
           noIndex
         />
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Dashboard</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadDashboardData()}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       </>
@@ -340,8 +342,8 @@ export function DashboardPage() {
   return (
     <>
       <PageMeta
-        title="Dashboard"
-        description="Your personal dashboard. View your balance, listings, and activity."
+        title={t('meta.title')}
+        description={t('meta.description')}
         noIndex
       />
       <motion.div
@@ -358,8 +360,8 @@ export function DashboardPage() {
                 <div className="flex items-center gap-3">
                   <Sparkles className="w-6 h-6 text-indigo-500 flex-shrink-0" aria-hidden="true" />
                   <div>
-                    <p className="font-semibold text-theme-primary">Complete your profile setup</p>
-                    <p className="text-sm text-theme-muted">Tell us about your interests and skills to get personalized matches</p>
+                    <p className="font-semibold text-theme-primary">{t('onboarding.banner_title')}</p>
+                    <p className="text-sm text-theme-muted">{t('onboarding.banner_subtitle')}</p>
                   </div>
                 </div>
                 <Link to={tenantPath('/onboarding')}>
@@ -368,7 +370,7 @@ export function DashboardPage() {
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                     startContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
                   >
-                    Get Started
+                    {t('onboarding.get_started')}
                   </Button>
                 </Link>
               </div>
@@ -382,10 +384,10 @@ export function DashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-theme-primary">
-                  Welcome back, {user?.first_name || user?.name?.split(' ')[0] || 'there'}!
+                  {t('welcome_back', { name: user?.first_name || user?.name?.split(' ')[0] || 'there' })}
                 </h1>
                 <p className="text-theme-muted mt-1">
-                  Here's what's happening in your {branding.name} community
+                  {t('community_activity', { community: branding.name })}
                 </p>
               </div>
               <div className="flex gap-3">
@@ -394,7 +396,7 @@ export function DashboardPage() {
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                     startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                   >
-                    New Listing
+                    {t('new_listing')}
                   </Button>
                 </Link>
               </div>
@@ -409,7 +411,7 @@ export function DashboardPage() {
         >
           <StatCard
             icon={<Wallet className="w-5 h-5" aria-hidden="true" />}
-            label="Balance"
+            label={t('stats.balance')}
             value={stats.walletBalance ? `${stats.walletBalance.balance}h` : '\u2014'}
             color="indigo"
             href="/wallet"
@@ -417,7 +419,7 @@ export function DashboardPage() {
           />
           <StatCard
             icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}
-            label="Active Listings"
+            label={t('stats.active_listings')}
             value={stats.activeListingsCount.toString()}
             color="emerald"
             href="/listings"
@@ -425,7 +427,7 @@ export function DashboardPage() {
           />
           <StatCard
             icon={<MessageSquare className="w-5 h-5" aria-hidden="true" />}
-            label="Messages"
+            label={t('stats.messages')}
             value={notificationCounts.messages.toString()}
             color="amber"
             href="/messages"
@@ -433,7 +435,7 @@ export function DashboardPage() {
           />
           <StatCard
             icon={<Clock className="w-5 h-5" aria-hidden="true" />}
-            label="Pending"
+            label={t('stats.pending')}
             value={stats.pendingTransactions.toString()}
             color="rose"
             href="/wallet"
@@ -451,10 +453,10 @@ export function DashboardPage() {
                 <div className="flex items-center justify-between gap-2 mb-4">
                   <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
                     <ListTodo className="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0" aria-hidden="true" />
-                    <span className="truncate">Recent Listings</span>
+                    <span className="truncate">{t('sections.recent_listings')}</span>
                   </h2>
                   <Link to={tenantPath('/listings')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
-                    View all <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                    {t('view_all')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </Link>
                 </div>
 
@@ -494,7 +496,7 @@ export function DashboardPage() {
                               color={listing.type === 'offer' ? 'success' : 'warning'}
                               className="shrink-0"
                             >
-                              {listing.type === 'offer' ? 'Offering' : 'Requesting'}
+                              {listing.type === 'offer' ? t('listings.offering') : t('listings.requesting')}
                             </Chip>
                           </div>
                         </Link>
@@ -504,9 +506,9 @@ export function DashboardPage() {
                 ) : (
                   <div className="text-center py-8 text-theme-subtle">
                     <ListTodo className="w-12 h-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
-                    <p>No recent listings</p>
+                    <p>{t('listings.empty')}</p>
                     <Link to={tenantPath('/listings/create')} className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm mt-2 inline-block">
-                      Create your first listing
+                      {t('listings.create_first')}
                     </Link>
                   </div>
                 )}
@@ -520,10 +522,10 @@ export function DashboardPage() {
                   <div className="flex items-center justify-between gap-2 mb-4">
                     <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
                       <Activity className="w-5 h-5 text-purple-500 dark:text-purple-400 shrink-0" aria-hidden="true" />
-                      <span className="truncate">Recent Activity</span>
+                      <span className="truncate">{t('sections.recent_activity')}</span>
                     </h2>
                     <Link to={tenantPath('/feed')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
-                      View All <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                      {t('view_all_caps')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                     </Link>
                   </div>
 
@@ -557,19 +559,19 @@ export function DashboardPage() {
                             <p className="text-sm text-theme-primary">
                               <span className="font-medium">{item.author_name}</span>
                               {' '}
-                              <span className="text-theme-muted">{formatActivityAction(item)}</span>
+                              <span className="text-theme-muted">{formatActivityAction(item, t)}</span>
                             </p>
                             <p className="text-xs text-theme-subtle line-clamp-1">{item.content}</p>
                           </div>
-                          <div className="hidden sm:flex items-center gap-3 shrink-0 text-theme-subtle text-xs">
+                          <div className="flex items-center gap-3 shrink-0 text-theme-subtle text-xs">
                             {item.likes_count > 0 && (
-                              <span className="flex items-center gap-1">
+                              <span className="hidden sm:flex items-center gap-1">
                                 <Heart className="w-3 h-3" aria-hidden="true" />
                                 {item.likes_count}
                               </span>
                             )}
                             {item.comments_count > 0 && (
-                              <span className="flex items-center gap-1">
+                              <span className="hidden sm:flex items-center gap-1">
                                 <MessageCircle className="w-3 h-3" aria-hidden="true" />
                                 {item.comments_count}
                               </span>
@@ -582,9 +584,9 @@ export function DashboardPage() {
                   ) : (
                     <div className="text-center py-8 text-theme-subtle">
                       <Activity className="w-12 h-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
-                      <p>No recent activity</p>
+                      <p>{t('activity.empty')}</p>
                       <Link to={tenantPath('/feed')} className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm mt-2 inline-block">
-                        Check out the feed
+                        {t('activity.check_feed')}
                       </Link>
                     </div>
                   )}
@@ -598,16 +600,16 @@ export function DashboardPage() {
             {/* Quick Actions */}
             <motion.div variants={itemVariants}>
               <GlassCard className="p-6">
-                <h2 className="text-lg font-semibold text-theme-primary mb-4">Quick Actions</h2>
+                <h2 className="text-lg font-semibold text-theme-primary mb-4">{t('sections.quick_actions')}</h2>
                 <div className="space-y-2">
-                  <QuickActionLink to={tenantPath('/listings/create')} icon={<Plus aria-hidden="true" />} label="Create Listing" />
-                  <QuickActionLink to={tenantPath('/messages')} icon={<MessageSquare aria-hidden="true" />} label="Messages" />
-                  <QuickActionLink to={tenantPath('/wallet')} icon={<Wallet aria-hidden="true" />} label="View Wallet" />
-                  <QuickActionLink to={tenantPath('/members')} icon={<Users aria-hidden="true" />} label="Find Members" />
+                  <QuickActionLink to={tenantPath('/listings/create')} icon={<Plus aria-hidden="true" />} label={t('quick_actions.create_listing')} />
+                  <QuickActionLink to={tenantPath('/messages')} icon={<MessageSquare aria-hidden="true" />} label={t('quick_actions.messages')} />
+                  <QuickActionLink to={tenantPath('/wallet')} icon={<Wallet aria-hidden="true" />} label={t('quick_actions.view_wallet')} />
+                  <QuickActionLink to={tenantPath('/members')} icon={<Users aria-hidden="true" />} label={t('quick_actions.find_members')} />
                   {hasEvents && (
-                    <QuickActionLink to={tenantPath('/events')} icon={<Calendar aria-hidden="true" />} label="Browse Events" />
+                    <QuickActionLink to={tenantPath('/events')} icon={<Calendar aria-hidden="true" />} label={t('quick_actions.browse_events')} />
                   )}
-                  <QuickActionLink to={tenantPath('/notifications')} icon={<Bell aria-hidden="true" />} label="Notifications" />
+                  <QuickActionLink to={tenantPath('/notifications')} icon={<Bell aria-hidden="true" />} label={t('quick_actions.notifications')} />
                 </div>
               </GlassCard>
             </motion.div>
@@ -627,10 +629,10 @@ export function DashboardPage() {
                     <div className="flex items-center justify-between gap-2 mb-4">
                       <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
                         <Sparkles className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0" aria-hidden="true" />
-                        <span className="truncate">Suggested for You</span>
+                        <span className="truncate">{t('sections.suggested_for_you')}</span>
                       </h2>
                       <Link to={tenantPath('/listings')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
-                        Browse All <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                        {t('browse_all')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                       </Link>
                     </div>
 
@@ -649,7 +651,7 @@ export function DashboardPage() {
                             key={listing.id}
                             to={tenantPath(`/listings/${listing.id}`)}
                             className="block p-3 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors group"
-                            aria-label={`${listing.title} - ${listing.type === 'offer' ? 'Offer' : 'Request'}`}
+                            aria-label={`${listing.title} - ${listing.type === 'offer' ? t('listings.offer') : t('listings.request')}`}
                           >
                             <div className="flex items-center gap-2 mb-2">
                               <Avatar
@@ -664,7 +666,7 @@ export function DashboardPage() {
                                 color={listing.type === 'offer' ? 'success' : 'warning'}
                                 className="text-[10px] h-5"
                               >
-                                {listing.type === 'offer' ? 'Offer' : 'Request'}
+                                {listing.type === 'offer' ? t('listings.offer') : t('listings.request')}
                               </Chip>
                             </div>
                             <h3 className="text-sm font-medium text-theme-primary line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
@@ -676,7 +678,7 @@ export function DashboardPage() {
                     ) : (
                       <div className="text-center py-6 text-theme-subtle">
                         <Sparkles className="w-10 h-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
-                        <p className="text-sm">No suggestions yet</p>
+                        <p className="text-sm">{t('suggestions.empty')}</p>
                       </div>
                     )}
                   </div>
@@ -691,10 +693,10 @@ export function DashboardPage() {
                   <div className="flex items-center justify-between gap-2 mb-4">
                     <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
                       <Users className="w-5 h-5 text-teal-500 dark:text-teal-400 shrink-0" aria-hidden="true" />
-                      <span className="truncate">My Groups</span>
+                      <span className="truncate">{t('sections.my_groups')}</span>
                     </h2>
                     <Link to={tenantPath('/groups')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
-                      View All <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                      {t('view_all_caps')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                     </Link>
                   </div>
 
@@ -737,7 +739,7 @@ export function DashboardPage() {
                             <h3 className="text-sm font-medium text-theme-primary truncate">{group.name}</h3>
                             <p className="text-xs text-theme-subtle flex items-center gap-1">
                               <UserPlus className="w-3 h-3" aria-hidden="true" />
-                              {group.member_count ?? group.members_count ?? 0} members
+                              {t('groups.members_count', { count: group.member_count ?? group.members_count ?? 0 })}
                             </p>
                           </div>
                         </Link>
@@ -746,9 +748,9 @@ export function DashboardPage() {
                   ) : (
                     <div className="text-center py-6 text-theme-subtle">
                       <Users className="w-10 h-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
-                      <p className="text-sm">You haven't joined any groups yet</p>
+                      <p className="text-sm">{t('groups.empty')}</p>
                       <Link to={tenantPath('/groups')} className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm mt-1 inline-block">
-                        Discover groups
+                        {t('groups.discover')}
                       </Link>
                     </div>
                   )}
@@ -763,10 +765,10 @@ export function DashboardPage() {
                   <div className="flex items-center justify-between gap-2 mb-4">
                     <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
                       <Calendar className="w-5 h-5 text-rose-500 dark:text-rose-400 shrink-0" aria-hidden="true" />
-                      <span className="truncate">Upcoming Events</span>
+                      <span className="truncate">{t('sections.upcoming_events')}</span>
                     </h2>
                     <Link to={tenantPath('/events')} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
-                      View All <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                      {t('view_all_caps')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                     </Link>
                   </div>
 
@@ -813,7 +815,7 @@ export function DashboardPage() {
                                 </p>
                               )}
                               {event.is_online && !event.location && (
-                                <p className="text-xs text-theme-subtle mt-0.5">Online event</p>
+                                <p className="text-xs text-theme-subtle mt-0.5">{t('events.online_event')}</p>
                               )}
                             </div>
                           </Link>
@@ -823,9 +825,9 @@ export function DashboardPage() {
                   ) : (
                     <div className="text-center py-6 text-theme-subtle">
                       <Calendar className="w-10 h-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
-                      <p className="text-sm">No upcoming events</p>
+                      <p className="text-sm">{t('events.empty')}</p>
                       <Link to={tenantPath('/events')} className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm mt-1 inline-block">
-                        Browse events
+                        {t('events.browse')}
                       </Link>
                     </div>
                   )}
@@ -839,7 +841,7 @@ export function DashboardPage() {
                 <GlassCard className="p-6">
                   <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
-                    Your Progress
+                    {t('sections.your_progress')}
                   </h2>
                   {isLoading ? (
                     <div className="space-y-4 animate-pulse">
@@ -853,7 +855,7 @@ export function DashboardPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-theme-primary flex items-center gap-1.5">
                           <Award className="w-4 h-4 text-amber-500" aria-hidden="true" />
-                          Level {stats.gamification.level}
+                          {t('gamification.level', { level: stats.gamification.level })}
                         </span>
                         <Chip size="sm" variant="flat" color="warning" className="text-xs">
                           {stats.gamification.level_name}
@@ -874,7 +876,7 @@ export function DashboardPage() {
                           value={Math.min(stats.gamification.xp_progress_percent, 100)}
                           color="warning"
                           size="sm"
-                          aria-label="XP Progress"
+                          aria-label={t('gamification.xp_progress')}
                           className="h-2"
                         />
                       </div>
@@ -883,11 +885,11 @@ export function DashboardPage() {
                       <div className="grid grid-cols-2 gap-3 pt-2">
                         <div className="text-center p-2 rounded-lg bg-theme-elevated">
                           <div className="text-lg font-bold text-theme-primary">{stats.gamification.total_badges}</div>
-                          <div className="text-xs text-theme-subtle">Badges</div>
+                          <div className="text-xs text-theme-subtle">{t('gamification.badges')}</div>
                         </div>
                         <div className="text-center p-2 rounded-lg bg-theme-elevated">
                           <div className="text-lg font-bold text-theme-primary">{stats.gamification.streak_days} day</div>
-                          <div className="text-xs text-theme-subtle">Streak</div>
+                          <div className="text-xs text-theme-subtle">{t('gamification.streak')}</div>
                         </div>
                       </div>
 
@@ -895,17 +897,17 @@ export function DashboardPage() {
                         to={tenantPath('/achievements')}
                         className="block text-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm"
                       >
-                        View Achievements <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
+                        {t('view_achievements')} <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
                       </Link>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <p className="text-sm text-theme-subtle text-center">Start earning XP by participating in the community!</p>
+                      <p className="text-sm text-theme-subtle text-center">{t('gamification.start_earning')}</p>
                       <Link
                         to={tenantPath('/achievements')}
                         className="block text-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm"
                       >
-                        View Achievements <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
+                        {t('view_achievements')} <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
                       </Link>
                     </div>
                   )}
@@ -943,7 +945,7 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
 
   return (
     <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? 'Loading' : value}`}>
-      <GlassCard className="p-4 hover:scale-[1.02] transition-transform">
+      <GlassCard className="p-4 hover:scale-[1.02] active:scale-[0.98] transition-transform">
         <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-3`}>
           {icon}
         </div>
@@ -992,6 +994,7 @@ interface PendingReview {
 
 function PendingReviewsCard() {
   const { tenantPath } = useTenant();
+  const { t } = useTranslation('dashboard');
   const [pending, setPending] = useState<PendingReview[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -1017,7 +1020,7 @@ function PendingReviewsCard() {
       <GlassCard className="p-6">
         <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
           <Star className="w-5 h-5 text-amber-500" aria-hidden="true" />
-          Pending Reviews
+          {t('sections.pending_reviews')}
         </h2>
         <div className="animate-pulse space-y-3">
           {[1, 2].map((i) => (
@@ -1036,7 +1039,7 @@ function PendingReviewsCard() {
     <GlassCard className="p-6">
       <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
         <Star className="w-5 h-5 text-amber-500" aria-hidden="true" />
-        Pending Reviews
+        {t('sections.pending_reviews')}
         <Chip size="sm" color="warning" variant="flat" className="ml-auto">
           {pending.length}
         </Chip>
@@ -1062,11 +1065,11 @@ function PendingReviewsCard() {
             </p>
             <div className="flex items-center gap-1 mt-2">
               <Chip size="sm" variant="flat" color={review.direction === 'sent' ? 'primary' : 'success'} className="text-[10px]">
-                {review.direction === 'sent' ? 'Sent' : 'Received'} {review.amount}h
+                {review.direction === 'sent' ? t('reviews.sent', { amount: review.amount }) : t('reviews.received', { amount: review.amount })}
               </Chip>
               <span className="text-xs text-amber-600 dark:text-amber-400 ml-auto flex items-center gap-1">
                 <Star className="w-3 h-3" aria-hidden="true" />
-                Review
+                {t('reviews.review')}
               </span>
             </div>
           </Link>
@@ -1077,7 +1080,7 @@ function PendingReviewsCard() {
         to={tenantPath('/wallet')}
         className="block mt-4 text-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm"
       >
-        View All Transactions <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
+        {t('view_all_transactions')} <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
       </Link>
     </GlassCard>
   );

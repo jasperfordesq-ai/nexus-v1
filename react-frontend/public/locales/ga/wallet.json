@@ -1,0 +1,58 @@
+{
+  "title": "Sparán",
+  "balance": "Iarmhéid",
+  "time_credits": "Creidmheasanna Ama",
+  "hours": "Uaireanta",
+  "transactions": "Idirbhearta",
+  "pending": "Ar feitheamh",
+  "completed": "Críochnaithe",
+  "sent": "Seolta",
+  "received": "Faighte",
+  "empty": "Gan idirbhearta fós",
+  "transfer": "Aistrigh Creidmheasanna",
+  "pending_reviews": "Léirmheasanna ar Feitheamh",
+  "review": "Fág Léirmheas",
+  "subtitle": "Coinnigh súil ar do chreidmheasanna ama agus idirbhearta",
+  "unable_to_load": "Ní féidir an Sparán a Luchtú",
+  "try_again": "Triail Arís",
+  "your_balance": "D'Iarmhéid",
+  "pending_in": "+{{count}}u ar feitheamh",
+  "no_pending": "Gan idirbhearta ar feitheamh",
+  "send_credits": "Seol Creidmheasanna",
+  "history": "Stair Idirbhearta",
+  "export": "Easpórtáil",
+  "load_more": "Luchtaigh Tuilleadh",
+  "no_transactions": "Gan idirbhearta",
+  "no_transactions_desc": "Beidh do stair idirbhearta le feiceáil anseo",
+  "stats": {
+    "earned": "Tuillte",
+    "spent": "Caite",
+    "pending": "Ar Feitheamh"
+  },
+  "filter": {
+    "all": "Gach",
+    "earned": "Tuillte",
+    "spent": "Caite",
+    "pending": "Ar Feitheamh"
+  },
+  "csv": {
+    "date": "Dáta",
+    "type": "Cineál",
+    "amount": "Méid",
+    "description": "Cur Síos",
+    "other_party": "Páirtí Eile",
+    "status": "Stádas",
+    "received": "Faighte",
+    "sent": "Seolta"
+  },
+  "toast": {
+    "no_data": "Gan sonraí",
+    "no_export": "Gan idirbhearta le heaspórtáil",
+    "load_error": "Earráid",
+    "load_more_error": "Theip ar luchtú tuilleadh idirbhearta",
+    "exported": "Easpórtáilte",
+    "exported_desc": "Idirbhearta easpórtáilte go CSV",
+    "transfer_success": "Aistriú rathúil",
+    "transfer_desc": "Seoladh {{amount}} uaireanta chuig {{recipient}}"
+  }
+}

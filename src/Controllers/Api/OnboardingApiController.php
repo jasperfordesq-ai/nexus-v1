@@ -14,17 +14,16 @@ use Nexus\Services\OnboardingService;
 /**
  * OnboardingApiController - RESTful API v2 for user onboarding wizard
  *
- * Handles the post-registration 4-step onboarding process:
+ * Handles the post-registration 5-step onboarding process:
  * 1. Welcome (no API call needed)
- * 2. Select interests (categories)
- * 3. Select skills (offers/needs)
- * 4. Confirm and auto-create listings
+ * 2. Profile photo + bio
+ * 3. Select interests (categories)
+ * 4. Select skills (offers/needs)
+ * 5. Confirm and auto-create listings
  *
  * Endpoints:
  * - GET  /api/v2/onboarding/status       - Get onboarding completion status
  * - GET  /api/v2/onboarding/categories   - Get available categories for selection
- * - PUT  /api/v2/users/me/interests      - Save user interests
- * - PUT  /api/v2/users/me/skills         - Save user skills (offers/needs)
  * - POST /api/v2/onboarding/complete     - Complete onboarding and auto-create listings
  *
  * Response Format (v2):
@@ -58,8 +57,15 @@ class OnboardingApiController extends BaseApiController
         $complete = OnboardingService::isOnboardingComplete($userId);
         $interests = OnboardingService::getUserInterests($userId);
 
+        // Include profile completeness for frontend enforcement
+        $user = \Nexus\Models\User::findById($userId);
+        $hasAvatar = !empty($user['avatar_url'] ?? '');
+        $hasBio = !empty(trim($user['bio'] ?? ''));
+
         $this->respondWithData([
             'onboarding_completed' => $complete,
+            'has_avatar' => $hasAvatar,
+            'has_bio' => $hasBio,
             'interests' => $interests,
         ]);
     }
@@ -92,106 +98,17 @@ class OnboardingApiController extends BaseApiController
     }
 
     /**
-     * PUT /api/v2/users/me/interests
-     *
-     * Save the user's category interests (Step 2 of onboarding).
-     * Replaces any existing interest selections.
-     *
-     * Request Body:
-     * {
-     *   "category_ids": [1, 3, 5]
-     * }
-     *
-     * Response: 200 OK
-     * { "data": { "message": "Interests saved" } }
-     */
-    public function saveInterests(): void
-    {
-        $userId = $this->getUserId();
-
-        $categoryIds = $this->input('category_ids', []);
-
-        if (empty($categoryIds) || !is_array($categoryIds)) {
-            $this->respondWithError(
-                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'At least one category is required',
-                'category_ids',
-                400
-            );
-            return; // Safety return (respondWithError calls exit)
-        }
-
-        // Sanitize: ensure all IDs are integers
-        $categoryIds = array_map('intval', $categoryIds);
-        $categoryIds = array_filter($categoryIds, fn($id) => $id > 0);
-
-        if (empty($categoryIds)) {
-            $this->respondWithError(
-                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'At least one valid category ID is required',
-                'category_ids',
-                400
-            );
-            return;
-        }
-
-        OnboardingService::saveInterests($userId, $categoryIds);
-
-        $this->respondWithData(['message' => 'Interests saved']);
-    }
-
-    /**
-     * PUT /api/v2/users/me/skills
-     *
-     * Save the user's skill offers and needs (Step 3 of onboarding).
-     * Replaces any existing skill selections.
-     *
-     * Request Body:
-     * {
-     *   "offers": [1, 3],
-     *   "needs": [5, 7]
-     * }
-     *
-     * Response: 200 OK
-     * { "data": { "message": "Skills saved" } }
-     */
-    public function saveSkills(): void
-    {
-        $userId = $this->getUserId();
-
-        $offers = $this->input('offers', []);
-        $needs = $this->input('needs', []);
-
-        // Sanitize: ensure all IDs are integers
-        if (is_array($offers)) {
-            $offers = array_map('intval', $offers);
-            $offers = array_filter($offers, fn($id) => $id > 0);
-        } else {
-            $offers = [];
-        }
-
-        if (is_array($needs)) {
-            $needs = array_map('intval', $needs);
-            $needs = array_filter($needs, fn($id) => $id > 0);
-        } else {
-            $needs = [];
-        }
-
-        OnboardingService::saveSkills($userId, $offers, $needs);
-
-        $this->respondWithData(['message' => 'Skills saved']);
-    }
-
-    /**
      * POST /api/v2/onboarding/complete
      *
      * Complete the onboarding process:
-     * 1. Save final skill selections (offers/needs)
-     * 2. Auto-create listings from skill selections
-     * 3. Mark onboarding as complete
+     * 1. Save interest selections (optional)
+     * 2. Save skill selections (offers/needs)
+     * 3. Auto-create listings from skill selections
+     * 4. Mark onboarding as complete
      *
      * Request Body:
      * {
+     *   "interests": [1, 2],
      *   "offers": [1, 3],
      *   "needs": [5, 7]
      * }
@@ -209,10 +126,39 @@ class OnboardingApiController extends BaseApiController
     {
         $userId = $this->getUserId();
 
+        // Verify profile photo and bio are present (mandatory for onboarding completion)
+        $user = \Nexus\Models\User::findById($userId);
+        if (empty($user['avatar_url'])) {
+            $this->respondWithError(
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                'Profile photo is required to complete onboarding',
+                'avatar_url',
+                422
+            );
+            return;
+        }
+        if (empty(trim($user['bio'] ?? ''))) {
+            $this->respondWithError(
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                'Bio is required to complete onboarding',
+                'bio',
+                422
+            );
+            return;
+        }
+
+        $interests = $this->input('interests', []);
         $offers = $this->input('offers', []);
         $needs = $this->input('needs', []);
 
         // Sanitize: ensure all IDs are integers
+        if (is_array($interests)) {
+            $interests = array_map('intval', $interests);
+            $interests = array_filter($interests, fn($id) => $id > 0);
+        } else {
+            $interests = [];
+        }
+
         if (is_array($offers)) {
             $offers = array_map('intval', $offers);
             $offers = array_filter($offers, fn($id) => $id > 0);
@@ -227,14 +173,19 @@ class OnboardingApiController extends BaseApiController
             $needs = [];
         }
 
-        // Save final skills
-        OnboardingService::saveSkills($userId, $offers, $needs);
+        // All-or-nothing: wrap interests + skills + listings + completion in one transaction
+        Database::beginTransaction();
+        try {
+            OnboardingService::saveInterests($userId, $interests);
+            OnboardingService::saveSkills($userId, $offers, $needs);
+            $listingIds = OnboardingService::autoCreateListings($userId, $offers, $needs);
+            OnboardingService::completeOnboarding($userId);
 
-        // Auto-create listings from selections
-        $listingIds = OnboardingService::autoCreateListings($userId, $offers, $needs);
-
-        // Mark onboarding complete
-        OnboardingService::completeOnboarding($userId);
+            Database::commit();
+        } catch (\Throwable $e) {
+            Database::rollback();
+            throw $e;
+        }
 
         $this->respondWithData([
             'message' => 'Onboarding complete!',

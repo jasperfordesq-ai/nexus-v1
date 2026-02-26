@@ -22,13 +22,13 @@ class RateLimiter
     // ============================================
 
     // Maximum login attempts before lockout
-    private const MAX_ATTEMPTS = 5;
+    private const MAX_ATTEMPTS = 10;
 
-    // Lockout duration in seconds (15 minutes)
-    private const LOCKOUT_DURATION = 900;
+    // Lockout duration in seconds (5 minutes)
+    private const LOCKOUT_DURATION = 300;
 
-    // Window for counting attempts in seconds (15 minutes)
-    private const ATTEMPT_WINDOW = 900;
+    // Window for counting attempts in seconds (5 minutes)
+    private const ATTEMPT_WINDOW = 300;
 
     // ============================================
     // API RATE LIMITING CONSTANTS

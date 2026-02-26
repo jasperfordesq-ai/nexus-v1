@@ -251,6 +251,20 @@ export const adminConfig = {
 
   runJob: (jobId: string) =>
     api.post(`/v2/admin/jobs/${jobId}/run`),
+
+  getLanguageConfig: () =>
+    api.get<{ default_language: string; supported_languages: string[] }>(
+      '/v2/admin/config/languages'
+    ),
+
+  updateLanguageConfig: (config: {
+    default_language?: string;
+    supported_languages?: string[];
+  }) =>
+    api.put<{ default_language: string; supported_languages: string[] }>(
+      '/v2/admin/config/languages',
+      config
+    ),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -909,9 +923,9 @@ export const adminFederation = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminPages = {
-  list: () => api.get<Array<{ id: number; title: string; slug: string; status: string; sort_order: number; created_at: string }>>('/v2/admin/pages'),
+  list: () => api.get<Array<{ id: number; title: string; slug: string; status: string; sort_order: number; show_in_menu: number; menu_location: string; menu_order: number; created_at: string }>>('/v2/admin/pages'),
   get: (id: number) => api.get('/v2/admin/pages/' + id),
-  create: (data: { title: string; content?: string; meta_description?: string; status?: string }) =>
+  create: (data: { title: string; content?: string; meta_description?: string; status?: string; show_in_menu?: number; menu_location?: string; menu_order?: number }) =>
     api.post('/v2/admin/pages', data),
   update: (id: number, data: Record<string, unknown>) =>
     api.put('/v2/admin/pages/' + id, data),
@@ -1292,7 +1306,7 @@ export const adminCron = {
 
 export const adminModeration = {
   // Feed Posts
-  getFeedPosts: (params?: { type?: string; status?: string; user_id?: number; page?: number; limit?: number }) =>
+  getFeedPosts: (params?: { type?: string; status?: string; user_id?: number; tenant_id?: number; page?: number; limit?: number }) =>
     api.get<PaginatedResponse<AdminFeedPost>>(`/v2/admin/feed/posts${buildQuery(params || {})}`),
 
   getFeedPost: (id: number) =>
@@ -1308,7 +1322,7 @@ export const adminModeration = {
     api.get<ModerationStats>('/v2/admin/feed/stats'),
 
   // Comments
-  getComments: (params?: { content_type?: string; is_flagged?: boolean; page?: number; limit?: number }) =>
+  getComments: (params?: { content_type?: string; is_flagged?: boolean; tenant_id?: number; page?: number; limit?: number }) =>
     api.get<PaginatedResponse<AdminComment>>(`/v2/admin/comments${buildQuery(params || {})}`),
 
   getComment: (id: number) =>
@@ -1321,7 +1335,7 @@ export const adminModeration = {
     api.delete<{ success: boolean }>(`/v2/admin/comments/${id}`),
 
   // Reviews
-  getReviews: (params?: { rating?: number; is_flagged?: boolean; page?: number; limit?: number }) =>
+  getReviews: (params?: { rating?: number; is_flagged?: boolean; tenant_id?: number; page?: number; limit?: number }) =>
     api.get<PaginatedResponse<AdminReview>>(`/v2/admin/reviews${buildQuery(params || {})}`),
 
   getReview: (id: number) =>
@@ -1337,7 +1351,7 @@ export const adminModeration = {
     api.delete<{ success: boolean }>(`/v2/admin/reviews/${id}`),
 
   // Reports
-  getReports: (params?: { type?: string; status?: string; page?: number; limit?: number }) =>
+  getReports: (params?: { type?: string; status?: string; tenant_id?: number; page?: number; limit?: number }) =>
     api.get<PaginatedResponse<AdminReport>>(`/v2/admin/reports${buildQuery(params || {})}`),
 
   getReport: (id: number) =>

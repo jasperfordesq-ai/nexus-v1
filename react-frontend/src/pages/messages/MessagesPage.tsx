@@ -12,6 +12,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Input, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab } from '@heroui/react';
@@ -49,7 +50,8 @@ function getOtherUser(conv: Conversation) {
 }
 
 export function MessagesPage() {
-  usePageTitle('Messages');
+  const { t } = useTranslation('messages');
+  usePageTitle(t('title'));
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
@@ -77,48 +79,7 @@ export function MessagesPage() {
   const toUserId = searchParams.get('to');
   const listingId = searchParams.get('listing');
 
-  /**
-   * Handle incoming new message from Pusher
-   * Updates conversation list with new message preview and increments unread count
-   */
-  const handleNewMessage = useCallback((event: NewMessageEvent) => {
-    setConversations((prev) => {
-      // Find the conversation with this sender
-      const existingIndex = prev.findIndex((conv) => {
-        const otherUser = getOtherUser(conv);
-        return otherUser.id === event.sender_id;
-      });
-
-      if (existingIndex >= 0) {
-        // Update existing conversation
-        const updated = [...prev];
-        const conv = { ...updated[existingIndex] };
-
-        // Update last message
-        conv.last_message = {
-          id: event.id,
-          body: event.body,
-          sender_id: event.sender_id,
-          created_at: event.created_at,
-        };
-
-        // Increment unread count
-        conv.unread_count = (conv.unread_count || 0) + 1;
-
-        // Move to top of list
-        updated.splice(existingIndex, 1);
-        updated.unshift(conv);
-
-        return updated;
-      }
-
-      // New conversation - we'll reload to get the full conversation data
-      // This triggers a refresh which will include the new conversation
-      return prev;
-    });
-  }, []);
-
-  // Memoize loadConversations to use in effects
+  // Memoize loadConversations to use in effects and handlers
   const loadConversations = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -136,6 +97,62 @@ export function MessagesPage() {
       setIsLoading(false);
     }
   }, []);
+
+  /**
+   * Handle incoming new message from Pusher
+   * Updates conversation list with new message preview and increments unread count
+   */
+  const handleNewMessage = useCallback((event: NewMessageEvent) => {
+    // Backend sends from_user_id on user channel; normalize to sender_id
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = event as any;
+    const senderId: number | undefined = event.sender_id || raw.from_user_id;
+    if (!senderId) {
+      // Can't identify sender — full reload to be safe
+      loadConversations();
+      return;
+    }
+
+    setConversations((prev) => {
+      // Find the conversation with this sender
+      const existingIndex = prev.findIndex((conv) => {
+        const otherUser = getOtherUser(conv);
+        return otherUser.id === senderId;
+      });
+
+      if (existingIndex >= 0) {
+        // Update existing conversation optimistically
+        const updated = [...prev];
+        const conv = { ...updated[existingIndex] };
+
+        // Update last message (body may come as preview from legacy events)
+        conv.last_message = {
+          id: event.id,
+          body: event.body || raw.preview || '',
+          sender_id: senderId,
+          created_at: event.created_at || new Date().toISOString(),
+        };
+
+        // Increment unread count
+        conv.unread_count = (conv.unread_count || 0) + 1;
+
+        // Move to top of list
+        updated.splice(existingIndex, 1);
+        updated.unshift(conv);
+
+        return updated;
+      }
+
+      // New conversation from unknown sender — can't build full Conversation
+      // object client-side, so we return prev and let the reload below handle it
+      return prev;
+    });
+
+    // Always reload to catch new conversations and ensure data consistency.
+    // For existing conversations this is a no-op (optimistic update already applied),
+    // but for new conversations this is the only way to get the full conversation data.
+    loadConversations();
+  }, [loadConversations]);
 
   // Subscribe to Pusher for real-time updates
   useEffect(() => {
@@ -229,7 +246,7 @@ export function MessagesPage() {
       }
     } catch (error) {
       logError('Failed to restore conversation', error);
-      toast.error('Error', 'Failed to restore conversation. Please try again.');
+      toast.error(t('error_title'), 'Failed to restore conversation. Please try again.');
     }
   }
 
@@ -302,9 +319,9 @@ export function MessagesPage() {
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="font-semibold text-theme-primary">Direct Messaging Disabled</h3>
+              <h3 className="font-semibold text-theme-primary">{t('disabled_title')}</h3>
               <p className="text-sm text-theme-muted mt-1">
-                Direct messaging is not enabled for this community. To arrange services, please use the exchange request system.
+                {t('disabled_subtitle')}
               </p>
               <Button
                 size="sm"
@@ -312,7 +329,7 @@ export function MessagesPage() {
                 startContent={<ArrowRightLeft className="w-4 h-4" />}
                 onPress={() => navigate(tenantPath('/exchanges'))}
               >
-                Go to Exchanges
+                {t('go_to_exchanges')}
               </Button>
             </div>
           </div>
@@ -324,9 +341,9 @@ export function MessagesPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <MessageSquare className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
-            Messages
+            {t('title')}
           </h1>
-          <p className="text-theme-muted mt-1">Your conversations with community members</p>
+          <p className="text-theme-muted mt-1">{t('page_subtitle')}</p>
         </div>
         <Button
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -334,7 +351,7 @@ export function MessagesPage() {
           onPress={() => setIsNewMessageOpen(true)}
           isDisabled={!isDirectMessagingEnabled}
         >
-          New Message
+          {t('new_message')}
         </Button>
       </div>
 
@@ -355,7 +372,7 @@ export function MessagesPage() {
             title={
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4" />
-                <span>Inbox</span>
+                <span>{t('tab_inbox')}</span>
               </div>
             }
           />
@@ -364,13 +381,13 @@ export function MessagesPage() {
             title={
               <div className="flex items-center gap-2">
                 <Archive className="w-4 h-4" />
-                <span>Archived</span>
+                <span>{t('tab_archived')}</span>
               </div>
             }
           />
         </Tabs>
         <Input
-          placeholder="Search conversations..."
+          placeholder={t('search_placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-subtle" />}
@@ -396,10 +413,10 @@ export function MessagesPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">New Message</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('new_message')}</ModalHeader>
           <ModalBody>
             <Input
-              placeholder="Search for a member..."
+              placeholder={t('member_search_placeholder')}
               value={userSearchQuery}
               onChange={(e) => setUserSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}
@@ -422,7 +439,7 @@ export function MessagesPage() {
                     className="mt-2 bg-theme-elevated text-theme-muted"
                     onPress={() => searchUsers(userSearchQuery)}
                   >
-                    Try Again
+                    {t('try_again')}
                   </Button>
                 </div>
               ) : userSearchResults.length > 0 ? (
@@ -448,10 +465,10 @@ export function MessagesPage() {
                   </Button>
                 ))
               ) : userSearchQuery.trim() && !isSearchingUsers ? (
-                <p className="text-center text-theme-subtle py-4">No members found</p>
+                <p className="text-center text-theme-subtle py-4">{t('member_search_empty')}</p>
               ) : !userSearchQuery.trim() ? (
                 <p className="text-center text-theme-subtle py-4">
-                  Start typing to search for members
+                  {t('member_search_hint')}
                 </p>
               ) : null}
             </div>
@@ -465,14 +482,14 @@ export function MessagesPage() {
         error ? (
           <GlassCard className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Messages</h3>
+            <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h3>
             <p className="text-theme-muted mb-4">{error}</p>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={() => loadConversations()}
             >
-              Try Again
+              {t('try_again')}
             </Button>
           </GlassCard>
         ) : isLoading ? (
@@ -492,15 +509,15 @@ export function MessagesPage() {
         ) : filteredConversations.length === 0 ? (
           <EmptyState
             icon={<MessageSquare className="w-12 h-12" />}
-            title="No messages yet"
-            description="Start a conversation with a community member"
+            title={t('empty')}
+            description={t('empty_subtitle')}
             action={
               <Button
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<Plus className="w-4 h-4" />}
                 onPress={() => setIsNewMessageOpen(true)}
               >
-                New Message
+                {t('new_message')}
               </Button>
             }
           />
@@ -539,8 +556,8 @@ export function MessagesPage() {
           ).length === 0 ? (
           <EmptyState
             icon={<Archive className="w-12 h-12" />}
-            title="No archived conversations"
-            description="Conversations you archive will appear here"
+            title={t('archived_empty')}
+            description={t('archived_empty_subtitle')}
           />
         ) : (
           <motion.div
@@ -633,6 +650,7 @@ interface ArchivedConversationCardProps {
 }
 
 function ArchivedConversationCard({ conversation, onRestore }: ArchivedConversationCardProps) {
+  const { t } = useTranslation('messages');
   const other_user = getOtherUser(conversation);
   const { last_message } = conversation;
 
@@ -672,7 +690,7 @@ function ArchivedConversationCard({ conversation, onRestore }: ArchivedConversat
           startContent={<RotateCcw className="w-3 h-3" />}
           onPress={onRestore}
         >
-          Restore
+          {t('restore')}
         </Button>
       </div>
     </GlassCard>

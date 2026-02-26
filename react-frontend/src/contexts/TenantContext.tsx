@@ -27,6 +27,7 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
+import i18n from '@/i18n';
 import { api, tokenManager, fetchCsrfToken } from '@/lib/api';
 import { detectTenantFromUrl, tenantPath as buildTenantPath } from '@/lib/tenant-routing';
 import { validateResponseIfPresent } from '@/lib/api-validation';
@@ -57,6 +58,10 @@ interface TenantContextValue extends TenantState {
   tenantSlug: string | null;
   /** Build a path with the tenant slug prefix (if present). */
   tenantPath: (path: string) => string;
+  /** Language codes supported by this tenant (e.g. ['en', 'ga'] or ['de', 'fr', 'it', 'en']) */
+  supportedLanguages: string[];
+  /** Default language for this tenant (e.g. 'de' for Swiss tenants) */
+  defaultLanguage: string;
 }
 
 // Default features — synced with PHP TenantBootstrapController::buildFeaturesData() defaults
@@ -275,6 +280,33 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     return buildTenantPath(path, effectiveTenantSlug);
   }, [effectiveTenantSlug]);
 
+  const supportedLanguages = useMemo<string[]>(
+    () => state.tenant?.supported_languages ?? ['en', 'ga'],
+    [state.tenant]
+  );
+
+  const defaultLanguage = useMemo<string>(
+    () => state.tenant?.default_language ?? 'en',
+    [state.tenant]
+  );
+
+  // After tenant data loads, apply tenant default language if user hasn't
+  // explicitly chosen one via the language switcher.
+  // Note: We check 'nexus_language_user_chosen' (set by LanguageSwitcher), NOT
+  // 'nexus_language' (auto-written by i18next's caches:['localStorage'] on init).
+  // Without this distinction, the browser-detected language gets auto-cached and
+  // the tenant default would never apply.
+  useEffect(() => {
+    if (!state.tenant) return;
+
+    const tenantDefault = state.tenant.default_language ?? 'en';
+    const userExplicitlyChose = localStorage.getItem('nexus_language_user_chosen');
+
+    if (!userExplicitlyChose && i18n.language !== tenantDefault) {
+      i18n.changeLanguage(tenantDefault);
+    }
+  }, [state.tenant]);
+
   const value = useMemo<TenantContextValue>(
     () => ({
       ...state,
@@ -286,8 +318,10 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       refreshTenant,
       tenantSlug: effectiveTenantSlug || null,
       tenantPath,
+      supportedLanguages,
+      defaultLanguage,
     }),
-    [state, features, modules, branding, hasFeature, hasModule, refreshTenant, effectiveTenantSlug, tenantPath]
+    [state, features, modules, branding, hasFeature, hasModule, refreshTenant, effectiveTenantSlug, tenantPath, supportedLanguages, defaultLanguage]
   );
 
   return (
@@ -323,6 +357,20 @@ export function useFeature(feature: keyof TenantFeatures): boolean {
 export function useModule(module: keyof TenantModules): boolean {
   const { hasModule } = useTenant();
   return hasModule(module);
+}
+
+/**
+ * Convenience hook for tenant-supported languages
+ */
+export function useTenantLanguages(): string[] {
+  return useTenant().supportedLanguages;
+}
+
+/**
+ * Convenience hook for tenant default language
+ */
+export function useTenantDefaultLanguage(): string {
+  return useTenant().defaultLanguage;
 }
 
 export default TenantContext;

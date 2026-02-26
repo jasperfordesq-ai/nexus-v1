@@ -133,17 +133,10 @@ class Router
             exit;
         }
 
-        // HTML Response for Web - Theme-aware error pages
+        // HTML Response for Web
         $suggestedUrl = $suggestion;
 
-        // Determine which theme to use for error page
-        $layout = $_SESSION['nexus_active_layout'] ?? 'modern';
-        $errorPage = __DIR__ . '/../../views/' . $layout . '/pages/error-404.php';
-
-        // Fallback to generic 404 if theme-specific doesn't exist
-        if (!file_exists($errorPage)) {
-            $errorPage = __DIR__ . '/../../views/404.php';
-        }
+        $errorPage = __DIR__ . '/../../views/404.php';
 
         require $errorPage;
     }

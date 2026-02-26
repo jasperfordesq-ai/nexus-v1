@@ -1,0 +1,15 @@
+{
+  "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+  "not_found": "Seite nicht gefunden",
+  "unauthorized": "Sie haben keine Berechtigung, diese Seite anzuzeigen",
+  "network": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.",
+  "loading_failed": "Inhalt konnte nicht geladen werden. Bitte aktualisieren Sie die Seite.",
+  "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+  "validation": {
+    "required": "Dieses Feld ist erforderlich",
+    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "phone": "Bitte geben Sie eine gültige Telefonnummer ein",
+    "min_length": "Muss mindestens {{min}} Zeichen lang sein",
+    "max_length": "Darf höchstens {{max}} Zeichen lang sein"
+  }
+}

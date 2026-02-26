@@ -42,7 +42,7 @@ class MenuManager
      * Get menu for a specific location and layout
      *
      * @param string $location Menu location
-     * @param string|null $layout Current layout (modern, civicone, skeleton)
+     * @param string|null $layout Current layout (modern)
      * @param bool $useCache Whether to use cached menus
      * @return array Hierarchical menu structure
      */

@@ -21,6 +21,7 @@ import {
   MapPin,
   AlertTriangle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant } from '@/contexts';
@@ -40,7 +41,8 @@ interface SearchResults {
 type SearchTab = 'all' | 'listings' | 'users' | 'events' | 'groups';
 
 export function SearchPage() {
-  usePageTitle('Search');
+  const { t } = useTranslation('search_page');
+  usePageTitle(t('page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -74,8 +76,8 @@ export function SearchPage() {
       }
     } catch (error) {
       logError('Search failed', error);
-      setSearchError('Search failed. Please try again.');
-      toast.error('Search failed');
+      setSearchError(t('error_message'));
+      toast.error(t('toast.search_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -119,16 +121,16 @@ export function SearchPage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Search className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-          Search
+          {t('title')}
         </h1>
-        <p className="text-theme-muted mt-1">Find listings, members, events, and groups</p>
+        <p className="text-theme-muted mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Search Form */}
       <GlassCard className="p-4">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
           <Input
-            placeholder="Search for anything..."
+            placeholder={t('search_placeholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             startContent={<Search className="w-5 h-5 text-theme-subtle" />}
@@ -154,24 +156,24 @@ export function SearchPage() {
               tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
             }}
           >
-            <Tab key="all" title={`All (${totalResults})`} />
-            <Tab key="listings" title={`Listings (${results.listings.length})`} />
-            <Tab key="users" title={`Members (${results.users.length})`} />
-            <Tab key="events" title={`Events (${results.events.length})`} />
-            <Tab key="groups" title={`Groups (${results.groups.length})`} />
+            <Tab key="all" title={t('tab_all', { count: totalResults })} />
+            <Tab key="listings" title={t('tab_listings', { count: results.listings.length })} />
+            <Tab key="users" title={t('tab_members', { count: results.users.length })} />
+            <Tab key="events" title={t('tab_events', { count: results.events.length })} />
+            <Tab key="groups" title={t('tab_groups', { count: results.groups.length })} />
           </Tabs>
 
           {/* Results Content */}
           {searchError ? (
             <GlassCard className="p-8 text-center">
               <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-              <h2 className="text-lg font-semibold text-theme-primary mb-2">Search Error</h2>
+              <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error_title')}</h2>
               <p className="text-theme-muted mb-4">{searchError}</p>
               <Button
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 onPress={() => performSearch(query)}
               >
-                Try Again
+                {t('try_again')}
               </Button>
             </GlassCard>
           ) : isLoading ? (
@@ -186,8 +188,8 @@ export function SearchPage() {
           ) : totalResults === 0 ? (
             <EmptyState
               icon={<Search className="w-12 h-12" />}
-              title="No results found"
-              description={`No results for "${query}". Try a different search term.`}
+              title={t('no_results_title')}
+              description={t('no_results_desc', { query })}
             />
           ) : (
             <motion.div
@@ -202,7 +204,7 @@ export function SearchPage() {
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                       <ListTodo className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                      Listings ({results.listings.length})
+                      {t('section_listings', { count: results.listings.length })}
                     </h2>
                   )}
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -214,7 +216,7 @@ export function SearchPage() {
                               text-xs px-2 py-1 rounded-full
                               ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}
                             `}>
-                              {listing.type === 'offer' ? 'Offering' : 'Requesting'}
+                              {listing.type === 'offer' ? t('listing_offering') : t('listing_requesting')}
                             </span>
                             <h3 className="font-semibold text-theme-primary mt-2">{listing.title}</h3>
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{listing.description}</p>
@@ -236,7 +238,7 @@ export function SearchPage() {
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                       <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                      Members ({results.users.length})
+                      {t('section_members', { count: results.users.length })}
                     </h2>
                   )}
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -278,7 +280,7 @@ export function SearchPage() {
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-                      Events ({results.events.length})
+                      {t('section_events', { count: results.events.length })}
                     </h2>
                   )}
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -314,7 +316,7 @@ export function SearchPage() {
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                       <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-                      Groups ({results.groups.length})
+                      {t('section_groups', { count: results.groups.length })}
                     </h2>
                   )}
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -326,7 +328,7 @@ export function SearchPage() {
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{group.description}</p>
                             <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                               <Users className="w-3 h-3" aria-hidden="true" />
-                              {group.members_count} members
+                              {t('members_count', { count: group.members_count })}
                             </div>
                           </GlassCard>
                         </Link>
@@ -344,9 +346,9 @@ export function SearchPage() {
       {!hasSearched && (
         <GlassCard className="p-12 text-center">
           <Search className="w-16 h-16 text-theme-subtle mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-theme-primary mb-2">Start searching</h3>
+          <h3 className="text-lg font-medium text-theme-primary mb-2">{t('initial_title')}</h3>
           <p className="text-theme-subtle">
-            Enter a search term to find listings, members, events, and groups
+            {t('initial_desc')}
           </p>
         </GlassCard>
       )}

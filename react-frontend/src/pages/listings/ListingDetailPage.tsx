@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Chip } from '@heroui/react';
 import {
@@ -38,7 +39,8 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Listing, ExchangeConfig } from '@/types/api';
 
 export function ListingDetailPage() {
-  usePageTitle('Listing');
+  const { t } = useTranslation('listings');
+  usePageTitle(t('title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -87,7 +89,7 @@ export function ListingDetailPage() {
         setListing(response.data);
         setIsSaved(response.data.is_favorited ?? false);
       } else {
-        setError('Listing not found or has been removed');
+        setError(t('not_found_error'));
       }
     } catch (err) {
       logError('Failed to load listing', err);
@@ -104,16 +106,16 @@ export function ListingDetailPage() {
   }, [loadListing, loadExchangeConfig, checkActiveExchange]);
 
   async function handleDelete() {
-    if (!listing || !window.confirm('Are you sure you want to delete this listing?')) return;
+    if (!listing || !window.confirm(t('delete_confirm'))) return;
 
     try {
       setIsDeleting(true);
       await api.delete(`/v2/listings/${listing.id}`);
-      toast.success('Listing deleted');
+      toast.success(t('delete_success_title'));
       navigate(tenantPath('/listings'), { replace: true });
     } catch (err) {
       logError('Failed to delete listing', err);
-      toast.error('Failed to delete', 'Please try again later');
+      toast.error(t('delete_error_title'), t('error_retry'));
     } finally {
       setIsDeleting(false);
     }
@@ -123,9 +125,9 @@ export function ListingDetailPage() {
     // Toggle saved state locally (API endpoint not yet implemented)
     setIsSaved(!isSaved);
     if (!isSaved) {
-      toast.success('Listing saved', 'You can find it in your saved items');
+      toast.success(t('save_success_title'), t('save_success_subtitle'));
     } else {
-      toast.info('Removed from saved');
+      toast.info(t('unsave_title'));
     }
   }
 
@@ -152,9 +154,9 @@ export function ListingDetailPage() {
       // Fallback: copy link to clipboard
       try {
         await navigator.clipboard.writeText(window.location.href);
-        toast.success('Link copied', 'Share this listing with anyone');
+        toast.success(t('share_copied_title'), t('share_copied_subtitle'));
       } catch {
-        toast.error('Could not copy link');
+        toast.error(t('share_error_title'));
       }
     }
   }
@@ -162,19 +164,19 @@ export function ListingDetailPage() {
   const isOwner = user && listing && user.id === listing.user_id;
 
   if (isLoading) {
-    return <LoadingScreen message="Loading listing..." />;
+    return <LoadingScreen message={t('loading')} />;
   }
 
   if (error || !listing) {
     return (
       <EmptyState
         icon={<AlertCircle className="w-12 h-12" />}
-        title="Listing Not Found"
-        description={error || 'The listing you are looking for does not exist'}
+        title={t('not_found_title')}
+        description={error || t('not_found_fallback')}
         action={
           <Link to={tenantPath('/listings')}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              Browse Listings
+              {t('browse')}
             </Button>
           </Link>
         }
@@ -190,7 +192,7 @@ export function ListingDetailPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Listings', href: '/listings' },
+        { label: t('title'), href: '/listings' },
         { label: listing?.title || 'Listing' },
       ]} />
 
@@ -203,7 +205,7 @@ export function ListingDetailPage() {
               text-sm px-3 py-1.5 rounded-full font-medium
               ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}
             `}>
-              {listing.type === 'offer' ? 'Offering' : 'Requesting'}
+              {listing.type === 'offer' ? t('offering') : t('requesting')}
             </span>
             {(listing.category || listing.category_name) && (
               <span className="text-sm px-3 py-1.5 rounded-full bg-theme-hover text-theme-muted flex items-center gap-1">
@@ -214,7 +216,7 @@ export function ListingDetailPage() {
           </div>
 
           {isOwner && (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Link to={tenantPath(`/listings/edit/${listing.id}`)}>
                 <Button
                   size="sm"
@@ -222,7 +224,7 @@ export function ListingDetailPage() {
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Edit
+                  {t('detail_edit')}
                 </Button>
               </Link>
               <Button
@@ -233,7 +235,7 @@ export function ListingDetailPage() {
                 onClick={handleDelete}
                 isLoading={isDeleting}
               >
-                Delete
+                {t('detail_delete')}
               </Button>
             </div>
           )}
@@ -249,11 +251,11 @@ export function ListingDetailPage() {
               <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
-              <div className="text-xs text-theme-subtle">Duration</div>
+              <div className="text-xs text-theme-subtle">{t('detail_duration')}</div>
               <div className="text-theme-primary">
                 {(listing.hours_estimate ?? listing.estimated_hours)
                   ? `${listing.hours_estimate ?? listing.estimated_hours} hours`
-                  : 'Flexible'}
+                  : t('detail_flexible')}
               </div>
             </div>
           </div>
@@ -263,7 +265,7 @@ export function ListingDetailPage() {
               <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <div className="text-xs text-theme-subtle">Posted</div>
+              <div className="text-xs text-theme-subtle">{t('detail_posted')}</div>
               <div className="text-theme-primary">
                 {new Date(listing.created_at).toLocaleDateString()}
               </div>
@@ -275,7 +277,7 @@ export function ListingDetailPage() {
               <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <div className="text-xs text-theme-subtle">Status</div>
+              <div className="text-xs text-theme-subtle">{t('detail_status')}</div>
               <div className="text-theme-primary capitalize">{listing.status}</div>
             </div>
           </div>
@@ -288,7 +290,7 @@ export function ListingDetailPage() {
               <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-xs text-theme-subtle">Location</div>
+              <div className="text-xs text-theme-subtle">{t('detail_location')}</div>
               <div className="text-theme-primary">{listing.location}</div>
             </div>
           </div>
@@ -297,7 +299,7 @@ export function ListingDetailPage() {
         {/* Location Map */}
         {listing.location && listing.latitude && listing.longitude && (
           <LocationMapCard
-            title="Service Location"
+            title={t('detail_service_location')}
             locationText={listing.location}
             markers={[{
               id: listing.id,
@@ -317,9 +319,9 @@ export function ListingDetailPage() {
 
         {/* Description */}
         <div className="mb-8">
-          <h2 className="text-lg font-semibold text-theme-primary mb-3">Description</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail_description')}</h2>
           <div className="prose prose-invert max-w-none">
-            <p className="text-theme-muted whitespace-pre-wrap">{listing.description}</p>
+            <p className="text-theme-muted whitespace-pre-wrap wrap-break-word">{listing.description}</p>
           </div>
         </div>
 
@@ -339,17 +341,17 @@ export function ListingDetailPage() {
                         activeExchange.status === 'pending_confirmation' ? 'primary' :
                         'default'
                       }>
-                        {activeExchange.status === 'pending_provider' ? 'Waiting for response' :
-                         activeExchange.status === 'pending_broker' ? 'Awaiting approval' :
-                         activeExchange.status === 'accepted' ? 'Accepted' :
-                         activeExchange.status === 'in_progress' ? 'In Progress' :
-                         activeExchange.status === 'pending_confirmation' ? 'Confirm Hours' :
-                         activeExchange.status === 'disputed' ? 'Under Review' :
+                        {activeExchange.status === 'pending_provider' ? t('exchange_status_pending_provider') :
+                         activeExchange.status === 'pending_broker' ? t('exchange_status_pending_broker') :
+                         activeExchange.status === 'accepted' ? t('exchange_status_accepted') :
+                         activeExchange.status === 'in_progress' ? t('exchange_status_in_progress') :
+                         activeExchange.status === 'pending_confirmation' ? t('exchange_status_pending_confirmation') :
+                         activeExchange.status === 'disputed' ? t('exchange_status_disputed') :
                          activeExchange.status.replace(/_/g, ' ')}
                       </Chip>
                     }
                   >
-                    Exchange
+                    {t('detail_exchange')}
                   </Button>
                 </Link>
               ) : (
@@ -358,7 +360,7 @@ export function ListingDetailPage() {
                     className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
                     startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
                   >
-                    Request Exchange
+                    {t('detail_request_exchange')}
                   </Button>
                 </Link>
               )
@@ -368,7 +370,7 @@ export function ListingDetailPage() {
                   className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                   startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Send Message
+                  {t('detail_send_message')}
                 </Button>
               </Link>
             )}
@@ -378,7 +380,7 @@ export function ListingDetailPage() {
               startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" aria-hidden="true" /> : <Heart className="w-4 h-4" aria-hidden="true" />}
               onClick={handleSave}
             >
-              {isSaved ? 'Saved' : 'Save'}
+              {isSaved ? t('detail_saved') : t('detail_save')}
             </Button>
             <Button
               variant="flat"
@@ -386,7 +388,7 @@ export function ListingDetailPage() {
               startContent={<Share2 className="w-4 h-4" aria-hidden="true" />}
               onClick={handleShare}
             >
-              Share
+              {t('detail_share')}
             </Button>
           </div>
         )}
@@ -402,7 +404,7 @@ export function ListingDetailPage() {
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
               <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-              {listing.type === 'offer' ? 'Offered by' : 'Requested by'}
+              {listing.type === 'offer' ? t('detail_offered_by') : t('detail_requested_by')}
             </h2>
 
             <Link
@@ -422,7 +424,7 @@ export function ListingDetailPage() {
                 {listing.user?.tagline && (
                   <p className="text-theme-muted text-sm truncate">{listing.user.tagline}</p>
                 )}
-                <p className="text-xs text-theme-subtle mt-1">Click to view profile</p>
+                <p className="text-xs text-theme-subtle mt-1">{t('detail_view_profile')}</p>
               </div>
             </Link>
           </GlassCard>

@@ -1,0 +1,22 @@
+{
+  "page_title": "Benachrichtigungen",
+  "title": "Benachrichtigungen",
+  "subtitle": "Bleiben Sie über Ihre Aktivitäten informiert",
+  "unread_badge": "{{count}} neu",
+  "mark_all_read": "Alle als gelesen markieren",
+  "settings_aria": "Benachrichtigungseinstellungen",
+  "filter_all": "Alle",
+  "filter_unread": "Ungelesen ({{count}})",
+  "empty_title": "Keine Benachrichtigungen",
+  "empty_desc": "Neue Benachrichtigungen werden hier angezeigt",
+  "empty_caught_up": "Alles gelesen!",
+  "empty_caught_up_desc": "Sie haben alle Ihre Benachrichtigungen gelesen",
+  "mark_read_aria": "Als gelesen markieren",
+  "delete_aria": "Benachrichtigung löschen",
+  "toast": {
+    "mark_read_failed": "Benachrichtigung konnte nicht als gelesen markiert werden",
+    "all_read": "Alle Benachrichtigungen als gelesen markiert",
+    "mark_all_failed": "Benachrichtigungen konnten nicht als gelesen markiert werden",
+    "delete_failed": "Benachrichtigung konnte nicht gelöscht werden"
+  }
+}

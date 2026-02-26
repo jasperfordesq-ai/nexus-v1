@@ -18,6 +18,7 @@ import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-do
 import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -34,6 +35,7 @@ interface Tenant {
 }
 
 export function LoginPage() {
+  const { t } = useTranslation('auth');
   usePageTitle('Sign In');
   const navigate = useNavigate();
   const location = useLocation();
@@ -234,9 +236,9 @@ export function LoginPage() {
                     >
                       <Mail className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
                     </motion.div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">Welcome Back</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('login.title')}</h1>
                     <p className="text-theme-muted mt-2">
-                      Sign in to continue to {branding.name}
+                      {t('login.subtitle_community', { name: branding.name })}
                     </p>
                   </div>
 
@@ -271,8 +273,8 @@ export function LoginPage() {
                     {/* Multi-tenant dropdown — only when tenant not resolved from URL */}
                     {showTenantDropdown && (
                       <Select
-                        label="Community"
-                        placeholder="Select your community"
+                        label={t('login.community_label')}
+                        placeholder={t('login.community_placeholder')}
                         selectedKeys={selectedTenantId ? new Set([selectedTenantId]) : new Set()}
                         onSelectionChange={handleTenantChange}
                         startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
@@ -320,8 +322,8 @@ export function LoginPage() {
 
                     <Input
                       type="email"
-                      label="Email"
-                      placeholder="you@example.com"
+                      label={t('login.email_label')}
+                      placeholder={t('login.email_placeholder')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
@@ -336,7 +338,7 @@ export function LoginPage() {
 
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      label="Password"
+                      label={t('login.password_label')}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -371,7 +373,7 @@ export function LoginPage() {
                         to={tenantPath('/password/forgot')}
                         className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"
                       >
-                        Forgot password?
+                        {t('login.forgot_password')}
                       </Link>
                     </div>
 
@@ -383,7 +385,7 @@ export function LoginPage() {
                       size="lg"
                       spinner={<Loader2 className="w-4 h-4 animate-spin" />}
                     >
-                      Sign In
+                      {t('login.submit')}
                     </Button>
                   </form>
 
@@ -392,12 +394,12 @@ export function LoginPage() {
 
                   {/* Register Link */}
                   <p className="text-center text-theme-muted text-sm">
-                    Don&apos;t have an account?{' '}
+                    {t('login.no_account')}{' '}
                     <Link
                       to={tenantPath('/register')}
                       className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors"
                     >
-                      Create one
+                      {t('login.create_account_link')}
                     </Link>
                   </p>
                 </motion.div>
@@ -419,10 +421,10 @@ export function LoginPage() {
                       <Shield className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
                     </motion.div>
                     <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">
-                      Two-Factor Authentication
+                      {t('login.twofa_title')}
                     </h1>
                     <p className="text-theme-muted mt-2">
-                      Enter the code from your authenticator app
+                      {t('login.twofa_subtitle')}
                     </p>
                   </div>
 
@@ -441,8 +443,8 @@ export function LoginPage() {
                   <form onSubmit={handleVerify2FA} className="space-y-5">
                     <Input
                       type="text"
-                      label={useBackupCode ? 'Backup Code' : 'Authentication Code'}
-                      placeholder={useBackupCode ? 'XXXX-XXXX' : '000000'}
+                      label={useBackupCode ? t('login.twofa_backup_code_label') : t('login.twofa_code_label')}
+                      placeholder={useBackupCode ? t('login.twofa_backup_placeholder') : t('login.twofa_code_placeholder')}
                       value={twoFactorCode}
                       onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, useBackupCode ? 8 : 6))}
                       startContent={<Shield className="w-4 h-4 text-theme-subtle" />}
@@ -468,7 +470,7 @@ export function LoginPage() {
                             label: 'text-theme-muted text-sm',
                           }}
                         >
-                          Use backup code instead
+                          {t('login.twofa_use_backup')}
                         </Checkbox>
                       )}
 
@@ -480,7 +482,7 @@ export function LoginPage() {
                           label: 'text-theme-muted text-sm',
                         }}
                       >
-                        Trust this device for 30 days
+                        {t('login.twofa_trust_device')}
                       </Checkbox>
                     </div>
 
@@ -492,7 +494,7 @@ export function LoginPage() {
                         className="flex-1 bg-theme-elevated text-theme-muted hover:bg-theme-hover"
                         startContent={<ArrowLeft className="w-4 h-4" />}
                       >
-                        Back
+                        {t('login.back')}
                       </Button>
 
                       <Button
@@ -502,14 +504,14 @@ export function LoginPage() {
                         className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
                         spinner={<Loader2 className="w-4 h-4 animate-spin" />}
                       >
-                        Verify
+                        {t('login.twofa_verify')}
                       </Button>
                     </div>
                   </form>
 
                   {/* Help text */}
                   <p className="mt-6 text-center text-theme-subtle text-xs">
-                    Lost access to your authenticator? Contact support for help recovering your account.
+                    {t('login.twofa_help')}
                   </p>
                 </motion.div>
               )}
@@ -528,7 +530,7 @@ export function LoginPage() {
               className="inline-flex items-center gap-2 text-theme-subtle hover:text-theme-secondary text-sm transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to home
+              {t('login.back_to_home')}
             </Link>
           </motion.div>
         </motion.div>

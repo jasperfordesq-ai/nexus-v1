@@ -66,9 +66,9 @@ class AuthController extends BaseApiController
             );
         }
 
-        // SECURITY: Redis-based rate limiting (fast, per-IP, 5 attempts per minute)
+        // SECURITY: Redis-based rate limiting (fast, per-IP, 10 attempts per minute)
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-        if (\Nexus\Services\RateLimitService::check("auth:login:$ip", 5, 60)) {
+        if (\Nexus\Services\RateLimitService::check("auth:login:$ip", 10, 60)) {
             header('Retry-After: 60');
             return $this->errorResponse(
                 'Too many login attempts. Please try again later.',
@@ -381,10 +381,53 @@ class AuthController extends BaseApiController
         $firstName = $parts[0];
         $lastName = $parts[1] ?? '';
 
-        $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, password_hash, tenant_id, role) VALUES (?, ?, ?, ?, ?, 'member')");
+        $stmt = $db->prepare("INSERT INTO users (name, first_name, last_name, email, password_hash, tenant_id, role) VALUES (?, ?, ?, ?, ?, ?, 'member')");
 
         try {
-            $stmt->execute([$firstName, $lastName, $email, $hashed, $tenant_id]);
+            $stmt->execute([trim($firstName . ' ' . $lastName), $firstName, $lastName, $email, $hashed, $tenant_id]);
+            $userId = (int) $db->lastInsertId();
+
+            // Notify admins of new registration (including hardcoded master email)
+            try {
+                $tenantName = \Nexus\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
+                $adminLink = \Nexus\Core\TenantContext::getFrontendUrl() . \Nexus\Core\TenantContext::getBasePath() . '/admin/users/' . $userId . '/edit';
+
+                // Get tenant admins
+                $adminStmt = $db->prepare("
+                    SELECT email, first_name FROM users
+                    WHERE tenant_id = ?
+                      AND role IN ('admin', 'super_admin', 'tenant_admin', 'tenant_super_admin')
+                      AND status = 'active'
+                ");
+                $adminStmt->execute([$tenant_id]);
+                $admins = $adminStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+                // Always include master notification address — hardcoded fallback + env override
+                $masterEmail = \Nexus\Core\Env::get('ADMIN_NOTIFICATION_EMAIL') ?: 'jasper@hour-timebank.ie';
+                $alreadyIncluded = array_filter($admins, fn($a) => strtolower($a['email']) === strtolower($masterEmail));
+                if (empty($alreadyIncluded)) {
+                    $admins[] = ['email' => $masterEmail, 'first_name' => 'Platform Admin'];
+                }
+
+                $mailer = new \Nexus\Core\Mailer();
+                foreach ($admins as $admin) {
+                    $html = \Nexus\Core\EmailTemplate::render(
+                        "New User Registration",
+                        "A new user has registered on $tenantName",
+                        "<strong>User:</strong> $firstName $lastName ($email)<br>
+                         <strong>Community:</strong> $tenantName<br>
+                         <strong>Status:</strong> Pending Approval<br><br>
+                         Please review and approve this user to grant them access.",
+                        "Review User",
+                        $adminLink,
+                        $tenantName
+                    );
+                    $mailer->send($admin['email'], "New Registration on $tenantName — $firstName $lastName", $html);
+                }
+            } catch (\Throwable $e) {
+                error_log("[Legacy API Registration] Admin notification failed: " . $e->getMessage());
+            }
+
             return $this->jsonResponse(['success' => true, 'message' => 'Registration successful']);
         } catch (\Exception $e) {
             return $this->errorResponse(
@@ -797,7 +840,7 @@ class AuthController extends BaseApiController
 
         // Verify user still exists and is active
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT id, email, role, status FROM users WHERE id = ? AND tenant_id = ?");
+        $stmt = $db->prepare("SELECT id, email, role, status, is_super_admin FROM users WHERE id = ? AND tenant_id = ?");
         $stmt->execute([$userId, $tenantId]);
         $user = $stmt->fetch();
 

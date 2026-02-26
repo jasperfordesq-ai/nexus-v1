@@ -12,10 +12,12 @@
 
 import { Card, CardBody, CardHeader, Divider, Chip } from '@heroui/react';
 import { FlaskConical, CheckCircle, AlertTriangle, Bug, Shield, Users, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 
 export function DevelopmentStatusPage() {
+  const { t } = useTranslation('public');
   usePageTitle('Development Status — Release Candidate (RC)');
 
   return (
@@ -25,7 +27,7 @@ export function DevelopmentStatusPage() {
         <FlaskConical className="w-8 h-8 text-amber-500 shrink-0 mt-1" aria-hidden="true" />
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            Development status: {RELEASE_STATUS.stageLabel}
+            {t('dev_status.title', { stage: RELEASE_STATUS.stageLabel })}
           </h1>
           <Chip
             color="warning"
@@ -41,19 +43,15 @@ export function DevelopmentStatusPage() {
       {/* Where we are */}
       <Card>
         <CardHeader>
-          <h2 className="text-lg font-semibold">Where we are now</h2>
+          <h2 className="text-lg font-semibold">{t('dev_status.where_we_are.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-3 text-sm text-foreground-600">
           <p>
-            Project NEXUS is currently in <strong>Release Candidate (RC)</strong> — the final stage
-            before a full public launch. We have reached feature-completeness for V1, and the platform
-            is in active use by real communities. Our focus now is hardening, performance, and catching
-            edge-case bugs before we declare General Availability.
+            {t('dev_status.where_we_are.paragraph1')}
           </p>
           <p>
-            Everything you see here is running on production infrastructure (Azure, Cloudflare, MariaDB).
-            Your data is real and treated seriously. We are not in a sandboxed demo environment.
+            {t('dev_status.where_we_are.paragraph2')}
           </p>
         </CardBody>
       </Card>
@@ -62,25 +60,25 @@ export function DevelopmentStatusPage() {
       <Card>
         <CardHeader className="flex gap-2">
           <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />
-          <h2 className="text-lg font-semibold">What's stable and working</h2>
+          <h2 className="text-lg font-semibold">{t('dev_status.whats_stable.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody>
           <ul className="text-sm text-foreground-600 space-y-2 list-none">
-            {[
-              'Member registration, login, and onboarding',
-              'Time credit wallet — earning, spending, and viewing transaction history',
-              'Listings — posting, browsing, and requesting exchanges',
-              'Messaging — direct conversations between members',
-              'Events — creating, discovering, and signing up for community events',
-              'Groups — community sub-groups with member management',
-              'Achievements and gamification (XP, badges, leaderboard)',
-              'Admin panel — tenant configuration, user management, moderation',
-              'Multi-tenant architecture — each community has isolated data',
-              'Email notifications (registration, exchange requests, messages)',
-              'Dark mode, accessibility, and mobile-responsive UI',
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2">
+            {([
+              t('dev_status.whats_stable.item1'),
+              t('dev_status.whats_stable.item2'),
+              t('dev_status.whats_stable.item3'),
+              t('dev_status.whats_stable.item4'),
+              t('dev_status.whats_stable.item5'),
+              t('dev_status.whats_stable.item6'),
+              t('dev_status.whats_stable.item7'),
+              t('dev_status.whats_stable.item8'),
+              t('dev_status.whats_stable.item9'),
+              t('dev_status.whats_stable.item10'),
+              t('dev_status.whats_stable.item11'),
+            ]).map((item, index) => (
+              <li key={index} className="flex items-start gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" aria-hidden="true" />
                 {item}
               </li>
@@ -93,20 +91,20 @@ export function DevelopmentStatusPage() {
       <Card>
         <CardHeader className="flex gap-2">
           <AlertTriangle className="w-5 h-5 text-warning" aria-hidden="true" />
-          <h2 className="text-lg font-semibold">What may still be rough</h2>
+          <h2 className="text-lg font-semibold">{t('dev_status.whats_rough.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody>
           <ul className="text-sm text-foreground-600 space-y-2 list-none">
-            {[
-              'Volunteering opportunities module — newer feature, less battle-tested',
-              'Federation (cross-community) features — experimental, may have edge cases',
-              'AI Chat assistant — depends on OpenAI API; prompts and context still being tuned',
-              'Push notifications (mobile) — may have delivery delays on some devices',
-              'Some admin reporting charts may show incorrect data in edge cases',
-              'Localisation — the platform is global-ready but English-only for now',
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2">
+            {([
+              t('dev_status.whats_rough.item1'),
+              t('dev_status.whats_rough.item2'),
+              t('dev_status.whats_rough.item3'),
+              t('dev_status.whats_rough.item4'),
+              t('dev_status.whats_rough.item5'),
+              t('dev_status.whats_rough.item6'),
+            ]).map((item, index) => (
+              <li key={index} className="flex items-start gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" aria-hidden="true" />
                 {item}
               </li>
@@ -119,19 +117,19 @@ export function DevelopmentStatusPage() {
       <Card>
         <CardHeader className="flex gap-2">
           <Shield className="w-5 h-5 text-primary" aria-hidden="true" />
-          <h2 className="text-lg font-semibold">How we catch bugs</h2>
+          <h2 className="text-lg font-semibold">{t('dev_status.how_we_catch_bugs.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody className="text-sm text-foreground-600 space-y-2">
           <p>
-            We use a multi-layer approach to catch and fix issues quickly:
+            {t('dev_status.how_we_catch_bugs.intro')}
           </p>
           <ul className="space-y-1.5 list-none ml-2">
-            <li>• <strong>Automated tests</strong> — PHP unit tests and React component tests run on every commit</li>
-            <li>• <strong>Sentry error tracking</strong> — exceptions on both frontend and backend are captured in real time</li>
-            <li>• <strong>Cloudflare analytics</strong> — traffic anomalies and error spikes are monitored</li>
-            <li>• <strong>Manual QA</strong> — core user journeys are tested before each deployment</li>
-            <li>• <strong>Community testing</strong> — real users help us discover edge cases in production</li>
+            <li>&bull; <strong>{t('dev_status.how_we_catch_bugs.method1_bold')}</strong> — {t('dev_status.how_we_catch_bugs.method1_text')}</li>
+            <li>&bull; <strong>{t('dev_status.how_we_catch_bugs.method2_bold')}</strong> — {t('dev_status.how_we_catch_bugs.method2_text')}</li>
+            <li>&bull; <strong>{t('dev_status.how_we_catch_bugs.method3_bold')}</strong> — {t('dev_status.how_we_catch_bugs.method3_text')}</li>
+            <li>&bull; <strong>{t('dev_status.how_we_catch_bugs.method4_bold')}</strong> — {t('dev_status.how_we_catch_bugs.method4_text')}</li>
+            <li>&bull; <strong>{t('dev_status.how_we_catch_bugs.method5_bold')}</strong> — {t('dev_status.how_we_catch_bugs.method5_text')}</li>
           </ul>
         </CardBody>
       </Card>
@@ -140,17 +138,16 @@ export function DevelopmentStatusPage() {
       <Card>
         <CardHeader className="flex gap-2">
           <Users className="w-5 h-5 text-secondary" aria-hidden="true" />
-          <h2 className="text-lg font-semibold">How to help</h2>
+          <h2 className="text-lg font-semibold">{t('dev_status.how_to_help.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody className="text-sm text-foreground-600 space-y-4">
           <div className="flex items-start gap-3">
             <Bug className="w-5 h-5 text-danger shrink-0 mt-0.5" aria-hidden="true" />
             <div>
-              <h3 className="font-semibold text-foreground mb-1">Report a bug</h3>
+              <h3 className="font-semibold text-foreground mb-1">{t('dev_status.how_to_help.report_bug_title')}</h3>
               <p>
-                Found something broken? Please open an issue on GitHub — it's the fastest way to get a fix
-                in front of us. Include what you were doing, what you expected, and what actually happened.
+                {t('dev_status.how_to_help.report_bug_description')}
               </p>
               <a
                 href="https://github.com/jasperfordesq-ai/nexus-v1/issues"
@@ -158,7 +155,7 @@ export function DevelopmentStatusPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 mt-2 text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
               >
-                Open an issue on GitHub
+                {t('dev_status.how_to_help.github_link')}
                 <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
               </a>
             </div>
@@ -169,10 +166,9 @@ export function DevelopmentStatusPage() {
           <div className="flex items-start gap-3">
             <Users className="w-5 h-5 text-secondary shrink-0 mt-0.5" aria-hidden="true" />
             <div>
-              <h3 className="font-semibold text-foreground mb-1">Become a tester</h3>
+              <h3 className="font-semibold text-foreground mb-1">{t('dev_status.how_to_help.become_tester_title')}</h3>
               <p>
-                If you run a timebank or community network and want to try Project NEXUS with your members,
-                we'd love to work with you. Reach out via GitHub Discussions or the contact page.
+                {t('dev_status.how_to_help.become_tester_description')}
               </p>
             </div>
           </div>
@@ -183,13 +179,12 @@ export function DevelopmentStatusPage() {
       <Card className="border border-danger-200 dark:border-danger-800">
         <CardHeader className="flex gap-2">
           <Shield className="w-5 h-5 text-danger" aria-hidden="true" />
-          <h2 className="text-lg font-semibold">Security disclosure</h2>
+          <h2 className="text-lg font-semibold">{t('dev_status.security.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody className="text-sm text-foreground-600">
           <p>
-            If you discover a security vulnerability, please do <strong>not</strong> open a public issue.
-            Instead, contact us confidentially at{' '}
+            {t('dev_status.security.description_before_email')}{' '}
             {/* TODO: Replace with real security contact when security@project-nexus.ie is set up */}
             <a
               href="mailto:security@project-nexus.ie"
@@ -197,7 +192,7 @@ export function DevelopmentStatusPage() {
             >
               security@project-nexus.ie
             </a>
-            . We will respond within 72 hours and work with you on responsible disclosure.
+            {t('dev_status.security.description_after_email')}
           </p>
         </CardBody>
       </Card>

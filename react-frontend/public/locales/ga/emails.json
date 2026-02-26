@@ -1,0 +1,47 @@
+{
+  "welcome": {
+    "subject": "Fáilte go dtí {{community}}!",
+    "greeting": "Fáilte, {{name}}!",
+    "body": "Go raibh maith agat as clárú le {{community}}. Tá do chuntas cruthaithe agus is féidir leat tús a chur le taiscéalaíocht ar an ardán anois.",
+    "cta": "Tosaigh"
+  },
+  "verification": {
+    "subject": "Deimhnigh do sheoladh ríomhphoist",
+    "greeting": "Dia duit {{name}},",
+    "body": "Deimhnigh do sheoladh ríomhphoist trí chliceáil ar an gcnaipe thíos.",
+    "cta": "Deimhnigh Ríomhphost",
+    "expiry": "Rachaidh an nasc seo in éag i gceann {{hours}} uair an chloig."
+  },
+  "password_reset": {
+    "subject": "Athshocraigh do phasfhocal",
+    "greeting": "Dia duit {{name}},",
+    "body": "D'iarr tú athshocrú pasfhocail. Cliceáil ar an gcnaipe thíos chun pasfhocal nua a shocrú.",
+    "cta": "Athshocraigh Pasfhocal",
+    "expiry": "Rachaidh an nasc seo in éag i gceann {{hours}} uair an chloig.",
+    "ignore": "Murar iarr tú é seo, is féidir leat neamhaird a dhéanamh den ríomhphost seo."
+  },
+  "transaction": {
+    "subject": "Idirbheart creidmheasa ama — {{amount}}u",
+    "greeting": "Dia duit {{name}},",
+    "sent": "Sheol tú {{amount}} uair(eanta) chuig {{recipient}}.",
+    "received": "Fuair tú {{amount}} uair(eanta) ó {{sender}}.",
+    "description": "Cur síos: {{description}}"
+  },
+  "review_request": {
+    "subject": "Fág léirmheas do {{name}}",
+    "greeting": "Dia duit {{name}},",
+    "body": "Mhalairtigh tú seirbhísí le {{other_party}} le déanaí. Glac nóiméad le léirmheas a fhágáil.",
+    "cta": "Fág Léirmheas"
+  },
+  "new_message": {
+    "subject": "Teachtaireacht nua ó {{sender}}",
+    "greeting": "Dia duit {{name}},",
+    "body": "Sheol {{sender}} teachtaireacht chugat.",
+    "cta": "Féach ar Theachtaireacht"
+  },
+  "footer": {
+    "unsubscribe": "Díliostáil ó na ríomhphoist seo",
+    "sent_by": "Seolta ag {{community}} arna chumhachtú ag Project NEXUS",
+    "address": "{{community}}"
+  }
+}

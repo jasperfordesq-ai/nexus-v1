@@ -17,8 +17,9 @@ class User
     {
         $tenantId = TenantContext::getId();
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (tenant_id, first_name, last_name, email, password_hash, location, phone, profile_type, organization_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        Database::query($sql, [$tenantId, $firstName, $lastName, $email, $hash, $location, $phone, $profileType, $orgName]);
+        $name = trim($firstName . ' ' . $lastName);
+        $sql = "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, location, phone, profile_type, organization_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Database::query($sql, [$tenantId, $name, $firstName, $lastName, $email, $hash, $location, $phone, $profileType, $orgName]);
     }
 
     public static function findByEmail($email)
@@ -153,11 +154,13 @@ class User
         Database::query($sql, [$firstName, $lastName, $bio, $location, $phone, $profileType, $orgName, $id, $tenantId]);
     }
 
-    public static function updateAvatar($id, $url)
+    public static function updateAvatar($id, $url): bool
     {
         $tenantId = TenantContext::getId();
-        $sql = "UPDATE users SET avatar_url = ? WHERE id = ? AND tenant_id = ?";
-        Database::query($sql, [$url, $id, $tenantId]);
+        // Allow super admins whose home tenant differs from current TenantContext
+        $sql = "UPDATE users SET avatar_url = ? WHERE id = ? AND (tenant_id = ? OR is_super_admin = 1)";
+        $stmt = Database::query($sql, [$url, $id, $tenantId]);
+        return $stmt->rowCount() > 0;
     }
 
     public static function updatePrivacy($id, $profile, $search, $contact)
@@ -277,7 +280,7 @@ class User
      * Allows partial updates without overwriting other fields.
      * Security: Only allows whitelisted fields to prevent mass assignment vulnerabilities
      */
-    public static function update($id, $data)
+    public static function update($id, $data): bool
     {
         $tenantId = TenantContext::getId();
 
@@ -316,15 +319,18 @@ class User
         }
 
         if (empty($fields)) {
-            return;
+            return true; // Nothing to update
         }
 
         // Handle users with NULL tenant_id (super admins / legacy users)
-        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL)";
+        // Also allow super admins who have tenant_id = 1 (master) but may be
+        // logged in cross-tenant via a different tenant's URL.
+        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL OR is_super_admin = 1)";
         $params[] = $id;
         $params[] = $tenantId;
 
-        Database::query($sql, $params);
+        $stmt = Database::query($sql, $params);
+        return $stmt->rowCount() > 0;
     }
 
     public static function getAll()

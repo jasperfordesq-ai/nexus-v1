@@ -1,0 +1,19 @@
+{
+  "review": "Prüfen",
+  "view_all": "Alle anzeigen",
+  "details": "Details",
+  "live": "LIVE",
+  "active": "Aktiv",
+  "completed": "Abgeschlossen",
+  "new": "NEU",
+  "last_checked": "Zuletzt geprüft: {{time}}",
+  "no_data": "Keine Daten verfügbar",
+  "status": {
+    "online": "Online",
+    "warning": "Warnung",
+    "offline": "Offline",
+    "all_operational": "Alle Systeme betriebsbereit",
+    "some_attention": "Einige Dienste erfordern Aufmerksamkeit",
+    "issues_detected": "Probleme erkannt"
+  }
+}

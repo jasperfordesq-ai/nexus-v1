@@ -28,8 +28,9 @@
 
 import { Outlet, useLocation, Routes } from 'react-router-dom';
 import { TenantProvider, useTenant, useAuth } from '@/contexts';
-import { AuthProvider, NotificationsProvider, PusherProvider } from '@/contexts';
+import { AuthProvider, NotificationsProvider, PusherProvider, MenuProvider } from '@/contexts';
 import { RESERVED_PATHS } from '@/lib/tenant-routing';
+import { CookieConsentBanner } from '@/components/feedback';
 import { lazy, Suspense } from 'react';
 
 const MaintenancePage = lazy(() => import('@/pages/public/MaintenancePage'));
@@ -62,9 +63,12 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
       <AuthProvider>
         <NotificationsProvider>
           <PusherProvider>
-            <TenantGuard slugPrefix={effectiveSlug} appRoutes={appRoutes}>
-              <Outlet />
-            </TenantGuard>
+            <MenuProvider>
+              <TenantGuard slugPrefix={effectiveSlug} appRoutes={appRoutes}>
+                <Outlet />
+              </TenantGuard>
+              <CookieConsentBanner />
+            </MenuProvider>
           </PusherProvider>
         </NotificationsProvider>
       </AuthProvider>

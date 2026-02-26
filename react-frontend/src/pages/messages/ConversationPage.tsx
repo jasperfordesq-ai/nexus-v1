@@ -14,6 +14,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Textarea, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
@@ -58,7 +59,8 @@ interface PaginationState {
 }
 
 export function ConversationPage() {
-  usePageTitle('Messages');
+  const { t } = useTranslation('messages');
+  usePageTitle(t('title'));
   const { id, userId } = useParams<{ id?: string; userId?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -278,14 +280,18 @@ export function ConversationPage() {
       pollingIntervalRef.current = null;
     }
 
-    // Only poll if: document visible, not new conversation, have messages, and Pusher not connected
-    if (!isDocumentVisible || isNewConversation || !lastMessageIdRef.current || pusher?.isConnected) {
+    // Only poll if: document visible, not new conversation, and have messages loaded
+    if (!isDocumentVisible || isNewConversation || !lastMessageIdRef.current) {
       return;
     }
 
+    // When Pusher is connected, use a longer polling interval as a reliability fallback.
+    // When disconnected, poll more frequently as it's the primary update mechanism.
+    const interval = pusher?.isConnected ? 30000 : 5000;
+
     pollingIntervalRef.current = setInterval(() => {
       pollForNewMessages();
-    }, 5000);
+    }, interval);
 
     return () => {
       if (pollingIntervalRef.current) {
@@ -490,7 +496,7 @@ export function ConversationPage() {
       }
     } catch (error) {
       logError('Failed to archive conversation', error);
-      toast.error('Error', 'Failed to archive conversation. Please try again.');
+      toast.error(t('error_title'), 'Failed to archive conversation. Please try again.');
     } finally {
       setIsArchiving(false);
       setShowArchiveModal(false);
@@ -556,7 +562,7 @@ export function ConversationPage() {
       }, 1000);
     } catch (error) {
       logError('Failed to start recording', error);
-      toast.error('Microphone Access Required', 'Please allow microphone access to record voice messages.');
+      toast.error(t('mic_required_title'), t('mic_required_subtitle'));
     }
   }
 
@@ -630,7 +636,7 @@ export function ConversationPage() {
       }
     } catch (error) {
       logError('Failed to send voice message', error);
-      toast.error('Error', 'Failed to send voice message. Please try again.');
+      toast.error(t('error_title'), t('voice_send_error'));
     } finally {
       setIsSending(false);
     }
@@ -822,7 +828,7 @@ export function ConversationPage() {
 
           setTimeout(() => scrollToBottom(), 50);
         } else {
-          toast.error('Error', response.error || 'Failed to send message. Please try again.');
+          toast.error(t('error_title'), response.error || t('send_error'));
         }
       } else {
         // Regular text message (no attachments)
@@ -858,12 +864,12 @@ export function ConversationPage() {
           setTimeout(() => scrollToBottom(), 50);
         } else {
           console.error('[Messages] Send failed:', response);
-          toast.error('Error', response.error || 'Failed to send message. Please try again.');
+          toast.error(t('error_title'), response.error || t('send_error'));
         }
       }
     } catch (error) {
       logError('Failed to send message', error);
-      toast.error('Error', 'Failed to send message. Please try again.');
+      toast.error(t('error_title'), t('send_error'));
     } finally {
       setIsSending(false);
     }
@@ -924,11 +930,11 @@ export function ConversationPage() {
           };
         });
         cancelEditing();
-        toast.success('Message updated', 'Your message has been edited.');
+        toast.success(t('message_updated'), t('message_updated_subtitle'));
       }
     } catch (error) {
       logError('Failed to edit message', error);
-      toast.error('Error', 'Failed to edit message. Please try again.');
+      toast.error(t('error_title'), t('edit_error'));
     }
   }
 
@@ -946,21 +952,21 @@ export function ConversationPage() {
             ...prev,
             messages: prev.messages.map((msg) =>
               msg.id === messageId
-                ? { ...msg, body: '[Message deleted]', is_deleted: true }
+                ? { ...msg, body: t('message_deleted_placeholder'), is_deleted: true }
                 : msg
             ),
           };
         });
-        toast.success('Message deleted', 'Your message has been deleted.');
+        toast.success(t('message_deleted'), t('message_deleted_subtitle'));
       }
     } catch (error) {
       logError('Failed to delete message', error);
-      toast.error('Error', 'Failed to delete message. Please try again.');
+      toast.error(t('error_title'), t('delete_error'));
     }
   }
 
   if (isLoading) {
-    return <LoadingScreen message="Loading conversation..." />;
+    return <LoadingScreen message={t('loading')} />;
   }
 
   if (!conversation) {
@@ -982,7 +988,7 @@ export function ConversationPage() {
               variant="light"
               className="text-theme-muted"
               onPress={() => navigate(tenantPath('/messages'))}
-              aria-label="Back to messages"
+              aria-label={t('aria_back')}
             >
               <ArrowLeft className="w-5 h-5" aria-hidden="true" />
             </Button>
@@ -1009,7 +1015,7 @@ export function ConversationPage() {
               variant="flat"
               size="sm"
               className="bg-theme-elevated text-theme-muted"
-              aria-label="Search messages"
+              aria-label={t('aria_search_messages')}
               onPress={() => setShowSearch(!showSearch)}
             >
               <Search className="w-4 h-4" />
@@ -1021,7 +1027,7 @@ export function ConversationPage() {
                 variant="flat"
                 size="sm"
                 className="bg-theme-elevated text-theme-muted"
-                aria-label="View profile"
+                aria-label={t('aria_view_profile')}
               >
                 <Info className="w-4 h-4" />
               </Button>
@@ -1034,7 +1040,7 @@ export function ConversationPage() {
                   variant="flat"
                   size="sm"
                   className="bg-theme-elevated text-theme-muted"
-                  aria-label="More options"
+                  aria-label={t('aria_more_options')}
                 >
                   <MoreVertical className="w-4 h-4" />
                 </Button>
@@ -1047,7 +1053,7 @@ export function ConversationPage() {
                   color="danger"
                   onPress={() => setShowArchiveModal(true)}
                 >
-                  Archive Conversation
+                  {t('archive_title')}
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -1061,7 +1067,7 @@ export function ConversationPage() {
           <div className="flex items-center gap-3">
             <div className="flex-1 relative">
               <Input
-                placeholder="Search in conversation..."
+                placeholder={t('conversation_search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 startContent={<Search className="w-4 h-4 text-theme-subtle" />}
@@ -1075,7 +1081,7 @@ export function ConversationPage() {
             {searchResults.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-theme-subtle">
-                  {currentSearchIndex + 1} of {searchResults.length}
+                  {t('search_result_count', { current: currentSearchIndex + 1, total: searchResults.length })}
                 </span>
                 <Button
                   isIconOnly
@@ -1083,7 +1089,7 @@ export function ConversationPage() {
                   variant="flat"
                   className="bg-theme-elevated text-theme-muted"
                   onPress={() => navigateSearchResult('prev')}
-                  aria-label="Previous result"
+                  aria-label={t('aria_prev_result')}
                 >
                   <ArrowLeft className="w-3 h-3" />
                 </Button>
@@ -1093,7 +1099,7 @@ export function ConversationPage() {
                   variant="flat"
                   className="bg-theme-elevated text-theme-muted"
                   onPress={() => navigateSearchResult('next')}
-                  aria-label="Next result"
+                  aria-label={t('aria_next_result')}
                 >
                   <ArrowLeft className="w-3 h-3 rotate-180" />
                 </Button>
@@ -1109,7 +1115,7 @@ export function ConversationPage() {
                 setSearchQuery('');
                 setSearchResults([]);
               }}
-              aria-label="Close search"
+              aria-label={t('aria_close_search')}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -1122,7 +1128,7 @@ export function ConversationPage() {
         <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg" role="alert">
           <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-amber-700 dark:text-amber-300 text-sm flex-1">
-            This conversation may be reviewed by a coordinator for safeguarding purposes.
+            {t('safeguarding_notice')}
           </p>
           <Button
             isIconOnly
@@ -1130,7 +1136,7 @@ export function ConversationPage() {
             variant="light"
             className="text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 flex-shrink-0 -mt-0.5"
             onPress={() => setIsSafeguardingDismissed(true)}
-            aria-label="Dismiss safeguarding notice"
+            aria-label={t('aria_dismiss_safeguarding')}
           >
             <X className="w-4 h-4" />
           </Button>
@@ -1144,7 +1150,7 @@ export function ConversationPage() {
             <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-theme-muted mb-1">
-                Regarding this {listing.type === 'offer' ? 'offer' : 'request'}:
+                {t('regarding_context', { type: listing.type === 'offer' ? 'offer' : 'request' })}
               </p>
               <Link
                 to={tenantPath(`/listings/${listing.id}`)}
@@ -1180,7 +1186,7 @@ export function ConversationPage() {
                 className="text-sm text-theme-subtle"
                 onPress={loadOlderMessages}
               >
-                Scroll up or tap to load older messages
+                {t('load_older_hint')}
               </Button>
             </div>
           )}
@@ -1194,7 +1200,7 @@ export function ConversationPage() {
               />
               <h3 className="text-lg font-semibold text-theme-primary mb-1">{other_user.name}</h3>
               <p className="text-theme-subtle text-sm max-w-xs">
-                This is the beginning of your conversation with {other_user.name}. Say hello!
+                {t('conversation_start', { name: other_user.name })}
               </p>
             </div>
           ) : (
@@ -1236,7 +1242,7 @@ export function ConversationPage() {
                 <span className="w-1.5 h-1.5 bg-theme-elevated rounded-full animate-bounce [animation-delay:150ms]" />
                 <span className="w-1.5 h-1.5 bg-theme-elevated rounded-full animate-bounce [animation-delay:300ms]" />
               </div>
-              <span>{other_user.name} is typing...</span>
+              <span>{t('typing_indicator', { name: other_user.name })}</span>
             </div>
           </div>
         )}
@@ -1247,14 +1253,14 @@ export function ConversationPage() {
           {!isDirectMessagingEnabled && (
             <div className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center">
               <span className="text-amber-600 dark:text-amber-400 text-sm flex-1">
-                Direct messaging is not enabled for this community. Use the exchange request system instead.
+                {t('disabled_inline')}
               </span>
               <Button
                 size="sm"
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 onPress={() => navigate(tenantPath('/exchanges'))}
               >
-                Exchanges
+                {t('exchanges_link')}
               </Button>
             </div>
           )}
@@ -1270,7 +1276,7 @@ export function ConversationPage() {
                   className="bg-theme-elevated text-theme-muted"
                   onPress={() => setAudioBlob(null)}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button
                   size="sm"
@@ -1278,7 +1284,7 @@ export function ConversationPage() {
                   onPress={sendVoiceMessage}
                   isLoading={isSending}
                 >
-                  Send
+                  {t('send')}
                 </Button>
               </div>
             </div>
@@ -1289,7 +1295,7 @@ export function ConversationPage() {
             <div className="flex items-center gap-3 mb-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
               <span className="text-theme-primary font-medium">{formatRecordingTime(recordingTime)}</span>
-              <span className="text-theme-subtle text-sm">Recording...</span>
+              <span className="text-theme-subtle text-sm">{t('recording')}</span>
               <div className="ml-auto flex gap-2">
                 <Button
                   size="sm"
@@ -1297,7 +1303,7 @@ export function ConversationPage() {
                   className="bg-theme-elevated text-theme-muted"
                   onPress={cancelRecording}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button
                   size="sm"
@@ -1305,7 +1311,7 @@ export function ConversationPage() {
                   onPress={stopRecording}
                   startContent={<Square className="w-3 h-3" />}
                 >
-                  Stop
+                  {t('stop_recording')}
                 </Button>
               </div>
             </div>
@@ -1363,13 +1369,13 @@ export function ConversationPage() {
                 variant="flat"
                 className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
                 onPress={() => fileInputRef.current?.click()}
-                aria-label="Add attachment"
+                aria-label={t('aria_add_attachment')}
                 isDisabled={attachments.length >= 5}
               >
                 <Paperclip className="w-4 h-4" />
               </Button>
               <Textarea
-                placeholder="Type a message..."
+                placeholder={t('type_placeholder')}
                 value={newMessage}
                 onChange={(e) => {
                   setNewMessage(e.target.value);
@@ -1400,7 +1406,7 @@ export function ConversationPage() {
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 }}
-                aria-label="Message input"
+                aria-label={t('aria_message_input')}
               />
               {/* Voice recording button - show when no text and no attachments */}
               {!newMessage.trim() && attachments.length === 0 && (
@@ -1410,7 +1416,7 @@ export function ConversationPage() {
                   variant="flat"
                   className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
                   onPress={startRecording}
-                  aria-label="Record voice message"
+                  aria-label={t('aria_record_voice')}
                 >
                   <Mic className="w-4 h-4" />
                 </Button>
@@ -1444,16 +1450,14 @@ export function ConversationPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            Archive Conversation
+            {t('archive_title')}
           </ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              Are you sure you want to archive this conversation with{' '}
-              <span className="font-semibold text-theme-primary">{other_user.name}</span>?
+              {t('archive_confirm_prompt', { name: other_user.name })}
             </p>
             <p className="text-theme-subtle text-sm mt-2">
-              The conversation will be hidden from your inbox but can be restored later.
-              {other_user.name} will still see the conversation in their inbox.
+              {t('archive_confirm_body')}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -1462,14 +1466,14 @@ export function ConversationPage() {
               className="bg-theme-elevated text-theme-muted"
               onPress={() => setShowArchiveModal(false)}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               color="danger"
               onPress={archiveConversation}
               isLoading={isArchiving}
             >
-              Archive
+              {t('archive_confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1516,6 +1520,7 @@ function MessageBubble({
   onSaveEdit,
   onCancelEdit,
 }: MessageBubbleProps) {
+  const { t } = useTranslation('messages');
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [showMessageMenu, setShowMessageMenu] = useState(false);
   const reactionPickerRef = useRef<HTMLDivElement>(null);
@@ -1606,16 +1611,16 @@ function MessageBubble({
               />
               <div className="flex gap-2 mt-2 justify-end">
                 <Button size="sm" variant="flat" className="bg-black/10 dark:bg-white/10 text-inherit/70" onPress={onCancelEdit}>
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button size="sm" className="bg-black/20 dark:bg-white/20 text-inherit" onPress={onSaveEdit}>
-                  Save
+                  {t('save')}
                 </Button>
               </div>
             </div>
           ) : isDeleted ? (
             /* Deleted message */
-            <p className="text-sm opacity-40 italic">[Message deleted]</p>
+            <p className="text-sm opacity-40 italic">{t('message_deleted_placeholder')}</p>
           ) : isVoiceMessage ? (
             <VoiceMessagePlayer audioUrl={message.audio_url} />
           ) : (
@@ -1625,7 +1630,7 @@ function MessageBubble({
               )}
               {/* Edited indicator */}
               {message.is_edited && (
-                <span className="text-[10px] opacity-40 ml-1">(edited)</span>
+                <span className="text-[10px] opacity-40 ml-1">{t('message_edited_indicator')}</span>
               )}
               {/* Attachments */}
               {message.attachments && message.attachments.length > 0 && (
@@ -1672,7 +1677,7 @@ function MessageBubble({
                 variant="light"
                 className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
                 onPress={() => setShowReactionPicker(!showReactionPicker)}
-                aria-label="Add reaction"
+                aria-label={t('aria_add_reaction')}
               >
                 <SmilePlus className="w-3 h-3 text-theme-muted" aria-hidden="true" />
               </Button>
@@ -1685,7 +1690,7 @@ function MessageBubble({
                   variant="light"
                   className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
                   onPress={() => setShowMessageMenu(!showMessageMenu)}
-                  aria-label="Message options"
+                  aria-label={t('aria_message_options')}
                 >
                   <MoreVertical className="w-3 h-3 text-theme-muted" aria-hidden="true" />
                 </Button>
@@ -1703,7 +1708,7 @@ function MessageBubble({
                 shadow-lg z-10
               `}
               role="menu"
-              aria-label="Add reaction"
+              aria-label={t('aria_add_reaction')}
             >
               {REACTION_EMOJIS.map((emoji) => (
                 <Button
@@ -1716,7 +1721,7 @@ function MessageBubble({
                     onReact?.(message.id, emoji);
                     setShowReactionPicker(false);
                   }}
-                  aria-label={`React with ${emoji}`}
+                  aria-label={t('aria_react_with', { emoji })}
                 >
                   {emoji}
                 </Button>
@@ -1734,7 +1739,7 @@ function MessageBubble({
                 shadow-lg z-10 min-w-[100px]
               `}
               role="menu"
-              aria-label="Message options"
+              aria-label={t('aria_message_options')}
             >
               <Button
                 variant="light"
@@ -1747,7 +1752,7 @@ function MessageBubble({
                 }}
                 role="menuitem"
               >
-                Edit
+                {t('message_edit')}
               </Button>
               <Button
                 variant="light"
@@ -1760,7 +1765,7 @@ function MessageBubble({
                 }}
                 role="menuitem"
               >
-                Delete
+                {t('message_delete')}
               </Button>
             </div>
           )}
@@ -1776,7 +1781,7 @@ function MessageBubble({
                 variant="light"
                 className="min-w-0 h-auto px-1.5 py-0.5 bg-theme-elevated rounded-full text-xs gap-0.5"
                 onPress={() => onReact?.(message.id, emoji)}
-                aria-label={`${emoji} reaction, click to toggle`}
+                aria-label={t('aria_toggle_reaction', { emoji })}
               >
                 <span>{emoji}</span>
                 {typeof count === 'number' && count > 1 && (
