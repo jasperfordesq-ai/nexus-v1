@@ -53,7 +53,11 @@ class WalletService
         return [
             'balance' => (float)($user['balance'] ?? 0),
             'total_earned' => Transaction::getTotalEarned($userId),
+            'total_spent' => Transaction::getTotalSpent($userId),
             'transaction_count' => Transaction::countForUser($userId),
+            'pending_in' => 0,
+            'pending_out' => 0,
+            'currency' => 'hours',
         ];
     }
 
@@ -134,7 +138,8 @@ class WalletService
 
             $items[] = [
                 'id' => (int)$t['id'],
-                'type' => $isSender ? 'sent' : 'received',
+                'type' => $isSender ? 'debit' : 'credit',
+                'status' => $t['status'] ?? 'completed',
                 'amount' => (float)$t['amount'],
                 'description' => $t['description'],
                 'other_user' => [
@@ -262,7 +267,8 @@ class WalletService
 
         return [
             'id' => (int)$t['id'],
-            'type' => $isSender ? 'sent' : 'received',
+            'type' => $isSender ? 'debit' : 'credit',
+            'status' => $t['status'] ?? 'completed',
             'amount' => (float)$t['amount'],
             'description' => $t['description'],
             'sender' => [

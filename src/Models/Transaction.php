@@ -186,7 +186,15 @@ class Transaction
     public static function getTotalEarned($userId)
     {
         $tenantId = \Nexus\Core\TenantContext::getId();
-        $sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE tenant_id = ? AND receiver_id = ?";
+        $sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE tenant_id = ? AND receiver_id = ? AND status = 'completed'";
+        $result = Database::query($sql, [$tenantId, $userId])->fetch();
+        return (float)($result['total'] ?? 0);
+    }
+
+    public static function getTotalSpent($userId)
+    {
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        $sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE tenant_id = ? AND sender_id = ? AND status = 'completed'";
         $result = Database::query($sql, [$tenantId, $userId])->fetch();
         return (float)($result['total'] ?? 0);
     }
