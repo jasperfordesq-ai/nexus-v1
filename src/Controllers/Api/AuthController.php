@@ -123,9 +123,25 @@ class AuthController extends BaseApiController
         }
         $user = $stmt->fetch();
 
+        // SUPER ADMIN CROSS-TENANT LOGIN: If tenant-scoped lookup found no user,
+        // fall back to a global lookup. Super admins live in tenant 1 (master) but
+        // need to log in from any tenant's URL. Only allow if the user is actually
+        // a super admin — regular users must match their home tenant.
+        if (!$user && $tenantId) {
+            $stmt = $db->prepare("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?");
+            $stmt->execute([$email]);
+            $candidate = $stmt->fetch();
+            if ($candidate && (!empty($candidate['is_super_admin']) || ($candidate['role'] ?? '') === 'super_admin')) {
+                $user = $candidate;
+            }
+        }
+
         // Constant-time comparison: always run password_verify even when user
         // doesn't exist, preventing timing-based user enumeration attacks.
-        $dummyHash = '$argon2id$v=19$m=65536,t=4,p=1$dW5rbm93bg$cGFzc3dvcmQ';
+        // The dummy hash must be a genuinely valid Argon2id hash so that
+        // password_verify() performs the full computation rather than short-circuiting
+        // on a malformed hash string (which would leak timing information).
+        $dummyHash = '$argon2id$v=19$m=65536,t=4,p=1$V1Jna0owWXBLNC55ajFQRQ$h0+cXUsJzOi6TzES3RPuquTJpwPbpYmVHS4A3ArHHXo';
         $passwordValid = password_verify($password, $user['password_hash'] ?? $dummyHash);
 
         if ($user && $passwordValid) {
@@ -479,7 +495,7 @@ class AuthController extends BaseApiController
             // Use a lightweight existence check — the token already contains user_id
             try {
                 $bearerUser = \Nexus\Models\User::findById((int)$bearerUserId, false);
-                if (!$bearerUser || !empty($bearerUser['is_banned'])) {
+                if (!$bearerUser || ($bearerUser['status'] ?? 'active') === 'suspended') {
                     return $this->errorResponse(
                         'User not found',
                         ApiErrorCodes::AUTH_ACCOUNT_DELETED,
