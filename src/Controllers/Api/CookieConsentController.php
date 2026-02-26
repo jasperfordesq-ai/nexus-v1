@@ -44,7 +44,9 @@ class CookieConsentController extends BaseApiController
     public function show(): void
     {
         try {
-            $userId = Auth::id();
+            // Use Bearer-token-aware auth so React frontend calls work correctly.
+            // Auth::id() is session-only and always returns null for API token requests.
+            $userId = $this->getAuthenticatedUserId();
             $sessionId = session_id();
 
             $consent = CookieConsentService::getConsent($userId, $sessionId);
@@ -64,11 +66,13 @@ class CookieConsentController extends BaseApiController
                     ]
                 ]);
             } else {
+                // No record yet — not an error, just means the user hasn't saved a
+                // preference server-side. Return 200 so the browser doesn't log a
+                // console error on every login.
                 $this->jsonResponse([
-                    'success' => false,
+                    'success' => true,
                     'consent' => null,
-                    'message' => 'No consent record found'
-                ], 404);
+                ]);
             }
         } catch (\Exception $e) {
             error_log("Cookie consent retrieval error: " . $e->getMessage());
