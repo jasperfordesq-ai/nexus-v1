@@ -38,6 +38,9 @@ class WebAuthnApiController extends BaseApiController
      */
     public function registerChallenge()
     {
+        // Rate limit: 10 challenge requests per minute per IP to prevent resource exhaustion
+        $this->rateLimit('webauthn:register-challenge', 10, 60);
+
         $userId = $this->requireAuth();
         $user = $this->getUser($userId);
 
@@ -256,6 +259,9 @@ class WebAuthnApiController extends BaseApiController
      */
     public function authChallenge()
     {
+        // Rate limit: 10 challenge requests per minute per IP to prevent resource exhaustion
+        $this->rateLimit('webauthn:auth-challenge', 10, 60);
+
         $input = $this->getInput();
 
         // Generate random challenge
