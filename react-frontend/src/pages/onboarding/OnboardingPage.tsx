@@ -122,10 +122,10 @@ export function OnboardingPage() {
 
   useEffect(() => {
     if (isComplete) return; // Let celebration animation play out
-    if (user?.onboarding_completed === true && user?.avatar_url && user?.bio) {
+    if (user?.onboarding_completed === true) {
       navigate(tenantPath('/dashboard'), { replace: true });
     }
-  }, [user?.onboarding_completed, user?.avatar_url, user?.bio, navigate, tenantPath, isComplete]);
+  }, [user?.onboarding_completed, navigate, tenantPath, isComplete]);
 
   // ── Pre-populate bio from user context if available ──────────────────────
 
@@ -501,7 +501,7 @@ export function OnboardingPage() {
 
   // ── Don't render wizard if fully completed (redirect is pending) ─────────
 
-  if (user?.onboarding_completed === true && user?.avatar_url && user?.bio) {
+  if (user?.onboarding_completed === true) {
     return null;
   }
 
