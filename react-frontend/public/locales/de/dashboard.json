@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "title": "Dashboard",
+    "description": "Ihr persönliches Dashboard. Zeigen Sie Ihr Guthaben, Inserate und Aktivitäten an."
+  },
+  "welcome_back": "Willkommen zurück, {{name}}!",
+  "community_activity": "Das passiert gerade in Ihrer {{community}}-Gemeinschaft",
+  "unable_to_load": "Dashboard konnte nicht geladen werden",
+  "try_again": "Erneut versuchen",
+  "onboarding": {
+    "banner_title": "Vervollständigen Sie Ihre Profileinrichtung",
+    "banner_subtitle": "Teilen Sie uns Ihre Interessen und Fähigkeiten mit, um personalisierte Treffer zu erhalten",
+    "get_started": "Jetzt starten"
+  },
+  "new_listing": "Neues Inserat",
+  "stats": {
+    "balance": "Guthaben",
+    "active_listings": "Aktive Inserate",
+    "messages": "Nachrichten",
+    "pending": "Ausstehend"
+  },
+  "sections": {
+    "recent_listings": "Neueste Inserate",
+    "recent_activity": "Aktuelle Aktivität",
+    "quick_actions": "Schnellaktionen",
+    "suggested_for_you": "Empfohlen für Sie",
+    "my_groups": "Meine Gruppen",
+    "upcoming_events": "Bevorstehende Veranstaltungen",
+    "your_progress": "Ihr Fortschritt",
+    "pending_reviews": "Ausstehende Bewertungen"
+  },
+  "view_all": "Alle anzeigen",
+  "view_all_caps": "Alle anzeigen",
+  "browse_all": "Alle durchsuchen",
+  "view_achievements": "Erfolge anzeigen",
+  "view_all_transactions": "Alle Transaktionen anzeigen",
+  "quick_actions": {
+    "create_listing": "Inserat erstellen",
+    "messages": "Nachrichten",
+    "view_wallet": "Zeitkonto anzeigen",
+    "find_members": "Mitglieder finden",
+    "browse_events": "Veranstaltungen suchen",
+    "notifications": "Benachrichtigungen"
+  },
+  "listings": {
+    "offering": "Angebot",
+    "requesting": "Gesuch",
+    "offer": "Angebot",
+    "request": "Gesuch",
+    "empty": "Keine aktuellen Inserate",
+    "create_first": "Erstellen Sie Ihr erstes Inserat"
+  },
+  "activity": {
+    "action_listing": "hat ein Inserat geteilt",
+    "action_event": "hat über eine Veranstaltung geschrieben",
+    "action_poll": "hat eine Umfrage erstellt",
+    "action_goal": "hat ein neues Ziel gesetzt",
+    "action_post": "hat einen Beitrag geteilt",
+    "empty": "Keine aktuelle Aktivität",
+    "check_feed": "Den Feed ansehen"
+  },
+  "suggestions": {
+    "empty": "Noch keine Empfehlungen"
+  },
+  "groups": {
+    "members_count": "{{count}} Mitglieder",
+    "empty": "Sie sind noch keiner Gruppe beigetreten",
+    "discover": "Gruppen entdecken"
+  },
+  "events": {
+    "online_event": "Online-Veranstaltung",
+    "empty": "Keine bevorstehenden Veranstaltungen",
+    "browse": "Veranstaltungen suchen"
+  },
+  "gamification": {
+    "level": "Stufe {{level}}",
+    "badges": "Abzeichen",
+    "streak": "Serie",
+    "xp_progress": "XP-Fortschritt",
+    "start_earning": "Verdienen Sie XP, indem Sie an der Gemeinschaft teilnehmen!"
+  },
+  "reviews": {
+    "sent": "Gesendet {{amount}}h",
+    "received": "Erhalten {{amount}}h",
+    "review": "Bewertung"
+  }
+}

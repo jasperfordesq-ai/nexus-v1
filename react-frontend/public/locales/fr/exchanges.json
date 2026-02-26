@@ -1,0 +1,165 @@
+{
+  "page_title": "\u00c9changes",
+  "title": "Mes \u00e9changes",
+  "subtitle": "Suivez vos demandes d'\u00e9change de services et vos confirmations",
+  "browse_listings": "Parcourir les annonces",
+  "load_more": "Charger plus",
+  "try_again": "R\u00e9essayer",
+  "service_exchange": "\u00c9change de service",
+  "unknown": "Inconnu",
+  "hours_count": "{{count}} heure",
+  "hours_count_other": "{{count}} heures",
+
+  "workflow_not_enabled_title": "Flux d'\u00e9change non activ\u00e9",
+  "workflow_not_enabled_description": "Le syst\u00e8me de flux d'\u00e9change n'est pas activ\u00e9 pour cette communaut\u00e9. Contactez votre coordinateur pour plus d'informations.",
+
+  "tabs": {
+    "aria_label": "Filtre de statut d'\u00e9change",
+    "active": "Actifs",
+    "active_aria": "Afficher les \u00e9changes actifs",
+    "needs_confirmation": "Confirmation requise",
+    "needs_confirmation_aria": "Afficher les \u00e9changes n\u00e9cessitant une confirmation",
+    "completed": "Termin\u00e9s",
+    "completed_aria": "Afficher les \u00e9changes termin\u00e9s",
+    "all": "Tous",
+    "all_aria": "Afficher tous les \u00e9changes"
+  },
+
+  "error": {
+    "load_failed": "Impossible de charger les \u00e9changes. Veuillez r\u00e9essayer.",
+    "unable_to_load": "Impossible de charger les \u00e9changes"
+  },
+
+  "empty": {
+    "title": "Aucun \u00e9change trouv\u00e9",
+    "active_description": "Vous n'avez aucun \u00e9change actif. Parcourez les annonces pour demander un service.",
+    "filter_description": "Aucun \u00e9change ne correspond \u00e0 ce filtre."
+  },
+
+  "card": {
+    "aria_label": "\u00c9change\u00a0: {{title}} \u2013 {{status}}",
+    "with_party": "Avec {{name}}",
+    "from_party": "De {{name}}",
+    "you_requested": "Vous avez demand\u00e9",
+    "you_providing": "Vous fournissez",
+    "confirm_hours": "Confirmer les heures",
+    "waiting_for_other": "En attente de l'autre partie",
+    "respond": "R\u00e9pondre"
+  },
+
+  "breadcrumb": {
+    "exchanges": "\u00c9changes",
+    "exchange": "\u00c9change"
+  },
+
+  "toast": {
+    "load_more_failed": "Impossible de charger plus d'\u00e9changes",
+    "accepted": "\u00c9change accept\u00e9\u00a0!",
+    "accept_failed": "Impossible d'accepter l'\u00e9change",
+    "declined": "\u00c9change refus\u00e9",
+    "decline_failed": "Impossible de refuser l'\u00e9change",
+    "started": "\u00c9change d\u00e9marr\u00e9\u00a0!",
+    "start_failed": "Impossible de d\u00e9marrer l'\u00e9change",
+    "completed": "\u00c9change marqu\u00e9 comme termin\u00e9. Veuillez confirmer les heures.",
+    "complete_failed": "Impossible de terminer l'\u00e9change",
+    "invalid_hours": "Veuillez entrer des heures valides",
+    "max_hours": "Maximum {{max}} heures par \u00e9change",
+    "hours_confirmed": "Heures confirm\u00e9es\u00a0!",
+    "confirm_failed": "Impossible de confirmer les heures",
+    "cancelled": "\u00c9change annul\u00e9",
+    "cancel_failed": "Impossible d'annuler l'\u00e9change",
+    "request_sent": "Demande d'\u00e9change envoy\u00e9e\u00a0!",
+    "request_failed": "Impossible de cr\u00e9er la demande d'\u00e9change"
+  },
+
+  "detail": {
+    "page_title": "D\u00e9tails de l'\u00e9change",
+    "loading": "Chargement de l'\u00e9change\u2026",
+    "not_found": "\u00c9change non trouv\u00e9",
+    "not_found_title": "\u00c9change non trouv\u00e9",
+    "not_found_description": "L'\u00e9change que vous recherchez n'existe pas",
+    "view_exchanges": "Voir mes \u00e9changes",
+    "exchange_details": "D\u00e9tails de l'\u00e9change",
+    "service": "Service",
+    "requester": "Demandeur",
+    "provider": "Fournisseur",
+    "you": "Vous",
+    "other_party": "Autre partie",
+    "confirmed_hours": "Confirm\u00e9 {{hours}}h",
+    "message_party": "Envoyer un message \u00e0 {{name}}",
+    "proposed_hours": "Heures propos\u00e9es",
+    "final_hours": "Heures finales",
+    "created": "Cr\u00e9\u00e9",
+    "message_from_requester": "Message du demandeur",
+    "broker_notes": "Notes du coordinateur",
+    "accept_request": "Accepter la demande",
+    "decline": "Refuser",
+    "start_exchange": "D\u00e9marrer l'\u00e9change",
+    "mark_complete": "Marquer comme termin\u00e9",
+    "confirm_hours": "Confirmer les heures",
+    "cancel_exchange": "Annuler l'\u00e9change",
+    "timeline_title": "Chronologie de l'\u00e9change",
+    "timeline": {
+      "created": "\u00c9change cr\u00e9\u00e9",
+      "accepted": "\u00c9change accept\u00e9",
+      "declined": "\u00c9change refus\u00e9",
+      "started": "\u00c9change d\u00e9marr\u00e9",
+      "completed": "\u00c9change termin\u00e9",
+      "confirmed": "Heures confirm\u00e9es",
+      "cancelled": "\u00c9change annul\u00e9",
+      "awaiting_confirmation": "En attente de confirmation",
+      "sent_to_broker": "Envoy\u00e9 au coordinateur",
+      "disputed": "\u00c9change contest\u00e9",
+      "fallback": "Statut mis \u00e0 jour"
+    }
+  },
+
+  "modal": {
+    "decline_title": "Refuser la demande d'\u00e9change",
+    "decline_reason_label": "Raison (facultatif)",
+    "decline_reason_placeholder": "Indiquez la raison de votre refus\u2026",
+    "decline_confirm": "Refuser la demande",
+    "cancel": "Annuler",
+    "confirm_title": "Confirmer les heures effectu\u00e9es",
+    "confirm_description": "Combien d'heures ont \u00e9t\u00e9 r\u00e9ellement effectu\u00e9es pour cet \u00e9change\u00a0?",
+    "hours_label": "Heures",
+    "hours_placeholder": "Entrez les heures",
+    "hours_unit": "heures",
+    "originally_proposed": "Initialement propos\u00e9\u00a0: {{hours}} heures (max\u00a0: {{max}})",
+    "cancel_title": "Annuler l'\u00e9change\u00a0?",
+    "cancel_description": "\u00cates-vous s\u00fbr de vouloir annuler cet \u00e9change\u00a0? Cette action est irr\u00e9versible.",
+    "keep_exchange": "Conserver l'\u00e9change"
+  },
+
+  "request": {
+    "page_title": "Demander un \u00e9change",
+    "title": "Demander un \u00e9change",
+    "subtitle": "Envoyez une demande pour \u00e9changer des cr\u00e9dits-temps pour ce service",
+    "loading": "Chargement\u2026",
+    "listing_not_found": "Annonce non trouv\u00e9e",
+    "workflow_not_enabled": "Le flux d'\u00e9change n'est pas activ\u00e9",
+    "load_failed": "Impossible de charger l'annonce",
+    "cannot_request": "Impossible de demander un \u00e9change",
+    "not_available": "Cette annonce n'est pas disponible pour les demandes d'\u00e9change.",
+    "own_listing_title": "Ceci est votre annonce",
+    "own_listing_description": "Vous ne pouvez pas demander un \u00e9change pour votre propre annonce.",
+    "view_listing": "Voir l'annonce",
+    "breadcrumb_listings": "Annonces",
+    "breadcrumb_listing": "Annonce",
+    "breadcrumb_request": "Demander un \u00e9change",
+    "estimated_hours": "~{{hours}} heures",
+    "service_offer": "Offre de service",
+    "service_request": "Demande de service",
+    "proposed_hours_label": "Heures propos\u00e9es",
+    "proposed_hours_placeholder": "Combien d'heures avez-vous besoin\u00a0?",
+    "proposed_hours_description": "Le temps estim\u00e9 pour ce service (max\u00a0: {{max}})",
+    "hours_unit": "heures",
+    "message_label": "Message (facultatif)",
+    "message_placeholder": "Ajoutez un message au fournisseur de service\u2026",
+    "message_description": "Expliquez vos besoins ou posez vos questions",
+    "broker_approval_title": "Approbation du coordinateur requise",
+    "broker_approval_description": "Cet \u00e9change devra \u00eatre approuv\u00e9 par un coordinateur communautaire avant de pouvoir se poursuivre.",
+    "cancel": "Annuler",
+    "send_request": "Envoyer la demande"
+  }
+}

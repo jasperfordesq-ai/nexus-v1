@@ -22,6 +22,7 @@ import {
   Select,
   SelectItem,
   Spinner,
+  Checkbox,
 } from '@heroui/react';
 import { Building2, Save, ArrowLeft } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
@@ -34,6 +35,44 @@ const FEATURE_OPTIONS = [
   'events', 'groups', 'gamification', 'goals', 'blog', 'resources',
   'volunteering', 'exchange_workflow', 'federation', 'organisations',
   'listings', 'wallet', 'messages', 'dashboard', 'feed',
+];
+
+const COUNTRY_CODES = [
+  { code: 'IE', label: 'Ireland' },
+  { code: 'GB', label: 'United Kingdom' },
+  { code: 'US', label: 'United States' },
+  { code: 'CA', label: 'Canada' },
+  { code: 'AU', label: 'Australia' },
+  { code: 'NZ', label: 'New Zealand' },
+  { code: 'DE', label: 'Germany' },
+  { code: 'FR', label: 'France' },
+  { code: 'ES', label: 'Spain' },
+  { code: 'IT', label: 'Italy' },
+  { code: 'NL', label: 'Netherlands' },
+  { code: 'BE', label: 'Belgium' },
+  { code: 'PT', label: 'Portugal' },
+  { code: 'SE', label: 'Sweden' },
+  { code: 'NO', label: 'Norway' },
+  { code: 'DK', label: 'Denmark' },
+  { code: 'FI', label: 'Finland' },
+  { code: 'PL', label: 'Poland' },
+  { code: 'AT', label: 'Austria' },
+  { code: 'CH', label: 'Switzerland' },
+];
+
+const SERVICE_AREAS = [
+  { key: 'local', label: 'Local' },
+  { key: 'regional', label: 'Regional' },
+  { key: 'national', label: 'National' },
+  { key: 'international', label: 'International' },
+];
+
+const PLATFORM_LANGUAGES = [
+  { code: 'en', label: 'English', short: 'EN' },
+  { code: 'ga', label: 'Gaeilge', short: 'GA' },
+  { code: 'de', label: 'Deutsch', short: 'DE' },
+  { code: 'fr', label: 'Français', short: 'FR' },
+  { code: 'it', label: 'Italiano', short: 'IT' },
 ];
 
 export function TenantForm() {
@@ -84,6 +123,9 @@ export function TenantForm() {
     social_youtube: '',
     // Features
     features: {} as Record<string, boolean>,
+    // Languages
+    default_language: 'en',
+    supported_languages: ['en', 'ga', 'de', 'fr', 'it'] as string[],
   });
 
   const updateField = (field: string, value: unknown) => {
@@ -127,6 +169,8 @@ export function TenantForm() {
           social_linkedin: tenant.social_linkedin || '',
           social_youtube: tenant.social_youtube || '',
           features: tenant.features || {},
+          default_language: (tenant.configuration as Record<string, unknown>)?.default_language as string || 'en',
+          supported_languages: (tenant.configuration as Record<string, unknown>)?.supported_languages as string[] || ['en'],
         });
       }
     } catch {
@@ -170,6 +214,16 @@ export function TenantForm() {
         delete payload.parent_id;
       }
 
+      // Merge language settings into configuration JSON
+      const existingConfig = (payload.configuration ?? {}) as Record<string, unknown>;
+      payload.configuration = {
+        ...existingConfig,
+        default_language: form.default_language,
+        supported_languages: form.supported_languages,
+      };
+      delete payload.default_language;
+      delete payload.supported_languages;
+
       let res;
       if (isEdit) {
         res = await adminSuper.updateTenant(Number(id), payload);
@@ -183,7 +237,7 @@ export function TenantForm() {
           navigate(tenantPath(`/admin/super/tenants/${id}`));
         } else {
           // Navigate to the new tenant's show page if ID is returned, otherwise go to list
-          const newId = (res as { data?: { id?: number } }).data?.id;
+          const newId = (res as { data?: { tenant_id?: number } }).data?.tenant_id;
           navigate(tenantPath(newId ? `/admin/super/tenants/${newId}` : '/admin/super/tenants'));
         }
       } else {
@@ -395,23 +449,38 @@ export function TenantForm() {
             <CardBody className="space-y-4 p-6">
               <Input
                 label="Location Name"
-                placeholder="City, County"
+                placeholder="City, Region"
                 value={form.location_name}
                 onValueChange={(v) => updateField('location_name', v)}
               />
-              <Input
-                label="Country Code"
-                placeholder="IE"
-                value={form.country_code}
-                onValueChange={(v) => updateField('country_code', v)}
+              <Select
+                label="Country"
+                placeholder="Select country"
+                selectedKeys={form.country_code ? [form.country_code] : []}
+                onSelectionChange={(keys) => {
+                  const arr = Array.from(keys);
+                  updateField('country_code', arr.length > 0 ? String(arr[0]) : '');
+                }}
                 className="max-w-xs"
-              />
-              <Input
+              >
+                {COUNTRY_CODES.map((c) => (
+                  <SelectItem key={c.code}>{c.label} ({c.code})</SelectItem>
+                ))}
+              </Select>
+              <Select
                 label="Service Area"
-                placeholder="e.g. South Dublin"
-                value={form.service_area}
-                onValueChange={(v) => updateField('service_area', v)}
-              />
+                placeholder="Select service area"
+                selectedKeys={form.service_area ? [form.service_area] : []}
+                onSelectionChange={(keys) => {
+                  const arr = Array.from(keys);
+                  updateField('service_area', arr.length > 0 ? String(arr[0]) : '');
+                }}
+                className="max-w-xs"
+              >
+                {SERVICE_AREAS.map((s) => (
+                  <SelectItem key={s.key}>{s.label}</SelectItem>
+                ))}
+              </Select>
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   label="Latitude"
@@ -463,6 +532,63 @@ export function TenantForm() {
                 value={form.social_youtube}
                 onValueChange={(v) => updateField('social_youtube', v)}
               />
+            </CardBody>
+          </Card>
+        </Tab>
+
+        <Tab key="languages" title="Languages">
+          <Card shadow="sm">
+            <CardBody className="space-y-4 p-6">
+              <Select
+                label="Default Language"
+                description="Shown to new visitors without a preference"
+                selectedKeys={[form.default_language]}
+                onSelectionChange={(keys) => {
+                  const val = Array.from(keys)[0] as string;
+                  if (val) updateField('default_language', val);
+                }}
+                className="max-w-xs"
+              >
+                {PLATFORM_LANGUAGES.filter((l) =>
+                  form.supported_languages.includes(l.code)
+                ).map((lang) => (
+                  <SelectItem key={lang.code}>
+                    {lang.label} ({lang.short})
+                  </SelectItem>
+                ))}
+              </Select>
+              <div>
+                <p className="text-sm font-medium mb-1">Available Languages</p>
+                <p className="text-xs text-default-400 mb-3">
+                  Languages shown in the language switcher
+                </p>
+                <div className="space-y-2">
+                  {PLATFORM_LANGUAGES.map((lang) => (
+                    <Checkbox
+                      key={lang.code}
+                      isSelected={form.supported_languages.includes(lang.code)}
+                      isDisabled={lang.code === 'en'}
+                      onValueChange={(checked) => {
+                        const updated = checked
+                          ? [...form.supported_languages, lang.code]
+                          : form.supported_languages.filter((c) => c !== lang.code);
+                        updateField('supported_languages', updated);
+                        // Reset default to English if it was unchecked
+                        if (!checked && form.default_language === lang.code) {
+                          updateField('default_language', 'en');
+                        }
+                      }}
+                    >
+                      <span className="text-sm">
+                        {lang.label} ({lang.short})
+                        {lang.code === 'en' && (
+                          <span className="ml-2 text-xs text-default-400">always enabled</span>
+                        )}
+                      </span>
+                    </Checkbox>
+                  ))}
+                </div>
+              </div>
             </CardBody>
           </Card>
         </Tab>

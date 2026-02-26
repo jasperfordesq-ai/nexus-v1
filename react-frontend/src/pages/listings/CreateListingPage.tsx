@@ -9,6 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Select, SelectItem, Radio, RadioGroup } from '@heroui/react';
 import {
@@ -49,7 +50,8 @@ const initialFormData: FormData = {
 };
 
 export function CreateListingPage() {
-  usePageTitle('Create Listing');
+  const { t } = useTranslation('listings');
+  usePageTitle(t('create'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -111,24 +113,24 @@ export function CreateListingPage() {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('form.title_required');
     } else if (formData.title.length < 5) {
-      newErrors.title = 'Title must be at least 5 characters';
+      newErrors.title = t('form.title_min_length');
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = t('form.description_required');
     } else if (formData.description.length < 20) {
-      newErrors.description = 'Description must be at least 20 characters';
+      newErrors.description = t('form.description_min_length');
     }
 
     if (!formData.category_id) {
-      newErrors.category_id = 'Please select a category';
+      newErrors.category_id = t('form.category_required');
     }
 
     const hours = parseFloat(formData.hours_estimate);
     if (isNaN(hours) || hours < 0.5 || hours > 100) {
-      newErrors.hours_estimate = 'Hours must be between 0.5 and 100';
+      newErrors.hours_estimate = t('form.hours_range');
     }
 
     setErrors(newErrors);
@@ -158,7 +160,7 @@ export function CreateListingPage() {
       navigate(tenantPath('/listings'));
     } catch (error) {
       logError('Failed to save listing', error);
-      toast.error('Failed to save listing', 'Please check your information and try again.');
+      toast.error(t('form.save_error_title'), t('form.save_error_subtitle'));
     } finally {
       setIsSubmitting(false);
     }
@@ -172,7 +174,7 @@ export function CreateListingPage() {
   }
 
   if (isLoading) {
-    return <LoadingScreen message="Loading listing..." />;
+    return <LoadingScreen message={t('loading')} />;
   }
 
   return (
@@ -183,49 +185,49 @@ export function CreateListingPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Listings', href: tenantPath('/listings') },
-        { label: isEditing ? 'Edit Listing' : 'New Listing' },
+        { label: t('title'), href: tenantPath('/listings') },
+        { label: isEditing ? t('form.edit_title') : t('form.new_title') },
       ]} />
 
       {/* Form */}
       <GlassCard className="p-6 sm:p-8">
         <h1 className="text-2xl font-bold text-theme-primary mb-6">
-          {isEditing ? 'Edit Listing' : 'Create New Listing'}
+          {isEditing ? t('form.edit_title') : t('form.create_title')}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Type Selection */}
           <div>
             <label className="block text-sm font-medium text-theme-muted mb-3">
-              What would you like to do?
+              {t('form.type_question')}
             </label>
             <RadioGroup
               value={formData.type}
               onValueChange={(value) => updateField('type', value as 'offer' | 'request')}
-              orientation="horizontal"
+              classNames={{ wrapper: 'sm:flex-row gap-3' }}
             >
               <Radio
                 value="offer"
                 classNames={{
-                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-emerald-500',
+                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-emerald-500 sm:flex-1',
                   label: 'text-theme-primary',
                 }}
               >
                 <div>
-                  <div className="font-medium">Offer a Service</div>
-                  <div className="text-xs text-theme-subtle">I want to help others</div>
+                  <div className="font-medium">{t('form.offer_title')}</div>
+                  <div className="text-xs text-theme-subtle">{t('form.offer_subtitle')}</div>
                 </div>
               </Radio>
               <Radio
                 value="request"
                 classNames={{
-                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-amber-500',
+                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-amber-500 sm:flex-1',
                   label: 'text-theme-primary',
                 }}
               >
                 <div>
-                  <div className="font-medium">Request Help</div>
-                  <div className="text-xs text-theme-subtle">I need assistance</div>
+                  <div className="font-medium">{t('form.request_title')}</div>
+                  <div className="text-xs text-theme-subtle">{t('form.request_subtitle')}</div>
                 </div>
               </Radio>
             </RadioGroup>
@@ -234,8 +236,8 @@ export function CreateListingPage() {
           {/* Title */}
           <div>
             <Input
-              label="Title"
-              placeholder="e.g., Help with gardening, Computer tutoring..."
+              label={t('form.title_label')}
+              placeholder={t('form.title_placeholder')}
               value={formData.title}
               onChange={(e) => updateField('title', e.target.value)}
               isInvalid={!!errors.title}
@@ -252,8 +254,8 @@ export function CreateListingPage() {
           {/* Description */}
           <div>
             <Textarea
-              label="Description"
-              placeholder="Describe what you're offering or requesting in detail..."
+              label={t('form.description_label')}
+              placeholder={t('form.description_placeholder')}
               value={formData.description}
               onChange={(e) => updateField('description', e.target.value)}
               minRows={4}
@@ -270,8 +272,8 @@ export function CreateListingPage() {
           {/* Category */}
           <div>
             <Select
-              label="Category"
-              placeholder="Select a category"
+              label={t('form.category_label')}
+              placeholder={t('form.category_placeholder')}
               selectedKeys={formData.category_id ? [formData.category_id] : []}
               onChange={(e) => updateField('category_id', e.target.value)}
               isInvalid={!!errors.category_id}
@@ -294,8 +296,8 @@ export function CreateListingPage() {
             <div>
               <Input
                 type="number"
-                label="Estimated Hours"
-                placeholder="1"
+                label={t('form.hours_estimated_label')}
+                placeholder={t('form.hours_placeholder')}
                 value={formData.hours_estimate}
                 onChange={(e) => updateField('hours_estimate', e.target.value)}
                 min={0.5}
@@ -314,8 +316,8 @@ export function CreateListingPage() {
 
             <div>
               <PlaceAutocompleteInput
-                label="Location (optional)"
-                placeholder="e.g., Online, Dublin, Cork..."
+                label={t('form.location_optional_label')}
+                placeholder={t('form.location_placeholder')}
                 value={formData.location}
                 onChange={(val) => updateField('location', val)}
                 onPlaceSelect={(place) => {
@@ -351,15 +353,15 @@ export function CreateListingPage() {
               startContent={isEditing ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
               isLoading={isSubmitting}
             >
-              {isEditing ? 'Update Listing' : 'Create Listing'}
+              {isEditing ? t('form.update') : t('create')}
             </Button>
             <Link to={tenantPath("/listings")}>
               <Button
                 type="button"
                 variant="flat"
-                className="bg-theme-elevated text-theme-primary"
+                className="bg-theme-elevated text-theme-primary min-w-[80px]"
               >
-                Cancel
+                {t('form.cancel')}
               </Button>
             </Link>
           </div>

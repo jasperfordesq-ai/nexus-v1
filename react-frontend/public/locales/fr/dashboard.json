@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "title": "Tableau de bord",
+    "description": "Votre tableau de bord personnel. Consultez votre solde, vos annonces et votre activité."
+  },
+  "welcome_back": "Content de vous revoir, {{name}} !",
+  "community_activity": "Voici ce qui se passe dans votre communauté {{community}}",
+  "unable_to_load": "Impossible de charger le tableau de bord",
+  "try_again": "Réessayer",
+  "onboarding": {
+    "banner_title": "Complétez la configuration de votre profil",
+    "banner_subtitle": "Parlez-nous de vos intérêts et compétences pour obtenir des correspondances personnalisées",
+    "get_started": "Commencer"
+  },
+  "new_listing": "Nouvelle annonce",
+  "stats": {
+    "balance": "Solde",
+    "active_listings": "Annonces actives",
+    "messages": "Messages",
+    "pending": "En attente"
+  },
+  "sections": {
+    "recent_listings": "Annonces récentes",
+    "recent_activity": "Activité récente",
+    "quick_actions": "Actions rapides",
+    "suggested_for_you": "Suggestions pour vous",
+    "my_groups": "Mes groupes",
+    "upcoming_events": "Événements à venir",
+    "your_progress": "Votre progression",
+    "pending_reviews": "Avis en attente"
+  },
+  "view_all": "Voir tout",
+  "view_all_caps": "Voir tout",
+  "browse_all": "Parcourir tout",
+  "view_achievements": "Voir les réalisations",
+  "view_all_transactions": "Voir toutes les transactions",
+  "quick_actions": {
+    "create_listing": "Créer une annonce",
+    "messages": "Messages",
+    "view_wallet": "Voir le portefeuille",
+    "find_members": "Trouver des membres",
+    "browse_events": "Parcourir les événements",
+    "notifications": "Notifications"
+  },
+  "listings": {
+    "offering": "Offre",
+    "requesting": "Demande",
+    "offer": "Offre",
+    "request": "Demande",
+    "empty": "Aucune annonce récente",
+    "create_first": "Créez votre première annonce"
+  },
+  "activity": {
+    "action_listing": "a partagé une annonce",
+    "action_event": "a publié à propos d'un événement",
+    "action_poll": "a créé un sondage",
+    "action_goal": "a défini un nouvel objectif",
+    "action_post": "a partagé une publication",
+    "empty": "Aucune activité récente",
+    "check_feed": "Consultez le fil d'actualité"
+  },
+  "suggestions": {
+    "empty": "Aucune suggestion pour l'instant"
+  },
+  "groups": {
+    "members_count": "{{count}} membres",
+    "empty": "Vous n'avez rejoint aucun groupe",
+    "discover": "Découvrir des groupes"
+  },
+  "events": {
+    "online_event": "Événement en ligne",
+    "empty": "Aucun événement à venir",
+    "browse": "Parcourir les événements"
+  },
+  "gamification": {
+    "level": "Niveau {{level}}",
+    "badges": "Badges",
+    "streak": "Série",
+    "xp_progress": "Progression XP",
+    "start_earning": "Commencez à gagner des XP en participant à la communauté !"
+  },
+  "reviews": {
+    "sent": "Envoyé {{amount}}h",
+    "received": "Reçu {{amount}}h",
+    "review": "Évaluation"
+  }
+}

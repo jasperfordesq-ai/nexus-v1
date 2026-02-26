@@ -35,6 +35,7 @@ import {
   RefreshCw,
   AlertTriangle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
@@ -96,7 +97,8 @@ const ITEMS_PER_PAGE = 20;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GroupExchangesPage() {
-  usePageTitle('Group Exchanges');
+  const { t } = useTranslation('group_exchanges');
+  usePageTitle(t('page_title'));
   const { user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -146,18 +148,18 @@ export function GroupExchangesPage() {
         setHasMore(more);
       } else {
         if (!append) {
-          setError('Failed to load group exchanges. Please try again.');
+          setError(t('error_load_failed'));
         } else {
-          toast.error('Failed to load more exchanges');
+          toast.error(t('toast.load_more_failed'));
         }
       }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
       logError('Failed to load group exchanges', err);
       if (!append) {
-        setError('Failed to load group exchanges. Please try again.');
+        setError(t('error_load_failed'));
       } else {
-        toast.error('Failed to load more exchanges');
+        toast.error(t('toast.load_more_failed'));
       }
     } finally {
       setIsLoading(false);
@@ -196,10 +198,10 @@ export function GroupExchangesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">
-            Group Exchanges
+            {t('title')}
           </h1>
           <p className="text-theme-muted mt-1">
-            Multi-participant exchanges with split types and confirmations
+            {t('subtitle')}
           </p>
         </div>
         <Link to={tenantPath('/group-exchanges/create')}>
@@ -207,7 +209,7 @@ export function GroupExchangesPage() {
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           >
-            New Exchange
+            {t('new_exchange')}
           </Button>
         </Link>
       </div>
@@ -218,17 +220,17 @@ export function GroupExchangesPage() {
           selectedKey={selectedTab}
           onSelectionChange={handleTabChange}
           variant="light"
-          aria-label="Group exchange status filter"
+          aria-label={t('tabs_aria')}
           classNames={{
             tabList: 'gap-2',
             tab: 'px-4 py-2',
           }}
         >
-          <Tab key="all" title="All" aria-label="Show all group exchanges" />
-          <Tab key="active" title="Active" aria-label="Show active group exchanges" />
-          <Tab key="pending_confirmation" title="Needs Confirmation" aria-label="Show exchanges needing confirmation" />
-          <Tab key="completed" title="Completed" aria-label="Show completed group exchanges" />
-          <Tab key="cancelled" title="Cancelled" aria-label="Show cancelled group exchanges" />
+          <Tab key="all" title={t('tab_all')} aria-label={t('tab_all_aria')} />
+          <Tab key="active" title={t('tab_active')} aria-label={t('tab_active_aria')} />
+          <Tab key="pending_confirmation" title={t('tab_needs_confirmation')} aria-label={t('tab_needs_confirmation_aria')} />
+          <Tab key="completed" title={t('tab_completed')} aria-label={t('tab_completed_aria')} />
+          <Tab key="cancelled" title={t('tab_cancelled')} aria-label={t('tab_cancelled_aria')} />
         </Tabs>
       </GlassCard>
 
@@ -236,14 +238,14 @@ export function GroupExchangesPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Exchanges</h3>
+          <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadExchanges()}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -269,16 +271,16 @@ export function GroupExchangesPage() {
           ) : exchanges.length === 0 ? (
             <EmptyState
               icon={<ArrowLeftRight className="w-12 h-12" />}
-              title="No Group Exchanges Found"
+              title={t('empty_title')}
               description={
                 selectedTab === 'all'
-                  ? "You haven't created or joined any group exchanges yet."
-                  : 'No group exchanges match this filter.'
+                  ? t('empty_description_all')
+                  : t('empty_description_filtered')
               }
               action={
                 <Link to={tenantPath('/group-exchanges/create')}>
                   <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                    Create Group Exchange
+                    {t('create_exchange')}
                   </Button>
                 </Link>
               }
@@ -293,7 +295,7 @@ export function GroupExchangesPage() {
                   <Link key={exchange.id} to={tenantPath(`/group-exchanges/${exchange.id}`)}>
                     <article
                       className="block"
-                      aria-label={`Group exchange: ${exchange.title} - ${statusConfig.label}`}
+                      aria-label={t('card_aria', { title: exchange.title, status: t('status.' + exchange.status) })}
                     >
                       <GlassCard className="p-4 sm:p-6 hover:border-indigo-500/30 transition-colors cursor-pointer">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -316,18 +318,18 @@ export function GroupExchangesPage() {
                                 color={statusConfig.color}
                                 variant="flat"
                               >
-                                {statusConfig.label}
+                                {t('status.' + exchange.status)}
                               </Chip>
                             </div>
 
                             <div className="flex flex-wrap items-center gap-4 text-sm text-theme-muted">
                               <span className="flex items-center gap-1">
                                 <Users className="w-4 h-4" aria-hidden="true" />
-                                {exchange.participant_count} participant{exchange.participant_count !== 1 ? 's' : ''}
+                                {t('participants_count', { count: exchange.participant_count })}
                               </span>
                               <span className="flex items-center gap-1">
                                 <Clock className="w-4 h-4" aria-hidden="true" />
-                                {Number(exchange.total_hours)} hour{Number(exchange.total_hours) !== 1 ? 's' : ''}
+                                {t('hours_count', { count: Number(exchange.total_hours) })}
                               </span>
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-4 h-4" aria-hidden="true" />
@@ -345,7 +347,7 @@ export function GroupExchangesPage() {
                                   ? 'bg-indigo-500/20 text-indigo-400'
                                   : 'bg-emerald-500/20 text-emerald-400'}
                               `}>
-                                {isOrganizer ? 'You organized' : 'Participant'}
+                                {isOrganizer ? t('role_organizer') : t('role_participant')}
                               </span>
                             </div>
                           </div>
@@ -353,7 +355,7 @@ export function GroupExchangesPage() {
                           {/* Split type badge */}
                           <div className="flex-shrink-0">
                             <Chip size="sm" variant="flat" className="bg-theme-elevated text-theme-muted capitalize">
-                              {exchange.split_type} split
+                              {t('split_type.' + exchange.split_type)}
                             </Chip>
                           </div>
                         </div>
@@ -372,7 +374,7 @@ export function GroupExchangesPage() {
                     onPress={loadMore}
                     isLoading={isLoadingMore}
                   >
-                    Load More
+                    {t('load_more')}
                   </Button>
                 </div>
               )}

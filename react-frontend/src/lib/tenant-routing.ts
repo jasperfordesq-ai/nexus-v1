@@ -40,6 +40,7 @@ export const RESERVED_PATHS = new Set([
   'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
   'uploads', 'classic', 'health', 'favicon.ico', 'robots.txt',
   'sitemap.xml', 'manifest.json', 'service-worker.js', '.well-known',
+  'page',
 ]);
 
 /**

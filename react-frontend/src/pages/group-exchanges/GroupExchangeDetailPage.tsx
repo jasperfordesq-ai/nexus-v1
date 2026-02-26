@@ -49,6 +49,7 @@ import {
   Search,
   Plus,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
@@ -141,7 +142,8 @@ const STATUS_CONFIGS: Record<GroupExchangeStatus, StatusConfig> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GroupExchangeDetailPage() {
-  usePageTitle('Group Exchange');
+  const { t } = useTranslation('group_exchanges');
+  usePageTitle(t('detail.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -178,10 +180,10 @@ export function GroupExchangeDetailPage() {
       if (response.success && response.data) {
         setExchange(response.data as unknown as GroupExchangeDetail);
       } else {
-        setError('Exchange not found');
+        setError(t('detail.not_found'));
       }
     } catch (err) {
-      setError('Exchange not found');
+      setError(t('detail.not_found'));
       logError('Failed to load group exchange', err);
     } finally {
       setIsLoading(false);
@@ -231,10 +233,10 @@ export function GroupExchangeDetailPage() {
         await api.put(`/v2/group-exchanges/${exchange.id}`, {});
       }
 
-      toast.success('Exchange updated');
+      toast.success(t('toast.exchange_updated'));
       loadExchange();
     } catch (err) {
-      toast.error('Failed to update exchange');
+      toast.error(t('toast.update_failed'));
       logError('Failed to update exchange status', err);
     } finally {
       setIsSubmitting(false);
@@ -247,10 +249,10 @@ export function GroupExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/group-exchanges/${exchange.id}/confirm`);
-      toast.success('Hours confirmed!');
+      toast.success(t('toast.hours_confirmed'));
       loadExchange();
     } catch (err) {
-      toast.error('Failed to confirm hours');
+      toast.error(t('toast.confirm_failed'));
       logError('Failed to confirm participation', err);
     } finally {
       setIsSubmitting(false);
@@ -267,13 +269,13 @@ export function GroupExchangeDetailPage() {
       );
 
       if (response.success) {
-        toast.success('Exchange completed!', 'All transactions have been created.');
+        toast.success(t('toast.exchange_completed'), t('toast.exchange_completed_desc'));
         loadExchange();
       } else {
-        toast.error('Failed to complete', response.error || 'An error occurred.');
+        toast.error(t('toast.complete_failed'), response.error || t('toast.error_occurred'));
       }
     } catch (err) {
-      toast.error('Failed to complete exchange');
+      toast.error(t('toast.complete_failed'));
       logError('Failed to complete group exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -286,11 +288,11 @@ export function GroupExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.delete(`/v2/group-exchanges/${exchange.id}`);
-      toast.success('Exchange cancelled');
+      toast.success(t('toast.exchange_cancelled'));
       setShowCancelModal(false);
       navigate(tenantPath('/group-exchanges'));
     } catch (err) {
-      toast.error('Failed to cancel exchange');
+      toast.error(t('toast.cancel_failed'));
       logError('Failed to cancel group exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -335,11 +337,11 @@ export function GroupExchangeDetailPage() {
         user_id: userId,
         role: addRole,
       });
-      toast.success('Participant added');
+      toast.success(t('toast.participant_added'));
       setSearchResults((prev) => prev.filter((r) => r.id !== userId));
       loadExchange();
     } catch (err) {
-      toast.error('Failed to add participant');
+      toast.error(t('toast.add_participant_failed'));
       logError('Failed to add participant', err);
     } finally {
       setIsSubmitting(false);
@@ -352,10 +354,10 @@ export function GroupExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.delete(`/v2/group-exchanges/${exchange.id}/participants/${userId}`);
-      toast.success('Participant removed');
+      toast.success(t('toast.participant_removed'));
       loadExchange();
     } catch (err) {
-      toast.error('Failed to remove participant');
+      toast.error(t('toast.remove_participant_failed'));
       logError('Failed to remove participant', err);
     } finally {
       setIsSubmitting(false);
@@ -392,19 +394,19 @@ export function GroupExchangeDetailPage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   if (isLoading) {
-    return <LoadingScreen message="Loading group exchange..." />;
+    return <LoadingScreen message={t('detail.loading')} />;
   }
 
   if (error || !exchange) {
     return (
       <EmptyState
         icon={<AlertTriangle className="w-12 h-12" />}
-        title="Exchange Not Found"
-        description={error || 'The group exchange you are looking for does not exist.'}
+        title={t('detail.not_found')}
+        description={error || t('detail.not_found_desc')}
         action={
           <Link to={tenantPath('/group-exchanges')}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              View Group Exchanges
+              {t('detail.view_exchanges')}
             </Button>
           </Link>
         }
@@ -420,7 +422,7 @@ export function GroupExchangeDetailPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Group Exchanges', href: tenantPath('/group-exchanges') },
+        { label: t('title'), href: tenantPath('/group-exchanges') },
         { label: exchange.title },
       ]} />
 
@@ -438,10 +440,10 @@ export function GroupExchangeDetailPage() {
                 variant="flat"
                 size="lg"
               >
-                {statusConfig.label}
+                {t('status.' + exchange.status)}
               </Chip>
               <Chip size="sm" variant="flat" className="bg-theme-elevated text-theme-muted capitalize">
-                {exchange.split_type} split
+                {t('split_type.' + exchange.split_type)}
               </Chip>
             </div>
           </div>
@@ -459,10 +461,10 @@ export function GroupExchangeDetailPage() {
             size="sm"
           />
           <div>
-            <p className="text-sm text-theme-muted">Organized by</p>
+            <p className="text-sm text-theme-muted">{t('detail.organized_by')}</p>
             <p className="font-medium text-theme-primary">
               {exchange.organizer_name}
-              {isOrganizer && ' (You)'}
+              {isOrganizer && ` (${t('detail.you')})`}
             </p>
           </div>
         </div>
@@ -470,19 +472,19 @@ export function GroupExchangeDetailPage() {
         {/* Hours */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="bg-theme-elevated rounded-lg p-4">
-            <p className="text-sm text-theme-muted">Total Hours</p>
+            <p className="text-sm text-theme-muted">{t('detail.total_hours')}</p>
             <p className="text-2xl font-bold text-theme-primary">{Number(exchange.total_hours)}</p>
           </div>
           <div className="bg-theme-elevated rounded-lg p-4">
-            <p className="text-sm text-theme-muted">Providers</p>
+            <p className="text-sm text-theme-muted">{t('detail.providers')}</p>
             <p className="text-2xl font-bold text-emerald-400">{providers.length}</p>
           </div>
           <div className="bg-theme-elevated rounded-lg p-4">
-            <p className="text-sm text-theme-muted">Receivers</p>
+            <p className="text-sm text-theme-muted">{t('detail.receivers')}</p>
             <p className="text-2xl font-bold text-amber-400">{receivers.length}</p>
           </div>
           <div className="bg-theme-elevated rounded-lg p-4">
-            <p className="text-sm text-theme-muted">Created</p>
+            <p className="text-sm text-theme-muted">{t('detail.created')}</p>
             <p className="text-sm font-medium text-theme-primary">
               <time dateTime={exchange.created_at}>
                 {new Date(exchange.created_at).toLocaleDateString()}
@@ -494,7 +496,7 @@ export function GroupExchangeDetailPage() {
         {/* Broker Notes */}
         {exchange.broker_notes && (
           <div className="bg-amber-500/10 rounded-lg p-4 mt-4">
-            <h3 className="text-sm font-medium text-amber-400 mb-2">Broker Notes</h3>
+            <h3 className="text-sm font-medium text-amber-400 mb-2">{t('detail.broker_notes')}</h3>
             <p className="text-theme-primary">{exchange.broker_notes}</p>
           </div>
         )}
@@ -504,14 +506,10 @@ export function GroupExchangeDetailPage() {
           <div className="bg-emerald-500/10 rounded-lg p-4 mt-4">
             <h3 className="text-sm font-medium text-emerald-400 mb-1 flex items-center gap-2">
               <CheckCircle className="w-4 h-4" aria-hidden="true" />
-              Exchange Completed
+              {t('detail.exchange_completed')}
             </h3>
             <p className="text-theme-muted text-sm">
-              Completed on{' '}
-              <time dateTime={exchange.completed_at}>
-                {new Date(exchange.completed_at).toLocaleDateString()}
-              </time>
-              . All transactions have been created.
+              {t('detail.completed_on', { date: new Date(exchange.completed_at).toLocaleDateString() })}
             </p>
           </div>
         )}
@@ -521,10 +519,10 @@ export function GroupExchangeDetailPage() {
           <div className="bg-red-500/10 rounded-lg p-4 mt-4">
             <h3 className="text-sm font-medium text-red-400 mb-1 flex items-center gap-2">
               <XCircle className="w-4 h-4" aria-hidden="true" />
-              Exchange Cancelled
+              {t('detail.exchange_cancelled')}
             </h3>
             <p className="text-theme-muted text-sm">
-              This exchange has been cancelled. No transactions were created.
+              {t('detail.cancelled_notice')}
             </p>
           </div>
         )}
@@ -543,7 +541,7 @@ export function GroupExchangeDetailPage() {
                   setSearchResults([]);
                 }}
               >
-                Add Participants
+                {t('detail.add_participants')}
               </Button>
             )}
             {canStartExchange && (
@@ -553,7 +551,7 @@ export function GroupExchangeDetailPage() {
                 onPress={() => handleUpdateStatus('pending_confirmation')}
                 isLoading={isSubmitting}
               >
-                Start Exchange
+                {t('detail.start_exchange')}
               </Button>
             )}
             {canConfirm && (
@@ -563,7 +561,7 @@ export function GroupExchangeDetailPage() {
                 onPress={handleConfirm}
                 isLoading={isSubmitting}
               >
-                Confirm My Hours
+                {t('detail.confirm_my_hours')}
               </Button>
             )}
             {canComplete && (
@@ -573,7 +571,7 @@ export function GroupExchangeDetailPage() {
                 onPress={handleComplete}
                 isLoading={isSubmitting}
               >
-                Complete Exchange
+                {t('detail.complete_exchange')}
               </Button>
             )}
             {canCancel && (
@@ -583,7 +581,7 @@ export function GroupExchangeDetailPage() {
                 startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => setShowCancelModal(true)}
               >
-                Cancel Exchange
+                {t('detail.cancel_exchange')}
               </Button>
             )}
           </div>
@@ -594,28 +592,28 @@ export function GroupExchangeDetailPage() {
       <GlassCard className="p-6">
         <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-3">
           <Users className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-          Participants ({exchange.participants.length})
+          {t('detail.participants_heading', { count: exchange.participants.length })}
         </h2>
 
         {exchange.participants.length === 0 ? (
           <div className="text-center py-6">
             <Users className="w-10 h-10 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-            <p className="text-theme-muted text-sm">No participants yet.</p>
+            <p className="text-theme-muted text-sm">{t('detail.no_participants')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-theme-default">
-                  <th className="text-left py-2 px-3 text-theme-muted font-medium">Name</th>
-                  <th className="text-left py-2 px-3 text-theme-muted font-medium">Role</th>
+                  <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_name')}</th>
+                  <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_role')}</th>
                   {exchange.split_type === 'custom' && (
-                    <th className="text-right py-2 px-3 text-theme-muted font-medium">Hours</th>
+                    <th className="text-right py-2 px-3 text-theme-muted font-medium">{t('detail.col_hours')}</th>
                   )}
                   {exchange.split_type === 'weighted' && (
-                    <th className="text-right py-2 px-3 text-theme-muted font-medium">Weight</th>
+                    <th className="text-right py-2 px-3 text-theme-muted font-medium">{t('detail.col_weight')}</th>
                   )}
-                  <th className="text-center py-2 px-3 text-theme-muted font-medium">Confirmed</th>
+                  <th className="text-center py-2 px-3 text-theme-muted font-medium">{t('detail.col_confirmed')}</th>
                   {canAddParticipants && (
                     <th className="text-right py-2 px-3 text-theme-muted font-medium" />
                   )}
@@ -634,7 +632,7 @@ export function GroupExchangeDetailPage() {
                         <span className="text-theme-primary">
                           {p.user_name}
                           {p.user_id === user?.id && (
-                            <span className="text-xs text-theme-subtle ml-1">(You)</span>
+                            <span className="text-xs text-theme-subtle ml-1">({t('detail.you')})</span>
                           )}
                         </span>
                       </div>
@@ -658,10 +656,10 @@ export function GroupExchangeDetailPage() {
                       {p.confirmed ? (
                         <span className="flex items-center justify-center gap-1 text-emerald-400 text-xs">
                           <CheckCircle className="w-4 h-4" aria-hidden="true" />
-                          Confirmed
+                          {t('detail.confirmed')}
                         </span>
                       ) : (
-                        <span className="text-theme-subtle text-xs">Pending</span>
+                        <span className="text-theme-subtle text-xs">{t('detail.pending')}</span>
                       )}
                     </td>
                     {canAddParticipants && (
@@ -672,7 +670,7 @@ export function GroupExchangeDetailPage() {
                           variant="flat"
                           className="bg-red-500/20 text-red-400"
                           onPress={() => handleRemoveParticipant(p.user_id)}
-                          aria-label={`Remove ${p.user_name}`}
+                          aria-label={t('detail.remove_participant', { name: p.user_name })}
                         >
                           <X className="w-4 h-4" />
                         </Button>
@@ -691,17 +689,17 @@ export function GroupExchangeDetailPage() {
         <GlassCard className="p-6">
           <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-3">
             <Scale className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-            Hour Split
+            {t('detail.hour_split')}
           </h2>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-theme-default">
-                  <th className="text-left py-2 px-3 text-theme-muted font-medium">Provider</th>
+                  <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_provider')}</th>
                   <th className="text-center py-2 px-3 text-theme-muted font-medium" aria-hidden="true" />
-                  <th className="text-left py-2 px-3 text-theme-muted font-medium">Receiver</th>
-                  <th className="text-right py-2 px-3 text-theme-muted font-medium">Hours</th>
+                  <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_receiver')}</th>
+                  <th className="text-right py-2 px-3 text-theme-muted font-medium">{t('detail.col_hours')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -709,7 +707,7 @@ export function GroupExchangeDetailPage() {
                   <tr key={idx} className="border-b border-theme-default/50">
                     <td className="py-2 px-3 text-emerald-400">{row.providerName}</td>
                     <td className="py-2 px-3 text-center text-theme-subtle">
-                      <ArrowRight className="w-4 h-4 inline" aria-label="gives to" />
+                      <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
                     </td>
                     <td className="py-2 px-3 text-amber-400">{row.receiverName}</td>
                     <td className="py-2 px-3 text-right font-medium text-theme-primary">{row.amount}h</td>
@@ -733,11 +731,10 @@ export function GroupExchangeDetailPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Cancel Group Exchange?</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('detail.cancel_modal_title')}</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              Are you sure you want to cancel this group exchange? This action cannot be undone.
-              No transactions will be created.
+              {t('detail.cancel_modal_body')}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -746,10 +743,10 @@ export function GroupExchangeDetailPage() {
               onPress={() => setShowCancelModal(false)}
               className="bg-theme-elevated text-theme-primary"
             >
-              Keep Exchange
+              {t('detail.keep_exchange')}
             </Button>
             <Button color="danger" onPress={handleCancel} isLoading={isSubmitting}>
-              Cancel Exchange
+              {t('detail.cancel_exchange')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -768,7 +765,7 @@ export function GroupExchangeDetailPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Add Participant</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('detail.add_participant_title')}</ModalHeader>
           <ModalBody>
             {/* Role selection */}
             <div className="flex gap-2 mb-4">
@@ -779,7 +776,7 @@ export function GroupExchangeDetailPage() {
                 onPress={() => setAddRole('provider')}
                 className={addRole !== 'provider' ? 'bg-theme-elevated text-theme-muted' : ''}
               >
-                Provider
+                {t('detail.role_provider')}
               </Button>
               <Button
                 size="sm"
@@ -788,12 +785,12 @@ export function GroupExchangeDetailPage() {
                 onPress={() => setAddRole('receiver')}
                 className={addRole !== 'receiver' ? 'bg-theme-elevated text-theme-muted' : ''}
               >
-                Receiver
+                {t('detail.role_receiver')}
               </Button>
             </div>
 
             <Input
-              placeholder="Search members by name..."
+              placeholder={t('detail.search_members_placeholder')}
               value={searchQuery}
               onChange={(e) => handleSearchMembers(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
@@ -802,7 +799,7 @@ export function GroupExchangeDetailPage() {
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
               }}
-              aria-label="Search members"
+              aria-label={t('detail.search_members_aria')}
             />
 
             {searchResults.length > 0 && (
@@ -835,7 +832,7 @@ export function GroupExchangeDetailPage() {
                         isLoading={isSubmitting}
                         startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
                       >
-                        Add as {addRole}
+                        {t('detail.add_as_role', { role: t('detail.role_' + addRole) })}
                       </Button>
                     </div>
                   );
@@ -845,7 +842,7 @@ export function GroupExchangeDetailPage() {
 
             {searchQuery.trim().length >= 2 && searchResults.length === 0 && !isSearching && (
               <div className="text-center py-4 text-theme-muted text-sm">
-                No members found matching your search.
+                {t('detail.no_members_found')}
               </div>
             )}
           </ModalBody>
@@ -855,7 +852,7 @@ export function GroupExchangeDetailPage() {
               onPress={() => setShowAddParticipantModal(false)}
               className="bg-theme-elevated text-theme-primary"
             >
-              Done
+              {t('detail.done')}
             </Button>
           </ModalFooter>
         </ModalContent>

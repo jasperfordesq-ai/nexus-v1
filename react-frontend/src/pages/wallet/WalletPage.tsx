@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   RefreshCw,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { TransferModal } from '@/components/wallet';
@@ -36,7 +37,8 @@ import type { WalletBalance, Transaction } from '@/types/api';
 type TransactionFilter = 'all' | 'earned' | 'spent' | 'pending';
 
 export function WalletPage() {
-  usePageTitle('Wallet');
+  const { t } = useTranslation('wallet');
+  usePageTitle(t('title'));
   const [searchParams, setSearchParams] = useSearchParams();
   const [balance, setBalance] = useState<WalletBalance | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -113,7 +115,7 @@ export function WalletPage() {
       }
     } catch (err) {
       logError('Failed to load more transactions', err);
-      toast.error('Error', 'Failed to load more transactions');
+      toast.error(t('toast.load_error'), t('toast.load_more_error'));
     } finally {
       setIsLoadingMore(false);
     }
@@ -134,8 +136,8 @@ export function WalletPage() {
     }
 
     toast.success(
-      'Transfer successful',
-      `Sent ${transaction.amount} hours to ${transaction.other_user?.name || 'recipient'}`
+      t('toast.transfer_success'),
+      t('toast.transfer_desc', { amount: transaction.amount, recipient: transaction.other_user?.name || 'recipient' })
     );
   }
 
@@ -176,15 +178,15 @@ export function WalletPage() {
   // Export transactions to CSV
   function handleExport() {
     if (transactions.length === 0) {
-      toast.info('No data', 'No transactions to export');
+      toast.info(t('toast.no_data'), t('toast.no_export'));
       return;
     }
 
     // Create CSV content
-    const headers = ['Date', 'Type', 'Amount', 'Description', 'Other Party', 'Status'];
+    const headers = [t('csv.date'), t('csv.type'), t('csv.amount'), t('csv.description'), t('csv.other_party'), t('csv.status')];
     const rows = transactions.map((tx) => [
       new Date(tx.created_at).toLocaleDateString(),
-      tx.type === 'credit' ? 'Received' : 'Sent',
+      tx.type === 'credit' ? t('csv.received') : t('csv.sent'),
       tx.amount.toString(),
       sanitizeCsvCell(tx.description || ''),
       sanitizeCsvCell(tx.other_user?.name || tx.other_party?.name || ''),
@@ -207,7 +209,7 @@ export function WalletPage() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    toast.success('Exported', 'Transactions exported to CSV');
+    toast.success(t('toast.exported'), t('toast.exported_desc'));
   }
 
   const containerVariants = {
@@ -234,9 +236,9 @@ export function WalletPage() {
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Wallet className="w-7 h-7 text-amber-400" />
-          Wallet
+          {t('title')}
         </h1>
-        <p className="text-theme-muted mt-1">Track your time credits and transactions</p>
+        <p className="text-theme-muted mt-1">{t('subtitle')}</p>
       </motion.div>
 
       {/* Error State */}
@@ -244,14 +246,14 @@ export function WalletPage() {
         <motion.div variants={itemVariants}>
           <GlassCard className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Wallet</h3>
+            <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h3>
             <p className="text-theme-muted mb-4">{error}</p>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={() => loadWalletData()}
             >
-              Try Again
+              {t('try_again')}
             </Button>
           </GlassCard>
         </motion.div>
@@ -272,19 +274,19 @@ export function WalletPage() {
               <Wallet className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
             </div>
 
-            <p className="text-theme-muted text-sm mb-2">Your Balance</p>
+            <p className="text-theme-muted text-sm mb-2">{t('your_balance')}</p>
 
             {isLoading ? (
               <div className="h-12 w-32 mx-auto bg-theme-elevated rounded animate-pulse" />
             ) : (
               <h1 className="text-3xl sm:text-5xl font-bold text-theme-primary mb-2">
                 {balance?.balance ?? 0}
-                <span className="text-2xl text-theme-muted ml-2">hours</span>
+                <span className="text-2xl text-theme-muted ml-2">{t('hours')}</span>
               </h1>
             )}
 
             <p className="text-theme-subtle text-sm mb-4">
-              {balance?.pending_in ? `+${balance.pending_in}h pending` : 'No pending transactions'}
+              {balance?.pending_in ? t('pending_in', { count: balance.pending_in }) : t('no_pending')}
             </p>
 
             {/* Send Credits Button */}
@@ -295,7 +297,7 @@ export function WalletPage() {
               onClick={() => setIsTransferModalOpen(true)}
               isDisabled={isLoading || !balance || balance.balance <= 0}
             >
-              Send Credits
+              {t('send_credits')}
             </Button>
           </div>
         </GlassCard>
@@ -307,21 +309,21 @@ export function WalletPage() {
       <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <StatCard
           icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
-          label="Earned"
+          label={t('stats.earned')}
           value={`+${stats.earned}h`}
           color="emerald"
           isLoading={isLoading}
         />
         <StatCard
           icon={<ArrowUpRight className="w-5 h-5" aria-hidden="true" />}
-          label="Spent"
+          label={t('stats.spent')}
           value={`-${stats.spent}h`}
           color="rose"
           isLoading={isLoading}
         />
         <StatCard
           icon={<Clock className="w-5 h-5" aria-hidden="true" />}
-          label="Pending"
+          label={t('stats.pending')}
           value={`${stats.pending}h`}
           color="amber"
           isLoading={isLoading}
@@ -336,7 +338,7 @@ export function WalletPage() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-              Transaction History
+              {t('history')}
             </h2>
 
             <Button
@@ -348,7 +350,7 @@ export function WalletPage() {
               isDisabled={transactions.length === 0}
               aria-label="Export transactions to CSV"
             >
-              Export
+              {t('export')}
             </Button>
           </div>
 
@@ -362,10 +364,10 @@ export function WalletPage() {
               tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
             }}
           >
-            <Tab key="all" title="All" />
-            <Tab key="earned" title="Earned" />
-            <Tab key="spent" title="Spent" />
-            <Tab key="pending" title="Pending" />
+            <Tab key="all" title={t('filter.all')} />
+            <Tab key="earned" title={t('filter.earned')} />
+            <Tab key="spent" title={t('filter.spent')} />
+            <Tab key="pending" title={t('filter.pending')} />
           </Tabs>
 
           {/* Transactions List */}
@@ -385,8 +387,8 @@ export function WalletPage() {
             ) : filteredTransactions.length === 0 ? (
               <EmptyState
                 icon={<Wallet className="w-12 h-12" />}
-                title="No transactions"
-                description="Your transaction history will appear here"
+                title={t('no_transactions')}
+                description={t('no_transactions_desc')}
               />
             ) : (
               <>
@@ -402,7 +404,7 @@ export function WalletPage() {
                       onClick={loadMoreTransactions}
                       isLoading={isLoadingMore}
                     >
-                      Load More
+                      {t('load_more')}
                     </Button>
                   </div>
                 )}
@@ -460,13 +462,14 @@ interface TransactionCardProps {
 }
 
 function TransactionCard({ transaction }: TransactionCardProps) {
+  const { t } = useTranslation('wallet');
   const isCredit = transaction.type === 'credit';
   const otherPartyName = transaction.other_user?.name || transaction.other_party?.name;
 
   return (
     <article
       className="p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
-      aria-label={`${isCredit ? 'Received' : 'Sent'} ${transaction.amount} hours ${otherPartyName ? (isCredit ? 'from' : 'to') + ' ' + otherPartyName : ''}`}
+      aria-label={`${isCredit ? t('csv.received') : t('csv.sent')} ${transaction.amount} hours ${otherPartyName ? (isCredit ? 'from' : 'to') + ' ' + otherPartyName : ''}`}
     >
       <div className="flex items-center gap-4">
         <div className={`
@@ -485,7 +488,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
             <h4 className="font-medium text-theme-primary truncate">{transaction.description}</h4>
             {transaction.status === 'pending' && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
-                Pending
+                {t('filter.pending')}
               </span>
             )}
           </div>

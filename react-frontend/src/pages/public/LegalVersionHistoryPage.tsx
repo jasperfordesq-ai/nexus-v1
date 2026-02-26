@@ -33,6 +33,7 @@ import {
   Clock,
   Info,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -79,6 +80,7 @@ function formatDate(dateStr: string | null): string {
 }
 
 export function LegalVersionHistoryPage() {
+  const { t } = useTranslation('legal');
   const location = useLocation();
   const { tenantPath, isLoading: tenantLoading, tenant } = useTenant();
 
@@ -95,7 +97,7 @@ export function LegalVersionHistoryPage() {
   const [expandedContent, setExpandedContent] = useState<LegalVersionDetail | null>(null);
   const [loadingContent, setLoadingContent] = useState(false);
 
-  usePageTitle(title ? `${title} - Version History` : 'Version History');
+  usePageTitle(title ? `${title} - ${t('version_history.page_title')}` : t('version_history.page_title'));
 
   useEffect(() => {
     if (!docType) return;
@@ -141,7 +143,7 @@ export function LegalVersionHistoryPage() {
   if (!docType) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
-        <p className="text-theme-muted">Document type not found.</p>
+        <p className="text-theme-muted">{t('version_history.not_found')}</p>
       </div>
     );
   }
@@ -170,7 +172,7 @@ export function LegalVersionHistoryPage() {
           className="inline-flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to {title || 'document'}
+          {t('version_history.back_to', { title: title || t('version_history.document') })}
         </Link>
       </motion.div>
 
@@ -180,10 +182,10 @@ export function LegalVersionHistoryPage() {
           <History className="w-10 h-10 text-slate-500 dark:text-slate-400" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
-          Version History
+          {t('version_history.heading')}
         </h1>
         <p className="text-theme-muted text-lg max-w-2xl mx-auto">
-          {title ? `Previous versions of "${title}"` : 'Previous versions of this document'}
+          {title ? t('version_history.subtitle_with_title', { title }) : t('version_history.subtitle_generic')}
         </p>
       </motion.div>
 
@@ -192,10 +194,10 @@ export function LegalVersionHistoryPage() {
         <motion.div variants={itemVariants}>
           <GlassCard className="p-8 text-center">
             <FileText className="w-12 h-12 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-            <p className="text-theme-muted">No published versions found for this document.</p>
+            <p className="text-theme-muted">{t('version_history.no_versions')}</p>
             <Link to={tenantPath(backRoute)} className="mt-4 inline-block">
               <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-primary">
-                View Current Document
+                {t('version_history.view_current')}
               </Button>
             </Link>
           </GlassCard>
@@ -233,7 +235,7 @@ export function LegalVersionHistoryPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span className="font-semibold text-theme-primary text-base">
-                        Version {version.version_number}
+                        {t('version_history.version_number', { number: version.version_number })}
                       </span>
                       {version.is_current && (
                         <Chip
@@ -242,7 +244,7 @@ export function LegalVersionHistoryPage() {
                           startContent={<CheckCircle className="w-3 h-3" />}
                           classNames={{ base: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' }}
                         >
-                          Current
+                          {t('version_history.current')}
                         </Chip>
                       )}
                       {!version.is_current && idx === versions.length - 1 && (
@@ -252,7 +254,7 @@ export function LegalVersionHistoryPage() {
                           startContent={<Clock className="w-3 h-3" />}
                           classNames={{ base: 'bg-[var(--surface-elevated)] text-theme-subtle' }}
                         >
-                          Original
+                          {t('version_history.original')}
                         </Chip>
                       )}
                       {version.version_label && (
@@ -264,7 +266,7 @@ export function LegalVersionHistoryPage() {
                     <div className="flex items-center gap-3 text-sm text-theme-muted">
                       <span className="inline-flex items-center gap-1">
                         <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" />
-                        Effective {formatDate(version.effective_date)}
+                        {t('version_history.effective', { date: formatDate(version.effective_date) })}
                       </span>
                     </div>
                     {version.summary_of_changes && (
@@ -295,7 +297,7 @@ export function LegalVersionHistoryPage() {
                             <Info className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
                             <div>
                               <h4 className="font-medium text-sm text-blue-600 dark:text-blue-400 mb-1">
-                                Summary of Changes
+                                {t('version_history.summary_of_changes')}
                               </h4>
                               <p className="text-sm text-theme-muted">
                                 {expandedContent.summary_of_changes}
@@ -325,7 +327,7 @@ export function LegalVersionHistoryPage() {
             className="bg-theme-elevated text-theme-primary"
             startContent={<ArrowLeft className="w-4 h-4" />}
           >
-            Back to Current {title}
+            {t('version_history.back_to_current', { title })}
           </Button>
         </Link>
       </motion.div>

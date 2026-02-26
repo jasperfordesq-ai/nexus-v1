@@ -597,7 +597,8 @@ class LegalDocumentService
                  )
              WHERE ld.tenant_id = ?
              AND ld.is_active = 1
-             AND ld.requires_acceptance = 1",
+             AND ld.requires_acceptance = 1
+             AND ld.current_version_id IS NOT NULL",
             [$userId, $userId, $tenantId]
         );
 

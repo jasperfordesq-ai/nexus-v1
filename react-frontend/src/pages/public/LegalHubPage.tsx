@@ -24,6 +24,7 @@ import {
   Handshake,
   Send,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -41,55 +42,52 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const legalDocuments = [
+const legalDocumentDefs = [
   {
-    title: 'Privacy Policy',
-    description:
-      'How we collect, use, and protect your personal information. Includes your GDPR rights and data retention policies.',
+    titleKey: 'hub.doc_privacy_title',
+    descKey: 'hub.doc_privacy_desc',
     icon: Shield,
     path: '/privacy',
     color: 'text-indigo-500',
     bg: 'bg-indigo-500/20',
     gradient: 'from-indigo-500/20 to-purple-500/20',
-    updated: 'February 2026',
+    updatedKey: 'hub.doc_updated_feb_2026',
   },
   {
-    title: 'Terms of Service',
-    description:
-      'The rules and guidelines governing your use of the platform, including member responsibilities and community standards.',
+    titleKey: 'hub.doc_terms_title',
+    descKey: 'hub.doc_terms_desc',
     icon: FileText,
     path: '/terms',
     color: 'text-blue-500',
     bg: 'bg-blue-500/20',
     gradient: 'from-blue-500/20 to-cyan-500/20',
-    updated: 'February 2026',
+    updatedKey: 'hub.doc_updated_feb_2026',
   },
   {
-    title: 'Cookie Policy',
-    description:
-      'Details about the cookies we use, why we use them, and how you can manage your cookie preferences.',
+    titleKey: 'hub.doc_cookies_title',
+    descKey: 'hub.doc_cookies_desc',
     icon: Cookie,
     path: '/cookies',
     color: 'text-amber-500',
     bg: 'bg-amber-500/20',
     gradient: 'from-amber-500/20 to-orange-500/20',
-    updated: 'February 2026',
+    updatedKey: 'hub.doc_updated_feb_2026',
   },
   {
-    title: 'Accessibility Statement',
-    description:
-      'Our commitment to making the platform accessible to everyone, including WCAG 2.1 AA compliance details.',
+    titleKey: 'hub.doc_accessibility_title',
+    descKey: 'hub.doc_accessibility_desc',
     icon: Accessibility,
     path: '/accessibility',
     color: 'text-emerald-500',
     bg: 'bg-emerald-500/20',
     gradient: 'from-emerald-500/20 to-green-500/20',
-    updated: 'February 2026',
+    updatedKey: 'hub.doc_updated_feb_2026',
   },
 ];
 
 export function LegalHubPage() {
-  usePageTitle('Legal');
+  const { t } = useTranslation('legal');
+  usePageTitle(t('hub.page_title'));
   const { branding, tenantPath } = useTenant();
 
   return (
@@ -105,11 +103,10 @@ export function LegalHubPage() {
           <Scale className="w-10 h-10 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
-          Legal &amp; Compliance
+          {t('hub.heading')}
         </h1>
         <p className="text-theme-muted text-lg max-w-2xl mx-auto">
-          Transparency and trust are at the heart of everything we do.
-          Here you will find all of our legal documents and policies.
+          {t('hub.subtitle')}
         </p>
       </motion.div>
 
@@ -119,19 +116,16 @@ export function LegalHubPage() {
           <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
             <h2 className="text-xl font-semibold text-theme-primary mb-3 flex items-center gap-2">
               <Handshake className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-              Our Commitment to Transparency
+              {t('hub.commitment_title')}
             </h2>
             <div className="space-y-3 text-theme-muted">
               <p>
-                {branding.name} is fully committed to GDPR compliance and data protection
-                best practices. We believe you have the right to understand exactly how your
-                data is collected, processed, and stored.
+                {t('hub.commitment_body_1', { name: branding.name })}
               </p>
               <p>
-                Every policy below has been written in{' '}
-                <strong className="text-theme-primary">plain language</strong> so that it is
-                genuinely useful, not just legally required. If anything is unclear, our team
-                is always happy to help.
+                {t('hub.commitment_body_2_before')}{' '}
+                <strong className="text-theme-primary">{t('hub.commitment_body_2_emphasis')}</strong>{' '}
+                {t('hub.commitment_body_2_after')}
               </p>
             </div>
           </div>
@@ -141,22 +135,22 @@ export function LegalHubPage() {
       {/* Legal Document Cards */}
       <motion.div variants={itemVariants}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {legalDocuments.map((doc) => (
-            <GlassCard key={doc.title} hoverable className="p-6 flex flex-col">
+          {legalDocumentDefs.map((doc) => (
+            <GlassCard key={doc.titleKey} hoverable className="p-6 flex flex-col">
               <div className="flex items-start gap-4 mb-4">
                 <div className={`p-3 rounded-xl bg-gradient-to-br ${doc.gradient} flex-shrink-0`}>
                   <doc.icon className={`w-6 h-6 ${doc.color}`} aria-hidden="true" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-theme-primary">{doc.title}</h3>
+                  <h3 className="text-lg font-semibold text-theme-primary">{t(doc.titleKey)}</h3>
                   <div className="flex items-center gap-1.5 mt-1 text-xs text-theme-subtle">
                     <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" />
-                    <span>Updated {doc.updated}</span>
+                    <span>{t(doc.updatedKey)}</span>
                   </div>
                 </div>
               </div>
               <p className="text-sm text-theme-muted flex-1 mb-4">
-                {doc.description}
+                {t(doc.descKey)}
               </p>
               <Link to={tenantPath(doc.path)}>
                 <Button
@@ -164,7 +158,7 @@ export function LegalHubPage() {
                   className="w-full bg-theme-elevated text-theme-primary"
                   endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Read Document
+                  {t('hub.read_document')}
                 </Button>
               </Link>
             </GlassCard>
@@ -180,11 +174,10 @@ export function LegalHubPage() {
               <Scale className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-semibold text-theme-primary mb-2">
-              Questions About Our Policies?
+              {t('hub.cta_title')}
             </h2>
             <p className="text-theme-muted text-sm mb-6 max-w-lg mx-auto">
-              If you have any questions about our legal documents, data practices, or want
-              to exercise your GDPR rights, please get in touch.
+              {t('hub.cta_body')}
             </p>
             <Divider className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
@@ -193,7 +186,7 @@ export function LegalHubPage() {
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                   startContent={<Send className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Contact Our Team
+                  {t('hub.contact_team')}
                 </Button>
               </Link>
               <Link to={tenantPath('/privacy')}>
@@ -202,7 +195,7 @@ export function LegalHubPage() {
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Privacy Policy
+                  {t('hub.privacy_policy_link')}
                 </Button>
               </Link>
             </div>

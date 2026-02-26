@@ -43,6 +43,7 @@ import {
   Ban,
   UserCheck,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
@@ -110,26 +111,26 @@ function getTimelineColor(action: string, newStatus?: string | null): string {
   return 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30';
 }
 
-function getTimelineLabel(action: string, newStatus?: string | null): string {
-  if (action === 'created') return 'Exchange Created';
-  if (action === 'accepted' || newStatus === 'accepted') return 'Exchange Accepted';
-  if (action === 'declined') return 'Exchange Declined';
-  if (action === 'started' || newStatus === 'in_progress') return 'Exchange Started';
-  if (action === 'completed' || newStatus === 'completed') return 'Exchange Completed';
-  if (action === 'confirmed') return 'Hours Confirmed';
-  if (action === 'cancelled' || newStatus === 'cancelled') return 'Exchange Cancelled';
-  if (newStatus === 'pending_confirmation') return 'Awaiting Confirmation';
-  if (newStatus === 'pending_broker') return 'Sent to Broker';
-  if (newStatus === 'disputed') return 'Exchange Disputed';
-  // Fallback: capitalize the action
-  return action.charAt(0).toUpperCase() + action.slice(1).replace(/_/g, ' ');
+function getTimelineLabelKey(action: string, newStatus?: string | null): string {
+  if (action === 'created') return 'detail.timeline.created';
+  if (action === 'accepted' || newStatus === 'accepted') return 'detail.timeline.accepted';
+  if (action === 'declined') return 'detail.timeline.declined';
+  if (action === 'started' || newStatus === 'in_progress') return 'detail.timeline.started';
+  if (action === 'completed' || newStatus === 'completed') return 'detail.timeline.completed';
+  if (action === 'confirmed') return 'detail.timeline.confirmed';
+  if (action === 'cancelled' || newStatus === 'cancelled') return 'detail.timeline.cancelled';
+  if (newStatus === 'pending_confirmation') return 'detail.timeline.awaiting_confirmation';
+  if (newStatus === 'pending_broker') return 'detail.timeline.sent_to_broker';
+  if (newStatus === 'disputed') return 'detail.timeline.disputed';
+  // Fallback: return a key based on the action
+  return 'detail.timeline.fallback';
 }
 
 function buildTimeline(history: ExchangeHistoryEntry[]): TimelineEntry[] {
   return history.map((entry) => ({
     icon: getTimelineIcon(entry.action, entry.new_status),
     colorClass: getTimelineColor(entry.action, entry.new_status),
-    label: getTimelineLabel(entry.action, entry.new_status),
+    label: getTimelineLabelKey(entry.action, entry.new_status),
     actor: entry.actor_name,
     timestamp: entry.created_at,
     notes: entry.notes,
@@ -139,7 +140,8 @@ function buildTimeline(history: ExchangeHistoryEntry[]): TimelineEntry[] {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function ExchangeDetailPage() {
-  usePageTitle('Exchange Details');
+  const { t } = useTranslation('exchanges');
+  usePageTitle(t('detail.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -169,10 +171,10 @@ export function ExchangeDetailPage() {
         setExchange(response.data);
         setConfirmHours(response.data.proposed_hours.toString());
       } else {
-        setError('Exchange not found');
+        setError(t('detail.not_found'));
       }
     } catch (err) {
-      setError('Exchange not found');
+      setError(t('detail.not_found'));
       logError('Failed to load exchange', err);
     } finally {
       setIsLoading(false);
@@ -201,10 +203,10 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/accept`);
-      toast.success('Exchange accepted!');
+      toast.success(t('toast.accepted'));
       loadExchange();
     } catch (err) {
-      toast.error('Failed to accept exchange');
+      toast.error(t('toast.accept_failed'));
       logError('Failed to accept exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -217,11 +219,11 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/decline`, { reason: declineReason });
-      toast.success('Exchange declined');
+      toast.success(t('toast.declined'));
       setShowDeclineModal(false);
       loadExchange();
     } catch (err) {
-      toast.error('Failed to decline exchange');
+      toast.error(t('toast.decline_failed'));
       logError('Failed to decline exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -234,10 +236,10 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/start`);
-      toast.success('Exchange started!');
+      toast.success(t('toast.started'));
       loadExchange();
     } catch (err) {
-      toast.error('Failed to start exchange');
+      toast.error(t('toast.start_failed'));
       logError('Failed to start exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -250,10 +252,10 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/complete`);
-      toast.success('Exchange marked as complete. Please confirm hours.');
+      toast.success(t('toast.completed'));
       loadExchange();
     } catch (err) {
-      toast.error('Failed to complete exchange');
+      toast.error(t('toast.complete_failed'));
       logError('Failed to complete exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -265,23 +267,23 @@ export function ExchangeDetailPage() {
 
     const hours = parseFloat(confirmHours);
     if (isNaN(hours) || hours <= 0) {
-      toast.error('Please enter valid hours');
+      toast.error(t('toast.invalid_hours'));
       return;
     }
 
     if (hours > MAX_EXCHANGE_HOURS) {
-      toast.error(`Maximum ${MAX_EXCHANGE_HOURS} hours per exchange`);
+      toast.error(t('toast.max_hours', { max: MAX_EXCHANGE_HOURS }));
       return;
     }
 
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/confirm`, { hours });
-      toast.success('Hours confirmed!');
+      toast.success(t('toast.hours_confirmed'));
       setShowConfirmModal(false);
       loadExchange();
     } catch (err) {
-      toast.error('Failed to confirm hours');
+      toast.error(t('toast.confirm_failed'));
       logError('Failed to confirm hours', err);
     } finally {
       setIsSubmitting(false);
@@ -294,11 +296,11 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.delete(`/v2/exchanges/${exchange.id}`);
-      toast.success('Exchange cancelled');
+      toast.success(t('toast.cancelled'));
       setShowCancelModal(false);
       navigate(tenantPath('/exchanges'));
     } catch (err) {
-      toast.error('Failed to cancel exchange');
+      toast.error(t('toast.cancel_failed'));
       logError('Failed to cancel exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -306,19 +308,19 @@ export function ExchangeDetailPage() {
   }
 
   if (isLoading) {
-    return <LoadingScreen message="Loading exchange..." />;
+    return <LoadingScreen message={t('detail.loading')} />;
   }
 
   if (error || !exchange) {
     return (
       <EmptyState
         icon={<AlertTriangle className="w-12 h-12" />}
-        title="Exchange Not Found"
-        description={error || 'The exchange you are looking for does not exist'}
+        title={t('detail.not_found_title')}
+        description={error || t('detail.not_found_description')}
         action={
           <Link to={tenantPath("/exchanges")}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              View My Exchanges
+              {t('detail.view_exchanges')}
             </Button>
           </Link>
         }
@@ -352,8 +354,8 @@ export function ExchangeDetailPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: 'Exchanges', href: tenantPath('/exchanges') },
-        { label: exchange?.listing?.title || 'Exchange' },
+        { label: t('breadcrumb.exchanges'), href: tenantPath('/exchanges') },
+        { label: exchange?.listing?.title || t('breadcrumb.exchange') },
       ]} />
 
       {/* Status Card */}
@@ -378,15 +380,15 @@ export function ExchangeDetailPage() {
       {/* Exchange Details */}
       <GlassCard className="p-6">
         <h2 className="text-xl font-semibold text-theme-primary mb-4">
-          Exchange Details
+          {t('detail.exchange_details')}
         </h2>
 
         {/* Listing */}
         <div className="mb-6">
-          <h3 className="text-sm font-medium text-theme-muted mb-2">Service</h3>
+          <h3 className="text-sm font-medium text-theme-muted mb-2">{t('detail.service')}</h3>
           <Link to={tenantPath(`/listings/${exchange.listing_id}`)} className="hover:underline">
             <p className="text-lg font-semibold text-theme-primary">
-              {exchange.listing?.title || 'Service Exchange'}
+              {exchange.listing?.title || t('service_exchange')}
             </p>
           </Link>
         </div>
@@ -394,22 +396,22 @@ export function ExchangeDetailPage() {
         {/* Parties */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <h3 className="text-sm font-medium text-theme-muted mb-2">Requester</h3>
+            <h3 className="text-sm font-medium text-theme-muted mb-2">{t('detail.requester')}</h3>
             <div className="flex items-center gap-3">
               <Avatar
                 src={resolveAvatarUrl(exchange.requester?.avatar)}
-                name={exchange.requester?.name || 'Unknown'}
+                name={exchange.requester?.name || t('unknown')}
                 size="sm"
               />
               <div>
                 <p className="font-medium text-theme-primary">
-                  {exchange.requester?.name || 'Unknown'}
-                  {isRequester && ' (You)'}
+                  {exchange.requester?.name || t('unknown')}
+                  {isRequester && ` (${t('detail.you')})`}
                 </p>
                 {exchange.requester_confirmed_at && (
                   <p className="text-xs text-emerald-400 flex items-center gap-1">
                     <CheckCircle className="w-3 h-3" aria-hidden="true" />
-                    Confirmed {exchange.requester_confirmed_hours}h
+                    {t('detail.confirmed_hours', { hours: exchange.requester_confirmed_hours })}
                   </p>
                 )}
               </div>
@@ -417,22 +419,22 @@ export function ExchangeDetailPage() {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-theme-muted mb-2">Provider</h3>
+            <h3 className="text-sm font-medium text-theme-muted mb-2">{t('detail.provider')}</h3>
             <div className="flex items-center gap-3">
               <Avatar
                 src={resolveAvatarUrl(exchange.provider?.avatar)}
-                name={exchange.provider?.name || 'Unknown'}
+                name={exchange.provider?.name || t('unknown')}
                 size="sm"
               />
               <div>
                 <p className="font-medium text-theme-primary">
-                  {exchange.provider?.name || 'Unknown'}
-                  {isProvider && ' (You)'}
+                  {exchange.provider?.name || t('unknown')}
+                  {isProvider && ` (${t('detail.you')})`}
                 </p>
                 {exchange.provider_confirmed_at && (
                   <p className="text-xs text-emerald-400 flex items-center gap-1">
                     <CheckCircle className="w-3 h-3" aria-hidden="true" />
-                    Confirmed {exchange.provider_confirmed_hours}h
+                    {t('detail.confirmed_hours', { hours: exchange.provider_confirmed_hours })}
                   </p>
                 )}
               </div>
@@ -449,7 +451,7 @@ export function ExchangeDetailPage() {
                 className="bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
                 startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
               >
-                Message {otherParty.name || 'Other Party'}
+                {t('detail.message_party', { name: otherParty.name || t('detail.other_party') })}
               </Button>
             </Link>
           </div>
@@ -458,17 +460,17 @@ export function ExchangeDetailPage() {
         {/* Hours */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6">
           <div className="bg-theme-elevated rounded-lg p-4">
-            <p className="text-sm text-theme-muted">Proposed Hours</p>
+            <p className="text-sm text-theme-muted">{t('detail.proposed_hours')}</p>
             <p className="text-2xl font-bold text-theme-primary">{exchange.proposed_hours}</p>
           </div>
           {exchange.final_hours && (
             <div className="bg-emerald-500/10 rounded-lg p-4">
-              <p className="text-sm text-emerald-400">Final Hours</p>
+              <p className="text-sm text-emerald-400">{t('detail.final_hours')}</p>
               <p className="text-2xl font-bold text-emerald-400">{exchange.final_hours}</p>
             </div>
           )}
           <div className="bg-theme-elevated rounded-lg p-4">
-            <p className="text-sm text-theme-muted">Created</p>
+            <p className="text-sm text-theme-muted">{t('detail.created')}</p>
             <p className="text-sm font-medium text-theme-primary">
               <time dateTime={exchange.created_at}>
                 {new Date(exchange.created_at).toLocaleDateString()}
@@ -482,7 +484,7 @@ export function ExchangeDetailPage() {
           <div className="bg-theme-elevated rounded-lg p-4 mb-6">
             <h3 className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-2">
               <MessageSquare className="w-4 h-4" aria-hidden="true" />
-              Message from requester
+              {t('detail.message_from_requester')}
             </h3>
             <p className="text-theme-primary">{exchange.message}</p>
           </div>
@@ -491,7 +493,7 @@ export function ExchangeDetailPage() {
         {/* Broker Notes */}
         {exchange.broker_notes && (
           <div className="bg-amber-500/10 rounded-lg p-4 mb-6">
-            <h3 className="text-sm font-medium text-amber-400 mb-2">Broker Notes</h3>
+            <h3 className="text-sm font-medium text-amber-400 mb-2">{t('detail.broker_notes')}</h3>
             <p className="text-theme-primary">{exchange.broker_notes}</p>
           </div>
         )}
@@ -506,7 +508,7 @@ export function ExchangeDetailPage() {
                 onClick={handleAccept}
                 isLoading={isSubmitting}
               >
-                Accept Request
+                {t('detail.accept_request')}
               </Button>
             )}
             {canDecline && (
@@ -516,7 +518,7 @@ export function ExchangeDetailPage() {
                 startContent={<X className="w-4 h-4" aria-hidden="true" />}
                 onClick={() => setShowDeclineModal(true)}
               >
-                Decline
+                {t('detail.decline')}
               </Button>
             )}
             {canStart && (
@@ -526,7 +528,7 @@ export function ExchangeDetailPage() {
                 onClick={handleStart}
                 isLoading={isSubmitting}
               >
-                Start Exchange
+                {t('detail.start_exchange')}
               </Button>
             )}
             {canComplete && (
@@ -536,7 +538,7 @@ export function ExchangeDetailPage() {
                 onClick={handleComplete}
                 isLoading={isSubmitting}
               >
-                Mark Complete
+                {t('detail.mark_complete')}
               </Button>
             )}
             {canConfirm && (
@@ -545,7 +547,7 @@ export function ExchangeDetailPage() {
                 startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
                 onClick={() => setShowConfirmModal(true)}
               >
-                Confirm Hours
+                {t('detail.confirm_hours')}
               </Button>
             )}
             {canCancel && (
@@ -555,7 +557,7 @@ export function ExchangeDetailPage() {
                 startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
                 onClick={() => setShowCancelModal(true)}
               >
-                Cancel Exchange
+                {t('detail.cancel_exchange')}
               </Button>
             )}
           </div>
@@ -567,7 +569,7 @@ export function ExchangeDetailPage() {
         <GlassCard className="p-6">
           <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-3">
             <Clock className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-            Exchange Timeline
+            {t('detail.timeline_title')}
           </h2>
 
           <div className="relative">
@@ -609,7 +611,7 @@ export function ExchangeDetailPage() {
                   <div className="flex-1 min-w-0 pt-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-sm text-theme-primary">
-                        {entry.label}
+                        {t(entry.label)}
                       </span>
                       {entry.actor && (
                         <Chip size="sm" variant="flat" className="text-xs bg-theme-elevated text-theme-muted">
@@ -649,11 +651,11 @@ export function ExchangeDetailPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Decline Exchange Request</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('modal.decline_title')}</ModalHeader>
           <ModalBody>
             <Textarea
-              label="Reason (optional)"
-              placeholder="Let them know why you're declining..."
+              label={t('modal.decline_reason_label')}
+              placeholder={t('modal.decline_reason_placeholder')}
               value={declineReason}
               onChange={(e) => setDeclineReason(e.target.value)}
               classNames={{
@@ -668,10 +670,10 @@ export function ExchangeDetailPage() {
               onClick={() => setShowDeclineModal(false)}
               className="bg-theme-elevated text-theme-primary"
             >
-              Cancel
+              {t('modal.cancel')}
             </Button>
             <Button color="danger" onClick={handleDecline} isLoading={isSubmitting}>
-              Decline Request
+              {t('modal.decline_confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -689,28 +691,28 @@ export function ExchangeDetailPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Confirm Hours Worked</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('modal.confirm_title')}</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted mb-4">
-              How many hours were actually worked for this exchange?
+              {t('modal.confirm_description')}
             </p>
             <Input
               type="number"
-              label="Hours"
-              placeholder="Enter hours"
+              label={t('modal.hours_label')}
+              placeholder={t('modal.hours_placeholder')}
               value={confirmHours}
               onChange={(e) => setConfirmHours(e.target.value)}
               min="0.5"
               max={MAX_EXCHANGE_HOURS}
               step="0.5"
-              endContent={<span className="text-theme-muted">hours</span>}
+              endContent={<span className="text-theme-muted">{t('modal.hours_unit')}</span>}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
               }}
             />
             <p className="text-xs text-theme-muted mt-2">
-              Originally proposed: {exchange?.proposed_hours} hours (max: {MAX_EXCHANGE_HOURS})
+              {t('modal.originally_proposed', { hours: exchange?.proposed_hours, max: MAX_EXCHANGE_HOURS })}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -719,10 +721,10 @@ export function ExchangeDetailPage() {
               onClick={() => setShowConfirmModal(false)}
               className="bg-theme-elevated text-theme-primary"
             >
-              Cancel
+              {t('modal.cancel')}
             </Button>
             <Button color="success" onClick={handleConfirm} isLoading={isSubmitting}>
-              Confirm Hours
+              {t('detail.confirm_hours')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -740,10 +742,10 @@ export function ExchangeDetailPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Cancel Exchange?</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('modal.cancel_title')}</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              Are you sure you want to cancel this exchange? This action cannot be undone.
+              {t('modal.cancel_description')}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -752,10 +754,10 @@ export function ExchangeDetailPage() {
               onClick={() => setShowCancelModal(false)}
               className="bg-theme-elevated text-theme-primary"
             >
-              Keep Exchange
+              {t('modal.keep_exchange')}
             </Button>
             <Button color="danger" onClick={handleCancel} isLoading={isSubmitting}>
-              Cancel Exchange
+              {t('detail.cancel_exchange')}
             </Button>
           </ModalFooter>
         </ModalContent>

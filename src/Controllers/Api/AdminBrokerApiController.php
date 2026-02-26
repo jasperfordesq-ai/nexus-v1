@@ -53,14 +53,18 @@ class AdminBrokerApiController extends BaseApiController
     public function dashboard(): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         // Pending exchanges
         $pendingExchanges = 0;
         try {
             $row = Database::query(
-                "SELECT COUNT(*) as cnt FROM exchange_requests WHERE tenant_id = ? AND status IN ('pending_broker', 'disputed')",
-                [$tenantId]
+                "SELECT COUNT(*) as cnt FROM exchange_requests WHERE {$tenantWhere} AND status IN ('pending_broker', 'disputed')",
+                $tenantParams
             )->fetch();
             $pendingExchanges = (int) ($row['cnt'] ?? 0);
         } catch (\Exception $e) {
@@ -71,8 +75,8 @@ class AdminBrokerApiController extends BaseApiController
         $unreviewedMessages = 0;
         try {
             $row = Database::query(
-                "SELECT COUNT(*) as cnt FROM broker_message_copies WHERE tenant_id = ? AND reviewed_by IS NULL",
-                [$tenantId]
+                "SELECT COUNT(*) as cnt FROM broker_message_copies WHERE {$tenantWhere} AND reviewed_by IS NULL",
+                $tenantParams
             )->fetch();
             $unreviewedMessages = (int) ($row['cnt'] ?? 0);
         } catch (\Exception $e) {
@@ -83,8 +87,8 @@ class AdminBrokerApiController extends BaseApiController
         $highRiskListings = 0;
         try {
             $row = Database::query(
-                "SELECT COUNT(*) as cnt FROM listing_risk_tags WHERE tenant_id = ? AND risk_level = 'high'",
-                [$tenantId]
+                "SELECT COUNT(*) as cnt FROM listing_risk_tags WHERE {$tenantWhere} AND risk_level = 'high'",
+                $tenantParams
             )->fetch();
             $highRiskListings = (int) ($row['cnt'] ?? 0);
         } catch (\Exception $e) {
@@ -95,8 +99,8 @@ class AdminBrokerApiController extends BaseApiController
         $monitoredUsers = 0;
         try {
             $row = Database::query(
-                "SELECT COUNT(*) as cnt FROM user_messaging_restrictions WHERE tenant_id = ? AND under_monitoring = 1",
-                [$tenantId]
+                "SELECT COUNT(*) as cnt FROM user_messaging_restrictions WHERE {$tenantWhere} AND under_monitoring = 1",
+                $tenantParams
             )->fetch();
             $monitoredUsers = (int) ($row['cnt'] ?? 0);
         } catch (\Exception $e) {
@@ -111,8 +115,8 @@ class AdminBrokerApiController extends BaseApiController
                 "SELECT
                     SUM(CASE WHEN status IN ('pending', 'submitted') THEN 1 ELSE 0 END) as pending,
                     SUM(CASE WHEN status = 'verified' AND expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as expiring
-                 FROM vetting_records WHERE tenant_id = ?",
-                [$tenantId]
+                 FROM vetting_records WHERE {$tenantWhere}",
+                $tenantParams
             )->fetch();
             $vettingPending = (int) ($row['pending'] ?? 0);
             $vettingExpiring = (int) ($row['expiring'] ?? 0);
@@ -124,8 +128,8 @@ class AdminBrokerApiController extends BaseApiController
         $safeguardingAlerts = 0;
         try {
             $row = Database::query(
-                "SELECT COUNT(*) as cnt FROM abuse_alerts WHERE tenant_id = ? AND status = 'open'",
-                [$tenantId]
+                "SELECT COUNT(*) as cnt FROM abuse_alerts WHERE {$tenantWhere} AND status = 'open'",
+                $tenantParams
             )->fetch();
             $safeguardingAlerts = (int) ($row['cnt'] ?? 0);
         } catch (\Exception $e) {
@@ -135,18 +139,21 @@ class AdminBrokerApiController extends BaseApiController
         // Recent broker activity (last 20 actions)
         $recentActivity = [];
         try {
+            $actWhere = $effectiveTenantId !== null ? 'al.tenant_id = ?' : '1=1';
+            $actParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
             $recentActivity = Database::query(
-                "SELECT al.*, u.first_name, u.last_name
+                "SELECT al.*, u.first_name, u.last_name, t.name as tenant_name
                  FROM activity_logs al
                  LEFT JOIN users u ON u.id = al.user_id
-                 WHERE al.tenant_id = ? AND al.action_type IN (
+                 LEFT JOIN tenants t ON al.tenant_id = t.id
+                 WHERE {$actWhere} AND al.action_type IN (
                      'exchange_approved', 'exchange_rejected', 'message_reviewed',
                      'risk_tag_added', 'user_monitored', 'vetting_verified', 'vetting_rejected',
                      'user_banned', 'user_unbanned', 'balance_adjusted'
                  )
                  ORDER BY al.created_at DESC
                  LIMIT 20",
-                [$tenantId]
+                $actParams
             )->fetchAll();
         } catch (\Exception $e) {
             // Table may not exist
@@ -173,6 +180,7 @@ class AdminBrokerApiController extends BaseApiController
     public function exchanges(): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
@@ -180,14 +188,22 @@ class AdminBrokerApiController extends BaseApiController
         $offset = ($page - 1) * $perPage;
 
         try {
-            // Build WHERE clause
-            $where = "er.tenant_id = ?";
-            $params = [$tenantId];
+            // Build WHERE clause with tenant scoping
+            $conditions = [];
+            $params = [];
+
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
+                $conditions[] = 'er.tenant_id = ?';
+                $params[] = $effectiveTenantId;
+            }
 
             if ($status && $status !== 'all') {
-                $where .= " AND er.status = ?";
+                $conditions[] = 'er.status = ?';
                 $params[] = $status;
             }
+
+            $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
             // Get total count
             $countRow = Database::query(
@@ -196,22 +212,30 @@ class AdminBrokerApiController extends BaseApiController
             )->fetch();
             $total = (int) ($countRow['cnt'] ?? 0);
 
-            // Get paginated data
+            // Get paginated data — join tenants table for cross-tenant name display
             $queryParams = array_merge($params, [$perPage, $offset]);
             $items = Database::query(
                 "SELECT er.*,
                     CONCAT(req.first_name, ' ', req.last_name) as requester_name,
                     CONCAT(prov.first_name, ' ', prov.last_name) as provider_name,
-                    l.title as listing_title
+                    l.title as listing_title,
+                    t.name as tenant_name
                 FROM exchange_requests er
                 JOIN users req ON er.requester_id = req.id
                 JOIN users prov ON er.provider_id = prov.id
                 LEFT JOIN listings l ON er.listing_id = l.id
+                LEFT JOIN tenants t ON er.tenant_id = t.id
                 WHERE {$where}
                 ORDER BY er.created_at DESC
                 LIMIT ? OFFSET ?",
                 $queryParams
             )->fetchAll();
+
+            // Add tenant info to each item
+            foreach ($items as &$item) {
+                $item['tenant_name'] = $item['tenant_name'] ?? 'Unknown';
+            }
+            unset($item);
 
             $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
         } catch (\Exception $e) {
@@ -227,15 +251,23 @@ class AdminBrokerApiController extends BaseApiController
     public function approveExchange(int $id): void
     {
         $adminId = $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $notes = $this->input('notes', '');
 
         try {
-            // Verify the exchange belongs to this tenant and is pending broker approval
-            $exchange = Database::query(
-                "SELECT id, status FROM exchange_requests WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can approve exchanges from any tenant
+            if ($isSuperAdmin) {
+                $exchange = Database::query(
+                    "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $exchange = Database::query(
+                    "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$exchange) {
                 $this->respondWithError('NOT_FOUND', 'Exchange request not found', null, 404);
@@ -270,6 +302,7 @@ class AdminBrokerApiController extends BaseApiController
     public function rejectExchange(int $id): void
     {
         $adminId = $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $reason = $this->input('reason', '');
 
@@ -279,11 +312,18 @@ class AdminBrokerApiController extends BaseApiController
         }
 
         try {
-            // Verify the exchange belongs to this tenant and is pending broker approval
-            $exchange = Database::query(
-                "SELECT id, status FROM exchange_requests WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can reject exchanges from any tenant
+            if ($isSuperAdmin) {
+                $exchange = Database::query(
+                    "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $exchange = Database::query(
+                    "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$exchange) {
                 $this->respondWithError('NOT_FOUND', 'Exchange request not found', null, 404);
@@ -319,29 +359,46 @@ class AdminBrokerApiController extends BaseApiController
     public function riskTags(): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $riskLevel = $this->query('risk_level');
 
         try {
-            $where = "rt.tenant_id = ?";
-            $params = [$tenantId];
+            $conditions = [];
+            $params = [];
+
+            // Tenant scoping
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
+                $conditions[] = 'rt.tenant_id = ?';
+                $params[] = $effectiveTenantId;
+            }
 
             if ($riskLevel && $riskLevel !== 'all') {
-                $where .= " AND rt.risk_level = ?";
+                $conditions[] = 'rt.risk_level = ?';
                 $params[] = $riskLevel;
             }
+
+            $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
             $items = Database::query(
                 "SELECT rt.*,
                     l.title as listing_title,
-                    CONCAT(u.first_name, ' ', u.last_name) as owner_name
+                    CONCAT(u.first_name, ' ', u.last_name) as owner_name,
+                    t.name as tenant_name
                 FROM listing_risk_tags rt
                 LEFT JOIN listings l ON rt.listing_id = l.id
                 LEFT JOIN users u ON l.user_id = u.id
+                LEFT JOIN tenants t ON rt.tenant_id = t.id
                 WHERE {$where}
                 ORDER BY FIELD(rt.risk_level, 'critical', 'high', 'medium', 'low'), rt.created_at DESC",
                 $params
             )->fetchAll();
+
+            foreach ($items as &$item) {
+                $item['tenant_name'] = $item['tenant_name'] ?? 'Unknown';
+            }
+            unset($item);
 
             $this->respondWithData($items);
         } catch (\Exception $e) {
@@ -358,6 +415,7 @@ class AdminBrokerApiController extends BaseApiController
     public function messages(): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
@@ -365,16 +423,25 @@ class AdminBrokerApiController extends BaseApiController
         $offset = ($page - 1) * $perPage;
 
         try {
-            $where = "bmc.tenant_id = ?";
-            $params = [$tenantId];
+            $conditions = [];
+            $params = [];
+
+            // Tenant scoping
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
+                $conditions[] = 'bmc.tenant_id = ?';
+                $params[] = $effectiveTenantId;
+            }
 
             if ($filter === 'unreviewed') {
-                $where .= " AND bmc.reviewed_by IS NULL";
+                $conditions[] = 'bmc.reviewed_by IS NULL';
             } elseif ($filter === 'flagged') {
-                $where .= " AND bmc.flagged = 1";
+                $conditions[] = 'bmc.flagged = 1';
             } elseif ($filter === 'reviewed') {
-                $where .= " AND bmc.reviewed_by IS NOT NULL";
+                $conditions[] = 'bmc.reviewed_by IS NOT NULL';
             }
+
+            $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
             // Count
             $countRow = Database::query(
@@ -383,27 +450,31 @@ class AdminBrokerApiController extends BaseApiController
             )->fetch();
             $total = (int) ($countRow['cnt'] ?? 0);
 
-            // Paginated data
+            // Paginated data — join tenants table for cross-tenant name display
             $queryParams = array_merge($params, [$perPage, $offset]);
             $items = Database::query(
                 "SELECT bmc.*,
                     CONCAT(s.first_name, ' ', s.last_name) as sender_name,
                     CONCAT(r.first_name, ' ', r.last_name) as receiver_name,
-                    l.title as listing_title
+                    l.title as listing_title,
+                    t.name as tenant_name
                 FROM broker_message_copies bmc
                 LEFT JOIN users s ON bmc.sender_id = s.id
                 LEFT JOIN users r ON bmc.receiver_id = r.id
                 LEFT JOIN listings l ON bmc.related_listing_id = l.id
+                LEFT JOIN tenants t ON bmc.tenant_id = t.id
                 WHERE {$where}
                 ORDER BY bmc.created_at DESC
                 LIMIT ? OFFSET ?",
                 $queryParams
             )->fetchAll();
 
-            // Normalize boolean fields
+            // Normalize boolean fields and add tenant info
             foreach ($items as &$item) {
                 $item['flagged'] = (bool) ($item['flagged'] ?? false);
+                $item['tenant_name'] = $item['tenant_name'] ?? 'Unknown';
             }
+            unset($item);
 
             $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
         } catch (\Exception $e) {
@@ -419,23 +490,33 @@ class AdminBrokerApiController extends BaseApiController
     public function reviewMessage(int $id): void
     {
         $adminId = $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            // Verify the message belongs to this tenant
-            $message = Database::query(
-                "SELECT id FROM broker_message_copies WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can review messages from any tenant
+            if ($isSuperAdmin) {
+                $message = Database::query(
+                    "SELECT id, tenant_id FROM broker_message_copies WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $message = Database::query(
+                    "SELECT id, tenant_id FROM broker_message_copies WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$message) {
                 $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
                 return;
             }
 
+            // Use the record's own tenant_id for the update
+            $recordTenantId = (int) $message['tenant_id'];
             Database::query(
                 "UPDATE broker_message_copies SET reviewed_by = ?, reviewed_at = NOW() WHERE id = ? AND tenant_id = ?",
-                [$adminId, $id, $tenantId]
+                [$adminId, $id, $recordTenantId]
             );
 
             $this->respondWithData(['id' => $id, 'reviewed' => true]);
@@ -452,23 +533,40 @@ class AdminBrokerApiController extends BaseApiController
     public function monitoring(): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
+            $conditions = ['umr.under_monitoring = 1'];
+            $params = [];
+
+            // Tenant scoping
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
+                $conditions[] = 'umr.tenant_id = ?';
+                $params[] = $effectiveTenantId;
+            }
+
+            $where = implode(' AND ', $conditions);
+
             $items = Database::query(
                 "SELECT umr.*,
-                    CONCAT(u.first_name, ' ', u.last_name) as user_name
+                    CONCAT(u.first_name, ' ', u.last_name) as user_name,
+                    t.name as tenant_name
                 FROM user_messaging_restrictions umr
                 LEFT JOIN users u ON umr.user_id = u.id
-                WHERE umr.tenant_id = ? AND umr.under_monitoring = 1
+                LEFT JOIN tenants t ON umr.tenant_id = t.id
+                WHERE {$where}
                 ORDER BY umr.monitoring_started_at DESC",
-                [$tenantId]
+                $params
             )->fetchAll();
 
-            // Normalize boolean fields
+            // Normalize boolean fields and add tenant info
             foreach ($items as &$item) {
                 $item['under_monitoring'] = (bool) ($item['under_monitoring'] ?? false);
+                $item['tenant_name'] = $item['tenant_name'] ?? 'Unknown';
             }
+            unset($item);
 
             $this->respondWithData($items);
         } catch (\Exception $e) {
@@ -485,6 +583,7 @@ class AdminBrokerApiController extends BaseApiController
     public function flagMessage(int $id): void
     {
         $adminId = $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $reason = trim($this->input('reason', ''));
         $severity = $this->input('severity', 'concern');
@@ -500,19 +599,29 @@ class AdminBrokerApiController extends BaseApiController
         }
 
         try {
-            $message = Database::query(
-                "SELECT id FROM broker_message_copies WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can flag messages from any tenant
+            if ($isSuperAdmin) {
+                $message = Database::query(
+                    "SELECT id, tenant_id FROM broker_message_copies WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $message = Database::query(
+                    "SELECT id, tenant_id FROM broker_message_copies WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$message) {
                 $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
                 return;
             }
 
+            // Use the record's own tenant_id for the update
+            $recordTenantId = (int) $message['tenant_id'];
             Database::query(
                 "UPDATE broker_message_copies SET flagged = 1, flag_reason = ?, flag_severity = ?, reviewed_by = ?, reviewed_at = NOW() WHERE id = ? AND tenant_id = ?",
-                [$reason, $severity, $adminId, $id, $tenantId]
+                [$reason, $severity, $adminId, $id, $recordTenantId]
             );
 
             $this->respondWithData(['id' => $id, 'flagged' => true, 'flag_reason' => $reason, 'flag_severity' => $severity]);
@@ -530,22 +639,42 @@ class AdminBrokerApiController extends BaseApiController
     public function showMessage(int $id): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            // Load the broker copy with sender/receiver names and listing title
-            $copy = Database::query(
-                "SELECT bmc.*,
-                    CONCAT(s.first_name, ' ', s.last_name) as sender_name,
-                    CONCAT(r.first_name, ' ', r.last_name) as receiver_name,
-                    l.title as listing_title
-                FROM broker_message_copies bmc
-                LEFT JOIN users s ON bmc.sender_id = s.id
-                LEFT JOIN users r ON bmc.receiver_id = r.id
-                LEFT JOIN listings l ON bmc.related_listing_id = l.id
-                WHERE bmc.id = ? AND bmc.tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can view messages from any tenant
+            if ($isSuperAdmin) {
+                $copy = Database::query(
+                    "SELECT bmc.*,
+                        CONCAT(s.first_name, ' ', s.last_name) as sender_name,
+                        CONCAT(r.first_name, ' ', r.last_name) as receiver_name,
+                        l.title as listing_title,
+                        t.name as tenant_name
+                    FROM broker_message_copies bmc
+                    LEFT JOIN users s ON bmc.sender_id = s.id
+                    LEFT JOIN users r ON bmc.receiver_id = r.id
+                    LEFT JOIN listings l ON bmc.related_listing_id = l.id
+                    LEFT JOIN tenants t ON bmc.tenant_id = t.id
+                    WHERE bmc.id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $copy = Database::query(
+                    "SELECT bmc.*,
+                        CONCAT(s.first_name, ' ', s.last_name) as sender_name,
+                        CONCAT(r.first_name, ' ', r.last_name) as receiver_name,
+                        l.title as listing_title,
+                        t.name as tenant_name
+                    FROM broker_message_copies bmc
+                    LEFT JOIN users s ON bmc.sender_id = s.id
+                    LEFT JOIN users r ON bmc.receiver_id = r.id
+                    LEFT JOIN listings l ON bmc.related_listing_id = l.id
+                    LEFT JOIN tenants t ON bmc.tenant_id = t.id
+                    WHERE bmc.id = ? AND bmc.tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$copy) {
                 $this->respondWithError('NOT_FOUND', 'Broker message copy not found', null, 404);
@@ -553,8 +682,10 @@ class AdminBrokerApiController extends BaseApiController
             }
 
             $copy['flagged'] = (bool) ($copy['flagged'] ?? false);
+            $copy['tenant_name'] = $copy['tenant_name'] ?? 'Unknown';
+            $copyTenantId = (int) $copy['tenant_id'];
 
-            // Load full conversation thread between sender and receiver
+            // Load full conversation thread between sender and receiver — use the copy's own tenant_id
             $thread = Database::query(
                 "SELECT m.id, m.sender_id, m.receiver_id, m.body, m.created_at, m.is_deleted,
                     CONCAT(u.first_name, ' ', u.last_name) as sender_name
@@ -564,7 +695,7 @@ class AdminBrokerApiController extends BaseApiController
                   AND ((m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?))
                 ORDER BY m.created_at ASC
                 LIMIT 200",
-                [$tenantId, $copy['sender_id'], $copy['receiver_id'], $copy['receiver_id'], $copy['sender_id']]
+                [$copyTenantId, $copy['sender_id'], $copy['receiver_id'], $copy['receiver_id'], $copy['sender_id']]
             )->fetchAll();
 
             // Redact deleted messages
@@ -575,14 +706,14 @@ class AdminBrokerApiController extends BaseApiController
             }
             unset($msg);
 
-            // If copy has an archive, load it
+            // If copy has an archive, load it — use the copy's own tenant_id
             $archive = null;
             if (!empty($copy['archive_id'])) {
                 $archive = Database::query(
                     "SELECT id, decision, decision_notes, decided_by_name, decided_at, flag_reason, flag_severity
                     FROM broker_review_archives
                     WHERE id = ? AND tenant_id = ?",
-                    [$copy['archive_id'], $tenantId]
+                    [$copy['archive_id'], $copyTenantId]
                 )->fetch() ?: null;
             }
 
@@ -606,28 +737,47 @@ class AdminBrokerApiController extends BaseApiController
     public function approveMessage(int $id): void
     {
         $adminId = $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $notes = trim($this->input('notes', ''));
 
         try {
-            // Load the broker copy with sender/receiver names and listing title
-            $copy = Database::query(
-                "SELECT bmc.*,
-                    CONCAT(s.first_name, ' ', s.last_name) as sender_name,
-                    CONCAT(r.first_name, ' ', r.last_name) as receiver_name,
-                    l.title as listing_title
-                FROM broker_message_copies bmc
-                LEFT JOIN users s ON bmc.sender_id = s.id
-                LEFT JOIN users r ON bmc.receiver_id = r.id
-                LEFT JOIN listings l ON bmc.related_listing_id = l.id
-                WHERE bmc.id = ? AND bmc.tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can approve messages from any tenant
+            if ($isSuperAdmin) {
+                $copy = Database::query(
+                    "SELECT bmc.*,
+                        CONCAT(s.first_name, ' ', s.last_name) as sender_name,
+                        CONCAT(r.first_name, ' ', r.last_name) as receiver_name,
+                        l.title as listing_title
+                    FROM broker_message_copies bmc
+                    LEFT JOIN users s ON bmc.sender_id = s.id
+                    LEFT JOIN users r ON bmc.receiver_id = r.id
+                    LEFT JOIN listings l ON bmc.related_listing_id = l.id
+                    WHERE bmc.id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $copy = Database::query(
+                    "SELECT bmc.*,
+                        CONCAT(s.first_name, ' ', s.last_name) as sender_name,
+                        CONCAT(r.first_name, ' ', r.last_name) as receiver_name,
+                        l.title as listing_title
+                    FROM broker_message_copies bmc
+                    LEFT JOIN users s ON bmc.sender_id = s.id
+                    LEFT JOIN users r ON bmc.receiver_id = r.id
+                    LEFT JOIN listings l ON bmc.related_listing_id = l.id
+                    WHERE bmc.id = ? AND bmc.tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$copy) {
                 $this->respondWithError('NOT_FOUND', 'Broker message copy not found', null, 404);
                 return;
             }
+
+            // Use the record's own tenant_id for all writes
+            $copyTenantId = (int) $copy['tenant_id'];
 
             // Prevent double-archiving
             if (!empty($copy['archive_id'])) {
@@ -642,7 +792,7 @@ class AdminBrokerApiController extends BaseApiController
             )->fetch();
             $adminName = $adminRow['name'] ?? 'Unknown';
 
-            // Snapshot the full conversation between sender and receiver
+            // Snapshot the full conversation between sender and receiver — use the copy's own tenant_id
             $conversationRows = Database::query(
                 "SELECT m.id, m.sender_id, m.body, m.created_at, m.is_deleted,
                     CONCAT(u.first_name, ' ', u.last_name) as sender_name
@@ -652,7 +802,7 @@ class AdminBrokerApiController extends BaseApiController
                   AND ((m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?))
                 ORDER BY m.created_at ASC
                 LIMIT 500",
-                [$tenantId, $copy['sender_id'], $copy['receiver_id'], $copy['receiver_id'], $copy['sender_id']]
+                [$copyTenantId, $copy['sender_id'], $copy['receiver_id'], $copy['receiver_id'], $copy['sender_id']]
             )->fetchAll();
 
             // Redact deleted messages in snapshot
@@ -669,7 +819,7 @@ class AdminBrokerApiController extends BaseApiController
             // Determine decision based on flag status
             $decision = !empty($copy['flagged']) ? 'flagged' : 'approved';
 
-            // INSERT the immutable archive record
+            // INSERT the immutable archive record — use the copy's own tenant_id
             Database::query(
                 "INSERT INTO broker_review_archives
                     (tenant_id, broker_copy_id, sender_id, sender_name, receiver_id, receiver_name,
@@ -678,7 +828,7 @@ class AdminBrokerApiController extends BaseApiController
                      decided_at, flag_reason, flag_severity, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW())",
                 [
-                    $tenantId,
+                    $copyTenantId,
                     $id,
                     $copy['sender_id'],
                     $copy['sender_name'] ?? '',
@@ -701,7 +851,7 @@ class AdminBrokerApiController extends BaseApiController
 
             $archiveId = Database::lastInsertId();
 
-            // Update the broker copy: link to archive, set reviewed if not already
+            // Update the broker copy: link to archive, set reviewed if not already — use the copy's own tenant_id
             Database::query(
                 "UPDATE broker_message_copies
                  SET archived_at = NOW(),
@@ -709,7 +859,7 @@ class AdminBrokerApiController extends BaseApiController
                      reviewed_by = COALESCE(reviewed_by, ?),
                      reviewed_at = COALESCE(reviewed_at, NOW())
                  WHERE id = ? AND tenant_id = ?",
-                [$archiveId, $adminId, $id, $tenantId]
+                [$archiveId, $adminId, $id, $copyTenantId]
             );
 
             $this->respondWithData([
@@ -732,6 +882,7 @@ class AdminBrokerApiController extends BaseApiController
     public function archives(): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $page = $this->queryInt('page', 1, 1);
@@ -743,49 +894,65 @@ class AdminBrokerApiController extends BaseApiController
         $offset = ($page - 1) * $perPage;
 
         try {
-            $where = "tenant_id = ?";
-            $params = [$tenantId];
+            $conditions = [];
+            $params = [];
+
+            // Tenant scoping
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
+                $conditions[] = 'bra.tenant_id = ?';
+                $params[] = $effectiveTenantId;
+            }
 
             if ($decision && $decision !== 'all') {
-                $where .= " AND decision = ?";
+                $conditions[] = 'bra.decision = ?';
                 $params[] = $decision;
             }
 
             if ($search) {
-                $where .= " AND (sender_name LIKE ? OR receiver_name LIKE ?)";
+                $conditions[] = '(bra.sender_name LIKE ? OR bra.receiver_name LIKE ?)';
                 $params[] = "%{$search}%";
                 $params[] = "%{$search}%";
             }
 
             if ($from) {
-                $where .= " AND decided_at >= ?";
+                $conditions[] = 'bra.decided_at >= ?';
                 $params[] = $from;
             }
 
             if ($to) {
-                $where .= " AND decided_at <= ?";
+                $conditions[] = 'bra.decided_at <= ?';
                 $params[] = $to . ' 23:59:59';
             }
 
+            $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
+
             // Count total
             $countRow = Database::query(
-                "SELECT COUNT(*) as cnt FROM broker_review_archives WHERE {$where}",
+                "SELECT COUNT(*) as cnt FROM broker_review_archives bra WHERE {$where}",
                 $params
             )->fetch();
             $total = (int) ($countRow['cnt'] ?? 0);
 
-            // Paginated data (exclude large conversation_snapshot from list view)
+            // Paginated data (exclude large conversation_snapshot from list view) — join tenants for name
             $queryParams = array_merge($params, [$perPage, $offset]);
             $items = Database::query(
-                "SELECT id, tenant_id, broker_copy_id, sender_id, sender_name, receiver_id, receiver_name,
-                    related_listing_id, listing_title, copy_reason, decision, decision_notes,
-                    decided_by, decided_by_name, decided_at, flag_reason, flag_severity, created_at
-                FROM broker_review_archives
+                "SELECT bra.id, bra.tenant_id, bra.broker_copy_id, bra.sender_id, bra.sender_name, bra.receiver_id, bra.receiver_name,
+                    bra.related_listing_id, bra.listing_title, bra.copy_reason, bra.decision, bra.decision_notes,
+                    bra.decided_by, bra.decided_by_name, bra.decided_at, bra.flag_reason, bra.flag_severity, bra.created_at,
+                    t.name as tenant_name
+                FROM broker_review_archives bra
+                LEFT JOIN tenants t ON bra.tenant_id = t.id
                 WHERE {$where}
-                ORDER BY decided_at DESC
+                ORDER BY bra.decided_at DESC
                 LIMIT ? OFFSET ?",
                 $queryParams
             )->fetchAll();
+
+            foreach ($items as &$item) {
+                $item['tenant_name'] = $item['tenant_name'] ?? 'Unknown';
+            }
+            unset($item);
 
             $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
         } catch (\Exception $e) {
@@ -802,18 +969,35 @@ class AdminBrokerApiController extends BaseApiController
     public function showArchive(int $id): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $archive = Database::query(
-                "SELECT * FROM broker_review_archives WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can view archives from any tenant
+            if ($isSuperAdmin) {
+                $archive = Database::query(
+                    "SELECT bra.*, t.name as tenant_name
+                     FROM broker_review_archives bra
+                     LEFT JOIN tenants t ON bra.tenant_id = t.id
+                     WHERE bra.id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $archive = Database::query(
+                    "SELECT bra.*, t.name as tenant_name
+                     FROM broker_review_archives bra
+                     LEFT JOIN tenants t ON bra.tenant_id = t.id
+                     WHERE bra.id = ? AND bra.tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$archive) {
                 $this->respondWithError('NOT_FOUND', 'Archive not found', null, 404);
                 return;
             }
+
+            $archive['tenant_name'] = $archive['tenant_name'] ?? 'Unknown';
 
             // Decode the conversation snapshot from JSON
             if (!empty($archive['conversation_snapshot'])) {
@@ -838,27 +1022,38 @@ class AdminBrokerApiController extends BaseApiController
     public function setMonitoring(int $userId): void
     {
         $adminId = $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $underMonitoring = (bool) $this->input('under_monitoring', true);
         $reason = trim($this->input('reason', ''));
         $messagingDisabled = (bool) $this->input('messaging_disabled', false);
 
         try {
-            // Verify user belongs to this tenant
-            $user = Database::query(
-                "SELECT id FROM users WHERE id = ? AND tenant_id = ?",
-                [$userId, $tenantId]
-            )->fetch();
+            // Super admins can manage monitoring for users from any tenant
+            if ($isSuperAdmin) {
+                $user = Database::query(
+                    "SELECT id, tenant_id FROM users WHERE id = ?",
+                    [$userId]
+                )->fetch();
+            } else {
+                $user = Database::query(
+                    "SELECT id, tenant_id FROM users WHERE id = ? AND tenant_id = ?",
+                    [$userId, $tenantId]
+                )->fetch();
+            }
 
             if (!$user) {
                 $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
                 return;
             }
 
+            // Use the user's own tenant_id for all writes
+            $userTenantId = (int) $user['tenant_id'];
+
             // Check if record already exists
             $existing = Database::query(
                 "SELECT id FROM user_messaging_restrictions WHERE user_id = ? AND tenant_id = ?",
-                [$userId, $tenantId]
+                [$userId, $userTenantId]
             )->fetch();
 
             if ($underMonitoring) {
@@ -870,12 +1065,12 @@ class AdminBrokerApiController extends BaseApiController
                 if ($existing) {
                     Database::query(
                         "UPDATE user_messaging_restrictions SET under_monitoring = 1, monitoring_reason = ?, messaging_disabled = ?, monitoring_started_at = NOW(), restricted_by = ? WHERE user_id = ? AND tenant_id = ?",
-                        [$reason, $messagingDisabled ? 1 : 0, $adminId, $userId, $tenantId]
+                        [$reason, $messagingDisabled ? 1 : 0, $adminId, $userId, $userTenantId]
                     );
                 } else {
                     Database::query(
                         "INSERT INTO user_messaging_restrictions (user_id, tenant_id, under_monitoring, monitoring_reason, messaging_disabled, monitoring_started_at, restricted_by) VALUES (?, ?, 1, ?, ?, NOW(), ?)",
-                        [$userId, $tenantId, $reason, $messagingDisabled ? 1 : 0, $adminId]
+                        [$userId, $userTenantId, $reason, $messagingDisabled ? 1 : 0, $adminId]
                     );
                 }
                 $this->respondWithData(['user_id' => $userId, 'under_monitoring' => true]);
@@ -883,7 +1078,7 @@ class AdminBrokerApiController extends BaseApiController
                 if ($existing) {
                     Database::query(
                         "UPDATE user_messaging_restrictions SET under_monitoring = 0, monitoring_reason = NULL, monitoring_started_at = NULL WHERE user_id = ? AND tenant_id = ?",
-                        [$userId, $tenantId]
+                        [$userId, $userTenantId]
                     );
                 }
                 $this->respondWithData(['user_id' => $userId, 'under_monitoring' => false]);
@@ -902,6 +1097,7 @@ class AdminBrokerApiController extends BaseApiController
     public function saveRiskTag(int $listingId): void
     {
         $adminId = $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $riskLevel = $this->input('risk_level', 'low');
@@ -924,33 +1120,43 @@ class AdminBrokerApiController extends BaseApiController
         }
 
         try {
-            // Verify listing belongs to this tenant
-            $listing = Database::query(
-                "SELECT id FROM listings WHERE id = ? AND tenant_id = ?",
-                [$listingId, $tenantId]
-            )->fetch();
+            // Super admins can tag listings from any tenant
+            if ($isSuperAdmin) {
+                $listing = Database::query(
+                    "SELECT id, tenant_id FROM listings WHERE id = ?",
+                    [$listingId]
+                )->fetch();
+            } else {
+                $listing = Database::query(
+                    "SELECT id, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
+                    [$listingId, $tenantId]
+                )->fetch();
+            }
 
             if (!$listing) {
                 $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
                 return;
             }
 
+            // Use the listing's own tenant_id for all writes
+            $listingTenantId = (int) $listing['tenant_id'];
+
             // Upsert
             $existing = Database::query(
                 "SELECT id FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
-                [$listingId, $tenantId]
+                [$listingId, $listingTenantId]
             )->fetch();
 
             if ($existing) {
                 Database::query(
                     "UPDATE listing_risk_tags SET risk_level = ?, risk_category = ?, risk_notes = ?, member_visible_notes = ?, requires_approval = ?, insurance_required = ?, dbs_required = ?, tagged_by = ?, updated_at = NOW() WHERE listing_id = ? AND tenant_id = ?",
-                    [$riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId, $listingId, $tenantId]
+                    [$riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId, $listingId, $listingTenantId]
                 );
                 $tagId = $existing['id'];
             } else {
                 Database::query(
                     "INSERT INTO listing_risk_tags (listing_id, tenant_id, risk_level, risk_category, risk_notes, member_visible_notes, requires_approval, insurance_required, dbs_required, tagged_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
-                    [$listingId, $tenantId, $riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId]
+                    [$listingId, $listingTenantId, $riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId]
                 );
                 $tagId = Database::lastInsertId();
             }
@@ -969,22 +1175,33 @@ class AdminBrokerApiController extends BaseApiController
     public function removeRiskTag(int $listingId): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $existing = Database::query(
-                "SELECT id FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
-                [$listingId, $tenantId]
-            )->fetch();
+            // Super admins can remove risk tags from any tenant
+            if ($isSuperAdmin) {
+                $existing = Database::query(
+                    "SELECT id, tenant_id FROM listing_risk_tags WHERE listing_id = ?",
+                    [$listingId]
+                )->fetch();
+            } else {
+                $existing = Database::query(
+                    "SELECT id, tenant_id FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
+                    [$listingId, $tenantId]
+                )->fetch();
+            }
 
             if (!$existing) {
                 $this->respondWithError('NOT_FOUND', 'Risk tag not found', null, 404);
                 return;
             }
 
+            // Use the record's own tenant_id for the delete
+            $recordTenantId = (int) $existing['tenant_id'];
             Database::query(
                 "DELETE FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
-                [$listingId, $tenantId]
+                [$listingId, $recordTenantId]
             );
 
             $this->respondWithData(['listing_id' => $listingId, 'removed' => true]);
@@ -1002,7 +1219,9 @@ class AdminBrokerApiController extends BaseApiController
     public function getConfiguration(): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
 
         $defaults = [
             // Messaging
@@ -1044,10 +1263,37 @@ class AdminBrokerApiController extends BaseApiController
             'insurance_expiry_warning_days' => 30,
         ];
 
+        // Determine which tenant's config to load
+        $scopeTenantId = $effectiveTenantId ?? $tenantId;
+
         try {
+            // Super admin with explicit ?tenant_id=all: show all tenant configs
+            if ($effectiveTenantId === null) {
+                $rows = Database::query(
+                    "SELECT ts.tenant_id, ts.setting_value, t.name as tenant_name
+                     FROM tenant_settings ts
+                     LEFT JOIN tenants t ON ts.tenant_id = t.id
+                     WHERE ts.setting_key = 'broker_config'
+                     ORDER BY t.name ASC"
+                )->fetchAll();
+
+                $allConfigs = [];
+                foreach ($rows as $r) {
+                    $saved = json_decode($r['setting_value'], true) ?? [];
+                    $allConfigs[] = [
+                        'tenant_id' => (int) $r['tenant_id'],
+                        'tenant_name' => $r['tenant_name'] ?? 'Unknown',
+                        'config' => array_merge($defaults, $saved),
+                    ];
+                }
+
+                $this->respondWithData($allConfigs);
+                return;
+            }
+
             $row = Database::query(
                 "SELECT setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'broker_config'",
-                [$tenantId]
+                [$scopeTenantId]
             )->fetch();
 
             $config = $defaults;
@@ -1071,9 +1317,16 @@ class AdminBrokerApiController extends BaseApiController
     public function saveConfiguration(): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $body = $this->getJsonInput();
+
+        // Super admin can specify which tenant to configure
+        $targetTenantId = $tenantId;
+        if ($isSuperAdmin && !empty($body['tenant_id'])) {
+            $targetTenantId = (int) $body['tenant_id'];
+        }
 
         // Whitelist allowed keys
         $allowedKeys = [
@@ -1102,19 +1355,19 @@ class AdminBrokerApiController extends BaseApiController
         try {
             $existing = Database::query(
                 "SELECT id FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'broker_config'",
-                [$tenantId]
+                [$targetTenantId]
             )->fetch();
 
             $json = json_encode($config);
             if ($existing) {
                 Database::query(
                     "UPDATE tenant_settings SET setting_value = ?, updated_at = NOW() WHERE tenant_id = ? AND setting_key = 'broker_config'",
-                    [$json, $tenantId]
+                    [$json, $targetTenantId]
                 );
             } else {
                 Database::query(
                     "INSERT INTO tenant_settings (tenant_id, setting_key, setting_value, created_at, updated_at) VALUES (?, 'broker_config', ?, NOW(), NOW())",
-                    [$tenantId, $json]
+                    [$targetTenantId, $json]
                 );
             }
 
@@ -1132,32 +1385,62 @@ class AdminBrokerApiController extends BaseApiController
     public function showExchange(int $id): void
     {
         $this->requireBrokerAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $exchange = Database::query(
-                "SELECT er.*,
-                    CONCAT(req.first_name, ' ', req.last_name) as requester_name,
-                    req.email as requester_email,
-                    req.avatar as requester_avatar,
-                    CONCAT(prov.first_name, ' ', prov.last_name) as provider_name,
-                    prov.email as provider_email,
-                    prov.avatar as provider_avatar,
-                    l.title as listing_title,
-                    l.listing_type,
-                    l.hours_offered
-                FROM exchange_requests er
-                JOIN users req ON er.requester_id = req.id
-                JOIN users prov ON er.provider_id = prov.id
-                LEFT JOIN listings l ON er.listing_id = l.id
-                WHERE er.id = ? AND er.tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can view exchanges from any tenant
+            if ($isSuperAdmin) {
+                $exchange = Database::query(
+                    "SELECT er.*,
+                        CONCAT(req.first_name, ' ', req.last_name) as requester_name,
+                        req.email as requester_email,
+                        req.avatar as requester_avatar,
+                        CONCAT(prov.first_name, ' ', prov.last_name) as provider_name,
+                        prov.email as provider_email,
+                        prov.avatar as provider_avatar,
+                        l.title as listing_title,
+                        l.listing_type,
+                        l.hours_offered,
+                        t.name as tenant_name
+                    FROM exchange_requests er
+                    JOIN users req ON er.requester_id = req.id
+                    JOIN users prov ON er.provider_id = prov.id
+                    LEFT JOIN listings l ON er.listing_id = l.id
+                    LEFT JOIN tenants t ON er.tenant_id = t.id
+                    WHERE er.id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $exchange = Database::query(
+                    "SELECT er.*,
+                        CONCAT(req.first_name, ' ', req.last_name) as requester_name,
+                        req.email as requester_email,
+                        req.avatar as requester_avatar,
+                        CONCAT(prov.first_name, ' ', prov.last_name) as provider_name,
+                        prov.email as provider_email,
+                        prov.avatar as provider_avatar,
+                        l.title as listing_title,
+                        l.listing_type,
+                        l.hours_offered,
+                        t.name as tenant_name
+                    FROM exchange_requests er
+                    JOIN users req ON er.requester_id = req.id
+                    JOIN users prov ON er.provider_id = prov.id
+                    LEFT JOIN listings l ON er.listing_id = l.id
+                    LEFT JOIN tenants t ON er.tenant_id = t.id
+                    WHERE er.id = ? AND er.tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$exchange) {
                 $this->respondWithError('NOT_FOUND', 'Exchange request not found', null, 404);
                 return;
             }
+
+            $exchange['tenant_name'] = $exchange['tenant_name'] ?? 'Unknown';
+            $exchangeTenantId = (int) $exchange['tenant_id'];
 
             // Fetch history/timeline
             $history = [];
@@ -1175,13 +1458,13 @@ class AdminBrokerApiController extends BaseApiController
                 // exchange_history table may not exist
             }
 
-            // Risk tag for the listing
+            // Risk tag for the listing — use the exchange's own tenant_id
             $riskTag = null;
             if (!empty($exchange['listing_id'])) {
                 try {
                     $riskTag = Database::query(
                         "SELECT * FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
-                        [$exchange['listing_id'], $tenantId]
+                        [$exchange['listing_id'], $exchangeTenantId]
                     )->fetch() ?: null;
                 } catch (\Exception $e) {}
             }

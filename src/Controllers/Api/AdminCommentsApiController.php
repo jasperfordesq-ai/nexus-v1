@@ -15,6 +15,7 @@ use Nexus\Models\ActivityLog;
  *
  * Moderate comments across all content types.
  * All endpoints require admin authentication.
+ * Super admins can operate across all tenants.
  *
  * Schema notes:
  * - Uses target_type/target_id (NOT content_type/content_id)
@@ -34,11 +35,12 @@ class AdminCommentsApiController extends BaseApiController
     /**
      * GET /api/v2/admin/comments
      *
-     * Query params: page, limit, target_type, search
+     * Query params: page, limit, target_type, search, tenant_id (super admin only)
      */
     public function index(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -47,8 +49,15 @@ class AdminCommentsApiController extends BaseApiController
         $targetType = $_GET['target_type'] ?? null;
         $search = $_GET['search'] ?? null;
 
-        $conditions = ['c.tenant_id = ?'];
-        $params = [$tenantId];
+        $conditions = [];
+        $params = [];
+
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        if ($effectiveTenantId !== null) {
+            $conditions[] = 'c.tenant_id = ?';
+            $params[] = $effectiveTenantId;
+        }
 
         // Target type filter
         if ($targetType) {
@@ -64,7 +73,7 @@ class AdminCommentsApiController extends BaseApiController
             $params[] = $searchPattern;
         }
 
-        $where = implode(' AND ', $conditions);
+        $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
         // Get total count
         $countQuery = "SELECT COUNT(*) as total
@@ -74,12 +83,14 @@ class AdminCommentsApiController extends BaseApiController
         $countStmt = Database::query($countQuery, $params);
         $total = (int) $countStmt->fetch()['total'];
 
-        // Get paginated results
+        // Get paginated results — join tenants table for cross-tenant name display
         $query = "SELECT c.*,
                          u.name as user_name,
-                         u.avatar_url as user_avatar
+                         u.avatar_url as user_avatar,
+                         t.name as tenant_name
                   FROM comments c
                   LEFT JOIN users u ON c.user_id = u.id
+                  LEFT JOIN tenants t ON c.tenant_id = t.id
                   WHERE {$where}
                   ORDER BY c.created_at DESC
                   LIMIT ? OFFSET ?";
@@ -94,6 +105,8 @@ class AdminCommentsApiController extends BaseApiController
             return [
                 'id' => (int) $comment['id'],
                 'user_id' => (int) $comment['user_id'],
+                'tenant_id' => (int) $comment['tenant_id'],
+                'tenant_name' => $comment['tenant_name'] ?? 'Unknown',
                 'user_name' => $comment['user_name'] ?? 'Unknown',
                 'user_avatar' => $comment['user_avatar'],
                 'target_type' => $comment['target_type'],
@@ -114,17 +127,24 @@ class AdminCommentsApiController extends BaseApiController
     public function show(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
+
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'AND c.tenant_id = ?' : '';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         $query = "SELECT c.*,
                          u.name as user_name,
                          u.email as user_email,
-                         u.avatar_url as user_avatar
+                         u.avatar_url as user_avatar,
+                         t.name as tenant_name
                   FROM comments c
                   LEFT JOIN users u ON c.user_id = u.id
-                  WHERE c.id = ? AND c.tenant_id = ?";
-
-        $stmt = Database::query($query, [$id, $tenantId]);
+                  LEFT JOIN tenants t ON c.tenant_id = t.id
+                  WHERE c.id = ? {$tenantWhere}";
+        $stmt = Database::query($query, array_merge([$id], $tenantParams));
         $comment = $stmt->fetch();
 
         if (!$comment) {
@@ -135,6 +155,8 @@ class AdminCommentsApiController extends BaseApiController
         $formatted = [
             'id' => (int) $comment['id'],
             'user_id' => (int) $comment['user_id'],
+            'tenant_id' => (int) $comment['tenant_id'],
+            'tenant_name' => $comment['tenant_name'] ?? 'Unknown',
             'user_name' => $comment['user_name'] ?? 'Unknown',
             'user_email' => $comment['user_email'],
             'user_avatar' => $comment['user_avatar'],
@@ -156,13 +178,18 @@ class AdminCommentsApiController extends BaseApiController
     public function hide(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Verify comment exists
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'AND tenant_id = ?' : '';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+
         $stmt = Database::query(
-            "SELECT id, target_type, target_id FROM comments WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            "SELECT id, target_type, target_id, tenant_id FROM comments WHERE id = ? {$tenantWhere}",
+            array_merge([$id], $tenantParams)
         );
         $comment = $stmt->fetch();
 
@@ -171,18 +198,21 @@ class AdminCommentsApiController extends BaseApiController
             return;
         }
 
+        // Use the comment's own tenant_id for the feed_hidden record
+        $commentTenantId = (int) $comment['tenant_id'];
+
         // Insert into feed_hidden table with target_type='comment'
         Database::query(
             "INSERT IGNORE INTO feed_hidden (user_id, tenant_id, target_type, target_id, created_at)
              VALUES (?, ?, 'comment', ?, NOW())",
-            [$adminId, $tenantId, $id]
+            [$adminId, $commentTenantId, $id]
         );
 
         // Log activity
         ActivityLog::log(
             $adminId,
             'hide_comment',
-            "Hidden comment #{$id} on {$comment['target_type']} #{$comment['target_id']}"
+            "Hidden comment #{$id} on {$comment['target_type']} #{$comment['target_id']}" . ($isSuperAdmin ? " (tenant {$commentTenantId})" : '')
         );
 
         $this->respondWithData(['success' => true, 'message' => 'Comment hidden']);
@@ -194,13 +224,18 @@ class AdminCommentsApiController extends BaseApiController
     public function destroy(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Verify comment exists
+        // Tenant scoping: defaults to current tenant, super admins can pass ?tenant_id=all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantWhere = $effectiveTenantId !== null ? 'AND tenant_id = ?' : '';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+
         $stmt = Database::query(
-            "SELECT id, target_type, user_id FROM comments WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            "SELECT id, target_type, target_id, user_id, tenant_id FROM comments WHERE id = ? {$tenantWhere}",
+            array_merge([$id], $tenantParams)
         );
         $comment = $stmt->fetch();
 
@@ -209,17 +244,25 @@ class AdminCommentsApiController extends BaseApiController
             return;
         }
 
-        // Delete comment (and child comments due to CASCADE)
+        $commentTenantId = (int) $comment['tenant_id'];
+
+        // Delete comment (and child comments due to CASCADE) using the comment's own tenant_id for safety
         Database::query(
             "DELETE FROM comments WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $commentTenantId]
+        );
+
+        // Also clean up any feed_hidden records for this comment
+        Database::query(
+            "DELETE FROM feed_hidden WHERE target_type = 'comment' AND target_id = ? AND tenant_id = ?",
+            [$id, $commentTenantId]
         );
 
         // Log activity
         ActivityLog::log(
             $adminId,
             'delete_comment',
-            "Deleted comment #{$id} on {$comment['target_type']} #{$comment['target_id']}"
+            "Deleted comment #{$id} on {$comment['target_type']} #{$comment['target_id']}" . ($isSuperAdmin ? " (tenant {$commentTenantId})" : '')
         );
 
         $this->respondWithData(['success' => true, 'message' => 'Comment deleted']);

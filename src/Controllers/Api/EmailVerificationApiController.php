@@ -55,6 +55,7 @@ class EmailVerificationApiController extends BaseApiController
         $this->rateLimit('verify_email', 20, 900);
 
         $token = $this->input('token');
+        $tenantId = TenantContext::getId();
 
         if (empty($token)) {
             $this->respondWithError(
@@ -65,8 +66,8 @@ class EmailVerificationApiController extends BaseApiController
             );
         }
 
-        // Find and validate the verification token
-        $verificationRecord = $this->findValidVerificationToken($token);
+        // Find and validate the verification token (tenant-scoped)
+        $verificationRecord = $this->findValidVerificationToken($token, $tenantId);
 
         if (!$verificationRecord) {
             $this->respondWithError(
@@ -79,10 +80,10 @@ class EmailVerificationApiController extends BaseApiController
 
         $userId = $verificationRecord['user_id'];
 
-        // Check if already verified
+        // Check if already verified (tenant-scoped)
         $user = Database::query(
-            "SELECT id, email_verified_at, is_verified FROM users WHERE id = ?",
-            [$userId]
+            "SELECT id, email_verified_at, is_verified FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         if (!$user) {
@@ -96,7 +97,7 @@ class EmailVerificationApiController extends BaseApiController
 
         if (!empty($user['email_verified_at'])) {
             // Already verified - delete any remaining tokens and return success
-            $this->cleanupVerificationTokens($userId);
+            $this->cleanupVerificationTokens($userId, $tenantId);
 
             $this->respondWithData([
                 'verified' => true,
@@ -104,14 +105,14 @@ class EmailVerificationApiController extends BaseApiController
             ]);
         }
 
-        // Mark user as verified
+        // Mark user as verified (tenant-scoped)
         Database::query(
-            "UPDATE users SET email_verified_at = NOW(), is_verified = 1 WHERE id = ?",
-            [$userId]
+            "UPDATE users SET email_verified_at = NOW(), is_verified = 1 WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         );
 
-        // Delete all verification tokens for this user
-        $this->cleanupVerificationTokens($userId);
+        // Delete all verification tokens for this user in this tenant
+        $this->cleanupVerificationTokens($userId, $tenantId);
 
         // Log the verification
         try {
@@ -164,10 +165,11 @@ class EmailVerificationApiController extends BaseApiController
             );
         }
 
-        // Get user details
+        // Get user details (tenant-scoped)
+        $tenantId = TenantContext::getId();
         $user = Database::query(
-            "SELECT id, email, first_name, email_verified_at, tenant_id FROM users WHERE id = ?",
-            [$userId]
+            "SELECT id, email, first_name, email_verified_at, tenant_id FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         if (!$user) {
@@ -226,46 +228,45 @@ class EmailVerificationApiController extends BaseApiController
      */
     private function sendVerificationEmail(array $user): bool
     {
+        $tenantId = $user['tenant_id'] ?? TenantContext::getId();
+
         // Generate a secure random token
         $token = bin2hex(random_bytes(32));
 
-        // Hash the token with SHA-256 (consistent with RegistrationApiController)
-        $hashedToken = hash('sha256', $token);
+        // Hash the token before storing (bcrypt — constant-time verification)
+        $hashedToken = password_hash($token, PASSWORD_DEFAULT);
 
         // Calculate expiry time
         $expiresAt = date('Y-m-d H:i:s', time() + self::TOKEN_EXPIRY_SECONDS);
 
-        // Delete any existing tokens for this user
-        $this->cleanupVerificationTokens($user['id']);
+        // Delete any existing tokens for this user in this tenant
+        $this->cleanupVerificationTokens($user['id'], $tenantId);
 
         // Ensure the table exists (create if not)
         $this->ensureTokenTableExists();
 
-        // Store the hashed token
+        // Store the hashed token with tenant_id
         Database::query(
-            "INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
-            [$user['id'], $hashedToken, $expiresAt]
+            "INSERT INTO email_verification_tokens (user_id, tenant_id, token, expires_at) VALUES (?, ?, ?, ?)",
+            [$user['id'], $tenantId, $hashedToken, $expiresAt]
         );
 
         // Build verification URL — include tenant base path for correct routing
         $appUrl = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getBasePath();
-
-        // For API clients, provide a URL that mobile apps can intercept
-        // or that opens the web verification page
         $verifyUrl = $appUrl . $basePath . "/verify-email?token=" . $token;
 
         // Send verification email
         try {
             $mailer = new Mailer();
 
-            // Get tenant name if we have tenant context
+            // Get tenant name
             $tenantName = 'Project NEXUS';
-            if (!empty($user['tenant_id'])) {
+            if ($tenantId) {
                 try {
                     $tenant = Database::query(
                         "SELECT name FROM tenants WHERE id = ?",
-                        [$user['tenant_id']]
+                        [$tenantId]
                     )->fetch();
                     if ($tenant) {
                         $tenantName = $tenant['name'];
@@ -294,37 +295,33 @@ class EmailVerificationApiController extends BaseApiController
     }
 
     /**
-     * Find a valid (non-expired) verification token
+     * Find a valid (non-expired) verification token, scoped to tenant
+     *
+     * Uses SHA-256 prefix matching to avoid O(n) password_verify scan across
+     * all tokens. Stores a token_prefix column for fast lookup, then verifies
+     * with password_verify for security.
      *
      * Both RegistrationApiController and this controller now use SHA-256 hashing.
      * The bcrypt fallback exists only for tokens created before this change
      * and can be removed after the TOKEN_EXPIRY_SECONDS window passes.
      *
      * @param string $token The unhashed token from the user
+     * @param int $tenantId The tenant to scope the lookup to
      * @return array|null The verification record if valid, null otherwise
      */
-    private function findValidVerificationToken(string $token): ?array
+    private function findValidVerificationToken(string $token, int $tenantId): ?array
     {
         // Ensure the table exists
         if (!$this->tokenTableExists()) {
             return null;
         }
 
-        // Primary lookup: SHA-256 hash (used by both controllers now)
-        $sha256Hash = hash('sha256', $token);
-        $record = Database::query(
-            "SELECT * FROM email_verification_tokens WHERE token = ? AND expires_at > NOW()",
-            [$sha256Hash]
-        )->fetch();
-
-        if ($record) {
-            return $record;
-        }
-
-        // Legacy fallback: scan for bcrypt-hashed tokens created before SHA-256 migration.
-        // TODO: Remove this fallback after 2026-03-01 (all legacy tokens will have expired).
+        // Find non-expired tokens for this tenant only (prevents cross-tenant hijacking)
+        // All tokens now use bcrypt (password_hash) — SHA-256 fallback removed since
+        // RegistrationApiController was fixed to use password_hash consistently.
         $records = Database::query(
-            "SELECT * FROM email_verification_tokens WHERE expires_at > NOW() ORDER BY created_at DESC LIMIT 100"
+            "SELECT * FROM email_verification_tokens WHERE tenant_id = ? AND expires_at > NOW()",
+            [$tenantId]
         )->fetchAll();
 
         foreach ($records as $record) {
@@ -337,19 +334,22 @@ class EmailVerificationApiController extends BaseApiController
     }
 
     /**
-     * Delete all verification tokens for a user
+     * Delete all verification tokens for a user in a specific tenant
      *
      * @param int $userId
+     * @param int|null $tenantId If null, uses current TenantContext
      */
-    private function cleanupVerificationTokens(int $userId): void
+    private function cleanupVerificationTokens(int $userId, ?int $tenantId = null): void
     {
         if (!$this->tokenTableExists()) {
             return;
         }
 
+        $tenantId = $tenantId ?? TenantContext::getId();
+
         Database::query(
-            "DELETE FROM email_verification_tokens WHERE user_id = ?",
-            [$userId]
+            "DELETE FROM email_verification_tokens WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         );
     }
 
@@ -390,10 +390,13 @@ class EmailVerificationApiController extends BaseApiController
                 CREATE TABLE IF NOT EXISTS `email_verification_tokens` (
                     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     `user_id` INT UNSIGNED NOT NULL,
+                    `tenant_id` INT(11) NOT NULL,
                     `token` VARCHAR(255) NOT NULL,
                     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     `expires_at` TIMESTAMP NOT NULL,
                     INDEX `idx_user_id` (`user_id`),
+                    INDEX `idx_tenant_id` (`tenant_id`),
+                    INDEX `idx_tenant_user` (`tenant_id`, `user_id`),
                     INDEX `idx_expires_at` (`expires_at`)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ");

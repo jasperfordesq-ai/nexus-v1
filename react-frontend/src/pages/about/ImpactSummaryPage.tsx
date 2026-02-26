@@ -26,6 +26,7 @@ import {
   ShieldCheck,
   Mail,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
@@ -47,21 +48,22 @@ const stagger = {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function ImpactSummaryPage() {
+  const { t } = useTranslation('about');
   const { tenantPath } = useTenant();
-  usePageTitle('Our Impact');
+  usePageTitle(t('impact_summary.page_title'));
 
   return (
     <>
     <PageMeta
-      title="Our Impact"
-      description="For every euro invested in hOUR Timebank, sixteen euros of social value is generated. 100% improved wellbeing, 95% socially connected."
+      title={t('impact_summary.page_title')}
+      description={t('impact_summary.meta_description')}
     />
     <div className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 -my-4 sm:-my-6 md:-my-8 overflow-x-hidden">
       {/* ─── Breadcrumbs ─── */}
       <div className="px-4 sm:px-6 lg:px-8 pt-6">
         <Breadcrumbs items={[
-          { label: 'About', href: '/about' },
-          { label: 'Our Impact' },
+          { label: t('impact_summary.breadcrumb_about'), href: '/about' },
+          { label: t('impact_summary.page_title') },
         ]} />
       </div>
 
@@ -85,7 +87,7 @@ export function ImpactSummaryPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-theme-primary mb-4"
           >
-            Our Impact
+            {t('impact_summary.page_title')}
           </motion.h1>
 
           {/* Hero stat */}
@@ -98,7 +100,7 @@ export function ImpactSummaryPage() {
               <h2 className="flex items-center gap-3 justify-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-gradient">
                 <Sparkles className="w-6 h-6 text-amber-500 dark:text-amber-400 flex-shrink-0" aria-hidden="true" />
                 <span>
-                  For Every &euro;1 Invested, We Generate &euro;16 in Social Value
+                  {t('impact_summary.hero_headline')}
                 </span>
               </h2>
             </GlassCard>
@@ -109,7 +111,7 @@ export function ImpactSummaryPage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg text-theme-muted max-w-2xl mx-auto"
           >
-            Independently validated by our 2023 Social Impact Study
+            {t('impact_summary.hero_subtitle')}
           </motion.p>
         </div>
       </section>
@@ -125,10 +127,10 @@ export function ImpactSummaryPage() {
             className="grid grid-cols-2 sm:grid-cols-4 gap-4"
           >
             {[
-              { value: '€16', label: 'Return per €1', icon: TrendingUp, color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-500/15' },
-              { value: '100%', label: 'Improved Wellbeing', icon: Heart, color: 'text-rose-500 dark:text-rose-400', bg: 'bg-rose-500/15' },
-              { value: '95%', label: 'Socially Connected', icon: Users, color: 'text-indigo-500 dark:text-indigo-400', bg: 'bg-indigo-500/15' },
-              { value: '€803K', label: 'Social Value Created', icon: ShieldCheck, color: 'text-amber-500 dark:text-amber-400', bg: 'bg-amber-500/15' },
+              { value: '€16', label: t('impact_summary.stat_return_label'), icon: TrendingUp, color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-500/15' },
+              { value: '100%', label: t('impact_summary.stat_wellbeing_label'), icon: Heart, color: 'text-rose-500 dark:text-rose-400', bg: 'bg-rose-500/15' },
+              { value: '95%', label: t('impact_summary.stat_connected_label'), icon: Users, color: 'text-indigo-500 dark:text-indigo-400', bg: 'bg-indigo-500/15' },
+              { value: '€803K', label: t('impact_summary.stat_value_label'), icon: ShieldCheck, color: 'text-amber-500 dark:text-amber-400', bg: 'bg-amber-500/15' },
             ].map((stat) => (
               <motion.div key={stat.label} variants={fadeInUp}>
                 <GlassCard className="p-5 text-center">
@@ -164,7 +166,7 @@ export function ImpactSummaryPage() {
                     <div className="p-2.5 rounded-xl bg-emerald-500/15">
                       <Heart className="w-6 h-6 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                     </div>
-                    <h2 className="text-xl font-bold text-theme-primary">Profound Impact on Wellbeing</h2>
+                    <h2 className="text-xl font-bold text-theme-primary">{t('impact_summary.wellbeing_heading')}</h2>
                   </div>
 
                   <div className="space-y-4">
@@ -173,8 +175,7 @@ export function ImpactSummaryPage() {
                         <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">100%</span>
                       </div>
                       <p className="text-theme-muted text-sm leading-relaxed">
-                        of participants reported <strong className="text-theme-primary">improved wellbeing</strong> as
-                        a direct result of their involvement in hOUR Timebank.
+                        {t('impact_summary.wellbeing_100_text')}
                       </p>
                     </div>
 
@@ -183,8 +184,7 @@ export function ImpactSummaryPage() {
                         <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">95%</span>
                       </div>
                       <p className="text-theme-muted text-sm leading-relaxed">
-                        of members felt more <strong className="text-theme-primary">socially connected</strong> and
-                        less isolated within their community.
+                        {t('impact_summary.wellbeing_95_text')}
                       </p>
                     </div>
 
@@ -194,11 +194,10 @@ export function ImpactSummaryPage() {
                         <Quote className="w-5 h-5 text-emerald-500/60 flex-shrink-0 mt-0.5" aria-hidden="true" />
                         <div>
                           <p className="text-sm italic text-theme-muted leading-relaxed">
-                            &ldquo;The impact of hOUR Timebank has been <strong className="text-theme-primary">transformational
-                            and lifesaving</strong> for its members.&rdquo;
+                            {t('impact_summary.wellbeing_quote')}
                           </p>
                           <p className="text-xs text-theme-subtle mt-2">
-                            &mdash; 2023 Social Impact Study
+                            {t('impact_summary.wellbeing_quote_attribution')}
                           </p>
                         </div>
                       </div>
@@ -224,19 +223,16 @@ export function ImpactSummaryPage() {
                     <div className="p-2.5 rounded-xl bg-indigo-500/15">
                       <Stethoscope className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </div>
-                    <h2 className="text-xl font-bold text-theme-primary">A Public Health Solution</h2>
+                    <h2 className="text-xl font-bold text-theme-primary">{t('impact_summary.public_health_heading')}</h2>
                   </div>
 
                   <div className="space-y-4">
                     <p className="text-theme-muted text-sm leading-relaxed">
-                      Timebanking has been identified as an <strong className="text-theme-primary">efficient and scalable
-                      intervention</strong> to combat loneliness and social isolation &mdash; one of the most pressing
-                      public health challenges of our time.
+                      {t('impact_summary.public_health_para1')}
                     </p>
 
                     <p className="text-theme-muted text-sm leading-relaxed">
-                      The study found that hOUR Timebank delivers measurable improvements across multiple wellbeing
-                      indicators, making it a cost-effective complement to traditional health services.
+                      {t('impact_summary.public_health_para2')}
                     </p>
 
                     {/* Blockquote */}
@@ -245,12 +241,10 @@ export function ImpactSummaryPage() {
                         <Quote className="w-5 h-5 text-indigo-500/60 flex-shrink-0 mt-0.5" aria-hidden="true" />
                         <div>
                           <p className="text-sm italic text-theme-muted leading-relaxed">
-                            &ldquo;Timebanking <strong className="text-theme-primary">could become part of a social
-                            prescribing offering</strong>, providing a structured community-based alternative to
-                            clinical interventions for loneliness and mental health.&rdquo;
+                            {t('impact_summary.public_health_quote')}
                           </p>
                           <p className="text-xs text-theme-subtle mt-2">
-                            &mdash; Social Impact Study Recommendation
+                            {t('impact_summary.public_health_quote_attribution')}
                           </p>
                         </div>
                       </div>
@@ -273,10 +267,10 @@ export function ImpactSummaryPage() {
             className="text-center mb-10"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
-              Our Strategic Documents
+              {t('impact_summary.strategic_docs_heading')}
             </h2>
             <p className="text-theme-muted max-w-lg mx-auto">
-              Explore our full impact study and strategic plan to learn more about our vision and results.
+              {t('impact_summary.strategic_docs_subtitle')}
             </p>
           </motion.div>
 
@@ -293,12 +287,12 @@ export function ImpactSummaryPage() {
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 mb-4">
                     <FileText className="w-7 h-7 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="text-lg font-semibold text-theme-primary mb-2">Impact Report</h3>
+                  <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('impact_summary.impact_report_title')}</h3>
                   <p className="text-sm text-theme-muted mb-4">
-                    Our full 2023 Social Impact Study with SROI analysis, member outcomes, and case studies.
+                    {t('impact_summary.impact_report_description')}
                   </p>
                   <div className="flex items-center justify-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 group-hover:gap-3 transition-all">
-                    Read Report <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                    {t('impact_summary.read_report')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </div>
                 </GlassCard>
               </Link>
@@ -316,12 +310,12 @@ export function ImpactSummaryPage() {
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 mb-4">
                     <Compass className="w-7 h-7 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="text-lg font-semibold text-theme-primary mb-2">Strategic Plan</h3>
+                  <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('impact_summary.strategic_plan_title')}</h3>
                   <p className="text-sm text-theme-muted mb-4">
-                    Our 2026&ndash;2030 strategy for growth, financial resilience, and building a connected Ireland.
+                    {t('impact_summary.strategic_plan_description')}
                   </p>
                   <div className="flex items-center justify-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 group-hover:gap-3 transition-all">
-                    Read Plan <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                    {t('impact_summary.read_plan')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </div>
                 </GlassCard>
               </Link>
@@ -350,11 +344,10 @@ export function ImpactSummaryPage() {
 
               <div className="relative z-10">
                 <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">
-                  Want to Learn More?
+                  {t('impact_summary.cta_heading')}
                 </h2>
                 <p className="text-theme-muted max-w-lg mx-auto mb-8">
-                  Get in touch to discuss our impact, partnership opportunities, or how timebanking
-                  can benefit your community.
+                  {t('impact_summary.cta_subtitle')}
                 </p>
 
                 <Link to={tenantPath('/contact')}>
@@ -363,7 +356,7 @@ export function ImpactSummaryPage() {
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold px-8"
                     startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
                   >
-                    Get in Touch
+                    {t('impact_summary.cta_contact')}
                   </Button>
                 </Link>
               </div>

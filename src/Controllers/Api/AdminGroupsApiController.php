@@ -38,6 +38,7 @@ class AdminGroupsApiController extends BaseApiController
     public function index(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -47,8 +48,15 @@ class AdminGroupsApiController extends BaseApiController
         $search = $_GET['search'] ?? null;
 
         try {
-            $conditions = ['g.tenant_id = ?'];
-            $params = [$tenantId];
+            $conditions = [];
+            $params = [];
+
+            // Tenant scoping: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
+                $conditions[] = 'g.tenant_id = ?';
+                $params[] = $effectiveTenantId;
+            }
 
             // Status filter (groups use is_active column, not status)
             if ($status === 'active') {
@@ -65,7 +73,7 @@ class AdminGroupsApiController extends BaseApiController
                 $params[] = $searchTerm;
             }
 
-            $where = implode(' AND ', $conditions);
+            $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
             // Total count
             $total = (int) Database::query(
@@ -73,12 +81,14 @@ class AdminGroupsApiController extends BaseApiController
                 $params
             )->fetch()['cnt'];
 
-            // Paginated results with member count and creator name
+            // Paginated results with member count, creator name, and tenant name
             $items = Database::query(
                 "SELECT g.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as creator_name,
+                    t.name as tenant_name,
                     (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'approved') as member_count
                  FROM `groups` g
                  LEFT JOIN users u ON g.owner_id = u.id
+                 LEFT JOIN tenants t ON g.tenant_id = t.id
                  WHERE {$where}
                  ORDER BY g.created_at DESC
                  LIMIT ? OFFSET ?",
@@ -89,6 +99,8 @@ class AdminGroupsApiController extends BaseApiController
             $formatted = array_map(function ($row) {
                 return [
                     'id' => (int) $row['id'],
+                    'tenant_id' => (int) $row['tenant_id'],
+                    'tenant_name' => $row['tenant_name'] ?? 'Unknown',
                     'name' => $row['name'] ?? '',
                     'description' => $row['description'] ?? '',
                     'image_url' => $row['image_url'] ?: null,
@@ -119,21 +131,28 @@ class AdminGroupsApiController extends BaseApiController
     public function analytics(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
+
+        // Determine scope: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantJoinCondition = $effectiveTenantId !== null ? 'g.tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         try {
             // Total groups
             $totalGroups = (int) Database::query(
-                "SELECT COUNT(*) as cnt FROM `groups` WHERE tenant_id = ?",
-                [$tenantId]
+                "SELECT COUNT(*) as cnt FROM `groups` WHERE {$tenantCondition}",
+                $tenantParams
             )->fetch()['cnt'];
 
             // Total approved members across all groups
             $totalMembers = (int) Database::query(
                 "SELECT COUNT(*) as cnt FROM group_members gm
                  JOIN `groups` g ON gm.group_id = g.id
-                 WHERE g.tenant_id = ? AND gm.status = 'approved'",
-                [$tenantId]
+                 WHERE {$tenantJoinCondition} AND gm.status = 'approved'",
+                $tenantParams
             )->fetch()['cnt'];
 
             // Average members per group
@@ -141,33 +160,35 @@ class AdminGroupsApiController extends BaseApiController
 
             // Active groups (groups with is_active = 1)
             $activeGroups = (int) Database::query(
-                "SELECT COUNT(*) as cnt FROM `groups` WHERE tenant_id = ? AND is_active = 1",
-                [$tenantId]
+                "SELECT COUNT(*) as cnt FROM `groups` WHERE {$tenantCondition} AND is_active = 1",
+                $tenantParams
             )->fetch()['cnt'];
 
             // Pending approvals count
             $pendingApprovals = (int) Database::query(
                 "SELECT COUNT(*) as cnt FROM group_members gm
                  JOIN `groups` g ON gm.group_id = g.id
-                 WHERE g.tenant_id = ? AND gm.status = 'pending'",
-                [$tenantId]
+                 WHERE {$tenantJoinCondition} AND gm.status = 'pending'",
+                $tenantParams
             )->fetch()['cnt'];
 
             // Most active groups (by member count, top 5)
             $mostActive = Database::query(
-                "SELECT g.id, g.name,
+                "SELECT g.id, g.name, t.name as tenant_name,
                     (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'approved') as member_count
                  FROM `groups` g
-                 WHERE g.tenant_id = ?
+                 LEFT JOIN tenants t ON g.tenant_id = t.id
+                 WHERE {$tenantJoinCondition}
                  ORDER BY member_count DESC
                  LIMIT 5",
-                [$tenantId]
+                $tenantParams
             )->fetchAll();
 
             $mostActiveFormatted = array_map(function ($row) {
                 return [
                     'id' => (int) $row['id'],
                     'name' => $row['name'],
+                    'tenant_name' => $row['tenant_name'] ?? 'Unknown',
                     'member_count' => (int) $row['member_count'],
                 ];
             }, $mostActive);
@@ -198,18 +219,32 @@ class AdminGroupsApiController extends BaseApiController
     public function approvals(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
+            $conditions = ['gm.status = \'pending\''];
+            $params = [];
+
+            // Tenant scoping: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+            $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+            if ($effectiveTenantId !== null) {
+                $conditions[] = 'g.tenant_id = ?';
+                $params[] = $effectiveTenantId;
+            }
+
+            $where = implode(' AND ', $conditions);
+
             $items = Database::query(
-                "SELECT gm.*, g.name as group_name,
+                "SELECT gm.*, g.name as group_name, t.name as tenant_name, g.tenant_id,
                     CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name
                  FROM group_members gm
                  JOIN `groups` g ON gm.group_id = g.id
                  JOIN users u ON gm.user_id = u.id
-                 WHERE g.tenant_id = ? AND gm.status = 'pending'
+                 LEFT JOIN tenants t ON g.tenant_id = t.id
+                 WHERE {$where}
                  ORDER BY gm.created_at DESC",
-                [$tenantId]
+                $params
             )->fetchAll();
 
             $formatted = array_map(function ($row) {
@@ -217,6 +252,8 @@ class AdminGroupsApiController extends BaseApiController
                     'id' => (int) $row['id'],
                     'group_id' => (int) $row['group_id'],
                     'group_name' => $row['group_name'] ?? '',
+                    'tenant_id' => (int) $row['tenant_id'],
+                    'tenant_name' => $row['tenant_name'] ?? 'Unknown',
                     'user_id' => (int) $row['user_id'],
                     'user_name' => trim($row['user_name'] ?? ''),
                     'status' => $row['status'] ?? 'pending',
@@ -243,17 +280,29 @@ class AdminGroupsApiController extends BaseApiController
     public function approveMember(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
             // Verify the membership record exists and is pending
-            $membership = Database::query(
-                "SELECT gm.*, g.name as group_name
-                 FROM group_members gm
-                 JOIN `groups` g ON gm.group_id = g.id
-                 WHERE gm.id = ? AND g.tenant_id = ? AND gm.status = 'pending'",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can approve memberships from any tenant
+            if ($isSuperAdmin) {
+                $membership = Database::query(
+                    "SELECT gm.*, g.name as group_name, g.tenant_id
+                     FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.id = ? AND gm.status = 'pending'",
+                    [$id]
+                )->fetch();
+            } else {
+                $membership = Database::query(
+                    "SELECT gm.*, g.name as group_name, g.tenant_id
+                     FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.id = ? AND g.tenant_id = ? AND gm.status = 'pending'",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$membership) {
                 $this->respondWithError(
@@ -270,10 +319,11 @@ class AdminGroupsApiController extends BaseApiController
                 [$id]
             );
 
+            $memberTenantId = (int) $membership['tenant_id'];
             ActivityLog::log(
                 $adminId,
                 'admin_approve_group_member',
-                "Approved membership #{$id} for group \"{$membership['group_name']}\""
+                "Approved membership #{$id} for group \"{$membership['group_name']}\"" . ($isSuperAdmin ? " (tenant {$memberTenantId})" : '')
             );
 
             $this->respondWithData([
@@ -298,17 +348,29 @@ class AdminGroupsApiController extends BaseApiController
     public function rejectMember(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
             // Verify the membership record exists and is pending
-            $membership = Database::query(
-                "SELECT gm.*, g.name as group_name
-                 FROM group_members gm
-                 JOIN `groups` g ON gm.group_id = g.id
-                 WHERE gm.id = ? AND g.tenant_id = ? AND gm.status = 'pending'",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can reject memberships from any tenant
+            if ($isSuperAdmin) {
+                $membership = Database::query(
+                    "SELECT gm.*, g.name as group_name, g.tenant_id
+                     FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.id = ? AND gm.status = 'pending'",
+                    [$id]
+                )->fetch();
+            } else {
+                $membership = Database::query(
+                    "SELECT gm.*, g.name as group_name, g.tenant_id
+                     FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.id = ? AND g.tenant_id = ? AND gm.status = 'pending'",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$membership) {
                 $this->respondWithError(
@@ -325,10 +387,11 @@ class AdminGroupsApiController extends BaseApiController
                 [$id]
             );
 
+            $memberTenantId = (int) $membership['tenant_id'];
             ActivityLog::log(
                 $adminId,
                 'admin_reject_group_member',
-                "Rejected membership #{$id} for group \"{$membership['group_name']}\""
+                "Rejected membership #{$id} for group \"{$membership['group_name']}\"" . ($isSuperAdmin ? " (tenant {$memberTenantId})" : '')
             );
 
             $this->respondWithData([
@@ -353,7 +416,13 @@ class AdminGroupsApiController extends BaseApiController
     public function moderation(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
+
+        // Determine tenant scoping: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $effectiveTenantId !== null ? 'g.tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         try {
             // Try to find groups referenced in the reports table
@@ -362,23 +431,25 @@ class AdminGroupsApiController extends BaseApiController
 
             try {
                 $items = Database::query(
-                    "SELECT g.id, g.name, g.is_active, g.created_at,
+                    "SELECT g.id, g.name, g.is_active, g.created_at, g.tenant_id, t.name as tenant_name,
                         COUNT(r.id) as report_count
                      FROM `groups` g
                      INNER JOIN reports r ON r.content_type = 'group' AND r.content_id = g.id
-                     WHERE g.tenant_id = ? AND r.status = 'pending'
-                     GROUP BY g.id, g.name, g.is_active, g.created_at
+                     LEFT JOIN tenants t ON g.tenant_id = t.id
+                     WHERE {$tenantCondition} AND r.status = 'pending'
+                     GROUP BY g.id, g.name, g.is_active, g.created_at, g.tenant_id, t.name
                      ORDER BY report_count DESC",
-                    [$tenantId]
+                    $tenantParams
                 )->fetchAll();
             } catch (\Exception $e) {
                 // If the reports table or columns don't exist, return inactive groups
                 $items = Database::query(
-                    "SELECT g.id, g.name, g.is_active, g.created_at, 0 as report_count
+                    "SELECT g.id, g.name, g.is_active, g.created_at, g.tenant_id, t.name as tenant_name, 0 as report_count
                      FROM `groups` g
-                     WHERE g.tenant_id = ? AND g.is_active = 0
+                     LEFT JOIN tenants t ON g.tenant_id = t.id
+                     WHERE {$tenantCondition} AND g.is_active = 0
                      ORDER BY g.created_at DESC",
-                    [$tenantId]
+                    $tenantParams
                 )->fetchAll();
             }
 
@@ -386,6 +457,8 @@ class AdminGroupsApiController extends BaseApiController
                 return [
                     'id' => (int) $row['id'],
                     'name' => $row['name'] ?? '',
+                    'tenant_id' => (int) $row['tenant_id'],
+                    'tenant_name' => $row['tenant_name'] ?? 'Unknown',
                     'status' => !empty($row['is_active']) ? 'active' : 'inactive',
                     'report_count' => (int) ($row['report_count'] ?? 0),
                     'created_at' => $row['created_at'],
@@ -411,6 +484,7 @@ class AdminGroupsApiController extends BaseApiController
     public function updateStatus(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $input = $this->getAllInput();
 
@@ -421,26 +495,36 @@ class AdminGroupsApiController extends BaseApiController
         }
 
         try {
-            $group = Database::query(
-                "SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can update groups from any tenant
+            if ($isSuperAdmin) {
+                $group = Database::query(
+                    "SELECT id, name, tenant_id FROM `groups` WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $group = Database::query(
+                    "SELECT id, name, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$group) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Group not found', null, 404);
                 return;
             }
 
+            // Use the record's own tenant_id for the UPDATE
+            $groupTenantId = (int) $group['tenant_id'];
             $isActive = $newStatus === 'active' ? 1 : 0;
             Database::query(
                 "UPDATE `groups` SET is_active = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
-                [$isActive, $id, $tenantId]
+                [$isActive, $id, $groupTenantId]
             );
 
             ActivityLog::log(
                 $adminId,
                 'admin_update_group_status',
-                "Set group #{$id} \"{$group['name']}\" to {$newStatus}"
+                "Set group #{$id} \"{$group['name']}\" to {$newStatus}" . ($isSuperAdmin ? " (tenant {$groupTenantId})" : '')
             );
 
             $this->respondWithData(['id' => $id, 'status' => $newStatus]);
@@ -457,13 +541,22 @@ class AdminGroupsApiController extends BaseApiController
     public function deleteGroup(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $group = Database::query(
-                "SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can delete groups from any tenant
+            if ($isSuperAdmin) {
+                $group = Database::query(
+                    "SELECT id, name, tenant_id FROM `groups` WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $group = Database::query(
+                    "SELECT id, name, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$group) {
                 $this->respondWithError(
@@ -475,6 +568,9 @@ class AdminGroupsApiController extends BaseApiController
                 return;
             }
 
+            // Use the record's own tenant_id for safe DELETE
+            $groupTenantId = (int) $group['tenant_id'];
+
             // Delete memberships first, then the group
             Database::query(
                 "DELETE FROM group_members WHERE group_id = ?",
@@ -483,13 +579,13 @@ class AdminGroupsApiController extends BaseApiController
 
             Database::query(
                 "DELETE FROM `groups` WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                [$id, $groupTenantId]
             );
 
             ActivityLog::log(
                 $adminId,
                 'admin_delete_group',
-                "Deleted group #{$id}: {$group['name']}"
+                "Deleted group #{$id}: {$group['name']}" . ($isSuperAdmin ? " (tenant {$groupTenantId})" : '')
             );
 
             $this->respondWithData(['deleted' => true, 'id' => $id]);
@@ -513,27 +609,54 @@ class AdminGroupsApiController extends BaseApiController
     public function getGroupTypes(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
+        // Determine scope: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $scopeTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $scopeTenantId !== null ? 'gt.tenant_id = ?' : '1=1';
+        $tenantParams = $scopeTenantId !== null ? [$scopeTenantId] : [];
+
         try {
-            $types = Database::query(
-                "SELECT gt.*,
-                    (SELECT COUNT(*) FROM `groups` g WHERE g.type_id = gt.id AND g.tenant_id = ?) as member_count
-                 FROM group_types gt
-                 WHERE gt.tenant_id = ?
-                 ORDER BY gt.sort_order ASC, gt.name ASC",
-                [$tenantId, $tenantId]
-            )->fetchAll();
+            if ($scopeTenantId !== null) {
+                $types = Database::query(
+                    "SELECT gt.*, t.name as tenant_name,
+                        (SELECT COUNT(*) FROM `groups` g WHERE g.type_id = gt.id AND g.tenant_id = ?) as member_count
+                     FROM group_types gt
+                     LEFT JOIN tenants t ON gt.tenant_id = t.id
+                     WHERE {$tenantCondition}
+                     ORDER BY gt.sort_order ASC, gt.name ASC",
+                    array_merge([$scopeTenantId], $tenantParams)
+                )->fetchAll();
+            } else {
+                // Super admin, no filter — show all types across all tenants
+                $types = Database::query(
+                    "SELECT gt.*, t.name as tenant_name,
+                        (SELECT COUNT(*) FROM `groups` g WHERE g.type_id = gt.id) as member_count
+                     FROM group_types gt
+                     LEFT JOIN tenants t ON gt.tenant_id = t.id
+                     ORDER BY gt.sort_order ASC, gt.name ASC"
+                )->fetchAll();
+            }
 
             // Get policy counts for each type
-            $formatted = array_map(function ($row) use ($tenantId) {
-                $policyCount = (int) Database::query(
-                    "SELECT COUNT(*) as cnt FROM group_policies WHERE tenant_id = ?",
-                    [$tenantId]
-                )->fetch()['cnt'];
+            $formatted = array_map(function ($row) use ($scopeTenantId) {
+                if ($scopeTenantId !== null) {
+                    $policyCount = (int) Database::query(
+                        "SELECT COUNT(*) as cnt FROM group_policies WHERE tenant_id = ?",
+                        [$scopeTenantId]
+                    )->fetch()['cnt'];
+                } else {
+                    $policyCount = (int) Database::query(
+                        "SELECT COUNT(*) as cnt FROM group_policies WHERE tenant_id = ?",
+                        [(int) $row['tenant_id']]
+                    )->fetch()['cnt'];
+                }
 
                 return [
                     'id' => (int) $row['id'],
+                    'tenant_id' => (int) $row['tenant_id'],
+                    'tenant_name' => $row['tenant_name'] ?? 'Unknown',
                     'name' => $row['name'],
                     'description' => $row['description'] ?? '',
                     'icon' => $row['icon'] ?? 'fa-layer-group',
@@ -563,6 +686,7 @@ class AdminGroupsApiController extends BaseApiController
     public function createGroupType(): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $input = $this->getAllInput();
 
@@ -572,12 +696,15 @@ class AdminGroupsApiController extends BaseApiController
             return;
         }
 
+        // Super admins can specify a target tenant_id; otherwise use current tenant
+        $targetTenantId = ($isSuperAdmin && isset($input['tenant_id'])) ? (int) $input['tenant_id'] : $tenantId;
+
         try {
             Database::query(
                 "INSERT INTO group_types (tenant_id, name, slug, description, icon, color, created_at)
                  VALUES (?, ?, ?, ?, ?, ?, NOW())",
                 [
-                    $tenantId,
+                    $targetTenantId,
                     $name,
                     \Nexus\Helpers\TextHelper::slugify($name),
                     $input['description'] ?? null,
@@ -588,7 +715,11 @@ class AdminGroupsApiController extends BaseApiController
 
             $id = Database::lastInsertId();
 
-            ActivityLog::log($adminId, 'admin_create_group_type', "Created group type: {$name}");
+            ActivityLog::log(
+                $adminId,
+                'admin_create_group_type',
+                "Created group type: {$name}" . ($isSuperAdmin ? " (tenant {$targetTenantId})" : '')
+            );
 
             $this->respondWithData(['id' => $id, 'name' => $name], 201);
         } catch (\Exception $e) {
@@ -609,20 +740,31 @@ class AdminGroupsApiController extends BaseApiController
     public function updateGroupType(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $input = $this->getAllInput();
 
         try {
-            $existing = Database::query(
-                "SELECT id, name FROM group_types WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can update group types from any tenant
+            if ($isSuperAdmin) {
+                $existing = Database::query(
+                    "SELECT id, name, tenant_id FROM group_types WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $existing = Database::query(
+                    "SELECT id, name, tenant_id FROM group_types WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$existing) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Group type not found', null, 404);
                 return;
             }
 
+            // Use the record's own tenant_id for safe UPDATE
+            $recordTenantId = (int) $existing['tenant_id'];
             $name = trim($input['name'] ?? $existing['name']);
             Database::query(
                 "UPDATE group_types
@@ -634,11 +776,15 @@ class AdminGroupsApiController extends BaseApiController
                     $input['icon'] ?? 'fa-layer-group',
                     $input['color'] ?? '#6366f1',
                     $id,
-                    $tenantId
+                    $recordTenantId
                 ]
             );
 
-            ActivityLog::log($adminId, 'admin_update_group_type', "Updated group type #{$id}: {$name}");
+            ActivityLog::log(
+                $adminId,
+                'admin_update_group_type',
+                "Updated group type #{$id}: {$name}" . ($isSuperAdmin ? " (tenant {$recordTenantId})" : '')
+            );
 
             $this->respondWithData(['id' => $id, 'name' => $name]);
         } catch (\Exception $e) {
@@ -659,23 +805,35 @@ class AdminGroupsApiController extends BaseApiController
     public function deleteGroupType(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $type = Database::query(
-                "SELECT id, name FROM group_types WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can delete group types from any tenant
+            if ($isSuperAdmin) {
+                $type = Database::query(
+                    "SELECT id, name, tenant_id FROM group_types WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $type = Database::query(
+                    "SELECT id, name, tenant_id FROM group_types WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$type) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Group type not found', null, 404);
                 return;
             }
 
+            // Use the record's own tenant_id for safe operations
+            $recordTenantId = (int) $type['tenant_id'];
+
             // Check if any groups use this type
             $count = (int) Database::query(
                 "SELECT COUNT(*) as cnt FROM `groups` WHERE type_id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                [$id, $recordTenantId]
             )->fetch()['cnt'];
 
             if ($count > 0) {
@@ -690,10 +848,14 @@ class AdminGroupsApiController extends BaseApiController
 
             Database::query(
                 "DELETE FROM group_types WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
+                [$id, $recordTenantId]
             );
 
-            ActivityLog::log($adminId, 'admin_delete_group_type', "Deleted group type #{$id}: {$type['name']}");
+            ActivityLog::log(
+                $adminId,
+                'admin_delete_group_type',
+                "Deleted group type #{$id}: {$type['name']}" . ($isSuperAdmin ? " (tenant {$recordTenantId})" : '')
+            );
 
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Exception $e) {
@@ -716,10 +878,14 @@ class AdminGroupsApiController extends BaseApiController
     public function getPolicies(int $typeId): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
+        // Determine scope — policies are always tenant-scoped, so fall back to current tenant if cross-tenant requested
+        $scopeTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId) ?? $tenantId;
+
         try {
-            $policies = \Nexus\Services\GroupPolicyRepository::getAllPolicies($tenantId);
+            $policies = \Nexus\Services\GroupPolicyRepository::getAllPolicies($scopeTenantId);
 
             // Transform to frontend format
             $formatted = [];
@@ -755,6 +921,7 @@ class AdminGroupsApiController extends BaseApiController
     public function setPolicy(int $typeId): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $input = $this->getAllInput();
 
@@ -766,6 +933,9 @@ class AdminGroupsApiController extends BaseApiController
             return;
         }
 
+        // Super admins can specify a target tenant_id; otherwise use current tenant
+        $targetTenantId = ($isSuperAdmin && isset($input['tenant_id'])) ? (int) $input['tenant_id'] : $tenantId;
+
         try {
             $category = $input['category'] ?? \Nexus\Services\GroupPolicyRepository::CATEGORY_FEATURES;
             $type = $input['type'] ?? \Nexus\Services\GroupPolicyRepository::TYPE_STRING;
@@ -776,10 +946,14 @@ class AdminGroupsApiController extends BaseApiController
                 $category,
                 $type,
                 $input['description'] ?? null,
-                $tenantId
+                $targetTenantId
             );
 
-            ActivityLog::log($adminId, 'admin_set_group_policy', "Set policy {$key} = " . json_encode($value));
+            ActivityLog::log(
+                $adminId,
+                'admin_set_group_policy',
+                "Set policy {$key} = " . json_encode($value) . ($isSuperAdmin ? " (tenant {$targetTenantId})" : '')
+            );
 
             $this->respondWithData(['key' => $key, 'value' => $value]);
         } catch (\Exception $e) {
@@ -802,12 +976,14 @@ class AdminGroupsApiController extends BaseApiController
     public function getGroup(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
             $group = \Nexus\Services\GroupService::getById($id);
 
-            if (!$group || $group['tenant_id'] ?? null != $tenantId) {
+            // Super admins can view groups from any tenant
+            if (!$group || (!$isSuperAdmin && ($group['tenant_id'] ?? null) != $tenantId)) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Group not found', null, 404);
                 return;
             }
@@ -826,6 +1002,15 @@ class AdminGroupsApiController extends BaseApiController
                 'events_count' => (int) ($stats['events_count'] ?? 0),
                 'activity_score' => (int) ($group['member_count'] ?? 0) * 10,
             ];
+
+            // Add tenant name for cross-tenant context
+            if (isset($group['tenant_id'])) {
+                $tenant = Database::query(
+                    "SELECT name FROM tenants WHERE id = ?",
+                    [(int) $group['tenant_id']]
+                )->fetch();
+                $group['tenant_name'] = $tenant['name'] ?? 'Unknown';
+            }
 
             $this->respondWithData($group);
         } catch (\Exception $e) {
@@ -846,19 +1031,31 @@ class AdminGroupsApiController extends BaseApiController
     public function updateGroup(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $input = $this->getAllInput();
 
         try {
-            $group = Database::query(
-                "SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can update groups from any tenant
+            if ($isSuperAdmin) {
+                $group = Database::query(
+                    "SELECT id, name, tenant_id FROM `groups` WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $group = Database::query(
+                    "SELECT id, name, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$group) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Group not found', null, 404);
                 return;
             }
+
+            // Use the record's own tenant_id for safe UPDATE
+            $groupTenantId = (int) $group['tenant_id'];
 
             $updates = [];
             $params = [];
@@ -887,14 +1084,18 @@ class AdminGroupsApiController extends BaseApiController
 
             $updates[] = 'updated_at = NOW()';
             $params[] = $id;
-            $params[] = $tenantId;
+            $params[] = $groupTenantId;
 
             Database::query(
                 "UPDATE `groups` SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?",
                 $params
             );
 
-            ActivityLog::log($adminId, 'admin_update_group', "Updated group #{$id}: {$group['name']}");
+            ActivityLog::log(
+                $adminId,
+                'admin_update_group',
+                "Updated group #{$id}: {$group['name']}" . ($isSuperAdmin ? " (tenant {$groupTenantId})" : '')
+            );
 
             $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
@@ -915,6 +1116,7 @@ class AdminGroupsApiController extends BaseApiController
     public function getMembers(int $groupId): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $role = $_GET['role'] ?? null;
@@ -922,8 +1124,14 @@ class AdminGroupsApiController extends BaseApiController
         $offset = (int) ($_GET['offset'] ?? 0);
 
         try {
-            $conditions = ['gm.group_id = ?', 'g.tenant_id = ?'];
-            $params = [$groupId, $tenantId];
+            $conditions = ['gm.group_id = ?'];
+            $params = [$groupId];
+
+            // Tenant scoping: super admins can view members from any tenant's groups
+            if (!$isSuperAdmin) {
+                $conditions[] = 'g.tenant_id = ?';
+                $params[] = $tenantId;
+            }
 
             if ($role) {
                 $conditions[] = 'gm.role = ?';
@@ -974,15 +1182,26 @@ class AdminGroupsApiController extends BaseApiController
     public function promoteMember(int $groupId, int $userId): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $member = Database::query(
-                "SELECT gm.role FROM group_members gm
-                 JOIN `groups` g ON gm.group_id = g.id
-                 WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
-                [$groupId, $userId, $tenantId]
-            )->fetch();
+            // Super admins can promote members in groups from any tenant
+            if ($isSuperAdmin) {
+                $member = Database::query(
+                    "SELECT gm.role, g.tenant_id FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.group_id = ? AND gm.user_id = ?",
+                    [$groupId, $userId]
+                )->fetch();
+            } else {
+                $member = Database::query(
+                    "SELECT gm.role, g.tenant_id FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
+                    [$groupId, $userId, $tenantId]
+                )->fetch();
+            }
 
             if (!$member) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Member not found', null, 404);
@@ -996,7 +1215,12 @@ class AdminGroupsApiController extends BaseApiController
                 [$newRole, $groupId, $userId]
             );
 
-            ActivityLog::log($adminId, 'admin_promote_group_member', "Promoted user #{$userId} to {$newRole} in group #{$groupId}");
+            $memberTenantId = (int) $member['tenant_id'];
+            ActivityLog::log(
+                $adminId,
+                'admin_promote_group_member',
+                "Promoted user #{$userId} to {$newRole} in group #{$groupId}" . ($isSuperAdmin ? " (tenant {$memberTenantId})" : '')
+            );
 
             $this->respondWithData(['role' => $newRole]);
         } catch (\Exception $e) {
@@ -1017,15 +1241,26 @@ class AdminGroupsApiController extends BaseApiController
     public function demoteMember(int $groupId, int $userId): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $member = Database::query(
-                "SELECT gm.role FROM group_members gm
-                 JOIN `groups` g ON gm.group_id = g.id
-                 WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
-                [$groupId, $userId, $tenantId]
-            )->fetch();
+            // Super admins can demote members in groups from any tenant
+            if ($isSuperAdmin) {
+                $member = Database::query(
+                    "SELECT gm.role, g.tenant_id FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.group_id = ? AND gm.user_id = ?",
+                    [$groupId, $userId]
+                )->fetch();
+            } else {
+                $member = Database::query(
+                    "SELECT gm.role, g.tenant_id FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
+                    [$groupId, $userId, $tenantId]
+                )->fetch();
+            }
 
             if (!$member) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Member not found', null, 404);
@@ -1039,7 +1274,12 @@ class AdminGroupsApiController extends BaseApiController
                 [$newRole, $groupId, $userId]
             );
 
-            ActivityLog::log($adminId, 'admin_demote_group_member', "Demoted user #{$userId} to {$newRole} in group #{$groupId}");
+            $memberTenantId = (int) $member['tenant_id'];
+            ActivityLog::log(
+                $adminId,
+                'admin_demote_group_member',
+                "Demoted user #{$userId} to {$newRole} in group #{$groupId}" . ($isSuperAdmin ? " (tenant {$memberTenantId})" : '')
+            );
 
             $this->respondWithData(['role' => $newRole]);
         } catch (\Exception $e) {
@@ -1060,15 +1300,26 @@ class AdminGroupsApiController extends BaseApiController
     public function kickMember(int $groupId, int $userId): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $member = Database::query(
-                "SELECT gm.role FROM group_members gm
-                 JOIN `groups` g ON gm.group_id = g.id
-                 WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
-                [$groupId, $userId, $tenantId]
-            )->fetch();
+            // Super admins can kick members from groups in any tenant
+            if ($isSuperAdmin) {
+                $member = Database::query(
+                    "SELECT gm.role, g.tenant_id FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.group_id = ? AND gm.user_id = ?",
+                    [$groupId, $userId]
+                )->fetch();
+            } else {
+                $member = Database::query(
+                    "SELECT gm.role, g.tenant_id FROM group_members gm
+                     JOIN `groups` g ON gm.group_id = g.id
+                     WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
+                    [$groupId, $userId, $tenantId]
+                )->fetch();
+            }
 
             if (!$member) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Member not found', null, 404);
@@ -1080,7 +1331,12 @@ class AdminGroupsApiController extends BaseApiController
                 [$groupId, $userId]
             );
 
-            ActivityLog::log($adminId, 'admin_kick_group_member', "Kicked user #{$userId} from group #{$groupId}");
+            $memberTenantId = (int) $member['tenant_id'];
+            ActivityLog::log(
+                $adminId,
+                'admin_kick_group_member',
+                "Kicked user #{$userId} from group #{$groupId}" . ($isSuperAdmin ? " (tenant {$memberTenantId})" : '')
+            );
 
             $this->respondWithData(['kicked' => true]);
         } catch (\Exception $e) {
@@ -1103,13 +1359,22 @@ class AdminGroupsApiController extends BaseApiController
     public function geocodeGroup(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $group = Database::query(
-                "SELECT id, name, location FROM `groups` WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can geocode groups from any tenant
+            if ($isSuperAdmin) {
+                $group = Database::query(
+                    "SELECT id, name, location, tenant_id FROM `groups` WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $group = Database::query(
+                    "SELECT id, name, location, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$group) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Group not found', null, 404);
@@ -1128,12 +1393,18 @@ class AdminGroupsApiController extends BaseApiController
                 return;
             }
 
+            // Use the record's own tenant_id for safe UPDATE
+            $groupTenantId = (int) $group['tenant_id'];
             Database::query(
                 "UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ? AND tenant_id = ?",
-                [$coords['latitude'], $coords['longitude'], $id, $tenantId]
+                [$coords['latitude'], $coords['longitude'], $id, $groupTenantId]
             );
 
-            ActivityLog::log($adminId, 'admin_geocode_group', "Geocoded group #{$id}: {$group['name']}");
+            ActivityLog::log(
+                $adminId,
+                'admin_geocode_group',
+                "Geocoded group #{$id}: {$group['name']}" . ($isSuperAdmin ? " (tenant {$groupTenantId})" : '')
+            );
 
             $this->respondWithData([
                 'latitude' => $coords['latitude'],
@@ -1157,17 +1428,23 @@ class AdminGroupsApiController extends BaseApiController
     public function batchGeocode(): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
+
+        // Determine scope: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         try {
             $groups = Database::query(
                 "SELECT id, location FROM `groups`
-                 WHERE tenant_id = ?
+                 WHERE {$tenantCondition}
                  AND location IS NOT NULL
                  AND location != ''
                  AND (latitude IS NULL OR longitude IS NULL)
                  LIMIT 50",
-                [$tenantId]
+                $tenantParams
             )->fetchAll();
 
             $success = 0;
@@ -1189,7 +1466,11 @@ class AdminGroupsApiController extends BaseApiController
                 usleep(100000); // 100ms delay
             }
 
-            ActivityLog::log($adminId, 'admin_batch_geocode_groups', "Batch geocoded {$success} groups, {$failed} failed");
+            ActivityLog::log(
+                $adminId,
+                'admin_batch_geocode_groups',
+                "Batch geocoded {$success} groups, {$failed} failed" . ($isSuperAdmin ? " (scope: " . ($effectiveTenantId ? "tenant {$effectiveTenantId}" : "all tenants") . ")" : '')
+            );
 
             $this->respondWithData([
                 'processed' => count($groups),
@@ -1216,7 +1497,13 @@ class AdminGroupsApiController extends BaseApiController
     public function getRecommendationData(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
+
+        // Determine scope: defaults to current tenant; super admins can pass ?tenant_id=all for cross-tenant
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        $tenantCondition = $effectiveTenantId !== null ? 'g.tenant_id = ?' : '1=1';
+        $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         $limit = min(100, max(1, (int) ($_GET['limit'] ?? 20)));
         $offset = (int) ($_GET['offset'] ?? 0);
@@ -1225,17 +1512,18 @@ class AdminGroupsApiController extends BaseApiController
             // Try to get recommendation data from group_recommendations table
             try {
                 $recommendations = Database::query(
-                    "SELECT gr.user_id, gr.group_id, gr.score, gr.created_at,
+                    "SELECT gr.user_id, gr.group_id, gr.score, gr.created_at, g.tenant_id, t.name as tenant_name,
                         CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
                         g.name as group_name,
                         (SELECT COUNT(*) FROM group_members gm WHERE gm.user_id = gr.user_id AND gm.group_id = gr.group_id) > 0 as joined
                      FROM group_recommendations gr
                      JOIN users u ON gr.user_id = u.id
                      JOIN `groups` g ON gr.group_id = g.id
-                     WHERE g.tenant_id = ?
+                     LEFT JOIN tenants t ON g.tenant_id = t.id
+                     WHERE {$tenantCondition}
                      ORDER BY gr.created_at DESC
                      LIMIT ? OFFSET ?",
-                    [$tenantId, $limit, $offset]
+                    array_merge($tenantParams, [$limit, $offset])
                 )->fetchAll();
 
                 $stats = Database::query(
@@ -1245,8 +1533,8 @@ class AdminGroupsApiController extends BaseApiController
                         SUM(CASE WHEN EXISTS(SELECT 1 FROM group_members gm WHERE gm.user_id = gr.user_id AND gm.group_id = gr.group_id) THEN 1 ELSE 0 END) as joined_count
                      FROM group_recommendations gr
                      JOIN `groups` g ON gr.group_id = g.id
-                     WHERE g.tenant_id = ?",
-                    [$tenantId]
+                     WHERE {$tenantCondition}",
+                    $tenantParams
                 )->fetch();
             } catch (\Exception $e) {
                 // Table doesn't exist or error - return mock data
@@ -1260,6 +1548,8 @@ class AdminGroupsApiController extends BaseApiController
                     'user_name' => trim($row['user_name']),
                     'group_id' => (int) $row['group_id'],
                     'group_name' => $row['group_name'],
+                    'tenant_id' => (int) $row['tenant_id'],
+                    'tenant_name' => $row['tenant_name'] ?? 'Unknown',
                     'score' => (float) $row['score'],
                     'joined' => (bool) $row['joined'],
                     'created_at' => $row['created_at'],
@@ -1296,10 +1586,14 @@ class AdminGroupsApiController extends BaseApiController
     public function getFeaturedGroups(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
+        // Featured groups service requires a tenant_id — fall back to current tenant if cross-tenant requested
+        $scopeTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId) ?? $tenantId;
+
         try {
-            $groups = \Nexus\Services\SmartGroupRankingService::getFeaturedGroupsWithScores($tenantId);
+            $groups = \Nexus\Services\SmartGroupRankingService::getFeaturedGroupsWithScores($scopeTenantId);
 
             $this->respondWithData($groups);
         } catch (\Exception $e) {
@@ -1320,15 +1614,20 @@ class AdminGroupsApiController extends BaseApiController
     public function updateFeaturedGroups(): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
+        // Super admins can specify a target tenant_id via request body or query param
+        $input = $this->getAllInput();
+        $targetTenantId = ($isSuperAdmin && isset($input['tenant_id'])) ? (int) $input['tenant_id'] : $tenantId;
+
         try {
-            $result = \Nexus\Services\SmartGroupRankingService::updateFeaturedLocalHubs($tenantId);
+            $result = \Nexus\Services\SmartGroupRankingService::updateFeaturedLocalHubs($targetTenantId);
 
             ActivityLog::log(
                 $adminId,
                 'admin_update_featured_groups',
-                "Updated featured groups: {$result['featured']} groups featured, {$result['cleared']} cleared"
+                "Updated featured groups: {$result['featured']} groups featured, {$result['cleared']} cleared" . ($isSuperAdmin ? " (tenant {$targetTenantId})" : '')
             );
 
             $this->respondWithData($result);
@@ -1350,30 +1649,41 @@ class AdminGroupsApiController extends BaseApiController
     public function toggleFeatured(int $id): void
     {
         $adminId = $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         try {
-            $group = Database::query(
-                "SELECT id, name, is_featured FROM `groups` WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            )->fetch();
+            // Super admins can toggle featured status for groups from any tenant
+            if ($isSuperAdmin) {
+                $group = Database::query(
+                    "SELECT id, name, is_featured, tenant_id FROM `groups` WHERE id = ?",
+                    [$id]
+                )->fetch();
+            } else {
+                $group = Database::query(
+                    "SELECT id, name, is_featured, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+            }
 
             if (!$group) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Group not found', null, 404);
                 return;
             }
 
+            // Use the record's own tenant_id for safe UPDATE
+            $groupTenantId = (int) $group['tenant_id'];
             $newStatus = $group['is_featured'] ? 0 : 1;
 
             Database::query(
                 "UPDATE `groups` SET is_featured = ? WHERE id = ? AND tenant_id = ?",
-                [$newStatus, $id, $tenantId]
+                [$newStatus, $id, $groupTenantId]
             );
 
             ActivityLog::log(
                 $adminId,
                 'admin_toggle_group_featured',
-                ($newStatus ? 'Featured' : 'Unfeatured') . " group #{$id}: {$group['name']}"
+                ($newStatus ? 'Featured' : 'Unfeatured') . " group #{$id}: {$group['name']}" . ($isSuperAdmin ? " (tenant {$groupTenantId})" : '')
             );
 
             $this->respondWithData(['is_featured' => (bool) $newStatus]);

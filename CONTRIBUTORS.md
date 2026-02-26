@@ -16,6 +16,7 @@ The originating Irish timebank initiative hOUR Timebank CLG was co-founded by:
 ## Contributors
 
 - **Steven J. Kelly** - Community insight, product thinking
+- **Sarah Bird** - CEO, Timebanking UK
 
 ## Research Foundation
 

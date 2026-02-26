@@ -10,11 +10,13 @@ return [
     /**
      * Enable/Disable Menu Manager
      *
-     * TRUE  = Use custom menu manager (EXPERIMENTAL - UNDER DEVELOPMENT)
-     * FALSE = Use original hardcoded navigation (STABLE)
+     * TRUE  = Use custom menu manager with React frontend integration
+     * FALSE = Use original hardcoded navigation (fallback)
      *
-     * IMPORTANT: Menu Manager is currently UNSTABLE and under active development.
-     * For production sites, keep this set to FALSE until stable release.
+     * IMPORTANT: Only enable after custom menus have been created via the
+     * admin panel. DefaultMenus fallback uses Font Awesome icons which are
+     * incompatible with the React frontend's Lucide icon renderer.
+     * The React frontend has its own hardcoded fallback when this is OFF.
      */
     'enabled' => false,
 
@@ -46,9 +48,9 @@ return [
     /**
      * Feature status
      */
-    'status' => 'BETA',
-    'version' => '0.7.0-beta',
-    'stable_release' => false,
+    'status' => 'STABLE',
+    'version' => '1.0.0',
+    'stable_release' => true,
 
     /**
      * Known issues

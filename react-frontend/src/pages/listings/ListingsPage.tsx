@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useCallback, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Input, Select, SelectItem, Avatar } from '@heroui/react';
 import {
@@ -41,7 +42,8 @@ type ListingType = 'all' | 'offer' | 'request';
 type ViewMode = 'grid' | 'list' | 'map';
 
 export function ListingsPage() {
-  usePageTitle('Listings');
+  const { t } = useTranslation('listings');
+  usePageTitle(t('title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -148,7 +150,7 @@ export function ListingsPage() {
   return (
     <>
       <PageMeta
-        title="Listings"
+        title={t('title')}
         description="Browse services and requests from the community. Find offers and requests for time-banked services."
         keywords="listings, services, offers, requests, time banking"
       />
@@ -158,9 +160,9 @@ export function ListingsPage() {
           <div>
             <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
               <ListTodo className="w-7 h-7 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-              Listings
+              {t('title')}
             </h1>
-            <p className="text-theme-muted mt-1">Browse services and requests from the community</p>
+            <p className="text-theme-muted mt-1">{t('page_subtitle')}</p>
           </div>
         {isAuthenticated && (
           <Link to={tenantPath('/listings/create')}>
@@ -168,7 +170,7 @@ export function ListingsPage() {
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<Plus className="w-4 h-4" />}
             >
-              New Listing
+              {t('create')}
             </Button>
           </Link>
         )}
@@ -179,7 +181,7 @@ export function ListingsPage() {
         <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <Input
-              placeholder="Search by title, description, location or name..."
+              placeholder={t('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}
@@ -192,7 +194,7 @@ export function ListingsPage() {
 
           <div className="flex flex-col sm:flex-row flex-wrap gap-3">
             <Select
-              placeholder="Type"
+              placeholder={t('filter_type_label')}
               selectedKeys={selectedType ? [selectedType] : []}
               onChange={(e) => setSelectedType(e.target.value as ListingType)}
               className="w-full sm:w-36"
@@ -202,13 +204,13 @@ export function ListingsPage() {
               }}
               startContent={<Filter className="w-4 h-4 text-theme-subtle" />}
             >
-              <SelectItem key="all">All Types</SelectItem>
-              <SelectItem key="offer">Offers</SelectItem>
-              <SelectItem key="request">Requests</SelectItem>
+              <SelectItem key="all">{t('filter_all_types')}</SelectItem>
+              <SelectItem key="offer">{t('filters.offers')}</SelectItem>
+              <SelectItem key="request">{t('filters.requests')}</SelectItem>
             </Select>
 
             <Select
-              placeholder="Category"
+              placeholder={t('filter_category_label')}
               selectedKeys={selectedCategory ? [selectedCategory] : []}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="w-full sm:w-44"
@@ -217,7 +219,7 @@ export function ListingsPage() {
                 value: 'text-theme-primary',
               }}
               startContent={<Tag className="w-4 h-4 text-theme-subtle" />}
-              items={[{ slug: '', name: 'All Categories' }, ...categories]}
+              items={[{ slug: '', name: t('filter_all_categories') }, ...categories]}
             >
               {(cat) => <SelectItem key={cat.slug}>{cat.name}</SelectItem>}
             </Select>
@@ -225,10 +227,9 @@ export function ListingsPage() {
             <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label="View mode">
               <Button
                 isIconOnly
-                size="sm"
                 variant="light"
-                className={`rounded-none ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
-                aria-label="Grid view"
+                className={`rounded-none min-w-[44px] min-h-[44px] ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
+                aria-label={t('aria_grid_view')}
                 aria-pressed={viewMode === 'grid'}
                 onPress={() => setViewMode('grid')}
               >
@@ -236,10 +237,9 @@ export function ListingsPage() {
               </Button>
               <Button
                 isIconOnly
-                size="sm"
                 variant="light"
-                className={`rounded-none ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
-                aria-label="List view"
+                className={`rounded-none min-w-[44px] min-h-[44px] ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
+                aria-label={t('aria_list_view')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
               >
@@ -248,10 +248,9 @@ export function ListingsPage() {
               {MAPS_ENABLED && (
                 <Button
                   isIconOnly
-                  size="sm"
                   variant="light"
-                  className={`rounded-none rounded-r-lg ${viewMode === 'map' ? 'bg-primary/10 text-primary' : 'bg-theme-elevated'}`}
-                  aria-label="Map view"
+                  className={`rounded-none rounded-r-lg min-w-[44px] min-h-[44px] ${viewMode === 'map' ? 'bg-primary/10 text-primary' : 'bg-theme-elevated'}`}
+                  aria-label={t('aria_map_view')}
                   aria-pressed={viewMode === 'map'}
                   onPress={() => setViewMode('map')}
                 >
@@ -277,26 +276,26 @@ export function ListingsPage() {
       ) : loadError ? (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Listings</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadListings(true)}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       ) : listings.length === 0 ? (
         <EmptyState
           icon={<Search className="w-12 h-12" />}
-          title="No listings found"
-          description="Try adjusting your filters or create a new listing"
+          title={t('empty')}
+          description={t('empty_subtitle')}
           action={
             isAuthenticated && (
               <Link to={tenantPath('/listings/create')}>
                 <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                  Create Listing
+                  {t('create')}
                 </Button>
               </Link>
             )
@@ -321,7 +320,7 @@ export function ListingsPage() {
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
                       l.type === 'offer' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                     }`}>
-                      {l.type === 'offer' ? 'Offer' : 'Request'}
+                      {l.type === 'offer' ? t('offer') : t('request')}
                     </span>
                   </div>
                   <h4 className="font-semibold text-sm text-gray-900">{l.title}</h4>
@@ -330,7 +329,7 @@ export function ListingsPage() {
                 </div>
               )}
               isLoading={isLoading}
-              emptyMessage="No listings with location data"
+              emptyMessage={t('map_empty')}
             />
           ) : (
             <motion.div
@@ -356,7 +355,7 @@ export function ListingsPage() {
                 onClick={() => loadListings()}
                 isLoading={isLoading}
               >
-                Load More
+                {t('load_more')}
               </Button>
             </div>
           )}
@@ -373,6 +372,7 @@ interface ListingCardProps {
 }
 
 const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCardProps) {
+  const { t } = useTranslation('listings');
   const { tenantPath } = useTenant();
   const isGrid = viewMode === 'grid';
   const hours = listing.estimated_hours || listing.hours_estimate;
@@ -395,7 +395,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
                   listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
                 }`}>
-                  {listing.type === 'offer' ? 'Offering' : 'Requesting'}
+                  {listing.type === 'offer' ? t('offering') : t('requesting')}
                 </span>
                 {listing.category_name && (
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-theme-hover text-theme-muted">
@@ -416,7 +416,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
               {listing.location && (
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3 h-3" aria-hidden="true" />
-                  <span className="truncate max-w-[80px]">{listing.location}</span>
+                  <span className="truncate max-w-[120px]">{listing.location}</span>
                 </span>
               )}
             </div>
@@ -435,7 +435,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
           <span className={`text-xs px-2 py-1 rounded-full font-medium ${
             listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
           }`}>
-            {listing.type === 'offer' ? 'Offering' : 'Requesting'}
+            {listing.type === 'offer' ? t('offering') : t('requesting')}
           </span>
           {listing.category_name && (
             <span className="text-xs px-2 py-1 rounded-full bg-theme-hover text-theme-muted">

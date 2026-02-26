@@ -599,10 +599,12 @@ class ApiClient {
         return { success: true, data: 'data' in data ? data.data : data };
       }
 
+      // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})
+      const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
       return {
         success: false,
-        error: data.error ?? 'Upload failed',
-        code: data.code ?? 'UPLOAD_ERROR',
+        error: data.error ?? firstError?.message ?? data.message ?? 'Upload failed',
+        code: data.code ?? firstError?.code ?? 'UPLOAD_ERROR',
       };
     } catch (error) {
       const rawMessage = error instanceof Error ? error.message : 'Upload failed';
@@ -677,5 +679,21 @@ export async function fetchCsrfToken(): Promise<string | null> {
     return null;
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Public Menu API
+// ─────────────────────────────────────────────────────────────────────────────
+
+import type { ApiMenu, MenusByLocation } from '@/types/menu';
+
+export const menuApi = {
+  /** Get all menus for the current tenant, optionally filtered by location */
+  getMenus: (location?: string) => {
+    const params = location ? `?location=${encodeURIComponent(location)}` : '';
+    return api.get<ApiMenu[] | MenusByLocation>(`/menus${params}`);
+  },
+  /** Get mobile-optimized menu */
+  getMobileMenu: () => api.get<ApiMenu[]>('/menus/mobile'),
+};
 
 export default api;

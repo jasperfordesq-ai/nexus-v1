@@ -1,0 +1,15 @@
+{
+  "generic": "Une erreur s'est produite. Veuillez réessayer.",
+  "not_found": "Page introuvable",
+  "unauthorized": "Vous n'avez pas la permission de consulter cette page",
+  "network": "Erreur réseau. Veuillez vérifier votre connexion.",
+  "loading_failed": "Échec du chargement du contenu. Veuillez actualiser la page.",
+  "session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
+  "validation": {
+    "required": "Ce champ est obligatoire",
+    "email": "Veuillez saisir une adresse e-mail valide",
+    "phone": "Veuillez saisir un numéro de téléphone valide",
+    "min_length": "Doit comporter au moins {{min}} caractères",
+    "max_length": "Ne doit pas dépasser {{max}} caractères"
+  }
+}

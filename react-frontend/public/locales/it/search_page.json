@@ -1,0 +1,28 @@
+{
+  "page_title": "Ricerca",
+  "title": "Ricerca",
+  "subtitle": "Trovi annunci, membri, eventi e gruppi",
+  "search_placeholder": "Cerchi qualcosa...",
+  "tab_all": "Tutti ({{count}})",
+  "tab_listings": "Annunci ({{count}})",
+  "tab_members": "Membri ({{count}})",
+  "tab_events": "Eventi ({{count}})",
+  "tab_groups": "Gruppi ({{count}})",
+  "error_title": "Errore di ricerca",
+  "error_message": "La ricerca non è riuscita. La preghiamo di riprovare.",
+  "try_again": "Riprova",
+  "no_results_title": "Nessun risultato trovato",
+  "no_results_desc": "Nessun risultato per \"{{query}}\". Provi un altro termine di ricerca.",
+  "section_listings": "Annunci ({{count}})",
+  "section_members": "Membri ({{count}})",
+  "section_events": "Eventi ({{count}})",
+  "section_groups": "Gruppi ({{count}})",
+  "listing_offering": "Offerta",
+  "listing_requesting": "Richiesta",
+  "members_count": "{{count}} membri",
+  "initial_title": "Inizi la ricerca",
+  "initial_desc": "Inserisca un termine di ricerca per trovare annunci, membri, eventi e gruppi",
+  "toast": {
+    "search_failed": "La ricerca non è riuscita"
+  }
+}

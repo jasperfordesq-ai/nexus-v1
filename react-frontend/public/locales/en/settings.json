@@ -1,0 +1,19 @@
+{
+  "title": "Settings",
+  "account": "Account",
+  "notifications": "Notifications",
+  "privacy": "Privacy",
+  "language": "Language",
+  "appearance": "Appearance",
+  "security": "Security",
+  "save": "Save Settings",
+  "saved": "Settings saved",
+  "language_preference": "Language Preference",
+  "select_language": "Choose your preferred language for the interface",
+  "theme": {
+    "title": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}

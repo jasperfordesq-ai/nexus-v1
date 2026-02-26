@@ -1,0 +1,15 @@
+{
+  "generic": "Chuaigh rud éigin mícheart. Bain triail eile as.",
+  "not_found": "Leathanach gan aimsiú",
+  "unauthorized": "Níl cead agat an leathanach seo a fheiceáil",
+  "network": "Earráid líonra. Seiceáil do nasc le do thoil.",
+  "loading_failed": "Theip ar luchtú an ábhair. Athnuaigh an leathanach le do thoil.",
+  "session_expired": "Tá do sheisiún imithe in éag. Logáil isteach arís le do thoil.",
+  "validation": {
+    "required": "Tá an réimse seo riachtanach",
+    "email": "Cuir isteach seoladh ríomhphoist bailí",
+    "phone": "Cuir isteach uimhir ghutháin bhailí",
+    "min_length": "Ní mór dó a bheith ar a laghad {{min}} carachtar",
+    "max_length": "Ní mór dó a bheith níos lú ná {{max}} carachtar"
+  }
+}

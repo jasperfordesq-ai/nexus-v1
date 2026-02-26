@@ -1,0 +1,165 @@
+{
+  "page_title": "Tauschgeschäfte",
+  "title": "Meine Tauschgeschäfte",
+  "subtitle": "Verfolgen Sie Ihre Tauschanfragen und Bestätigungen",
+  "browse_listings": "Angebote durchsuchen",
+  "load_more": "Mehr laden",
+  "try_again": "Erneut versuchen",
+  "service_exchange": "Dienstleistungstausch",
+  "unknown": "Unbekannt",
+  "hours_count": "{{count}} Stunde",
+  "hours_count_other": "{{count}} Stunden",
+
+  "workflow_not_enabled_title": "Tausch-Workflow nicht aktiviert",
+  "workflow_not_enabled_description": "Das Tausch-Workflow-System ist für diese Gemeinschaft nicht aktiviert. Kontaktieren Sie Ihren Koordinator für weitere Informationen.",
+
+  "tabs": {
+    "aria_label": "Tauschstatus-Filter",
+    "active": "Aktiv",
+    "active_aria": "Aktive Tauschgeschäfte anzeigen",
+    "needs_confirmation": "Bestätigung nötig",
+    "needs_confirmation_aria": "Tauschgeschäfte mit ausstehender Bestätigung anzeigen",
+    "completed": "Abgeschlossen",
+    "completed_aria": "Abgeschlossene Tauschgeschäfte anzeigen",
+    "all": "Alle",
+    "all_aria": "Alle Tauschgeschäfte anzeigen"
+  },
+
+  "error": {
+    "load_failed": "Tauschgeschäfte konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "unable_to_load": "Tauschgeschäfte können nicht geladen werden"
+  },
+
+  "empty": {
+    "title": "Keine Tauschgeschäfte gefunden",
+    "active_description": "Sie haben keine aktiven Tauschgeschäfte. Durchsuchen Sie Angebote, um eine Dienstleistung anzufragen.",
+    "filter_description": "Keine Tauschgeschäfte entsprechen diesem Filter."
+  },
+
+  "card": {
+    "aria_label": "Tausch: {{title}} - {{status}}",
+    "with_party": "Mit {{name}}",
+    "from_party": "Von {{name}}",
+    "you_requested": "Sie haben angefragt",
+    "you_providing": "Sie bieten an",
+    "confirm_hours": "Stunden bestätigen",
+    "waiting_for_other": "Auf Gegenpartei warten",
+    "respond": "Antworten"
+  },
+
+  "breadcrumb": {
+    "exchanges": "Tauschgeschäfte",
+    "exchange": "Tauschgeschäft"
+  },
+
+  "toast": {
+    "load_more_failed": "Weitere Tauschgeschäfte konnten nicht geladen werden",
+    "accepted": "Tauschgeschäft angenommen!",
+    "accept_failed": "Tauschgeschäft konnte nicht angenommen werden",
+    "declined": "Tauschgeschäft abgelehnt",
+    "decline_failed": "Tauschgeschäft konnte nicht abgelehnt werden",
+    "started": "Tauschgeschäft gestartet!",
+    "start_failed": "Tauschgeschäft konnte nicht gestartet werden",
+    "completed": "Tauschgeschäft als abgeschlossen markiert. Bitte bestätigen Sie die Stunden.",
+    "complete_failed": "Tauschgeschäft konnte nicht abgeschlossen werden",
+    "invalid_hours": "Bitte geben Sie gültige Stunden ein",
+    "max_hours": "Maximal {{max}} Stunden pro Tauschgeschäft",
+    "hours_confirmed": "Stunden bestätigt!",
+    "confirm_failed": "Stunden konnten nicht bestätigt werden",
+    "cancelled": "Tauschgeschäft storniert",
+    "cancel_failed": "Tauschgeschäft konnte nicht storniert werden",
+    "request_sent": "Tauschanfrage gesendet!",
+    "request_failed": "Tauschanfrage konnte nicht erstellt werden"
+  },
+
+  "detail": {
+    "page_title": "Tauschdetails",
+    "loading": "Tauschgeschäft wird geladen...",
+    "not_found": "Tauschgeschäft nicht gefunden",
+    "not_found_title": "Tauschgeschäft nicht gefunden",
+    "not_found_description": "Das gesuchte Tauschgeschäft existiert nicht",
+    "view_exchanges": "Meine Tauschgeschäfte anzeigen",
+    "exchange_details": "Tauschdetails",
+    "service": "Dienstleistung",
+    "requester": "Anfragende Person",
+    "provider": "Anbietende Person",
+    "you": "Sie",
+    "other_party": "Gegenpartei",
+    "confirmed_hours": "Bestätigt {{hours}}h",
+    "message_party": "Nachricht an {{name}}",
+    "proposed_hours": "Vorgeschlagene Stunden",
+    "final_hours": "Endgültige Stunden",
+    "created": "Erstellt",
+    "message_from_requester": "Nachricht der anfragenden Person",
+    "broker_notes": "Vermittler-Notizen",
+    "accept_request": "Anfrage annehmen",
+    "decline": "Ablehnen",
+    "start_exchange": "Tausch starten",
+    "mark_complete": "Als abgeschlossen markieren",
+    "confirm_hours": "Stunden bestätigen",
+    "cancel_exchange": "Tausch stornieren",
+    "timeline_title": "Tausch-Verlauf",
+    "timeline": {
+      "created": "Tauschgeschäft erstellt",
+      "accepted": "Tauschgeschäft angenommen",
+      "declined": "Tauschgeschäft abgelehnt",
+      "started": "Tauschgeschäft gestartet",
+      "completed": "Tauschgeschäft abgeschlossen",
+      "confirmed": "Stunden bestätigt",
+      "cancelled": "Tauschgeschäft storniert",
+      "awaiting_confirmation": "Warten auf Bestätigung",
+      "sent_to_broker": "An Vermittler gesendet",
+      "disputed": "Tauschgeschäft angefochten",
+      "fallback": "Status aktualisiert"
+    }
+  },
+
+  "modal": {
+    "decline_title": "Tauschanfrage ablehnen",
+    "decline_reason_label": "Grund (optional)",
+    "decline_reason_placeholder": "Teilen Sie mit, warum Sie ablehnen...",
+    "decline_confirm": "Anfrage ablehnen",
+    "cancel": "Abbrechen",
+    "confirm_title": "Geleistete Stunden bestätigen",
+    "confirm_description": "Wie viele Stunden wurden tatsächlich für dieses Tauschgeschäft gearbeitet?",
+    "hours_label": "Stunden",
+    "hours_placeholder": "Stunden eingeben",
+    "hours_unit": "Stunden",
+    "originally_proposed": "Ursprünglich vorgeschlagen: {{hours}} Stunden (max: {{max}})",
+    "cancel_title": "Tauschgeschäft stornieren?",
+    "cancel_description": "Sind Sie sicher, dass Sie dieses Tauschgeschäft stornieren möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "keep_exchange": "Tausch beibehalten"
+  },
+
+  "request": {
+    "page_title": "Tausch anfragen",
+    "title": "Tausch anfragen",
+    "subtitle": "Senden Sie eine Anfrage zum Tausch von Zeitguthaben für diese Dienstleistung",
+    "loading": "Wird geladen...",
+    "listing_not_found": "Angebot nicht gefunden",
+    "workflow_not_enabled": "Tausch-Workflow ist nicht aktiviert",
+    "load_failed": "Angebot konnte nicht geladen werden",
+    "cannot_request": "Tausch kann nicht angefragt werden",
+    "not_available": "Dieses Angebot ist nicht für Tauschanfragen verfügbar.",
+    "own_listing_title": "Dies ist Ihr Angebot",
+    "own_listing_description": "Sie können keinen Tausch für Ihr eigenes Angebot anfragen.",
+    "view_listing": "Angebot anzeigen",
+    "breadcrumb_listings": "Angebote",
+    "breadcrumb_listing": "Angebot",
+    "breadcrumb_request": "Tausch anfragen",
+    "estimated_hours": "~{{hours}} Stunden",
+    "service_offer": "Dienstleistungsangebot",
+    "service_request": "Dienstleistungsanfrage",
+    "proposed_hours_label": "Vorgeschlagene Stunden",
+    "proposed_hours_placeholder": "Wie viele Stunden benötigen Sie?",
+    "proposed_hours_description": "Die geschätzte Zeit für diese Dienstleistung (max: {{max}})",
+    "hours_unit": "Stunden",
+    "message_label": "Nachricht (optional)",
+    "message_placeholder": "Fügen Sie eine Nachricht an den Dienstleister hinzu...",
+    "message_description": "Erklären Sie Ihre Bedürfnisse oder stellen Sie Fragen",
+    "broker_approval_title": "Vermittler-Genehmigung erforderlich",
+    "broker_approval_description": "Dieses Tauschgeschäft muss von einem Gemeinschaftskoordinator genehmigt werden, bevor es fortfahren kann.",
+    "cancel": "Abbrechen",
+    "send_request": "Anfrage senden"
+  }
+}

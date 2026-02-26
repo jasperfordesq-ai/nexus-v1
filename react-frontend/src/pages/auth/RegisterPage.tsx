@@ -34,6 +34,7 @@ import {
   X,
   ChevronLeft,
 } from 'lucide-react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
@@ -60,6 +61,7 @@ const STEPS = [
 ];
 
 export function RegisterPage() {
+  const { t } = useTranslation('auth');
   usePageTitle('Create Account');
   const navigate = useNavigate();
   const { register, isAuthenticated, isLoading, error, clearError } = useAuth();
@@ -308,8 +310,8 @@ export function RegisterPage() {
             {/* Tenant Selector - Only show if multiple tenants AND tenant not already known from context */}
             {!tenantsLoading && tenants.length > 1 && !tenant?.id && (
               <Select
-                label="Community"
-                placeholder="Select your community"
+                label={t('register.community_label')}
+                placeholder={t('register.community_placeholder')}
                 selectedKeys={selectedTenantId ? new Set([selectedTenantId]) : new Set()}
                 onSelectionChange={handleTenantChange}
                 startContent={<Building2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -380,15 +382,15 @@ export function RegisterPage() {
             {!tenantsLoading && tenants.length === 0 && !tenant?.id && (
               <div className="p-3 rounded-xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10 text-center">
                 <p className="text-theme-muted text-sm">
-                  Joining {tenant?.name || 'NEXUS'}
+                  {t('register.joining', { name: tenant?.name || 'NEXUS' })}
                 </p>
               </div>
             )}
 
             {/* Profile Type */}
             <Select
-              label="Profile Type"
-              placeholder="Select profile type"
+              label={t('register.profile_type_label')}
+              placeholder={t('register.profile_type_placeholder')}
               selectedKeys={new Set([profileType])}
               onSelectionChange={handleProfileTypeChange}
               isRequired
@@ -403,21 +405,21 @@ export function RegisterPage() {
             >
               <SelectItem
                 key="individual"
-                textValue="Individual"
+                textValue={t('register.type_individual')}
                 classNames={{
                   base: 'text-gray-900 dark:text-white data-[hover=true]:bg-gray-100 dark:data-[hover=true]:bg-white/10',
                 }}
               >
-                Individual
+                {t('register.type_individual')}
               </SelectItem>
               <SelectItem
                 key="organisation"
-                textValue="Organisation"
+                textValue={t('register.type_organisation')}
                 classNames={{
                   base: 'text-gray-900 dark:text-white data-[hover=true]:bg-gray-100 dark:data-[hover=true]:bg-white/10',
                 }}
               >
-                Organisation
+                {t('register.type_organisation')}
               </SelectItem>
             </Select>
 
@@ -425,8 +427,8 @@ export function RegisterPage() {
             {profileType === 'organisation' && (
               <Input
                 type="text"
-                label="Organisation Name"
-                placeholder="e.g. Acme Corp"
+                label={t('register.org_name_label')}
+                placeholder={t('register.org_name_placeholder')}
                 value={organizationName}
                 onChange={(e) => setOrganizationName(e.target.value)}
                 startContent={<Building2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -449,8 +451,8 @@ export function RegisterPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 type="text"
-                label="First Name"
-                placeholder="John"
+                label={t('register.first_name_label')}
+                placeholder={t('register.first_name_placeholder')}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 isRequired
@@ -465,14 +467,14 @@ export function RegisterPage() {
 
               <Input
                 type="text"
-                label="Last Name"
-                placeholder="Doe"
+                label={t('register.last_name_label')}
+                placeholder={t('register.last_name_placeholder')}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 isRequired
                 autoComplete="family-name"
                 description={
-                  profileType === 'organisation' ? 'Only visible to admins' : undefined
+                  profileType === 'organisation' ? t('register.admin_only_note') : undefined
                 }
                 classNames={{
                   inputWrapper:
@@ -486,8 +488,8 @@ export function RegisterPage() {
 
             {/* Location */}
             <PlaceAutocompleteInput
-              label="Location"
-              placeholder="Your town or city"
+              label={t('register.location_label')}
+              placeholder={t('register.location_placeholder')}
               value={location}
               onChange={(val) => setLocation(val)}
               onPlaceSelect={(place) => {
@@ -510,15 +512,15 @@ export function RegisterPage() {
             {/* Phone */}
             <Input
               type="tel"
-              label="Phone Number"
-              placeholder="e.g. +1 555 123 4567"
+              label={t('register.phone_label')}
+              placeholder={t('register.phone_placeholder')}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               startContent={<Phone className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               autoComplete="tel"
               isInvalid={!!phoneError}
               errorMessage={phoneError}
-              description={phoneError ? undefined : 'Only visible to administrators'}
+              description={phoneError ? undefined : t('register.phone_admin_note')}
               classNames={{
                 inputWrapper:
                   'glass-card border-glass-border hover:border-glass-border-hover',
@@ -536,8 +538,8 @@ export function RegisterPage() {
             {/* Email */}
             <Input
               type="email"
-              label="Email"
-              placeholder="you@example.com"
+              label={t('register.email_label')}
+              placeholder={t('register.email_placeholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               startContent={<Mail className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -555,8 +557,8 @@ export function RegisterPage() {
             <div>
               <Input
                 type={showPassword ? 'text' : 'password'}
-                label="Password"
-                placeholder="Create a strong password"
+                label={t('register.password_label')}
+                placeholder={t('register.password_placeholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 startContent={<Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -630,8 +632,8 @@ export function RegisterPage() {
             {/* Confirm Password */}
             <Input
               type={showPassword ? 'text' : 'password'}
-              label="Confirm Password"
-              placeholder="Re-enter your password"
+              label={t('register.confirm_password_label')}
+              placeholder={t('register.confirm_password_placeholder')}
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
               startContent={<Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -639,7 +641,7 @@ export function RegisterPage() {
               autoComplete="new-password"
               isInvalid={passwordConfirm.length > 0 && !passwordsMatch}
               errorMessage={
-                passwordConfirm.length > 0 && !passwordsMatch ? 'Passwords must match' : ''
+                passwordConfirm.length > 0 && !passwordsMatch ? t('register.passwords_must_match') : ''
               }
               classNames={{
                 inputWrapper:
@@ -665,21 +667,14 @@ export function RegisterPage() {
                 }}
               >
                 <span>
-                  I agree to the{' '}
-                  <Link
-                    to={tenantPath('/terms')}
-                    className="text-indigo-600 dark:text-indigo-400 hover:underline"
-                  >
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link
-                    to={tenantPath('/privacy')}
-                    className="text-indigo-600 dark:text-indigo-400 hover:underline"
-                  >
-                    Privacy Policy
-                  </Link>
-                  , and I am 18 years of age or older.
+                  <Trans
+                    i18nKey="register.terms_agreement"
+                    t={t}
+                    components={{
+                      termsLink: <Link to={tenantPath('/terms')} className="text-indigo-600 dark:text-indigo-400 hover:underline" />,
+                      privacyLink: <Link to={tenantPath('/privacy')} className="text-indigo-600 dark:text-indigo-400 hover:underline" />,
+                    }}
+                  />
                 </span>
               </Checkbox>
 
@@ -691,24 +686,22 @@ export function RegisterPage() {
                   label: 'text-theme-muted text-sm',
                 }}
               >
-                Send me occasional updates and tips
+                {t('register.newsletter_opt_in')}
               </Checkbox>
             </div>
 
             {/* Data Protection Notice */}
             <div className="p-3 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-xs text-theme-muted space-y-2">
-              <p className="font-medium text-theme-primary">Data Protection Notice</p>
+              <p className="font-medium text-theme-primary">{t('register.data_protection_title')}</p>
               <p>
-                By clicking "Create Account," you are entering into a membership agreement. We
-                collect your personal data solely to administer your account, facilitate safe
-                exchanges between members, and send you essential community updates.
+                {t('register.data_protection_body')}
               </p>
               <p>
                 <Link
                   to={tenantPath('/privacy')}
                   className="text-indigo-600 dark:text-indigo-400 hover:underline"
                 >
-                  View our full Privacy Policy
+                  {t('register.data_protection_privacy_link')}
                 </Link>
               </p>
             </div>
@@ -754,7 +747,7 @@ export function RegisterPage() {
             size="lg"
             spinner={<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
           >
-            Create Account
+            {t('register.submit')}
           </Button>
         </form>
       );
@@ -780,9 +773,9 @@ export function RegisterPage() {
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-theme-primary">
-              Step {currentStep} of {STEPS.length}
+              {t('register.step_indicator', { step: currentStep, total: STEPS.length })}
             </span>
-            <span className="text-sm text-theme-muted">{STEPS[currentStep - 1].title}</span>
+            <span className="text-sm text-theme-muted">{t(`register.step_${['community','details','account','terms'][currentStep - 1]}`)}</span>
           </div>
           <Progress
             value={progressPercent}
@@ -806,7 +799,7 @@ export function RegisterPage() {
                 }`}
                 onPress={() => step.id < currentStep && setCurrentStep(step.id)}
                 isDisabled={step.id > currentStep}
-                aria-label={`Go to step ${step.id}: ${step.title}`}
+                aria-label={`Go to step ${step.id}: ${t(`register.step_${['community','details','account','terms'][step.id - 1]}`)}`}
               >
                 <div
                   className={`w-2.5 h-2.5 rounded-full ${
@@ -817,7 +810,7 @@ export function RegisterPage() {
                         : 'bg-theme-elevated'
                   }`}
                 />
-                <span className="text-[10px] mt-1 hidden xs:block">{step.shortTitle}</span>
+                <span className="text-[10px] mt-1 hidden xs:block">{t(`register.step_${['community','details','account','terms'][step.id - 1]}`)}</span>
               </Button>
             ))}
           </div>
@@ -846,7 +839,7 @@ export function RegisterPage() {
               className="flex-1 bg-theme-elevated text-theme-secondary"
               startContent={<ChevronLeft className="w-4 h-4" aria-hidden="true" />}
             >
-              Back
+              {t('register.back')}
             </Button>
           )}
 
@@ -858,7 +851,7 @@ export function RegisterPage() {
               className={`${currentStep === 1 ? 'w-full' : 'flex-1'} bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium`}
               endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
             >
-              Continue
+              {t('register.continue')}
             </Button>
           ) : (
             <Button
@@ -868,7 +861,7 @@ export function RegisterPage() {
               className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
               spinner={<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
             >
-              Create Account
+              {t('register.submit')}
             </Button>
           )}
         </div>
@@ -901,9 +894,9 @@ export function RegisterPage() {
             >
               <User className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
             </motion.div>
-            <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">Create Account</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('register.title')}</h1>
             <p className="text-theme-muted mt-2 text-sm sm:text-base">
-              Join {tenant?.name || 'NEXUS'} and start exchanging time
+              {t('register.subtitle_with_name', { name: tenant?.name || 'NEXUS' })}
             </p>
           </div>
 
@@ -926,12 +919,12 @@ export function RegisterPage() {
 
           {/* Login Link */}
           <p className="text-center text-theme-muted text-sm">
-            Already have an account?{' '}
+            {t('register.have_account')}{' '}
             <Link
               to={tenantPath('/login')}
               className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors"
             >
-              Sign in
+              {t('register.sign_in_link')}
             </Link>
           </p>
         </GlassCard>
@@ -948,7 +941,7 @@ export function RegisterPage() {
             className="inline-flex items-center gap-2 text-theme-subtle hover:text-theme-muted text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            Back to home
+            {t('register.back_to_home')}
           </Link>
         </motion.div>
       </motion.div>

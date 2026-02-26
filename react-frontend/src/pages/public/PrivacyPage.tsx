@@ -31,6 +31,7 @@ import {
   Send,
   CalendarDays,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { useTenant } from '@/contexts';
@@ -50,105 +51,105 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const quickNavItems = [
-  { id: 'data-collection', label: 'Data Collection', icon: Database },
-  { id: 'data-usage', label: 'How We Use Data', icon: PieChart },
-  { id: 'your-rights', label: 'Your Rights', icon: UserCheck },
-  { id: 'cookies', label: 'Cookies', icon: Cookie },
+const quickNavIcons = [
+  { id: 'data-collection', key: 'privacy.nav_data_collection', icon: Database },
+  { id: 'data-usage', key: 'privacy.nav_data_usage', icon: PieChart },
+  { id: 'your-rights', key: 'privacy.nav_your_rights', icon: UserCheck },
+  { id: 'cookies', key: 'privacy.nav_cookies', icon: Cookie },
 ];
 
-const dataCollectionRows = [
+const dataCollectionKeys = [
   {
-    type: 'Account Information',
-    collected: 'Name, email address, password (encrypted)',
-    why: 'Required to create and manage your account',
-    basis: 'Contract',
+    typeKey: 'privacy.data_account_type',
+    collectedKey: 'privacy.data_account_collected',
+    whyKey: 'privacy.data_account_why',
+    basisKey: 'privacy.data_account_basis',
   },
   {
-    type: 'Profile Details',
-    collected: 'Bio, skills, location, profile photo',
-    why: 'Helps connect you with community members',
-    basis: 'Consent',
+    typeKey: 'privacy.data_profile_type',
+    collectedKey: 'privacy.data_profile_collected',
+    whyKey: 'privacy.data_profile_why',
+    basisKey: 'privacy.data_profile_basis',
   },
   {
-    type: 'Activity Data',
-    collected: 'Exchanges, messages, time credit transactions',
-    why: 'Essential for platform functionality',
-    basis: 'Contract',
+    typeKey: 'privacy.data_activity_type',
+    collectedKey: 'privacy.data_activity_collected',
+    whyKey: 'privacy.data_activity_why',
+    basisKey: 'privacy.data_activity_basis',
   },
   {
-    type: 'Device Information',
-    collected: 'Browser type, IP address, device type',
-    why: 'Security monitoring and troubleshooting',
-    basis: 'Legitimate Interest',
+    typeKey: 'privacy.data_device_type',
+    collectedKey: 'privacy.data_device_collected',
+    whyKey: 'privacy.data_device_why',
+    basisKey: 'privacy.data_device_basis',
   },
   {
-    type: 'Usage Analytics',
-    collected: 'Pages visited, features used, session duration',
-    why: 'Improve platform experience',
-    basis: 'Legitimate Interest',
+    typeKey: 'privacy.data_analytics_type',
+    collectedKey: 'privacy.data_analytics_collected',
+    whyKey: 'privacy.data_analytics_why',
+    basisKey: 'privacy.data_analytics_basis',
   },
 ];
 
-const gdprRights = [
+const gdprRightKeys = [
   {
     icon: Eye,
-    title: 'Right to Access',
-    description: 'Request a copy of all personal data we hold about you. We will respond within 30 days.',
+    titleKey: 'privacy.right_access_title',
+    descKey: 'privacy.right_access_desc',
     color: 'text-blue-500',
     bg: 'bg-blue-500/20',
   },
   {
     icon: Pencil,
-    title: 'Right to Rectification',
-    description: 'Correct any inaccurate or incomplete personal information we hold about you.',
+    titleKey: 'privacy.right_rectification_title',
+    descKey: 'privacy.right_rectification_desc',
     color: 'text-emerald-500',
     bg: 'bg-emerald-500/20',
   },
   {
     icon: Trash2,
-    title: 'Right to Erasure',
-    description: 'Request deletion of your account and all associated personal data.',
+    titleKey: 'privacy.right_erasure_title',
+    descKey: 'privacy.right_erasure_desc',
     color: 'text-red-500',
     bg: 'bg-red-500/20',
   },
   {
     icon: Download,
-    title: 'Right to Portability',
-    description: 'Export your data in a structured, machine-readable format (JSON or CSV).',
+    titleKey: 'privacy.right_portability_title',
+    descKey: 'privacy.right_portability_desc',
     color: 'text-purple-500',
     bg: 'bg-purple-500/20',
   },
   {
     icon: Ban,
-    title: 'Right to Restrict Processing',
-    description: 'Request that we limit how we process your data while a concern is being resolved.',
+    titleKey: 'privacy.right_restrict_title',
+    descKey: 'privacy.right_restrict_desc',
     color: 'text-amber-500',
     bg: 'bg-amber-500/20',
   },
   {
     icon: UserCheck,
-    title: 'Right to Withdraw Consent',
-    description: 'Withdraw consent for optional data processing at any time without affecting prior processing.',
+    titleKey: 'privacy.right_withdraw_title',
+    descKey: 'privacy.right_withdraw_desc',
     color: 'text-indigo-500',
     bg: 'bg-indigo-500/20',
   },
 ];
 
-const cookieCategories = [
+const cookieCategoryKeys = [
   {
-    name: 'Essential Cookies',
-    description: 'Required for login, security, and basic platform functionality. Cannot be disabled.',
+    nameKey: 'privacy.cookie_essential_name',
+    descKey: 'privacy.cookie_essential_desc',
     required: true,
   },
   {
-    name: 'Preference Cookies',
-    description: 'Remember your settings such as theme preference, language, and display options.',
+    nameKey: 'privacy.cookie_preference_name',
+    descKey: 'privacy.cookie_preference_desc',
     required: false,
   },
   {
-    name: 'Analytics Cookies',
-    description: 'Help us understand how people use the platform so we can improve features. All data is anonymised.',
+    nameKey: 'privacy.cookie_analytics_name',
+    descKey: 'privacy.cookie_analytics_desc',
     required: false,
   },
 ];
@@ -161,7 +162,8 @@ function scrollToSection(id: string) {
 }
 
 export function PrivacyPage() {
-  usePageTitle('Privacy Policy');
+  const { t } = useTranslation('legal');
+  usePageTitle(t('privacy.page_title'));
   const { branding, tenantPath } = useTenant();
   const { document: customDoc, loading } = useLegalDocument('privacy');
 
@@ -190,21 +192,21 @@ export function PrivacyPage() {
           <Shield className="w-10 h-10 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
-          Privacy Policy
+          {t('privacy.heading')}
         </h1>
         <p className="text-theme-muted text-lg max-w-2xl mx-auto">
-          How we collect, use, and protect your personal information
+          {t('privacy.subtitle')}
         </p>
         <div className="flex items-center justify-center gap-2 mt-3 text-sm text-theme-subtle">
           <CalendarDays className="w-4 h-4" aria-hidden="true" />
-          <span>Last updated: February 2026</span>
+          <span>{t('privacy.last_updated')}</span>
         </div>
       </motion.div>
 
       {/* Quick Navigation */}
       <motion.div variants={itemVariants}>
         <div className="flex flex-wrap justify-center gap-3">
-          {quickNavItems.map((item) => (
+          {quickNavIcons.map((item) => (
             <Button
               key={item.id}
               variant="light"
@@ -212,7 +214,7 @@ export function PrivacyPage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-indigo-500/10 text-theme-primary text-sm font-medium transition-colors h-auto min-w-0"
             >
               <item.icon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-              {item.label}
+              {t(item.key)}
             </Button>
           ))}
         </div>
@@ -224,18 +226,18 @@ export function PrivacyPage() {
           <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
             <h2 className="text-xl font-semibold text-theme-primary mb-3 flex items-center gap-2">
               <Handshake className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-              Our Commitment to Your Privacy
+              {t('privacy.commitment_title')}
             </h2>
             <div className="space-y-3 text-theme-muted">
               <p>
-                {branding.name} is committed to protecting your privacy and ensuring your
-                personal data is handled responsibly. This policy explains what information
-                we collect, why we collect it, and how you can manage your data.
+                {t('privacy.commitment_body_1', { name: branding.name })}
               </p>
               <p>
-                We believe in <strong className="text-theme-primary">transparency</strong> and{' '}
-                <strong className="text-theme-primary">user control</strong>. You have the right
-                to understand and manage how your information is used.
+                {t('privacy.commitment_body_2_before')}{' '}
+                <strong className="text-theme-primary">{t('privacy.commitment_body_2_transparency')}</strong>{' '}
+                {t('privacy.commitment_body_2_and')}{' '}
+                <strong className="text-theme-primary">{t('privacy.commitment_body_2_control')}</strong>.{' '}
+                {t('privacy.commitment_body_2_after')}
               </p>
             </div>
           </div>
@@ -247,27 +249,27 @@ export function PrivacyPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Database className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-            Information We Collect
+            {t('privacy.data_collection_title')}
           </h2>
           <p className="text-theme-muted mb-6">
-            We collect only the information necessary to provide and improve our services:
+            {t('privacy.data_collection_intro')}
           </p>
 
           {/* Data Table - responsive card layout */}
           <div className="space-y-3">
-            {dataCollectionRows.map((row) => (
+            {dataCollectionKeys.map((row) => (
               <div
-                key={row.type}
+                key={row.typeKey}
                 className="p-4 rounded-xl bg-theme-elevated border border-default-200 dark:border-default-100"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                  <h3 className="font-semibold text-theme-primary">{row.type}</h3>
+                  <h3 className="font-semibold text-theme-primary">{t(row.typeKey)}</h3>
                   <Chip size="sm" variant="flat" color="primary" className="text-xs">
-                    {row.basis}
+                    {t(row.basisKey)}
                   </Chip>
                 </div>
-                <p className="text-sm text-theme-muted mb-1">{row.collected}</p>
-                <p className="text-xs text-theme-subtle">{row.why}</p>
+                <p className="text-sm text-theme-muted mb-1">{t(row.collectedKey)}</p>
+                <p className="text-xs text-theme-subtle">{t(row.whyKey)}</p>
               </div>
             ))}
           </div>
@@ -279,23 +281,23 @@ export function PrivacyPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <PieChart className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-            How We Use Your Data
+            {t('privacy.data_usage_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            Your data is used exclusively for the following purposes:
+            {t('privacy.data_usage_intro')}
           </p>
           <ul className="space-y-3 text-theme-muted">
-            {[
-              { label: 'Service Delivery', desc: 'Facilitating time exchanges and community connections' },
-              { label: 'Communication', desc: 'Sending important updates, notifications, and messages from other members' },
-              { label: 'Security', desc: 'Protecting your account and preventing fraud or abuse' },
-              { label: 'Improvement', desc: 'Analysing usage patterns to enhance platform features' },
-              { label: 'Legal Compliance', desc: 'Meeting regulatory requirements when necessary' },
-            ].map((item) => (
-              <li key={item.label} className="flex items-start gap-3">
+            {([
+              { labelKey: 'privacy.usage_delivery_label', descKey: 'privacy.usage_delivery_desc' },
+              { labelKey: 'privacy.usage_communication_label', descKey: 'privacy.usage_communication_desc' },
+              { labelKey: 'privacy.usage_security_label', descKey: 'privacy.usage_security_desc' },
+              { labelKey: 'privacy.usage_improvement_label', descKey: 'privacy.usage_improvement_desc' },
+              { labelKey: 'privacy.usage_legal_label', descKey: 'privacy.usage_legal_desc' },
+            ] as const).map((item) => (
+              <li key={item.labelKey} className="flex items-start gap-3">
                 <div className="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
                 <span>
-                  <strong className="text-theme-primary">{item.label}:</strong> {item.desc}
+                  <strong className="text-theme-primary">{t(item.labelKey)}:</strong> {t(item.descKey)}
                 </span>
               </li>
             ))}
@@ -303,8 +305,7 @@ export function PrivacyPage() {
 
           <div className="mt-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
             <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-              We do not sell your personal data to third parties. Your information is never
-              shared with advertisers or data brokers.
+              {t('privacy.no_sell_data')}
             </p>
           </div>
         </GlassCard>
@@ -315,18 +316,16 @@ export function PrivacyPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Eye className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-            Profile Visibility
+            {t('privacy.visibility_title')}
           </h2>
           <div className="space-y-3 text-theme-muted">
             <p>
-              Your profile is visible to other verified members of the timebank community.
-              This visibility is essential for facilitating exchanges and building trust
-              within the community.
+              {t('privacy.visibility_body_1')}
             </p>
             <p>
-              You can control what information appears on your profile through your{' '}
-              <strong className="text-theme-primary">account settings</strong>. Some information,
-              like your name and general location, is required for meaningful community participation.
+              {t('privacy.visibility_body_2_before')}{' '}
+              <strong className="text-theme-primary">{t('privacy.visibility_body_2_emphasis')}</strong>.{' '}
+              {t('privacy.visibility_body_2_after')}
             </p>
           </div>
         </GlassCard>
@@ -337,27 +336,27 @@ export function PrivacyPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Lock className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-            How We Protect Your Data
+            {t('privacy.protection_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            We implement robust security measures to safeguard your information:
+            {t('privacy.protection_intro')}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              { label: 'Encryption', desc: 'All data encrypted in transit (HTTPS) and at rest' },
-              { label: 'Secure Passwords', desc: 'Passwords hashed using industry-standard algorithms' },
-              { label: 'Access Controls', desc: 'Strict internal policies limit data access' },
-              { label: 'Regular Audits', desc: 'Security reviews and practice updates' },
-              { label: 'Secure Infrastructure', desc: 'Hosted in certified data centres' },
-            ].map((item) => (
+            {([
+              { labelKey: 'privacy.protect_encryption_label', descKey: 'privacy.protect_encryption_desc' },
+              { labelKey: 'privacy.protect_passwords_label', descKey: 'privacy.protect_passwords_desc' },
+              { labelKey: 'privacy.protect_access_label', descKey: 'privacy.protect_access_desc' },
+              { labelKey: 'privacy.protect_audits_label', descKey: 'privacy.protect_audits_desc' },
+              { labelKey: 'privacy.protect_infrastructure_label', descKey: 'privacy.protect_infrastructure_desc' },
+            ] as const).map((item) => (
               <div
-                key={item.label}
+                key={item.labelKey}
                 className="flex items-start gap-3 p-3 rounded-xl bg-theme-elevated"
               >
                 <Lock className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
                 <div>
-                  <p className="font-medium text-theme-primary text-sm">{item.label}</p>
-                  <p className="text-xs text-theme-subtle mt-0.5">{item.desc}</p>
+                  <p className="font-medium text-theme-primary text-sm">{t(item.labelKey)}</p>
+                  <p className="text-xs text-theme-subtle mt-0.5">{t(item.descKey)}</p>
                 </div>
               </div>
             ))}
@@ -371,34 +370,32 @@ export function PrivacyPage() {
           <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 mb-6">
             <h2 className="text-xl font-semibold text-theme-primary mb-2 flex items-center gap-2">
               <UserCheck className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-              Your Privacy Rights
+              {t('privacy.rights_title')}
             </h2>
             <p className="text-theme-muted text-sm">
-              Under the General Data Protection Regulation (GDPR), you have full control
-              over your personal data. Here are your rights:
+              {t('privacy.rights_intro')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {gdprRights.map((right) => (
+            {gdprRightKeys.map((right) => (
               <div
-                key={right.title}
+                key={right.titleKey}
                 className="flex items-start gap-3 p-4 rounded-xl bg-theme-elevated"
               >
                 <div className={`p-2 rounded-lg ${right.bg} flex-shrink-0`}>
                   <right.icon className={`w-4 h-4 ${right.color}`} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-theme-primary text-sm">{right.title}</h3>
-                  <p className="text-xs text-theme-subtle mt-1">{right.description}</p>
+                  <h3 className="font-medium text-theme-primary text-sm">{t(right.titleKey)}</h3>
+                  <p className="text-xs text-theme-subtle mt-1">{t(right.descKey)}</p>
                 </div>
               </div>
             ))}
           </div>
 
           <p className="text-sm text-theme-muted mt-4">
-            To exercise any of these rights, please contact us through our contact page.
-            We will respond to all requests within 30 days.
+            {t('privacy.rights_contact')}
           </p>
         </GlassCard>
       </motion.div>
@@ -408,39 +405,39 @@ export function PrivacyPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Cookie className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-            Cookies &amp; Tracking
+            {t('privacy.cookies_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            We use cookies to enhance your experience on our platform:
+            {t('privacy.cookies_intro')}
           </p>
 
           <div className="space-y-3">
-            {cookieCategories.map((cat) => (
+            {cookieCategoryKeys.map((cat) => (
               <div
-                key={cat.name}
+                key={cat.nameKey}
                 className="flex items-start gap-3 p-4 rounded-xl bg-theme-elevated border border-default-200 dark:border-default-100"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-theme-primary text-sm">{cat.name}</h3>
+                    <h3 className="font-medium text-theme-primary text-sm">{t(cat.nameKey)}</h3>
                     {cat.required && (
                       <Chip size="sm" variant="flat" color="warning" className="text-xs">
-                        Required
+                        {t('privacy.cookie_required')}
                       </Chip>
                     )}
                   </div>
-                  <p className="text-xs text-theme-subtle">{cat.description}</p>
+                  <p className="text-xs text-theme-subtle">{t(cat.descKey)}</p>
                 </div>
               </div>
             ))}
           </div>
 
           <p className="text-sm text-theme-muted mt-4">
-            We do <strong className="text-theme-primary">not</strong> use advertising cookies or
-            share data with ad networks. You can manage cookie preferences in your browser settings.
-            For more details, see our{' '}
+            {t('privacy.cookies_no_ads_before')}{' '}
+            <strong className="text-theme-primary">{t('privacy.cookies_no_ads_not')}</strong>{' '}
+            {t('privacy.cookies_no_ads_after')}{' '}
             <Link to={tenantPath('/cookies')} className="text-indigo-500 hover:underline">
-              Cookie Policy
+              {t('privacy.cookie_policy_link')}
             </Link>.
           </p>
         </GlassCard>
@@ -451,22 +448,22 @@ export function PrivacyPage() {
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Clock className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-            Data Retention
+            {t('privacy.retention_title')}
           </h2>
           <p className="text-theme-muted mb-4">
-            We retain your data only as long as necessary:
+            {t('privacy.retention_intro')}
           </p>
           <ul className="space-y-3 text-theme-muted">
-            {[
-              { label: 'Active Accounts', desc: 'Data is kept while your account remains active' },
-              { label: 'Deleted Accounts', desc: 'Personal data is removed within 30 days of account deletion' },
-              { label: 'Transaction Records', desc: 'May be retained for up to 7 years for legal and audit purposes' },
-              { label: 'Security Logs', desc: 'IP addresses and access logs retained for 12 months' },
-            ].map((item) => (
-              <li key={item.label} className="flex items-start gap-3">
+            {([
+              { labelKey: 'privacy.retention_active_label', descKey: 'privacy.retention_active_desc' },
+              { labelKey: 'privacy.retention_deleted_label', descKey: 'privacy.retention_deleted_desc' },
+              { labelKey: 'privacy.retention_transactions_label', descKey: 'privacy.retention_transactions_desc' },
+              { labelKey: 'privacy.retention_logs_label', descKey: 'privacy.retention_logs_desc' },
+            ] as const).map((item) => (
+              <li key={item.labelKey} className="flex items-start gap-3">
                 <div className="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
                 <span>
-                  <strong className="text-theme-primary">{item.label}:</strong> {item.desc}
+                  <strong className="text-theme-primary">{t(item.labelKey)}:</strong> {t(item.descKey)}
                 </span>
               </li>
             ))}
@@ -482,11 +479,10 @@ export function PrivacyPage() {
               <MessageSquare className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-semibold text-theme-primary mb-2">
-              Questions About Your Privacy?
+              {t('privacy.cta_title')}
             </h2>
             <p className="text-theme-muted text-sm mb-6 max-w-lg mx-auto">
-              We are here to help. If you have any questions about this policy or want to
-              exercise your data rights, please do not hesitate to reach out.
+              {t('privacy.cta_body')}
             </p>
             <Divider className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
@@ -495,7 +491,7 @@ export function PrivacyPage() {
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                   startContent={<Send className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Contact Our Privacy Team
+                  {t('privacy.contact_privacy_team')}
                 </Button>
               </Link>
               <Link to={tenantPath('/cookies')}>
@@ -504,7 +500,7 @@ export function PrivacyPage() {
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Cookie className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Cookie Policy
+                  {t('privacy.cookie_policy_link')}
                 </Button>
               </Link>
             </div>

@@ -1,0 +1,91 @@
+{
+  "title": "Próifíl",
+  "edit_profile": "Cuir Próifíl in Eagar",
+  "joined": "Chláraithe {{date}}",
+  "bio": "Faoi",
+  "skills": "Scileanna",
+  "interests": "Spéiseanna",
+  "listings": "Liostaí",
+  "reviews": "Léirmheasanna",
+  "badges": "Suaitheantas",
+  "credits": "Creidmheasanna Ama",
+  "send_message": "Seol Teachtaireacht",
+  "connect": "Nasc",
+  "connected": "Nasctha",
+  "loading": "Próifíl á luchtú...",
+  "unable_to_load": "Ní féidir an Phróifíl a Luchtú",
+  "browse_members": "Féach ar Bhaill",
+  "try_again": "Triail Arís",
+  "not_found": "Próifíl gan aimsiú",
+  "not_found_desc": "Níl an phróifíl seo ann nó baineadh í",
+  "settings": "Socruithe",
+  "pending": "Ar Feitheamh",
+  "accept": "Glac",
+  "write_review": "Scríobh Léirmheas",
+  "send_credits": "Seol Creidmheasanna",
+  "level": "Leibh {{level}}",
+  "location_title": "Suíomh",
+  "stats": {
+    "hours_given": "Uaireanta Tugtha",
+    "hours_received": "Uaireanta Faighte",
+    "active_listings": "Liostaí Gníomhacha",
+    "groups": "Grúpaí",
+    "events": "Imeachtaí"
+  },
+  "tabs": {
+    "about": "Faoi",
+    "listings": "Liostaí",
+    "reviews": "Léirmheasanna",
+    "achievements": "Éachtaí"
+  },
+  "about": {
+    "heading": "Faoi",
+    "no_bio": "Níl aon bhitheolaíocht curtha leis go fóill.",
+    "skills": "Scileanna"
+  },
+  "listing_type": {
+    "offer": "Á thairiscint",
+    "request": "Á lorg"
+  },
+  "no_listings": "Gan liostaí",
+  "no_listings_own": "Níor chruthaigh tú aon liostaí fós",
+  "no_listings_other": "Níor chruthaigh an úsáideoir seo aon liostaí",
+  "create_listing": "Cruthaigh Liostáil",
+  "reviews_count_one": "{{count}} léirmheas",
+  "reviews_count_other": "{{count}} léirmheas",
+  "no_reviews": "Gan léirmheasanna fós",
+  "no_reviews_own": "Críochnaigh malartuithe chun léirmheasanna a fháil ó bhaill eile",
+  "no_reviews_other": "Níor fhaigh an ball seo aon léirmheas fós",
+  "for_listing": "Do: {{title}}",
+  "anonymous": "Gan Ainm",
+  "achievements": {
+    "badges_one": "{{count}} Suaitheantas Tuillte",
+    "badges_other": "{{count}} Suaitheantas Tuillte",
+    "level": "Leibhéal {{level}}",
+    "view_all": "Féach ar Gach",
+    "badge_earned": "Tuillte",
+    "badge_locked": "Faoi Ghlas",
+    "no_achievements": "Gan éachtaí fós",
+    "no_achievements_own": "Déan rannpháirtíocht chun suaitheantas agus éachtaí a thuilleamh!",
+    "no_achievements_other": "Níor thuill an t-úsáideoir seo aon éacht fós",
+    "view_badges": "Féach ar Shuaitheantas ar Fáil"
+  },
+  "toast": {
+    "request_sent_title": "Iarratas seolta",
+    "request_sent": "Iarratas naisc seolta go rathúil",
+    "connected_title": "Nasctha",
+    "connected": "Tá tú nasctha anois",
+    "removed_title": "Bainte",
+    "removed": "Nasc bainte",
+    "failed": "Theip",
+    "error": "Chuaigh rud éigin mícheart"
+  },
+  "form": {
+    "first_name": "Céadainm",
+    "last_name": "Sloinne",
+    "bio": "Fúm Féin",
+    "location": "Suíomh",
+    "phone": "Fón",
+    "save": "Sábháil Athruithe"
+  }
+}

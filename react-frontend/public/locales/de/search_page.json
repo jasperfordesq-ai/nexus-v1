@@ -1,0 +1,28 @@
+{
+  "page_title": "Suche",
+  "title": "Suche",
+  "subtitle": "Finden Sie Angebote, Mitglieder, Veranstaltungen und Gruppen",
+  "search_placeholder": "Nach etwas suchen...",
+  "tab_all": "Alle ({{count}})",
+  "tab_listings": "Angebote ({{count}})",
+  "tab_members": "Mitglieder ({{count}})",
+  "tab_events": "Veranstaltungen ({{count}})",
+  "tab_groups": "Gruppen ({{count}})",
+  "error_title": "Suchfehler",
+  "error_message": "Suche fehlgeschlagen. Bitte versuchen Sie es erneut.",
+  "try_again": "Erneut versuchen",
+  "no_results_title": "Keine Ergebnisse gefunden",
+  "no_results_desc": "Keine Ergebnisse für \"{{query}}\". Versuchen Sie einen anderen Suchbegriff.",
+  "section_listings": "Angebote ({{count}})",
+  "section_members": "Mitglieder ({{count}})",
+  "section_events": "Veranstaltungen ({{count}})",
+  "section_groups": "Gruppen ({{count}})",
+  "listing_offering": "Angebot",
+  "listing_requesting": "Gesuch",
+  "members_count": "{{count}} Mitglieder",
+  "initial_title": "Suche starten",
+  "initial_desc": "Geben Sie einen Suchbegriff ein, um Angebote, Mitglieder, Veranstaltungen und Gruppen zu finden",
+  "toast": {
+    "search_failed": "Suche fehlgeschlagen"
+  }
+}

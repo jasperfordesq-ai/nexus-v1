@@ -77,8 +77,8 @@ class MasterController
 
                     $hash = password_hash($adminPass, PASSWORD_DEFAULT);
                     Database::query(
-                        "INSERT INTO users (tenant_id, first_name, last_name, email, password_hash, role, is_approved) VALUES (?, ?, ?, ?, ?, 'admin', 1)",
-                        [$tenantId, $firstName, $lastName, $adminEmail, $hash]
+                        "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, role, is_approved) VALUES (?, ?, ?, ?, ?, ?, 'admin', 1)",
+                        [$tenantId, trim($firstName . ' ' . $lastName), $firstName, $lastName, $adminEmail, $hash]
                     );
 
                     // Initialize Default SEO Metadata
@@ -114,8 +114,8 @@ class MasterController
             $hash = password_hash($password, PASSWORD_DEFAULT);
             try {
                 Database::query(
-                    "INSERT INTO users (tenant_id, first_name, last_name, email, password_hash, role, is_approved) VALUES (?, ?, ?, ?, ?, 'admin', 1)",
-                    [$tenantId, $firstName, $lastName, $email, $hash]
+                    "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, role, is_approved) VALUES (?, ?, ?, ?, ?, ?, 'admin', 1)",
+                    [$tenantId, trim($firstName . ' ' . $lastName), $firstName, $lastName, $email, $hash]
                 );
             } catch (\Exception $e) {
                 // Ignore for now or handle dupes

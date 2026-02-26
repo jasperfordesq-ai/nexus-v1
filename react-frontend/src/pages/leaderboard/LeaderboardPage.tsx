@@ -26,6 +26,7 @@ import {
   ChevronRight,
   Flame,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
@@ -91,6 +92,7 @@ interface CurrentSeason extends Season {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function SeasonCard() {
+  const { t } = useTranslation('gamification');
   const toast = useToast();
   const [season, setSeason] = useState<CurrentSeason | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -130,7 +132,7 @@ function SeasonCard() {
       setShowAllSeasons(true);
     } catch (err) {
       logError('Failed to load all seasons', err);
-      toast.error('Load Failed', 'Could not load season history.');
+      toast.error(t('leaderboard.season.load_failed'), t('leaderboard.season.load_failed_desc'));
     } finally {
       setLoadingAllSeasons(false);
     }
@@ -171,21 +173,21 @@ function SeasonCard() {
           </div>
           <Chip size="sm" color="secondary" variant="flat" className="flex-shrink-0">
             <Calendar className="w-3 h-3 inline mr-1" aria-hidden="true" />
-            {season.days_remaining}d left
+            {t('leaderboard.season.days_left', { days: season.days_remaining })}
           </Chip>
         </div>
 
         {/* Season date range */}
         <p className="text-xs text-theme-subtle mb-3">
           {new Date(season.start_date).toLocaleDateString()} &mdash; {new Date(season.end_date).toLocaleDateString()}
-          {' '}&middot; {season.total_participants.toLocaleString()} participants
+          {' '}&middot; {t('leaderboard.season.participants', { count: season.total_participants })}
         </p>
 
         {/* User's season progress */}
         {season.user_data && (
           <div className="bg-theme-hover/50 rounded-lg p-3 mb-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-theme-primary">Your Season Progress</span>
+              <span className="text-sm font-medium text-theme-primary">{t('leaderboard.season.your_progress')}</span>
               <div className="flex items-center gap-2">
                 {season.user_data.tier && (
                   <Chip size="sm" variant="flat" className={tierColors[season.user_data.tier] ?? 'text-theme-subtle'}>
@@ -205,10 +207,10 @@ function SeasonCard() {
                 track: 'bg-theme-hover',
               }}
               size="sm"
-              aria-label="Season progress"
+              aria-label={t('leaderboard.season.progress_aria')}
             />
             <p className="text-xs text-theme-subtle mt-1">
-              {season.user_data.xp_earned.toLocaleString()} XP earned this season
+              {t('leaderboard.season.xp_earned', { xp: season.user_data.xp_earned.toLocaleString() })}
             </p>
           </div>
         )}
@@ -216,7 +218,7 @@ function SeasonCard() {
         {/* Reward tiers */}
         {season.rewards && season.rewards.length > 0 && (
           <div className="space-y-1">
-            <p className="text-xs font-medium text-theme-muted mb-1">Season Rewards</p>
+            <p className="text-xs font-medium text-theme-muted mb-1">{t('leaderboard.season.rewards')}</p>
             <div className="flex flex-wrap gap-2">
               {season.rewards.map((reward) => (
                 <Chip
@@ -247,7 +249,7 @@ function SeasonCard() {
             onPress={loadAllSeasons}
             isLoading={loadingAllSeasons}
           >
-            {showAllSeasons ? 'Hide Season History' : 'All Seasons'}
+            {showAllSeasons ? t('leaderboard.season.hide_history') : t('leaderboard.season.all_seasons')}
           </Button>
         </div>
       </GlassCard>
@@ -257,7 +259,7 @@ function SeasonCard() {
         <GlassCard className="p-4">
           <h4 className="font-semibold text-theme-primary mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
-            Season History
+            {t('leaderboard.season.history')}
           </h4>
           <div className="space-y-2">
             {allSeasons.map((s) => (
@@ -277,7 +279,7 @@ function SeasonCard() {
                     <p className="text-sm font-medium text-theme-primary truncate">
                       {s.name}
                       {s.is_active && (
-                        <Chip size="sm" color="secondary" variant="flat" className="ml-2">Active</Chip>
+                        <Chip size="sm" color="secondary" variant="flat" className="ml-2">{t('leaderboard.season.active')}</Chip>
                       )}
                     </p>
                     <p className="text-xs text-theme-subtle">
@@ -299,7 +301,8 @@ function SeasonCard() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function LeaderboardPage() {
-  usePageTitle('Leaderboard');
+  const { t } = useTranslation('gamification');
+  usePageTitle(t('leaderboard.page_title'));
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [meta, setMeta] = useState<LeaderboardMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -380,9 +383,9 @@ export function LeaderboardPage() {
   };
 
   const typeLabels: Record<LeaderboardType, string> = {
-    xp: 'XP',
-    volunteer_hours: 'Volunteer Hours',
-    credits_earned: 'Credits Earned',
+    xp: t('leaderboard.type.xp'),
+    volunteer_hours: t('leaderboard.type.volunteer_hours'),
+    credits_earned: t('leaderboard.type.credits_earned'),
   };
 
   const typeIcons: Record<LeaderboardType, React.ReactNode> = {
@@ -402,10 +405,10 @@ export function LeaderboardPage() {
   };
 
   const periodLabels: Record<LeaderboardPeriod, string> = {
-    all: 'All Time',
-    season: 'This Season',
-    month: 'This Month',
-    week: 'This Week',
+    all: t('leaderboard.period.all'),
+    season: t('leaderboard.period.season'),
+    month: t('leaderboard.period.month'),
+    week: t('leaderboard.period.week'),
   };
 
   return (
@@ -415,16 +418,16 @@ export function LeaderboardPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Trophy className="w-7 h-7 text-amber-400" aria-hidden="true" />
-            Leaderboard
+            {t('leaderboard.title')}
           </h1>
-          <p className="text-theme-muted mt-1">See who&apos;s leading the community</p>
+          <p className="text-theme-muted mt-1">{t('leaderboard.subtitle')}</p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Type Selector */}
           <Select
-            placeholder="Type"
-            aria-label="Leaderboard type"
+            placeholder={t('leaderboard.type_placeholder')}
+            aria-label={t('leaderboard.type_aria')}
             selectedKeys={[type]}
             onChange={(e) => setType((e.target.value as LeaderboardType) || 'xp')}
             className="w-full sm:w-48"
@@ -434,15 +437,15 @@ export function LeaderboardPage() {
             }}
             startContent={typeIcons[type]}
           >
-            <SelectItem key="xp">XP</SelectItem>
-            <SelectItem key="volunteer_hours">Volunteer Hours</SelectItem>
-            <SelectItem key="credits_earned">Credits Earned</SelectItem>
+            <SelectItem key="xp">{t('leaderboard.type.xp')}</SelectItem>
+            <SelectItem key="volunteer_hours">{t('leaderboard.type.volunteer_hours')}</SelectItem>
+            <SelectItem key="credits_earned">{t('leaderboard.type.credits_earned')}</SelectItem>
           </Select>
 
           {/* Period Selector */}
           <Select
-            placeholder="Period"
-            aria-label="Leaderboard period"
+            placeholder={t('leaderboard.period_placeholder')}
+            aria-label={t('leaderboard.period_aria')}
             selectedKeys={[period]}
             onChange={(e) => setPeriod(e.target.value as LeaderboardPeriod)}
             className="w-full sm:w-44"
@@ -452,10 +455,10 @@ export function LeaderboardPage() {
             }}
             startContent={<TrendingUp className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           >
-            <SelectItem key="all">All Time</SelectItem>
-            <SelectItem key="season">This Season</SelectItem>
-            <SelectItem key="month">This Month</SelectItem>
-            <SelectItem key="week">This Week</SelectItem>
+            <SelectItem key="all">{t('leaderboard.period.all')}</SelectItem>
+            <SelectItem key="season">{t('leaderboard.period.season')}</SelectItem>
+            <SelectItem key="month">{t('leaderboard.period.month')}</SelectItem>
+            <SelectItem key="week">{t('leaderboard.period.week')}</SelectItem>
           </Select>
         </div>
       </div>
@@ -469,7 +472,7 @@ export function LeaderboardPage() {
           <div className="flex items-center gap-3">
             <Star className="w-5 h-5 text-indigo-400" aria-hidden="true" />
             <span className="text-theme-primary font-medium">
-              Your rank: <strong>#{meta.your_position}</strong> of {meta.total_entries} members
+              {t('leaderboard.your_rank', { position: meta.your_position, total: meta.total_entries })}
               {' '}({periodLabels[period]} &middot; {typeLabels[type]})
             </span>
           </div>
@@ -480,14 +483,14 @@ export function LeaderboardPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Leaderboard</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('leaderboard.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadLeaderboard}
           >
-            Try Again
+            {t('leaderboard.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -512,8 +515,8 @@ export function LeaderboardPage() {
           ) : entries.length === 0 ? (
             <EmptyState
               icon={<Trophy className="w-12 h-12" aria-hidden="true" />}
-              title="No rankings yet"
-              description={`Start earning ${typeLabels[type]} to appear on the leaderboard!`}
+              title={t('leaderboard.empty_title')}
+              description={t('leaderboard.empty_description', { type: typeLabels[type] })}
             />
           ) : (
             <GlassCard className="overflow-hidden">
@@ -549,9 +552,9 @@ export function LeaderboardPage() {
                       <div className="flex-1 min-w-0">
                         <p className={`font-medium truncate ${entry.is_current_user ? 'text-indigo-400' : 'text-theme-primary'}`}>
                           {entry.user.name}
-                          {entry.is_current_user && <span className="text-xs ml-2 text-indigo-400">(You)</span>}
+                          {entry.is_current_user && <span className="text-xs ml-2 text-indigo-400">{t('leaderboard.you')}</span>}
                         </p>
-                        <p className="text-xs text-theme-subtle">Level {entry.level}</p>
+                        <p className="text-xs text-theme-subtle">{t('leaderboard.level', { level: entry.level })}</p>
                       </div>
 
                       {/* Score */}

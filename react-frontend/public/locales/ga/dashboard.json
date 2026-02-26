@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "title": "Painéal",
+    "description": "Do phainéal pearsanta. Féach ar d'iarmhéid, liostaí, agus gníomhaíocht."
+  },
+  "welcome_back": "Fáilte ar ais, {{name}}!",
+  "community_activity": "Seo a tharlaíonn i do phobal {{community}}",
+  "unable_to_load": "Ní féidir an Painéal a Luchtú",
+  "try_again": "Bain triail eile as",
+  "onboarding": {
+    "banner_title": "Críochnaigh socrú do phróifíle",
+    "banner_subtitle": "Inis dúinn faoi do spéiseanna agus scileanna chun meaitseálacha pearsantaithe a fháil",
+    "get_started": "Tosaigh"
+  },
+  "new_listing": "Liosta Nua",
+  "stats": {
+    "balance": "Iarmhéid",
+    "active_listings": "Liostaí Gníomhacha",
+    "messages": "Teachtaireachtaí",
+    "pending": "Ar feitheamh"
+  },
+  "sections": {
+    "recent_listings": "Liostaí le Déanaí",
+    "recent_activity": "Gníomhaíocht le Déanaí",
+    "quick_actions": "Gníomhartha Tapa",
+    "suggested_for_you": "Molta Duit",
+    "my_groups": "Mo Ghrúpaí",
+    "upcoming_events": "Imeachtaí atá le Teacht",
+    "your_progress": "Do Dhul Chun Cinn",
+    "pending_reviews": "Léirmheasanna ar Feitheamh"
+  },
+  "view_all": "Féach ar gach",
+  "view_all_caps": "Féach ar Gach",
+  "browse_all": "Brabhsáil Uile",
+  "view_achievements": "Féach ar Éachtaí",
+  "view_all_transactions": "Féach ar Gach Idirbheart",
+  "quick_actions": {
+    "create_listing": "Cruthaigh Liosta",
+    "messages": "Teachtaireachtaí",
+    "view_wallet": "Féach ar Sparán",
+    "find_members": "Faigh Comhaltaí",
+    "browse_events": "Brabhsáil Imeachtaí",
+    "notifications": "Fógraí"
+  },
+  "listings": {
+    "offering": "Ag Tairiscint",
+    "requesting": "Ag Iarraidh",
+    "offer": "Tairiscint",
+    "request": "Iarratas",
+    "empty": "Gan liostaí le déanaí",
+    "create_first": "Cruthaigh do chéad liosta"
+  },
+  "activity": {
+    "action_listing": "roinnt liosta",
+    "action_event": "scríobh faoi imeacht",
+    "action_poll": "chruthaigh vótáil",
+    "action_goal": "leag sprioc nua síos",
+    "action_post": "roinnt postáil",
+    "empty": "Gan gníomhaíocht le déanaí",
+    "check_feed": "Féach ar an sruth"
+  },
+  "suggestions": {
+    "empty": "Gan moltaí fós"
+  },
+  "groups": {
+    "members_count": "{{count}} comhalta",
+    "empty": "Níl tú páirteach in aon ghrúpa fós",
+    "discover": "Faigh grúpaí"
+  },
+  "events": {
+    "online_event": "Imeacht ar líne",
+    "empty": "Gan imeachtaí atá le teacht",
+    "browse": "Brabhsáil imeachtaí"
+  },
+  "gamification": {
+    "level": "Leibhéal {{level}}",
+    "badges": "Suaitheantas",
+    "streak": "Sraith",
+    "xp_progress": "Dul Chun Cinn XP",
+    "start_earning": "Tosaigh ag tuilleamh XP trí bheith rannpháirteach sa phobal!"
+  },
+  "reviews": {
+    "sent": "Seolta {{amount}}u",
+    "received": "Faighte {{amount}}u",
+    "review": "Léirmheas"
+  }
+}

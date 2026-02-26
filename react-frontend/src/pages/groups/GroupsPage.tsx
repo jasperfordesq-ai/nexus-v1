@@ -22,6 +22,7 @@ import {
   RefreshCw,
   AlertTriangle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -37,7 +38,8 @@ const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
 export function GroupsPage() {
-  usePageTitle('Groups');
+  const { t } = useTranslation('groups');
+  usePageTitle(t('title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -150,9 +152,9 @@ export function GroupsPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-            Groups
+            {t('title')}
           </h1>
-          <p className="text-theme-muted mt-1">Join groups to connect with like-minded community members</p>
+          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
         </div>
         {isAuthenticated && (
           <Link to={tenantPath('/groups/create')}>
@@ -160,7 +162,7 @@ export function GroupsPage() {
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             >
-              Create Group
+              {t('create_group')}
             </Button>
           </Link>
         )}
@@ -171,8 +173,8 @@ export function GroupsPage() {
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <Input
-              placeholder="Search groups..."
-              aria-label="Search groups"
+              placeholder={t('search_placeholder')}
+              aria-label={t('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -184,8 +186,8 @@ export function GroupsPage() {
           </div>
 
           <Select
-            placeholder="Filter"
-            aria-label="Filter groups by type"
+            placeholder={t('filter_placeholder')}
+            aria-label={t('filter_placeholder')}
             selectedKeys={[filter]}
             onChange={(e) => setFilter(e.target.value as GroupFilter)}
             className="w-32 sm:w-40"
@@ -195,10 +197,10 @@ export function GroupsPage() {
             }}
             startContent={<Filter className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           >
-            <SelectItem key="all">All Groups</SelectItem>
-            {isAuthenticated ? <SelectItem key="joined">My Groups</SelectItem> : null}
-            <SelectItem key="public">Public</SelectItem>
-            <SelectItem key="private">Private</SelectItem>
+            <SelectItem key="all">{t('filter_all')}</SelectItem>
+            {isAuthenticated ? <SelectItem key="joined">{t('filter_my')}</SelectItem> : null}
+            <SelectItem key="public">{t('filter_public')}</SelectItem>
+            <SelectItem key="private">{t('filter_private')}</SelectItem>
           </Select>
         </div>
       </GlassCard>
@@ -207,14 +209,14 @@ export function GroupsPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Groups</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadGroups()}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -236,13 +238,13 @@ export function GroupsPage() {
           ) : groups.length === 0 ? (
             <EmptyState
               icon={<Users className="w-12 h-12" aria-hidden="true" />}
-              title="No groups found"
-              description="Start a new group or try a different search"
+              title={t('no_groups')}
+              description={t('no_groups_desc')}
               action={
                 isAuthenticated && (
                   <Link to={tenantPath('/groups/create')}>
                     <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                      Create Group
+                      {t('create_group')}
                     </Button>
                   </Link>
                 )
@@ -272,7 +274,7 @@ export function GroupsPage() {
                     onPress={loadMoreGroups}
                     isLoading={isLoadingMore}
                   >
-                    Load More Groups
+                    {t('load_more')}
                   </Button>
                 </div>
               )}
@@ -289,6 +291,7 @@ interface GroupCardProps {
 }
 
 const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
+  const { t } = useTranslation('groups');
   const { tenantPath } = useTenant();
   const memberCount = group.member_count ?? group.members_count ?? 0;
 
@@ -299,18 +302,18 @@ const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
           <div className="flex items-start justify-between gap-3 mb-3">
             <h3 className="font-semibold text-theme-primary text-lg">{group.name}</h3>
             {group.visibility === 'private' ? (
-              <span className="flex-shrink-0 p-1.5 rounded-full bg-amber-500/20" title="Private group">
+              <span className="flex-shrink-0 p-1.5 rounded-full bg-amber-500/20" title={t('private_title')}>
                 <Lock className="w-4 h-4 text-amber-400" aria-hidden="true" />
               </span>
             ) : (
-              <span className="flex-shrink-0 p-1.5 rounded-full bg-emerald-500/20" title="Public group">
+              <span className="flex-shrink-0 p-1.5 rounded-full bg-emerald-500/20" title={t('public_title')}>
                 <Globe className="w-4 h-4 text-emerald-400" aria-hidden="true" />
               </span>
             )}
           </div>
 
           <p className="text-theme-muted text-sm line-clamp-2 flex-1 mb-4">
-            {group.description || 'No description provided'}
+            {group.description || t('no_description')}
           </p>
 
           {/* Group Stats */}
@@ -346,7 +349,7 @@ const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
           {(group.is_member || group.viewer_membership?.status === 'active') && (
             <div className="mt-4 pt-4 border-t border-theme-default">
               <span className="text-xs px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
-                Member
+                {t('member_status')}
               </span>
             </div>
           )}

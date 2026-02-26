@@ -48,6 +48,7 @@ export interface User {
   organization_name?: string;
   has_2fa_enabled?: boolean;
   preferred_layout?: 'modern';
+  preferred_language?: string;
   onboarding_completed?: boolean;
   email_verified_at?: string | null;
   created_at?: string;
@@ -870,7 +871,12 @@ export interface TenantConfig {
   categories?: Category[];
   menu_pages?: {
     about?: { title: string; slug: string }[];
+    footer?: { title: string; slug: string }[];
   };
+  /** Language codes supported by this tenant (e.g. ['en', 'ga'] or ['de', 'fr', 'it', 'en']) */
+  supported_languages?: string[];
+  /** Default language for this tenant (e.g. 'de' for Swiss tenants) */
+  default_language?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

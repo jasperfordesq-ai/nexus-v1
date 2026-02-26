@@ -14,6 +14,7 @@ import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Select, SelectItem } from '@heroui/react';
 import { Mail, MessageSquare, Loader2, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
@@ -21,6 +22,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
 export function ContactPage() {
+  const { t } = useTranslation('public');
   const { branding, tenantPath } = useTenant();
   const { user, isAuthenticated } = useAuth();
   usePageTitle('Contact Us');
@@ -50,7 +52,7 @@ export function ContactPage() {
       if (response.success) {
         setSubmitted(true);
       } else {
-        setError(response.error || 'Failed to send message. Please try again.');
+        setError(response.error || t('contact.error_fallback'));
       }
     } catch (err) {
       logError('Failed to submit contact form', err);
@@ -72,9 +74,9 @@ export function ContactPage() {
             <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
               <MessageSquare className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h1 className="text-2xl font-bold text-theme-primary">Contact Us</h1>
+            <h1 className="text-2xl font-bold text-theme-primary">{t('contact.title')}</h1>
             <p className="text-theme-muted mt-2">
-              Have a question about {branding.name}? We&apos;d love to hear from you.
+              {t('contact.subtitle', { name: branding.name })}
             </p>
           </div>
 
@@ -83,9 +85,9 @@ export function ContactPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
                 <Mail className="w-8 h-8 text-green-400" aria-hidden="true" />
               </div>
-              <h2 className="text-xl font-semibold text-theme-primary mb-2">Message Sent!</h2>
+              <h2 className="text-xl font-semibold text-theme-primary mb-2">{t('contact.success_title')}</h2>
               <p className="text-theme-muted mb-4">
-                We&apos;ll get back to you as soon as possible.
+                {t('contact.success_message')}
               </p>
               <Link to={tenantPath('/help')}>
                 <Button
@@ -93,7 +95,7 @@ export function ContactPage() {
                   className="bg-theme-elevated text-theme-muted"
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Back to Help Center
+                  {t('contact.back_to_help')}
                 </Button>
               </Link>
             </div>
@@ -106,8 +108,8 @@ export function ContactPage() {
               )}
 
               <Input
-                label="Name"
-                placeholder="Your name"
+                label={t('contact.form.name_label')}
+                placeholder={t('contact.form.name_placeholder')}
                 isRequired
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
@@ -120,8 +122,8 @@ export function ContactPage() {
 
               <Input
                 type="email"
-                label="Email"
-                placeholder="you@example.com"
+                label={t('contact.form.email_label')}
+                placeholder={t('contact.form.email_placeholder')}
                 isRequired
                 value={formData.email}
                 onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
@@ -133,8 +135,8 @@ export function ContactPage() {
               />
 
               <Select
-                label="Subject"
-                placeholder="What is this about?"
+                label={t('contact.form.subject_label')}
+                placeholder={t('contact.form.subject_placeholder')}
                 selectedKeys={formData.subject ? [formData.subject] : []}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -146,16 +148,16 @@ export function ContactPage() {
                   value: 'text-theme-primary',
                 }}
               >
-                <SelectItem key="general">General Inquiry</SelectItem>
-                <SelectItem key="account">Account Help</SelectItem>
-                <SelectItem key="technical">Technical Issue</SelectItem>
-                <SelectItem key="feedback">Feedback / Suggestion</SelectItem>
-                <SelectItem key="other">Other</SelectItem>
+                <SelectItem key="general">{t('contact.form.subjects.general')}</SelectItem>
+                <SelectItem key="account">{t('contact.form.subjects.account')}</SelectItem>
+                <SelectItem key="technical">{t('contact.form.subjects.technical')}</SelectItem>
+                <SelectItem key="feedback">{t('contact.form.subjects.feedback')}</SelectItem>
+                <SelectItem key="other">{t('contact.form.subjects.other')}</SelectItem>
               </Select>
 
               <Textarea
-                label="Message"
-                placeholder="How can we help?"
+                label={t('contact.form.message_label')}
+                placeholder={t('contact.form.message_placeholder')}
                 minRows={4}
                 isRequired
                 value={formData.message}
@@ -175,16 +177,16 @@ export function ContactPage() {
                 size="lg"
                 spinner={<Loader2 className="w-4 h-4 animate-spin" />}
               >
-                Send Message
+                {t('contact.form.submit')}
               </Button>
 
               {!isAuthenticated && (
                 <p className="text-xs text-theme-subtle text-center">
-                  Already have an account?{' '}
+                  {t('contact.form.login_prompt_before')}{' '}
                   <Link to={tenantPath('/login')} className="text-indigo-500 hover:underline">
-                    Log in
+                    {t('contact.form.login_link')}
                   </Link>{' '}
-                  for faster support.
+                  {t('contact.form.login_prompt_after')}
                 </p>
               )}
             </form>

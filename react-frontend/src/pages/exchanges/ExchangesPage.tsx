@@ -20,6 +20,7 @@ import {
   RefreshCw,
   AlertTriangle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard, ExchangeCardSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -33,7 +34,8 @@ import type { Exchange, ExchangeConfig } from '@/types/api';
 const ITEMS_PER_PAGE = 20;
 
 export function ExchangesPage() {
-  usePageTitle('Exchanges');
+  const { t } = useTranslation('exchanges');
+  usePageTitle(t('page_title'));
   const { user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -101,9 +103,9 @@ export function ExchangesPage() {
         setHasMore(response.data.length >= ITEMS_PER_PAGE);
       } else {
         if (!append) {
-          setError('Failed to load exchanges. Please try again.');
+          setError(t('error.load_failed'));
         } else {
-          toast.error('Failed to load more exchanges');
+          toast.error(t('toast.load_more_failed'));
         }
       }
     } catch (err) {
@@ -112,9 +114,9 @@ export function ExchangesPage() {
 
       logError('Failed to load exchanges', err);
       if (!append) {
-        setError('Failed to load exchanges. Please try again.');
+        setError(t('error.load_failed'));
       } else {
-        toast.error('Failed to load more exchanges');
+        toast.error(t('toast.load_more_failed'));
       }
     } finally {
       setIsLoading(false);
@@ -160,12 +162,12 @@ export function ExchangesPage() {
     return (
       <EmptyState
         icon={<ArrowRightLeft className="w-12 h-12" />}
-        title="Exchange Workflow Not Enabled"
-        description="The exchange workflow system is not enabled for this community. Contact your coordinator for more information."
+        title={t('workflow_not_enabled_title')}
+        description={t('workflow_not_enabled_description')}
         action={
           <Link to={tenantPath("/listings")}>
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              Browse Listings
+              {t('browse_listings')}
             </Button>
           </Link>
         }
@@ -183,10 +185,10 @@ export function ExchangesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">
-            My Exchanges
+            {t('title')}
           </h1>
           <p className="text-theme-muted mt-1">
-            Track your service exchange requests and confirmations
+            {t('subtitle')}
           </p>
         </div>
         <Link to={tenantPath("/listings")}>
@@ -194,7 +196,7 @@ export function ExchangesPage() {
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           >
-            Browse Listings
+            {t('browse_listings')}
           </Button>
         </Link>
       </div>
@@ -205,16 +207,16 @@ export function ExchangesPage() {
           selectedKey={selectedTab}
           onSelectionChange={handleTabChange}
           variant="light"
-          aria-label="Exchange status filter"
+          aria-label={t('tabs.aria_label')}
           classNames={{
             tabList: 'gap-2',
             tab: 'px-4 py-2',
           }}
         >
-          <Tab key="active" title="Active" aria-label="Show active exchanges" />
-          <Tab key="pending_confirmation" title="Needs Confirmation" aria-label="Show exchanges needing confirmation" />
-          <Tab key="completed" title="Completed" aria-label="Show completed exchanges" />
-          <Tab key="all" title="All" aria-label="Show all exchanges" />
+          <Tab key="active" title={t('tabs.active')} aria-label={t('tabs.active_aria')} />
+          <Tab key="pending_confirmation" title={t('tabs.needs_confirmation')} aria-label={t('tabs.needs_confirmation_aria')} />
+          <Tab key="completed" title={t('tabs.completed')} aria-label={t('tabs.completed_aria')} />
+          <Tab key="all" title={t('tabs.all')} aria-label={t('tabs.all_aria')} />
         </Tabs>
       </GlassCard>
 
@@ -222,14 +224,14 @@ export function ExchangesPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Exchanges</h3>
+          <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('error.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadExchanges()}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -246,16 +248,16 @@ export function ExchangesPage() {
           ) : exchanges.length === 0 ? (
             <EmptyState
               icon={<ArrowRightLeft className="w-12 h-12" />}
-              title="No Exchanges Found"
+              title={t('empty.title')}
               description={
                 selectedTab === 'active'
-                  ? "You don't have any active exchanges. Browse listings to request a service."
-                  : "No exchanges match this filter."
+                  ? t('empty.active_description')
+                  : t('empty.filter_description')
               }
               action={
                 <Link to={tenantPath("/listings")}>
                   <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                    Browse Listings
+                    {t('browse_listings')}
                   </Button>
                 </Link>
               }
@@ -271,14 +273,14 @@ export function ExchangesPage() {
                   <Link key={exchange.id} to={tenantPath(`/exchanges/${exchange.id}`)}>
                     <article
                       className="block"
-                      aria-label={`Exchange: ${exchange.listing?.title || 'Service Exchange'} - ${statusConfig.label}`}
+                      aria-label={t('card.aria_label', { title: exchange.listing?.title || t('service_exchange'), status: statusConfig.label })}
                     >
                       <GlassCard className="p-4 sm:p-6 hover:border-indigo-500/30 transition-colors cursor-pointer">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                           {/* Other party avatar */}
                           <Avatar
                             src={resolveAvatarUrl(other?.avatar)}
-                            name={other?.name || 'Unknown'}
+                            name={other?.name || t('unknown')}
                             size="lg"
                             className="flex-shrink-0"
                           />
@@ -287,7 +289,7 @@ export function ExchangesPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-1">
                               <h3 className="font-semibold text-theme-primary truncate">
-                                {exchange.listing?.title || 'Service Exchange'}
+                                {exchange.listing?.title || t('service_exchange')}
                               </h3>
                               <Chip
                                 size="sm"
@@ -302,12 +304,11 @@ export function ExchangesPage() {
                             <div className="flex flex-wrap items-center gap-4 text-sm text-theme-muted">
                               <span className="flex items-center gap-1">
                                 <User className="w-4 h-4" aria-hidden="true" />
-                                {isRequester(exchange) ? 'With ' : 'From '}
-                                {other?.name || 'Unknown'}
+                                {isRequester(exchange) ? t('card.with_party', { name: other?.name || t('unknown') }) : t('card.from_party', { name: other?.name || t('unknown') })}
                               </span>
                               <span className="flex items-center gap-1">
                                 <Clock className="w-4 h-4" aria-hidden="true" />
-                                {exchange.proposed_hours} hour{exchange.proposed_hours !== 1 ? 's' : ''}
+                                {t('hours_count', { count: exchange.proposed_hours })}
                               </span>
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-4 h-4" aria-hidden="true" />
@@ -325,7 +326,7 @@ export function ExchangesPage() {
                                   ? 'bg-amber-500/20 text-amber-400'
                                   : 'bg-emerald-500/20 text-emerald-400'}
                               `}>
-                                {isRequester(exchange) ? 'You requested' : 'You are providing'}
+                                {isRequester(exchange) ? t('card.you_requested') : t('card.you_providing')}
                               </span>
                             </div>
                           </div>
@@ -336,11 +337,11 @@ export function ExchangesPage() {
                               {(isRequester(exchange) && !exchange.requester_confirmed_at) ||
                                (isProvider(exchange) && !exchange.provider_confirmed_at) ? (
                                 <Chip color="warning" variant="flat">
-                                  Confirm Hours
+                                  {t('card.confirm_hours')}
                                 </Chip>
                               ) : (
                                 <Chip color="default" variant="flat">
-                                  Waiting for other
+                                  {t('card.waiting_for_other')}
                                 </Chip>
                               )}
                             </div>
@@ -348,7 +349,7 @@ export function ExchangesPage() {
 
                           {exchange.status === 'pending_provider' && isProvider(exchange) && (
                             <Chip color="warning" variant="flat">
-                              Respond
+                              {t('card.respond')}
                             </Chip>
                           )}
                         </div>
@@ -367,7 +368,7 @@ export function ExchangesPage() {
                     onPress={loadMoreExchanges}
                     isLoading={isLoadingMore}
                   >
-                    Load More
+                    {t('load_more')}
                   </Button>
                 </div>
               )}

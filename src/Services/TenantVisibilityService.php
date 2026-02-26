@@ -226,9 +226,10 @@ class TenantVisibilityService
 
         $sql .= " ORDER BY t.path, u.last_name, u.first_name";
 
-        // Apply limit
+        // Apply limit and offset
         $limit = $filters['limit'] ?? 100;
-        $sql .= " LIMIT " . (int)$limit;
+        $offset = $filters['offset'] ?? 0;
+        $sql .= " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
 
         return Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -327,13 +328,29 @@ class TenantVisibilityService
             SELECT COUNT(*) FROM tenants t WHERE {$scope['sql']} AND t.allows_subtenants = 1
         ", $scope['params'])->fetchColumn();
 
+        // Total listings across visible tenants
+        $totalListings = Database::query("
+            SELECT COUNT(*) FROM listings l
+            JOIN tenants t ON l.tenant_id = t.id
+            WHERE {$scope['sql']}
+        ", $scope['params'])->fetchColumn();
+
+        // Pending users (not yet approved)
+        $pendingUsers = Database::query("
+            SELECT COUNT(*) FROM users u
+            JOIN tenants t ON u.tenant_id = t.id
+            WHERE {$scope['sql']} AND u.is_approved = 0
+        ", $scope['params'])->fetchColumn();
+
         return [
             'total_tenants' => (int)$tenantCount,
             'active_tenants' => (int)$activeTenants,
             'inactive_tenants' => (int)$tenantCount - (int)$activeTenants,
             'total_users' => (int)$totalUsers,
+            'pending_users' => (int)$pendingUsers,
             'super_admins' => (int)$superAdmins,
             'hub_tenants' => (int)$hubTenants,
+            'total_listings' => (int)$totalListings,
             'scope' => $access['scope'],
             'level' => $access['level']
         ];

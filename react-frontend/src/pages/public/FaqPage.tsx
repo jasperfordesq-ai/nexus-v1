@@ -18,6 +18,7 @@ import {
   Rocket, Wallet, Handshake, Trophy, ShieldCheck,
   Search, HelpCircle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
@@ -43,6 +44,7 @@ const itemVariants = {
 };
 
 export function FaqPage() {
+  const { t } = useTranslation('public');
   const { tenantPath } = useTenant();
   usePageTitle('FAQ');
 
@@ -50,279 +52,279 @@ export function FaqPage() {
 
   const categories: FaqCategory[] = useMemo(() => [
     {
-      title: 'Getting Started',
+      title: t('faq.categories.getting_started.title'),
       icon: Rocket,
       items: [
         {
-          question: 'What is time banking?',
+          question: t('faq.categories.getting_started.q1.question'),
           answer: (
             <>
-              <p>Time banking is a community exchange system where <strong>one hour of help equals one time credit</strong>, regardless of the service provided. Whether you&apos;re teaching a language, helping with gardening, or providing tech support, your time is valued equally.</p>
-              <p>It&apos;s a way to build community connections while exchanging skills and services without traditional money.</p>
+              <p>{t('faq.categories.getting_started.q1.answer_p1')}</p>
+              <p>{t('faq.categories.getting_started.q1.answer_p2')}</p>
             </>
           ),
         },
         {
-          question: 'Is it free to join?',
+          question: t('faq.categories.getting_started.q2.question'),
           answer: (
             <>
-              <p>Yes! Membership is completely free. The only currency used is time credits, which you earn by helping others in the community.</p>
-              <p>New members often receive a small number of starter credits to help them get started.</p>
+              <p>{t('faq.categories.getting_started.q2.answer_p1')}</p>
+              <p>{t('faq.categories.getting_started.q2.answer_p2')}</p>
             </>
           ),
         },
         {
-          question: 'How do I get started?',
+          question: t('faq.categories.getting_started.q3.question'),
           answer: (
             <>
-              <p>Here&apos;s how to begin:</p>
+              <p>{t('faq.categories.getting_started.q3.answer_intro')}</p>
               <ul>
-                <li><strong>Complete your profile</strong> &mdash; Add a photo, bio, and your skills</li>
-                <li><strong>Browse the marketplace</strong> &mdash; See what services are offered and needed</li>
-                <li><strong>Post an offer</strong> &mdash; Share what you can help others with</li>
-                <li><strong>Make a request</strong> &mdash; Ask for something you need</li>
-                <li><strong>Connect with members</strong> &mdash; Build your network</li>
+                <li><strong>{t('faq.categories.getting_started.q3.step1_bold')}</strong> &mdash; {t('faq.categories.getting_started.q3.step1_text')}</li>
+                <li><strong>{t('faq.categories.getting_started.q3.step2_bold')}</strong> &mdash; {t('faq.categories.getting_started.q3.step2_text')}</li>
+                <li><strong>{t('faq.categories.getting_started.q3.step3_bold')}</strong> &mdash; {t('faq.categories.getting_started.q3.step3_text')}</li>
+                <li><strong>{t('faq.categories.getting_started.q3.step4_bold')}</strong> &mdash; {t('faq.categories.getting_started.q3.step4_text')}</li>
+                <li><strong>{t('faq.categories.getting_started.q3.step5_bold')}</strong> &mdash; {t('faq.categories.getting_started.q3.step5_text')}</li>
               </ul>
             </>
           ),
         },
         {
-          question: 'What skills can I offer?',
+          question: t('faq.categories.getting_started.q4.question'),
           answer: (
             <>
-              <p>Almost anything! Common offerings include:</p>
+              <p>{t('faq.categories.getting_started.q4.answer_intro')}</p>
               <ul>
-                <li>Home help (gardening, cleaning, minor repairs)</li>
-                <li>Tech support (computer help, phone setup)</li>
-                <li>Teaching (languages, music, academic subjects)</li>
-                <li>Creative services (design, photography, writing)</li>
-                <li>Transportation (rides, errands)</li>
-                <li>Companionship (walks, visits, conversation)</li>
-                <li>Professional skills (accounting, legal advice, etc.)</li>
+                <li>{t('faq.categories.getting_started.q4.skill1')}</li>
+                <li>{t('faq.categories.getting_started.q4.skill2')}</li>
+                <li>{t('faq.categories.getting_started.q4.skill3')}</li>
+                <li>{t('faq.categories.getting_started.q4.skill4')}</li>
+                <li>{t('faq.categories.getting_started.q4.skill5')}</li>
+                <li>{t('faq.categories.getting_started.q4.skill6')}</li>
+                <li>{t('faq.categories.getting_started.q4.skill7')}</li>
               </ul>
-              <p>Everyone has something valuable to offer!</p>
+              <p>{t('faq.categories.getting_started.q4.answer_outro')}</p>
             </>
           ),
         },
       ],
     },
     {
-      title: 'Time Credits',
+      title: t('faq.categories.time_credits.title'),
       icon: Wallet,
       items: [
         {
-          question: 'What is a time credit?',
+          question: t('faq.categories.time_credits.q1.question'),
           answer: (
             <>
-              <p>One time credit equals one hour of service. It&apos;s the currency of our community.</p>
-              <p>You can also exchange partial hours: 30 minutes = 0.5 credits, 15 minutes = 0.25 credits.</p>
+              <p>{t('faq.categories.time_credits.q1.answer_p1')}</p>
+              <p>{t('faq.categories.time_credits.q1.answer_p2')}</p>
             </>
           ),
         },
         {
-          question: 'How do I earn time credits?',
+          question: t('faq.categories.time_credits.q2.question'),
           answer: (
             <>
-              <p>You earn credits by:</p>
+              <p>{t('faq.categories.time_credits.q2.answer_intro')}</p>
               <ul>
-                <li><strong>Providing services</strong> to other members</li>
-                <li><strong>Logging volunteer hours</strong> with approved organisations</li>
-                <li><strong>Receiving donations</strong> from other members</li>
-                <li><strong>Starter credits</strong> when you first join</li>
+                <li><strong>{t('faq.categories.time_credits.q2.way1_bold')}</strong> {t('faq.categories.time_credits.q2.way1_text')}</li>
+                <li><strong>{t('faq.categories.time_credits.q2.way2_bold')}</strong> {t('faq.categories.time_credits.q2.way2_text')}</li>
+                <li><strong>{t('faq.categories.time_credits.q2.way3_bold')}</strong> {t('faq.categories.time_credits.q2.way3_text')}</li>
+                <li><strong>{t('faq.categories.time_credits.q2.way4_bold')}</strong> {t('faq.categories.time_credits.q2.way4_text')}</li>
               </ul>
             </>
           ),
         },
         {
-          question: 'Can I donate my credits?',
+          question: t('faq.categories.time_credits.q3.question'),
           answer: (
             <>
-              <p>Yes! You can:</p>
+              <p>{t('faq.categories.time_credits.q3.answer_intro')}</p>
               <ul>
-                <li>Transfer credits to any other member</li>
-                <li>Donate to the community pot (helps members who need extra support)</li>
+                <li>{t('faq.categories.time_credits.q3.option1')}</li>
+                <li>{t('faq.categories.time_credits.q3.option2')}</li>
               </ul>
-              <p>Go to your <Link to={tenantPath('/wallet')} className="text-indigo-500 dark:text-indigo-400 hover:underline">Wallet</Link> to send credits.</p>
+              <p>{t('faq.categories.time_credits.q3.answer_link_before')}<Link to={tenantPath('/wallet')} className="text-indigo-500 dark:text-indigo-400 hover:underline">{t('faq.categories.time_credits.q3.wallet_link')}</Link>{t('faq.categories.time_credits.q3.answer_link_after')}</p>
             </>
           ),
         },
         {
-          question: 'Can my balance go negative?',
+          question: t('faq.categories.time_credits.q4.question'),
           answer: (
-            <p>Some communities allow limited negative balances to help new members get started before they&apos;ve had a chance to earn credits. Check with your community coordinator for the specific rules in your timebank.</p>
+            <p>{t('faq.categories.time_credits.q4.answer')}</p>
           ),
         },
         {
-          question: 'What if I sent credits to the wrong person?',
+          question: t('faq.categories.time_credits.q5.question'),
           answer: (
             <>
-              <p>Transactions cannot be automatically reversed. If you made a mistake:</p>
+              <p>{t('faq.categories.time_credits.q5.answer_intro')}</p>
               <ul>
-                <li>Contact the recipient and ask them to send the credits back</li>
-                <li>If you can&apos;t resolve it, contact support for assistance</li>
+                <li>{t('faq.categories.time_credits.q5.step1')}</li>
+                <li>{t('faq.categories.time_credits.q5.step2')}</li>
               </ul>
-              <p>Always double-check the recipient before confirming a transfer.</p>
+              <p>{t('faq.categories.time_credits.q5.answer_outro')}</p>
             </>
           ),
         },
       ],
     },
     {
-      title: 'Exchanges & Safety',
+      title: t('faq.categories.exchanges_safety.title'),
       icon: Handshake,
       items: [
         {
-          question: 'How do I arrange an exchange?',
+          question: t('faq.categories.exchanges_safety.q1.question'),
           answer: (
             <>
-              <p>The typical process is:</p>
+              <p>{t('faq.categories.exchanges_safety.q1.answer_intro')}</p>
               <ul>
-                <li>Find an offer or request that interests you</li>
-                <li>Message the member to discuss details</li>
-                <li>Agree on when, where, and estimated time</li>
-                <li>Meet and complete the exchange</li>
-                <li>The person who received help sends time credits</li>
-                <li>Leave a review for each other</li>
+                <li>{t('faq.categories.exchanges_safety.q1.step1')}</li>
+                <li>{t('faq.categories.exchanges_safety.q1.step2')}</li>
+                <li>{t('faq.categories.exchanges_safety.q1.step3')}</li>
+                <li>{t('faq.categories.exchanges_safety.q1.step4')}</li>
+                <li>{t('faq.categories.exchanges_safety.q1.step5')}</li>
+                <li>{t('faq.categories.exchanges_safety.q1.step6')}</li>
               </ul>
             </>
           ),
         },
         {
-          question: 'Is it safe to meet strangers?',
+          question: t('faq.categories.exchanges_safety.q2.question'),
           answer: (
             <>
-              <p>We recommend these safety practices:</p>
+              <p>{t('faq.categories.exchanges_safety.q2.answer_intro')}</p>
               <ul>
-                <li>Meet in public places for first exchanges</li>
-                <li>Check the member&apos;s profile and reviews</li>
-                <li>Tell someone where you&apos;re going</li>
-                <li>Trust your instincts &mdash; if something feels wrong, leave</li>
-                <li>Start with smaller, low-risk exchanges</li>
+                <li>{t('faq.categories.exchanges_safety.q2.tip1')}</li>
+                <li>{t('faq.categories.exchanges_safety.q2.tip2')}</li>
+                <li>{t('faq.categories.exchanges_safety.q2.tip3')}</li>
+                <li>{t('faq.categories.exchanges_safety.q2.tip4')}</li>
+                <li>{t('faq.categories.exchanges_safety.q2.tip5')}</li>
               </ul>
-              <p>Report any concerning behaviour to our support team.</p>
+              <p>{t('faq.categories.exchanges_safety.q2.answer_outro')}</p>
             </>
           ),
         },
         {
-          question: 'What if someone doesn\'t show up or complete the service?',
+          question: t('faq.categories.exchanges_safety.q3.question'),
           answer: (
             <>
-              <p>Communication is key. If there&apos;s an issue:</p>
+              <p>{t('faq.categories.exchanges_safety.q3.answer_intro')}</p>
               <ul>
-                <li>Message the member to discuss what happened</li>
-                <li>Try to find a resolution together</li>
-                <li>If you can&apos;t resolve it, contact support</li>
+                <li>{t('faq.categories.exchanges_safety.q3.step1')}</li>
+                <li>{t('faq.categories.exchanges_safety.q3.step2')}</li>
+                <li>{t('faq.categories.exchanges_safety.q3.step3')}</li>
               </ul>
-              <p>Repeated no-shows or poor behaviour may result in account restrictions.</p>
+              <p>{t('faq.categories.exchanges_safety.q3.answer_outro')}</p>
             </>
           ),
         },
         {
-          question: 'Are the services insured?',
+          question: t('faq.categories.exchanges_safety.q4.question'),
           answer: (
-            <p>Exchanges are informal arrangements between community members. We don&apos;t provide insurance coverage for services. For higher-risk activities, discuss liability with the other member beforehand. Some members have their own professional insurance.</p>
+            <p>{t('faq.categories.exchanges_safety.q4.answer')}</p>
           ),
         },
       ],
     },
     {
-      title: 'Badges & Rewards',
+      title: t('faq.categories.badges_rewards.title'),
       icon: Trophy,
       items: [
         {
-          question: 'What are badges and XP?',
+          question: t('faq.categories.badges_rewards.q1.question'),
           answer: (
             <>
-              <p>Our gamification system rewards community participation:</p>
+              <p>{t('faq.categories.badges_rewards.q1.answer_intro')}</p>
               <ul>
-                <li><strong>XP (Experience Points)</strong> &mdash; Earned for various activities, helping you level up</li>
-                <li><strong>Badges</strong> &mdash; Achievements for reaching milestones (60+ to collect!)</li>
-                <li><strong>Levels</strong> &mdash; Progress from Newcomer to Timebank Legend</li>
-                <li><strong>Streaks</strong> &mdash; Rewards for daily engagement</li>
+                <li><strong>{t('faq.categories.badges_rewards.q1.item1_bold')}</strong> &mdash; {t('faq.categories.badges_rewards.q1.item1_text')}</li>
+                <li><strong>{t('faq.categories.badges_rewards.q1.item2_bold')}</strong> &mdash; {t('faq.categories.badges_rewards.q1.item2_text')}</li>
+                <li><strong>{t('faq.categories.badges_rewards.q1.item3_bold')}</strong> &mdash; {t('faq.categories.badges_rewards.q1.item3_text')}</li>
+                <li><strong>{t('faq.categories.badges_rewards.q1.item4_bold')}</strong> &mdash; {t('faq.categories.badges_rewards.q1.item4_text')}</li>
               </ul>
             </>
           ),
         },
         {
-          question: 'How do I earn XP?',
+          question: t('faq.categories.badges_rewards.q2.question'),
           answer: (
             <>
-              <p>You earn XP for many activities:</p>
+              <p>{t('faq.categories.badges_rewards.q2.answer_intro')}</p>
               <ul>
-                <li>Sending/receiving time credits</li>
-                <li>Creating listings</li>
-                <li>Logging volunteer hours</li>
-                <li>Attending events</li>
-                <li>Making connections</li>
-                <li>Daily logins</li>
-                <li>Earning badges</li>
+                <li>{t('faq.categories.badges_rewards.q2.activity1')}</li>
+                <li>{t('faq.categories.badges_rewards.q2.activity2')}</li>
+                <li>{t('faq.categories.badges_rewards.q2.activity3')}</li>
+                <li>{t('faq.categories.badges_rewards.q2.activity4')}</li>
+                <li>{t('faq.categories.badges_rewards.q2.activity5')}</li>
+                <li>{t('faq.categories.badges_rewards.q2.activity6')}</li>
+                <li>{t('faq.categories.badges_rewards.q2.activity7')}</li>
               </ul>
             </>
           ),
         },
         {
-          question: 'Can I opt out of leaderboards?',
+          question: t('faq.categories.badges_rewards.q3.question'),
           answer: (
-            <p>Yes! If you prefer privacy, you can opt out of appearing on public leaderboards in your <Link to={tenantPath('/settings')} className="text-indigo-500 dark:text-indigo-400 hover:underline">Settings</Link>. You&apos;ll still earn XP and badges, they just won&apos;t be visible to others on the rankings.</p>
+            <p>{t('faq.categories.badges_rewards.q3.answer_before_link')}<Link to={tenantPath('/settings')} className="text-indigo-500 dark:text-indigo-400 hover:underline">{t('faq.categories.badges_rewards.q3.settings_link')}</Link>{t('faq.categories.badges_rewards.q3.answer_after_link')}</p>
           ),
         },
       ],
     },
     {
-      title: 'Account & Privacy',
+      title: t('faq.categories.account_privacy.title'),
       icon: ShieldCheck,
       items: [
         {
-          question: 'How do I change my password?',
+          question: t('faq.categories.account_privacy.q1.question'),
           answer: (
-            <p>Go to <Link to={tenantPath('/settings')} className="text-indigo-500 dark:text-indigo-400 hover:underline">Settings</Link> &gt; Security to change your password. You&apos;ll need to enter your current password first. If you&apos;ve forgotten your password, use the &quot;Forgot Password&quot; link on the login page.</p>
+            <p>{t('faq.categories.account_privacy.q1.answer_before_link')}<Link to={tenantPath('/settings')} className="text-indigo-500 dark:text-indigo-400 hover:underline">{t('faq.categories.account_privacy.q1.settings_link')}</Link>{t('faq.categories.account_privacy.q1.answer_after_link')}</p>
           ),
         },
         {
-          question: 'Who can see my profile?',
+          question: t('faq.categories.account_privacy.q2.question'),
           answer: (
             <>
-              <p>By default, your profile is visible to other community members. You can control:</p>
+              <p>{t('faq.categories.account_privacy.q2.answer_intro')}</p>
               <ul>
-                <li>What contact information is displayed</li>
-                <li>Whether you appear on leaderboards</li>
-                <li>Your general location visibility</li>
+                <li>{t('faq.categories.account_privacy.q2.item1')}</li>
+                <li>{t('faq.categories.account_privacy.q2.item2')}</li>
+                <li>{t('faq.categories.account_privacy.q2.item3')}</li>
               </ul>
-              <p>Adjust these in your <Link to={tenantPath('/settings')} className="text-indigo-500 dark:text-indigo-400 hover:underline">Settings</Link>.</p>
+              <p>{t('faq.categories.account_privacy.q2.answer_link_before')}<Link to={tenantPath('/settings')} className="text-indigo-500 dark:text-indigo-400 hover:underline">{t('faq.categories.account_privacy.q2.settings_link')}</Link>{t('faq.categories.account_privacy.q2.answer_link_after')}</p>
             </>
           ),
         },
         {
-          question: 'How do I delete my account?',
+          question: t('faq.categories.account_privacy.q3.question'),
           answer: (
             <>
-              <p>If you wish to leave the community:</p>
+              <p>{t('faq.categories.account_privacy.q3.answer_intro')}</p>
               <ul>
-                <li>Go to Settings &gt; Account</li>
-                <li>Click &quot;Delete Account&quot;</li>
-                <li>Confirm your decision</li>
+                <li>{t('faq.categories.account_privacy.q3.step1')}</li>
+                <li>{t('faq.categories.account_privacy.q3.step2')}</li>
+                <li>{t('faq.categories.account_privacy.q3.step3')}</li>
               </ul>
-              <p>Note: Your transaction history will be retained for record-keeping, but your personal information will be removed.</p>
+              <p>{t('faq.categories.account_privacy.q3.answer_outro')}</p>
             </>
           ),
         },
         {
-          question: 'How is my data protected?',
+          question: t('faq.categories.account_privacy.q4.question'),
           answer: (
             <>
-              <p>We take privacy seriously:</p>
+              <p>{t('faq.categories.account_privacy.q4.answer_intro')}</p>
               <ul>
-                <li>Your data is encrypted and securely stored</li>
-                <li>We never sell your information</li>
-                <li>You can request a copy of your data at any time</li>
-                <li>We comply with GDPR and data protection regulations</li>
+                <li>{t('faq.categories.account_privacy.q4.item1')}</li>
+                <li>{t('faq.categories.account_privacy.q4.item2')}</li>
+                <li>{t('faq.categories.account_privacy.q4.item3')}</li>
+                <li>{t('faq.categories.account_privacy.q4.item4')}</li>
               </ul>
             </>
           ),
         },
       ],
     },
-  ], [tenantPath]);
+  ], [tenantPath, t]);
 
   // Filter by search query
   const filteredCategories = useMemo(() => {
@@ -351,19 +353,19 @@ export function FaqPage() {
               <div className="p-2 rounded-xl bg-indigo-500/10">
                 <HelpCircle className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
               </div>
-              <h1 className="text-3xl font-bold text-theme-primary">Frequently Asked Questions</h1>
+              <h1 className="text-3xl font-bold text-theme-primary">{t('faq.title')}</h1>
             </div>
             <p className="text-theme-muted mb-6">
-              Can&apos;t find what you&apos;re looking for? Visit our{' '}
+              {t('faq.subtitle_before_link')}{' '}
               <Link to={tenantPath('/help')} className="text-indigo-500 dark:text-indigo-400 hover:underline">
-                Help Center
+                {t('faq.help_center_link')}
               </Link>{' '}
-              for detailed guides.
+              {t('faq.subtitle_after_link')}
             </p>
 
             {/* Search */}
             <Input
-              placeholder="Search questions..."
+              placeholder={t('faq.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -379,7 +381,7 @@ export function FaqPage() {
         {filteredCategories.length === 0 ? (
           <motion.div variants={itemVariants}>
             <GlassCard className="p-8 text-center">
-              <p className="text-theme-muted">No matching questions found. Try a different search term.</p>
+              <p className="text-theme-muted">{t('faq.no_results')}</p>
             </GlassCard>
           </motion.div>
         ) : (
@@ -425,15 +427,15 @@ export function FaqPage() {
         {/* Contact CTA */}
         <motion.div variants={itemVariants}>
           <GlassCard className="p-8 text-center">
-            <h3 className="text-xl font-semibold text-theme-primary mb-2">Still have questions?</h3>
-            <p className="text-theme-muted mb-4">Our support team is here to help.</p>
+            <h3 className="text-xl font-semibold text-theme-primary mb-2">{t('faq.cta_title')}</h3>
+            <p className="text-theme-muted mb-4">{t('faq.cta_description')}</p>
             <Link
               to={tenantPath('/contact')}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl
                          bg-indigo-500 text-white font-medium
                          hover:bg-indigo-600 transition-colors"
             >
-              Contact Support
+              {t('faq.cta_button')}
             </Link>
           </GlassCard>
         </motion.div>

@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -41,6 +41,7 @@ import {
   UserCheck,
   Handshake,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
@@ -97,7 +98,9 @@ const PERMISSION_META: Record<string, { label: string; icon: typeof Globe }> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function FederationPartnersPage() {
-  usePageTitle('Partner Communities');
+  const { t } = useTranslation('federation');
+  usePageTitle(t('partners.page_title'));
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
 
@@ -121,7 +124,7 @@ export function FederationPartnersPage() {
       }
     } catch (error) {
       logError('Failed to load federation partners', error);
-      setLoadError('Failed to load partner communities. Please try again.');
+      setLoadError(t('partners.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -159,8 +162,8 @@ export function FederationPartnersPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Federation', href: '/federation' },
-          { label: 'Partner Communities' },
+          { label: t('partners.breadcrumb_federation'), href: '/federation' },
+          { label: t('partners.breadcrumb_partners') },
         ]}
       />
 
@@ -168,10 +171,10 @@ export function FederationPartnersPage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Handshake className="w-7 h-7 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
-          Partner Communities
+          {t('partners.heading')}
         </h1>
         <p className="text-theme-muted mt-1">
-          Explore the timebanks in your federation network
+          {t('partners.subheading')}
         </p>
       </div>
 
@@ -198,7 +201,7 @@ export function FederationPartnersPage() {
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
-            Unable to Load Partners
+            {t('partners.unable_to_load')}
           </h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
@@ -206,7 +209,7 @@ export function FederationPartnersPage() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadPartners}
           >
-            Try Again
+            {t('partners.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -215,8 +218,8 @@ export function FederationPartnersPage() {
       {!isLoading && !loadError && partners.length === 0 && (
         <EmptyState
           icon={<Globe className="w-12 h-12" />}
-          title="No partner communities yet"
-          description="Your community has not established any federation partnerships yet."
+          title={t('partners.empty_title')}
+          description={t('partners.empty_description')}
         />
       )}
 
@@ -283,15 +286,16 @@ export function FederationPartnersPage() {
                     )}
                     <span className="flex items-center gap-1.5 text-theme-muted">
                       <Users className="w-4 h-4" aria-hidden="true" />
-                      {selectedPartner.member_count.toLocaleString()} members
+                      {t('partners.member_count', { count: selectedPartner.member_count })}
                     </span>
                     {selectedPartner.partnership_since && (
                       <span className="flex items-center gap-1.5 text-theme-muted">
                         <Shield className="w-4 h-4" aria-hidden="true" />
-                        Partner since{' '}
-                        {new Date(selectedPartner.partnership_since).toLocaleDateString('en-US', {
-                          month: 'long',
-                          year: 'numeric',
+                        {t('partners.partner_since', {
+                          date: new Date(selectedPartner.partnership_since).toLocaleDateString('en-US', {
+                            month: 'long',
+                            year: 'numeric',
+                          }),
                         })}
                       </span>
                     )}
@@ -300,7 +304,7 @@ export function FederationPartnersPage() {
                   {/* Federation Level */}
                   <div>
                     <h3 className="text-sm font-semibold text-theme-primary mb-2">
-                      Federation Level
+                      {t('partners.federation_level')}
                     </h3>
                     <Chip
                       variant="flat"
@@ -320,7 +324,7 @@ export function FederationPartnersPage() {
                   {selectedPartner.permissions && selectedPartner.permissions.length > 0 && (
                     <div>
                       <h3 className="text-sm font-semibold text-theme-primary mb-2">
-                        Available Features
+                        {t('partners.available_features')}
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {selectedPartner.permissions.map((perm) => {
@@ -336,7 +340,7 @@ export function FederationPartnersPage() {
                                 <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                               }
                             >
-                              {meta?.label || perm}
+                              {meta ? t(`partners.permission_${perm}`) : perm}
                             </Chip>
                           );
                         })}
@@ -348,25 +352,29 @@ export function FederationPartnersPage() {
               <ModalFooter className="flex gap-2">
                 {isAuthenticated && (
                   <>
-                    <Link to={tenantPath(`/federation/members?partner_id=${selectedPartner.id}`)}>
-                      <Button
-                        variant="flat"
-                        className="bg-theme-elevated text-theme-primary"
-                        startContent={<Users className="w-4 h-4" aria-hidden="true" />}
-                        onPress={closeDetail}
-                      >
-                        Browse Members
-                      </Button>
-                    </Link>
-                    <Link to={tenantPath(`/federation/listings?partner_id=${selectedPartner.id}`)}>
-                      <Button
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
-                        onPress={closeDetail}
-                      >
-                        Browse Listings
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-primary"
+                      startContent={<Users className="w-4 h-4" aria-hidden="true" />}
+                      onPress={() => {
+                        const path = tenantPath(`/federation/members?partner_id=${selectedPartner.id}`);
+                        closeDetail();
+                        navigate(path);
+                      }}
+                    >
+                      {t('partners.browse_members')}
+                    </Button>
+                    <Button
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
+                      onPress={() => {
+                        const path = tenantPath(`/federation/listings?partner_id=${selectedPartner.id}`);
+                        closeDetail();
+                        navigate(path);
+                      }}
+                    >
+                      {t('partners.browse_listings')}
+                    </Button>
                   </>
                 )}
                 {!isAuthenticated && (
@@ -375,7 +383,7 @@ export function FederationPartnersPage() {
                     className="bg-theme-elevated text-theme-muted"
                     onPress={closeDetail}
                   >
-                    Close
+                    {t('partners.close')}
                   </Button>
                 )}
               </ModalFooter>
@@ -397,6 +405,7 @@ interface PartnerCardProps {
 }
 
 function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
+  const { t } = useTranslation('federation');
   const levelMeta = FEDERATION_LEVELS[partner.federation_level];
 
   return (
@@ -431,7 +440,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
         )}
         <span className="flex items-center gap-1">
           <Users className="w-3.5 h-3.5" aria-hidden="true" />
-          {partner.member_count.toLocaleString()} members
+          {t('partners.member_count', { count: partner.member_count })}
         </span>
       </div>
 
@@ -447,10 +456,11 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
           </Chip>
           {partner.partnership_since && (
             <span className="text-xs text-theme-subtle">
-              Since{' '}
-              {new Date(partner.partnership_since).toLocaleDateString('en-US', {
-                month: 'short',
-                year: 'numeric',
+              {t('partners.since_date', {
+                date: new Date(partner.partnership_since).toLocaleDateString('en-US', {
+                  month: 'short',
+                  year: 'numeric',
+                }),
               })}
             </span>
           )}
@@ -462,7 +472,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
           startContent={<Eye className="w-3.5 h-3.5" aria-hidden="true" />}
           onPress={onViewDetails}
         >
-          View Details
+          {t('partners.view_details')}
         </Button>
       </div>
     </GlassCard>

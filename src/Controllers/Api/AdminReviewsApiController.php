@@ -41,6 +41,7 @@ class AdminReviewsApiController extends BaseApiController
     public function index(): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -50,8 +51,15 @@ class AdminReviewsApiController extends BaseApiController
         $status = $_GET['status'] ?? null;
         $search = $_GET['search'] ?? null;
 
-        $conditions = ['r.tenant_id = ?'];
-        $params = [$tenantId];
+        $conditions = [];
+        $params = [];
+
+        // Tenant scoping: defaults to current tenant, super admins can explicitly request all
+        $effectiveTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId);
+        if ($effectiveTenantId !== null) {
+            $conditions[] = 'r.tenant_id = ?';
+            $params[] = $effectiveTenantId;
+        }
 
         // Rating filter
         if ($rating !== null && $rating >= 1 && $rating <= 5) {
@@ -74,7 +82,7 @@ class AdminReviewsApiController extends BaseApiController
             $params[] = $searchPattern;
         }
 
-        $where = implode(' AND ', $conditions);
+        $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
         // Get total count
         $countQuery = "SELECT COUNT(*) as total
@@ -85,15 +93,17 @@ class AdminReviewsApiController extends BaseApiController
         $countStmt = Database::query($countQuery, $params);
         $total = (int) $countStmt->fetch()['total'];
 
-        // Get paginated results
+        // Get paginated results — join tenants table for cross-tenant name display
         $query = "SELECT r.*,
                          reviewer.name as reviewer_name,
                          reviewer.avatar_url as reviewer_avatar,
                          receiver.name as receiver_name,
-                         receiver.avatar_url as receiver_avatar
+                         receiver.avatar_url as receiver_avatar,
+                         t.name as tenant_name
                   FROM reviews r
                   LEFT JOIN users reviewer ON r.reviewer_id = reviewer.id
                   LEFT JOIN users receiver ON r.receiver_id = receiver.id
+                  LEFT JOIN tenants t ON r.tenant_id = t.id
                   WHERE {$where}
                   ORDER BY r.created_at DESC
                   LIMIT ? OFFSET ?";
@@ -107,6 +117,8 @@ class AdminReviewsApiController extends BaseApiController
         $formatted = array_map(function ($review) {
             return [
                 'id' => (int) $review['id'],
+                'tenant_id' => (int) $review['tenant_id'],
+                'tenant_name' => $review['tenant_name'] ?? 'Unknown',
                 'reviewer_id' => (int) $review['reviewer_id'],
                 'reviewer_name' => $review['reviewer_name'] ?? 'Unknown',
                 'reviewer_avatar' => $review['reviewer_avatar'],
@@ -131,21 +143,41 @@ class AdminReviewsApiController extends BaseApiController
     public function show(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        $query = "SELECT r.*,
-                         reviewer.name as reviewer_name,
-                         reviewer.email as reviewer_email,
-                         reviewer.avatar_url as reviewer_avatar,
-                         receiver.name as receiver_name,
-                         receiver.email as receiver_email,
-                         receiver.avatar_url as receiver_avatar
-                  FROM reviews r
-                  LEFT JOIN users reviewer ON r.reviewer_id = reviewer.id
-                  LEFT JOIN users receiver ON r.receiver_id = receiver.id
-                  WHERE r.id = ? AND r.tenant_id = ?";
-
-        $stmt = Database::query($query, [$id, $tenantId]);
+        // Super admins can view reviews from any tenant
+        if ($isSuperAdmin) {
+            $query = "SELECT r.*,
+                             reviewer.name as reviewer_name,
+                             reviewer.email as reviewer_email,
+                             reviewer.avatar_url as reviewer_avatar,
+                             receiver.name as receiver_name,
+                             receiver.email as receiver_email,
+                             receiver.avatar_url as receiver_avatar,
+                             t.name as tenant_name
+                      FROM reviews r
+                      LEFT JOIN users reviewer ON r.reviewer_id = reviewer.id
+                      LEFT JOIN users receiver ON r.receiver_id = receiver.id
+                      LEFT JOIN tenants t ON r.tenant_id = t.id
+                      WHERE r.id = ?";
+            $stmt = Database::query($query, [$id]);
+        } else {
+            $query = "SELECT r.*,
+                             reviewer.name as reviewer_name,
+                             reviewer.email as reviewer_email,
+                             reviewer.avatar_url as reviewer_avatar,
+                             receiver.name as receiver_name,
+                             receiver.email as receiver_email,
+                             receiver.avatar_url as receiver_avatar,
+                             t.name as tenant_name
+                      FROM reviews r
+                      LEFT JOIN users reviewer ON r.reviewer_id = reviewer.id
+                      LEFT JOIN users receiver ON r.receiver_id = receiver.id
+                      LEFT JOIN tenants t ON r.tenant_id = t.id
+                      WHERE r.id = ? AND r.tenant_id = ?";
+            $stmt = Database::query($query, [$id, $tenantId]);
+        }
         $review = $stmt->fetch();
 
         if (!$review) {
@@ -155,6 +187,8 @@ class AdminReviewsApiController extends BaseApiController
 
         $formatted = [
             'id' => (int) $review['id'],
+            'tenant_id' => (int) $review['tenant_id'],
+            'tenant_name' => $review['tenant_name'] ?? 'Unknown',
             'reviewer_id' => (int) $review['reviewer_id'],
             'reviewer_name' => $review['reviewer_name'] ?? 'Unknown',
             'reviewer_email' => $review['reviewer_email'],
@@ -183,14 +217,22 @@ class AdminReviewsApiController extends BaseApiController
     public function flag(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Verify review exists
-        $stmt = Database::query(
-            "SELECT id, status FROM reviews WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
-        );
+        // Verify review exists — super admins can flag reviews from any tenant
+        if ($isSuperAdmin) {
+            $stmt = Database::query(
+                "SELECT id, status, tenant_id FROM reviews WHERE id = ?",
+                [$id]
+            );
+        } else {
+            $stmt = Database::query(
+                "SELECT id, status, tenant_id FROM reviews WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+        }
         $review = $stmt->fetch();
 
         if (!$review) {
@@ -198,17 +240,20 @@ class AdminReviewsApiController extends BaseApiController
             return;
         }
 
+        // Use the review's own tenant_id for the update
+        $reviewTenantId = (int) $review['tenant_id'];
+
         // Update review status to pending (flagged for review)
         Database::query(
             "UPDATE reviews SET status = 'pending' WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $reviewTenantId]
         );
 
         // Log activity
         ActivityLog::log(
             $adminId,
             'flag_review',
-            "Flagged review #{$id} for admin review (set status to pending)"
+            "Flagged review #{$id} for admin review (set status to pending)" . ($isSuperAdmin ? " (tenant {$reviewTenantId})" : '')
         );
 
         $this->respondWithData(['success' => true, 'message' => 'Review flagged for attention']);
@@ -220,14 +265,22 @@ class AdminReviewsApiController extends BaseApiController
     public function hide(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Verify review exists
-        $stmt = Database::query(
-            "SELECT id, status FROM reviews WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
-        );
+        // Verify review exists — super admins can hide reviews from any tenant
+        if ($isSuperAdmin) {
+            $stmt = Database::query(
+                "SELECT id, status, tenant_id FROM reviews WHERE id = ?",
+                [$id]
+            );
+        } else {
+            $stmt = Database::query(
+                "SELECT id, status, tenant_id FROM reviews WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+        }
         $review = $stmt->fetch();
 
         if (!$review) {
@@ -235,17 +288,20 @@ class AdminReviewsApiController extends BaseApiController
             return;
         }
 
+        // Use the review's own tenant_id for the update
+        $reviewTenantId = (int) $review['tenant_id'];
+
         // Update review status to rejected (hidden)
         Database::query(
             "UPDATE reviews SET status = 'rejected' WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $reviewTenantId]
         );
 
         // Log activity
         ActivityLog::log(
             $adminId,
             'hide_review',
-            "Hidden review #{$id} (set status to rejected)"
+            "Hidden review #{$id} (set status to rejected)" . ($isSuperAdmin ? " (tenant {$reviewTenantId})" : '')
         );
 
         $this->respondWithData(['success' => true, 'message' => 'Review hidden']);
@@ -257,14 +313,22 @@ class AdminReviewsApiController extends BaseApiController
     public function destroy(int $id): void
     {
         $this->requireAdmin();
+        $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
         $adminId = $this->getAuthenticatedUserId();
 
-        // Verify review exists
-        $stmt = Database::query(
-            "SELECT id FROM reviews WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
-        );
+        // Verify review exists — super admins can delete reviews from any tenant
+        if ($isSuperAdmin) {
+            $stmt = Database::query(
+                "SELECT id, tenant_id FROM reviews WHERE id = ?",
+                [$id]
+            );
+        } else {
+            $stmt = Database::query(
+                "SELECT id, tenant_id FROM reviews WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+        }
         $review = $stmt->fetch();
 
         if (!$review) {
@@ -272,17 +336,19 @@ class AdminReviewsApiController extends BaseApiController
             return;
         }
 
-        // Delete review
+        $reviewTenantId = (int) $review['tenant_id'];
+
+        // Delete review using the review's own tenant_id for safety
         Database::query(
             "DELETE FROM reviews WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
+            [$id, $reviewTenantId]
         );
 
         // Log activity
         ActivityLog::log(
             $adminId,
             'delete_review',
-            "Deleted review #{$id}"
+            "Deleted review #{$id}" . ($isSuperAdmin ? " (tenant {$reviewTenantId})" : '')
         );
 
         $this->respondWithData(['success' => true, 'message' => 'Review deleted']);

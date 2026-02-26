@@ -1,0 +1,31 @@
+{
+  "dashboard": "Painéal",
+  "users": "Úsáideoirí",
+  "listings": "Liostaí",
+  "transactions": "Idirbhearta",
+  "events": "Imeachtaí",
+  "groups": "Grúpaí",
+  "organizations": "Eagraíochtaí",
+  "volunteering": "Deonaíocht",
+  "messages": "Teachtaireachtaí",
+  "reviews": "Léirmheasanna",
+  "reports": "Tuarascálacha",
+  "blog": "Blag",
+  "pages": "Leathanaigh",
+  "newsletters": "Nuachtlitreacha",
+  "settings": "Socruithe",
+  "activity_log": "Loga Gníomhaíochta",
+  "federation": "Cónaidhm",
+  "gamification": "Cluichíocht",
+  "enterprise": "Fiontraíocht",
+  "super_admin": "Ollriarachán",
+  "back_to_site": "Ar ais go dtí an Suíomh",
+  "logout": "Logáil Amach",
+  "sections": {
+    "content": "Ábhar",
+    "community": "Pobal",
+    "intelligence": "Faisnéis",
+    "engagement": "Rannpháirtíocht",
+    "system": "Córas"
+  }
+}

@@ -28,6 +28,7 @@ import {
   Search,
   User,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
@@ -71,7 +72,8 @@ interface BlogCategory {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function BlogPage() {
-  usePageTitle('Blog');
+  const { t } = useTranslation('blog');
+  usePageTitle(t('page_title'));
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -131,11 +133,11 @@ export function BlogPage() {
         setHasMore(response.meta?.has_more ?? false);
         cursorRef.current = response.meta?.cursor ?? undefined;
       } else {
-        if (!append) setError('Failed to load blog posts.');
+        if (!append) setError(t('error_load_posts'));
       }
     } catch (err) {
       logError('Failed to load blog posts', err);
-      if (!append) setError('Failed to load blog posts. Please try again.');
+      if (!append) setError(t('error_load_posts_retry'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -173,16 +175,16 @@ export function BlogPage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <BookOpen className="w-7 h-7 text-blue-400" aria-hidden="true" />
-          Blog &amp; News
+          {t('title')}
         </h1>
-        <p className="text-theme-muted mt-1">Community stories, updates, and announcements</p>
+        <p className="text-theme-muted mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 max-w-md">
           <Input
-            placeholder="Search posts..."
+            placeholder={t('search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
@@ -201,7 +203,7 @@ export function BlogPage() {
               className={!selectedCategory ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setSelectedCategory(null)}
             >
-              All
+              {t('filter_all')}
             </Button>
             {categories.map((cat) => (
               <Button
@@ -229,14 +231,14 @@ export function BlogPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to Load Posts</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadPosts()}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -262,11 +264,11 @@ export function BlogPage() {
           ) : posts.length === 0 ? (
             <EmptyState
               icon={<BookOpen className="w-12 h-12" aria-hidden="true" />}
-              title="No posts found"
+              title={t('empty_title')}
               description={
                 searchQuery || selectedCategory
-                  ? 'Try different search terms or clear your filters'
-                  : 'No blog posts have been published yet'
+                  ? t('empty_desc_filtered')
+                  : t('empty_desc')
               }
             />
           ) : (
@@ -303,7 +305,7 @@ export function BlogPage() {
                     onPress={() => loadPosts(true)}
                     isLoading={isLoadingMore}
                   >
-                    Load More Posts
+                    {t('load_more')}
                   </Button>
                 </div>
               )}
@@ -323,6 +325,7 @@ interface PostCardProps {
 }
 
 function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
+  const { t } = useTranslation('blog');
   const { tenantPath } = useTenant();
   const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : null;
 
@@ -371,7 +374,7 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
               </span>
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" aria-hidden="true" />
-                {post.reading_time} min read
+                {t('min_read', { count: post.reading_time })}
               </span>
             </div>
           </div>
@@ -384,6 +387,7 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
 /* ───────────────────────── Blog Post Card ───────────────────────── */
 
 function BlogPostCard({ post, categoryColors }: PostCardProps) {
+  const { t } = useTranslation('blog');
   const { tenantPath } = useTenant();
   const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : null;
 
@@ -430,7 +434,7 @@ function BlogPostCard({ post, categoryColors }: PostCardProps) {
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" aria-hidden="true" />
-                {post.reading_time}m
+                {t('min_read_short', { count: post.reading_time })}
               </span>
               {post.views > 0 && (
                 <span className="flex items-center gap-1">

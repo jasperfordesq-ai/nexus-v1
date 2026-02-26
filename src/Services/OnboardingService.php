@@ -42,7 +42,7 @@ class OnboardingService
     }
 
     /**
-     * Get all user interests grouped by type
+     * Get all user interests grouped by type (tenant-scoped)
      *
      * @param int $userId
      * @return array Array of interest rows with category_name joined
@@ -53,9 +53,9 @@ class OnboardingService
             "SELECT ui.*, c.name as category_name
              FROM user_interests ui
              JOIN categories c ON c.id = ui.category_id
-             WHERE ui.user_id = ?
+             WHERE ui.user_id = ? AND ui.tenant_id = ?
              ORDER BY ui.interest_type, c.name",
-            [$userId]
+            [$userId, TenantContext::getId()]
         );
         return $stmt->fetchAll();
     }
@@ -70,16 +70,18 @@ class OnboardingService
      */
     public static function saveInterests(int $userId, array $categoryIds): void
     {
-        // Delete existing interests for this user, then insert new ones
+        $tenantId = TenantContext::getId();
+
+        // Delete existing interests for this user+tenant, then insert new ones
         Database::query(
-            "DELETE FROM user_interests WHERE user_id = ? AND interest_type = 'interest'",
-            [$userId]
+            "DELETE FROM user_interests WHERE user_id = ? AND tenant_id = ? AND interest_type = 'interest'",
+            [$userId, $tenantId]
         );
 
         foreach ($categoryIds as $catId) {
             Database::query(
-                "INSERT IGNORE INTO user_interests (user_id, category_id, interest_type) VALUES (?, ?, 'interest')",
-                [$userId, (int)$catId]
+                "INSERT IGNORE INTO user_interests (user_id, tenant_id, category_id, interest_type) VALUES (?, ?, ?, 'interest')",
+                [$userId, $tenantId, (int)$catId]
             );
         }
     }
@@ -95,23 +97,25 @@ class OnboardingService
      */
     public static function saveSkills(int $userId, array $offers, array $needs): void
     {
-        // Delete existing skills
+        $tenantId = TenantContext::getId();
+
+        // Delete existing skills for this user+tenant
         Database::query(
-            "DELETE FROM user_interests WHERE user_id = ? AND interest_type IN ('skill_offer', 'skill_need')",
-            [$userId]
+            "DELETE FROM user_interests WHERE user_id = ? AND tenant_id = ? AND interest_type IN ('skill_offer', 'skill_need')",
+            [$userId, $tenantId]
         );
 
         foreach ($offers as $catId) {
             Database::query(
-                "INSERT IGNORE INTO user_interests (user_id, category_id, interest_type) VALUES (?, ?, 'skill_offer')",
-                [$userId, (int)$catId]
+                "INSERT IGNORE INTO user_interests (user_id, tenant_id, category_id, interest_type) VALUES (?, ?, ?, 'skill_offer')",
+                [$userId, $tenantId, (int)$catId]
             );
         }
 
         foreach ($needs as $catId) {
             Database::query(
-                "INSERT IGNORE INTO user_interests (user_id, category_id, interest_type) VALUES (?, ?, 'skill_need')",
-                [$userId, (int)$catId]
+                "INSERT IGNORE INTO user_interests (user_id, tenant_id, category_id, interest_type) VALUES (?, ?, ?, 'skill_need')",
+                [$userId, $tenantId, (int)$catId]
             );
         }
     }

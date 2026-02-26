@@ -99,6 +99,7 @@ The originating time bank initiative [hOUR Timebank CLG](https://hour-timebank.i
 ### Contributors
 
 - **Steven J. Kelly** — Community insight, product thinking
+- **Sarah Bird** — CEO, Timebanking UK
 
 ### Research Foundation
 

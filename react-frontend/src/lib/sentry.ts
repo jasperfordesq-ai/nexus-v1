@@ -12,6 +12,7 @@
 
 import * as Sentry from '@sentry/react';
 import { createElement } from 'react';
+import { readStoredConsent } from '@/contexts/CookieConsentContext';
 import type { User } from '@/types';
 import type { ReactNode, ComponentType } from 'react';
 
@@ -24,16 +25,34 @@ interface TenantInfo {
 type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug';
 
 const DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined;
-const IS_ENABLED = !!DSN;
+
+/**
+ * Sentry is enabled only if DSN is set AND the user has granted analytics consent.
+ * On first visit (no consent stored), Sentry is NOT initialized.
+ * When the user accepts analytics cookies, Sentry starts on the next page load.
+ */
+function checkEnabled(): boolean {
+  if (!DSN) return false;
+  const consent = readStoredConsent();
+  // No consent stored yet → don't track (GDPR default: opt-in)
+  if (!consent) return false;
+  return consent.analytics === true;
+}
+
+let IS_ENABLED = checkEnabled();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Initialization
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Initialize Sentry SDK. Must be called before React renders (main.tsx).
+ * Initialize Sentry SDK. Called from main.tsx on page load, and can be
+ * called again if the user grants analytics consent mid-session.
+ * Safe to call multiple times — Sentry.init is idempotent.
  */
 export function initSentry(): void {
+  // Re-check consent in case it was granted after initial load
+  IS_ENABLED = checkEnabled();
   if (!IS_ENABLED) {
     return;
   }

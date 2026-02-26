@@ -529,7 +529,7 @@ class RegistrationApiController extends BaseApiController
     {
         try {
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-            $adminLink = TenantContext::getFrontendUrl() . '/admin/users/' . $userId;
+            $adminLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . '/admin/users/' . $userId . '/edit';
 
             // Collect notification recipients: all active admins for this tenant
             // (includes all admin roles: admin, super_admin, tenant_admin, tenant_super_admin)
@@ -543,14 +543,12 @@ class RegistrationApiController extends BaseApiController
             $stmt->execute([$tenantId]);
             $admins = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-            // Always include master notification address if configured
-            // (ensures jasper@hour-timebank.ie is notified regardless of tenant setup)
-            $masterEmail = \Nexus\Core\Env::get('ADMIN_NOTIFICATION_EMAIL');
-            if ($masterEmail) {
-                $alreadyIncluded = array_filter($admins, fn($a) => strtolower($a['email']) === strtolower($masterEmail));
-                if (empty($alreadyIncluded)) {
-                    $admins[] = ['email' => $masterEmail, 'first_name' => 'Admin'];
-                }
+            // Always include master notification address — hardcoded fallback + env override
+            // jasper@hour-timebank.ie gets notified of ALL registrations across ALL tenants
+            $masterEmail = \Nexus\Core\Env::get('ADMIN_NOTIFICATION_EMAIL') ?: 'jasper@hour-timebank.ie';
+            $alreadyIncluded = array_filter($admins, fn($a) => strtolower($a['email']) === strtolower($masterEmail));
+            if (empty($alreadyIncluded)) {
+                $admins[] = ['email' => $masterEmail, 'first_name' => 'Platform Admin'];
             }
 
             if (empty($admins)) {
@@ -604,22 +602,24 @@ class RegistrationApiController extends BaseApiController
     private function sendVerificationEmail(int $userId, string $email, string $firstName): void
     {
         try {
+            $tenantId = TenantContext::getId();
+
             // Generate verification token
             $token = bin2hex(random_bytes(32));
-            $tokenHash = hash('sha256', $token);
+            // Use bcrypt (password_hash) — MUST match EmailVerificationApiController::findValidVerificationToken()
+            $tokenHash = password_hash($token, PASSWORD_DEFAULT);
             $expiresAt = date('Y-m-d H:i:s', time() + 86400); // 24 hours
 
             $db = Database::getConnection();
 
-            // Store token hash (never store raw token)
+            // Store token hash with tenant_id (never store raw token)
             $stmt = $db->prepare("
-                INSERT INTO email_verification_tokens (user_id, token, expires_at)
-                VALUES (?, ?, ?)
+                INSERT INTO email_verification_tokens (user_id, tenant_id, token, expires_at)
+                VALUES (?, ?, ?, ?)
             ");
-            $stmt->execute([$userId, $tokenHash, $expiresAt]);
+            $stmt->execute([$userId, $tenantId, $tokenHash, $expiresAt]);
 
-            // Build verification URL using the React frontend URL (not PHP API domain)
-            // Include tenant base path so the link resolves correctly in the React app
+            // Build verification URL — include tenant base path for correct routing
             $baseUrl = TenantContext::getFrontendUrl();
             $basePath = TenantContext::getBasePath();
             $verifyUrl = $baseUrl . $basePath . '/verify-email?token=' . $token;

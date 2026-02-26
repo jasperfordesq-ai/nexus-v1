@@ -19,12 +19,16 @@ import {
   Divider,
   Avatar,
   Spinner,
+  Input,
+  Select,
+  SelectItem,
 } from '@heroui/react';
 import {
   Building2,
   ArrowLeft,
   Edit,
   Globe,
+  Languages,
   MapPin,
   Search,
   Users,
@@ -37,6 +41,7 @@ import {
   Instagram,
   Linkedin,
   Youtube,
+  UserPlus,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -50,6 +55,14 @@ const FEATURE_OPTIONS = [
   'listings', 'wallet', 'messages', 'dashboard', 'feed',
 ];
 
+const LANGUAGE_LABELS: Record<string, string> = {
+  en: 'English',
+  ga: 'Gaeilge',
+  de: 'Deutsch',
+  fr: 'Français',
+  it: 'Italiano',
+};
+
 export function TenantShow() {
   const { id } = useParams<{ id: string }>();
   usePageTitle('Super Admin - Tenant Details');
@@ -60,6 +73,17 @@ export function TenantShow() {
   const [loading, setLoading] = useState(true);
   const [tenant, setTenant] = useState<SuperAdminTenantDetail | null>(null);
 
+  // Add Administrator form
+  const [showAddAdmin, setShowAddAdmin] = useState(false);
+  const [adminForm, setAdminForm] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    role: 'admin',
+  });
+  const [addingAdmin, setAddingAdmin] = useState(false);
+
   const loadTenant = useCallback(async () => {
     if (!id) return;
     setLoading(true);
@@ -68,13 +92,44 @@ export function TenantShow() {
       if (res.success && res.data) {
         setTenant(res.data as SuperAdminTenantDetail);
       } else {
-        toast.error('Failed to load tenant');
+        toast.error(`Tenant: ${res.error || 'Failed to load tenant details'}`);
       }
-    } catch {
-      toast.error('Failed to load tenant');
+    } catch (err) {
+      toast.error(`Tenant error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
     setLoading(false);
   }, [id, toast]);
+
+  const handleAddAdmin = async () => {
+    if (!tenant) return;
+    if (!adminForm.first_name.trim() || !adminForm.email.trim() || !adminForm.password.trim()) {
+      toast.error('First name, email, and password are required');
+      return;
+    }
+    setAddingAdmin(true);
+    try {
+      const res = await adminSuper.createUser({
+        tenant_id: tenant.id,
+        first_name: adminForm.first_name.trim(),
+        last_name: adminForm.last_name.trim(),
+        email: adminForm.email.trim(),
+        password: adminForm.password,
+        role: adminForm.role,
+      });
+      if (res.success) {
+        toast.success('Administrator added successfully');
+        setShowAddAdmin(false);
+        setAdminForm({ first_name: '', last_name: '', email: '', password: '', role: 'admin' });
+        loadTenant(); // Refresh to show new admin
+      } else {
+        toast.error(res.error || 'Failed to add administrator');
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to add administrator';
+      toast.error(message);
+    }
+    setAddingAdmin(false);
+  };
 
   useEffect(() => {
     loadTenant();
@@ -191,7 +246,8 @@ export function TenantShow() {
                     )
                   }
                 />
-                <DetailField label="Hierarchy Depth" value={String(tenant.max_depth)} />
+                <DetailField label="Depth in Hierarchy" value={String(tenant.depth ?? 0)} />
+                <DetailField label="Max Sub-tenant Depth" value={String(tenant.max_depth)} />
                 <DetailField
                   label="Allows Sub-tenants"
                   value={
@@ -220,6 +276,25 @@ export function TenantShow() {
               )}
             </CardBody>
           </Card>
+
+          {/* Contact Information */}
+          {(tenant.contact_email || tenant.contact_phone || tenant.address) && (
+            <Card shadow="sm">
+              <CardHeader className="pb-0">
+                <div className="flex items-center gap-2">
+                  <Users size={18} className="text-primary" />
+                  <h3 className="text-lg font-semibold">Contact Information</h3>
+                </div>
+              </CardHeader>
+              <CardBody className="pt-3">
+                <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <DetailField label="Email" value={tenant.contact_email} />
+                  <DetailField label="Phone" value={tenant.contact_phone} />
+                  <DetailField label="Address" value={tenant.address} />
+                </dl>
+              </CardBody>
+            </Card>
+          )}
 
           {/* SEO Settings */}
           <Card shadow="sm">
@@ -296,6 +371,43 @@ export function TenantShow() {
               ) : (
                 <p className="text-sm text-default-400">No social media links configured.</p>
               )}
+            </CardBody>
+          </Card>
+
+          {/* Languages */}
+          <Card shadow="sm">
+            <CardHeader className="pb-0">
+              <div className="flex items-center gap-2">
+                <Languages size={18} className="text-primary" />
+                <h3 className="text-lg font-semibold">Languages</h3>
+              </div>
+            </CardHeader>
+            <CardBody className="pt-3">
+              <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <DetailField
+                  label="Default Language"
+                  value={
+                    (() => {
+                      const code = (tenant.configuration as Record<string, unknown>)?.default_language as string | undefined;
+                      return code ? `${LANGUAGE_LABELS[code] || code} (${code.toUpperCase()})` : 'English (EN)';
+                    })()
+                  }
+                />
+                <div>
+                  <dt className="text-xs font-medium uppercase text-default-400">Supported Languages</dt>
+                  <dd className="mt-1 flex flex-wrap gap-1.5">
+                    {(() => {
+                      const langs = (tenant.configuration as Record<string, unknown>)?.supported_languages as string[] | undefined;
+                      const codes = langs ?? ['en'];
+                      return codes.map((code) => (
+                        <Chip key={code} size="sm" variant="flat" color="primary">
+                          {LANGUAGE_LABELS[code] || code}
+                        </Chip>
+                      ));
+                    })()}
+                  </dd>
+                </div>
+              </dl>
             </CardBody>
           </Card>
 
@@ -435,20 +547,91 @@ export function TenantShow() {
           {/* Tenant Admins */}
           <Card shadow="sm">
             <CardHeader className="pb-0">
-              <div className="flex items-center gap-2">
-                <Users size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold">
-                  Admins
-                  {tenant.admins.length > 0 && (
-                    <span className="ml-1 text-sm font-normal text-default-400">
-                      ({tenant.admins.length})
-                    </span>
-                  )}
-                </h3>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <Users size={18} className="text-primary" />
+                  <h3 className="text-lg font-semibold">
+                    Admins
+                    {tenant.admins.length > 0 && (
+                      <span className="ml-1 text-sm font-normal text-default-400">
+                        ({tenant.admins.length})
+                      </span>
+                    )}
+                  </h3>
+                </div>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color="primary"
+                  startContent={<UserPlus size={14} />}
+                  onPress={() => setShowAddAdmin(!showAddAdmin)}
+                >
+                  {showAddAdmin ? 'Cancel' : 'Add'}
+                </Button>
               </div>
             </CardHeader>
             <CardBody className="pt-3">
-              {tenant.admins.length === 0 ? (
+              {/* Add Administrator Form */}
+              {showAddAdmin && (
+                <div className="mb-4 space-y-3 rounded-lg border border-default-200 p-3">
+                  <p className="text-sm font-medium text-foreground">Add Administrator</p>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <Input
+                      size="sm"
+                      label="First Name"
+                      isRequired
+                      value={adminForm.first_name}
+                      onValueChange={(v) => setAdminForm({ ...adminForm, first_name: v })}
+                    />
+                    <Input
+                      size="sm"
+                      label="Last Name"
+                      value={adminForm.last_name}
+                      onValueChange={(v) => setAdminForm({ ...adminForm, last_name: v })}
+                    />
+                  </div>
+                  <Input
+                    size="sm"
+                    label="Email"
+                    type="email"
+                    isRequired
+                    value={adminForm.email}
+                    onValueChange={(v) => setAdminForm({ ...adminForm, email: v })}
+                  />
+                  <Input
+                    size="sm"
+                    label="Password"
+                    type="password"
+                    isRequired
+                    value={adminForm.password}
+                    onValueChange={(v) => setAdminForm({ ...adminForm, password: v })}
+                  />
+                  <Select
+                    size="sm"
+                    label="Role"
+                    selectedKeys={[adminForm.role]}
+                    onSelectionChange={(keys) => {
+                      const val = Array.from(keys)[0] as string;
+                      if (val) setAdminForm({ ...adminForm, role: val });
+                    }}
+                  >
+                    <SelectItem key="admin">Admin</SelectItem>
+                    <SelectItem key="tenant_admin">Tenant Admin</SelectItem>
+                    <SelectItem key="member">Member</SelectItem>
+                  </Select>
+                  <Button
+                    size="sm"
+                    color="primary"
+                    isLoading={addingAdmin}
+                    onPress={handleAddAdmin}
+                    fullWidth
+                  >
+                    Create Administrator
+                  </Button>
+                </div>
+              )}
+
+              {tenant.admins.length === 0 && !showAddAdmin ? (
                 <p className="text-sm text-default-400">No admins found.</p>
               ) : (
                 <ul className="space-y-2">

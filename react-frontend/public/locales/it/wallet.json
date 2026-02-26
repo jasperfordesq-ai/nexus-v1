@@ -1,0 +1,58 @@
+{
+  "title": "Portafoglio",
+  "balance": "Saldo",
+  "time_credits": "Crediti Tempo",
+  "hours": "Ore",
+  "transactions": "Transazioni",
+  "pending": "In Attesa",
+  "completed": "Completate",
+  "sent": "Inviati",
+  "received": "Ricevuti",
+  "empty": "Nessuna transazione ancora",
+  "transfer": "Trasferisci Crediti",
+  "pending_reviews": "Recensioni in Attesa",
+  "review": "Lascia Recensione",
+  "subtitle": "Tieni traccia dei tuoi crediti tempo e transazioni",
+  "unable_to_load": "Impossibile Caricare il Portafoglio",
+  "try_again": "Riprova",
+  "your_balance": "Il Tuo Saldo",
+  "pending_in": "+{{count}}h in attesa",
+  "no_pending": "Nessuna transazione in attesa",
+  "send_credits": "Invia Crediti",
+  "history": "Storico Transazioni",
+  "export": "Esporta",
+  "load_more": "Carica altro",
+  "no_transactions": "Nessuna transazione",
+  "no_transactions_desc": "Il tuo storico transazioni apparirà qui",
+  "stats": {
+    "earned": "Guadagnate",
+    "spent": "Spese",
+    "pending": "In Attesa"
+  },
+  "filter": {
+    "all": "Tutte",
+    "earned": "Guadagnate",
+    "spent": "Spese",
+    "pending": "In Attesa"
+  },
+  "csv": {
+    "date": "Data",
+    "type": "Tipo",
+    "amount": "Importo",
+    "description": "Descrizione",
+    "other_party": "Altra Parte",
+    "status": "Stato",
+    "received": "Ricevuto",
+    "sent": "Inviato"
+  },
+  "toast": {
+    "no_data": "Nessun dato",
+    "no_export": "Nessuna transazione da esportare",
+    "load_error": "Errore",
+    "load_more_error": "Impossibile caricare altre transazioni",
+    "exported": "Esportato",
+    "exported_desc": "Transazioni esportate in CSV",
+    "transfer_success": "Trasferimento riuscito",
+    "transfer_desc": "Inviati {{amount}} ore a {{recipient}}"
+  }
+}

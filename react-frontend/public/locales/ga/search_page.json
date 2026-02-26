@@ -1,0 +1,28 @@
+{
+  "page_title": "Cuardach",
+  "title": "Cuardach",
+  "subtitle": "Faigh liostaí, baill, imeachtaí, agus grúpaí",
+  "search_placeholder": "Cuardaigh rud ar bith...",
+  "tab_all": "Uile ({{count}})",
+  "tab_listings": "Liostaí ({{count}})",
+  "tab_members": "Baill ({{count}})",
+  "tab_events": "Imeachtaí ({{count}})",
+  "tab_groups": "Grúpaí ({{count}})",
+  "error_title": "Earráid Chuardaigh",
+  "error_message": "Theip ar an gcuardach. Triail arís le do thoil.",
+  "try_again": "Triail Arís",
+  "no_results_title": "Gan torthaí le fáil",
+  "no_results_desc": "Gan torthaí do \"{{query}}\". Bain triail as téarma cuardaigh eile.",
+  "section_listings": "Liostaí ({{count}})",
+  "section_members": "Baill ({{count}})",
+  "section_events": "Imeachtaí ({{count}})",
+  "section_groups": "Grúpaí ({{count}})",
+  "listing_offering": "Á thairiscint",
+  "listing_requesting": "Á iarraidh",
+  "members_count": "{{count}} comhalta",
+  "initial_title": "Tosaigh ag cuardach",
+  "initial_desc": "Cuir isteach téarma cuardaigh chun liostaí, baill, imeachtaí, agus grúpaí a fháil",
+  "toast": {
+    "search_failed": "Theip ar an gcuardach"
+  }
+}

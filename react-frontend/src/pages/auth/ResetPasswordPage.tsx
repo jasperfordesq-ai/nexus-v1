@@ -12,6 +12,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input } from '@heroui/react';
 import { Lock, ArrowLeft, CheckCircle, Eye, EyeOff, Check, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -19,6 +20,7 @@ import { api } from '@/lib/api';
 import { validatePassword, PASSWORD_REQUIREMENTS } from '@/lib/validation';
 
 export function ResetPasswordPage() {
+  const { t } = useTranslation('auth');
   usePageTitle('Set New Password');
   const { branding, tenantPath } = useTenant();
   const [searchParams] = useSearchParams();
@@ -41,13 +43,13 @@ export function ResetPasswordPage() {
           className="w-full max-w-md"
         >
           <GlassCard className="p-8 text-center">
-            <h1 className="text-2xl font-bold text-theme-primary mb-4">Invalid reset link</h1>
+            <h1 className="text-2xl font-bold text-theme-primary mb-4">{t('reset_password.invalid_title')}</h1>
             <p className="text-theme-muted mb-6">
-              This password reset link is invalid or has expired. Please request a new one.
+              {t('reset_password.invalid_message')}
             </p>
             <Link to={tenantPath('/password/forgot')}>
               <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                Request new link
+                {t('reset_password.request_new_link')}
               </Button>
             </Link>
           </GlassCard>
@@ -67,7 +69,7 @@ export function ResetPasswordPage() {
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('reset_password.passwords_no_match'));
       return;
     }
 
@@ -80,7 +82,7 @@ export function ResetPasswordPage() {
       });
       setIsSuccess(true);
     } catch (err) {
-      setError('Failed to reset password. The link may have expired.');
+      setError(t('reset_password.link_expired_error'));
     } finally {
       setIsLoading(false);
     }
@@ -98,13 +100,13 @@ export function ResetPasswordPage() {
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-emerald-400" />
             </div>
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">Password reset successful</h1>
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('reset_password.success_title')}</h1>
             <p className="text-theme-muted mb-6">
-              Your password has been updated. You can now sign in with your new password.
+              {t('reset_password.success_message')}
             </p>
             <Link to={tenantPath('/login')}>
               <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                Sign in
+                {t('reset_password.sign_in')}
               </Button>
             </Link>
           </GlassCard>
@@ -126,15 +128,15 @@ export function ResetPasswordPage() {
           className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to login
+          {t('reset_password.back_to_login')}
         </Link>
 
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">Set new password</h1>
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('reset_password.page_title')}</h1>
             <p className="text-theme-muted">
-              Enter your new password below.
+              {t('reset_password.page_subtitle')}
             </p>
           </div>
 
@@ -150,8 +152,8 @@ export function ResetPasswordPage() {
             <div>
               <Input
                 type={showPassword ? 'text' : 'password'}
-                label="New password"
-                placeholder="Enter a strong password"
+                label={t('reset_password.new_password_label')}
+                placeholder={t('reset_password.new_password_placeholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
@@ -201,13 +203,13 @@ export function ResetPasswordPage() {
 
             <Input
               type={showPassword ? 'text' : 'password'}
-              label="Confirm password"
-              placeholder="Re-enter your password"
+              label={t('reset_password.confirm_label')}
+              placeholder={t('reset_password.confirm_placeholder')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
               isInvalid={confirmPassword.length > 0 && password !== confirmPassword}
-              errorMessage={confirmPassword.length > 0 && password !== confirmPassword ? 'Passwords do not match' : ''}
+              errorMessage={confirmPassword.length > 0 && password !== confirmPassword ? t('reset_password.passwords_no_match') : ''}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -222,7 +224,7 @@ export function ResetPasswordPage() {
               isLoading={isLoading}
               isDisabled={!password || !confirmPassword}
             >
-              Reset password
+              {t('reset_password.submit')}
             </Button>
           </form>
         </GlassCard>

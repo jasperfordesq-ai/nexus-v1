@@ -1,4 +1,5 @@
 # Deployment System Audit Report
+
 **Date:** 2026-02-20
 **Issue:** Dev images being used on production instead of production images
 **Status:** ROOT CAUSE IDENTIFIED + CRITICAL FIXES APPLIED
@@ -10,6 +11,7 @@
 The deployment system had a **fundamental architectural flaw** causing dev Docker images to be used in production. This wasn't a one-time bug—it was a systemic vulnerability with **5 independent failure paths**.
 
 **Root Cause:** Implicit Docker image naming, combined with:
+
 - Same container names for dev and prod (`nexus-react-prod` used for BOTH)
 - No explicit image tags (both defaulted to `staging_frontend:latest`)
 - Git tracking dev `compose.yml` on production server
@@ -23,6 +25,7 @@ The deployment system had a **fundamental architectural flaw** causing dev Docke
 ## The 5 Failure Paths
 
 ### Failure Path #1: Docker Layer Caching
+
 1. Production image built on Feb 5 with old code
 2. Code updated, image rebuilt WITHOUT `--no-cache`
 3. Old layers cached, new container runs old code
@@ -32,6 +35,7 @@ The deployment system had a **fundamental architectural flaw** causing dev Docke
 **Detection:** Files are correct on disk, but stale bytecode served. No errors.
 
 ### Failure Path #2: Image Name Collision
+
 - Dev compose builds: `staging_frontend:latest` from `Dockerfile` (dev)
 - Prod compose builds: `staging_frontend:latest` from `Dockerfile.prod` (prod)
 - Last builder wins → unpredictable which image runs
@@ -40,6 +44,7 @@ The deployment system had a **fundamental architectural flaw** causing dev Docke
 **Detection:** `docker inspect` shows wrong image, but container name looks correct.
 
 ### Failure Path #3: Git Overwrites Production Config
+
 1. Production server does `git pull`
 2. Pulls dev `compose.yml` from GitHub
 3. `safe-deploy.sh` runs `cp compose.prod.yml compose.yml`
@@ -49,6 +54,7 @@ The deployment system had a **fundamental architectural flaw** causing dev Docke
 **Detection:** Deployment succeeds but serves dev build.
 
 ### Failure Path #4: Container Name Confusion
+
 - **Dev:** `container_name: nexus-react-prod` (running dev Dockerfile)
 - **Prod:** `container_name: nexus-react-prod` (running prod Dockerfile)
 - Name says "prod" but could be dev image underneath
@@ -57,6 +63,7 @@ The deployment system had a **fundamental architectural flaw** causing dev Docke
 **Detection:** Container name is correct, but image layers are wrong.
 
 ### Failure Path #5: No Post-Deploy Verification
+
 - Deployment scripts don't verify which image was deployed
 - Health checks pass (both dev and prod are "healthy")
 - No check for: Dockerfile used, build args applied, layer provenance
@@ -69,7 +76,9 @@ The deployment system had a **fundamental architectural flaw** causing dev Docke
 ## Critical Fixes Applied (2026-02-20)
 
 ### ✅ Fix #1: Explicit Image Naming (P1 - CRITICAL)
+
 **Changed:**
+
 ```yaml
 # compose.yml (dev) - BEFORE
 frontend:
@@ -105,12 +114,14 @@ frontend:
 ```
 
 **Why This Works:**
+
 - Dev and prod images now have **different names**
 - No more image name collision
 - `docker images` clearly shows which is which
 - Can't accidentally run dev image in prod container
 
 **Verification:**
+
 ```bash
 # Before fix:
 docker images | grep frontend
@@ -124,12 +135,14 @@ nexus-react-prod  latest  # ← Clearly prod
 
 ---
 
-## Remaining Fixes (Not Yet Applied)
+## Remaining Fixes ✅ All Applied (2026-02-24)
 
-### Fix #2: Always Use `--no-cache` for Frontend (P2)
+### ✅ Fix #2: Always Use `--no-cache` for Frontend (P2) — APPLIED
+
 **Current Bug:** `safe-deploy.sh` quick mode skips rebuild entirely.
 
 **Proposed Fix:**
+
 ```bash
 deploy_quick() {
     cp compose.prod.yml compose.yml
@@ -145,8 +158,10 @@ deploy_quick() {
 
 **Why:** Prevents Docker layer cache from serving stale code.
 
-### Fix #3: Add Image Verification (P2)
+### ✅ Fix #3: Add Image Verification (P2) — APPLIED
+
 **Proposed Addition to `safe-deploy.sh`:**
+
 ```bash
 verify_production_images() {
     log_info "Verifying deployed images..."
@@ -177,7 +192,8 @@ verify_production_images() {
 
 **Why:** Catches wrong images BEFORE declaring deploy success.
 
-### Fix #4: Remove Dev Compose from Production (P3)
+### ✅ Fix #4: Protect compose.yml from git overwrites (P3) — APPLIED
+
 **Proposed:** Don't track `compose.yml` on production. Only use `compose.prod.yml`.
 
 ```bash
@@ -189,6 +205,7 @@ rm -f compose.yml.bak  # No fallback to dev version
 **Why:** Eliminates confusion about which compose file is active.
 
 ### Fix #5: Docker Registry (P4 - Medium Term)
+
 **Proposed:** Push images to registry with version tags.
 
 ```yaml
@@ -198,6 +215,7 @@ frontend:
 ```
 
 **Benefits:**
+
 - Immutable deployments
 - Easy rollback (reference old tag)
 - Registry attestation (image comes from trusted source)
@@ -208,20 +226,25 @@ frontend:
 ## Prevention: How to Never Regress
 
 ### 1. Pre-Commit Checks (Already in Place)
+
 - Husky pre-commit hook runs TypeScript checks
 - Blocks commits if build fails
 
 ### 2. Pre-Push Checks (Already in Place)
+
 - Full `npm run build` before push
 - Blocks push if build fails
 
 ### 3. CI/CD Pipeline (Already in Place)
+
 - GitHub Actions runs 5-stage pipeline
 - Dockerfile drift detection
 - Regression pattern scanning
 
-### 4. Deployment Validation (MISSING - Add This)
+### 4. Deployment Validation (APPLIED ✅)
+
 **Add to `safe-deploy.sh`:**
+
 ```bash
 # Before deploy
 validate_dockerfiles() {
@@ -239,8 +262,10 @@ validate_dockerfiles() {
 }
 ```
 
-### 5. Post-Deploy Verification (MISSING - Add This)
+### 5. Post-Deploy Verification (APPLIED ✅)
+
 **Add image provenance checks to `verify-deploy.sh`:**
+
 ```bash
 # Verify image names match expectations
 verify_image_provenance() {
@@ -253,14 +278,16 @@ verify_image_provenance() {
 
 ## Deployment Best Practices (Going Forward)
 
-### ✅ DO:
+### ✅ DO
+
 - Always use `--no-cache` for production frontend builds
 - Explicitly tag images in compose files
 - Verify images post-deploy before declaring success
 - Keep dev and prod image names completely separate
 - Restart PHP container after code changes (clears OPCache)
 
-### ⛔ DON'T:
+### ⛔ DON'T
+
 - Use implicit Docker image naming
 - Share image names between dev and prod
 - Skip rebuilds on production deploys
@@ -272,59 +299,61 @@ verify_image_provenance() {
 ## Lessons Learned
 
 ### 1. Container Names ≠ Image Names
+
 - Container: `nexus-react-prod` (what it's called)
 - Image: `nexus-react-prod:latest` (what it runs)
 - These can diverge! Always verify **both**.
 
 ### 2. Docker Layer Cache is Persistent
+
 - Without `--no-cache`, old layers survive rebuilds
 - OPCache never re-reads files → requires container restart
 - "Clean rebuild" isn't clean without `--no-cache`
 
 ### 3. Implicit Naming is Dangerous
+
 - Docker infers image names from project + service
 - Both dev and prod can build to same implicit name
 - Always use explicit `image:` field
 
 ### 4. Git as Source of Truth Has Risks
+
 - Dev config (`compose.yml`) checked into repo
 - Production pulls it during deploy
 - Must be overwritten before use
 - Timing window for failure
 
 ### 5. Health Checks ≠ Correctness
+
 - Both dev and prod images are "healthy"
 - Health check just means "container responds"
 - Need provenance checks (which Dockerfile? which build args?)
 
 ---
 
-## Current State (After Fix #1)
+## Current State (All Fixes Applied — 2026-02-24)
 
-### ✅ What's Fixed:
-- Dev and prod images now have different names
+### ✅ What's Fixed
+
+- Dev and prod images have different explicit names (`nexus-react-dev:latest` vs `nexus-react-prod:latest`)
 - Dev container renamed from `nexus-react-prod` to `nexus-react-dev`
-- Explicit image tags in both compose files
-- No more image name collision
+- Explicit `image:` tags in both compose files prevent collision
+- Quick deploy forces `--no-cache` rebuild for both `frontend` and `sales`
+- `verify_production_images()` checks nginx binary, image name, OPCache, and display_errors after every deploy
+- `protect_compose_yml()` runs `git update-index --skip-worktree compose.yml` so `git reset --hard` never overwrites it with the dev version
+- `validate_dockerfiles()` confirms correct base images in Dockerfiles before any build begins
+- All three modes (quick, full, rollback) call both `protect_compose_yml()` and `validate_dockerfiles()`
 
-### ⚠️ What's Still Risky:
-- Quick deploy skips frontend rebuild (uses old image)
-- No post-deploy image verification
-- Docker layer cache can still cause stale code
-- Dev compose.yml still tracked on production server
+### 📋 Status: FULLY HARDENED
 
-### 📋 Next Steps:
-1. Apply Fix #2: Force `--no-cache` rebuild in quick deploy
-2. Apply Fix #3: Add image verification to `safe-deploy.sh`
-3. Apply Fix #4: Remove dev compose from production
-4. Test full deployment with verification
-5. Document new deployment procedure
+No outstanding risks from the original 5 failure paths. All P1–P3 fixes are in production.
 
 ---
 
 ## Testing the Fixes
 
 ### Verify Local Dev (Should Use Dev Image)
+
 ```bash
 docker compose down
 docker compose build --no-cache
@@ -339,6 +368,7 @@ docker exec nexus-react-dev ps aux | grep node
 ```
 
 ### Verify Production (Should Use Prod Image)
+
 ```bash
 # On production server
 cd /opt/nexus-php

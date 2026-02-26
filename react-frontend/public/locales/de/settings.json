@@ -1,0 +1,19 @@
+{
+  "title": "Einstellungen",
+  "account": "Konto",
+  "notifications": "Benachrichtigungen",
+  "privacy": "Datenschutz",
+  "language": "Sprache",
+  "appearance": "Erscheinungsbild",
+  "security": "Sicherheit",
+  "save": "Einstellungen speichern",
+  "saved": "Einstellungen gespeichert",
+  "language_preference": "Spracheinstellung",
+  "select_language": "Wählen Sie Ihre bevorzugte Sprache für die Oberfläche",
+  "theme": {
+    "title": "Design",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  }
+}

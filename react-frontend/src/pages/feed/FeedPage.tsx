@@ -39,6 +39,7 @@ import {
   TrendingUp,
   Flag,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
@@ -78,7 +79,8 @@ function FeedSkeleton() {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function FeedPage() {
-  usePageTitle('Feed');
+  const { t } = useTranslation('feed');
+  usePageTitle(t('page_title'));
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
   const [items, setItems] = useState<FeedItem[]>([]);
@@ -130,11 +132,11 @@ export function FeedPage() {
         setHasMore(response.meta?.has_more ?? false);
         cursorRef.current = response.meta?.cursor ?? undefined;
       } else {
-        if (!append) setError('Failed to load feed.');
+        if (!append) setError(t('error_load'));
       }
     } catch (err) {
       logError('Failed to load feed', err);
-      if (!append) setError('Failed to load feed. Please try again.');
+      if (!append) setError(t('error_load_retry'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -190,10 +192,10 @@ export function FeedPage() {
     try {
       await api.post(`/v2/feed/posts/${postId}/hide`);
       setItems((prev) => prev.filter((fi) => !(fi.id === postId && fi.type === 'post')));
-      toast.success('Post hidden');
+      toast.success(t('toast.post_hidden'));
     } catch (err) {
       logError('Failed to hide post', err);
-      toast.error('Failed to hide post');
+      toast.error(t('toast.hide_failed'));
     }
   };
 
@@ -201,10 +203,10 @@ export function FeedPage() {
     try {
       await api.post(`/v2/feed/users/${userId}/mute`);
       setItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
-      toast.success('User muted');
+      toast.success(t('toast.user_muted'));
     } catch (err) {
       logError('Failed to mute user', err);
-      toast.error('Failed to mute user');
+      toast.error(t('toast.mute_failed'));
     }
   };
 
@@ -216,7 +218,7 @@ export function FeedPage() {
 
   const handleReport = async () => {
     if (!reportPostId || !reportReason.trim()) {
-      toast.error('Please provide a reason');
+      toast.error(t('toast.provide_reason'));
       return;
     }
 
@@ -228,10 +230,10 @@ export function FeedPage() {
       onReportClose();
       setReportPostId(null);
       setReportReason('');
-      toast.success('Post reported. Thank you for helping keep our community safe.');
+      toast.success(t('toast.reported'));
     } catch (err) {
       logError('Failed to report post', err);
-      toast.error('Failed to report post');
+      toast.error(t('toast.report_failed'));
     } finally {
       setIsReporting(false);
     }
@@ -244,10 +246,10 @@ export function FeedPage() {
         target_id: item.id,
       });
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toast.success('Post deleted');
+      toast.success(t('toast.deleted'));
     } catch (err) {
       logError('Failed to delete post', err);
-      toast.error('Failed to delete post');
+      toast.error(t('toast.delete_failed'));
     }
   };
 
@@ -270,17 +272,17 @@ export function FeedPage() {
       }
     } catch (err) {
       logError('Failed to vote', err);
-      toast.error('Failed to submit vote');
+      toast.error(t('toast.vote_failed'));
     }
   };
 
   const filterOptions: { key: FeedFilter; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'posts', label: 'Posts' },
-    { key: 'listings', label: 'Listings' },
-    { key: 'events', label: 'Events' },
-    { key: 'polls', label: 'Polls' },
-    { key: 'goals', label: 'Goals' },
+    { key: 'all', label: t('filter.all') },
+    { key: 'posts', label: t('filter.posts') },
+    { key: 'listings', label: t('filter.listings') },
+    { key: 'events', label: t('filter.events') },
+    { key: 'polls', label: t('filter.polls') },
+    { key: 'goals', label: t('filter.goals') },
   ];
 
   const containerVariants = {
@@ -302,9 +304,9 @@ export function FeedPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <Newspaper className="w-5 h-5 text-white" aria-hidden="true" />
             </div>
-            Community Feed
+            {t('title')}
           </h1>
-          <p className="text-[var(--text-muted)] mt-1 text-sm">See what&apos;s happening in your community</p>
+          <p className="text-[var(--text-muted)] mt-1 text-sm">{t('subtitle')}</p>
         </div>
 
         {isAuthenticated && (
@@ -313,7 +315,7 @@ export function FeedPage() {
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={onCreateOpen}
           >
-            New Post
+            {t('new_post')}
           </Button>
         )}
       </div>
@@ -330,7 +332,7 @@ export function FeedPage() {
               className="ring-2 ring-[var(--border-default)]"
             />
             <div className="flex-1 bg-[var(--surface-elevated)] rounded-full px-4 py-2.5 text-[var(--text-subtle)] text-sm border border-[var(--border-default)] hover:border-[var(--color-primary)]/30 transition-colors">
-              What&apos;s on your mind?
+              {t('whats_on_your_mind')}
             </div>
             <div className="flex gap-1">
               <Button
@@ -339,7 +341,7 @@ export function FeedPage() {
                 variant="light"
                 className="text-[var(--text-muted)]"
                 onPress={() => { setComposeDefaultTab('post'); onCreateOpen(); }}
-                aria-label="Add image"
+                aria-label={t('add_image_aria')}
               >
                 <ImagePlus className="w-4 h-4" />
               </Button>
@@ -349,7 +351,7 @@ export function FeedPage() {
                 variant="light"
                 className="text-[var(--text-muted)]"
                 onPress={() => { setComposeDefaultTab('poll'); onCreateOpen(); }}
-                aria-label="Create poll"
+                aria-label={t('create_poll_aria')}
               >
                 <BarChart3 className="w-4 h-4" />
               </Button>
@@ -384,14 +386,14 @@ export function FeedPage() {
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mx-auto mb-5">
             <AlertTriangle className="w-8 h-8 text-amber-500" aria-hidden="true" />
           </div>
-          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Unable to Load Feed</h2>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('unable_to_load')}</h2>
           <p className="text-[var(--text-muted)] mb-5 text-sm max-w-xs mx-auto">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadFeed()}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -410,11 +412,11 @@ export function FeedPage() {
               <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-6">
                 <Sparkles className="w-10 h-10 text-indigo-400" aria-hidden="true" />
               </div>
-              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No posts yet</h2>
+              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('empty_title')}</h2>
               <p className="text-sm text-[var(--text-muted)] mb-6 max-w-xs mx-auto">
                 {filter !== 'all'
-                  ? `No ${filter} in the feed right now. Try a different filter!`
-                  : 'Be the first to share something with your community!'}
+                  ? t('empty_filtered', { filter })
+                  : t('empty_desc')}
               </p>
               {isAuthenticated && (
                 <Button
@@ -422,7 +424,7 @@ export function FeedPage() {
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                   onPress={onCreateOpen}
                 >
-                  Create Post
+                  {t('create_post')}
                 </Button>
               )}
             </GlassCard>
@@ -455,7 +457,7 @@ export function FeedPage() {
                     isLoading={isLoadingMore}
                     startContent={!isLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
                   >
-                    Load More
+                    {t('load_more')}
                   </Button>
                 </div>
               )}
@@ -487,16 +489,16 @@ export function FeedPage() {
               <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
                 <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
               </div>
-              Report Post
+              {t('report.title')}
             </div>
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-[var(--text-muted)] mb-3">
-              Please describe why you are reporting this post. Our moderators will review your report.
+              {t('report.description')}
             </p>
             <Textarea
-              label="Reason"
-              placeholder="Describe the issue..."
+              label={t('report.reason_label')}
+              placeholder={t('report.reason_placeholder')}
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
               minRows={3}
@@ -513,7 +515,7 @@ export function FeedPage() {
               onPress={onReportClose}
               className="text-[var(--text-muted)]"
             >
-              Cancel
+              {t('report.cancel')}
             </Button>
             <Button
               color="danger"
@@ -523,7 +525,7 @@ export function FeedPage() {
               isDisabled={!reportReason.trim()}
               className="font-medium"
             >
-              Submit Report
+              {t('report.submit')}
             </Button>
           </ModalFooter>
         </ModalContent>
