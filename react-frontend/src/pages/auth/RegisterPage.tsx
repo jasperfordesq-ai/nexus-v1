@@ -99,6 +99,13 @@ export function RegisterPage() {
   const [longitude, setLongitude] = useState<number | undefined>();
   const [phone, setPhone] = useState('');
 
+  // E.164 phone validation (optional field — only validate if user enters something)
+  const isPhoneValid = (value: string) => {
+    if (!value.trim()) return true; // Empty is fine (optional field)
+    return /^\+[1-9]\d{1,14}$/.test(value.replace(/[\s\-()]/g, ''));
+  };
+  const phoneError = phone.trim() && !isPhoneValid(phone) ? 'Enter a valid international number (e.g. +1 555 123 4567)' : '';
+
   // Form state - Consents
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
@@ -186,7 +193,8 @@ export function RegisterPage() {
   const isStep2Valid =
     firstName.trim() &&
     lastName.trim() &&
-    (profileType === 'individual' || organizationName.trim());
+    (profileType === 'individual' || organizationName.trim()) &&
+    isPhoneValid(phone);
   const isStep3Valid =
     email.trim() &&
     password.trim() &&
@@ -510,7 +518,9 @@ export function RegisterPage() {
               onChange={(e) => setPhone(e.target.value)}
               startContent={<Phone className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               autoComplete="tel"
-              description={t('register.phone_admin_note')}
+              isInvalid={!!phoneError}
+              errorMessage={phoneError}
+              description={phoneError ? undefined : t('register.phone_admin_note')}
               classNames={{
                 inputWrapper:
                   'glass-card border-glass-border hover:border-glass-border-hover',

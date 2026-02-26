@@ -301,6 +301,10 @@ class EmailVerificationApiController extends BaseApiController
      * all tokens. Stores a token_prefix column for fast lookup, then verifies
      * with password_verify for security.
      *
+     * Both RegistrationApiController and this controller now use SHA-256 hashing.
+     * The bcrypt fallback exists only for tokens created before this change
+     * and can be removed after the TOKEN_EXPIRY_SECONDS window passes.
+     *
      * @param string $token The unhashed token from the user
      * @param int $tenantId The tenant to scope the lookup to
      * @return array|null The verification record if valid, null otherwise

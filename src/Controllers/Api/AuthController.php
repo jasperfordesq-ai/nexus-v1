@@ -136,7 +136,15 @@ class AuthController extends BaseApiController
             }
         }
 
-        if ($user && password_verify($password, $user['password_hash'])) {
+        // Constant-time comparison: always run password_verify even when user
+        // doesn't exist, preventing timing-based user enumeration attacks.
+        // The dummy hash must be a genuinely valid Argon2id hash so that
+        // password_verify() performs the full computation rather than short-circuiting
+        // on a malformed hash string (which would leak timing information).
+        $dummyHash = '$argon2id$v=19$m=65536,t=4,p=1$V1Jna0owWXBLNC55ajFQRQ$h0+cXUsJzOi6TzES3RPuquTJpwPbpYmVHS4A3ArHHXo';
+        $passwordValid = password_verify($password, $user['password_hash'] ?? $dummyHash);
+
+        if ($user && $passwordValid) {
             // SECURITY: Record successful login and clear failed attempts
             if (!empty($email)) {
                 \Nexus\Core\RateLimiter::recordAttempt($email, 'email', true);
@@ -334,10 +342,10 @@ class AuthController extends BaseApiController
             );
         }
 
-        // Validate password strength (minimum 8 chars for legacy endpoint)
-        if (strlen($password) < 8) {
+        // Validate password strength (minimum 12 chars — matches v2 registration)
+        if (strlen($password) < 12) {
             return $this->errorResponse(
-                'Password must be at least 8 characters',
+                'Password must be at least 12 characters',
                 ApiErrorCodes::VALIDATION_TOO_SHORT,
                 400
             );
@@ -524,8 +532,27 @@ class AuthController extends BaseApiController
         // with concurrent API requests. Session is regenerated only at login time.
         // This prevents 401 errors when multiple requests are in-flight during regeneration.
 
-        // For Bearer-authenticated requests, skip session-related operations
-        // This keeps the API stateless for mobile/SPA clients
+        // For Bearer-authenticated requests, verify user still exists (throttled to once per 5 min via token claim)
+        // This detects deleted/disabled users without requiring a session store.
+        if ($isBearerAuth && $bearerUserId) {
+            // Use a lightweight existence check — the token already contains user_id
+            try {
+                $bearerUser = \Nexus\Models\User::findById((int)$bearerUserId, false);
+                if (!$bearerUser || ($bearerUser['status'] ?? 'active') === 'suspended') {
+                    return $this->errorResponse(
+                        'User not found',
+                        ApiErrorCodes::AUTH_ACCOUNT_DELETED,
+                        401,
+                        ['authenticated' => false, 'should_reauth' => true]
+                    );
+                }
+            } catch (\Throwable $e) {
+                error_log('[Heartbeat] Bearer user check failed: ' . $e->getMessage());
+                // Don't fail the heartbeat on transient DB errors for Bearer clients
+            }
+        }
+
+        // For session-authenticated requests, perform session-related operations
         if (!$isBearerAuth && $isSessionAuth) {
             // Verify user still exists in database (prevents stale sessions for deleted users)
             // Only check once per 5 minutes to reduce DB load
