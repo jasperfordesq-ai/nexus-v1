@@ -275,7 +275,7 @@ class GoalService
             'avatar_url' => $goal['owner_avatar'] ?? null,
         ];
 
-        // Format mentor info
+        // Format mentor info (internal field)
         if (!empty($goal['mentor_id'])) {
             $goal['mentor'] = [
                 'id' => $goal['mentor_id'],
@@ -285,6 +285,11 @@ class GoalService
         } else {
             $goal['mentor'] = null;
         }
+
+        // Buddy aliases — React frontend uses 'buddy' terminology
+        $goal['buddy_id']     = !empty($goal['mentor_id']) ? (int)$goal['mentor_id'] : null;
+        $goal['buddy_name']   = $goal['mentor']['name'] ?? null;
+        $goal['buddy_avatar'] = $goal['mentor']['avatar_url'] ?? null;
 
         // Boolean conversion
         $goal['is_public'] = (bool)($goal['is_public'] ?? false);

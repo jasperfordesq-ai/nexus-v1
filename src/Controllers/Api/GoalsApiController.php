@@ -74,8 +74,14 @@ class GoalsApiController extends BaseApiController
 
         $result = GoalService::getAll($filters);
 
+        $items = array_map(function (array $goal) use ($userId) {
+            $goal['is_owner'] = ((int)($goal['user_id'] ?? 0) === $userId);
+            $goal['is_buddy'] = ((int)($goal['buddy_id'] ?? 0) === $userId && $goal['buddy_id'] !== null);
+            return $goal;
+        }, $result['items']);
+
         $this->respondWithCollection(
-            $result['items'],
+            $items,
             $result['cursor'],
             $filters['limit'],
             $result['has_more']
@@ -108,8 +114,14 @@ class GoalsApiController extends BaseApiController
 
         $result = GoalService::getPublicForBuddy($userId, $filters);
 
+        $items = array_map(function (array $goal) use ($userId) {
+            $goal['is_owner'] = ((int)($goal['user_id'] ?? 0) === $userId);
+            $goal['is_buddy'] = ((int)($goal['buddy_id'] ?? 0) === $userId && $goal['buddy_id'] !== null);
+            return $goal;
+        }, $result['items']);
+
         $this->respondWithCollection(
-            $result['items'],
+            $items,
             $result['cursor'],
             $filters['limit'],
             $result['has_more']
@@ -149,8 +161,9 @@ class GoalsApiController extends BaseApiController
             );
         }
 
-        // Add ownership flag
+        // Add ownership and buddy flags
         $goal['is_owner'] = ((int)$goal['user_id'] === $userId);
+        $goal['is_buddy'] = ((int)($goal['buddy_id'] ?? 0) === $userId && $goal['buddy_id'] !== null);
 
         $this->respondWithData($goal);
     }
