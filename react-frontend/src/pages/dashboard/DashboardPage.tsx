@@ -563,15 +563,15 @@ export function DashboardPage() {
                             </p>
                             <p className="text-xs text-theme-subtle line-clamp-1">{item.content}</p>
                           </div>
-                          <div className="hidden sm:flex items-center gap-3 shrink-0 text-theme-subtle text-xs">
+                          <div className="flex items-center gap-3 shrink-0 text-theme-subtle text-xs">
                             {item.likes_count > 0 && (
-                              <span className="flex items-center gap-1">
+                              <span className="hidden sm:flex items-center gap-1">
                                 <Heart className="w-3 h-3" aria-hidden="true" />
                                 {item.likes_count}
                               </span>
                             )}
                             {item.comments_count > 0 && (
-                              <span className="flex items-center gap-1">
+                              <span className="hidden sm:flex items-center gap-1">
                                 <MessageCircle className="w-3 h-3" aria-hidden="true" />
                                 {item.comments_count}
                               </span>
@@ -945,7 +945,7 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
 
   return (
     <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? 'Loading' : value}`}>
-      <GlassCard className="p-4 hover:scale-[1.02] transition-transform">
+      <GlassCard className="p-4 hover:scale-[1.02] active:scale-[0.98] transition-transform">
         <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-3`}>
           {icon}
         </div>
