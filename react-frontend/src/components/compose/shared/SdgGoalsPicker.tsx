@@ -8,6 +8,7 @@
  */
 
 import { Chip } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { SDG_GOALS } from '@/data/sdg-goals';
 
 interface SdgGoalsPickerProps {
@@ -16,6 +17,8 @@ interface SdgGoalsPickerProps {
 }
 
 export function SdgGoalsPicker({ selected, onChange }: SdgGoalsPickerProps) {
+  const { t } = useTranslation('feed');
+
   const toggle = (id: number) => {
     if (selected.includes(id)) {
       onChange(selected.filter((s) => s !== id));
@@ -27,7 +30,7 @@ export function SdgGoalsPicker({ selected, onChange }: SdgGoalsPickerProps) {
   return (
     <div className="space-y-2">
       <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
-        UN Sustainable Development Goals (optional)
+        {t('compose.sdg_label')}
       </label>
       <div className="flex flex-wrap gap-1.5 max-h-28 sm:max-h-none overflow-y-auto sm:overflow-visible scrollbar-hide">
         {SDG_GOALS.map((goal) => {
@@ -53,7 +56,9 @@ export function SdgGoalsPicker({ selected, onChange }: SdgGoalsPickerProps) {
       </div>
       {selected.length > 0 && (
         <p className="text-xs text-[var(--text-subtle)]">
-          {selected.length} goal{selected.length !== 1 ? 's' : ''} selected
+          {selected.length === 1
+            ? t('compose.sdg_selected', { count: selected.length })
+            : t('compose.sdg_selected_plural', { count: selected.length })}
         </p>
       )}
     </div>

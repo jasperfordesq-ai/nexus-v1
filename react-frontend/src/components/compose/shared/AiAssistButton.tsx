@@ -11,6 +11,7 @@
 import { useState } from 'react';
 import { Button, Tooltip } from '@heroui/react';
 import { Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 
@@ -22,12 +23,13 @@ interface AiAssistButtonProps {
 }
 
 export function AiAssistButton({ type, title, context, onGenerated }: AiAssistButtonProps) {
+  const { t } = useTranslation('feed');
   const [isGenerating, setIsGenerating] = useState(false);
   const toast = useToast();
 
   const handleGenerate = async () => {
     if (!title.trim()) {
-      toast.error('Enter a title first so AI can generate a description');
+      toast.error(t('compose.ai_title_required'));
       return;
     }
 
@@ -40,18 +42,18 @@ export function AiAssistButton({ type, title, context, onGenerated }: AiAssistBu
 
       if (res.success && res.data?.content) {
         onGenerated(res.data.content);
-        toast.success('AI description generated!');
+        toast.success(t('compose.ai_generated'));
       } else {
-        toast.error('AI could not generate a description');
+        toast.error(t('compose.ai_failed'));
       }
     } catch (err: unknown) {
       const status = (err as { status?: number })?.status;
       if (status === 403) {
-        toast.error('AI assist is not available for your community');
+        toast.error(t('compose.ai_unavailable'));
       } else if (status === 429) {
-        toast.error('You\'ve used your AI credits — try again later');
+        toast.error(t('compose.ai_rate_limited'));
       } else {
-        toast.error('AI generation failed — please write manually');
+        toast.error(t('compose.ai_error'));
       }
     } finally {
       setIsGenerating(false);
@@ -59,7 +61,7 @@ export function AiAssistButton({ type, title, context, onGenerated }: AiAssistBu
   };
 
   return (
-    <Tooltip content="Generate description with AI" placement="top">
+    <Tooltip content={t('compose.ai_tooltip')} placement="top">
       <Button
         size="sm"
         variant="flat"
@@ -69,7 +71,7 @@ export function AiAssistButton({ type, title, context, onGenerated }: AiAssistBu
         isLoading={isGenerating}
         isDisabled={!title.trim()}
       >
-        AI Assist
+        {t('compose.ai_button')}
       </Button>
     </Tooltip>
   );

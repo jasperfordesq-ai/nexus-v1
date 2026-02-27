@@ -10,6 +10,7 @@
 import { useRef } from 'react';
 import { Button } from '@heroui/react';
 import { ImagePlus, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ImageUploaderProps {
   file: File | null;
@@ -28,6 +29,7 @@ export function ImageUploader({
   maxSizeMb = 5,
   onError,
 }: ImageUploaderProps) {
+  const { t } = useTranslation('feed');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,12 +37,12 @@ export function ImageUploader({
     if (!f) return;
 
     if (!f.type.startsWith('image/')) {
-      onError?.('Please select an image file');
+      onError?.(t('compose.image_select_error'));
       return;
     }
 
     if (f.size > maxSizeMb * 1024 * 1024) {
-      onError?.(`Image must be smaller than ${maxSizeMb}MB`);
+      onError?.(t('compose.image_size_error', { size: maxSizeMb }));
       return;
     }
 
@@ -70,9 +72,9 @@ export function ImageUploader({
           <Button
             isIconOnly
             variant="flat"
-            className="absolute top-2 right-2 bg-black/60 text-white min-w-8 w-9 h-9 backdrop-blur-sm"
+            className="absolute top-2 right-2 bg-black/60 text-white min-w-11 w-11 h-11 backdrop-blur-sm"
             onPress={handleRemove}
-            aria-label="Remove image"
+            aria-label={t('compose.image_remove_aria')}
           >
             <X className="w-4 h-4" />
           </Button>
@@ -83,11 +85,11 @@ export function ImageUploader({
         <Button
           size="sm"
           variant="flat"
-          className="bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--color-primary)]"
+          className="bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--color-primary)] min-h-[44px]"
           startContent={<ImagePlus className="w-4 h-4" aria-hidden="true" />}
           onPress={() => inputRef.current?.click()}
         >
-          {file ? 'Change Image' : 'Add Image'}
+          {file ? t('compose.image_change') : t('compose.image_add')}
         </Button>
         {file && (
           <span className="text-xs text-[var(--text-subtle)]">

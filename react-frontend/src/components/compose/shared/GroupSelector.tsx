@@ -10,6 +10,7 @@
 import { useState, useEffect } from 'react';
 import { Select, SelectItem } from '@heroui/react';
 import { Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts';
 import { logError } from '@/lib/logger';
@@ -26,6 +27,7 @@ interface GroupSelectorProps {
 }
 
 export function GroupSelector({ value, onChange }: GroupSelectorProps) {
+  const { t } = useTranslation('feed');
   const { user } = useAuth();
   const [groups, setGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,8 +58,8 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
 
   return (
     <Select
-      label="Post to"
-      placeholder="Public Feed"
+      label={t('compose.group_label')}
+      placeholder={t('compose.group_placeholder')}
       selectedKeys={value ? [String(value)] : []}
       onSelectionChange={(keys) => {
         const selected = Array.from(keys)[0];
@@ -76,7 +78,7 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
             <span className="text-sm">{g.name}</span>
             {g.member_count != null && (
               <span className="text-xs text-[var(--text-subtle)]">
-                {g.member_count} members
+                {t('compose.group_members', { count: g.member_count })}
               </span>
             )}
           </div>
