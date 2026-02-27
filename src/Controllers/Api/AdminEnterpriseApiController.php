@@ -292,11 +292,11 @@ class AdminEnterpriseApiController extends BaseApiController
                     $perm = Database::query(
                         "SELECT id FROM permissions WHERE name = ? LIMIT 1",
                         [$permName]
-                    );
+                    )->fetch();
                     if (!empty($perm)) {
                         Database::query(
                             "INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
-                            [$roleId, $perm[0]['id']]
+                            [$roleId, $perm['id']]
                         );
                     }
                 }
@@ -304,7 +304,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
             Database::commit();
 
-            $role = Database::query(
+            $result = Database::query(
                 "SELECT r.*, GROUP_CONCAT(p.name) as permission_names
                  FROM roles r
                  LEFT JOIN role_permissions rp ON r.id = rp.role_id
@@ -312,10 +312,8 @@ class AdminEnterpriseApiController extends BaseApiController
                  WHERE r.id = ? AND r.tenant_id = ?
                  GROUP BY r.id",
                 [$roleId, $tenantId]
-            );
-
-            $result = $role[0] ?? [];
-            $result['permissions'] = $result['permission_names'] ? explode(',', $result['permission_names']) : [];
+            )->fetch() ?? [];
+            $result['permissions'] = !empty($result['permission_names']) ? explode(',', $result['permission_names']) : [];
             unset($result['permission_names']);
 
             $this->respondWithData($result, null, 201);
@@ -360,11 +358,11 @@ class AdminEnterpriseApiController extends BaseApiController
             if (isset($data['permissions']) && is_array($data['permissions'])) {
                 Database::query("DELETE FROM role_permissions WHERE role_id = ?", [$id]);
                 foreach ($data['permissions'] as $permName) {
-                    $perm = Database::query("SELECT id FROM permissions WHERE name = ? LIMIT 1", [$permName]);
+                    $perm = Database::query("SELECT id FROM permissions WHERE name = ? LIMIT 1", [$permName])->fetch();
                     if (!empty($perm)) {
                         Database::query(
                             "INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
-                            [$id, $perm[0]['id']]
+                            [$id, $perm['id']]
                         );
                     }
                 }
@@ -372,7 +370,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
             Database::commit();
 
-            $role = Database::query(
+            $result = Database::query(
                 "SELECT r.*, GROUP_CONCAT(p.name) as permission_names
                  FROM roles r
                  LEFT JOIN role_permissions rp ON r.id = rp.role_id
@@ -380,15 +378,14 @@ class AdminEnterpriseApiController extends BaseApiController
                  WHERE r.id = ? AND r.tenant_id = ?
                  GROUP BY r.id",
                 [$id, $tenantId]
-            );
+            )->fetch();
 
-            if (empty($role)) {
+            if (empty($result)) {
                 $this->respondWithError('NOT_FOUND', 'Role not found', null, 404);
                 return;
             }
 
-            $result = $role[0];
-            $result['permissions'] = $result['permission_names'] ? explode(',', $result['permission_names']) : [];
+            $result['permissions'] = !empty($result['permission_names']) ? explode(',', $result['permission_names']) : [];
             unset($result['permission_names']);
 
             $this->respondWithData($result);
@@ -636,7 +633,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
         try {
             Database::query(
-                "INSERT INTO data_breach_log (tenant_id, breach_type, description, severity, status, detected_at, reported_by, created_at)
+                "INSERT INTO data_breach_log (tenant_id, breach_type, description, severity, status, detected_at, created_by, created_at)
                  VALUES (?, ?, ?, ?, 'open', NOW(), ?, NOW())",
                 [
                     $tenantId,

@@ -195,4 +195,37 @@ Codebase: `c:\xampp\htdocs\staging`
 
 ---
 
-Last updated: 2026-02-27 — all 18 fixes applied.
+Last updated: 2026-02-27 — all 18 fixes applied and re-audit second-pass complete.
+
+---
+
+## Re-Audit Pass 2 — Post-Fix Verification (2026-02-27)
+
+A second-pass audit was run after initial deployment. Three critical bugs were found and immediately fixed.
+
+### Bugs Found and Fixed in Pass 2
+
+| Bug | File | Description | Fix Applied |
+| --- | --- | --- | --- |
+| P2-1 | `AdminEnterpriseApiController.php` | `createRole()`: `Database::query()` returns PDOStatement; code accessed `$perm[0]['id']` and `$role[0]` as arrays — both fatal errors | Changed to `->fetch()` on the PDOStatement; `$perm['id']` and direct `$result` access |
+| P2-2 | `AdminEnterpriseApiController.php` | `updateRole()`: same PDOStatement-as-array bug in permission loop and final role fetch | Same fix: `->fetch()`, `$perm['id']`, `$result` not `$result[0]` |
+| P2-3 | `AdminEnterpriseApiController.php` | `createBreach()`: INSERT used column `reported_by` but migration created column `created_by` — SQL error on every breach creation | Changed to `created_by` to match migration schema |
+| P2-4 | `PermissionService.php` | `getPermissionByName()` called `$this->db->query()` — `$this->db` is never initialized, fatal error | Changed to `Database::query()` |
+
+### Re-Audit Feature Status
+
+| Feature | Status After Pass 1 | Status After Pass 2 |
+| --- | --- | --- |
+| 1. GDPR Compliance Suite | Working | Working |
+| 2. Broker Controls | Working | Working |
+| 3. Risk Tagging | Working | Working |
+| 4. Vetting & Background Checks | Working | Working |
+| 5. Insurance Certificates | Working | Working |
+| 6. Legal Documents Management | Working | Working |
+| 7. Safeguarding Controls | Working | Working |
+| 8. Enterprise Roles & Permissions | Working (masked by bugs) | Working |
+| 9. System Monitoring | Working | Working |
+
+### Security Note (Non-Blocking)
+
+`LegalDocVersionList.tsx` renders version HTML via `dangerouslySetInnerHTML` without DOMPurify sanitization. Legal document content is admin-authored only, so XSS risk is low. Recommend adding DOMPurify in a future pass.
