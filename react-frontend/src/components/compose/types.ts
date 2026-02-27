@@ -42,3 +42,12 @@ export interface TabSubmitProps {
   groupId: number | null;
   templateData?: TemplateData | null;
 }
+
+/** Registration payload a tab provides so ComposeHub can render a header submit button. */
+export interface ComposeSubmitRegistration {
+  canSubmit: boolean;
+  isSubmitting: boolean;
+  onSubmit: () => void;
+  buttonLabel: string;
+  gradientClass: string;
+}

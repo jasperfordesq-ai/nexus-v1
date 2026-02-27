@@ -8,13 +8,14 @@
  * Now with character count and draft persistence.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button, Input, Textarea, DatePicker, TimeInput } from '@heroui/react';
 import type { DateInputValue, TimeInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PlaceAutocompleteInput } from '@/components/location';
@@ -22,6 +23,7 @@ import { AiAssistButton } from '../shared/AiAssistButton';
 import { SdgGoalsPicker } from '../shared/SdgGoalsPicker';
 import { CharacterCount } from '../shared/CharacterCount';
 import { EmojiPicker } from '../shared/EmojiPicker';
+import { useComposeSubmit } from '../ComposeSubmitContext';
 import type { TabSubmitProps } from '../types';
 
 const inputClasses = {
@@ -50,6 +52,9 @@ interface EventDraft {
 export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmitProps) {
   const { t } = useTranslation('feed');
   const toast = useToast();
+  const { register, unregister } = useComposeSubmit();
+  const isMobile = useMediaQuery('(max-width: 639px)');
+  const submitRef = useRef<() => void>(() => {});
 
   const [draft, setDraft, clearDraft] = useDraftPersistence<EventDraft>(
     'compose-draft-event',
@@ -135,6 +140,19 @@ export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmi
       setIsSubmitting(false);
     }
   };
+  submitRef.current = handleSubmit;
+
+  // Register submit capabilities for mobile header button
+  useEffect(() => {
+    register({
+      canSubmit,
+      isSubmitting,
+      onSubmit: () => submitRef.current(),
+      buttonLabel: t('compose.create_event'),
+      gradientClass: 'from-emerald-500 to-teal-600',
+    });
+    return unregister;
+  }, [canSubmit, isSubmitting, register, unregister, t]);
 
   return (
     <div className="space-y-4">
@@ -224,30 +242,32 @@ export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmi
 
       <SdgGoalsPicker selected={sdgGoals} onChange={setSdgGoals} />
 
-      <div className="flex items-center justify-between pt-1">
+      <div className={`flex items-center justify-between pt-1 ${isMobile ? 'sticky bottom-0 bg-[var(--surface-base)] py-3 border-t border-[var(--border-default)]' : ''}`}>
         <div className="flex items-center gap-1">
           <EmojiPicker onSelect={handleEmojiSelect} />
         </div>
 
-        <div className="flex items-center gap-2">
-        <Button
-          variant="flat"
-          size="sm"
-          onPress={onClose}
-          className="text-[var(--text-muted)]"
-        >
-          {t('compose.cancel')}
-        </Button>
-        <Button
-          size="sm"
-          className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20"
-          onPress={handleSubmit}
-          isLoading={isSubmitting}
-          isDisabled={!canSubmit}
-        >
-          {t('compose.create_event')}
-        </Button>
-        </div>
+        {!isMobile && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="flat"
+              size="sm"
+              onPress={onClose}
+              className="text-[var(--text-muted)]"
+            >
+              {t('compose.cancel')}
+            </Button>
+            <Button
+              size="sm"
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20"
+              onPress={handleSubmit}
+              isLoading={isSubmitting}
+              isDisabled={!canSubmit}
+            >
+              {t('compose.create_event')}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
