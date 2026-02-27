@@ -157,7 +157,7 @@ class ChallengeService
         }
 
         // Send notification
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         Notification::create(
             $userId,
             "Challenge Complete! You finished '{$challenge['title']}' and earned {$challenge['xp_reward']} XP!",

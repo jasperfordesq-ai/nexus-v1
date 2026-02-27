@@ -621,7 +621,7 @@ class RegistrationApiController extends BaseApiController
 
             // Build verification URL — include tenant base path for correct routing
             $baseUrl = TenantContext::getFrontendUrl();
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $verifyUrl = $baseUrl . $basePath . '/verify-email?token=' . $token;
 
             // Send email using standard template

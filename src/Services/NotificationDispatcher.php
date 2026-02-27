@@ -514,7 +514,7 @@ HTML;
     {
         $tenant = \Nexus\Core\TenantContext::get();
         $tenantName = $tenant['name'] ?? 'Community';
-        $basePath = \Nexus\Core\TenantContext::getBasePath();
+        $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -548,7 +548,7 @@ HTML;
     {
         $tenant = \Nexus\Core\TenantContext::get();
         $tenantName = $tenant['name'] ?? 'Community';
-        $basePath = \Nexus\Core\TenantContext::getBasePath();
+        $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
         $scoreText = $matchScore > 0 ? " ({$matchScore}% match)" : "";
 
         return <<<HTML
@@ -581,7 +581,7 @@ HTML;
     {
         $tenant = \Nexus\Core\TenantContext::get();
         $tenantName = $tenant['name'] ?? 'Community';
-        $basePath = \Nexus\Core\TenantContext::getBasePath();
+        $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
 
         $reasonHtml = '';
         if (!empty($reason)) {
@@ -646,7 +646,7 @@ HTML;
             $recipientName = $user['first_name'] ?? $user['name'] ?? 'there';
             $tenantName = \Nexus\Core\TenantContext::getSetting('site_name', 'Project NEXUS');
             $baseUrl = \Nexus\Core\TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
-            $basePath = \Nexus\Core\TenantContext::getBasePath();
+            $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
             $walletUrl = $baseUrl . $basePath . '/wallet';
 
             $hourLabel = $amount == 1 ? 'hour' : 'hours';
@@ -807,7 +807,8 @@ HTML;
 
             // Build full URL — use getFrontendUrl() so links go to React app, not legacy PHP
             $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
-            $fullUrl = $baseUrl . $link;
+            $slugPrefix = \Nexus\Core\TenantContext::getSlugPrefix();
+            $fullUrl = $baseUrl . $slugPrefix . $link;
 
             $mailer = new \Nexus\Core\Mailer();
 
@@ -1468,7 +1469,7 @@ HTML;
             $recipientName = $user['first_name'] ?? $user['name'] ?? 'there';
             $tenantName = \Nexus\Core\TenantContext::getSetting('site_name', 'Project NEXUS');
             $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
-            $basePath = \Nexus\Core\TenantContext::getBasePath();
+            $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
             $profileUrl = $baseUrl . $basePath . '/profile/' . $receiverUserId;
 
             $displayName = $isAnonymous ? 'Someone' : htmlspecialchars($reviewerName);

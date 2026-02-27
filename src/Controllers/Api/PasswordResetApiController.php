@@ -253,7 +253,7 @@ class PasswordResetApiController extends BaseApiController
 
         // Build reset URL — include tenant base path for correct routing
         $appUrl = TenantContext::getFrontendUrl();
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
 
         // For API clients, provide a deep link or web fallback
         // Mobile apps can intercept this URL pattern

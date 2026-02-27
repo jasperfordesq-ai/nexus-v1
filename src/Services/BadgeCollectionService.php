@@ -237,7 +237,7 @@ class BadgeCollectionService
             $db->commit();
 
             // Send notification AFTER transaction completes (async operation)
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             Notification::create(
                 $userId,
                 "Collection Complete! You finished '{$collection['name']}' and earned {$collection['bonus_xp']} bonus XP! {$collection['icon']}",

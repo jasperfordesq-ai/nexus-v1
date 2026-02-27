@@ -33,7 +33,7 @@ class EmailTemplate
 
         // Settings URL (frontend domain for user-facing links)
         $frontendUrl = TenantContext::getFrontendUrl();
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $settingsUrl = $frontendUrl . $basePath . '/notifications';
 
         // Button HTML

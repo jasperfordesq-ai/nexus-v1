@@ -687,7 +687,7 @@ class TotpService
             // Set cookie
             $cookieExpires = time() + (self::TRUSTED_DEVICE_DAYS * 24 * 60 * 60);
             $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-            $basePath = TenantContext::getBasePath() ?: '/';
+            $basePath = TenantContext::getSlugPrefix() ?: '/';
 
             setcookie(
                 self::TRUSTED_DEVICE_COOKIE,
@@ -789,7 +789,7 @@ class TotpService
         );
 
         // Also clear the cookie
-        $basePath = TenantContext::getBasePath() ?: '/';
+        $basePath = TenantContext::getSlugPrefix() ?: '/';
         setcookie(self::TRUSTED_DEVICE_COOKIE, '', time() - 3600, $basePath);
 
         return $result->rowCount();

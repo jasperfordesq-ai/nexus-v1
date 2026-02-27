@@ -226,7 +226,7 @@ class GamificationApiController extends BaseApiController
             'url' => ''
         ];
 
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $baseUrl = TenantContext::getFrontendUrl();
 
         switch ($type) {

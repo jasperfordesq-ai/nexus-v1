@@ -142,7 +142,7 @@ class SocialGamificationService
         \Nexus\Models\Notification::create(
             $challengedId,
             "You've been challenged! Check your gamification challenges.",
-            TenantContext::getBasePath() . '/achievements/challenges',
+            TenantContext::getSlugPrefix() . '/achievements/challenges',
             'challenge'
         );
 
@@ -172,7 +172,7 @@ class SocialGamificationService
         \Nexus\Models\Notification::create(
             $challenge['challenger_id'],
             "Your challenge was accepted! Let the competition begin!",
-            TenantContext::getBasePath() . '/achievements/challenges',
+            TenantContext::getSlugPrefix() . '/achievements/challenges',
             'challenge'
         );
 
@@ -293,7 +293,7 @@ class SocialGamificationService
         GamificationService::awardXP($winnerId, $xpReward, 'friend_challenge', 'Won friend challenge');
 
         // Notify both users
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         \Nexus\Models\Notification::create(
             $winnerId,
             "🎉 You won the challenge! +{$xpReward} XP",
@@ -420,7 +420,7 @@ class SocialGamificationService
         \Nexus\Models\Notification::create(
             $achievementUserId,
             "{$celebrator['first_name']} celebrated your achievement! 🎉",
-            TenantContext::getBasePath() . '/achievements',
+            TenantContext::getSlugPrefix() . '/achievements',
             'social'
         );
 
