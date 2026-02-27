@@ -30,9 +30,9 @@ export function CharacterCount({ current, max }: CharacterCountProps) {
     : 'text-[var(--text-muted)]';
 
   return (
-    <div className="flex items-center gap-2 h-5">
+    <div className="flex items-center gap-2 h-6 mt-1">
       {/* Progress bar */}
-      <div className="flex-1 h-1.5 rounded-full bg-[var(--surface-hover)] overflow-hidden">
+      <div className="flex-1 h-2 rounded-full bg-[var(--surface-hover)] overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-200 ${barColor}`}
           style={{ width: `${percentage}%` }}
@@ -40,7 +40,7 @@ export function CharacterCount({ current, max }: CharacterCountProps) {
       </div>
 
       {/* Count text */}
-      <span className={`text-xs tabular-nums whitespace-nowrap ${textColor}`}>
+      <span className={`text-sm tabular-nums whitespace-nowrap ${textColor}`}>
         {current}/{max}
       </span>
     </div>

@@ -184,7 +184,8 @@ export function LinkPreview({ content, onPreviewData }: LinkPreviewProps) {
         <Skeleton className="w-full h-32 rounded-lg mb-3" />
         <Skeleton className="h-4 w-3/4 rounded mb-2" />
         <Skeleton className="h-3 w-full rounded mb-1" />
-        <Skeleton className="h-3 w-1/2 rounded" />
+        <Skeleton className="h-3 w-1/2 rounded mb-1" />
+        <Skeleton className="h-3 w-1/4 rounded" />
       </div>
     );
   }

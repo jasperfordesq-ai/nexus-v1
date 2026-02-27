@@ -18,6 +18,7 @@ import { useDraftPersistence } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { CharacterCount } from '../shared/CharacterCount';
+import { EmojiPicker } from '../shared/EmojiPicker';
 import type { TabSubmitProps } from '../types';
 
 const inputClasses = {
@@ -65,6 +66,13 @@ export function GoalTab({ onSuccess, onClose, templateData }: TabSubmitProps) {
   );
   const setDescription = useCallback(
     (v: string) => setDraft((prev) => ({ ...prev, description: v })),
+    [setDraft],
+  );
+
+  const handleEmojiSelect = useCallback(
+    (emoji: string) => {
+      setDraft((prev) => ({ ...prev, description: prev.description + emoji }));
+    },
     [setDraft],
   );
 
@@ -138,7 +146,7 @@ export function GoalTab({ onSuccess, onClose, templateData }: TabSubmitProps) {
           granularity="day"
           minValue={today(getLocalTimeZone())}
           classNames={{
-            inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
+            inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
           }}
         />
       </div>
@@ -156,22 +164,30 @@ export function GoalTab({ onSuccess, onClose, templateData }: TabSubmitProps) {
         />
       </div>
 
-      <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
+      <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center gap-1">
+          <EmojiPicker onSelect={handleEmojiSelect} />
+        </div>
+
+        <div className="flex items-center gap-2">
         <Button
           variant="flat"
+          size="sm"
           onPress={onClose}
           className="text-[var(--text-muted)]"
         >
           {t('compose.cancel')}
         </Button>
         <Button
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
+          size="sm"
+          className="bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/20"
           onPress={handleSubmit}
           isLoading={isSubmitting}
           isDisabled={!canSubmit}
         >
           {t('compose.create_goal')}
         </Button>
+        </div>
       </div>
     </div>
   );

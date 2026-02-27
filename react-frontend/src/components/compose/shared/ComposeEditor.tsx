@@ -8,9 +8,20 @@
  * Lighter version of the admin RichTextEditor with a minimal toolbar:
  * Bold, Italic, Underline, Bullet list, Numbered list, Link insert/remove.
  * Outputs sanitized HTML and optionally reports plain text for character counting.
+ *
+ * Exposes an `editorRef` so parent components can programmatically insert text
+ * (used by EmojiPicker and VoiceInput).
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -38,7 +49,7 @@ import {
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from '@lexical/link';
 import { $getNearestNodeOfType } from '@lexical/utils';
 import { $isListNode, ListNode as ListNodeClass } from '@lexical/list';
-import { Button } from '@heroui/react';
+import { Button, Input } from '@heroui/react';
 import {
   Bold,
   Italic,
@@ -46,9 +57,16 @@ import {
   List,
   ListOrdered,
   Link2,
+  Check,
+  X,
 } from 'lucide-react';
 
 /* ───────────────────────── Types ───────────────────────── */
+
+export interface ComposeEditorHandle {
+  /** Insert text at the current cursor position (or end of document) */
+  insertText: (text: string) => void;
+}
 
 export interface ComposeEditorProps {
   /** Current HTML content */
@@ -85,6 +103,9 @@ const composeEditorTheme = {
   link: 'text-[var(--color-primary)] underline cursor-pointer',
 };
 
+/** Lexical node types used by this editor */
+const EDITOR_NODES = [ListNode, ListItemNode, LinkNode, AutoLinkNode];
+
 /* ───────────────────────── Toolbar ───────────────────────── */
 
 function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
@@ -94,6 +115,9 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
   const [isUnderline, setIsUnderline] = useState(false);
   const [isLink, setIsLink] = useState(false);
   const [blockType, setBlockType] = useState<string>('paragraph');
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const linkInputRef = useRef<HTMLInputElement>(null);
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -144,98 +168,174 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
     if (isLink) {
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     } else {
-      const url = prompt('Enter URL:');
-      if (url) {
-        editor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
-      }
+      setLinkUrl('https://');
+      setShowLinkInput(true);
+      // Focus the input after it renders
+      requestAnimationFrame(() => {
+        linkInputRef.current?.focus();
+        linkInputRef.current?.select();
+      });
+    }
+  };
+
+  const confirmLink = () => {
+    const trimmed = linkUrl.trim();
+    if (trimmed && trimmed !== 'https://') {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, trimmed);
+    }
+    setShowLinkInput(false);
+    setLinkUrl('');
+  };
+
+  const cancelLink = () => {
+    setShowLinkInput(false);
+    setLinkUrl('');
+  };
+
+  const handleLinkKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      confirmLink();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelLink();
     }
   };
 
   return (
-    <div className="flex items-center gap-0.5 bg-[var(--surface-elevated)] border-b border-[var(--border-default)] px-2 py-1 rounded-t-lg">
-      {/* Bold */}
-      <Button
-        isIconOnly
-        size="sm"
-        variant={isBold ? 'flat' : 'light'}
-        color={isBold ? 'primary' : 'default'}
-        isDisabled={isDisabled}
-        onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
-        aria-label="Bold"
-        className="min-w-9 w-9 h-9"
-      >
-        <Bold size={16} />
-      </Button>
+    <div className="bg-[var(--surface-elevated)] border-b border-[var(--border-default)] rounded-t-lg">
+      <div className="flex items-center gap-0.5 px-2 py-1">
+        {/* Bold */}
+        <Button
+          isIconOnly
+          size="sm"
+          variant={isBold ? 'flat' : 'light'}
+          color={isBold ? 'primary' : 'default'}
+          isDisabled={isDisabled}
+          onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
+          aria-label="Bold"
+          aria-pressed={isBold}
+          className="min-w-9 w-9 h-9"
+        >
+          <Bold size={16} />
+        </Button>
 
-      {/* Italic */}
-      <Button
-        isIconOnly
-        size="sm"
-        variant={isItalic ? 'flat' : 'light'}
-        color={isItalic ? 'primary' : 'default'}
-        isDisabled={isDisabled}
-        onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
-        aria-label="Italic"
-        className="min-w-9 w-9 h-9"
-      >
-        <Italic size={16} />
-      </Button>
+        {/* Italic */}
+        <Button
+          isIconOnly
+          size="sm"
+          variant={isItalic ? 'flat' : 'light'}
+          color={isItalic ? 'primary' : 'default'}
+          isDisabled={isDisabled}
+          onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
+          aria-label="Italic"
+          aria-pressed={isItalic}
+          className="min-w-9 w-9 h-9"
+        >
+          <Italic size={16} />
+        </Button>
 
-      {/* Underline */}
-      <Button
-        isIconOnly
-        size="sm"
-        variant={isUnderline ? 'flat' : 'light'}
-        color={isUnderline ? 'primary' : 'default'}
-        isDisabled={isDisabled}
-        onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
-        aria-label="Underline"
-        className="min-w-9 w-9 h-9"
-      >
-        <Underline size={16} />
-      </Button>
+        {/* Underline */}
+        <Button
+          isIconOnly
+          size="sm"
+          variant={isUnderline ? 'flat' : 'light'}
+          color={isUnderline ? 'primary' : 'default'}
+          isDisabled={isDisabled}
+          onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
+          aria-label="Underline"
+          aria-pressed={isUnderline}
+          className="min-w-9 w-9 h-9"
+        >
+          <Underline size={16} />
+        </Button>
 
-      {/* Bullet list */}
-      <Button
-        isIconOnly
-        size="sm"
-        variant={blockType === 'bullet' ? 'flat' : 'light'}
-        color={blockType === 'bullet' ? 'primary' : 'default'}
-        isDisabled={isDisabled}
-        onPress={() => formatList('bullet')}
-        aria-label="Bullet List"
-        className="min-w-9 w-9 h-9"
-      >
-        <List size={16} />
-      </Button>
+        {/* Bullet list */}
+        <Button
+          isIconOnly
+          size="sm"
+          variant={blockType === 'bullet' ? 'flat' : 'light'}
+          color={blockType === 'bullet' ? 'primary' : 'default'}
+          isDisabled={isDisabled}
+          onPress={() => formatList('bullet')}
+          aria-label="Bullet List"
+          aria-pressed={blockType === 'bullet'}
+          className="min-w-9 w-9 h-9"
+        >
+          <List size={16} />
+        </Button>
 
-      {/* Numbered list */}
-      <Button
-        isIconOnly
-        size="sm"
-        variant={blockType === 'number' ? 'flat' : 'light'}
-        color={blockType === 'number' ? 'primary' : 'default'}
-        isDisabled={isDisabled}
-        onPress={() => formatList('number')}
-        aria-label="Numbered List"
-        className="min-w-9 w-9 h-9"
-      >
-        <ListOrdered size={16} />
-      </Button>
+        {/* Numbered list */}
+        <Button
+          isIconOnly
+          size="sm"
+          variant={blockType === 'number' ? 'flat' : 'light'}
+          color={blockType === 'number' ? 'primary' : 'default'}
+          isDisabled={isDisabled}
+          onPress={() => formatList('number')}
+          aria-label="Numbered List"
+          aria-pressed={blockType === 'number'}
+          className="min-w-9 w-9 h-9"
+        >
+          <ListOrdered size={16} />
+        </Button>
 
-      {/* Link */}
-      <Button
-        isIconOnly
-        size="sm"
-        variant={isLink ? 'flat' : 'light'}
-        color={isLink ? 'primary' : 'default'}
-        isDisabled={isDisabled}
-        onPress={insertLink}
-        aria-label={isLink ? 'Remove Link' : 'Insert Link'}
-        className="min-w-9 w-9 h-9"
-      >
-        <Link2 size={16} />
-      </Button>
+        {/* Link */}
+        <Button
+          isIconOnly
+          size="sm"
+          variant={isLink ? 'flat' : 'light'}
+          color={isLink ? 'primary' : 'default'}
+          isDisabled={isDisabled}
+          onPress={insertLink}
+          aria-label={isLink ? 'Remove Link' : 'Insert Link'}
+          aria-pressed={isLink}
+          className="min-w-9 w-9 h-9"
+        >
+          <Link2 size={16} />
+        </Button>
+      </div>
+
+      {/* Inline link URL input */}
+      {showLinkInput && (
+        <div className="flex items-center gap-1 px-2 pb-1.5">
+          <Input
+            ref={linkInputRef}
+            size="sm"
+            placeholder="https://example.com"
+            value={linkUrl}
+            onValueChange={setLinkUrl}
+            onKeyDown={handleLinkKeyDown}
+            aria-label="Link URL"
+            classNames={{
+              input: 'bg-transparent text-[var(--text-primary)] text-xs',
+              inputWrapper: 'bg-[var(--surface-default)] border-[var(--border-default)] h-8',
+            }}
+          />
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            color="success"
+            onPress={confirmLink}
+            aria-label="Confirm link"
+            className="min-w-8 w-8 h-8"
+          >
+            <Check size={14} />
+          </Button>
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            color="danger"
+            onPress={cancelLink}
+            aria-label="Cancel link"
+            className="min-w-8 w-8 h-8"
+          >
+            <X size={14} />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -280,6 +380,27 @@ function DisabledPlugin({ isDisabled }: { isDisabled?: boolean }) {
   return null;
 }
 
+/* ───────────────────────── Insert Text Plugin ───────────────────────── */
+
+/**
+ * Plugin that exposes the Lexical editor for programmatic text insertion.
+ * Used by parent components (via ref) to insert emoji or voice transcripts
+ * at the current cursor position.
+ */
+function InsertTextPlugin({
+  onEditorReady,
+}: {
+  onEditorReady: (editor: LexicalEditor) => void;
+}) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    onEditorReady(editor);
+  }, [editor, onEditorReady]);
+
+  return null;
+}
+
 /* ───────────────────────── Error Boundary ───────────────────────── */
 
 function ComposeEditorErrorBoundary({ children }: { children: React.ReactNode }) {
@@ -288,85 +409,128 @@ function ComposeEditorErrorBoundary({ children }: { children: React.ReactNode })
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
-export function ComposeEditor({
-  value,
-  onChange,
-  onPlainTextChange,
-  placeholder = 'What would you like to share?',
-  maxLength,
-  isDisabled = false,
-}: ComposeEditorProps) {
-  const initialConfig = {
-    namespace: 'NexusComposeEditor',
-    theme: composeEditorTheme,
-    nodes: [ListNode, ListItemNode, LinkNode, AutoLinkNode],
-    onError: (error: Error) => {
-      console.error('ComposeEditor error:', error);
+export const ComposeEditor = forwardRef<ComposeEditorHandle, ComposeEditorProps>(
+  function ComposeEditor(
+    {
+      value,
+      onChange,
+      onPlainTextChange,
+      placeholder = 'What would you like to share?',
+      maxLength,
+      isDisabled = false,
     },
-    editable: !isDisabled,
-  };
+    ref,
+  ) {
+    const editorRef = useRef<LexicalEditor | null>(null);
 
-  const handleChange = useCallback(
-    (_editorState: EditorState, editor: LexicalEditor) => {
-      editor.read(() => {
-        const html = $generateHtmlFromNodes(editor);
-        const root = $getRoot();
-        const plainText = root.getTextContent();
+    const initialConfig = useMemo(
+      () => ({
+        namespace: 'NexusComposeEditor',
+        theme: composeEditorTheme,
+        nodes: EDITOR_NODES,
+        onError: (error: Error) => {
+          console.error('ComposeEditor error:', error);
+        },
+        editable: !isDisabled,
+      }),
+      [isDisabled],
+    );
 
-        // Lexical outputs <p><br></p> for empty content, normalize to empty string
-        if (html === '<p><br></p>' || html === '<p></p>') {
-          onChange('');
-          onPlainTextChange?.('');
-        } else {
-          onChange(html);
-          onPlainTextChange?.(plainText);
-        }
-      });
-    },
-    [onChange, onPlainTextChange],
-  );
+    const handleEditorReady = useCallback((editor: LexicalEditor) => {
+      editorRef.current = editor;
+    }, []);
 
-  return (
-    <div
-      className={`
-        border border-[var(--border-default)] rounded-lg
-        focus-within:border-[var(--color-primary)] transition-colors
-        ${isDisabled ? 'opacity-50 pointer-events-none' : ''}
-      `}
-    >
-      <LexicalComposer initialConfig={initialConfig}>
-        <ComposeToolbar isDisabled={isDisabled} />
-        <div className="relative">
-          <RichTextPlugin
-            contentEditable={
-              <ContentEditable
-                className="min-h-[120px] max-h-[300px] overflow-y-auto px-3 py-2 outline-none text-sm text-[var(--text-primary)]"
-                aria-label="Post content editor"
-              />
+    // Expose insertText via ref for parent components (emoji, voice)
+    useImperativeHandle(
+      ref,
+      () => ({
+        insertText: (text: string) => {
+          const editor = editorRef.current;
+          if (!editor) return;
+
+          editor.update(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              // Insert at current cursor position
+              selection.insertText(text);
+            } else {
+              // No active selection — move focus to end and insert
+              const root = $getRoot();
+              root.selectEnd();
+              const newSelection = $getSelection();
+              if ($isRangeSelection(newSelection)) {
+                newSelection.insertText(text);
+              }
             }
-            placeholder={
-              <div className="pointer-events-none absolute top-2 left-3 text-sm text-[var(--text-subtle)]">
-                {placeholder}
-              </div>
-            }
-            ErrorBoundary={ComposeEditorErrorBoundary}
-          />
-        </div>
-        <HistoryPlugin />
-        <ListPlugin />
-        <LinkPlugin />
-        <OnChangePlugin onChange={handleChange} />
-        <HtmlImportPlugin html={value} />
-        <DisabledPlugin isDisabled={isDisabled} />
-      </LexicalComposer>
+          });
+        },
+      }),
+      [],
+    );
 
-      {/* Character count indicator */}
-      {maxLength !== undefined && (
-        <MaxLengthIndicator maxLength={maxLength} />
-      )}
-    </div>
-  );
-}
+    const handleChange = useCallback(
+      (_editorState: EditorState, editor: LexicalEditor) => {
+        editor.read(() => {
+          const html = $generateHtmlFromNodes(editor);
+          const root = $getRoot();
+          const plainText = root.getTextContent();
+
+          // Lexical outputs <p><br></p> for empty content, normalize to empty string
+          if (html === '<p><br></p>' || html === '<p></p>') {
+            onChange('');
+            onPlainTextChange?.('');
+          } else {
+            onChange(html);
+            onPlainTextChange?.(plainText);
+          }
+        });
+      },
+      [onChange, onPlainTextChange],
+    );
+
+    return (
+      <div
+        className={`
+          border border-[var(--border-default)] rounded-lg
+          focus-within:border-[var(--color-primary)] transition-colors
+          ${isDisabled ? 'opacity-50 pointer-events-none' : ''}
+        `}
+      >
+        <LexicalComposer initialConfig={initialConfig}>
+          <ComposeToolbar isDisabled={isDisabled} />
+          <div className="relative">
+            <RichTextPlugin
+              contentEditable={
+                <ContentEditable
+                  className="min-h-[120px] max-h-[300px] overflow-y-auto px-3 py-2 outline-none text-sm text-[var(--text-primary)]"
+                  aria-label="Post content editor"
+                />
+              }
+              placeholder={
+                <div className="pointer-events-none absolute top-2 left-3 text-sm text-[var(--text-subtle)]">
+                  {placeholder}
+                </div>
+              }
+              ErrorBoundary={ComposeEditorErrorBoundary}
+            />
+          </div>
+          <HistoryPlugin />
+          <ListPlugin />
+          <LinkPlugin />
+          <OnChangePlugin onChange={handleChange} />
+          <HtmlImportPlugin html={value} />
+          <DisabledPlugin isDisabled={isDisabled} />
+          <InsertTextPlugin onEditorReady={handleEditorReady} />
+        </LexicalComposer>
+
+        {/* Character count indicator */}
+        {maxLength !== undefined && (
+          <MaxLengthIndicator maxLength={maxLength} />
+        )}
+      </div>
+    );
+  },
+);
 
 /* ───────────────────────── Max Length Indicator ───────────────────────── */
 

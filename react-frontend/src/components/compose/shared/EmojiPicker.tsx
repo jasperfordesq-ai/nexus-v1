@@ -13,7 +13,7 @@ import { Button, Input, Popover, PopoverContent, PopoverTrigger } from '@heroui/
 import { Search, Smile } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { EMOJI_CATEGORIES } from '@/data/emoji-data';
+import { EMOJI_CATEGORIES, EMOJI_KEYWORDS } from '@/data/emoji-data';
 
 interface EmojiPickerProps {
   onSelect: (emoji: string) => void;
@@ -37,14 +37,21 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
         const labelText = t(cat.label).toLowerCase();
         if (labelText.includes(query)) return cat;
 
-        // Filter individual emoji (basic: check if any emoji in category matches)
-        const matchingEmojis = cat.emojis.filter((emoji) => emoji.includes(query));
+        // If category key matches query, return all emoji in that category
+        if (cat.key.includes(query)) return cat;
+
+        // Filter individual emoji by direct match or keyword match
+        const matchingEmojis = cat.emojis.filter((emoji) => {
+          // Direct emoji match
+          if (emoji.includes(query)) return true;
+          // Keyword match: check if any keyword for this emoji contains the query
+          const keywords = EMOJI_KEYWORDS[emoji];
+          return keywords?.some((kw) => kw.includes(query)) ?? false;
+        });
+
         if (matchingEmojis.length > 0) {
           return { ...cat, emojis: matchingEmojis };
         }
-
-        // If category name matches query, return all emoji in that category
-        if (cat.key.includes(query)) return cat;
 
         return null;
       })
@@ -81,6 +88,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
           size="sm"
           variant="light"
           aria-label={t('compose.emoji_search')}
+          className="min-w-11 w-11 h-11"
         >
           <Smile className="w-4 h-4" aria-hidden="true" />
         </Button>
@@ -105,7 +113,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
               type="button"
               onClick={() => handleCategoryClick(cat.key)}
               className={`
-                w-8 h-8 flex items-center justify-center rounded-lg text-base
+                w-10 h-10 flex items-center justify-center rounded-lg text-base
                 cursor-pointer transition-colors shrink-0
                 ${activeCategory === cat.key
                   ? 'bg-[var(--surface-hover)]'
@@ -113,6 +121,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
                 }
               `}
               aria-label={t(cat.label)}
+              aria-pressed={activeCategory === cat.key}
               title={t(cat.label)}
             >
               {cat.icon}
@@ -141,7 +150,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
                     key={emoji}
                     type="button"
                     onClick={() => handleEmojiClick(emoji)}
-                    className="w-9 h-9 text-lg cursor-pointer hover:bg-[var(--surface-hover)] rounded-lg flex items-center justify-center"
+                    className="w-11 h-11 text-lg cursor-pointer hover:bg-[var(--surface-hover)] rounded-lg flex items-center justify-center"
                     aria-label={emoji}
                   >
                     {emoji}

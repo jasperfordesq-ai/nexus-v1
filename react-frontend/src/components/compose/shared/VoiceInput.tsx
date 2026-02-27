@@ -143,24 +143,26 @@ export function VoiceInput({ onTranscript, isDisabled }: VoiceInputProps) {
   }
 
   return (
-    <Button
-      isIconOnly
-      size="sm"
-      variant={isListening ? 'solid' : 'light'}
-      className={
-        isListening
-          ? 'animate-pulse bg-red-500 text-white'
-          : undefined
-      }
-      onPress={handleToggle}
-      isDisabled={isDisabled}
-      aria-label={isListening ? t('compose.voice_stop') : t('compose.voice_start')}
-    >
-      {isListening ? (
-        <MicOff className="w-4 h-4" aria-hidden="true" />
-      ) : (
-        <Mic className="w-4 h-4" aria-hidden="true" />
-      )}
-    </Button>
+    <div role="status" aria-live="polite" className="contents">
+      <Button
+        isIconOnly
+        size="sm"
+        variant={isListening ? 'solid' : 'light'}
+        className={
+          isListening
+            ? 'animate-pulse bg-red-500 text-white min-w-11 w-11 h-11'
+            : 'min-w-11 w-11 h-11'
+        }
+        onPress={handleToggle}
+        isDisabled={isDisabled}
+        aria-label={isListening ? t('compose.voice_stop') : t('compose.voice_start')}
+      >
+        {isListening ? (
+          <MicOff className="w-4 h-4" aria-hidden="true" />
+        ) : (
+          <Mic className="w-4 h-4" aria-hidden="true" />
+        )}
+      </Button>
+    </div>
   );
 }

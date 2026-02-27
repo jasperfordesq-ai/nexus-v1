@@ -19,6 +19,7 @@ import { PlaceAutocompleteInput } from '@/components/location';
 import { AiAssistButton } from '../shared/AiAssistButton';
 import { SdgGoalsPicker } from '../shared/SdgGoalsPicker';
 import { CharacterCount } from '../shared/CharacterCount';
+import { EmojiPicker } from '../shared/EmojiPicker';
 import type { TabSubmitProps } from '../types';
 
 interface Category {
@@ -80,6 +81,13 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
   );
   const setType = useCallback(
     (v: 'offer' | 'request') => setDraft((prev) => ({ ...prev, type: v })),
+    [setDraft],
+  );
+
+  const handleEmojiSelect = useCallback(
+    (emoji: string) => {
+      setDraft((prev) => ({ ...prev, description: prev.description + emoji }));
+    },
     [setDraft],
   );
 
@@ -241,22 +249,34 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
 
       <SdgGoalsPicker selected={sdgGoals} onChange={setSdgGoals} />
 
-      <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
+      <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center gap-1">
+          <EmojiPicker onSelect={handleEmojiSelect} />
+        </div>
+
+        <div className="flex items-center gap-2">
         <Button
           variant="flat"
+          size="sm"
           onPress={onClose}
           className="text-[var(--text-muted)]"
         >
           {t('compose.cancel')}
         </Button>
         <Button
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
+          size="sm"
+          className={`text-white shadow-lg ${
+            draft.type === 'offer'
+              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/20'
+              : 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/20'
+          }`}
           onPress={handleSubmit}
           isLoading={isSubmitting}
           isDisabled={!canSubmit}
         >
           {t('compose.create_listing')}
         </Button>
+        </div>
       </div>
     </div>
   );
