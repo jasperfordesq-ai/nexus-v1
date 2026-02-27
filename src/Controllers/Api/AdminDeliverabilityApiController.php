@@ -100,7 +100,7 @@ class AdminDeliverabilityApiController extends BaseApiController
                 $oldValue,
                 $newValue,
                 $description,
-                $_SERVER['REMOTE_ADDR'] ?? null,
+                \Nexus\Core\ClientIp::get(),
                 $_SERVER['HTTP_USER_AGENT'] ?? null,
             ]
         );

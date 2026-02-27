@@ -297,7 +297,7 @@ class HelpController
 
         // Get user ID if logged in, otherwise use IP
         $userId = $_SESSION['user_id'] ?? null;
-        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
+        $ipAddress = \Nexus\Core\ClientIp::get();
 
         try {
             $result = HelpArticle::recordFeedback($article['id'], $helpful, $userId, $ipAddress);

@@ -73,7 +73,7 @@ class CookieConsentService
                 $categories['functional'],
                 $categories['analytics'],
                 $categories['marketing'],
-                $_SERVER['REMOTE_ADDR'] ?? null,
+                \Nexus\Core\ClientIp::get(),
                 $_SERVER['HTTP_USER_AGENT'] ?? null,
                 json_encode($categories),
                 $expiresAt,
@@ -449,7 +449,7 @@ class CookieConsentService
                     $action,
                     !empty($oldValues) ? json_encode($oldValues) : null,
                     !empty($newValues) ? json_encode($newValues) : null,
-                    $_SERVER['REMOTE_ADDR'] ?? null,
+                    \Nexus\Core\ClientIp::get(),
                     $_SERVER['HTTP_USER_AGENT'] ?? null
                 ]
             );

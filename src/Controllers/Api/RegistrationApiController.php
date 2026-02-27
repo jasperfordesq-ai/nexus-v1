@@ -87,7 +87,7 @@ class RegistrationApiController extends BaseApiController
         // SECURITY: Two-layer rate limiting (complementary, not redundant):
         //   Layer 1 — Redis, per-IP: blocks burst attempts (3 per minute, fast check)
         //   Layer 2 — Database, per-IP: blocks sustained volume (5 per hour, longer window)
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
         if (\Nexus\Services\RateLimitService::check("auth:register:$ip", 3, 60)) {
             header('Retry-After: 60');
             $this->respondWithError(
@@ -447,7 +447,7 @@ class RegistrationApiController extends BaseApiController
                     $termsDoc['id'],
                     $termsDoc['current_version_id'],
                     LegalDocumentService::ACCEPTANCE_REGISTRATION,
-                    $_SERVER['REMOTE_ADDR'] ?? null,
+                    \Nexus\Core\ClientIp::get(),
                     $_SERVER['HTTP_USER_AGENT'] ?? null
                 );
             }
@@ -460,7 +460,7 @@ class RegistrationApiController extends BaseApiController
                     $privacyDoc['id'],
                     $privacyDoc['current_version_id'],
                     LegalDocumentService::ACCEPTANCE_REGISTRATION,
-                    $_SERVER['REMOTE_ADDR'] ?? null,
+                    \Nexus\Core\ClientIp::get(),
                     $_SERVER['HTTP_USER_AGENT'] ?? null
                 );
             }

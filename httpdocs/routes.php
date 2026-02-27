@@ -954,8 +954,9 @@ $router->add('DELETE', '/api/v2/admin/tools/redirects/{id}', 'Nexus\Controllers\
 $router->add('GET', '/api/v2/admin/tools/404-errors', 'Nexus\Controllers\Api\AdminToolsApiController@get404Errors');
 $router->add('DELETE', '/api/v2/admin/tools/404-errors/{id}', 'Nexus\Controllers\Api\AdminToolsApiController@delete404Error');
 
-// Admin Tools - Health Check, WebP, Seed, Blog Backups
+// Admin Tools - Health Check, WebP, Seed, Blog Backups, IP Debug
 $router->add('POST', '/api/v2/admin/tools/health-check', 'Nexus\Controllers\Api\AdminToolsApiController@runHealthCheck');
+$router->add('GET', '/api/v2/admin/tools/ip-debug', 'Nexus\Controllers\Api\AdminToolsApiController@ipDebug');
 $router->add('GET', '/api/v2/admin/tools/webp-stats', 'Nexus\Controllers\Api\AdminToolsApiController@getWebpStats');
 $router->add('POST', '/api/v2/admin/tools/webp-convert', 'Nexus\Controllers\Api\AdminToolsApiController@runWebpConversion');
 $router->add('POST', '/api/v2/admin/tools/seed', 'Nexus\Controllers\Api\AdminToolsApiController@runSeedGenerator');

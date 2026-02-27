@@ -331,7 +331,7 @@ class AdminTimebankingApiController extends BaseApiController
                 [
                     $adminId,
                     "Adjusted balance for user #{$userId} by {$amount}h: {$reason}",
-                    $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+                    \Nexus\Core\ClientIp::get(),
                 ]
             );
         } catch (\Throwable $e) {

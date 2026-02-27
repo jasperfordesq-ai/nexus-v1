@@ -60,7 +60,7 @@ class AuthController
         }
 
         // Security: Rate limiting to prevent brute force attacks
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
 
         // Check rate limit by email (if provided)
         if (!empty($email)) {
@@ -340,7 +340,7 @@ class AuthController
                                 $termsDoc['id'],
                                 $termsDoc['current_version_id'],
                                 LegalDocumentService::ACCEPTANCE_REGISTRATION,
-                                $_SERVER['REMOTE_ADDR'] ?? null,
+                                \Nexus\Core\ClientIp::get(),
                                 $_SERVER['HTTP_USER_AGENT'] ?? null
                             );
                         }
@@ -353,7 +353,7 @@ class AuthController
                                 $privacyDoc['id'],
                                 $privacyDoc['current_version_id'],
                                 LegalDocumentService::ACCEPTANCE_REGISTRATION,
-                                $_SERVER['REMOTE_ADDR'] ?? null,
+                                \Nexus\Core\ClientIp::get(),
                                 $_SERVER['HTTP_USER_AGENT'] ?? null
                             );
                         }
@@ -725,7 +725,7 @@ class AuthController
             $adminId = $_SESSION['user_id'] ?? null;
             $adminName = $_SESSION['user_name'] ?? 'Unknown';
             $adminEmail = $_SESSION['user_email'] ?? 'Unknown';
-            $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+            $ip = \Nexus\Core\ClientIp::get();
             $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
             $tenantId = \Nexus\Core\TenantContext::getId();
 
@@ -768,7 +768,7 @@ class AuthController
         $genericMessage = "<h2>Check your email</h2><p>If an account exists with that email address, we have sent a password reset link. Please check your inbox and spam folder.</p><p><a href='" . \Nexus\Core\TenantContext::getBasePath() . "/login'>Back to Login</a></p>";
 
         // SECURITY: Rate limiting to prevent abuse
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
         $ipLimit = \Nexus\Core\RateLimiter::check($ip, 'ip');
         if ($ipLimit['limited']) {
             // Still show generic message to prevent enumeration

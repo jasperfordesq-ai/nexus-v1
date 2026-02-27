@@ -600,7 +600,7 @@ class FederationApiMiddleware
             $keyId,
             $endpoint,
             $_SERVER['REQUEST_METHOD'],
-            $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            \Nexus\Core\ClientIp::get(),
             substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255),
             $authMethod,
             $signatureValid

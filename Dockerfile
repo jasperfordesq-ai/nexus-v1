@@ -58,7 +58,7 @@ RUN pecl install redis && docker-php-ext-enable redis
 # Apache Configuration
 # =============================================================================
 # Enable required modules
-RUN a2enmod rewrite headers expires deflate
+RUN a2enmod rewrite headers expires deflate remoteip
 
 # Set document root to httpdocs (where index.php lives)
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/httpdocs
@@ -69,6 +69,44 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
 # Allow .htaccess overrides
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+
+# mod_remoteip: Rewrite REMOTE_ADDR to the real client IP behind Cloudflare + Docker.
+# This makes $_SERVER['REMOTE_ADDR'] correct for ALL PHP code, even code that
+# doesn't use ClientIp::get(). Only trusted proxy IPs are allowed to set headers.
+RUN printf '<IfModule remoteip_module>\n\
+  # Trust Cloudflare CF-Connecting-IP header (most reliable)\n\
+  RemoteIPHeader CF-Connecting-IP\n\
+  # Cloudflare IPv4 ranges (https://www.cloudflare.com/ips-v4/)\n\
+  RemoteIPTrustedProxy 173.245.48.0/20\n\
+  RemoteIPTrustedProxy 103.21.244.0/22\n\
+  RemoteIPTrustedProxy 103.22.200.0/22\n\
+  RemoteIPTrustedProxy 103.31.4.0/22\n\
+  RemoteIPTrustedProxy 141.101.64.0/18\n\
+  RemoteIPTrustedProxy 108.162.192.0/18\n\
+  RemoteIPTrustedProxy 190.93.240.0/20\n\
+  RemoteIPTrustedProxy 188.114.96.0/20\n\
+  RemoteIPTrustedProxy 197.234.240.0/22\n\
+  RemoteIPTrustedProxy 198.41.128.0/17\n\
+  RemoteIPTrustedProxy 162.158.0.0/15\n\
+  RemoteIPTrustedProxy 104.16.0.0/13\n\
+  RemoteIPTrustedProxy 104.24.0.0/14\n\
+  RemoteIPTrustedProxy 172.64.0.0/13\n\
+  RemoteIPTrustedProxy 131.0.72.0/22\n\
+  # Cloudflare IPv6 ranges (https://www.cloudflare.com/ips-v6/)\n\
+  RemoteIPTrustedProxy 2400:cb00::/32\n\
+  RemoteIPTrustedProxy 2606:4700::/32\n\
+  RemoteIPTrustedProxy 2803:f800::/32\n\
+  RemoteIPTrustedProxy 2405:b500::/32\n\
+  RemoteIPTrustedProxy 2405:8100::/32\n\
+  RemoteIPTrustedProxy 2a06:98c0::/29\n\
+  RemoteIPTrustedProxy 2c0f:f248::/32\n\
+  # Docker bridge networks (container-to-host forwarding)\n\
+  RemoteIPTrustedProxy 172.16.0.0/12\n\
+  RemoteIPTrustedProxy 10.0.0.0/8\n\
+  RemoteIPTrustedProxy 192.168.0.0/16\n\
+  RemoteIPTrustedProxy 127.0.0.0/8\n\
+</IfModule>\n' > /etc/apache2/conf-available/remoteip.conf \
+    && a2enconf remoteip
 
 # Pass environment variables to PHP via Apache
 # This ensures Docker env vars are available to PHP via $_SERVER and getenv()

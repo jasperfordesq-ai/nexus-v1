@@ -427,7 +427,7 @@ if (class_exists('\Nexus\Services\SentryService') && \Nexus\Services\SentryServi
         \Nexus\Services\SentryService::setRequestContext([
             'method' => $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN',
             'uri' => $_SERVER['REQUEST_URI'] ?? '',
-            'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            'ip' => \Nexus\Core\ClientIp::get(),
             'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
         ]);
     }

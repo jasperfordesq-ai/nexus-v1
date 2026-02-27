@@ -67,7 +67,7 @@ class AuthController extends BaseApiController
         }
 
         // SECURITY: Redis-based rate limiting (fast, per-IP, 10 attempts per minute)
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
         if (\Nexus\Services\RateLimitService::check("auth:login:$ip", 10, 60)) {
             header('Retry-After: 60');
             return $this->errorResponse(
@@ -294,7 +294,7 @@ class AuthController extends BaseApiController
     public function register()
     {
         // SECURITY: Redis-based rate limiting (fast, per-IP, 3 attempts per minute)
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
         if (\Nexus\Services\RateLimitService::check("auth:register:$ip", 3, 60)) {
             header('Retry-After: 60');
             return $this->errorResponse(
@@ -776,7 +776,7 @@ class AuthController extends BaseApiController
     public function refreshToken()
     {
         // SECURITY: Rate limiting to prevent token refresh abuse
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
         if (\Nexus\Services\RateLimitService::check("auth:refresh:$ip", 10, 60)) {
             header('Retry-After: 60');
             return $this->errorResponse(
@@ -1102,7 +1102,7 @@ class AuthController extends BaseApiController
     public function getCsrfToken()
     {
         // Rate limit this endpoint (10 per minute per IP)
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
         $rateLimitResult = \Nexus\Core\RateLimiter::check($ip . ':csrf', 'csrf_token');
 
         if ($rateLimitResult['limited']) {

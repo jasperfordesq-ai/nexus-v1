@@ -306,7 +306,7 @@ class SuperPanelAccess
             $_SESSION['user_id'] ?? 'none',
             $_SESSION['tenant_id'] ?? 'none',
             $access['reason'],
-            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+            \Nexus\Core\ClientIp::get()
         ));
 
         if (self::isApiRequest()) {
