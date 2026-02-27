@@ -13,6 +13,7 @@ import { Button, Avatar } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -23,6 +24,7 @@ import { EmojiPicker } from '../shared/EmojiPicker';
 import { VoiceInput } from '../shared/VoiceInput';
 import { CharacterCount } from '../shared/CharacterCount';
 import { LinkPreview } from '../shared/LinkPreview';
+import { useComposeSubmit } from '../ComposeSubmitContext';
 import type { TabSubmitProps } from '../types';
 
 const MAX_CONTENT_CHARS = 5000;
@@ -36,7 +38,10 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
   const { t } = useTranslation('feed');
   const { user } = useAuth();
   const toast = useToast();
+  const { register, unregister } = useComposeSubmit();
+  const isMobile = useMediaQuery('(max-width: 639px)');
   const editorRef = useRef<ComposeEditorHandle>(null);
+  const submitRef = useRef<() => void>(() => {});
 
   const [draft, setDraft, clearDraft] = useDraftPersistence<PostDraft>(
     'compose-draft-post',
@@ -149,6 +154,19 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
       setIsSubmitting(false);
     }
   };
+  submitRef.current = handleSubmit;
+
+  // Register submit capabilities for mobile header button
+  useEffect(() => {
+    register({
+      canSubmit,
+      isSubmitting,
+      onSubmit: () => submitRef.current(),
+      buttonLabel: t('compose.post_button'),
+      gradientClass: 'from-indigo-500 to-purple-600',
+    });
+    return unregister;
+  }, [canSubmit, isSubmitting, register, unregister, t]);
 
   return (
     <div className="space-y-4">
@@ -189,31 +207,33 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
       />
 
       {/* Toolbar + submit row */}
-      <div className="flex items-center justify-between pt-1">
+      <div className={`flex items-center justify-between pt-1 ${isMobile ? 'sticky bottom-0 bg-[var(--surface-base)] py-3 border-t border-[var(--border-default)]' : ''}`}>
         <div className="flex items-center gap-1">
           <EmojiPicker onSelect={handleEmojiSelect} />
           <VoiceInput onTranscript={handleVoiceTranscript} />
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="flat"
-            size="sm"
-            onPress={onClose}
-            className="text-[var(--text-muted)]"
-          >
-            {t('compose.cancel')}
-          </Button>
-          <Button
-            size="sm"
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
-            onPress={handleSubmit}
-            isLoading={isSubmitting}
-            isDisabled={!canSubmit}
-          >
-            {t('compose.post_button')}
-          </Button>
-        </div>
+        {!isMobile && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="flat"
+              size="sm"
+              onPress={onClose}
+              className="text-[var(--text-muted)]"
+            >
+              {t('compose.cancel')}
+            </Button>
+            <Button
+              size="sm"
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
+              onPress={handleSubmit}
+              isLoading={isSubmitting}
+              isDisabled={!canSubmit}
+            >
+              {t('compose.post_button')}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

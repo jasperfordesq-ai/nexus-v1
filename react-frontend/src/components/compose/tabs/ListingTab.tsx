@@ -8,11 +8,12 @@
  * Now with character count and draft persistence.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Input, Textarea, Select, SelectItem, Chip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PlaceAutocompleteInput } from '@/components/location';
@@ -20,6 +21,7 @@ import { AiAssistButton } from '../shared/AiAssistButton';
 import { SdgGoalsPicker } from '../shared/SdgGoalsPicker';
 import { CharacterCount } from '../shared/CharacterCount';
 import { EmojiPicker } from '../shared/EmojiPicker';
+import { useComposeSubmit } from '../ComposeSubmitContext';
 import type { TabSubmitProps } from '../types';
 
 interface Category {
@@ -43,6 +45,9 @@ interface ListingDraft {
 export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps) {
   const { t } = useTranslation('feed');
   const toast = useToast();
+  const { register, unregister } = useComposeSubmit();
+  const isMobile = useMediaQuery('(max-width: 639px)');
+  const submitRef = useRef<() => void>(() => {});
 
   const [draft, setDraft, clearDraft] = useDraftPersistence<ListingDraft>(
     'compose-draft-listing',
@@ -70,6 +75,10 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
   }, [templateData, setDraft]);
 
   const canSubmit = draft.title.trim().length > 0 && draft.description.trim().length > 0;
+
+  const gradientClass = draft.type === 'offer'
+    ? 'from-emerald-500 to-teal-600'
+    : 'from-amber-500 to-orange-600';
 
   const setTitle = useCallback(
     (v: string) => setDraft((prev) => ({ ...prev, title: v })),
@@ -139,6 +148,19 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
       setIsSubmitting(false);
     }
   };
+  submitRef.current = handleSubmit;
+
+  // Register submit capabilities for mobile header button
+  useEffect(() => {
+    register({
+      canSubmit,
+      isSubmitting,
+      onSubmit: () => submitRef.current(),
+      buttonLabel: t('compose.create_listing'),
+      gradientClass,
+    });
+    return unregister;
+  }, [canSubmit, isSubmitting, gradientClass, register, unregister, t]);
 
   return (
     <div className="space-y-4">
@@ -249,34 +271,36 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
 
       <SdgGoalsPicker selected={sdgGoals} onChange={setSdgGoals} />
 
-      <div className="flex items-center justify-between pt-1">
+      <div className={`flex items-center justify-between pt-1 ${isMobile ? 'sticky bottom-0 bg-[var(--surface-base)] py-3 border-t border-[var(--border-default)]' : ''}`}>
         <div className="flex items-center gap-1">
           <EmojiPicker onSelect={handleEmojiSelect} />
         </div>
 
-        <div className="flex items-center gap-2">
-        <Button
-          variant="flat"
-          size="sm"
-          onPress={onClose}
-          className="text-[var(--text-muted)]"
-        >
-          {t('compose.cancel')}
-        </Button>
-        <Button
-          size="sm"
-          className={`text-white shadow-lg ${
-            draft.type === 'offer'
-              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/20'
-              : 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/20'
-          }`}
-          onPress={handleSubmit}
-          isLoading={isSubmitting}
-          isDisabled={!canSubmit}
-        >
-          {t('compose.create_listing')}
-        </Button>
-        </div>
+        {!isMobile && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="flat"
+              size="sm"
+              onPress={onClose}
+              className="text-[var(--text-muted)]"
+            >
+              {t('compose.cancel')}
+            </Button>
+            <Button
+              size="sm"
+              className={`text-white shadow-lg ${
+                draft.type === 'offer'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/20'
+                  : 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/20'
+              }`}
+              onPress={handleSubmit}
+              isLoading={isSubmitting}
+              isDisabled={!canSubmit}
+            >
+              {t('compose.create_listing')}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

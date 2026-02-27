@@ -9,8 +9,8 @@
  * Supports creating posts, polls, listings, events, and goals from a single
  * modal. Each tab is feature/module-gated by the tenant configuration.
  *
- * Replaces the old inline create-post modal in FeedPage, and mirrors the
- * capabilities of the legacy PHP /compose page.
+ * Mobile: Full-screen portal overlay with slide-up animation.
+ * Desktop: HeroUI Modal with underlined tabs and glass background.
  */
 
 import { useState, useMemo, useCallback } from 'react';
@@ -19,10 +19,6 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
   Tabs,
   Tab,
   Divider,
@@ -37,6 +33,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { ComposeSubmitProvider } from './ComposeSubmitContext';
+import { MobileComposeOverlay } from './MobileComposeOverlay';
 import { PostTab } from './tabs/PostTab';
 import { PollTab } from './tabs/PollTab';
 import { ListingTab } from './tabs/ListingTab';
@@ -104,58 +102,7 @@ export function ComposeHub({
     templateData,
   };
 
-  /** Shared header — title + HeroUI Tabs with proper a11y */
-  const headerContent = (
-    <div className="flex flex-col gap-3 w-full">
-      {/* Grab handle — mobile drawer indicator */}
-      {isMobile && (
-        <div className="flex justify-center pt-1">
-          <div className="w-10 h-1 rounded-full bg-[var(--border-default)]" />
-        </div>
-      )}
-
-      {/* Title row */}
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-          <ActiveIcon className="w-4 h-4 text-white" aria-hidden="true" />
-        </div>
-        <span className="font-semibold flex-1">
-          {t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
-        </span>
-        <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />
-      </div>
-
-      {/* HeroUI Tabs — semantic role="tab", keyboard arrow-key nav, aria-selected */}
-      <Tabs
-        selectedKey={activeTab}
-        onSelectionChange={(key) => setActiveTab(key as ComposeTab)}
-        variant="light"
-        size="sm"
-        classNames={{
-          tabList: 'gap-1 overflow-x-auto sm:flex-wrap scrollbar-hide p-0',
-          tab: 'min-h-[44px] px-3 data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white rounded-full',
-          cursor: 'hidden',
-        }}
-      >
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <Tab
-              key={tab.key}
-              title={
-                <div className="flex items-center gap-1.5">
-                  <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-                  <span>{t(`compose.tab_${tab.key}`)}</span>
-                </div>
-              }
-            />
-          );
-        })}
-      </Tabs>
-    </div>
-  );
-
-  /** Shared body — group selector + active tab content */
+  /** Body content — group selector + active tab */
   const bodyContent = (
     <>
       {TABS_WITH_GROUPS.includes(activeTab) && (
@@ -175,62 +122,92 @@ export function ComposeHub({
     </>
   );
 
-  /* Mobile: HeroUI Drawer as bottom-sheet */
+  /* ── Mobile: Full-screen portal overlay ── */
   if (isMobile) {
     return (
-      <Drawer
-        isOpen={isOpen}
-        onClose={handleClose}
-        placement="bottom"
-        size="full"
-        classNames={{
-          base: 'bg-[var(--glass-bg)] backdrop-blur-xl border-t border-[var(--glass-border)] max-h-[92vh] rounded-t-2xl',
-          backdrop: 'bg-black/60 backdrop-blur-sm',
-          body: 'px-4',
-          header: 'px-4',
-        }}
-      >
-        <DrawerContent>
-          <DrawerHeader className="text-[var(--text-primary)] pb-2">
-            {headerContent}
-          </DrawerHeader>
-
-          <Divider className="bg-[var(--border-default)]" />
-
-          <DrawerBody className="pt-4 pb-4 overflow-y-auto">
-            {bodyContent}
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+      <ComposeSubmitProvider>
+        <MobileComposeOverlay
+          isOpen={isOpen}
+          onClose={handleClose}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          tabs={tabs}
+          headerTitle={t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
+          templatePicker={<TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
+        >
+          {bodyContent}
+        </MobileComposeOverlay>
+      </ComposeSubmitProvider>
     );
   }
 
-  /* Desktop: HeroUI Modal centered */
+  /* ── Desktop: HeroUI Modal with underlined tabs ── */
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      size="2xl"
-      scrollBehavior="inside"
-      classNames={{
-        base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] max-h-[85vh]',
-        wrapper: 'items-center',
-        backdrop: 'bg-black/60 backdrop-blur-sm',
-        body: 'px-6',
-        header: 'px-6',
-      }}
-    >
-      <ModalContent>
-        <ModalHeader className="text-[var(--text-primary)] pb-2">
-          {headerContent}
-        </ModalHeader>
+    <ComposeSubmitProvider>
+      <Modal
+        isOpen={isOpen}
+        onClose={handleClose}
+        size="2xl"
+        scrollBehavior="inside"
+        classNames={{
+          base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] max-h-[85vh]',
+          wrapper: 'items-center',
+          backdrop: 'bg-black/60 backdrop-blur-sm',
+          body: 'px-6',
+          header: 'px-6',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-[var(--text-primary)] pb-2">
+            <div className="flex flex-col gap-3 w-full">
+              {/* Title row */}
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                  <ActiveIcon className="w-4 h-4 text-white" aria-hidden="true" />
+                </div>
+                <span className="font-semibold flex-1">
+                  {t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
+                </span>
+                <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />
+              </div>
 
-        <Divider className="bg-[var(--border-default)]" />
+              {/* Underlined tabs */}
+              <Tabs
+                selectedKey={activeTab}
+                onSelectionChange={(key) => setActiveTab(key as ComposeTab)}
+                variant="underlined"
+                size="sm"
+                classNames={{
+                  tabList: 'gap-2 p-0 border-b border-[var(--border-default)]',
+                  tab: 'min-h-[44px] px-3 text-[var(--text-muted)] data-[selected=true]:text-[var(--text-primary)]',
+                  cursor: 'bg-gradient-to-r from-indigo-500 to-purple-600 h-[2px] rounded-full',
+                }}
+              >
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <Tab
+                      key={tab.key}
+                      title={
+                        <div className="flex items-center gap-1.5">
+                          <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                          <span>{t(`compose.tab_${tab.key}`)}</span>
+                        </div>
+                      }
+                    />
+                  );
+                })}
+              </Tabs>
+            </div>
+          </ModalHeader>
 
-        <ModalBody className="pt-4 pb-4">
-          {bodyContent}
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+          <Divider className="bg-[var(--border-default)]" />
+
+          <ModalBody className="pt-4 pb-4">
+            {bodyContent}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </ComposeSubmitProvider>
   );
 }
