@@ -56,7 +56,7 @@ class ListingService
         if ($currentUserId !== null) {
             $sql = "SELECT l.id, l.title, l.description, l.type, l.category_id, l.image_url,
                            l.location, l.latitude, l.longitude, l.status, l.federated_visibility,
-                           l.created_at, l.updated_at, l.user_id, l.estimated_hours,
+                           l.created_at, l.updated_at, l.user_id, l.hours_estimate,
                            CASE
                                WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
                                THEN u.organization_name
@@ -75,7 +75,7 @@ class ListingService
         } else {
             $sql = "SELECT l.id, l.title, l.description, l.type, l.category_id, l.image_url,
                            l.location, l.latitude, l.longitude, l.status, l.federated_visibility,
-                           l.created_at, l.updated_at, l.user_id, l.estimated_hours,
+                           l.created_at, l.updated_at, l.user_id, l.hours_estimate,
                            CASE
                                WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
                                THEN u.organization_name
@@ -239,9 +239,9 @@ class ListingService
         // Add attributes
         $listing['attributes'] = self::getAttributes($id);
 
-        // Add estimated_hours (may not exist in all tenants — React uses conditional rendering)
-        if (!array_key_exists('estimated_hours', $listing)) {
-            $listing['estimated_hours'] = null;
+        // Add hours_estimate (may not exist in all tenants — React uses conditional rendering)
+        if (!array_key_exists('hours_estimate', $listing)) {
+            $listing['hours_estimate'] = null;
         }
 
         // Add like count
@@ -385,7 +385,7 @@ class ListingService
         // Insert listing
         $sql = "INSERT INTO listings (
                     tenant_id, user_id, title, description, type, category_id,
-                    image_url, location, latitude, longitude, federated_visibility, estimated_hours, status, created_at
+                    image_url, location, latitude, longitude, federated_visibility, hours_estimate, status, created_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())";
 
         Database::query($sql, [
@@ -400,7 +400,7 @@ class ListingService
             $latitude,
             $longitude,
             $federatedVisibility,
-            isset($data['estimated_hours']) ? floatval($data['estimated_hours']) : null,
+            isset($data['hours_estimate']) ? floatval($data['hours_estimate']) : null,
         ]);
 
         $listingId = Database::lastInsertId();
@@ -522,9 +522,9 @@ class ListingService
             }
         }
 
-        if (array_key_exists('estimated_hours', $data)) {
-            $fields[] = 'estimated_hours = ?';
-            $params[] = isset($data['estimated_hours']) ? floatval($data['estimated_hours']) : null;
+        if (array_key_exists('hours_estimate', $data)) {
+            $fields[] = 'hours_estimate = ?';
+            $params[] = isset($data['hours_estimate']) ? floatval($data['hours_estimate']) : null;
         }
 
         if (empty($fields)) {
