@@ -53,13 +53,13 @@ class ListingService
 
         $sql = "SELECT l.id, l.title, l.description, l.type, l.category_id, l.image_url,
                        l.location, l.latitude, l.longitude, l.status, l.federated_visibility,
-                       l.created_at, l.updated_at, l.user_id,
+                       l.created_at, l.updated_at, l.user_id, l.estimated_hours,
                        CASE
                            WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
                            THEN u.organization_name
                            ELSE CONCAT(u.first_name, ' ', u.last_name)
                        END as author_name,
-                       u.avatar_url as author_avatar,
+                       u.avatar_url as author_avatar, u.tagline as tagline,
                        c.name as category_name, c.color as category_color
                 FROM listings l
                 JOIN users u ON l.user_id = u.id
@@ -144,6 +144,18 @@ class ListingService
             $lastItem = end($items);
             $nextCursor = base64_encode((string)$lastItem['id']);
         }
+
+        // Build nested user object for each item (React expects listing.user)
+        $items = array_map(function (array $item): array {
+            $item['user'] = [
+                'id'         => (int)($item['user_id'] ?? 0),
+                'name'       => $item['author_name'] ?? null,
+                'avatar'     => $item['author_avatar'] ?? null,
+                'avatar_url' => $item['author_avatar'] ?? null,
+                'tagline'    => $item['tagline'] ?? null,
+            ];
+            return $item;
+        }, $items);
 
         return [
             'items' => $items,

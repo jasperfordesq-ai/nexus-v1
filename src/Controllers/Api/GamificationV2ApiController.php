@@ -464,7 +464,7 @@ class GamificationV2ApiController extends BaseApiController
         try {
             $data = XPShopService::getItemsWithUserStatus($userId);
 
-            $this->respondWithData($data);
+            $this->respondWithData($data['items'] ?? $data, ['user_xp' => $data['user_xp'] ?? null]);
         } catch (\Throwable $e) {
             $this->respondWithError(
                 ApiErrorCodes::SERVER_INTERNAL_ERROR,

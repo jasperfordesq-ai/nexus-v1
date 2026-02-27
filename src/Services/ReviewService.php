@@ -226,6 +226,7 @@ class ReviewService
                     r.review_type,
                     r.is_anonymous,
                     r.created_at,
+                    r.reviewer_id,
                     CASE
                         WHEN r.is_anonymous = 1 THEN 'Anonymous'
                         WHEN reviewer.tenant_id = ? THEN reviewer.name
@@ -233,14 +234,27 @@ class ReviewService
                     END as reviewer_name,
                     CASE
                         WHEN r.is_anonymous = 1 THEN NULL
+                        WHEN reviewer.tenant_id = ? THEN reviewer.first_name
+                        ELSE NULL
+                    END as reviewer_first_name,
+                    CASE
+                        WHEN r.is_anonymous = 1 THEN NULL
+                        WHEN reviewer.tenant_id = ? THEN reviewer.last_name
+                        ELSE NULL
+                    END as reviewer_last_name,
+                    CASE
+                        WHEN r.is_anonymous = 1 THEN NULL
                         WHEN reviewer.tenant_id = ? THEN reviewer.avatar_url
                         ELSE NULL
                     END as reviewer_avatar,
                     reviewer.tenant_id as reviewer_tenant_id,
-                    t.name as reviewer_timebank
+                    t.name as reviewer_timebank,
+                    li.title as listing_title
                 FROM reviews r
                 JOIN users reviewer ON reviewer.id = r.reviewer_id
                 LEFT JOIN tenants t ON t.id = reviewer.tenant_id
+                LEFT JOIN federation_transactions ft ON ft.id = r.federation_transaction_id
+                LEFT JOIN listings li ON li.id = ft.listing_id
                 WHERE r.receiver_id = ?
                 AND r.status = 'approved'
             ";
@@ -253,6 +267,8 @@ class ReviewService
             $reviewQuery .= " ORDER BY r.created_at DESC LIMIT ? OFFSET ?";
 
             $reviews = Database::query($reviewQuery, [
+                $viewerTenantId ?? 0,
+                $viewerTenantId ?? 0,
                 $viewerTenantId ?? 0,
                 $viewerTenantId ?? 0,
                 $userId,

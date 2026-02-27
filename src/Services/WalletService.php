@@ -265,6 +265,16 @@ class WalletService
 
         $isSender = (int)$t['sender_id'] === $userId;
 
+        $other_user = $isSender ? [
+            'id' => (int)$t['receiver_id'],
+            'name' => $t['receiver_name'],
+            'avatar_url' => $t['receiver_avatar'],
+        ] : [
+            'id' => (int)$t['sender_id'],
+            'name' => $t['sender_name'],
+            'avatar_url' => $t['sender_avatar'],
+        ];
+
         return [
             'id' => (int)$t['id'],
             'type' => $isSender ? 'debit' : 'credit',
@@ -281,6 +291,7 @@ class WalletService
                 'name' => $t['receiver_name'],
                 'avatar_url' => $t['receiver_avatar'],
             ],
+            'other_user' => $other_user,
             'created_at' => $t['created_at'],
         ];
     }

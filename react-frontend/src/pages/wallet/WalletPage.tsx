@@ -45,6 +45,7 @@ export function WalletPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMoreTransactions, setHasMoreTransactions] = useState(true);
+  const [txCursor, setTxCursor] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<TransactionFilter>('all');
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
@@ -59,6 +60,7 @@ export function WalletPage() {
     try {
       setIsLoading(true);
       setError(null);
+      setTxCursor(null);
       const [balanceRes, transactionsRes] = await Promise.all([
         api.get<WalletBalance>('/v2/wallet/balance'),
         api.get<Transaction[]>('/v2/wallet/transactions?limit=50'),
@@ -72,8 +74,8 @@ export function WalletPage() {
       }
       if (transactionsRes.success && transactionsRes.data) {
         setTransactions(transactionsRes.data);
-        // If we got fewer than 50, there are no more to load
-        setHasMoreTransactions(transactionsRes.data.length >= 50);
+        setTxCursor(transactionsRes.meta?.cursor ?? null);
+        setHasMoreTransactions(transactionsRes.meta?.has_more ?? transactionsRes.data.length >= 50);
       }
     } catch (err) {
       logError('Failed to load wallet data', err);
@@ -98,20 +100,20 @@ export function WalletPage() {
     }
   }, [savedRecipientId, isLoading, balance]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Load more transactions (pagination)
+  // Load more transactions (cursor-based pagination)
   const loadMoreTransactions = useCallback(async () => {
-    if (isLoadingMore || !hasMoreTransactions || transactions.length === 0) return;
+    if (isLoadingMore || !hasMoreTransactions || !txCursor) return;
 
     try {
       setIsLoadingMore(true);
-      const offset = transactions.length;
-      const response = await api.get<Transaction[]>(`/v2/wallet/transactions?limit=50&offset=${offset}`);
+      const response = await api.get<Transaction[]>(`/v2/wallet/transactions?limit=50&cursor=${encodeURIComponent(txCursor)}`);
 
       if (response.success && response.data) {
         if (response.data.length > 0) {
           setTransactions((prev) => [...prev, ...response.data!]);
         }
-        setHasMoreTransactions(response.data.length >= 50);
+        setTxCursor(response.meta?.cursor ?? null);
+        setHasMoreTransactions(response.meta?.has_more ?? false);
       }
     } catch (err) {
       logError('Failed to load more transactions', err);
@@ -119,7 +121,7 @@ export function WalletPage() {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, hasMoreTransactions, transactions.length, toast]);
+  }, [isLoadingMore, hasMoreTransactions, txCursor, toast]);
 
   // Handle successful transfer
   function handleTransferComplete(transaction: Transaction) {
@@ -357,7 +359,7 @@ export function WalletPage() {
           {/* Filter Tabs */}
           <Tabs
             selectedKey={filter}
-            onSelectionChange={(key) => setFilter(key as TransactionFilter)}
+            onSelectionChange={(key) => { setFilter(key as TransactionFilter); setTxCursor(null); }}
             classNames={{
               tabList: 'bg-theme-elevated p-1 rounded-lg',
               cursor: 'bg-theme-hover',
