@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { Button, Input, Avatar, DatePicker } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
 import { Plus, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -18,6 +19,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import type { TabSubmitProps } from '../types';
 
 export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
+  const { t } = useTranslation('feed');
   const { user } = useAuth();
   const toast = useToast();
   const [question, setQuestion] = useState('');
@@ -44,11 +46,11 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
 
   const handleSubmit = async () => {
     if (!question.trim()) {
-      toast.error('Please enter a question');
+      toast.error(t('compose.poll_question_required'));
       return;
     }
     if (validOptions.length < 2) {
-      toast.error('Add at least 2 options');
+      toast.error(t('compose.poll_min_options'));
       return;
     }
 
@@ -68,13 +70,15 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
 
       const res = await api.post('/v2/feed/polls', payload);
       if (res.success) {
-        toast.success('Poll created!');
+        toast.success(t('compose.poll_created'));
         onClose();
         onSuccess('poll');
+      } else {
+        toast.error(t('compose.poll_failed'));
       }
     } catch (err) {
       logError('Failed to create poll', err);
-      toast.error('Failed to create poll');
+      toast.error(t('compose.poll_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -91,7 +95,7 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           isBordered
         />
         <Input
-          placeholder="Ask a question..."
+          placeholder={t('compose.poll_question_placeholder')}
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           classNames={{
@@ -140,19 +144,19 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
             startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
             onPress={addOption}
           >
-            Add Option
+            {t('compose.add_option')}
           </Button>
         )}
 
         <DatePicker
-          label="End date (optional)"
+          label={t('compose.poll_end_date')}
           value={expiresAt}
           onChange={setExpiresAt}
           granularity="day"
           classNames={{
             inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
           }}
-          description="Leave empty for no deadline"
+          description={t('compose.poll_no_deadline')}
         />
       </div>
 
@@ -162,7 +166,7 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           onPress={onClose}
           className="text-[var(--text-muted)]"
         >
-          Cancel
+          {t('compose.cancel')}
         </Button>
         <Button
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
@@ -170,7 +174,7 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           isLoading={isSubmitting}
           isDisabled={!canSubmit}
         >
-          Create Poll
+          {t('compose.create_poll')}
         </Button>
       </div>
     </div>

@@ -10,7 +10,8 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Input, Textarea, Select, SelectItem, Chip } from '@heroui/react';
-import { useToast, useTenant } from '@/contexts';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PlaceAutocompleteInput } from '@/components/location';
@@ -29,8 +30,8 @@ const inputClasses = {
 };
 
 export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
+  const { t } = useTranslation('feed');
   const toast = useToast();
-  const { tenantPath } = useTenant();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState<'offer' | 'request'>('offer');
@@ -79,17 +80,15 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
       const res = await api.post<{ id: number }>('/v2/listings', payload);
       if (res.success) {
         const id = res.data?.id;
-        toast.success(
-          id
-            ? `Listing created! View it at ${tenantPath(`/listings/${id}`)}`
-            : 'Listing created!'
-        );
+        toast.success(t('compose.listing_created'));
         onClose();
         onSuccess('listing', id);
+      } else {
+        toast.error(t('compose.listing_failed'));
       }
     } catch (err) {
       logError('Failed to create listing', err);
-      toast.error('Failed to create listing');
+      toast.error(t('compose.listing_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -98,8 +97,8 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
   return (
     <div className="space-y-4">
       <Input
-        label="Title"
-        placeholder="What service are you offering or looking for?"
+        label={t('compose.listing_title_label')}
+        placeholder={t('compose.listing_title_placeholder')}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         isRequired
@@ -117,7 +116,7 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
           }`}
           onClick={() => setType('offer')}
         >
-          Offering
+          {t('compose.listing_offering')}
         </Chip>
         <Chip
           size="sm"
@@ -129,7 +128,7 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
           }`}
           onClick={() => setType('request')}
         >
-          Looking For
+          {t('compose.listing_looking_for')}
         </Chip>
       </div>
 
@@ -137,8 +136,8 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
         <div className="flex items-end gap-2">
           <div className="flex-1">
             <Textarea
-              label="Description"
-              placeholder="Describe your service in detail..."
+              label={t('compose.description_label')}
+              placeholder={t('compose.listing_desc_placeholder')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               isRequired
@@ -161,8 +160,8 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {categories.length > 0 && (
           <Select
-            label="Category"
-            placeholder="Select category"
+            label={t('compose.category_label')}
+            placeholder={t('compose.category_placeholder')}
             selectedKeys={categoryId ? [categoryId] : []}
             onSelectionChange={(keys) => setCategoryId(Array.from(keys)[0] as string)}
             classNames={{
@@ -179,7 +178,7 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
         )}
         <Input
           type="number"
-          label="Estimated Hours"
+          label={t('compose.estimated_hours_label')}
           placeholder="1"
           value={hoursEstimate}
           onChange={(e) => setHoursEstimate(e.target.value)}
@@ -190,8 +189,8 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
       </div>
 
       <PlaceAutocompleteInput
-        label="Location (optional)"
-        placeholder="Start typing an address..."
+        label={t('compose.location_label')}
+        placeholder={t('compose.location_placeholder')}
         value={location}
         onPlaceSelect={(place) => {
           setLocation(place.formattedAddress);
@@ -209,7 +208,7 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
           onPress={onClose}
           className="text-[var(--text-muted)]"
         >
-          Cancel
+          {t('compose.cancel')}
         </Button>
         <Button
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
@@ -217,7 +216,7 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
           isLoading={isSubmitting}
           isDisabled={!canSubmit}
         >
-          Create Listing
+          {t('compose.create_listing')}
         </Button>
       </div>
     </div>
