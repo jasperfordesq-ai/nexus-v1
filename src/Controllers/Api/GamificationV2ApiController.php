@@ -15,6 +15,7 @@ use Nexus\Services\BadgeCollectionService;
 use Nexus\Services\XPShopService;
 use Nexus\Services\GamificationService;
 use Nexus\Services\LeaderboardSeasonService;
+use Nexus\Services\LeaderboardService;
 use Nexus\Models\UserBadge;
 
 /**
@@ -218,78 +219,109 @@ class GamificationV2ApiController extends BaseApiController
     /**
      * GET /api/v2/gamification/leaderboard
      *
-     * Get the XP leaderboard.
+     * Get the leaderboard filtered by type and period.
      *
      * Query Parameters:
+     * - type:   string ('xp', 'volunteer_hours', 'credits_earned') - default 'xp'
      * - period: string ('all', 'season', 'month', 'week') - default 'all'
-     * - limit: int (default 20, max 100)
+     * - limit:  int (default 20, max 100)
      *
-     * Response: 200 OK with leaderboard entries
+     * Response: 200 OK with leaderboard entries.
+     * Each entry includes a `score` field whose value corresponds to the
+     * requested type (XP points, volunteer hours, or time credits earned).
      */
     public function leaderboard(): void
     {
         $userId = $this->getUserId();
         $period = $this->query('period', 'all');
-        $limit = $this->queryInt('limit', 20, 1, 100);
+        $limit  = $this->queryInt('limit', 20, 1, 100);
+        $type   = $this->query('type', 'xp');
 
         $this->rateLimit('gamification_leaderboard', 30, 60);
 
         $tenantId = TenantContext::getId();
 
-        // Get leaderboard entries
-        $sql = "
-            SELECT
-                u.id, u.first_name, u.last_name, u.avatar_url, u.xp, u.level,
-                @rank := @rank + 1 as position
-            FROM users u, (SELECT @rank := 0) r
-            WHERE u.tenant_id = ? AND u.is_approved = 1
-            ORDER BY u.xp DESC, u.level DESC
-            LIMIT ?
-        ";
+        // ── Map frontend type → LeaderboardService type ──────────────────────
+        // Supported frontend values: 'xp', 'volunteer_hours', 'credits_earned'
+        $typeMap = [
+            'xp'             => 'xp',
+            'volunteer_hours' => 'vol_hours',
+            'credits_earned' => 'credits_earned',
+        ];
+        $serviceType = $typeMap[$type] ?? 'xp';
 
-        $entries = Database::query($sql, [$tenantId, $limit])->fetchAll();
+        // ── Map frontend period → LeaderboardService period ──────────────────
+        // 'season' is managed by a separate service; treat it the same as
+        // all_time at the data layer (season boundaries are applied by the
+        // seasons feature, not the base leaderboard query).
+        $periodMap = [
+            'all'    => 'all_time',
+            'season' => 'all_time',
+            'month'  => 'monthly',
+            'week'   => 'weekly',
+        ];
+        $servicePeriod = $periodMap[$period] ?? 'all_time';
 
-        // Format entries
+        // ── Fetch via LeaderboardService ──────────────────────────────────────
+        // LeaderboardService::getLeaderboard() already scopes by tenant_id,
+        // applies the correct date filter, and returns a `score` field for
+        // every type (including 'xp').
+        $rawEntries = LeaderboardService::getLeaderboard(
+            $serviceType,
+            $servicePeriod,
+            $limit,
+            true // include current user's row even if outside top N
+        );
+
+        // ── Format to match the shape the React frontend expects ──────────────
         $leaderboard = [];
-        foreach ($entries as $entry) {
+        foreach ($rawEntries as $entry) {
+            $score = isset($entry['score']) ? (float)$entry['score'] : 0;
+            $xp    = ($serviceType === 'xp')
+                ? (int)$score
+                : (int)($entry['xp'] ?? 0);
+
             $leaderboard[] = [
-                'position' => (int)$entry['position'],
-                'user' => [
-                    'id' => $entry['id'],
-                    'name' => trim(($entry['first_name'] ?? '') . ' ' . ($entry['last_name'] ?? '')),
-                    'avatar_url' => $entry['avatar_url'],
+                'position'       => (int)($entry['rank'] ?? 0),
+                'user'           => [
+                    'id'         => (int)$entry['user_id'],
+                    'name'       => trim(($entry['name'] ?? '')),
+                    'avatar_url' => $entry['avatar_url'] ?? null,
                 ],
-                'xp' => (int)($entry['xp'] ?? 0),
-                'level' => (int)($entry['level'] ?? 1),
-                'is_current_user' => ((int)$entry['id'] === $userId),
+                'xp'             => $xp,
+                'level'          => (int)($entry['level'] ?? 1),
+                'score'          => $score,
+                'is_current_user' => (bool)($entry['is_current_user'] ?? false),
             ];
         }
 
-        // Get current user's position if not in top list
+        // ── Determine current user's position for the meta banner ─────────────
         $currentUserPosition = null;
-        $isInList = false;
         foreach ($leaderboard as $entry) {
             if ($entry['is_current_user']) {
-                $isInList = true;
                 $currentUserPosition = $entry['position'];
                 break;
             }
         }
 
-        if (!$isInList) {
-            // Get user's actual position
-            $positionResult = Database::query("
-                SELECT COUNT(*) + 1 as position
-                FROM users
-                WHERE tenant_id = ? AND is_approved = 1 AND xp > (
-                    SELECT COALESCE(xp, 0) FROM users WHERE id = ?
-                )
-            ", [$tenantId, $userId])->fetch();
-            $currentUserPosition = (int)($positionResult['position'] ?? 0);
+        // If user is not in the list at all, fall back to a simple count query
+        // (only reliable for xp; for other types LeaderboardService already
+        // appends the user row via getUserRank()).
+        if ($currentUserPosition === null && $serviceType === 'xp') {
+            $positionResult = Database::query(
+                "SELECT COUNT(*) + 1 AS position
+                 FROM users
+                 WHERE tenant_id = ? AND is_approved = 1 AND xp > (
+                     SELECT COALESCE(xp, 0) FROM users WHERE id = ?
+                 )",
+                [$tenantId, $userId]
+            )->fetch();
+            $currentUserPosition = (int)($positionResult['position'] ?? 0) ?: null;
         }
 
         $this->respondWithData($leaderboard, [
-            'period' => $period,
+            'period'        => $period,
+            'type'          => $type,
             'your_position' => $currentUserPosition,
             'total_entries' => count($leaderboard),
         ]);

@@ -74,6 +74,7 @@ export function EventsPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [filter, setFilter] = useState<EventFilter>('upcoming');
@@ -107,14 +108,18 @@ export function EventsPage() {
         setIsLoadingMore(true);
       }
 
-      const offset = append ? events.length : 0;
       const params = new URLSearchParams();
       if (debouncedQuery) params.set('q', debouncedQuery);
-      params.set('filter', filter);
-      params.set('limit', String(ITEMS_PER_PAGE));
-      params.set('offset', String(offset));
+      params.set('when', filter);
+      params.set('per_page', String(ITEMS_PER_PAGE));
+      if (append && nextCursor) {
+        params.set('cursor', nextCursor);
+      }
       if (selectedCategory && selectedCategory !== 'all') {
-        params.set('category', selectedCategory);
+        const categoryInt = parseInt(selectedCategory);
+        if (!isNaN(categoryInt)) {
+          params.set('category_id', String(categoryInt));
+        }
       }
 
       const response = await api.get<Event[]>(`/v2/events?${params}`);
@@ -124,7 +129,9 @@ export function EventsPage() {
         } else {
           setEvents(response.data);
         }
-        setHasMore(response.data.length >= ITEMS_PER_PAGE);
+        const cursor = response.meta?.cursor ?? null;
+        setNextCursor(cursor);
+        setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
       } else {
         if (!append) {
           setError(t('unable_to_load'));
@@ -141,10 +148,11 @@ export function EventsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, filter, selectedCategory, events.length]);
+  }, [debouncedQuery, filter, selectedCategory, nextCursor]);
 
-  // Load events when filter, category, or debounced query changes
+  // Load events when filter, category, or debounced query changes (fresh load — reset cursor)
   useEffect(() => {
+    setNextCursor(null);
     loadEvents();
     setHasMore(true);
   }, [debouncedQuery, filter, selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
