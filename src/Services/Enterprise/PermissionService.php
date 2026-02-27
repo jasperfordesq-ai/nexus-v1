@@ -539,7 +539,7 @@ class PermissionService
      */
     public function getPermissionByName(string $name): ?array
     {
-        $result = $this->db->query(
+        $result = Database::query(
             "SELECT * FROM permissions WHERE name = ? LIMIT 1",
             [$name]
         )->fetch();
