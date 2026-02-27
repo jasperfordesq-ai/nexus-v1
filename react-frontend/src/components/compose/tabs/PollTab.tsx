@@ -99,7 +99,7 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           classNames={{
-            input: 'bg-transparent text-[var(--text-primary)]',
+            input: 'bg-transparent text-[var(--text-primary)] text-base',
             inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
           }}
         />
@@ -112,12 +112,12 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
               {index + 1}
             </div>
             <Input
-              placeholder={`Option ${index + 1}`}
+              placeholder={t('compose.poll_option_placeholder', { number: index + 1 })}
               value={opt}
               onChange={(e) => updateOption(index, e.target.value)}
               size="sm"
               classNames={{
-                input: 'bg-transparent text-[var(--text-primary)]',
+                input: 'bg-transparent text-[var(--text-primary)] text-base',
                 inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
               }}
             />
@@ -126,7 +126,7 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
                 isIconOnly
                 size="sm"
                 variant="light"
-                className="text-[var(--text-muted)] min-w-0 hover:text-danger"
+                className="text-[var(--text-muted)] min-w-11 w-11 h-11 hover:text-danger"
                 onPress={() => removeOption(index)}
                 aria-label={`Remove option ${index + 1}`}
               >

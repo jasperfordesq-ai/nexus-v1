@@ -8,7 +8,9 @@
  */
 
 import { useState } from 'react';
-import { Button, Input, Textarea, Switch } from '@heroui/react';
+import { Button, Input, Textarea, Switch, DatePicker } from '@heroui/react';
+import type { DateInputValue } from '@heroui/react';
+import { today, getLocalTimeZone } from '@internationalized/date';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -16,7 +18,7 @@ import { logError } from '@/lib/logger';
 import type { TabSubmitProps } from '../types';
 
 const inputClasses = {
-  input: 'bg-transparent text-[var(--text-primary)]',
+  input: 'bg-transparent text-[var(--text-primary)] text-base',
   inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
 };
 
@@ -26,7 +28,7 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [targetValue, setTargetValue] = useState('');
-  const [deadline, setDeadline] = useState('');
+  const [deadline, setDeadline] = useState<DateInputValue | null>(null);
   const [isPublic, setIsPublic] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,7 +44,7 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
       };
       if (description.trim()) payload.description = description.trim();
       if (targetValue) payload.target_value = parseFloat(targetValue) || 0;
-      if (deadline) payload.deadline = deadline;
+      if (deadline) payload.deadline = deadline.toString();
       payload.is_public = isPublic;
 
       const res = await api.post('/v2/goals', payload);
@@ -91,12 +93,15 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
           onChange={(e) => setTargetValue(e.target.value)}
           classNames={inputClasses}
         />
-        <Input
-          type="date"
+        <DatePicker
           label={t('compose.deadline_label')}
           value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          classNames={inputClasses}
+          onChange={setDeadline}
+          granularity="day"
+          minValue={today(getLocalTimeZone())}
+          classNames={{
+            inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
+          }}
         />
       </div>
 
@@ -109,6 +114,7 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
           isSelected={isPublic}
           onValueChange={setIsPublic}
           size="sm"
+          aria-label={t('compose.make_public')}
         />
       </div>
 

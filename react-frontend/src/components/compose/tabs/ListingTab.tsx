@@ -25,7 +25,7 @@ interface Category {
 }
 
 const inputClasses = {
-  input: 'bg-transparent text-[var(--text-primary)]',
+  input: 'bg-transparent text-[var(--text-primary)] text-base',
   inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
 };
 
