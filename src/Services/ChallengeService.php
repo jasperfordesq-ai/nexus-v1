@@ -56,6 +56,7 @@ class ChallengeService
             $challenge['is_completed'] = $challenge['user_progress'] >= $challenge['target_count'];
             $challenge['days_remaining'] = max(0, (strtotime($challenge['end_date']) - time()) / 86400);
             $challenge['hours_remaining'] = max(0, (strtotime($challenge['end_date']) - time()) / 3600);
+            $challenge['reward_xp'] = $challenge['xp_reward'] ?? 0;
         }
 
         return $challenges;

@@ -302,6 +302,11 @@ class LeaderboardSeasonService
         return [
             'season' => $season,
             'user_rank' => $userRank,
+            'user_data' => $userRank ? [
+                'xp_earned' => (int)($userRank['xp_earned'] ?? $userRank['xp'] ?? $userRank['season_xp'] ?? 0),
+                'rank' => $userRank['rank'] ?? null,
+                'position' => $userRank['position'] ?? null,
+            ] : null,
             'leaderboard' => $leaderboard,
             'rewards' => $rewards,
             'days_remaining' => $daysRemaining,

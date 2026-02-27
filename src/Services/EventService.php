@@ -237,12 +237,19 @@ class EventService
             'title' => $event['title'],
             'description' => $detailed ? $event['description'] : self::truncate($event['description'] ?? '', 200),
             'location' => $event['location'],
+            'is_online' => (bool)($event['is_online'] ?? false),
+            'online_url' => $event['online_url'] ?? null,
             'latitude' => $event['latitude'] ? (float)$event['latitude'] : null,
             'longitude' => $event['longitude'] ? (float)$event['longitude'] : null,
+            'coordinates' => ($event['latitude'] && $event['longitude']) ? [
+                'lat' => (float)$event['latitude'],
+                'lng' => (float)$event['longitude'],
+            ] : null,
             'start_time' => $event['start_time'],
             'end_time' => $event['end_time'],
             'start_date' => $event['start_time'],
             'end_date' => $event['end_time'],
+            'max_attendees' => isset($event['max_attendees']) ? (int)$event['max_attendees'] : null,
             'cover_image' => $event['cover_image'] ?? null,
             'organizer' => [
                 'id' => (int)$event['user_id'],
@@ -257,11 +264,14 @@ class EventService
                 'name' => $event['category_name'] ?? null,
                 'color' => $event['category_color'] ?? null,
             ] : null,
+            'category_name' => $event['category_name'] ?? null,
             'group_id' => $event['group_id'] ? (int)$event['group_id'] : null,
             'rsvp_counts' => [
                 'going' => (int)($event['going_count'] ?? 0),
                 'interested' => (int)($event['interested_count'] ?? 0),
             ],
+            'attendees_count' => (int)($event['going_count'] ?? 0),
+            'interested_count' => (int)($event['interested_count'] ?? 0),
             'created_at' => $event['created_at'] ?? null,
         ];
 

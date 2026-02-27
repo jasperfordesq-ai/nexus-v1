@@ -154,6 +154,7 @@ class GamificationV2ApiController extends BaseApiController
             $def = GamificationService::getBadgeByKey($badge['badge_key']);
             if ($def) {
                 $enriched = array_merge($badge, $def);
+                $enriched['description'] = $enriched['msg'] ?? $enriched['description'] ?? null;
 
                 // Filter by type if specified
                 if ($type && ($enriched['type'] ?? '') !== $type) {
@@ -209,6 +210,7 @@ class GamificationV2ApiController extends BaseApiController
             'earned_at' => $userBadge['awarded_at'] ?? null,
             'is_showcased' => !empty($userBadge['is_showcased'] ?? false),
         ]);
+        $badge['description'] = $badge['msg'] ?? $badge['description'] ?? null;
 
         $this->respondWithData($badge);
     }

@@ -291,6 +291,10 @@ class GoalService
         $goal['buddy_name']   = $goal['mentor']['name'] ?? null;
         $goal['buddy_avatar'] = $goal['mentor']['avatar_url'] ?? null;
 
+        // Flat user fields — React GoalsPage accesses goal.user_name and goal.user_avatar directly
+        $goal['user_name']   = $goal['owner']['name'] ?? null;
+        $goal['user_avatar'] = $goal['owner']['avatar_url'] ?? null;
+
         // Boolean conversion
         $goal['is_public'] = (bool)($goal['is_public'] ?? false);
 

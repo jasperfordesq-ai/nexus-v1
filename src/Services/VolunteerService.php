@@ -1494,7 +1494,12 @@ class VolunteerService
                 'id' => (int)$r['id'],
                 'rating' => (int)$r['rating'],
                 'comment' => $r['comment'],
-                'reviewer' => [
+                'author' => [
+                    'id' => (int)($r['user_id'] ?? $r['reviewer_id'] ?? 0),
+                    'name' => trim(($r['first_name'] ?? '') . ' ' . ($r['last_name'] ?? '')),
+                    'avatar' => $r['avatar_url'] ?? null,
+                ],
+                'reviewer' => [  // keep for backward compat
                     'name' => trim(($r['first_name'] ?? '') . ' ' . ($r['last_name'] ?? '')),
                     'avatar_url' => $r['avatar_url'] ?? null,
                 ],

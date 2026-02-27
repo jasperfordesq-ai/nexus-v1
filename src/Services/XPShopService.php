@@ -52,6 +52,7 @@ class XPShopService
             $item['user_purchases'] = $purchases[$item['id']] ?? 0;
             $item['can_purchase'] = self::canPurchase($userId, $item, $userXP);
             $item['reason'] = self::getPurchaseBlockReason($userId, $item, $userXP);
+            $item['cost_xp'] = $item['xp_cost'] ?? 0;
         }
 
         return [
