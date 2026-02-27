@@ -56,11 +56,6 @@ import {
   Info,
   FileText,
   Shield,
-  Handshake,
-  Stethoscope,
-  TrendingUp,
-  BarChart3,
-  Compass,
   Bot,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -320,20 +315,11 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
   ] : [];
 
-  // About dropdown — universal items + tenant-specific items + dynamic CMS pages
-  const isHourTimebank = tenant?.slug === 'hour-timebank';
+  // About dropdown — universal items + dynamic CMS pages
   const aboutItems = [
     { label: t('nav.about'), href: tenantPath('/about'), icon: Info },
     { label: t('nav.faq'), href: tenantPath('/faq'), icon: HelpCircle },
     { label: t('nav.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },
-    // Tenant 2 (hOUR Timebank) specific pages — these contain hardcoded org content
-    ...(isHourTimebank ? [
-      { label: t('nav.partner_with_us'), href: tenantPath('/partner'), icon: Handshake },
-      { label: t('nav.social_prescribing'), href: tenantPath('/social-prescribing'), icon: Stethoscope },
-      { label: t('nav.our_impact'), href: tenantPath('/impact-summary'), icon: TrendingUp },
-      { label: t('nav.impact_report'), href: tenantPath('/impact-report'), icon: BarChart3 },
-      { label: t('nav.strategic_plan'), href: tenantPath('/strategic-plan'), icon: Compass },
-    ] : []),
     ...(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => ({
       label: p.title,
       href: tenantPath(`/page/${p.slug}`),

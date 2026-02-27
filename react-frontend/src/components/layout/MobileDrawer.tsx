@@ -48,11 +48,6 @@ import {
   Globe,
   Info,
   FileText,
-  Handshake,
-  Stethoscope,
-  TrendingUp,
-  BarChart3,
-  Compass,
   Cookie,
   Bot,
 } from 'lucide-react';
@@ -128,15 +123,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.about'), href: '/about', icon: Info },
     { label: t('nav.faq'), href: '/faq', icon: HelpCircle },
     { label: t('nav.timebanking_guide'), href: '/timebanking-guide', icon: BookOpen },
-  ];
-
-  // Tenant 2 (hOUR Timebank) specific pages — contain hardcoded org content
-  const hourTimebankAboutItems = [
-    { label: t('nav.partner_with_us'), href: '/partner', icon: Handshake },
-    { label: t('nav.social_prescribing'), href: '/social-prescribing', icon: Stethoscope },
-    { label: t('nav.our_impact'), href: '/impact-summary', icon: TrendingUp },
-    { label: t('nav.impact_report'), href: '/impact-report', icon: BarChart3 },
-    { label: t('nav.strategic_plan'), href: '/strategic-plan', icon: Compass },
   ];
 
   const supportNavItems = [
@@ -383,7 +369,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </p>
               <div className="space-y-1">
                 {aboutNavItems.map(renderNavLink)}
-                {tenant?.slug === 'hour-timebank' && hourTimebankAboutItems.map(renderNavLink)}
                 {(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => renderNavLink({
                   label: p.title,
                   href: `/page/${p.slug}`,
