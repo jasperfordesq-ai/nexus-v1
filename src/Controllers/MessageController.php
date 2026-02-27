@@ -239,7 +239,7 @@ class MessageController
             $receiver = $stmt->fetch();
 
             if ($receiver && $receiver['email']) {
-                $replyLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/messages/" . $senderId;
+                $replyLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/messages/" . $senderId;
 
                 if (class_exists('Nexus\Core\EmailTemplate')) {
                     $emailHtml = EmailTemplate::render(

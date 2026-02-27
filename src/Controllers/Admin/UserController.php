@@ -134,7 +134,7 @@ class UserController
                 try {
                     $tenant = TenantContext::get();
                     $tenantName = $tenant['name'] ?? 'Project NEXUS';
-                    $loginLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/login";
+                    $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
 
                     $html = \Nexus\Core\EmailTemplate::render(
                         "Your Account Has Been Created",
