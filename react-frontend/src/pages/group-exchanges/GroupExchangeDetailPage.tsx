@@ -175,10 +175,10 @@ export function GroupExchangeDetailPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.get<{ data: GroupExchangeDetail }>(`/v2/group-exchanges/${id}`);
+      const response = await api.get<GroupExchangeDetail>(`/v2/group-exchanges/${id}`);
 
       if (response.success && response.data) {
-        setExchange(response.data as unknown as GroupExchangeDetail);
+        setExchange(response.data);
       } else {
         setError(t('detail.not_found'));
       }
