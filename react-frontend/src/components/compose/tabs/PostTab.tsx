@@ -4,46 +4,126 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * PostTab — text post + image upload form for the Compose Hub.
+ * PostTab — rich text post creation with multi-image upload, emoji picker,
+ * voice input, link preview, character count, and draft persistence.
  */
 
-import { useState } from 'react';
-import { Button, Textarea, Avatar } from '@heroui/react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { Button, Avatar } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
+import { useDraftPersistence } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { ImageUploader } from '../shared/ImageUploader';
+import { ComposeEditor } from '../shared/ComposeEditor';
+import type { ComposeEditorHandle } from '../shared/ComposeEditor';
+import { MultiImageUploader } from '../shared/MultiImageUploader';
+import { EmojiPicker } from '../shared/EmojiPicker';
+import { VoiceInput } from '../shared/VoiceInput';
+import { CharacterCount } from '../shared/CharacterCount';
+import { LinkPreview } from '../shared/LinkPreview';
 import type { TabSubmitProps } from '../types';
 
-export function PostTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
+const MAX_CONTENT_CHARS = 5000;
+
+interface PostDraft {
+  htmlContent: string;
+  plainText: string;
+}
+
+export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmitProps) {
   const { t } = useTranslation('feed');
   const { user } = useAuth();
   const toast = useToast();
-  const [content, setContent] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const editorRef = useRef<ComposeEditorHandle>(null);
+
+  const [draft, setDraft, clearDraft] = useDraftPersistence<PostDraft>(
+    'compose-draft-post',
+    { htmlContent: '', plainText: '' },
+  );
+
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const canSubmit = content.trim().length > 0 || imageFile !== null;
+  // Apply template data when selected from TemplatePicker
+  useEffect(() => {
+    if (templateData) {
+      setDraft((prev) => ({
+        ...prev,
+        htmlContent: templateData.content,
+        plainText: templateData.content,
+      }));
+    }
+  }, [templateData, setDraft]);
+
+  const canSubmit = draft.plainText.trim().length > 0 || imageFiles.length > 0;
+
+  const handleHtmlChange = useCallback(
+    (html: string) => setDraft((prev) => ({ ...prev, htmlContent: html })),
+    [setDraft],
+  );
+
+  const handlePlainTextChange = useCallback(
+    (text: string) => setDraft((prev) => ({ ...prev, plainText: text })),
+    [setDraft],
+  );
+
+  const handleEmojiSelect = useCallback(
+    (emoji: string) => {
+      // Insert emoji at cursor position via Lexical's editor API
+      editorRef.current?.insertText(emoji);
+    },
+    [],
+  );
+
+  const handleVoiceTranscript = useCallback(
+    (text: string) => {
+      // Insert voice transcript at cursor position via Lexical's editor API
+      editorRef.current?.insertText(text);
+    },
+    [],
+  );
+
+  // Multi-image handlers
+  const handleImageAdd = useCallback((file: File, preview: string) => {
+    setImageFiles((prev) => [...prev, file]);
+    setImagePreviews((prev) => [...prev, preview]);
+  }, []);
+
+  const handleImageRemove = useCallback((index: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const handleImageReorder = useCallback((files: File[], previews: string[]) => {
+    setImageFiles(files);
+    setImagePreviews(previews);
+  }, []);
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
     setIsSubmitting(true);
     try {
-      if (imageFile) {
-        // Use api.upload() for multipart/form-data — api.post() would
-        // JSON.stringify the FormData and destroy the file payload.
+      // Decide content: use HTML if it's rich, plain text otherwise
+      const contentToSend = draft.htmlContent || draft.plainText.trim();
+
+      if (imageFiles.length > 0) {
         const formData = new FormData();
-        formData.append('content', content.trim());
+        formData.append('content', contentToSend);
         formData.append('visibility', 'public');
-        formData.append('image', imageFile);
         if (groupId) formData.append('group_id', String(groupId));
+
+        // Append all images
+        imageFiles.forEach((file, i) => {
+          formData.append(i === 0 ? 'image' : `image_${i}`, file);
+        });
 
         const res = await api.upload('/social/create-post', formData);
         if (res.success) {
+          clearDraft();
           toast.success(t('compose.post_created'));
           onClose();
           onSuccess('post');
@@ -52,11 +132,12 @@ export function PostTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
         }
       } else {
         const res = await api.post('/v2/feed/posts', {
-          content: content.trim(),
+          content: contentToSend,
           visibility: 'public',
           ...(groupId ? { group_id: groupId } : {}),
         });
         if (res.success) {
+          clearDraft();
           toast.success(t('compose.post_created'));
           onClose();
           onSuccess('post');
@@ -74,53 +155,68 @@ export function PostTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
 
   return (
     <div className="space-y-4">
+      {/* Avatar + Rich text editor */}
       <div className="flex items-start gap-3">
         <Avatar
           name={user?.first_name || 'You'}
           src={resolveAvatarUrl(user?.avatar)}
           size="sm"
-          className="mt-1"
+          className="mt-1 flex-shrink-0"
           isBordered
         />
-        <Textarea
-          placeholder={t('whats_on_your_mind')}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          minRows={3}
-          maxRows={8}
-          classNames={{
-            input: 'bg-transparent text-[var(--text-primary)] text-base',
-            inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
-          }}
-        />
+        <div className="flex-1 min-w-0">
+          <ComposeEditor
+            ref={editorRef}
+            value={draft.htmlContent}
+            onChange={handleHtmlChange}
+            onPlainTextChange={handlePlainTextChange}
+            placeholder={t('whats_on_your_mind')}
+            maxLength={MAX_CONTENT_CHARS}
+          />
+          <CharacterCount current={draft.plainText.length} max={MAX_CONTENT_CHARS} />
+        </div>
       </div>
 
-      <div className="pl-11">
-        <ImageUploader
-          file={imageFile}
-          preview={imagePreview}
-          onSelect={(f, p) => { setImageFile(f); setImagePreview(p); }}
-          onRemove={() => { setImageFile(null); setImagePreview(null); }}
-          onError={(msg) => toast.error(msg)}
-        />
-      </div>
+      {/* Link preview */}
+      <LinkPreview content={draft.plainText} />
 
-      <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
-        <Button
-          variant="flat"
-          onPress={onClose}
-          className="text-[var(--text-muted)]"
-        >
-          {t('compose.cancel')}
-        </Button>
-        <Button
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
-          onPress={handleSubmit}
-          isLoading={isSubmitting}
-          isDisabled={!canSubmit}
-        >
-          {t('compose.post_button')}
-        </Button>
+      {/* Multi-image uploader */}
+      <MultiImageUploader
+        files={imageFiles}
+        previews={imagePreviews}
+        onAdd={handleImageAdd}
+        onRemove={handleImageRemove}
+        onReorder={handleImageReorder}
+        maxImages={4}
+        onError={(msg) => toast.error(msg)}
+      />
+
+      {/* Toolbar + submit row */}
+      <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center gap-1">
+          <EmojiPicker onSelect={handleEmojiSelect} />
+          <VoiceInput onTranscript={handleVoiceTranscript} />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="flat"
+            size="sm"
+            onPress={onClose}
+            className="text-[var(--text-muted)]"
+          >
+            {t('compose.cancel')}
+          </Button>
+          <Button
+            size="sm"
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
+            onPress={handleSubmit}
+            isLoading={isSubmitting}
+            isDisabled={!canSubmit}
+          >
+            {t('compose.post_button')}
+          </Button>
+        </div>
       </div>
     </div>
   );

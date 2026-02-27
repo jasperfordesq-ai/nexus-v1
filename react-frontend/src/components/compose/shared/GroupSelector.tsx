@@ -59,8 +59,8 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
   if (isLoading) {
     return (
       <div className="flex gap-2">
-        <Skeleton className="h-8 w-24 rounded-full" />
-        <Skeleton className="h-8 w-32 rounded-full" />
+        <Skeleton className="h-11 w-24 rounded-full" />
+        <Skeleton className="h-11 w-32 rounded-full" />
       </div>
     );
   }

@@ -201,7 +201,7 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
           onChange={setExpiresAt}
           granularity="day"
           classNames={{
-            inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
+            inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
           }}
           description={t('compose.poll_no_deadline')}
         />
@@ -223,7 +223,7 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
           </Button>
           <Button
             size="sm"
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
+            className="bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/20"
             onPress={handleSubmit}
             isLoading={isSubmitting}
             isDisabled={!canSubmit}
