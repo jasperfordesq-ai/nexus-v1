@@ -316,6 +316,20 @@ class TenantContext
     }
 
     /**
+     * Get the tenant slug prefix for building frontend URLs (e.g. "/hour-timebank").
+     * Unlike getBasePath(), this always derives the prefix from the tenant slug,
+     * so it works correctly even in API contexts where basePath is empty.
+     *
+     * @return string The slug prefix (e.g. "/hour-timebank") or empty string for master tenant
+     */
+    public static function getSlugPrefix(): string
+    {
+        $tenant = self::get();
+        $slug = $tenant['slug'] ?? '';
+        return $slug ? '/' . $slug : '';
+    }
+
+    /**
      * Get a setting from tenant configuration
      *
      * @param string $key The configuration key (supports dot notation for nested values)

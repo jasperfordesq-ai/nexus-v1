@@ -72,7 +72,7 @@ class VolunteeringController
                 $subject = "Organization Approved: " . $org['name'];
 
                 // Construct Absolute URL
-                $dashboardLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/volunteering/dashboard";
+                $dashboardLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/volunteering/dashboard";
 
                 $body = "<h2>Organization Approved</h2><p>Congratulations! Your organization <strong>" . htmlspecialchars($org['name']) . "</strong> has been approved. You can now post opportunities and manage your profile.</p><p><a href='" . $dashboardLink . "'>Go to Dashboard</a></p>";
                 $mailer->send($user['email'], $subject, $body);

@@ -372,7 +372,7 @@ class AdminUsersApiController extends BaseApiController
                 try {
                     $tenant = TenantContext::get();
                     $tenantName = $tenant['name'] ?? 'Project NEXUS';
-                    $loginLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/login";
+                    $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
 
                     $html = \Nexus\Core\EmailTemplate::render(
                         "Your Account Has Been Created",
@@ -1358,7 +1358,7 @@ class AdminUsersApiController extends BaseApiController
 
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            $resetLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/reset-password?token={$token}&email=" . urlencode($user['email']);
+            $resetLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/reset-password?token={$token}&email=" . urlencode($user['email']);
 
             $html = \Nexus\Core\EmailTemplate::render(
                 "Password Reset",
@@ -1423,7 +1423,7 @@ class AdminUsersApiController extends BaseApiController
                 <p>Log in to start connecting with your community, browse available services, and offer your own skills.</p>";
             }
 
-            $loginLink = TenantContext::getFrontendUrl() . TenantContext::getBasePath() . "/login";
+            $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
 
             if (stripos($mainMessage, '<!DOCTYPE') !== false || stripos($mainMessage, '<html') !== false) {
                 $html = $mainMessage;
