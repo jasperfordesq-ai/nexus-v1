@@ -110,40 +110,37 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
       // Decide content: use HTML if it's rich, plain text otherwise
       const contentToSend = draft.htmlContent || draft.plainText.trim();
 
+      let res;
+
       if (imageFiles.length > 0) {
+        // Use multipart/form-data when images are attached
         const formData = new FormData();
         formData.append('content', contentToSend);
         formData.append('visibility', 'public');
         if (groupId) formData.append('group_id', String(groupId));
 
-        // Append all images
+        // Append all images (primary + extras for future multi-image support)
         imageFiles.forEach((file, i) => {
           formData.append(i === 0 ? 'image' : `image_${i}`, file);
         });
 
-        const res = await api.upload('/social/create-post', formData);
-        if (res.success) {
-          clearDraft();
-          toast.success(t('compose.post_created'));
-          onClose();
-          onSuccess('post');
-        } else {
-          toast.error(t('compose.post_failed'));
-        }
+        res = await api.upload('/v2/feed/posts', formData);
       } else {
-        const res = await api.post('/v2/feed/posts', {
+        // JSON for text-only posts
+        res = await api.post('/v2/feed/posts', {
           content: contentToSend,
           visibility: 'public',
           ...(groupId ? { group_id: groupId } : {}),
         });
-        if (res.success) {
-          clearDraft();
-          toast.success(t('compose.post_created'));
-          onClose();
-          onSuccess('post');
-        } else {
-          toast.error(t('compose.post_failed'));
-        }
+      }
+
+      if (res.success) {
+        clearDraft();
+        toast.success(t('compose.post_created'));
+        onClose();
+        onSuccess('post');
+      } else {
+        toast.error(t('compose.post_failed'));
       }
     } catch (err) {
       logError('Failed to create post', err);
