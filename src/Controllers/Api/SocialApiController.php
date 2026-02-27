@@ -97,13 +97,16 @@ class SocialApiController extends BaseApiController
      * POST /api/v2/feed/posts
      * Create a new feed post
      *
-     * Request Body (JSON):
+     * Request Body (JSON or multipart/form-data):
      * {
      *   "content": "string",
      *   "image_url": "string (optional)",
      *   "visibility": "public|private (default: public)",
      *   "group_id": "int (optional)"
      * }
+     *
+     * When sent as multipart/form-data, accepts file field "image" for upload.
+     * The uploaded image is validated and saved; the resulting URL is set as image_url.
      */
     public function createPostV2(): void
     {
@@ -112,6 +115,14 @@ class SocialApiController extends BaseApiController
         $this->rateLimit('feed_create', 20, 60);
 
         $data = $this->getAllInput();
+
+        // Handle image upload if present (multipart/form-data)
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $imageUrl = $this->handleImageUpload($_FILES['image']);
+            if ($imageUrl) {
+                $data['image_url'] = $imageUrl;
+            }
+        }
 
         $postId = FeedService::createPost($userId, $data);
 

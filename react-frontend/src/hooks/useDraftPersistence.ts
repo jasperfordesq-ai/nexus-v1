@@ -57,7 +57,16 @@ export function useDraftPersistence<T>(
     }
     debounceRef.current = setTimeout(() => {
       try {
-        localStorage.setItem(keyRef.current, JSON.stringify(val));
+        const serialized = JSON.stringify(val);
+        // Skip persistence for empty/default drafts to avoid localStorage bloat.
+        // Also guard against extremely large drafts (>100KB) that could cause
+        // quota issues on mobile browsers with limited localStorage.
+        if (serialized === JSON.stringify(initialValueRef.current)) {
+          localStorage.removeItem(keyRef.current);
+        } else if (serialized.length <= 100_000) {
+          localStorage.setItem(keyRef.current, serialized);
+        }
+        // If >100KB, silently skip — the draft is still in React state
       } catch {
         // Quota exceeded or localStorage unavailable — silently fail
       }
