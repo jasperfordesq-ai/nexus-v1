@@ -195,10 +195,18 @@ class ListingService
      *
      * @param int $id Listing ID
      * @param bool $includeDeleted Include soft-deleted listings
+     * @param int|null $currentUserId If provided, attaches is_favorited field
      * @return array|null Listing data or null if not found
      */
-    public static function getById(int $id, bool $includeDeleted = false): ?array
+    public static function getById(int $id, bool $includeDeleted = false, ?int $currentUserId = null): ?array
     {
+        $favSelect = $currentUserId
+            ? ', IF(usl.id IS NOT NULL, 1, 0) AS is_favorited'
+            : ', 0 AS is_favorited';
+        $favJoin = $currentUserId
+            ? ' LEFT JOIN user_saved_listings usl ON usl.listing_id = l.id AND usl.user_id = ? AND usl.tenant_id = l.tenant_id'
+            : '';
+
         $sql = "SELECT l.*,
                        CASE
                            WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
@@ -207,20 +215,26 @@ class ListingService
                        END as author_name,
                        u.avatar_url as author_avatar, u.email as author_email,
                        c.name as category_name, c.color as category_color
+                       {$favSelect}
                 FROM listings l
                 JOIN users u ON l.user_id = u.id
                 LEFT JOIN categories c ON l.category_id = c.id
+                {$favJoin}
                 WHERE l.id = ?";
 
         if (!$includeDeleted) {
             $sql .= " AND (l.status IS NULL OR l.status != 'deleted')";
         }
 
-        $listing = Database::query($sql, [$id])->fetch(\PDO::FETCH_ASSOC);
+        $params = $currentUserId ? [$currentUserId, $id] : [$id];
+        $listing = Database::query($sql, $params)->fetch(\PDO::FETCH_ASSOC);
 
         if (!$listing) {
             return null;
         }
+
+        // Cast is_favorited to bool
+        $listing['is_favorited'] = (bool)($listing['is_favorited'] ?? false);
 
         // Add attributes
         $listing['attributes'] = self::getAttributes($id);
