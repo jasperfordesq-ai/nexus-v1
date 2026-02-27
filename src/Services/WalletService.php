@@ -342,10 +342,14 @@ class WalletService
         $users = User::searchForWallet($query, $userId, $limit);
 
         return array_map(function ($user) {
+            $name = $user['display_name'] ?? $user['name'] ?? '';
+            $nameParts = explode(' ', $name, 2);
             return [
                 'id' => (int)$user['id'],
                 'username' => $user['username'] ?? null,
-                'name' => $user['display_name'] ?? $user['name'] ?? null,
+                'name' => $name,
+                'first_name' => $user['first_name'] ?? $nameParts[0] ?? null,
+                'last_name' => $user['last_name'] ?? $nameParts[1] ?? null,
                 'avatar_url' => $user['avatar_url'] ?? null,
             ];
         }, $users);

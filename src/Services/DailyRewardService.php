@@ -113,10 +113,14 @@ class DailyRewardService
         $streak = StreakService::getStreak($userId, 'login');
 
         return [
-            'claimed' => (bool)$reward,
+            'claimed' => (bool)$reward,          // keep for compat
+            'claimed_today' => (bool)$reward,    // alias React expects
             'reward' => $reward,
+            'reward_xp' => (int)($reward['xp_earned'] ?? $reward['xp_amount'] ?? $reward['amount'] ?? 10),
             'current_streak' => $streak['current'] ?? 0,
             'longest_streak' => $streak['longest'] ?? 0,
+            'next_reward_xp' => null,            // React renders conditionally
+            'next_claim_at' => null,             // React renders conditionally
         ];
     }
 

@@ -187,6 +187,11 @@ class ListingService
         // Add attributes
         $listing['attributes'] = self::getAttributes($id);
 
+        // Add estimated_hours (may not exist in all tenants — React uses conditional rendering)
+        if (!array_key_exists('estimated_hours', $listing)) {
+            $listing['estimated_hours'] = null;
+        }
+
         // Add like count
         $likeCount = Database::query(
             "SELECT COUNT(*) as cnt FROM likes WHERE target_type = 'listing' AND target_id = ?",
