@@ -95,16 +95,26 @@ class ReviewsApiController extends BaseApiController
 
         // Format reviews
         $formattedReviews = array_map(function ($r) {
+            // Split reviewer_name into first/last if discrete columns are not available
+            $nameParts = explode(' ', $r['reviewer_name'] ?? '', 2);
+            $firstName = $r['reviewer_first_name'] ?? ($nameParts[0] ?? $r['reviewer_name']);
+            $lastName  = $r['reviewer_last_name']  ?? ($nameParts[1] ?? '');
+
             return [
-                'id' => (int)$r['id'],
-                'rating' => (int)$r['rating'],
-                'comment' => $r['comment'],
-                'review_type' => $r['review_type'] ?? 'local',
-                'is_anonymous' => (bool)($r['is_anonymous'] ?? false),
+                'id'            => (int)$r['id'],
+                'rating'        => (int)$r['rating'],
+                'comment'       => $r['comment'],
+                'review_type'   => $r['review_type'] ?? 'local',
+                'is_anonymous'  => (bool)($r['is_anonymous'] ?? false),
+                'listing_title' => $r['listing_title'] ?? null,
                 'reviewer' => [
-                    'name' => $r['reviewer_name'],
-                    'avatar_url' => $r['reviewer_avatar'] ?? null,
-                    'timebank' => $r['reviewer_timebank'] ?? null,
+                    'id'         => (int)($r['reviewer_id'] ?? 0),
+                    'name'       => $r['reviewer_name'],          // backward compat
+                    'first_name' => $firstName,
+                    'last_name'  => $lastName,
+                    'avatar'     => $r['reviewer_avatar'] ?? null, // React expects 'avatar'
+                    'avatar_url' => $r['reviewer_avatar'] ?? null, // backward compat
+                    'timebank'   => $r['reviewer_timebank'] ?? null,
                 ],
                 'created_at' => $r['created_at'],
             ];

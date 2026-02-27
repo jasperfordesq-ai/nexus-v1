@@ -241,10 +241,7 @@ export function FeedPage() {
 
   const handleDeletePost = async (item: FeedItem) => {
     try {
-      await api.post('/social/delete', {
-        target_type: item.type,
-        target_id: item.id,
-      });
+      await api.post(`/v2/feed/posts/${item.id}/delete`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
       toast.success(t('toast.deleted'));
     } catch (err) {

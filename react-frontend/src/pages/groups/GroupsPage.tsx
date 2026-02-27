@@ -40,7 +40,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 export function GroupsPage() {
   const { t } = useTranslation('groups');
   usePageTitle(t('title'));
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,6 +50,7 @@ export function GroupsPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [cursor, setCursor] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [filter, setFilter] = useState<GroupFilter>('all');
@@ -81,12 +82,21 @@ export function GroupsPage() {
         setIsLoadingMore(true);
       }
 
-      const offset = append ? groups.length : 0;
       const params = new URLSearchParams();
       if (debouncedQuery) params.set('q', debouncedQuery);
-      if (filter !== 'all') params.set('filter', filter);
-      params.set('limit', String(ITEMS_PER_PAGE));
-      params.set('offset', String(offset));
+      // Map the UI filter value to the PHP-supported query params
+      if (filter === 'public') {
+        params.set('visibility', 'public');
+      } else if (filter === 'private') {
+        params.set('visibility', 'private');
+      } else if (filter === 'joined' && user?.id) {
+        params.set('user_id', String(user.id));
+      }
+      params.set('per_page', String(ITEMS_PER_PAGE));
+      // Cursor-based pagination: only send cursor when loading more pages
+      if (append && cursor) {
+        params.set('cursor', cursor);
+      }
 
       const response = await api.get<Group[]>(`/v2/groups?${params}`);
       if (response.success && response.data) {
@@ -95,7 +105,14 @@ export function GroupsPage() {
         } else {
           setGroups(response.data);
         }
-        setHasMore(response.data.length >= ITEMS_PER_PAGE);
+        // Prefer server-reported has_more; fall back to length heuristic
+        const nextCursor = response.meta?.cursor ?? response.meta?.next_cursor ?? null;
+        setCursor(nextCursor);
+        if (response.meta !== undefined) {
+          setHasMore(response.meta.has_more);
+        } else {
+          setHasMore(response.data.length >= ITEMS_PER_PAGE);
+        }
       } else {
         if (!append) {
           setError('Failed to load groups. Please try again.');
@@ -112,10 +129,11 @@ export function GroupsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, filter, groups.length]);
+  }, [debouncedQuery, filter, cursor, user?.id]);
 
-  // Load groups when filter or debounced query changes
+  // Load groups when filter or debounced query changes; reset cursor for a fresh page-1 fetch
   useEffect(() => {
+    setCursor(null);
     loadGroups();
     setHasMore(true);
   }, [debouncedQuery, filter]); // eslint-disable-line react-hooks/exhaustive-deps
