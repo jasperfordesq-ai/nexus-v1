@@ -340,6 +340,12 @@ class AdminContentApiController extends BaseApiController
             return;
         }
 
+        // Remove any menu items referencing this page before deleting it
+        Database::query(
+            "DELETE FROM menu_items WHERE page_id = ?",
+            [$id]
+        );
+
         Database::query(
             "DELETE FROM pages WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
