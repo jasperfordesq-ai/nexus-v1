@@ -9,3 +9,4 @@ export { useApiErrorHandler } from './useApiErrorHandler';
 export { usePageTitle } from './usePageTitle';
 export { useMenus } from './useMenus';
 export { useMediaQuery } from './useMediaQuery';
+export { useDraftPersistence } from './useDraftPersistence';

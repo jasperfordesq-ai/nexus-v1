@@ -50,6 +50,14 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
   // Track plain text separately for char count / submit validation
   const [plainText, setPlainText] = useState(draft.plainText);
 
+  // Apply template data when selected from TemplatePicker
+  useEffect(() => {
+    if (templateData) {
+      setDraft({ html: `<p>${templateData.content}</p>`, plainText: templateData.content });
+      setPlainText(templateData.content);
+    }
+  }, [templateData, setDraft]);
+
   const canSubmit = plainText.trim().length > 0 || imageFiles.length > 0;
 
   const handleHtmlChange = useCallback(

@@ -13,7 +13,7 @@
  * capabilities of the legacy PHP /compose page.
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   Modal,
   ModalContent,
@@ -43,6 +43,7 @@ import { ListingTab } from './tabs/ListingTab';
 import { EventTab } from './tabs/EventTab';
 import { GoalTab } from './tabs/GoalTab';
 import { GroupSelector } from './shared/GroupSelector';
+import { TemplatePicker } from './shared/TemplatePicker';
 import type { ComposeHubProps, ComposeTab, ComposeTabConfig } from './types';
 
 const ALL_TABS: ComposeTabConfig[] = [
@@ -66,7 +67,14 @@ export function ComposeHub({
   const { hasFeature, hasModule } = useTenant();
   const [activeTab, setActiveTab] = useState<ComposeTab>(defaultTab);
   const [sharedGroupId, setSharedGroupId] = useState<number | null>(groupId ?? null);
+  const [templateData, setTemplateData] = useState<{ title?: string; content: string } | null>(null);
   const isMobile = useMediaQuery('(max-width: 639px)');
+
+  const handleTemplateSelect = useCallback((data: { title?: string; content: string }) => {
+    setTemplateData(data);
+    // Clear after a tick so tabs can consume it
+    setTimeout(() => setTemplateData(null), 0);
+  }, []);
 
   const tabs = useMemo(() => {
     return ALL_TABS.filter((tab) => {
@@ -93,6 +101,7 @@ export function ComposeHub({
     onSuccess: handleSuccess,
     onClose: handleClose,
     groupId: sharedGroupId,
+    templateData,
   };
 
   /** Shared header — title + HeroUI Tabs with proper a11y */
@@ -110,9 +119,10 @@ export function ComposeHub({
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
           <ActiveIcon className="w-4 h-4 text-white" aria-hidden="true" />
         </div>
-        <span className="font-semibold">
+        <span className="font-semibold flex-1">
           {t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
         </span>
+        <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />
       </div>
 
       {/* HeroUI Tabs — semantic role="tab", keyboard arrow-key nav, aria-selected */}

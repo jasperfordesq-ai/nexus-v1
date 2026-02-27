@@ -717,7 +717,11 @@ class FeedService
     {
         self::$errors = [];
 
-        $content = trim($data['content'] ?? '');
+        $rawContent = trim($data['content'] ?? '');
+        // Sanitize HTML if present, otherwise use plain text
+        $content = HtmlSanitizer::containsHtml($rawContent)
+            ? HtmlSanitizer::sanitize($rawContent)
+            : $rawContent;
         $imageUrl = $data['image_url'] ?? null;
         $visibility = $data['visibility'] ?? 'public';
         $groupId = (int)($data['group_id'] ?? 0);

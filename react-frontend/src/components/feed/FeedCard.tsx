@@ -55,6 +55,7 @@ import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
 import type { FeedItem, FeedComment, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
+import { FeedContentRenderer } from './FeedContentRenderer';
 
 /* ───────────────────────── Props ───────────────────────── */
 
@@ -447,17 +448,11 @@ const FeedCard = React.memo(function FeedCard({
               <p className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">{item.title}</p>
             )
           )}
-          <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">
-            {item.content}
-            {item.content_truncated && detailPath && (
-              <Link
-                to={tenantPath(detailPath)}
-                className="text-[var(--color-primary)] hover:underline ml-1 font-medium"
-              >
-                {t('card.read_more')}
-              </Link>
-            )}
-          </p>
+          <FeedContentRenderer
+            content={item.content}
+            truncated={item.content_truncated}
+            detailPath={detailPath ? tenantPath(detailPath) : undefined}
+          />
         </div>
 
         {/* Event metadata */}

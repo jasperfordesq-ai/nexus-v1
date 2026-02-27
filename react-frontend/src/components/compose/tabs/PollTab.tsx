@@ -5,47 +5,90 @@
 
 /**
  * PollTab — poll creation form with question, options, and end date.
+ * Now with character count, draft persistence, and emoji picker.
  */
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Button, Input, Avatar, DatePicker } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
+import { useDraftPersistence } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { CharacterCount } from '../shared/CharacterCount';
+import { EmojiPicker } from '../shared/EmojiPicker';
 import type { TabSubmitProps } from '../types';
 
-export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
+const MAX_QUESTION_CHARS = 500;
+
+interface PollDraft {
+  question: string;
+  options: string[];
+}
+
+export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmitProps) {
   const { t } = useTranslation('feed');
   const { user } = useAuth();
   const toast = useToast();
-  const [question, setQuestion] = useState('');
-  const [options, setOptions] = useState<string[]>(['', '']);
+
+  const [draft, setDraft, clearDraft] = useDraftPersistence<PollDraft>(
+    'compose-draft-poll',
+    { question: '', options: ['', ''] },
+  );
+
   const [expiresAt, setExpiresAt] = useState<DateInputValue | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validOptions = options.filter((o) => o.trim().length > 0);
-  const canSubmit = question.trim().length > 0 && validOptions.length >= 2;
+  // Apply template data when selected from TemplatePicker
+  useEffect(() => {
+    if (templateData) {
+      setDraft((prev) => ({ ...prev, question: templateData.content }));
+    }
+  }, [templateData, setDraft]);
+
+  const validOptions = draft.options.filter((o) => o.trim().length > 0);
+  const canSubmit = draft.question.trim().length > 0 && validOptions.length >= 2;
+
+  const setQuestion = useCallback(
+    (q: string) => setDraft((prev) => ({ ...prev, question: q })),
+    [setDraft],
+  );
 
   const addOption = () => {
-    if (options.length < 6) setOptions([...options, '']);
+    if (draft.options.length < 6) {
+      setDraft((prev) => ({ ...prev, options: [...prev.options, ''] }));
+    }
   };
 
   const updateOption = (index: number, value: string) => {
-    const updated = [...options];
-    updated[index] = value;
-    setOptions(updated);
+    setDraft((prev) => {
+      const updated = [...prev.options];
+      updated[index] = value;
+      return { ...prev, options: updated };
+    });
   };
 
   const removeOption = (index: number) => {
-    if (options.length > 2) setOptions(options.filter((_, i) => i !== index));
+    if (draft.options.length > 2) {
+      setDraft((prev) => ({
+        ...prev,
+        options: prev.options.filter((_, i) => i !== index),
+      }));
+    }
   };
 
+  const handleEmojiSelect = useCallback(
+    (emoji: string) => {
+      setDraft((prev) => ({ ...prev, question: prev.question + emoji }));
+    },
+    [setDraft],
+  );
+
   const handleSubmit = async () => {
-    if (!question.trim()) {
+    if (!draft.question.trim()) {
       toast.error(t('compose.poll_question_required'));
       return;
     }
@@ -57,7 +100,7 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
     setIsSubmitting(true);
     try {
       const payload: Record<string, unknown> = {
-        question: question.trim(),
+        question: draft.question.trim(),
         options: validOptions.map((o) => o.trim()),
       };
 
@@ -70,6 +113,7 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
 
       const res = await api.post('/v2/feed/polls', payload);
       if (res.success) {
+        clearDraft();
         toast.success(t('compose.poll_created'));
         onClose();
         onSuccess('poll');
@@ -94,19 +138,22 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           className="mt-1"
           isBordered
         />
-        <Input
-          placeholder={t('compose.poll_question_placeholder')}
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          classNames={{
-            input: 'bg-transparent text-[var(--text-primary)] text-base',
-            inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
-          }}
-        />
+        <div className="flex-1">
+          <Input
+            placeholder={t('compose.poll_question_placeholder')}
+            value={draft.question}
+            onChange={(e) => setQuestion(e.target.value)}
+            classNames={{
+              input: 'bg-transparent text-[var(--text-primary)] text-base',
+              inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
+            }}
+          />
+          <CharacterCount current={draft.question.length} max={MAX_QUESTION_CHARS} />
+        </div>
       </div>
 
       <div className="space-y-2 pl-0 sm:pl-11">
-        {options.map((opt, index) => (
+        {draft.options.map((opt, index) => (
           <div key={index} className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full border-2 border-[var(--border-default)] flex-shrink-0 flex items-center justify-center text-[10px] text-[var(--text-subtle)] font-medium">
               {index + 1}
@@ -121,7 +168,7 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
                 inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
               }}
             />
-            {options.length > 2 && (
+            {draft.options.length > 2 && (
               <Button
                 isIconOnly
                 size="sm"
@@ -136,7 +183,7 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           </div>
         ))}
 
-        {options.length < 6 && (
+        {draft.options.length < 6 && (
           <Button
             size="sm"
             variant="flat"
@@ -160,22 +207,30 @@ export function PollTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
         />
       </div>
 
-      <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
-        <Button
-          variant="flat"
-          onPress={onClose}
-          className="text-[var(--text-muted)]"
-        >
-          {t('compose.cancel')}
-        </Button>
-        <Button
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
-          onPress={handleSubmit}
-          isLoading={isSubmitting}
-          isDisabled={!canSubmit}
-        >
-          {t('compose.create_poll')}
-        </Button>
+      <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center gap-1">
+          <EmojiPicker onSelect={handleEmojiSelect} />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="flat"
+            size="sm"
+            onPress={onClose}
+            className="text-[var(--text-muted)]"
+          >
+            {t('compose.cancel')}
+          </Button>
+          <Button
+            size="sm"
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
+            onPress={handleSubmit}
+            isLoading={isSubmitting}
+            isDisabled={!canSubmit}
+          >
+            {t('compose.create_poll')}
+          </Button>
+        </div>
       </div>
     </div>
   );
