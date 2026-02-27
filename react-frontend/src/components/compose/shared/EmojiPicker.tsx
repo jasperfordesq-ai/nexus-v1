@@ -24,6 +24,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState(EMOJI_CATEGORIES[0].key);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -60,6 +61,9 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
 
   const handleEmojiClick = (emoji: string) => {
     onSelect(emoji);
+    // Move focus back to the trigger before closing to prevent
+    // aria-hidden from trapping focus inside the popover (HeroUI bug)
+    triggerRef.current?.focus();
     setIsOpen(false);
     setSearch('');
   };
@@ -74,16 +78,19 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
   };
 
   const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
     if (!open) {
+      // Return focus to trigger before closing to avoid aria-hidden focus trap
+      triggerRef.current?.focus();
       setSearch('');
     }
+    setIsOpen(open);
   };
 
   return (
     <Popover isOpen={isOpen} onOpenChange={handleOpenChange} placement="top">
       <PopoverTrigger>
         <Button
+          ref={triggerRef}
           isIconOnly
           size="sm"
           variant="light"
