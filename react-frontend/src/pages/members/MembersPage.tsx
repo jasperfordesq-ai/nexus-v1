@@ -150,7 +150,7 @@ export function MembersPage() {
         } else {
           setMembers(response.data);
         }
-        setHasMore(response.data.length >= ITEMS_PER_PAGE);
+        setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
 
         // Get total count from response meta if available
         if (response.meta?.total_items !== undefined) {
