@@ -29,6 +29,7 @@ import {
   Calendar,
   Target,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { PostTab } from './tabs/PostTab';
 import { PollTab } from './tabs/PollTab';
@@ -55,6 +56,7 @@ export function ComposeHub({
   onSuccess,
   groupId,
 }: ComposeHubProps) {
+  const { t } = useTranslation('feed');
   const { hasFeature, hasModule } = useTenant();
   const [activeTab, setActiveTab] = useState<ComposeTab>(defaultTab);
   const [sharedGroupId, setSharedGroupId] = useState<number | null>(groupId ?? null);
@@ -109,7 +111,7 @@ export function ComposeHub({
                 <ActiveIcon className="w-4 h-4 text-white" aria-hidden="true" />
               </div>
               <span className="font-semibold">
-                Create {activeConfig?.label || 'Post'}
+                {t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
               </span>
             </div>
 
@@ -131,7 +133,7 @@ export function ComposeHub({
                     onClick={() => setActiveTab(tab.key)}
                     startContent={<Icon className="w-3 h-3" aria-hidden="true" />}
                   >
-                    {tab.label}
+                    {t(`compose.tab_${tab.key}`)}
                   </Chip>
                 );
               })}

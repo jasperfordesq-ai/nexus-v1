@@ -12,7 +12,8 @@ import { useState } from 'react';
 import { Button, Input, Textarea, DatePicker, TimeInput } from '@heroui/react';
 import type { DateInputValue, TimeInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
-import { useToast, useTenant } from '@/contexts';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PlaceAutocompleteInput } from '@/components/location';
@@ -37,8 +38,8 @@ function toIsoString(date: DateInputValue, time: TimeInputValue | null): string 
 }
 
 export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
+  const { t } = useTranslation('feed');
   const toast = useToast();
-  const { tenantPath } = useTenant();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState<DateInputValue | null>(null);
@@ -55,11 +56,11 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      toast.error('Please enter an event title');
+      toast.error(t('compose.event_title_required'));
       return;
     }
     if (!startDate) {
-      toast.error('Please select a start date');
+      toast.error(t('compose.event_date_required'));
       return;
     }
 
@@ -79,18 +80,15 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
 
       const res = await api.post<{ id: number }>('/v2/events', payload);
       if (res.success) {
-        const id = res.data?.id;
-        toast.success(
-          id
-            ? `Event created! View it at ${tenantPath(`/events/${id}`)}`
-            : 'Event created!'
-        );
+        toast.success(t('compose.event_created'));
         onClose();
-        onSuccess('event', id);
+        onSuccess('event', res.data?.id);
+      } else {
+        toast.error(t('compose.event_failed'));
       }
     } catch (err) {
       logError('Failed to create event', err);
-      toast.error('Failed to create event');
+      toast.error(t('compose.event_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -99,8 +97,8 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
   return (
     <div className="space-y-4">
       <Input
-        label="Event Title"
-        placeholder="What's happening?"
+        label={t('compose.event_title_label')}
+        placeholder={t('compose.event_title_placeholder')}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         isRequired
@@ -109,8 +107,8 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
 
       <div>
         <Textarea
-          label="Description"
-          placeholder="Tell people about this event..."
+          label={t('compose.description_label')}
+          placeholder={t('compose.event_desc_placeholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           minRows={2}
@@ -128,7 +126,7 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <DatePicker
-          label="Start Date"
+          label={t('compose.start_date_label')}
           value={startDate}
           onChange={setStartDate}
           granularity="day"
@@ -139,7 +137,7 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           }}
         />
         <TimeInput
-          label="Start Time"
+          label={t('compose.start_time_label')}
           value={startTime}
           onChange={setStartTime}
           classNames={{
@@ -150,7 +148,7 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <DatePicker
-          label="End Date (optional)"
+          label={t('compose.end_date_label')}
           value={endDate}
           onChange={setEndDate}
           granularity="day"
@@ -160,7 +158,7 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           }}
         />
         <TimeInput
-          label="End Time"
+          label={t('compose.end_time_label')}
           value={endTime}
           onChange={setEndTime}
           classNames={{
@@ -170,8 +168,8 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
       </div>
 
       <PlaceAutocompleteInput
-        label="Location (optional)"
-        placeholder="Start typing an address..."
+        label={t('compose.location_label')}
+        placeholder={t('compose.location_placeholder')}
         value={location}
         onPlaceSelect={(place) => {
           setLocation(place.formattedAddress);
@@ -189,7 +187,7 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           onPress={onClose}
           className="text-[var(--text-muted)]"
         >
-          Cancel
+          {t('compose.cancel')}
         </Button>
         <Button
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
@@ -197,7 +195,7 @@ export function EventTab({ onSuccess, onClose, groupId }: TabSubmitProps) {
           isLoading={isSubmitting}
           isDisabled={!canSubmit}
         >
-          Create Event
+          {t('compose.create_event')}
         </Button>
       </div>
     </div>

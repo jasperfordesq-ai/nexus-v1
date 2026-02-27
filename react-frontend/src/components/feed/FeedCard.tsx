@@ -47,6 +47,7 @@ import {
   MapPin,
   ArrowRight,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -112,6 +113,7 @@ interface CommentItemProps {
 }
 
 export function CommentItem({ comment }: CommentItemProps) {
+  const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
   const [showReplies, setShowReplies] = useState(false);
 
@@ -135,7 +137,7 @@ export function CommentItem({ comment }: CommentItemProps) {
               {comment.author.name}
             </Link>
             {comment.edited && (
-              <span className="text-[10px] text-[var(--text-subtle)] italic">(edited)</span>
+              <span className="text-[10px] text-[var(--text-subtle)] italic">({t('card.edited')})</span>
             )}
           </div>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed">{comment.content}</p>
@@ -152,7 +154,7 @@ export function CommentItem({ comment }: CommentItemProps) {
               className="text-[10px] text-[var(--color-primary)] p-0 min-w-0 h-auto"
               onPress={() => setShowReplies(!showReplies)}
             >
-              {showReplies ? 'Hide' : `${comment.replies.length}`} {comment.replies.length === 1 ? 'reply' : 'replies'}
+              {showReplies ? t('card.hide') : `${comment.replies.length}`} {comment.replies.length === 1 ? t('card.reply') : t('card.replies')}
             </Button>
           )}
         </div>
@@ -206,6 +208,7 @@ const FeedCard = React.memo(function FeedCard({
   isAuthenticated,
   currentUserId,
 }: FeedCardProps) {
+  const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<FeedComment[]>([]);
@@ -381,7 +384,7 @@ const FeedCard = React.memo(function FeedCard({
                   isIconOnly
                   size="sm"
                   variant="light"
-                  className="text-[var(--text-subtle)] hover:text-[var(--text-primary)] min-w-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="text-[var(--text-subtle)] hover:text-[var(--text-primary)] min-w-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                   aria-label="Post options"
                 >
                   <MoreHorizontal className="w-4 h-4" />
@@ -396,7 +399,7 @@ const FeedCard = React.memo(function FeedCard({
                     color="danger"
                     onPress={onDeletePost}
                   >
-                    Delete Post
+                    {t('card.delete_post')}
                   </DropdownItem>
                 ) : (
                   <>
@@ -405,14 +408,14 @@ const FeedCard = React.memo(function FeedCard({
                       startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
                       onPress={onHidePost}
                     >
-                      Hide Post
+                      {t('card.hide_post')}
                     </DropdownItem>
                     <DropdownItem
                       key="mute"
                       startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
                       onPress={onMuteUser}
                     >
-                      Mute {author.name}
+                      {t('card.mute_user', { name: author.name })}
                     </DropdownItem>
                     <DropdownItem
                       key="report"
@@ -421,7 +424,7 @@ const FeedCard = React.memo(function FeedCard({
                       color="danger"
                       onPress={onReportPost}
                     >
-                      Report Post
+                      {t('card.report_post')}
                     </DropdownItem>
                   </>
                 )}
@@ -451,7 +454,7 @@ const FeedCard = React.memo(function FeedCard({
                 to={tenantPath(detailPath)}
                 className="text-[var(--color-primary)] hover:underline ml-1 font-medium"
               >
-                Read more
+                {t('card.read_more')}
               </Link>
             )}
           </p>
@@ -556,7 +559,7 @@ const FeedCard = React.memo(function FeedCard({
                   })}
                   <p className="text-xs text-[var(--text-subtle)] flex items-center gap-1.5 pt-1">
                     <TrendingUp className="w-3 h-3" aria-hidden="true" />
-                    {pollData.total_votes} {pollData.total_votes === 1 ? 'vote' : 'votes'}
+                    {pollData.total_votes} {pollData.total_votes === 1 ? t('card.vote') : t('card.votes')}
                   </p>
                 </CardBody>
               </Card>
@@ -570,7 +573,7 @@ const FeedCard = React.memo(function FeedCard({
             <CardBody className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[var(--text-muted)] uppercase tracking-wide font-medium">Reviewed</span>
+                  <span className="text-xs text-[var(--text-muted)] uppercase tracking-wide font-medium">{t('card.reviewed')}</span>
                   <Link
                     to={tenantPath(`/profile/${item.receiver.id}`)}
                     className="text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors"
@@ -620,7 +623,7 @@ const FeedCard = React.memo(function FeedCard({
                       <Heart className="w-2.5 h-2.5 text-white fill-white" aria-hidden="true" />
                     </span>
                   </span>
-                  {item.likes_count} {item.likes_count === 1 ? 'like' : 'likes'}
+                  {item.likes_count} {item.likes_count === 1 ? t('card.like') : t('card.likes')}
                 </span>
               )}
             </span>
@@ -631,7 +634,7 @@ const FeedCard = React.memo(function FeedCard({
                 className="text-xs text-[var(--text-subtle)] hover:text-[var(--text-primary)] p-0 min-w-0 h-auto"
                 onPress={toggleComments}
               >
-                {localCommentsCount} {localCommentsCount === 1 ? 'comment' : 'comments'}
+                {localCommentsCount} {localCommentsCount === 1 ? t('card.comment') : t('card.comments')}
               </Button>
             )}
           </div>
@@ -642,7 +645,7 @@ const FeedCard = React.memo(function FeedCard({
 
         {/* Action Buttons */}
         <div className="flex items-center justify-around -mx-1">
-          <Tooltip content={item.is_liked ? 'Unlike' : 'Like'} delay={400} closeDelay={0} size="sm">
+          <Tooltip content={item.is_liked ? t('card.unlike') : t('card.like_action')} delay={400} closeDelay={0} size="sm">
             <Button
               size="sm"
               variant="light"
@@ -659,11 +662,11 @@ const FeedCard = React.memo(function FeedCard({
               onPress={isAuthenticated ? onToggleLike : undefined}
               isDisabled={!isAuthenticated}
             >
-              Like
+              {t('card.like_action')}
             </Button>
           </Tooltip>
 
-          <Tooltip content="View comments" delay={400} closeDelay={0} size="sm">
+          <Tooltip content={t('card.view_comments')} delay={400} closeDelay={0} size="sm">
             <Button
               size="sm"
               variant="light"
@@ -671,7 +674,7 @@ const FeedCard = React.memo(function FeedCard({
               startContent={<MessageCircle className={`w-[18px] h-[18px] ${showComments ? 'fill-[var(--color-primary)]/20' : ''}`} aria-hidden="true" />}
               onPress={toggleComments}
             >
-              Comment
+              {t('card.comment_action')}
             </Button>
           </Tooltip>
         </div>
@@ -690,7 +693,7 @@ const FeedCard = React.memo(function FeedCard({
               {isAuthenticated && (
                 <div className="flex items-start gap-2.5">
                   <Input
-                    placeholder="Write a comment..."
+                    placeholder={t('card.write_comment')}
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmitComment()}
@@ -732,7 +735,7 @@ const FeedCard = React.memo(function FeedCard({
                 </div>
               ) : comments.length === 0 ? (
                 <p className="text-xs text-[var(--text-subtle)] text-center py-3 italic">
-                  No comments yet. Be the first to share your thoughts!
+                  {t('card.no_comments')}
                 </p>
               ) : (
                 <div className="space-y-3">

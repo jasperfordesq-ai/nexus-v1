@@ -9,6 +9,7 @@
 
 import { useState } from 'react';
 import { Button, Input, Textarea, Switch } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -20,6 +21,7 @@ const inputClasses = {
 };
 
 export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
+  const { t } = useTranslation('feed');
   const toast = useToast();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -45,13 +47,15 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
 
       const res = await api.post('/v2/goals', payload);
       if (res.success) {
-        toast.success('Goal created!');
+        toast.success(t('compose.goal_created'));
         onClose();
         onSuccess('goal');
+      } else {
+        toast.error(t('compose.goal_failed'));
       }
     } catch (err) {
       logError('Failed to create goal', err);
-      toast.error('Failed to create goal');
+      toast.error(t('compose.goal_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -60,8 +64,8 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
   return (
     <div className="space-y-4">
       <Input
-        label="Goal Title"
-        placeholder="e.g., Give 10 hours this month"
+        label={t('compose.goal_title_label')}
+        placeholder={t('compose.goal_title_placeholder')}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         isRequired
@@ -69,8 +73,8 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
       />
 
       <Textarea
-        label="Description"
-        placeholder="Describe your goal..."
+        label={t('compose.description_label')}
+        placeholder={t('compose.goal_desc_placeholder')}
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         minRows={2}
@@ -81,15 +85,15 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input
           type="number"
-          label="Target Value"
-          placeholder="e.g., 10"
+          label={t('compose.target_value_label')}
+          placeholder={t('compose.target_value_placeholder')}
           value={targetValue}
           onChange={(e) => setTargetValue(e.target.value)}
           classNames={inputClasses}
         />
         <Input
           type="date"
-          label="Deadline (optional)"
+          label={t('compose.deadline_label')}
           value={deadline}
           onChange={(e) => setDeadline(e.target.value)}
           classNames={inputClasses}
@@ -98,8 +102,8 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
 
       <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--surface-elevated)] border border-[var(--border-default)]">
         <div>
-          <p className="text-sm font-medium text-[var(--text-primary)]">Make Public</p>
-          <p className="text-xs text-[var(--text-muted)]">Others can see and support your goal</p>
+          <p className="text-sm font-medium text-[var(--text-primary)]">{t('compose.make_public')}</p>
+          <p className="text-xs text-[var(--text-muted)]">{t('compose.make_public_desc')}</p>
         </div>
         <Switch
           isSelected={isPublic}
@@ -114,7 +118,7 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
           onPress={onClose}
           className="text-[var(--text-muted)]"
         >
-          Cancel
+          {t('compose.cancel')}
         </Button>
         <Button
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
@@ -122,7 +126,7 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
           isLoading={isSubmitting}
           isDisabled={!canSubmit}
         >
-          Create Goal
+          {t('compose.create_goal')}
         </Button>
       </div>
     </div>
