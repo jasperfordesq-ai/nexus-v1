@@ -38,6 +38,61 @@ interface SearchResults {
   groups: Group[];
 }
 
+/**
+ * Raw item shape returned by the PHP UnifiedSearchService.
+ * Each item carries a `type` discriminator plus type-specific fields.
+ */
+interface RawSearchItem {
+  type: 'listing' | 'user' | 'event' | 'group';
+  id: number;
+  // listing fields
+  listing_type?: string;
+  // user fields
+  avatar_url?: string;
+  bio?: string;
+  // group fields
+  member_count?: number;
+  // shared / catch-all
+  [key: string]: unknown;
+}
+
+/**
+ * The PHP /api/v2/search endpoint returns a flat array of typed items.
+ * This function groups them into the SearchResults shape expected by the UI,
+ * normalising any field-name differences along the way.
+ */
+function groupSearchItems(items: RawSearchItem[]): SearchResults {
+  const result: SearchResults = { listings: [], users: [], events: [], groups: [] };
+
+  for (const item of items) {
+    if (item.type === 'listing') {
+      result.listings.push({
+        ...item,
+        // PHP returns `listing_type`; Listing type uses `type` for offer/request
+        type: (item.listing_type ?? item.type) as string,
+      } as unknown as Listing);
+    } else if (item.type === 'user') {
+      result.users.push({
+        ...item,
+        // PHP returns `avatar_url`; React resolveAvatarUrl expects `avatar`
+        avatar: item.avatar_url,
+        // PHP returns `bio`; React renders `user.tagline`
+        tagline: item.bio,
+      } as unknown as UserType);
+    } else if (item.type === 'event') {
+      result.events.push(item as unknown as Event);
+    } else if (item.type === 'group') {
+      result.groups.push({
+        ...item,
+        // PHP returns `member_count`; React renders `group.members_count`
+        members_count: item.member_count,
+      } as unknown as Group);
+    }
+  }
+
+  return result;
+}
+
 type SearchTab = 'all' | 'listings' | 'users' | 'events' | 'groups';
 
 export function SearchPage() {
@@ -70,9 +125,9 @@ export function SearchPage() {
       setIsLoading(true);
       setHasSearched(true);
       setSearchError(null);
-      const response = await api.get<SearchResults>(`/v2/search?q=${encodeURIComponent(searchQuery)}`);
+      const response = await api.get<RawSearchItem[]>(`/v2/search?q=${encodeURIComponent(searchQuery)}`);
       if (response.success && response.data) {
-        setResults(response.data);
+        setResults(groupSearchItems(response.data));
       }
     } catch (error) {
       logError('Search failed', error);

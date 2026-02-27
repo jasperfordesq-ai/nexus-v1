@@ -333,8 +333,8 @@ class ListingService
         // Insert listing
         $sql = "INSERT INTO listings (
                     tenant_id, user_id, title, description, type, category_id,
-                    image_url, location, latitude, longitude, federated_visibility, status, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())";
+                    image_url, location, latitude, longitude, federated_visibility, estimated_hours, status, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())";
 
         Database::query($sql, [
             $tenantId,
@@ -348,6 +348,7 @@ class ListingService
             $latitude,
             $longitude,
             $federatedVisibility,
+            isset($data['estimated_hours']) ? floatval($data['estimated_hours']) : null,
         ]);
 
         $listingId = Database::lastInsertId();
@@ -467,6 +468,11 @@ class ListingService
                 $fields[] = 'federated_visibility = ?';
                 $params[] = $visibility;
             }
+        }
+
+        if (array_key_exists('estimated_hours', $data)) {
+            $fields[] = 'estimated_hours = ?';
+            $params[] = isset($data['estimated_hours']) ? floatval($data['estimated_hours']) : null;
         }
 
         if (empty($fields)) {

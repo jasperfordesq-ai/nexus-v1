@@ -286,8 +286,8 @@ export function CreateEventPage() {
       const payload: Record<string, unknown> = {
         title: formData.title,
         description: formData.description,
-        start_date: startDateTime.toISOString(),
-        end_date: endDateTime?.toISOString() || null,
+        start_time: startDateTime.toISOString(),
+        end_time: endDateTime?.toISOString() || null,
         location: formData.location || null,
         latitude: formData.latitude,
         longitude: formData.longitude,
@@ -295,7 +295,10 @@ export function CreateEventPage() {
       };
 
       if (formData.category) {
-        payload.category = formData.category;
+        const categoryInt = parseInt(formData.category);
+        if (!isNaN(categoryInt)) {
+          payload.category_id = categoryInt;
+        }
       }
 
       let response;

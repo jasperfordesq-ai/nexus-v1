@@ -70,7 +70,7 @@ export function ListingsPage() {
       if (selectedType !== 'all') params.set('type', selectedType);
       if (selectedCategory) params.set('category', selectedCategory);
       if (!reset && cursor) params.set('cursor', cursor);
-      params.set('limit', '20');
+      params.set('per_page', '20');
 
       const response = await api.get<Listing[]>(`/v2/listings?${params}`);
 

@@ -216,7 +216,7 @@ export function CreateGroupPage() {
       const payload = {
         name: formData.name,
         description: formData.description,
-        is_private: formData.is_private,
+        visibility: formData.is_private ? 'private' : 'public',
         location: formData.location || undefined,
         latitude: formData.latitude,
         longitude: formData.longitude,
