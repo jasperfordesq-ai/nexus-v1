@@ -42,5 +42,9 @@
     "deleted": "Beitrag gelöscht",
     "delete_failed": "Beitrag konnte nicht gelöscht werden",
     "vote_failed": "Abstimmung konnte nicht abgegeben werden"
+  },
+  "realtime": {
+    "new_post_singular": "1 neuer Beitrag",
+    "new_posts_plural": "{{count}} neue Beiträge"
   }
 }

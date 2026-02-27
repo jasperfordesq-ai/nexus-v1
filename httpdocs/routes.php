@@ -171,10 +171,13 @@ $router->add('GET', '/api/v2/categories', function () {
 
 $router->add('GET', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@index');
 $router->add('GET', '/api/v2/listings/nearby', 'Nexus\Controllers\Api\ListingsApiController@nearby');
+$router->add('GET', '/api/v2/listings/saved', 'Nexus\Controllers\Api\ListingsApiController@getSavedListings');
 $router->add('POST', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@store');
 $router->add('GET', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@show');
 $router->add('PUT', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@update');
 $router->add('DELETE', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@destroy');
+$router->add('POST', '/api/v2/listings/{id}/save', 'Nexus\Controllers\Api\ListingsApiController@saveListing');
+$router->add('DELETE', '/api/v2/listings/{id}/save', 'Nexus\Controllers\Api\ListingsApiController@unsaveListing');
 $router->add('POST', '/api/v2/listings/{id}/image', 'Nexus\Controllers\Api\ListingsApiController@uploadImage');
 
 // ============================================
@@ -520,6 +523,11 @@ $router->add('GET', '/api/v2/blog/categories', 'Nexus\Controllers\Api\BlogPublic
 $router->add('GET', '/api/v2/blog/{slug}', 'Nexus\Controllers\Api\BlogPublicApiController@show');
 
 // ============================================
+// API V2 - HELP / FAQ (Public, for React frontend)
+// ============================================
+$router->add('GET', '/api/v2/help/faqs', 'Nexus\Controllers\Api\HelpApiController@getFaqs');
+
+// ============================================
 // API V2 - PAGES (Public, for React frontend)
 // ============================================
 $router->add('GET', '/api/v2/pages/{slug}', 'Nexus\Controllers\Api\PagesPublicApiController@show');
@@ -662,6 +670,12 @@ $router->add('GET', '/api/v2/admin/matching/approvals/stats', 'Nexus\Controllers
 $router->add('GET', '/api/v2/admin/matching/approvals/{id}', 'Nexus\Controllers\Api\AdminMatchingApiController@show');
 $router->add('POST', '/api/v2/admin/matching/approvals/{id}/approve', 'Nexus\Controllers\Api\AdminMatchingApiController@approve');
 $router->add('POST', '/api/v2/admin/matching/approvals/{id}/reject', 'Nexus\Controllers\Api\AdminMatchingApiController@reject');
+
+// Admin Help / FAQ
+$router->add('GET', '/api/v2/admin/help/faqs', 'Nexus\Controllers\Api\HelpApiController@adminGetFaqs');
+$router->add('POST', '/api/v2/admin/help/faqs', 'Nexus\Controllers\Api\HelpApiController@adminCreateFaq');
+$router->add('PUT', '/api/v2/admin/help/faqs/{id}', 'Nexus\Controllers\Api\HelpApiController@adminUpdateFaq');
+$router->add('DELETE', '/api/v2/admin/help/faqs/{id}', 'Nexus\Controllers\Api\HelpApiController@adminDeleteFaq');
 
 // Admin Blog
 $router->add('GET', '/api/v2/admin/blog', 'Nexus\Controllers\Api\AdminBlogApiController@index');

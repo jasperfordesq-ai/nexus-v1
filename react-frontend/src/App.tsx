@@ -129,6 +129,8 @@ const CreateGroupExchangePage = lazyWithRetry(() => import('@/pages/group-exchan
 const GroupExchangeDetailPage = lazyWithRetry(() => import('@/pages/group-exchanges/GroupExchangeDetailPage'));
 const MatchesRedirectPage = lazyWithRetry(() => import('@/pages/matches/MatchesRedirectPage'));
 const NewsletterUnsubscribePage = lazyWithRetry(() => import('@/pages/newsletter/NewsletterUnsubscribePage'));
+const AiChatPage = lazyWithRetry(() => import('@/pages/chat/AiChatPage'));
+const ConnectionsPage = lazyWithRetry(() => import('@/pages/connections/ConnectionsPage'));
 
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
@@ -364,6 +366,22 @@ function AppRoutes() {
             <FeatureGate feature="connections" fallback={<ComingSoonPage feature="Members Directory" />}>
               <FeatureErrorBoundary featureName="Members Directory">
                 <MembersPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="connections" element={
+            <FeatureGate feature="connections" fallback={<ComingSoonPage feature="Connections" />}>
+              <FeatureErrorBoundary featureName="Connections">
+                <ConnectionsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Feature-gated: AI Chat */}
+          <Route path="chat" element={
+            <FeatureGate feature="ai_chat" fallback={<ComingSoonPage feature="AI Assistant" />}>
+              <FeatureErrorBoundary featureName="AI Assistant">
+                <AiChatPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

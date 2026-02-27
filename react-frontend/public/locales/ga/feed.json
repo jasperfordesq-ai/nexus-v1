@@ -42,5 +42,9 @@
     "deleted": "Postáil scriosta",
     "delete_failed": "Theip ar an bpostáil a scriosadh",
     "vote_failed": "Theip ar an vóta a sheoladh"
+  },
+  "realtime": {
+    "new_post_singular": "1 postáil nua",
+    "new_posts_plural": "{{count}} postáil nua"
   }
 }

@@ -151,6 +151,15 @@ class PusherService
     }
 
     /**
+     * Get channel name for the tenant-wide feed (used for real-time new post broadcasts)
+     */
+    public static function getTenantFeedChannel(?int $tenantId = null): string
+    {
+        $tenantId = $tenantId ?? TenantContext::getId();
+        return "private-tenant.{$tenantId}.feed";
+    }
+
+    /**
      * Get channel name for presence (tenant-scoped online users)
      */
     public static function getPresenceChannel(?int $tenantId = null): string
@@ -197,6 +206,10 @@ class PusherService
                 return null;
             }
         }
+
+        // Feed channel: any authenticated tenant member may subscribe (read-only broadcast)
+        // Pattern: private-tenant.{tenantId}.feed
+        // No additional user-level restriction needed — tenant prefix check above is sufficient.
 
         try {
             // Pusher SDK returns a JSON string directly

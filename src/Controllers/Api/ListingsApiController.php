@@ -81,6 +81,11 @@ class ListingsApiController extends BaseApiController
 
         $filters['limit'] = $this->queryInt('per_page', 20, 1, 100);
 
+        // Pass current user ID so getAll() can attach is_favorited
+        if ($userId !== null) {
+            $filters['current_user_id'] = $userId;
+        }
+
         // Get listings
         $result = ListingService::getAll($filters);
 
@@ -295,6 +300,58 @@ class ListingsApiController extends BaseApiController
         }
 
         $this->noContent();
+    }
+
+    /**
+     * POST /api/v2/listings/{id}/save
+     *
+     * Save (favourite) a listing for the authenticated user.
+     *
+     * Response: 200 OK with { saved: true, listing_id: int }
+     */
+    public function saveListing(int $id): void
+    {
+        $userId = $this->getUserId();
+
+        $result = ListingService::saveListing($userId, $id);
+
+        if (!$result) {
+            $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        $this->respondWithData(['saved' => true, 'listing_id' => $id]);
+    }
+
+    /**
+     * DELETE /api/v2/listings/{id}/save
+     *
+     * Unsave (un-favourite) a listing for the authenticated user.
+     *
+     * Response: 200 OK with { saved: false, listing_id: int }
+     */
+    public function unsaveListing(int $id): void
+    {
+        $userId = $this->getUserId();
+
+        ListingService::unsaveListing($userId, $id);
+
+        $this->respondWithData(['saved' => false, 'listing_id' => $id]);
+    }
+
+    /**
+     * GET /api/v2/listings/saved
+     *
+     * Get listing IDs saved by the authenticated user in the current tenant.
+     *
+     * Response: 200 OK with array of listing IDs
+     */
+    public function getSavedListings(): void
+    {
+        $userId = $this->getUserId();
+
+        $savedIds = ListingService::getSavedListingIds($userId);
+
+        $this->respondWithData($savedIds);
     }
 
     /**

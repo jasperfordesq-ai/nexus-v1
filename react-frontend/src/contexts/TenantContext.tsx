@@ -82,6 +82,7 @@ const defaultFeatures: TenantFeatures = {
   direct_messaging: true,
   group_exchanges: false,
   search: true,
+  ai_chat: false,
 };
 
 // Default modules (all enabled)

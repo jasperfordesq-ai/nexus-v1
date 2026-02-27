@@ -329,7 +329,7 @@ export function GroupDetailPage() {
 
     try {
       setEventsLoading(true);
-      const response = await api.get<Event[]>(`/v2/events?group_id=${id}&limit=20`);
+      const response = await api.get<Event[]>(`/v2/events?group_id=${id}&per_page=20`);
       if (response.success && response.data) {
         setEvents(response.data);
       }

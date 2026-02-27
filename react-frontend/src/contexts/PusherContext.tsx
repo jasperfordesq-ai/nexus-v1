@@ -41,6 +41,8 @@ interface PusherContextValue {
   onTyping: (callback: (event: TypingEvent) => void) => () => void;
   /** Register a callback for unread count updates */
   onUnreadCount: (callback: (event: UnreadCountEvent) => void) => () => void;
+  /** Register a callback for new feed posts broadcast to the tenant channel */
+  onFeedPost: (callback: (event: FeedPostEvent) => void) => () => void;
   /** Send typing indicator */
   sendTyping: (toUserId: number, isTyping: boolean) => void;
 }
@@ -66,6 +68,11 @@ export interface UnreadCountEvent {
   timestamp: number;
 }
 
+export interface FeedPostEvent {
+  post: import('@/components/feed/types').FeedItem;
+  timestamp: number;
+}
+
 const PusherContext = createContext<PusherContextValue | null>(null);
 
 interface PusherProviderProps {
@@ -85,6 +92,10 @@ export function PusherProvider({ children }: PusherProviderProps) {
   const messageListenersRef = useRef<Set<(message: NewMessageEvent) => void>>(new Set());
   const typingListenersRef = useRef<Set<(event: TypingEvent) => void>>(new Set());
   const unreadListenersRef = useRef<Set<(event: UnreadCountEvent) => void>>(new Set());
+  const feedPostListenersRef = useRef<Set<(event: FeedPostEvent) => void>>(new Set());
+
+  // Tenant feed channel ref (unsubscribed on cleanup alongside user channel)
+  const feedChannelRef = useRef<Channel | null>(null);
 
   // Load Pusher config from API (only when authenticated)
   useEffect(() => {
@@ -158,6 +169,14 @@ export function PusherProvider({ children }: PusherProviderProps) {
 
     userChannelRef.current = userChannel;
 
+    // Subscribe to the tenant-wide feed channel to receive real-time new post events.
+    // Channel name must match PusherService::getTenantFeedChannel() on the PHP side.
+    const feedChannel = pusher.subscribe(`private-tenant.${tenantId}.feed`);
+    feedChannel.bind('feed.post_created', (data: FeedPostEvent) => {
+      feedPostListenersRef.current.forEach((listener) => listener(data));
+    });
+    feedChannelRef.current = feedChannel;
+
     // Cleanup on unmount — unbind all handlers first, then disconnect().
     // Do NOT call unsubscribe() before disconnect() — it queues an async send
     // that fires after disconnect starts closing the socket, causing
@@ -166,10 +185,14 @@ export function PusherProvider({ children }: PusherProviderProps) {
       if (userChannelRef.current) {
         userChannelRef.current.unbind_all();
       }
+      if (feedChannelRef.current) {
+        feedChannelRef.current.unbind_all();
+      }
       conversationChannelsRef.current.forEach((ch) => ch.unbind_all());
       pusher.disconnect();
       pusherRef.current = null;
       userChannelRef.current = null;
+      feedChannelRef.current = null;
       conversationChannelsRef.current.clear();
       setIsConnected(false);
     };
@@ -270,6 +293,17 @@ export function PusherProvider({ children }: PusherProviderProps) {
   }, []);
 
   /**
+   * Register a callback for new feed posts on the tenant feed channel
+   * Returns an unsubscribe function
+   */
+  const onFeedPost = useCallback((callback: (event: FeedPostEvent) => void) => {
+    feedPostListenersRef.current.add(callback);
+    return () => {
+      feedPostListenersRef.current.delete(callback);
+    };
+  }, []);
+
+  /**
    * Send typing indicator to another user
    */
   const sendTyping = useCallback(async (toUserId: number, isTyping: boolean) => {
@@ -290,6 +324,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
     onNewMessage,
     onTyping,
     onUnreadCount,
+    onFeedPost,
     sendTyping,
   };
 

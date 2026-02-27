@@ -185,7 +185,7 @@ export function ProfilePage() {
 
     try {
       setIsLoadingReviews(true);
-      const response = await api.get<Review[]>(`/v2/reviews/user/${profileId}`);
+      const response = await api.get<Review[]>(`/v2/reviews/user/${profileId}?per_page=100`);
 
       if (response.success && response.data) {
         setReviews(response.data);

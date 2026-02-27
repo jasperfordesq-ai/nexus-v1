@@ -30,6 +30,7 @@ import {
   MessageSquare,
   Wallet,
   Users,
+  Users2,
   Calendar,
   Bell,
   Settings,
@@ -60,6 +61,7 @@ import {
   TrendingUp,
   BarChart3,
   Compass,
+  Bot,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
@@ -285,6 +287,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   // Community dropdown items
   const communityItems = [
     { label: t('nav.members'), href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
+    { label: t('nav.connections'), href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
     { label: t('nav.events'), href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
     { label: t('nav.groups'), href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
     { label: t('nav.blog'), href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' as const },
@@ -300,6 +303,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
     { label: t('nav.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' as const },
     { label: t('nav.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
+    { label: t('nav.ai_chat', 'AI Assistant'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' as const },
   ].filter(item => {
     if (item.feature && !hasFeature(item.feature)) return false;
     if (item.module && !hasModule(item.module)) return false;

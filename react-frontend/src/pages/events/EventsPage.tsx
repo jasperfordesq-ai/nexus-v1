@@ -110,7 +110,7 @@ export function EventsPage() {
 
       const params = new URLSearchParams();
       if (debouncedQuery) params.set('q', debouncedQuery);
-      params.set('when', filter);
+      if (filter !== 'all') params.set('when', filter);
       params.set('per_page', String(ITEMS_PER_PAGE));
       if (append && nextCursor) {
         params.set('cursor', nextCursor);

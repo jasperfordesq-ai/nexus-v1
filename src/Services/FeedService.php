@@ -10,6 +10,7 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\FeedPost;
 use Nexus\Models\User;
+use Nexus\Services\RealtimeService;
 
 /**
  * FeedService - Business logic for social feed operations
@@ -763,7 +764,20 @@ class FeedService
                 $stmt->execute([$userId, $tenantId, $content, $imageUrl, $visibility]);
             }
 
-            return (int)$db->lastInsertId();
+            $postId = (int)$db->lastInsertId();
+
+            // Broadcast the new post to all feed subscribers in real time.
+            // Failures are swallowed so a Pusher outage never fails post creation.
+            try {
+                $formattedPost = self::getItem('post', $postId, $userId);
+                if ($formattedPost !== null) {
+                    RealtimeService::broadcastFeedPost($formattedPost);
+                }
+            } catch (\Exception $pusherEx) {
+                error_log("FeedService::createPost Pusher broadcast failed: " . $pusherEx->getMessage());
+            }
+
+            return $postId;
         } catch (\Exception $e) {
             error_log("FeedService::createPost error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create post'];

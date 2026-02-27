@@ -43,6 +43,7 @@ class ListingService
      *   - limit: int (default 20, max 100)
      *   - user_id: int (filter by owner)
      *   - include_deleted: bool (default false)
+     *   - current_user_id: int|null (when provided, adds is_favorited field)
      * @return array ['items' => [], 'cursor' => string|null, 'has_more' => bool]
      */
     public static function getAll(array $filters = []): array
@@ -50,23 +51,44 @@ class ListingService
         $tenantId = TenantContext::getId();
         $limit = min((int)($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
+        $currentUserId = !empty($filters['current_user_id']) ? (int)$filters['current_user_id'] : null;
 
-        $sql = "SELECT l.id, l.title, l.description, l.type, l.category_id, l.image_url,
-                       l.location, l.latitude, l.longitude, l.status, l.federated_visibility,
-                       l.created_at, l.updated_at, l.user_id, l.estimated_hours,
-                       CASE
-                           WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
-                           THEN u.organization_name
-                           ELSE CONCAT(u.first_name, ' ', u.last_name)
-                       END as author_name,
-                       u.avatar_url as author_avatar, u.tagline as tagline,
-                       c.name as category_name, c.color as category_color
-                FROM listings l
-                JOIN users u ON l.user_id = u.id
-                LEFT JOIN categories c ON l.category_id = c.id
-                WHERE l.tenant_id = ?";
-
-        $params = [$tenantId];
+        if ($currentUserId !== null) {
+            $sql = "SELECT l.id, l.title, l.description, l.type, l.category_id, l.image_url,
+                           l.location, l.latitude, l.longitude, l.status, l.federated_visibility,
+                           l.created_at, l.updated_at, l.user_id, l.estimated_hours,
+                           CASE
+                               WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
+                               THEN u.organization_name
+                               ELSE CONCAT(u.first_name, ' ', u.last_name)
+                           END as author_name,
+                           u.avatar_url as author_avatar, u.tagline as tagline,
+                           c.name as category_name, c.color as category_color,
+                           CASE WHEN usl.id IS NOT NULL THEN 1 ELSE 0 END as is_favorited
+                    FROM listings l
+                    JOIN users u ON l.user_id = u.id
+                    LEFT JOIN categories c ON l.category_id = c.id
+                    LEFT JOIN user_saved_listings usl
+                           ON usl.listing_id = l.id AND usl.user_id = ? AND usl.tenant_id = ?
+                    WHERE l.tenant_id = ?";
+            $params = [$currentUserId, $tenantId, $tenantId];
+        } else {
+            $sql = "SELECT l.id, l.title, l.description, l.type, l.category_id, l.image_url,
+                           l.location, l.latitude, l.longitude, l.status, l.federated_visibility,
+                           l.created_at, l.updated_at, l.user_id, l.estimated_hours,
+                           CASE
+                               WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
+                               THEN u.organization_name
+                               ELSE CONCAT(u.first_name, ' ', u.last_name)
+                           END as author_name,
+                           u.avatar_url as author_avatar, u.tagline as tagline,
+                           c.name as category_name, c.color as category_color
+                    FROM listings l
+                    JOIN users u ON l.user_id = u.id
+                    LEFT JOIN categories c ON l.category_id = c.id
+                    WHERE l.tenant_id = ?";
+            $params = [$tenantId];
+        }
 
         // Status filter
         if (empty($filters['include_deleted'])) {
@@ -154,6 +176,10 @@ class ListingService
                 'avatar_url' => $item['author_avatar'] ?? null,
                 'tagline'    => $item['tagline'] ?? null,
             ];
+            // Cast is_favorited to bool if present
+            if (array_key_exists('is_favorited', $item)) {
+                $item['is_favorited'] = (bool)$item['is_favorited'];
+            }
             return $item;
         }, $items);
 
@@ -652,5 +678,76 @@ class ListingService
     {
         $filters['search'] = $query;
         return self::getAll($filters);
+    }
+
+    // ============================================
+    // SAVED / FAVOURITE LISTINGS
+    // ============================================
+
+    /**
+     * Save a listing for the given user (idempotent).
+     *
+     * @param int $userId  The user saving the listing
+     * @param int $listingId The listing to save
+     * @return bool False if listing does not belong to the current tenant
+     */
+    public static function saveListing(int $userId, int $listingId): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        // Verify listing belongs to this tenant
+        $listing = Database::query(
+            "SELECT id FROM listings WHERE id = ? AND tenant_id = ?",
+            [$listingId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$listing) {
+            return false;
+        }
+
+        // INSERT IGNORE for idempotency (UNIQUE KEY prevents duplicates)
+        Database::query(
+            "INSERT IGNORE INTO user_saved_listings (user_id, listing_id, tenant_id) VALUES (?, ?, ?)",
+            [$userId, $listingId, $tenantId]
+        );
+
+        return true;
+    }
+
+    /**
+     * Remove a saved listing for the given user.
+     *
+     * @param int $userId    The user unsaving the listing
+     * @param int $listingId The listing to unsave
+     * @return bool Always true (idempotent)
+     */
+    public static function unsaveListing(int $userId, int $listingId): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        Database::query(
+            "DELETE FROM user_saved_listings WHERE user_id = ? AND listing_id = ? AND tenant_id = ?",
+            [$userId, $listingId, $tenantId]
+        );
+
+        return true;
+    }
+
+    /**
+     * Get all listing IDs saved by the given user in the current tenant.
+     *
+     * @param int $userId The user whose saved listings to fetch
+     * @return int[] Array of listing IDs
+     */
+    public static function getSavedListingIds(int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $rows = Database::query(
+            "SELECT listing_id FROM user_saved_listings WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        )->fetchAll(\PDO::FETCH_ASSOC);
+
+        return array_map('intval', array_column($rows, 'listing_id'));
     }
 }

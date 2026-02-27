@@ -163,6 +163,31 @@ class RealtimeService
     }
 
     /**
+     * Broadcast a new feed post to all members of the tenant's feed channel
+     *
+     * Called after a feed post is successfully created. All subscribers on
+     * `private-tenant.{tenantId}.feed` will receive the `feed.post_created`
+     * event and can prepend the post to their local feed state.
+     *
+     * @param array $post Formatted post data (as returned by FeedService::getItem)
+     * @param int|null $tenantId Tenant ID (defaults to current context)
+     * @return bool Success status
+     */
+    public static function broadcastFeedPost(array $post, ?int $tenantId = null): bool
+    {
+        if (!PusherService::isConfigured()) {
+            return false;
+        }
+
+        $channel = PusherService::getTenantFeedChannel($tenantId);
+
+        return PusherService::trigger($channel, 'feed.post_created', [
+            'post' => $post,
+            'timestamp' => time() * 1000,
+        ]);
+    }
+
+    /**
      * Broadcast a custom event to a user
      *
      * @param int $userId Target user ID
