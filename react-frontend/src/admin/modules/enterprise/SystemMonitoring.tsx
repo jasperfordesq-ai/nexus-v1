@@ -40,8 +40,8 @@ export function SystemMonitoring() {
       if (res.success && res.data) {
         setHealth(res.data as unknown as SystemHealth);
       }
-    } catch {
-      // Silently handle
+    } catch (err) {
+      console.error('Failed to load monitoring data', err);
     } finally {
       setLoading(false);
     }

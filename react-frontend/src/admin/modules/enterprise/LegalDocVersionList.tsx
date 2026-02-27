@@ -58,6 +58,8 @@ export default function LegalDocVersionList() {
   const [notifyTarget, setNotifyTarget] = useState<'all' | 'non_accepted'>('non_accepted');
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [submitting, setSubmitting] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewingVersion, setViewingVersion] = useState<LegalDocumentVersion | null>(null);
 
   const documentId = parseInt(id || '0', 10);
 
@@ -307,8 +309,8 @@ export default function LegalDocVersionList() {
                       variant="bordered"
                       isIconOnly
                       onPress={() => {
-                        // TODO: Navigate to view page or show in modal
-                        // View feature placeholder
+                        setViewingVersion(version);
+                        setShowViewModal(true);
                       }}
                     >
                       <Eye size={16} />
@@ -396,6 +398,63 @@ export default function LegalDocVersionList() {
                   isLoading={submitting}
                 >
                   Publish Version
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* View Version Content Modal */}
+      <Modal
+        isOpen={showViewModal}
+        onClose={() => { setShowViewModal(false); setViewingVersion(null); }}
+        size="4xl"
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <FileText size={20} />
+                  <span>
+                    Version {viewingVersion?.version_number}
+                    {viewingVersion?.version_label ? ` — ${viewingVersion.version_label}` : ''}
+                  </span>
+                </div>
+              </ModalHeader>
+              <ModalBody className="space-y-4">
+                <div className="flex flex-wrap gap-4 text-sm text-(--color-text-secondary)">
+                  {viewingVersion?.effective_date && (
+                    <div className="flex items-center gap-1">
+                      <Clock size={14} />
+                      <span>Effective: {new Date(viewingVersion.effective_date).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                  {viewingVersion?.published_at && (
+                    <div className="flex items-center gap-1">
+                      <CheckCircle2 size={14} />
+                      <span>Published: {new Date(viewingVersion.published_at).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+                {viewingVersion?.summary_of_changes && (
+                  <div className="p-3 bg-(--color-surface) rounded-lg">
+                    <p className="text-sm font-medium mb-1">Summary of Changes:</p>
+                    <p className="text-sm text-(--color-text-secondary)">
+                      {viewingVersion.summary_of_changes}
+                    </p>
+                  </div>
+                )}
+                <div
+                  className="prose prose-sm max-w-none dark:prose-invert border rounded-lg p-4 overflow-auto"
+                  dangerouslySetInnerHTML={{ __html: viewingVersion?.content ?? '' }}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>
+                  Close
                 </Button>
               </ModalFooter>
             </>

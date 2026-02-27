@@ -25,6 +25,7 @@ class AdminLegalDocController extends BaseApiController
      */
     public function getVersions(int $docId): void
     {
+        $this->requireAdmin();
         try {
             $versions = LegalDocumentService::getVersions($docId);
             $this->jsonResponse(['success' => true, 'data' => $versions]);
@@ -40,6 +41,7 @@ class AdminLegalDocController extends BaseApiController
      */
     public function compareVersions(int $docId): void
     {
+        $this->requireAdmin();
         $v1 = $_GET['v1'] ?? null;
         $v2 = $_GET['v2'] ?? null;
 
@@ -114,6 +116,7 @@ class AdminLegalDocController extends BaseApiController
      */
     public function createVersion(int $docId): void
     {
+        $this->requireAdmin();
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
         // Validation
@@ -155,6 +158,7 @@ class AdminLegalDocController extends BaseApiController
      */
     public function publishVersion(int $versionId): void
     {
+        $this->requireAdmin();
         try {
             $success = LegalDocumentService::publishVersion($versionId);
 
@@ -175,6 +179,7 @@ class AdminLegalDocController extends BaseApiController
      */
     public function getComplianceStats(): void
     {
+        $this->requireAdmin();
         try {
             $docId = $_GET['doc_id'] ?? null;
             $tenantId = TenantContext::getId();
@@ -196,6 +201,7 @@ class AdminLegalDocController extends BaseApiController
      */
     public function getAcceptances(int $versionId): void
     {
+        $this->requireAdmin();
         $limit = (int) ($_GET['limit'] ?? 50);
         $offset = (int) ($_GET['offset'] ?? 0);
 
@@ -214,6 +220,7 @@ class AdminLegalDocController extends BaseApiController
      */
     public function exportAcceptances(int $docId): void
     {
+        $this->requireAdmin();
         $startDate = $_GET['start_date'] ?? null;
         $endDate = $_GET['end_date'] ?? null;
 
@@ -266,6 +273,7 @@ class AdminLegalDocController extends BaseApiController
      */
     public function notifyUsers(int $docId, int $versionId): void
     {
+        $this->requireAdmin();
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
         $target = $input['target'] ?? 'non_accepted';
 
@@ -288,6 +296,7 @@ class AdminLegalDocController extends BaseApiController
      */
     public function getUsersPendingCount(int $docId, int $versionId): void
     {
+        $this->requireAdmin();
         try {
             $count = LegalDocumentService::getUsersPendingAcceptanceCount($docId, $versionId);
             $this->jsonResponse(['success' => true, 'data' => ['count' => $count]]);

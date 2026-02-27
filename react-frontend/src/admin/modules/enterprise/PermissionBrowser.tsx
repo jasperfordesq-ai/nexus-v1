@@ -28,8 +28,8 @@ export function PermissionBrowser() {
       if (res.success && res.data) {
         setPermissions(res.data as unknown as Record<string, string[]>);
       }
-    } catch {
-      // Silently handle
+    } catch (err) {
+      console.error('Failed to load permissions data', err);
     } finally {
       setLoading(false);
     }

@@ -39,8 +39,8 @@ export function GdprDashboard() {
       if (res.success && res.data) {
         setStats(res.data as unknown as GdprDashboardStats);
       }
-    } catch {
-      // Silently handle
+    } catch (err) {
+      console.error('Failed to load GDPR dashboard data', err);
     } finally {
       setLoading(false);
     }
