@@ -81,6 +81,26 @@ class BrokerControlConfigService
             $config = $fullConfig['broker_controls'] ?? [];
         }
 
+        // Also check tenant_settings.broker_config for controller-saved values
+        try {
+            $settingsRow = Database::query(
+                "SELECT setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'broker_config' LIMIT 1",
+                [$tenantId]
+            );
+            $settingsRow = is_object($settingsRow) ? $settingsRow->fetch() : ($settingsRow[0] ?? null);
+            if (!empty($settingsRow) && !empty($settingsRow['setting_value'])) {
+                $controllerConfig = json_decode($settingsRow['setting_value'], true) ?? [];
+                // Merge: controller-saved values take precedence for workflow keys
+                foreach (['require_broker_approval', 'auto_approve_low_risk', 'max_hours_without_approval', 'exchange_workflow_enabled'] as $key) {
+                    if (array_key_exists($key, $controllerConfig)) {
+                        $config[$key] = $controllerConfig[$key];
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Ignore — use defaults
+        }
+
         // Merge with defaults
         $merged = self::mergeWithDefaults($config);
 
@@ -373,6 +393,16 @@ class BrokerControlConfigService
     public static function isInsuranceEnabled(): bool
     {
         return (bool) self::getComplianceSetting('insurance_enabled', false);
+    }
+
+    public static function isVettingEnforcedOnExchanges(): bool
+    {
+        return (bool) self::getComplianceSetting('enforce_vetting_on_exchanges', false);
+    }
+
+    public static function isInsuranceEnforcedOnExchanges(): bool
+    {
+        return (bool) self::getComplianceSetting('enforce_insurance_on_exchanges', false);
     }
 
     public static function getVettingExpiryWarningDays(): int

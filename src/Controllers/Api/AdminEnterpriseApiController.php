@@ -200,26 +200,29 @@ class AdminEnterpriseApiController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $stmt = Database::query(
-                "SELECT r.*, (SELECT COUNT(*) FROM user_roles ur WHERE ur.role_id = r.id) as users_count
-                 FROM roles r WHERE r.tenant_id = ? ORDER BY r.name ASC",
+            $rows = Database::query(
+                "SELECT r.id, r.name, r.display_name, r.description, r.is_system, r.level, r.created_at, r.updated_at,
+                        (SELECT COUNT(*) FROM user_roles ur WHERE ur.role_id = r.id) as users_count,
+                        GROUP_CONCAT(p.name) as permission_names
+                 FROM roles r
+                 LEFT JOIN role_permissions rp ON r.id = rp.role_id
+                 LEFT JOIN permissions p ON rp.permission_id = p.id
+                 WHERE r.tenant_id = ?
+                 GROUP BY r.id
+                 ORDER BY r.name ASC",
                 [$tenantId]
             );
-            $roles = $stmt->fetchAll();
+            $roles = $rows->fetchAll();
 
-            // Decode permissions JSON
             foreach ($roles as &$role) {
-                $role['permissions'] = json_decode($role['permissions'] ?? '[]', true) ?: [];
+                $role['permissions'] = $role['permission_names'] ? explode(',', $role['permission_names']) : [];
+                unset($role['permission_names']);
             }
             unset($role);
         } catch (\Exception $e) {
-            // Return default roles if table doesn't exist
-            $roles = [
-                ['id' => 0, 'name' => 'Member', 'slug' => 'member', 'description' => 'Standard community member', 'permissions' => ['users.view', 'listings.view', 'listings.create'], 'users_count' => 0, 'created_at' => date('Y-m-d H:i:s')],
-                ['id' => 0, 'name' => 'Moderator', 'slug' => 'moderator', 'description' => 'Content moderator', 'permissions' => ['users.view', 'listings.view', 'listings.approve', 'content.blog.manage'], 'users_count' => 0, 'created_at' => date('Y-m-d H:i:s')],
-                ['id' => 0, 'name' => 'Admin', 'slug' => 'admin', 'description' => 'Full admin access', 'permissions' => ['*'], 'users_count' => 0, 'created_at' => date('Y-m-d H:i:s')],
-                ['id' => 0, 'name' => 'Super Admin', 'slug' => 'super_admin', 'description' => 'Cross-tenant super admin', 'permissions' => ['*'], 'users_count' => 0, 'created_at' => date('Y-m-d H:i:s')],
-            ];
+            error_log('AdminEnterpriseApiController::roles() SQL error: ' . $e->getMessage());
+            $this->respondWithData([]);
+            return;
         }
 
         $this->respondWithData($roles);
@@ -259,39 +262,67 @@ class AdminEnterpriseApiController extends BaseApiController
     public function createRole(): void
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
+        $data = $this->getJsonInput();
+        $tenantId = TenantContext::getId();
 
-        $name = trim($this->input('name', ''));
-        $description = trim($this->input('description', ''));
-        $permissions = $this->input('permissions', []);
-
-        if (empty($name)) {
-            $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name', 422);
+        if (empty($data['name'])) {
+            $this->respondWithError('VALIDATION_ERROR', 'Role name is required', 'name', 422);
+            return;
         }
 
-        if (!is_array($permissions)) {
-            $permissions = [];
-        }
-
-        $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '_', $name));
+        $name = trim($data['name']);
+        $displayName = $data['display_name'] ?? $name;
+        $description = $data['description'] ?? null;
+        $level = (int)($data['level'] ?? 10);
+        $permissions = $data['permissions'] ?? [];
 
         try {
+            Database::beginTransaction();
+
             Database::query(
-                "INSERT INTO roles (name, slug, description, permissions, tenant_id, created_at)
-                 VALUES (?, ?, ?, ?, ?, NOW())",
-                [$name, $slug, $description, json_encode($permissions), $tenantId]
+                "INSERT INTO roles (name, display_name, description, level, tenant_id, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+                [$name, $displayName, $description, $level, $tenantId]
             );
             $roleId = Database::lastInsertId();
 
-            $this->respondWithData([
-                'id' => (int) $roleId,
-                'name' => $name,
-                'slug' => $slug,
-                'description' => $description,
-                'permissions' => $permissions,
-            ], null, 201);
+            // Assign permissions via junction table
+            if (!empty($permissions)) {
+                foreach ($permissions as $permName) {
+                    $perm = Database::query(
+                        "SELECT id FROM permissions WHERE name = ? LIMIT 1",
+                        [$permName]
+                    );
+                    if (!empty($perm)) {
+                        Database::query(
+                            "INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
+                            [$roleId, $perm[0]['id']]
+                        );
+                    }
+                }
+            }
+
+            Database::commit();
+
+            $role = Database::query(
+                "SELECT r.*, GROUP_CONCAT(p.name) as permission_names
+                 FROM roles r
+                 LEFT JOIN role_permissions rp ON r.id = rp.role_id
+                 LEFT JOIN permissions p ON rp.permission_id = p.id
+                 WHERE r.id = ? AND r.tenant_id = ?
+                 GROUP BY r.id",
+                [$roleId, $tenantId]
+            );
+
+            $result = $role[0] ?? [];
+            $result['permissions'] = $result['permission_names'] ? explode(',', $result['permission_names']) : [];
+            unset($result['permission_names']);
+
+            $this->respondWithData($result, null, 201);
         } catch (\Exception $e) {
-            $this->respondWithError('CREATE_FAILED', 'Failed to create role: ' . $e->getMessage(), null, 500);
+            Database::rollback();
+            error_log('createRole error: ' . $e->getMessage());
+            $this->respondWithError('CREATE_FAILED', 'Failed to create role', null, 500);
         }
     }
 
@@ -301,45 +332,69 @@ class AdminEnterpriseApiController extends BaseApiController
     public function updateRole(int $id): void
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
-
-        $name = $this->input('name');
-        $description = $this->input('description');
-        $permissions = $this->input('permissions');
-
-        $updates = [];
-        $params = [];
-
-        if ($name !== null) {
-            $updates[] = "name = ?";
-            $params[] = trim($name);
-            $updates[] = "slug = ?";
-            $params[] = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '_', trim($name)));
-        }
-        if ($description !== null) {
-            $updates[] = "description = ?";
-            $params[] = trim($description);
-        }
-        if ($permissions !== null) {
-            $updates[] = "permissions = ?";
-            $params[] = json_encode(is_array($permissions) ? $permissions : []);
-        }
-
-        if (empty($updates)) {
-            $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
-        }
-
-        $updates[] = "updated_at = NOW()";
-        $params[] = $id;
-        $params[] = $tenantId;
+        $data = $this->getJsonInput();
+        $tenantId = TenantContext::getId();
 
         try {
-            Database::query(
-                "UPDATE roles SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?",
-                $params
+            Database::beginTransaction();
+
+            $setParts = [];
+            $params = [];
+
+            if (isset($data['name'])) { $setParts[] = 'name = ?'; $params[] = $data['name']; }
+            if (isset($data['display_name'])) { $setParts[] = 'display_name = ?'; $params[] = $data['display_name']; }
+            if (isset($data['description'])) { $setParts[] = 'description = ?'; $params[] = $data['description']; }
+            if (isset($data['level'])) { $setParts[] = 'level = ?'; $params[] = (int)$data['level']; }
+
+            if (!empty($setParts)) {
+                $setParts[] = 'updated_at = NOW()';
+                $params[] = $id;
+                $params[] = $tenantId;
+                Database::query(
+                    "UPDATE roles SET " . implode(', ', $setParts) . " WHERE id = ? AND tenant_id = ?",
+                    $params
+                );
+            }
+
+            // Update permissions if provided
+            if (isset($data['permissions']) && is_array($data['permissions'])) {
+                Database::query("DELETE FROM role_permissions WHERE role_id = ?", [$id]);
+                foreach ($data['permissions'] as $permName) {
+                    $perm = Database::query("SELECT id FROM permissions WHERE name = ? LIMIT 1", [$permName]);
+                    if (!empty($perm)) {
+                        Database::query(
+                            "INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
+                            [$id, $perm[0]['id']]
+                        );
+                    }
+                }
+            }
+
+            Database::commit();
+
+            $role = Database::query(
+                "SELECT r.*, GROUP_CONCAT(p.name) as permission_names
+                 FROM roles r
+                 LEFT JOIN role_permissions rp ON r.id = rp.role_id
+                 LEFT JOIN permissions p ON rp.permission_id = p.id
+                 WHERE r.id = ? AND r.tenant_id = ?
+                 GROUP BY r.id",
+                [$id, $tenantId]
             );
-            $this->respondWithData(['id' => $id, 'updated' => true]);
+
+            if (empty($role)) {
+                $this->respondWithError('NOT_FOUND', 'Role not found', null, 404);
+                return;
+            }
+
+            $result = $role[0];
+            $result['permissions'] = $result['permission_names'] ? explode(',', $result['permission_names']) : [];
+            unset($result['permission_names']);
+
+            $this->respondWithData($result);
         } catch (\Exception $e) {
+            Database::rollback();
+            error_log('updateRole error: ' . $e->getMessage());
             $this->respondWithError('UPDATE_FAILED', 'Failed to update role', null, 500);
         }
     }
@@ -461,7 +516,7 @@ class AdminEnterpriseApiController extends BaseApiController
             // Fetch
             $fetchParams = array_merge($params, [$perPage, $offset]);
             $stmt = Database::query(
-                "SELECT gr.*, u.name as user_name, u.email as user_email
+                "SELECT gr.*, gr.request_type as type, u.name as user_name, u.email as user_email
                  FROM gdpr_requests gr
                  LEFT JOIN users u ON u.id = gr.user_id
                  WHERE $where
@@ -528,7 +583,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
         try {
             $stmt = Database::query(
-                "SELECT uc.*, u.name as user_name
+                "SELECT uc.*, uc.consent_given as consented, uc.given_at as consented_at, u.name as user_name
                  FROM user_consents uc
                  LEFT JOIN users u ON u.id = uc.user_id
                  WHERE uc.tenant_id = ?
@@ -553,7 +608,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
         try {
             $stmt = Database::query(
-                "SELECT * FROM data_breach_log WHERE tenant_id = ? ORDER BY detected_at DESC LIMIT 100",
+                "SELECT *, breach_type as title, detected_at as reported_at FROM data_breach_log WHERE tenant_id = ? ORDER BY detected_at DESC LIMIT 100",
                 [$tenantId]
             );
             $breaches = $stmt->fetchAll();
@@ -573,30 +628,29 @@ class AdminEnterpriseApiController extends BaseApiController
         $tenantId = $this->getTenantId();
         $input = $this->getAllInput();
 
-        $title = trim($input['title'] ?? '');
-        if (!$title) {
-            $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 422);
+        $breachType = trim($input['breach_type'] ?? $input['title'] ?? '');
+        if (!$breachType) {
+            $this->respondWithError('VALIDATION_ERROR', 'Breach type is required', 'breach_type', 422);
             return;
         }
 
         try {
             Database::query(
-                "INSERT INTO data_breach_log (tenant_id, title, description, severity, status, affected_users, detected_at, reported_by, created_at)
-                 VALUES (?, ?, ?, ?, 'open', ?, NOW(), ?, NOW())",
+                "INSERT INTO data_breach_log (tenant_id, breach_type, description, severity, status, detected_at, reported_by, created_at)
+                 VALUES (?, ?, ?, ?, 'open', NOW(), ?, NOW())",
                 [
                     $tenantId,
-                    $title,
+                    $breachType,
                     $input['description'] ?? '',
                     $input['severity'] ?? 'medium',
-                    (int) ($input['affected_users'] ?? 0),
-                    (int) ($this->getCurrentUserId() ?? 0),
+                    (int) ($this->getAuthenticatedUserId() ?? 0),
                 ]
             );
             $id = Database::lastInsertId();
 
             $this->respondWithData(['id' => $id, 'message' => 'Breach reported successfully'], null, 201);
         } catch (\Exception $e) {
-            $this->respondWithError('CREATE_FAILED', 'Failed to report breach: ' . $e->getMessage());
+            $this->respondWithError('CREATE_FAILED', 'Failed to report breach: ' . $e->getMessage(), null, 500);
         }
     }
 
@@ -610,11 +664,13 @@ class AdminEnterpriseApiController extends BaseApiController
 
         try {
             $stmt = Database::query(
-                "SELECT al.*, u.name as user_name
-                 FROM activity_log al
-                 LEFT JOIN users u ON u.id = al.user_id
-                 WHERE al.tenant_id = ? AND al.action LIKE 'gdpr%'
-                 ORDER BY al.created_at DESC
+                "SELECT gal.id, gal.tenant_id, gal.admin_id, gal.action, gal.entity_type, gal.entity_id,
+                        gal.old_value, gal.new_value, gal.ip_address, gal.created_at,
+                        u.name as user_name
+                 FROM gdpr_audit_log gal
+                 LEFT JOIN users u ON u.id = gal.admin_id
+                 WHERE gal.tenant_id = ?
+                 ORDER BY gal.created_at DESC
                  LIMIT 100",
                 [$tenantId]
             );
@@ -733,15 +789,31 @@ class AdminEnterpriseApiController extends BaseApiController
             // Ignore
         }
 
-        $allOk = $dbOk && $redisOk;
+        $checks = [
+            ['name' => 'Database', 'status' => $dbOk ? 'ok' : 'fail'],
+            ['name' => 'Redis', 'status' => $redisOk ? 'ok' : 'fail'],
+            ['name' => 'Disk', 'status' => 'ok', 'free' => $diskFree, 'total' => $diskTotal],
+        ];
+
+        // PHP extension checks
+        $requiredExtensions = ['pdo_mysql', 'redis', 'zip', 'mbstring', 'gd', 'curl', 'json', 'openssl'];
+        foreach ($requiredExtensions as $ext) {
+            $checks[] = [
+                'name'   => 'PHP ext: ' . $ext,
+                'status' => extension_loaded($ext) ? 'ok' : 'fail',
+            ];
+        }
+        $checks[] = [
+            'name'   => 'PHP >= 8.2',
+            'status' => version_compare(PHP_VERSION, '8.2.0', '>=') ? 'ok' : 'fail',
+        ];
+
+        $hasFailures = !empty(array_filter($checks, fn($c) => $c['status'] === 'fail'));
+        $overall = $hasFailures ? 'unhealthy' : 'healthy';
 
         $this->respondWithData([
-            'status' => $allOk ? 'healthy' : 'degraded',
-            'checks' => [
-                ['name' => 'Database', 'status' => $dbOk ? 'ok' : 'fail'],
-                ['name' => 'Redis', 'status' => $redisOk ? 'ok' : 'fail'],
-                ['name' => 'Disk', 'status' => 'ok', 'free' => $diskFree, 'total' => $diskTotal],
-            ],
+            'status' => $overall,
+            'checks' => $checks,
         ]);
     }
 
@@ -904,16 +976,11 @@ class AdminEnterpriseApiController extends BaseApiController
     public function legalDocs(): void
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
-
         try {
-            $stmt = Database::query(
-                "SELECT * FROM legal_documents WHERE tenant_id = ? ORDER BY updated_at DESC",
-                [$tenantId]
-            );
-            $docs = $stmt->fetchAll();
+            $docs = \Nexus\Services\LegalDocumentService::getAllForTenant(TenantContext::getId());
             $this->respondWithData($docs);
         } catch (\Exception $e) {
+            error_log('legalDocs error: ' . $e->getMessage());
             $this->respondWithData([]);
         }
     }
@@ -949,34 +1016,28 @@ class AdminEnterpriseApiController extends BaseApiController
     public function createLegalDoc(): void
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
+        $data = $this->getJsonInput();
+        $adminId = $this->getAuthenticatedUserId();
 
-        $title = trim($this->input('title', ''));
-        $content = $this->input('content', '');
-        $type = $this->input('type', 'terms');
-        $version = $this->input('version', '1.0');
-        $status = $this->input('status', 'draft');
-
-        if (empty($title)) {
+        if (empty($data['title'])) {
             $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 422);
+            return;
         }
 
         try {
-            Database::query(
-                "INSERT INTO legal_documents (title, content, type, version, status, tenant_id, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
-                [$title, $content, $type, $version, $status, $tenantId]
-            );
-            $docId = Database::lastInsertId();
-
-            $this->respondWithData([
-                'id' => (int) $docId,
-                'title' => $title,
-                'type' => $type,
-                'version' => $version,
-                'status' => $status,
-            ], null, 201);
+            $doc = \Nexus\Services\LegalDocumentService::createDocument([
+                'title'                   => $data['title'],
+                'document_type'           => $data['type'] ?? $data['document_type'] ?? 'terms',
+                'slug'                    => $data['slug'] ?? null,
+                'requires_acceptance'     => $data['requires_acceptance'] ?? true,
+                'acceptance_required_for' => $data['acceptance_required_for'] ?? 'registration',
+                'notify_on_update'        => $data['notify_on_update'] ?? false,
+                'is_active'               => $data['is_active'] ?? true,
+                'created_by'              => $adminId,
+            ]);
+            $this->respondWithData($doc, null, 201);
         } catch (\Exception $e) {
+            error_log('createLegalDoc error: ' . $e->getMessage());
             $this->respondWithError('CREATE_FAILED', 'Failed to create legal document: ' . $e->getMessage(), null, 500);
         }
     }
@@ -987,53 +1048,27 @@ class AdminEnterpriseApiController extends BaseApiController
     public function updateLegalDoc(int $id): void
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
-
-        $title = $this->input('title');
-        $content = $this->input('content');
-        $type = $this->input('type');
-        $version = $this->input('version');
-        $status = $this->input('status');
-
-        $updates = [];
-        $params = [];
-
-        if ($title !== null) {
-            $updates[] = "title = ?";
-            $params[] = trim($title);
-        }
-        if ($content !== null) {
-            $updates[] = "content = ?";
-            $params[] = $content;
-        }
-        if ($type !== null) {
-            $updates[] = "type = ?";
-            $params[] = $type;
-        }
-        if ($version !== null) {
-            $updates[] = "version = ?";
-            $params[] = $version;
-        }
-        if ($status !== null) {
-            $updates[] = "status = ?";
-            $params[] = $status;
-        }
-
-        if (empty($updates)) {
-            $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
-        }
-
-        $updates[] = "updated_at = NOW()";
-        $params[] = $id;
-        $params[] = $tenantId;
+        $data = $this->getJsonInput();
 
         try {
-            Database::query(
-                "UPDATE legal_documents SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?",
-                $params
-            );
-            $this->respondWithData(['id' => $id, 'updated' => true]);
+            $updateData = [];
+            if (isset($data['title'])) $updateData['title'] = $data['title'];
+            if (isset($data['type'])) $updateData['document_type'] = $data['type'];
+            if (isset($data['document_type'])) $updateData['document_type'] = $data['document_type'];
+            if (isset($data['slug'])) $updateData['slug'] = $data['slug'];
+            if (isset($data['is_active'])) $updateData['is_active'] = $data['is_active'];
+            if (isset($data['requires_acceptance'])) $updateData['requires_acceptance'] = $data['requires_acceptance'];
+            if (isset($data['acceptance_required_for'])) $updateData['acceptance_required_for'] = $data['acceptance_required_for'];
+            if (isset($data['notify_on_update'])) $updateData['notify_on_update'] = $data['notify_on_update'];
+
+            $doc = \Nexus\Services\LegalDocumentService::updateDocument($id, $updateData);
+            if (!$doc) {
+                $this->respondWithError('NOT_FOUND', 'Document not found', null, 404);
+                return;
+            }
+            $this->respondWithData($doc);
         } catch (\Exception $e) {
+            error_log('updateLegalDoc error: ' . $e->getMessage());
             $this->respondWithError('UPDATE_FAILED', 'Failed to update legal document', null, 500);
         }
     }

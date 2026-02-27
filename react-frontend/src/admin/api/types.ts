@@ -1349,7 +1349,7 @@ export interface VettingRecord {
   first_name: string;
   last_name: string;
   email: string;
-  avatar?: string;
+  avatar_url?: string;
   vetting_type: 'dbs_basic' | 'dbs_standard' | 'dbs_enhanced' | 'garda_vetting' | 'access_ni' | 'pvg_scotland' | 'international' | 'other';
   status: 'pending' | 'submitted' | 'verified' | 'expired' | 'rejected' | 'revoked';
   reference_number: string | null;

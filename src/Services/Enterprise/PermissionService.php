@@ -35,6 +35,12 @@ class PermissionService
 {
     private array $cache = [];
     private bool $auditEnabled = true;
+    private int $tenantId;
+
+    public function __construct()
+    {
+        $this->tenantId = \Nexus\Core\TenantContext::getId();
+    }
 
     // Permission check results (for audit logging)
     const RESULT_GRANTED = 'granted';
@@ -170,14 +176,16 @@ class PermissionService
             LEFT JOIN user_permissions up ON p.id = up.permission_id
                 AND up.user_id = ?
                 AND up.granted = TRUE
+                AND up.tenant_id = ?
                 AND (up.expires_at IS NULL OR up.expires_at > NOW())
             LEFT JOIN user_roles ur ON ur.user_id = ?
+                AND ur.tenant_id = ?
                 AND (ur.expires_at IS NULL OR ur.expires_at > NOW())
             LEFT JOIN role_permissions rp ON rp.role_id = ur.role_id
                 AND rp.permission_id = p.id
             WHERE (up.id IS NOT NULL OR rp.id IS NOT NULL)
             ORDER BY p.category, p.name
-        ", [$userId, $userId])->fetchAll();
+        ", [$userId, $this->tenantId, $userId, $this->tenantId])->fetchAll();
 
         return $permissions;
     }
@@ -202,9 +210,10 @@ class PermissionService
             JOIN roles r ON ur.role_id = r.id
             LEFT JOIN users assignedBy ON ur.assigned_by = assignedBy.id
             WHERE ur.user_id = ?
+                AND ur.tenant_id = ?
                 AND (ur.expires_at IS NULL OR ur.expires_at > NOW())
             ORDER BY r.level DESC, r.name
-        ", [$userId])->fetchAll();
+        ", [$userId, $this->tenantId])->fetchAll();
     }
 
     /**
@@ -215,16 +224,16 @@ class PermissionService
         try {
             // Check if already assigned
             $existing = Database::query(
-                "SELECT id FROM user_roles WHERE user_id = ? AND role_id = ?",
-                [$userId, $roleId]
+                "SELECT id FROM user_roles WHERE user_id = ? AND role_id = ? AND tenant_id = ?",
+                [$userId, $roleId, $this->tenantId]
             )->fetch();
 
             if ($existing) {
                 // Update expiration if different
                 if ($expiresAt) {
                     Database::query(
-                        "UPDATE user_roles SET expires_at = ? WHERE id = ?",
-                        [$expiresAt, $existing['id']]
+                        "UPDATE user_roles SET expires_at = ? WHERE id = ? AND tenant_id = ?",
+                        [$expiresAt, $existing['id'], $this->tenantId]
                     );
                 }
                 $this->clearUserPermissionCache($userId);
@@ -233,9 +242,9 @@ class PermissionService
 
             // Insert new role assignment
             Database::query(
-                "INSERT INTO user_roles (user_id, role_id, assigned_by, expires_at)
-                 VALUES (?, ?, ?, ?)",
-                [$userId, $roleId, $assignedBy, $expiresAt]
+                "INSERT INTO user_roles (user_id, role_id, assigned_by, expires_at, tenant_id)
+                 VALUES (?, ?, ?, ?, ?)",
+                [$userId, $roleId, $assignedBy, $expiresAt, $this->tenantId]
             );
 
             // Audit log
@@ -259,8 +268,8 @@ class PermissionService
     {
         try {
             Database::query(
-                "DELETE FROM user_roles WHERE user_id = ? AND role_id = ?",
-                [$userId, $roleId]
+                "DELETE FROM user_roles WHERE user_id = ? AND role_id = ? AND tenant_id = ?",
+                [$userId, $roleId, $this->tenantId]
             );
 
             // Audit log
@@ -282,15 +291,15 @@ class PermissionService
     {
         try {
             Database::query(
-                "INSERT INTO user_permissions (user_id, permission_id, granted, granted_by, reason, expires_at)
-                 VALUES (?, ?, TRUE, ?, ?, ?)
+                "INSERT INTO user_permissions (user_id, permission_id, granted, granted_by, reason, expires_at, tenant_id)
+                 VALUES (?, ?, TRUE, ?, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE
                     granted = TRUE,
                     granted_by = VALUES(granted_by),
                     reason = VALUES(reason),
                     expires_at = VALUES(expires_at),
                     granted_at = CURRENT_TIMESTAMP",
-                [$userId, $permissionId, $grantedBy, $reason, $expiresAt]
+                [$userId, $permissionId, $grantedBy, $reason, $expiresAt, $this->tenantId]
             );
 
             // Audit log
@@ -315,14 +324,14 @@ class PermissionService
     {
         try {
             Database::query(
-                "INSERT INTO user_permissions (user_id, permission_id, granted, granted_by, reason)
-                 VALUES (?, ?, FALSE, ?, ?)
+                "INSERT INTO user_permissions (user_id, permission_id, granted, granted_by, reason, tenant_id)
+                 VALUES (?, ?, FALSE, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE
                     granted = FALSE,
                     granted_by = VALUES(granted_by),
                     reason = VALUES(reason),
                     granted_at = CURRENT_TIMESTAMP",
-                [$userId, $permissionId, $revokedBy, $reason]
+                [$userId, $permissionId, $revokedBy, $reason, $this->tenantId]
             );
 
             // Audit log
@@ -372,9 +381,10 @@ class PermissionService
             WHERE up.user_id = ?
                 AND p.name = ?
                 AND up.granted = FALSE
+                AND up.tenant_id = ?
                 AND (up.expires_at IS NULL OR up.expires_at > NOW())
             LIMIT 1
-        ", [$userId, $permission])->fetch();
+        ", [$userId, $permission, $this->tenantId])->fetch();
 
         return !empty($result);
     }
@@ -391,9 +401,10 @@ class PermissionService
             WHERE up.user_id = ?
                 AND p.name = ?
                 AND up.granted = TRUE
+                AND up.tenant_id = ?
                 AND (up.expires_at IS NULL OR up.expires_at > NOW())
             LIMIT 1
-        ", [$userId, $permission])->fetch();
+        ", [$userId, $permission, $this->tenantId])->fetch();
 
         return !empty($result);
     }
@@ -410,9 +421,10 @@ class PermissionService
             JOIN permissions p ON rp.permission_id = p.id
             WHERE ur.user_id = ?
                 AND p.name = ?
+                AND ur.tenant_id = ?
                 AND (ur.expires_at IS NULL OR ur.expires_at > NOW())
             LIMIT 1
-        ", [$userId, $permission])->fetch();
+        ", [$userId, $permission, $this->tenantId])->fetch();
 
         return !empty($result);
     }
@@ -541,8 +553,10 @@ class PermissionService
     public function getAllPermissions(): array
     {
         $permissions = Database::query("
-            SELECT * FROM permissions ORDER BY category, name
-        ")->fetchAll();
+            SELECT * FROM permissions
+            WHERE (tenant_id = ? OR tenant_id IS NULL)
+            ORDER BY category, name
+        ", [$this->tenantId])->fetchAll();
 
         $grouped = [];
         foreach ($permissions as $perm) {
@@ -604,10 +618,12 @@ class PermissionService
             FROM roles r
             LEFT JOIN role_permissions rp ON r.id = rp.role_id
             LEFT JOIN user_roles ur ON r.id = ur.role_id
+                AND ur.tenant_id = ?
                 AND (ur.expires_at IS NULL OR ur.expires_at > NOW())
+            WHERE r.tenant_id = ?
             GROUP BY r.id
             ORDER BY r.level DESC, r.name
-        ")->fetchAll();
+        ", [$this->tenantId, $this->tenantId])->fetchAll();
     }
 
     /**

@@ -52,27 +52,37 @@ class GdprApiController extends BaseApiController
         $consentId = $this->input('consent_id');
         $granted = $this->inputBool('granted', false);
 
-        if (!$consentId) {
+        if (!$consentId && !$this->input('consent_type')) {
             $this->respondWithError('VALIDATION_ERROR', 'Missing consent_id', 'consent_id', 400);
         }
 
-        try {
-            $ip = \Nexus\Core\ClientIp::get();
-            $platform = $this->isStatelessRequest() ? 'mobile' : 'web';
+        // Resolve consent_id (int) to consent type slug, or use consent_type directly
+        if ($consentId) {
+            $consentRow = Database::query(
+                "SELECT slug FROM consent_types WHERE id = ? LIMIT 1",
+                [(int) $consentId]
+            )->fetch();
+            $consentType = $consentRow['slug'] ?? null;
+        } else {
+            $consentType = $this->input('consent_type');
+        }
 
-            if ($granted) {
-                $result = $this->gdprService->grantConsent($userId, (int) $consentId, $platform, $ip);
-            } else {
-                $result = $this->gdprService->withdrawConsent($userId, (int) $consentId, $ip);
-            }
+        if (!$consentType) {
+            $this->respondWithError('VALIDATION_ERROR', 'consent_id or consent_type is required', 'consent_id', 422);
+            return;
+        }
+
+        try {
+            $result = $this->gdprService->updateUserConsent($userId, $consentType, $granted);
 
             $this->respondWithData([
-                'updated' => $result,
-                'consent_id' => (int) $consentId,
+                'updated' => true,
+                'consent_id' => $consentId ? (int) $consentId : null,
+                'consent_type' => $consentType,
                 'granted' => $granted
             ]);
         } catch (\Exception $e) {
-            $this->respondWithError('CONSENT_UPDATE_FAILED', 'Failed to update consent', null, 500);
+            $this->respondWithError('CONSENT_UPDATE_FAILED', $e->getMessage(), null, 500);
         }
     }
 

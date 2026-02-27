@@ -1371,6 +1371,22 @@ class AdminBrokerApiController extends BaseApiController
                 );
             }
 
+            // Also sync workflow config to tenants.configuration for BrokerControlConfigService
+            $workflowKeys = [
+                'require_broker_approval', 'auto_approve_low_risk', 'max_hours_without_approval',
+                'exchange_workflow_enabled', 'require_broker_approval_new_members',
+                'require_broker_approval_high_risk', 'require_broker_approval_over_hours',
+            ];
+            $workflowConfig = [];
+            foreach ($workflowKeys as $key) {
+                if (array_key_exists($key, $body)) {
+                    $workflowConfig[$key] = $body[$key];
+                }
+            }
+            if (!empty($workflowConfig)) {
+                \Nexus\Services\BrokerControlConfigService::updateConfig($workflowConfig);
+            }
+
             $this->respondWithData($config);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to save configuration', null, 500);

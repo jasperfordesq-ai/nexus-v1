@@ -285,7 +285,7 @@ export function VettingRecords() {
       render: (item) => (
         <div className="flex items-center gap-2">
           <Avatar
-            src={item.avatar || undefined}
+            src={item.avatar_url || undefined}
             name={`${item.first_name} ${item.last_name}`}
             size="sm"
             className="shrink-0"
@@ -719,7 +719,7 @@ export function VettingRecords() {
             <ModalBody>
               <div className="flex items-center gap-3 mb-4">
                 <Avatar
-                  src={viewItem.avatar || undefined}
+                  src={viewItem.avatar_url || undefined}
                   name={`${viewItem.first_name} ${viewItem.last_name}`}
                   size="lg"
                 />
