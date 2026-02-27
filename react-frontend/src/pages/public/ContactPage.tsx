@@ -56,8 +56,7 @@ export function ContactPage() {
       }
     } catch (err) {
       logError('Failed to submit contact form', err);
-      // Still show success - the message may have been received
-      setSubmitted(true);
+      setError(t('contact.error_fallback'));
     } finally {
       setIsSubmitting(false);
     }

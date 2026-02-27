@@ -170,7 +170,8 @@ class ListingsApiController extends BaseApiController
      */
     public function show(int $id): void
     {
-        $listing = ListingService::getById($id);
+        $userId  = $this->getOptionalUserId();
+        $listing = ListingService::getById($id, false, $userId);
 
         if (!$listing) {
             $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);

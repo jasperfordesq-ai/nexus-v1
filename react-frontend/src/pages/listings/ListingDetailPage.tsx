@@ -52,6 +52,7 @@ export function ListingDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [exchangeConfig, setExchangeConfig] = useState<ExchangeConfig | null>(null);
   const [activeExchange, setActiveExchange] = useState<{ id: number; status: string; role: string; proposed_hours: number } | null>(null);
 
@@ -121,15 +122,26 @@ export function ListingDetailPage() {
     }
   }
 
-  function handleSave() {
-    // Toggle saved state locally (API endpoint not yet implemented)
-    setIsSaved(!isSaved);
-    if (!isSaved) {
-      toast.success(t('save_success_title'), t('save_success_subtitle'));
-    } else {
-      toast.info(t('unsave_title'));
+  const handleSave = async () => {
+    if (!id || isSaving) return;
+    const wasAlreadySaved = isSaved;
+    setIsSaved(!wasAlreadySaved); // optimistic update
+    setIsSaving(true);
+    try {
+      if (wasAlreadySaved) {
+        await api.delete(`/v2/listings/${id}/save`);
+        toast.info(t('unsave_title'));
+      } else {
+        await api.post(`/v2/listings/${id}/save`, {});
+        toast.success(t('save_success_title'), t('save_success_subtitle'));
+      }
+    } catch (err) {
+      logError('Failed to save listing', err);
+      setIsSaved(wasAlreadySaved); // rollback on failure
+    } finally {
+      setIsSaving(false);
     }
-  }
+  };
 
   async function handleShare() {
     if (!listing) return;
@@ -378,7 +390,8 @@ export function ListingDetailPage() {
               variant="flat"
               className={`flex-1 sm:flex-none ${isSaved ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" aria-hidden="true" /> : <Heart className="w-4 h-4" aria-hidden="true" />}
-              onClick={handleSave}
+              onClick={() => void handleSave()}
+              isDisabled={isSaving}
             >
               {isSaved ? t('detail_saved') : t('detail_save')}
             </Button>

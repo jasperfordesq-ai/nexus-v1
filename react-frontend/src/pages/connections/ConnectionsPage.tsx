@@ -61,12 +61,6 @@ interface Connection {
   created_at: string;
 }
 
-interface ConnectionsResponse {
-  items: Connection[];
-  cursor: string | null;
-  has_more: boolean;
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Skeleton card
 // ─────────────────────────────────────────────────────────────────────────────
@@ -417,17 +411,19 @@ export default function ConnectionsPage() {
     }
 
     try {
-      let url = `/api/v2/connections?status=${status}&per_page=20`;
+      let url = `/v2/connections?status=${status}&per_page=20`;
       if (cursor) url += `&cursor=${cursor}`;
 
-      const response = await api.get<ConnectionsResponse>(url);
+      const response = await api.get<Connection[]>(url);
 
       if (response.success && response.data) {
-        const { items, cursor: nextCursor, has_more } = response.data;
+        const items = Array.isArray(response.data) ? response.data : [];
+        const nextCursor = response.meta?.cursor ?? null;
+        const hasMoreItems = response.meta?.has_more ?? false;
 
         setterMap[status](prev => isInitial ? items : [...prev, ...items]);
         setCursors(prev => ({ ...prev, [status]: nextCursor }));
-        setHasMore(prev => ({ ...prev, [status]: has_more }));
+        setHasMore(prev => ({ ...prev, [status]: hasMoreItems }));
       }
     } catch {
       toastError('Failed to load connections');
@@ -460,7 +456,7 @@ export default function ConnectionsPage() {
   const handleAccept = async (connectionId: number) => {
     markActing(connectionId, true);
     try {
-      const response = await api.post(`/api/v2/connections/${connectionId}/accept`, {});
+      const response = await api.post(`/v2/connections/${connectionId}/accept`, {});
       if (response.success) {
         // Move from pending_received to accepted
         const accepted_conn = pendingReceived.find(c => c.connection_id === connectionId);
@@ -482,7 +478,7 @@ export default function ConnectionsPage() {
   const handleDecline = async (connectionId: number) => {
     markActing(connectionId, true);
     try {
-      const response = await api.delete(`/api/v2/connections/${connectionId}`);
+      const response = await api.delete(`/v2/connections/${connectionId}`);
       if (response.success) {
         setPendingReceived(prev => prev.filter(c => c.connection_id !== connectionId));
         toastInfo('Request declined');
@@ -499,7 +495,7 @@ export default function ConnectionsPage() {
   const handleDisconnect = async (connectionId: number) => {
     markActing(connectionId, true);
     try {
-      const response = await api.delete(`/api/v2/connections/${connectionId}`);
+      const response = await api.delete(`/v2/connections/${connectionId}`);
       if (response.success) {
         setAccepted(prev => prev.filter(c => c.connection_id !== connectionId));
         toastInfo('Disconnected');
@@ -516,7 +512,7 @@ export default function ConnectionsPage() {
   const handleCancelSent = async (connectionId: number) => {
     markActing(connectionId, true);
     try {
-      const response = await api.delete(`/api/v2/connections/${connectionId}`);
+      const response = await api.delete(`/v2/connections/${connectionId}`);
       if (response.success) {
         setPendingSent(prev => prev.filter(c => c.connection_id !== connectionId));
         toastInfo('Request cancelled');
