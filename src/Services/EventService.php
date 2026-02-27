@@ -216,7 +216,8 @@ class EventService
 
         // Add user's RSVP status if logged in
         if ($userId) {
-            $formatted['user_rsvp'] = EventRsvp::getUserStatus($id, $userId);
+            $formatted['rsvp_status'] = EventRsvp::getUserStatus($id, $userId);
+            $formatted['user_rsvp'] = $formatted['rsvp_status'];
         }
 
         return $formatted;
@@ -240,10 +241,15 @@ class EventService
             'longitude' => $event['longitude'] ? (float)$event['longitude'] : null,
             'start_time' => $event['start_time'],
             'end_time' => $event['end_time'],
+            'start_date' => $event['start_time'],
+            'end_date' => $event['end_time'],
             'cover_image' => $event['cover_image'] ?? null,
             'organizer' => [
                 'id' => (int)$event['user_id'],
                 'name' => $event['organizer_name'] ?? trim(($event['organizer_first_name'] ?? '') . ' ' . ($event['organizer_last_name'] ?? '')),
+                'first_name' => $event['organizer_first_name'] ?? null,
+                'last_name' => $event['organizer_last_name'] ?? null,
+                'avatar' => $event['organizer_avatar'] ?? null,
                 'avatar_url' => $event['organizer_avatar'] ?? null,
             ],
             'category' => $event['category_id'] ? [
@@ -631,7 +637,11 @@ class EventService
             $items[] = [
                 'id' => (int)$att['user_id'],
                 'name' => $att['name'] ?? trim(($att['first_name'] ?? '') . ' ' . ($att['last_name'] ?? '')),
+                'first_name' => $att['first_name'] ?? null,
+                'last_name' => $att['last_name'] ?? null,
+                'avatar' => $att['avatar_url'],
                 'avatar_url' => $att['avatar_url'],
+                'rsvp_status' => $att['status'],
                 'status' => $att['status'],
                 'rsvp_at' => $att['rsvp_at'],
             ];

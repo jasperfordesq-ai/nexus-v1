@@ -206,7 +206,7 @@ class GamificationV2ApiController extends BaseApiController
 
         $badge = array_merge($definition, [
             'earned' => !empty($userBadge),
-            'earned_at' => $userBadge['created_at'] ?? null,
+            'earned_at' => $userBadge['awarded_at'] ?? null,
             'is_showcased' => !empty($userBadge['is_showcased'] ?? false),
         ]);
 
