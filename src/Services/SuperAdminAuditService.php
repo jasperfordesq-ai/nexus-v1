@@ -67,7 +67,7 @@ class SuperAdminAuditService
                 $oldValues ? json_encode($oldValues) : null,
                 $newValues ? json_encode($newValues) : null,
                 $description,
-                $_SERVER['REMOTE_ADDR'] ?? null,
+                \Nexus\Core\ClientIp::get(),
                 substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 500)
             ]);
 

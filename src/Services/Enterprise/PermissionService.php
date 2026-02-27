@@ -462,7 +462,7 @@ class PermissionService
                 $granted ? self::RESULT_GRANTED : self::RESULT_DENIED,
                 $resourceType,
                 $resourceId,
-                $_SERVER['REMOTE_ADDR'] ?? null,
+                \Nexus\Core\ClientIp::get(),
                 $_SERVER['HTTP_USER_AGENT'] ?? null
             ]);
         } catch (\Exception $e) {
@@ -492,7 +492,7 @@ class PermissionService
                 $actorId,
                 $roleId,
                 $permissionId,
-                $_SERVER['REMOTE_ADDR'] ?? null,
+                \Nexus\Core\ClientIp::get(),
                 $_SERVER['HTTP_USER_AGENT'] ?? null,
                 $metadata ? json_encode($metadata) : null
             ]);

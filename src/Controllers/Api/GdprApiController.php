@@ -57,7 +57,7 @@ class GdprApiController extends BaseApiController
         }
 
         try {
-            $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+            $ip = \Nexus\Core\ClientIp::get();
             $platform = $this->isStatelessRequest() ? 'mobile' : 'web';
 
             if ($granted) {

@@ -608,7 +608,7 @@ class GdprService
                 $consentText,
                 $version,
                 $consentHash,
-                $_SERVER['REMOTE_ADDR'] ?? null,
+                \Nexus\Core\ClientIp::get(),
                 $_SERVER['HTTP_USER_AGENT'] ?? null,
                 $consented ? date('Y-m-d H:i:s') : null,
             ]
@@ -1104,7 +1104,7 @@ class GdprService
                 $entityId,
                 $oldValue ? json_encode($oldValue) : null,
                 $newValue ? json_encode($newValue) : null,
-                $_SERVER['REMOTE_ADDR'] ?? null,
+                \Nexus\Core\ClientIp::get(),
                 $_SERVER['HTTP_USER_AGENT'] ?? null,
                 $_SERVER['HTTP_X_REQUEST_ID'] ?? null,
             ]

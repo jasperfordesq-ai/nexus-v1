@@ -116,7 +116,7 @@ class FederationAuditService
                 $actorName,
                 $actorEmail,
                 !empty($data) ? json_encode($data) : null,
-                $_SERVER['REMOTE_ADDR'] ?? null,
+                \Nexus\Core\ClientIp::get(),
                 isset($_SERVER['HTTP_USER_AGENT']) ? substr($_SERVER['HTTP_USER_AGENT'], 0, 500) : null
             ]);
 

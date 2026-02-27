@@ -29,7 +29,7 @@ class NewsletterTrackingController
                     $trackingToken,
                     $data['email'] ?? 'unknown',
                     $_SERVER['HTTP_USER_AGENT'] ?? null,
-                    $_SERVER['REMOTE_ADDR'] ?? null
+                    \Nexus\Core\ClientIp::get()
                 );
             } catch (\Exception $e) {
                 // Silently fail - don't disrupt email viewing
@@ -69,7 +69,7 @@ class NewsletterTrackingController
                     $url,
                     $linkId,
                     $_SERVER['HTTP_USER_AGENT'] ?? null,
-                    $_SERVER['REMOTE_ADDR'] ?? null
+                    \Nexus\Core\ClientIp::get()
                 );
             } catch (\Exception $e) {
                 // Silently fail - still redirect

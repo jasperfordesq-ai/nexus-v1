@@ -622,4 +622,22 @@ class AdminToolsApiController extends BaseApiController
             'message' => 'SEO audit queued',
         ]);
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // IP Debug (Temporary — remove after verification)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * GET /api/v2/admin/tools/ip-debug
+     *
+     * Returns all IP-related headers and the resolved client IP.
+     * Admin-only. Use this to verify that ClientIp::get() returns
+     * the real public IP after deploying the fix.
+     */
+    public function ipDebug(): void
+    {
+        $this->requireAdmin();
+
+        $this->respondWithData(\Nexus\Core\ClientIp::debug());
+    }
 }

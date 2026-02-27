@@ -106,7 +106,7 @@ class RateLimiter
         self::ensureTableExists();
 
         $db = Database::getInstance();
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = ClientIp::get();
 
         $stmt = $db->prepare(
             "INSERT INTO login_attempts (identifier, type, ip_address, success, attempted_at)

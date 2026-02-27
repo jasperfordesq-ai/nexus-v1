@@ -812,7 +812,7 @@ abstract class BaseApiController
             return "user:{$userId}";
         }
 
-        return 'ip:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        return 'ip:' . \Nexus\Core\ClientIp::get();
     }
 
     // ============================================

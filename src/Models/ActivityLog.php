@@ -18,7 +18,7 @@ class ActivityLog
 
     public static function log($userId, $action, $details = '', $isPublic = false, $linkUrl = null, $actionType = 'system', $entityType = null, $entityId = null)
     {
-        $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+        $ip = \Nexus\Core\ClientIp::get();
         $sql = "INSERT INTO activity_log (user_id, action, details, is_public, link_url, ip_address, action_type, entity_type, entity_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Database::query($sql, [$userId, $action, $details, $isPublic ? 1 : 0, $linkUrl, $ip, $actionType, $entityType, $entityId]);
     }

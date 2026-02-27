@@ -145,7 +145,7 @@ class TotpService
     public static function recordAttempt(int $userId, bool $successful, string $type = 'totp', ?string $failureReason = null): void
     {
         $tenantId = TenantContext::getId();
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 
         Database::query(
@@ -380,7 +380,7 @@ class TotpService
         }
 
         // Mark code as used
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 
         Database::query(
@@ -561,7 +561,7 @@ class TotpService
         Database::beginTransaction();
         try {
             // Log the override
-            $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $ip = \Nexus\Core\ClientIp::get();
             $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 
             Database::query(
@@ -671,7 +671,7 @@ class TotpService
         $token = bin2hex(random_bytes(32));
         $tokenHash = hash('sha256', $token);
 
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = \Nexus\Core\ClientIp::get();
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
         $deviceName = self::parseDeviceName($userAgent);
         $expiresAt = date('Y-m-d H:i:s', time() + (self::TRUSTED_DEVICE_DAYS * 24 * 60 * 60));

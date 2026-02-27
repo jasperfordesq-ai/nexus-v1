@@ -17,7 +17,7 @@ namespace Nexus\Services;
  * endpoints like authentication and token refresh.
  *
  * Usage:
- *   $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+ *   $ip = \Nexus\Core\ClientIp::get();
  *   if (RateLimitService::check("auth:login:$ip", 5, 60)) {
  *       // Rate limited - return 429
  *   }

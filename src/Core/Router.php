@@ -193,7 +193,7 @@ class Router
             // Get request information
             $referer = $_SERVER['HTTP_REFERER'] ?? null;
             $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
-            $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
+            $ipAddress = ClientIp::get();
             $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
             // Log the 404 error

@@ -475,7 +475,7 @@ class Deliverable
         $oldValueStr = is_array($oldValue) ? json_encode($oldValue) : $oldValue;
         $newValueStr = is_array($newValue) ? json_encode($newValue) : $newValue;
 
-        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
+        $ipAddress = \Nexus\Core\ClientIp::get();
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 
         $sql = "INSERT INTO deliverable_history (
