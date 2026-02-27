@@ -648,6 +648,9 @@ class PageController
             // Delete versions first (foreign key constraint)
             Database::query("DELETE FROM page_versions WHERE page_id = ?", [$id]);
 
+            // Remove any menu items referencing this page
+            Database::query("DELETE FROM menu_items WHERE page_id = ?", [$id]);
+
             // Delete the page
             Database::query("DELETE FROM pages WHERE id = ?", [$id]);
 
