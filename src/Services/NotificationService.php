@@ -204,6 +204,7 @@ class NotificationService
             'title' => $notification['title'] ?? null,
             'message' => $notification['message'],
             'is_read' => (bool)$notification['is_read'],
+            'read_at' => $notification['is_read'] ? ($notification['read_at'] ?? $notification['updated_at'] ?? $notification['created_at']) : null,
             'actor' => $actor,
             'target' => $target,
             'link' => $notification['link'] ?? null,

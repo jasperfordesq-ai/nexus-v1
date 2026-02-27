@@ -267,11 +267,11 @@ class UserService
     {
         try {
             $badges = Database::query(
-                "SELECT b.name, b.badge_key, b.icon, b.description, ub.earned_at
+                "SELECT b.name, b.badge_key, b.icon, b.description, ub.awarded_at as earned_at
                  FROM user_badges ub
                  JOIN badges b ON ub.badge_key = b.badge_key AND ub.tenant_id = b.tenant_id
                  WHERE ub.user_id = ?
-                 ORDER BY ub.earned_at DESC",
+                 ORDER BY ub.awarded_at DESC",
                 [$userId]
             )->fetchAll(\PDO::FETCH_ASSOC);
 

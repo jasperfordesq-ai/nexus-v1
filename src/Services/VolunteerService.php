@@ -497,7 +497,7 @@ class VolunteerService
         }
 
         $sql = "
-            SELECT a.*, o.title as opp_title, o.location, org.name as org_name, org.logo_url as org_logo,
+            SELECT a.*, o.title as opp_title, o.location, org.id as org_id, org.name as org_name, org.logo_url as org_logo,
                    s.start_time as shift_start, s.end_time as shift_end
             FROM vol_applications a
             JOIN vol_opportunities o ON a.opportunity_id = o.id
@@ -544,6 +544,7 @@ class VolunteerService
                     'location' => $app['location'],
                 ],
                 'organization' => [
+                    'id' => (int)$app['org_id'],
                     'name' => $app['org_name'],
                     'logo_url' => $app['org_logo'],
                 ],
@@ -1311,7 +1312,12 @@ class VolunteerService
                 'logo_url' => $org['logo_url'] ?? null,
                 'website' => $org['website'],
                 'contact_email' => $org['contact_email'],
+                'location' => $org['location'] ?? null,
+                'created_at' => $org['created_at'] ?? null,
                 'opportunity_count' => (int)$org['opportunity_count'],
+                'total_hours' => null,
+                'volunteer_count' => null,
+                'average_rating' => null,
                 'owner' => [
                     'name' => $org['owner_name'],
                     'avatar_url' => $org['owner_avatar'],
@@ -1367,10 +1373,18 @@ class VolunteerService
             'logo_url' => $org['logo_url'] ?? null,
             'website' => $org['website'],
             'contact_email' => $org['contact_email'],
+            'location' => $org['location'] ?? null,
+            'created_at' => $org['created_at'] ?? null,
             'status' => $org['status'],
+            'opportunity_count' => $oppCount,
+            'total_hours' => $totalHours,
+            'volunteer_count' => null,
+            'review_count' => count($reviews),
+            'average_rating' => round($avgRating, 1),
             'stats' => [
                 'opportunity_count' => $oppCount,
                 'total_hours_logged' => $totalHours,
+                'total_hours' => $totalHours,
                 'review_count' => count($reviews),
                 'average_rating' => round($avgRating, 1),
             ],
