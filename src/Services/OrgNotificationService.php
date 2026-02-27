@@ -43,7 +43,7 @@ class OrgNotificationService
                 $message .= ": " . (strlen($description) > 50 ? substr($description, 0, 50) . '...' : $description);
             }
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . '/wallet';
 
             // Platform notification
@@ -82,7 +82,7 @@ class OrgNotificationService
             $formattedAmount = number_format($amount, 2);
             $message = "{$depositorName} deposited {$formattedAmount} credits to {$orgName} wallet";
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/organizations/{$organizationId}/wallet";
 
             // Notify all admins/owners
@@ -132,7 +132,7 @@ class OrgNotificationService
                 ? "{$requesterName} requested {$formattedAmount} credits from {$orgName}"
                 : "{$requesterName} requested {$formattedAmount} credits for {$recipientName} from {$orgName}";
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/organizations/{$organizationId}/wallet";
 
             // Notify all admins/owners
@@ -178,7 +178,7 @@ class OrgNotificationService
             $formattedAmount = number_format($amount, 2);
             $approverName = $approver['name'] ?? 'An admin';
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
 
             // Notify requester
             $message = "Your transfer request for {$formattedAmount} credits from {$orgName} was approved";
@@ -223,7 +223,7 @@ class OrgNotificationService
             $formattedAmount = number_format($amount, 2);
             $approverName = $approver['name'] ?? 'An admin';
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/organizations/{$organizationId}/wallet";
 
             $message = "Your transfer request for {$formattedAmount} credits from {$orgName} was rejected";
@@ -269,7 +269,7 @@ class OrgNotificationService
                 $addedByName = $addedBy['name'] ?? 'An admin';
             }
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/volunteering/organization/{$organizationId}";
 
             $message = "You've been added to {$orgName} as {$roleLabel}";
@@ -312,7 +312,7 @@ class OrgNotificationService
                 $createdByName = $createdBy['name'] ?? 'A site administrator';
             }
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/organizations/{$organizationId}/wallet";
 
             $message = "An organization '{$orgName}' has been created for you!";
@@ -356,7 +356,7 @@ class OrgNotificationService
                 $changedByName = $changedBy['name'] ?? 'An admin';
             }
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/volunteering/organization/{$organizationId}";
 
             $message = "Your role in {$orgName} has been changed to {$roleLabel}";
@@ -398,7 +398,7 @@ class OrgNotificationService
                 $removedByName = $removedBy['name'] ?? 'An admin';
             }
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/volunteering/organizations";
 
             $message = "You've been removed from {$orgName}";
@@ -435,7 +435,7 @@ class OrgNotificationService
             $requesterName = $requester['name'] ?? 'Someone';
             $orgName = $org['name'];
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/organizations/{$organizationId}/members";
 
             $message = "{$requesterName} has requested to join {$orgName}";
@@ -476,7 +476,7 @@ class OrgNotificationService
 
             $orgName = $org['name'];
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/volunteering/organization/{$organizationId}";
 
             $message = "Your request to join {$orgName} has been approved!";
@@ -511,7 +511,7 @@ class OrgNotificationService
 
             $orgName = $org['name'];
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $link = $basePath . "/volunteering/organizations";
 
             $message = "Your request to join {$orgName} was not approved";

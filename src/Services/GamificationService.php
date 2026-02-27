@@ -604,7 +604,7 @@ class GamificationService
                 Database::query("UPDATE users SET level = ? WHERE id = ? AND tenant_id = ?", [$newLevel, $userId, $tenantId]);
 
                 // Notify user
-                $basePath = TenantContext::getBasePath();
+                $basePath = TenantContext::getSlugPrefix();
                 \Nexus\Models\Notification::create(
                     $userId,
                     "Congratulations! You've reached Level $newLevel! 🎉",
@@ -838,7 +838,7 @@ class GamificationService
             $msg = $def['msg'] ?? 'reaching a new milestone';
 
             // In-App Notification
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             \Nexus\Models\Notification::create(
                 $userId,
                 "You earned the '{$def['name']}' badge! {$def['icon']}",

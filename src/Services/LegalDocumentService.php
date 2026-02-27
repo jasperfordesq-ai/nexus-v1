@@ -910,7 +910,7 @@ class LegalDocumentService
 
         // Build email content
         $frontendUrl = \Nexus\Core\TenantContext::getFrontendUrl();
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $documentUrl = $frontendUrl . $basePath . '/' . $document['slug'];
 
         $subject = "Updated {$document['title']} - Action Required";

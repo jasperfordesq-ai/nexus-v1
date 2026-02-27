@@ -299,7 +299,7 @@ class BalanceAlertService
             return;
         }
 
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $link = $basePath . "/organizations/{$organizationId}/wallet";
 
         $formattedBalance = number_format($balance, 2);

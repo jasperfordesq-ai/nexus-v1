@@ -220,7 +220,7 @@ class GamificationEmailService
      */
     private static function sendDigestEmail(array $user, array $digest): bool
     {
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $siteName = TenantContext::getSetting('site_name', 'Community');
         $siteUrl = TenantContext::getFrontendUrl();
 
@@ -834,7 +834,7 @@ HTML;
         }
 
         $siteName = TenantContext::getSetting('site_name', 'Community');
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $siteUrl = TenantContext::getFrontendUrl();
 
         switch ($type) {

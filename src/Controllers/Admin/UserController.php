@@ -388,7 +388,7 @@ class UserController
 
                 \Nexus\Models\UserBadge::award($userId, $badgeKey, $name, $icon);
 
-                $basePath = \Nexus\Core\TenantContext::getBasePath();
+                $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
                 \Nexus\Models\Notification::create(
                     $userId,
                     "You were awarded the '{$name}' badge! {$icon}",
@@ -499,7 +499,7 @@ class UserController
             if (!\Nexus\Models\UserBadge::hasBadge($userId, $badgeKey)) {
                 \Nexus\Models\UserBadge::award($userId, $badgeKey, $badge['name'], $badge['icon']);
 
-                $basePath = TenantContext::getBasePath();
+                $basePath = TenantContext::getSlugPrefix();
                 \Nexus\Models\Notification::create(
                     $userId,
                     "You were awarded the '{$badge['name']}' badge! {$badge['icon']}",

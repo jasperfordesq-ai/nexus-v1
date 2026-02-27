@@ -40,7 +40,7 @@ class EmailTemplateBuilder
     {
         $this->tenantName = $tenantName;
         $this->appUrl = TenantContext::getFrontendUrl();
-        $this->basePath = TenantContext::getBasePath();
+        $this->basePath = TenantContext::getSlugPrefix();
     }
 
     /**
@@ -776,7 +776,7 @@ HTML;
     public static function personalizeContent(string $content, array $recipient): string
     {
         $appUrl = \Nexus\Core\TenantContext::getFrontendUrl();
-        $basePath = \Nexus\Core\TenantContext::getBasePath();
+        $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
 
         $tokens = [
             '{{first_name}}' => $recipient['first_name'] ?? $recipient['name'] ?? 'there',
@@ -846,7 +846,7 @@ HTML;
                 return '<p style="color: #6b7280; font-style: italic;">No recent listings available.</p>';
             }
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $appUrl = TenantContext::getFrontendUrl();
 
             $html = '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 20px 0;">';
@@ -898,7 +898,7 @@ HTML;
                 return '<p style="color: #6b7280; font-style: italic;">No upcoming events.</p>';
             }
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $appUrl = TenantContext::getFrontendUrl();
 
             $html = '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 20px 0;">';
@@ -959,7 +959,7 @@ HTML;
                 return '';
             }
 
-            $basePath = TenantContext::getBasePath();
+            $basePath = TenantContext::getSlugPrefix();
             $appUrl = TenantContext::getFrontendUrl();
 
             $name = htmlspecialchars(trim($member['first_name'] . ' ' . $member['last_name']));
@@ -1055,7 +1055,7 @@ HTML;
      */
     private static function renderQuickLinksBlock(array $options = []): string
     {
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $appUrl = TenantContext::getFrontendUrl();
 
         $links = [

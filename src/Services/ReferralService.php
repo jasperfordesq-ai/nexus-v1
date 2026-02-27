@@ -123,7 +123,7 @@ class ReferralService
     public static function getReferralLink($userId)
     {
         $code = self::getReferralCode($userId);
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $baseUrl = TenantContext::getFrontendUrl();
 
         return $baseUrl . $basePath . '/register?ref=' . $code;

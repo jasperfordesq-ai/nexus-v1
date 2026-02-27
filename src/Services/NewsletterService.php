@@ -362,7 +362,7 @@ class NewsletterService
         $sent = 0;
         $failed = 0;
 
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
 
         // Check if this is an A/B test
         $isABTest = !empty($newsletter['ab_test_enabled']) && !empty($newsletter['subject_b']);
@@ -574,7 +574,7 @@ class NewsletterService
 
         // Frontend URL for user-facing links (uses tenant domain, not API domain)
         $frontendUrl = TenantContext::getFrontendUrl();
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         // API URL for tracking endpoints (must hit PHP backend)
         $apiUrl = rtrim(Env::get('APP_URL') ?? $frontendUrl, '/');
 
@@ -1010,7 +1010,7 @@ HTML;
     public static function processTemplateVariables($content, $sampleData = [])
     {
         $tenant = TenantContext::get();
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
         $apiUrl = rtrim(Env::get('APP_URL') ?? $frontendUrl, '/');
 

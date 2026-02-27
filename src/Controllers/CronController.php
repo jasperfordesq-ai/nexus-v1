@@ -327,7 +327,7 @@ class CronController
 
                     // Replace placeholder URLs in email body
                     $baseUrl = TenantContext::getFrontendUrl();
-                    $basePath = TenantContext::getBasePath();
+                    $basePath = TenantContext::getSlugPrefix();
 
                     // Replace {{MATCHES_URL}} placeholder
                     $body = str_replace('{{MATCHES_URL}}', $baseUrl . $basePath . '/matches', $body);
@@ -395,7 +395,7 @@ class CronController
 
                 <div style='margin-top: 30px; font-size: 12px; color: #aaa; text-align: center;'>
                     <p>You received this email because you opted for a $frequency summary.</p>
-                    <p><a href='" . TenantContext::getFrontendUrl() . "/dashboard?tab=notifications' style='color: #aaa;'>Manage Notifications</a></p>
+                    <p><a href='" . TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/dashboard?tab=notifications' style='color: #aaa;'>Manage Notifications</a></p>
                 </div>
             </div>
         </body>

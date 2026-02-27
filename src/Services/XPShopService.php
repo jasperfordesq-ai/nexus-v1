@@ -201,7 +201,7 @@ class XPShopService
         self::applyItemEffect($userId, $item);
 
         // Send notification (outside transaction - non-critical)
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         Notification::create(
             $userId,
             "Purchase successful! You bought '{$item['name']}' for {$item['xp_cost']} XP. {$item['icon']}",

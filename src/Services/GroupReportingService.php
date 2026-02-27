@@ -193,7 +193,7 @@ class GroupReportingService
      */
     private static function renderWeeklyDigestEmail($data)
     {
-        $basePath = TenantContext::getBasePath();
+        $basePath = TenantContext::getSlugPrefix();
         $group = $data['group'];
         $stats = $data['stats'];
         $contributors = $data['topContributors'];

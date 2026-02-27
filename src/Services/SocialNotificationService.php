@@ -54,7 +54,7 @@ class SocialNotificationService
             $message = "$likerName liked your $contentLabel";
 
             // Build link
-            $basePath = class_exists('\Nexus\Core\TenantContext') ? TenantContext::getBasePath() : '';
+            $basePath = class_exists('\Nexus\Core\TenantContext') ? TenantContext::getSlugPrefix() : '';
             $link = self::getContentLink($basePath, $contentType, $contentId);
 
             // 1. Create platform notification (bell)
@@ -106,7 +106,7 @@ class SocialNotificationService
             $message = "$commenterName commented on your $contentLabel: \"$shortComment\"";
 
             // Build link
-            $basePath = class_exists('\Nexus\Core\TenantContext') ? TenantContext::getBasePath() : '';
+            $basePath = class_exists('\Nexus\Core\TenantContext') ? TenantContext::getSlugPrefix() : '';
             $link = self::getContentLink($basePath, $contentType, $contentId);
 
             // 1. Create platform notification (bell)
@@ -155,7 +155,7 @@ class SocialNotificationService
             $message = "$sharerName shared your $contentLabel";
 
             // Build link
-            $basePath = class_exists('\Nexus\Core\TenantContext') ? TenantContext::getBasePath() : '';
+            $basePath = class_exists('\Nexus\Core\TenantContext') ? TenantContext::getSlugPrefix() : '';
             $link = self::getContentLink($basePath, $contentType, $contentId);
 
             // 1. Create platform notification (bell)
