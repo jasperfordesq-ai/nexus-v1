@@ -31,8 +31,14 @@ export interface ComposeHubProps {
   groupId?: number;
 }
 
+export interface TemplateData {
+  title?: string;
+  content: string;
+}
+
 export interface TabSubmitProps {
   onSuccess: (type: ComposeTab, id?: number) => void;
   onClose: () => void;
   groupId: number | null;
+  templateData?: TemplateData | null;
 }

@@ -5,16 +5,19 @@
 
 /**
  * GoalTab — personal/community goal creation form for the Compose Hub.
+ * Now with character count and draft persistence.
  */
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Button, Input, Textarea, Switch, DatePicker } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
+import { useDraftPersistence } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { CharacterCount } from '../shared/CharacterCount';
 import type { TabSubmitProps } from '../types';
 
 const inputClasses = {
@@ -22,17 +25,48 @@ const inputClasses = {
   inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
 };
 
-export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
+const MAX_DESC_CHARS = 1000;
+
+interface GoalDraft {
+  title: string;
+  description: string;
+}
+
+export function GoalTab({ onSuccess, onClose, templateData }: TabSubmitProps) {
   const { t } = useTranslation('feed');
   const toast = useToast();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+
+  const [draft, setDraft, clearDraft] = useDraftPersistence<GoalDraft>(
+    'compose-draft-goal',
+    { title: '', description: '' },
+  );
+
   const [targetValue, setTargetValue] = useState('');
   const [deadline, setDeadline] = useState<DateInputValue | null>(null);
   const [isPublic, setIsPublic] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const canSubmit = title.trim().length > 0;
+  // Apply template data when selected from TemplatePicker
+  useEffect(() => {
+    if (templateData) {
+      setDraft((prev) => ({
+        ...prev,
+        title: templateData.title || prev.title,
+        description: templateData.content,
+      }));
+    }
+  }, [templateData, setDraft]);
+
+  const canSubmit = draft.title.trim().length > 0;
+
+  const setTitle = useCallback(
+    (v: string) => setDraft((prev) => ({ ...prev, title: v })),
+    [setDraft],
+  );
+  const setDescription = useCallback(
+    (v: string) => setDraft((prev) => ({ ...prev, description: v })),
+    [setDraft],
+  );
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -40,15 +74,16 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
     setIsSubmitting(true);
     try {
       const payload: Record<string, unknown> = {
-        title: title.trim(),
+        title: draft.title.trim(),
       };
-      if (description.trim()) payload.description = description.trim();
+      if (draft.description.trim()) payload.description = draft.description.trim();
       if (targetValue) payload.target_value = parseFloat(targetValue) || 0;
       if (deadline) payload.deadline = deadline.toString();
       payload.is_public = isPublic;
 
       const res = await api.post('/v2/goals', payload);
       if (res.success) {
+        clearDraft();
         toast.success(t('compose.goal_created'));
         onClose();
         onSuccess('goal');
@@ -68,21 +103,24 @@ export function GoalTab({ onSuccess, onClose }: TabSubmitProps) {
       <Input
         label={t('compose.goal_title_label')}
         placeholder={t('compose.goal_title_placeholder')}
-        value={title}
+        value={draft.title}
         onChange={(e) => setTitle(e.target.value)}
         isRequired
         classNames={inputClasses}
       />
 
-      <Textarea
-        label={t('compose.description_label')}
-        placeholder={t('compose.goal_desc_placeholder')}
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        minRows={2}
-        maxRows={5}
-        classNames={inputClasses}
-      />
+      <div>
+        <Textarea
+          label={t('compose.description_label')}
+          placeholder={t('compose.goal_desc_placeholder')}
+          value={draft.description}
+          onChange={(e) => setDescription(e.target.value)}
+          minRows={2}
+          maxRows={5}
+          classNames={inputClasses}
+        />
+        <CharacterCount current={draft.description.length} max={MAX_DESC_CHARS} />
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input

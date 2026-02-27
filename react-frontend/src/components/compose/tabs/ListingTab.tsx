@@ -5,18 +5,20 @@
 
 /**
  * ListingTab — quick listing creation form for the Compose Hub.
- * Simplified version of CreateListingPage for use in the compose modal.
+ * Now with character count and draft persistence.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Input, Textarea, Select, SelectItem, Chip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
+import { useDraftPersistence } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { AiAssistButton } from '../shared/AiAssistButton';
 import { SdgGoalsPicker } from '../shared/SdgGoalsPicker';
+import { CharacterCount } from '../shared/CharacterCount';
 import type { TabSubmitProps } from '../types';
 
 interface Category {
@@ -29,12 +31,23 @@ const inputClasses = {
   inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
 };
 
-export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
+const MAX_DESC_CHARS = 3000;
+
+interface ListingDraft {
+  title: string;
+  description: string;
+  type: 'offer' | 'request';
+}
+
+export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps) {
   const { t } = useTranslation('feed');
   const toast = useToast();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [type, setType] = useState<'offer' | 'request'>('offer');
+
+  const [draft, setDraft, clearDraft] = useDraftPersistence<ListingDraft>(
+    'compose-draft-listing',
+    { title: '', description: '', type: 'offer' },
+  );
+
   const [categoryId, setCategoryId] = useState('');
   const [hoursEstimate, setHoursEstimate] = useState('1');
   const [location, setLocation] = useState('');
@@ -44,7 +57,31 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const canSubmit = title.trim().length > 0 && description.trim().length > 0;
+  // Apply template data when selected from TemplatePicker
+  useEffect(() => {
+    if (templateData) {
+      setDraft((prev) => ({
+        ...prev,
+        title: templateData.title || prev.title,
+        description: templateData.content,
+      }));
+    }
+  }, [templateData, setDraft]);
+
+  const canSubmit = draft.title.trim().length > 0 && draft.description.trim().length > 0;
+
+  const setTitle = useCallback(
+    (v: string) => setDraft((prev) => ({ ...prev, title: v })),
+    [setDraft],
+  );
+  const setDescription = useCallback(
+    (v: string) => setDraft((prev) => ({ ...prev, description: v })),
+    [setDraft],
+  );
+  const setType = useCallback(
+    (v: 'offer' | 'request') => setDraft((prev) => ({ ...prev, type: v })),
+    [setDraft],
+  );
 
   useEffect(() => {
     async function loadCategories() {
@@ -66,9 +103,9 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
     setIsSubmitting(true);
     try {
       const payload: Record<string, unknown> = {
-        title: title.trim(),
-        description: description.trim(),
-        type,
+        title: draft.title.trim(),
+        description: draft.description.trim(),
+        type: draft.type,
         hours_estimate: parseFloat(hoursEstimate) || 1,
       };
       if (categoryId) payload.category_id = parseInt(categoryId);
@@ -80,6 +117,7 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
       const res = await api.post<{ id: number }>('/v2/listings', payload);
       if (res.success) {
         const id = res.data?.id;
+        clearDraft();
         toast.success(t('compose.listing_created'));
         onClose();
         onSuccess('listing', id);
@@ -99,7 +137,7 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
       <Input
         label={t('compose.listing_title_label')}
         placeholder={t('compose.listing_title_placeholder')}
-        value={title}
+        value={draft.title}
         onChange={(e) => setTitle(e.target.value)}
         isRequired
         classNames={inputClasses}
@@ -108,9 +146,9 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
       <div className="flex gap-2">
         <Chip
           size="sm"
-          variant={type === 'offer' ? 'solid' : 'flat'}
+          variant={draft.type === 'offer' ? 'solid' : 'flat'}
           className={`cursor-pointer transition-all ${
-            type === 'offer'
+            draft.type === 'offer'
               ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white'
               : 'bg-[var(--surface-elevated)] text-[var(--text-muted)]'
           }`}
@@ -120,9 +158,9 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
         </Chip>
         <Chip
           size="sm"
-          variant={type === 'request' ? 'solid' : 'flat'}
+          variant={draft.type === 'request' ? 'solid' : 'flat'}
           className={`cursor-pointer transition-all ${
-            type === 'request'
+            draft.type === 'request'
               ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
               : 'bg-[var(--surface-elevated)] text-[var(--text-muted)]'
           }`}
@@ -138,20 +176,21 @@ export function ListingTab({ onSuccess, onClose }: TabSubmitProps) {
             <Textarea
               label={t('compose.description_label')}
               placeholder={t('compose.listing_desc_placeholder')}
-              value={description}
+              value={draft.description}
               onChange={(e) => setDescription(e.target.value)}
               isRequired
               minRows={3}
               maxRows={6}
               classNames={inputClasses}
             />
+            <CharacterCount current={draft.description.length} max={MAX_DESC_CHARS} />
           </div>
         </div>
         <div className="flex justify-end mt-1">
           <AiAssistButton
             type="listing"
-            title={title}
-            context={{ type }}
+            title={draft.title}
+            context={{ type: draft.type }}
             onGenerated={setDescription}
           />
         </div>

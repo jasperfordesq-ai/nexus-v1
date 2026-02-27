@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Select, SelectItem } from '@heroui/react';
+import { Select, SelectItem, Skeleton } from '@heroui/react';
 import { Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
@@ -56,6 +56,15 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
 
   if (groups.length === 0 && !isLoading) return null;
 
+  if (isLoading) {
+    return (
+      <div className="flex gap-2">
+        <Skeleton className="h-8 w-24 rounded-full" />
+        <Skeleton className="h-8 w-32 rounded-full" />
+      </div>
+    );
+  }
+
   return (
     <Select
       label={t('compose.group_label')}
@@ -70,7 +79,6 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
         trigger: 'bg-[var(--surface-elevated)] border-[var(--border-default)] min-h-11',
         value: 'text-[var(--text-primary)]',
       }}
-      isLoading={isLoading}
     >
       {groups.map((g) => (
         <SelectItem key={String(g.id)} textValue={g.name}>
