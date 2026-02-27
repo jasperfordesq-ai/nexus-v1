@@ -42,5 +42,9 @@
     "deleted": "Post deleted",
     "delete_failed": "Failed to delete post",
     "vote_failed": "Failed to submit vote"
+  },
+  "realtime": {
+    "new_post_singular": "1 new post",
+    "new_posts_plural": "{{count}} new posts"
   }
 }

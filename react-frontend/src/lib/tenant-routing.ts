@@ -31,9 +31,10 @@ export const RESERVED_SUBDOMAINS = new Set([
 export const RESERVED_PATHS = new Set([
   'login', 'register', 'password', 'logout', 'dashboard', 'listings',
   'events', 'groups', 'messages', 'notifications', 'wallet', 'feed',
-  'search', 'members', 'profile', 'settings', 'exchanges', 'achievements',
+  'search', 'members', 'connections', 'profile', 'settings', 'exchanges', 'achievements',
   'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
   'organisations', 'federation', 'onboarding', 'group-exchanges', 'matches', 'newsletter',
+  'chat',
   'help', 'contact', 'about', 'faq', 'legal', 'terms',
   'privacy', 'accessibility', 'cookies', 'development-status',
   'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',

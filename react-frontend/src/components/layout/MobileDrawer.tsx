@@ -28,6 +28,7 @@ import {
   MessageSquare,
   Wallet,
   Users,
+  Users2,
   Calendar,
   Settings,
   LogOut,
@@ -53,6 +54,7 @@ import {
   BarChart3,
   Compass,
   Cookie,
+  Bot,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent } from '@/contexts';
@@ -96,6 +98,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.exchanges'), href: '/exchanges', icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
     { label: t('nav.group_exchanges'), href: '/group-exchanges', icon: Users, feature: 'group_exchanges' as keyof TenantFeatures },
     { label: t('nav.members'), href: '/members', icon: Users, feature: 'connections' as const },
+    { label: t('nav.connections'), href: '/connections', icon: Users2, feature: 'connections' as keyof TenantFeatures },
     { label: t('nav.events'), href: '/events', icon: Calendar, feature: 'events' as const },
     { label: t('nav.groups'), href: '/groups', icon: Users, feature: 'groups' as const },
     { label: t('nav.blog'), href: '/blog', icon: BookOpen, feature: 'blog' as const },
@@ -108,6 +111,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.achievements'), href: '/achievements', icon: Trophy, feature: 'gamification' as const },
     { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
     { label: t('nav.goals'), href: '/goals', icon: Target, feature: 'goals' as const },
+    { label: t('nav.ai_chat', 'AI Assistant'), href: '/chat', icon: Bot, feature: 'ai_chat' as keyof TenantFeatures },
   ];
 
   const federationNavItems = [
@@ -348,7 +352,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             )}
 
             {/* Explore */}
-            {(hasFeature('gamification') || hasFeature('goals')) && (
+            {(hasFeature('gamification') || hasFeature('goals') || hasFeature('ai_chat')) && (
               <div>
                 <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
                   {t('sections.explore')}

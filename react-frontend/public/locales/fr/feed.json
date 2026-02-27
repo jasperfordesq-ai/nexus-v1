@@ -42,5 +42,9 @@
     "deleted": "Publication supprimée",
     "delete_failed": "Impossible de supprimer la publication",
     "vote_failed": "Impossible de soumettre le vote"
+  },
+  "realtime": {
+    "new_post_singular": "1 nouvelle publication",
+    "new_posts_plural": "{{count}} nouvelles publications"
   }
 }

@@ -38,12 +38,14 @@ import {
   Sparkles,
   TrendingUp,
   Flag,
+  ArrowUp,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, usePusherOptional } from '@/contexts';
+import type { FeedPostEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -83,12 +85,15 @@ export function FeedPage() {
   usePageTitle(t('page_title'));
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
+  const pusher = usePusherOptional();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FeedFilter>('all');
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  // Count of real-time posts received while the user hasn't scrolled to top
+  const [pendingPostCount, setPendingPostCount] = useState(0);
 
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
@@ -145,8 +150,46 @@ export function FeedPage() {
 
   useEffect(() => {
     cursorRef.current = undefined;
+    setPendingPostCount(0);
     loadFeed();
   }, [filter, loadFeed]);
+
+  /* ───────── Real-time feed subscription ───────── */
+
+  useEffect(() => {
+    if (!pusher || isLoading) return;
+
+    const unsub = pusher.onFeedPost((event: FeedPostEvent) => {
+      const incoming = event.post;
+
+      // If the post was created by the current user it is already prepended
+      // optimistically by ComposeHub / the onSuccess reload, so skip it.
+      if (user?.id && incoming.author?.id === user.id) return;
+
+      // Only surface posts that match the active filter.
+      const matchesFilter =
+        filter === 'all' ||
+        (filter === 'posts' && incoming.type === 'post') ||
+        (filter === 'listings' && incoming.type === 'listing') ||
+        (filter === 'events' && incoming.type === 'event') ||
+        (filter === 'polls' && incoming.type === 'poll') ||
+        (filter === 'goals' && incoming.type === 'goal');
+
+      if (!matchesFilter) return;
+
+      setItems((prev) => {
+        // Guard against duplicates (e.g. race between Pusher event and manual reload)
+        if (prev.some((p) => p.type === incoming.type && p.id === incoming.id)) {
+          return prev;
+        }
+        return [incoming, ...prev];
+      });
+
+      setPendingPostCount((n) => n + 1);
+    });
+
+    return unsub;
+  }, [pusher, isLoading, filter, user?.id]);
 
   /* ───────── Like Toggle ───────── */
 
@@ -273,6 +316,13 @@ export function FeedPage() {
     }
   };
 
+  /* ───────── New-posts banner dismiss ───────── */
+
+  const handleScrollToNewPosts = () => {
+    setPendingPostCount(0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const filterOptions: { key: FeedFilter; label: string }[] = [
     { key: 'all', label: t('filter.all') },
     { key: 'posts', label: t('filter.posts') },
@@ -376,6 +426,31 @@ export function FeedPage() {
           </Button>
         ))}
       </div>
+
+      {/* New posts banner — appears when real-time posts arrive off-screen */}
+      <AnimatePresence>
+        {pendingPostCount > 0 && (
+          <motion.div
+            key="new-posts-banner"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+            className="sticky top-4 z-20 flex justify-center"
+          >
+            <button
+              type="button"
+              onClick={handleScrollToNewPosts}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-shadow cursor-pointer"
+            >
+              <ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
+              {pendingPostCount === 1
+                ? t('realtime.new_post_singular')
+                : t('realtime.new_posts_plural', { count: pendingPostCount })}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Error State */}
       {error && !isLoading && (

@@ -7,173 +7,41 @@
  * Help Center Page - FAQ and support resources
  *
  * Displays common questions, guides, and links to contact support.
- * Uses HeroUI Accordion component for expand/collapse.
+ * FAQs are loaded dynamically from /api/v2/help/faqs (tenant-specific
+ * with fallback to global defaults). Uses HeroUI Accordion component
+ * for expand/collapse.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Accordion, AccordionItem, Button, Input } from '@heroui/react';
+import { Accordion, AccordionItem, Button, Input, Spinner } from '@heroui/react';
 import {
   HelpCircle,
   Search,
   MessageSquare,
   BookOpen,
   Wallet,
-  Users,
-  Shield,
-  Settings,
   Calendar,
-  ArrowRightLeft,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { api } from '@/lib/api';
 
 /* ───────────────────────── Types ───────────────────────── */
 
-interface FaqItem {
+interface Faq {
+  id: number;
   question: string;
   answer: string;
 }
 
-interface FaqCategory {
-  title: string;
-  icon: React.ReactNode;
-  items: FaqItem[];
+interface FaqGroup {
+  category: string;
+  faqs: Faq[];
 }
-
-/* ───────────────────────── FAQ Data ───────────────────────── */
-
-const faqCategories: FaqCategory[] = [
-  {
-    title: 'Getting Started',
-    icon: <BookOpen className="w-5 h-5" aria-hidden="true" />,
-    items: [
-      {
-        question: 'What is timebanking?',
-        answer:
-          'Timebanking is a community-based exchange system where everyone\'s time is valued equally. You earn time credits by helping others and spend them to receive help. One hour of service equals one time credit, regardless of the type of service.',
-      },
-      {
-        question: 'How do I create an account?',
-        answer:
-          'Click "Sign Up" on the home page, select your community, fill in your details, and verify your email. Your community coordinator may need to approve your account before you can start exchanging.',
-      },
-      {
-        question: 'How do I get started after signing up?',
-        answer:
-          'Start by completing your profile with your skills and interests. Then browse listings to find services you need, or create your own listings to offer your skills. You can also join groups and events to meet other members.',
-      },
-    ],
-  },
-  {
-    title: 'Listings & Exchanges',
-    icon: <ArrowRightLeft className="w-5 h-5" aria-hidden="true" />,
-    items: [
-      {
-        question: 'How do I create a listing?',
-        answer:
-          'Go to the Listings page and click "Create Listing". Choose whether you\'re offering a service or requesting one, add a title, description, category, and estimated time. Your listing will be visible to other community members.',
-      },
-      {
-        question: 'How does an exchange work?',
-        answer:
-          'When you find a listing you\'re interested in, you can request an exchange. The other member accepts or declines. Once accepted, you coordinate the service, and when complete, time credits are transferred automatically.',
-      },
-      {
-        question: 'What happens if a service takes longer than estimated?',
-        answer:
-          'The actual time spent is what gets recorded. Before confirming the exchange, both parties agree on the actual hours. The estimate is just a guide to help members plan.',
-      },
-    ],
-  },
-  {
-    title: 'Wallet & Credits',
-    icon: <Wallet className="w-5 h-5" aria-hidden="true" />,
-    items: [
-      {
-        question: 'How do I earn time credits?',
-        answer:
-          'You earn credits by providing services to other members. When an exchange is completed and confirmed, the agreed-upon hours are added to your wallet balance.',
-      },
-      {
-        question: 'Can I transfer credits directly?',
-        answer:
-          'Yes! Go to your Wallet page and use the "Transfer" option. You can send credits to any member in your community. This is useful for gifting or adjusting balances.',
-      },
-      {
-        question: 'What if my balance is zero?',
-        answer:
-          'You can still request services even with a zero balance. Timebanking is built on trust and reciprocity. Most communities allow negative balances to encourage participation.',
-      },
-    ],
-  },
-  {
-    title: 'Community Features',
-    icon: <Users className="w-5 h-5" aria-hidden="true" />,
-    items: [
-      {
-        question: 'How do groups work?',
-        answer:
-          'Groups are community spaces around shared interests. You can join existing groups, participate in discussions, and share resources. Some groups are open for anyone, while others require approval.',
-      },
-      {
-        question: 'How do I RSVP to events?',
-        answer:
-          'Browse the Events page, find an event you\'re interested in, and click "RSVP". You\'ll receive reminders before the event. You can cancel your RSVP at any time.',
-      },
-      {
-        question: 'How do I connect with other members?',
-        answer:
-          'Visit a member\'s profile and click "Connect". They\'ll receive a notification and can accept or decline. Once connected, you can message each other directly.',
-      },
-    ],
-  },
-  {
-    title: 'Account & Privacy',
-    icon: <Shield className="w-5 h-5" aria-hidden="true" />,
-    items: [
-      {
-        question: 'How do I update my profile?',
-        answer:
-          'Go to Settings from the menu. You can update your name, bio, skills, location, and avatar. Your profile helps other members find and connect with you.',
-      },
-      {
-        question: 'Is my personal information safe?',
-        answer:
-          'We take privacy seriously. Your email and personal details are only visible to community members. We comply with GDPR and provide tools for you to manage your data, including account deletion.',
-      },
-      {
-        question: 'How do I change my password?',
-        answer:
-          'Go to Settings and find the Password section. Enter your current password and your new password. For extra security, consider enabling two-factor authentication.',
-      },
-    ],
-  },
-  {
-    title: 'Settings & Preferences',
-    icon: <Settings className="w-5 h-5" aria-hidden="true" />,
-    items: [
-      {
-        question: 'How do I enable dark mode?',
-        answer:
-          'Click the sun/moon icon in the top navigation bar to toggle between light and dark themes. Your preference is saved automatically.',
-      },
-      {
-        question: 'How do I manage notifications?',
-        answer:
-          'Go to Settings and find the Notifications section. You can control email notifications, push notifications, and in-app alerts for different types of activity.',
-      },
-      {
-        question: 'Can I delete my account?',
-        answer:
-          'Yes, you can delete your account from Settings. This action is permanent and will remove your profile, listings, and transaction history. Contact your community coordinator if you need help.',
-      },
-    ],
-  },
-];
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
@@ -181,21 +49,53 @@ export function HelpCenterPage() {
   const { t } = useTranslation('utility');
   const { branding, tenantPath } = useTenant();
   usePageTitle(t('help.page_title'));
-  const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter FAQ items by search
-  const filteredCategories = searchQuery.trim()
-    ? faqCategories
-        .map((cat) => ({
-          ...cat,
-          items: cat.items.filter(
-            (item) =>
-              item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              item.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  const [searchQuery, setSearchQuery] = useState('');
+  const [faqGroups, setFaqGroups] = useState<FaqGroup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+
+  // Fetch FAQ groups from API on mount
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadFaqs() {
+      setLoading(true);
+      setLoadError(false);
+
+      const result = await api.get<FaqGroup[]>('/v2/help/faqs');
+
+      if (cancelled) return;
+
+      if (result.success && Array.isArray(result.data)) {
+        setFaqGroups(result.data);
+      } else {
+        setLoadError(true);
+      }
+
+      setLoading(false);
+    }
+
+    void loadFaqs();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Filter FAQ groups by search query (client-side after load)
+  const filteredGroups = searchQuery.trim()
+    ? faqGroups
+        .map((group) => ({
+          ...group,
+          faqs: group.faqs.filter(
+            (faq) =>
+              faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
           ),
         }))
-        .filter((cat) => cat.items.length > 0)
-    : faqCategories;
+        .filter((group) => group.faqs.length > 0)
+    : faqGroups;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 px-1 sm:px-0">
@@ -234,10 +134,10 @@ export function HelpCenterPage() {
         transition={{ delay: 0.1 }}
         className="grid grid-cols-2 sm:grid-cols-4 gap-3"
       >
-        <QuickLink to={tenantPath("/listings")} icon={<BookOpen />} label={t('help.quick_browse_listings')} />
-        <QuickLink to={tenantPath("/wallet")} icon={<Wallet />} label={t('help.quick_my_wallet')} />
-        <QuickLink to={tenantPath("/events")} icon={<Calendar />} label={t('help.quick_events')} />
-        <QuickLink to={tenantPath("/contact")} icon={<MessageSquare />} label={t('help.quick_contact_us')} />
+        <QuickLink to={tenantPath('/listings')} icon={<BookOpen />} label={t('help.quick_browse_listings')} />
+        <QuickLink to={tenantPath('/wallet')} icon={<Wallet />} label={t('help.quick_my_wallet')} />
+        <QuickLink to={tenantPath('/events')} icon={<Calendar />} label={t('help.quick_events')} />
+        <QuickLink to={tenantPath('/contact')} icon={<MessageSquare />} label={t('help.quick_contact_us')} />
       </motion.div>
 
       {/* FAQ Categories */}
@@ -247,23 +147,48 @@ export function HelpCenterPage() {
         transition={{ delay: 0.2 }}
         className="space-y-4"
       >
-        {filteredCategories.length === 0 ? (
+        {/* Loading state */}
+        {loading && (
+          <GlassCard className="p-12 text-center">
+            <Spinner size="lg" className="mx-auto" />
+            <p className="text-theme-muted mt-4 text-sm">{t('common.loading', 'Loading...')}</p>
+          </GlassCard>
+        )}
+
+        {/* Error state */}
+        {!loading && loadError && (
+          <GlassCard className="p-8 text-center">
+            <HelpCircle className="w-12 h-12 text-theme-subtle mx-auto mb-4 opacity-50" aria-hidden="true" />
+            <h2 className="text-lg font-semibold text-theme-primary mb-2">
+              {t('help.load_error_title', 'Could not load FAQs')}
+            </h2>
+            <p className="text-theme-muted">
+              {t('help.load_error_description', 'Please try refreshing the page or contact support.')}
+            </p>
+          </GlassCard>
+        )}
+
+        {/* Empty state (loaded, no results) */}
+        {!loading && !loadError && filteredGroups.length === 0 && (
           <GlassCard className="p-8 text-center">
             <Search className="w-12 h-12 text-theme-subtle mx-auto mb-4 opacity-50" aria-hidden="true" />
             <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('help.no_results_found')}</h2>
             <p className="text-theme-muted mb-4">
               {t('help.no_results_description_before')}{' '}
-              <Link to={tenantPath("/contact")} className="text-indigo-500 hover:underline">
+              <Link to={tenantPath('/contact')} className="text-indigo-500 hover:underline">
                 {t('help.no_results_contact_link')}
               </Link>{' '}
               {t('help.no_results_description_after')}
             </p>
           </GlassCard>
-        ) : (
+        )}
+
+        {/* FAQ Accordion */}
+        {!loading && !loadError && filteredGroups.length > 0 && (
           <Accordion
             selectionMode="multiple"
             variant="splitted"
-            defaultExpandedKeys={["0"]}
+            defaultExpandedKeys={['0']}
             itemClasses={{
               base: 'bg-theme-elevated/50 backdrop-blur-md border border-theme-default/30 shadow-sm',
               title: 'font-semibold text-theme-primary',
@@ -273,15 +198,15 @@ export function HelpCenterPage() {
               content: 'px-5 pb-2',
             }}
           >
-            {filteredCategories.map((category, catIdx) => (
+            {filteredGroups.map((group, catIdx) => (
               <AccordionItem
                 key={String(catIdx)}
-                aria-label={t('help.faq_cat_' + catIdx + '_title')}
-                title={t('help.faq_cat_' + catIdx + '_title')}
-                subtitle={t('help.articles_count', { count: category.items.length })}
+                aria-label={group.category}
+                title={group.category}
+                subtitle={t('help.articles_count', { count: group.faqs.length })}
                 startContent={
                   <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400">
-                    {category.icon}
+                    <HelpCircle className="w-5 h-5" aria-hidden="true" />
                   </div>
                 }
               >
@@ -296,13 +221,13 @@ export function HelpCenterPage() {
                     indicator: 'text-theme-muted',
                   }}
                 >
-                  {category.items.map((_item, itemIdx) => (
+                  {group.faqs.map((faq) => (
                     <AccordionItem
-                      key={`${catIdx}-${itemIdx}`}
-                      aria-label={t('help.faq_cat_' + catIdx + '_q_' + itemIdx)}
-                      title={t('help.faq_cat_' + catIdx + '_q_' + itemIdx)}
+                      key={String(faq.id)}
+                      aria-label={faq.question}
+                      title={faq.question}
                     >
-                      {t('help.faq_cat_' + catIdx + '_a_' + itemIdx)}
+                      {faq.answer}
                     </AccordionItem>
                   ))}
                 </Accordion>
@@ -323,7 +248,7 @@ export function HelpCenterPage() {
           <p className="text-sm text-theme-muted mb-4">
             {t('help.still_need_help_description')}
           </p>
-          <Link to={tenantPath("/contact")}>
+          <Link to={tenantPath('/contact')}>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}

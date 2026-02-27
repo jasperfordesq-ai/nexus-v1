@@ -815,6 +815,7 @@ export interface TenantFeatures {
   direct_messaging: boolean;
   group_exchanges: boolean;
   search: boolean;
+  ai_chat: boolean;
 }
 
 export interface TenantModules {

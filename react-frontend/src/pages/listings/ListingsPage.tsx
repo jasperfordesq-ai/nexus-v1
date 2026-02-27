@@ -23,6 +23,7 @@ import {
   MapPin,
   Tag,
   Clock,
+  Heart,
   AlertTriangle,
   RefreshCw,
 } from 'lucide-react';
@@ -59,6 +60,8 @@ export function ListingsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
+  // Track in-flight save requests to prevent double-clicks
+  const [savingIds, setSavingIds] = useState<Set<number>>(new Set());
 
   const loadListings = useCallback(async (reset = false) => {
     try {
@@ -134,6 +137,43 @@ export function ListingsPage() {
     loadListings(true);
   }
 
+  /**
+   * Toggle save/unsave a listing with optimistic UI update.
+   * Reverts on failure.
+   */
+  const handleToggleSave = useCallback(async (listingId: number, currentlySaved: boolean) => {
+    if (savingIds.has(listingId)) return; // Prevent double-click
+
+    // Optimistic update
+    setSavingIds((prev) => new Set(prev).add(listingId));
+    setListings((prev) =>
+      prev.map((l) => l.id === listingId ? { ...l, is_favorited: !currentlySaved } : l)
+    );
+
+    try {
+      if (currentlySaved) {
+        await api.delete(`/v2/listings/${listingId}/save`);
+        toast.success(t('unsaved_success', 'Listing removed from saved'));
+      } else {
+        await api.post(`/v2/listings/${listingId}/save`);
+        toast.success(t('saved_success', 'Listing saved'));
+      }
+    } catch (error) {
+      logError('Failed to toggle save listing', error);
+      // Revert optimistic update
+      setListings((prev) =>
+        prev.map((l) => l.id === listingId ? { ...l, is_favorited: currentlySaved } : l)
+      );
+      toast.error(t('save_error', 'Failed to update saved listing'));
+    } finally {
+      setSavingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(listingId);
+        return next;
+      });
+    }
+  }, [savingIds, t]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -167,7 +207,7 @@ export function ListingsPage() {
         {isAuthenticated && (
           <Link to={tenantPath('/listings/create')}>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<Plus className="w-4 h-4" />}
             >
               {t('create')}
@@ -279,7 +319,7 @@ export function ListingsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadListings(true)}
           >
@@ -294,7 +334,7 @@ export function ListingsPage() {
           action={
             isAuthenticated && (
               <Link to={tenantPath('/listings/create')}>
-                <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
                   {t('create')}
                 </Button>
               </Link>
@@ -340,7 +380,12 @@ export function ListingsPage() {
             >
               {listings.map((listing) => (
                 <motion.div key={listing.id} variants={itemVariants}>
-                  <ListingCard listing={listing} viewMode={viewMode} />
+                  <ListingCard
+                    listing={listing}
+                    viewMode={viewMode}
+                    isSaving={savingIds.has(listing.id)}
+                    onToggleSave={isAuthenticated ? handleToggleSave : undefined}
+                  />
                 </motion.div>
               ))}
             </motion.div>
@@ -369,14 +414,25 @@ export function ListingsPage() {
 interface ListingCardProps {
   listing: Listing;
   viewMode: ViewMode;
+  isSaving?: boolean;
+  onToggleSave?: (listingId: number, currentlySaved: boolean) => void;
 }
 
-const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCardProps) {
+const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onToggleSave }: ListingCardProps) {
   const { t } = useTranslation('listings');
   const { tenantPath } = useTenant();
   const isGrid = viewMode === 'grid';
   const hours = listing.estimated_hours || listing.hours_estimate;
   const avatarSrc = resolveAvatarUrl(listing.author_avatar || listing.user?.avatar);
+  const isFavorited = listing.is_favorited === true;
+
+  function handleSaveClick(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onToggleSave && !isSaving) {
+      onToggleSave(listing.id, isFavorited);
+    }
+  }
 
   if (!isGrid) {
     // ─── List View ───
@@ -388,7 +444,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
               src={avatarSrc}
               name={listing.author_name || 'User'}
               size="md"
-              className="flex-shrink-0 ring-2 ring-theme-muted/20"
+              className="shrink-0 ring-2 ring-theme-muted/20"
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -406,7 +462,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
               <h3 className="font-semibold text-theme-primary truncate">{listing.title}</h3>
               <p className="text-theme-muted text-sm line-clamp-1 mt-0.5">{listing.description}</p>
             </div>
-            <div className="flex flex-col items-end gap-1 text-xs text-theme-subtle flex-shrink-0">
+            <div className="flex flex-col items-end gap-1 text-xs text-theme-subtle shrink-0">
               {hours && (
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" aria-hidden="true" />
@@ -418,6 +474,20 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
                   <MapPin className="w-3 h-3" aria-hidden="true" />
                   <span className="truncate max-w-[120px]">{listing.location}</span>
                 </span>
+              )}
+              {onToggleSave && (
+                <button
+                  type="button"
+                  onClick={handleSaveClick}
+                  disabled={isSaving}
+                  aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
+                  className="p-1 rounded transition-colors hover:bg-theme-hover disabled:opacity-50"
+                >
+                  <Heart
+                    className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
+                    aria-hidden="true"
+                  />
+                </button>
               )}
             </div>
           </div>
@@ -442,6 +512,20 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
               {listing.category_name}
             </span>
           )}
+          {onToggleSave && (
+            <button
+              type="button"
+              onClick={handleSaveClick}
+              disabled={isSaving}
+              aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
+              className="ml-auto p-1 rounded transition-colors hover:bg-theme-hover disabled:opacity-50"
+            >
+              <Heart
+                className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
+                aria-hidden="true"
+              />
+            </button>
+          )}
         </div>
 
         {/* Title & Description */}
@@ -455,20 +539,20 @@ const ListingCard = memo(function ListingCard({ listing, viewMode }: ListingCard
               src={avatarSrc}
               name={listing.author_name || 'User'}
               size="sm"
-              className="flex-shrink-0 w-6 h-6"
+              className="shrink-0 w-6 h-6"
             />
             <span className="text-sm text-theme-subtle truncate">{listing.author_name}</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-theme-subtle min-w-0 overflow-hidden">
             {hours && (
-              <span className="flex items-center gap-1 flex-shrink-0" aria-label={`${hours} hours estimated`}>
+              <span className="flex items-center gap-1 shrink-0" aria-label={`${hours} hours estimated`}>
                 <Clock className="w-3 h-3" aria-hidden="true" />
                 {hours}h
               </span>
             )}
             {listing.location && (
               <span className="flex items-center gap-1 min-w-0" aria-label={`Location: ${listing.location}`}>
-                <MapPin className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
+                <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
                 <span className="truncate">{listing.location}</span>
               </span>
             )}

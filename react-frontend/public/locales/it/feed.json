@@ -42,5 +42,9 @@
     "deleted": "Post eliminato",
     "delete_failed": "Impossibile eliminare il post",
     "vote_failed": "Impossibile inviare il voto"
+  },
+  "realtime": {
+    "new_post_singular": "1 nuovo post",
+    "new_posts_plural": "{{count}} nuovi post"
   }
 }
