@@ -62,7 +62,7 @@ const quickLinks = [
   },
   {
     title: 'Vetting Records',
-    description: 'Manage DBS checks, insurance, and member vetting',
+    description: 'Manage DBS checks, Garda vetting, and safeguarding compliance',
     icon: ShieldCheck,
     color: 'success' as const,
     path: '/admin/broker-controls/vetting',

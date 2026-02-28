@@ -284,6 +284,7 @@ $router->add('GET', '/api/v2/members/nearby', 'Nexus\Controllers\Api\UsersApiCon
 // ============================================
 $router->add('GET', '/api/v2/messages', 'Nexus\Controllers\Api\MessagesApiController@conversations');
 $router->add('GET', '/api/v2/messages/unread-count', 'Nexus\Controllers\Api\MessagesApiController@unreadCount');
+$router->add('GET', '/api/v2/messages/restriction-status', 'Nexus\Controllers\Api\MessagesApiController@restrictionStatus');
 $router->add('POST', '/api/v2/messages', 'Nexus\Controllers\Api\MessagesApiController@send');
 $router->add('POST', '/api/v2/messages/typing', 'Nexus\Controllers\Api\MessagesApiController@typing');
 $router->add('POST', '/api/v2/messages/upload-voice', 'Nexus\Controllers\Api\MessagesApiController@uploadVoice');
@@ -814,6 +815,7 @@ $router->add('POST', '/api/v2/admin/broker/exchanges/{id}/approve', 'Nexus\Contr
 $router->add('POST', '/api/v2/admin/broker/exchanges/{id}/reject', 'Nexus\Controllers\Api\AdminBrokerApiController@rejectExchange');
 $router->add('GET', '/api/v2/admin/broker/risk-tags', 'Nexus\Controllers\Api\AdminBrokerApiController@riskTags');
 $router->add('GET', '/api/v2/admin/broker/messages', 'Nexus\Controllers\Api\AdminBrokerApiController@messages');
+$router->add('GET', '/api/v2/admin/broker/messages/unreviewed-count', 'Nexus\Controllers\Api\AdminBrokerApiController@unreviewedCount');
 $router->add('POST', '/api/v2/admin/broker/messages/{id}/review', 'Nexus\Controllers\Api\AdminBrokerApiController@reviewMessage');
 $router->add('GET', '/api/v2/admin/broker/monitoring', 'Nexus\Controllers\Api\AdminBrokerApiController@monitoring');
 $router->add('POST', '/api/v2/admin/broker/messages/{id}/flag', 'Nexus\Controllers\Api\AdminBrokerApiController@flagMessage');
@@ -833,11 +835,13 @@ $router->add('GET', '/api/v2/admin/vetting/stats', 'Nexus\Controllers\Api\AdminV
 $router->add('GET', '/api/v2/admin/vetting/user/{userId}', 'Nexus\Controllers\Api\AdminVettingApiController@getUserRecords');
 $router->add('GET', '/api/v2/admin/vetting', 'Nexus\Controllers\Api\AdminVettingApiController@list');
 $router->add('GET', '/api/v2/admin/vetting/{id}', 'Nexus\Controllers\Api\AdminVettingApiController@show');
+$router->add('POST', '/api/v2/admin/vetting/bulk', 'Nexus\Controllers\Api\AdminVettingApiController@bulk');
 $router->add('POST', '/api/v2/admin/vetting', 'Nexus\Controllers\Api\AdminVettingApiController@store');
 $router->add('PUT', '/api/v2/admin/vetting/{id}', 'Nexus\Controllers\Api\AdminVettingApiController@update');
 $router->add('POST', '/api/v2/admin/vetting/{id}/verify', 'Nexus\Controllers\Api\AdminVettingApiController@verify');
 $router->add('POST', '/api/v2/admin/vetting/{id}/reject', 'Nexus\Controllers\Api\AdminVettingApiController@reject');
 $router->add('DELETE', '/api/v2/admin/vetting/{id}', 'Nexus\Controllers\Api\AdminVettingApiController@destroy');
+$router->add('POST', '/api/v2/admin/vetting/{id}/upload', 'Nexus\Controllers\Api\AdminVettingApiController@uploadDocument');
 
 // Admin Insurance Certificates (compliance)
 $router->add('GET', '/api/v2/admin/insurance/stats', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@stats');
