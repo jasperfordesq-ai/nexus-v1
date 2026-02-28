@@ -33,9 +33,12 @@ import {
   Check,
   X,
   ChevronLeft,
+  MailCheck,
+  ShieldCheck,
 } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
+import type { RegisterResult } from '@/contexts/AuthContext';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
 import { PlaceAutocompleteInput } from '@/components/location';
@@ -109,6 +112,9 @@ export function RegisterPage() {
   // Form state - Consents
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
+
+  // Post-registration pending state (verification/approval required)
+  const [pendingResult, setPendingResult] = useState<RegisterResult | null>(null);
 
   // Detect mobile viewport
   useEffect(() => {
@@ -261,7 +267,7 @@ export function RegisterPage() {
     const selectedTenant = tenants.find((t) => String(t.id) === selectedTenantId);
     const tenantId = selectedTenant?.id || parseInt(selectedTenantId) || tenant?.id || undefined;
 
-    const success = await register({
+    const result = await register({
       first_name: firstName,
       last_name: lastName,
       email,
@@ -278,7 +284,13 @@ export function RegisterPage() {
       newsletter_opt_in: newsletterOptIn,
     });
 
-    if (success) {
+    if (result.success) {
+      // If verification or approval is required, show pending screen instead of redirecting
+      if (result.requiresVerification || result.requiresApproval) {
+        setPendingResult(result);
+        return;
+      }
+      // No gates — redirect to dashboard (fully authenticated)
       navigate(tenantPath('/dashboard'), { replace: true });
     }
   };
@@ -868,6 +880,93 @@ export function RegisterPage() {
       </form>
     );
   };
+
+  // ── Pending Registration Success Screen ──────────────────────────────────
+  if (pendingResult) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 py-12">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="blob blob-indigo" />
+          <div className="blob blob-purple" />
+          <div className="blob blob-cyan" />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md relative z-10"
+        >
+          <GlassCard className="p-6 sm:p-8">
+            <div className="text-center">
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 mb-4"
+              >
+                {pendingResult.requiresVerification ? (
+                  <MailCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" />
+                ) : (
+                  <ShieldCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" />
+                )}
+              </motion.div>
+
+              <h1 className="text-xl sm:text-2xl font-bold text-theme-primary mb-2">
+                Registration Successful!
+              </h1>
+
+              <div className="space-y-3 mt-4 text-left">
+                {pendingResult.requiresVerification && (
+                  <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-sm">
+                    <div className="flex items-start gap-3">
+                      <MailCheck className="w-5 h-5 text-blue-500 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-blue-600 dark:text-blue-400">Verify your email</p>
+                        <p className="text-blue-600/80 dark:text-blue-300/80 mt-1">
+                          We&apos;ve sent a verification link to <strong>{email}</strong>. Please check your inbox and click the link to verify your email address.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {pendingResult.requiresApproval && (
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm">
+                    <div className="flex items-start gap-3">
+                      <ShieldCheck className="w-5 h-5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-amber-600 dark:text-amber-400">Awaiting admin approval</p>
+                        <p className="text-amber-600/80 dark:text-amber-300/80 mt-1">
+                          Your account will be reviewed by a community administrator. You&apos;ll receive an email once your account has been approved.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <p className="text-theme-muted text-sm mt-6">
+                Once {pendingResult.requiresVerification && pendingResult.requiresApproval
+                  ? 'your email is verified and your account is approved'
+                  : pendingResult.requiresVerification
+                    ? 'your email is verified'
+                    : 'your account is approved'
+                }, you can log in.
+              </p>
+
+              <Button
+                className="w-full mt-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+                size="lg"
+                onPress={() => navigate(tenantPath('/login'))}
+              >
+                Go to Login
+              </Button>
+            </div>
+          </GlassCard>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 py-12">

@@ -154,6 +154,46 @@ class AuthController extends BaseApiController
             // Clear Redis rate limit counter on successful login
             \Nexus\Services\RateLimitService::reset("auth:login:$ip");
 
+            // =====================================================
+            // REGISTRATION POLICY ENFORCEMENT — Tenant-aware gates
+            // Check email verification and admin approval BEFORE
+            // issuing any tokens. Admins/super-admins bypass these
+            // gates so they can always log in to manage the system.
+            // =====================================================
+            $userTenantId = (int) ($user['tenant_id'] ?? 0);
+            $isAdminRole = in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'])
+                || !empty($user['is_super_admin'])
+                || !empty($user['is_tenant_super_admin']);
+
+            if (!$isAdminRole) {
+                // Gate 1: Email verification required?
+                if (\Nexus\Services\TenantSettingsService::requiresEmailVerification($userTenantId)) {
+                    if (empty($user['email_verified_at'])) {
+                        return $this->errorResponse(
+                            'Please verify your email address before logging in. Check your inbox for the verification link.',
+                            ApiErrorCodes::AUTH_EMAIL_NOT_VERIFIED,
+                            403,
+                            [
+                                'requires_verification' => true,
+                                'can_resend' => true,
+                            ]
+                        );
+                    }
+                }
+
+                // Gate 2: Admin approval required?
+                if (\Nexus\Services\TenantSettingsService::requiresAdminApproval($userTenantId)) {
+                    if (empty($user['is_approved'])) {
+                        return $this->errorResponse(
+                            'Your account is pending approval by a community administrator. You will receive an email once approved.',
+                            ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL,
+                            403,
+                            ['pending_approval' => true]
+                        );
+                    }
+                }
+            }
+
             // Detect if this is a mobile/API request for platform-appropriate token expiry
             $isMobile = TokenService::isMobileRequest();
 
@@ -324,6 +364,15 @@ class AuthController extends BaseApiController
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
         $tenant_id = $data['tenant_id'] ?? 1;
+
+        // SECURITY: Check if registration is open for this tenant
+        if (!\Nexus\Services\TenantSettingsService::isRegistrationOpen((int) $tenant_id)) {
+            return $this->errorResponse(
+                'Registration is currently closed for this community.',
+                ApiErrorCodes::REGISTRATION_CLOSED,
+                403
+            );
+        }
 
         if (empty($name) || empty($email) || empty($password)) {
             return $this->errorResponse(

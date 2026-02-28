@@ -173,7 +173,15 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   success: true;
   user: User;
-  message: string;
+  message?: string;
+  access_token?: string;
+  refresh_token?: string;
+  token_type?: 'Bearer';
+  expires_in?: number;
+  refresh_expires_in?: number;
+  requires_verification?: boolean;
+  requires_approval?: boolean;
+  next_steps?: string[];
 }
 
 export interface ForgotPasswordRequest {

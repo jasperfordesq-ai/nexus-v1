@@ -100,11 +100,22 @@ class RegistrationApiController extends BaseApiController
         \Nexus\Services\RateLimitService::increment("auth:register:$ip", 60);
         $this->rateLimit('registration', 5, 3600);
 
+        // SECURITY: Check if registration is open for this tenant
+        $requestedTenantId = $this->inputInt('tenant_id', TenantContext::getId());
+        if (!\Nexus\Services\TenantSettingsService::isRegistrationOpen($requestedTenantId)) {
+            $this->respondWithError(
+                ApiErrorCodes::REGISTRATION_CLOSED,
+                'Registration is currently closed for this community. Please contact an administrator for an invitation.',
+                null,
+                403
+            );
+        }
+
         // Collect input - Basic
         $email = strtolower(trim($this->input('email', '')));
         $password = $this->input('password', '');
         $passwordConfirmation = $this->input('password_confirmation', '');
-        $tenantId = $this->inputInt('tenant_id', TenantContext::getId());
+        $tenantId = $requestedTenantId;
 
         // Handle name - accept either full name or first/last
         $firstName = trim($this->input('first_name', ''));
@@ -308,7 +319,41 @@ class RegistrationApiController extends BaseApiController
         $this->notifyAdmins($userId, $firstName, $lastName, $email, $tenantId);
         $this->awardWelcomeXp($userId);
 
-        // Generate tokens
+        // Send verification email (always — even if not enforced, users should verify)
+        $this->sendVerificationEmail($userId, $email, $firstName);
+
+        // Determine what gates the user must pass before they can log in
+        $requiresVerification = \Nexus\Services\TenantSettingsService::requiresEmailVerification($tenantId);
+        $requiresApproval = \Nexus\Services\TenantSettingsService::requiresAdminApproval($tenantId);
+
+        // SECURITY: If verification or approval is required, do NOT issue tokens.
+        // The user must verify their email and/or be approved before they can log in.
+        if ($requiresVerification || $requiresApproval) {
+            $nextSteps = [];
+            if ($requiresVerification) {
+                $nextSteps[] = 'Please check your inbox and verify your email address.';
+            }
+            if ($requiresApproval) {
+                $nextSteps[] = 'Your account will be reviewed by a community administrator.';
+            }
+
+            $this->respondWithData([
+                'user' => [
+                    'id' => $userId,
+                    'email' => $email,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'name' => trim($firstName . ' ' . $lastName),
+                ],
+                'requires_verification' => $requiresVerification,
+                'requires_approval' => $requiresApproval,
+                'next_steps' => $nextSteps,
+                'message' => 'Registration successful! ' . implode(' ', $nextSteps),
+            ], null, 201);
+            return;
+        }
+
+        // No gates — generate tokens and issue them immediately
         $isMobile = TokenService::isMobileRequest();
         $accessToken = TokenService::generateToken($userId, $tenantId, [
             'role' => 'member',
@@ -316,10 +361,6 @@ class RegistrationApiController extends BaseApiController
         ], $isMobile);
         $refreshToken = TokenService::generateRefreshToken($userId, $tenantId, $isMobile);
 
-        // Send verification email
-        $this->sendVerificationEmail($userId, $email, $firstName);
-
-        // Return success response
         $this->respondWithData([
             'user' => [
                 'id' => $userId,
@@ -339,7 +380,8 @@ class RegistrationApiController extends BaseApiController
             'token_type' => 'Bearer',
             'expires_in' => TokenService::getAccessTokenExpiry($isMobile),
             'refresh_expires_in' => TokenService::getRefreshTokenExpiry($isMobile),
-            'requires_verification' => true
+            'requires_verification' => false,
+            'requires_approval' => false,
         ], null, 201);
     }
 

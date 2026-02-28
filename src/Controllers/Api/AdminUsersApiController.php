@@ -598,7 +598,48 @@ class AdminUsersApiController extends BaseApiController
         ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$user['tenant_id']})" : ''));
         AuditLogService::logUserApproved($adminId, $id, $user['email']);
 
+        // Send approval notification email to the user
+        $this->sendApprovalNotificationEmail($user);
+
         $this->respondWithData(['approved' => true, 'id' => $id]);
+    }
+
+    /**
+     * Send approval notification email to the approved user.
+     *
+     * @param array $user User record from the database
+     */
+    private function sendApprovalNotificationEmail(array $user): void
+    {
+        try {
+            $userTenantId = (int) ($user['tenant_id'] ?? TenantContext::getId());
+            $tenantName = 'Project NEXUS';
+            $tenant = Database::query("SELECT name FROM tenants WHERE id = ?", [$userTenantId])->fetch();
+            if ($tenant) {
+                $tenantName = $tenant['name'];
+            }
+
+            $firstName = $user['first_name'] ?? 'there';
+            $loginUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/login';
+
+            $html = \Nexus\Core\EmailTemplate::render(
+                'Account Approved!',
+                "Welcome to {$tenantName}, {$firstName}!",
+                '<p>Great news! Your account has been approved by a community administrator.</p>
+                 <p>You can now log in and start using the platform.</p>',
+                'Log In Now',
+                $loginUrl,
+                $tenantName
+            );
+
+            (new \Nexus\Core\Mailer())->send(
+                $user['email'],
+                "Your account has been approved - {$tenantName}",
+                $html
+            );
+        } catch (\Throwable $e) {
+            error_log("[AdminUsers] Failed to send approval email to user #{$user['id']}: " . $e->getMessage());
+        }
     }
 
     /**
