@@ -81,24 +81,21 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
 
       const params = new URLSearchParams({
         user_id: String(userId),
-        limit: '20',
+        per_page: '20',
       });
       if (cursor) params.set('cursor', cursor);
 
-      const response = await api.get<{
-        items: FeedItem[];
-        cursor: string | null;
-        has_more: boolean;
-      }>(`/v2/feed?${params.toString()}`);
+      const response = await api.get<FeedItem[]>(`/v2/feed?${params.toString()}`);
 
       if (response.success && response.data) {
+        const feedItems = Array.isArray(response.data) ? response.data : [];
         if (isInitial) {
-          setItems(response.data.items);
+          setItems(feedItems);
         } else {
-          setItems((prev) => [...prev, ...response.data!.items]);
+          setItems((prev) => [...prev, ...feedItems]);
         }
-        cursorRef.current = response.data.cursor ?? undefined;
-        setHasMore(response.data.has_more);
+        cursorRef.current = response.meta?.cursor ?? undefined;
+        setHasMore(response.meta?.has_more ?? false);
       }
     } catch (err) {
       logError('Failed to load profile feed', err);
