@@ -472,6 +472,18 @@ class WebAuthnApiController extends BaseApiController
             $_SESSION['webauthn_auth_email']
         );
 
+        // SECURITY: Enforce registration policy gates on WebAuthn login
+        $webauthnUser = Database::query(
+            "SELECT id, role, is_super_admin, is_tenant_super_admin, tenant_id, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?",
+            [(int)$credential['user_id'], (int)$credential['tenant_id']]
+        )->fetch();
+        if ($webauthnUser) {
+            $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($webauthnUser);
+            if ($gateBlock) {
+                $this->error($gateBlock['message'], 403, $gateBlock['code']);
+            }
+        }
+
         // Determine if client wants stateless auth
         $wantsStateless = TokenService::isMobileRequest() || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
 

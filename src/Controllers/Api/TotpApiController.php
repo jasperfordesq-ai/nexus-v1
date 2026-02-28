@@ -163,7 +163,8 @@ class TotpApiController extends BaseApiController
         // Fetch user data for response
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            SELECT id, first_name, last_name, email, avatar_url, role, tenant_id
+            SELECT id, first_name, last_name, email, avatar_url, role, tenant_id,
+                   is_super_admin, is_tenant_super_admin, email_verified_at, is_approved
             FROM users WHERE id = ?
         ");
         $stmt->execute([$userId]);
@@ -175,6 +176,13 @@ class TotpApiController extends BaseApiController
                 401,
                 ApiErrorCodes::RESOURCE_NOT_FOUND
             );
+        }
+
+        // SECURITY: Enforce registration policy gates after 2FA completion.
+        // This catches edge cases like an admin demoted to member after 2FA challenge was issued.
+        $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+        if ($gateBlock) {
+            $this->error($gateBlock['message'], 403, $gateBlock['code']);
         }
 
         // Generate tokens

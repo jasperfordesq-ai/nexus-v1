@@ -153,6 +153,53 @@ class TenantSettingsService
     }
 
     /**
+     * Check if a user passes all registration policy gates for their tenant.
+     * Returns null if the user passes, or an error array if blocked.
+     *
+     * IMPORTANT: Call this from EVERY authentication entry point that issues
+     * tokens or creates sessions (login, token refresh, social auth, WebAuthn,
+     * 2FA completion, session restore). The login controller is NOT sufficient
+     * alone — tokens from other flows bypass it.
+     *
+     * @param array $user  User row from DB (must include: role, is_super_admin,
+     *                     is_tenant_super_admin, tenant_id, email_verified_at, is_approved)
+     * @return array|null  Null = passes, or ['code' => ..., 'message' => ..., 'extra' => [...]]
+     */
+    public static function checkLoginGates(array $user): ?array
+    {
+        $isAdminRole = in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'])
+            || !empty($user['is_super_admin'])
+            || !empty($user['is_tenant_super_admin']);
+
+        // Admins/super-admins always bypass registration gates
+        if ($isAdminRole) {
+            return null;
+        }
+
+        $tenantId = (int) ($user['tenant_id'] ?? 0);
+
+        // Gate 1: Email verification
+        if (self::requiresEmailVerification($tenantId) && empty($user['email_verified_at'])) {
+            return [
+                'code' => 'AUTH_EMAIL_NOT_VERIFIED',
+                'message' => 'Please verify your email address before logging in. Check your inbox for the verification link.',
+                'extra' => ['requires_verification' => true, 'can_resend' => true],
+            ];
+        }
+
+        // Gate 2: Admin approval
+        if (self::requiresAdminApproval($tenantId) && empty($user['is_approved'])) {
+            return [
+                'code' => 'AUTH_ACCOUNT_PENDING_APPROVAL',
+                'message' => 'Your account is pending approval by a community administrator. You will receive an email once approved.',
+                'extra' => ['pending_approval' => true],
+            ];
+        }
+
+        return null; // All gates passed
+    }
+
+    /**
      * Seed secure defaults for a tenant if settings don't exist.
      * Called during registration enforcement and by migration.
      *

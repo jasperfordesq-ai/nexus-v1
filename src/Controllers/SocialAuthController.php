@@ -77,6 +77,15 @@ class SocialAuthController
         $user = $service->handleUser($provider, $userInfo);
 
         if ($user) {
+            // SECURITY: Enforce registration policy gates on social login
+            $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+            if ($gateBlock) {
+                // Redirect to login page with error message instead of dying
+                $loginUrl = TenantContext::getBasePath() . '/login?error=' . urlencode($gateBlock['message']);
+                header('Location: ' . $loginUrl);
+                exit;
+            }
+
             // FIXED: Preserve layout preference before session regeneration
             $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
 
