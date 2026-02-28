@@ -83,6 +83,7 @@ interface LoginResult {
   success: boolean;
   requires2FA: boolean;
   error?: string;
+  errorCode?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -198,7 +199,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         status: 'error',
         error: response.error ?? 'Login failed',
       }));
-      return { success: false, requires2FA: false, error: response.error };
+      return { success: false, requires2FA: false, error: response.error, errorCode: response.code };
     }
 
     const data = response.data;
