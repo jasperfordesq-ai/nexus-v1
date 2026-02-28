@@ -788,22 +788,23 @@ class GroupService
             }
         }
 
+        $tenantId = TenantContext::getId();
         $sql = "
             SELECT gd.*, u.name as author_name, u.avatar_url as author_avatar,
-                   (SELECT COUNT(*) FROM group_posts gp WHERE gp.discussion_id = gd.id) as reply_count,
-                   (SELECT MAX(created_at) FROM group_posts gp WHERE gp.discussion_id = gd.id) as last_reply_at
+                   (SELECT COUNT(*) FROM group_posts gp WHERE gp.discussion_id = gd.id AND gp.tenant_id = gd.tenant_id) as reply_count,
+                   (SELECT MAX(created_at) FROM group_posts gp WHERE gp.discussion_id = gd.id AND gp.tenant_id = gd.tenant_id) as last_reply_at
             FROM group_discussions gd
             JOIN users u ON gd.user_id = u.id
-            WHERE gd.group_id = ?
+            WHERE gd.group_id = ? AND gd.tenant_id = ?
         ";
-        $params = [$groupId];
+        $params = [$groupId, $tenantId];
 
         if ($cursorId) {
             $sql .= " AND gd.id < ?";
             $params[] = $cursorId;
         }
 
-        $sql .= " ORDER BY gd.is_pinned DESC, COALESCE((SELECT MAX(created_at) FROM group_posts WHERE discussion_id = gd.id), gd.created_at) DESC, gd.id DESC";
+        $sql .= " ORDER BY gd.is_pinned DESC, COALESCE((SELECT MAX(created_at) FROM group_posts gp2 WHERE gp2.discussion_id = gd.id AND gp2.tenant_id = gd.tenant_id), gd.created_at) DESC, gd.id DESC";
         $sql .= " LIMIT " . ($limit + 1);
 
         $stmt = $db->prepare($sql);
@@ -845,7 +846,7 @@ class GroupService
     /**
      * Create a discussion
      */
-    public static function createDiscussion(int $groupId, int $userId, array $data): ?int
+    public static function createDiscussion(int $groupId, int $userId, array $data): ?array
     {
         self::$errors = [];
 
@@ -871,7 +872,28 @@ class GroupService
             $discussionId = GroupDiscussion::create($groupId, $userId, $title);
             GroupPost::create($discussionId, $userId, $content);
 
-            return (int)$discussionId;
+            // Return the full discussion object so the frontend can render it immediately
+            $discussion = GroupDiscussion::findById($discussionId);
+            if (!$discussion) {
+                error_log("GroupService::createDiscussion: findById failed for ID {$discussionId}");
+                self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Discussion created but could not be retrieved'];
+                return null;
+            }
+
+            return [
+                'id' => (int)$discussion['id'],
+                'title' => $discussion['title'],
+                'content' => $content,
+                'author' => [
+                    'id' => (int)$discussion['user_id'],
+                    'name' => $discussion['author_name'],
+                    'avatar_url' => $discussion['author_avatar'],
+                ],
+                'reply_count' => 0,
+                'is_pinned' => false,
+                'created_at' => $discussion['created_at'],
+                'last_reply_at' => null,
+            ];
         } catch (\Exception $e) {
             error_log("GroupService::createDiscussion error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create discussion'];
@@ -911,13 +933,14 @@ class GroupService
             }
         }
 
+        $tenantId = TenantContext::getId();
         $sql = "
             SELECT gp.*, u.name as author_name, u.avatar_url as author_avatar
             FROM group_posts gp
             JOIN users u ON gp.user_id = u.id
-            WHERE gp.discussion_id = ?
+            WHERE gp.discussion_id = ? AND gp.tenant_id = ?
         ";
-        $params = [$discussionId];
+        $params = [$discussionId, $tenantId];
 
         if ($cursorId) {
             $sql .= " AND gp.id > ?";
@@ -953,16 +976,30 @@ class GroupService
             ];
         }
 
+        // Fetch initial post content and accurate aggregate stats
+        $metaStmt = $db->prepare(
+            "SELECT
+                (SELECT content FROM group_posts WHERE discussion_id = ? AND tenant_id = ? ORDER BY id ASC LIMIT 1) as first_content,
+                (SELECT COUNT(*) FROM group_posts WHERE discussion_id = ? AND tenant_id = ?) as total_replies,
+                (SELECT MAX(created_at) FROM group_posts WHERE discussion_id = ? AND tenant_id = ?) as last_reply_at"
+        );
+        $metaStmt->execute([$discussionId, $tenantId, $discussionId, $tenantId, $discussionId, $tenantId]);
+        $meta = $metaStmt->fetch(\PDO::FETCH_ASSOC);
+
         return [
             'discussion' => [
                 'id' => (int)$discussion['id'],
                 'title' => $discussion['title'],
+                'content' => $meta['first_content'] ?? '',
                 'author' => [
                     'id' => (int)$discussion['user_id'],
                     'name' => $discussion['author_name'],
                     'avatar_url' => $discussion['author_avatar'],
                 ],
+                'reply_count' => (int)($meta['total_replies'] ?? 0),
+                'is_pinned' => (bool)($discussion['is_pinned'] ?? false),
                 'created_at' => $discussion['created_at'],
+                'last_reply_at' => $meta['last_reply_at'] ?? null,
             ],
             'items' => $items,
             'cursor' => $hasMore && $lastId ? base64_encode((string)$lastId) : null,
@@ -973,7 +1010,7 @@ class GroupService
     /**
      * Post to a discussion
      */
-    public static function postToDiscussion(int $groupId, int $discussionId, int $userId, array $data): ?int
+    public static function postToDiscussion(int $groupId, int $discussionId, int $userId, array $data): ?array
     {
         self::$errors = [];
 
@@ -997,7 +1034,26 @@ class GroupService
 
         try {
             $postId = GroupPost::create($discussionId, $userId, $content);
-            return (int)$postId;
+
+            // Return the full message object so the frontend can render it immediately
+            $post = GroupPost::findById($postId);
+            if (!$post) {
+                error_log("GroupService::postToDiscussion: findById failed for ID {$postId}");
+                self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Reply posted but could not be retrieved'];
+                return null;
+            }
+
+            return [
+                'id' => (int)$post['id'],
+                'content' => $post['content'],
+                'author' => [
+                    'id' => (int)$post['user_id'],
+                    'name' => $post['author_name'],
+                    'avatar_url' => $post['author_avatar'],
+                ],
+                'is_own' => true,
+                'created_at' => $post['created_at'],
+            ];
         } catch (\Exception $e) {
             error_log("GroupService::postToDiscussion error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to post'];

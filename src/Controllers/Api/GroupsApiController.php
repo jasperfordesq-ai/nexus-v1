@@ -562,7 +562,7 @@ class GroupsApiController extends BaseApiController
     public function discussions(int $id): void
     {
         $userId = $this->getUserId();
-        $this->rateLimit('groups_discussions', 60, 60);
+        $this->rateLimit("groups_discussions_{$id}", 60, 60);
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
@@ -613,13 +613,13 @@ class GroupsApiController extends BaseApiController
     {
         $userId = $this->getUserId();
         $this->verifyCsrf();
-        $this->rateLimit('groups_create_discussion', 10, 60);
+        $this->rateLimit("groups_create_discussion_{$id}", 10, 60);
 
         $data = $this->getAllInput();
 
-        $discussionId = GroupService::createDiscussion($id, $userId, $data);
+        $discussion = GroupService::createDiscussion($id, $userId, $data);
 
-        if ($discussionId === null) {
+        if ($discussion === null) {
             $errors = GroupService::getErrors();
             $status = 422;
 
@@ -633,7 +633,7 @@ class GroupsApiController extends BaseApiController
             $this->respondWithErrors($errors, $status);
         }
 
-        $this->respondWithData(['id' => $discussionId], null, 201);
+        $this->respondWithData($discussion, null, 201);
     }
 
     /**
@@ -650,7 +650,7 @@ class GroupsApiController extends BaseApiController
     public function discussionMessages(int $id, int $discussionId): void
     {
         $userId = $this->getUserId();
-        $this->rateLimit('groups_discussion_messages', 60, 60);
+        $this->rateLimit("groups_discussion_messages_{$id}", 60, 60);
 
         $filters = [
             'limit' => $this->queryInt('per_page', 50, 1, 100),
@@ -707,13 +707,13 @@ class GroupsApiController extends BaseApiController
     {
         $userId = $this->getUserId();
         $this->verifyCsrf();
-        $this->rateLimit('groups_post_to_discussion', 30, 60);
+        $this->rateLimit("groups_post_to_discussion_{$id}", 30, 60);
 
         $data = $this->getAllInput();
 
-        $postId = GroupService::postToDiscussion($id, $discussionId, $userId, $data);
+        $message = GroupService::postToDiscussion($id, $discussionId, $userId, $data);
 
-        if ($postId === null) {
+        if ($message === null) {
             $errors = GroupService::getErrors();
             $status = 422;
 
@@ -731,7 +731,7 @@ class GroupsApiController extends BaseApiController
             $this->respondWithErrors($errors, $status);
         }
 
-        $this->respondWithData(['id' => $postId], null, 201);
+        $this->respondWithData($message, null, 201);
     }
 
     /**
