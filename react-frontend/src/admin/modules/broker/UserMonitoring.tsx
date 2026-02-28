@@ -9,7 +9,7 @@
  * Parity: PHP BrokerControlsController::monitoring()
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -22,13 +22,15 @@ import {
   Input,
   Textarea,
   Switch,
+  Avatar,
+  Spinner,
 } from '@heroui/react';
-import { ArrowLeft, Eye, UserPlus, UserMinus } from 'lucide-react';
+import { ArrowLeft, Eye, UserPlus, UserMinus, X, Search } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { adminBroker } from '../../api/adminApi';
+import { adminBroker, adminUsers } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
-import type { MonitoredUser } from '../../api/types';
+import type { MonitoredUser, AdminUser } from '../../api/types';
 
 export function UserMonitoring() {
   usePageTitle('Admin - User Monitoring');
@@ -40,11 +42,21 @@ export function UserMonitoring() {
 
   // Add to monitoring modal state
   const [monitoringModalOpen, setMonitoringModalOpen] = useState(false);
-  const [monitoringUserIdInput, setMonitoringUserIdInput] = useState('');
   const [monitoringReason, setMonitoringReason] = useState('');
   const [messagingDisabled, setMessagingDisabled] = useState(false);
   const [monitoringLoading, setMonitoringLoading] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
+
+  // User search state
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userSearchResults, setUserSearchResults] = useState<AdminUser[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -64,10 +76,102 @@ export function UserMonitoring() {
     loadItems();
   }, [loadItems]);
 
+  // Debounced user search
+  const handleUserSearch = useCallback((query: string) => {
+    setUserSearchQuery(query);
+    setHighlightedIndex(-1);
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (!query || query.length < 2) {
+      setUserSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    searchTimeoutRef.current = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const res = await adminUsers.list({ search: query, limit: 10 });
+        if (res.success && res.data) {
+          const results = Array.isArray(res.data) ? res.data : (res.data as { items?: AdminUser[] }).items ?? [];
+          setUserSearchResults(results);
+          setShowDropdown(results.length > 0);
+        }
+      } catch {
+        setUserSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+  }, []);
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!showDropdown || userSearchResults.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.min(prev + 1, userSearchResults.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+      e.preventDefault();
+      const user = userSearchResults[highlightedIndex];
+      if (user) {
+        setSelectedUser(user);
+        setShowDropdown(false);
+        setUserSearchQuery('');
+        setUserSearchResults([]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+    }
+  }, [showDropdown, userSearchResults, highlightedIndex]);
+
+  const selectUser = useCallback((user: AdminUser) => {
+    setSelectedUser(user);
+    setShowDropdown(false);
+    setUserSearchQuery('');
+    setUserSearchResults([]);
+  }, []);
+
+  const clearSelectedUser = useCallback(() => {
+    setSelectedUser(null);
+    setUserSearchQuery('');
+    setUserSearchResults([]);
+    // Focus the search input after clearing
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }, []);
+
+  const resetModalState = useCallback(() => {
+    setMonitoringModalOpen(false);
+    setSelectedUser(null);
+    setUserSearchQuery('');
+    setUserSearchResults([]);
+    setMonitoringReason('');
+    setMessagingDisabled(false);
+    setShowDropdown(false);
+    setHighlightedIndex(-1);
+  }, []);
+
   const handleAddMonitoring = async () => {
-    const userId = parseInt(monitoringUserIdInput, 10);
-    if (!userId || isNaN(userId)) {
-      toast.error('Please enter a valid user ID');
+    if (!selectedUser) {
+      toast.error('Please select a user');
       return;
     }
     if (!monitoringReason.trim()) {
@@ -76,17 +180,14 @@ export function UserMonitoring() {
     }
     setMonitoringLoading(true);
     try {
-      const res = await adminBroker.setMonitoring(userId, {
+      const res = await adminBroker.setMonitoring(selectedUser.id, {
         under_monitoring: true,
         reason: monitoringReason,
         messaging_disabled: messagingDisabled,
       });
       if (res?.success) {
-        toast.success('User added to monitoring');
-        setMonitoringModalOpen(false);
-        setMonitoringUserIdInput('');
-        setMonitoringReason('');
-        setMessagingDisabled(false);
+        toast.success(`${selectedUser.name} added to monitoring`);
+        resetModalState();
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to add user to monitoring');
@@ -162,6 +263,27 @@ export function UserMonitoring() {
       ),
     },
     {
+      key: 'monitoring_expires_at',
+      label: 'Expires',
+      sortable: true,
+      render: (item) => {
+        if (!item.monitoring_expires_at) {
+          return <span className="text-sm text-default-400">No expiry</span>;
+        }
+        const expiresAt = new Date(item.monitoring_expires_at);
+        const isExpired = expiresAt <= new Date();
+        return (
+          <Chip
+            size="sm"
+            variant="flat"
+            color={isExpired ? 'danger' : 'default'}
+          >
+            {expiresAt.toLocaleDateString()}
+          </Chip>
+        );
+      },
+    },
+    {
       key: 'actions',
       label: 'Actions',
       render: (item) => (
@@ -227,7 +349,7 @@ export function UserMonitoring() {
       {/* Add to Monitoring Modal */}
       <Modal
         isOpen={monitoringModalOpen}
-        onClose={() => setMonitoringModalOpen(false)}
+        onClose={resetModalState}
         size="md"
       >
         <ModalContent>
@@ -236,15 +358,93 @@ export function UserMonitoring() {
             Add User to Monitoring
           </ModalHeader>
           <ModalBody>
-            <Input
-              label="User ID"
-              placeholder="Enter numeric user ID"
-              value={monitoringUserIdInput}
-              onValueChange={setMonitoringUserIdInput}
-              type="number"
-              variant="bordered"
-              isRequired
-            />
+            {/* User search / selection */}
+            {selectedUser ? (
+              <div className="flex items-center gap-3 rounded-lg border border-divider p-3">
+                <Avatar
+                  src={selectedUser.avatar_url ?? selectedUser.avatar ?? undefined}
+                  name={selectedUser.name}
+                  size="sm"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground truncate">{selectedUser.name}</p>
+                  <p className="text-xs text-default-500 truncate">{selectedUser.email}</p>
+                </div>
+                <Chip size="sm" variant="flat" color={selectedUser.status === 'active' ? 'success' : 'default'}>
+                  {selectedUser.status}
+                </Chip>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  onPress={clearSelectedUser}
+                  aria-label="Clear selection"
+                >
+                  <X size={14} />
+                </Button>
+              </div>
+            ) : (
+              <div ref={dropdownRef} className="relative">
+                <Input
+                  ref={inputRef}
+                  label="Search User"
+                  placeholder="Type a name or email..."
+                  variant="bordered"
+                  isRequired
+                  value={userSearchQuery}
+                  onValueChange={handleUserSearch}
+                  onKeyDown={handleKeyDown}
+                  onFocus={() => {
+                    if (userSearchResults.length > 0) setShowDropdown(true);
+                  }}
+                  startContent={<Search size={16} className="text-default-400" />}
+                  endContent={isSearching ? <Spinner size="sm" /> : null}
+                  autoComplete="off"
+                />
+                {showDropdown && (
+                  <ul
+                    className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-lg border border-divider bg-content1 shadow-lg"
+                    role="listbox"
+                  >
+                    {userSearchResults.map((user, index) => (
+                      <li
+                        key={user.id}
+                        role="option"
+                        aria-selected={index === highlightedIndex}
+                        className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors ${
+                          index === highlightedIndex
+                            ? 'bg-primary/10'
+                            : 'hover:bg-default-100'
+                        }`}
+                        onMouseEnter={() => setHighlightedIndex(index)}
+                        onMouseDown={(e) => {
+                          e.preventDefault(); // Prevent input blur
+                          selectUser(user);
+                        }}
+                      >
+                        <Avatar
+                          src={user.avatar_url ?? user.avatar ?? undefined}
+                          name={user.name}
+                          size="sm"
+                          className="shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
+                          <p className="text-xs text-default-500 truncate">{user.email}</p>
+                        </div>
+                        <Chip size="sm" variant="flat" color={user.status === 'active' ? 'success' : 'default'}>
+                          {user.status}
+                        </Chip>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {userSearchQuery.length >= 2 && !isSearching && userSearchResults.length === 0 && (
+                  <p className="mt-1 text-xs text-default-400">No users found</p>
+                )}
+              </div>
+            )}
+
             <Textarea
               label="Reason (required)"
               placeholder="Reason for placing this user under monitoring..."
@@ -266,7 +466,7 @@ export function UserMonitoring() {
           <ModalFooter>
             <Button
               variant="flat"
-              onPress={() => setMonitoringModalOpen(false)}
+              onPress={resetModalState}
               isDisabled={monitoringLoading}
             >
               Cancel
@@ -275,6 +475,7 @@ export function UserMonitoring() {
               color="primary"
               onPress={handleAddMonitoring}
               isLoading={monitoringLoading}
+              isDisabled={!selectedUser}
               startContent={!monitoringLoading && <UserPlus size={14} />}
             >
               Add to Monitoring

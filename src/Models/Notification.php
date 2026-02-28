@@ -139,6 +139,7 @@ class Notification
             'share' => 'general',
             'follow' => 'general',
             'group' => 'general',
+            'broker_review' => 'general',
         ];
 
         return $typeMap[$type] ?? 'general';
@@ -169,6 +170,7 @@ class Notification
             'share' => 'Your content was shared',
             'follow' => 'New Follower',
             'group' => 'Group Update',
+            'broker_review' => 'Message for Review',
         ];
 
         return $titles[$type] ?? 'Notification';

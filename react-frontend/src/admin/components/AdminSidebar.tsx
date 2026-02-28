@@ -9,10 +9,11 @@
  * Uses Lucide icons (consistent with React frontend).
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
+import { adminBroker } from '../api/adminApi';
 import {
   LayoutDashboard,
   Users,
@@ -334,6 +335,26 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
     }
   );
 
+  // Dynamic unreviewed message count for sidebar badge
+  const [unreviewedCount, setUnreviewedCount] = useState(0);
+
+  const fetchUnreviewedCount = useCallback(async () => {
+    try {
+      const res = await adminBroker.getUnreviewedCount();
+      if (res.success && res.data) {
+        setUnreviewedCount(res.data.count);
+      }
+    } catch {
+      // Silently fail — sidebar badge is non-critical
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUnreviewedCount();
+    const interval = setInterval(fetchUnreviewedCount, 60000);
+    return () => clearInterval(interval);
+  }, [fetchUnreviewedCount]);
+
   const toggleSection = (key: string) => {
     setExpandedSections((prev) => {
       const next = new Set(prev);
@@ -455,11 +476,22 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
                             >
                               <ItemIcon size={16} className="shrink-0" />
                               <span>{item.label}</span>
-                              {item.badge && (
-                                <span className="ml-auto rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
-                                  {item.badge}
-                                </span>
-                              )}
+                              {(() => {
+                                const isMessageReview = item.href === '/admin/broker-controls/messages';
+                                const dynamicBadge = isMessageReview && unreviewedCount > 0
+                                  ? String(unreviewedCount)
+                                  : item.badge;
+                                if (!dynamicBadge) return null;
+                                return (
+                                  <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                                    isMessageReview && unreviewedCount > 0
+                                      ? 'bg-danger text-danger-foreground'
+                                      : 'bg-primary text-primary-foreground'
+                                  }`}>
+                                    {dynamicBadge}
+                                  </span>
+                                );
+                              })()}
                             </Link>
                           </li>
                         );

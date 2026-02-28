@@ -68,6 +68,9 @@ export function MessagesPage() {
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox');
   const archivedLoadedRef = useRef(false);
 
+  // Broker messaging restriction state
+  const [messagingRestricted, setMessagingRestricted] = useState(false);
+
   // New message modal state
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -177,6 +180,19 @@ export function MessagesPage() {
   useEffect(() => {
     loadConversations();
   }, [loadConversations]);
+
+  // Fetch messaging restriction status (broker monitoring)
+  useEffect(() => {
+    let cancelled = false;
+    api.get<{ messaging_disabled: boolean }>('/v2/messages/restriction-status')
+      .then((res) => {
+        if (!cancelled && res.success && res.data?.messaging_disabled) {
+          setMessagingRestricted(true);
+        }
+      })
+      .catch(() => { /* non-critical */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Memoize startNewConversation
   const startNewConversation = useCallback((userId: number, listing?: number) => {
@@ -313,7 +329,7 @@ export function MessagesPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Messaging Disabled Notice */}
+      {/* Messaging Disabled Notice (feature flag) */}
       {!isDirectMessagingEnabled && (
         <GlassCard className="p-4 border-l-4 border-amber-500 bg-amber-500/10">
           <div className="flex items-start gap-3">
@@ -336,6 +352,21 @@ export function MessagesPage() {
         </GlassCard>
       )}
 
+      {/* Messaging restricted by broker/admin */}
+      {isDirectMessagingEnabled && messagingRestricted && (
+        <GlassCard className="p-4 border-l-4 border-red-500 bg-red-500/10">
+          <div className="flex items-start gap-3" role="alert">
+            <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-red-700 dark:text-red-300">Messaging Restricted</h3>
+              <p className="text-sm text-red-600/80 dark:text-red-400/80 mt-1">
+                Your messaging has been temporarily restricted. You can view existing conversations but cannot send new messages. If you believe this is an error, please contact your timebank coordinator.
+              </p>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
@@ -349,7 +380,7 @@ export function MessagesPage() {
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
           startContent={<Plus className="w-4 h-4" />}
           onPress={() => setIsNewMessageOpen(true)}
-          isDisabled={!isDirectMessagingEnabled}
+          isDisabled={!isDirectMessagingEnabled || messagingRestricted}
         >
           {t('new_message')}
         </Button>

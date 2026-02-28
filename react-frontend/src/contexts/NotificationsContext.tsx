@@ -400,6 +400,7 @@ function getToastConfig(type: string): { title: string } {
     event: { title: 'Event Update' },
     group: { title: 'Group Notification' },
     achievement: { title: 'Achievement Unlocked!' },
+    broker_review: { title: 'Message for Review' },
     system: { title: 'System Notification' },
   };
 
