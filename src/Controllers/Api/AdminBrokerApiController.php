@@ -12,6 +12,7 @@ use Nexus\Services\AuditLogService;
 use Nexus\Services\ExchangeWorkflowService;
 use Nexus\Services\ListingRiskTagService;
 use Nexus\Services\NotificationDispatcher;
+use Nexus\Models\Notification;
 
 /**
  * AdminBrokerApiController - V2 API for React admin broker controls
@@ -102,7 +103,7 @@ class AdminBrokerApiController extends BaseApiController
         $monitoredUsers = 0;
         try {
             $row = Database::query(
-                "SELECT COUNT(*) as cnt FROM user_messaging_restrictions WHERE {$tenantWhere} AND under_monitoring = 1",
+                "SELECT COUNT(*) as cnt FROM user_messaging_restrictions WHERE {$tenantWhere} AND under_monitoring = 1 AND (monitoring_expires_at IS NULL OR monitoring_expires_at > NOW())",
                 $tenantParams
             )->fetch();
             $monitoredUsers = (int) ($row['cnt'] ?? 0);
@@ -542,7 +543,10 @@ class AdminBrokerApiController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         try {
-            $conditions = ['umr.under_monitoring = 1'];
+            $conditions = [
+                'umr.under_monitoring = 1',
+                '(umr.monitoring_expires_at IS NULL OR umr.monitoring_expires_at > NOW())',
+            ];
             $params = [];
 
             // Tenant scoping
@@ -566,15 +570,17 @@ class AdminBrokerApiController extends BaseApiController
                 $params
             )->fetchAll();
 
-            // Normalize boolean fields and add tenant info
+            // Normalize boolean fields
             foreach ($items as &$item) {
                 $item['under_monitoring'] = (bool) ($item['under_monitoring'] ?? false);
+                $item['messaging_disabled'] = (bool) ($item['messaging_disabled'] ?? false);
                 $item['tenant_name'] = $item['tenant_name'] ?? 'Unknown';
             }
             unset($item);
 
             $this->respondWithData($items);
         } catch (\Exception $e) {
+            error_log("[AdminBrokerApiController] monitoring() failed: " . $e->getMessage());
             $this->respondWithData([]);
         }
     }
@@ -1021,8 +1027,8 @@ class AdminBrokerApiController extends BaseApiController
      * POST /api/v2/admin/broker/monitoring/{userId}
      *
      * Set or remove monitoring for a user.
-     * Body: { under_monitoring: bool, reason?: string, messaging_disabled?: bool }
-     * If under_monitoring is false, removes monitoring.
+     * Body: { under_monitoring: bool, reason?: string, messaging_disabled?: bool, expires_days?: int }
+     * If under_monitoring is false, removes monitoring and clears messaging_disabled.
      */
     public function setMonitoring(int $userId): void
     {
@@ -1032,17 +1038,18 @@ class AdminBrokerApiController extends BaseApiController
         $underMonitoring = (bool) $this->input('under_monitoring', true);
         $reason = trim($this->input('reason', ''));
         $messagingDisabled = (bool) $this->input('messaging_disabled', false);
+        $expiresDays = $this->input('expires_days', null);
 
         try {
             // Super admins can manage monitoring for users from any tenant
             if ($isSuperAdmin) {
                 $user = Database::query(
-                    "SELECT id, tenant_id FROM users WHERE id = ?",
+                    "SELECT id, tenant_id, first_name, last_name FROM users WHERE id = ?",
                     [$userId]
                 )->fetch();
             } else {
                 $user = Database::query(
-                    "SELECT id, tenant_id FROM users WHERE id = ? AND tenant_id = ?",
+                    "SELECT id, tenant_id, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
                     [$userId, $tenantId]
                 )->fetch();
             }
@@ -1054,6 +1061,7 @@ class AdminBrokerApiController extends BaseApiController
 
             // Use the user's own tenant_id for all writes
             $userTenantId = (int) $user['tenant_id'];
+            $userName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
 
             // Check if record already exists
             $existing = Database::query(
@@ -1067,28 +1075,68 @@ class AdminBrokerApiController extends BaseApiController
                     return;
                 }
 
+                // Calculate expiry date if expires_days is provided
+                $expiresAt = null;
+                if ($expiresDays !== null && (int) $expiresDays > 0) {
+                    $expiresAt = date('Y-m-d H:i:s', strtotime('+' . (int) $expiresDays . ' days'));
+                }
+
                 if ($existing) {
                     Database::query(
-                        "UPDATE user_messaging_restrictions SET under_monitoring = 1, monitoring_reason = ?, restriction_reason = ?, messaging_disabled = ?, monitoring_started_at = NOW(), restricted_by = ? WHERE user_id = ? AND tenant_id = ?",
-                        [$reason, $reason, $messagingDisabled ? 1 : 0, $adminId, $userId, $userTenantId]
+                        "UPDATE user_messaging_restrictions SET under_monitoring = 1, monitoring_reason = ?, restriction_reason = ?, messaging_disabled = ?, monitoring_started_at = NOW(), monitoring_expires_at = ?, restricted_by = ? WHERE user_id = ? AND tenant_id = ?",
+                        [$reason, $reason, $messagingDisabled ? 1 : 0, $expiresAt, $adminId, $userId, $userTenantId]
                     );
                 } else {
                     Database::query(
-                        "INSERT INTO user_messaging_restrictions (user_id, tenant_id, under_monitoring, monitoring_reason, restriction_reason, messaging_disabled, monitoring_started_at, restricted_by) VALUES (?, ?, 1, ?, ?, ?, NOW(), ?)",
-                        [$userId, $userTenantId, $reason, $reason, $messagingDisabled ? 1 : 0, $adminId]
+                        "INSERT INTO user_messaging_restrictions (user_id, tenant_id, under_monitoring, monitoring_reason, restriction_reason, messaging_disabled, monitoring_started_at, monitoring_expires_at, restricted_by) VALUES (?, ?, 1, ?, ?, ?, NOW(), ?, ?)",
+                        [$userId, $userTenantId, $reason, $reason, $messagingDisabled ? 1 : 0, $expiresAt, $adminId]
                     );
                 }
+
+                AuditLogService::log('user_monitoring_added', null, $adminId, [
+                    'user_id' => $userId,
+                    'user_name' => $userName,
+                    'reason' => $reason,
+                    'messaging_disabled' => $messagingDisabled,
+                    'expires_days' => $expiresDays ? (int) $expiresDays : null,
+                    'expires_at' => $expiresAt,
+                ]);
+
+                // Notify the affected user
+                try {
+                    $msg = $messagingDisabled
+                        ? 'Your messaging has been temporarily restricted by your timebank coordinator.'
+                        : 'Your account has been placed under review by your timebank coordinator.';
+                    Notification::create($userId, $msg, '/messages', 'system', true);
+                } catch (\Throwable $e) {
+                    error_log("[AdminBrokerApiController] Failed to notify user {$userId} about monitoring: " . $e->getMessage());
+                }
+
                 $this->respondWithData(['user_id' => $userId, 'under_monitoring' => true]);
             } else {
                 if ($existing) {
                     Database::query(
-                        "UPDATE user_messaging_restrictions SET under_monitoring = 0, monitoring_reason = NULL, restriction_reason = NULL, monitoring_started_at = NULL WHERE user_id = ? AND tenant_id = ?",
+                        "UPDATE user_messaging_restrictions SET under_monitoring = 0, messaging_disabled = 0, monitoring_reason = NULL, restriction_reason = NULL, monitoring_started_at = NULL, monitoring_expires_at = NULL WHERE user_id = ? AND tenant_id = ?",
                         [$userId, $userTenantId]
                     );
                 }
+
+                AuditLogService::log('user_monitoring_removed', null, $adminId, [
+                    'user_id' => $userId,
+                    'user_name' => $userName,
+                ]);
+
+                // Notify the affected user that restrictions have been lifted
+                try {
+                    Notification::create($userId, 'Your messaging restrictions have been lifted.', '/messages', 'system', true);
+                } catch (\Throwable $e) {
+                    error_log("[AdminBrokerApiController] Failed to notify user {$userId} about monitoring removal: " . $e->getMessage());
+                }
+
                 $this->respondWithData(['user_id' => $userId, 'under_monitoring' => false]);
             }
         } catch (\Exception $e) {
+            error_log("[AdminBrokerApiController] setMonitoring failed for user {$userId}: " . $e->getMessage());
             $this->respondWithError('SERVER_ERROR', 'Failed to update monitoring', null, 500);
         }
     }

@@ -14,6 +14,8 @@ use Nexus\Services\BrokerControlConfigService;
 use Nexus\Services\ListingRiskTagService;
 use Nexus\Services\ExchangeWorkflowService;
 use Nexus\Services\BrokerMessageVisibilityService;
+use Nexus\Services\AuditLogService;
+use Nexus\Models\Notification;
 
 /**
  * BrokerControlsController - Admin Dashboard for Broker Control Features
@@ -91,10 +93,11 @@ class BrokerControlsController
             );
             $highRiskListings = (int) ($stmt->fetch()['count'] ?? 0);
 
-            // Users under monitoring
+            // Users under monitoring (exclude expired)
             $stmt = Database::query(
                 "SELECT COUNT(*) as count FROM user_messaging_restrictions
-                 WHERE tenant_id = ? AND under_monitoring = 1",
+                 WHERE tenant_id = ? AND under_monitoring = 1
+                 AND (monitoring_expires_at IS NULL OR monitoring_expires_at > NOW())",
                 [$tenantId]
             );
             $usersUnderMonitoring = (int) ($stmt->fetch()['count'] ?? 0);
@@ -740,6 +743,7 @@ class BrokerControlsController
                  JOIN users u ON umr.user_id = u.id
                  LEFT JOIN users b ON umr.restricted_by = b.id
                  WHERE umr.tenant_id = ? AND umr.under_monitoring = 1
+                 AND (umr.monitoring_expires_at IS NULL OR umr.monitoring_expires_at > NOW())
                  ORDER BY umr.monitoring_started_at DESC",
                 [$tenantId]
             )->fetchAll();
@@ -774,29 +778,66 @@ class BrokerControlsController
                 [$tenantId, $userId]
             )->fetch();
 
-            if ($existing) {
-                Database::query(
-                    "UPDATE user_messaging_restrictions SET
-                        under_monitoring = ?, monitoring_reason = ?,
-                        monitoring_started_at = CASE WHEN ? = 1 THEN NOW() ELSE monitoring_started_at END,
-                        restricted_by = ?, updated_at = NOW()
-                     WHERE tenant_id = ? AND user_id = ?",
-                    [$enabled ? 1 : 0, $reason, $enabled ? 1 : 0, $brokerId, $tenantId, $userId]
-                );
+            if ($enabled) {
+                if ($existing) {
+                    Database::query(
+                        "UPDATE user_messaging_restrictions SET
+                            under_monitoring = 1, monitoring_reason = ?,
+                            monitoring_started_at = NOW(),
+                            restricted_by = ?, updated_at = NOW()
+                         WHERE tenant_id = ? AND user_id = ?",
+                        [$reason, $brokerId, $tenantId, $userId]
+                    );
+                } else {
+                    Database::query(
+                        "INSERT INTO user_messaging_restrictions
+                         (tenant_id, user_id, under_monitoring, monitoring_reason,
+                          monitoring_started_at, restricted_by, created_at)
+                         VALUES (?, ?, 1, ?, NOW(), ?, NOW())",
+                        [$tenantId, $userId, $reason, $brokerId]
+                    );
+                }
+
+                AuditLogService::log('user_monitoring_added', null, $brokerId, [
+                    'user_id' => $userId,
+                    'reason' => $reason,
+                    'source' => 'legacy_admin',
+                ]);
+
+                try {
+                    Notification::create($userId, 'Your account has been placed under review by your timebank coordinator.', '/messages', 'system', true);
+                } catch (\Throwable $e) {
+                    error_log("[BrokerControlsController] Failed to notify user {$userId} about monitoring: " . $e->getMessage());
+                }
             } else {
-                Database::query(
-                    "INSERT INTO user_messaging_restrictions
-                     (tenant_id, user_id, under_monitoring, monitoring_reason,
-                      monitoring_started_at, restricted_by, restricted_at)
-                     VALUES (?, ?, ?, ?, NOW(), ?, NOW())",
-                    [$tenantId, $userId, $enabled ? 1 : 0, $reason, $brokerId]
-                );
+                if ($existing) {
+                    Database::query(
+                        "UPDATE user_messaging_restrictions SET
+                            under_monitoring = 0, messaging_disabled = 0,
+                            monitoring_reason = NULL, restriction_reason = NULL,
+                            monitoring_started_at = NULL, monitoring_expires_at = NULL,
+                            updated_at = NOW()
+                         WHERE tenant_id = ? AND user_id = ?",
+                        [$tenantId, $userId]
+                    );
+                }
+
+                AuditLogService::log('user_monitoring_removed', null, $brokerId, [
+                    'user_id' => $userId,
+                    'source' => 'legacy_admin',
+                ]);
+
+                try {
+                    Notification::create($userId, 'Your messaging restrictions have been lifted.', '/messages', 'system', true);
+                } catch (\Throwable $e) {
+                    error_log("[BrokerControlsController] Failed to notify user {$userId} about monitoring removal: " . $e->getMessage());
+                }
             }
 
             $_SESSION['flash_success'] = $enabled ? 'User added to monitoring.' : 'User removed from monitoring.';
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to update monitoring status.';
-            error_log("BrokerControlsController::setMonitoring - " . $e->getMessage());
+            error_log("[BrokerControlsController] setMonitoring failed for user {$userId}: " . $e->getMessage());
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/monitoring');
