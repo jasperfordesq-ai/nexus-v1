@@ -30,9 +30,9 @@ const DOC_TYPES = [
   { value: 'terms', label: 'Terms of Service' },
   { value: 'privacy', label: 'Privacy Policy' },
   { value: 'cookies', label: 'Cookie Policy' },
+  { value: 'accessibility', label: 'Accessibility Statement' },
+  { value: 'community_guidelines', label: 'Community Guidelines' },
   { value: 'acceptable_use', label: 'Acceptable Use Policy' },
-  { value: 'data_processing', label: 'Data Processing Agreement' },
-  { value: 'other', label: 'Other' },
 ];
 
 const STATUS_OPTIONS = [

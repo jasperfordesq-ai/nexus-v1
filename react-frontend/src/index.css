@@ -225,6 +225,79 @@
 }
 
 /* ─────────────────────────────────────────────
+   VERSION DIFF CONTENT
+   Styles for the unified diff HTML returned by
+   GET /api/v2/legal/versions/compare
+   ───────────────────────────────────────────── */
+
+.version-diff-content .diff-unified {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.version-diff-content .diff-line {
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.version-diff-content .diff-indicator {
+  display: inline-block;
+  width: 1rem;
+  font-weight: 700;
+  text-align: center;
+  margin-right: 0.5rem;
+  user-select: none;
+}
+
+.version-diff-content .diff-removed {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--text-primary);
+}
+
+.version-diff-content .diff-removed del {
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+.version-diff-content .diff-removed .diff-indicator {
+  color: #ef4444;
+}
+
+.version-diff-content .diff-added {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--text-primary);
+}
+
+.version-diff-content .diff-added ins {
+  text-decoration: none;
+}
+
+.version-diff-content .diff-added .diff-indicator {
+  color: #10b981;
+}
+
+.version-diff-content .diff-unchanged {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.version-diff-content .diff-unchanged .diff-indicator {
+  opacity: 0.3;
+}
+
+/* Dark mode adjustments */
+.dark .version-diff-content .diff-removed {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.dark .version-diff-content .diff-added {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+/* ─────────────────────────────────────────────
    FEED RICH TEXT CONTENT
    Styles for HTML rendered in feed posts
    (output from Lexical compose editor)

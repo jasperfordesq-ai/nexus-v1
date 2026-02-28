@@ -11,13 +11,23 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Chip } from '@heroui/react';
-import { Plus, Pencil, Trash2, FileText } from 'lucide-react';
+import { Plus, Pencil, Trash2, FileText, GitBranch } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminLegalDocs } from '../../api/adminApi';
 import { PageHeader, DataTable, ConfirmModal, StatusBadge } from '../../components';
 import type { Column } from '../../components';
 import type { LegalDocument } from '../../api/types';
+
+/** Human-friendly labels for legal document types */
+const DOC_TYPE_LABELS: Record<string, string> = {
+  terms: 'Terms of Service',
+  privacy: 'Privacy Policy',
+  cookies: 'Cookie Policy',
+  accessibility: 'Accessibility',
+  community_guidelines: 'Community Guidelines',
+  acceptable_use: 'Acceptable Use',
+};
 
 export function LegalDocList() {
   usePageTitle('Admin - Legal Documents');
@@ -88,8 +98,8 @@ export function LegalDocList() {
       label: 'Type',
       sortable: true,
       render: (doc) => (
-        <Chip size="sm" variant="flat" color="primary" className="capitalize">
-          {doc.type}
+        <Chip size="sm" variant="flat" color="primary">
+          {DOC_TYPE_LABELS[doc.type] ?? doc.type}
         </Chip>
       ),
     },
@@ -111,6 +121,15 @@ export function LegalDocList() {
       label: 'Actions',
       render: (doc) => (
         <div className="flex items-center gap-1">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="light"
+            onPress={() => navigate(tenantPath(`/admin/legal-documents/${doc.id}/versions`))}
+            aria-label="Manage versions"
+          >
+            <GitBranch size={14} />
+          </Button>
           <Button
             isIconOnly
             size="sm"

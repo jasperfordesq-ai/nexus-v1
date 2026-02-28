@@ -55,6 +55,7 @@ import {
   Compass,
   Cookie,
   Bot,
+  ShieldCheck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent } from '@/contexts';
@@ -150,6 +151,8 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('legal.privacy_policy'), href: '/privacy', icon: FileText },
     { label: t('legal.cookie_policy', 'Cookie Policy'), href: '/cookies', icon: Cookie },
     { label: t('legal.accessibility'), href: '/accessibility', icon: FileText },
+    { label: t('legal.community_guidelines', 'Community Guidelines'), href: '/community-guidelines', icon: Users },
+    { label: t('legal.acceptable_use', 'Acceptable Use'), href: '/acceptable-use', icon: ShieldCheck },
   ];
 
   // Track previous pathname to only close on actual navigation
@@ -519,6 +522,23 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               >
                 Built on Project NEXUS by Jasper Ford
               </a>
+              <div className="flex justify-center gap-2 mt-2">
+                <Link
+                  to={tenantPath('/platform/terms')}
+                  className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors"
+                  onClick={onClose}
+                >
+                  Platform Terms
+                </Link>
+                <span className="text-theme-subtle/30">&middot;</span>
+                <Link
+                  to={tenantPath('/platform/privacy')}
+                  className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors"
+                  onClick={onClose}
+                >
+                  Privacy
+                </Link>
+              </div>
             </div>
           </nav>
         </DrawerBody>

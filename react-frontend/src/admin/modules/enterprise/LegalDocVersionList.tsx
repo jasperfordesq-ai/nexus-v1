@@ -30,6 +30,8 @@ import {
   User,
   Calendar,
   AlertCircle,
+  Trash2,
+  Pencil,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
@@ -60,6 +62,10 @@ export default function LegalDocVersionList() {
   const [submitting, setSubmitting] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewingVersion, setViewingVersion] = useState<LegalDocumentVersion | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<LegalDocumentVersion | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editTarget, setEditTarget] = useState<LegalDocumentVersion | null>(null);
 
   const documentId = parseInt(id || '0', 10);
 
@@ -103,6 +109,28 @@ export default function LegalDocVersionList() {
       }
     } catch (err) {
       error('Failed to publish version');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteDraft = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      setSubmitting(true);
+      const response = await adminLegalDocs.deleteVersion(documentId, deleteTarget.id);
+
+      if (response.success) {
+        success('Draft version deleted');
+        setShowDeleteModal(false);
+        setDeleteTarget(null);
+        loadVersions();
+      } else {
+        error(response.error || 'Failed to delete version');
+      }
+    } catch (err) {
+      error('Failed to delete version');
     } finally {
       setSubmitting(false);
     }
@@ -260,20 +288,49 @@ export default function LegalDocVersionList() {
 
                 <div className="flex gap-2">
                   {version.is_draft && (
-                    <Tooltip content="Publish this version">
-                      <Button
-                        size="sm"
-                        color="success"
-                        variant="flat"
-                        startContent={<CheckCircle2 size={16} />}
-                        onPress={() => {
-                          setSelectedVersion(version);
-                          setShowPublishModal(true);
-                        }}
-                      >
-                        Publish
-                      </Button>
-                    </Tooltip>
+                    <>
+                      <Tooltip content="Publish this version">
+                        <Button
+                          size="sm"
+                          color="success"
+                          variant="flat"
+                          startContent={<CheckCircle2 size={16} />}
+                          onPress={() => {
+                            setSelectedVersion(version);
+                            setShowPublishModal(true);
+                          }}
+                        >
+                          Publish
+                        </Button>
+                      </Tooltip>
+                      <Tooltip content="Edit this draft">
+                        <Button
+                          size="sm"
+                          variant="flat"
+                          startContent={<Pencil size={16} />}
+                          onPress={() => {
+                            setEditTarget(version);
+                            setShowEditModal(true);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      </Tooltip>
+                      <Tooltip content="Delete this draft">
+                        <Button
+                          size="sm"
+                          color="danger"
+                          variant="flat"
+                          startContent={<Trash2 size={16} />}
+                          onPress={() => {
+                            setDeleteTarget(version);
+                            setShowDeleteModal(true);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </Tooltip>
+                    </>
                   )}
 
                   {!version.is_draft && (
@@ -343,6 +400,31 @@ export default function LegalDocVersionList() {
           )}
         </ModalContent>
       </Modal>
+
+      {/* Edit Draft Version Modal */}
+      {editTarget && (
+        <Modal
+          isOpen={showEditModal}
+          onClose={() => { setShowEditModal(false); setEditTarget(null); }}
+          size="5xl"
+          scrollBehavior="inside"
+        >
+          <ModalContent>
+            {(onClose) => (
+              <LegalDocVersionForm
+                documentId={documentId}
+                editVersion={editTarget}
+                onSuccess={() => {
+                  onClose();
+                  setEditTarget(null);
+                  loadVersions();
+                }}
+                onCancel={onClose}
+              />
+            )}
+          </ModalContent>
+        </Modal>
+      )}
 
       {/* Compare Modal */}
       {compareVersions && (
@@ -522,6 +604,43 @@ export default function LegalDocVersionList() {
                   startContent={<Send size={16} />}
                 >
                   Send Notification
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Draft Confirmation Modal */}
+      <Modal isOpen={showDeleteModal} onClose={() => { setShowDeleteModal(false); setDeleteTarget(null); }}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>Delete Draft Version</ModalHeader>
+              <ModalBody>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 p-3 bg-danger-50 dark:bg-danger-900/20 rounded-lg">
+                    <AlertCircle size={20} className="text-danger shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-medium mb-1">This action cannot be undone.</p>
+                      <p className="text-[var(--color-text-secondary)]">
+                        Draft version {deleteTarget?.version_number} will be permanently deleted.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={handleDeleteDraft}
+                  isLoading={submitting}
+                  startContent={<Trash2 size={16} />}
+                >
+                  Delete Draft
                 </Button>
               </ModalFooter>
             </>

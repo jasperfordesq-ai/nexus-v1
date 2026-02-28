@@ -9,10 +9,13 @@ declare(strict_types=1);
 namespace Nexus\Controllers;
 
 use Nexus\Core\Auth;
+use Nexus\Core\ClientIp;
+use Nexus\Core\RateLimiter;
 use Nexus\Core\TenantContext;
 use Nexus\Core\View;
 use Nexus\Core\SEO;
 use Nexus\Services\LegalDocumentService;
+use Nexus\Services\RedisCache;
 
 /**
  * LegalDocumentController
@@ -452,6 +455,109 @@ class LegalDocumentController
                 'summary_of_changes' => $version['summary_of_changes'] ?? null,
             ]
         ]);
+    }
+
+    /**
+     * API: Compare two published versions (public, no auth required)
+     * GET /api/v2/legal/versions/compare?v1={id}&v2={id}
+     *
+     * Returns a unified diff between two published versions so that
+     * end-users can see exactly what changed between releases.
+     */
+    public function apiCompareVersions(): void
+    {
+        header('Content-Type: application/json');
+
+        // Rate limit: 30 requests per 10 minutes per IP (LCS diff is expensive)
+        $ip = ClientIp::get();
+        if (!RateLimiter::attempt("legal:compare:{$ip}", 30, 600)) {
+            http_response_code(429);
+            echo json_encode(['error' => 'Too many comparison requests. Please try again later.']);
+            return;
+        }
+
+        $v1 = $_GET['v1'] ?? null;
+        $v2 = $_GET['v2'] ?? null;
+
+        if (!$v1 || !$v2) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Both v1 and v2 parameters are required']);
+            return;
+        }
+
+        // Verify both versions exist, belong to current tenant, and are published
+        $version1 = LegalDocumentService::getVersion((int) $v1);
+        $version2 = LegalDocumentService::getVersion((int) $v2);
+
+        if (!$version1 || !$version2) {
+            http_response_code(404);
+            echo json_encode(['error' => 'One or both versions not found']);
+            return;
+        }
+
+        $tenantId = TenantContext::getId();
+        if ((int) $version1['tenant_id'] !== $tenantId || (int) $version2['tenant_id'] !== $tenantId) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Version not found']);
+            return;
+        }
+
+        // Don't let public users compare drafts
+        if ($version1['is_draft'] || $version2['is_draft']) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Version not found']);
+            return;
+        }
+
+        // Both versions must belong to the same document
+        if ((int) $version1['document_id'] !== (int) $version2['document_id']) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Versions must belong to the same document']);
+            return;
+        }
+
+        // Cache the comparison result (24 hours) — LCS is expensive
+        $cacheKey = "legal:compare:{$tenantId}:" . min((int) $v1, (int) $v2) . ':' . max((int) $v1, (int) $v2);
+        $cached = RedisCache::get($cacheKey);
+        if ($cached) {
+            echo json_encode($cached);
+            return;
+        }
+
+        $comparison = LegalDocumentService::compareVersions((int) $v1, (int) $v2);
+
+        if (!$comparison) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Comparison failed']);
+            return;
+        }
+
+        // Strip internal fields from the public response
+        $publicVersion = static function (array $v): array {
+            return [
+                'id' => (int) $v['id'],
+                'version_number' => $v['version_number'],
+                'version_label' => $v['version_label'] ?? null,
+                'effective_date' => $v['effective_date'],
+                'published_at' => $v['published_at'],
+                'is_current' => (bool) $v['is_current'],
+                'summary_of_changes' => $v['summary_of_changes'] ?? null,
+            ];
+        };
+
+        $response = [
+            'data' => [
+                'version1' => $publicVersion($comparison['version1']),
+                'version2' => $publicVersion($comparison['version2']),
+                'diff_html' => $comparison['diff_html'],
+                'changes_count' => $comparison['changes_count'],
+            ]
+        ];
+
+        // Cache for 24 hours — legal document versions are immutable once published
+        RedisCache::set($cacheKey, $response, 86400);
+
+        echo json_encode($response);
     }
 
     /**

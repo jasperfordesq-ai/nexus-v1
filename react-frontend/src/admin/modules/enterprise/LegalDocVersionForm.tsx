@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ModalHeader,
   ModalBody,
@@ -15,20 +15,25 @@ import {
 } from '@heroui/react';
 import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
+import type { LegalDocumentVersion } from '@/admin/api/types';
 import { AlertCircle } from 'lucide-react';
 
 interface LegalDocVersionFormProps {
   documentId: number;
+  /** When provided, the form operates in edit mode for this draft version. */
+  editVersion?: LegalDocumentVersion;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
 export default function LegalDocVersionForm({
   documentId,
+  editVersion,
   onSuccess,
   onCancel,
 }: LegalDocVersionFormProps) {
   const { success, error } = useToast();
+  const isEditMode = !!editVersion;
 
   const [formData, setFormData] = useState({
     version_number: '',
@@ -41,6 +46,20 @@ export default function LegalDocVersionForm({
 
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Populate form when editing an existing draft
+  useEffect(() => {
+    if (editVersion) {
+      setFormData({
+        version_number: editVersion.version_number ?? '',
+        version_label: editVersion.version_label ?? '',
+        content: editVersion.content ?? '',
+        summary_of_changes: editVersion.summary_of_changes ?? '',
+        effective_date: editVersion.effective_date ?? '',
+        is_draft: editVersion.is_draft,
+      });
+    }
+  }, [editVersion]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -70,23 +89,33 @@ export default function LegalDocVersionForm({
 
     try {
       setSubmitting(true);
-      const response = await adminLegalDocs.createVersion(documentId, {
+
+      const payload = {
         version_number: formData.version_number.trim(),
         version_label: formData.version_label.trim() || undefined,
         content: formData.content,
         summary_of_changes: formData.summary_of_changes.trim() || undefined,
         effective_date: formData.effective_date,
-        is_draft: formData.is_draft,
-      });
+      };
+
+      let response;
+      if (isEditMode) {
+        response = await adminLegalDocs.updateVersion(documentId, editVersion.id, payload);
+      } else {
+        response = await adminLegalDocs.createVersion(documentId, {
+          ...payload,
+          is_draft: formData.is_draft,
+        });
+      }
 
       if (response.success) {
-        success('Version created successfully');
+        success(isEditMode ? 'Version updated successfully' : 'Version created successfully');
         onSuccess();
       } else {
-        error(response.error || 'Failed to create version');
+        error(response.error || `Failed to ${isEditMode ? 'update' : 'create'} version`);
       }
     } catch (err) {
-      error('Failed to create version');
+      error(`Failed to ${isEditMode ? 'update' : 'create'} version`);
     } finally {
       setSubmitting(false);
     }
@@ -94,17 +123,18 @@ export default function LegalDocVersionForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <ModalHeader>Create New Version</ModalHeader>
+      <ModalHeader>{isEditMode ? 'Edit Draft Version' : 'Create New Version'}</ModalHeader>
       <ModalBody>
         <div className="space-y-4">
           {/* Info banner */}
           <div className="flex items-start gap-3 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
-            <AlertCircle size={20} className="text-primary flex-shrink-0 mt-0.5" />
+            <AlertCircle size={20} className="text-primary shrink-0 mt-0.5" />
             <div className="text-sm">
               <p className="font-medium mb-1">Version Management</p>
               <p className="text-[var(--color-text-secondary)]">
-                Create a draft version first. You can publish it later when ready. Publishing will make it
-                the current version and trigger user re-acceptance if needed.
+                {isEditMode
+                  ? 'You are editing a draft version. Changes will be saved immediately. Publish when ready.'
+                  : 'Create a draft version first. You can publish it later when ready. Publishing will make it the current version and trigger user re-acceptance if needed.'}
               </p>
             </div>
           </div>
@@ -161,19 +191,21 @@ export default function LegalDocVersionForm({
             isRequired
           />
 
-          {/* Draft Toggle */}
-          <div className="flex items-center justify-between p-3 border rounded-lg">
-            <div>
-              <p className="font-medium">Save as Draft</p>
-              <p className="text-sm text-[var(--color-text-secondary)]">
-                Drafts are not visible to users and can be edited
-              </p>
+          {/* Draft Toggle — only for new versions, editing is always a draft */}
+          {!isEditMode && (
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <p className="font-medium">Save as Draft</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">
+                  Drafts are not visible to users and can be edited
+                </p>
+              </div>
+              <Switch
+                isSelected={formData.is_draft}
+                onValueChange={(checked) => setFormData({ ...formData, is_draft: checked })}
+              />
             </div>
-            <Switch
-              isSelected={formData.is_draft}
-              onValueChange={(checked) => setFormData({ ...formData, is_draft: checked })}
-            />
-          </div>
+          )}
         </div>
       </ModalBody>
       <ModalFooter>
@@ -181,7 +213,7 @@ export default function LegalDocVersionForm({
           Cancel
         </Button>
         <Button color="primary" type="submit" isLoading={submitting}>
-          Create Version
+          {isEditMode ? 'Update Version' : 'Create Version'}
         </Button>
       </ModalFooter>
     </form>

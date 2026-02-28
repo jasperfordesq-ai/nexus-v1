@@ -128,6 +128,8 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/privacy')}>Privacy Policy</FooterLink></li>
                   <li><FooterLink href={tenantPath('/cookies')}>Cookie Policy</FooterLink></li>
                   <li><FooterLink href={tenantPath('/accessibility')}>Accessibility</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/community-guidelines')}>Community Guidelines</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/acceptable-use')}>Acceptable Use</FooterLink></li>
                 </ul>
               </div>
             </div>
@@ -158,6 +160,20 @@ export function Footer({ children, copyright }: FooterProps) {
                   <Cookie className="w-3 h-3" aria-hidden="true" />
                   Cookie Settings
                 </button>
+                <span className="text-theme-subtle/30">|</span>
+                <Link
+                  to={tenantPath('/platform/terms')}
+                  className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
+                >
+                  Platform Terms
+                </Link>
+                <span className="text-theme-subtle/30">&middot;</span>
+                <Link
+                  to={tenantPath('/platform/privacy')}
+                  className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
+                >
+                  Privacy
+                </Link>
                 <span className="text-theme-subtle/30">|</span>
                 <a
                   href="https://github.com/jasperfordesq-ai/nexus-v1"

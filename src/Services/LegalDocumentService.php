@@ -996,4 +996,157 @@ class LegalDocumentService
 
         return (int) ($stmt->fetch()['count'] ?? 0);
     }
+
+    /**
+     * Compare two versions and generate an HTML diff.
+     *
+     * Uses a sentence-level Longest Common Subsequence (LCS) algorithm
+     * to produce a unified diff with additions (<ins>) and removals (<del>).
+     *
+     * @return array{version1: array, version2: array, diff_html: string, changes_count: int}
+     */
+    public static function compareVersions(int $versionId1, int $versionId2): ?array
+    {
+        $v1 = self::getVersion($versionId1);
+        $v2 = self::getVersion($versionId2);
+
+        if (!$v1 || !$v2) {
+            return null;
+        }
+
+        $oldText = self::stripToPlainSentences($v1['content_plain'] ?: strip_tags($v1['content']));
+        $newText = self::stripToPlainSentences($v2['content_plain'] ?: strip_tags($v2['content']));
+
+        $diffHtml = self::generateLcsDiff($oldText, $newText);
+        $changesCount = substr_count($diffHtml, 'diff-removed') + substr_count($diffHtml, 'diff-added');
+
+        return [
+            'version1' => $v1,
+            'version2' => $v2,
+            'diff_html' => $diffHtml,
+            'changes_count' => $changesCount,
+        ];
+    }
+
+    /**
+     * Split content into sentences for diff comparison.
+     *
+     * @return string[]
+     */
+    private static function stripToPlainSentences(string $text): array
+    {
+        // Normalise whitespace
+        $text = preg_replace('/\s+/', ' ', trim($text));
+
+        // Split on sentence boundaries (period/question/exclamation followed by space or end)
+        // or double-newline paragraph breaks
+        $sentences = preg_split('/(?<=[.!?])\s+/', $text, -1, PREG_SPLIT_NO_EMPTY);
+
+        return array_values(array_filter(array_map('trim', $sentences)));
+    }
+
+    /**
+     * Generate an HTML diff using Longest Common Subsequence.
+     *
+     * @param string[] $oldSentences
+     * @param string[] $newSentences
+     */
+    private static function generateLcsDiff(array $oldSentences, array $newSentences): string
+    {
+        $m = count($oldSentences);
+        $n = count($newSentences);
+
+        // Safety limit: LCS builds an O(m*n) table. Cap at 2000 sentences
+        // per side (~100k words) to avoid memory exhaustion.
+        $maxSentences = 2000;
+        if ($m > $maxSentences || $n > $maxSentences) {
+            return self::generateTruncatedDiff($oldSentences, $newSentences, $maxSentences);
+        }
+
+        // Build LCS table
+        $lcs = array_fill(0, $m + 1, array_fill(0, $n + 1, 0));
+        for ($i = 1; $i <= $m; $i++) {
+            for ($j = 1; $j <= $n; $j++) {
+                if (self::normaliseSentence($oldSentences[$i - 1]) === self::normaliseSentence($newSentences[$j - 1])) {
+                    $lcs[$i][$j] = $lcs[$i - 1][$j - 1] + 1;
+                } else {
+                    $lcs[$i][$j] = max($lcs[$i - 1][$j], $lcs[$i][$j - 1]);
+                }
+            }
+        }
+
+        // Back-trace to build diff entries
+        $diff = [];
+        $i = $m;
+        $j = $n;
+
+        while ($i > 0 || $j > 0) {
+            if ($i > 0 && $j > 0 && self::normaliseSentence($oldSentences[$i - 1]) === self::normaliseSentence($newSentences[$j - 1])) {
+                array_unshift($diff, ['type' => 'unchanged', 'text' => $newSentences[$j - 1]]);
+                $i--;
+                $j--;
+            } elseif ($j > 0 && ($i === 0 || $lcs[$i][$j - 1] >= $lcs[$i - 1][$j])) {
+                array_unshift($diff, ['type' => 'added', 'text' => $newSentences[$j - 1]]);
+                $j--;
+            } else {
+                array_unshift($diff, ['type' => 'removed', 'text' => $oldSentences[$i - 1]]);
+                $i--;
+            }
+        }
+
+        // Render HTML
+        $html = '<div class="diff-unified">';
+        foreach ($diff as $entry) {
+            $escaped = htmlspecialchars($entry['text'], ENT_QUOTES, 'UTF-8');
+            switch ($entry['type']) {
+                case 'removed':
+                    $html .= '<div class="diff-line diff-removed"><span class="diff-indicator">−</span> <del>' . $escaped . '</del></div>';
+                    break;
+                case 'added':
+                    $html .= '<div class="diff-line diff-added"><span class="diff-indicator">+</span> <ins>' . $escaped . '</ins></div>';
+                    break;
+                default:
+                    $html .= '<div class="diff-line diff-unchanged"><span class="diff-indicator">&nbsp;</span> ' . $escaped . '</div>';
+                    break;
+            }
+        }
+        $html .= '</div>';
+
+        return $html;
+    }
+
+    /**
+     * Normalise a sentence for comparison (lowercase, collapse whitespace, strip punctuation).
+     */
+    private static function normaliseSentence(string $s): string
+    {
+        return preg_replace('/\s+/', ' ', strtolower(trim(preg_replace('/[^\w\s]/u', '', $s))));
+    }
+
+    /**
+     * Fallback diff for documents that exceed the LCS sentence limit.
+     *
+     * Truncates to the first N sentences from each version, runs the LCS diff
+     * on that subset, and appends a notice that the diff was truncated.
+     *
+     * @param string[] $oldSentences
+     * @param string[] $newSentences
+     */
+    private static function generateTruncatedDiff(array $oldSentences, array $newSentences, int $limit): string
+    {
+        $oldSlice = array_slice($oldSentences, 0, $limit);
+        $newSlice = array_slice($newSentences, 0, $limit);
+
+        // Recurse with the truncated arrays (now within the limit)
+        $html = self::generateLcsDiff($oldSlice, $newSlice);
+
+        $oldTotal = count($oldSentences);
+        $newTotal = count($newSentences);
+        $html .= '<div class="diff-line" style="padding:0.75rem;background:rgba(245,158,11,0.1);border-radius:0.5rem;margin-top:0.5rem;font-style:italic;font-family:sans-serif;">'
+            . 'Diff truncated — showing first ' . $limit . ' sentences of '
+            . max($oldTotal, $newTotal) . '. View the full document for complete content.'
+            . '</div>';
+
+        return $html;
+    }
 }
