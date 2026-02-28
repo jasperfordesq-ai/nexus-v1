@@ -221,8 +221,10 @@ class TenantContext
                 // STRICT ISOLATION VS CUSTOM PAGES
                 // Before 404ing, check if this is actually a known custom page for the Master Tenant
                 // (Only applies if we are falling back to ID 1)
-                $masterPagePath = __DIR__ . '/../../views/tenants/master/pages/' . $firstSegment . '.php';
-                if (file_exists($masterPagePath)) {
+                // Sanitize segment to prevent path traversal (e.g. ../../etc/passwd)
+                $safeSegment = basename($firstSegment);
+                $masterPagePath = __DIR__ . '/../../views/tenants/master/pages/' . $safeSegment . '.php';
+                if ($safeSegment === $firstSegment && file_exists($masterPagePath)) {
                     // It's a custom page, not a tenant. Fallthrough to Master Logic.
                 } else {
                     // STRICT ISOLATION:

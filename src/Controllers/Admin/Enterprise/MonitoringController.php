@@ -189,7 +189,7 @@ class MonitoringController extends BaseEnterpriseController
 
         if ($this->wantsJson()) {
             header('Content-Type: application/json');
-            echo json_encode(['content' => $content, 'filename' => $filename]);
+            echo json_encode(['content' => $content, 'filename' => $filename]); // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json; filename is basename()-sanitized
             return;
         }
 

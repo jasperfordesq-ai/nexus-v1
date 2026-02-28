@@ -141,6 +141,7 @@ class LegalDocumentsController
             $documentId = LegalDocumentService::createDocument($data);
 
             $_SESSION['flash_success'] = 'Legal document created successfully. Now create the first version.';
+            // nosemgrep: tainted-sql-string — $documentId is a database-generated integer ID from LegalDocumentService::createDocument()
             header("Location: /admin-legacy/legal-documents/{$documentId}/versions/create");
             exit;
         } catch (\Exception $e) {

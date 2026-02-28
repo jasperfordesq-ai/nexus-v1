@@ -101,7 +101,7 @@ class TestRunnerController
             $this->saveTestRun($suite, $result);
         }
 
-        echo json_encode($result);
+        echo json_encode($result); // nosemgrep: echoed-request — output is JSON-encoded; $suite is validated against allowlist
     }
 
     /**

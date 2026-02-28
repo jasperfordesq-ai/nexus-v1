@@ -534,7 +534,7 @@ class NewsletterController
         $this->checkAdmin();
         Csrf::verifyOrDie();
 
-        $id = $_POST['id'] ?? null;
+        $id = $_POST['id'] ?? null; // nosemgrep: tainted-sql-string — $id is passed to Newsletter::findById() and Newsletter::delete() which both use prepared statements
         error_log("Newsletter delete called. ID from POST: " . var_export($id, true));
 
         if (!$id) {
@@ -560,8 +560,8 @@ class NewsletterController
         }
 
         try {
-            Newsletter::delete($id);
-            $_SESSION['flash_success'] = 'Newsletter "' . $newsletter['subject'] . '" deleted successfully';
+            Newsletter::delete($id); // nosemgrep: tainted-sql-string — Newsletter::delete() uses prepared statements internally
+            $_SESSION['flash_success'] = 'Newsletter "' . htmlspecialchars($newsletter['subject'], ENT_QUOTES, 'UTF-8') . '" deleted successfully';
             error_log("Newsletter delete SUCCESS for ID: $id");
         } catch (\Exception $e) {
             error_log("Newsletter delete error: " . $e->getMessage());

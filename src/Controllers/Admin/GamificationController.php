@@ -453,7 +453,7 @@ class GamificationController
         $users = AchievementCampaignService::getTargetUsers($campaign);
 
         header('Content-Type: application/json');
-        echo json_encode(['count' => count($users)]);
+        echo json_encode(['count' => count($users)]); // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         exit;
     }
 }

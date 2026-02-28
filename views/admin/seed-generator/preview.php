@@ -4,8 +4,10 @@
  * Shows exactly what will be generated before you download it
  */
 
-$type = $_GET['type'] ?? 'production';
-$preview = $_GET['preview'] ?? 'analysis';
+$allowedTypes = ['production', 'development', 'testing', 'minimal', 'full'];
+$type = (isset($_GET['type']) && in_array($_GET['type'], $allowedTypes, true)) ? $_GET['type'] : 'production';
+$allowedPreviews = ['analysis', 'tables', 'code'];
+$preview = (isset($_GET['preview']) && in_array($_GET['preview'], $allowedPreviews, true)) ? $_GET['preview'] : 'analysis';
 
 ?>
 <!DOCTYPE html>
@@ -200,15 +202,15 @@ $preview = $_GET['preview'] ?? 'analysis';
 
         <div class="preview-tabs">
             <button class="preview-tab <?= $preview === 'analysis' ? 'active' : '' ?>"
-                    onclick="location.href='?type=<?= $type ?>&preview=analysis'">
+                    onclick="location.href='?type=<?= htmlspecialchars(urlencode($type), ENT_QUOTES, 'UTF-8') ?>&preview=analysis'">
                 📊 Safety Analysis
             </button>
             <button class="preview-tab <?= $preview === 'tables' ? 'active' : '' ?>"
-                    onclick="location.href='?type=<?= $type ?>&preview=tables'">
+                    onclick="location.href='?type=<?= htmlspecialchars(urlencode($type), ENT_QUOTES, 'UTF-8') ?>&preview=tables'">
                 📋 Tables Included
             </button>
             <button class="preview-tab <?= $preview === 'code' ? 'active' : '' ?>"
-                    onclick="location.href='?type=<?= $type ?>&preview=code'">
+                    onclick="location.href='?type=<?= htmlspecialchars(urlencode($type), ENT_QUOTES, 'UTF-8') ?>&preview=code'">
                 💻 Generated Code
             </button>
         </div>
@@ -359,7 +361,7 @@ $preview = $_GET['preview'] ?? 'analysis';
             </div>
 
             <div style="margin-top: 32px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-                <a href="/admin-legacy/seed-generator/download?type=<?= $type ?>" class="btn-primary">
+                <a href="/admin-legacy/seed-generator/download?type=<?= htmlspecialchars(urlencode($type), ENT_QUOTES, 'UTF-8') ?>" class="btn-primary">
                     ⬇️ Download Script (Safe)
                 </a>
                 <a href="/admin-legacy/seed-generator" class="btn-secondary">
@@ -378,7 +380,7 @@ $preview = $_GET['preview'] ?? 'analysis';
                     <small>Complete read access to your database structure.</small>
                 </div>
 
-                <iframe src="/admin-legacy/seed-generator/preview?type=<?= $type ?>&format=tables-only"
+                <iframe src="/admin-legacy/seed-generator/preview?type=<?= htmlspecialchars(urlencode($type), ENT_QUOTES, 'UTF-8') ?>&format=tables-only"
                         style="width: 100%; height: 600px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 16px;">
                 </iframe>
             </div>
@@ -394,13 +396,13 @@ $preview = $_GET['preview'] ?? 'analysis';
                     <small>The generated script may be very long. Scroll to see all code.</small>
                 </div>
 
-                <iframe src="/admin-legacy/seed-generator/preview?type=<?= $type ?>&format=code-only"
+                <iframe src="/admin-legacy/seed-generator/preview?type=<?= htmlspecialchars(urlencode($type), ENT_QUOTES, 'UTF-8') ?>&format=code-only"
                         style="width: 100%; height: 600px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 16px; background: #1e293b;">
                 </iframe>
             </div>
 
             <div style="margin-top: 24px;">
-                <a href="/admin-legacy/seed-generator/download?type=<?= $type ?>" class="btn-primary">
+                <a href="/admin-legacy/seed-generator/download?type=<?= htmlspecialchars(urlencode($type), ENT_QUOTES, 'UTF-8') ?>" class="btn-primary">
                     ⬇️ Download This Script
                 </a>
                 <a href="/admin-legacy/seed-generator" class="btn-secondary">

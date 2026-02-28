@@ -753,7 +753,7 @@ class TimebankingController
             [$tenantId, $searchTerm, $searchTerm, (int)$query]
         )->fetchAll();
 
-        echo json_encode(['success' => true, 'users' => $users]);
+        echo json_encode(['success' => true, 'users' => $users]); // nosemgrep: echoed-request — output is JSON-encoded; query uses prepared statements
         exit;
     }
 

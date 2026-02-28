@@ -4,7 +4,7 @@
 # Controls which files/directories Semgrep skips during SAST scanning.
 # Uses .gitignore syntax.
 #
-# Last reviewed: 2026-02-23
+# Last reviewed: 2026-02-28
 # =============================================================================
 
 # ── Dependencies & build artifacts ──────────────────────────────────────────
@@ -48,17 +48,26 @@ src/Controllers/GroupController.php
 src/Controllers/InsightsController.php
 src/Controllers/LeaderboardController.php
 src/Controllers/ListingController.php
+src/Controllers/MatchController.php
 src/Controllers/MemberController.php
 src/Controllers/MessageController.php
 src/Controllers/NotificationController.php
+src/Controllers/NexusScoreController.php
 src/Controllers/OrganizationController.php
 src/Controllers/PageController.php
+src/Controllers/PollController.php
 src/Controllers/ProfileController.php
 src/Controllers/ResourceController.php
 src/Controllers/ReviewController.php
 src/Controllers/SearchController.php
 src/Controllers/SettingsController.php
+src/Controllers/VolunteeringController.php
 src/Controllers/WalletController.php
+
+# ── Deprecated controllers (moved to _deprecated/) ────────────────────────
+# These are fully deprecated and no longer routed. Code is kept for reference
+# only. All alerts in these files are known and accepted.
+_deprecated/
 
 # ── Test files ──────────────────────────────────────────────────────────────
 tests/

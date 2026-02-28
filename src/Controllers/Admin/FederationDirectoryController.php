@@ -287,6 +287,7 @@ class FederationDirectoryController
 
         $timebanks = FederationDirectoryService::getDiscoverableTimebanks($tenantId, $filters);
 
+        // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         echo json_encode([
             'success' => true,
             'timebanks' => $timebanks,

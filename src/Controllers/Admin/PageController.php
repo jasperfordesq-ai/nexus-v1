@@ -399,6 +399,7 @@ class PageController
             }
 
             $message = $isAutosave ? 'Draft saved' : 'Page saved successfully';
+            // nosemgrep: echoed-request — output is JSON-encoded; $isAutosave is boolean
             echo json_encode(['success' => true, 'message' => $message, 'autosave' => $isAutosave]);
             exit;
 

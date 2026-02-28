@@ -244,6 +244,7 @@ class MenuController
         if (!$validation['valid']) {
             header('Content-Type: application/json');
             http_response_code(400);
+            // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
             echo json_encode(['success' => false, 'error' => $validation['error'], 'field' => $validation['field'] ?? null]);
             exit;
         }
@@ -359,6 +360,7 @@ class MenuController
         if (!$validation['valid']) {
             header('Content-Type: application/json');
             http_response_code(400);
+            // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
             echo json_encode(['success' => false, 'error' => $validation['error'], 'field' => $validation['field'] ?? null]);
             exit;
         }
@@ -407,6 +409,7 @@ class MenuController
         if ($itemId) {
             MenuManager::clearCache($tenantId);
             header('Content-Type: application/json');
+            // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
             echo json_encode(['success' => true, 'item_id' => $itemId, 'message' => 'Menu item added']);
         } else {
             header('Content-Type: application/json');
@@ -456,6 +459,7 @@ class MenuController
         if (!$validation['valid']) {
             header('Content-Type: application/json');
             http_response_code(400);
+            // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
             echo json_encode(['success' => false, 'error' => $validation['error'], 'field' => $validation['field'] ?? null]);
             exit;
         }
@@ -847,6 +851,7 @@ class MenuController
             MenuManager::clearCache($tenantId);
 
             header('Content-Type: application/json');
+            // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json; $action is validated against allowlist
             echo json_encode([
                 'success' => true,
                 'affected' => $affected,

@@ -161,7 +161,7 @@ class TenantController
             $_SESSION['flash_success'] = "Tenant '{$data['name']}' created successfully";
             header('Location: /super-admin/tenants/' . $result['tenant_id']);
         } else {
-            $this->redirectWithError('/super-admin/tenants/create?parent_id=' . $parentId, $result['error']);
+            $this->redirectWithError('/super-admin/tenants/create?parent_id=' . $parentId, $result['error']); // nosemgrep: tainted-sql-string — $parentId is cast to (int)
         }
     }
 

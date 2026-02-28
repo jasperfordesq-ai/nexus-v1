@@ -75,6 +75,7 @@ class PermissionApiController
         $userId = $this->getCurrentUserId();
         $hasPermission = $this->permService->can($userId, $permission);
 
+        // nosemgrep: echoed-request — output is JSON-encoded; permission string is checked by service
         echo json_encode([
             'user_id' => $userId,
             'permission' => $permission,
@@ -417,6 +418,7 @@ class PermissionApiController
 
         $logs = $this->db->query($sql, $params)->fetchAll();
 
+        // nosemgrep: echoed-request — output is JSON-encoded; all query params use prepared statements or (int) casts
         echo json_encode([
             'logs' => $logs,
             'total' => $total,

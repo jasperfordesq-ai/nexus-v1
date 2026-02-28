@@ -25,12 +25,13 @@ if (!$permService->can($currentUserId, 'system.audit_logs')) {
     exit;
 }
 
-// Get filters from query parameters
+// Get filters from query parameters (validated/sanitized)
 $filterUserId = isset($_GET['user_id']) ? (int) $_GET['user_id'] : null;
-$filterPermission = $_GET['permission'] ?? null;
-$filterEventType = $_GET['event_type'] ?? null;
-$filterFromDate = $_GET['from_date'] ?? date('Y-m-d', strtotime('-30 days'));
-$filterToDate = $_GET['to_date'] ?? date('Y-m-d');
+$filterPermission = isset($_GET['permission']) ? preg_replace('/[^a-zA-Z0-9_.\-]/', '', $_GET['permission']) : null;
+$allowedEventTypes = ['role_assigned', 'role_removed', 'permission_check', 'permission_granted', 'permission_revoked', 'login', 'logout'];
+$filterEventType = (isset($_GET['event_type']) && in_array($_GET['event_type'], $allowedEventTypes, true)) ? $_GET['event_type'] : null;
+$filterFromDate = isset($_GET['from_date']) ? preg_replace('/[^0-9\-]/', '', $_GET['from_date']) : date('Y-m-d', strtotime('-30 days'));
+$filterToDate = isset($_GET['to_date']) ? preg_replace('/[^0-9\-]/', '', $_GET['to_date']) : date('Y-m-d');
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $perPage = 50;
 $offset = ($page - 1) * $perPage;
@@ -570,9 +571,9 @@ $recentUsers = $db->query("
                 <?php foreach ($logs as $log): ?>
                     <tr>
                         <td style="white-space: nowrap;">
-                            <div><?= date('M j, Y', strtotime($log['created_at'])) ?></div>
+                            <div><?= htmlspecialchars(date('M j, Y', strtotime($log['created_at'])), ENT_QUOTES, 'UTF-8') ?></div>
                             <div style="font-size: 0.75rem; color: var(--admin-text-muted);">
-                                <?= date('g:i A', strtotime($log['created_at'])) ?>
+                                <?= htmlspecialchars(date('g:i A', strtotime($log['created_at'])), ENT_QUOTES, 'UTF-8') ?>
                             </div>
                         </td>
                         <td>
@@ -581,7 +582,7 @@ $recentUsers = $db->query("
                                     <img src="<?= htmlspecialchars($log['avatar_url']) ?>" loading="lazy" alt="Avatar" class="user-avatar">
                                 <?php else: ?>
                                     <div class="user-avatar-placeholder">
-                                        <?= strtoupper(substr($log['username'] ?? 'U', 0, 1)) ?>
+                                        <?= htmlspecialchars(strtoupper(substr($log['username'] ?? 'U', 0, 1)), ENT_QUOTES, 'UTF-8') ?>
                                     </div>
                                 <?php endif; ?>
                                 <div class="user-info">
@@ -591,7 +592,7 @@ $recentUsers = $db->query("
                             </div>
                         </td>
                         <td>
-                            <span class="event-badge event-<?= str_replace('_', '-', $log['event_type']) ?>">
+                            <span class="event-badge event-<?= htmlspecialchars(str_replace('_', '-', $log['event_type']), ENT_QUOTES, 'UTF-8') ?>">
                                 <?= htmlspecialchars($log['event_type']) ?>
                             </span>
                         </td>
@@ -606,7 +607,7 @@ $recentUsers = $db->query("
                         </td>
                         <td>
                             <?php if ($log['result']): ?>
-                                <span class="result-badge result-<?= $log['result'] ?>">
+                                <span class="result-badge result-<?= htmlspecialchars($log['result'], ENT_QUOTES, 'UTF-8') ?>">
                                     <?= htmlspecialchars($log['result']) ?>
                                 </span>
                             <?php else: ?>
@@ -640,14 +641,14 @@ $recentUsers = $db->query("
 <?php if ($totalPages > 1): ?>
 <div class="pagination">
     <div class="pagination-info">
-        Showing <?= number_format($offset + 1) ?> to <?= number_format(min($offset + $perPage, $totalRecords)) ?> of <?= number_format($totalRecords) ?> entries
+        Showing <?= htmlspecialchars(number_format($offset + 1), ENT_QUOTES, 'UTF-8') ?> to <?= htmlspecialchars(number_format(min($offset + $perPage, $totalRecords)), ENT_QUOTES, 'UTF-8') ?> of <?= htmlspecialchars(number_format($totalRecords), ENT_QUOTES, 'UTF-8') ?> entries
     </div>
     <div class="pagination-controls">
         <?php if ($page > 1): ?>
-            <a href="?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>" class="pagination-btn">
+            <a href="?<?= htmlspecialchars(http_build_query(array_merge($_GET, ['page' => 1])), ENT_QUOTES, 'UTF-8') ?>" class="pagination-btn">
                 <i class="fas fa-angle-double-left"></i>
             </a>
-            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>" class="pagination-btn">
+            <a href="?<?= htmlspecialchars(http_build_query(array_merge($_GET, ['page' => $page - 1])), ENT_QUOTES, 'UTF-8') ?>" class="pagination-btn">
                 <i class="fas fa-angle-left"></i> Prev
             </a>
         <?php endif; ?>
@@ -658,18 +659,18 @@ $recentUsers = $db->query("
         for ($i = $startPage; $i <= $endPage; $i++):
         ?>
             <a
-                href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>"
+                href="?<?= htmlspecialchars(http_build_query(array_merge($_GET, ['page' => $i])), ENT_QUOTES, 'UTF-8') ?>"
                 class="pagination-btn <?= $i === $page ? 'active' : '' ?>"
             >
-                <?= $i ?>
+                <?= (int)$i ?>
             </a>
         <?php endfor; ?>
 
         <?php if ($page < $totalPages): ?>
-            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>" class="pagination-btn">
+            <a href="?<?= htmlspecialchars(http_build_query(array_merge($_GET, ['page' => $page + 1])), ENT_QUOTES, 'UTF-8') ?>" class="pagination-btn">
                 Next <i class="fas fa-angle-right"></i>
             </a>
-            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $totalPages])) ?>" class="pagination-btn">
+            <a href="?<?= htmlspecialchars(http_build_query(array_merge($_GET, ['page' => $totalPages])), ENT_QUOTES, 'UTF-8') ?>" class="pagination-btn">
                 <i class="fas fa-angle-double-right"></i>
             </a>
         <?php endif; ?>

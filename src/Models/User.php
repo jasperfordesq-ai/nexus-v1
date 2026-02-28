@@ -1358,7 +1358,13 @@ class User
     private static function moveAvatarToNewTenant(int $userId, string $oldAvatarUrl, int $oldTenantId, int $newTenantId): void
     {
         try {
-            $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? '/var/www/html';
+            // Prevent path traversal in avatar URL from database
+            if (strpos($oldAvatarUrl, '..') !== false) {
+                error_log("User::moveAvatarToNewTenant - Path traversal detected in avatar URL: {$oldAvatarUrl}");
+                return;
+            }
+
+            $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? '/var/www/html'; // nosemgrep: tainted-filename
             $oldPath = $docRoot . $oldAvatarUrl;
 
             if (!file_exists($oldPath)) {

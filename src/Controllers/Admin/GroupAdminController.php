@@ -523,6 +523,7 @@ class GroupAdminController
         switch ($action) {
             case 'feature':
                 // Single UPDATE for all groups
+                // nosemgrep: tainted-sql-string — $placeholders is array_fill of '?' only; actual values are parameterized
                 Database::query(
                     "UPDATE `groups` SET is_featured = 1 WHERE tenant_id = ? AND id IN ($placeholders)",
                     $params
@@ -537,6 +538,7 @@ class GroupAdminController
 
             case 'unfeature':
                 // Single UPDATE for all groups
+                // nosemgrep: tainted-sql-string — $placeholders is array_fill of '?' only; actual values are parameterized
                 Database::query(
                     "UPDATE `groups` SET is_featured = 0 WHERE tenant_id = ? AND id IN ($placeholders)",
                     $params
@@ -556,12 +558,14 @@ class GroupAdminController
                 }
 
                 // Single DELETE for group members
+                // nosemgrep: tainted-sql-string — $placeholders is array_fill of '?' only; actual values are parameterized
                 Database::query(
                     "DELETE FROM group_members WHERE group_id IN ($placeholders)",
                     $groupIds
                 );
 
                 // Single DELETE for groups (with tenant check)
+                // nosemgrep: tainted-sql-string — $placeholders is array_fill of '?' only; actual values are parameterized
                 Database::query(
                     "DELETE FROM `groups` WHERE tenant_id = ? AND id IN ($placeholders)",
                     $params
@@ -570,7 +574,7 @@ class GroupAdminController
                 break;
         }
 
-        echo json_encode(['success' => true, 'message' => "$count groups updated"]);
+        echo json_encode(['success' => true, 'message' => "$count groups updated"]); // nosemgrep: echoed-request — output is JSON-encoded
         exit;
     }
 
@@ -633,7 +637,7 @@ class GroupAdminController
 
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
-        echo $csv;
+        echo $csv; // nosemgrep: echoed-request — output is CSV data with Content-Type: text/csv download
         exit;
     }
 
@@ -680,6 +684,7 @@ class GroupAdminController
 
         $success = GroupModerationService::moderateContent($flagId, $action, $_SESSION['user_id'], $notes);
 
+        // nosemgrep: echoed-request — output is JSON-encoded; action is processed by service
         echo json_encode([
             'success' => $success,
             'message' => $success ? 'Moderation action completed' : 'Failed to complete action'
@@ -748,6 +753,7 @@ class GroupAdminController
                 break;
         }
 
+        // nosemgrep: echoed-request — output is JSON-encoded; action is validated in switch
         echo json_encode([
             'success' => $success,
             'message' => $message
@@ -846,6 +852,7 @@ class GroupAdminController
         $definition = GroupFeatureToggleService::getFeatureDefinition($feature);
         $label = $definition['label'] ?? $feature;
 
+        // nosemgrep: echoed-request — output is JSON-encoded; $feature validated by service, $label from definition
         echo json_encode([
             'success' => $success,
             'message' => $success

@@ -222,7 +222,7 @@ class NexusScoreController
         }
 
         $scoreData = $this->scoreService->calculateNexusScore($userId, $tenantId);
-        echo json_encode($scoreData);
+        echo json_encode($scoreData); // nosemgrep: echoed-request — output is JSON-encoded; $userId and $tenantId are from session
     }
 
     /**

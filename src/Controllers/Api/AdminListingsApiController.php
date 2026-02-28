@@ -93,8 +93,15 @@ class AdminListingsApiController extends BaseApiController
 
         $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
-        // Map 'user_name' sort
-        $sortColumn = $sort === 'user_name' ? 'user_name' : "l.{$sort}";
+        // Map sort column via allowlist (prevents SQL injection even though $sort is already whitelisted)
+        $sortColumnMap = [
+            'title' => 'l.title',
+            'type' => 'l.type',
+            'status' => 'l.status',
+            'created_at' => 'l.created_at',
+            'user_name' => 'user_name',
+        ];
+        $sortColumn = $sortColumnMap[$sort] ?? 'l.created_at';
 
         // Total count
         $total = (int) Database::query(

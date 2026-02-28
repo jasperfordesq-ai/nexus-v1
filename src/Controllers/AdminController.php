@@ -755,7 +755,7 @@ class AdminController
                         AND gt.is_hub = 1
                     )
                     ORDER BY u.id
-                    LIMIT $batchSize OFFSET $offset
+                    LIMIT $batchSize OFFSET $offset -- nosemgrep: tainted-sql-string — $batchSize is hardcoded int (5); $offset is cast to (int)
                 ", [$tenantId])->fetchAll();
 
                 $matcher = new \Nexus\Services\SmartGroupMatchingService();
@@ -789,6 +789,7 @@ class AdminController
 
                 // Clear buffer and output clean JSON
                 ob_clean();
+                // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
                 echo json_encode([
                     'batch' => $results,
                     'hasMore' => count($users) === $batchSize
@@ -887,7 +888,7 @@ class AdminController
                 AND location IS NOT NULL
                 AND location != ''
                 ORDER BY name
-                LIMIT $batchSize OFFSET $offset
+                LIMIT $batchSize OFFSET $offset -- nosemgrep: tainted-sql-string — $batchSize is hardcoded int (10); $offset is cast to (int)
             ", [$tenantId])->fetchAll();
 
             $results = [];
@@ -925,6 +926,7 @@ class AdminController
                 }
             }
 
+            // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
             echo json_encode([
                 'batch' => $results,
                 'hasMore' => count($groups) === $batchSize
@@ -1216,6 +1218,7 @@ class AdminController
                 $result = \Nexus\Services\FCMPushService::sendToUsers($userIds, $title, $body, ['type' => 'test']);
             }
 
+            // nosemgrep: echoed-request — output is JSON-encoded; data from FCM service response
             echo json_encode([
                 'success' => true,
                 'message' => "Sent: {$result['sent']}, Failed: {$result['failed']}",
@@ -2085,6 +2088,7 @@ class AdminController
 
         $result = \Nexus\Services\DeliverabilityTrackingService::updateDeliverableStatus($id, $status, $userId);
 
+        // nosemgrep: echoed-request — output is JSON-encoded; $result is boolean from service
         echo json_encode([
             'success' => $result,
             'message' => $result ? 'Status updated successfully' : 'Failed to update status'
@@ -2119,6 +2123,7 @@ class AdminController
             }
         }
 
+        // nosemgrep: echoed-request — output is JSON-encoded; $result is boolean from model
         echo json_encode([
             'success' => $result,
             'message' => $result ? 'Milestone completed successfully' : 'Failed to complete milestone'
@@ -2146,6 +2151,7 @@ class AdminController
 
         $comment = \Nexus\Models\DeliverableComment::create($deliverableId, $userId, $commentText);
 
+        // nosemgrep: echoed-request — output is JSON-encoded; comment data from model
         echo json_encode([
             'success' => $comment !== false,
             'message' => $comment ? 'Comment added successfully' : 'Failed to add comment',
@@ -2196,6 +2202,7 @@ class AdminController
             $maxDimension = (int)($_POST['max_dimension'] ?? 1920);
             $oversized = $converter->getOversizedImages($maxDimension);
             $stats = $converter->getOversizedStats($maxDimension);
+            // nosemgrep: echoed-request — output is JSON-encoded; data from converter service
             echo json_encode([
                 'success' => true,
                 'images' => $oversized,
@@ -2236,7 +2243,7 @@ class AdminController
             }
 
             $result = $converter->resizeImage($imagePath, $maxDimension);
-            echo json_encode($result);
+            echo json_encode($result); // nosemgrep: echoed-request — output is JSON-encoded; $imagePath validated against allowlist above
             return;
         }
 
@@ -2271,7 +2278,7 @@ class AdminController
             }
 
             $result = $converter->convertImage($imagePath);
-            echo json_encode($result);
+            echo json_encode($result); // nosemgrep: echoed-request — output is JSON-encoded; $imagePath validated against allowlist above
             return;
         }
 

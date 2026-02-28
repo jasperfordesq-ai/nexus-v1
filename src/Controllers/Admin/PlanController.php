@@ -311,7 +311,7 @@ class PlanController
         }
 
         header('Content-Type: application/json');
-        echo json_encode($result);
+        echo json_encode($result); // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
     }
 
     /**

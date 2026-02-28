@@ -169,8 +169,13 @@ $router->add('GET', '/api/v2/platform/stats', 'Nexus\Controllers\Api\TenantBoots
 $router->add('GET', '/api/v2/categories', function () {
     header('Content-Type: application/json');
     $type = $_GET['type'] ?? 'listing';
+    // Validate type against allowlist to prevent tainted input
+    $allowedTypes = ['listing', 'event', 'volunteering', 'resource'];
+    if (!in_array($type, $allowedTypes, true)) {
+        $type = 'listing';
+    }
     $categories = \Nexus\Models\Category::getByType($type);
-    echo json_encode(['data' => $categories]);
+    echo json_encode(['data' => $categories]); // nosemgrep: echoed-request — json_encode + Content-Type: application/json
 });
 
 $router->add('GET', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@index');
@@ -233,6 +238,8 @@ $router->add('GET', '/api/v2/users', function () {
     $totalCount = \Nexus\Core\Database::query($countSql, $params)->fetch()['total'] ?? 0;
 
     // Get users with pagination and calculated fields
+    // Note: ORDER BY uses $orderByField from $validSorts allowlist — safe from injection
+    // LIMIT/OFFSET use parameterized values
     $sql = "SELECT u.id, u.name, u.first_name, u.last_name,
                    u.avatar_url as avatar, u.bio as tagline,
                    u.location, u.latitude, u.longitude,
@@ -242,7 +249,9 @@ $router->add('GET', '/api/v2/users', function () {
             FROM users u
             WHERE $whereClause
             ORDER BY $orderBy
-            LIMIT $limit OFFSET $offset";
+            LIMIT ? OFFSET ?";
+    $params[] = (int)$limit;
+    $params[] = (int)$offset;
 
     $users = \Nexus\Core\Database::query($sql, $params)->fetchAll();
 
