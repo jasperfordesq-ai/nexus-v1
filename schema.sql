@@ -2845,6 +2845,7 @@ CREATE TABLE `listings` (
   `service_type` enum('physical_only','remote_only','hybrid','location_dependent') NOT NULL DEFAULT 'physical_only',
   `direct_messaging_disabled` tinyint(1) DEFAULT 0 COMMENT 'Disable direct contact for this listing, require exchange request',
   `exchange_workflow_required` tinyint(1) DEFAULT 0 COMMENT 'This listing requires formal exchange workflow',
+  `hours_estimate` decimal(5,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `tenant_id` (`tenant_id`),
   KEY `user_id` (`user_id`),
