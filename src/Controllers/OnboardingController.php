@@ -76,6 +76,7 @@ class OnboardingController
                         $tenantId = TenantContext::getId();
                         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $tenantId . '/avatars/';
 
+                        // nosemgrep: tainted-filename — $uploadDir uses tenant ID from TenantContext; filename is random (bin2hex); extension validated against allowlist
                         if (!is_dir($uploadDir)) {
                             mkdir($uploadDir, 0755, true);
                         }

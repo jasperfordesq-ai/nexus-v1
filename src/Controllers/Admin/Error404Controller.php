@@ -88,6 +88,7 @@ class Error404Controller
         $result = Error404Log::getAll($page, $perPage, $orderBy, $orderDir, $resolved);
 
         header('Content-Type: application/json');
+        // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         echo json_encode([
             'success' => true,
             'data' => $result['data'],
@@ -111,6 +112,7 @@ class Error404Controller
         $errors = Error404Log::getTopErrors($limit);
 
         header('Content-Type: application/json');
+        // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         echo json_encode([
             'success' => true,
             'data' => $errors
@@ -159,6 +161,7 @@ class Error404Controller
         $success = Error404Log::markResolved($id, $redirectId, $notes);
 
         header('Content-Type: application/json');
+        // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         echo json_encode([
             'success' => $success,
             'message' => $success ? 'Error marked as resolved' : 'Failed to mark error as resolved'
@@ -189,6 +192,7 @@ class Error404Controller
         $success = Error404Log::markUnresolved($id);
 
         header('Content-Type: application/json');
+        // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         echo json_encode([
             'success' => $success,
             'message' => $success ? 'Error marked as unresolved' : 'Failed to mark error as unresolved'
@@ -219,6 +223,7 @@ class Error404Controller
         $success = Error404Log::delete($id);
 
         header('Content-Type: application/json');
+        // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         echo json_encode([
             'success' => $success,
             'message' => $success ? 'Error log deleted' : 'Failed to delete error log'
@@ -244,6 +249,7 @@ class Error404Controller
         $results = Error404Log::search($query, $limit);
 
         header('Content-Type: application/json');
+        // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         echo json_encode([
             'success' => true,
             'data' => $results
@@ -282,6 +288,7 @@ class Error404Controller
         }
 
         header('Content-Type: application/json');
+        // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         echo json_encode([
             'success' => (bool)$redirectId,
             'message' => $redirectId ? 'Redirect created successfully' : 'Failed to create redirect',
@@ -306,6 +313,7 @@ class Error404Controller
         $deleted = Error404Log::cleanOldResolved($daysOld);
 
         header('Content-Type: application/json');
+        // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         echo json_encode([
             'success' => true,
             'message' => "Deleted $deleted old resolved errors",

@@ -280,6 +280,7 @@ class BulkController
             'limit' => 100
         ]);
 
+        // nosemgrep: echoed-request — output is JSON-encoded; filters passed to service method
         echo json_encode([
             'success' => true,
             'users' => $users

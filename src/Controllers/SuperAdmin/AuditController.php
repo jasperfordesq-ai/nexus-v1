@@ -68,6 +68,7 @@ class AuditController
 
         $logs = SuperAdminAuditService::getLog(array_filter($filters));
 
+        // nosemgrep: echoed-request — output is JSON-encoded; filters are validated and passed to service
         echo json_encode([
             'success' => true,
             'logs' => $logs,

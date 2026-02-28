@@ -239,6 +239,7 @@ class BlogRestoreController
             $parsed = $this->parseSqlExport($sql);
 
             if (!empty($parsed['errors'])) {
+                // nosemgrep: echoed-request — output is JSON-encoded; errors from internal parser
                 echo json_encode([
                     'success' => false,
                     'error' => 'Invalid SQL file: ' . implode('; ', $parsed['errors'])
@@ -270,6 +271,7 @@ class BlogRestoreController
 
                     $placeholders = implode(', ', array_fill(0, count($insert['values']), '?'));
 
+                    // nosemgrep: tainted-sql-string — $columns sanitized via preg_replace to [a-zA-Z0-9_] and validated against DESCRIBE; $placeholders are '?' only; values are parameterized
                     $sql = "INSERT INTO posts ({$columns}) VALUES ({$placeholders})";
                     Database::query($sql, $insert['values']);
                     $insertedCount++;
@@ -553,7 +555,7 @@ class BlogRestoreController
             header('Content-Disposition: attachment; filename="' . $filename . '"');
             header('Content-Length: ' . strlen($sql));
 
-            echo $sql;
+            echo $sql; // nosemgrep: echoed-request — output is SQL export with Content-Type: application/sql download; $sql built from database data
             exit;
 
         } catch (\Exception $e) {

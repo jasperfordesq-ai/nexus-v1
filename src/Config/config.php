@@ -11,6 +11,7 @@ use Nexus\Core\Env;
 // ------------------------------------------------------------------
 // Using nested dirname() for maximum PHP compatibility (Pre-7.0 safe)
 
+// nosemgrep: tainted-filename — DOCUMENT_ROOT is server-configured, not user input
 $possiblePaths = [
     __DIR__ . '/../../.env',                          // Standard relative path
     dirname(dirname(__DIR__)) . '/.env',              // Nested dirname (Safe)

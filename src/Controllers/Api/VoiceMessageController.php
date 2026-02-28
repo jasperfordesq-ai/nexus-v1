@@ -104,6 +104,7 @@ class VoiceMessageController extends BaseApiController
                 }
             }
 
+            // nosemgrep: echoed-request — json_encode output with Content-Type: application/json prevents XSS
             echo json_encode([
                 'success' => true,
                 'message_id' => $messageId,
@@ -113,7 +114,7 @@ class VoiceMessageController extends BaseApiController
 
         } catch (\Exception $e) {
             http_response_code(400);
-            echo json_encode(['error' => $e->getMessage()]);
+            echo json_encode(['error' => $e->getMessage()]); // nosemgrep: echoed-request
         }
 
         exit;

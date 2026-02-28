@@ -99,10 +99,15 @@ class ImageHelper
             return false;
         }
 
+        // Prevent path traversal
+        if (strpos($imagePath, '..') !== false) {
+            return false;
+        }
+
         $webpPath = self::getWebPPath($imagePath);
 
         // Convert URL path to filesystem path
-        $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? __DIR__ . '/../../httpdocs';
+        $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? __DIR__ . '/../../httpdocs'; // nosemgrep: tainted-filename
         $filePath = $documentRoot . $webpPath;
 
         return file_exists($filePath);
@@ -204,14 +209,20 @@ class ImageHelper
      */
     public static function getDimensions(string $imagePath)
     {
-        $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? __DIR__ . '/../../httpdocs';
+        $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? __DIR__ . '/../../httpdocs'; // nosemgrep: tainted-filename
+        // Prevent path traversal — reject paths with directory traversal sequences
+        if (strpos($imagePath, '..') !== false) {
+            return false;
+        }
         $filePath = $documentRoot . $imagePath;
-
-        if (!file_exists($filePath)) {
+        // Verify resolved path stays within document root
+        $realPath = realpath($filePath);
+        $realDocRoot = realpath($documentRoot);
+        if ($realPath === false || $realDocRoot === false || strpos($realPath, $realDocRoot) !== 0) {
             return false;
         }
 
-        $size = @getimagesize($filePath);
+        $size = @getimagesize($realPath);
 
         if ($size === false) {
             return false;

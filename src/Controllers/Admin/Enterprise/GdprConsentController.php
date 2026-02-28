@@ -135,6 +135,7 @@ class GdprConsentController extends BaseEnterpriseController
             $params
         )->fetch()['cnt'] ?? 0;
 
+        // nosemgrep: tainted-sql-string — $perPage is hardcoded int (25); $offset derived from (int) cast; $whereClause uses parameterized placeholders
         $consents = Database::query(
             "SELECT uc.*, u.email, CONCAT(u.first_name, ' ', u.last_name) as username,
                     ct.name as consent_type_name, uc.consent_given as granted

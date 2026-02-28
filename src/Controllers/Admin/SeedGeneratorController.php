@@ -129,7 +129,7 @@ class SeedGeneratorController
         // Default: show the script
         $script = $this->buildScript($type);
         header('Content-Type: text/plain; charset=utf-8');
-        echo $script;
+        echo $script; // nosemgrep: echoed-request — output is generated PHP seed script with Content-Type: text/plain; not rendered as HTML
     }
 
     /**

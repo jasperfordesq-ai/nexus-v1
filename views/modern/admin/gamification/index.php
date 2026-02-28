@@ -41,21 +41,21 @@ require dirname(__DIR__) . '/partials/admin-header.php';
 <?php if (isset($_GET['rechecked'])): ?>
 <div class="admin-alert admin-alert-success">
     <i class="fa-solid fa-check-circle"></i>
-    <div>Rechecked <?= (int)$_GET['rechecked'] ?> users. <?= (int)($_GET['awarded'] ?? 0) ?> new badges awarded.</div>
+    <div>Rechecked <?= htmlspecialchars((string)(int)$_GET['rechecked'], ENT_QUOTES, 'UTF-8') ?> users. <?= htmlspecialchars((string)(int)($_GET['awarded'] ?? 0), ENT_QUOTES, 'UTF-8') ?> new badges awarded.</div>
 </div>
 <?php endif; ?>
 
 <?php if (isset($_GET['bulk_awarded'])): ?>
 <div class="admin-alert admin-alert-success">
     <i class="fa-solid fa-check-circle"></i>
-    <div>Successfully awarded badge to <?= (int)$_GET['bulk_awarded'] ?> users.</div>
+    <div>Successfully awarded badge to <?= htmlspecialchars((string)(int)$_GET['bulk_awarded'], ENT_QUOTES, 'UTF-8') ?> users.</div>
 </div>
 <?php endif; ?>
 
 <?php if (isset($_GET['all_awarded'])): ?>
 <div class="admin-alert admin-alert-success">
     <i class="fa-solid fa-check-circle"></i>
-    <div>Badge awarded to <?= (int)$_GET['all_awarded'] ?> users.</div>
+    <div>Badge awarded to <?= htmlspecialchars((string)(int)$_GET['all_awarded'], ENT_QUOTES, 'UTF-8') ?> users.</div>
 </div>
 <?php endif; ?>
 

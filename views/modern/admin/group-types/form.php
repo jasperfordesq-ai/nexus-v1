@@ -389,19 +389,19 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 <?php $stats = GroupType::getStats($typeId); ?>
                 <div class="sidebar-stat">
                     <div class="sidebar-stat-label">Total Groups</div>
-                    <div class="sidebar-stat-value"><?= $stats['total_groups'] ?></div>
+                    <div class="sidebar-stat-value"><?= (int)$stats['total_groups'] ?></div>
                 </div>
                 <div class="sidebar-stat">
                     <div class="sidebar-stat-label">Total Members</div>
-                    <div class="sidebar-stat-value"><?= $stats['total_members'] ?></div>
+                    <div class="sidebar-stat-value"><?= (int)$stats['total_members'] ?></div>
                 </div>
                 <div class="sidebar-stat">
                     <div class="sidebar-stat-label">Public</div>
-                    <div class="sidebar-stat-value"><?= $stats['public_groups'] ?></div>
+                    <div class="sidebar-stat-value"><?= (int)$stats['public_groups'] ?></div>
                 </div>
                 <div class="sidebar-stat">
                     <div class="sidebar-stat-label">Private</div>
-                    <div class="sidebar-stat-value"><?= $stats['private_groups'] ?></div>
+                    <div class="sidebar-stat-value"><?= (int)$stats['private_groups'] ?></div>
                 </div>
             </div>
         </div>

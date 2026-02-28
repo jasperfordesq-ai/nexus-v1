@@ -266,7 +266,9 @@ class FederationApiController extends BaseApiController
         }
 
         $sql .= " ORDER BY u.first_name ASC, u.last_name ASC";
-        $sql .= " LIMIT " . (($page - 1) * $perPage) . ", " . $perPage;
+        $sql .= " LIMIT ?, ?";
+        $params[] = (int)(($page - 1) * $perPage);
+        $params[] = (int)$perPage;
 
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
@@ -515,7 +517,9 @@ class FederationApiController extends BaseApiController
         }
 
         $sql .= " ORDER BY l.created_at DESC";
-        $sql .= " LIMIT " . (($page - 1) * $perPage) . ", " . $perPage;
+        $sql .= " LIMIT ?, ?";
+        $params[] = (int)(($page - 1) * $perPage);
+        $params[] = (int)$perPage;
 
         $stmt = $db->prepare($sql);
         $stmt->execute($params);

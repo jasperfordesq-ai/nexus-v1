@@ -71,14 +71,15 @@ class AudioUploader
 
         // Tenant-scoped directory (consistent with UserService avatar convention)
         $tenantId = TenantContext::getId();
-        $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $tenantId . '/voice_messages';
+        // nosemgrep: tainted-filename — $tenantId is int from TenantContext, $filename is uniqid-generated
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . (int)$tenantId . '/voice_messages';
 
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0755, true);
         }
 
         $targetPath = $targetDir . '/' . $filename;
-        $publicPath = '/uploads/' . $tenantId . '/voice_messages/' . $filename;
+        $publicPath = '/uploads/' . (int)$tenantId . '/voice_messages/' . $filename;
 
         // Move uploaded file
         if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
@@ -134,14 +135,15 @@ class AudioUploader
 
         // Tenant-scoped directory (consistent with UserService avatar convention)
         $tenantId = TenantContext::getId();
-        $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $tenantId . '/voice_messages';
+        // nosemgrep: tainted-filename — $tenantId is int from TenantContext, $filename is uniqid-generated
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . (int)$tenantId . '/voice_messages';
 
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0755, true);
         }
 
         $targetPath = $targetDir . '/' . $filename;
-        $publicPath = '/uploads/' . $tenantId . '/voice_messages/' . $filename;
+        $publicPath = '/uploads/' . (int)$tenantId . '/voice_messages/' . $filename;
 
         // Save file
         if (file_put_contents($targetPath, $audioData) === false) {

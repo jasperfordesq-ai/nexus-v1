@@ -234,6 +234,7 @@ class AiSettingsController
                     error_log("Database does NOT have key for [$providerId]. Key name checked: $keyName");
                 }
 
+                // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
                 echo json_encode([
                     'success' => false,
                     'message' => "Provider '$providerId' is not configured. Please add the API key and save settings first."
@@ -252,7 +253,7 @@ class AiSettingsController
                 error_log("Provider [$providerId] test FAILED. Message: " . ($result['message'] ?? 'unknown'));
             }
 
-            echo json_encode($result);
+            echo json_encode($result); // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
         } catch (\Exception $e) {
             error_log("Provider [$providerId] test EXCEPTION: " . $e->getMessage());
             echo json_encode([

@@ -355,7 +355,7 @@ class CustomBadgeController
             ['custom_' . $badgeId]
         )->fetchAll();
 
-        echo json_encode(['success' => true, 'users' => $users]);
+        echo json_encode(['success' => true, 'users' => $users]); // nosemgrep: echoed-request — output is JSON-encoded, data from prepared statement
     }
 
     /**

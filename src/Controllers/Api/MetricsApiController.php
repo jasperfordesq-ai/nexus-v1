@@ -84,6 +84,7 @@ class MetricsApiController extends BaseApiController
 
         $summary = PerformanceMonitorService::getSummary($hours);
 
+        // nosemgrep: echoed-request — json_encode output with Content-Type: application/json prevents XSS
         echo json_encode([
             'success' => true,
             'data' => $summary,

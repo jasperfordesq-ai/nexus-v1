@@ -113,12 +113,16 @@ class AdminUsersApiController extends BaseApiController
 
         $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
-        // Map 'name' sort to computed column
-        $sortColumn = $sort === 'name' ? 'name' : "u.{$sort}";
-        // Map 'status' sort to computed expression
-        if ($sort === 'status') {
-            $sortColumn = "CASE WHEN u.is_approved = 0 THEN 'pending' WHEN u.status = 'suspended' THEN 'suspended' WHEN u.status = 'banned' THEN 'banned' ELSE 'active' END";
-        }
+        // Map sort column via allowlist (prevents SQL injection even though $sort is already whitelisted)
+        $sortColumnMap = [
+            'name' => 'name',
+            'email' => 'u.email',
+            'role' => 'u.role',
+            'created_at' => 'u.created_at',
+            'balance' => 'COALESCE(u.balance, 0)',
+            'status' => "CASE WHEN u.is_approved = 0 THEN 'pending' WHEN u.status = 'suspended' THEN 'suspended' WHEN u.status = 'banned' THEN 'banned' ELSE 'active' END",
+        ];
+        $sortColumn = $sortColumnMap[$sort] ?? 'u.created_at';
 
         // Get total count
         $total = (int) Database::query(

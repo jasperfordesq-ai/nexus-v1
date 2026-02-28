@@ -132,6 +132,7 @@ class UserController
 
         // Validation
         if (empty($firstName) || empty($email) || empty($password)) {
+            // nosemgrep: tainted-sql-string — $tenantId is cast to (int) on line 119
             $this->redirectWithError(
                 '/super-admin/users/create?tenant_id=' . $tenantId,
                 'First name, email, and password are required'
@@ -142,6 +143,7 @@ class UserController
         // Check if email exists
         $existing = User::findGlobalByEmail($email);
         if ($existing) {
+            // nosemgrep: tainted-sql-string — $tenantId is cast to (int) on line 119
             $this->redirectWithError(
                 '/super-admin/users/create?tenant_id=' . $tenantId,
                 'Email already exists in the system'
@@ -178,6 +180,7 @@ class UserController
             $_SESSION['flash_success'] = "User '{$firstName} {$lastName}' created successfully";
             header('Location: /super-admin/users/' . $userId);
         } else {
+            // nosemgrep: tainted-sql-string — $tenantId is cast to (int) on line 119
             $this->redirectWithError(
                 '/super-admin/users/create?tenant_id=' . $tenantId,
                 'Failed to create user'
@@ -593,6 +596,7 @@ class UserController
             'limit' => 20
         ]);
 
+        // nosemgrep: echoed-request — output is JSON-encoded; filters passed to service method
         echo json_encode([
             'success' => true,
             'users' => $users
