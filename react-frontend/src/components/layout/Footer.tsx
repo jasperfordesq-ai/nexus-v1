@@ -128,8 +128,6 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/privacy')}>Privacy Policy</FooterLink></li>
                   <li><FooterLink href={tenantPath('/cookies')}>Cookie Policy</FooterLink></li>
                   <li><FooterLink href={tenantPath('/accessibility')}>Accessibility</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/community-guidelines')}>Community Guidelines</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/acceptable-use')}>Acceptable Use</FooterLink></li>
                 </ul>
               </div>
             </div>
@@ -161,11 +159,20 @@ export function Footer({ children, copyright }: FooterProps) {
                   Cookie Settings
                 </button>
                 <span className="text-theme-subtle/30">|</span>
+                <a
+                  href="https://github.com/jasperfordesq-ai/nexus-v1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
+                >
+                  Built on Project NEXUS
+                </a>
+                <span className="text-theme-subtle/30">&middot;</span>
                 <Link
                   to={tenantPath('/platform/terms')}
                   className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
                 >
-                  Platform Terms
+                  Terms
                 </Link>
                 <span className="text-theme-subtle/30">&middot;</span>
                 <Link
@@ -174,15 +181,6 @@ export function Footer({ children, copyright }: FooterProps) {
                 >
                   Privacy
                 </Link>
-                <span className="text-theme-subtle/30">|</span>
-                <a
-                  href="https://github.com/jasperfordesq-ai/nexus-v1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
-                >
-                  Built on Project NEXUS by Jasper Ford
-                </a>
                 <span className="text-[10px] text-theme-subtle/50 font-mono" title={`Built ${__BUILD_TIME__}`}>
                   {__BUILD_COMMIT__}
                 </span>
