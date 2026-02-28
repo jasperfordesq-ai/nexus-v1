@@ -8,7 +8,10 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Services\AuditLogService;
 use Nexus\Services\ExchangeWorkflowService;
+use Nexus\Services\ListingRiskTagService;
+use Nexus\Services\NotificationDispatcher;
 
 /**
  * AdminBrokerApiController - V2 API for React admin broker controls
@@ -87,7 +90,7 @@ class AdminBrokerApiController extends BaseApiController
         $highRiskListings = 0;
         try {
             $row = Database::query(
-                "SELECT COUNT(*) as cnt FROM listing_risk_tags WHERE {$tenantWhere} AND risk_level = 'high'",
+                "SELECT COUNT(*) as cnt FROM listing_risk_tags WHERE {$tenantWhere} AND risk_level IN ('high', 'critical')",
                 $tenantParams
             )->fetch();
             $highRiskListings = (int) ($row['cnt'] ?? 0);
@@ -384,11 +387,13 @@ class AdminBrokerApiController extends BaseApiController
             $items = Database::query(
                 "SELECT rt.*,
                     l.title as listing_title,
-                    CONCAT(u.first_name, ' ', u.last_name) as owner_name,
+                    u.name as owner_name,
+                    tagger.name as tagged_by_name,
                     t.name as tenant_name
                 FROM listing_risk_tags rt
                 LEFT JOIN listings l ON rt.listing_id = l.id
                 LEFT JOIN users u ON l.user_id = u.id
+                LEFT JOIN users tagger ON rt.tagged_by = tagger.id
                 LEFT JOIN tenants t ON rt.tenant_id = t.id
                 WHERE {$where}
                 ORDER BY FIELD(rt.risk_level, 'critical', 'high', 'medium', 'low'), rt.created_at DESC",
@@ -1141,24 +1146,48 @@ class AdminBrokerApiController extends BaseApiController
             // Use the listing's own tenant_id for all writes
             $listingTenantId = (int) $listing['tenant_id'];
 
-            // Upsert
+            // Upsert — fetch full existing record for audit trail
             $existing = Database::query(
-                "SELECT id FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
+                "SELECT id, risk_level FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
                 [$listingId, $listingTenantId]
             )->fetch();
 
             if ($existing) {
+                $oldRiskLevel = $existing['risk_level'];
                 Database::query(
                     "UPDATE listing_risk_tags SET risk_level = ?, risk_category = ?, risk_notes = ?, member_visible_notes = ?, requires_approval = ?, insurance_required = ?, dbs_required = ?, tagged_by = ?, updated_at = NOW() WHERE listing_id = ? AND tenant_id = ?",
                     [$riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId, $listingId, $listingTenantId]
                 );
                 $tagId = $existing['id'];
+
+                AuditLogService::log('listing_risk_tag_updated', null, $adminId, [
+                    'listing_id' => $listingId,
+                    'old_risk_level' => $oldRiskLevel,
+                    'new_risk_level' => $riskLevel,
+                ]);
+
+                // Notify admins if risk level was upgraded to high/critical
+                $highLevels = [ListingRiskTagService::RISK_HIGH, ListingRiskTagService::RISK_CRITICAL];
+                if (in_array($riskLevel, $highLevels, true) && !in_array($oldRiskLevel, $highLevels, true)) {
+                    $this->notifyAdminsOfRiskTagChange($listingId, $riskLevel, $adminId);
+                }
             } else {
                 Database::query(
                     "INSERT INTO listing_risk_tags (listing_id, tenant_id, risk_level, risk_category, risk_notes, member_visible_notes, requires_approval, insurance_required, dbs_required, tagged_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
                     [$listingId, $listingTenantId, $riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId]
                 );
                 $tagId = Database::lastInsertId();
+
+                AuditLogService::log('listing_risk_tag_created', null, $adminId, [
+                    'listing_id' => $listingId,
+                    'tag_id' => $tagId,
+                    'risk_level' => $riskLevel,
+                ]);
+
+                // Notify admins if high/critical
+                if (in_array($riskLevel, [ListingRiskTagService::RISK_HIGH, ListingRiskTagService::RISK_CRITICAL], true)) {
+                    $this->notifyAdminsOfRiskTagChange($listingId, $riskLevel, $adminId);
+                }
             }
 
             $this->respondWithData(['id' => $tagId, 'listing_id' => $listingId, 'risk_level' => $riskLevel]);
@@ -1174,7 +1203,7 @@ class AdminBrokerApiController extends BaseApiController
      */
     public function removeRiskTag(int $listingId): void
     {
-        $this->requireBrokerAdmin();
+        $adminId = $this->requireBrokerAdmin();
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -1182,12 +1211,12 @@ class AdminBrokerApiController extends BaseApiController
             // Super admins can remove risk tags from any tenant
             if ($isSuperAdmin) {
                 $existing = Database::query(
-                    "SELECT id, tenant_id FROM listing_risk_tags WHERE listing_id = ?",
+                    "SELECT id, tenant_id, risk_level FROM listing_risk_tags WHERE listing_id = ?",
                     [$listingId]
                 )->fetch();
             } else {
                 $existing = Database::query(
-                    "SELECT id, tenant_id FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
+                    "SELECT id, tenant_id, risk_level FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
                     [$listingId, $tenantId]
                 )->fetch();
             }
@@ -1204,9 +1233,46 @@ class AdminBrokerApiController extends BaseApiController
                 [$listingId, $recordTenantId]
             );
 
+            AuditLogService::log('listing_risk_tag_removed', null, $adminId, [
+                'listing_id' => $listingId,
+                'previous_risk_level' => $existing['risk_level'] ?? null,
+            ]);
+
             $this->respondWithData(['listing_id' => $listingId, 'removed' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to remove risk tag', null, 500);
+        }
+    }
+
+    /**
+     * Notify admins when a high/critical risk tag is created or upgraded.
+     */
+    private function notifyAdminsOfRiskTagChange(int $listingId, string $riskLevel, int $brokerId): void
+    {
+        try {
+            $listing = Database::query(
+                "SELECT l.title, u.name as owner_name
+                 FROM listings l
+                 LEFT JOIN users u ON l.user_id = u.id
+                 WHERE l.id = ?",
+                [$listingId]
+            )->fetch();
+
+            if ($listing) {
+                NotificationDispatcher::notifyAdmins(
+                    'listing_risk_tagged',
+                    [
+                        'listing_id' => $listingId,
+                        'listing_title' => $listing['title'] ?? 'Unknown',
+                        'owner_name' => $listing['owner_name'] ?? 'Unknown',
+                        'risk_level' => $riskLevel,
+                        'tagged_by' => $brokerId,
+                    ],
+                    "Listing '{$listing['title']}' tagged as {$riskLevel} risk"
+                );
+            }
+        } catch (\Exception $e) {
+            error_log("Failed to notify admins of risk tag: " . $e->getMessage());
         }
     }
 

@@ -81,18 +81,30 @@ class ListingRiskTagService
         // Check if listing already has a tag
         $existing = self::getTagForListing($listingId);
 
+        $memberVisibleNotes = $data['member_visible_notes'] ?? null;
+        $insuranceRequired = ($data['insurance_required'] ?? false) ? 1 : 0;
+        $dbsRequired = ($data['dbs_required'] ?? false) ? 1 : 0;
+        $requiresApproval = ($data['requires_approval'] ?? false) ? 1 : 0;
+
         if ($existing) {
+            $oldRiskLevel = $existing['risk_level'];
+
             // Update existing tag
             Database::query(
                 "UPDATE listing_risk_tags
                  SET risk_level = ?, risk_category = ?, risk_notes = ?,
-                     requires_approval = ?, tagged_by = ?, updated_at = NOW()
+                     member_visible_notes = ?, requires_approval = ?,
+                     insurance_required = ?, dbs_required = ?,
+                     tagged_by = ?, updated_at = NOW()
                  WHERE id = ?",
                 [
                     $riskLevel,
                     $category,
                     $data['risk_notes'] ?? null,
-                    ($data['requires_approval'] ?? false) ? 1 : 0,
+                    $memberVisibleNotes,
+                    $requiresApproval,
+                    $insuranceRequired,
+                    $dbsRequired,
                     $brokerId,
                     $existing['id'],
                 ]
@@ -101,9 +113,15 @@ class ListingRiskTagService
             // Log update
             AuditLogService::log('listing_risk_tag_updated', null, $brokerId, [
                 'listing_id' => $listingId,
-                'old_risk_level' => $existing['risk_level'],
+                'old_risk_level' => $oldRiskLevel,
                 'new_risk_level' => $riskLevel,
             ]);
+
+            // Notify admins if risk level was upgraded to high/critical
+            $highLevels = [self::RISK_HIGH, self::RISK_CRITICAL];
+            if (in_array($riskLevel, $highLevels, true) && !in_array($oldRiskLevel, $highLevels, true)) {
+                self::notifyAdminsOfRiskTag($listingId, $riskLevel, $brokerId);
+            }
 
             return $existing['id'];
         }
@@ -111,15 +129,20 @@ class ListingRiskTagService
         // Create new tag
         Database::query(
             "INSERT INTO listing_risk_tags
-             (tenant_id, listing_id, risk_level, risk_category, risk_notes, requires_approval, tagged_by, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+             (tenant_id, listing_id, risk_level, risk_category, risk_notes,
+              member_visible_notes, requires_approval, insurance_required, dbs_required,
+              tagged_by, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
             [
                 $tenantId,
                 $listingId,
                 $riskLevel,
                 $category,
                 $data['risk_notes'] ?? null,
-                ($data['requires_approval'] ?? false) ? 1 : 0,
+                $memberVisibleNotes,
+                $requiresApproval,
+                $insuranceRequired,
+                $dbsRequired,
                 $brokerId,
             ]
         );
