@@ -67,6 +67,11 @@ export function LoginPage() {
   const [useBackupCode, setUseBackupCode] = useState(false);
   const [trustDevice, setTrustDevice] = useState(false);
 
+  // Verification resend state
+  const [loginErrorCode, setLoginErrorCode] = useState<string | undefined>();
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [resendVerificationSent, setResendVerificationSent] = useState(false);
+
   // Redirect after successful login (preserve tenant slug prefix)
   const from = (location.state as { from?: string })?.from || tenantPath('/dashboard');
 
@@ -157,10 +162,28 @@ export function LoginPage() {
     if (!email.trim() || !password.trim()) return;
     if (!selectedTenantId) return;
 
+    setLoginErrorCode(undefined);
+    setResendVerificationSent(false);
     tokenManager.clearTokens();
     tokenManager.setTenantId(selectedTenantId);
 
-    await login({ email, password });
+    const result = await login({ email, password });
+    if (!result.success && result.errorCode) {
+      setLoginErrorCode(result.errorCode);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email.trim()) return;
+    setIsResendingVerification(true);
+    try {
+      await api.post('/auth/resend-verification-by-email', { email }, { skipAuth: true });
+      setResendVerificationSent(true);
+    } catch {
+      // Silently handle — the endpoint always returns success for security
+    } finally {
+      setIsResendingVerification(false);
+    }
   };
 
   const handleVerify2FA = async (e: FormEvent) => {
@@ -247,9 +270,30 @@ export function LoginPage() {
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm"
+                      className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm"
                     >
-                      {error}
+                      <p className="text-red-600 dark:text-red-400">{error}</p>
+                      {/* Resend verification email button */}
+                      {loginErrorCode === 'AUTH_EMAIL_NOT_VERIFIED' && (
+                        <div className="mt-3">
+                          {resendVerificationSent ? (
+                            <p className="text-emerald-600 dark:text-emerald-400 text-xs">
+                              Verification email sent! Check your inbox.
+                            </p>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="flat"
+                              onPress={handleResendVerification}
+                              isLoading={isResendingVerification}
+                              className="bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
+                              startContent={!isResendingVerification ? <Mail className="w-3 h-3" /> : undefined}
+                            >
+                              Resend verification email
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </motion.div>
                   )}
 

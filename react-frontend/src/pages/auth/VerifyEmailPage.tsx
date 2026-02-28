@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
-import { CheckCircle, XCircle, Loader2, ArrowLeft, Mail } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowLeft, Mail, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant, useAuth } from '@/contexts';
@@ -27,8 +27,12 @@ type VerifyState = 'loading' | 'success' | 'error';
 export function VerifyEmailPage() {
   const { t } = useTranslation('auth');
   usePageTitle('Verify Email');
-  const { branding, tenantPath } = useTenant();
+  const { branding, tenantPath, tenant } = useTenant();
   const { isAuthenticated } = useAuth();
+
+  // Check if tenant requires admin approval (from bootstrap settings)
+  const requiresApproval = tenant?.settings?.admin_approval === true
+    || tenant?.settings?.admin_approval === 'true';
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
@@ -124,9 +128,25 @@ export function VerifyEmailPage() {
               <CheckCircle className="w-8 h-8 text-emerald-400" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.success_title')}</h1>
-            <p className="text-theme-muted mb-6">
+            <p className="text-theme-muted mb-4">
               {t('verify_email.success_subtitle')}
             </p>
+
+            {/* If tenant requires admin approval, warn user they still can't login yet */}
+            {requiresApproval && !isAuthenticated && (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-left mb-6">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-600 dark:text-amber-400">Awaiting admin approval</p>
+                    <p className="text-amber-600/80 dark:text-amber-300/80 mt-1">
+                      Your email is verified, but your account still needs to be approved by a community administrator. You&apos;ll receive an email once approved.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {isAuthenticated ? (
               <Link to={tenantPath('/dashboard')}>
                 <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
@@ -136,7 +156,7 @@ export function VerifyEmailPage() {
             ) : (
               <Link to={tenantPath('/login')}>
                 <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                  {t('verify_email.go_to_login')}
+                  {requiresApproval ? 'Back to Login' : t('verify_email.go_to_login')}
                 </Button>
               </Link>
             )}

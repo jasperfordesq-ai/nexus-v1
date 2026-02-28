@@ -1105,6 +1105,7 @@ $router->add('POST', '/api/auth/reset-password', 'Nexus\Controllers\Api\Password
 // Email Verification API (stateless, v2 response format)
 $router->add('POST', '/api/auth/verify-email', 'Nexus\Controllers\Api\EmailVerificationApiController@verifyEmail');
 $router->add('POST', '/api/auth/resend-verification', 'Nexus\Controllers\Api\EmailVerificationApiController@resendVerification');
+$router->add('POST', '/api/auth/resend-verification-by-email', 'Nexus\Controllers\Api\EmailVerificationApiController@resendVerificationByEmail');
 
 // TOTP 2FA API (Legacy V1)
 $router->add('POST', '/api/totp/verify', 'Nexus\Controllers\Api\TotpApiController@verify');

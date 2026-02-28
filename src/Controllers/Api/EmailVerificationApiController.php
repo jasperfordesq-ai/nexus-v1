@@ -198,6 +198,59 @@ class EmailVerificationApiController extends BaseApiController
     }
 
     /**
+     * POST /api/auth/resend-verification-by-email
+     *
+     * Public endpoint (no auth required) to resend a verification email.
+     * Used on the login page when a user is blocked by the email verification gate.
+     * Rate limited aggressively to prevent abuse.
+     *
+     * Request: { "email": "user@example.com" }
+     * Response: { "data": { "message": "If an account exists..." } }
+     *
+     * SECURITY: Always returns the same response regardless of whether the email
+     * exists or the user is already verified — prevents user enumeration.
+     */
+    public function resendVerificationByEmail(): void
+    {
+        // Rate limit by IP — 3 per 5 minutes (aggressive since unauthenticated)
+        $ip = \Nexus\Core\ClientIp::get();
+        if (\Nexus\Services\RateLimitService::check("resend_verify:$ip", 3, 300)) {
+            header('Retry-After: 300');
+            $this->respondWithError(
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                'Too many requests. Please try again later.',
+                null,
+                429
+            );
+        }
+        \Nexus\Services\RateLimitService::increment("resend_verify:$ip", 300);
+
+        $email = strtolower(trim($this->input('email', '')));
+        $tenantId = TenantContext::getId();
+
+        // Always return the same success message (prevents user enumeration)
+        $genericResponse = ['message' => 'If an account with that email exists and is unverified, a new verification email has been sent.'];
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->respondWithData($genericResponse);
+            return;
+        }
+
+        // Look up user (tenant-scoped)
+        $user = Database::query(
+            "SELECT id, email, first_name, email_verified_at, tenant_id FROM users WHERE email = ? AND tenant_id = ?",
+            [$email, $tenantId]
+        )->fetch();
+
+        // Only send if user exists AND is not yet verified
+        if ($user && empty($user['email_verified_at'])) {
+            $this->sendVerificationEmail($user);
+        }
+
+        $this->respondWithData($genericResponse);
+    }
+
+    /**
      * Generate a verification token for a user (called during registration)
      *
      * This is a public static method that can be called from other controllers
