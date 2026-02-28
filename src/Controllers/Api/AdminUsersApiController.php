@@ -1130,8 +1130,15 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        // Use the user's own tenant_id for the token (so the impersonated session is in the correct tenant)
+        // Warn admin if target user is blocked by registration policy gates
         $userTenantId = (int) $user['tenant_id'];
+        $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+        if ($gateBlock) {
+            // Allow impersonation but include a warning — admins may need this for testing
+            // The gate status is returned so the admin UI can display it
+        }
+
+        // Use the user's own tenant_id for the token (so the impersonated session is in the correct tenant)
 
         try {
             // Generate an access token for the target user with impersonation claim
@@ -1142,11 +1149,16 @@ class AdminUsersApiController extends BaseApiController
             ActivityLog::log($adminId, 'admin_impersonate', "Impersonated user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
             AuditLogService::logUserImpersonated($adminId, $id, $user['email']);
 
-            $this->respondWithData([
+            $responseData = [
                 'token' => $token,
                 'user_id' => $id,
                 'user_name' => trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')),
-            ]);
+            ];
+            if ($gateBlock) {
+                $responseData['gate_warning'] = $gateBlock['message'];
+                $responseData['gate_code'] = $gateBlock['code'];
+            }
+            $this->respondWithData($responseData);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to generate impersonation token', null, 500);
         }
