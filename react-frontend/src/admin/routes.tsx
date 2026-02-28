@@ -313,10 +313,10 @@ export function AdminRoutes() {
       <Route path="performance" element={<Lazy><PerformanceDashboard /></Lazy>} />
       <Route path="legal-documents" element={<Lazy><LegalDocList /></Lazy>} />
       <Route path="legal-documents/create" element={<Lazy><LegalDocForm /></Lazy>} />
+      <Route path="legal-documents/compliance" element={<Lazy><LegalDocComplianceDashboard /></Lazy>} />
       <Route path="legal-documents/:id" element={<Lazy><LegalDocForm /></Lazy>} />
       <Route path="legal-documents/:id/edit" element={<Lazy><LegalDocForm /></Lazy>} />
       <Route path="legal-documents/:id/versions" element={<Lazy><LegalDocVersionList /></Lazy>} />
-      <Route path="legal-documents/compliance" element={<Lazy><LegalDocComplianceDashboard /></Lazy>} />
 
       {/* ─── FEDERATION ─── */}
       <Route path="federation" element={<Lazy><FederationSettings /></Lazy>} />
