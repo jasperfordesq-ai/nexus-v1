@@ -11,6 +11,7 @@ use Nexus\Models\Listing;
 use Nexus\Models\Group;
 use Nexus\Core\TenantContext;
 use Nexus\Core\Database;
+use Nexus\Services\BrokerMessageVisibilityService;
 
 /**
  * CoreApiController - Core platform API endpoints
@@ -319,6 +320,14 @@ class CoreApiController extends BaseApiController
         // Don't allow messaging yourself
         if ($receiverId === $userId) {
             $this->error('Cannot send message to yourself', 400, 'VALIDATION_ERROR');
+        }
+
+        // Check messaging restrictions (broker monitoring)
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser($userId)) {
+            $this->error('Your messaging privileges have been restricted. Please contact support.', 403, 'SENDER_RESTRICTED');
+        }
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser($receiverId)) {
+            $this->error('This user is not currently accepting messages.', 403, 'RECIPIENT_UNAVAILABLE');
         }
 
         $tenantId = $this->getTenantId();

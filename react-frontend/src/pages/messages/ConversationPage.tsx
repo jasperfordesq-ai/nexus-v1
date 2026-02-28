@@ -660,6 +660,9 @@ export function ConversationPage() {
         }
 
         setTimeout(() => scrollToBottom(), 50);
+      } else {
+        toast.error(t('error_title'), response.error || t('voice_send_error'));
+        refreshRestrictionStatus();
       }
     } catch (error) {
       logError('Failed to send voice message', error);

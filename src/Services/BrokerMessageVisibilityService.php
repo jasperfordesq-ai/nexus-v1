@@ -599,7 +599,7 @@ class BrokerMessageVisibilityService
              AND monitoring_expires_at <= NOW()"
         );
 
-        // Notify admins per tenant
+        // Notify admins and affected users per tenant
         $byTenant = [];
         foreach ($expired as $row) {
             $byTenant[(int) $row['tenant_id']][] = $row;
@@ -610,7 +610,10 @@ class BrokerMessageVisibilityService
                 TenantContext::setId($tenantId);
                 $adminIds = self::getTenantBrokerAdminIds();
                 foreach ($users as $row) {
-                    $userName = trim($row['user_name']) ?: 'User #' . $row['user_id'];
+                    $userId = (int) $row['user_id'];
+                    $userName = trim($row['user_name']) ?: 'User #' . $userId;
+
+                    // Notify admins
                     foreach ($adminIds as $adminId) {
                         Notification::create(
                             $adminId,
@@ -620,6 +623,15 @@ class BrokerMessageVisibilityService
                             false // No push for batch expiry — in-app only
                         );
                     }
+
+                    // Notify the affected user that restrictions have been lifted
+                    Notification::create(
+                        $userId,
+                        'Your messaging restrictions have been lifted.',
+                        '/messages',
+                        'system',
+                        true
+                    );
                 }
             } catch (\Throwable $e) {
                 error_log("[BrokerMessageVisibilityService] Expiry notification error (tenant {$tenantId}): " . $e->getMessage());
