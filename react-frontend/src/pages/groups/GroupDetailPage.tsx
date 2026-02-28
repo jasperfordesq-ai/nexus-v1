@@ -86,14 +86,15 @@ interface GroupDetails extends Group {
 interface Discussion {
   id: number;
   title: string;
-  content: string;
+  content?: string;
   author: {
     id: number;
     name: string;
-    avatar?: string | null;
+    avatar_url?: string | null;
   };
   reply_count: number;
-  last_activity_at: string;
+  is_pinned?: boolean;
+  last_reply_at?: string | null;
   created_at: string;
 }
 
@@ -103,8 +104,9 @@ interface DiscussionMessage {
   author: {
     id: number;
     name: string;
-    avatar?: string | null;
+    avatar_url?: string | null;
   };
+  is_own?: boolean;
   created_at: string;
 }
 
@@ -254,6 +256,7 @@ export function GroupDetailPage() {
 
   const loadDiscussions = useCallback(async (append = false) => {
     if (!id || discussionsLoading) return;
+    if (append && !discussionsCursor) return;
 
     try {
       setDiscussionsLoading(true);
@@ -420,13 +423,15 @@ export function GroupDetailPage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   async function handleCreateDiscussion() {
-    if (!id || !newDiscussionTitle.trim() || !newDiscussionContent.trim()) return;
+    const title = newDiscussionTitle.trim();
+    const content = newDiscussionContent.trim();
+    if (!id || !title || !content) return;
 
     try {
       setCreatingDiscussion(true);
       const response = await api.post<Discussion>(`/v2/groups/${id}/discussions`, {
-        title: newDiscussionTitle.trim(),
-        content: newDiscussionContent.trim(),
+        title,
+        content,
       });
       if (response.success && response.data) {
         setDiscussions((prev) => [response.data!, ...prev]);
@@ -460,11 +465,14 @@ export function GroupDetailPage() {
       setExpandedDiscussionId(discussionId);
       setExpandedLoading(true);
       setExpandedDiscussion(null);
-      const response = await api.get<DiscussionDetail>(
+      setReplyContent('');
+      const response = await api.get<{ discussion: Discussion; messages: DiscussionMessage[] }>(
         `/v2/groups/${id}/discussions/${discussionId}`
       );
       if (response.success && response.data) {
-        setExpandedDiscussion(response.data);
+        // Flatten the nested API response into a DiscussionDetail
+        const { discussion: disc, messages } = response.data;
+        setExpandedDiscussion({ ...disc, messages });
       } else {
         toast.error(t('toast.discussion_load_failed'));
         setExpandedDiscussionId(null);
@@ -483,23 +491,25 @@ export function GroupDetailPage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   async function handleReply() {
-    if (!id || !expandedDiscussionId || !replyContent.trim()) return;
+    const content = replyContent.trim();
+    if (!id || !expandedDiscussionId || !content) return;
 
     try {
       setSendingReply(true);
       const response = await api.post<DiscussionMessage>(
         `/v2/groups/${id}/discussions/${expandedDiscussionId}/messages`,
-        { content: replyContent.trim() }
+        { content }
       );
       if (response.success && response.data) {
+        const newMessage = response.data;
         setExpandedDiscussion((prev) =>
-          prev ? { ...prev, messages: [...prev.messages, response.data!] } : null
+          prev ? { ...prev, messages: [...prev.messages, newMessage] } : null
         );
-        // Update reply count in the discussions list
+        // Update reply count and timestamp in the discussions list
         setDiscussions((prev) =>
           prev.map((d) =>
             d.id === expandedDiscussionId
-              ? { ...d, reply_count: d.reply_count + 1, last_activity_at: new Date().toISOString() }
+              ? { ...d, reply_count: d.reply_count + 1, last_reply_at: newMessage.created_at }
               : d
           )
         );
@@ -1056,7 +1066,7 @@ export function GroupDetailPage() {
                           <div className="p-4">
                             <div className="flex items-start gap-3">
                               <Avatar
-                                src={resolveAvatarUrl(discussion.author.avatar)}
+                                src={resolveAvatarUrl(discussion.author.avatar_url)}
                                 name={discussion.author.name}
                                 size="sm"
                                 className="flex-shrink-0 mt-0.5"
@@ -1078,7 +1088,7 @@ export function GroupDetailPage() {
                                   </span>
                                   <span className="flex items-center gap-1">
                                     <Clock className="w-3 h-3" aria-hidden="true" />
-                                    {formatRelativeTime(discussion.last_activity_at || discussion.created_at)}
+                                    {formatRelativeTime(discussion.last_reply_at || discussion.created_at)}
                                   </span>
                                 </div>
                               </div>
@@ -1114,7 +1124,7 @@ export function GroupDetailPage() {
                                         {expandedDiscussion.messages.map((msg) => (
                                           <div key={msg.id} className="flex gap-3 p-3 rounded-lg bg-theme-elevated/30">
                                             <Avatar
-                                              src={resolveAvatarUrl(msg.author.avatar)}
+                                              src={resolveAvatarUrl(msg.author.avatar_url)}
                                               name={msg.author.name}
                                               size="sm"
                                               className="flex-shrink-0"

@@ -13,35 +13,39 @@ class GroupDiscussion
 {
     public static function create($groupId, $userId, $title)
     {
-        $sql = "INSERT INTO group_discussions (group_id, user_id, title) VALUES (?, ?, ?)";
-        Database::query($sql, [$groupId, $userId, $title]);
+        $tenantId = TenantContext::getId();
+        $sql = "INSERT INTO group_discussions (tenant_id, group_id, user_id, title) VALUES (?, ?, ?, ?)";
+        Database::query($sql, [$tenantId, $groupId, $userId, $title]);
         return Database::getInstance()->lastInsertId();
     }
 
     public static function getForGroup($groupId)
     {
+        $tenantId = TenantContext::getId();
         $sql = "SELECT gd.*, u.name as author_name, u.avatar_url as author_avatar,
                        (SELECT COUNT(*) FROM group_posts gp WHERE gp.discussion_id = gd.id) as reply_count,
                        (SELECT MAX(created_at) FROM group_posts gp WHERE gp.discussion_id = gd.id) as last_reply_at
                 FROM group_discussions gd
                 JOIN users u ON gd.user_id = u.id
-                WHERE gd.group_id = ?
+                WHERE gd.group_id = ? AND gd.tenant_id = ?
                 ORDER BY is_pinned DESC, last_reply_at DESC, created_at DESC";
-        return Database::query($sql, [$groupId])->fetchAll();
+        return Database::query($sql, [$groupId, $tenantId])->fetchAll();
     }
 
     public static function findById($id)
     {
+        $tenantId = TenantContext::getId();
         $sql = "SELECT gd.*, u.name as author_name, u.avatar_url as author_avatar
                 FROM group_discussions gd
                 JOIN users u ON gd.user_id = u.id
-                WHERE gd.id = ?";
-        return Database::query($sql, [$id])->fetch();
+                WHERE gd.id = ? AND gd.tenant_id = ?";
+        return Database::query($sql, [$id, $tenantId])->fetch();
     }
 
     public static function delete($id)
     {
-        $sql = "DELETE FROM group_discussions WHERE id = ?";
-        return Database::query($sql, [$id]);
+        $tenantId = TenantContext::getId();
+        $sql = "DELETE FROM group_discussions WHERE id = ? AND tenant_id = ?";
+        return Database::query($sql, [$id, $tenantId]);
     }
 }
