@@ -8,7 +8,7 @@
  * Provides global toast notifications for API errors and user feedback
  */
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
@@ -82,10 +82,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     addToast({ type: 'info', title, message });
   }, [addToast]);
 
+  const value = useMemo(
+    () => ({ toasts, addToast, removeToast, success, error, warning, info }),
+    [toasts, addToast, removeToast, success, error, warning, info],
+  );
+
   return (
-    <ToastContext.Provider
-      value={{ toasts, addToast, removeToast, success, error, warning, info }}
-    >
+    <ToastContext.Provider value={value}>
       {children}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
@@ -101,7 +104,29 @@ export function useToast(): ToastContextType {
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider');
   }
-  return context;
+
+  // Return a STABLE object reference to prevent infinite loops.
+  // Problem: 33+ components use `const toast = useToast()` then `useCallback(fn, [toast])`.
+  // If the returned object changes when toasts are added (which it does, since the context
+  // value includes the `toasts` array), any useCallback depending on it gets recreated,
+  // causing useEffects to re-fire → API calls → toast.error() → new toast → loop.
+  // Fix: useMemo keyed only on the stable useCallback-wrapped methods.
+  // `toasts` is accessed via ref so reads are always current without invalidating the memo.
+  const ref = useRef(context);
+  ref.current = context;
+
+  return useMemo<ToastContextType>(
+    () => ({
+      get toasts() { return ref.current.toasts; },
+      addToast: context.addToast,
+      removeToast: context.removeToast,
+      success: context.success,
+      error: context.error,
+      warning: context.warning,
+      info: context.info,
+    }),
+    [context.addToast, context.removeToast, context.success, context.error, context.warning, context.info],
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
