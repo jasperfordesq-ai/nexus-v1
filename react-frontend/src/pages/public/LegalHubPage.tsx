@@ -25,6 +25,9 @@ import {
   Send,
   Users,
   ShieldCheck,
+  Hexagon,
+  AlertTriangle,
+  ExternalLink,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -186,6 +189,60 @@ export function LegalHubPage() {
             </GlassCard>
           ))}
         </div>
+      </motion.div>
+
+      {/* Platform Legal Documents */}
+      <motion.div variants={itemVariants}>
+        <GlassCard className="p-6 sm:p-8">
+          <div className="flex items-start gap-3 mb-5">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-slate-500/20 to-blue-500/20 shrink-0">
+              <Hexagon className="w-5 h-5 text-slate-500 dark:text-slate-400" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-theme-primary">
+                {t('hub.platform_section_title', 'Platform Provider Legal')}
+              </h2>
+              <p className="text-sm text-theme-muted mt-1">
+                {t(
+                  'hub.platform_section_desc',
+                  'These documents govern the Project NEXUS platform infrastructure and are separate from your community\'s policies.',
+                )}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link to={tenantPath('/platform/terms')}>
+              <Button
+                variant="flat"
+                className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
+                startContent={<FileText className="w-4 h-4 text-slate-500" aria-hidden="true" />}
+                endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
+              >
+                {t('hub.platform_terms', 'Platform Terms')}
+              </Button>
+            </Link>
+            <Link to={tenantPath('/platform/privacy')}>
+              <Button
+                variant="flat"
+                className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
+                startContent={<Shield className="w-4 h-4 text-slate-500" aria-hidden="true" />}
+                endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
+              >
+                {t('hub.platform_privacy', 'Platform Privacy')}
+              </Button>
+            </Link>
+            <Link to={tenantPath('/platform/disclaimer')}>
+              <Button
+                variant="flat"
+                className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
+                startContent={<AlertTriangle className="w-4 h-4 text-slate-500" aria-hidden="true" />}
+                endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
+              >
+                {t('hub.platform_disclaimer', 'Disclaimer')}
+              </Button>
+            </Link>
+          </div>
+        </GlassCard>
       </motion.div>
 
       {/* Contact CTA */}
