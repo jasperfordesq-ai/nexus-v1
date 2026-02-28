@@ -897,6 +897,8 @@ export interface MonitoredUser {
   under_monitoring: boolean;
   monitoring_reason?: string;
   monitoring_started_at?: string;
+  monitoring_expires_at?: string;
+  messaging_disabled?: boolean;
   restricted_by?: number;
 }
 
@@ -1359,6 +1361,11 @@ export interface VettingRecord {
   verifier_first_name: string | null;
   verifier_last_name: string | null;
   verified_at: string | null;
+  rejected_by: number | null;
+  rejector_first_name: string | null;
+  rejector_last_name: string | null;
+  rejected_at: string | null;
+  rejection_reason: string | null;
   document_url: string | null;
   notes: string | null;
   works_with_children: boolean;

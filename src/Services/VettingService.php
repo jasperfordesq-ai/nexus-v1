@@ -26,10 +26,12 @@ class VettingService
         $tenantId = TenantContext::getId();
         $stmt = Database::query(
             "SELECT vr.*, u.first_name, u.last_name, u.email,
-                    vb.first_name as verifier_first_name, vb.last_name as verifier_last_name
+                    vb.first_name as verifier_first_name, vb.last_name as verifier_last_name,
+                    rb.first_name as rejector_first_name, rb.last_name as rejector_last_name
              FROM vetting_records vr
              JOIN users u ON u.id = vr.user_id
              LEFT JOIN users vb ON vb.id = vr.verified_by
+             LEFT JOIN users rb ON rb.id = vr.rejected_by
              WHERE vr.tenant_id = ? AND vr.user_id = ?
              ORDER BY vr.created_at DESC",
             [$tenantId, $userId]
@@ -45,10 +47,12 @@ class VettingService
         $tenantId = TenantContext::getId();
         $stmt = Database::query(
             "SELECT vr.*, u.first_name, u.last_name, u.email, u.avatar_url,
-                    vb.first_name as verifier_first_name, vb.last_name as verifier_last_name
+                    vb.first_name as verifier_first_name, vb.last_name as verifier_last_name,
+                    rb.first_name as rejector_first_name, rb.last_name as rejector_last_name
              FROM vetting_records vr
              JOIN users u ON u.id = vr.user_id
              LEFT JOIN users vb ON vb.id = vr.verified_by
+             LEFT JOIN users rb ON rb.id = vr.rejected_by
              WHERE vr.id = ? AND vr.tenant_id = ?",
             [$id, $tenantId]
         );
@@ -74,10 +78,11 @@ class VettingService
             $params[] = $filters['vetting_type'];
         }
         if (!empty($filters['expiring_soon'])) {
-            $where[] = 'vr.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)';
+            $warningDays = BrokerControlConfigService::getVettingExpiryWarningDays();
+            $where[] = "vr.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL {$warningDays} DAY)";
         }
         if (!empty($filters['expired'])) {
-            $where[] = 'vr.expiry_date < CURDATE() AND vr.status = "verified"';
+            $where[] = '((vr.expiry_date < CURDATE() AND vr.status = "verified") OR vr.status = "expired")';
         }
         if (!empty($filters['search'])) {
             $where[] = '(u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR vr.reference_number LIKE ?)';
@@ -103,10 +108,12 @@ class VettingService
         // Fetch records
         $stmt = Database::query(
             "SELECT vr.*, u.first_name, u.last_name, u.email, u.avatar_url,
-                    vb.first_name as verifier_first_name, vb.last_name as verifier_last_name
+                    vb.first_name as verifier_first_name, vb.last_name as verifier_last_name,
+                    rb.first_name as rejector_first_name, rb.last_name as rejector_last_name
              FROM vetting_records vr
              JOIN users u ON u.id = vr.user_id
              LEFT JOIN users vb ON vb.id = vr.verified_by
+             LEFT JOIN users rb ON rb.id = vr.rejected_by
              WHERE {$whereClause}
              ORDER BY vr.created_at DESC
              LIMIT {$perPage} OFFSET {$offset}",
@@ -134,13 +141,14 @@ class VettingService
         $stats = ['pending' => 0, 'verified' => 0, 'expired' => 0, 'expiring_soon' => 0, 'total' => 0];
 
         try {
+            $warningDays = BrokerControlConfigService::getVettingExpiryWarningDays();
             $row = Database::query(
                 "SELECT
                     COUNT(*) as total,
                     SUM(CASE WHEN status = 'pending' OR status = 'submitted' THEN 1 ELSE 0 END) as pending,
                     SUM(CASE WHEN status = 'verified' AND (expiry_date IS NULL OR expiry_date >= CURDATE()) THEN 1 ELSE 0 END) as verified,
-                    SUM(CASE WHEN status = 'verified' AND expiry_date < CURDATE() THEN 1 ELSE 0 END) as expired,
-                    SUM(CASE WHEN status = 'verified' AND expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as expiring_soon
+                    SUM(CASE WHEN (status = 'verified' AND expiry_date < CURDATE()) OR status = 'expired' THEN 1 ELSE 0 END) as expired,
+                    SUM(CASE WHEN status = 'verified' AND expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL {$warningDays} DAY) THEN 1 ELSE 0 END) as expiring_soon
                  FROM vetting_records WHERE tenant_id = ?",
                 [$tenantId]
             )->fetch();
@@ -269,8 +277,8 @@ class VettingService
         $tenantId = TenantContext::getId();
 
         Database::query(
-            "UPDATE vetting_records SET status = 'rejected', verified_by = ?, verified_at = NOW(),
-             notes = CONCAT(IFNULL(notes, ''), '\nRejected: ', ?)
+            "UPDATE vetting_records SET status = 'rejected', rejected_by = ?, rejected_at = NOW(),
+             rejection_reason = ?
              WHERE id = ? AND tenant_id = ?",
             [$rejectedBy, $reason, $id, $tenantId]
         );
@@ -328,8 +336,8 @@ class VettingService
 
             if (!$best) {
                 Database::query(
-                    "UPDATE users SET vetting_status = 'none', vetting_expires_at = NULL WHERE id = ?",
-                    [$userId]
+                    "UPDATE users SET vetting_status = 'none', vetting_expires_at = NULL WHERE id = ? AND tenant_id = ?",
+                    [$userId, $tenantId]
                 );
                 return;
             }
@@ -348,12 +356,25 @@ class VettingService
             }
 
             Database::query(
-                "UPDATE users SET vetting_status = ?, vetting_expires_at = ? WHERE id = ?",
-                [$status, $expiresAt, $userId]
+                "UPDATE users SET vetting_status = ?, vetting_expires_at = ? WHERE id = ? AND tenant_id = ?",
+                [$status, $expiresAt, $userId, $tenantId]
             );
         } catch (\Exception $e) {
             // Columns may not exist yet
         }
+    }
+
+    /**
+     * Update the document URL for a vetting record
+     */
+    public static function updateDocumentUrl(int $id, string $url): bool
+    {
+        $tenantId = TenantContext::getId();
+        Database::query(
+            "UPDATE vetting_records SET document_url = ? WHERE id = ? AND tenant_id = ?",
+            [$url, $id, $tenantId]
+        );
+        return true;
     }
 
     /**

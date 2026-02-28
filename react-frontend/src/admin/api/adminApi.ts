@@ -517,6 +517,9 @@ export const adminBroker = {
       `/v2/admin/broker/messages${buildQuery(params)}`
     ),
 
+  getUnreviewedCount: () =>
+    api.get<{ count: number }>('/v2/admin/broker/messages/unreviewed-count'),
+
   reviewMessage: (id: number) =>
     api.post(`/v2/admin/broker/messages/${id}/review`),
 
@@ -1202,7 +1205,7 @@ export const adminImpactReport = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminVetting = {
-  list: (params: { status?: string; vetting_type?: string; search?: string; page?: number; expiring_soon?: boolean } = {}) =>
+  list: (params: { status?: string; vetting_type?: string; search?: string; page?: number; per_page?: number; expiring_soon?: boolean } = {}) =>
     api.get<PaginatedResponse<VettingRecord>>(
       `/v2/admin/vetting${buildQuery(params)}`
     ),
@@ -1230,6 +1233,15 @@ export const adminVetting = {
 
   getUserRecords: (userId: number) =>
     api.get<VettingRecord[]>(`/v2/admin/vetting/user/${userId}`),
+
+  uploadDocument: (id: number, file: File) =>
+    api.upload<VettingRecord>(`/v2/admin/vetting/${id}/upload`, file),
+
+  bulk: (ids: number[], action: 'verify' | 'reject' | 'delete', reason?: string) =>
+    api.post<{ action: string; processed: number; failed: number; total: number }>(
+      '/v2/admin/vetting/bulk',
+      { ids, action, reason }
+    ),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
