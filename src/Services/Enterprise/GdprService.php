@@ -295,6 +295,7 @@ class GdprService
             'notifications' => $this->getNotificationsData($userId),
             'connections' => $this->getConnectionsData($userId),
             'login_history' => $this->getLoginHistoryData($userId),
+            'messaging_restrictions' => $this->getMessagingRestrictionsData($userId),
         ];
     }
 
@@ -463,6 +464,19 @@ class GdprService
              LIMIT 100",
             [$userId]
         )->fetchAll();
+    }
+
+    private function getMessagingRestrictionsData(int $userId): ?array
+    {
+        $row = $this->query(
+            "SELECT messaging_disabled, under_monitoring, monitoring_reason,
+                    monitoring_started_at, monitoring_expires_at, restricted_by, created_at, updated_at
+             FROM user_messaging_restrictions
+             WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $this->tenantId]
+        )->fetch();
+
+        return $row ?: null;
     }
 
     // =========================================================================

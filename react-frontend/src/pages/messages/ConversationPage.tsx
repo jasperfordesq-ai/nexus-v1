@@ -280,17 +280,19 @@ export function ConversationPage() {
   }, [loadConversation]);
 
   // Fetch messaging restriction status (broker monitoring)
-  useEffect(() => {
-    let cancelled = false;
+  const refreshRestrictionStatus = useCallback(() => {
     api.get<{ messaging_disabled: boolean; under_monitoring: boolean; restriction_reason: string | null }>(
       '/v2/messages/restriction-status'
     ).then((res) => {
-      if (!cancelled && res.success && res.data) {
+      if (res.success && res.data) {
         setMessagingRestriction(res.data);
       }
     }).catch(() => { /* non-critical */ });
-    return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    refreshRestrictionStatus();
+  }, [refreshRestrictionStatus]);
 
   // Set up polling (fallback when Pusher not available) - pause when tab hidden
   useEffect(() => {
@@ -662,6 +664,7 @@ export function ConversationPage() {
     } catch (error) {
       logError('Failed to send voice message', error);
       toast.error(t('error_title'), t('voice_send_error'));
+      refreshRestrictionStatus();
     } finally {
       setIsSending(false);
     }
@@ -858,6 +861,7 @@ export function ConversationPage() {
           setTimeout(() => scrollToBottom(), 50);
         } else {
           toast.error(t('error_title'), response.error || t('send_error'));
+          refreshRestrictionStatus();
         }
       } else {
         // Regular text message (no attachments)
@@ -894,6 +898,7 @@ export function ConversationPage() {
         } else {
           console.error('[Messages] Send failed:', response);
           toast.error(t('error_title'), response.error || t('send_error'));
+          refreshRestrictionStatus();
         }
       }
     } catch (error) {

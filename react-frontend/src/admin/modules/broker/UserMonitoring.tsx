@@ -22,10 +22,12 @@ import {
   Input,
   Textarea,
   Switch,
+  Select,
+  SelectItem,
   Avatar,
   Spinner,
 } from '@heroui/react';
-import { ArrowLeft, Eye, UserPlus, UserMinus, X, Search } from 'lucide-react';
+import { ArrowLeft, Eye, MessageCircleOff, UserPlus, UserMinus, X, Search } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker, adminUsers } from '../../api/adminApi';
@@ -44,6 +46,7 @@ export function UserMonitoring() {
   const [monitoringModalOpen, setMonitoringModalOpen] = useState(false);
   const [monitoringReason, setMonitoringReason] = useState('');
   const [messagingDisabled, setMessagingDisabled] = useState(false);
+  const [expiresDays, setExpiresDays] = useState('');
   const [monitoringLoading, setMonitoringLoading] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
 
@@ -165,6 +168,7 @@ export function UserMonitoring() {
     setUserSearchResults([]);
     setMonitoringReason('');
     setMessagingDisabled(false);
+    setExpiresDays('');
     setShowDropdown(false);
     setHighlightedIndex(-1);
   }, []);
@@ -184,6 +188,7 @@ export function UserMonitoring() {
         under_monitoring: true,
         reason: monitoringReason,
         messaging_disabled: messagingDisabled,
+        ...(expiresDays ? { expires_days: Number(expiresDays) } : {}),
       });
       if (res?.success) {
         toast.success(`${selectedUser.name} added to monitoring`);
@@ -200,7 +205,7 @@ export function UserMonitoring() {
   };
 
   const handleRemoveMonitoring = async (userId: number) => {
-    if (!window.confirm('Remove this user from monitoring?')) return;
+    if (!window.confirm('Remove this user from monitoring? This will also re-enable their messaging if it was disabled.')) return;
     setRemovingId(userId);
     try {
       const res = await adminBroker.setMonitoring(userId, { under_monitoring: false });
@@ -230,14 +235,26 @@ export function UserMonitoring() {
       key: 'under_monitoring',
       label: 'Status',
       render: (item) => (
-        <Chip
-          size="sm"
-          variant="flat"
-          color={item.under_monitoring ? 'warning' : 'default'}
-          startContent={<Eye size={12} />}
-        >
-          {item.under_monitoring ? 'Under Monitoring' : 'Not Monitored'}
-        </Chip>
+        <div className="flex flex-wrap gap-1">
+          <Chip
+            size="sm"
+            variant="flat"
+            color={item.under_monitoring ? 'warning' : 'default'}
+            startContent={<Eye size={12} />}
+          >
+            Monitored
+          </Chip>
+          {item.messaging_disabled && (
+            <Chip
+              size="sm"
+              variant="flat"
+              color="danger"
+              startContent={<MessageCircleOff size={12} />}
+            >
+              Messaging Off
+            </Chip>
+          )}
+        </div>
       ),
     },
     {
@@ -462,6 +479,22 @@ export function UserMonitoring() {
                 size="sm"
               />
             </div>
+            <Select
+              label="Monitoring duration"
+              placeholder="No expiry (indefinite)"
+              variant="bordered"
+              selectedKeys={expiresDays ? [expiresDays] : []}
+              onSelectionChange={(keys) => {
+                const val = Array.from(keys)[0] as string | undefined;
+                setExpiresDays(val ?? '');
+              }}
+            >
+              <SelectItem key="7">7 days</SelectItem>
+              <SelectItem key="14">14 days</SelectItem>
+              <SelectItem key="30">30 days</SelectItem>
+              <SelectItem key="60">60 days</SelectItem>
+              <SelectItem key="90">90 days</SelectItem>
+            </Select>
           </ModalBody>
           <ModalFooter>
             <Button

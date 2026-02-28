@@ -529,7 +529,7 @@ export const adminBroker = {
   flagMessage: (id: number, reason: string, severity: 'info' | 'warning' | 'concern' | 'urgent') =>
     api.post(`/v2/admin/broker/messages/${id}/flag`, { reason, severity }),
 
-  setMonitoring: (userId: number, data: { under_monitoring: boolean; reason?: string; messaging_disabled?: boolean }) =>
+  setMonitoring: (userId: number, data: { under_monitoring: boolean; reason?: string; messaging_disabled?: boolean; expires_days?: number }) =>
     api.post(`/v2/admin/broker/monitoring/${userId}`, data),
 
   saveRiskTag: (listingId: number, data: {
@@ -788,6 +788,12 @@ export const adminLegalDocs = {
 
   createVersion: (docId: number, data: { version_number: string; version_label?: string; content: string; summary_of_changes?: string; effective_date: string; is_draft?: boolean }) =>
     api.post<{ id: number }>(`/v2/admin/legal-documents/${docId}/versions`, data),
+
+  updateVersion: (docId: number, versionId: number, data: { version_number?: string; version_label?: string; content?: string; summary_of_changes?: string; effective_date?: string }) =>
+    api.put<{ updated: boolean }>(`/v2/admin/legal-documents/${docId}/versions/${versionId}`, data),
+
+  deleteVersion: (docId: number, versionId: number) =>
+    api.delete<{ deleted: boolean }>(`/v2/admin/legal-documents/${docId}/versions/${versionId}`),
 
   publishVersion: (versionId: number) =>
     api.post<{ published: boolean }>(`/v2/admin/legal-documents/versions/${versionId}/publish`, {}),
