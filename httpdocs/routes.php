@@ -797,6 +797,8 @@ $router->add('PUT', '/api/v2/admin/enterprise/config', 'Nexus\Controllers\Api\Ad
 $router->add('GET', '/api/v2/admin/enterprise/config/secrets', 'Nexus\Controllers\Api\AdminEnterpriseApiController@secrets');
 $router->add('GET', '/api/v2/admin/legal-documents', 'Nexus\Controllers\Api\AdminEnterpriseApiController@legalDocs');
 $router->add('POST', '/api/v2/admin/legal-documents', 'Nexus\Controllers\Api\AdminEnterpriseApiController@createLegalDoc');
+// Static paths MUST come before {id} wildcard to avoid "compliance" matching {id}
+$router->add('GET', '/api/v2/admin/legal-documents/compliance', 'Nexus\Controllers\Api\AdminLegalDocController@getComplianceStats');
 $router->add('GET', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@showLegalDoc');
 $router->add('PUT', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@updateLegalDoc');
 $router->add('DELETE', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\Api\AdminEnterpriseApiController@deleteLegalDoc');
@@ -808,7 +810,6 @@ $router->add('POST', '/api/v2/admin/legal-documents/{docId}/versions', 'Nexus\Co
 $router->add('PUT', '/api/v2/admin/legal-documents/{docId}/versions/{versionId}', 'Nexus\Controllers\Api\AdminLegalDocController@updateVersion');
 $router->add('DELETE', '/api/v2/admin/legal-documents/{docId}/versions/{versionId}', 'Nexus\Controllers\Api\AdminLegalDocController@deleteVersion');
 $router->add('POST', '/api/v2/admin/legal-documents/versions/{versionId}/publish', 'Nexus\Controllers\Api\AdminLegalDocController@publishVersion');
-$router->add('GET', '/api/v2/admin/legal-documents/compliance', 'Nexus\Controllers\Api\AdminLegalDocController@getComplianceStats');
 $router->add('GET', '/api/v2/admin/legal-documents/versions/{versionId}/acceptances', 'Nexus\Controllers\Api\AdminLegalDocController@getAcceptances');
 $router->add('GET', '/api/v2/admin/legal-documents/{docId}/acceptances/export', 'Nexus\Controllers\Api\AdminLegalDocController@exportAcceptances');
 $router->add('POST', '/api/v2/admin/legal-documents/{docId}/versions/{versionId}/notify', 'Nexus\Controllers\Api\AdminLegalDocController@notifyUsers');

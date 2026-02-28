@@ -985,9 +985,15 @@ class AdminEnterpriseApiController extends BaseApiController
     /**
      * GET /api/v2/admin/legal-documents/{id}
      */
-    public function showLegalDoc(int $id): void
+    public function showLegalDoc(string|int $id): void
     {
         $this->requireAdmin();
+
+        if (!is_numeric($id)) {
+            $this->respondWithError('INVALID_ID', 'Legal document ID must be numeric', null, 400);
+            return;
+        }
+        $id = (int) $id;
         $tenantId = $this->getTenantId();
 
         try {
