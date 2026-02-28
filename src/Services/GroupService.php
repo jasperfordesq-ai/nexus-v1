@@ -128,8 +128,8 @@ class GroupService
             $params[] = $term;
             $params[] = $term;
         } else {
-            // When not searching, only show top-level groups
-            $sql .= " AND (g.parent_id IS NULL OR g.parent_id = 0)";
+            // When not searching, only show top-level groups + featured sub-groups
+            $sql .= " AND (g.parent_id IS NULL OR g.parent_id = 0 OR g.is_featured = 1)";
         }
 
         // Cursor pagination
