@@ -23,6 +23,8 @@ import {
   ArrowRight,
   Handshake,
   Send,
+  Users,
+  ShieldCheck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -81,6 +83,26 @@ const legalDocumentDefs = [
     color: 'text-emerald-500',
     bg: 'bg-emerald-500/20',
     gradient: 'from-emerald-500/20 to-green-500/20',
+    updatedKey: 'hub.doc_updated_feb_2026',
+  },
+  {
+    titleKey: 'hub.doc_community_guidelines_title',
+    descKey: 'hub.doc_community_guidelines_desc',
+    icon: Users,
+    path: '/community-guidelines',
+    color: 'text-violet-500',
+    bg: 'bg-violet-500/20',
+    gradient: 'from-violet-500/20 to-fuchsia-500/20',
+    updatedKey: 'hub.doc_updated_feb_2026',
+  },
+  {
+    titleKey: 'hub.doc_acceptable_use_title',
+    descKey: 'hub.doc_acceptable_use_desc',
+    icon: ShieldCheck,
+    path: '/acceptable-use',
+    color: 'text-teal-500',
+    bg: 'bg-teal-500/20',
+    gradient: 'from-teal-500/20 to-cyan-500/20',
     updatedKey: 'hub.doc_updated_feb_2026',
   },
 ];

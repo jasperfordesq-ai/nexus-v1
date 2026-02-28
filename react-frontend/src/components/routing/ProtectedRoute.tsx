@@ -23,7 +23,7 @@ interface ProtectedRouteProps {
 const LEGAL_GATE_BYPASS_SEGMENTS = new Set([
   'terms', 'privacy', 'cookies', 'accessibility',
   'community-guidelines', 'acceptable-use',
-  'legal', 'onboarding',
+  'legal', 'onboarding', 'platform',
 ]);
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {

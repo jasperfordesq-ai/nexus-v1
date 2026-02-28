@@ -51,63 +51,24 @@ class AdminLegalDocController extends BaseApiController
         }
 
         try {
-            $version1 = LegalDocumentService::getVersion((int) $v1);
-            $version2 = LegalDocumentService::getVersion((int) $v2);
+            $comparison = LegalDocumentService::compareVersions((int) $v1, (int) $v2);
 
-            if (!$version1 || !$version2) {
+            if (!$comparison) {
                 $this->jsonResponse(['success' => false, 'error' => 'One or both versions not found'], 404);
                 return;
             }
 
-            // Simple diff implementation using plain text
-            // In production, you'd use a proper diff library
-            $diff = $this->generateSimpleDiff($version1['content_plain'], $version2['content_plain']);
-
-            $comparison = [
-                'version1' => $version1,
-                'version2' => $version2,
-                'diff_html' => $diff,
-                'changes_count' => substr_count($diff, '<del>') + substr_count($diff, '<ins>')
-            ];
+            // Verify both versions belong to the document in the URL
+            if ((int) $comparison['version1']['document_id'] !== $docId || (int) $comparison['version2']['document_id'] !== $docId) {
+                $this->jsonResponse(['success' => false, 'error' => 'Versions do not belong to this document'], 400);
+                return;
+            }
 
             $this->jsonResponse(['success' => true, 'data' => $comparison]);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] compareVersions error: " . $e->getMessage());
             $this->jsonResponse(['success' => false, 'error' => 'Failed to compare versions'], 500);
         }
-    }
-
-    /**
-     * Simple diff generator (basic implementation)
-     * In production, use a proper diff library like sebastian/diff or jfcherng/php-diff
-     */
-    private function generateSimpleDiff(string $old, string $new): string
-    {
-        $oldLines = explode("\n", $old);
-        $newLines = explode("\n", $new);
-
-        $html = '<div class="diff-container">';
-        $html .= '<div class="diff-column"><h4>Version 1 (Older)</h4>';
-        foreach ($oldLines as $line) {
-            $html .= '<p>' . htmlspecialchars($line) . '</p>';
-        }
-        $html .= '</div>';
-
-        $html .= '<div class="diff-column"><h4>Version 2 (Newer)</h4>';
-        foreach ($newLines as $line) {
-            $html .= '<p>' . htmlspecialchars($line) . '</p>';
-        }
-        $html .= '</div>';
-        $html .= '</div>';
-
-        $html .= '<style>
-            .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-            .diff-column { border: 1px solid var(--color-border); padding: 1rem; border-radius: 0.5rem; }
-            .diff-column h4 { margin-bottom: 0.5rem; font-weight: bold; }
-            .diff-column p { margin: 0.25rem 0; font-size: 0.875rem; }
-        </style>';
-
-        return $html;
     }
 
     /**
@@ -303,6 +264,91 @@ class AdminLegalDocController extends BaseApiController
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] getUsersPendingCount error: " . $e->getMessage());
             $this->jsonResponse(['success' => false, 'error' => 'Failed to fetch count'], 500);
+        }
+    }
+
+    /**
+     * Update a draft version
+     * PUT /api/v2/admin/legal-documents/{docId}/versions/{versionId}
+     */
+    public function updateVersion(int $docId, int $versionId): void
+    {
+        $this->requireAdmin();
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        try {
+            $version = LegalDocumentService::getVersion($versionId);
+
+            if (!$version) {
+                $this->jsonResponse(['success' => false, 'error' => 'Version not found'], 404);
+                return;
+            }
+
+            if ((int) $version['document_id'] !== $docId) {
+                $this->jsonResponse(['success' => false, 'error' => 'Version does not belong to this document'], 400);
+                return;
+            }
+
+            if (!$version['is_draft']) {
+                $this->jsonResponse(['success' => false, 'error' => 'Only draft versions can be edited'], 400);
+                return;
+            }
+
+            $success = LegalDocumentService::updateVersion($versionId, [
+                'version_number' => $input['version_number'] ?? $version['version_number'],
+                'version_label' => $input['version_label'] ?? $version['version_label'],
+                'content' => $input['content'] ?? $version['content'],
+                'summary_of_changes' => $input['summary_of_changes'] ?? $version['summary_of_changes'],
+                'effective_date' => $input['effective_date'] ?? $version['effective_date'],
+            ]);
+
+            if ($success) {
+                $this->jsonResponse(['success' => true, 'data' => ['updated' => true]]);
+            } else {
+                $this->jsonResponse(['success' => false, 'error' => 'Failed to update version'], 500);
+            }
+        } catch (\Exception $e) {
+            error_log("[AdminLegalDocController] updateVersion error: " . $e->getMessage());
+            $this->jsonResponse(['success' => false, 'error' => 'Failed to update version'], 500);
+        }
+    }
+
+    /**
+     * Delete a draft version
+     * DELETE /api/v2/admin/legal-documents/{docId}/versions/{versionId}
+     */
+    public function deleteVersion(int $docId, int $versionId): void
+    {
+        $this->requireAdmin();
+
+        try {
+            $version = LegalDocumentService::getVersion($versionId);
+
+            if (!$version) {
+                $this->jsonResponse(['success' => false, 'error' => 'Version not found'], 404);
+                return;
+            }
+
+            if ((int) $version['document_id'] !== $docId) {
+                $this->jsonResponse(['success' => false, 'error' => 'Version does not belong to this document'], 400);
+                return;
+            }
+
+            if (!$version['is_draft']) {
+                $this->jsonResponse(['success' => false, 'error' => 'Only draft versions can be deleted'], 400);
+                return;
+            }
+
+            $success = LegalDocumentService::deleteVersion($versionId);
+
+            if ($success) {
+                $this->jsonResponse(['success' => true, 'data' => ['deleted' => true]]);
+            } else {
+                $this->jsonResponse(['success' => false, 'error' => 'Failed to delete version'], 500);
+            }
+        } catch (\Exception $e) {
+            error_log("[AdminLegalDocController] deleteVersion error: " . $e->getMessage());
+            $this->jsonResponse(['success' => false, 'error' => 'Failed to delete version'], 500);
         }
     }
 }

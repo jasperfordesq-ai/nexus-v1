@@ -112,9 +112,13 @@ $router->add('GET', '/api/cookie-consent/inventory', 'Nexus\Controllers\Api\Cook
 $router->add('GET', '/api/cookie-consent/check/{category}', 'Nexus\Controllers\Api\CookieConsentController@check');
 
 // Legal Documents API (Public Content + User Acceptance Tracking)
-$router->add('GET', '/api/v2/legal/{type}', 'Nexus\Controllers\LegalDocumentController@apiGetDocument');
-$router->add('GET', '/api/v2/legal/{type}/versions', 'Nexus\Controllers\LegalDocumentController@apiGetVersions');
+// IMPORTANT: Literal routes MUST come before parameterized {type} routes — the router
+// matches first-registered, so /versions/compare and /version/{id} would be swallowed
+// by the {type} wildcard if registered after it.
+$router->add('GET', '/api/v2/legal/versions/compare', 'Nexus\Controllers\LegalDocumentController@apiCompareVersions');
 $router->add('GET', '/api/v2/legal/version/{versionId}', 'Nexus\Controllers\LegalDocumentController@apiGetVersion');
+$router->add('GET', '/api/v2/legal/{type}/versions', 'Nexus\Controllers\LegalDocumentController@apiGetVersions');
+$router->add('GET', '/api/v2/legal/{type}', 'Nexus\Controllers\LegalDocumentController@apiGetDocument');
 // V2 user acceptance endpoints (Bearer token + session auth via ApiAuth trait)
 $router->add('GET', '/api/v2/legal/acceptance/status', 'Nexus\Controllers\Api\LegalAcceptanceApiController@getStatus');
 $router->add('POST', '/api/v2/legal/acceptance/accept-all', 'Nexus\Controllers\Api\LegalAcceptanceApiController@acceptAll');
@@ -801,6 +805,8 @@ $router->add('DELETE', '/api/v2/admin/legal-documents/{id}', 'Nexus\Controllers\
 $router->add('GET', '/api/v2/admin/legal-documents/{docId}/versions', 'Nexus\Controllers\Api\AdminLegalDocController@getVersions');
 $router->add('GET', '/api/v2/admin/legal-documents/{docId}/versions/compare', 'Nexus\Controllers\Api\AdminLegalDocController@compareVersions');
 $router->add('POST', '/api/v2/admin/legal-documents/{docId}/versions', 'Nexus\Controllers\Api\AdminLegalDocController@createVersion');
+$router->add('PUT', '/api/v2/admin/legal-documents/{docId}/versions/{versionId}', 'Nexus\Controllers\Api\AdminLegalDocController@updateVersion');
+$router->add('DELETE', '/api/v2/admin/legal-documents/{docId}/versions/{versionId}', 'Nexus\Controllers\Api\AdminLegalDocController@deleteVersion');
 $router->add('POST', '/api/v2/admin/legal-documents/versions/{versionId}/publish', 'Nexus\Controllers\Api\AdminLegalDocController@publishVersion');
 $router->add('GET', '/api/v2/admin/legal-documents/compliance', 'Nexus\Controllers\Api\AdminLegalDocController@getComplianceStats');
 $router->add('GET', '/api/v2/admin/legal-documents/versions/{versionId}/acceptances', 'Nexus\Controllers\Api\AdminLegalDocController@getAcceptances');

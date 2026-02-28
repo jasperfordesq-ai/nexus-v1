@@ -128,7 +128,7 @@ export default function LegalDocVersionComparison({
             <div>
               <h3 className="font-semibold mb-3">Content Comparison</h3>
               <div
-                className="prose dark:prose-invert max-w-none p-4 border rounded-lg bg-[var(--color-surface)]"
+                className="version-diff-content prose dark:prose-invert max-w-none p-4 border rounded-lg bg-[var(--color-surface)]"
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comparison.diff_html) }}
               />
             </div>

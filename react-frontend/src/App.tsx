@@ -140,10 +140,17 @@ const TermsPage = lazyWithRetry(() => import('@/pages/public/TermsPage'));
 const PrivacyPage = lazyWithRetry(() => import('@/pages/public/PrivacyPage'));
 const AccessibilityPage = lazyWithRetry(() => import('@/pages/public/AccessibilityPage'));
 const CookiesPage = lazyWithRetry(() => import('@/pages/public/CookiesPage'));
+const CommunityGuidelinesPage = lazyWithRetry(() => import('@/pages/public/CommunityGuidelinesPage'));
+const AcceptableUsePage = lazyWithRetry(() => import('@/pages/public/AcceptableUsePage'));
 const LegalHubPage = lazyWithRetry(() => import('@/pages/public/LegalHubPage'));
 const LegalVersionHistoryPage = lazyWithRetry(() => import('@/pages/public/LegalVersionHistoryPage'));
 const FaqPage = lazyWithRetry(() => import('@/pages/public/FaqPage'));
 const HelpCenterPage = lazyWithRetry(() => import('@/pages/help/HelpCenterPage'));
+
+// Platform Legal Pages (provider-level, distinct from tenant legal docs)
+const PlatformTermsPage = lazyWithRetry(() => import('@/pages/platform/PlatformTermsPage'));
+const PlatformPrivacyPage = lazyWithRetry(() => import('@/pages/platform/PlatformPrivacyPage'));
+const PlatformDisclaimerPage = lazyWithRetry(() => import('@/pages/platform/PlatformDisclaimerPage'));
 const CustomPage = lazyWithRetry(() => import('@/pages/public/CustomPage'));
 
 // About Sub-Pages
@@ -200,7 +207,14 @@ function AppRoutes() {
         <Route path="accessibility/versions" element={<LegalVersionHistoryPage />} />
         <Route path="cookies" element={<CookiesPage />} />
         <Route path="cookies/versions" element={<LegalVersionHistoryPage />} />
+        <Route path="community-guidelines" element={<CommunityGuidelinesPage />} />
+        <Route path="community-guidelines/versions" element={<LegalVersionHistoryPage />} />
+        <Route path="acceptable-use" element={<AcceptableUsePage />} />
+        <Route path="acceptable-use/versions" element={<LegalVersionHistoryPage />} />
         <Route path="legal" element={<LegalHubPage />} />
+        <Route path="platform/terms" element={<PlatformTermsPage />} />
+        <Route path="platform/privacy" element={<PlatformPrivacyPage />} />
+        <Route path="platform/disclaimer" element={<PlatformDisclaimerPage />} />
         <Route path="timebanking-guide" element={<TimebankingGuidePage />} />
 
         {/* Newsletter unsubscribe — public, no auth, token-based */}
