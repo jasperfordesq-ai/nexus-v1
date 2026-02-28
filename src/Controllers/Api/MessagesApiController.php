@@ -7,6 +7,7 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Services\MessageService;
+use Nexus\Services\BrokerMessageVisibilityService;
 use Nexus\Core\AudioUploader;
 
 /**
@@ -583,5 +584,21 @@ class MessagesApiController extends BaseApiController
         }
 
         $this->respondWithData(['success' => true, 'message' => 'Conversation restored', 'restored_count' => $count]);
+    }
+
+    /**
+     * GET /api/v2/messages/restriction-status
+     *
+     * Returns the current user's messaging restriction status.
+     * Used by the conversation UI to show restriction warnings.
+     */
+    public function restrictionStatus(): void
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('messages_restriction_status', 30, 60);
+
+        $status = BrokerMessageVisibilityService::getUserRestrictionStatus($userId);
+
+        $this->respondWithData($status);
     }
 }

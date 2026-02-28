@@ -25,6 +25,7 @@ use Nexus\Services\AbuseDetectionService;
 use Nexus\Services\GroupReportingService;
 use Nexus\Services\BalanceAlertService;
 use Nexus\Services\SmartMatchingEngine;
+use Nexus\Services\BrokerMessageVisibilityService;
 
 class CronController
 {
@@ -727,6 +728,10 @@ class CronController
                 $taskNum++;
                 echo "\n[{$taskNum}] Cleaning sessions & tokens...\n";
                 $this->cleanSessionsAndTokensInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Expiring monitoring restrictions...\n";
+                $this->expireMonitoringRestrictionsInternal();
             }
 
             // ── HOURLY (at :30) ──
@@ -1394,6 +1399,26 @@ class CronController
             echo "   Cleaned expired reset tokens.\n";
         } catch (\Exception $e) {
             echo "   Reset tokens: skipped.\n";
+        }
+    }
+
+    /**
+     * Expire monitoring restrictions that have passed their expiry date (hourly)
+     */
+    private function expireMonitoringRestrictionsInternal(): void
+    {
+        try {
+            $totalExpired = 0;
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalExpired) {
+                $expired = BrokerMessageVisibilityService::expireMonitoringBatch();
+                if ($expired > 0) {
+                    echo "   [{$slug}] Expired {$expired} monitoring restriction(s).\n";
+                    $totalExpired += $expired;
+                }
+            });
+            echo "   Total expired: {$totalExpired}\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
         }
     }
 

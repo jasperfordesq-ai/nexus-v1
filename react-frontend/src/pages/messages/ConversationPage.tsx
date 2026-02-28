@@ -124,6 +124,13 @@ export function ConversationPage() {
   // Safeguarding notice state (reappears on reload)
   const [isSafeguardingDismissed, setIsSafeguardingDismissed] = useState(false);
 
+  // Broker messaging restriction state
+  const [messagingRestriction, setMessagingRestriction] = useState<{
+    messaging_disabled: boolean;
+    under_monitoring: boolean;
+    restriction_reason: string | null;
+  } | null>(null);
+
   // Track document visibility for polling optimization
   useEffect(() => {
     function handleVisibilityChange() {
@@ -271,6 +278,19 @@ export function ConversationPage() {
   useEffect(() => {
     loadConversation();
   }, [loadConversation]);
+
+  // Fetch messaging restriction status (broker monitoring)
+  useEffect(() => {
+    let cancelled = false;
+    api.get<{ messaging_disabled: boolean; under_monitoring: boolean; restriction_reason: string | null }>(
+      '/v2/messages/restriction-status'
+    ).then((res) => {
+      if (!cancelled && res.success && res.data) {
+        setMessagingRestriction(res.data);
+      }
+    }).catch(() => { /* non-critical */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Set up polling (fallback when Pusher not available) - pause when tab hidden
   useEffect(() => {
@@ -531,6 +551,7 @@ export function ConversationPage() {
    * Start voice recording
    */
   async function startRecording() {
+    if (messagingRestriction?.messaging_disabled) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
@@ -601,6 +622,10 @@ export function ConversationPage() {
    */
   async function sendVoiceMessage() {
     if (!audioBlob || !targetId || isSending) return;
+    if (messagingRestriction?.messaging_disabled) {
+      toast.error(t('error'), 'Your messaging has been restricted');
+      return;
+    }
 
     try {
       setIsSending(true);
@@ -782,6 +807,10 @@ export function ConversationPage() {
   async function sendMessageWithAttachments(e: React.FormEvent) {
     e.preventDefault();
     if ((!newMessage.trim() && attachments.length === 0) || !targetId || isSending) return;
+    if (messagingRestriction?.messaging_disabled) {
+      toast.error(t('error'), 'Your messaging has been restricted');
+      return;
+    }
 
     try {
       setIsSending(true);
@@ -1249,7 +1278,7 @@ export function ConversationPage() {
 
         {/* Input */}
         <div className="p-4 border-t border-theme-default">
-          {/* Messaging disabled notice */}
+          {/* Messaging disabled notice (feature flag) */}
           {!isDirectMessagingEnabled && (
             <div className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center">
               <span className="text-amber-600 dark:text-amber-400 text-sm flex-1">
@@ -1265,8 +1294,23 @@ export function ConversationPage() {
             </div>
           )}
 
+          {/* Messaging restricted by broker/admin */}
+          {isDirectMessagingEnabled && messagingRestriction?.messaging_disabled && (
+            <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg" role="alert">
+              <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="flex-1">
+                <p className="text-red-700 dark:text-red-300 text-sm font-medium">
+                  Your messaging has been temporarily restricted.
+                </p>
+                <p className="text-red-600/80 dark:text-red-400/80 text-xs mt-1">
+                  If you believe this is an error, please contact your timebank coordinator.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Voice recording preview */}
-          {isDirectMessagingEnabled && audioBlob && !isRecording && (
+          {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && audioBlob && !isRecording && (
             <div className="flex items-center gap-3 mb-3 p-3 bg-theme-elevated rounded-lg">
               <VoiceMessagePlayer audioBlob={audioBlob} />
               <div className="flex gap-2 ml-auto">
@@ -1291,7 +1335,7 @@ export function ConversationPage() {
           )}
 
           {/* Recording indicator */}
-          {isDirectMessagingEnabled && isRecording && (
+          {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && isRecording && (
             <div className="flex items-center gap-3 mb-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
               <span className="text-theme-primary font-medium">{formatRecordingTime(recordingTime)}</span>
@@ -1318,7 +1362,7 @@ export function ConversationPage() {
           )}
 
           {/* Attachment previews */}
-          {isDirectMessagingEnabled && attachmentPreviews.length > 0 && (
+          {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && attachmentPreviews.length > 0 && (
             <div className="flex gap-2 mb-3 flex-wrap">
               {attachmentPreviews.map((item, index) => (
                 <div key={index} className="relative group">
@@ -1351,7 +1395,7 @@ export function ConversationPage() {
           )}
 
           {/* Text input form */}
-          {isDirectMessagingEnabled && !isRecording && !audioBlob && (
+          {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && !isRecording && !audioBlob && (
             <form onSubmit={sendMessageWithAttachments} className="flex gap-3">
               {/* Hidden file input */}
               <input

@@ -1064,20 +1064,20 @@ class AdminBrokerApiController extends BaseApiController
 
                 if ($existing) {
                     Database::query(
-                        "UPDATE user_messaging_restrictions SET under_monitoring = 1, monitoring_reason = ?, messaging_disabled = ?, monitoring_started_at = NOW(), restricted_by = ? WHERE user_id = ? AND tenant_id = ?",
-                        [$reason, $messagingDisabled ? 1 : 0, $adminId, $userId, $userTenantId]
+                        "UPDATE user_messaging_restrictions SET under_monitoring = 1, monitoring_reason = ?, restriction_reason = ?, messaging_disabled = ?, monitoring_started_at = NOW(), restricted_by = ? WHERE user_id = ? AND tenant_id = ?",
+                        [$reason, $reason, $messagingDisabled ? 1 : 0, $adminId, $userId, $userTenantId]
                     );
                 } else {
                     Database::query(
-                        "INSERT INTO user_messaging_restrictions (user_id, tenant_id, under_monitoring, monitoring_reason, messaging_disabled, monitoring_started_at, restricted_by) VALUES (?, ?, 1, ?, ?, NOW(), ?)",
-                        [$userId, $userTenantId, $reason, $messagingDisabled ? 1 : 0, $adminId]
+                        "INSERT INTO user_messaging_restrictions (user_id, tenant_id, under_monitoring, monitoring_reason, restriction_reason, messaging_disabled, monitoring_started_at, restricted_by) VALUES (?, ?, 1, ?, ?, ?, NOW(), ?)",
+                        [$userId, $userTenantId, $reason, $reason, $messagingDisabled ? 1 : 0, $adminId]
                     );
                 }
                 $this->respondWithData(['user_id' => $userId, 'under_monitoring' => true]);
             } else {
                 if ($existing) {
                     Database::query(
-                        "UPDATE user_messaging_restrictions SET under_monitoring = 0, monitoring_reason = NULL, monitoring_started_at = NULL WHERE user_id = ? AND tenant_id = ?",
+                        "UPDATE user_messaging_restrictions SET under_monitoring = 0, monitoring_reason = NULL, restriction_reason = NULL, monitoring_started_at = NULL WHERE user_id = ? AND tenant_id = ?",
                         [$userId, $userTenantId]
                     );
                 }
@@ -1493,5 +1493,18 @@ class AdminBrokerApiController extends BaseApiController
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to load exchange', null, 500);
         }
+    }
+
+    /**
+     * GET /api/v2/admin/broker/messages/unreviewed-count
+     * Lightweight endpoint for admin sidebar badge — returns unreviewed broker message count.
+     */
+    public function unreviewedCount(): void
+    {
+        $this->requireBrokerAdmin();
+
+        $count = \Nexus\Services\BrokerMessageVisibilityService::countUnreviewed();
+
+        $this->respondWithData(['count' => $count]);
     }
 }

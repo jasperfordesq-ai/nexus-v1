@@ -8,6 +8,7 @@ namespace Nexus\Services;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Models\Notification;
 
 /**
  * BrokerMessageVisibilityService
@@ -138,6 +139,31 @@ class BrokerMessageVisibilityService
         );
 
         $copyId = Database::lastInsertId();
+
+        // Notify all tenant admins about the new broker message copy
+        try {
+            $senderStmt = Database::query(
+                "SELECT CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as name
+                 FROM users WHERE id = ? AND tenant_id = ?",
+                [$message['sender_id'], $tenantId]
+            );
+            $senderRow = $senderStmt->fetch();
+            $senderDisplayName = trim($senderRow['name'] ?? '') ?: 'A user';
+
+            $notifMessage = "New message for review from {$senderDisplayName}";
+            $notifLink = '/admin/broker-controls/messages';
+
+            $adminIds = self::getTenantBrokerAdminIds();
+            foreach ($adminIds as $adminId) {
+                // Don't notify the sender if they happen to be an admin
+                if ($adminId === (int) $message['sender_id']) {
+                    continue;
+                }
+                Notification::create($adminId, $notifMessage, $notifLink, 'broker_review', true);
+            }
+        } catch (\Throwable $e) {
+            error_log("[BrokerMessageVisibilityService] Admin notification error: " . $e->getMessage());
+        }
 
         // Record first contact if applicable
         if ($reason === self::REASON_FIRST_CONTACT) {
@@ -370,13 +396,46 @@ class BrokerMessageVisibilityService
         $tenantId = TenantContext::getId();
 
         $stmt = Database::query(
-            "SELECT under_monitoring FROM user_messaging_restrictions
+            "SELECT under_monitoring, monitoring_expires_at FROM user_messaging_restrictions
              WHERE user_id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
         $restriction = $stmt->fetch();
 
-        return ($restriction['under_monitoring'] ?? 0) == 1;
+        if (($restriction['under_monitoring'] ?? 0) != 1) {
+            return false;
+        }
+
+        // Check expiry — if set and past, auto-clear monitoring
+        $expiresAt = $restriction['monitoring_expires_at'] ?? null;
+        if ($expiresAt && strtotime($expiresAt) <= time()) {
+            self::clearExpiredMonitoring($userId, $tenantId);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Clear monitoring for a user whose monitoring_expires_at has passed.
+     */
+    private static function clearExpiredMonitoring(int $userId, int $tenantId): void
+    {
+        try {
+            Database::query(
+                "UPDATE user_messaging_restrictions
+                 SET under_monitoring = 0, monitoring_reason = CONCAT(COALESCE(monitoring_reason, ''), ' [auto-expired]')
+                 WHERE user_id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
+            );
+
+            AuditLogService::log('user_monitoring_expired', null, null, [
+                'user_id' => $userId,
+                'reason' => 'Monitoring period expired automatically',
+            ]);
+        } catch (\Throwable $e) {
+            error_log("[BrokerMessageVisibilityService] Failed to clear expired monitoring: " . $e->getMessage());
+        }
     }
 
     /**
@@ -428,7 +487,7 @@ class BrokerMessageVisibilityService
         if ($existing) {
             $result = Database::query(
                 "UPDATE user_messaging_restrictions
-                 SET messaging_disabled = ?, under_monitoring = ?, restriction_reason = ?, set_by = ?, updated_at = NOW()
+                 SET messaging_disabled = ?, under_monitoring = ?, restriction_reason = ?, restricted_by = ?, updated_at = NOW()
                  WHERE user_id = ? AND tenant_id = ?",
                 [
                     $messagingDisabled ? 1 : 0,
@@ -442,7 +501,7 @@ class BrokerMessageVisibilityService
         } else {
             $result = Database::query(
                 "INSERT INTO user_messaging_restrictions
-                 (tenant_id, user_id, messaging_disabled, under_monitoring, restriction_reason, set_by, created_at)
+                 (tenant_id, user_id, messaging_disabled, under_monitoring, restriction_reason, restricted_by, created_at)
                  VALUES (?, ?, ?, ?, ?, ?, NOW())",
                 [
                     $tenantId,
@@ -596,5 +655,114 @@ class BrokerMessageVisibilityService
 
         // Return affected rows count
         return $result ? $result->rowCount() : 0;
+    }
+
+    /**
+     * Get user IDs of all broker admins for the current tenant
+     *
+     * @return int[] Admin user IDs
+     */
+    public static function getTenantBrokerAdminIds(): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $stmt = Database::query(
+            "SELECT id FROM users
+             WHERE tenant_id = ?
+             AND role IN ('admin', 'tenant_admin', 'super_admin')
+             AND status = 'active'",
+            [$tenantId]
+        );
+
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return array_map(fn($row) => (int) $row['id'], $rows ?: []);
+    }
+
+    /**
+     * Batch-expire all monitoring records that have passed their monitoring_expires_at.
+     * Designed to be called from cron. Notifies tenant admins about each expiry.
+     *
+     * @return int Number of records expired
+     */
+    public static function expireMonitoringBatch(): int
+    {
+        $stmt = Database::query(
+            "SELECT umr.user_id, umr.tenant_id,
+                    CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name
+             FROM user_messaging_restrictions umr
+             JOIN users u ON u.id = umr.user_id AND u.tenant_id = umr.tenant_id
+             WHERE umr.under_monitoring = 1
+             AND umr.monitoring_expires_at IS NOT NULL
+             AND umr.monitoring_expires_at <= NOW()"
+        );
+        $expired = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+
+        if (empty($expired)) {
+            return 0;
+        }
+
+        // Batch update all expired records
+        Database::query(
+            "UPDATE user_messaging_restrictions
+             SET under_monitoring = 0, monitoring_reason = CONCAT(COALESCE(monitoring_reason, ''), ' [auto-expired]')
+             WHERE under_monitoring = 1
+             AND monitoring_expires_at IS NOT NULL
+             AND monitoring_expires_at <= NOW()"
+        );
+
+        // Notify admins per tenant
+        $byTenant = [];
+        foreach ($expired as $row) {
+            $byTenant[(int) $row['tenant_id']][] = $row;
+        }
+
+        foreach ($byTenant as $tenantId => $users) {
+            try {
+                TenantContext::setId($tenantId);
+                $adminIds = self::getTenantBrokerAdminIds();
+                foreach ($users as $row) {
+                    $userName = trim($row['user_name']) ?: 'User #' . $row['user_id'];
+                    foreach ($adminIds as $adminId) {
+                        Notification::create(
+                            $adminId,
+                            "Monitoring expired for {$userName}",
+                            '/admin/broker-controls/monitoring',
+                            'broker_review',
+                            false // No push for batch expiry — in-app only
+                        );
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log("[BrokerMessageVisibilityService] Expiry notification error (tenant {$tenantId}): " . $e->getMessage());
+            }
+        }
+
+        return count($expired);
+    }
+
+    /**
+     * Get the messaging restriction status for a specific user.
+     * Used by user-facing API to show restriction warnings.
+     *
+     * @param int $userId User ID
+     * @return array{messaging_disabled: bool, under_monitoring: bool, restriction_reason: string|null}
+     */
+    public static function getUserRestrictionStatus(int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $stmt = Database::query(
+            "SELECT messaging_disabled, under_monitoring, monitoring_reason, restriction_reason
+             FROM user_messaging_restrictions
+             WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+        $row = $stmt->fetch();
+
+        return [
+            'messaging_disabled' => (bool) ($row['messaging_disabled'] ?? 0),
+            'under_monitoring' => (bool) ($row['under_monitoring'] ?? 0),
+            'restriction_reason' => $row['monitoring_reason'] ?? $row['restriction_reason'] ?? null,
+        ];
     }
 }
