@@ -16,6 +16,7 @@ use Nexus\Services\FederationUserService;
 use Nexus\Services\FederationAuditService;
 use Nexus\Services\FederationJwtService;
 use Nexus\Services\FederationExternalPartnerService;
+use Nexus\Services\BrokerMessageVisibilityService;
 
 /**
  * FederationApiController
@@ -709,6 +710,16 @@ class FederationApiController extends BaseApiController
 
         if (!$recipient['messaging_enabled_federated']) {
             FederationApiMiddleware::sendError(403, 'Recipient does not accept federated messages', 'MESSAGES_DISABLED');
+            return;
+        }
+
+        // Check if sender or receiver has messaging disabled (broker monitoring)
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $input['sender_id'])) {
+            FederationApiMiddleware::sendError(403, 'Sender messaging privileges have been restricted', 'SENDER_RESTRICTED');
+            return;
+        }
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $input['recipient_id'])) {
+            FederationApiMiddleware::sendError(403, 'Recipient is not currently accepting messages', 'RECIPIENT_UNAVAILABLE');
             return;
         }
 

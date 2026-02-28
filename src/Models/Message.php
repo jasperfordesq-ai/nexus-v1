@@ -10,6 +10,7 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\Mailer;
 use Nexus\Services\RealtimeService;
+use Nexus\Services\BrokerMessageVisibilityService;
 
 class Message
 {
@@ -110,9 +111,19 @@ HTML;
 
     /**
      * Create a new message
+     *
+     * @throws \RuntimeException if sender or receiver has messaging disabled
      */
     public static function create($tenantId, $senderId, $receiverId, $subject, $body)
     {
+        // Check messaging restrictions (broker monitoring)
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $senderId)) {
+            throw new \RuntimeException('Your messaging privileges have been restricted.');
+        }
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $receiverId)) {
+            throw new \RuntimeException('This user is not currently accepting messages.');
+        }
+
         $db = Database::getConnection();
         $stmt = $db->prepare("
             INSERT INTO messages (tenant_id, sender_id, receiver_id, subject, body, created_at)
@@ -152,9 +163,19 @@ HTML;
 
     /**
      * Create a voice message
+     *
+     * @throws \RuntimeException if sender or receiver has messaging disabled
      */
     public static function createVoice($tenantId, $senderId, $receiverId, $audioUrl, $duration)
     {
+        // Check messaging restrictions (broker monitoring)
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $senderId)) {
+            throw new \RuntimeException('Your messaging privileges have been restricted.');
+        }
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $receiverId)) {
+            throw new \RuntimeException('This user is not currently accepting messages.');
+        }
+
         $db = Database::getConnection();
         $stmt = $db->prepare("
             INSERT INTO messages (tenant_id, sender_id, receiver_id, subject, body, audio_url, audio_duration, created_at)
