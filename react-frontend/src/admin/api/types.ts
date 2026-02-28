@@ -54,9 +54,9 @@ export interface FeaturedGroup {
   group_id: number;
   name: string;
   member_count: number;
-  engagement_score: number;
-  geographic_diversity: number;
-  ranking_score: number;
+  engagement_score?: number;
+  geographic_diversity?: number;
+  ranking_score?: number;
   is_featured: boolean;
   manual_rank?: number;
 }

@@ -21,6 +21,7 @@ import {
   MessageSquare,
   RefreshCw,
   AlertTriangle,
+  Star,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -275,13 +276,49 @@ export function GroupsPage() {
               animate="visible"
               className="space-y-6"
             >
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {groups.map((group) => (
-                  <motion.div key={group.id} variants={itemVariants}>
-                    <GroupCard group={group} />
-                  </motion.div>
-                ))}
-              </div>
+              {/* Featured Groups Section */}
+              {(() => {
+                const featuredGroups = groups.filter((g) => g.is_featured);
+                const regularGroups = groups.filter((g) => !g.is_featured);
+
+                return (
+                  <>
+                    {featuredGroups.length > 0 && (
+                      <div className="space-y-3">
+                        <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
+                          <Star className="w-5 h-5 text-amber-500" aria-hidden="true" />
+                          {t('featured_groups')}
+                        </h2>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {featuredGroups.map((group) => (
+                            <motion.div key={group.id} variants={itemVariants}>
+                              <GroupCard group={group} featured />
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* All Groups Section */}
+                    {regularGroups.length > 0 && (
+                      <div className="space-y-3">
+                        {featuredGroups.length > 0 && (
+                          <h2 className="text-lg font-semibold text-theme-primary">
+                            {t('all_groups')}
+                          </h2>
+                        )}
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {regularGroups.map((group) => (
+                            <motion.div key={group.id} variants={itemVariants}>
+                              <GroupCard group={group} />
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
 
               {/* Load More Button */}
               {hasMore && (
@@ -306,9 +343,10 @@ export function GroupsPage() {
 
 interface GroupCardProps {
   group: Group;
+  featured?: boolean;
 }
 
-const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
+const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
   const { t } = useTranslation('groups');
   const { tenantPath } = useTenant();
   const memberCount = group.member_count ?? group.members_count ?? 0;
@@ -316,15 +354,23 @@ const GroupCard = memo(function GroupCard({ group }: GroupCardProps) {
   return (
     <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${memberCount} members`}>
       <article>
-        <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full flex flex-col">
+        <GlassCard className={`p-5 hover:scale-[1.02] transition-transform h-full flex flex-col${featured ? ' ring-1 ring-amber-500/30' : ''}`}>
+          {featured && (
+            <div className="flex items-center gap-1.5 mb-2">
+              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" aria-hidden="true" />
+              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                {t('featured_badge')}
+              </span>
+            </div>
+          )}
           <div className="flex items-start justify-between gap-3 mb-3">
             <h3 className="font-semibold text-theme-primary text-lg">{group.name}</h3>
             {group.visibility === 'private' ? (
-              <span className="flex-shrink-0 p-1.5 rounded-full bg-amber-500/20" title={t('private_title')}>
+              <span className="shrink-0 p-1.5 rounded-full bg-amber-500/20" title={t('private_title')}>
                 <Lock className="w-4 h-4 text-amber-400" aria-hidden="true" />
               </span>
             ) : (
-              <span className="flex-shrink-0 p-1.5 rounded-full bg-emerald-500/20" title={t('public_title')}>
+              <span className="shrink-0 p-1.5 rounded-full bg-emerald-500/20" title={t('public_title')}>
                 <Globe className="w-4 h-4 text-emerald-400" aria-hidden="true" />
               </span>
             )}

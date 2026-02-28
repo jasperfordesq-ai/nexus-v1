@@ -254,14 +254,16 @@ class SmartGroupRankingService
         }
 
         if ($type === 'local_hubs') {
-            // Simple query without group_posts table (which may not exist)
             $sql = "
                 SELECT
-                    g.id,
+                    g.id as group_id,
                     g.name,
                     g.is_featured,
                     COUNT(DISTINCT gm.user_id) as member_count,
-                    parent.name as parent_name
+                    parent.name as parent_name,
+                    (COUNT(DISTINCT gm.user_id) * 3.0) as engagement_score,
+                    0 as geographic_diversity,
+                    (COUNT(DISTINCT gm.user_id) * 3.0) as ranking_score
                 FROM `groups` g
                 LEFT JOIN group_members gm ON gm.group_id = g.id AND gm.status = 'active'
                 LEFT JOIN `groups` parent ON parent.id = g.parent_id
@@ -274,15 +276,16 @@ class SmartGroupRankingService
 
             return Database::query($sql, [$tenantId, $hubType['id']])->fetchAll();
         } else {
-            // Community groups - simplified without group_posts table
             $sql = "
                 SELECT
-                    g.id,
+                    g.id as group_id,
                     g.name,
                     g.is_featured,
                     gt.name as type_name,
                     COUNT(DISTINCT gm.user_id) as member_count,
-                    (COUNT(DISTINCT gm.user_id) * 3.0) as engagement_score
+                    (COUNT(DISTINCT gm.user_id) * 3.0) as engagement_score,
+                    0 as geographic_diversity,
+                    (COUNT(DISTINCT gm.user_id) * 3.0) as ranking_score
                 FROM `groups` g
                 LEFT JOIN group_members gm ON gm.group_id = g.id AND gm.status = 'active'
                 LEFT JOIN group_types gt ON gt.id = g.type_id
