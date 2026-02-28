@@ -258,6 +258,17 @@ class ListingService
         )->fetch(\PDO::FETCH_ASSOC);
         $listing['comments_count'] = (int)($commentCount['cnt'] ?? 0);
 
+        // Add is_liked flag (for authenticated users)
+        if ($currentUserId) {
+            $isLiked = Database::query(
+                "SELECT COUNT(*) as cnt FROM likes WHERE target_type = 'listing' AND target_id = ? AND user_id = ?",
+                [$id, $currentUserId]
+            )->fetch(\PDO::FETCH_ASSOC);
+            $listing['is_liked'] = (int)($isLiked['cnt'] ?? 0) > 0;
+        } else {
+            $listing['is_liked'] = false;
+        }
+
         return $listing;
     }
 

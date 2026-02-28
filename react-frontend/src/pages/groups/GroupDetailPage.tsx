@@ -8,7 +8,7 @@
  * Full discussions UI, admin features, events tab, member management
  */
 
-import { useState, useEffect, useCallback, Fragment } from 'react';
+import { useState, useEffect, useCallback, useRef, Fragment } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -30,6 +30,9 @@ import {
   DropdownMenu,
   DropdownItem,
   Spinner,
+  Skeleton,
+  Divider,
+  useDisclosure,
 } from '@heroui/react';
 import {
   Users,
@@ -61,9 +64,13 @@ import {
   ChevronUp,
   Upload,
   Image,
+  Newspaper,
+  Flag,
+  TrendingUp,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
+import { ComposeHub } from '@/components/compose';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { useTranslation } from 'react-i18next';
@@ -72,6 +79,9 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { FeedCard } from '@/components/feed/FeedCard';
+import type { FeedItem } from '@/components/feed/types';
+import { getAuthor } from '@/components/feed/types';
 import type { Group, User, FeedPost, Event } from '@/types/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -166,10 +176,27 @@ export function GroupDetailPage() {
 
   // Core state
   const [group, setGroup] = useState<GroupDetails | null>(null);
-  const [activeTab, setActiveTab] = useState('discussion');
+  const [activeTab, setActiveTab] = useState('feed');
   const [isLoading, setIsLoading] = useState(true);
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Feed state
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [feedLoading, setFeedLoading] = useState(false);
+  const [feedLoaded, setFeedLoaded] = useState(false);
+  const [feedHasMore, setFeedHasMore] = useState(false);
+  const [feedLoadingMore, setFeedLoadingMore] = useState(false);
+  const feedCursorRef = useRef<string | undefined>();
+
+  // Compose Hub for group posts
+  const { isOpen: isComposeOpen, onOpen: onComposeOpen, onClose: onComposeClose } = useDisclosure();
+
+  // Report modal
+  const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
+  const [reportPostId, setReportPostId] = useState<number | null>(null);
+  const [reportReason, setReportReason] = useState('');
+  const [isReporting, setIsReporting] = useState(false);
 
   // Members state
   const [members, setMembers] = useState<GroupMember[]>([]);
@@ -249,6 +276,158 @@ export function GroupDetailPage() {
   useEffect(() => {
     loadGroup();
   }, [loadGroup]);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Load Group Feed
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const loadGroupFeed = useCallback(async (append = false) => {
+    if (!id) return;
+    if (append && !feedCursorRef.current) return;
+
+    try {
+      if (append) {
+        setFeedLoadingMore(true);
+      } else {
+        setFeedLoading(true);
+      }
+
+      const params = new URLSearchParams();
+      params.set('group_id', id);
+      params.set('per_page', '20');
+      if (append && feedCursorRef.current) params.set('cursor', feedCursorRef.current);
+
+      const response = await api.get<FeedItem[]>(`/v2/feed?${params}`);
+      if (response.success && response.data) {
+        const items = Array.isArray(response.data) ? response.data : [];
+        if (append) {
+          setFeedItems((prev) => [...prev, ...items]);
+        } else {
+          setFeedItems(items);
+        }
+        setFeedHasMore(response.meta?.has_more ?? false);
+        feedCursorRef.current = response.meta?.cursor ?? undefined;
+      }
+    } catch (err) {
+      logError('Failed to load group feed', err);
+      if (!append) {
+        toast.error(t('toast.feed_load_failed', 'Failed to load feed'));
+      }
+    } finally {
+      setFeedLoading(false);
+      setFeedLoadingMore(false);
+      setFeedLoaded(true);
+    }
+  }, [id, toast, t]);
+
+  useEffect(() => {
+    if (activeTab === 'feed' && !feedLoaded && group && isMember(group)) {
+      loadGroupFeed();
+    }
+  }, [activeTab, feedLoaded, group]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Feed Actions (like, hide, mute, report, delete, poll vote)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const handleFeedToggleLike = async (item: FeedItem) => {
+    setFeedItems((prev) =>
+      prev.map((fi) =>
+        fi.id === item.id && fi.type === item.type
+          ? { ...fi, is_liked: !fi.is_liked, likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1 }
+          : fi
+      )
+    );
+    try {
+      await api.post('/v2/feed/like', { target_type: item.type, target_id: item.id });
+    } catch (err) {
+      logError('Failed to toggle like', err);
+      setFeedItems((prev) =>
+        prev.map((fi) =>
+          fi.id === item.id && fi.type === item.type
+            ? { ...fi, is_liked: !fi.is_liked, likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1 }
+            : fi
+        )
+      );
+    }
+  };
+
+  const handleFeedHidePost = async (postId: number) => {
+    try {
+      await api.post(`/v2/feed/posts/${postId}/hide`);
+      setFeedItems((prev) => prev.filter((fi) => !(fi.id === postId && fi.type === 'post')));
+      toast.success(t('toast.post_hidden', 'Post hidden'));
+    } catch (err) {
+      logError('Failed to hide post', err);
+      toast.error(t('toast.hide_failed', 'Failed to hide post'));
+    }
+  };
+
+  const handleFeedMuteUser = async (userId: number) => {
+    try {
+      await api.post(`/v2/feed/users/${userId}/mute`);
+      setFeedItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
+      toast.success(t('toast.user_muted', 'User muted'));
+    } catch (err) {
+      logError('Failed to mute user', err);
+      toast.error(t('toast.mute_failed', 'Failed to mute user'));
+    }
+  };
+
+  const openFeedReportModal = (postId: number) => {
+    setReportPostId(postId);
+    setReportReason('');
+    onReportOpen();
+  };
+
+  const handleFeedReport = async () => {
+    if (!reportPostId || !reportReason.trim()) {
+      toast.error(t('toast.provide_reason', 'Please provide a reason'));
+      return;
+    }
+    try {
+      setIsReporting(true);
+      await api.post(`/v2/feed/posts/${reportPostId}/report`, { reason: reportReason.trim() });
+      onReportClose();
+      setReportPostId(null);
+      setReportReason('');
+      toast.success(t('toast.reported', 'Post reported'));
+    } catch (err) {
+      logError('Failed to report post', err);
+      toast.error(t('toast.report_failed', 'Failed to report post'));
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
+  const handleFeedDeletePost = async (item: FeedItem) => {
+    try {
+      await api.post(`/v2/feed/posts/${item.id}/delete`);
+      setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+      toast.success(t('toast.deleted', 'Post deleted'));
+    } catch (err) {
+      logError('Failed to delete post', err);
+      toast.error(t('toast.delete_failed', 'Failed to delete post'));
+    }
+  };
+
+  const handleFeedVotePoll = async (pollId: number, optionId: number) => {
+    try {
+      const response = await api.post<{ id: number; question: string; options: Array<{ id: number; text: string; vote_count: number; percentage: number }>; total_votes: number; user_vote_option_id: number | null; is_active: boolean }>(`/v2/feed/polls/${pollId}/vote`, { option_id: optionId });
+      if (response.success && response.data) {
+        setFeedItems((prev) =>
+          prev.map((fi) =>
+            fi.id === pollId && fi.type === 'poll'
+              ? { ...fi, poll_data: response.data as FeedItem['poll_data'] }
+              : fi
+          )
+        );
+      }
+    } catch (err) {
+      logError('Failed to vote', err);
+      toast.error(t('toast.vote_failed', 'Failed to vote'));
+    }
+  };
 
   // ─────────────────────────────────────────────────────────────────────────
   // Load Discussions
@@ -971,6 +1150,15 @@ export function GroupDetailPage() {
         }}
       >
         <Tab
+          key="feed"
+          title={
+            <span className="flex items-center gap-2">
+              <Newspaper className="w-4 h-4" aria-hidden="true" />
+              {t('detail.tab_feed', 'Feed')}
+            </span>
+          }
+        />
+        <Tab
           key="discussion"
           title={
             <span className="flex items-center gap-2">
@@ -1012,6 +1200,127 @@ export function GroupDetailPage() {
 
       {/* Tab Content */}
       <div>
+        {/* ─── Feed Tab ─── */}
+        {activeTab === 'feed' && (
+          <div className="space-y-4">
+            {userIsMember ? (
+              <>
+                {/* Create Post Button */}
+                {isAuthenticated && (
+                  <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors cursor-pointer" onClick={onComposeOpen}>
+                    <div className="flex items-center gap-3">
+                      <Avatar
+                        name={currentUser?.first_name || 'You'}
+                        src={resolveAvatarUrl(currentUser?.avatar)}
+                        size="sm"
+                        isBordered
+                        className="ring-2 ring-[var(--border-default)]"
+                      />
+                      <div className="flex-1 bg-[var(--surface-elevated)] rounded-full px-4 py-2.5 text-[var(--text-subtle)] text-sm border border-[var(--border-default)] hover:border-[var(--color-primary)]/30 transition-colors">
+                        {t('detail.feed_whats_on_your_mind', "What's on your mind?")}
+                      </div>
+                    </div>
+                  </GlassCard>
+                )}
+
+                {/* Feed Items */}
+                {feedLoading && feedItems.length === 0 ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <GlassCard key={i} className="p-5">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Skeleton className="w-10 h-10 rounded-full" />
+                          <div className="flex-1">
+                            <Skeleton className="h-4 w-28 rounded mb-2" />
+                            <Skeleton className="h-3 w-20 rounded" />
+                          </div>
+                        </div>
+                        <Skeleton className="h-4 w-full rounded mb-2" />
+                        <Skeleton className="h-4 w-4/5 rounded mb-4" />
+                        <Divider />
+                        <div className="flex gap-4 pt-3">
+                          <Skeleton className="h-8 w-20 rounded-lg" />
+                          <Skeleton className="h-8 w-24 rounded-lg" />
+                        </div>
+                      </GlassCard>
+                    ))}
+                  </div>
+                ) : feedItems.length === 0 ? (
+                  <EmptyState
+                    icon={<Newspaper className="w-12 h-12" aria-hidden="true" />}
+                    title={t('detail.feed_empty_title', 'No posts yet')}
+                    description={t('detail.feed_empty_desc', 'Be the first to share something with this group!')}
+                    action={
+                      isAuthenticated && (
+                        <Button
+                          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                          startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                          onPress={onComposeOpen}
+                        >
+                          {t('detail.feed_create_post', 'Create Post')}
+                        </Button>
+                      )
+                    }
+                  />
+                ) : (
+                  <div className="space-y-4">
+                    <AnimatePresence mode="popLayout">
+                      {feedItems.map((item) => (
+                        <motion.div key={`${item.type}-${item.id}`} layout>
+                          <FeedCard
+                            item={item}
+                            onToggleLike={() => handleFeedToggleLike(item)}
+                            onHidePost={() => handleFeedHidePost(item.id)}
+                            onMuteUser={() => handleFeedMuteUser(getAuthor(item).id)}
+                            onReportPost={() => openFeedReportModal(item.id)}
+                            onDeletePost={() => handleFeedDeletePost(item)}
+                            onVotePoll={handleFeedVotePoll}
+                            isAuthenticated={isAuthenticated}
+                            currentUserId={currentUser?.id}
+                          />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+
+                    {feedHasMore && (
+                      <div className="pt-4 text-center">
+                        <Button
+                          variant="bordered"
+                          className="border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                          onPress={() => loadGroupFeed(true)}
+                          isLoading={feedLoadingMore}
+                          startContent={!feedLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
+                        >
+                          {t('detail.feed_load_more', 'Load More')}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <GlassCard className="p-6">
+                <EmptyState
+                  icon={<Lock className="w-12 h-12" aria-hidden="true" />}
+                  title={t('detail.join_to_see_feed_title', 'Join to see the feed')}
+                  description={t('detail.join_to_see_feed_desc', 'Join this group to view posts and participate in conversations.')}
+                  action={
+                    isAuthenticated && (
+                      <Button
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                        onPress={handleJoinLeave}
+                        isLoading={isJoining}
+                      >
+                        {t('detail.join_group')}
+                      </Button>
+                    )
+                  }
+                />
+              </GlassCard>
+            )}
+          </div>
+        )}
+
         {/* ─── Discussion Tab ─── */}
         {activeTab === 'discussion' && (
           <GlassCard className="p-6">
@@ -1690,6 +1999,71 @@ export function GroupDetailPage() {
               </ModalFooter>
             </>
           )}
+        </ModalContent>
+      </Modal>
+
+      {/* ─── Compose Hub (Group Feed) ─── */}
+      <ComposeHub
+        isOpen={isComposeOpen}
+        onClose={onComposeClose}
+        groupId={group?.id ? Number(group.id) : undefined}
+        onSuccess={() => { feedCursorRef.current = undefined; setFeedLoaded(false); loadGroupFeed(); }}
+      />
+
+      {/* ─── Report Post Modal ─── */}
+      <Modal
+        isOpen={isReportOpen}
+        onClose={onReportClose}
+        classNames={{
+          base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)]',
+          backdrop: 'bg-black/60 backdrop-blur-sm',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-[var(--text-primary)]">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
+                <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
+              </div>
+              {t('detail.report_title', 'Report Post')}
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-sm text-[var(--text-muted)] mb-3">
+              {t('detail.report_description', 'Help us understand why you are reporting this post.')}
+            </p>
+            <Textarea
+              label={t('detail.report_reason_label', 'Reason')}
+              placeholder={t('detail.report_reason_placeholder', 'Describe why this post is inappropriate...')}
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              minRows={3}
+              classNames={{
+                input: 'bg-transparent text-[var(--text-primary)]',
+                inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
+              }}
+              autoFocus
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              onPress={onReportClose}
+              className="text-[var(--text-muted)]"
+            >
+              {t('detail.cancel')}
+            </Button>
+            <Button
+              color="danger"
+              variant="flat"
+              onPress={handleFeedReport}
+              isLoading={isReporting}
+              isDisabled={!reportReason.trim()}
+              className="font-medium"
+            >
+              {t('detail.report_submit', 'Report')}
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </motion.div>

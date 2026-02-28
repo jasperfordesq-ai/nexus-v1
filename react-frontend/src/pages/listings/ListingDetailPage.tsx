@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Chip } from '@heroui/react';
+import { Button, Avatar, Chip, useDisclosure } from '@heroui/react';
 import {
   Clock,
   MapPin,
@@ -20,7 +20,6 @@ import {
   Tag,
   MessageSquare,
   Heart,
-  Share2,
   Edit,
   Trash2,
   AlertCircle,
@@ -31,8 +30,9 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
+import { CommentsSection, LikersModal, ShareButton } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { usePageTitle, useSocialInteractions } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -55,6 +55,22 @@ export function ListingDetailPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [exchangeConfig, setExchangeConfig] = useState<ExchangeConfig | null>(null);
   const [activeExchange, setActiveExchange] = useState<{ id: number; status: string; role: string; proposed_hours: number } | null>(null);
+  const [showComments, setShowComments] = useState(false);
+
+  // Social fields from API response (set after listing loads)
+  const [socialInit, setSocialInit] = useState<{ liked: boolean; likes: number; comments: number }>({ liked: false, likes: 0, comments: 0 });
+
+  // Social interactions hook
+  const social = useSocialInteractions({
+    targetType: 'listing',
+    targetId: Number(id) || 0,
+    initialLiked: socialInit.liked,
+    initialLikesCount: socialInit.likes,
+    initialCommentsCount: socialInit.comments,
+  });
+
+  // Likers modal
+  const { isOpen: isLikersOpen, onOpen: onLikersOpen, onClose: onLikersClose } = useDisclosure();
 
   const loadExchangeConfig = useCallback(async () => {
     try {
@@ -89,6 +105,13 @@ export function ListingDetailPage() {
       if (response.success && response.data) {
         setListing(response.data);
         setIsSaved(response.data.is_favorited ?? false);
+        // Social fields come from the API but aren't on the Listing type
+        const data = response.data as unknown as { is_liked?: boolean; likes_count?: number; comments_count?: number };
+        setSocialInit({
+          liked: data.is_liked ?? false,
+          likes: data.likes_count ?? 0,
+          comments: data.comments_count ?? 0,
+        });
       } else {
         setError(t('not_found_error'));
       }
@@ -143,33 +166,10 @@ export function ListingDetailPage() {
     }
   };
 
-  async function handleShare() {
-    if (!listing) return;
-
-    const shareData = {
-      title: listing.title,
-      text: listing.description?.slice(0, 100) + (listing.description && listing.description.length > 100 ? '...' : ''),
-      url: window.location.href,
-    };
-
-    // Try native Web Share API first (mobile/PWA)
-    if (navigator.share && navigator.canShare?.(shareData)) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        // User cancelled or share failed - that's ok
-        if ((err as Error).name !== 'AbortError') {
-          logError('Share failed', err);
-        }
-      }
-    } else {
-      // Fallback: copy link to clipboard
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success(t('share_copied_title'), t('share_copied_subtitle'));
-      } catch {
-        toast.error(t('share_error_title'));
-      }
+  function toggleComments() {
+    setShowComments((prev) => !prev);
+    if (!social.commentsLoaded) {
+      void social.loadComments();
     }
   }
 
@@ -337,6 +337,33 @@ export function ListingDetailPage() {
           </div>
         </div>
 
+        {/* Social Proof */}
+        {(social.likesCount > 0 || social.commentsCount > 0) && (
+          <div className="flex gap-4 text-sm text-theme-subtle mb-4">
+            {social.likesCount > 0 && (
+              <button
+                type="button"
+                onClick={onLikersOpen}
+                className="flex items-center gap-1.5 hover:text-theme-primary transition-colors cursor-pointer"
+              >
+                <span className="w-4 h-4 rounded-full bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
+                  <Heart className="w-2.5 h-2.5 text-white fill-white" aria-hidden="true" />
+                </span>
+                {social.likesCount} {social.likesCount === 1 ? t('like', 'like') : t('likes', 'likes')}
+              </button>
+            )}
+            {social.commentsCount > 0 && (
+              <button
+                type="button"
+                onClick={toggleComments}
+                className="hover:text-theme-primary transition-colors cursor-pointer"
+              >
+                {social.commentsCount} {social.commentsCount === 1 ? t('comment', 'comment') : t('comments', 'comments')}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Action Buttons */}
         {isAuthenticated && !isOwner && (
           <div className="flex flex-wrap gap-2 sm:gap-3 pt-6 border-t border-theme-default">
@@ -388,21 +415,37 @@ export function ListingDetailPage() {
             )}
             <Button
               variant="flat"
+              className={`flex-1 sm:flex-none ${social.isLiked ? 'bg-rose-500/20 text-rose-500' : 'bg-theme-elevated text-theme-primary'}`}
+              startContent={<Heart className={`w-4 h-4 ${social.isLiked ? 'fill-current' : ''}`} aria-hidden="true" />}
+              onClick={() => void social.toggleLike()}
+              isDisabled={social.isLiking}
+            >
+              {social.likesCount > 0 ? `${social.likesCount} ` : ''}{social.isLiked ? t('detail_liked', 'Liked') : t('detail_like', 'Like')}
+            </Button>
+            <Button
+              variant="flat"
+              className={`flex-1 sm:flex-none ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
+              startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+              onClick={toggleComments}
+            >
+              {social.commentsCount > 0 ? `${social.commentsCount} ` : ''}{t('detail_comments', 'Comments')}
+            </Button>
+            <Button
+              variant="flat"
               className={`flex-1 sm:flex-none ${isSaved ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
-              startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" aria-hidden="true" /> : <Heart className="w-4 h-4" aria-hidden="true" />}
+              startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" aria-hidden="true" /> : <Bookmark className="w-4 h-4" aria-hidden="true" />}
               onClick={() => void handleSave()}
               isDisabled={isSaving}
             >
               {isSaved ? t('detail_saved') : t('detail_save')}
             </Button>
-            <Button
-              variant="flat"
-              className="flex-1 sm:flex-none bg-theme-elevated text-theme-primary"
-              startContent={<Share2 className="w-4 h-4" aria-hidden="true" />}
-              onClick={handleShare}
-            >
-              {t('detail_share')}
-            </Button>
+            <ShareButton
+              shareToFeed={social.shareToFeed}
+              title={listing.title}
+              description={listing.description}
+              isAuthenticated={isAuthenticated}
+              className="flex-1 sm:flex-none"
+            />
           </div>
         )}
       </GlassCard>
@@ -443,6 +486,36 @@ export function ListingDetailPage() {
           </GlassCard>
         );
       })()}
+
+      {/* Comments Section — threaded with reactions, replies, edit, delete */}
+      {showComments && (
+        <GlassCard className="p-6">
+          <CommentsSection
+            comments={social.comments}
+            commentsCount={social.commentsCount}
+            commentsLoading={social.commentsLoading}
+            commentsLoaded={social.commentsLoaded}
+            loadComments={social.loadComments}
+            submitComment={social.submitComment}
+            editComment={social.editComment}
+            deleteComment={social.deleteComment}
+            toggleReaction={social.toggleReaction}
+            searchMentions={social.searchMentions}
+            isAuthenticated={isAuthenticated}
+            currentUserId={user?.id}
+            currentUserAvatar={user?.avatar ?? undefined}
+            currentUserName={user?.first_name || user?.name}
+          />
+        </GlassCard>
+      )}
+
+      {/* Likers Modal */}
+      <LikersModal
+        isOpen={isLikersOpen}
+        onClose={onLikersClose}
+        loadLikers={social.loadLikers}
+        likesCount={social.likesCount}
+      />
     </motion.div>
   );
 }
