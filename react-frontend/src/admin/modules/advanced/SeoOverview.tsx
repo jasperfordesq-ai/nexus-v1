@@ -10,11 +10,23 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Switch, Input, Button, Spinner } from '@heroui/react';
-import { Search, Globe, FileText, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { PageHeader, StatCard } from '../../components';
+import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
+
+// Keys that map to the backend's seo_* tenant_settings rows
+const SEO_KEYS = [
+  'seo_title_suffix', 'seo_meta_description', 'seo_meta_keywords',
+  'seo_auto_sitemap', 'seo_canonical_urls', 'seo_open_graph',
+  'seo_twitter_cards', 'seo_robots_txt', 'seo_google_verification', 'seo_bing_verification',
+] as const;
+
+// Keys stored directly on the tenants table
+const TENANT_KEYS = [
+  'tenant_meta_title', 'tenant_meta_description', 'tenant_h1_headline', 'tenant_hero_intro',
+] as const;
 
 export function SeoOverview() {
   usePageTitle('Admin - SEO Overview');
@@ -22,33 +34,46 @@ export function SeoOverview() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Record<string, unknown>>({
-    title_suffix: '',
-    meta_description: '',
-    meta_keywords: '',
-    auto_sitemap: true,
-    canonical_urls: true,
-    open_graph: true,
-    indexed_pages: '--',
-    sitemap_urls: '--',
-    errors_30d: '--',
-    redirects: '--',
+    seo_title_suffix: '',
+    seo_meta_description: '',
+    seo_meta_keywords: '',
+    seo_auto_sitemap: true,
+    seo_canonical_urls: true,
+    seo_open_graph: true,
+    seo_twitter_cards: true,
+    seo_robots_txt: '',
+    seo_google_verification: '',
+    seo_bing_verification: '',
+    tenant_meta_title: '',
+    tenant_meta_description: '',
+    tenant_h1_headline: '',
+    tenant_hero_intro: '',
   });
 
   useEffect(() => {
     adminSettings.getSeoSettings()
       .then(res => {
         if (res.data) {
-          setFormData(prev => ({ ...prev, ...res.data }));
+          // API returns { tenant_id, seo: { seo_title_suffix: ..., tenant_meta_title: ... } }
+          const raw = res.data as Record<string, unknown>;
+          const seo = (raw.seo ?? raw) as Record<string, unknown>;
+          setFormData(prev => ({ ...prev, ...seo }));
         }
       })
       .catch(() => toast.error('Failed to load SEO settings'))
       .finally(() => setLoading(false));
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await adminSettings.updateSeoSettings(formData);
+      // Only send recognized keys to the backend
+      const payload: Record<string, unknown> = {};
+      for (const key of [...SEO_KEYS, ...TENANT_KEYS]) {
+        if (key in formData) payload[key] = formData[key];
+      }
+
+      const res = await adminSettings.updateSeoSettings(payload);
 
       if (res.success) {
         toast.success('SEO settings saved successfully');
@@ -80,37 +105,66 @@ export function SeoOverview() {
     <div>
       <PageHeader title="SEO Overview" description="Search engine optimization configuration and metrics" />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <StatCard label="Indexed Pages" value={String(formData.indexed_pages ?? '--')} icon={FileText} color="primary" />
-        <StatCard label="Sitemap URLs" value={String(formData.sitemap_urls ?? '--')} icon={Globe} color="success" />
-        <StatCard label="404 Errors (30d)" value={String(formData.errors_30d ?? '--')} icon={Search} color="warning" />
-        <StatCard label="Redirects" value={String(formData.redirects ?? '--')} icon={Globe} color="secondary" />
-      </div>
-
       <div className="space-y-4">
+        {/* Tenant-level meta (stored directly on tenants table) */}
+        <Card shadow="sm">
+          <CardHeader><h3 className="text-lg font-semibold">Tenant Meta</h3></CardHeader>
+          <CardBody className="gap-4">
+            <Input
+              label="Meta Title"
+              placeholder="Your Timebank Name"
+              variant="bordered"
+              value={String(formData.tenant_meta_title || '')}
+              onValueChange={(v) => updateField('tenant_meta_title', v)}
+            />
+            <Input
+              label="Meta Description"
+              placeholder="A short description of your timebank..."
+              variant="bordered"
+              value={String(formData.tenant_meta_description || '')}
+              onValueChange={(v) => updateField('tenant_meta_description', v)}
+            />
+            <Input
+              label="H1 Headline"
+              placeholder="Welcome to our community"
+              variant="bordered"
+              value={String(formData.tenant_h1_headline || '')}
+              onValueChange={(v) => updateField('tenant_h1_headline', v)}
+            />
+            <Input
+              label="Hero Intro Text"
+              placeholder="Exchange skills and time with your community"
+              variant="bordered"
+              value={String(formData.tenant_hero_intro || '')}
+              onValueChange={(v) => updateField('tenant_hero_intro', v)}
+            />
+          </CardBody>
+        </Card>
+
+        {/* Global SEO settings (stored in tenant_settings) */}
         <Card shadow="sm">
           <CardHeader><h3 className="text-lg font-semibold">Meta Tags</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
               label="Default Title Suffix"
-              placeholder=" - Project NEXUS"
+              placeholder=" | My Timebank"
               variant="bordered"
-              value={String(formData.title_suffix || '')}
-              onValueChange={(v) => updateField('title_suffix', v)}
+              value={String(formData.seo_title_suffix || '')}
+              onValueChange={(v) => updateField('seo_title_suffix', v)}
             />
             <Input
-              label="Meta Description"
+              label="Global Meta Description"
               placeholder="Community timebanking platform..."
               variant="bordered"
-              value={String(formData.meta_description || '')}
-              onValueChange={(v) => updateField('meta_description', v)}
+              value={String(formData.seo_meta_description || '')}
+              onValueChange={(v) => updateField('seo_meta_description', v)}
             />
             <Input
               label="Meta Keywords"
               placeholder="timebanking, community, exchange"
               variant="bordered"
-              value={String(formData.meta_keywords || '')}
-              onValueChange={(v) => updateField('meta_keywords', v)}
+              value={String(formData.seo_meta_keywords || '')}
+              onValueChange={(v) => updateField('seo_meta_keywords', v)}
             />
           </CardBody>
         </Card>
@@ -123,22 +177,56 @@ export function SeoOverview() {
                 <p className="font-medium">Auto-Generate Sitemap</p>
                 <p className="text-sm text-default-500">Automatically generate and update sitemap.xml</p>
               </div>
-              <Switch isSelected={!!formData.auto_sitemap} onValueChange={(v) => updateField('auto_sitemap', v)} aria-label="Auto sitemap" />
+              <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label="Auto sitemap" />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Canonical URLs</p>
                 <p className="text-sm text-default-500">Add canonical URL tags to prevent duplicate content</p>
               </div>
-              <Switch isSelected={!!formData.canonical_urls} onValueChange={(v) => updateField('canonical_urls', v)} aria-label="Canonical URLs" />
+              <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label="Canonical URLs" />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Open Graph Tags</p>
                 <p className="text-sm text-default-500">Add Open Graph meta tags for social sharing</p>
               </div>
-              <Switch isSelected={!!formData.open_graph} onValueChange={(v) => updateField('open_graph', v)} aria-label="Open Graph" />
+              <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label="Open Graph" />
             </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Twitter Cards</p>
+                <p className="text-sm text-default-500">Add Twitter Card meta tags for sharing on X/Twitter</p>
+              </div>
+              <Switch isSelected={!!formData.seo_twitter_cards} onValueChange={(v) => updateField('seo_twitter_cards', v)} aria-label="Twitter Cards" />
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card shadow="sm">
+          <CardHeader><h3 className="text-lg font-semibold">Verification &amp; Robots</h3></CardHeader>
+          <CardBody className="gap-4">
+            <Input
+              label="Google Search Console Verification"
+              placeholder="google-site-verification=..."
+              variant="bordered"
+              value={String(formData.seo_google_verification || '')}
+              onValueChange={(v) => updateField('seo_google_verification', v)}
+            />
+            <Input
+              label="Bing Webmaster Verification"
+              placeholder="msvalidate.01=..."
+              variant="bordered"
+              value={String(formData.seo_bing_verification || '')}
+              onValueChange={(v) => updateField('seo_bing_verification', v)}
+            />
+            <Input
+              label="Custom robots.txt Content"
+              placeholder="User-agent: *&#10;Disallow: /admin/"
+              variant="bordered"
+              value={String(formData.seo_robots_txt || '')}
+              onValueChange={(v) => updateField('seo_robots_txt', v)}
+            />
           </CardBody>
         </Card>
 
