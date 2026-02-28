@@ -1593,7 +1593,7 @@ class AdminGroupsApiController extends BaseApiController
         $scopeTenantId = $this->resolveAdminTenantFilter($isSuperAdmin, $tenantId) ?? $tenantId;
 
         try {
-            $groups = \Nexus\Services\SmartGroupRankingService::getFeaturedGroupsWithScores($scopeTenantId);
+            $groups = \Nexus\Services\SmartGroupRankingService::getFeaturedGroupsWithScores('local_hubs', $scopeTenantId);
 
             $this->respondWithData($groups);
         } catch (\Exception $e) {

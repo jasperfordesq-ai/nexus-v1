@@ -138,8 +138,8 @@ class GroupService
             $params[] = $cursorId;
         }
 
-        // Order by member count (popularity) then creation date
-        $sql .= " ORDER BY g.cached_member_count DESC, g.created_at DESC, g.id DESC";
+        // Featured groups first, then by member count (popularity) then creation date
+        $sql .= " ORDER BY g.is_featured DESC, g.cached_member_count DESC, g.created_at DESC, g.id DESC";
         $sql .= " LIMIT " . ($limit + 1);
 
         $stmt = $db->prepare($sql);

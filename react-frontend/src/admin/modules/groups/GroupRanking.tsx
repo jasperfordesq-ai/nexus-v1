@@ -98,16 +98,16 @@ export default function GroupRanking() {
                     <span className="font-medium">{group.name}</span>
                   </div>
                 </TableCell>
-                <TableCell>{group.member_count}</TableCell>
+                <TableCell>{group.member_count ?? 0}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary"
-                        style={{ width: `${Math.min(100, group.engagement_score)}%` }}
+                        style={{ width: `${Math.min(100, group.engagement_score ?? 0)}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm">{group.engagement_score.toFixed(0)}</span>
+                    <span className="text-sm">{(group.engagement_score ?? 0).toFixed(0)}</span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -115,14 +115,14 @@ export default function GroupRanking() {
                     <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-success"
-                        style={{ width: `${Math.min(100, group.geographic_diversity)}%` }}
+                        style={{ width: `${Math.min(100, group.geographic_diversity ?? 0)}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm">{group.geographic_diversity.toFixed(0)}</span>
+                    <span className="text-sm">{(group.geographic_diversity ?? 0).toFixed(0)}</span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="font-bold text-primary">{group.ranking_score.toFixed(0)}</span>
+                  <span className="font-bold text-primary">{(group.ranking_score ?? 0).toFixed(0)}</span>
                 </TableCell>
                 <TableCell>
                   <Switch
