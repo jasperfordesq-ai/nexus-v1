@@ -40,12 +40,14 @@ import {
   CalendarCheck,
   ArrowUpRight,
   ArrowDownLeft,
+  Rss,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { ReviewModal } from '@/components/reviews';
+import { ProfileFeed } from '@/components/profile/ProfileFeed';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useFeature, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -570,6 +572,16 @@ export function ProfilePage() {
               </span>
             }
           />
+          <Tab
+            key="activity"
+            aria-label="User activity feed"
+            title={
+              <span className="flex items-center gap-2">
+                <Rss className="w-4 h-4" aria-hidden="true" />
+                {t('tabs.activity', 'Activity')}
+              </span>
+            }
+          />
           {hasReviews && reviewsAvailable && (
             <Tab
               key="reviews"
@@ -686,6 +698,10 @@ export function ProfilePage() {
                 </div>
               )}
             </div>
+          )}
+
+          {activeTab === 'activity' && profile && (
+            <ProfileFeed userId={profile.id} isOwnProfile={!!isOwnProfile} />
           )}
 
           {/* Reviews Tab */}

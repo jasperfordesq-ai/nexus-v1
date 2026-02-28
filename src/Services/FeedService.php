@@ -159,9 +159,48 @@ class FeedService
     }
 
     /**
-     * Load user profile feed
+     * Load user profile feed — aggregates all content types for a single user.
+     * Mirrors loadAggregatedFeed() but scoped to profileUserId.
      */
     private static function loadUserFeed(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $perTypeLimit = (int)ceil($limit * 1.5);
+
+        $items = [];
+        $items = array_merge($items, self::loadUserPosts($profileUserId, $userId, $tenantId, $perTypeLimit, $cursorData));
+        $items = array_merge($items, self::loadUserListings($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 2), $cursorData));
+        $items = array_merge($items, self::loadUserEvents($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadUserPolls($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadUserGoals($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadUserReviews($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
+
+        // Sort by created_at descending, then id descending
+        usort($items, function ($a, $b) {
+            $cmp = strcmp($b['created_at'], $a['created_at']);
+            if ($cmp === 0) {
+                return $b['id'] - $a['id'];
+            }
+            return $cmp;
+        });
+
+        // Apply cursor filtering AFTER merge+sort (same logic as loadAggregatedFeed)
+        if ($cursorData) {
+            $cursorTs = $cursorData['created_at'];
+            $cursorId = (int)$cursorData['id'];
+            $items = array_values(array_filter($items, function ($item) use ($cursorTs, $cursorId) {
+                $cmp = strcmp($item['created_at'], $cursorTs);
+                if ($cmp !== 0) return $cmp < 0;
+                return $item['id'] < $cursorId;
+            }));
+        }
+
+        return array_slice($items, 0, $limit);
+    }
+
+    /**
+     * Load posts for a specific user's profile feed
+     */
+    private static function loadUserPosts(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
     {
         $db = Database::getConnection();
 
@@ -177,7 +216,7 @@ class FeedService
         ";
         $params = [$profileUserId, $tenantId];
 
-        if ($cursorData) {
+        if ($cursorData && $cursorData['type'] === 'post') {
             $sql .= " AND (p.created_at < ? OR (p.created_at = ? AND p.id < ?))";
             $params[] = $cursorData['created_at'];
             $params[] = $cursorData['created_at'];
@@ -188,9 +227,197 @@ class FeedService
 
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
-        $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        return self::formatItems($posts, $userId);
+        return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load listings for a specific user's profile feed
+     */
+    private static function loadUserListings(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        $sql = "
+            SELECT l.id, l.title, l.description as content, l.image_url, l.created_at, l.user_id,
+                   'listing' as type,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'listing' AND target_id = l.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'listing' AND target_id = l.id) as comments_count
+            FROM listings l
+            JOIN users u ON l.user_id = u.id
+            WHERE l.user_id = ? AND l.tenant_id = ? AND l.status = 'active'
+        ";
+        $params = [$profileUserId, $tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'listing') {
+            $sql .= " AND (l.created_at < ? OR (l.created_at = ? AND l.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY l.created_at DESC, l.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load events for a specific user's profile feed
+     */
+    private static function loadUserEvents(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        $sql = "
+            SELECT e.id, e.title, e.description as content, e.cover_image as image_url, e.created_at, e.user_id,
+                   e.start_time as start_date, e.location,
+                   'event' as type,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'event' AND target_id = e.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'event' AND target_id = e.id) as comments_count
+            FROM events e
+            JOIN users u ON e.user_id = u.id
+            WHERE e.user_id = ? AND e.tenant_id = ?
+        ";
+        $params = [$profileUserId, $tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'event') {
+            $sql .= " AND (e.created_at < ? OR (e.created_at = ? AND e.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY e.created_at DESC, e.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load polls for a specific user's profile feed
+     */
+    private static function loadUserPolls(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        $sql = "
+            SELECT po.id, po.question as title, po.question as content, po.created_at, po.user_id,
+                   'poll' as type,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'poll' AND target_id = po.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'poll' AND target_id = po.id) as comments_count
+            FROM polls po
+            JOIN users u ON po.user_id = u.id
+            WHERE po.user_id = ? AND po.tenant_id = ? AND po.is_active = 1
+        ";
+        $params = [$profileUserId, $tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'poll') {
+            $sql .= " AND (po.created_at < ? OR (po.created_at = ? AND po.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY po.created_at DESC, po.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load goals for a specific user's profile feed
+     */
+    private static function loadUserGoals(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        $sql = "
+            SELECT g.id, g.title, g.description as content, g.created_at, g.user_id,
+                   'goal' as type,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'goal' AND target_id = g.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'goal' AND target_id = g.id) as comments_count
+            FROM goals g
+            JOIN users u ON g.user_id = u.id
+            WHERE g.user_id = ? AND g.tenant_id = ?
+        ";
+        $params = [$profileUserId, $tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'goal') {
+            $sql .= " AND (g.created_at < ? OR (g.created_at = ? AND g.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY g.created_at DESC, g.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load reviews written BY a specific user for their profile feed
+     */
+    private static function loadUserReviews(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        $sql = "
+            SELECT r.id, r.rating, r.comment as content, r.created_at, r.reviewer_id as user_id,
+                   'review' as type,
+                   COALESCE(reviewer.name, CONCAT(reviewer.first_name, ' ', reviewer.last_name)) as author_name,
+                   reviewer.avatar_url as author_avatar,
+                   COALESCE(receiver.name, CONCAT(receiver.first_name, ' ', receiver.last_name)) as receiver_name,
+                   receiver.id as receiver_id,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'review' AND target_id = r.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'review' AND target_id = r.id) as comments_count
+            FROM reviews r
+            JOIN users reviewer ON r.reviewer_id = reviewer.id
+            JOIN users receiver ON r.receiver_id = receiver.id
+            WHERE r.reviewer_id = ? AND r.reviewer_tenant_id = ? AND r.status = 'approved'
+        ";
+        $params = [$profileUserId, $tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'review') {
+            $sql .= " AND (r.created_at < ? OR (r.created_at = ? AND r.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY r.created_at DESC, r.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        $reviews = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        foreach ($reviews as &$review) {
+            $review['rating'] = (int)$review['rating'];
+            $review['receiver'] = [
+                'id' => (int)$review['receiver_id'],
+                'name' => $review['receiver_name'],
+            ];
+        }
+
+        return self::formatItems($reviews, $userId);
     }
 
     /**
