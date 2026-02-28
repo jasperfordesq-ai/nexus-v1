@@ -9,17 +9,17 @@
  * Parity: PHP BrokerControlsController::riskTags()
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Tabs, Tab, Button, Chip,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Input, Select, SelectItem, Textarea, Switch,
+  Input, Select, SelectItem, Textarea, Switch, Spinner,
 } from '@heroui/react';
-import { ArrowLeft, ShieldCheck, ShieldAlert, Plus, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, ShieldAlert, Plus, Edit, Trash2, Search } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { adminBroker } from '../../api/adminApi';
+import { adminBroker, adminListings } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { RiskTag } from '../../api/types';
 
@@ -35,6 +35,16 @@ const RISK_LEVELS = [
   { key: 'medium', label: 'Medium' },
   { key: 'high', label: 'High' },
   { key: 'critical', label: 'Critical' },
+];
+
+const RISK_CATEGORIES = [
+  { key: 'safeguarding', label: 'Safeguarding Concern' },
+  { key: 'financial', label: 'Financial Risk' },
+  { key: 'health_safety', label: 'Health & Safety' },
+  { key: 'legal', label: 'Legal/Regulatory' },
+  { key: 'reputation', label: 'Reputational Risk' },
+  { key: 'fraud', label: 'Potential Fraud' },
+  { key: 'other', label: 'Other' },
 ];
 
 interface RiskTagForm {
@@ -59,6 +69,12 @@ const EMPTY_FORM: RiskTagForm = {
   dbs_required: false,
 };
 
+interface ListingSearchResult {
+  id: number;
+  title: string;
+  owner_name?: string;
+}
+
 export function RiskTagsPage() {
   usePageTitle('Admin - Risk Tags');
   const { tenantPath } = useTenant();
@@ -67,6 +83,7 @@ export function RiskTagsPage() {
   const [items, setItems] = useState<RiskTag[]>([]);
   const [loading, setLoading] = useState(true);
   const [riskLevel, setRiskLevel] = useState('all');
+  const [tableSearch, setTableSearch] = useState('');
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -74,6 +91,13 @@ export function RiskTagsPage() {
   const [form, setForm] = useState<RiskTagForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState<number | null>(null);
+
+  // Listing search state
+  const [listingSearch, setListingSearch] = useState('');
+  const [listingResults, setListingResults] = useState<ListingSearchResult[]>([]);
+  const [searchingListings, setSearchingListings] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<ListingSearchResult | null>(null);
+  const searchDebounce = useRef<ReturnType<typeof setTimeout>>();
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -95,9 +119,40 @@ export function RiskTagsPage() {
     loadItems();
   }, [loadItems]);
 
+  // Listing search with debounce
+  useEffect(() => {
+    if (!listingSearch.trim() || listingSearch.trim().length < 2) {
+      setListingResults([]);
+      return;
+    }
+    clearTimeout(searchDebounce.current);
+    searchDebounce.current = setTimeout(async () => {
+      setSearchingListings(true);
+      try {
+        const res = await adminListings.list({ search: listingSearch.trim(), page: 1 });
+        if (res.success && res.data) {
+          const data = Array.isArray(res.data) ? res.data : (res.data as { items?: ListingSearchResult[] }).items ?? [];
+          setListingResults(data.slice(0, 8).map((l: Record<string, unknown>) => ({
+            id: l.id as number,
+            title: (l.title as string) || `Listing #${l.id}`,
+            owner_name: (l.owner_name ?? l.user_name ?? '') as string,
+          })));
+        }
+      } catch {
+        // silently fail
+      } finally {
+        setSearchingListings(false);
+      }
+    }, 300);
+    return () => clearTimeout(searchDebounce.current);
+  }, [listingSearch]);
+
   function openCreateModal() {
     setEditingTag(null);
     setForm(EMPTY_FORM);
+    setSelectedListing(null);
+    setListingSearch('');
+    setListingResults([]);
     setModalOpen(true);
   }
 
@@ -108,11 +163,14 @@ export function RiskTagsPage() {
       risk_level: tag.risk_level,
       risk_category: tag.risk_category,
       risk_notes: tag.risk_notes ?? '',
-      member_visible_notes: '',
+      member_visible_notes: tag.member_visible_notes ?? '',
       requires_approval: tag.requires_approval,
       insurance_required: tag.insurance_required,
       dbs_required: tag.dbs_required,
     });
+    setSelectedListing(null);
+    setListingSearch('');
+    setListingResults([]);
     setModalOpen(true);
   }
 
@@ -120,12 +178,22 @@ export function RiskTagsPage() {
     setModalOpen(false);
     setEditingTag(null);
     setForm(EMPTY_FORM);
+    setSelectedListing(null);
+    setListingSearch('');
+    setListingResults([]);
+  }
+
+  function selectListing(listing: ListingSearchResult) {
+    setSelectedListing(listing);
+    setForm(f => ({ ...f, listing_id: String(listing.id) }));
+    setListingSearch('');
+    setListingResults([]);
   }
 
   async function handleSave() {
     const listingId = parseInt(form.listing_id);
     if (!listingId || listingId <= 0) {
-      toast.error('Please enter a valid Listing ID');
+      toast.error('Please select a valid listing');
       return;
     }
     if (!form.risk_category.trim()) {
@@ -176,6 +244,18 @@ export function RiskTagsPage() {
     }
   }
 
+  // Client-side search filtering
+  const filteredItems = useMemo(() => {
+    if (!tableSearch.trim()) return items;
+    const q = tableSearch.toLowerCase();
+    return items.filter(item =>
+      (item.listing_title ?? '').toLowerCase().includes(q) ||
+      (item.owner_name ?? '').toLowerCase().includes(q) ||
+      (item.risk_category ?? '').toLowerCase().includes(q) ||
+      (item.tagged_by_name ?? '').toLowerCase().includes(q)
+    );
+  }, [items, tableSearch]);
+
   const columns: Column<RiskTag>[] = [
     {
       key: 'listing_title',
@@ -220,9 +300,10 @@ export function RiskTagsPage() {
       key: 'risk_category',
       label: 'Category',
       sortable: true,
-      render: (item) => (
-        <span className="text-sm capitalize">{item.risk_category || '—'}</span>
-      ),
+      render: (item) => {
+        const label = RISK_CATEGORIES.find(c => c.key === item.risk_category)?.label;
+        return <span className="text-sm">{label ?? item.risk_category ?? '—'}</span>;
+      },
     },
     {
       key: 'requires_approval',
@@ -249,6 +330,16 @@ export function RiskTagsPage() {
         <Chip size="sm" variant="dot" color={item.dbs_required ? 'warning' : 'default'}>
           {item.dbs_required ? 'Yes' : 'No'}
         </Chip>
+      ),
+    },
+    {
+      key: 'tagged_by_name',
+      label: 'Tagged By',
+      sortable: true,
+      render: (item) => (
+        <span className="text-sm text-default-500">
+          {item.tagged_by_name || '—'}
+        </span>
       ),
     },
     {
@@ -337,9 +428,10 @@ export function RiskTagsPage() {
 
       <DataTable
         columns={columns}
-        data={items}
+        data={filteredItems}
         isLoading={loading}
-        searchable={false}
+        searchable
+        onSearch={setTableSearch}
         onRefresh={loadItems}
       />
 
@@ -350,17 +442,71 @@ export function RiskTagsPage() {
             {editingTag ? 'Edit Risk Tag' : 'Tag Listing'}
           </ModalHeader>
           <ModalBody className="space-y-4">
-            {/* Listing ID — only shown when creating */}
+            {/* Listing search — only shown when creating */}
             {!editingTag && (
-              <Input
-                label="Listing ID"
-                type="number"
-                value={form.listing_id}
-                onValueChange={v => setForm(f => ({ ...f, listing_id: v }))}
-                placeholder="Enter listing ID"
-                isRequired
-                min={1}
-              />
+              <div className="relative">
+                {selectedListing ? (
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-default-100">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{selectedListing.title}</p>
+                      <p className="text-xs text-default-500">
+                        ID: {selectedListing.id}
+                        {selectedListing.owner_name && ` · ${selectedListing.owner_name}`}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      onPress={() => {
+                        setSelectedListing(null);
+                        setForm(f => ({ ...f, listing_id: '' }));
+                      }}
+                    >
+                      Change
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <Input
+                      label="Search Listing"
+                      value={listingSearch}
+                      onValueChange={setListingSearch}
+                      placeholder="Type to search by title or ID..."
+                      isRequired
+                      startContent={searchingListings ? <Spinner size="sm" /> : <Search size={14} />}
+                    />
+                    {listingResults.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-content1 border border-default-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        {listingResults.map(listing => (
+                          <button
+                            key={listing.id}
+                            className="w-full text-left px-3 py-2 hover:bg-default-100 transition-colors"
+                            onClick={() => selectListing(listing)}
+                            type="button"
+                          >
+                            <p className="text-sm font-medium">{listing.title}</p>
+                            <p className="text-xs text-default-500">
+                              ID: {listing.id}
+                              {listing.owner_name && ` · ${listing.owner_name}`}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {/* Fallback: manual ID entry */}
+                    <Input
+                      label="Or enter Listing ID directly"
+                      type="number"
+                      value={form.listing_id}
+                      onValueChange={v => setForm(f => ({ ...f, listing_id: v }))}
+                      placeholder="e.g. 42"
+                      min={1}
+                      className="mt-2"
+                      size="sm"
+                    />
+                  </>
+                )}
+              </div>
             )}
             {editingTag && (
               <div>
@@ -385,13 +531,21 @@ export function RiskTagsPage() {
               ))}
             </Select>
 
-            <Input
+            <Select
               label="Risk Category"
-              value={form.risk_category}
-              onValueChange={v => setForm(f => ({ ...f, risk_category: v }))}
-              placeholder="e.g. physical, financial, safeguarding"
+              selectedKeys={form.risk_category ? new Set([form.risk_category]) : new Set()}
+              onSelectionChange={keys => {
+                const val = Array.from(keys)[0] as string;
+                if (val) setForm(f => ({ ...f, risk_category: val }));
+              }}
               isRequired
-            />
+            >
+              {RISK_CATEGORIES.map(cat => (
+                <SelectItem key={cat.key}>
+                  {cat.label}
+                </SelectItem>
+              ))}
+            </Select>
 
             <Textarea
               label="Risk Notes (internal)"

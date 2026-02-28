@@ -803,9 +803,11 @@ export interface RiskTag {
   risk_level: 'low' | 'medium' | 'high' | 'critical';
   risk_category: string;
   risk_notes?: string;
+  member_visible_notes?: string;
   requires_approval: boolean;
   insurance_required: boolean;
   dbs_required: boolean;
+  tagged_by_name?: string;
   created_at: string;
 }
 
