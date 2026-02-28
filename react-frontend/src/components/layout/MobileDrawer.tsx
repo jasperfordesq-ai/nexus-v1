@@ -55,7 +55,6 @@ import {
   Compass,
   Cookie,
   Bot,
-  ShieldCheck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent } from '@/contexts';
@@ -151,8 +150,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('legal.privacy_policy'), href: '/privacy', icon: FileText },
     { label: t('legal.cookie_policy', 'Cookie Policy'), href: '/cookies', icon: Cookie },
     { label: t('legal.accessibility'), href: '/accessibility', icon: FileText },
-    { label: t('legal.community_guidelines', 'Community Guidelines'), href: '/community-guidelines', icon: Users },
-    { label: t('legal.acceptable_use', 'Acceptable Use'), href: '/acceptable-use', icon: ShieldCheck },
   ];
 
   // Track previous pathname to only close on actual navigation
