@@ -24,7 +24,7 @@ import {
   type ReactNode,
 } from 'react';
 import Pusher, { type Channel } from 'pusher-js';
-import { api, tokenManager } from '@/lib/api';
+import { api, tokenManager, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
@@ -237,7 +237,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     try {
       const pusher = new Pusher(PUSHER_KEY, {
         cluster: PUSHER_CLUSTER,
-        authEndpoint: `${import.meta.env.VITE_API_URL || ''}/api/pusher/auth`,
+        authEndpoint: `${API_BASE}/pusher/auth`,
         auth: {
           headers: {
             Authorization: `Bearer ${tokenManager.getAccessToken()}`,
