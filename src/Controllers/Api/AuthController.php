@@ -159,39 +159,18 @@ class AuthController extends BaseApiController
             // Check email verification and admin approval BEFORE
             // issuing any tokens. Admins/super-admins bypass these
             // gates so they can always log in to manage the system.
+            // Uses the centralized TenantSettingsService::checkLoginGates()
+            // helper — the same check is enforced on ALL auth entry points
+            // (login, token refresh, social auth, WebAuthn, 2FA, session restore).
             // =====================================================
-            $userTenantId = (int) ($user['tenant_id'] ?? 0);
-            $isAdminRole = in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'])
-                || !empty($user['is_super_admin'])
-                || !empty($user['is_tenant_super_admin']);
-
-            if (!$isAdminRole) {
-                // Gate 1: Email verification required?
-                if (\Nexus\Services\TenantSettingsService::requiresEmailVerification($userTenantId)) {
-                    if (empty($user['email_verified_at'])) {
-                        return $this->errorResponse(
-                            'Please verify your email address before logging in. Check your inbox for the verification link.',
-                            ApiErrorCodes::AUTH_EMAIL_NOT_VERIFIED,
-                            403,
-                            [
-                                'requires_verification' => true,
-                                'can_resend' => true,
-                            ]
-                        );
-                    }
-                }
-
-                // Gate 2: Admin approval required?
-                if (\Nexus\Services\TenantSettingsService::requiresAdminApproval($userTenantId)) {
-                    if (empty($user['is_approved'])) {
-                        return $this->errorResponse(
-                            'Your account is pending approval by a community administrator. You will receive an email once approved.',
-                            ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL,
-                            403,
-                            ['pending_approval' => true]
-                        );
-                    }
-                }
+            $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+            if ($gateBlock) {
+                return $this->errorResponse(
+                    $gateBlock['message'],
+                    $gateBlock['code'],
+                    403,
+                    $gateBlock['extra']
+                );
             }
 
             // Detect if this is a mobile/API request for platform-appropriate token expiry
@@ -743,7 +722,7 @@ class AuthController extends BaseApiController
 
         // Fetch user data to populate session
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT id, first_name, last_name, email, role, avatar_url, tenant_id, is_super_admin FROM users WHERE id = ?");
+        $stmt = $db->prepare("SELECT id, first_name, last_name, email, role, avatar_url, tenant_id, is_super_admin, is_tenant_super_admin, email_verified_at, is_approved FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         $user = $stmt->fetch();
 
@@ -752,6 +731,17 @@ class AuthController extends BaseApiController
                 'User not found',
                 ApiErrorCodes::RESOURCE_NOT_FOUND,
                 401
+            );
+        }
+
+        // SECURITY: Enforce registration policy gates on session restore
+        $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+        if ($gateBlock) {
+            return $this->errorResponse(
+                $gateBlock['message'],
+                $gateBlock['code'],
+                403,
+                $gateBlock['extra']
             );
         }
 
@@ -889,7 +879,7 @@ class AuthController extends BaseApiController
 
         // Verify user still exists and is active
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT id, email, role, status, is_super_admin FROM users WHERE id = ? AND tenant_id = ?");
+        $stmt = $db->prepare("SELECT id, email, role, status, is_super_admin, is_tenant_super_admin, tenant_id, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?");
         $stmt->execute([$userId, $tenantId]);
         $user = $stmt->fetch();
 
@@ -906,6 +896,19 @@ class AuthController extends BaseApiController
                 'Account suspended',
                 ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED,
                 403
+            );
+        }
+
+        // SECURITY: Enforce registration policy gates on token refresh.
+        // Without this, users with pre-existing refresh tokens can keep
+        // generating new access tokens even after lockdown is enabled.
+        $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+        if ($gateBlock) {
+            return $this->errorResponse(
+                $gateBlock['message'],
+                $gateBlock['code'],
+                403,
+                $gateBlock['extra']
             );
         }
 
