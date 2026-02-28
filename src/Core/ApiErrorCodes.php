@@ -84,6 +84,15 @@ class ApiErrorCodes
     /** Too many failed 2FA attempts, must re-login */
     public const AUTH_2FA_MAX_ATTEMPTS = 'AUTH_2FA_MAX_ATTEMPTS';
 
+    /** Email address has not been verified */
+    public const AUTH_EMAIL_NOT_VERIFIED = 'AUTH_EMAIL_NOT_VERIFIED';
+
+    /** Account is pending admin approval */
+    public const AUTH_ACCOUNT_PENDING_APPROVAL = 'AUTH_ACCOUNT_PENDING_APPROVAL';
+
+    /** Registration is closed for this community */
+    public const REGISTRATION_CLOSED = 'REGISTRATION_CLOSED';
+
     // ============================================
     // WEBAUTHN ERRORS (400, 401)
     // ============================================

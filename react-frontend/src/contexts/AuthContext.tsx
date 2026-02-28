@@ -58,12 +58,21 @@ interface AuthState {
   twoFactorMethods: string[];
 }
 
+export interface RegisterResult {
+  success: boolean;
+  requiresVerification?: boolean;
+  requiresApproval?: boolean;
+  nextSteps?: string[];
+  message?: string;
+  error?: string;
+}
+
 interface AuthContextValue extends AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<LoginResult>;
   verify2FA: (request: TwoFactorVerifyRequest) => Promise<boolean>;
-  register: (data: RegisterRequest) => Promise<boolean>;
+  register: (data: RegisterRequest) => Promise<RegisterResult>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   clearError: () => void;
@@ -337,10 +346,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Register
   // ─────────────────────────────────────────────────────────────────────────
 
-  const register = useCallback(async (data: RegisterRequest): Promise<boolean> => {
+  const register = useCallback(async (data: RegisterRequest): Promise<RegisterResult> => {
     setState((prev) => ({ ...prev, status: 'loading', error: null }));
 
-    const response = await api.post<LoginSuccessResponse>(
+    // Use a generic type since the response shape varies based on whether tokens are issued
+    const response = await api.post<Record<string, unknown>>(
       '/v2/auth/register',
       data,
       { skipAuth: true }
@@ -352,32 +362,57 @@ export function AuthProvider({ children }: AuthProviderProps) {
         status: 'error',
         error: response.error ?? 'Registration failed',
       }));
-      return false;
+      return { success: false, error: response.error ?? 'Registration failed' };
     }
 
-    const responseData = response.data!;
+    const responseData = response.data as Record<string, unknown>;
 
-    if (responseData.access_token || responseData.token) {
-      tokenManager.setAccessToken(responseData.access_token || responseData.token);
+    // Check if verification or approval is required (no tokens issued)
+    const requiresVerification = responseData.requires_verification === true;
+    const requiresApproval = responseData.requires_approval === true;
+
+    if (requiresVerification || requiresApproval) {
+      // Registration succeeded but user cannot log in yet.
+      // Reset to idle state — do NOT store any tokens.
+      setState((prev) => ({
+        ...prev,
+        status: 'idle',
+        error: null,
+      }));
+      return {
+        success: true,
+        requiresVerification,
+        requiresApproval,
+        nextSteps: (responseData.next_steps as string[]) ?? [],
+        message: (responseData.message as string) ?? 'Registration successful!',
+      };
     }
-    if (responseData.refresh_token) {
-      tokenManager.setRefreshToken(responseData.refresh_token);
+
+    // No gates — tokens were issued, authenticate immediately
+    const accessToken = (responseData.access_token || responseData.token) as string | undefined;
+    const refreshToken = responseData.refresh_token as string | undefined;
+    const user = responseData.user as User | undefined;
+
+    if (accessToken) {
+      tokenManager.setAccessToken(accessToken);
     }
-    // Only set tenant ID from user data if no tenant was pre-selected
-    if (responseData.user?.tenant_id && !tokenManager.getTenantId()) {
-      tokenManager.setTenantId(responseData.user.tenant_id);
+    if (refreshToken) {
+      tokenManager.setRefreshToken(refreshToken);
+    }
+    if (user?.tenant_id && !tokenManager.getTenantId()) {
+      tokenManager.setTenantId(user.tenant_id);
     }
 
     wasAuthenticated.current = true;
     setState({
-      user: responseData.user,
+      user: user ?? null,
       status: 'authenticated',
       error: null,
       twoFactorToken: null,
       twoFactorMethods: [],
     });
 
-    return true;
+    return { success: true };
   }, []);
 
   // ─────────────────────────────────────────────────────────────────────────
