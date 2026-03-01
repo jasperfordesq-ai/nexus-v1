@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard, MemberCardSkeleton } from '@/components/ui';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
+import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
@@ -493,7 +494,10 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
                 className="ring-2 ring-theme-muted/20"
               />
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-theme-primary">{displayName}</h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-semibold text-theme-primary">{displayName}</h3>
+                  <VerificationBadgeRow userId={member.id} size="sm" />
+                </div>
                 {member.tagline && (
                   <p className="text-sm text-theme-subtle truncate">{member.tagline}</p>
                 )}
@@ -532,7 +536,10 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
             name={displayName}
             className="w-16 h-16 mx-auto ring-2 ring-theme-muted/20 mb-3"
           />
-          <h3 className="font-semibold text-theme-primary">{displayName}</h3>
+          <div className="flex items-center justify-center gap-1.5">
+            <h3 className="font-semibold text-theme-primary">{displayName}</h3>
+            <VerificationBadgeRow userId={member.id} size="sm" />
+          </div>
           {member.tagline && (
             <p className="text-sm text-theme-subtle line-clamp-1 mt-1">{member.tagline}</p>
           )}

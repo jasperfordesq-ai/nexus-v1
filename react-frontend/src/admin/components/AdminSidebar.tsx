@@ -68,6 +68,8 @@ import {
   Eye,
   Archive,
   FileCheck,
+  UserX,
+  DollarSign,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -169,10 +171,11 @@ function useAdminNav(): NavSection[] {
         label: 'Moderation',
         icon: Shield,
         items: [
+          { label: 'Content Queue', href: '/admin/moderation/queue', icon: Shield, badge: 'NEW' },
           { label: 'Feed Posts', href: '/admin/moderation/feed', icon: MessageSquare },
           { label: 'Comments', href: '/admin/moderation/comments', icon: MessageCircle },
           { label: 'Reviews', href: '/admin/moderation/reviews', icon: Star },
-          { label: 'Reports', href: '/admin/moderation/reports', icon: Flag, badge: 'NEW' },
+          { label: 'Reports', href: '/admin/moderation/reports', icon: Flag },
         ],
       },
       {
@@ -208,6 +211,10 @@ function useAdminNav(): NavSection[] {
         items: [
           { label: 'Community Analytics', href: '/admin/community-analytics', icon: BarChart3 },
           { label: 'Impact Report', href: '/admin/impact-report', icon: FileText },
+          { label: 'Social Value / SROI', href: '/admin/reports/social-value', icon: DollarSign },
+          { label: 'Member Reports', href: '/admin/reports/members', icon: Users },
+          { label: 'Hours Reports', href: '/admin/reports/hours', icon: Clock },
+          { label: 'Inactive Members', href: '/admin/reports/inactive-members', icon: UserX },
         ],
       },
       {

@@ -7,3 +7,6 @@ export { IdeationPage } from './IdeationPage';
 export { ChallengeDetailPage } from './ChallengeDetailPage';
 export { IdeaDetailPage } from './IdeaDetailPage';
 export { CreateChallengePage } from './CreateChallengePage';
+export { CampaignsPage } from './CampaignsPage';
+export { CampaignDetailPage } from './CampaignDetailPage';
+export { OutcomesDashboardPage } from './OutcomesDashboardPage';

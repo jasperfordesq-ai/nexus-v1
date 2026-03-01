@@ -67,6 +67,8 @@ import {
   Newspaper,
   Flag,
   TrendingUp,
+  FolderOpen,
+  Megaphone,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
@@ -80,9 +82,12 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { FeedCard } from '@/components/feed/FeedCard';
+import { TeamChatrooms, TeamTasks, TeamDocuments } from '@/components/ideation';
 import type { FeedItem } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
 import type { Group, User, FeedPost, Event } from '@/types/api';
+import { GroupFilesTab } from './tabs/GroupFilesTab';
+import { GroupAnnouncementsTab } from './tabs/GroupAnnouncementsTab';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -1139,6 +1144,9 @@ export function GroupDetailPage() {
         )}
       </GlassCard>
 
+      {/* Pinned Announcements Banner (GR3) */}
+      <PinnedAnnouncementsBanner groupId={group.id} />
+
       {/* Tabs */}
       <Tabs
         selectedKey={activeTab}
@@ -1182,6 +1190,51 @@ export function GroupDetailPage() {
             <span className="flex items-center gap-2">
               <Calendar className="w-4 h-4" aria-hidden="true" />
               {t('detail.tab_events')}
+            </span>
+          }
+        />
+        <Tab
+          key="files"
+          title={
+            <span className="flex items-center gap-2">
+              <FolderOpen className="w-4 h-4" aria-hidden="true" />
+              Files
+            </span>
+          }
+        />
+        <Tab
+          key="announcements"
+          title={
+            <span className="flex items-center gap-2">
+              <Megaphone className="w-4 h-4" aria-hidden="true" />
+              Announcements
+            </span>
+          }
+        />
+        <Tab
+          key="chatrooms"
+          title={
+            <span className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" aria-hidden="true" />
+              Channels
+            </span>
+          }
+        />
+        <Tab
+          key="tasks"
+          title={
+            <span className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" aria-hidden="true" />
+              Tasks
+            </span>
+          }
+        />
+        <Tab
+          key="documents"
+          title={
+            <span className="flex items-center gap-2">
+              <FileText className="w-4 h-4" aria-hidden="true" />
+              Documents
             </span>
           }
         />
@@ -1720,6 +1773,53 @@ export function GroupDetailPage() {
           </GlassCard>
         )}
 
+        {/* ─── Files Tab (GR1) ─── */}
+        {activeTab === 'files' && (
+          <GroupFilesTab
+            groupId={group.id}
+            isAdmin={userIsAdmin}
+            isMember={userIsMember}
+          />
+        )}
+
+        {/* ─── Announcements Tab (GR3) ─── */}
+        {activeTab === 'announcements' && (
+          <GroupAnnouncementsTab
+            groupId={group.id}
+            isAdmin={userIsAdmin}
+            isMember={userIsMember}
+          />
+        )}
+
+        {/* ─── Chatrooms Tab (I4) ─── */}
+        {activeTab === 'chatrooms' && userIsMember && (
+          <GlassCard className="p-6">
+            <TeamChatrooms groupId={group.id} isGroupAdmin={userIsAdmin} />
+          </GlassCard>
+        )}
+
+        {/* ─── Tasks Tab (I5) ─── */}
+        {activeTab === 'tasks' && userIsMember && (
+          <GlassCard className="p-6">
+            <TeamTasks
+              groupId={group.id}
+              isGroupAdmin={userIsAdmin}
+              members={(members || []).map(m => ({
+                id: m.id,
+                name: m.first_name && m.last_name ? `${m.first_name} ${m.last_name}` : m.name ?? 'User',
+                avatar_url: m.avatar_url ?? m.avatar ?? null,
+              }))}
+            />
+          </GlassCard>
+        )}
+
+        {/* ─── Documents Tab (I6) ─── */}
+        {activeTab === 'documents' && userIsMember && (
+          <GlassCard className="p-6">
+            <TeamDocuments groupId={group.id} isGroupAdmin={userIsAdmin} />
+          </GlassCard>
+        )}
+
         {/* ─── Subgroups Tab ─── */}
         {activeTab === 'subgroups' && hasSubGroups && (
           <GlassCard className="p-6">
@@ -2067,6 +2167,54 @@ export function GroupDetailPage() {
         </ModalContent>
       </Modal>
     </motion.div>
+  );
+}
+
+/**
+ * Pinned Announcements Banner
+ * Shows pinned announcements at top of group page (above tabs).
+ */
+function PinnedAnnouncementsBanner({ groupId }: { groupId: number }) {
+  const [pinned, setPinned] = useState<Array<{ id: number; title: string; content: string; author: { name: string }; created_at: string }>>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await api.get(`/api/v2/groups/${groupId}/announcements?pinned=1`);
+        if (res.success) {
+          const payload = res.data;
+          const items = Array.isArray(payload)
+            ? payload
+            : (payload as { announcements?: typeof pinned })?.announcements ?? [];
+          setPinned(items.filter((a: { is_pinned?: boolean }) => a.is_pinned !== false));
+        }
+      } catch {
+        // Silently fail — banner is non-critical
+      }
+      setLoaded(true);
+    }
+    load();
+  }, [groupId]);
+
+  if (!loaded || pinned.length === 0) return null;
+
+  return (
+    <div className="space-y-2">
+      {pinned.map((announcement) => (
+        <div
+          key={announcement.id}
+          className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20"
+        >
+          <Megaphone className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-theme-primary">{announcement.title}</p>
+            <p className="text-xs text-theme-subtle mt-0.5 line-clamp-2">{announcement.content}</p>
+          </div>
+          <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">Pinned</Chip>
+        </div>
+      ))}
+    </div>
   );
 }
 
