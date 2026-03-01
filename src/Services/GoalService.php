@@ -219,6 +219,77 @@ class GoalService
     }
 
     /**
+     * Get goals where the user is a buddy/mentor
+     *
+     * @param int $userId The buddy's user ID
+     * @param array $filters Optional: cursor, limit
+     * @return array ['items' => [...], 'cursor' => ?string, 'has_more' => bool]
+     */
+    public static function getGoalsIAmBuddyFor(int $userId, array $filters = []): array
+    {
+        $tenantId = TenantContext::getId();
+        $limit = $filters['limit'] ?? 20;
+        $cursor = $filters['cursor'] ?? null;
+
+        $params = [$tenantId, $userId];
+        $where = [
+            "g.tenant_id = ?",
+            "g.mentor_id = ?",
+        ];
+
+        if ($cursor) {
+            $cursorId = base64_decode($cursor);
+            if ($cursorId !== false) {
+                $where[] = "g.id < ?";
+                $params[] = (int)$cursorId;
+            }
+        }
+
+        $whereClause = implode(' AND ', $where);
+        $params[] = $limit + 1;
+
+        $sql = "
+            SELECT
+                g.*,
+                u.first_name as owner_first_name,
+                u.last_name as owner_last_name,
+                u.avatar_url as owner_avatar,
+                m.first_name as mentor_first_name,
+                m.last_name as mentor_last_name,
+                m.avatar_url as mentor_avatar
+            FROM goals g
+            LEFT JOIN users u ON g.user_id = u.id
+            LEFT JOIN users m ON g.mentor_id = m.id
+            WHERE {$whereClause}
+            ORDER BY g.created_at DESC, g.id DESC
+            LIMIT ?
+        ";
+
+        $goals = Database::query($sql, $params)->fetchAll();
+
+        $hasMore = count($goals) > $limit;
+        if ($hasMore) {
+            array_pop($goals);
+        }
+
+        $nextCursor = null;
+        if ($hasMore && !empty($goals)) {
+            $lastGoal = end($goals);
+            $nextCursor = base64_encode((string)$lastGoal['id']);
+        }
+
+        foreach ($goals as &$goal) {
+            $goal = self::enrichGoal($goal);
+        }
+
+        return [
+            'items' => $goals,
+            'cursor' => $nextCursor,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
      * Get a single goal by ID
      *
      * @param int $id
