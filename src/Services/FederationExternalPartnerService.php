@@ -373,7 +373,10 @@ class FederationExternalPartnerService
      */
     private static function encryptApiKey(string $apiKey): string
     {
-        $secret = getenv('APP_KEY') ?: getenv('ENCRYPTION_KEY') ?: 'nexus-default-key';
+        $secret = getenv('APP_KEY') ?: getenv('ENCRYPTION_KEY') ?: '';
+        if (empty($secret)) {
+            throw new \RuntimeException('APP_KEY or ENCRYPTION_KEY must be set for federation encryption');
+        }
         $key = hash('sha256', $secret, true);
         $iv = random_bytes(16);
         $encrypted = openssl_encrypt($apiKey, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
@@ -385,7 +388,10 @@ class FederationExternalPartnerService
      */
     public static function decryptApiKey(string $encryptedKey): string
     {
-        $secret = getenv('APP_KEY') ?: getenv('ENCRYPTION_KEY') ?: 'nexus-default-key';
+        $secret = getenv('APP_KEY') ?: getenv('ENCRYPTION_KEY') ?: '';
+        if (empty($secret)) {
+            throw new \RuntimeException('APP_KEY or ENCRYPTION_KEY must be set for federation encryption');
+        }
         $key = hash('sha256', $secret, true);
         $data = base64_decode($encryptedKey);
         $iv = substr($data, 0, 16);
