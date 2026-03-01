@@ -454,4 +454,124 @@ class AdminFederationApiController extends BaseApiController
 
         $this->respondWithData($data);
     }
+
+    /**
+     * Export federation data as CSV
+     * GET /api/v2/admin/federation/export/{type}
+     */
+    public function exportData(string $type): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $allowedTypes = ['users', 'partnerships', 'transactions', 'audit'];
+        if (!in_array($type, $allowedTypes, true)) {
+            $this->respondWithError('INVALID_TYPE', 'Invalid export type. Allowed: ' . implode(', ', $allowedTypes), 400);
+            return;
+        }
+
+        try {
+            $db = Database::getInstance();
+            $rows = [];
+            $headers = [];
+
+            switch ($type) {
+                case 'users':
+                    if (!$this->tableExists('federation_user_settings')) {
+                        $this->respondWithError('NO_DATA', 'Federation user settings table not found', 404);
+                        return;
+                    }
+                    $stmt = $db->prepare("
+                        SELECT u.id, u.first_name, u.last_name, u.email, u.username,
+                               fus.federation_optin, fus.privacy_level, fus.service_reach,
+                               fus.created_at, fus.updated_at
+                        FROM federation_user_settings fus
+                        JOIN users u ON u.id = fus.user_id
+                        WHERE u.tenant_id = ? AND fus.federation_optin = 1
+                        ORDER BY u.first_name, u.last_name
+                    ");
+                    $stmt->execute([$tenantId]);
+                    $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                    $headers = ['ID', 'First Name', 'Last Name', 'Email', 'Username', 'Opted In', 'Privacy Level', 'Service Reach', 'Created', 'Updated'];
+                    break;
+
+                case 'partnerships':
+                    if (!$this->tableExists('federation_partnerships')) {
+                        $this->respondWithError('NO_DATA', 'Federation partnerships table not found', 404);
+                        return;
+                    }
+                    $stmt = $db->prepare("
+                        SELECT fp.id, t1.name AS tenant_name, t2.name AS partner_name,
+                               fp.status, fp.level, fp.created_at, fp.updated_at
+                        FROM federation_partnerships fp
+                        LEFT JOIN tenants t1 ON t1.id = fp.tenant_id
+                        LEFT JOIN tenants t2 ON t2.id = fp.partner_tenant_id
+                        WHERE fp.tenant_id = ? OR fp.partner_tenant_id = ?
+                        ORDER BY fp.created_at DESC
+                    ");
+                    $stmt->execute([$tenantId, $tenantId]);
+                    $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                    $headers = ['ID', 'Tenant', 'Partner', 'Status', 'Level', 'Created', 'Updated'];
+                    break;
+
+                case 'transactions':
+                    if (!$this->tableExists('federation_transactions')) {
+                        $this->respondWithError('NO_DATA', 'Federation transactions table not found', 404);
+                        return;
+                    }
+                    $stmt = $db->prepare("
+                        SELECT ft.id, ft.sender_user_id, ft.receiver_user_id,
+                               ft.amount, ft.description, ft.status,
+                               ft.created_at, ft.completed_at
+                        FROM federation_transactions ft
+                        WHERE ft.sender_tenant_id = ? OR ft.receiver_tenant_id = ?
+                        ORDER BY ft.created_at DESC
+                    ");
+                    $stmt->execute([$tenantId, $tenantId]);
+                    $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                    $headers = ['ID', 'Sender ID', 'Receiver ID', 'Amount', 'Description', 'Status', 'Created', 'Completed'];
+                    break;
+
+                case 'audit':
+                    if (!$this->tableExists('federation_audit_log')) {
+                        $this->respondWithError('NO_DATA', 'Federation audit log table not found', 404);
+                        return;
+                    }
+                    $stmt = $db->prepare("
+                        SELECT id, action, category, level, actor_user_id,
+                               source_tenant_id, target_tenant_id, details, created_at
+                        FROM federation_audit_log
+                        WHERE source_tenant_id = ? OR target_tenant_id = ?
+                        ORDER BY created_at DESC
+                        LIMIT 5000
+                    ");
+                    $stmt->execute([$tenantId, $tenantId]);
+                    $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                    $headers = ['ID', 'Action', 'Category', 'Level', 'Actor ID', 'Source Tenant', 'Target Tenant', 'Details', 'Created'];
+                    break;
+            }
+
+            // Send CSV response
+            $filename = "federation_{$type}_" . date('Y-m-d_His') . '.csv';
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Cache-Control: no-cache, no-store, must-revalidate');
+
+            $output = fopen('php://output', 'w');
+            // BOM for Excel UTF-8 compatibility
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv($output, $headers);
+
+            foreach ($rows as $row) {
+                fputcsv($output, array_values($row));
+            }
+
+            fclose($output);
+            exit;
+
+        } catch (\Exception $e) {
+            error_log("Federation export error ({$type}): " . $e->getMessage());
+            $this->respondWithError('EXPORT_FAILED', 'Failed to export data', 500);
+        }
+    }
 }

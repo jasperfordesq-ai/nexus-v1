@@ -43,7 +43,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FederationSettings } from '@/types/api';
@@ -88,6 +88,7 @@ export function FederationSettingsPage() {
   const { t } = useTranslation('federation');
   usePageTitle(t('settings.page_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -243,7 +244,7 @@ export function FederationSettingsPage() {
     return (
       <div className="max-w-3xl mx-auto">
         <Breadcrumbs items={[
-          { label: t('settings.breadcrumb_federation'), href: '/federation' },
+          { label: t('settings.breadcrumb_federation'), href: tenantPath('/federation') },
           { label: t('settings.breadcrumb_settings') },
         ]} />
         <GlassCard className="p-8 text-center">
@@ -273,7 +274,7 @@ export function FederationSettingsPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('settings.breadcrumb_federation'), href: '/federation' },
+        { label: t('settings.breadcrumb_federation'), href: tenantPath('/federation') },
         { label: t('settings.breadcrumb_settings') },
       ]} />
 

@@ -919,6 +919,7 @@ $router->add('GET', '/api/v2/admin/federation/analytics', 'Nexus\Controllers\Api
 $router->add('GET', '/api/v2/admin/federation/api-keys', 'Nexus\Controllers\Api\AdminFederationApiController@apiKeys');
 $router->add('POST', '/api/v2/admin/federation/api-keys', 'Nexus\Controllers\Api\AdminFederationApiController@createApiKey');
 $router->add('GET', '/api/v2/admin/federation/data', 'Nexus\Controllers\Api\AdminFederationApiController@dataManagement');
+$router->add('GET', '/api/v2/admin/federation/export/{type}', 'Nexus\Controllers\Api\AdminFederationApiController@exportData');
 
 // Federation V2 (user-facing, for React frontend)
 $router->add('GET', '/api/v2/federation/status', 'Nexus\Controllers\Api\FederationV2ApiController@status');

@@ -162,7 +162,7 @@ export function FederationPartnersPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('partners.breadcrumb_federation'), href: '/federation' },
+          { label: t('partners.breadcrumb_federation'), href: tenantPath('/federation') },
           { label: t('partners.breadcrumb_partners') },
         ]}
       />
