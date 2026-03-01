@@ -458,6 +458,7 @@ $router->add('POST', '/api/v2/polls/{id}/vote', 'Nexus\Controllers\Api\PollsApiC
 $router->add('GET', '/api/v2/goals', 'Nexus\Controllers\Api\GoalsApiController@index');
 $router->add('POST', '/api/v2/goals', 'Nexus\Controllers\Api\GoalsApiController@store');
 $router->add('GET', '/api/v2/goals/discover', 'Nexus\Controllers\Api\GoalsApiController@discover');
+$router->add('GET', '/api/v2/goals/mentoring', 'Nexus\Controllers\Api\GoalsApiController@mentoring');
 $router->add('GET', '/api/v2/goals/{id}', 'Nexus\Controllers\Api\GoalsApiController@show');
 $router->add('PUT', '/api/v2/goals/{id}', 'Nexus\Controllers\Api\GoalsApiController@update');
 $router->add('DELETE', '/api/v2/goals/{id}', 'Nexus\Controllers\Api\GoalsApiController@destroy');

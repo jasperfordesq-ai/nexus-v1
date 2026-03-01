@@ -102,7 +102,7 @@ interface ProgressEntry {
   created_at: string;
 }
 
-type GoalTab = 'my' | 'discover';
+type GoalTab = 'my' | 'buddying' | 'discover';
 
 /* ───────────────────────── Confetti Particle ───────────────────────── */
 
@@ -216,6 +216,8 @@ export function GoalsPage() {
 
       const endpoint = tab === 'discover'
         ? `/v2/goals/discover?${params}`
+        : tab === 'buddying'
+        ? `/v2/goals/mentoring?${params}`
         : `/v2/goals?${params}&status=all`;
 
       const response = await api.get<Goal[]>(endpoint);
@@ -468,7 +470,7 @@ export function GoalsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <Button
           variant={tab === 'my' ? 'solid' : 'flat'}
           className={tab === 'my' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white' : 'bg-theme-elevated text-theme-muted'}
@@ -476,6 +478,14 @@ export function GoalsPage() {
           startContent={<Target className="w-4 h-4" aria-hidden="true" />}
         >
           {t('goals.tab_my')}
+        </Button>
+        <Button
+          variant={tab === 'buddying' ? 'solid' : 'flat'}
+          className={tab === 'buddying' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+          onPress={() => setTab('buddying')}
+          startContent={<Users className="w-4 h-4" aria-hidden="true" />}
+        >
+          {t('goals.tab_buddying')}
         </Button>
         <Button
           variant={tab === 'discover' ? 'solid' : 'flat'}
@@ -519,18 +529,26 @@ export function GoalsPage() {
             </div>
           ) : goals.length === 0 ? (
             <EmptyState
-              icon={<Target className="w-12 h-12" aria-hidden="true" />}
-              title={tab === 'my' ? t('goals.empty_my_title') : t('goals.empty_discover_title')}
-              description={tab === 'my' ? t('goals.empty_my_description') : t('goals.empty_discover_description')}
+              icon={tab === 'buddying' ? <Users className="w-12 h-12" aria-hidden="true" /> : <Target className="w-12 h-12" aria-hidden="true" />}
+              title={tab === 'my' ? t('goals.empty_my_title') : tab === 'buddying' ? t('goals.empty_buddying_title') : t('goals.empty_discover_title')}
+              description={tab === 'my' ? t('goals.empty_my_description') : tab === 'buddying' ? t('goals.empty_buddying_description') : t('goals.empty_discover_description')}
               action={
-                tab === 'my' && isAuthenticated && (
+                tab === 'my' && isAuthenticated ? (
                   <Button
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                     onPress={onOpen}
                   >
                     {t('goals.create_goal')}
                   </Button>
-                )
+                ) : tab === 'buddying' && isAuthenticated ? (
+                  <Button
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    onPress={() => setTab('discover')}
+                    startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    {t('goals.tab_discover')}
+                  </Button>
+                ) : undefined
               }
             />
           ) : (
@@ -556,6 +574,7 @@ export function GoalsPage() {
                       onBecomeBuddy={handleBecomeBuddy}
                       onOpenDetail={openDetail}
                       isDiscoverTab={tab === 'discover'}
+                      isBuddyingTab={tab === 'buddying'}
                     />
                   </motion.div>
                 );
@@ -915,6 +934,7 @@ interface GoalCardProps {
   currentUserId: number | null;
   isCelebrating: boolean;
   isDiscoverTab: boolean;
+  isBuddyingTab?: boolean;
   onProgressUpdate: (goalId: number, increment: number) => void;
   onEdit: (goal: Goal) => void;
   onDelete: (goal: Goal) => void;
@@ -929,6 +949,7 @@ function GoalCard({
   currentUserId,
   isCelebrating,
   isDiscoverTab,
+  isBuddyingTab = false,
   onProgressUpdate,
   onEdit,
   onDelete,
@@ -973,7 +994,7 @@ function GoalCard({
                 {t('goals.visibility.private')}
               </Chip>
             )}
-            {isBuddy && (
+            {isBuddy && !isBuddyingTab && (
               <Chip size="sm" color="secondary" variant="flat" startContent={<Users className="w-3 h-3" />}>
                 {t('goals.youre_a_buddy')}
               </Chip>
@@ -1011,13 +1032,13 @@ function GoalCard({
                 {isOverdue ? t('goals.overdue') : t('goals.due')}{deadlineDate.toLocaleDateString()}
               </span>
             )}
-            {goal.buddy_name && (
+            {goal.buddy_name && !isBuddyingTab && (
               <span className="flex items-center gap-1">
                 <Users className="w-3 h-3" aria-hidden="true" />
                 {t('goals.buddy_label')}: {goal.buddy_name}
               </span>
             )}
-            {!isOwner && (
+            {(!isOwner || isBuddyingTab) && goal.user_name && (
               <Link
                 to={`/profile/${goal.user_id}`}
                 className="flex items-center gap-1.5 hover:text-theme-primary transition-colors"

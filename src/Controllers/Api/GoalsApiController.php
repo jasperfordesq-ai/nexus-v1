@@ -129,6 +129,45 @@ class GoalsApiController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/goals/mentoring
+     *
+     * Get goals where the current user is a buddy/mentor.
+     *
+     * Query Parameters:
+     * - cursor: string (pagination cursor)
+     * - per_page: int (default 20, max 100)
+     *
+     * Response: 200 OK with data array and pagination meta
+     */
+    public function mentoring(): void
+    {
+        $userId = $this->getUserId();
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ];
+
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = GoalService::getGoalsIAmBuddyFor($userId, $filters);
+
+        $items = array_map(function (array $goal) use ($userId) {
+            $goal['is_owner'] = ((int)($goal['user_id'] ?? 0) === $userId);
+            $goal['is_buddy'] = true;
+            return $goal;
+        }, $result['items']);
+
+        $this->respondWithCollection(
+            $items,
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
+    }
+
+    /**
      * GET /api/v2/goals/{id}
      *
      * Get a single goal by ID.
