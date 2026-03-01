@@ -134,11 +134,10 @@ class JobVacancyService
                 u.first_name as creator_first_name,
                 u.last_name as creator_last_name,
                 u.avatar_url as creator_avatar,
-                o.name as organization_name,
-                o.logo_url as organization_logo
+                NULL as organization_name,
+                NULL as organization_logo
             FROM job_vacancies jv
             LEFT JOIN users u ON jv.user_id = u.id
-            LEFT JOIN organizations o ON jv.organization_id = o.id
             WHERE {$whereClause}
             ORDER BY jv.created_at DESC, jv.id DESC
             LIMIT ?
@@ -186,11 +185,10 @@ class JobVacancyService
                 u.first_name as creator_first_name,
                 u.last_name as creator_last_name,
                 u.avatar_url as creator_avatar,
-                o.name as organization_name,
-                o.logo_url as organization_logo
+                NULL as organization_name,
+                NULL as organization_logo
             FROM job_vacancies jv
             LEFT JOIN users u ON jv.user_id = u.id
-            LEFT JOIN organizations o ON jv.organization_id = o.id
             WHERE jv.id = ? AND jv.tenant_id = ?
         ";
 
