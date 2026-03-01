@@ -8,6 +8,7 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Services\PollService;
 use Nexus\Core\ApiErrorCodes;
+use Nexus\Core\TenantContext;
 
 /**
  * PollsApiController - RESTful API v2 for polls
@@ -34,6 +35,13 @@ class PollsApiController extends BaseApiController
     /** Mark as v2 API for correct headers */
     protected bool $isV2Api = true;
 
+    private function checkFeature(): void
+    {
+        if (!TenantContext::hasFeature('polls')) {
+            $this->respondWithError('FEATURE_DISABLED', 'Polls module is not enabled for this community', null, 403);
+        }
+    }
+
     /**
      * GET /api/v2/polls
      *
@@ -49,6 +57,7 @@ class PollsApiController extends BaseApiController
      */
     public function index(): void
     {
+        $this->checkFeature();
         // Require authentication
         $userId = $this->getUserId();
 
@@ -99,6 +108,7 @@ class PollsApiController extends BaseApiController
      */
     public function show(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
 
         $poll = PollService::getById($id, $userId);
@@ -132,6 +142,7 @@ class PollsApiController extends BaseApiController
      */
     public function store(): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('poll_create', 5, 60);
@@ -171,6 +182,7 @@ class PollsApiController extends BaseApiController
      */
     public function update(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('poll_update', 10, 60);
@@ -218,6 +230,7 @@ class PollsApiController extends BaseApiController
      */
     public function destroy(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('poll_delete', 5, 60);
@@ -259,6 +272,7 @@ class PollsApiController extends BaseApiController
      */
     public function vote(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('poll_vote', 20, 60);

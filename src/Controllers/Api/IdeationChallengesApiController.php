@@ -8,6 +8,7 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Services\IdeationChallengeService;
 use Nexus\Core\ApiErrorCodes;
+use Nexus\Core\TenantContext;
 
 /**
  * IdeationChallengesApiController - RESTful API v2 for ideation challenges
@@ -40,6 +41,13 @@ class IdeationChallengesApiController extends BaseApiController
     /** Mark as v2 API for correct headers */
     protected bool $isV2Api = true;
 
+    private function checkFeature(): void
+    {
+        if (!TenantContext::hasFeature('ideation_challenges')) {
+            $this->respondWithError('FEATURE_DISABLED', 'Ideation Challenges module is not enabled for this community', null, 403);
+        }
+    }
+
     // ============================================
     // CHALLENGE ENDPOINTS
     // ============================================
@@ -56,6 +64,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function index(): void
     {
+        $this->checkFeature();
         // Optional auth — allow unauthenticated browsing
         $userId = $this->getOptionalUserId();
 
@@ -89,6 +98,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function store(): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_create', 10, 60);
@@ -115,6 +125,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function show(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getOptionalUserId();
 
         $challenge = IdeationChallengeService::getChallengeById($id, $userId);
@@ -138,6 +149,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function update(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_update', 20, 60);
@@ -164,6 +176,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function destroy(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_delete', 10, 60);
@@ -187,6 +200,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function updateStatus(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_status', 20, 60);
@@ -231,6 +245,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function ideas(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getOptionalUserId();
 
         $filters = [
@@ -261,6 +276,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function submitIdea(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_submit_idea', 10, 60);
@@ -287,6 +303,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function showIdea(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getOptionalUserId();
 
         $idea = IdeationChallengeService::getIdeaById($id, $userId);
@@ -310,6 +327,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function updateIdea(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_update_idea', 20, 60);
@@ -336,6 +354,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function deleteIdea(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_delete_idea', 10, 60);
@@ -358,6 +377,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function voteIdea(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_vote', 30, 60);
@@ -381,6 +401,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function updateIdeaStatus(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_idea_status', 20, 60);
@@ -424,6 +445,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function comments(int $id): void
     {
+        $this->checkFeature();
         $this->getOptionalUserId();
 
         $filters = [
@@ -452,6 +474,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function addComment(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_comment', 20, 60);
@@ -480,6 +503,7 @@ class IdeationChallengesApiController extends BaseApiController
      */
     public function deleteComment(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('ideation_delete_comment', 10, 60);
