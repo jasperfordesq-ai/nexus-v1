@@ -352,6 +352,22 @@ class IdeationChallengeService
 
             $challengeId = Database::lastInsertId();
 
+            // Record in feed_activity table
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'challenge', (int)$challengeId, [
+                    'title' => $title,
+                    'content' => $description,
+                    'image_url' => $coverImage,
+                    'metadata' => [
+                        'submission_deadline' => $submissionDeadline,
+                        'ideas_count' => 0,
+                    ],
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log("IdeationChallengeService::createChallenge feed_activity record failed: " . $faEx->getMessage());
+            }
+
             // Sync normalized tags if tag_ids provided
             if (isset($data['tag_ids']) && is_array($data['tag_ids'])) {
                 ChallengeTagService::syncTagsForChallenge((int)$challengeId, $data['tag_ids']);
@@ -531,6 +547,14 @@ class IdeationChallengeService
                 "DELETE FROM ideation_challenges WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
+
+            // Remove from feed_activity
+            try {
+                FeedActivityService::removeActivity('challenge', $id);
+            } catch (\Exception $faEx) {
+                error_log("IdeationChallengeService::deleteChallenge feed_activity remove failed: " . $faEx->getMessage());
+            }
+
             return true;
         } catch (\Throwable $e) {
             error_log("Challenge deletion failed: " . $e->getMessage());

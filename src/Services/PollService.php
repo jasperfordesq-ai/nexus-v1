@@ -333,6 +333,17 @@ class PollService
 
             Database::commit();
 
+            // Record in feed_activity table
+            try {
+                FeedActivityService::recordActivity(TenantContext::getId(), $userId, 'poll', (int)$pollId, [
+                    'title' => $question,
+                    'content' => $question,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log("PollService::create feed_activity record failed: " . $faEx->getMessage());
+            }
+
             // Award gamification points
             try {
                 if (class_exists('\Nexus\Models\Gamification')) {
@@ -477,6 +488,14 @@ class PollService
             Database::query("DELETE FROM polls WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
             Database::commit();
+
+            // Remove from feed_activity
+            try {
+                FeedActivityService::removeActivity('poll', $id);
+            } catch (\Exception $faEx) {
+                error_log("PollService::delete feed_activity remove failed: " . $faEx->getMessage());
+            }
+
             return true;
         } catch (\Throwable $e) {
             Database::rollback();

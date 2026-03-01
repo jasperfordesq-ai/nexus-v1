@@ -143,6 +143,20 @@ class ReviewService
 
             $reviewId = $db->lastInsertId();
 
+            // Record in feed_activity table
+            try {
+                FeedActivityService::recordActivity($reviewerTenantId, $reviewerId, 'review', (int)$reviewId, [
+                    'content' => $comment,
+                    'metadata' => [
+                        'rating' => $rating,
+                        'receiver_id' => $receiverId,
+                    ],
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log("ReviewService::createReview feed_activity record failed: " . $faEx->getMessage());
+            }
+
             // Mark transaction as reviewed
             if ($federationTransactionId) {
                 $isSender = ((int)$transaction['sender_user_id'] === $reviewerId);

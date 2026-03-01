@@ -427,6 +427,17 @@ class GoalService
 
             $goalId = (int)Database::lastInsertId();
 
+            // Record in feed_activity table
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'goal', $goalId, [
+                    'title' => $title,
+                    'content' => $description ?: null,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log("GoalService::create feed_activity record failed: " . $faEx->getMessage());
+            }
+
             // Log creation in progress history
             GoalProgressService::logEvent($goalId, $tenantId, 'created', null, null, $userId, [
                 'title' => $title,
@@ -717,6 +728,14 @@ class GoalService
         try {
             $tenantId = TenantContext::getId();
             Database::query("DELETE FROM goals WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+            // Remove from feed_activity (hard delete)
+            try {
+                FeedActivityService::removeActivity('goal', $id);
+            } catch (\Exception $faEx) {
+                error_log("GoalService::delete feed_activity remove failed: " . $faEx->getMessage());
+            }
+
             return true;
         } catch (\Throwable $e) {
             error_log("Goal deletion failed: " . $e->getMessage());

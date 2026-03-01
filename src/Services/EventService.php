@@ -437,6 +437,22 @@ class EventService
                 Database::query("UPDATE events SET sdg_goals = ? WHERE id = ? AND tenant_id = ?", [$json, $eventId, TenantContext::getId()]);
             }
 
+            // Record in feed_activity table
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'event', (int)$eventId, [
+                    'title' => trim($data['title']),
+                    'content' => $data['description'] ?? '',
+                    'metadata' => [
+                        'start_date' => $data['start_time'] ?? null,
+                        'location' => $data['location'] ?? null,
+                    ],
+                    'group_id' => $data['group_id'] ?? null,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log("EventService::create feed_activity record failed: " . $faEx->getMessage());
+            }
+
             // Log activity
             ActivityLog::log($userId, 'hosted an Event', $data['title'], true, '/events/' . $eventId);
 
@@ -544,6 +560,14 @@ class EventService
 
         try {
             Event::delete($id);
+
+            // Remove from feed_activity
+            try {
+                FeedActivityService::removeActivity('event', $id);
+            } catch (\Exception $faEx) {
+                error_log("EventService::delete feed_activity remove failed: " . $faEx->getMessage());
+            }
+
             return true;
         } catch (\Exception $e) {
             error_log("EventService::delete error: " . $e->getMessage());
@@ -1324,6 +1348,13 @@ class EventService
 
             // Notify all RSVPs (going + interested)
             self::notifyCancellation($eventId, $event['title'], $reason, $tenantId);
+
+            // Hide from feed_activity
+            try {
+                FeedActivityService::hideActivity('event', $eventId);
+            } catch (\Exception $faEx) {
+                error_log("EventService::cancelEvent feed_activity hide failed: " . $faEx->getMessage());
+            }
 
             // Log activity
             ActivityLog::log($userId, 'cancelled an Event', $event['title'], true, '/events/' . $eventId);

@@ -106,6 +106,24 @@ const typeConfig = {
     icon: <Star className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-amber-500/10 to-yellow-500/10',
   },
+  job: {
+    label: 'Job',
+    color: 'primary' as const,
+    icon: <TrendingUp className="w-3 h-3" aria-hidden="true" />,
+    gradient: 'from-blue-500/10 to-cyan-500/10',
+  },
+  challenge: {
+    label: 'Challenge',
+    color: 'secondary' as const,
+    icon: <Target className="w-3 h-3" aria-hidden="true" />,
+    gradient: 'from-violet-500/10 to-purple-500/10',
+  },
+  volunteer: {
+    label: 'Volunteer',
+    color: 'success' as const,
+    icon: <Heart className="w-3 h-3" aria-hidden="true" />,
+    gradient: 'from-green-500/10 to-emerald-500/10',
+  },
 };
 
 /* ───────────────────────── Comment Item ───────────────────────── */

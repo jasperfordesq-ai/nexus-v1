@@ -356,6 +356,13 @@ class SocialApiController extends BaseApiController
 
         Database::query("DELETE FROM feed_posts WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
+        // Remove from feed_activity
+        try {
+            \Nexus\Services\FeedActivityService::removeActivity('post', $id);
+        } catch (\Exception $e) {
+            error_log("SocialApiController::deletePost feed_activity remove failed: " . $e->getMessage());
+        }
+
         $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
 
@@ -1023,6 +1030,13 @@ class SocialApiController extends BaseApiController
 
                 // Delete the post
                 Database::query("DELETE FROM feed_posts WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
+
+                // Remove from feed_activity
+                try {
+                    \Nexus\Services\FeedActivityService::removeActivity('post', $targetId);
+                } catch (\Exception $e) {
+                    error_log("SocialApiController::moderateContent feed_activity remove failed: " . $e->getMessage());
+                }
 
                 $this->jsonResponse(['success' => true, 'status' => 'deleted']);
             }
