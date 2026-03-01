@@ -60,6 +60,9 @@ interface Resource {
   description: string;
   file_url: string;
   file_path: string;
+  file_type: string | null;
+  file_size: number;
+  downloads: number;
   created_at: string;
   uploader: {
     id: number;
@@ -489,10 +492,19 @@ export function ResourcesPage() {
                             <User className="w-3 h-3" aria-hidden="true" />
                             {resource.uploader.name}
                           </span>
+                          {resource.file_size > 0 && (
+                            <span>{formatFileSize(resource.file_size)}</span>
+                          )}
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" aria-hidden="true" />
                             {formatRelativeTime(resource.created_at)}
                           </span>
+                          {resource.downloads > 0 && (
+                            <span className="flex items-center gap-1">
+                              <Download className="w-3 h-3" aria-hidden="true" />
+                              {resource.downloads}
+                            </span>
+                          )}
                         </div>
                       </div>
 

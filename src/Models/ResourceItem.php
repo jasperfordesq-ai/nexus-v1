@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class ResourceItem
 {
@@ -38,33 +39,49 @@ class ResourceItem
 
     public static function find($id)
     {
-        return Database::query("SELECT * FROM resources WHERE id = ?", [$id])->fetch();
+        return Database::query(
+            "SELECT * FROM resources WHERE id = ? AND tenant_id = ?",
+            [$id, TenantContext::getId()]
+        )->fetch();
     }
 
     public static function update($id, $title, $description, $categoryId)
     {
-        $sql = "UPDATE resources SET title = ?, description = ?, category_id = ? WHERE id = ?";
-        Database::query($sql, [$title, $description, $categoryId, $id]);
+        Database::query(
+            "UPDATE resources SET title = ?, description = ?, category_id = ? WHERE id = ? AND tenant_id = ?",
+            [$title, $description, $categoryId, $id, TenantContext::getId()]
+        );
     }
 
     public static function delete($id)
     {
         $res = self::find($id);
         if ($res && !empty($res['file_path'])) {
-            // Security: Validate path is within uploads directory to prevent path traversal
             $uploadsDir = realpath(__DIR__ . '/../../httpdocs/uploads');
-            $fullPath = realpath(__DIR__ . '/../../httpdocs' . $res['file_path']);
+            $filePath = $res['file_path'];
 
-            // Only delete if file exists AND is within the uploads directory
+            // Legacy records store full web path (e.g. /uploads/resources/file.pdf)
+            // New records store just the filename (e.g. file.pdf) under tenant-scoped dir
+            if (str_starts_with($filePath, '/uploads/')) {
+                $fullPath = realpath(__DIR__ . '/../../httpdocs' . $filePath);
+            } else {
+                $tenantId = $res['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
+                $fullPath = realpath(__DIR__ . '/../../httpdocs/uploads/' . $tenantId . '/resources/' . $filePath);
+            }
+
+            // Security: Only delete if file exists AND is within the uploads directory
             if ($fullPath && $uploadsDir && strpos($fullPath, $uploadsDir) === 0 && file_exists($fullPath)) {
                 unlink($fullPath);
             }
         }
-        Database::query("DELETE FROM resources WHERE id = ?", [$id]);
+        Database::query("DELETE FROM resources WHERE id = ? AND tenant_id = ?", [$id, TenantContext::getId()]);
     }
 
     public static function incrementDownload($id)
     {
-        Database::query("UPDATE resources SET downloads = downloads + 1 WHERE id = ?", [$id]);
+        Database::query(
+            "UPDATE resources SET downloads = downloads + 1 WHERE id = ? AND tenant_id = ?",
+            [$id, TenantContext::getId()]
+        );
     }
 }
