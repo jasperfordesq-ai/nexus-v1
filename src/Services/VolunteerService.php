@@ -231,6 +231,22 @@ class VolunteerService
                 $data['category_id'] ?? null
             );
 
+            // Record in feed_activity table
+            try {
+                FeedActivityService::recordActivity(TenantContext::getId(), $userId, 'volunteer', (int)$oppId, [
+                    'title' => $data['title'],
+                    'content' => $data['description'] ?? '',
+                    'metadata' => [
+                        'location' => $data['location'] ?? null,
+                        'credits_offered' => $data['credits_offered'] ?? null,
+                        'organization' => $org['name'] ?? null,
+                    ],
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log("VolunteerService::createOpportunity feed_activity record failed: " . $faEx->getMessage());
+            }
+
             // Log activity
             try {
                 ActivityLog::log($userId, 'posted a Volunteer Opportunity', $data['title'], true, '/volunteering/' . $oppId);
@@ -326,6 +342,14 @@ class VolunteerService
             $db = Database::getConnection();
             $stmt = $db->prepare("UPDATE vol_opportunities SET is_active = 0 WHERE id = ?");
             $stmt->execute([$id]);
+
+            // Hide from feed_activity
+            try {
+                FeedActivityService::hideActivity('volunteer', $id);
+            } catch (\Exception $faEx) {
+                error_log("VolunteerService::deleteOpportunity feed_activity hide failed: " . $faEx->getMessage());
+            }
+
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::deleteOpportunity error: " . $e->getMessage());
