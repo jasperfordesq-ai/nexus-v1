@@ -185,12 +185,11 @@ export function DevelopmentStatusPage() {
         <CardBody className="text-sm text-foreground-600">
           <p>
             {t('dev_status.security.description_before_email')}{' '}
-            {/* TODO: Replace with real security contact when security@project-nexus.ie is set up */}
             <a
-              href="mailto:security@project-nexus.ie"
+              href="mailto:jasper@hour-timebank.ie"
               className="text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
             >
-              security@project-nexus.ie
+              jasper@hour-timebank.ie
             </a>
             {t('dev_status.security.description_after_email')}
           </p>
