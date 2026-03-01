@@ -727,49 +727,28 @@ class FederationApiController extends BaseApiController
             return;
         }
 
-        // Create the message
-        // For external partners, we may need to store additional sender info
-        if ($isExternalPartner) {
-            // Store as external message with sender metadata
-            $stmt = $db->prepare("
-                INSERT INTO messages
-                (sender_id, recipient_id, subject, body, is_federated, sender_tenant_id,
-                 external_sender_name, external_sender_email, external_platform_id, created_at)
-                VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, NOW())
-            ");
-            $stmt->execute([
-                $input['sender_id'],
-                $input['recipient_id'],
-                $input['subject'],
-                $input['body'],
-                $partnerTenantId,
-                $input['sender_name'] ?? null,
-                $input['sender_email'] ?? null,
-                $partner['platform_id']
-            ]);
-        } else {
-            $stmt = $db->prepare("
-                INSERT INTO messages
-                (sender_id, recipient_id, subject, body, is_federated, sender_tenant_id, created_at)
-                VALUES (?, ?, ?, ?, 1, ?, NOW())
-            ");
-            $stmt->execute([
-                $input['sender_id'],
-                $input['recipient_id'],
-                $input['subject'],
-                $input['body'],
-                $partnerTenantId
-            ]);
-        }
+        // Create the message using correct column names (receiver_id, tenant_id)
+        $stmt = $db->prepare("
+            INSERT INTO messages
+            (tenant_id, sender_id, receiver_id, subject, body, is_federated, created_at)
+            VALUES (?, ?, ?, ?, ?, 1, NOW())
+        ");
+        $stmt->execute([
+            $recipient['tenant_id'],
+            $input['sender_id'],
+            $input['recipient_id'],
+            $input['subject'],
+            $input['body'],
+        ]);
         $messageId = $db->lastInsertId();
 
-        // Log the action
+        // Log the action — signature: log(actionType, sourceTenantId, targetTenantId, actorUserId, data, level)
         FederationAuditService::log(
+            'api_message_sent',
             $partnerTenantId,
             $recipient['tenant_id'],
-            'api_message_sent',
-            "API message sent to user {$input['recipient_id']}" . ($isExternalPartner ? " (external: {$partner['platform_id']})" : ''),
-            ['message_id' => $messageId, 'external_partner' => $isExternalPartner]
+            null,
+            ['message_id' => $messageId, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternalPartner]
         );
 
         FederationApiMiddleware::sendSuccess([
@@ -858,40 +837,22 @@ class FederationApiController extends BaseApiController
             return;
         }
 
-        // Create pending transaction (requires confirmation flow in production)
-        // For external partners, we store the external sender info
-        if ($isExternalPartner) {
-            $stmt = $db->prepare("
-                INSERT INTO transactions
-                (sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id,
-                 external_sender_name, external_platform_id, created_at)
-                VALUES (?, ?, ?, ?, 'pending', 1, ?, ?, ?, ?, NOW())
-            ");
-            $stmt->execute([
-                $input['sender_id'],
-                $input['recipient_id'],
-                $amount,
-                $input['description'],
-                $partnerTenantId,
-                $recipient['tenant_id'],
-                $input['sender_name'] ?? null,
-                $partner['platform_id']
-            ]);
-        } else {
-            $stmt = $db->prepare("
-                INSERT INTO transactions
-                (sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
-                VALUES (?, ?, ?, ?, 'pending', 1, ?, ?, NOW())
-            ");
-            $stmt->execute([
-                $input['sender_id'],
-                $input['recipient_id'],
-                $amount,
-                $input['description'],
-                $partnerTenantId,
-                $recipient['tenant_id']
-            ]);
-        }
+        // Create pending transaction
+        // Create transaction using correct column names (no external_sender_name/external_platform_id on this table)
+        $stmt = $db->prepare("
+            INSERT INTO transactions
+            (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
+            VALUES (?, ?, ?, ?, ?, 'pending', 1, ?, ?, NOW())
+        ");
+        $stmt->execute([
+            $recipient['tenant_id'],
+            $input['sender_id'],
+            $input['recipient_id'],
+            $amount,
+            $input['description'],
+            $partnerTenantId,
+            $recipient['tenant_id']
+        ]);
         $transactionId = $db->lastInsertId();
 
         // Credit recipient's balance immediately for external transactions
@@ -907,13 +868,13 @@ class FederationApiController extends BaseApiController
             $stmt->execute([$transactionId]);
         }
 
-        // Log the action
+        // Log the action — signature: log(actionType, sourceTenantId, targetTenantId, actorUserId, data, level)
         FederationAuditService::log(
+            'api_transaction_initiated',
             $partnerTenantId,
             $recipient['tenant_id'],
-            'api_transaction_initiated',
-            "API transaction initiated: {$amount} hours to user {$input['recipient_id']}" . ($isExternalPartner ? " (external: {$partner['platform_id']})" : ''),
-            ['transaction_id' => $transactionId, 'amount' => $amount, 'external_partner' => $isExternalPartner]
+            null,
+            ['transaction_id' => $transactionId, 'amount' => $amount, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternalPartner]
         );
 
         FederationApiMiddleware::sendSuccess([
