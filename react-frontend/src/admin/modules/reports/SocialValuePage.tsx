@@ -59,6 +59,7 @@ import {
   DollarSign,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { StatCard, PageHeader } from '../../components';
 
@@ -197,6 +198,7 @@ async function exportCsv(dateFrom?: string, dateTo?: string) {
 
 export function SocialValuePage() {
   usePageTitle('Social Value Dashboard');
+  const toast = useToast();
 
   const [data, setData] = useState<SocialValueData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -228,11 +230,11 @@ export function SocialValuePage() {
         setConfigPeriod(d.config.reporting_period);
       }
     } catch {
-      // Silently handle errors
+      toast.error('Failed to load social value data');
     } finally {
       setLoading(false);
     }
-  }, [dateFrom, dateTo]);
+  }, [dateFrom, dateTo, toast]);
 
   useEffect(() => {
     loadData();
@@ -250,7 +252,7 @@ export function SocialValuePage() {
       onClose();
       await loadData();
     } catch {
-      // Config save failed
+      toast.error('Failed to save configuration');
     } finally {
       setSaving(false);
     }
@@ -299,7 +301,9 @@ export function SocialValuePage() {
             <Button
               variant="flat"
               startContent={<Download size={16} />}
-              onPress={() => exportCsv(dateFrom, dateTo)}
+              onPress={async () => {
+                try { await exportCsv(dateFrom, dateTo); } catch { toast.error('Failed to export CSV'); }
+              }}
               size="sm"
             >
               Export CSV

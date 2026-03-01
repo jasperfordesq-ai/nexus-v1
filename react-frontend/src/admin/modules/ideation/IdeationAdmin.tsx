@@ -67,6 +67,85 @@ const statusColors: Record<ChallengeStatus, 'success' | 'warning' | 'default' | 
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ChallengeActions — extracted to module level to avoid remount on every render
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ChallengeActionsProps {
+  challenge: Challenge;
+  onStatusChange: (challenge: Challenge, status: ChallengeStatus) => void;
+  onDelete: (challenge: Challenge) => void;
+  onView: (challenge: Challenge) => void;
+}
+
+function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: ChallengeActionsProps) {
+  type ActionKey = 'view' | ChallengeStatus | 'delete';
+
+  const handleAction = (key: React.Key) => {
+    const action = key as ActionKey;
+    if (action === 'view') {
+      onView(challenge);
+    } else if (action === 'delete') {
+      onDelete(challenge);
+    } else {
+      onStatusChange(challenge, action);
+    }
+  };
+
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <Button isIconOnly size="sm" variant="light" aria-label="Actions">
+          <MoreVertical size={16} />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label="Challenge actions" onAction={handleAction}>
+        <DropdownItem key="view" startContent={<Eye size={14} />}>
+          View Details
+        </DropdownItem>
+        <DropdownItem
+          key="open"
+          startContent={<CheckCircle size={14} />}
+          color="success"
+          className={challenge.status !== 'open' ? 'text-success' : 'hidden'}
+        >
+          Mark as Open
+        </DropdownItem>
+        <DropdownItem
+          key="reviewing"
+          startContent={<Clock size={14} />}
+          color="warning"
+          className={challenge.status !== 'reviewing' ? 'text-warning' : 'hidden'}
+        >
+          Mark as Reviewing
+        </DropdownItem>
+        <DropdownItem
+          key="closed"
+          startContent={<XCircle size={14} />}
+          className={challenge.status !== 'closed' ? '' : 'hidden'}
+        >
+          Mark as Closed
+        </DropdownItem>
+        <DropdownItem
+          key="archived"
+          startContent={<Archive size={14} />}
+          className={challenge.status !== 'archived' ? '' : 'hidden'}
+        >
+          Mark as Archived
+        </DropdownItem>
+        <DropdownItem
+          key="delete"
+          startContent={<Trash2 size={14} />}
+          className="text-danger"
+          color="danger"
+        >
+          Delete
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -107,7 +186,7 @@ export function IdeationAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, status]);
+  }, [page, search, status, toast]);
 
   useEffect(() => {
     loadItems();
@@ -151,76 +230,6 @@ export function IdeationAdmin() {
       setConfirmDelete(null);
     }
   };
-
-  // ── Actions dropdown per row ────────────────────────────────────────────
-
-  function ChallengeActions({ challenge }: { challenge: Challenge }) {
-    type ActionKey = 'view' | ChallengeStatus | 'delete';
-
-    const handleAction = (key: React.Key) => {
-      const action = key as ActionKey;
-      if (action === 'view') {
-        setDetailItem(challenge);
-      } else if (action === 'delete') {
-        setConfirmDelete(challenge);
-      } else {
-        handleStatusChange(challenge, action);
-      }
-    };
-
-    return (
-      <Dropdown>
-        <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label="Actions">
-            <MoreVertical size={16} />
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu aria-label="Challenge actions" onAction={handleAction}>
-          <DropdownItem key="view" startContent={<Eye size={14} />}>
-            View Details
-          </DropdownItem>
-          <DropdownItem
-            key="open"
-            startContent={<CheckCircle size={14} />}
-            color="success"
-            className={challenge.status !== 'open' ? 'text-success' : 'hidden'}
-          >
-            Mark as Open
-          </DropdownItem>
-          <DropdownItem
-            key="reviewing"
-            startContent={<Clock size={14} />}
-            color="warning"
-            className={challenge.status !== 'reviewing' ? 'text-warning' : 'hidden'}
-          >
-            Mark as Reviewing
-          </DropdownItem>
-          <DropdownItem
-            key="closed"
-            startContent={<XCircle size={14} />}
-            className={challenge.status !== 'closed' ? '' : 'hidden'}
-          >
-            Mark as Closed
-          </DropdownItem>
-          <DropdownItem
-            key="archived"
-            startContent={<Archive size={14} />}
-            className={challenge.status !== 'archived' ? '' : 'hidden'}
-          >
-            Mark as Archived
-          </DropdownItem>
-          <DropdownItem
-            key="delete"
-            startContent={<Trash2 size={14} />}
-            className="text-danger"
-            color="danger"
-          >
-            Delete
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    );
-  }
 
   // ── Table columns ───────────────────────────────────────────────────────
 
@@ -287,7 +296,14 @@ export function IdeationAdmin() {
     {
       key: 'actions',
       label: 'Actions',
-      render: (item) => <ChallengeActions challenge={item} />,
+      render: (item) => (
+        <ChallengeActions
+          challenge={item}
+          onStatusChange={handleStatusChange}
+          onDelete={setConfirmDelete}
+          onView={setDetailItem}
+        />
+      ),
     },
   ];
 
