@@ -36,6 +36,54 @@ vi.mock('@/contexts', () => ({
   useAuth: (...args: any[]) => mockUseAuth(...args),
   useTenant: (...args: any[]) => mockUseTenant(...args),
   useNotifications: (...args: any[]) => mockUseNotifications(...args),
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useCookieConsent: () => ({ showBanner: false, openPreferences: vi.fn() }),
+}));
+
+const i18nMap: Record<string, string> = {
+  'nav.home': 'Home', 'nav.dashboard': 'Dashboard', 'nav.feed': 'Feed',
+  'nav.listings': 'Listings', 'nav.messages': 'Messages', 'nav.groups': 'Groups',
+  'nav.events': 'Events', 'nav.connections': 'Connections', 'nav.exchanges': 'Exchanges',
+  'nav.wallet': 'Wallet', 'nav.volunteering': 'Volunteering', 'nav.blog': 'Blog',
+  'nav.resources': 'Resources', 'nav.members': 'Members', 'nav.about': 'About',
+  'nav.achievements': 'Achievements', 'nav.leaderboard': 'Leaderboard', 'nav.goals': 'Goals',
+  'nav.ai_chat': 'AI Chat', 'nav.our_impact': 'Our Impact',
+  'nav.timebanking_guide': 'Timebanking Guide', 'nav.faq': 'FAQ',
+  'nav.strategic_plan': 'Strategic Plan', 'nav.social_prescribing': 'Social Prescribing',
+  'nav.partner_with_us': 'Partner With Us', 'nav.impact_report': 'Impact Report',
+  'nav.organisations': 'Organisations', 'nav.partner_communities': 'Partner Communities',
+  'nav.group_exchanges': 'Group Exchanges',
+  'nav.federation_hub': 'Federation Hub', 'nav.federated_members': 'Federated Members',
+  'nav.federated_listings': 'Federated Listings', 'nav.federated_messages': 'Federated Messages',
+  'nav.federated_events': 'Federated Events',
+  'auth.log_in': 'Log In', 'auth.sign_up': 'Sign Up',
+  'account.settings': 'Settings', 'account.log_out': 'Log Out',
+  'admin_tools.section': 'Admin Tools', 'admin_tools.admin_panel': 'Admin Panel',
+  'admin_tools.legacy_admin': 'Legacy Admin',
+  'sections.about': 'About', 'sections.support': 'Support', 'sections.legal': 'Legal',
+  'sections.community': 'Community', 'sections.explore': 'Explore',
+  'sections.federation': 'Federation', 'sections.account': 'Account',
+  'sections.language': 'Language',
+  'support.help_center': 'Help Center', 'support.contact': 'Contact',
+  'legal.terms_of_service': 'Terms of Service', 'legal.privacy_policy': 'Privacy Policy',
+  'legal.cookie_policy': 'Cookie Policy', 'legal.accessibility': 'Accessibility',
+  'legal.legal_hub': 'Legal Hub',
+  'cookie_consent.manage': 'Manage Cookies',
+  'stats.credits': 'Credits', 'stats.messages': 'Messages', 'stats.alerts': 'Alerts',
+  'search.placeholder': 'Search...',
+};
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (key: string) => i18nMap[key] ?? key, i18n: { language: 'en', changeLanguage: vi.fn() } }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
+}));
+
+vi.mock('@/components/LanguageSwitcher', () => ({
+  LanguageSwitcher: () => null,
+}));
+
+vi.mock('@/components/navigation', () => ({
+  DesktopMenuItems: () => null,
+  MobileMenuItems: () => null,
 }));
 
 vi.mock('@/lib/helpers', () => ({
