@@ -48,6 +48,9 @@ import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { ReviewModal } from '@/components/reviews';
 import { ProfileFeed } from '@/components/profile/ProfileFeed';
+import { VerificationBadgeRow, VerificationBadgeSummary } from '@/components/verification/VerificationBadge';
+import { EndorseButton } from '@/components/endorsements/EndorseButton';
+import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useFeature, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -355,6 +358,8 @@ export function ProfilePage() {
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
                 <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary">{profile.name}</h1>
+                {/* Verification badges */}
+                <VerificationBadgeRow userId={profile.id} size="sm" />
                 {/* Connected chip for other users */}
                 {!isOwnProfile && connectionStatus === 'connected' && (
                   <Chip
@@ -582,6 +587,16 @@ export function ProfilePage() {
               </span>
             }
           />
+          <Tab
+            key="availability"
+            aria-label="User availability"
+            title={
+              <span className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" aria-hidden="true" />
+                Availability
+              </span>
+            }
+          />
           {hasReviews && reviewsAvailable && (
             <Tab
               key="reviews"
@@ -630,16 +645,34 @@ export function ProfilePage() {
                   <h3 className="text-sm font-medium text-theme-muted mb-3">{t('about.skills')}</h3>
                   <div className="flex flex-wrap gap-2">
                     {profile.skills.map((skill, index) => (
-                      <Chip
-                        key={index}
-                        variant="flat"
-                        size="sm"
-                        className="bg-indigo-500/20 text-indigo-600 dark:text-indigo-300"
-                      >
-                        {skill}
-                      </Chip>
+                      <div key={index} className="inline-flex items-center gap-1.5">
+                        <Chip
+                          variant="flat"
+                          size="sm"
+                          className="bg-indigo-500/20 text-indigo-600 dark:text-indigo-300"
+                        >
+                          {skill}
+                        </Chip>
+                        {/* Endorsement button for other users' skills */}
+                        {!isOwnProfile && isAuthenticated && profile.id && (
+                          <EndorseButton
+                            memberId={profile.id}
+                            skillName={skill}
+                            endorsementCount={0}
+                            isEndorsed={false}
+                            compact
+                          />
+                        )}
+                      </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Verification Badges Summary */}
+              {profile.id && (
+                <div className="mt-6">
+                  <VerificationBadgeSummary userId={profile.id} />
                 </div>
               )}
             </GlassCard>
@@ -702,6 +735,12 @@ export function ProfilePage() {
 
           {activeTab === 'activity' && profile && (
             <ProfileFeed userId={profile.id} isOwnProfile={!!isOwnProfile} />
+          )}
+
+          {activeTab === 'availability' && profile && (
+            <GlassCard className="p-6">
+              <AvailabilityGrid userId={profile.id} editable={false} compact />
+            </GlassCard>
           )}
 
           {/* Reviews Tab */}

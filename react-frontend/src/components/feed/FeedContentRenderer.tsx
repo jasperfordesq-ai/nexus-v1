@@ -9,9 +9,11 @@
  * Sanitizes HTML with DOMPurify before rendering.
  */
 
+import { Fragment } from 'react';
 import DOMPurify from 'dompurify';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useTenant } from '@/contexts';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -58,6 +60,51 @@ function sanitizeHtml(html: string): string {
   return div.innerHTML;
 }
 
+/* ───────────────────────── Hashtag Helper ───────────────────────── */
+
+/**
+ * Render plain text with clickable #hashtags.
+ */
+function TextWithHashtags({ text, tenantPath }: { text: string; tenantPath: (p: string) => string }) {
+  const hashtagRegex = /#(\w{2,})/g;
+  const parts: Array<{ type: 'text' | 'hashtag'; value: string }> = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = hashtagRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ type: 'text', value: text.slice(lastIndex, match.index) });
+    }
+    parts.push({ type: 'hashtag', value: match[1] });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ type: 'text', value: text.slice(lastIndex) });
+  }
+
+  if (parts.length === 0) return <>{text}</>;
+
+  return (
+    <>
+      {parts.map((part, idx) => (
+        <Fragment key={idx}>
+          {part.type === 'hashtag' ? (
+            <Link
+              to={tenantPath(`/feed/hashtag/${part.value}`)}
+              className="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              #{part.value}
+            </Link>
+          ) : (
+            part.value
+          )}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
 /* ───────────────────────── Component ───────────────────────── */
 
 export function FeedContentRenderer({
@@ -66,6 +113,7 @@ export function FeedContentRenderer({
   detailPath,
 }: FeedContentRendererProps) {
   const { t } = useTranslation('feed');
+  const { tenantPath } = useTenant();
 
   if (!content) {
     return null;
@@ -95,10 +143,10 @@ export function FeedContentRenderer({
     );
   }
 
-  // Plain text content (legacy) — render with whitespace preservation
+  // Plain text content (legacy) — render with whitespace preservation and clickable hashtags
   return (
     <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">
-      {content}
+      <TextWithHashtags text={content} tenantPath={tenantPath} />
       {truncated && detailPath && (
         <Link
           to={detailPath}

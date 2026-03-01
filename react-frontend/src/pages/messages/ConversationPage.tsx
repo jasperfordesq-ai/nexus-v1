@@ -29,6 +29,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { Message, User } from '@/types/api';
+import { MessageContextCard } from '@/components/messages/MessageContextCard';
 
 interface OtherUser {
   id: number;
@@ -44,6 +45,8 @@ interface OtherUser {
 interface ConversationMeta {
   id: number;
   other_user: OtherUser;
+  context_type?: string;
+  context_id?: number;
 }
 
 interface ConversationData {
@@ -83,6 +86,12 @@ export function ConversationPage() {
   // Get listing ID from query params if provided
   const listingIdParam = searchParams.get('listing');
   const listingId = listingIdParam ? parseInt(listingIdParam) : null;
+
+  // Get context from query params (MS1: contextual messaging)
+  const contextTypeParam = searchParams.get('context_type');
+  const contextIdParam = searchParams.get('context_id');
+  const contextType = contextTypeParam || undefined;
+  const contextId = contextIdParam ? parseInt(contextIdParam) : undefined;
 
   const [conversation, setConversation] = useState<ConversationData | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -835,6 +844,12 @@ export function ConversationPage() {
           formData.append('listing_id', listingId.toString());
         }
 
+        // MS1: Include context if provided via URL params
+        if (contextType && contextId && isNewConversation) {
+          formData.append('context_type', contextType);
+          formData.append('context_id', contextId.toString());
+        }
+
         const response = await api.upload<Message>('/v2/messages', formData);
 
         if (response.success && response.data) {
@@ -876,6 +891,12 @@ export function ConversationPage() {
         // Include listing ID if this is the first message in conversation
         if (listingId && isNewConversation) {
           payload.listing_id = listingId;
+        }
+
+        // MS1: Include context if provided via URL params
+        if (contextType && contextId && isNewConversation) {
+          payload.context_type = contextType;
+          payload.context_id = contextId;
         }
 
         const response = await api.post<Message>('/v2/messages', payload);
@@ -1198,6 +1219,20 @@ export function ConversationPage() {
             </div>
           </div>
         </GlassCard>
+      )}
+
+      {/* MS1: Contextual Message Card — shows linked context from conversation meta or URL params */}
+      {!listing && (conversation?.meta?.context_type && conversation?.meta?.context_id) && (
+        <MessageContextCard
+          contextType={conversation.meta.context_type}
+          contextId={conversation.meta.context_id}
+        />
+      )}
+      {!listing && !conversation?.meta?.context_type && contextType && contextId && (
+        <MessageContextCard
+          contextType={contextType}
+          contextId={contextId}
+        />
       )}
 
       {/* Messages */}

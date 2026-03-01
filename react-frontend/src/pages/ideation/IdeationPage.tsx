@@ -8,8 +8,14 @@
  *
  * Features:
  * - Grid of challenge cards with status chips
- * - Filter tabs: All, Open, Voting, Closed
+ * - Filter tabs: All, Open, Voting, Evaluating, Closed, Archived, Favorites
+ * - Category filter dropdown (I1)
+ * - Tag chips on challenge cards (I1)
+ * - Status lifecycle badges with color coding (I11)
+ * - Favorite heart toggle (I8)
  * - Create Challenge button (admin only)
+ * - Link to Campaigns page (I7)
+ * - Link to Outcomes Dashboard (I10)
  * - Cursor-based pagination
  * - Empty state
  */
@@ -22,6 +28,8 @@ import {
   Tabs,
   Tab,
   Spinner,
+  Select,
+  SelectItem,
 } from '@heroui/react';
 import {
   Lightbulb,
@@ -34,6 +42,8 @@ import {
   Heart,
   Eye,
   Star,
+  Layers,
+  BarChart3,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -53,7 +63,7 @@ interface Challenge {
   title: string;
   description: string;
   category: string | null;
-  status: 'draft' | 'open' | 'voting' | 'closed';
+  status: 'draft' | 'open' | 'voting' | 'evaluating' | 'closed' | 'archived';
   ideas_count: number;
   submission_deadline: string | null;
   voting_deadline: string | null;
@@ -73,13 +83,24 @@ interface Challenge {
   };
 }
 
-type FilterTab = 'all' | 'open' | 'voting' | 'closed';
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  color: string | null;
+  challenges_count: number;
+}
 
-const STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 'danger'> = {
+type FilterTab = 'all' | 'open' | 'voting' | 'evaluating' | 'closed' | 'archived' | 'favorites';
+
+const STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 'danger' | 'secondary' | 'primary'> = {
   draft: 'default',
   open: 'success',
   voting: 'warning',
+  evaluating: 'primary',
   closed: 'danger',
+  archived: 'secondary',
 };
 
 /* ───────────────────────── Main Component ───────────────────────── */
@@ -101,9 +122,28 @@ export function IdeationPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [favoritingIds, setFavoritingIds] = useState<Set<number>>(new Set());
 
+  // Category filter (I1)
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
-  const fetchChallenges = useCallback(async (tab: FilterTab, loadMore = false) => {
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get<Category[]>('/v2/ideation-categories');
+        if (response.success && response.data) {
+          setCategories(Array.isArray(response.data) ? response.data : []);
+        }
+      } catch (err) {
+        logError('Failed to fetch ideation categories', err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const fetchChallenges = useCallback(async (tab: FilterTab, loadMore = false, categoryFilter?: string) => {
     try {
       if (loadMore) {
         setIsLoadingMore(true);
@@ -114,9 +154,17 @@ export function IdeationPage() {
 
       const params = new URLSearchParams();
       params.set('per_page', '20');
-      if (tab !== 'all') {
+
+      if (tab === 'favorites') {
+        params.set('favorites', '1');
+      } else if (tab !== 'all') {
         params.set('status', tab);
       }
+
+      if (categoryFilter) {
+        params.set('category', categoryFilter);
+      }
+
       if (loadMore && cursor) {
         params.set('cursor', cursor);
       }
@@ -150,12 +198,21 @@ export function IdeationPage() {
 
   useEffect(() => {
     setCursor(undefined);
-    fetchChallenges(activeTab);
+    fetchChallenges(activeTab, false, selectedCategory);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+  }, [activeTab, selectedCategory]);
 
   const handleTabChange = (key: React.Key) => {
     setActiveTab(key as FilterTab);
+  };
+
+  const handleCategoryChange = (keys: Set<React.Key> | 'all') => {
+    if (keys === 'all') {
+      setSelectedCategory('');
+      return;
+    }
+    const selected = Array.from(keys)[0];
+    setSelectedCategory(selected ? String(selected) : '');
   };
 
   const handleToggleFavorite = async (e: React.MouseEvent, challengeId: number) => {
@@ -225,31 +282,79 @@ export function IdeationPage() {
           </p>
         </div>
 
-        {isAdmin && (
+        <div className="flex items-center gap-2">
+          {/* Campaigns link */}
           <Button
-            color="primary"
-            startContent={<Plus className="w-4 h-4" />}
-            onPress={() => navigate(tenantPath('/ideation/create'))}
+            variant="flat"
+            size="sm"
+            startContent={<Layers className="w-4 h-4" />}
+            onPress={() => navigate(tenantPath('/ideation/campaigns'))}
           >
-            {t('challenges.create')}
+            {t('campaigns.title')}
           </Button>
-        )}
+
+          {/* Outcomes Dashboard link */}
+          <Button
+            variant="flat"
+            size="sm"
+            startContent={<BarChart3 className="w-4 h-4" />}
+            onPress={() => navigate(tenantPath('/ideation/outcomes'))}
+          >
+            {t('outcomes.dashboard')}
+          </Button>
+
+          {isAdmin && (
+            <Button
+              color="primary"
+              startContent={<Plus className="w-4 h-4" />}
+              onPress={() => navigate(tenantPath('/ideation/create'))}
+            >
+              {t('challenges.create')}
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="mb-6">
-        <Tabs
-          selectedKey={activeTab}
-          onSelectionChange={handleTabChange}
-          variant="underlined"
-          color="primary"
-          aria-label={t('tabs.all')}
-        >
-          <Tab key="all" title={t('tabs.all')} />
-          <Tab key="open" title={t('tabs.open')} />
-          <Tab key="voting" title={t('tabs.voting')} />
-          <Tab key="closed" title={t('tabs.closed')} />
-        </Tabs>
+      {/* Filter Row: Tabs + Category dropdown */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+        <div className="flex-1 overflow-x-auto">
+          <Tabs
+            selectedKey={activeTab}
+            onSelectionChange={handleTabChange}
+            variant="underlined"
+            color="primary"
+            aria-label={t('tabs.all')}
+          >
+            <Tab key="all" title={t('tabs.all')} />
+            <Tab key="open" title={t('tabs.open')} />
+            <Tab key="voting" title={t('tabs.voting')} />
+            <Tab key="evaluating" title={t('tabs.evaluating')} />
+            <Tab key="closed" title={t('tabs.closed')} />
+            <Tab key="archived" title={t('tabs.archived')} />
+            <Tab key="favorites" title={t('tabs.favorites')} />
+          </Tabs>
+        </div>
+
+        {/* Category Filter (I1) */}
+        {categories.length > 0 && (
+          <div className="w-48 shrink-0">
+            <Select
+              size="sm"
+              label={t('categories.title')}
+              placeholder={t('categories.all')}
+              selectedKeys={selectedCategory ? new Set([selectedCategory]) : new Set<string>()}
+              onSelectionChange={handleCategoryChange}
+              variant="bordered"
+              className="max-w-xs"
+            >
+              {categories.map((cat) => (
+                <SelectItem key={cat.slug}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+        )}
       </div>
 
       {/* Loading */}
@@ -270,7 +375,7 @@ export function IdeationPage() {
               color="primary"
               variant="flat"
               startContent={<RefreshCw className="w-4 h-4" />}
-              onPress={() => fetchChallenges(activeTab)}
+              onPress={() => fetchChallenges(activeTab, false, selectedCategory)}
             >
               {t('ideas.load_more')}
             </Button>
@@ -282,8 +387,18 @@ export function IdeationPage() {
       {!isLoading && !error && challenges.length === 0 && (
         <EmptyState
           icon={<Lightbulb className="w-10 h-10 text-theme-subtle" />}
-          title={t('challenges.empty_title')}
-          description={activeTab === 'all' ? t('challenges.empty_description') : t('challenges.empty_filtered')}
+          title={
+            activeTab === 'favorites'
+              ? t('favorites.empty_title')
+              : t('challenges.empty_title')
+          }
+          description={
+            activeTab === 'favorites'
+              ? t('favorites.empty_description')
+              : activeTab === 'all'
+                ? t('challenges.empty_description')
+                : t('challenges.empty_filtered')
+          }
         />
       )}
 
@@ -327,6 +442,7 @@ export function IdeationPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
+                        {/* Status Badge (I11) */}
                         <Chip
                           size="sm"
                           color={STATUS_COLOR_MAP[challenge.status] ?? 'default'}
@@ -334,7 +450,7 @@ export function IdeationPage() {
                         >
                           {t(`status.${challenge.status}`)}
                         </Chip>
-                        {/* Favorite Button */}
+                        {/* Favorite Button (I8) */}
                         <button
                           onClick={(e) => handleToggleFavorite(e, challenge.id)}
                           disabled={favoritingIds.has(challenge.id)}
@@ -356,7 +472,7 @@ export function IdeationPage() {
                       {truncate(challenge.description, 150)}
                     </p>
 
-                    {/* Tags */}
+                    {/* Tags (I1) */}
                     {challenge.tags && challenge.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mb-3">
                         {challenge.tags.map((tag) => (
@@ -402,7 +518,7 @@ export function IdeationPage() {
                         </span>
                       )}
 
-                      {/* Category */}
+                      {/* Category (I1) */}
                       {challenge.category && (
                         <Chip size="sm" variant="flat" className="text-xs">
                           {challenge.category}
@@ -421,7 +537,7 @@ export function IdeationPage() {
               <Button
                 variant="flat"
                 isLoading={isLoadingMore}
-                onPress={() => fetchChallenges(activeTab, true)}
+                onPress={() => fetchChallenges(activeTab, true, selectedCategory)}
               >
                 {t('challenges.load_more')}
               </Button>

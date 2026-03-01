@@ -34,6 +34,9 @@ import {
   ModalBody,
   ModalFooter,
   DatePicker,
+  Switch,
+  Select,
+  SelectItem,
   useDisclosure,
 } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
@@ -50,6 +53,12 @@ import {
   AlertTriangle,
   Check,
   TrendingUp,
+  GripVertical,
+  EyeOff,
+  Download,
+  Tag,
+  ListOrdered,
+  Filter,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -85,6 +94,9 @@ interface Poll {
     name: string;
     avatar_url: string | null;
   };
+  poll_type?: 'standard' | 'ranked';
+  category?: string | null;
+  is_anonymous?: boolean;
 }
 
 type PollTab = 'open' | 'closed' | 'mine';
@@ -116,9 +128,11 @@ interface PollCardProps {
   currentUserId?: number;
   onVote: (pollId: number, optionId: number) => void;
   onDelete: (poll: Poll) => void;
+  onRankedVote: (poll: Poll) => void;
+  onExport: (pollId: number) => void;
 }
 
-const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete }: PollCardProps) {
+const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete, onRankedVote, onExport }: PollCardProps) {
   const { t } = useTranslation('polls');
   const { tenantPath } = useTenant();
 
@@ -165,6 +179,40 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete 
                 >
                   {isOpen ? t('status.open') : t('status.closed')}
                 </Chip>
+                {/* P1 - Ranked poll indicator */}
+                {poll.poll_type === 'ranked' && (
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color="secondary"
+                    startContent={<ListOrdered className="w-3 h-3" />}
+                    className="text-[10px] h-5"
+                  >
+                    Ranked
+                  </Chip>
+                )}
+                {/* P3 - Anonymous badge */}
+                {poll.is_anonymous && (
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    className="text-[10px] h-5 bg-gray-500/10 text-gray-400"
+                    startContent={<EyeOff className="w-3 h-3" />}
+                  >
+                    Anonymous
+                  </Chip>
+                )}
+                {/* P2 - Category badge */}
+                {poll.category && (
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    className="text-[10px] h-5 bg-blue-500/10 text-blue-400"
+                    startContent={<Tag className="w-3 h-3" />}
+                  >
+                    {poll.category}
+                  </Chip>
+                )}
               </div>
               <div className="flex items-center gap-2 text-xs text-[var(--text-subtle)]">
                 <span className="flex items-center gap-1">
@@ -184,18 +232,33 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete 
             </div>
           </div>
 
-          {isOwner && (
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              className="text-[var(--text-subtle)] hover:text-danger min-w-0"
-              onPress={() => onDelete(poll)}
-              aria-label={t('delete_poll')}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          )}
+          <div className="flex items-center gap-1">
+            {/* P4 - Export CSV (owner/admin only) */}
+            {isOwner && (
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className="text-[var(--text-subtle)] hover:text-[var(--color-primary)] min-w-0"
+                onPress={() => onExport(poll.id)}
+                aria-label="Export results as CSV"
+              >
+                <Download className="w-4 h-4" />
+              </Button>
+            )}
+            {isOwner && (
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className="text-[var(--text-subtle)] hover:text-danger min-w-0"
+                onPress={() => onDelete(poll)}
+                aria-label={t('delete_poll')}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Question */}
@@ -234,8 +297,14 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete 
                       aria-label={`${option.label}: ${option.percentage}%`}
                     />
                   </div>
+                ) : poll.poll_type === 'ranked' ? (
+                  /* P1 - Ranked poll: show label only (voting done in modal) */
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--surface-hover)]/50">
+                    <GripVertical className="w-3.5 h-3.5 text-[var(--text-subtle)]" aria-hidden="true" />
+                    <span className="text-sm text-[var(--text-primary)]">{option.label}</span>
+                  </div>
                 ) : (
-                  /* Vote button */
+                  /* Standard vote button */
                   <Button
                     variant="bordered"
                     size="sm"
@@ -249,6 +318,18 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete 
             );
           })}
         </div>
+
+        {/* P1 - Ranked poll vote button */}
+        {poll.poll_type === 'ranked' && isOpen && !hasVoted && (
+          <Button
+            size="sm"
+            className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white mb-3"
+            startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => onRankedVote(poll)}
+          >
+            Rank Your Preferences
+          </Button>
+        )}
 
         {/* Footer stats */}
         <div className="flex items-center gap-3 text-xs text-[var(--text-subtle)]">
@@ -290,11 +371,41 @@ export function PollsPage() {
   const [newOptions, setNewOptions] = useState<string[]>(['', '']);
   const [newExpiresAt, setNewExpiresAt] = useState<DateInputValue | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [newPollType, setNewPollType] = useState<'standard' | 'ranked'>('standard');
+  const [newCategory, setNewCategory] = useState('');
+  const [newIsAnonymous, setNewIsAnonymous] = useState(false);
+
+  /* ── P2 Categories ── */
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  /* ── P1 Ranked-choice ── */
+  const { isOpen: isRankedOpen, onOpen: onRankedOpen, onClose: onRankedClose } = useDisclosure();
+  const [rankedPoll, setRankedPoll] = useState<Poll | null>(null);
+  const [rankOrder, setRankOrder] = useState<number[]>([]);
+  const [isSubmittingRank, setIsSubmittingRank] = useState(false);
+  const [rankedResults, setRankedResults] = useState<Record<string, unknown> | null>(null);
+  const [isLoadingRanked, setIsLoadingRanked] = useState(false);
 
   /* ── Delete modal ── */
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const [deletingPoll, setDeletingPoll] = useState<Poll | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  /* ── Load categories on mount (P2) ── */
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await api.get<string[]>('/v2/polls/categories');
+        if (response.success && response.data) {
+          setCategories(Array.isArray(response.data) ? response.data : []);
+        }
+      } catch (err) {
+        logError('Failed to load poll categories', err);
+      }
+    };
+    loadCategories();
+  }, []);
 
   /* ── Data loading ── */
   const loadPolls = useCallback(async (append = false) => {
@@ -316,6 +427,11 @@ export function PollsPage() {
         params.set('status', 'closed');
       } else if (tab === 'mine') {
         params.set('mine', '1');
+      }
+
+      // P2 - Category filter
+      if (selectedCategory) {
+        params.set('category', selectedCategory);
       }
 
       const response = await api.get<Poll[]>(`/v2/polls?${params}`);
@@ -343,13 +459,13 @@ export function PollsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [tab, cursor, t, toast]);
+  }, [tab, cursor, selectedCategory, t, toast]);
 
-  // Reload when tab changes
+  // Reload when tab or category changes
   useEffect(() => {
     setCursor(undefined);
     loadPolls();
-  }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tab, selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
@@ -385,6 +501,9 @@ export function PollsPage() {
     setNewDescription('');
     setNewOptions(['', '']);
     setNewExpiresAt(null);
+    setNewPollType('standard');
+    setNewCategory('');
+    setNewIsAnonymous(false);
   };
 
   const handleCreate = async () => {
@@ -403,7 +522,13 @@ export function PollsPage() {
         question: newQuestion.trim(),
         description: newDescription.trim() || undefined,
         options: validOptions.map((o) => o.trim()),
+        poll_type: newPollType,
+        is_anonymous: newIsAnonymous,
       };
+
+      if (newCategory.trim()) {
+        payload.category = newCategory.trim();
+      }
 
       if (newExpiresAt) {
         payload.expires_at = newExpiresAt.toString();
@@ -508,6 +633,100 @@ export function PollsPage() {
       toast.error(t('toast.delete_failed'));
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  /* ── P1: Ranked-choice voting ── */
+  const openRankedVote = (poll: Poll) => {
+    setRankedPoll(poll);
+    setRankOrder(poll.options.map((o) => o.id));
+    setRankedResults(null);
+    onRankedOpen();
+  };
+
+  const loadRankedResults = async (pollId: number) => {
+    try {
+      setIsLoadingRanked(true);
+      const response = await api.get<Record<string, unknown>>(`/v2/polls/${pollId}/ranked-results`);
+      if (response.success && response.data) {
+        setRankedResults(response.data);
+      }
+    } catch (err) {
+      logError('Failed to load ranked results', err);
+      toast.error(t('toast.vote_failed'));
+    } finally {
+      setIsLoadingRanked(false);
+    }
+  };
+
+  const handleRankedSubmit = async () => {
+    if (!rankedPoll) return;
+    try {
+      setIsSubmittingRank(true);
+      const response = await api.post(`/v2/polls/${rankedPoll.id}/rank`, {
+        rankings: rankOrder,
+      });
+
+      if (response.success) {
+        toast.success(t('toast.voted'));
+        onRankedClose();
+        loadPolls();
+      } else {
+        toast.error(t('toast.vote_failed'));
+      }
+    } catch (err) {
+      logError('Failed to submit ranked vote', err);
+      toast.error(t('toast.vote_failed'));
+    } finally {
+      setIsSubmittingRank(false);
+    }
+  };
+
+  const moveRankUp = (index: number) => {
+    if (index === 0) return;
+    setRankOrder((prev) => {
+      const next = [...prev];
+      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+      return next;
+    });
+  };
+
+  const moveRankDown = (index: number) => {
+    setRankOrder((prev) => {
+      if (index >= prev.length - 1) return prev;
+      const next = [...prev];
+      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+      return next;
+    });
+  };
+
+  /* ── P4: Export CSV ── */
+  const handleExport = async (pollId: number) => {
+    try {
+      const response = await fetch(`/api/v2/polls/${pollId}/export`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('nexus_access_token')}`,
+          'X-Tenant-ID': localStorage.getItem('nexus_tenant_id') || '',
+        },
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `poll-${pollId}-results.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        toast.success('CSV exported successfully.');
+      } else {
+        toast.error('Failed to export poll results.');
+      }
+    } catch (err) {
+      logError('Failed to export poll', err);
+      toast.error('Failed to export poll results.');
     }
   };
 
@@ -654,6 +873,49 @@ export function PollsPage() {
                   </div>
                 </div>
 
+                {/* Poll Type (P1) */}
+                <Select
+                  label="Poll Type"
+                  selectedKeys={[newPollType]}
+                  onSelectionChange={(keys) => {
+                    const val = Array.from(keys)[0] as string;
+                    if (val === 'standard' || val === 'ranked') {
+                      setNewPollType(val);
+                    }
+                  }}
+                  classNames={{
+                    trigger: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
+                    value: 'text-[var(--text-primary)]',
+                  }}
+                >
+                  <SelectItem key="standard">Standard (pick one)</SelectItem>
+                  <SelectItem key="ranked">Ranked Choice (order preferences)</SelectItem>
+                </Select>
+
+                {/* Category (P2) */}
+                <Input
+                  label="Category (optional)"
+                  placeholder="e.g. Community, Events, Feedback"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  classNames={{
+                    input: 'bg-transparent text-[var(--text-primary)]',
+                    inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
+                  }}
+                />
+
+                {/* Anonymous (P3) */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">Anonymous Voting</p>
+                    <p className="text-xs text-[var(--text-muted)]">Hide voter identities in results</p>
+                  </div>
+                  <Switch
+                    isSelected={newIsAnonymous}
+                    onValueChange={setNewIsAnonymous}
+                  />
+                </div>
+
                 {/* Expiry date */}
                 <DatePicker
                   label={t('expires_at')}
@@ -714,6 +976,36 @@ export function PollsPage() {
           <Tab key="mine" title={t('tabs.mine')} />
         </Tabs>
       </GlassCard>
+
+      {/* P2 - Category Filter */}
+      {categories.length > 0 && (
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            size="sm"
+            variant={!selectedCategory ? 'solid' : 'flat'}
+            className={!selectedCategory
+              ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
+              : 'bg-theme-elevated text-theme-muted'}
+            onPress={() => setSelectedCategory(null)}
+            startContent={<Filter className="w-3.5 h-3.5" aria-hidden="true" />}
+          >
+            All Categories
+          </Button>
+          {categories.map((cat) => (
+            <Button
+              key={cat}
+              size="sm"
+              variant={selectedCategory === cat ? 'solid' : 'flat'}
+              className={selectedCategory === cat
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
+                : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+            >
+              {cat}
+            </Button>
+          ))}
+        </div>
+      )}
 
       {/* Error State */}
       {error && !isLoading && (
@@ -786,6 +1078,8 @@ export function PollsPage() {
                     currentUserId={user?.id}
                     onVote={handleVote}
                     onDelete={openDeleteModal}
+                    onRankedVote={openRankedVote}
+                    onExport={handleExport}
                   />
                 </motion.div>
               ))}
@@ -807,6 +1101,116 @@ export function PollsPage() {
           )}
         </>
       )}
+
+      {/* P1 - Ranked-Choice Voting Modal */}
+      <Modal
+        isOpen={isRankedOpen}
+        onClose={onRankedClose}
+        size="lg"
+        classNames={{ base: 'bg-content1 border border-theme-default' }}
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-[var(--text-primary)]">
+              <ListOrdered className="w-5 h-5 text-purple-400" aria-hidden="true" />
+              Rank Your Preferences
+            </div>
+            {rankedPoll && (
+              <p className="text-sm text-[var(--text-muted)] font-normal">{rankedPoll.question}</p>
+            )}
+          </ModalHeader>
+          <ModalBody>
+            {rankedPoll && (
+              <div className="space-y-4">
+                <p className="text-xs text-[var(--text-subtle)]">
+                  Drag options or use arrows to rank from most preferred (top) to least preferred (bottom).
+                </p>
+
+                <div className="space-y-2">
+                  {rankOrder.map((optionId, index) => {
+                    const option = rankedPoll.options.find((o) => o.id === optionId);
+                    if (!option) return null;
+                    return (
+                      <div
+                        key={optionId}
+                        className="flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-default)]"
+                      >
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <span className="flex-1 text-sm font-medium text-[var(--text-primary)]">
+                          {option.label}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            className="text-[var(--text-subtle)] min-w-0 w-7 h-7"
+                            onPress={() => moveRankUp(index)}
+                            isDisabled={index === 0}
+                            aria-label={`Move ${option.label} up`}
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            className="text-[var(--text-subtle)] min-w-0 w-7 h-7 rotate-180"
+                            onPress={() => moveRankDown(index)}
+                            isDisabled={index === rankOrder.length - 1}
+                            aria-label={`Move ${option.label} down`}
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Show ranked results button for closed polls */}
+                {rankedPoll.status === 'closed' && (
+                  <div className="pt-2">
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-primary"
+                      onPress={() => loadRankedResults(rankedPoll.id)}
+                      isLoading={isLoadingRanked}
+                    >
+                      View Ranked Results
+                    </Button>
+                    {rankedResults && (
+                      <div className="mt-3 p-3 rounded-xl bg-theme-elevated">
+                        <h4 className="text-sm font-semibold text-theme-primary mb-2">Round-by-Round Results</h4>
+                        <pre className="text-xs text-theme-muted whitespace-pre-wrap overflow-x-auto">
+                          {JSON.stringify(rankedResults, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onRankedClose} className="text-[var(--text-muted)]">
+              Cancel
+            </Button>
+            {rankedPoll?.status === 'open' && (
+              <Button
+                className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white"
+                onPress={handleRankedSubmit}
+                isLoading={isSubmittingRank}
+              >
+                Submit Rankings
+              </Button>
+            )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal isOpen={isDeleteOpen} onClose={onDeleteClose} size="sm">

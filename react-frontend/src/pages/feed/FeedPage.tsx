@@ -44,6 +44,8 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
+import { TrendingHashtags } from '@/components/hashtags/TrendingHashtags';
+import { TopEndorsedWidget } from '@/components/endorsements/TopEndorsedWidget';
 import { useAuth, useToast, usePusherOptional } from '@/contexts';
 import type { FeedPostEvent } from '@/contexts';
 import { api } from '@/lib/api';
@@ -343,7 +345,9 @@ export function FeedPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5">
+    <div className="max-w-5xl mx-auto flex gap-6">
+      {/* Main Feed Column */}
+      <div className="flex-1 min-w-0 max-w-2xl space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -602,6 +606,13 @@ export function FeedPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      </div>
+
+      {/* Right Sidebar - Trending & Top Endorsed (hidden on mobile) */}
+      <aside className="hidden lg:block w-72 flex-shrink-0 space-y-4 sticky top-24 self-start">
+        <TrendingHashtags limit={8} />
+        <TopEndorsedWidget limit={5} />
+      </aside>
     </div>
   );
 }

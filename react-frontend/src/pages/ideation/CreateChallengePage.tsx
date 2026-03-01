@@ -8,7 +8,10 @@
  *
  * Features:
  * - Create new challenge or edit existing (via :id param)
+ * - Category dropdown from API (I1)
+ * - Template picker modal (I9)
  * - All fields: title, description, category, prize, deadlines, max ideas, status
+ * - Tag input with chips
  * - Validation with error display
  * - Redirects non-admin users
  */
@@ -23,13 +26,22 @@ import {
   SelectItem,
   Spinner,
   Chip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
 } from '@heroui/react';
 import {
   ArrowLeft,
   X,
+  FileText,
+  Eye,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -60,6 +72,35 @@ interface ChallengeData {
   voting_deadline: string | null;
   max_ideas_per_user: number | null;
   status: string;
+  cover_image: string | null;
+  tags: string[];
+}
+
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  color: string | null;
+}
+
+interface Template {
+  id: number;
+  name: string;
+  description: string | null;
+  category: string | null;
+  tags: string[];
+  created_at: string;
+}
+
+interface TemplateData {
+  title: string;
+  description: string;
+  category: string | null;
+  prize_description: string | null;
+  submission_deadline: string | null;
+  voting_deadline: string | null;
+  max_ideas_per_user: number | null;
   cover_image: string | null;
   tags: string[];
 }
@@ -97,6 +138,16 @@ export function CreateChallengePage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [tagInput, setTagInput] = useState('');
 
+  // Categories (I1)
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  // Templates (I9)
+  const { isOpen: isTemplateOpen, onOpen: onTemplateOpen, onClose: onTemplateClose } = useDisclosure();
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+  const [isApplyingTemplate, setIsApplyingTemplate] = useState(false);
+
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
   // Redirect non-admins
@@ -105,6 +156,21 @@ export function CreateChallengePage() {
       navigate(tenantPath('/ideation'), { replace: true });
     }
   }, [isAdmin, navigate, tenantPath]);
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get<Category[]>('/v2/ideation-categories');
+        if (response.success && response.data) {
+          setCategories(Array.isArray(response.data) ? response.data : []);
+        }
+      } catch (err) {
+        logError('Failed to fetch categories', err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Load existing challenge for editing
   useEffect(() => {
@@ -123,7 +189,7 @@ export function CreateChallengePage() {
             category: challenge.category ?? '',
             prize_description: challenge.prize_description ?? '',
             submission_deadline: challenge.submission_deadline
-              ? challenge.submission_deadline.slice(0, 16) // Trim to YYYY-MM-DDTHH:MM for input[type=datetime-local]
+              ? challenge.submission_deadline.slice(0, 16)
               : '',
             voting_deadline: challenge.voting_deadline
               ? challenge.voting_deadline.slice(0, 16)
@@ -150,7 +216,6 @@ export function CreateChallengePage() {
 
   const updateField = (field: keyof ChallengeForm, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
-    // Clear error for this field
     if (errors[field]) {
       setErrors(prev => {
         const next = { ...prev };
@@ -226,7 +291,6 @@ export function CreateChallengePage() {
       }
     } catch (err: unknown) {
       logError('Failed to save challenge', err);
-      // Try to extract field-level errors from API response
       const apiErrors = (err as { response?: { data?: { errors?: Array<{ field?: string; message: string }> } } })
         ?.response?.data?.errors;
       if (apiErrors && Array.isArray(apiErrors)) {
@@ -246,6 +310,61 @@ export function CreateChallengePage() {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Template picker (I9)
+  const handleOpenTemplates = async () => {
+    onTemplateOpen();
+    if (templates.length === 0) {
+      setIsLoadingTemplates(true);
+      try {
+        const response = await api.get<Template[]>('/v2/ideation-templates');
+        if (response.success && response.data) {
+          setTemplates(Array.isArray(response.data) ? response.data : []);
+        }
+      } catch (err) {
+        logError('Failed to fetch templates', err);
+      } finally {
+        setIsLoadingTemplates(false);
+      }
+    }
+  };
+
+  const handleApplyTemplate = async () => {
+    if (!selectedTemplateId) return;
+
+    setIsApplyingTemplate(true);
+    try {
+      const response = await api.get<TemplateData>(`/v2/ideation-templates/${selectedTemplateId}/data`);
+      if (response.success && response.data) {
+        const td = response.data;
+        setForm({
+          title: td.title ?? '',
+          description: td.description ?? '',
+          category: td.category ?? '',
+          prize_description: td.prize_description ?? '',
+          submission_deadline: td.submission_deadline
+            ? td.submission_deadline.slice(0, 16)
+            : '',
+          voting_deadline: td.voting_deadline
+            ? td.voting_deadline.slice(0, 16)
+            : '',
+          max_ideas_per_user: td.max_ideas_per_user != null
+            ? String(td.max_ideas_per_user)
+            : '',
+          status: 'draft',
+          cover_image: td.cover_image ?? '',
+          tags: td.tags ?? [],
+        });
+        onTemplateClose();
+        toast.success(t('templates.use_template'));
+      }
+    } catch (err) {
+      logError('Failed to apply template', err);
+      toast.error(t('toast.error_generic'));
+    } finally {
+      setIsApplyingTemplate(false);
     }
   };
 
@@ -277,14 +396,27 @@ export function CreateChallengePage() {
       </Button>
 
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">
-          {isEdit ? t('edit_page.title') : t('create_page.title')}
-        </h1>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--color-text)]">
+            {isEdit ? t('edit_page.title') : t('create_page.title')}
+          </h1>
+          {!isEdit && (
+            <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+              {t('create_page.subtitle')}
+            </p>
+          )}
+        </div>
+
+        {/* Template picker button (I9) - only on create */}
         {!isEdit && (
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            {t('create_page.subtitle')}
-          </p>
+          <Button
+            variant="flat"
+            startContent={<FileText className="w-4 h-4" />}
+            onPress={handleOpenTemplates}
+          >
+            {t('templates.start_from_template')}
+          </Button>
         )}
       </div>
 
@@ -316,14 +448,34 @@ export function CreateChallengePage() {
             errorMessage={errors.description}
           />
 
-          {/* Category */}
-          <Input
-            label={t('form.category_label')}
-            placeholder={t('form.category_placeholder')}
-            value={form.category}
-            onValueChange={(val) => updateField('category', val)}
-            variant="bordered"
-          />
+          {/* Category (I1 - dropdown from API) */}
+          {categories.length > 0 ? (
+            <Select
+              label={t('form.category_label')}
+              placeholder={t('form.category_placeholder')}
+              selectedKeys={form.category ? new Set([form.category]) : new Set<string>()}
+              onSelectionChange={(keys) => {
+                if (keys === 'all') return;
+                const selected = Array.from(keys)[0];
+                updateField('category', selected ? String(selected) : '');
+              }}
+              variant="bordered"
+            >
+              {categories.map((cat) => (
+                <SelectItem key={cat.name}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </Select>
+          ) : (
+            <Input
+              label={t('form.category_free_label')}
+              placeholder={t('form.category_free_placeholder')}
+              value={form.category}
+              onValueChange={(val) => updateField('category', val)}
+              variant="bordered"
+            />
+          )}
 
           {/* Cover Image URL */}
           <Input
@@ -442,6 +594,75 @@ export function CreateChallengePage() {
           </div>
         </div>
       </GlassCard>
+
+      {/* Template Picker Modal (I9) */}
+      <Modal isOpen={isTemplateOpen} onClose={onTemplateClose} size="2xl" scrollBehavior="inside">
+        <ModalContent>
+          <ModalHeader>{t('templates.title')}</ModalHeader>
+          <ModalBody>
+            {isLoadingTemplates && (
+              <div className="flex justify-center py-8">
+                <Spinner size="md" />
+              </div>
+            )}
+
+            {!isLoadingTemplates && templates.length === 0 && (
+              <EmptyState
+                icon={<FileText className="w-10 h-10 text-theme-subtle" />}
+                title={t('templates.empty_title')}
+                description={t('templates.empty_description')}
+              />
+            )}
+
+            {!isLoadingTemplates && templates.length > 0 && (
+              <div className="space-y-3">
+                {templates.map((tmpl) => (
+                  <GlassCard
+                    key={tmpl.id}
+                    className={`p-4 cursor-pointer transition-all ${
+                      selectedTemplateId === tmpl.id
+                        ? 'ring-2 ring-primary bg-primary/5'
+                        : 'hover:bg-[var(--color-surface-hover)]'
+                    }`}
+                    onClick={() => setSelectedTemplateId(tmpl.id)}
+                  >
+                    <h4 className="font-semibold text-[var(--color-text)] mb-1">
+                      {tmpl.name}
+                    </h4>
+                    {tmpl.description && (
+                      <p className="text-sm text-[var(--color-text-secondary)] mb-2">
+                        {tmpl.description}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {tmpl.category && (
+                        <Chip size="sm" variant="flat">{tmpl.category}</Chip>
+                      )}
+                      {tmpl.tags?.map((tag) => (
+                        <Chip key={tag} size="sm" variant="bordered" className="text-xs">{tag}</Chip>
+                      ))}
+                    </div>
+                  </GlassCard>
+                ))}
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onTemplateClose}>
+              {t('form.cancel')}
+            </Button>
+            <Button
+              color="primary"
+              isLoading={isApplyingTemplate}
+              isDisabled={!selectedTemplateId}
+              startContent={<Eye className="w-4 h-4" />}
+              onPress={handleApplyTemplate}
+            >
+              {t('templates.use_template')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

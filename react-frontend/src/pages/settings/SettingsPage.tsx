@@ -72,10 +72,17 @@ import {
   PenLine,
   Ban,
   Scale,
+  Sparkles,
+  Calendar,
+  Users,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
 import { PlaceAutocompleteInput } from '@/components/location';
+import { SkillSelector } from '@/components/skills/SkillSelector';
+import type { UserSkill } from '@/components/skills/SkillSelector';
+import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
+import { SubAccountsManager } from '@/components/subaccounts/SubAccountsManager';
 import { useAuth, useToast, useTenant, useTheme } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -916,6 +923,33 @@ export function SettingsPage() {
               <span className="flex items-center gap-2">
                 <Lock className="w-4 h-4" aria-hidden="true" />
                 Security
+              </span>
+            }
+          />
+          <Tab
+            key="skills"
+            title={
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
+                Skills
+              </span>
+            }
+          />
+          <Tab
+            key="availability"
+            title={
+              <span className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" aria-hidden="true" />
+                Availability
+              </span>
+            }
+          />
+          <Tab
+            key="linked-accounts"
+            title={
+              <span className="flex items-center gap-2">
+                <Users className="w-4 h-4" aria-hidden="true" />
+                Linked
               </span>
             }
           />
@@ -1795,6 +1829,43 @@ export function SettingsPage() {
             </GlassCard>
           </div>
         )}
+
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {/* SKILLS TAB */}
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {activeTab === 'skills' && (
+          <div className="space-y-6">
+            <GlassCard className="p-6">
+              <h2 className="text-lg font-semibold text-theme-primary mb-2">Your Skills</h2>
+              <p className="text-sm text-theme-muted mb-6">
+                Add skills to your profile so other members can find you. Community members can endorse your skills.
+              </p>
+              <SkillsTabContent />
+            </GlassCard>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {/* AVAILABILITY TAB */}
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {activeTab === 'availability' && (
+          <div className="space-y-6">
+            <GlassCard className="p-6">
+              <AvailabilityGrid editable />
+            </GlassCard>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {/* LINKED ACCOUNTS TAB */}
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {activeTab === 'linked-accounts' && (
+          <div className="space-y-6">
+            <GlassCard className="p-6">
+              <SubAccountsManager />
+            </GlassCard>
+          </div>
+        )}
       </motion.div>
 
       {/* ═══════════════════════════════════════════════════════════════════════ */}
@@ -2271,6 +2342,43 @@ function SettingToggle({ label, description, checked, onChange, disabled }: Sett
       />
     </div>
   );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Skills Tab Content (lazy-loaded skills data)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function SkillsTabContent() {
+  const [userSkills, setUserSkills] = useState<UserSkill[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadSkills = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get<UserSkill[]>('/v2/users/me/skills');
+      if (response.success && response.data) {
+        setUserSkills(response.data);
+      }
+    } catch (err) {
+      logError('Failed to load user skills', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSkills();
+  }, [loadSkills]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-8">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  return <SkillSelector userSkills={userSkills} onSkillsChange={loadSkills} />;
 }
 
 export default SettingsPage;
