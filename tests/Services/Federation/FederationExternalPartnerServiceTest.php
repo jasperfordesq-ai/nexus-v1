@@ -295,6 +295,11 @@ class FederationExternalPartnerServiceTest extends DatabaseTestCase
 
     public function testDecryptApiKeyRoundTrip(): void
     {
+        // Ensure encryption key is available for CI environments
+        if (!getenv('APP_KEY') && !getenv('ENCRYPTION_KEY')) {
+            putenv('APP_KEY=test-encryption-key-for-ci-only');
+        }
+
         $originalKey = 'test-api-key-' . time();
 
         // Use reflection to access private encryptApiKey method
@@ -312,6 +317,11 @@ class FederationExternalPartnerServiceTest extends DatabaseTestCase
 
     public function testEncryptionProducesDifferentOutputs(): void
     {
+        // Ensure encryption key is available for CI environments
+        if (!getenv('APP_KEY') && !getenv('ENCRYPTION_KEY')) {
+            putenv('APP_KEY=test-encryption-key-for-ci-only');
+        }
+
         $key = 'same-key-input';
 
         $reflection = new \ReflectionClass(FederationExternalPartnerService::class);

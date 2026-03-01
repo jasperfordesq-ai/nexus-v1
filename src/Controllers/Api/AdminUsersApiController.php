@@ -133,6 +133,7 @@ class AdminUsersApiController extends BaseApiController
         )->fetch()['cnt'];
 
         // Get paginated users — join tenants table for cross-tenant name display
+        // nosemgrep: tainted-sql-string — $sortColumn from allowlist map, $order validated against ['ASC','DESC'], $where from parameterized conditions
         $users = Database::query(
             "SELECT u.id, u.first_name, u.last_name,
                 CASE
