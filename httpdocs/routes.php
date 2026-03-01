@@ -1071,6 +1071,40 @@ $router->add('GET', '/api/v2/admin/volunteering/organizations', 'Nexus\Controlle
 $router->add('POST', '/api/v2/admin/volunteering/approvals/{id}/approve', 'Nexus\Controllers\Api\AdminVolunteeringApiController@approveApplication');
 $router->add('POST', '/api/v2/admin/volunteering/approvals/{id}/decline', 'Nexus\Controllers\Api\AdminVolunteeringApiController@declineApplication');
 
+// Admin Events
+$router->add('GET', '/api/v2/admin/events', 'Nexus\Controllers\Api\AdminEventsApiController@index');
+$router->add('GET', '/api/v2/admin/events/{id}', 'Nexus\Controllers\Api\AdminEventsApiController@show');
+$router->add('DELETE', '/api/v2/admin/events/{id}', 'Nexus\Controllers\Api\AdminEventsApiController@destroy');
+$router->add('POST', '/api/v2/admin/events/{id}/cancel', 'Nexus\Controllers\Api\AdminEventsApiController@cancel');
+
+// Admin Polls
+$router->add('GET', '/api/v2/admin/polls', 'Nexus\Controllers\Api\AdminPollsApiController@index');
+$router->add('GET', '/api/v2/admin/polls/{id}', 'Nexus\Controllers\Api\AdminPollsApiController@show');
+$router->add('DELETE', '/api/v2/admin/polls/{id}', 'Nexus\Controllers\Api\AdminPollsApiController@destroy');
+
+// Admin Goals
+$router->add('GET', '/api/v2/admin/goals', 'Nexus\Controllers\Api\AdminGoalsApiController@index');
+$router->add('GET', '/api/v2/admin/goals/{id}', 'Nexus\Controllers\Api\AdminGoalsApiController@show');
+$router->add('DELETE', '/api/v2/admin/goals/{id}', 'Nexus\Controllers\Api\AdminGoalsApiController@destroy');
+
+// Admin Resources / Knowledge Base
+$router->add('GET', '/api/v2/admin/resources', 'Nexus\Controllers\Api\AdminResourcesApiController@index');
+$router->add('GET', '/api/v2/admin/resources/{id}', 'Nexus\Controllers\Api\AdminResourcesApiController@show');
+$router->add('DELETE', '/api/v2/admin/resources/{id}', 'Nexus\Controllers\Api\AdminResourcesApiController@destroy');
+
+// Admin Jobs
+$router->add('GET', '/api/v2/admin/jobs', 'Nexus\Controllers\Api\AdminJobsApiController@index');
+$router->add('GET', '/api/v2/admin/jobs/{id}', 'Nexus\Controllers\Api\AdminJobsApiController@show');
+$router->add('DELETE', '/api/v2/admin/jobs/{id}', 'Nexus\Controllers\Api\AdminJobsApiController@destroy');
+$router->add('POST', '/api/v2/admin/jobs/{id}/feature', 'Nexus\Controllers\Api\AdminJobsApiController@feature');
+$router->add('POST', '/api/v2/admin/jobs/{id}/unfeature', 'Nexus\Controllers\Api\AdminJobsApiController@unfeature');
+
+// Admin Ideation / Challenges
+$router->add('GET', '/api/v2/admin/ideation', 'Nexus\Controllers\Api\AdminIdeationApiController@index');
+$router->add('GET', '/api/v2/admin/ideation/{id}', 'Nexus\Controllers\Api\AdminIdeationApiController@show');
+$router->add('DELETE', '/api/v2/admin/ideation/{id}', 'Nexus\Controllers\Api\AdminIdeationApiController@destroy');
+$router->add('POST', '/api/v2/admin/ideation/{id}/status', 'Nexus\Controllers\Api\AdminIdeationApiController@updateStatus');
+
 // Admin Federation
 $router->add('GET', '/api/v2/admin/federation/settings', 'Nexus\Controllers\Api\AdminFederationApiController@settings');
 $router->add('PUT', '/api/v2/admin/federation/settings', 'Nexus\Controllers\Api\AdminFederationApiController@updateSettings');
