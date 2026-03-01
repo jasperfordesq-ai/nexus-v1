@@ -10,6 +10,9 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Models\ActivityLog;
+use Nexus\Services\ListingFeaturedService;
+use Nexus\Services\ListingModerationService;
+use Nexus\Services\SearchLogService;
 
 /**
  * AdminListingsApiController - V2 API for React admin content moderation
@@ -18,10 +21,18 @@ use Nexus\Models\ActivityLog;
  * All endpoints require admin authentication.
  *
  * Endpoints:
- * - GET    /api/v2/admin/listings              - List all content (paginated, filterable)
- * - GET    /api/v2/admin/listings/{id}         - Get single listing detail
- * - POST   /api/v2/admin/listings/{id}/approve - Approve a pending listing
- * - DELETE /api/v2/admin/listings/{id}         - Delete a listing
+ * - GET    /api/v2/admin/listings                      - List all content (paginated, filterable)
+ * - GET    /api/v2/admin/listings/{id}                 - Get single listing detail
+ * - POST   /api/v2/admin/listings/{id}/approve         - Approve a pending listing
+ * - DELETE /api/v2/admin/listings/{id}                 - Delete a listing
+ * - POST   /api/v2/admin/listings/{id}/feature         - Feature a listing
+ * - DELETE /api/v2/admin/listings/{id}/feature         - Unfeature a listing
+ * - POST   /api/v2/admin/listings/{id}/reject          - Reject a listing (moderation)
+ * - GET    /api/v2/admin/listings/moderation-queue      - Get moderation queue
+ * - GET    /api/v2/admin/listings/moderation-stats      - Get moderation stats
+ * - GET    /api/v2/admin/search/analytics               - Get search analytics
+ * - GET    /api/v2/admin/search/trending                - Get trending searches (admin)
+ * - GET    /api/v2/admin/search/zero-results            - Get zero-result queries
  */
 class AdminListingsApiController extends BaseApiController
 {
@@ -304,5 +315,163 @@ class AdminListingsApiController extends BaseApiController
         );
 
         $this->respondWithData(['deleted' => true, 'id' => $id]);
+    }
+
+    /**
+     * POST /api/v2/admin/listings/{id}/feature
+     *
+     * Feature a listing. Optional body: { "days": 7 }
+     */
+    public function feature(int $id): void
+    {
+        $this->requireAdmin();
+        $data = $this->getAllInput();
+        $days = isset($data['days']) ? (int)$data['days'] : null;
+
+        $result = ListingFeaturedService::featureListing($id, $days);
+
+        if (!$result['success']) {
+            $this->respondWithError('FEATURE_FAILED', $result['error'], null, 404);
+            return;
+        }
+
+        $this->respondWithData([
+            'featured' => true,
+            'id' => $id,
+            'featured_until' => $result['featured_until'],
+        ]);
+    }
+
+    /**
+     * DELETE /api/v2/admin/listings/{id}/feature
+     *
+     * Unfeature a listing.
+     */
+    public function unfeature(int $id): void
+    {
+        $this->requireAdmin();
+
+        $result = ListingFeaturedService::unfeatureListing($id);
+
+        if (!$result['success']) {
+            $this->respondWithError('UNFEATURE_FAILED', $result['error'], null, 404);
+            return;
+        }
+
+        $this->respondWithData(['featured' => false, 'id' => $id]);
+    }
+
+    /**
+     * POST /api/v2/admin/listings/{id}/reject
+     *
+     * Reject a listing during moderation review.
+     * Body: { "reason": "Rejection reason here" }
+     */
+    public function reject(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+        $data = $this->getAllInput();
+        $reason = $data['reason'] ?? '';
+
+        $result = ListingModerationService::reject($id, $adminId, $reason);
+
+        if (!$result['success']) {
+            $status = $result['error'] === 'Listing not found' ? 404 : 422;
+            $this->respondWithError('REJECT_FAILED', $result['error'], null, $status);
+            return;
+        }
+
+        $this->respondWithData(['rejected' => true, 'id' => $id]);
+    }
+
+    /**
+     * GET /api/v2/admin/listings/moderation-queue
+     *
+     * Get pending listings for moderation review.
+     * Query params: page, limit, type
+     */
+    public function moderationQueue(): void
+    {
+        $this->requireAdmin();
+
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $limit = min(100, max(1, (int)($_GET['limit'] ?? 20)));
+        $type = $_GET['type'] ?? null;
+
+        $result = ListingModerationService::getReviewQueue($page, $limit, $type);
+
+        $this->respondWithPaginatedCollection(
+            $result['items'],
+            $result['total'],
+            $page,
+            $limit
+        );
+    }
+
+    /**
+     * GET /api/v2/admin/listings/moderation-stats
+     *
+     * Get moderation statistics.
+     */
+    public function moderationStats(): void
+    {
+        $this->requireAdmin();
+
+        $stats = ListingModerationService::getStats();
+
+        $this->respondWithData($stats);
+    }
+
+    /**
+     * GET /api/v2/admin/search/analytics
+     *
+     * Get search analytics summary.
+     * Query params: days (default 30)
+     */
+    public function searchAnalytics(): void
+    {
+        $this->requireAdmin();
+
+        $days = min(90, max(1, (int)($_GET['days'] ?? 30)));
+
+        $analytics = SearchLogService::getAnalyticsSummary($days);
+
+        $this->respondWithData($analytics);
+    }
+
+    /**
+     * GET /api/v2/admin/search/trending
+     *
+     * Get trending searches (admin view).
+     * Query params: days, limit
+     */
+    public function searchTrending(): void
+    {
+        $this->requireAdmin();
+
+        $days = min(90, max(1, (int)($_GET['days'] ?? 7)));
+        $limit = min(50, max(1, (int)($_GET['limit'] ?? 20)));
+
+        $trending = SearchLogService::getTrendingSearches($days, $limit);
+
+        $this->respondWithData($trending);
+    }
+
+    /**
+     * GET /api/v2/admin/search/zero-results
+     *
+     * Get queries that returned zero results.
+     * Query params: days, limit
+     */
+    public function searchZeroResults(): void
+    {
+        $this->requireAdmin();
+
+        $days = min(90, max(1, (int)($_GET['days'] ?? 30)));
+        $limit = min(50, max(1, (int)($_GET['limit'] ?? 20)));
+
+        $zeroResults = SearchLogService::getZeroResultSearches($days, $limit);
+
+        $this->respondWithData($zeroResults);
     }
 }

@@ -207,7 +207,7 @@ export interface TotpStatusResponse {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type ListingType = 'offer' | 'request';
-export type ListingStatus = 'active' | 'paused' | 'completed' | 'expired' | 'deleted';
+export type ListingStatus = 'active' | 'paused' | 'completed' | 'expired' | 'deleted' | 'pending' | 'rejected';
 
 export interface Listing {
   id: number;
@@ -228,8 +228,19 @@ export interface Listing {
   status: ListingStatus | null;
   federated_visibility?: 'none' | 'listed' | 'bookable';
   views_count?: number;
+  view_count?: number;
+  contact_count?: number;
+  save_count?: number;
   responses_count?: number;
   is_favorited?: boolean;
+  is_featured?: boolean;
+  featured_until?: string | null;
+  expires_at?: string | null;
+  renewed_at?: string | null;
+  renewal_count?: number;
+  skill_tags?: string[];
+  moderation_status?: 'pending_review' | 'approved' | 'rejected' | null;
+  rejection_reason?: string | null;
   can_edit?: boolean;
   can_delete?: boolean;
   created_at: string;
@@ -304,6 +315,46 @@ export interface ListingFilters {
   user_id?: number;
   cursor?: string;
   per_page?: number;
+  skills?: string;
+  featured_first?: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Listing Analytics Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ListingAnalytics {
+  listing_id: number;
+  title: string;
+  summary: {
+    total_views: number;
+    unique_viewers: number;
+    total_contacts: number;
+    total_saves: number;
+    contact_rate: number;
+    save_rate: number;
+    views_trend_percent: number;
+  };
+  views_over_time: Array<{ date: string; count: number }>;
+  contacts_over_time: Array<{ date: string; count: number }>;
+  contact_types: Array<{ contact_type: string; count: number }>;
+  period_days: number;
+  created_at: string;
+  expires_at: string | null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Saved Search Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface SavedSearch {
+  id: number;
+  name: string;
+  query_params: Record<string, string>;
+  notify_on_new: boolean;
+  last_run_at: string | null;
+  last_result_count: number | null;
+  created_at: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -445,6 +496,10 @@ export interface Transaction {
   };
   created_at: string;
   completed_at?: string;
+  // Extended fields (W4, W8)
+  transaction_type?: 'transfer' | 'exchange' | 'donation' | 'starting_balance' | 'admin_grant' | 'community_fund';
+  category_id?: number | null;
+  prep_time?: number | null;
 }
 
 export interface TransferRequest {
@@ -452,6 +507,7 @@ export interface TransferRequest {
   amount: number;
   description: string;
   listing_id?: number;
+  category_id?: number;
 }
 
 export interface TransferResponse {
@@ -474,11 +530,94 @@ export interface WalletUserSearchResult {
   avatar?: string | null;
 }
 
+// W8 - Transaction Categories
+export interface TransactionCategory {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string | null;
+  icon?: string | null;
+  color?: string | null;
+  sort_order: number;
+  is_system: boolean;
+}
+
+// W1 - Community Fund
+export interface CommunityFundBalance {
+  id: number;
+  balance: number;
+  total_deposited: number;
+  total_withdrawn: number;
+  total_donated: number;
+  description: string;
+}
+
+export interface CommunityFundTransaction {
+  id: number;
+  type: 'deposit' | 'withdrawal' | 'donation' | 'starting_balance_grant';
+  amount: number;
+  balance_after: number;
+  description: string;
+  user_name?: string;
+  user_avatar?: string;
+  admin_name?: string;
+  created_at: string;
+}
+
+// W10 - Exchange Ratings
+export interface ExchangeRating {
+  id: number;
+  rater: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+  };
+  rated: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+  };
+  rating: number;
+  comment?: string | null;
+  role: 'requester' | 'provider';
+  created_at: string;
+}
+
+export interface UserRating {
+  average: number | null;
+  count: number;
+}
+
+// W6 - Credit Donations
+export interface CreditDonation {
+  id: number;
+  donor_id: number;
+  recipient_type: 'user' | 'community_fund';
+  recipient_id?: number | null;
+  amount: number;
+  message?: string | null;
+  donor_name?: string;
+  donor_avatar?: string;
+  recipient_name?: string;
+  recipient_avatar?: string;
+  created_at: string;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Event Types
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type RsvpStatus = 'attending' | 'maybe' | 'not_attending';
+
+export type EventStatus = 'active' | 'cancelled' | 'postponed' | 'draft';
+
+export interface EventSeries {
+  id: number;
+  title: string;
+  description?: string | null;
+  event_count: number;
+  creator?: string;
+}
 
 export interface Event {
   id: number;
@@ -486,6 +625,8 @@ export interface Event {
   description: string;
   start_date: string;
   end_date?: string;
+  start_time?: string;
+  end_time?: string;
   location?: string;
   coordinates?: {
     lat: number;
@@ -498,7 +639,9 @@ export interface Event {
     id: number;
     first_name: string;
     last_name: string;
+    name?: string;
     avatar?: string | null;
+    avatar_url?: string | null;
   };
   group?: {
     id: number;
@@ -507,12 +650,29 @@ export interface Event {
   };
   attendees_count: number;
   maybe_count?: number;
-  max_attendees?: number;
+  max_attendees?: number | null;
+  spots_left?: number | null;
   is_full?: boolean;
   category_name?: string;
   interested_count?: number;
   rsvp_status?: RsvpStatus | null;
+  user_rsvp?: RsvpStatus | null;
   can_edit?: boolean;
+  // E5: Cancellation
+  status?: EventStatus;
+  cancellation_reason?: string | null;
+  // E7: Series
+  series_id?: number | null;
+  series?: EventSeries | null;
+  // E1: Recurrence
+  parent_event_id?: number | null;
+  is_recurring?: boolean;
+  // E3: Waitlist
+  waitlist_count?: number;
+  rsvp_counts?: {
+    going: number;
+    interested: number;
+  };
   recent_attendees?: Array<{
     id: number;
     first_name: string;
@@ -533,10 +693,55 @@ export interface EventCreateRequest {
   online_url?: string;
   max_attendees?: number;
   group_id?: number;
+  // E1: Recurrence fields
+  recurrence_frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
+  recurrence_interval?: number;
+  recurrence_days?: string;
+  recurrence_ends_type?: 'never' | 'after_count' | 'on_date';
+  recurrence_ends_after_count?: number;
+  recurrence_ends_on_date?: string;
+  // E7: Series
+  series_id?: number;
 }
 
 export interface RsvpRequest {
   status: RsvpStatus;
+}
+
+export interface RsvpResponse {
+  status: RsvpStatus | 'waitlisted';
+  rsvp_counts: { going: number; interested: number };
+  waitlist_position?: number | null;
+  message?: string;
+}
+
+export interface EventAttendanceRecord {
+  user_id: number;
+  name: string;
+  first_name?: string;
+  last_name?: string;
+  avatar_url?: string | null;
+  checked_in_at: string;
+  checked_in_by?: string;
+  hours_credited?: number | null;
+  notes?: string | null;
+}
+
+export interface EventReminder {
+  remind_before_minutes: number;
+  reminder_type: 'platform' | 'email' | 'both';
+  status: 'pending' | 'sent' | 'failed' | 'cancelled';
+  scheduled_for: string;
+}
+
+export interface WaitlistEntry {
+  id: number;
+  name: string;
+  first_name?: string;
+  last_name?: string;
+  avatar_url?: string | null;
+  position: number;
+  joined_at: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1012,6 +1217,7 @@ export interface Exchange {
   requester_id: number;
   provider_id: number;
   proposed_hours: number;
+  prep_time?: number | null;
   status: ExchangeStatus;
   requester_confirmed_at?: string | null;
   requester_confirmed_hours?: number | null;

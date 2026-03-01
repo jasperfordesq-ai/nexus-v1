@@ -46,12 +46,18 @@ class UnifiedSearchService
     /**
      * Unified search across all content types
      *
-     * @param string $query Search query
+     * @param string $query Search query (supports "exact phrase", AND, OR, NOT/-prefix)
      * @param int|null $userId User ID for personalization
      * @param array $filters [
      *   'type' => 'all' (default), 'listings', 'users', 'events', 'groups',
      *   'cursor' => string,
-     *   'limit' => int (default: 20, max: 50)
+     *   'limit' => int (default: 20, max: 50),
+     *   'category_id' => int (listings only),
+     *   'date_from' => string ISO date,
+     *   'date_to' => string ISO date,
+     *   'sort' => 'relevance'|'newest'|'oldest',
+     *   'skills' => string (comma-separated, listings only),
+     *   'location' => string (location filter),
      * ]
      * @return array Search results with pagination
      */
@@ -79,6 +85,9 @@ class UnifiedSearchService
         }
 
         $tenantId = TenantContext::getId();
+
+        // Parse the query for boolean operators and exact phrases
+        $searchTerms = self::parseSearchQuery($query);
         $searchTerm = '%' . $query . '%';
 
         $results = [];
@@ -86,35 +95,54 @@ class UnifiedSearchService
 
         // Search based on type filter
         if ($type === 'all' || $type === 'listings') {
-            $listingResults = self::searchListings($searchTerm, $tenantId, $type === 'all' ? 10 : $limit, $offset);
+            $listingResults = self::searchListings(
+                $searchTerm, $tenantId, $type === 'all' ? 10 : $limit, $offset,
+                $searchTerms, $filters
+            );
             $results = array_merge($results, $listingResults['items']);
             $totalCount += $listingResults['total'];
         }
 
         if ($type === 'all' || $type === 'users') {
-            $userResults = self::searchUsers($searchTerm, $tenantId, $type === 'all' ? 10 : $limit, $offset);
+            $userResults = self::searchUsers(
+                $searchTerm, $tenantId, $type === 'all' ? 10 : $limit, $offset,
+                $searchTerms, $filters
+            );
             $results = array_merge($results, $userResults['items']);
             $totalCount += $userResults['total'];
         }
 
         if ($type === 'all' || $type === 'events') {
-            $eventResults = self::searchEvents($searchTerm, $tenantId, $type === 'all' ? 10 : $limit, $offset);
+            $eventResults = self::searchEvents(
+                $searchTerm, $tenantId, $type === 'all' ? 10 : $limit, $offset,
+                $searchTerms, $filters
+            );
             $results = array_merge($results, $eventResults['items']);
             $totalCount += $eventResults['total'];
         }
 
         if ($type === 'all' || $type === 'groups') {
-            $groupResults = self::searchGroups($searchTerm, $tenantId, $type === 'all' ? 10 : $limit, $offset);
+            $groupResults = self::searchGroups(
+                $searchTerm, $tenantId, $type === 'all' ? 10 : $limit, $offset,
+                $searchTerms, $filters
+            );
             $results = array_merge($results, $groupResults['items']);
             $totalCount += $groupResults['total'];
         }
 
-        // If searching all types, sort by relevance (created_at for now)
-        if ($type === 'all') {
-            usort($results, function ($a, $b) {
+        // Sort results
+        $sort = $filters['sort'] ?? 'relevance';
+        if ($type === 'all' || $sort !== 'relevance') {
+            usort($results, function ($a, $b) use ($sort) {
+                if ($sort === 'oldest') {
+                    return strtotime($a['created_at'] ?? '1970-01-01') - strtotime($b['created_at'] ?? '1970-01-01');
+                }
+                // Default: newest first (relevance fallback)
                 return strtotime($b['created_at'] ?? '1970-01-01') - strtotime($a['created_at'] ?? '1970-01-01');
             });
-            $results = array_slice($results, 0, $limit);
+            if ($type === 'all') {
+                $results = array_slice($results, 0, $limit);
+            }
         }
 
         $hasMore = count($results) >= $limit;
@@ -130,23 +158,202 @@ class UnifiedSearchService
     }
 
     /**
-     * Search listings
+     * Parse a search query supporting:
+     * - Exact phrases: "time banking"
+     * - NOT / exclusion: -spam, NOT spam
+     * - AND: cooking AND baking
+     * - OR: cooking OR baking
+     *
+     * Returns structured parsed terms for SQL WHERE clause building.
+     *
+     * @param string $query Raw user query
+     * @return array ['must' => string[], 'must_not' => string[], 'exact' => string[]]
      */
-    private static function searchListings(string $searchTerm, int $tenantId, int $limit, int $offset): array
+    private static function parseSearchQuery(string $query): array
     {
+        $must = [];
+        $mustNot = [];
+        $exact = [];
+
+        // Extract quoted exact phrases first
+        if (preg_match_all('/"([^"]+)"/', $query, $matches)) {
+            foreach ($matches[1] as $phrase) {
+                $exact[] = trim($phrase);
+            }
+            // Remove quoted phrases from query for further parsing
+            $query = preg_replace('/"[^"]*"/', '', $query);
+        }
+
+        // Split remaining query by spaces
+        $tokens = preg_split('/\s+/', trim($query));
+        $tokens = array_filter($tokens, fn($t) => $t !== '');
+
+        $i = 0;
+        while ($i < count($tokens)) {
+            $token = $tokens[$i];
+
+            // Skip boolean operators (they modify the next token)
+            if (strtoupper($token) === 'AND') {
+                $i++;
+                continue;
+            }
+            if (strtoupper($token) === 'OR') {
+                $i++;
+                continue;
+            }
+
+            // NOT prefix: -term or NOT term
+            if (str_starts_with($token, '-') && strlen($token) > 1) {
+                $mustNot[] = substr($token, 1);
+                $i++;
+                continue;
+            }
+            if (strtoupper($token) === 'NOT' && isset($tokens[$i + 1])) {
+                $mustNot[] = $tokens[$i + 1];
+                $i += 2;
+                continue;
+            }
+
+            // Regular term
+            if (strlen($token) >= 2) {
+                $must[] = $token;
+            }
+            $i++;
+        }
+
+        return [
+            'must' => $must,
+            'must_not' => $mustNot,
+            'exact' => $exact,
+        ];
+    }
+
+    /**
+     * Build SQL WHERE conditions for boolean search terms.
+     *
+     * @param array $searchTerms Parsed search terms
+     * @param array $columns Column names to search in
+     * @param array &$params Reference to params array to append to
+     * @return string SQL WHERE fragment (empty string if no conditions)
+     */
+    private static function buildBooleanSearchSql(array $searchTerms, array $columns, array &$params): string
+    {
+        $conditions = [];
+
+        // Exact phrases: all columns must match
+        foreach ($searchTerms['exact'] as $phrase) {
+            $phraseConditions = [];
+            foreach ($columns as $col) {
+                $phraseConditions[] = "{$col} LIKE ?";
+                $params[] = '%' . $phrase . '%';
+            }
+            $conditions[] = '(' . implode(' OR ', $phraseConditions) . ')';
+        }
+
+        // Must NOT contain
+        foreach ($searchTerms['must_not'] as $term) {
+            foreach ($columns as $col) {
+                $conditions[] = "({$col} NOT LIKE ? OR {$col} IS NULL)";
+                $params[] = '%' . $term . '%';
+            }
+        }
+
+        return !empty($conditions) ? implode(' AND ', $conditions) : '';
+    }
+
+    /**
+     * Search listings with advanced filters and boolean search
+     */
+    private static function searchListings(
+        string $searchTerm, int $tenantId, int $limit, int $offset,
+        array $searchTerms = [], array $filters = []
+    ): array {
         $db = Database::getConnection();
 
+        // Build WHERE clause
+        $where = "l.tenant_id = ? AND l.status = 'active'
+                  AND (l.title LIKE ? OR l.description LIKE ? OR l.location LIKE ?)";
+        $countParams = [$tenantId, $searchTerm, $searchTerm, $searchTerm];
+        $queryParams = [$tenantId, $searchTerm, $searchTerm, $searchTerm];
+
+        // Boolean search conditions
+        if (!empty($searchTerms)) {
+            $boolParams = [];
+            $boolSql = self::buildBooleanSearchSql(
+                $searchTerms,
+                ['l.title', 'l.description'],
+                $boolParams
+            );
+            if ($boolSql) {
+                $where .= " AND {$boolSql}";
+                $countParams = array_merge($countParams, $boolParams);
+                $queryParams = array_merge($queryParams, $boolParams);
+            }
+        }
+
+        // Category filter
+        if (!empty($filters['category_id'])) {
+            $where .= " AND l.category_id = ?";
+            $countParams[] = (int)$filters['category_id'];
+            $queryParams[] = (int)$filters['category_id'];
+        }
+
+        // Date range filter
+        if (!empty($filters['date_from'])) {
+            $where .= " AND l.created_at >= ?";
+            $countParams[] = $filters['date_from'];
+            $queryParams[] = $filters['date_from'];
+        }
+        if (!empty($filters['date_to'])) {
+            $where .= " AND l.created_at <= ?";
+            $countParams[] = $filters['date_to'] . ' 23:59:59';
+            $queryParams[] = $filters['date_to'] . ' 23:59:59';
+        }
+
+        // Skills filter
+        if (!empty($filters['skills'])) {
+            $skills = is_array($filters['skills']) ? $filters['skills'] : explode(',', $filters['skills']);
+            $skills = array_map('trim', array_filter($skills));
+            if (!empty($skills)) {
+                $skillPlaceholders = implode(',', array_fill(0, count($skills), '?'));
+                $where .= " AND l.id IN (
+                    SELECT lst.listing_id FROM listing_skill_tags lst
+                    WHERE lst.tenant_id = ? AND lst.tag IN ({$skillPlaceholders})
+                )";
+                $countParams[] = $tenantId;
+                $queryParams[] = $tenantId;
+                foreach ($skills as $skill) {
+                    $countParams[] = strtolower($skill);
+                    $queryParams[] = strtolower($skill);
+                }
+            }
+        }
+
+        // Location filter
+        if (!empty($filters['location'])) {
+            $where .= " AND l.location LIKE ?";
+            $locTerm = '%' . $filters['location'] . '%';
+            $countParams[] = $locTerm;
+            $queryParams[] = $locTerm;
+        }
+
+        // Sort
+        $sort = $filters['sort'] ?? 'relevance';
+        $orderBy = match ($sort) {
+            'oldest' => 'l.created_at ASC',
+            'newest' => 'l.created_at DESC',
+            default => 'l.is_featured DESC, l.created_at DESC',
+        };
+
         // Get total count
-        $countStmt = $db->prepare("
-            SELECT COUNT(*) as total FROM listings
-            WHERE tenant_id = ?
-            AND status = 'active'
-            AND (title LIKE ? OR description LIKE ? OR location LIKE ?)
-        ");
-        $countStmt->execute([$tenantId, $searchTerm, $searchTerm, $searchTerm]);
+        $countStmt = $db->prepare("SELECT COUNT(*) as total FROM listings l WHERE {$where}");
+        $countStmt->execute($countParams);
         $total = (int)$countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
         // Get results
+        $queryParams[] = $limit;
+        $queryParams[] = $offset;
+
         $stmt = $db->prepare("
             SELECT
                 l.id,
@@ -155,18 +362,21 @@ class UnifiedSearchService
                 l.type as listing_type,
                 l.image_url,
                 l.location,
+                l.is_featured,
                 l.created_at,
-                u.name as user_name,
+                CASE
+                    WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
+                    THEN u.organization_name
+                    ELSE CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))
+                END as user_name,
                 u.avatar_url as user_avatar
             FROM listings l
             JOIN users u ON l.user_id = u.id
-            WHERE l.tenant_id = ?
-            AND l.status = 'active'
-            AND (l.title LIKE ? OR l.description LIKE ? OR l.location LIKE ?)
-            ORDER BY l.created_at DESC
+            WHERE {$where}
+            ORDER BY {$orderBy}
             LIMIT ? OFFSET ?
         ");
-        $stmt->execute([$tenantId, $searchTerm, $searchTerm, $searchTerm, $limit, $offset]);
+        $stmt->execute($queryParams);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         $items = array_map(function ($row) {
@@ -178,8 +388,9 @@ class UnifiedSearchService
                 'listing_type' => $row['listing_type'],
                 'image_url' => $row['image_url'],
                 'location' => $row['location'],
+                'is_featured' => (bool)($row['is_featured'] ?? false),
                 'user' => [
-                    'name' => $row['user_name'],
+                    'name' => trim($row['user_name'] ?? ''),
                     'avatar_url' => $row['user_avatar'],
                 ],
                 'created_at' => $row['created_at'],
@@ -190,10 +401,12 @@ class UnifiedSearchService
     }
 
     /**
-     * Search users
+     * Search users with advanced filters
      */
-    private static function searchUsers(string $searchTerm, int $tenantId, int $limit, int $offset): array
-    {
+    private static function searchUsers(
+        string $searchTerm, int $tenantId, int $limit, int $offset,
+        array $searchTerms = [], array $filters = []
+    ): array {
         $db = Database::getConnection();
 
         // Get total count
@@ -246,10 +459,12 @@ class UnifiedSearchService
     }
 
     /**
-     * Search events
+     * Search events with advanced filters
      */
-    private static function searchEvents(string $searchTerm, int $tenantId, int $limit, int $offset): array
-    {
+    private static function searchEvents(
+        string $searchTerm, int $tenantId, int $limit, int $offset,
+        array $searchTerms = [], array $filters = []
+    ): array {
         $db = Database::getConnection();
 
         // Get total count
@@ -310,10 +525,12 @@ class UnifiedSearchService
     }
 
     /**
-     * Search groups
+     * Search groups with advanced filters
      */
-    private static function searchGroups(string $searchTerm, int $tenantId, int $limit, int $offset): array
-    {
+    private static function searchGroups(
+        string $searchTerm, int $tenantId, int $limit, int $offset,
+        array $searchTerms = [], array $filters = []
+    ): array {
         $db = Database::getConnection();
 
         // Get total count

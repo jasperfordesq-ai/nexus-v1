@@ -4,3 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 export { TransferModal } from './TransferModal';
+export { DonateModal } from './DonateModal';
+export { CommunityFundCard } from './CommunityFundCard';
+export { RatingModal } from './RatingModal';
+export { CategorySelect } from './CategorySelect';

@@ -24,6 +24,10 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { SavedSearches } from '@/components/search/SavedSearches';
+import { AdvancedSearchFilters, defaultFilters } from '@/components/search/AdvancedSearchFilters';
+import type { SearchFilters as AdvancedFilters } from '@/components/search/AdvancedSearchFilters';
+import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -112,8 +116,9 @@ export function SearchPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilters>({ ...defaultFilters });
 
-  const performSearch = useCallback(async (searchQuery: string) => {
+  const performSearch = useCallback(async (searchQuery: string, filters?: AdvancedFilters) => {
     if (!searchQuery.trim()) {
       setResults({ listings: [], users: [], events: [], groups: [] });
       setHasSearched(false);
@@ -125,7 +130,21 @@ export function SearchPage() {
       setIsLoading(true);
       setHasSearched(true);
       setSearchError(null);
-      const response = await api.get<RawSearchItem[]>(`/v2/search?q=${encodeURIComponent(searchQuery)}`);
+
+      const params = new URLSearchParams();
+      params.set('q', searchQuery);
+
+      // Apply advanced filters
+      const f = filters || advancedFilters;
+      if (f.type && f.type !== 'all') params.set('type', f.type);
+      if (f.category_id) params.set('category_id', f.category_id);
+      if (f.date_from) params.set('date_from', f.date_from);
+      if (f.date_to) params.set('date_to', f.date_to);
+      if (f.sort && f.sort !== 'relevance') params.set('sort', f.sort);
+      if (f.skills) params.set('skills', f.skills);
+      if (f.location) params.set('location', f.location);
+
+      const response = await api.get<RawSearchItem[]>(`/v2/search?${params}`);
       if (response.success && response.data) {
         setResults(groupSearchItems(response.data));
       }
@@ -136,7 +155,7 @@ export function SearchPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, advancedFilters]);
 
   useEffect(() => {
     const initialQuery = searchParams.get('q');
@@ -149,6 +168,27 @@ export function SearchPage() {
     e.preventDefault();
     setSearchParams(query ? { q: query } : {});
     performSearch(query);
+  }
+
+  function handleRunSavedSearch(queryParams: Record<string, string>) {
+    const savedQuery = queryParams.q || '';
+    setQuery(savedQuery);
+    if (queryParams.type) {
+      setActiveTab(queryParams.type as SearchTab);
+    }
+    // Build filters from saved search params
+    const savedFilters: AdvancedFilters = {
+      type: queryParams.type || 'all',
+      category_id: queryParams.category_id || '',
+      date_from: queryParams.date_from || '',
+      date_to: queryParams.date_to || '',
+      sort: queryParams.sort || 'relevance',
+      skills: queryParams.skills || '',
+      location: queryParams.location || '',
+    };
+    setAdvancedFilters(savedFilters);
+    setSearchParams(savedQuery ? { q: savedQuery } : {});
+    performSearch(savedQuery, savedFilters);
   }
 
   const totalResults =
@@ -198,6 +238,25 @@ export function SearchPage() {
         </form>
       </GlassCard>
 
+      {/* Advanced Filters */}
+      <AdvancedSearchFilters
+        filters={advancedFilters}
+        onChange={setAdvancedFilters}
+        onApply={() => performSearch(query)}
+        onReset={() => performSearch(query)}
+      />
+
+      {/* Saved Searches */}
+      <SavedSearches
+        onRunSearch={handleRunSavedSearch}
+        currentQuery={hasSearched ? query : undefined}
+        currentFilters={hasSearched ? {
+          ...(advancedFilters.type !== 'all' ? { type: advancedFilters.type } : {}),
+          ...(advancedFilters.category_id ? { category_id: advancedFilters.category_id } : {}),
+          ...(advancedFilters.skills ? { skills: advancedFilters.skills } : {}),
+        } : undefined}
+      />
+
       {/* Results */}
       {hasSearched && (
         <>
@@ -225,7 +284,7 @@ export function SearchPage() {
               <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error_title')}</h2>
               <p className="text-theme-muted mb-4">{searchError}</p>
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
                 onPress={() => performSearch(query)}
               >
                 {t('try_again')}
@@ -273,6 +332,7 @@ export function SearchPage() {
                             `}>
                               {listing.type === 'offer' ? t('listing_offering') : t('listing_requesting')}
                             </span>
+                            {listing.is_featured && <FeaturedBadge />}
                             <h3 className="font-semibold text-theme-primary mt-2">{listing.title}</h3>
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{listing.description}</p>
                             <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">

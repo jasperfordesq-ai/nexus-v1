@@ -27,6 +27,7 @@ import {
   AlertTriangle,
   Tag,
   Star,
+  Ban,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -433,11 +434,12 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
   const { tenantPath } = useTenant();
   const startDate = new Date(event.start_date);
   const isPast = startDate < new Date();
+  const isCancelled = event.status === 'cancelled';
 
   return (
     <Link to={tenantPath(`/events/${event.id}`)} aria-label={`${event.title} on ${startDate.toLocaleDateString()}`}>
       <article>
-        <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${isPast ? 'opacity-60' : ''}`}>
+        <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${isPast || isCancelled ? 'opacity-60' : ''}`}>
           <div className="flex gap-3 sm:gap-4">
             {/* Date Box */}
             <div className="flex-shrink-0 w-14 sm:w-16 text-center">
@@ -467,6 +469,12 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
               <p className="text-theme-muted text-sm line-clamp-2 mt-1">{event.description}</p>
 
               <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-theme-subtle">
+                {event.status === 'cancelled' && (
+                  <span className="flex items-center gap-1 text-red-400 font-medium">
+                    <Ban className="w-4 h-4" aria-hidden="true" />
+                    Cancelled
+                  </span>
+                )}
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" aria-hidden="true" />
                   <time dateTime={event.start_date}>
@@ -486,6 +494,14 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                     <span className="text-theme-subtle">&middot; {t('interested', { count: event.interested_count })}</span>
                   )}
                 </span>
+                {event.max_attendees != null && event.spots_left != null && event.spots_left > 0 && event.status !== 'cancelled' && (
+                  <span className={`text-xs font-medium ${event.spots_left <= 3 ? 'text-red-400' : 'text-emerald-400'}`}>
+                    {event.spots_left} {event.spots_left === 1 ? 'spot' : 'spots'} left
+                  </span>
+                )}
+                {event.is_full && event.status !== 'cancelled' && (
+                  <span className="text-xs font-medium text-red-400">Full</span>
+                )}
               </div>
             </div>
 

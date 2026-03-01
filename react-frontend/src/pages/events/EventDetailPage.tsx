@@ -40,6 +40,10 @@ import {
   Copy,
   UserCheck,
   ClipboardCheck,
+  Ban,
+  ListOrdered,
+  Link2,
+  Repeat,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
@@ -50,7 +54,7 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import type { Event, User } from '@/types/api';
+import type { Event, User, RsvpResponse } from '@/types/api';
 
 type RsvpOption = 'going' | 'interested' | 'not_going';
 
@@ -58,6 +62,8 @@ interface AttendeeWithCheckIn extends User {
   checked_in?: boolean;
   rsvp_status?: string;
 }
+
+
 
 export function EventDetailPage() {
   const { t } = useTranslation('events');
@@ -76,8 +82,13 @@ export function EventDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+  const [isCancelling, setIsCancelling] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [checkingInUserId, setCheckingInUserId] = useState<number | null>(null);
+  const [isWaitlisted, setIsWaitlisted] = useState(false);
+  const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
 
   /** Map backend rsvp_status to our 3-option model */
   function normalizeRsvpStatus(status: string | null | undefined): RsvpOption | null {
@@ -154,31 +165,46 @@ export function EventDetailPage() {
 
     try {
       setIsSubmitting(true);
-      const response = await api.post(`/v2/events/${event.id}/rsvp`, { status: newStatus });
-      if (response.success) {
+      const response = await api.post<RsvpResponse>(`/v2/events/${event.id}/rsvp`, { status: newStatus });
+      if (response.success && response.data) {
+        const rsvpData = response.data;
+
+        // Check if user was waitlisted instead
+        if (rsvpData.status === 'waitlisted') {
+          setIsWaitlisted(true);
+          setWaitlistPosition(rsvpData.waitlist_position ?? null);
+          toast.info(rsvpData.message || 'Event is full. You have been added to the waitlist.');
+          return;
+        }
+
         const prevStatus = rsvpStatus;
         setRsvpStatus(newStatus);
 
-        // Update counts optimistically
-        setEvent((prev) => {
-          if (!prev) return null;
-          let goingCount = prev.attendees_count ?? 0;
-          let interestedCount = prev.interested_count ?? 0;
-
-          // Decrement old status count
-          if (prevStatus === 'going') goingCount = Math.max(0, goingCount - 1);
-          if (prevStatus === 'interested') interestedCount = Math.max(0, interestedCount - 1);
-
-          // Increment new status count
-          if (newStatus === 'going') goingCount += 1;
-          if (newStatus === 'interested') interestedCount += 1;
-
-          return {
-            ...prev,
-            attendees_count: goingCount,
-            interested_count: interestedCount,
-          };
-        });
+        // Update counts from response
+        if (rsvpData.rsvp_counts) {
+          setEvent((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              attendees_count: rsvpData.rsvp_counts.going,
+              interested_count: rsvpData.rsvp_counts.interested,
+              spots_left: prev.max_attendees != null ? Math.max(0, prev.max_attendees - rsvpData.rsvp_counts.going) : null,
+              is_full: prev.max_attendees != null ? rsvpData.rsvp_counts.going >= prev.max_attendees : false,
+            };
+          });
+        } else {
+          // Optimistic fallback
+          setEvent((prev) => {
+            if (!prev) return null;
+            let goingCount = prev.attendees_count ?? 0;
+            let interestedCount = prev.interested_count ?? 0;
+            if (prevStatus === 'going') goingCount = Math.max(0, goingCount - 1);
+            if (prevStatus === 'interested') interestedCount = Math.max(0, interestedCount - 1);
+            if (newStatus === 'going') goingCount += 1;
+            if (newStatus === 'interested') interestedCount += 1;
+            return { ...prev, attendees_count: goingCount, interested_count: interestedCount };
+          });
+        }
 
         const messages: Record<RsvpOption, string> = {
           going: t('toast.rsvp_going'),
@@ -252,7 +278,69 @@ export function EventDetailPage() {
     }
   }
 
+  async function handleCancelEvent() {
+    if (!event) return;
+
+    try {
+      setIsCancelling(true);
+      const response = await api.post(`/v2/events/${event.id}/cancel`, { reason: cancelReason });
+      if (response.success) {
+        setEvent((prev) => prev ? { ...prev, status: 'cancelled', cancellation_reason: cancelReason } : null);
+        toast.success('Event cancelled. All attendees have been notified.');
+        setShowCancelModal(false);
+      } else {
+        toast.error('Failed to cancel event.');
+      }
+    } catch (err) {
+      logError('Failed to cancel event', err);
+      toast.error('Something went wrong.');
+    } finally {
+      setIsCancelling(false);
+    }
+  }
+
+  async function handleJoinWaitlist() {
+    if (!event) return;
+
+    try {
+      setIsSubmitting(true);
+      const response = await api.post(`/v2/events/${event.id}/waitlist`);
+      if (response.success && response.data) {
+        setIsWaitlisted(true);
+        setWaitlistPosition((response.data as { position?: number }).position ?? null);
+        toast.success('You have been added to the waitlist.');
+      } else {
+        toast.error('Failed to join waitlist.');
+      }
+    } catch (err) {
+      logError('Failed to join waitlist', err);
+      toast.error('Something went wrong.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleLeaveWaitlist() {
+    if (!event) return;
+
+    try {
+      setIsSubmitting(true);
+      const response = await api.delete(`/v2/events/${event.id}/waitlist`);
+      if (response.success) {
+        setIsWaitlisted(false);
+        setWaitlistPosition(null);
+        toast.success('You have been removed from the waitlist.');
+      }
+    } catch (err) {
+      logError('Failed to leave waitlist', err);
+      toast.error('Something went wrong.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   const isOrganizer = user && event && user.id === event.organizer?.id;
+  const isCancelled = event?.status === 'cancelled';
   const goingAttendees = attendees.filter((a) => a.rsvp_status === 'going' || a.rsvp_status === 'attending' || !a.rsvp_status);
   const checkedInCount = attendees.filter((a) => a.checked_in).length;
 
@@ -364,8 +452,8 @@ export function EventDetailPage() {
             </div>
           </div>
 
-          {isOrganizer && (
-            <div className="flex gap-2">
+          {isOrganizer && !isCancelled && (
+            <div className="flex gap-2 flex-wrap">
               <Link to={tenantPath(`/events/${event.id}/edit`)}>
                 <Button
                   size="sm"
@@ -376,6 +464,15 @@ export function EventDetailPage() {
                   {t('detail.edit')}
                 </Button>
               </Link>
+              <Button
+                size="sm"
+                variant="flat"
+                className="bg-amber-500/10 text-amber-400"
+                startContent={<Ban className="w-4 h-4" aria-hidden="true" />}
+                onPress={() => setShowCancelModal(true)}
+              >
+                Cancel Event
+              </Button>
               <Button
                 size="sm"
                 variant="flat"
@@ -392,27 +489,72 @@ export function EventDetailPage() {
         {/* Title */}
         <h1 className="text-3xl font-bold text-theme-primary mb-4">{event.title}</h1>
 
-        {/* RSVP Status Display */}
-        {isAuthenticated && rsvpStatus && (
-          <div className="mb-6">
-            <Chip
-              variant="flat"
-              color={rsvpStatus === 'going' ? 'success' : rsvpStatus === 'interested' ? 'warning' : 'default'}
-              size="lg"
-              startContent={
-                rsvpStatus === 'going'
-                  ? <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
-                  : rsvpStatus === 'interested'
-                    ? <Heart className="w-4 h-4" aria-hidden="true" />
-                    : <XCircle className="w-4 h-4" aria-hidden="true" />
-              }
-            >
-              {rsvpStatus === 'going' ? t('detail.rsvp_going') : rsvpStatus === 'interested' ? t('detail.rsvp_interested') : t('detail.rsvp_not_going')}
+        {/* E5: Cancellation Banner */}
+        {isCancelled && (
+          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+            <div className="flex items-center gap-3">
+              <Ban className="w-5 h-5 text-red-400 flex-shrink-0" aria-hidden="true" />
+              <div>
+                <p className="text-red-400 font-semibold">This event has been cancelled</p>
+                {event.cancellation_reason && (
+                  <p className="text-red-300/80 text-sm mt-1">Reason: {event.cancellation_reason}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* E1: Recurring event indicator */}
+        {event.is_recurring && (
+          <div className="mb-4">
+            <Chip variant="flat" color="secondary" size="sm" startContent={<Repeat className="w-3 h-3" aria-hidden="true" />}>
+              Recurring Event
             </Chip>
           </div>
         )}
 
-        {/* Attendee Count Breakdown */}
+        {/* E7: Series link */}
+        {event.series && (
+          <div className="mb-4">
+            <Chip
+              variant="flat"
+              color="primary"
+              size="sm"
+              startContent={<Link2 className="w-3 h-3" aria-hidden="true" />}
+            >
+              Part of: {event.series.title} ({event.series.event_count} events)
+            </Chip>
+          </div>
+        )}
+
+        {/* RSVP / Waitlist Status Display */}
+        {isAuthenticated && (rsvpStatus || isWaitlisted) && (
+          <div className="mb-6 flex flex-wrap gap-2">
+            {rsvpStatus && (
+              <Chip
+                variant="flat"
+                color={rsvpStatus === 'going' ? 'success' : rsvpStatus === 'interested' ? 'warning' : 'default'}
+                size="lg"
+                startContent={
+                  rsvpStatus === 'going'
+                    ? <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+                    : rsvpStatus === 'interested'
+                      ? <Heart className="w-4 h-4" aria-hidden="true" />
+                      : <XCircle className="w-4 h-4" aria-hidden="true" />
+                }
+              >
+                {rsvpStatus === 'going' ? t('detail.rsvp_going') : rsvpStatus === 'interested' ? t('detail.rsvp_interested') : t('detail.rsvp_not_going')}
+              </Chip>
+            )}
+            {isWaitlisted && (
+              <Chip variant="flat" color="warning" size="lg" startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}>
+                On waitlist{waitlistPosition ? ` (#${waitlistPosition})` : ''}
+              </Chip>
+            )}
+          </div>
+        )}
+
+        {/* Attendee Count Breakdown with Capacity Info (E2) */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-6">
           <div className="flex items-center gap-2 text-sm">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
@@ -426,10 +568,26 @@ export function EventDetailPage() {
               <span className="text-theme-muted">{t('detail.interested_count')}</span>
             </div>
           )}
-          {event.max_attendees && (
+          {event.max_attendees != null && (
+            <>
+              <div className="flex items-center gap-2 text-sm">
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-400" />
+                <span className="text-theme-muted">Max {event.max_attendees}</span>
+              </div>
+              {event.spots_left != null && event.spots_left > 0 && (
+                <Chip size="sm" variant="flat" color={event.spots_left <= 3 ? 'danger' : 'success'}>
+                  {event.spots_left} {event.spots_left === 1 ? 'spot' : 'spots'} left
+                </Chip>
+              )}
+              {event.is_full && (
+                <Chip size="sm" variant="flat" color="danger">Event Full</Chip>
+              )}
+            </>
+          )}
+          {(event.waitlist_count ?? 0) > 0 && (
             <div className="flex items-center gap-2 text-sm">
-              <div className="w-2.5 h-2.5 rounded-full bg-gray-400" />
-              <span className="text-theme-muted">{t('detail.max_capacity', { count: event.max_attendees })}</span>
+              <ListOrdered className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />
+              <span className="text-theme-muted">{event.waitlist_count} on waitlist</span>
             </div>
           )}
         </div>
@@ -756,10 +914,10 @@ export function EventDetailPage() {
         </AnimatePresence>
 
         {/* Action Buttons */}
-        {isAuthenticated && !isPast && (
+        {isAuthenticated && !isPast && !isCancelled && (
           <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-theme-default mt-8">
             {/* RSVP Options */}
-            <div className="flex gap-2" role="group" aria-label={t('detail.rsvp_aria')}>
+            <div className="flex gap-2 flex-wrap" role="group" aria-label={t('detail.rsvp_aria')}>
               <Button
                 className={
                   rsvpStatus === 'going'
@@ -800,6 +958,29 @@ export function EventDetailPage() {
               >
                 {t('detail.not_going_btn')}
               </Button>
+
+              {/* E3: Waitlist join/leave button when event is full */}
+              {event.is_full && !rsvpStatus && !isWaitlisted && (
+                <Button
+                  className="bg-theme-elevated text-theme-primary hover:bg-amber-500/20"
+                  startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}
+                  onPress={handleJoinWaitlist}
+                  isLoading={isSubmitting}
+                >
+                  Join Waitlist
+                </Button>
+              )}
+              {isWaitlisted && (
+                <Button
+                  className="bg-amber-500/10 text-amber-400"
+                  variant="flat"
+                  startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
+                  onPress={handleLeaveWaitlist}
+                  isLoading={isSubmitting}
+                >
+                  Leave Waitlist
+                </Button>
+              )}
             </div>
 
             {/* Share */}
@@ -860,6 +1041,51 @@ export function EventDetailPage() {
               isLoading={isDeleting}
             >
               {t('detail.delete_confirm_btn')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* E5: Cancel Event Modal */}
+      <Modal
+        isOpen={showCancelModal}
+        onOpenChange={setShowCancelModal}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">Cancel Event</ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted mb-4">
+              Are you sure you want to cancel &quot;{event.title}&quot;? All attendees and waitlisted users will be notified.
+            </p>
+            <textarea
+              className="w-full p-3 rounded-lg bg-theme-elevated border border-theme-default text-theme-primary placeholder:text-theme-subtle resize-none"
+              rows={3}
+              placeholder="Reason for cancellation (optional)"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              onPress={() => setShowCancelModal(false)}
+            >
+              Keep Event
+            </Button>
+            <Button
+              className="bg-amber-500 text-white"
+              startContent={<Ban className="w-4 h-4" aria-hidden="true" />}
+              onPress={handleCancelEvent}
+              isLoading={isCancelling}
+            >
+              Cancel Event
             </Button>
           </ModalFooter>
         </ModalContent>

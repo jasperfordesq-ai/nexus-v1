@@ -136,12 +136,15 @@ class WalletService
             $lastId = $t['id'];
             $isSender = (int)$t['sender_id'] === $userId;
 
-            $items[] = [
+            $item = [
                 'id' => (int)$t['id'],
                 'type' => $isSender ? 'debit' : 'credit',
                 'status' => $t['status'] ?? 'completed',
                 'amount' => (float)$t['amount'],
                 'description' => $t['description'],
+                'transaction_type' => $t['transaction_type'] ?? 'transfer',
+                'category_id' => $t['category_id'] ? (int)$t['category_id'] : null,
+                'prep_time' => $t['prep_time'] ? (float)$t['prep_time'] : null,
                 'other_user' => [
                     'id' => (int)($isSender ? $t['receiver_id'] : $t['sender_id']),
                     'name' => $isSender ? $t['receiver_name'] : $t['sender_name'],
@@ -149,6 +152,8 @@ class WalletService
                 ],
                 'created_at' => $t['created_at'],
             ];
+
+            $items[] = $item;
         }
 
         return [
@@ -164,10 +169,13 @@ class WalletService
      * @param int $senderId Sender user ID
      * @param int|string $recipientIdentifier Recipient user ID, username, or email
      * @param float $amount Amount to transfer
+     * @param string $transactionType Transaction type: 'transfer', 'exchange', 'donation', etc.
      * @param string $description Optional description
+     * @param int|null $categoryId Optional transaction category ID
+     * @param float|null $prepTime Optional prep time in hours
      * @return int|null Transaction ID or null on failure
      */
-    public static function transfer(int $senderId, $recipientIdentifier, float $amount, string $description = ''): ?int
+    public static function transfer(int $senderId, $recipientIdentifier, float $amount, string $transactionType = 'transfer', string $description = '', ?int $categoryId = null, ?float $prepTime = null): ?int
     {
         self::$errors = [];
 
@@ -179,7 +187,7 @@ class WalletService
 
         // Find recipient
         $recipient = null;
-        if (is_int($recipientIdentifier) || ctype_digit($recipientIdentifier)) {
+        if (is_int($recipientIdentifier) || ctype_digit((string) $recipientIdentifier)) {
             $recipient = User::findById((int)$recipientIdentifier);
         } elseif (filter_var($recipientIdentifier, FILTER_VALIDATE_EMAIL)) {
             $recipient = User::findByEmail($recipientIdentifier);
@@ -194,8 +202,8 @@ class WalletService
 
         $receiverId = (int)$recipient['id'];
 
-        // Can't send to self
-        if ($senderId === $receiverId) {
+        // Can't send to self (except for system types)
+        if ($senderId === $receiverId && !in_array($transactionType, ['starting_balance', 'community_fund', 'donation'], true)) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot transfer to yourself', 'field' => 'recipient'];
             return null;
         }
@@ -209,6 +217,33 @@ class WalletService
 
         try {
             $transactionId = Transaction::create($senderId, $receiverId, $amount, $description);
+
+            // Update the transaction with extra fields if provided
+            $tenantId = TenantContext::getId();
+            $updates = [];
+            $params = [];
+
+            if ($transactionType !== 'transfer') {
+                $updates[] = 'transaction_type = ?';
+                $params[] = $transactionType;
+            }
+            if ($categoryId !== null) {
+                $updates[] = 'category_id = ?';
+                $params[] = $categoryId;
+            }
+            if ($prepTime !== null) {
+                $updates[] = 'prep_time = ?';
+                $params[] = $prepTime;
+            }
+
+            if (!empty($updates)) {
+                $params[] = $transactionId;
+                $params[] = $tenantId;
+                Database::query(
+                    "UPDATE transactions SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?",
+                    $params
+                );
+            }
 
             // Send email notification to recipient
             try {

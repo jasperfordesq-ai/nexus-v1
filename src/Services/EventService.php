@@ -22,7 +22,13 @@ use Nexus\Models\ActivityLog;
  *
  * Key operations:
  * - Event CRUD with validation
- * - RSVP management
+ * - RSVP management with capacity enforcement (E2)
+ * - Waitlist management (E3)
+ * - Event cancellation with notifications (E5)
+ * - Event attendance tracking (E6)
+ * - Event series linking (E7)
+ * - Event recurrence (E1)
+ * - Event reminders (E4)
  * - Attendee listing
  * - Cursor-based pagination
  */
@@ -232,6 +238,10 @@ class EventService
      */
     private static function formatEvent(array $event, bool $detailed = false): array
     {
+        $goingCount = (int)($event['going_count'] ?? 0);
+        $maxAttendees = isset($event['max_attendees']) && $event['max_attendees'] !== null ? (int)$event['max_attendees'] : null;
+        $spotsLeft = $maxAttendees !== null ? max(0, $maxAttendees - $goingCount) : null;
+
         $formatted = [
             'id' => (int)$event['id'],
             'title' => $event['title'],
@@ -249,8 +259,15 @@ class EventService
             'end_time' => $event['end_time'],
             'start_date' => $event['start_time'],
             'end_date' => $event['end_time'],
-            'max_attendees' => isset($event['max_attendees']) ? (int)$event['max_attendees'] : null,
+            'max_attendees' => $maxAttendees,
+            'spots_left' => $spotsLeft,
+            'is_full' => ($maxAttendees !== null && $goingCount >= $maxAttendees),
             'cover_image' => $event['cover_image'] ?? null,
+            'status' => $event['status'] ?? 'active',
+            'cancellation_reason' => $event['cancellation_reason'] ?? null,
+            'series_id' => isset($event['series_id']) ? (int)$event['series_id'] : null,
+            'parent_event_id' => isset($event['parent_event_id']) ? (int)$event['parent_event_id'] : null,
+            'is_recurring' => !empty($event['is_recurring_template']) || !empty($event['parent_event_id']),
             'organizer' => [
                 'id' => (int)$event['user_id'],
                 'name' => $event['organizer_name'] ?? trim(($event['organizer_first_name'] ?? '') . ' ' . ($event['organizer_last_name'] ?? '')),
@@ -267,10 +284,10 @@ class EventService
             'category_name' => $event['category_name'] ?? null,
             'group_id' => $event['group_id'] ? (int)$event['group_id'] : null,
             'rsvp_counts' => [
-                'going' => (int)($event['going_count'] ?? 0),
+                'going' => $goingCount,
                 'interested' => (int)($event['interested_count'] ?? 0),
             ],
-            'attendees_count' => (int)($event['going_count'] ?? 0),
+            'attendees_count' => $goingCount,
             'interested_count' => (int)($event['interested_count'] ?? 0),
             'created_at' => $event['created_at'] ?? null,
         ];
@@ -279,6 +296,16 @@ class EventService
         if ($detailed) {
             $formatted['federated_visibility'] = $event['federated_visibility'] ?? 'none';
             $formatted['sdg_goals'] = $event['sdg_goals'] ? json_decode($event['sdg_goals'], true) : [];
+
+            // Add waitlist count if capacity limited
+            if ($maxAttendees !== null) {
+                $formatted['waitlist_count'] = self::getWaitlistCount($event['id']);
+            }
+
+            // Add series info if part of a series
+            if (!empty($event['series_id'])) {
+                $formatted['series'] = self::getSeriesInfo((int)$event['series_id']);
+            }
         }
 
         return $formatted;
@@ -398,6 +425,11 @@ class EventService
                 $data['federated_visibility'] ?? 'none'
             );
 
+            // Handle max_attendees
+            if (isset($data['max_attendees']) && $data['max_attendees'] !== null) {
+                Database::query("UPDATE events SET max_attendees = ? WHERE id = ? AND tenant_id = ?", [(int)$data['max_attendees'], $eventId, TenantContext::getId()]);
+            }
+
             // Handle SDG goals
             if (!empty($data['sdg_goals']) && is_array($data['sdg_goals'])) {
                 $goals = array_map('intval', $data['sdg_goals']);
@@ -467,6 +499,12 @@ class EventService
 
             Event::update($id, $title, $description, $location, $startTime, $endTime, $groupId, $categoryId, $lat, $lon, $fedVis);
 
+            // Handle max_attendees update
+            if (array_key_exists('max_attendees', $data)) {
+                $maxAtt = $data['max_attendees'] !== null ? (int)$data['max_attendees'] : null;
+                Database::query("UPDATE events SET max_attendees = ? WHERE id = ? AND tenant_id = ?", [$maxAtt, $id, TenantContext::getId()]);
+            }
+
             // Handle SDG goals update
             if (array_key_exists('sdg_goals', $data)) {
                 $goals = is_array($data['sdg_goals']) ? array_map('intval', $data['sdg_goals']) : [];
@@ -515,12 +553,12 @@ class EventService
     }
 
     /**
-     * Set RSVP status for an event
+     * Set RSVP status for an event (E2: capacity enforcement)
      *
      * @param int $eventId
      * @param int $userId
      * @param string $status 'going', 'interested', 'not_going'
-     * @return bool
+     * @return array ['success' => bool, 'waitlisted' => bool]
      */
     public static function rsvp(int $eventId, int $userId, string $status): bool
     {
@@ -533,15 +571,46 @@ class EventService
             return false;
         }
 
-        // Check event exists
+        // Check event exists and is active
         $event = Event::find($eventId);
         if (!$event) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
             return false;
         }
 
+        if (($event['status'] ?? 'active') === 'cancelled') {
+            self::$errors[] = ['code' => 'EVENT_CANCELLED', 'message' => 'This event has been cancelled'];
+            return false;
+        }
+
+        // E2: Capacity enforcement for 'going' status
+        if ($status === 'going' && !empty($event['max_attendees'])) {
+            $maxAttendees = (int)$event['max_attendees'];
+            $currentGoing = (int)EventRsvp::getCount($eventId, 'going');
+
+            // Check if user already has 'going' status (re-RSVP)
+            $currentUserStatus = EventRsvp::getUserStatus($eventId, $userId);
+            $isAlreadyGoing = ($currentUserStatus === 'going');
+
+            if (!$isAlreadyGoing && $currentGoing >= $maxAttendees) {
+                // Event is full — add to waitlist instead (E3)
+                self::addToWaitlist($eventId, $userId);
+                self::$errors[] = [
+                    'code' => 'EVENT_FULL',
+                    'message' => 'This event is full. You have been added to the waitlist.',
+                    'waitlisted' => true,
+                ];
+                return false;
+            }
+        }
+
         try {
             EventRsvp::rsvp($eventId, $userId, $status);
+
+            // If going, remove from waitlist if they were on it
+            if ($status === 'going') {
+                self::removeFromWaitlist($eventId, $userId);
+            }
 
             // Gamification for "going"
             if ($status === 'going') {
@@ -550,6 +619,11 @@ class EventService
                 } catch (\Throwable $e) {
                     error_log("Gamification event attend error: " . $e->getMessage());
                 }
+            }
+
+            // E4: Auto-create default reminders when going
+            if ($status === 'going') {
+                self::createDefaultReminders($eventId, $userId);
             }
 
             return true;
@@ -561,7 +635,7 @@ class EventService
     }
 
     /**
-     * Remove RSVP for an event
+     * Remove RSVP for an event (E2/E3: auto-promote from waitlist)
      *
      * @param int $eventId
      * @param int $userId
@@ -574,8 +648,20 @@ class EventService
         $db = Database::getConnection();
 
         try {
+            // Check if user was 'going' — we need to know for waitlist promotion
+            $currentStatus = EventRsvp::getUserStatus($eventId, $userId);
+
             $stmt = $db->prepare("DELETE FROM event_rsvps WHERE event_id = ? AND user_id = ?");
             $stmt->execute([$eventId, $userId]);
+
+            // Also remove any reminders for this user/event
+            self::cancelReminders($eventId, $userId);
+
+            // E3: If user was 'going' and event has capacity, promote from waitlist
+            if ($currentStatus === 'going') {
+                self::promoteFromWaitlist($eventId);
+            }
+
             return true;
         } catch (\Exception $e) {
             error_log("EventService::removeRsvp error: " . $e->getMessage());
@@ -779,5 +865,1139 @@ class EventService
             'items' => $items,
             'has_more' => count($items) >= $limit,
         ];
+    }
+
+    // =========================================================================
+    // E3: WAITLIST MANAGEMENT
+    // =========================================================================
+
+    /**
+     * Add user to event waitlist
+     */
+    public static function addToWaitlist(int $eventId, int $userId): bool
+    {
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+
+        try {
+            // Check if already on waitlist
+            $exists = $db->prepare("SELECT id FROM event_waitlist WHERE event_id = ? AND user_id = ? AND status = 'waiting'");
+            $exists->execute([$eventId, $userId]);
+            if ($exists->fetch()) {
+                return true; // Already on waitlist
+            }
+
+            // Get next position
+            $posStmt = $db->prepare("SELECT COALESCE(MAX(position), 0) + 1 as next_pos FROM event_waitlist WHERE event_id = ? AND status = 'waiting'");
+            $posStmt->execute([$eventId]);
+            $nextPos = (int)$posStmt->fetch(\PDO::FETCH_ASSOC)['next_pos'];
+
+            $db->prepare(
+                "INSERT INTO event_waitlist (event_id, user_id, tenant_id, position, status) VALUES (?, ?, ?, ?, 'waiting')
+                 ON DUPLICATE KEY UPDATE status = 'waiting', position = ?, updated_at = NOW()"
+            )->execute([$eventId, $userId, $tenantId, $nextPos, $nextPos]);
+
+            // Notify user they're on waitlist
+            $event = Event::find($eventId);
+            if ($event) {
+                Notification::create(
+                    $userId,
+                    "You've been added to the waitlist for \"{$event['title']}\" (position #{$nextPos}). We'll notify you if a spot opens up.",
+                    '/events/' . $eventId,
+                    'event',
+                    true,
+                    $tenantId
+                );
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            error_log("EventService::addToWaitlist error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Remove user from waitlist
+     */
+    public static function removeFromWaitlist(int $eventId, int $userId): bool
+    {
+        $db = Database::getConnection();
+
+        try {
+            $db->prepare(
+                "UPDATE event_waitlist SET status = 'cancelled', cancelled_at = NOW() WHERE event_id = ? AND user_id = ? AND status = 'waiting'"
+            )->execute([$eventId, $userId]);
+            return true;
+        } catch (\Exception $e) {
+            error_log("EventService::removeFromWaitlist error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Promote next user from waitlist when a spot opens (E3)
+     */
+    public static function promoteFromWaitlist(int $eventId): bool
+    {
+        $db = Database::getConnection();
+
+        $event = Event::find($eventId);
+        if (!$event || empty($event['max_attendees'])) {
+            return false;
+        }
+
+        $maxAttendees = (int)$event['max_attendees'];
+        $currentGoing = (int)EventRsvp::getCount($eventId, 'going');
+
+        if ($currentGoing >= $maxAttendees) {
+            return false; // Still full
+        }
+
+        try {
+            // Get next person on waitlist
+            $stmt = $db->prepare(
+                "SELECT id, user_id FROM event_waitlist WHERE event_id = ? AND status = 'waiting' ORDER BY position ASC LIMIT 1"
+            );
+            $stmt->execute([$eventId]);
+            $next = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$next) {
+                return false; // No one waiting
+            }
+
+            // Promote: update waitlist status
+            $db->prepare(
+                "UPDATE event_waitlist SET status = 'promoted', promoted_at = NOW() WHERE id = ?"
+            )->execute([$next['id']]);
+
+            // Set RSVP to going
+            EventRsvp::rsvp($eventId, (int)$next['user_id'], 'going');
+
+            // Create reminders for promoted user
+            self::createDefaultReminders($eventId, (int)$next['user_id']);
+
+            // Notify the promoted user
+            Notification::create(
+                (int)$next['user_id'],
+                "A spot opened up! You've been moved from the waitlist to the attendee list for \"{$event['title']}\".",
+                '/events/' . $eventId,
+                'event',
+                true,
+                TenantContext::getId()
+            );
+
+            return true;
+        } catch (\Exception $e) {
+            error_log("EventService::promoteFromWaitlist error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get waitlist for an event
+     */
+    public static function getWaitlist(int $eventId, array $filters = []): array
+    {
+        $db = Database::getConnection();
+        $limit = min($filters['limit'] ?? 20, 100);
+
+        $stmt = $db->prepare("
+            SELECT w.id, w.user_id, w.position, w.status, w.created_at,
+                   u.name, u.first_name, u.last_name, u.avatar_url
+            FROM event_waitlist w
+            JOIN users u ON w.user_id = u.id
+            WHERE w.event_id = ? AND w.status = 'waiting'
+            ORDER BY w.position ASC
+            LIMIT " . ($limit + 1)
+        );
+        $stmt->execute([$eventId]);
+        $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $hasMore = count($items) > $limit;
+        if ($hasMore) {
+            array_pop($items);
+        }
+
+        $formatted = [];
+        foreach ($items as $item) {
+            $formatted[] = [
+                'id' => (int)$item['user_id'],
+                'name' => $item['name'] ?? trim(($item['first_name'] ?? '') . ' ' . ($item['last_name'] ?? '')),
+                'first_name' => $item['first_name'] ?? null,
+                'last_name' => $item['last_name'] ?? null,
+                'avatar_url' => $item['avatar_url'],
+                'position' => (int)$item['position'],
+                'joined_at' => $item['created_at'],
+            ];
+        }
+
+        return ['items' => $formatted, 'has_more' => $hasMore];
+    }
+
+    /**
+     * Get waitlist count for an event
+     */
+    public static function getWaitlistCount(int $eventId): int
+    {
+        $db = Database::getConnection();
+        try {
+            $stmt = $db->prepare("SELECT COUNT(*) FROM event_waitlist WHERE event_id = ? AND status = 'waiting'");
+            $stmt->execute([$eventId]);
+            return (int)$stmt->fetchColumn();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Get user's waitlist position (or null if not on waitlist)
+     */
+    public static function getUserWaitlistPosition(int $eventId, int $userId): ?int
+    {
+        $db = Database::getConnection();
+        try {
+            $stmt = $db->prepare("SELECT position FROM event_waitlist WHERE event_id = ? AND user_id = ? AND status = 'waiting'");
+            $stmt->execute([$eventId, $userId]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            return $row ? (int)$row['position'] : null;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    // =========================================================================
+    // E4: EVENT REMINDERS
+    // =========================================================================
+
+    /**
+     * Create default reminders for a user attending an event
+     * Default: 1 hour before and 1 day before
+     */
+    public static function createDefaultReminders(int $eventId, int $userId): void
+    {
+        $event = Event::find($eventId);
+        if (!$event || !$event['start_time']) {
+            return;
+        }
+
+        $tenantId = TenantContext::getId();
+        $defaultIntervals = [60, 1440]; // 1 hour, 1 day (in minutes)
+
+        foreach ($defaultIntervals as $minutes) {
+            self::createReminder($eventId, $userId, $tenantId, $minutes, 'both');
+        }
+    }
+
+    /**
+     * Create a single event reminder
+     */
+    public static function createReminder(int $eventId, int $userId, int $tenantId, int $minutesBefore, string $type = 'both'): bool
+    {
+        $db = Database::getConnection();
+
+        $event = Event::find($eventId);
+        if (!$event || !$event['start_time']) {
+            return false;
+        }
+
+        $startTimestamp = strtotime($event['start_time']);
+        $scheduledFor = date('Y-m-d H:i:s', $startTimestamp - ($minutesBefore * 60));
+
+        // Don't create reminders in the past
+        if (strtotime($scheduledFor) < time()) {
+            return false;
+        }
+
+        try {
+            $db->prepare("
+                INSERT INTO event_reminders (event_id, user_id, tenant_id, remind_before_minutes, reminder_type, scheduled_for, status)
+                VALUES (?, ?, ?, ?, ?, ?, 'pending')
+                ON DUPLICATE KEY UPDATE status = 'pending', scheduled_for = ?, updated_at = NOW()
+            ")->execute([$eventId, $userId, $tenantId, $minutesBefore, $type, $scheduledFor, $scheduledFor]);
+            return true;
+        } catch (\Exception $e) {
+            error_log("EventService::createReminder error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update user's reminder preferences for an event
+     *
+     * @param int $eventId
+     * @param int $userId
+     * @param array $reminders Array of ['minutes' => int, 'type' => 'platform'|'email'|'both']
+     * @return bool
+     */
+    public static function updateReminders(int $eventId, int $userId, array $reminders): bool
+    {
+        $tenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        try {
+            // Cancel existing reminders
+            self::cancelReminders($eventId, $userId);
+
+            // Create new reminders
+            $validTypes = ['platform', 'email', 'both'];
+            $validMinutes = [60, 1440, 10080]; // 1hr, 1day, 1week
+
+            foreach ($reminders as $reminder) {
+                $minutes = (int)($reminder['minutes'] ?? 0);
+                $type = $reminder['type'] ?? 'both';
+
+                if (!in_array($minutes, $validMinutes) || !in_array($type, $validTypes)) {
+                    continue;
+                }
+
+                self::createReminder($eventId, $userId, $tenantId, $minutes, $type);
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            error_log("EventService::updateReminders error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Cancel all reminders for a user's event
+     */
+    public static function cancelReminders(int $eventId, int $userId): void
+    {
+        $db = Database::getConnection();
+        try {
+            $db->prepare(
+                "UPDATE event_reminders SET status = 'cancelled' WHERE event_id = ? AND user_id = ? AND status = 'pending'"
+            )->execute([$eventId, $userId]);
+        } catch (\Exception $e) {
+            error_log("EventService::cancelReminders error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get user's reminders for an event
+     */
+    public static function getUserReminders(int $eventId, int $userId): array
+    {
+        $db = Database::getConnection();
+        try {
+            $stmt = $db->prepare("
+                SELECT remind_before_minutes, reminder_type, status, scheduled_for
+                FROM event_reminders
+                WHERE event_id = ? AND user_id = ? AND status = 'pending'
+                ORDER BY remind_before_minutes ASC
+            ");
+            $stmt->execute([$eventId, $userId]);
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Process pending reminders (cron job logic — E4)
+     * Call this from a scheduled task: `php scripts/process_event_reminders.php`
+     *
+     * @return int Number of reminders sent
+     */
+    public static function processPendingReminders(): int
+    {
+        $db = Database::getConnection();
+        $sentCount = 0;
+
+        try {
+            // Get all reminders that should fire now
+            $stmt = $db->prepare("
+                SELECT r.*, e.title as event_title, e.start_time, e.location
+                FROM event_reminders r
+                JOIN events e ON r.event_id = e.id
+                WHERE r.status = 'pending'
+                AND r.scheduled_for <= NOW()
+                AND e.status = 'active'
+                LIMIT 100
+            ");
+            $stmt->execute();
+            $reminders = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            foreach ($reminders as $reminder) {
+                try {
+                    $minutesBefore = (int)$reminder['remind_before_minutes'];
+                    $timeLabel = match(true) {
+                        $minutesBefore >= 10080 => '1 week',
+                        $minutesBefore >= 1440 => '1 day',
+                        $minutesBefore >= 60 => '1 hour',
+                        default => $minutesBefore . ' minutes',
+                    };
+
+                    $message = "Reminder: \"{$reminder['event_title']}\" starts in {$timeLabel}";
+                    if ($reminder['location']) {
+                        $message .= " at {$reminder['location']}";
+                    }
+
+                    $shouldPlatform = in_array($reminder['reminder_type'], ['platform', 'both']);
+                    $shouldEmail = in_array($reminder['reminder_type'], ['email', 'both']);
+
+                    if ($shouldPlatform) {
+                        Notification::create(
+                            (int)$reminder['user_id'],
+                            $message,
+                            '/events/' . $reminder['event_id'],
+                            'event_reminder',
+                            true,
+                            (int)$reminder['tenant_id']
+                        );
+                    }
+
+                    // Mark as sent
+                    $db->prepare(
+                        "UPDATE event_reminders SET status = 'sent', sent_at = NOW() WHERE id = ?"
+                    )->execute([$reminder['id']]);
+
+                    $sentCount++;
+                } catch (\Exception $e) {
+                    error_log("Failed to send reminder {$reminder['id']}: " . $e->getMessage());
+                    $db->prepare(
+                        "UPDATE event_reminders SET status = 'failed' WHERE id = ?"
+                    )->execute([$reminder['id']]);
+                }
+            }
+        } catch (\Exception $e) {
+            error_log("EventService::processPendingReminders error: " . $e->getMessage());
+        }
+
+        return $sentCount;
+    }
+
+    // =========================================================================
+    // E5: EVENT CANCELLATION WITH NOTIFICATIONS
+    // =========================================================================
+
+    /**
+     * Cancel an event and notify all RSVPs
+     *
+     * @param int $eventId
+     * @param int $userId User performing the cancellation
+     * @param string $reason Cancellation reason
+     * @return bool
+     */
+    public static function cancelEvent(int $eventId, int $userId, string $reason = ''): bool
+    {
+        self::$errors = [];
+
+        $event = Event::find($eventId);
+        if (!$event) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            return false;
+        }
+
+        if (!self::canModify($event, $userId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to cancel this event'];
+            return false;
+        }
+
+        if (($event['status'] ?? 'active') === 'cancelled') {
+            self::$errors[] = ['code' => 'ALREADY_CANCELLED', 'message' => 'This event is already cancelled'];
+            return false;
+        }
+
+        $tenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        try {
+            // Update event status
+            $db->prepare("
+                UPDATE events SET status = 'cancelled', cancellation_reason = ?, cancelled_at = NOW(), cancelled_by = ?
+                WHERE id = ? AND tenant_id = ?
+            ")->execute([$reason, $userId, $eventId, $tenantId]);
+
+            // Cancel all pending reminders
+            $db->prepare("
+                UPDATE event_reminders SET status = 'cancelled' WHERE event_id = ? AND status = 'pending'
+            ")->execute([$eventId]);
+
+            // Cancel all waitlist entries
+            $db->prepare("
+                UPDATE event_waitlist SET status = 'cancelled', cancelled_at = NOW() WHERE event_id = ? AND status = 'waiting'
+            ")->execute([$eventId]);
+
+            // Notify all RSVPs (going + interested)
+            self::notifyCancellation($eventId, $event['title'], $reason, $tenantId);
+
+            // Log activity
+            ActivityLog::log($userId, 'cancelled an Event', $event['title'], true, '/events/' . $eventId);
+
+            return true;
+        } catch (\Exception $e) {
+            error_log("EventService::cancelEvent error: " . $e->getMessage());
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel event'];
+            return false;
+        }
+    }
+
+    /**
+     * Send cancellation notifications to all RSVPs (E5)
+     */
+    private static function notifyCancellation(int $eventId, string $eventTitle, string $reason, int $tenantId): void
+    {
+        $db = Database::getConnection();
+
+        try {
+            // Get all users with RSVP (going, interested, invited)
+            $stmt = $db->prepare("
+                SELECT DISTINCT user_id FROM event_rsvps
+                WHERE event_id = ? AND status IN ('going', 'interested', 'invited')
+            ");
+            $stmt->execute([$eventId]);
+            $rsvps = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+            // Also get waitlisted users
+            $wStmt = $db->prepare("
+                SELECT DISTINCT user_id FROM event_waitlist
+                WHERE event_id = ? AND status = 'waiting'
+            ");
+            $wStmt->execute([$eventId]);
+            $waitlisted = $wStmt->fetchAll(\PDO::FETCH_COLUMN);
+
+            $allUsers = array_unique(array_merge($rsvps, $waitlisted));
+
+            $message = "The event \"{$eventTitle}\" has been cancelled.";
+            if (!empty($reason)) {
+                $message .= " Reason: {$reason}";
+            }
+
+            foreach ($allUsers as $uid) {
+                try {
+                    Notification::create(
+                        (int)$uid,
+                        $message,
+                        '/events/' . $eventId,
+                        'event',
+                        true,
+                        $tenantId
+                    );
+                } catch (\Exception $e) {
+                    error_log("Failed to notify user {$uid} of event cancellation: " . $e->getMessage());
+                }
+            }
+        } catch (\Exception $e) {
+            error_log("EventService::notifyCancellation error: " . $e->getMessage());
+        }
+    }
+
+    // =========================================================================
+    // E6: EVENT ATTENDANCE TRACKING
+    // =========================================================================
+
+    /**
+     * Mark a user as attended (post-event attendance tracking)
+     *
+     * @param int $eventId
+     * @param int $attendeeId User being marked as attended
+     * @param int $markedById User doing the marking (organizer/admin)
+     * @param float|null $hoursOverride Override calculated hours
+     * @param string|null $notes Optional notes
+     * @return bool
+     */
+    public static function markAttended(int $eventId, int $attendeeId, int $markedById, ?float $hoursOverride = null, ?string $notes = null): bool
+    {
+        self::$errors = [];
+
+        $event = Event::find($eventId);
+        if (!$event) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            return false;
+        }
+
+        if (!self::canModify($event, $markedById)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the organizer or admin can mark attendance'];
+            return false;
+        }
+
+        $tenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        // Calculate hours from event duration
+        $hours = $hoursOverride;
+        if ($hours === null && !empty($event['start_time']) && !empty($event['end_time'])) {
+            $start = strtotime($event['start_time']);
+            $end = strtotime($event['end_time']);
+            $hours = round(($end - $start) / 3600, 2);
+            if ($hours < 0.5) {
+                $hours = 0.5;
+            }
+        }
+        if ($hours === null) {
+            $hours = 1.0;
+        }
+
+        try {
+            // Upsert attendance record
+            $db->prepare("
+                INSERT INTO event_attendance (event_id, user_id, tenant_id, checked_in_at, checked_in_by, hours_credited, notes)
+                VALUES (?, ?, ?, NOW(), ?, ?, ?)
+                ON DUPLICATE KEY UPDATE checked_in_at = NOW(), checked_in_by = ?, hours_credited = ?, notes = ?, updated_at = NOW()
+            ")->execute([$eventId, $attendeeId, $tenantId, $markedById, $hours, $notes, $markedById, $hours, $notes]);
+
+            // Also update RSVP status to 'attended' for backward compatibility
+            EventRsvp::rsvp($eventId, $attendeeId, 'attended');
+
+            return true;
+        } catch (\Exception $e) {
+            error_log("EventService::markAttended error: " . $e->getMessage());
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to mark attendance'];
+            return false;
+        }
+    }
+
+    /**
+     * Unmark a user's attendance
+     */
+    public static function unmarkAttended(int $eventId, int $attendeeId, int $markedById): bool
+    {
+        self::$errors = [];
+
+        $event = Event::find($eventId);
+        if (!$event) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            return false;
+        }
+
+        if (!self::canModify($event, $markedById)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the organizer or admin can modify attendance'];
+            return false;
+        }
+
+        $db = Database::getConnection();
+
+        try {
+            $db->prepare("DELETE FROM event_attendance WHERE event_id = ? AND user_id = ?")->execute([$eventId, $attendeeId]);
+            // Revert RSVP status back to going
+            EventRsvp::rsvp($eventId, $attendeeId, 'going');
+            return true;
+        } catch (\Exception $e) {
+            error_log("EventService::unmarkAttended error: " . $e->getMessage());
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to unmark attendance'];
+            return false;
+        }
+    }
+
+    /**
+     * Bulk mark attendance (organizer can mark multiple users at once)
+     *
+     * @param int $eventId
+     * @param array $attendeeIds Array of user IDs
+     * @param int $markedById
+     * @return array ['marked' => int, 'failed' => int]
+     */
+    public static function bulkMarkAttended(int $eventId, array $attendeeIds, int $markedById): array
+    {
+        $marked = 0;
+        $failed = 0;
+
+        foreach ($attendeeIds as $attendeeId) {
+            if (self::markAttended($eventId, (int)$attendeeId, $markedById)) {
+                $marked++;
+            } else {
+                $failed++;
+            }
+        }
+
+        return ['marked' => $marked, 'failed' => $failed];
+    }
+
+    /**
+     * Get attendance records for an event
+     */
+    public static function getAttendanceRecords(int $eventId): array
+    {
+        $db = Database::getConnection();
+
+        try {
+            $stmt = $db->prepare("
+                SELECT a.*, u.name, u.first_name, u.last_name, u.avatar_url,
+                       cb.name as checked_in_by_name
+                FROM event_attendance a
+                JOIN users u ON a.user_id = u.id
+                LEFT JOIN users cb ON a.checked_in_by = cb.id
+                WHERE a.event_id = ?
+                ORDER BY a.checked_in_at ASC
+            ");
+            $stmt->execute([$eventId]);
+            $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $items = [];
+            foreach ($records as $r) {
+                $items[] = [
+                    'user_id' => (int)$r['user_id'],
+                    'name' => $r['name'] ?? trim(($r['first_name'] ?? '') . ' ' . ($r['last_name'] ?? '')),
+                    'first_name' => $r['first_name'] ?? null,
+                    'last_name' => $r['last_name'] ?? null,
+                    'avatar_url' => $r['avatar_url'],
+                    'checked_in_at' => $r['checked_in_at'],
+                    'checked_in_by' => $r['checked_in_by_name'] ?? null,
+                    'hours_credited' => $r['hours_credited'] ? (float)$r['hours_credited'] : null,
+                    'notes' => $r['notes'],
+                ];
+            }
+
+            return $items;
+        } catch (\Exception $e) {
+            error_log("EventService::getAttendanceRecords error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get attendance stats for a user across all events
+     */
+    public static function getUserAttendanceStats(int $userId): array
+    {
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+
+        try {
+            $stmt = $db->prepare("
+                SELECT COUNT(*) as total_attended,
+                       COALESCE(SUM(hours_credited), 0) as total_hours
+                FROM event_attendance
+                WHERE user_id = ? AND tenant_id = ?
+            ");
+            $stmt->execute([$userId, $tenantId]);
+            $stats = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            return [
+                'total_attended' => (int)($stats['total_attended'] ?? 0),
+                'total_hours' => (float)($stats['total_hours'] ?? 0),
+            ];
+        } catch (\Exception $e) {
+            return ['total_attended' => 0, 'total_hours' => 0];
+        }
+    }
+
+    // =========================================================================
+    // E7: EVENT SERIES LINKING
+    // =========================================================================
+
+    /**
+     * Create a new event series
+     */
+    public static function createSeries(int $userId, string $title, ?string $description = null): ?int
+    {
+        self::$errors = [];
+        $tenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        if (empty(trim($title))) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Series title is required', 'field' => 'title'];
+            return null;
+        }
+
+        try {
+            $db->prepare("
+                INSERT INTO event_series (tenant_id, title, description, created_by) VALUES (?, ?, ?, ?)
+            ")->execute([$tenantId, trim($title), $description, $userId]);
+            return (int)$db->lastInsertId();
+        } catch (\Exception $e) {
+            error_log("EventService::createSeries error: " . $e->getMessage());
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create series'];
+            return null;
+        }
+    }
+
+    /**
+     * Link an event to a series
+     */
+    public static function linkToSeries(int $eventId, int $seriesId, int $userId): bool
+    {
+        self::$errors = [];
+
+        $event = Event::find($eventId);
+        if (!$event) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            return false;
+        }
+
+        if (!self::canModify($event, $userId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this event'];
+            return false;
+        }
+
+        $tenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        try {
+            $db->prepare("UPDATE events SET series_id = ? WHERE id = ? AND tenant_id = ?")->execute([$seriesId, $eventId, $tenantId]);
+            return true;
+        } catch (\Exception $e) {
+            error_log("EventService::linkToSeries error: " . $e->getMessage());
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to link event to series'];
+            return false;
+        }
+    }
+
+    /**
+     * Get all events in a series
+     */
+    public static function getSeriesEvents(int $seriesId): array
+    {
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+
+        try {
+            $stmt = $db->prepare("
+                SELECT e.id, e.title, e.start_time, e.end_time, e.status, e.location,
+                       (SELECT COUNT(*) FROM event_rsvps WHERE event_id = e.id AND status = 'going') as going_count
+                FROM events e
+                WHERE e.series_id = ? AND e.tenant_id = ?
+                ORDER BY e.start_time ASC
+            ");
+            $stmt->execute([$seriesId, $tenantId]);
+            $events = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $items = [];
+            foreach ($events as $e) {
+                $items[] = [
+                    'id' => (int)$e['id'],
+                    'title' => $e['title'],
+                    'start_time' => $e['start_time'],
+                    'end_time' => $e['end_time'],
+                    'status' => $e['status'] ?? 'active',
+                    'location' => $e['location'],
+                    'going_count' => (int)($e['going_count'] ?? 0),
+                ];
+            }
+
+            return $items;
+        } catch (\Exception $e) {
+            error_log("EventService::getSeriesEvents error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get series info (for embedding in event detail)
+     */
+    public static function getSeriesInfo(int $seriesId): ?array
+    {
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+
+        try {
+            $stmt = $db->prepare("
+                SELECT s.*, u.name as creator_name,
+                       (SELECT COUNT(*) FROM events WHERE series_id = s.id AND tenant_id = ?) as event_count
+                FROM event_series s
+                JOIN users u ON s.created_by = u.id
+                WHERE s.id = ? AND s.tenant_id = ?
+            ");
+            $stmt->execute([$tenantId, $seriesId, $tenantId]);
+            $series = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$series) {
+                return null;
+            }
+
+            return [
+                'id' => (int)$series['id'],
+                'title' => $series['title'],
+                'description' => $series['description'],
+                'event_count' => (int)$series['event_count'],
+                'creator' => $series['creator_name'],
+            ];
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get all series for the current tenant
+     */
+    public static function getAllSeries(array $filters = []): array
+    {
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+        $limit = min($filters['limit'] ?? 20, 100);
+
+        try {
+            $stmt = $db->prepare("
+                SELECT s.*, u.name as creator_name,
+                       (SELECT COUNT(*) FROM events WHERE series_id = s.id AND tenant_id = ?) as event_count,
+                       (SELECT MIN(start_time) FROM events WHERE series_id = s.id AND tenant_id = ? AND start_time >= NOW()) as next_event
+                FROM event_series s
+                JOIN users u ON s.created_by = u.id
+                WHERE s.tenant_id = ?
+                ORDER BY s.created_at DESC
+                LIMIT " . ($limit + 1)
+            );
+            $stmt->execute([$tenantId, $tenantId, $tenantId]);
+            $series = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $hasMore = count($series) > $limit;
+            if ($hasMore) {
+                array_pop($series);
+            }
+
+            $items = [];
+            foreach ($series as $s) {
+                $items[] = [
+                    'id' => (int)$s['id'],
+                    'title' => $s['title'],
+                    'description' => $s['description'],
+                    'event_count' => (int)$s['event_count'],
+                    'next_event' => $s['next_event'],
+                    'creator' => $s['creator_name'],
+                    'created_at' => $s['created_at'],
+                ];
+            }
+
+            return ['items' => $items, 'has_more' => $hasMore];
+        } catch (\Exception $e) {
+            error_log("EventService::getAllSeries error: " . $e->getMessage());
+            return ['items' => [], 'has_more' => false];
+        }
+    }
+
+    // =========================================================================
+    // E1: RECURRING EVENTS
+    // =========================================================================
+
+    /**
+     * Create a recurring event with recurrence rule
+     *
+     * @param int $userId
+     * @param array $data Event data (same as create) + recurrence fields
+     * @return array|null ['template_id' => int, 'occurrences' => int] or null on failure
+     */
+    public static function createRecurring(int $userId, array $data): ?array
+    {
+        self::$errors = [];
+
+        // Validate recurrence
+        $frequency = $data['recurrence_frequency'] ?? null;
+        $validFrequencies = ['daily', 'weekly', 'monthly', 'yearly', 'custom'];
+        if (!$frequency || !in_array($frequency, $validFrequencies)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Valid recurrence frequency is required', 'field' => 'recurrence_frequency'];
+            return null;
+        }
+
+        // Create the template event
+        $data['_is_template'] = true;
+        $templateId = self::create($userId, $data);
+        if (!$templateId) {
+            return null;
+        }
+
+        $tenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        // Mark as recurring template
+        $db->prepare("UPDATE events SET is_recurring_template = 1 WHERE id = ? AND tenant_id = ?")->execute([$templateId, $tenantId]);
+
+        // Create recurrence rule
+        $interval = max(1, (int)($data['recurrence_interval'] ?? 1));
+        $daysOfWeek = $data['recurrence_days'] ?? null; // e.g., "1,3,5" for Mon,Wed,Fri
+        $dayOfMonth = $data['recurrence_day_of_month'] ?? null;
+        $endsType = $data['recurrence_ends_type'] ?? 'after_count';
+        $endsAfterCount = $data['recurrence_ends_after_count'] ?? 10;
+        $endsOnDate = $data['recurrence_ends_on_date'] ?? null;
+        $rrule = $data['recurrence_rrule'] ?? null;
+
+        try {
+            $db->prepare("
+                INSERT INTO event_recurrence_rules
+                (event_id, tenant_id, frequency, interval_value, days_of_week, day_of_month, rrule, ends_type, ends_after_count, ends_on_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ")->execute([
+                $templateId, $tenantId, $frequency, $interval,
+                $daysOfWeek, $dayOfMonth, $rrule, $endsType,
+                $endsAfterCount, $endsOnDate
+            ]);
+
+            // Generate occurrences
+            $occurrenceCount = self::generateOccurrences($templateId, $data);
+
+            return [
+                'template_id' => $templateId,
+                'occurrences' => $occurrenceCount,
+            ];
+        } catch (\Exception $e) {
+            error_log("EventService::createRecurring error: " . $e->getMessage());
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create recurring event'];
+            return null;
+        }
+    }
+
+    /**
+     * Generate occurrence events from a recurrence template
+     */
+    private static function generateOccurrences(int $templateId, array $data): int
+    {
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+
+        // Get recurrence rule
+        $stmt = $db->prepare("SELECT * FROM event_recurrence_rules WHERE event_id = ? AND tenant_id = ?");
+        $stmt->execute([$templateId, $tenantId]);
+        $rule = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$rule) {
+            return 0;
+        }
+
+        // Get template event
+        $template = Event::find($templateId);
+        if (!$template) {
+            return 0;
+        }
+
+        $startTime = new \DateTime($template['start_time']);
+        $endTime = $template['end_time'] ? new \DateTime($template['end_time']) : null;
+        $duration = $endTime ? $startTime->diff($endTime) : null;
+
+        $frequency = $rule['frequency'];
+        $interval = max(1, (int)$rule['interval_value']);
+        $endsType = $rule['ends_type'];
+        $maxOccurrences = $endsType === 'after_count' ? min((int)($rule['ends_after_count'] ?? 10), 52) : 52; // Cap at 52
+        $endsOnDate = $rule['ends_on_date'] ? new \DateTime($rule['ends_on_date']) : null;
+        $daysOfWeek = $rule['days_of_week'] ? explode(',', $rule['days_of_week']) : null;
+
+        $occurrences = [];
+        $current = clone $startTime;
+
+        for ($i = 0; $i < $maxOccurrences; $i++) {
+            // Advance to next occurrence
+            switch ($frequency) {
+                case 'daily':
+                    $current->modify("+{$interval} days");
+                    break;
+                case 'weekly':
+                    $current->modify("+{$interval} weeks");
+                    break;
+                case 'monthly':
+                    $current->modify("+{$interval} months");
+                    break;
+                case 'yearly':
+                    $current->modify("+{$interval} years");
+                    break;
+                default:
+                    $current->modify("+{$interval} weeks"); // Default to weekly
+                    break;
+            }
+
+            // Check end conditions
+            if ($endsOnDate && $current > $endsOnDate) {
+                break;
+            }
+
+            // Don't generate more than 1 year out
+            $oneYearOut = new \DateTime('+1 year');
+            if ($current > $oneYearOut) {
+                break;
+            }
+
+            $occurrenceStart = clone $current;
+            $occurrenceEnd = null;
+            if ($duration) {
+                $occurrenceEnd = clone $occurrenceStart;
+                $occurrenceEnd->add($duration);
+            }
+
+            $occurrences[] = [
+                'start' => $occurrenceStart->format('Y-m-d H:i:s'),
+                'end' => $occurrenceEnd ? $occurrenceEnd->format('Y-m-d H:i:s') : null,
+                'date' => $occurrenceStart->format('Y-m-d'),
+            ];
+        }
+
+        // Create occurrence events
+        $count = 0;
+        foreach ($occurrences as $occ) {
+            try {
+                $occId = Event::create(
+                    $tenantId,
+                    (int)$template['user_id'],
+                    $template['title'],
+                    $template['description'] ?? '',
+                    $template['location'] ?? '',
+                    $occ['start'],
+                    $occ['end'],
+                    $template['group_id'] ?? null,
+                    $template['category_id'] ?? null,
+                    $template['latitude'] ?? null,
+                    $template['longitude'] ?? null,
+                    $template['federated_visibility'] ?? 'none'
+                );
+
+                // Link to parent template
+                $db->prepare("
+                    UPDATE events SET parent_event_id = ?, occurrence_date = ?, max_attendees = ?, series_id = ?
+                    WHERE id = ? AND tenant_id = ?
+                ")->execute([
+                    $templateId,
+                    $occ['date'],
+                    $template['max_attendees'] ?? null,
+                    $template['series_id'] ?? null,
+                    $occId,
+                    $tenantId,
+                ]);
+
+                $count++;
+            } catch (\Exception $e) {
+                error_log("Failed to generate occurrence: " . $e->getMessage());
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Update a single occurrence or all occurrences of a recurring event
+     *
+     * @param int $eventId The specific occurrence ID
+     * @param int $userId
+     * @param array $data
+     * @param string $scope 'single' or 'all'
+     * @return bool
+     */
+    public static function updateRecurring(int $eventId, int $userId, array $data, string $scope = 'single'): bool
+    {
+        self::$errors = [];
+
+        if ($scope === 'single') {
+            // Detach from parent (make independent) and update
+            $tenantId = TenantContext::getId();
+            Database::query("UPDATE events SET parent_event_id = NULL WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
+            return self::update($eventId, $userId, $data);
+        }
+
+        // scope === 'all': update all future occurrences
+        $event = Event::find($eventId);
+        if (!$event) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            return false;
+        }
+
+        $parentId = $event['parent_event_id'] ?? $eventId;
+        $tenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        // Get all future occurrences of this parent
+        $stmt = $db->prepare("
+            SELECT id FROM events
+            WHERE (parent_event_id = ? OR id = ?) AND tenant_id = ? AND start_time >= NOW()
+        ");
+        $stmt->execute([$parentId, $parentId, $tenantId]);
+        $ids = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+        $updated = 0;
+        foreach ($ids as $id) {
+            if (self::update((int)$id, $userId, $data)) {
+                $updated++;
+            }
+        }
+
+        return $updated > 0;
     }
 }

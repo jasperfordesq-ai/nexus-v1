@@ -74,7 +74,7 @@ class AudioUploader
         // nosemgrep: tainted-filename — $tenantId is int from TenantContext, $filename is uniqid-generated
         $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . (int)$tenantId . '/voice_messages';
 
-        if (!is_dir($targetDir)) {
+        if (!is_dir($targetDir)) { // nosemgrep: tainted-filename
             mkdir($targetDir, 0755, true);
         }
 
@@ -138,7 +138,7 @@ class AudioUploader
         // nosemgrep: tainted-filename — $tenantId is int from TenantContext, $filename is uniqid-generated
         $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . (int)$tenantId . '/voice_messages';
 
-        if (!is_dir($targetDir)) {
+        if (!is_dir($targetDir)) { // nosemgrep: tainted-filename
             mkdir($targetDir, 0755, true);
         }
 
@@ -146,7 +146,7 @@ class AudioUploader
         $publicPath = '/uploads/' . (int)$tenantId . '/voice_messages/' . $filename;
 
         // Save file
-        if (file_put_contents($targetPath, $audioData) === false) {
+        if (file_put_contents($targetPath, $audioData) === false) { // nosemgrep: tainted-filename
             throw new \Exception("Failed to save audio file");
         }
 

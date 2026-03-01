@@ -69,6 +69,7 @@ class ResourcesPublicApiController extends BaseApiController
         $items = Database::query(
             "SELECT r.id, r.title, r.description, r.file_path, r.file_type, r.file_size,
                     r.downloads, r.category_id, r.user_id, r.created_at,
+                    r.sort_order, r.content_type, r.content_body,
                     CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as uploader_name,
                     u.avatar_url as uploader_avatar,
                     c.name as category_name,
@@ -78,7 +79,7 @@ class ResourcesPublicApiController extends BaseApiController
              LEFT JOIN users u ON r.user_id = u.id
              LEFT JOIN categories c ON r.category_id = c.id
              WHERE {$where}
-             ORDER BY r.created_at DESC
+             ORDER BY r.sort_order ASC, r.created_at DESC
              LIMIT ?",
             array_merge($params, [$perPage + 1])
         )->fetchAll();
@@ -116,6 +117,9 @@ class ResourcesPublicApiController extends BaseApiController
                 'file_type' => $row['file_type'] ?? null,
                 'file_size' => (int) ($row['file_size'] ?? 0),
                 'downloads' => (int) ($row['downloads'] ?? 0),
+                'sort_order' => (int) ($row['sort_order'] ?? 0),
+                'content_type' => $row['content_type'] ?? 'plain',
+                'content_body' => $row['content_body'] ?? null,
                 'created_at' => $row['created_at'],
                 'uploader' => [
                     'id' => (int) ($row['user_id'] ?? 0),

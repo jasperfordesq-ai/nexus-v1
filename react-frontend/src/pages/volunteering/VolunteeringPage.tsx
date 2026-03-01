@@ -45,6 +45,9 @@ import {
   Globe,
   Briefcase,
   Timer,
+  Sparkles,
+  Award,
+  Siren,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -53,6 +56,9 @@ import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { RecommendedShiftsTab } from './RecommendedShiftsTab';
+import { EmergencyAlertsTab } from './EmergencyAlertsTab';
+import { CertificatesTab } from './CertificatesTab';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -108,7 +114,7 @@ interface HoursSummary {
   by_month: { month: string; total: number }[];
 }
 
-type VolunteerTab = 'opportunities' | 'applications' | 'hours';
+type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts';
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
@@ -169,6 +175,30 @@ export function VolunteeringPage() {
             >
               {t('volunteering.tab_hours')}
             </Button>
+            <Button
+              variant={tab === 'recommended' ? 'solid' : 'flat'}
+              className={tab === 'recommended' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('recommended')}
+              startContent={<Sparkles className="w-4 h-4" aria-hidden="true" />}
+            >
+              For You
+            </Button>
+            <Button
+              variant={tab === 'certificates' ? 'solid' : 'flat'}
+              className={tab === 'certificates' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('certificates')}
+              startContent={<Award className="w-4 h-4" aria-hidden="true" />}
+            >
+              Certificates
+            </Button>
+            <Button
+              variant={tab === 'alerts' ? 'solid' : 'flat'}
+              className={tab === 'alerts' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('alerts')}
+              startContent={<Siren className="w-4 h-4" aria-hidden="true" />}
+            >
+              Alerts
+            </Button>
           </>
         )}
       </div>
@@ -177,6 +207,9 @@ export function VolunteeringPage() {
       {tab === 'opportunities' && <OpportunitiesTab />}
       {tab === 'applications' && <ApplicationsTab />}
       {tab === 'hours' && <HoursTab />}
+      {tab === 'recommended' && <RecommendedShiftsTab />}
+      {tab === 'certificates' && <CertificatesTab />}
+      {tab === 'alerts' && <EmergencyAlertsTab />}
     </div>
   );
 }

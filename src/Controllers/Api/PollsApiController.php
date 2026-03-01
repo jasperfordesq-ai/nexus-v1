@@ -7,6 +7,8 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Services\PollService;
+use Nexus\Services\PollRankingService;
+use Nexus\Services\PollExportService;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\TenantContext;
 
@@ -78,6 +80,11 @@ class PollsApiController extends BaseApiController
         // "My Polls" tab — filter to current user's polls
         if ($this->query('mine') === '1') {
             $filters['user_id'] = $userId;
+        }
+
+        // Category filter
+        if ($this->query('category')) {
+            $filters['category'] = $this->query('category');
         }
 
         // Get polls
@@ -312,5 +319,171 @@ class PollsApiController extends BaseApiController
         $poll = PollService::getById($id, $userId);
 
         $this->respondWithData($poll);
+    }
+
+    // ============================================
+    // RANKED-CHOICE VOTING (P1)
+    // ============================================
+
+    /**
+     * POST /api/v2/polls/{id}/rank
+     *
+     * Submit ranked-choice votes for a ranked poll.
+     *
+     * Request Body (JSON):
+     * {
+     *   "rankings": [
+     *     { "option_id": 1, "rank": 1 },
+     *     { "option_id": 2, "rank": 2 },
+     *     { "option_id": 3, "rank": 3 }
+     *   ]
+     * }
+     *
+     * Response: 200 OK with ranked results
+     */
+    public function rank(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('poll_rank', 20, 60);
+
+        $rankings = $this->input('rankings');
+
+        if (empty($rankings) || !is_array($rankings)) {
+            $this->respondWithError(
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                'Rankings array is required',
+                'rankings',
+                400
+            );
+        }
+
+        $success = PollRankingService::submitRanking($id, $userId, $rankings);
+
+        if (!$success) {
+            $errors = PollRankingService::getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === ApiErrorCodes::RESOURCE_NOT_FOUND) { $status = 404; break; }
+                if ($error['code'] === ApiErrorCodes::RESOURCE_CONFLICT) { $status = 409; break; }
+            }
+            $this->respondWithErrors($errors, $status);
+        }
+
+        // Return ranked results
+        $results = PollRankingService::calculateResults($id);
+        $poll = PollService::getById($id, $userId);
+
+        $this->respondWithData([
+            'poll' => $poll,
+            'ranked_results' => $results,
+        ]);
+    }
+
+    /**
+     * GET /api/v2/polls/{id}/ranked-results
+     *
+     * Get ranked-choice voting results for a poll.
+     *
+     * Response: 200 OK with IRV results
+     */
+    public function rankedResults(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+
+        $poll = PollService::getById($id, $userId);
+        if (!$poll) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Poll not found', null, 404);
+        }
+
+        if (($poll['poll_type'] ?? 'standard') !== 'ranked') {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'This is not a ranked-choice poll', null, 400);
+        }
+
+        $results = PollRankingService::calculateResults($id);
+
+        // Include user's rankings if they voted
+        $userRankings = PollRankingService::getUserRankings($id, $userId);
+
+        $this->respondWithData([
+            'poll' => $poll,
+            'ranked_results' => $results,
+            'my_rankings' => $userRankings,
+        ]);
+    }
+
+    // ============================================
+    // POLL EXPORT (P4)
+    // ============================================
+
+    /**
+     * GET /api/v2/polls/{id}/export
+     *
+     * Export poll results as CSV.
+     * Only poll creator or admin can export.
+     *
+     * Query Parameters:
+     * - format: string (currently only 'csv')
+     *
+     * Response: CSV file download
+     */
+    public function export(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('poll_export', 10, 60);
+
+        $csv = PollExportService::exportToCsv($id, $userId);
+
+        if ($csv === null) {
+            $errors = PollExportService::getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === ApiErrorCodes::RESOURCE_NOT_FOUND) { $status = 404; break; }
+                if ($error['code'] === ApiErrorCodes::RESOURCE_FORBIDDEN) { $status = 403; break; }
+            }
+            $this->respondWithErrors($errors, $status);
+        }
+
+        // Send CSV response
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="poll-' . $id . '-export.csv"');
+        header('Content-Length: ' . strlen($csv));
+        echo $csv;
+        exit;
+    }
+
+    // ============================================
+    // POLL CATEGORIES (P2)
+    // ============================================
+
+    /**
+     * GET /api/v2/polls/categories
+     *
+     * Get available poll categories for the tenant.
+     *
+     * Response: 200 OK with category list
+     */
+    public function categories(): void
+    {
+        $this->checkFeature();
+        $this->getUserId();
+
+        $tenantId = TenantContext::getId();
+
+        $categories = \Nexus\Core\Database::query(
+            "SELECT DISTINCT category FROM polls
+             WHERE tenant_id = ? AND category IS NOT NULL AND category != ''
+             ORDER BY category ASC",
+            [$tenantId]
+        )->fetchAll();
+
+        $result = array_map(function ($row) {
+            return $row['category'];
+        }, $categories);
+
+        $this->respondWithData($result);
     }
 }

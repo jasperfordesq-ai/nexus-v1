@@ -20,6 +20,52 @@ use Nexus\Services\FederationExternalApiClient;
  */
 class FederationSearchService
 {
+    /** Cache TTL for cross-tenant queries (5 minutes) */
+    private const CACHE_TTL = 300;
+
+    /**
+     * Cached wrapper for searchMembers — caches cross-tenant queries in Redis
+     * Falls back to uncached search if Redis is unavailable.
+     *
+     * @param array $partnerTenantIds Array of partner tenant IDs to search
+     * @param array $filters Search filters
+     * @return array Search results with members and metadata
+     */
+    public static function cachedSearchMembers(array $partnerTenantIds, array $filters): array
+    {
+        if (empty($partnerTenantIds)) {
+            return self::searchMembers($partnerTenantIds, $filters);
+        }
+
+        // Build cache key from search parameters
+        $cacheKey = 'fed_search_' . md5(json_encode([
+            'tenants' => $partnerTenantIds,
+            'filters' => array_diff_key($filters, ['offset' => 1]), // Exclude offset from cache key
+        ]));
+
+        try {
+            $cached = RedisCache::get($cacheKey);
+            if ($cached !== null && is_array($cached)) {
+                $cached['from_cache'] = true;
+                return $cached;
+            }
+        } catch (\Throwable $e) {
+            // Redis unavailable — fall through to uncached
+        }
+
+        $result = self::searchMembers($partnerTenantIds, $filters);
+        $result['from_cache'] = false;
+
+        // Cache the result
+        try {
+            RedisCache::set($cacheKey, $result, self::CACHE_TTL);
+        } catch (\Throwable $e) {
+            // Caching failed — still return result
+        }
+
+        return $result;
+    }
+
     /**
      * Advanced search for federated members
      *

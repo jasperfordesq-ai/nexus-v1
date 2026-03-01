@@ -106,6 +106,7 @@ class ExchangesApiController extends BaseApiController
             (int) $data['listing_id'],
             [
                 'proposed_hours' => $data['proposed_hours'] ?? null,
+                'prep_time' => $data['prep_time'] ?? null,
                 'message' => $data['message'] ?? null,
             ]
         );
@@ -494,6 +495,7 @@ class ExchangesApiController extends BaseApiController
                 'avatar' => $exchange['provider_avatar'] ?? null,
             ],
             'proposed_hours' => (float) $exchange['proposed_hours'],
+            'prep_time' => isset($exchange['prep_time']) && $exchange['prep_time'] !== null ? (float) $exchange['prep_time'] : null,
             'final_hours' => $exchange['final_hours'] ? (float) $exchange['final_hours'] : null,
             'status' => $exchange['status'],
             'risk_level' => $exchange['risk_level'] ?? null,

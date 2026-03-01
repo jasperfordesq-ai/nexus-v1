@@ -28,6 +28,20 @@ use Nexus\Models\EventRsvp;
  * - DELETE /api/v2/events/{id}/rsvp    - Remove RSVP
  * - GET    /api/v2/events/{id}/attendees - List attendees
  * - POST   /api/v2/events/{id}/image   - Upload event image
+ * - POST   /api/v2/events/{id}/cancel  - Cancel event (E5)
+ * - GET    /api/v2/events/{id}/waitlist - Get waitlist (E3)
+ * - POST   /api/v2/events/{id}/waitlist - Join waitlist (E3)
+ * - DELETE /api/v2/events/{id}/waitlist - Leave waitlist (E3)
+ * - GET    /api/v2/events/{id}/reminders - Get user's reminders (E4)
+ * - PUT    /api/v2/events/{id}/reminders - Update reminders (E4)
+ * - POST   /api/v2/events/{id}/attendance - Mark attendance (E6)
+ * - POST   /api/v2/events/{id}/attendance/bulk - Bulk mark attendance (E6)
+ * - GET    /api/v2/events/{id}/attendance - Get attendance records (E6)
+ * - GET    /api/v2/events/series       - List event series (E7)
+ * - POST   /api/v2/events/series       - Create event series (E7)
+ * - GET    /api/v2/events/series/{id}  - Get series events (E7)
+ * - POST   /api/v2/events/{id}/series  - Link event to series (E7)
+ * - POST   /api/v2/events/recurring    - Create recurring event (E1)
  *
  * Response Format:
  * Success: { "data": {...}, "meta": {...} }
@@ -339,11 +353,34 @@ class EventsApiController extends BaseApiController
             $errors = EventService::getErrors();
             $httpStatus = 422;
 
+            // Check if user was waitlisted (special case — not a real error)
+            $isWaitlisted = false;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
                     $httpStatus = 404;
                     break;
                 }
+                if ($error['code'] === 'EVENT_CANCELLED') {
+                    $httpStatus = 409;
+                    break;
+                }
+                if ($error['code'] === 'EVENT_FULL') {
+                    $isWaitlisted = true;
+                    break;
+                }
+            }
+
+            // Waitlisted is a 200 with special response, not a true error
+            if ($isWaitlisted) {
+                $position = EventService::getUserWaitlistPosition($id, $userId);
+                $event = EventService::getById($id, $userId);
+                $this->respondWithData([
+                    'status' => 'waitlisted',
+                    'waitlist_position' => $position,
+                    'rsvp_counts' => $event['rsvp_counts'] ?? ['going' => 0, 'interested' => 0],
+                    'message' => 'Event is full. You have been added to the waitlist.',
+                ]);
+                return;
             }
 
             $this->respondWithErrors($errors, $httpStatus);
@@ -561,5 +598,561 @@ class EventsApiController extends BaseApiController
         } catch (\Exception $e) {
             $this->respondWithError('CHECKIN_ERROR', 'Failed to check in attendee: ' . $e->getMessage(), null, 500);
         }
+    }
+
+    // =========================================================================
+    // E5: EVENT CANCELLATION
+    // =========================================================================
+
+    /**
+     * POST /api/v2/events/{id}/cancel
+     *
+     * Cancel an event and notify all RSVPs.
+     *
+     * Request Body (JSON):
+     * {
+     *   "reason": "string (optional cancellation reason)"
+     * }
+     *
+     * Response: 200 OK with cancellation confirmation
+     */
+    public function cancel(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_cancel', 5, 60);
+
+        $reason = $this->input('reason') ?? '';
+
+        $success = EventService::cancelEvent($id, $userId, $reason);
+
+        if (!$success) {
+            $errors = EventService::getErrors();
+            $status = 400;
+
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+                if ($error['code'] === 'ALREADY_CANCELLED') {
+                    $status = 409;
+                    break;
+                }
+            }
+
+            $this->respondWithErrors($errors, $status);
+        }
+
+        $this->respondWithData([
+            'cancelled' => true,
+            'event_id' => $id,
+            'reason' => $reason,
+        ]);
+    }
+
+    // =========================================================================
+    // E3: WAITLIST MANAGEMENT
+    // =========================================================================
+
+    /**
+     * GET /api/v2/events/{id}/waitlist
+     *
+     * Get the waitlist for an event (organizer/admin only).
+     *
+     * Response: 200 OK with waitlist array
+     */
+    public function waitlist(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('events_waitlist', 60, 60);
+
+        $event = EventService::getById($id);
+        if (!$event) {
+            $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return;
+        }
+
+        $result = EventService::getWaitlist($id, [
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ]);
+
+        // Include user's waitlist position if they're on it
+        $userPosition = EventService::getUserWaitlistPosition($id, $userId);
+
+        $this->respondWithData($result['items'], [
+            'has_more' => $result['has_more'],
+            'user_position' => $userPosition,
+        ]);
+    }
+
+    /**
+     * POST /api/v2/events/{id}/waitlist
+     *
+     * Join the waitlist for a full event.
+     *
+     * Response: 200 OK with waitlist position
+     */
+    public function joinWaitlist(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_waitlist', 30, 60);
+
+        $event = EventService::getById($id);
+        if (!$event) {
+            $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return;
+        }
+
+        $success = EventService::addToWaitlist($id, $userId);
+
+        if (!$success) {
+            $this->respondWithError('WAITLIST_FAILED', 'Failed to join waitlist', null, 400);
+            return;
+        }
+
+        $position = EventService::getUserWaitlistPosition($id, $userId);
+
+        $this->respondWithData([
+            'waitlisted' => true,
+            'position' => $position,
+        ]);
+    }
+
+    /**
+     * DELETE /api/v2/events/{id}/waitlist
+     *
+     * Leave the waitlist for an event.
+     *
+     * Response: 204 No Content
+     */
+    public function leaveWaitlist(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_waitlist', 30, 60);
+
+        EventService::removeFromWaitlist($id, $userId);
+        $this->noContent();
+    }
+
+    // =========================================================================
+    // E4: EVENT REMINDERS
+    // =========================================================================
+
+    /**
+     * GET /api/v2/events/{id}/reminders
+     *
+     * Get user's reminders for an event.
+     *
+     * Response: 200 OK with reminders array
+     */
+    public function getReminders(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('events_reminders', 60, 60);
+
+        $reminders = EventService::getUserReminders($id, $userId);
+
+        $this->respondWithData($reminders);
+    }
+
+    /**
+     * PUT /api/v2/events/{id}/reminders
+     *
+     * Update user's reminder preferences for an event.
+     *
+     * Request Body (JSON):
+     * {
+     *   "reminders": [
+     *     { "minutes": 60, "type": "both" },
+     *     { "minutes": 1440, "type": "platform" }
+     *   ]
+     * }
+     *
+     * Response: 200 OK with updated reminders
+     */
+    public function updateReminders(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_reminders', 20, 60);
+
+        $reminders = $this->input('reminders');
+        if (!is_array($reminders)) {
+            $this->respondWithError('VALIDATION_ERROR', 'reminders must be an array', 'reminders', 400);
+            return;
+        }
+
+        $success = EventService::updateReminders($id, $userId, $reminders);
+
+        if (!$success) {
+            $this->respondWithError('UPDATE_FAILED', 'Failed to update reminders', null, 400);
+            return;
+        }
+
+        $updated = EventService::getUserReminders($id, $userId);
+        $this->respondWithData($updated);
+    }
+
+    // =========================================================================
+    // E6: EVENT ATTENDANCE TRACKING
+    // =========================================================================
+
+    /**
+     * POST /api/v2/events/{id}/attendance
+     *
+     * Mark a user as attended (organizer/admin only).
+     *
+     * Request Body (JSON):
+     * {
+     *   "user_id": int (required),
+     *   "hours": float (optional override),
+     *   "notes": "string (optional)"
+     * }
+     *
+     * Response: 200 OK with attendance confirmation
+     */
+    public function markAttendance(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_attendance', 30, 60);
+
+        $attendeeId = $this->inputInt('user_id');
+        if (!$attendeeId) {
+            $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id', 400);
+            return;
+        }
+
+        $hours = $this->input('hours') !== null ? (float)$this->input('hours') : null;
+        $notes = $this->input('notes');
+
+        $success = EventService::markAttended($id, $attendeeId, $userId, $hours, $notes);
+
+        if (!$success) {
+            $errors = EventService::getErrors();
+            $status = 400;
+
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData([
+            'marked' => true,
+            'event_id' => $id,
+            'user_id' => $attendeeId,
+        ]);
+    }
+
+    /**
+     * POST /api/v2/events/{id}/attendance/bulk
+     *
+     * Bulk mark attendance (organizer/admin only).
+     *
+     * Request Body (JSON):
+     * {
+     *   "user_ids": [1, 2, 3]
+     * }
+     *
+     * Response: 200 OK with results
+     */
+    public function bulkMarkAttendance(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_attendance', 10, 60);
+
+        $userIds = $this->input('user_ids');
+        if (!is_array($userIds) || empty($userIds)) {
+            $this->respondWithError('VALIDATION_ERROR', 'user_ids must be a non-empty array', 'user_ids', 400);
+            return;
+        }
+
+        $result = EventService::bulkMarkAttended($id, $userIds, $userId);
+
+        $this->respondWithData($result);
+    }
+
+    /**
+     * GET /api/v2/events/{id}/attendance
+     *
+     * Get attendance records for an event.
+     *
+     * Response: 200 OK with attendance records
+     */
+    public function getAttendance(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('events_attendance', 60, 60);
+
+        $event = EventService::getById($id);
+        if (!$event) {
+            $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return;
+        }
+
+        $records = EventService::getAttendanceRecords($id);
+
+        $this->respondWithData($records);
+    }
+
+    // =========================================================================
+    // E7: EVENT SERIES
+    // =========================================================================
+
+    /**
+     * GET /api/v2/events/series
+     *
+     * List all event series.
+     *
+     * Response: 200 OK with series array
+     */
+    public function listSeries(): void
+    {
+        $this->getOptionalUserId();
+        $this->rateLimit('events_series', 60, 60);
+
+        $result = EventService::getAllSeries([
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ]);
+
+        $this->respondWithData($result['items'], [
+            'has_more' => $result['has_more'],
+        ]);
+    }
+
+    /**
+     * POST /api/v2/events/series
+     *
+     * Create a new event series.
+     *
+     * Request Body (JSON):
+     * {
+     *   "title": "string (required)",
+     *   "description": "string (optional)"
+     * }
+     *
+     * Response: 201 Created with series data
+     */
+    public function createSeries(): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_series', 10, 60);
+
+        $title = $this->input('title');
+        $description = $this->input('description');
+
+        if (empty($title)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Series title is required', 'title', 400);
+            return;
+        }
+
+        $seriesId = EventService::createSeries($userId, $title, $description);
+
+        if (!$seriesId) {
+            $errors = EventService::getErrors();
+            $this->respondWithErrors($errors, 422);
+            return;
+        }
+
+        $series = EventService::getSeriesInfo($seriesId);
+        $this->respondWithData($series, null, 201);
+    }
+
+    /**
+     * GET /api/v2/events/series/{seriesId}
+     *
+     * Get all events in a series.
+     *
+     * Response: 200 OK with series info and events array
+     */
+    public function showSeries(int $seriesId): void
+    {
+        $this->getOptionalUserId();
+        $this->rateLimit('events_series', 60, 60);
+
+        $series = EventService::getSeriesInfo($seriesId);
+        if (!$series) {
+            $this->respondWithError('NOT_FOUND', 'Series not found', null, 404);
+            return;
+        }
+
+        $events = EventService::getSeriesEvents($seriesId);
+
+        $this->respondWithData([
+            'series' => $series,
+            'events' => $events,
+        ]);
+    }
+
+    /**
+     * POST /api/v2/events/{id}/series
+     *
+     * Link an event to a series.
+     *
+     * Request Body (JSON):
+     * {
+     *   "series_id": int (required)
+     * }
+     *
+     * Response: 200 OK
+     */
+    public function linkToSeries(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_series', 20, 60);
+
+        $seriesId = $this->inputInt('series_id');
+        if (!$seriesId) {
+            $this->respondWithError('VALIDATION_ERROR', 'series_id is required', 'series_id', 400);
+            return;
+        }
+
+        $success = EventService::linkToSeries($id, $seriesId, $userId);
+
+        if (!$success) {
+            $errors = EventService::getErrors();
+            $status = 400;
+
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['linked' => true, 'event_id' => $id, 'series_id' => $seriesId]);
+    }
+
+    // =========================================================================
+    // E1: RECURRING EVENTS
+    // =========================================================================
+
+    /**
+     * POST /api/v2/events/recurring
+     *
+     * Create a recurring event with recurrence rules.
+     *
+     * Request Body (JSON): Same as create event, plus:
+     * {
+     *   "recurrence_frequency": "daily|weekly|monthly|yearly|custom",
+     *   "recurrence_interval": 1,
+     *   "recurrence_days": "1,3,5",
+     *   "recurrence_ends_type": "never|after_count|on_date",
+     *   "recurrence_ends_after_count": 10,
+     *   "recurrence_ends_on_date": "2026-06-01"
+     * }
+     *
+     * Response: 201 Created with template and occurrence count
+     */
+    public function createRecurring(): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_create', 5, 60);
+
+        $data = $this->getAllInput();
+
+        $result = EventService::createRecurring($userId, $data);
+
+        if (!$result) {
+            $errors = EventService::getErrors();
+            $status = 422;
+
+            foreach ($errors as $error) {
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $template = EventService::getById($result['template_id'], $userId);
+
+        $this->respondWithData([
+            'template' => $template,
+            'occurrences_created' => $result['occurrences'],
+        ], null, 201);
+    }
+
+    /**
+     * PUT /api/v2/events/{id}/recurring
+     *
+     * Update a recurring event (single occurrence or all).
+     *
+     * Request Body (JSON): Same as update, plus:
+     * {
+     *   "scope": "single|all"
+     * }
+     *
+     * Response: 200 OK with updated event data
+     */
+    public function updateRecurring(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('events_update', 20, 60);
+
+        $data = $this->getAllInput();
+        $scope = $data['scope'] ?? 'single';
+
+        if (!in_array($scope, ['single', 'all'])) {
+            $this->respondWithError('VALIDATION_ERROR', 'scope must be "single" or "all"', 'scope', 400);
+            return;
+        }
+
+        $success = EventService::updateRecurring($id, $userId, $data, $scope);
+
+        if (!$success) {
+            $errors = EventService::getErrors();
+            $status = 422;
+
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $event = EventService::getById($id, $userId);
+        $this->respondWithData($event);
     }
 }

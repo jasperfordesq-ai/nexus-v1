@@ -129,6 +129,7 @@ class WalletApiController extends BaseApiController
         $recipient = $this->input('recipient') ?? $this->input('user_id') ?? $this->input('username') ?? $this->input('email');
         $amount = (float)($this->input('amount') ?? 0);
         $description = trim($this->input('description', ''));
+        $categoryId = $this->input('category_id') ? (int)$this->input('category_id') : null;
 
         if (empty($recipient)) {
             $this->respondWithError('VALIDATION_ERROR', 'Recipient is required', 'recipient', 400);
@@ -138,7 +139,7 @@ class WalletApiController extends BaseApiController
             $this->respondWithError('VALIDATION_ERROR', 'Amount must be greater than 0', 'amount', 400);
         }
 
-        $transactionId = WalletService::transfer($userId, $recipient, $amount, $description);
+        $transactionId = WalletService::transfer($userId, $recipient, $amount, 'transfer', $description, $categoryId);
 
         if ($transactionId === null) {
             $errors = WalletService::getErrors();
