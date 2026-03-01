@@ -2225,7 +2225,7 @@ $router->add('POST', '/api/v2/events/{id}/series', 'Nexus\Controllers\Api\Events
 // API V2 - VOLUNTEERING FEATURES (New endpoints)
 // ============================================
 $router->add('GET', '/api/v2/volunteering/recommended-shifts', 'Nexus\Controllers\Api\VolunteerApiController@recommendedShifts');
-$router->add('GET', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\VolunteerApiController@listCertificates');
+$router->add('GET', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\VolunteerApiController@myCertificates');
 $router->add('POST', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\VolunteerApiController@generateCertificate');
 $router->add('GET', '/api/v2/volunteering/certificates/verify/{code}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCertificate');
 $router->add('GET', '/api/v2/volunteering/certificates/{code}/html', 'Nexus\Controllers\Api\VolunteerApiController@certificateHtml');
