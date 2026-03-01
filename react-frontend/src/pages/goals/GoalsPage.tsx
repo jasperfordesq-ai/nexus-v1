@@ -58,6 +58,9 @@ import {
   UserPlus,
   Sparkles,
   PartyPopper,
+  ClipboardCheck,
+  FileText,
+  History,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -66,7 +69,11 @@ import { useAuth, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl } from '@/lib/helpers';
+import { GoalTemplatePickerModal } from './components/GoalTemplatePickerModal';
+import { GoalCheckinModal } from './components/GoalCheckinModal';
+import { GoalReminderToggle } from './components/GoalReminderToggle';
+import { GoalProgressHistory } from './components/GoalProgressHistory';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -197,11 +204,16 @@ export function GoalsPage() {
   // Detail modal
   const { isOpen: isDetailOpen, onOpen: onDetailOpen, onClose: onDetailClose } = useDisclosure();
   const [detailGoal, setDetailGoal] = useState<Goal | null>(null);
-  const [detailHistory, setDetailHistory] = useState<ProgressEntry[]>([]);
-  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
   // Completion celebration
   const [celebratingId, setCelebratingId] = useState<number | null>(null);
+
+  // G1 - Template picker
+  const { isOpen: isTemplateOpen, onOpen: onTemplateOpen, onClose: onTemplateClose } = useDisclosure();
+
+  // G3 - Check-in modal
+  const { isOpen: isCheckinOpen, onOpen: onCheckinOpen, onClose: onCheckinClose } = useDisclosure();
+  const [checkinGoal, setCheckinGoal] = useState<Goal | null>(null);
 
   const loadGoals = useCallback(async (append = false) => {
     try {
@@ -402,29 +414,25 @@ export function GoalsPage() {
     }
   };
 
+  // ── Check-in (G3) ──
+  const openCheckin = (goal: Goal) => {
+    setCheckinGoal(goal);
+    onCheckinOpen();
+  };
+
   // ── Detail ──
   const openDetail = async (goal: Goal) => {
     setDetailGoal(goal);
-    setDetailHistory([]);
     onDetailOpen();
 
+    // Fetch fresh goal data for the detail modal
     try {
-      setIsLoadingDetail(true);
-      const response = await api.get<Goal & { progress_history?: ProgressEntry[] }>(`/v2/goals/${goal.id}`);
-      if (response.success && response.data) {
-        const fullGoal = response.data;
-        if (fullGoal.progress_history) {
-          setDetailHistory(fullGoal.progress_history);
-        }
-        // Update the detail goal with any fresh data
-        if (fullGoal.id) {
-          setDetailGoal(fullGoal);
-        }
+      const response = await api.get<Goal>(`/v2/goals/${goal.id}`);
+      if (response.success && response.data && response.data.id) {
+        setDetailGoal(response.data);
       }
     } catch (err) {
       logError('Failed to load goal details', err);
-    } finally {
-      setIsLoadingDetail(false);
     }
   };
 
@@ -459,13 +467,23 @@ export function GoalsPage() {
           <p className="text-theme-muted mt-1">{t('goals.subtitle')}</p>
         </div>
         {isAuthenticated && (
-          <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-            startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-            onPress={onOpen}
-          >
-            {t('goals.new_goal')}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
+              onPress={onTemplateOpen}
+            >
+              From Template
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              onPress={onOpen}
+            >
+              {t('goals.new_goal')}
+            </Button>
+          </div>
         )}
       </div>
 
@@ -573,6 +591,7 @@ export function GoalsPage() {
                       onComplete={handleComplete}
                       onBecomeBuddy={handleBecomeBuddy}
                       onOpenDetail={openDetail}
+                      onCheckin={openCheckin}
                       isDiscoverTab={tab === 'discover'}
                       isBuddyingTab={tab === 'buddying'}
                     />
@@ -742,6 +761,34 @@ export function GoalsPage() {
         </ModalContent>
       </Modal>
 
+      {/* ─── G1 - Template Picker Modal ─── */}
+      <GoalTemplatePickerModal
+        isOpen={isTemplateOpen}
+        onClose={onTemplateClose}
+        onTemplateSelected={() => {
+          setCursor(undefined);
+          loadGoals();
+        }}
+      />
+
+      {/* ─── G3 - Check-in Modal ─── */}
+      {checkinGoal && (
+        <GoalCheckinModal
+          isOpen={isCheckinOpen}
+          onClose={() => {
+            onCheckinClose();
+            setCheckinGoal(null);
+          }}
+          goalId={checkinGoal.id}
+          goalTitle={checkinGoal.title}
+          currentProgress={Math.round(checkinGoal.progress_percentage)}
+          onCheckinCreated={() => {
+            setCursor(undefined);
+            loadGoals();
+          }}
+        />
+      )}
+
       {/* ─── Goal Detail Modal ─── */}
       <Modal isOpen={isDetailOpen} onClose={onDetailClose} size="2xl" scrollBehavior="inside" classNames={modalClasses}>
         <ModalContent>
@@ -876,43 +923,13 @@ export function GoalsPage() {
                   </div>
                 )}
 
-                {/* Progress Timeline */}
+                {/* G5 - Full Progress History Timeline */}
                 <div>
-                  <h4 className="text-sm font-semibold text-theme-primary mb-3">{t('goals.detail.progress_timeline')}</h4>
-                  {isLoadingDetail ? (
-                    <div className="space-y-2">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="flex gap-3 animate-pulse">
-                          <div className="w-2 h-2 rounded-full bg-theme-hover mt-1.5 flex-shrink-0" />
-                          <div className="flex-1">
-                            <div className="h-3 bg-theme-hover rounded w-1/3 mb-1" />
-                            <div className="h-3 bg-theme-hover rounded w-1/5" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : detailHistory.length > 0 ? (
-                    <div className="space-y-3 border-l-2 border-theme-default ml-1 pl-4">
-                      {detailHistory.map((entry) => (
-                        <div key={entry.id} className="relative">
-                          <div className="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 border-2 border-white dark:border-gray-900" />
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-theme-primary">
-                                +{entry.increment}
-                              </span>
-                              {entry.note && (
-                                <span className="text-xs text-theme-muted">{entry.note}</span>
-                              )}
-                            </div>
-                            <span className="text-xs text-theme-subtle">{formatRelativeTime(entry.created_at)}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-theme-subtle text-center py-4">{t('goals.detail.no_progress')}</p>
-                  )}
+                  <h4 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">
+                    <History className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+                    {t('goals.detail.progress_timeline')}
+                  </h4>
+                  <GoalProgressHistory goalId={detailGoal.id} />
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -941,6 +958,7 @@ interface GoalCardProps {
   onComplete: (goal: Goal) => void;
   onBecomeBuddy: (goal: Goal) => void;
   onOpenDetail: (goal: Goal) => void;
+  onCheckin: (goal: Goal) => void;
 }
 
 function GoalCard({
@@ -956,6 +974,7 @@ function GoalCard({
   onComplete,
   onBecomeBuddy,
   onOpenDetail,
+  onCheckin,
 }: GoalCardProps) {
   const { t } = useTranslation('gamification');
   const isCompleted = goal.status === 'completed' || goal.progress_percentage >= 100;
@@ -1094,6 +1113,24 @@ function GoalCard({
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
+          )}
+
+          {/* G4 - Reminder Toggle */}
+          {isOwner && !isCompleted && (
+            <GoalReminderToggle goalId={goal.id} />
+          )}
+
+          {/* G3 - Check-in button */}
+          {isOwner && !isCompleted && (
+            <Button
+              size="sm"
+              variant="flat"
+              className="bg-indigo-500/10 text-indigo-400"
+              startContent={<ClipboardCheck className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => onCheckin(goal)}
+            >
+              Check In
+            </Button>
           )}
 
           {/* Quick +1 for owner */}

@@ -42,11 +42,17 @@ import {
   Upload,
   X,
   CheckCircle,
+  ChevronRight,
+  ChevronDown,
+  Folder,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
@@ -84,6 +90,15 @@ interface ResourceCategory {
   resource_count: number;
 }
 
+interface CategoryTreeNode {
+  id: number;
+  name: string;
+  slug: string;
+  color: string;
+  resource_count: number;
+  children: CategoryTreeNode[];
+}
+
 /* ───────────────────────── Constants ───────────────────────── */
 
 const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'png', 'gif', 'svg'];
@@ -114,13 +129,88 @@ function formatFileSize(bytes: number): string {
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+/* ───────────────────────── R1 - Category Tree Component ───────────────────────── */
+
+function CategoryTreeItem({
+  node,
+  selectedId,
+  onSelect,
+  depth = 0,
+}: {
+  node: CategoryTreeNode;
+  selectedId: number | null;
+  onSelect: (id: number | null) => void;
+  depth?: number;
+}) {
+  const [expanded, setExpanded] = useState(true);
+  const hasChildren = node.children && node.children.length > 0;
+  const isSelected = selectedId === node.id;
+  // color is available on the node but we use class-based styling via the selected state
+
+  return (
+    <div>
+      <button
+        type="button"
+        className={`
+          w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition-colors
+          ${isSelected ? 'bg-amber-500/10 text-amber-500 font-semibold' : 'text-theme-muted hover:bg-theme-hover'}
+        `}
+        style={{ paddingLeft: `${depth * 16 + 8}px` }}
+        onClick={() => onSelect(isSelected ? null : node.id)}
+      >
+        {hasChildren ? (
+          <button
+            type="button"
+            className="p-0 min-w-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded(!expanded);
+            }}
+            aria-label={expanded ? 'Collapse' : 'Expand'}
+          >
+            {expanded ? (
+              <ChevronDown className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />
+            ) : (
+              <ChevronRight className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />
+            )}
+          </button>
+        ) : (
+          <span className="w-3.5" />
+        )}
+        <Folder className={`w-3.5 h-3.5 flex-shrink-0 ${isSelected ? 'text-amber-400' : 'text-theme-subtle'}`} aria-hidden="true" />
+        <span className="flex-1 truncate">{node.name}</span>
+        {node.resource_count > 0 && (
+          <span className="text-xs text-theme-subtle">{node.resource_count}</span>
+        )}
+      </button>
+      {hasChildren && expanded && (
+        <div>
+          {node.children.map((child) => (
+            <CategoryTreeItem
+              key={child.id}
+              node={child}
+              selectedId={selectedId}
+              onSelect={onSelect}
+              depth={depth + 1}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ───────────────────────── Main Component ───────────────────────── */
+
 export function ResourcesPage() {
   const { t } = useTranslation('utility');
   usePageTitle(t('resources.page_title'));
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  useTenant(); // ensure tenant context is available
   const toast = useToast();
   const [resources, setResources] = useState<Resource[]>([]);
   const [categories, setCategories] = useState<ResourceCategory[]>([]);
+  const [categoryTree, setCategoryTree] = useState<CategoryTreeNode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -128,6 +218,11 @@ export function ResourcesPage() {
   const [hasMore, setHasMore] = useState(false);
   const [cursor, setCursor] = useState<string | undefined>();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showCategoryTree, setShowCategoryTree] = useState(true);
+
+  // R3 - Admin reorder
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'tenant_admin';
+  const [isReordering, setIsReordering] = useState(false);
 
   // Upload modal state
   const uploadModal = useDisclosure();
@@ -140,13 +235,19 @@ export function ResourcesPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Load categories on mount
+  // Load categories and category tree on mount
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const response = await api.get<ResourceCategory[]>('/v2/resources/categories');
-        if (response.success && response.data) {
-          setCategories(Array.isArray(response.data) ? response.data : []);
+        const [flatRes, treeRes] = await Promise.all([
+          api.get<ResourceCategory[]>('/v2/resources/categories'),
+          api.get<CategoryTreeNode[]>('/v2/resources/categories/tree'),
+        ]);
+        if (flatRes.success && flatRes.data) {
+          setCategories(Array.isArray(flatRes.data) ? flatRes.data : []);
+        }
+        if (treeRes.success && treeRes.data) {
+          setCategoryTree(Array.isArray(treeRes.data) ? treeRes.data : []);
         }
       } catch (err) {
         logError('Failed to load resource categories', err);
@@ -308,6 +409,28 @@ export function ResourcesPage() {
     }
   }
 
+  // R3 - Admin reorder resources
+  const handleMoveResource = async (resourceId: number, direction: 'up' | 'down') => {
+    const currentIndex = resources.findIndex((r) => r.id === resourceId);
+    if (currentIndex === -1) return;
+    if (direction === 'up' && currentIndex === 0) return;
+    if (direction === 'down' && currentIndex === resources.length - 1) return;
+
+    const newResources = [...resources];
+    const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    [newResources[currentIndex], newResources[swapIndex]] = [newResources[swapIndex], newResources[currentIndex]];
+    setResources(newResources);
+
+    try {
+      const orderedIds = newResources.map((r) => r.id);
+      await api.put('/v2/resources/reorder', { order: orderedIds });
+    } catch (err) {
+      logError('Failed to reorder resources', err);
+      toast.error('Failed to save new order.');
+      loadResources();
+    }
+  };
+
   const categoryColorMap: Record<string, string> = {
     blue: 'bg-blue-500/10 text-blue-500',
     gray: 'bg-gray-500/10 text-gray-500',
@@ -357,7 +480,7 @@ export function ResourcesPage() {
         )}
       </div>
 
-      {/* Search & Filters */}
+      {/* Search & Admin Controls */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 max-w-md">
           <Input
@@ -372,34 +495,101 @@ export function ResourcesPage() {
           />
         </div>
 
-        {categories.length > 0 && (
-          <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap items-center">
+          {/* R3 - Admin reorder toggle */}
+          {isAdmin && (
             <Button
               size="sm"
-              variant={!selectedCategory ? 'solid' : 'flat'}
-              className={!selectedCategory ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setSelectedCategory(null)}
+              variant={isReordering ? 'solid' : 'flat'}
+              className={isReordering ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              startContent={<GripVertical className="w-3.5 h-3.5" aria-hidden="true" />}
+              onPress={() => setIsReordering(!isReordering)}
             >
-              {t('resources.filter_all')}
+              {isReordering ? 'Done Reordering' : 'Reorder'}
             </Button>
-            {categories.map((cat) => (
+          )}
+
+          {/* Category quick-filter chips (fallback if tree not available) */}
+          {categoryTree.length === 0 && categories.length > 0 && (
+            <>
               <Button
-                key={cat.id}
                 size="sm"
-                variant={selectedCategory === cat.id ? 'solid' : 'flat'}
-                className={
-                  selectedCategory === cat.id
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
-                    : 'bg-theme-elevated text-theme-muted'
-                }
-                onPress={() => setSelectedCategory(cat.id)}
+                variant={!selectedCategory ? 'solid' : 'flat'}
+                className={!selectedCategory ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+                onPress={() => setSelectedCategory(null)}
               >
-                {cat.name}
+                {t('resources.filter_all')}
               </Button>
-            ))}
+              {categories.map((cat) => (
+                <Button
+                  key={cat.id}
+                  size="sm"
+                  variant={selectedCategory === cat.id ? 'solid' : 'flat'}
+                  className={
+                    selectedCategory === cat.id
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
+                      : 'bg-theme-elevated text-theme-muted'
+                  }
+                  onPress={() => setSelectedCategory(cat.id)}
+                >
+                  {cat.name}
+                </Button>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* R1 - Layout with Category Tree Sidebar */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Category Tree Sidebar */}
+        {categoryTree.length > 0 && (
+          <div className="lg:w-64 flex-shrink-0">
+            <GlassCard className="p-3 sticky top-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-semibold text-theme-primary flex items-center gap-2">
+                  <Folder className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                  Categories
+                </h3>
+                <Button
+                  size="sm"
+                  variant="light"
+                  isIconOnly
+                  className="text-theme-subtle min-w-0 w-6 h-6 lg:hidden"
+                  onPress={() => setShowCategoryTree(!showCategoryTree)}
+                  aria-label={showCategoryTree ? 'Hide categories' : 'Show categories'}
+                >
+                  {showCategoryTree ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </Button>
+              </div>
+              {showCategoryTree && (
+                <div className="space-y-0.5">
+                  <button
+                    type="button"
+                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition-colors ${
+                      !selectedCategory ? 'bg-amber-500/10 text-amber-500 font-semibold' : 'text-theme-muted hover:bg-theme-hover'
+                    }`}
+                    onClick={() => setSelectedCategory(null)}
+                  >
+                    <FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />
+                    All Resources
+                  </button>
+                  {categoryTree.map((node) => (
+                    <CategoryTreeItem
+                      key={node.id}
+                      node={node}
+                      selectedId={selectedCategory}
+                      onSelect={setSelectedCategory}
+                    />
+                  ))}
+                </div>
+              )}
+            </GlassCard>
           </div>
         )}
-      </div>
+
+        {/* Main Content */}
+        <div className="flex-1 min-w-0 space-y-4">
 
       {/* Error */}
       {error && !isLoading && (
@@ -456,6 +646,32 @@ export function ResourcesPage() {
                 <motion.div key={resource.id} variants={itemVariants}>
                   <GlassCard className="p-4 hover:bg-theme-hover/30 transition-colors">
                     <div className="flex items-center gap-4">
+                      {/* R3 - Reorder controls (admin only) */}
+                      {isReordering && isAdmin && (
+                        <div className="flex flex-col gap-0.5 flex-shrink-0">
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            className="text-theme-subtle min-w-0 w-6 h-6"
+                            onPress={() => handleMoveResource(resource.id, 'up')}
+                            aria-label="Move up"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            className="text-theme-subtle min-w-0 w-6 h-6"
+                            onPress={() => handleMoveResource(resource.id, 'down')}
+                            aria-label="Move down"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      )}
+
                       {/* File Icon */}
                       <div className="w-10 h-10 rounded-lg bg-theme-elevated flex items-center justify-center flex-shrink-0">
                         {getFileIcon(resource.file_path)}
@@ -545,6 +761,9 @@ export function ResourcesPage() {
           )}
         </>
       )}
+
+        </div>{/* end Main Content */}
+      </div>{/* end R1 Layout */}
 
       {/* Upload Resource Modal */}
       <Modal

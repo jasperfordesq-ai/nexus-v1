@@ -113,6 +113,11 @@ const FederationAnalytics = lazy(() => import('./modules/federation/FederationAn
 const ApiKeys = lazy(() => import('./modules/federation/ApiKeys'));
 const CreateApiKey = lazy(() => import('./modules/federation/CreateApiKey'));
 const DataManagement = lazy(() => import('./modules/federation/DataManagement'));
+const CreditAgreements = lazy(() => import('./modules/federation/CreditAgreements'));
+const Neighborhoods = lazy(() => import('./modules/federation/Neighborhoods'));
+
+// Safeguarding module
+const SafeguardingDashboard = lazy(() => import('./modules/safeguarding/SafeguardingDashboard'));
 
 // Advanced/SEO module
 const AiSettings = lazy(() => import('./modules/advanced/AiSettings'));
@@ -149,6 +154,13 @@ const NexusScoreAnalytics = lazy(() => import('./modules/diagnostics/NexusScoreA
 // Analytics & Reporting
 const CommunityAnalytics = lazy(() => import('./modules/analytics/CommunityAnalytics'));
 const ImpactReport = lazy(() => import('./modules/impact/ImpactReport'));
+
+// Admin Reports & Moderation Queue (A1-A5, A7)
+const SocialValuePage = lazy(() => import('./modules/reports/SocialValuePage'));
+const MemberReportsPage = lazy(() => import('./modules/reports/MemberReportsPage'));
+const HoursReportsPage = lazy(() => import('./modules/reports/HoursReportsPage'));
+const InactiveMembersPage = lazy(() => import('./modules/reports/InactiveMembersPage'));
+const ModerationQueuePage = lazy(() => import('./modules/reports/ModerationQueuePage'));
 
 // Admin 404
 const AdminNotFound = lazy(() => import('./modules/AdminNotFound'));
@@ -327,6 +339,11 @@ export function AdminRoutes() {
       <Route path="federation/api-keys" element={<Lazy><ApiKeys /></Lazy>} />
       <Route path="federation/api-keys/create" element={<Lazy><CreateApiKey /></Lazy>} />
       <Route path="federation/data" element={<Lazy><DataManagement /></Lazy>} />
+      <Route path="federation/credit-agreements" element={<Lazy><CreditAgreements /></Lazy>} />
+      <Route path="federation/neighborhoods" element={<Lazy><Neighborhoods /></Lazy>} />
+
+      {/* ─── SAFEGUARDING ─── */}
+      <Route path="safeguarding" element={<Lazy><SafeguardingDashboard /></Lazy>} />
 
       {/* ─── SYSTEM ─── */}
       <Route path="settings" element={<Lazy><AdminSettings /></Lazy>} />
@@ -399,6 +416,11 @@ export function AdminRoutes() {
       {/* ─── ANALYTICS & REPORTING ─── */}
       <Route path="community-analytics" element={<Lazy><CommunityAnalytics /></Lazy>} />
       <Route path="impact-report" element={<Lazy><ImpactReport /></Lazy>} />
+      <Route path="reports/social-value" element={<Lazy><SocialValuePage /></Lazy>} />
+      <Route path="reports/members" element={<Lazy><MemberReportsPage /></Lazy>} />
+      <Route path="reports/hours" element={<Lazy><HoursReportsPage /></Lazy>} />
+      <Route path="reports/inactive-members" element={<Lazy><InactiveMembersPage /></Lazy>} />
+      <Route path="moderation/queue" element={<Lazy><ModerationQueuePage /></Lazy>} />
 
       {/* ─── REDIRECT: /admin/login → main login page ─── */}
       <Route path="login" element={<Navigate to="/login" replace />} />

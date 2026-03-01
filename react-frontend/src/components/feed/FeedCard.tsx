@@ -46,6 +46,7 @@ import {
   Calendar,
   MapPin,
   ArrowRight,
+  Repeat2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -672,6 +673,27 @@ const FeedCard = React.memo(function FeedCard({
               {t('card.comment_action')}
             </Button>
           </Tooltip>
+
+          {/* Share Button */}
+          {item.type === 'post' && isAuthenticated && (
+            <Tooltip content={t('card.share_action', 'Share')} delay={400} closeDelay={0} size="sm">
+              <Button
+                size="sm"
+                variant="light"
+                className="flex-1 max-w-[140px] text-[var(--text-muted)] hover:text-emerald-500 transition-colors"
+                startContent={<Repeat2 className="w-[18px] h-[18px]" aria-hidden="true" />}
+                onPress={async () => {
+                  try {
+                    await api.post(`/v2/feed/posts/${item.id}/share`);
+                  } catch {
+                    // Ignore share errors
+                  }
+                }}
+              >
+                {t('card.share_action', 'Share')}
+              </Button>
+            </Tooltip>
+          )}
         </div>
 
         {/* Comments Section */}

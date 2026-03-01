@@ -8,10 +8,14 @@
  *
  * Features:
  * - Challenge header with status, description, deadlines, prize
- * - Admin controls: status transitions, edit, delete
+ * - Admin controls: full status lifecycle transitions (I11)
  * - Ideas list with sort toggle (Top Voted / Newest)
+ * - Rich media on ideas (I2)
  * - Vote toggle on each idea
- * - Submit Idea modal (when challenge is open)
+ * - Submit Idea modal with media attachment (I2)
+ * - Outcomes section on closed challenges (I10)
+ * - Campaign link (I7)
+ * - Favorite toggle (I8)
  * - Cursor-based pagination for ideas
  */
 
@@ -28,6 +32,8 @@ import {
   ModalFooter,
   Input,
   Textarea,
+  Select,
+  SelectItem,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
@@ -54,6 +60,14 @@ import {
   Star,
   Copy,
   Users,
+  Link as LinkIcon,
+  Image,
+  FileText,
+  Video,
+  ExternalLink,
+  Award,
+  Target,
+  Layers,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -73,7 +87,7 @@ interface Challenge {
   title: string;
   description: string;
   category: string | null;
-  status: 'draft' | 'open' | 'voting' | 'closed';
+  status: 'draft' | 'open' | 'voting' | 'evaluating' | 'closed' | 'archived';
   ideas_count: number;
   submission_deadline: string | null;
   voting_deadline: string | null;
@@ -87,11 +101,22 @@ interface Challenge {
   favorites_count: number;
   views_count: number;
   is_featured: boolean;
+  campaign_id?: number | null;
+  campaign_name?: string | null;
   creator: {
     id: number;
     name: string;
     avatar_url: string | null;
   };
+}
+
+interface IdeaMedia {
+  id: number;
+  idea_id: number;
+  type: 'image' | 'video' | 'document' | 'link';
+  url: string;
+  caption: string | null;
+  created_at: string;
 }
 
 interface Idea {
@@ -106,6 +131,7 @@ interface Idea {
   has_voted: boolean;
   created_at: string;
   image_url: string | null;
+  media?: IdeaMedia[];
   creator: {
     id: number;
     name: string;
@@ -118,13 +144,28 @@ interface VoteResult {
   votes_count: number;
 }
 
+interface ChallengeOutcome {
+  winning_idea_id: number | null;
+  winning_idea_title: string | null;
+  implementation_status: 'not_started' | 'in_progress' | 'implemented' | 'abandoned';
+  impact_description: string | null;
+  updated_at: string | null;
+}
+
+interface Campaign {
+  id: number;
+  name: string;
+}
+
 type SortMode = 'votes' | 'newest';
 
-const STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 'danger'> = {
+const STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 'danger' | 'secondary' | 'primary'> = {
   draft: 'default',
   open: 'success',
   voting: 'warning',
+  evaluating: 'primary',
   closed: 'danger',
+  archived: 'secondary',
 };
 
 const IDEA_STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 'secondary'> = {
@@ -132,6 +173,13 @@ const IDEA_STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 
   shortlisted: 'warning',
   winner: 'success',
   withdrawn: 'secondary',
+};
+
+const MEDIA_ICON_MAP: Record<string, typeof Image> = {
+  image: Image,
+  video: Video,
+  document: FileText,
+  link: ExternalLink,
 };
 
 /* ───────────────────────── Main Component ───────────────────────── */
@@ -159,6 +207,10 @@ export function ChallengeDetailPage() {
   const { isOpen: isSubmitOpen, onOpen: onSubmitOpen, onClose: onSubmitClose } = useDisclosure();
   const [newIdea, setNewIdea] = useState({ title: '', description: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Media attachment for new idea (I2)
+  const [newIdeaMediaUrl, setNewIdeaMediaUrl] = useState('');
+  const [newIdeaMediaType, setNewIdeaMediaType] = useState<string>('link');
+  const [newIdeaMediaCaption, setNewIdeaMediaCaption] = useState('');
 
   // Delete challenge modal
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
@@ -169,6 +221,23 @@ export function ChallengeDetailPage() {
 
   // Duplicate
   const [isDuplicating, setIsDuplicating] = useState(false);
+
+  // Outcomes (I10)
+  const [outcome, setOutcome] = useState<ChallengeOutcome | null>(null);
+  const [, setIsLoadingOutcome] = useState(false);
+  const { isOpen: isOutcomeOpen, onOpen: onOutcomeOpen, onClose: onOutcomeClose } = useDisclosure();
+  const [outcomeForm, setOutcomeForm] = useState({
+    winning_idea_id: '',
+    implementation_status: 'not_started',
+    impact_description: '',
+  });
+  const [isSavingOutcome, setIsSavingOutcome] = useState(false);
+
+  // Campaign linking (I7)
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const { isOpen: isCampaignOpen, onOpen: onCampaignOpen, onClose: onCampaignClose } = useDisclosure();
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string>('');
+  const [isLinkingCampaign, setIsLinkingCampaign] = useState(false);
 
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
@@ -226,6 +295,27 @@ export function ChallengeDetailPage() {
     }
   }, [id, cursor]);
 
+  /* ───── Fetch outcome (I10) ───── */
+  const fetchOutcome = useCallback(async () => {
+    if (!challenge || !['closed', 'archived'].includes(challenge.status)) return;
+    setIsLoadingOutcome(true);
+    try {
+      const response = await api.get<ChallengeOutcome>(`/v2/ideation-challenges/${id}/outcome`);
+      if (response.success && response.data) {
+        setOutcome(response.data);
+        setOutcomeForm({
+          winning_idea_id: response.data.winning_idea_id ? String(response.data.winning_idea_id) : '',
+          implementation_status: response.data.implementation_status ?? 'not_started',
+          impact_description: response.data.impact_description ?? '',
+        });
+      }
+    } catch (err) {
+      logError('Failed to fetch outcome', err);
+    } finally {
+      setIsLoadingOutcome(false);
+    }
+  }, [id, challenge?.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     fetchChallenge();
   }, [fetchChallenge]);
@@ -237,6 +327,12 @@ export function ChallengeDetailPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, sortMode]);
+
+  useEffect(() => {
+    if (challenge && ['closed', 'archived'].includes(challenge.status)) {
+      fetchOutcome();
+    }
+  }, [challenge?.status, fetchOutcome]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ───── Actions ───── */
 
@@ -281,13 +377,30 @@ export function ChallengeDetailPage() {
 
     setIsSubmitting(true);
     try {
-      await api.post(`/v2/ideation-challenges/${id}/ideas`, {
+      const ideaResponse = await api.post<{ id: number }>(`/v2/ideation-challenges/${id}/ideas`, {
         title: newIdea.title.trim(),
         description: newIdea.description.trim(),
       });
 
+      // If media URL provided, attach it (I2)
+      if (ideaResponse.data?.id && newIdeaMediaUrl.trim()) {
+        try {
+          await api.post(`/v2/ideation-ideas/${ideaResponse.data.id}/media`, {
+            type: newIdeaMediaType,
+            url: newIdeaMediaUrl.trim(),
+            caption: newIdeaMediaCaption.trim() || null,
+          });
+        } catch (mediaErr) {
+          logError('Failed to attach media to idea', mediaErr);
+          // Don't fail the whole submission for media
+        }
+      }
+
       toast.success(t('toast.idea_submitted'));
       setNewIdea({ title: '', description: '' });
+      setNewIdeaMediaUrl('');
+      setNewIdeaMediaType('link');
+      setNewIdeaMediaCaption('');
       onSubmitClose();
 
       // Refresh
@@ -371,6 +484,59 @@ export function ChallengeDetailPage() {
     }
   };
 
+  // Save outcome (I10)
+  const handleSaveOutcome = async () => {
+    setIsSavingOutcome(true);
+    try {
+      await api.put(`/v2/ideation-challenges/${id}/outcome`, {
+        winning_idea_id: outcomeForm.winning_idea_id ? parseInt(outcomeForm.winning_idea_id, 10) : null,
+        implementation_status: outcomeForm.implementation_status,
+        impact_description: outcomeForm.impact_description.trim() || null,
+      });
+      toast.success(t('toast.outcome_saved'));
+      onOutcomeClose();
+      fetchOutcome();
+    } catch (err) {
+      logError('Failed to save outcome', err);
+      toast.error(t('toast.error_generic'));
+    } finally {
+      setIsSavingOutcome(false);
+    }
+  };
+
+  // Link to campaign (I7)
+  const handleLinkCampaign = async () => {
+    if (!selectedCampaignId) return;
+    setIsLinkingCampaign(true);
+    try {
+      await api.post(`/v2/ideation-campaigns/${selectedCampaignId}/challenges`, {
+        challenge_id: parseInt(id!, 10),
+      });
+      toast.success(t('campaigns.link_challenge'));
+      onCampaignClose();
+      fetchChallenge();
+    } catch (err) {
+      logError('Failed to link campaign', err);
+      toast.error(t('toast.error_generic'));
+    } finally {
+      setIsLinkingCampaign(false);
+    }
+  };
+
+  const openCampaignModal = async () => {
+    onCampaignOpen();
+    if (campaigns.length === 0) {
+      try {
+        const response = await api.get<Campaign[]>('/v2/ideation-campaigns');
+        if (response.success && response.data) {
+          setCampaigns(Array.isArray(response.data) ? response.data : []);
+        }
+      } catch (err) {
+        logError('Failed to fetch campaigns', err);
+      }
+    }
+  };
+
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null;
     try {
@@ -419,15 +585,28 @@ export function ChallengeDetailPage() {
     );
   }
 
-  // Status transition options for the admin dropdown
+  // Status transition options for the admin dropdown (I11 - full lifecycle)
   const statusTransitions: Record<string, { key: string; label: string }[]> = {
     draft: [{ key: 'open', label: t('admin.set_open') }],
     open: [
       { key: 'voting', label: t('admin.set_voting') },
+      { key: 'evaluating', label: t('admin.set_evaluating') },
       { key: 'closed', label: t('admin.set_closed') },
     ],
-    voting: [{ key: 'closed', label: t('admin.set_closed') }],
-    closed: [{ key: 'open', label: t('admin.reopen') }],
+    voting: [
+      { key: 'evaluating', label: t('admin.set_evaluating') },
+      { key: 'closed', label: t('admin.set_closed') },
+    ],
+    evaluating: [
+      { key: 'closed', label: t('admin.set_closed') },
+    ],
+    closed: [
+      { key: 'archived', label: t('admin.set_archived') },
+      { key: 'open', label: t('admin.reopen') },
+    ],
+    archived: [
+      { key: 'closed', label: t('admin.unarchive') },
+    ],
   };
 
   // Build admin dropdown items with uniform shape
@@ -447,6 +626,12 @@ export function ChallengeDetailPage() {
       onPress: () => handleStatusChange(transition.key),
     })),
     {
+      key: 'link-campaign',
+      label: t('campaigns.link_challenge'),
+      startContent: <Layers className="w-4 h-4" />,
+      onPress: openCampaignModal,
+    },
+    {
       key: 'duplicate',
       label: t('duplicate.button'),
       startContent: <Copy className="w-4 h-4" />,
@@ -458,15 +643,28 @@ export function ChallengeDetailPage() {
       startContent: <Edit3 className="w-4 h-4" />,
       onPress: () => navigate(tenantPath(`/ideation/${id}/edit`)),
     },
+    ...(['closed', 'archived'].includes(challenge.status) ? [{
+      key: 'outcome',
+      label: t('outcomes.title'),
+      startContent: <Target className="w-4 h-4" />,
+      onPress: onOutcomeOpen,
+    }] : []),
     {
       key: 'delete',
       label: t('admin.delete_challenge'),
       className: 'text-danger',
-      color: 'danger',
+      color: 'danger' as const,
       startContent: <Trash2 className="w-4 h-4" />,
       onPress: onDeleteOpen,
     },
   ];
+
+  const IMPLEMENTATION_STATUS_COLORS: Record<string, 'default' | 'warning' | 'success' | 'danger'> = {
+    not_started: 'default',
+    in_progress: 'warning',
+    implemented: 'success',
+    abandoned: 'danger',
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -495,7 +693,7 @@ export function ChallengeDetailPage() {
       <GlassCard className="p-6 mb-6">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-2xl font-bold text-[var(--color-text)]">
                 {challenge.title}
               </h1>
@@ -518,11 +716,24 @@ export function ChallengeDetailPage() {
               )}
             </div>
 
-            {challenge.category && (
-              <Chip size="sm" variant="flat" className="mb-3">
-                {challenge.category}
-              </Chip>
-            )}
+            {/* Category + Campaign link */}
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              {challenge.category && (
+                <Chip size="sm" variant="flat">
+                  {challenge.category}
+                </Chip>
+              )}
+              {challenge.campaign_name && (
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  color="secondary"
+                  startContent={<Layers className="w-3 h-3" />}
+                >
+                  {challenge.campaign_name}
+                </Chip>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
@@ -588,18 +799,14 @@ export function ChallengeDetailPage() {
 
         {/* Meta info */}
         <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--color-text-tertiary)]">
-          {/* Views count */}
           <span className="flex items-center gap-1.5">
             <Eye className="w-4 h-4" />
             {challenge.views_count} {t('views')}
           </span>
-
-          {/* Favorites count */}
           <span className="flex items-center gap-1.5">
             <Heart className="w-4 h-4" />
             {challenge.favorites_count}
           </span>
-
           {challenge.submission_deadline && (
             <span className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
@@ -635,6 +842,63 @@ export function ChallengeDetailPage() {
           </div>
         )}
       </GlassCard>
+
+      {/* Outcome Section (I10) — shown on closed/archived challenges */}
+      {['closed', 'archived'].includes(challenge.status) && outcome && (
+        <GlassCard className="p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-[var(--color-text)] flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              {t('outcomes.title')}
+            </h2>
+            {isAdmin && (
+              <Button variant="flat" size="sm" onPress={onOutcomeOpen}>
+                <Edit3 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            {outcome.winning_idea_title && (
+              <div>
+                <span className="text-sm font-medium text-[var(--color-text-tertiary)]">
+                  {t('outcomes.winning_idea')}
+                </span>
+                <p className="text-[var(--color-text)] flex items-center gap-2 mt-0.5">
+                  <Award className="w-4 h-4 text-amber-500" />
+                  {outcome.winning_idea_title}
+                </p>
+              </div>
+            )}
+
+            <div>
+              <span className="text-sm font-medium text-[var(--color-text-tertiary)]">
+                Status
+              </span>
+              <div className="mt-0.5">
+                <Chip
+                  size="sm"
+                  color={IMPLEMENTATION_STATUS_COLORS[outcome.implementation_status] ?? 'default'}
+                  variant="flat"
+                >
+                  {t(`outcomes.status_${outcome.implementation_status}`)}
+                </Chip>
+              </div>
+            </div>
+
+            {outcome.impact_description && (
+              <div>
+                <span className="text-sm font-medium text-[var(--color-text-tertiary)]">
+                  {t('outcomes.impact_description')}
+                </span>
+                <p className="text-[var(--color-text-secondary)] mt-0.5 whitespace-pre-wrap">
+                  {outcome.impact_description}
+                </p>
+              </div>
+            )}
+          </div>
+        </GlassCard>
+      )}
 
       {/* Ideas Section */}
       <div className="flex items-center justify-between mb-4">
@@ -721,110 +985,153 @@ export function ChallengeDetailPage() {
       {/* Ideas List */}
       {!isLoadingIdeas && ideas.length > 0 && (
         <div className="space-y-3">
-          {ideas.map((idea) => (
-            <GlassCard key={idea.id} className="p-4">
-              <div className="flex items-start gap-4">
-                {/* Vote Button */}
-                <div className="flex flex-col items-center gap-0.5 min-w-[48px]">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleVote(idea.id);
-                    }}
-                    disabled={!isAuthenticated || votingIds.has(idea.id)}
-                    className={`p-1.5 rounded-lg transition-colors ${
-                      idea.has_voted
-                        ? 'bg-primary/10 text-primary'
-                        : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)]'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    aria-label={idea.has_voted ? t('ideas.unvote') : t('ideas.vote')}
-                  >
-                    <ArrowBigUp
-                      className={`w-6 h-6 ${idea.has_voted ? 'fill-current' : ''}`}
-                    />
-                  </button>
-                  <span className={`text-sm font-semibold ${
-                    idea.has_voted ? 'text-primary' : 'text-[var(--color-text-secondary)]'
-                  }`}>
-                    {idea.votes_count}
-                  </span>
-                </div>
+          {ideas.map((idea) => {
+            const MediaIconComponent = idea.media && idea.media.length > 0
+              ? MEDIA_ICON_MAP[idea.media[0].type] ?? LinkIcon
+              : null;
 
-                {/* Idea Content */}
-                <div className="flex-1 min-w-0">
-                  <Link
-                    to={tenantPath(`/ideation/${challenge.id}/ideas/${idea.id}`)}
-                    className="block"
-                  >
-                    <div className="flex items-start gap-2 mb-1">
-                      <h3 className="text-base font-semibold text-[var(--color-text)] hover:text-primary transition-colors">
-                        {idea.title}
-                      </h3>
-                      {idea.status !== 'submitted' && (
-                        <Chip
+            return (
+              <GlassCard key={idea.id} className="p-4">
+                <div className="flex items-start gap-4">
+                  {/* Vote Button */}
+                  <div className="flex flex-col items-center gap-0.5 min-w-[48px]">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleVote(idea.id);
+                      }}
+                      disabled={!isAuthenticated || votingIds.has(idea.id)}
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        idea.has_voted
+                          ? 'bg-primary/10 text-primary'
+                          : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)]'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      aria-label={idea.has_voted ? t('ideas.unvote') : t('ideas.vote')}
+                    >
+                      <ArrowBigUp
+                        className={`w-6 h-6 ${idea.has_voted ? 'fill-current' : ''}`}
+                      />
+                    </button>
+                    <span className={`text-sm font-semibold ${
+                      idea.has_voted ? 'text-primary' : 'text-[var(--color-text-secondary)]'
+                    }`}>
+                      {idea.votes_count}
+                    </span>
+                  </div>
+
+                  {/* Idea Content */}
+                  <div className="flex-1 min-w-0">
+                    <Link
+                      to={tenantPath(`/ideation/${challenge.id}/ideas/${idea.id}`)}
+                      className="block"
+                    >
+                      <div className="flex items-start gap-2 mb-1">
+                        <h3 className="text-base font-semibold text-[var(--color-text)] hover:text-primary transition-colors">
+                          {idea.title}
+                        </h3>
+                        {idea.status !== 'submitted' && (
+                          <Chip
+                            size="sm"
+                            color={IDEA_STATUS_COLOR_MAP[idea.status] ?? 'default'}
+                            variant="flat"
+                          >
+                            {t(`idea_status.${idea.status}`)}
+                          </Chip>
+                        )}
+                      </div>
+
+                      <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2 mb-2">
+                        {idea.description}
+                      </p>
+
+                      {/* Idea image thumbnail */}
+                      {idea.image_url && (
+                        <div className="mb-2">
+                          <img
+                            src={resolveAssetUrl(idea.image_url)}
+                            alt={t('idea_image')}
+                            className="w-24 h-24 object-cover rounded-lg"
+                          />
+                        </div>
+                      )}
+
+                      {/* Media gallery thumbnails (I2) */}
+                      {idea.media && idea.media.length > 0 && (
+                        <div className="flex gap-2 mb-2 flex-wrap">
+                          {idea.media.slice(0, 4).map((m) => {
+                            const MIcon = MEDIA_ICON_MAP[m.type] ?? LinkIcon;
+                            return m.type === 'image' ? (
+                              <img
+                                key={m.id}
+                                src={resolveAssetUrl(m.url)}
+                                alt={m.caption ?? ''}
+                                className="w-16 h-16 object-cover rounded-lg border border-[var(--color-border)]"
+                              />
+                            ) : (
+                              <div
+                                key={m.id}
+                                className="w-16 h-16 rounded-lg border border-[var(--color-border)] flex items-center justify-center bg-[var(--color-surface-hover)]"
+                              >
+                                <MIcon className="w-5 h-5 text-[var(--color-text-tertiary)]" />
+                              </div>
+                            );
+                          })}
+                          {idea.media.length > 4 && (
+                            <div className="w-16 h-16 rounded-lg border border-[var(--color-border)] flex items-center justify-center bg-[var(--color-surface-hover)]">
+                              <span className="text-xs text-[var(--color-text-tertiary)]">
+                                +{idea.media.length - 4}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </Link>
+
+                    <div className="flex items-center gap-3 text-xs text-[var(--color-text-tertiary)]">
+                      <span className="flex items-center gap-1">
+                        <Avatar
+                          src={resolveAvatarUrl(idea.creator.avatar_url)}
                           size="sm"
-                          color={IDEA_STATUS_COLOR_MAP[idea.status] ?? 'default'}
-                          variant="flat"
-                        >
-                          {t(`idea_status.${idea.status}`)}
-                        </Chip>
+                          className="w-4 h-4"
+                          name={idea.creator.name}
+                        />
+                        {idea.creator.name}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        {t('ideas.comments', { count: idea.comments_count })}
+                      </span>
+                      {MediaIconComponent && (
+                        <span className="flex items-center gap-1">
+                          <MediaIconComponent className="w-3.5 h-3.5" />
+                          {idea.media?.length}
+                        </span>
+                      )}
+                      <span>{formatRelativeTime(idea.created_at)}</span>
+
+                      {/* Create Group shortcut for shortlisted/winner ideas */}
+                      {(idea.status === 'shortlisted' || idea.status === 'winner') &&
+                        isAuthenticated &&
+                        (isAdmin || user?.id === idea.user_id) && (
+                        <Tooltip content={t('convert_to_group.title')}>
+                          <Button
+                            isIconOnly
+                            variant="light"
+                            size="sm"
+                            className="ml-auto min-w-6 w-6 h-6"
+                            onPress={() => navigate(tenantPath(`/ideation/${challenge.id}/ideas/${idea.id}`))}
+                            aria-label={t('convert_to_group.title')}
+                          >
+                            <Users className="w-3.5 h-3.5" />
+                          </Button>
+                        </Tooltip>
                       )}
                     </div>
-
-                    <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2 mb-2">
-                      {idea.description}
-                    </p>
-
-                    {/* Idea image thumbnail */}
-                    {idea.image_url && (
-                      <div className="mb-2">
-                        <img
-                          src={resolveAssetUrl(idea.image_url)}
-                          alt={t('idea_image')}
-                          className="w-24 h-24 object-cover rounded-lg"
-                        />
-                      </div>
-                    )}
-                  </Link>
-
-                  <div className="flex items-center gap-3 text-xs text-[var(--color-text-tertiary)]">
-                    <span className="flex items-center gap-1">
-                      <Avatar
-                        src={resolveAvatarUrl(idea.creator.avatar_url)}
-                        size="sm"
-                        className="w-4 h-4"
-                        name={idea.creator.name}
-                      />
-                      {idea.creator.name}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      {t('ideas.comments', { count: idea.comments_count })}
-                    </span>
-                    <span>{formatRelativeTime(idea.created_at)}</span>
-
-                    {/* Create Group shortcut for shortlisted/winner ideas */}
-                    {(idea.status === 'shortlisted' || idea.status === 'winner') &&
-                      isAuthenticated &&
-                      (isAdmin || user?.id === idea.user_id) && (
-                      <Tooltip content={t('convert_to_group.title')}>
-                        <Button
-                          isIconOnly
-                          variant="light"
-                          size="sm"
-                          className="ml-auto min-w-6 w-6 h-6"
-                          onPress={() => navigate(tenantPath(`/ideation/${challenge.id}/ideas/${idea.id}`))}
-                          aria-label={t('convert_to_group.title')}
-                        >
-                          <Users className="w-3.5 h-3.5" />
-                        </Button>
-                      </Tooltip>
-                    )}
                   </div>
                 </div>
-              </div>
-            </GlassCard>
-          ))}
+              </GlassCard>
+            );
+          })}
 
           {/* Load More Ideas */}
           {hasMore && (
@@ -841,7 +1148,7 @@ export function ChallengeDetailPage() {
         </div>
       )}
 
-      {/* Submit Idea Modal */}
+      {/* Submit Idea Modal (I2 - with media attachment) */}
       <Modal isOpen={isSubmitOpen} onClose={onSubmitClose} size="lg">
         <ModalContent>
           <ModalHeader>{t('ideas.submit_title')}</ModalHeader>
@@ -863,6 +1170,46 @@ export function ChallengeDetailPage() {
               minRows={4}
               isRequired
             />
+
+            {/* Media Attachment (I2) */}
+            <div className="border border-[var(--color-border)] rounded-lg p-3 space-y-3">
+              <p className="text-sm font-medium text-[var(--color-text)]">
+                {t('media.add')} <span className="text-[var(--color-text-tertiary)] font-normal">({t('media.caption_placeholder')})</span>
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Select
+                  size="sm"
+                  label={t('media.type_label')}
+                  selectedKeys={[newIdeaMediaType]}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0];
+                    if (selected) setNewIdeaMediaType(String(selected));
+                  }}
+                  variant="bordered"
+                >
+                  <SelectItem key="image">{t('media.type_image')}</SelectItem>
+                  <SelectItem key="video">{t('media.type_video')}</SelectItem>
+                  <SelectItem key="document">{t('media.type_document')}</SelectItem>
+                  <SelectItem key="link">{t('media.type_link')}</SelectItem>
+                </Select>
+                <Input
+                  size="sm"
+                  label={t('media.url_label')}
+                  placeholder={t('media.url_placeholder')}
+                  value={newIdeaMediaUrl}
+                  onValueChange={setNewIdeaMediaUrl}
+                  variant="bordered"
+                />
+              </div>
+              <Input
+                size="sm"
+                label={t('media.caption_label')}
+                placeholder={t('media.caption_placeholder')}
+                value={newIdeaMediaCaption}
+                onValueChange={setNewIdeaMediaCaption}
+                variant="bordered"
+              />
+            </div>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onSubmitClose}>
@@ -899,6 +1246,122 @@ export function ChallengeDetailPage() {
               onPress={handleDeleteChallenge}
             >
               {t('admin.delete_challenge')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Outcome Editor Modal (I10) */}
+      <Modal isOpen={isOutcomeOpen} onClose={onOutcomeClose} size="lg">
+        <ModalContent>
+          <ModalHeader>{t('outcomes.title')}</ModalHeader>
+          <ModalBody>
+            {/* Winning idea selector */}
+            {ideas.length > 0 && (
+              <Select
+                label={t('outcomes.winning_idea')}
+                selectedKeys={outcomeForm.winning_idea_id ? new Set([outcomeForm.winning_idea_id]) : new Set<string>()}
+                onSelectionChange={(keys) => {
+                  if (keys === 'all') return;
+                  const selected = Array.from(keys)[0];
+                  setOutcomeForm(prev => ({
+                    ...prev,
+                    winning_idea_id: selected ? String(selected) : '',
+                  }));
+                }}
+                variant="bordered"
+              >
+                {ideas.map((idea) => (
+                  <SelectItem key={String(idea.id)}>
+                    {idea.title}
+                  </SelectItem>
+                ))}
+              </Select>
+            )}
+
+            <Select
+              label="Implementation Status"
+              selectedKeys={[outcomeForm.implementation_status]}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0];
+                if (selected) {
+                  setOutcomeForm(prev => ({
+                    ...prev,
+                    implementation_status: String(selected),
+                  }));
+                }
+              }}
+              variant="bordered"
+            >
+              <SelectItem key="not_started">{t('outcomes.status_not_started')}</SelectItem>
+              <SelectItem key="in_progress">{t('outcomes.status_in_progress')}</SelectItem>
+              <SelectItem key="implemented">{t('outcomes.status_implemented')}</SelectItem>
+              <SelectItem key="abandoned">{t('outcomes.status_abandoned')}</SelectItem>
+            </Select>
+
+            <Textarea
+              label={t('outcomes.impact_description')}
+              placeholder={t('outcomes.impact_placeholder')}
+              value={outcomeForm.impact_description}
+              onValueChange={(val) => setOutcomeForm(prev => ({ ...prev, impact_description: val }))}
+              variant="bordered"
+              minRows={3}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onOutcomeClose}>
+              {t('form.cancel')}
+            </Button>
+            <Button
+              color="primary"
+              isLoading={isSavingOutcome}
+              onPress={handleSaveOutcome}
+            >
+              {isSavingOutcome ? t('outcomes.saving') : t('outcomes.save')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Link to Campaign Modal (I7) */}
+      <Modal isOpen={isCampaignOpen} onClose={onCampaignClose}>
+        <ModalContent>
+          <ModalHeader>{t('campaigns.link_challenge')}</ModalHeader>
+          <ModalBody>
+            {campaigns.length === 0 ? (
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                {t('campaigns.empty_description')}
+              </p>
+            ) : (
+              <Select
+                label={t('campaigns.title')}
+                selectedKeys={selectedCampaignId ? new Set([selectedCampaignId]) : new Set<string>()}
+                onSelectionChange={(keys) => {
+                  if (keys === 'all') return;
+                  const selected = Array.from(keys)[0];
+                  setSelectedCampaignId(selected ? String(selected) : '');
+                }}
+                variant="bordered"
+              >
+                {campaigns.map((c) => (
+                  <SelectItem key={String(c.id)}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </Select>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onCampaignClose}>
+              {t('form.cancel')}
+            </Button>
+            <Button
+              color="primary"
+              isLoading={isLinkingCampaign}
+              isDisabled={!selectedCampaignId}
+              onPress={handleLinkCampaign}
+            >
+              {t('campaigns.link_challenge')}
             </Button>
           </ModalFooter>
         </ModalContent>

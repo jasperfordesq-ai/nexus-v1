@@ -116,6 +116,9 @@ const IdeationPage = lazyWithRetry(() => import('@/pages/ideation/IdeationPage')
 const ChallengeDetailPage = lazyWithRetry(() => import('@/pages/ideation/ChallengeDetailPage'));
 const IdeaDetailPage = lazyWithRetry(() => import('@/pages/ideation/IdeaDetailPage'));
 const CreateChallengePage = lazyWithRetry(() => import('@/pages/ideation/CreateChallengePage'));
+const CampaignsPage = lazyWithRetry(() => import('@/pages/ideation/CampaignsPage'));
+const CampaignDetailPage = lazyWithRetry(() => import('@/pages/ideation/CampaignDetailPage'));
+const OutcomesDashboardPage = lazyWithRetry(() => import('@/pages/ideation/OutcomesDashboardPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
 const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
@@ -123,6 +126,8 @@ const FeedPage = lazyWithRetry(() => import('@/pages/feed/FeedPage'));
 const BlogPage = lazyWithRetry(() => import('@/pages/blog/BlogPage'));
 const BlogPostPage = lazyWithRetry(() => import('@/pages/blog/BlogPostPage'));
 const ResourcesPage = lazyWithRetry(() => import('@/pages/resources/ResourcesPage'));
+const KnowledgeBasePage = lazyWithRetry(() => import('@/pages/kb/KnowledgeBasePage'));
+const KBArticlePage = lazyWithRetry(() => import('@/pages/kb/KBArticlePage'));
 const FederationHubPage = lazyWithRetry(() => import('@/pages/federation/FederationHubPage'));
 const FederationPartnersPage = lazyWithRetry(() => import('@/pages/federation/FederationPartnersPage'));
 const FederationPartnerDetailPage = lazyWithRetry(() => import('@/pages/federation/FederationPartnerDetailPage'));
@@ -137,10 +142,14 @@ const OnboardingPage = lazyWithRetry(() => import('@/pages/onboarding/Onboarding
 const GroupExchangesPage = lazyWithRetry(() => import('@/pages/group-exchanges/GroupExchangesPage'));
 const CreateGroupExchangePage = lazyWithRetry(() => import('@/pages/group-exchanges/CreateGroupExchangePage'));
 const GroupExchangeDetailPage = lazyWithRetry(() => import('@/pages/group-exchanges/GroupExchangeDetailPage'));
-const MatchesRedirectPage = lazyWithRetry(() => import('@/pages/matches/MatchesRedirectPage'));
+const MatchesPage = lazyWithRetry(() => import('@/pages/matches/MatchesPage'));
 const NewsletterUnsubscribePage = lazyWithRetry(() => import('@/pages/newsletter/NewsletterUnsubscribePage'));
 const AiChatPage = lazyWithRetry(() => import('@/pages/chat/AiChatPage'));
 const ConnectionsPage = lazyWithRetry(() => import('@/pages/connections/ConnectionsPage'));
+const SkillsBrowsePage = lazyWithRetry(() => import('@/pages/skills/SkillsBrowsePage'));
+const ActivityDashboardPage = lazyWithRetry(() => import('@/pages/activity/ActivityDashboardPage'));
+const HashtagPage = lazyWithRetry(() => import('@/pages/feed/HashtagPage'));
+const HashtagsDiscoveryPage = lazyWithRetry(() => import('@/pages/feed/HashtagsDiscoveryPage'));
 
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
@@ -230,8 +239,8 @@ function AppRoutes() {
         {/* Newsletter unsubscribe — public, no auth, token-based */}
         <Route path="newsletter/unsubscribe" element={<NewsletterUnsubscribePage />} />
 
-        {/* Matches redirect — /matches email links redirect to /listings */}
-        <Route path="matches" element={<MatchesRedirectPage />} />
+        {/* Matches — cross-module matches page (MA1) */}
+        <Route path="matches" element={<MatchesPage />} />
         <Route path="matches/preferences" element={<Navigate to="settings" replace />} />
 
         {/* Tenant 2 (hOUR Timebank) specific pages — redirect other tenants to /about */}
@@ -399,6 +408,20 @@ function AppRoutes() {
                 <ConnectionsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
+          } />
+
+          {/* Skills Browse */}
+          <Route path="skills" element={
+            <FeatureErrorBoundary featureName="Skills">
+              <SkillsBrowsePage />
+            </FeatureErrorBoundary>
+          } />
+
+          {/* Activity Dashboard */}
+          <Route path="activity" element={
+            <FeatureErrorBoundary featureName="Activity Dashboard">
+              <ActivityDashboardPage />
+            </FeatureErrorBoundary>
           } />
 
           {/* Feature-gated: AI Chat */}
@@ -584,6 +607,27 @@ function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
+          <Route path="ideation/campaigns" element={
+            <FeatureGate feature="ideation_challenges" redirect="/">
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <CampaignsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="ideation/campaigns/:id" element={
+            <FeatureGate feature="ideation_challenges" redirect="/">
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <CampaignDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="ideation/outcomes" element={
+            <FeatureGate feature="ideation_challenges" redirect="/">
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <OutcomesDashboardPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
 
           {/* Feature-gated: Volunteering */}
           <Route path="volunteering" element={
@@ -616,12 +660,42 @@ function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
+          <Route path="feed/hashtag/:tag" element={
+            <FeatureGate module="feed" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Feed">
+                <HashtagPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="feed/hashtags" element={
+            <FeatureGate module="feed" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Feed">
+                <HashtagsDiscoveryPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
 
           {/* Feature-gated: Resources */}
           <Route path="resources" element={
             <FeatureGate feature="resources" fallback={<ComingSoonPage feature="Resources" />}>
               <FeatureErrorBoundary featureName="Resources">
                 <ResourcesPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Feature-gated: Knowledge Base (R4) */}
+          <Route path="kb" element={
+            <FeatureGate feature="resources" fallback={<ComingSoonPage feature="Knowledge Base" />}>
+              <FeatureErrorBoundary featureName="Knowledge Base">
+                <KnowledgeBasePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="kb/:id" element={
+            <FeatureGate feature="resources" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Knowledge Base">
+                <KBArticlePage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
