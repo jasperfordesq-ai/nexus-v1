@@ -151,6 +151,35 @@
     "error_generic": "Something went wrong. Please try again."
   },
 
+  "favorites": {
+    "add": "Add to favorites",
+    "remove": "Remove from favorites"
+  },
+
+  "views": "views",
+
+  "featured": "Featured",
+
+  "tags": {
+    "label": "Tags",
+    "placeholder": "Add tags (press Enter)",
+    "helper": "Add skills or topics relevant to this challenge"
+  },
+
+  "cover_image": {
+    "label": "Cover Image URL",
+    "placeholder": "https://example.com/image.jpg",
+    "helper": "Banner image for the challenge (recommended 600x400)"
+  },
+
+  "duplicate": {
+    "button": "Duplicate Challenge",
+    "success": "Challenge duplicated successfully",
+    "error": "Failed to duplicate challenge"
+  },
+
+  "idea_image": "Idea image",
+
   "validation": {
     "title_required": "Title is required",
     "description_required": "Description is required",
