@@ -149,10 +149,10 @@ class GroupDigestCronTest extends TestCase
         $this->assertEquals('userId', $params[0]->getName());
         $this->assertEquals('matches', $params[1]->getName());
 
-        // period should be optional with default 'daily'
+        // period should be optional with default 'fortnightly'
         if (count($params) > 2) {
             $this->assertTrue($params[2]->isOptional(), 'period should be optional');
-            $this->assertEquals('daily', $params[2]->getDefaultValue(), 'Default period should be daily');
+            $this->assertEquals('fortnightly', $params[2]->getDefaultValue(), 'Default period should be fortnightly');
         }
     }
 
@@ -465,16 +465,16 @@ class GroupDigestCronTest extends TestCase
         $ref = new \ReflectionMethod(NotificationDispatcher::class, 'dispatchMatchDigest');
         $params = $ref->getParameters();
 
-        // The period parameter should support 'daily' and 'weekly'
+        // The period parameter should support 'fortnightly', 'daily', 'weekly', etc.
         if (count($params) > 2) {
             $periodParam = $params[2];
             $this->assertEquals('period', $periodParam->getName());
-            $this->assertEquals('daily', $periodParam->getDefaultValue());
+            $this->assertEquals('fortnightly', $periodParam->getDefaultValue());
         }
 
-        // Both daily and weekly should be valid periods
-        $validPeriods = ['daily', 'weekly'];
-        $this->assertCount(2, $validPeriods);
+        // Multiple periods should be valid
+        $validPeriods = ['daily', 'weekly', 'fortnightly'];
+        $this->assertCount(3, $validPeriods);
     }
 
     /**

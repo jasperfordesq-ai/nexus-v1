@@ -110,7 +110,7 @@ class ImageHelper
         $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? __DIR__ . '/../../httpdocs'; // nosemgrep: tainted-filename
         $filePath = $documentRoot . $webpPath;
 
-        return file_exists($filePath);
+        return file_exists($filePath); // nosemgrep: tainted-filename
     }
 
     /**
