@@ -180,6 +180,21 @@
 
   "idea_image": "Idea image",
 
+  "convert_to_group": {
+    "button": "Create Group",
+    "title": "Create Group from Idea",
+    "description": "Convert this winning idea into an action group where members can collaborate to bring it to life.",
+    "name_label": "Group Name",
+    "description_label": "Group Description",
+    "visibility_label": "Visibility",
+    "visibility_public": "Public",
+    "visibility_private": "Private",
+    "confirm": "Create Group",
+    "creating": "Creating...",
+    "success": "Group created successfully! Redirecting...",
+    "error": "Failed to create group"
+  },
+
   "validation": {
     "title_required": "Title is required",
     "description_required": "Description is required",

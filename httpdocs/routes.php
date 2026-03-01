@@ -486,6 +486,7 @@ $router->add('GET', '/api/v2/ideation-challenges/{id}/ideas', 'Nexus\Controllers
 $router->add('POST', '/api/v2/ideation-challenges/{id}/ideas', 'Nexus\Controllers\Api\IdeationChallengesApiController@submitIdea');
 $router->add('POST', '/api/v2/ideation-challenges/{id}/favorite', 'Nexus\Controllers\Api\IdeationChallengesApiController@toggleFavorite');
 $router->add('POST', '/api/v2/ideation-challenges/{id}/duplicate', 'Nexus\Controllers\Api\IdeationChallengesApiController@duplicate');
+$router->add('POST', '/api/v2/ideation-ideas/{id}/convert-to-group', 'Nexus\Controllers\Api\IdeationChallengesApiController@convertToGroup');
 
 // ============================================
 // API V2 - GOALS (Full CRUD + Progress Tracking)

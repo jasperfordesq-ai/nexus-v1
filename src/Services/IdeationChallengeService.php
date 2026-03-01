@@ -9,6 +9,7 @@ namespace Nexus\Services;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
+use Nexus\Services\GroupService;
 
 /**
  * IdeationChallengeService - Business logic for ideation challenges
@@ -1390,5 +1391,95 @@ class IdeationChallengeService
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to delete comment');
             return false;
         }
+    }
+
+    // ============================================
+    // IDEA → GROUP CONVERSION
+    // ============================================
+
+    /**
+     * Convert a shortlisted or winning idea into a Group
+     *
+     * Creates a new group from the idea's title and description,
+     * then links it back via source_idea_id / source_challenge_id.
+     *
+     * @return array|null Group data on success, null on failure
+     */
+    public static function convertIdeaToGroup(int $ideaId, int $userId): ?array
+    {
+        self::clearErrors();
+
+        // 1. Get the idea
+        $idea = self::getIdeaById($ideaId, $userId);
+
+        if (!$idea) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Idea not found');
+            return null;
+        }
+
+        // 2. Validate idea status
+        $status = $idea['status'] ?? '';
+        if (!in_array($status, ['shortlisted', 'winner'], true)) {
+            self::addError(
+                ApiErrorCodes::VALIDATION_INVALID_VALUE,
+                'Only shortlisted or winning ideas can be converted to groups'
+            );
+            return null;
+        }
+
+        // 3. Check permissions: must be admin or idea creator
+        $isAdmin = self::isAdmin($userId);
+        $isCreator = (int)($idea['creator']['id'] ?? 0) === $userId;
+
+        if (!$isAdmin && !$isCreator) {
+            self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Only admins or the idea creator can convert an idea to a group');
+            return null;
+        }
+
+        // 4. Get challenge title for the group description
+        $tenantId = TenantContext::getId();
+        $challengeId = (int)($idea['challenge_id'] ?? 0);
+
+        $challenge = Database::query(
+            "SELECT title FROM ideation_challenges WHERE id = ? AND tenant_id = ?",
+            [$challengeId, $tenantId]
+        )->fetch();
+
+        $challengeTitle = $challenge['title'] ?? 'Unknown Challenge';
+
+        // 5. Create the group via GroupService
+        $description = ($idea['description'] ?? '') . "\n\n---\nCreated from idea in challenge: {$challengeTitle}";
+
+        $groupId = GroupService::create($userId, [
+            'name' => $idea['title'] ?? 'Untitled Idea',
+            'description' => $description,
+            'visibility' => 'public',
+        ]);
+
+        if ($groupId === null) {
+            // Propagate GroupService errors
+            $groupErrors = GroupService::getErrors();
+            foreach ($groupErrors as $err) {
+                self::addError(
+                    $err['code'] ?? ApiErrorCodes::SERVER_INTERNAL_ERROR,
+                    $err['message'] ?? 'Failed to create group'
+                );
+            }
+            return null;
+        }
+
+        // 6. Link the group back to the source idea and challenge
+        try {
+            Database::query(
+                "UPDATE `groups` SET source_idea_id = ?, source_challenge_id = ? WHERE id = ? AND tenant_id = ?",
+                [$ideaId, $challengeId, $groupId, $tenantId]
+            );
+        } catch (\Throwable $e) {
+            error_log("Failed to set source columns on group {$groupId}: " . $e->getMessage());
+            // Non-fatal — the group was already created successfully
+        }
+
+        // 7. Return the full group data
+        return GroupService::getById($groupId, $userId);
     }
 }
