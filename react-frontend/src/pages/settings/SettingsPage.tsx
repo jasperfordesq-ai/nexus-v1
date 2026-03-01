@@ -220,7 +220,7 @@ export function SettingsPage() {
   });
 
   // Match digest frequency & preferences
-  const [matchDigestFrequency, setMatchDigestFrequency] = useState<string>('daily');
+  const [matchDigestFrequency, setMatchDigestFrequency] = useState<string>('fortnightly');
   const [notifyHotMatches, setNotifyHotMatches] = useState(true);
   const [notifyMutualMatches, setNotifyMutualMatches] = useState(true);
 
@@ -293,7 +293,7 @@ export function SettingsPage() {
     try {
       const response = await api.get<{ notification_frequency: string; notify_hot_matches: boolean; notify_mutual_matches: boolean }>('/v2/users/me/match-preferences');
       if (response.success && response.data) {
-        setMatchDigestFrequency(response.data.notification_frequency || 'daily');
+        setMatchDigestFrequency(response.data.notification_frequency || 'fortnightly');
         setNotifyHotMatches(response.data.notify_hot_matches ?? true);
         setNotifyMutualMatches(response.data.notify_mutual_matches ?? true);
       }
@@ -1287,6 +1287,7 @@ export function SettingsPage() {
                       >
                         <SelectItem key="daily">Daily</SelectItem>
                         <SelectItem key="weekly">Weekly</SelectItem>
+                        <SelectItem key="fortnightly">Fortnightly</SelectItem>
                         <SelectItem key="never">Never</SelectItem>
                       </Select>
                     </div>

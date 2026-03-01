@@ -183,7 +183,7 @@ class NotificationDispatcher
             return; // User disabled hot match notifications
         }
 
-        $frequency = $prefs['notification_frequency'] ?? 'daily';
+        $frequency = $prefs['notification_frequency'] ?? 'fortnightly';
         if ($frequency === 'never') {
             return;
         }
@@ -222,7 +222,7 @@ class NotificationDispatcher
             return; // User disabled mutual match notifications
         }
 
-        $frequency = $prefs['notification_frequency'] ?? 'daily';
+        $frequency = $prefs['notification_frequency'] ?? 'fortnightly';
         if ($frequency === 'never') {
             return;
         }
@@ -245,7 +245,7 @@ class NotificationDispatcher
      * @param array $matches Array of new matches
      * @param string $period 'daily' or 'weekly'
      */
-    public static function dispatchMatchDigest($userId, $matches, $period = 'daily')
+    public static function dispatchMatchDigest($userId, $matches, $period = 'fortnightly')
     {
         if (empty($matches)) {
             return;

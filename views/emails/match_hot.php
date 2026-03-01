@@ -27,8 +27,8 @@ $borderColor = '#fed7aa';
 
 $tenantName = $tenantName ?? 'Community';
 $userName = $userName ?? 'there';
-$appUrl = rtrim(Env::get('APP_URL') ?? '', '/');
-$basePath = TenantContext::getBasePath();
+$appUrl = TenantContext::getFrontendUrl();
+$basePath = TenantContext::getSlugPrefix();
 $year = date('Y');
 
 $listingUrl = $appUrl . $basePath . '/listings/' . ($match['listing_id'] ?? $match['id'] ?? 0);

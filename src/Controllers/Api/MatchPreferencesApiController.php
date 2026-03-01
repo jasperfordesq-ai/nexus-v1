@@ -33,7 +33,7 @@ class MatchPreferencesApiController extends BaseApiController
     /**
      * PUT /api/v2/users/me/match-preferences
      *
-     * Accepts: { notification_frequency: "daily"|"weekly"|"never" }
+     * Accepts: { notification_frequency: "daily"|"weekly"|"fortnightly"|"never" }
      */
     public function update(): void
     {
@@ -45,9 +45,9 @@ class MatchPreferencesApiController extends BaseApiController
         // Only update fields that were provided
         $updated = $current;
         if (isset($input['notification_frequency'])) {
-            $allowed = ['daily', 'weekly', 'never'];
+            $allowed = ['daily', 'weekly', 'fortnightly', 'never'];
             if (!in_array($input['notification_frequency'], $allowed, true)) {
-                $this->respondWithError('VALIDATION_ERROR', 'Invalid frequency. Must be: daily, weekly, or never', 'notification_frequency');
+                $this->respondWithError('VALIDATION_ERROR', 'Invalid frequency. Must be: daily, weekly, fortnightly, or never', 'notification_frequency');
                 return;
             }
             $updated['notification_frequency'] = $input['notification_frequency'];

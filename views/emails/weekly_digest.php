@@ -25,8 +25,8 @@ $bgColor = '#f3f4f6';
 $cardBg = '#ffffff';
 
 $tenantName = $tenantName ?? 'Community';
-$appUrl = rtrim(Env::get('APP_URL') ?? '', '/');
-$basePath = TenantContext::getBasePath();
+$appUrl = TenantContext::getFrontendUrl();
+$basePath = TenantContext::getSlugPrefix();
 $year = date('Y');
 
 $unsubscribeUrl = !empty($unsubscribeToken)

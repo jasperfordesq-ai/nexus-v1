@@ -369,7 +369,7 @@ class CronController
         foreach ($items as $item) {
             $date = date('M j, g:i a', strtotime($item['created_at']));
             $snippet = htmlspecialchars($item['content_snippet']);
-            $link = $item['link'] ? TenantContext::getFrontendUrl() . $item['link'] : '#';
+            $link = $item['link'] ? TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $item['link'] : '#';
 
             $listHtml .= "
             <div style='margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;'>
@@ -784,6 +784,13 @@ class CronController
                 $taskNum++;
                 echo "\n[{$taskNum}] Match digest daily...\n";
                 $this->matchDigestInternal('daily');
+
+                // Fortnightly digest: runs every other Monday (weeks where ISO week number is even)
+                if ($dayOfWeek === 1 && (int)date('W') % 2 === 0) {
+                    $taskNum++;
+                    echo "\n[{$taskNum}] Match digest fortnightly...\n";
+                    $this->matchDigestInternal('fortnightly');
+                }
             }
 
             // ── WEEKLY ──
@@ -1060,7 +1067,7 @@ class CronController
                 AND u.id IN (SELECT DISTINCT user_id FROM listings WHERE status = 'active')
                 AND (
                     (mp.notification_frequency = ? AND mp.notification_frequency IS NOT NULL)
-                    OR (mp.notification_frequency IS NULL AND ? = 'daily')
+                    OR (mp.notification_frequency IS NULL AND ? = 'fortnightly')
                 )";
 
         try {
@@ -1083,8 +1090,13 @@ class CronController
 
         foreach ($users as $user) {
             try {
-                // Get fresh matches for this user (created in last 24h for daily, 7d for weekly)
-                $lookbackHours = $frequency === 'daily' ? 24 : 168;
+                // Get fresh matches for this user (24h daily, 7d weekly, 14d fortnightly)
+                $lookbackHours = match ($frequency) {
+                    'daily' => 24,
+                    'weekly' => 168,
+                    'fortnightly' => 336,
+                    default => 24,
+                };
 
                 $matches = MatchingService::getSuggestionsForUser($user['id'], 20, [
                     'created_after' => date('Y-m-d H:i:s', strtotime("-{$lookbackHours} hours"))
@@ -1771,7 +1783,12 @@ class CronController
     {
         try {
             $totalSent = 0;
-            $lookbackHours = $frequency === 'daily' ? 24 : 168;
+            $lookbackHours = match ($frequency) {
+                'daily' => 24,
+                'weekly' => 168,
+                'fortnightly' => 336,
+                default => 24,
+            };
 
             $this->forEachTenant(function ($tenantId, $slug) use ($frequency, $lookbackHours, &$totalSent) {
                 $sql = "SELECT DISTINCT u.id, u.name
@@ -1781,7 +1798,7 @@ class CronController
                         AND u.id IN (SELECT DISTINCT user_id FROM listings WHERE status = 'active')
                         AND (
                             (mp.notification_frequency = ? AND mp.notification_frequency IS NOT NULL)
-                            OR (mp.notification_frequency IS NULL AND ? = 'daily')
+                            OR (mp.notification_frequency IS NULL AND ? = 'fortnightly')
                         )
                         LIMIT 100";
 

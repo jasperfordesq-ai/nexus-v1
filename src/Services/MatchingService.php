@@ -110,7 +110,7 @@ class MatchingService
 
         $maxDistance = (int)($preferences['max_distance_km'] ?? 25);
         $minScore = (int)($preferences['min_match_score'] ?? 50);
-        $frequency = $preferences['notification_frequency'] ?? 'daily';
+        $frequency = $preferences['notification_frequency'] ?? 'fortnightly';
         $notifyHot = isset($preferences['notify_hot_matches']) ? 1 : 0;
         $notifyMutual = isset($preferences['notify_mutual_matches']) ? 1 : 0;
         $categories = !empty($preferences['categories']) ? json_encode($preferences['categories']) : null;
@@ -151,7 +151,7 @@ class MatchingService
         $defaults = [
             'max_distance_km' => 25,
             'min_match_score' => 50,
-            'notification_frequency' => 'daily',
+            'notification_frequency' => 'fortnightly',
             'notify_hot_matches' => true,
             'notify_mutual_matches' => true,
             'categories' => [],
