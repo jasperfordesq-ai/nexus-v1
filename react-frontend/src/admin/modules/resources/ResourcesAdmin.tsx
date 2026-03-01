@@ -13,7 +13,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Tabs, Tab, Chip, Button } from '@heroui/react';
 import { BookOpen, Eye, Trash2, ThumbsUp } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
 
@@ -53,6 +53,7 @@ const PAGE_SIZE = 50;
 export function ResourcesAdmin() {
   usePageTitle('Admin - Resources');
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   const [items, setItems] = useState<Resource[]>([]);
   const [total, setTotal] = useState(0);
@@ -199,7 +200,7 @@ export function ResourcesAdmin() {
             variant="flat"
             color="primary"
             as="a"
-            href={`/resources/${item.id}`}
+            href={tenantPath(`/resources/${item.id}`)}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="View resource"

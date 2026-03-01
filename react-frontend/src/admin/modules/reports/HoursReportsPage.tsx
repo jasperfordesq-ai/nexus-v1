@@ -63,6 +63,7 @@ import {
   ArrowLeftRight,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { StatCard, PageHeader } from '../../components';
 
@@ -160,8 +161,9 @@ async function exportCsv(exportType: string, dateFrom?: string, dateTo?: string)
 
 export function HoursReportsPage() {
   usePageTitle('Hours Reports');
+  const toast = useToast();
 
-  const [groupBy, setGroupBy] = useState('summary');
+  const [groupBy, setGroupBy] = useState('category');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>(null);
   const [summary, setSummary] = useState<HoursSummary | null>(null);
@@ -182,9 +184,9 @@ export function HoursReportsPage() {
         setSummary(res.data as HoursSummary);
       }
     } catch {
-      // Silently handle
+      toast.error('Failed to load summary data');
     }
-  }, [dateFrom, dateTo]);
+  }, [dateFrom, dateTo, toast]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -198,11 +200,11 @@ export function HoursReportsPage() {
         setData(res.data);
       }
     } catch {
-      // Silently handle
+      toast.error('Failed to load report data');
     } finally {
       setLoading(false);
     }
-  }, [groupBy, dateFrom, dateTo, sortBy, page]);
+  }, [groupBy, dateFrom, dateTo, sortBy, page, toast]);
 
   useEffect(() => {
     loadSummary();
@@ -501,7 +503,9 @@ export function HoursReportsPage() {
             <Button
               variant="flat"
               startContent={<Download size={16} />}
-              onPress={() => exportCsv(groupBy, dateFrom, dateTo)}
+              onPress={async () => {
+                try { await exportCsv(groupBy, dateFrom, dateTo); } catch { toast.error('Failed to export CSV'); }
+              }}
               size="sm"
             >
               Export CSV
@@ -536,8 +540,6 @@ export function HoursReportsPage() {
       {groupBy === 'category' && renderCategory()}
       {groupBy === 'member' && renderMember()}
       {groupBy === 'period' && renderPeriod()}
-      {/* summary tab just shows the stat cards above, no additional content */}
-      {groupBy === 'summary' && renderCategory()}
     </div>
   );
 }

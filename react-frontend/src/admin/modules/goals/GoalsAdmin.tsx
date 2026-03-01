@@ -29,7 +29,7 @@ import {
 } from '@heroui/react';
 import { Target, Search, RefreshCw, Trash2, Eye } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, ConfirmModal } from '../../components';
 
@@ -73,6 +73,7 @@ const statusColors: Record<string, 'primary' | 'success' | 'danger'> = {
 export function GoalsAdmin() {
   usePageTitle('Admin - Goals');
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   const [goals, setGoals] = useState<Goal[]>([]);
   const [meta, setMeta] = useState<GoalsMeta>({ page: 1, per_page: 50, total: 0, total_pages: 1 });
@@ -105,7 +106,7 @@ export function GoalsAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }, [page, search, toast]);
 
   useEffect(() => {
     loadGoals();
@@ -284,7 +285,7 @@ export function GoalsAdmin() {
                           variant="flat"
                           color="primary"
                           aria-label="View goal"
-                          onPress={() => window.open(`/goals/${goal.id}`, '_blank')}
+                          onPress={() => window.open(tenantPath(`/goals/${goal.id}`), '_blank')}
                         >
                           <Eye size={14} />
                         </Button>
