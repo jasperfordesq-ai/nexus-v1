@@ -270,10 +270,16 @@ export function FederationMessagesPage() {
 
         // Try to fetch the user info to fill in the name
         api
-          .get<FederatedMemberResult>(`/v2/federation/members/${toUser}?tenant_id=${toTenant}`)
+          .get<FederatedMemberResult & { timebank?: { id: number; name: string } }>(`/v2/federation/members/${toUser}?tenant_id=${toTenant}`)
           .then((res) => {
             if (res.success && res.data) {
-              setSelectedRecipient(res.data);
+              // Normalize: API may return tenant info under timebank instead of tenant_id
+              const d = res.data;
+              setSelectedRecipient({
+                ...d,
+                tenant_id: d.tenant_id ?? d.timebank?.id ?? parseInt(toTenant!, 10),
+                tenant_name: d.tenant_name ?? d.timebank?.name ?? '',
+              });
             }
           })
           .catch(() => {
@@ -386,8 +392,15 @@ export function FederationMessagesPage() {
           `/v2/federation/members?q=${encodeURIComponent(composeRecipientQuery)}&limit=10`
         );
         if (response.success && response.data) {
+          // Normalize member data: API may return tenant info as timebank.id/timebank.name
+          // instead of tenant_id/tenant_name — map both formats for compatibility
+          const normalized = (response.data as (FederatedMemberResult & { timebank?: { id: number; name: string } })[]).map((m) => ({
+            ...m,
+            tenant_id: m.tenant_id ?? m.timebank?.id ?? 0,
+            tenant_name: m.tenant_name ?? m.timebank?.name ?? '',
+          }));
           // Filter out current user
-          setComposeRecipientResults(response.data.filter((m) => m.id !== user?.id));
+          setComposeRecipientResults(normalized.filter((m) => m.id !== user?.id));
         }
       } catch (err) {
         logError('Failed to search federated members', err);
@@ -401,7 +414,7 @@ export function FederationMessagesPage() {
 
   // ── Send compose message ──
   const sendComposeMessage = useCallback(async () => {
-    if (!selectedRecipient || !composeSubject.trim() || !composeBody.trim() || isComposeSending) return;
+    if (!selectedRecipient || !selectedRecipient.tenant_id || !composeSubject.trim() || !composeBody.trim() || isComposeSending) return;
 
     try {
       setIsComposeSending(true);
@@ -1003,7 +1016,7 @@ export function FederationMessagesPage() {
               startContent={<Send className="w-4 h-4" aria-hidden="true" />}
               onPress={sendComposeMessage}
               isLoading={isComposeSending}
-              isDisabled={!selectedRecipient || !composeSubject.trim() || !composeBody.trim()}
+              isDisabled={!selectedRecipient || !selectedRecipient.tenant_id || !composeSubject.trim() || !composeBody.trim()}
             >
               {t('messages.send_message')}
             </Button>
