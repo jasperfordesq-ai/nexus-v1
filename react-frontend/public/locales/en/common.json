@@ -35,7 +35,10 @@
     "impact_report": "Impact Report",
     "strategic_plan": "Strategic Plan",
     "home": "Home",
-    "leaderboard": "Leaderboard"
+    "leaderboard": "Leaderboard",
+    "polls": "Polls",
+    "jobs": "Jobs",
+    "ideation": "Ideation"
   },
   "user_menu": {
     "my_profile": "My Profile",

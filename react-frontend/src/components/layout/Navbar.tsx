@@ -62,6 +62,8 @@ import {
   BarChart3,
   Compass,
   Bot,
+  Briefcase,
+  Lightbulb,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
@@ -294,6 +296,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.volunteering'), href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
     { label: t('nav.organisations'), href: tenantPath('/organisations'), icon: Building2, feature: 'organisations' as const },
     { label: t('nav.resources'), href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
+    { label: t('nav.polls'), href: tenantPath('/polls'), icon: BarChart3, feature: 'polls' as const },
+    { label: t('nav.jobs'), href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
+    { label: t('nav.ideation'), href: tenantPath('/ideation'), icon: Lightbulb, feature: 'ideation_challenges' as const },
   ].filter(item => hasFeature(item.feature));
 
   // Activity dropdown items — filtered by feature flags and module flags

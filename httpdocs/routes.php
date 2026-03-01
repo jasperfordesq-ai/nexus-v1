@@ -453,6 +453,39 @@ $router->add('DELETE', '/api/v2/polls/{id}', 'Nexus\Controllers\Api\PollsApiCont
 $router->add('POST', '/api/v2/polls/{id}/vote', 'Nexus\Controllers\Api\PollsApiController@vote');
 
 // ============================================
+// API V2 - JOB VACANCIES
+// ============================================
+$router->add('GET', '/api/v2/jobs', 'Nexus\Controllers\Api\JobVacanciesApiController@index');
+$router->add('POST', '/api/v2/jobs', 'Nexus\Controllers\Api\JobVacanciesApiController@store');
+$router->add('GET', '/api/v2/jobs/my-applications', 'Nexus\Controllers\Api\JobVacanciesApiController@myApplications');
+$router->add('GET', '/api/v2/jobs/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@show');
+$router->add('PUT', '/api/v2/jobs/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@update');
+$router->add('DELETE', '/api/v2/jobs/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@destroy');
+$router->add('POST', '/api/v2/jobs/{id}/apply', 'Nexus\Controllers\Api\JobVacanciesApiController@apply');
+$router->add('GET', '/api/v2/jobs/{id}/applications', 'Nexus\Controllers\Api\JobVacanciesApiController@applications');
+$router->add('PUT', '/api/v2/jobs/applications/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@updateApplication');
+
+// ============================================
+// API V2 - IDEATION CHALLENGES
+// ============================================
+$router->add('GET', '/api/v2/ideation', 'Nexus\Controllers\Api\IdeationChallengesApiController@index');
+$router->add('POST', '/api/v2/ideation', 'Nexus\Controllers\Api\IdeationChallengesApiController@store');
+$router->add('GET', '/api/v2/ideation/ideas/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@showIdea');
+$router->add('PUT', '/api/v2/ideation/ideas/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateIdea');
+$router->add('DELETE', '/api/v2/ideation/ideas/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteIdea');
+$router->add('POST', '/api/v2/ideation/ideas/{id}/vote', 'Nexus\Controllers\Api\IdeationChallengesApiController@voteIdea');
+$router->add('PUT', '/api/v2/ideation/ideas/{id}/status', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateIdeaStatus');
+$router->add('GET', '/api/v2/ideation/ideas/{id}/comments', 'Nexus\Controllers\Api\IdeationChallengesApiController@comments');
+$router->add('POST', '/api/v2/ideation/ideas/{id}/comments', 'Nexus\Controllers\Api\IdeationChallengesApiController@addComment');
+$router->add('DELETE', '/api/v2/ideation/comments/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteComment');
+$router->add('GET', '/api/v2/ideation/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@show');
+$router->add('PUT', '/api/v2/ideation/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@update');
+$router->add('DELETE', '/api/v2/ideation/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@destroy');
+$router->add('PUT', '/api/v2/ideation/{id}/status', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateStatus');
+$router->add('GET', '/api/v2/ideation/{id}/ideas', 'Nexus\Controllers\Api\IdeationChallengesApiController@ideas');
+$router->add('POST', '/api/v2/ideation/{id}/ideas', 'Nexus\Controllers\Api\IdeationChallengesApiController@submitIdea');
+
+// ============================================
 // API V2 - GOALS (Full CRUD + Progress Tracking)
 // ============================================
 $router->add('GET', '/api/v2/goals', 'Nexus\Controllers\Api\GoalsApiController@index');

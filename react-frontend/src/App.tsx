@@ -106,6 +106,14 @@ const RequestExchangePage = lazyWithRetry(() => import('@/pages/exchanges/Reques
 const LeaderboardPage = lazyWithRetry(() => import('@/pages/leaderboard/LeaderboardPage'));
 const AchievementsPage = lazyWithRetry(() => import('@/pages/achievements/AchievementsPage'));
 const GoalsPage = lazyWithRetry(() => import('@/pages/goals/GoalsPage'));
+const PollsPage = lazyWithRetry(() => import('@/pages/polls/PollsPage'));
+const JobsPage = lazyWithRetry(() => import('@/pages/jobs/JobsPage'));
+const JobDetailPage = lazyWithRetry(() => import('@/pages/jobs/JobDetailPage'));
+const CreateJobPage = lazyWithRetry(() => import('@/pages/jobs/CreateJobPage'));
+const IdeationPage = lazyWithRetry(() => import('@/pages/ideation/IdeationPage'));
+const ChallengeDetailPage = lazyWithRetry(() => import('@/pages/ideation/ChallengeDetailPage'));
+const IdeaDetailPage = lazyWithRetry(() => import('@/pages/ideation/IdeaDetailPage'));
+const CreateChallengePage = lazyWithRetry(() => import('@/pages/ideation/CreateChallengePage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
 const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
@@ -481,6 +489,82 @@ function AppRoutes() {
             <FeatureGate feature="goals" fallback={<ComingSoonPage feature="Goals" />}>
               <FeatureErrorBoundary featureName="Goals">
                 <GoalsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Feature-gated: Polls */}
+          <Route path="polls" element={
+            <FeatureGate feature="polls" fallback={<ComingSoonPage feature="Polls" />}>
+              <FeatureErrorBoundary featureName="Polls">
+                <PollsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Feature-gated: Job Vacancies */}
+          <Route path="jobs" element={
+            <FeatureGate feature="job_vacancies" fallback={<ComingSoonPage feature="Job Vacancies" />}>
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <JobsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs/create" element={
+            <FeatureGate feature="job_vacancies" redirect="/">
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <CreateJobPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs/:id/edit" element={
+            <FeatureGate feature="job_vacancies" redirect="/">
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <CreateJobPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs/:id" element={
+            <FeatureGate feature="job_vacancies" redirect="/">
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <JobDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Feature-gated: Ideation Challenges */}
+          <Route path="ideation" element={
+            <FeatureGate feature="ideation_challenges" fallback={<ComingSoonPage feature="Ideation Challenges" />}>
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <IdeationPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="ideation/create" element={
+            <FeatureGate feature="ideation_challenges" redirect="/">
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <CreateChallengePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="ideation/:id/edit" element={
+            <FeatureGate feature="ideation_challenges" redirect="/">
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <CreateChallengePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="ideation/:id" element={
+            <FeatureGate feature="ideation_challenges" redirect="/">
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <ChallengeDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="ideation/:challengeId/ideas/:id" element={
+            <FeatureGate feature="ideation_challenges" redirect="/">
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <IdeaDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

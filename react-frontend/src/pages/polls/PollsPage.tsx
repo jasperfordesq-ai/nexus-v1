@@ -1,0 +1,849 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * PollsPage — Standalone polls listing with inline voting, creation, and tabs.
+ *
+ * Features:
+ * - Open / Closed / My Polls tabs
+ * - Expandable create-poll section at top
+ * - Inline voting with optimistic updates
+ * - Results display with HeroUI Progress bars
+ * - Cursor-based pagination ("Load More")
+ * - Delete confirmation modal (owner / admin)
+ */
+
+import { useState, useEffect, useCallback, memo } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Button,
+  Input,
+  Textarea,
+  Progress,
+  Chip,
+  Avatar,
+  Tabs,
+  Tab,
+  Divider,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  DatePicker,
+  useDisclosure,
+} from '@heroui/react';
+import type { DateInputValue } from '@heroui/react';
+import {
+  BarChart3,
+  Plus,
+  Clock,
+  CheckCircle,
+  Users,
+  Trash2,
+  X,
+  ChevronUp,
+  RefreshCw,
+  AlertTriangle,
+  Check,
+  TrendingUp,
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { GlassCard } from '@/components/ui';
+import { EmptyState } from '@/components/feedback';
+import { useAuth, useToast, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
+import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+
+/* ───────────────────────── Types ───────────────────────── */
+
+interface PollOption {
+  id: number;
+  label: string;
+  vote_count: number;
+  percentage: number;
+}
+
+interface Poll {
+  id: number;
+  question: string;
+  description: string | null;
+  expires_at: string | null;
+  created_at: string;
+  total_votes: number;
+  status: 'open' | 'closed';
+  has_voted: boolean;
+  voted_option_id: number | null;
+  options: PollOption[];
+  creator: {
+    id: number;
+    name: string;
+    avatar_url: string | null;
+  };
+}
+
+type PollTab = 'open' | 'closed' | 'mine';
+
+const ITEMS_PER_PAGE = 20;
+
+/* ───────────────────────── Time Remaining Helper ───────────────────────── */
+
+function getTimeRemaining(expiresAt: string): string | null {
+  const now = new Date();
+  const end = new Date(expiresAt);
+  const diffMs = end.getTime() - now.getTime();
+
+  if (diffMs <= 0) return null;
+
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffDays > 0) return `${diffDays}d`;
+  if (diffHours > 0) return `${diffHours}h`;
+  return `${diffMinutes}m`;
+}
+
+/* ───────────────────────── Poll Card ───────────────────────── */
+
+interface PollCardProps {
+  poll: Poll;
+  currentUserId?: number;
+  onVote: (pollId: number, optionId: number) => void;
+  onDelete: (poll: Poll) => void;
+}
+
+const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete }: PollCardProps) {
+  const { t } = useTranslation('polls');
+  const { tenantPath } = useTenant();
+
+  const isOwner = currentUserId === poll.creator.id;
+  const isOpen = poll.status === 'open';
+  const hasVoted = poll.has_voted;
+  const showResults = hasVoted || !isOpen;
+
+  const timeRemaining = poll.expires_at ? getTimeRemaining(poll.expires_at) : null;
+  const isExpired = poll.expires_at ? new Date(poll.expires_at) <= new Date() : false;
+
+  return (
+    <GlassCard hoverable className="overflow-hidden">
+      {/* Status accent bar */}
+      <div className={`h-0.5 bg-gradient-to-r ${isOpen ? 'from-amber-500/30 to-orange-500/30' : 'from-gray-400/20 to-gray-500/20'}`} />
+
+      <div className="p-5">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link to={tenantPath(`/profile/${poll.creator.id}`)}>
+              <Avatar
+                name={poll.creator.name}
+                src={resolveAvatarUrl(poll.creator.avatar_url)}
+                size="sm"
+                className="ring-2 ring-[var(--border-default)] flex-shrink-0"
+                isBordered
+              />
+            </Link>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Link
+                  to={tenantPath(`/profile/${poll.creator.id}`)}
+                  className="text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors truncate"
+                >
+                  {poll.creator.name}
+                </Link>
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  color={isOpen ? 'warning' : 'default'}
+                  startContent={isOpen ? <BarChart3 className="w-3 h-3" /> : <CheckCircle className="w-3 h-3" />}
+                  className="text-[10px] h-5"
+                >
+                  {isOpen ? t('status.open') : t('status.closed')}
+                </Chip>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-[var(--text-subtle)]">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" aria-hidden="true" />
+                  {formatRelativeTime(poll.created_at)}
+                </span>
+                {isOpen && timeRemaining && (
+                  <span className="flex items-center gap-1 text-amber-500">
+                    <Clock className="w-3 h-3" aria-hidden="true" />
+                    {t('time_remaining', { time: timeRemaining })}
+                  </span>
+                )}
+                {isOpen && isExpired && (
+                  <span className="text-danger text-xs">{t('expired')}</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {isOwner && (
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              className="text-[var(--text-subtle)] hover:text-danger min-w-0"
+              onPress={() => onDelete(poll)}
+              aria-label={t('delete_poll')}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+
+        {/* Question */}
+        <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{poll.question}</h3>
+        {poll.description && (
+          <p className="text-sm text-[var(--text-secondary)] mb-3">{poll.description}</p>
+        )}
+
+        {/* Options */}
+        <div className="space-y-2.5 mb-3">
+          {poll.options.map((option) => {
+            const isVotedOption = poll.voted_option_id === option.id;
+
+            return (
+              <div key={option.id}>
+                {showResults ? (
+                  /* Results view */
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-sm ${isVotedOption ? 'font-semibold text-[var(--color-primary)]' : 'text-[var(--text-primary)]'}`}>
+                        {isVotedOption && <Check className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" aria-hidden="true" />}
+                        {option.label}
+                      </span>
+                      <span className={`text-xs font-medium ml-2 ${isVotedOption ? 'text-[var(--color-primary)]' : 'text-[var(--text-muted)]'}`}>
+                        {option.percentage}%
+                      </span>
+                    </div>
+                    <Progress
+                      value={option.percentage}
+                      size="sm"
+                      color={isVotedOption ? 'primary' : 'default'}
+                      classNames={{
+                        track: 'bg-[var(--surface-hover)]',
+                        indicator: isVotedOption ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : '',
+                      }}
+                      aria-label={`${option.label}: ${option.percentage}%`}
+                    />
+                  </div>
+                ) : (
+                  /* Vote button */
+                  <Button
+                    variant="bordered"
+                    size="sm"
+                    className="w-full justify-start text-[var(--text-primary)] border-[var(--border-default)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all"
+                    onPress={() => onVote(poll.id, option.id)}
+                  >
+                    {option.label}
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Footer stats */}
+        <div className="flex items-center gap-3 text-xs text-[var(--text-subtle)]">
+          <span className="flex items-center gap-1.5">
+            <TrendingUp className="w-3 h-3" aria-hidden="true" />
+            {poll.total_votes} {poll.total_votes === 1 ? t('votes_one') : t('votes')}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Users className="w-3 h-3" aria-hidden="true" />
+            {poll.options.length} {t('options')}
+          </span>
+        </div>
+      </div>
+    </GlassCard>
+  );
+});
+
+/* ───────────────────────── Main Component ───────────────────────── */
+
+export function PollsPage() {
+  const { t } = useTranslation('polls');
+  usePageTitle(t('page_title'));
+  const { isAuthenticated, user } = useAuth();
+  const toast = useToast();
+
+  /* ── State ── */
+  const [polls, setPolls] = useState<Poll[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [cursor, setCursor] = useState<string | undefined>();
+  const [tab, setTab] = useState<PollTab>('open');
+
+  /* ── Create form ── */
+  const [showCreate, setShowCreate] = useState(false);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newOptions, setNewOptions] = useState<string[]>(['', '']);
+  const [newExpiresAt, setNewExpiresAt] = useState<DateInputValue | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+
+  /* ── Delete modal ── */
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+  const [deletingPoll, setDeletingPoll] = useState<Poll | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  /* ── Data loading ── */
+  const loadPolls = useCallback(async (append = false) => {
+    try {
+      if (!append) {
+        setIsLoading(true);
+        setError(null);
+      } else {
+        setIsLoadingMore(true);
+      }
+
+      const params = new URLSearchParams();
+      params.set('per_page', String(ITEMS_PER_PAGE));
+      if (append && cursor) params.set('cursor', cursor);
+
+      if (tab === 'open') {
+        params.set('status', 'open');
+      } else if (tab === 'closed') {
+        params.set('status', 'closed');
+      } else if (tab === 'mine') {
+        params.set('mine', '1');
+      }
+
+      const response = await api.get<Poll[]>(`/v2/polls?${params}`);
+
+      if (response.success && response.data) {
+        const items = Array.isArray(response.data) ? response.data : [];
+        if (append) {
+          setPolls((prev) => [...prev, ...items]);
+        } else {
+          setPolls(items);
+        }
+        setHasMore(response.meta?.has_more ?? items.length >= ITEMS_PER_PAGE);
+        setCursor(response.meta?.cursor ?? undefined);
+      } else {
+        if (!append) setError(t('errors.load_failed'));
+      }
+    } catch (err) {
+      logError('Failed to load polls', err);
+      if (!append) {
+        setError(t('errors.load_failed'));
+      } else {
+        toast.error(t('errors.load_more_failed'));
+      }
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+    }
+  }, [tab, cursor, t, toast]);
+
+  // Reload when tab changes
+  useEffect(() => {
+    setCursor(undefined);
+    loadPolls();
+  }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+    loadPolls(true);
+  }, [isLoadingMore, hasMore, loadPolls]);
+
+  /* ── Create poll ── */
+  const validOptions = newOptions.filter((o) => o.trim().length > 0);
+  const canCreate = newQuestion.trim().length > 0 && validOptions.length >= 2;
+
+  const addOption = () => {
+    if (newOptions.length < 6) {
+      setNewOptions((prev) => [...prev, '']);
+    }
+  };
+
+  const updateOption = (index: number, value: string) => {
+    setNewOptions((prev) => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
+
+  const removeOption = (index: number) => {
+    if (newOptions.length > 2) {
+      setNewOptions((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const resetCreateForm = () => {
+    setNewQuestion('');
+    setNewDescription('');
+    setNewOptions(['', '']);
+    setNewExpiresAt(null);
+  };
+
+  const handleCreate = async () => {
+    if (!newQuestion.trim()) {
+      toast.error(t('errors.question_required'));
+      return;
+    }
+    if (validOptions.length < 2) {
+      toast.error(t('errors.min_options'));
+      return;
+    }
+
+    try {
+      setIsCreating(true);
+      const payload: Record<string, unknown> = {
+        question: newQuestion.trim(),
+        description: newDescription.trim() || undefined,
+        options: validOptions.map((o) => o.trim()),
+      };
+
+      if (newExpiresAt) {
+        payload.expires_at = newExpiresAt.toString();
+      }
+
+      const response = await api.post('/v2/polls', payload);
+
+      if (response.success) {
+        resetCreateForm();
+        setShowCreate(false);
+        toast.success(t('toast.created'));
+        // If we're on the "open" or "mine" tab, reload to show the new poll
+        if (tab === 'open' || tab === 'mine') {
+          setCursor(undefined);
+          loadPolls();
+        } else {
+          setTab('open');
+        }
+      } else {
+        toast.error(t('toast.create_failed'));
+      }
+    } catch (err) {
+      logError('Failed to create poll', err);
+      toast.error(t('toast.create_failed'));
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  /* ── Vote ── */
+  const handleVote = useCallback(async (pollId: number, optionId: number) => {
+    // Optimistic update
+    setPolls((prev) =>
+      prev.map((poll) => {
+        if (poll.id !== pollId) return poll;
+
+        const wasVoted = poll.has_voted;
+        const newTotal = poll.total_votes + (wasVoted ? 0 : 1);
+
+        const updatedOptions = poll.options.map((opt) => {
+          let newCount = opt.vote_count;
+          if (opt.id === poll.voted_option_id) newCount -= 1;
+          if (opt.id === optionId) newCount += 1;
+          newCount = Math.max(0, newCount);
+          return {
+            ...opt,
+            vote_count: newCount,
+            percentage: newTotal > 0 ? Math.round((newCount / newTotal) * 1000) / 10 : 0,
+          };
+        });
+
+        return {
+          ...poll,
+          has_voted: true,
+          voted_option_id: optionId,
+          total_votes: newTotal,
+          options: updatedOptions,
+        };
+      })
+    );
+
+    try {
+      const response = await api.post(`/v2/polls/${pollId}/vote`, { option_id: optionId });
+      if (response.success) {
+        toast.success(t('toast.voted'));
+      } else {
+        // Revert on failure
+        loadPolls();
+        toast.error(t('toast.vote_failed'));
+      }
+    } catch (err) {
+      logError('Failed to vote', err);
+      loadPolls();
+      toast.error(t('toast.vote_failed'));
+    }
+  }, [t, toast, loadPolls]);
+
+  /* ── Delete ── */
+  const openDeleteModal = (poll: Poll) => {
+    setDeletingPoll(poll);
+    onDeleteOpen();
+  };
+
+  const handleDelete = async () => {
+    if (!deletingPoll) return;
+
+    try {
+      setIsDeleting(true);
+      const response = await api.delete(`/v2/polls/${deletingPoll.id}`);
+
+      if (response.success) {
+        onDeleteClose();
+        setDeletingPoll(null);
+        toast.success(t('toast.deleted'));
+        // Remove from local state
+        setPolls((prev) => prev.filter((p) => p.id !== deletingPoll.id));
+      } else {
+        toast.error(t('toast.delete_failed'));
+      }
+    } catch (err) {
+      logError('Failed to delete poll', err);
+      toast.error(t('toast.delete_failed'));
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  /* ── Tab change handler ── */
+  const handleTabChange = (key: React.Key) => {
+    setTab(key as PollTab);
+  };
+
+  /* ── Animation variants ── */
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  /* ── Empty state description by tab ── */
+  const getEmptyDescription = () => {
+    switch (tab) {
+      case 'closed':
+        return t('empty.description_closed');
+      case 'mine':
+        return t('empty.description_mine');
+      default:
+        return t('empty.description');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+            <BarChart3 className="w-7 h-7 text-amber-400" aria-hidden="true" />
+            {t('title')}
+          </h1>
+          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
+        </div>
+        {isAuthenticated && (
+          <Button
+            className="bg-gradient-to-r from-amber-500 to-orange-600 text-white"
+            startContent={showCreate ? <ChevronUp className="w-4 h-4" aria-hidden="true" /> : <Plus className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => setShowCreate(!showCreate)}
+          >
+            {showCreate ? t('collapse') : t('expand')}
+          </Button>
+        )}
+      </div>
+
+      {/* Create Poll Section */}
+      <AnimatePresence>
+        {showCreate && isAuthenticated && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+          >
+            <GlassCard className="p-5">
+              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-amber-400" aria-hidden="true" />
+                {t('create_poll')}
+              </h2>
+
+              <div className="space-y-4">
+                {/* Question */}
+                <Input
+                  label={t('question')}
+                  placeholder={t('question_placeholder')}
+                  value={newQuestion}
+                  onChange={(e) => setNewQuestion(e.target.value)}
+                  classNames={{
+                    input: 'bg-transparent text-[var(--text-primary)]',
+                    inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
+                  }}
+                />
+
+                {/* Description */}
+                <Textarea
+                  label={t('description')}
+                  placeholder={t('description_placeholder')}
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  minRows={2}
+                  maxRows={4}
+                  classNames={{
+                    input: 'bg-transparent text-[var(--text-primary)]',
+                    inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
+                  }}
+                />
+
+                {/* Options */}
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-primary)] mb-2">{t('options')}</p>
+                  <div className="space-y-2">
+                    {newOptions.map((opt, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full border-2 border-[var(--border-default)] flex-shrink-0 flex items-center justify-center text-[10px] text-[var(--text-subtle)] font-medium">
+                          {index + 1}
+                        </div>
+                        <Input
+                          placeholder={t('option_placeholder', { number: index + 1 })}
+                          value={opt}
+                          onChange={(e) => updateOption(index, e.target.value)}
+                          size="sm"
+                          classNames={{
+                            input: 'bg-transparent text-[var(--text-primary)]',
+                            inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
+                          }}
+                        />
+                        {newOptions.length > 2 && (
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            className="text-[var(--text-muted)] min-w-8 w-8 h-8 hover:text-danger"
+                            onPress={() => removeOption(index)}
+                            aria-label={`${t('remove_option')} ${index + 1}`}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+
+                    {newOptions.length < 6 && (
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        className="bg-[var(--surface-elevated)] text-[var(--color-primary)]"
+                        startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
+                        onPress={addOption}
+                      >
+                        {t('add_option')}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Expiry date */}
+                <DatePicker
+                  label={t('expires_at')}
+                  value={newExpiresAt}
+                  onChange={setNewExpiresAt}
+                  granularity="day"
+                  classNames={{
+                    inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
+                  }}
+                  description={t('no_deadline')}
+                />
+
+                <Divider />
+
+                {/* Actions */}
+                <div className="flex items-center justify-end gap-2">
+                  <Button
+                    variant="flat"
+                    size="sm"
+                    onPress={() => {
+                      resetCreateForm();
+                      setShowCreate(false);
+                    }}
+                    className="text-[var(--text-muted)]"
+                  >
+                    {t('confirm_delete.cancel')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/20"
+                    onPress={handleCreate}
+                    isLoading={isCreating}
+                    isDisabled={!canCreate}
+                  >
+                    {t('submit')}
+                  </Button>
+                </div>
+              </div>
+            </GlassCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Tabs */}
+      <GlassCard className="p-2">
+        <Tabs
+          selectedKey={tab}
+          onSelectionChange={handleTabChange}
+          variant="light"
+          aria-label={t('tabs.aria_label')}
+          classNames={{
+            tabList: 'gap-2',
+            tab: 'px-4 py-2',
+          }}
+        >
+          <Tab key="open" title={t('tabs.open')} />
+          <Tab key="closed" title={t('tabs.closed')} />
+          <Tab key="mine" title={t('tabs.mine')} />
+        </Tabs>
+      </GlassCard>
+
+      {/* Error State */}
+      {error && !isLoading && (
+        <GlassCard className="p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('errors.load_failed')}</h2>
+          <p className="text-theme-muted mb-4">{error}</p>
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => loadPolls()}
+          >
+            {t('try_again')}
+          </Button>
+        </GlassCard>
+      )}
+
+      {/* Polls List */}
+      {!error && (
+        <>
+          {isLoading ? (
+            /* Loading skeleton */
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <GlassCard key={i} className="p-5 animate-pulse">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 rounded-full bg-theme-hover" />
+                    <div className="flex-1">
+                      <div className="h-4 bg-theme-hover rounded w-1/3 mb-1" />
+                      <div className="h-3 bg-theme-hover rounded w-1/5" />
+                    </div>
+                  </div>
+                  <div className="h-5 bg-theme-hover rounded w-2/3 mb-3" />
+                  <div className="space-y-2">
+                    <div className="h-8 bg-theme-hover rounded" />
+                    <div className="h-8 bg-theme-hover rounded" />
+                    <div className="h-8 bg-theme-hover rounded" />
+                  </div>
+                </GlassCard>
+              ))}
+            </div>
+          ) : polls.length === 0 ? (
+            <EmptyState
+              icon={<BarChart3 className="w-12 h-12" aria-hidden="true" />}
+              title={t('empty.title')}
+              description={getEmptyDescription()}
+              action={
+                isAuthenticated && tab !== 'closed' && (
+                  <Button
+                    className="bg-gradient-to-r from-amber-500 to-orange-600 text-white"
+                    startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                    onPress={() => setShowCreate(true)}
+                  >
+                    {t('create_poll')}
+                  </Button>
+                )
+              }
+            />
+          ) : (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="space-y-4"
+            >
+              {polls.map((poll) => (
+                <motion.div key={poll.id} variants={itemVariants}>
+                  <PollCard
+                    poll={poll}
+                    currentUserId={user?.id}
+                    onVote={handleVote}
+                    onDelete={openDeleteModal}
+                  />
+                </motion.div>
+              ))}
+
+              {/* Load More */}
+              {hasMore && (
+                <div className="pt-4 text-center">
+                  <Button
+                    variant="flat"
+                    className="bg-theme-elevated text-theme-muted"
+                    onPress={loadMore}
+                    isLoading={isLoadingMore}
+                  >
+                    {t('load_more')}
+                  </Button>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={isDeleteOpen} onClose={onDeleteClose} size="sm">
+        <ModalContent>
+          <ModalHeader className="text-[var(--text-primary)]">
+            {t('confirm_delete.title')}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-[var(--text-secondary)]">
+              {t('confirm_delete.message')}
+            </p>
+            {deletingPoll && (
+              <p className="text-sm font-medium text-[var(--text-primary)] mt-2 italic">
+                &ldquo;{deletingPoll.question}&rdquo;
+              </p>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              onPress={onDeleteClose}
+              className="text-[var(--text-muted)]"
+            >
+              {t('confirm_delete.cancel')}
+            </Button>
+            <Button
+              color="danger"
+              onPress={handleDelete}
+              isLoading={isDeleting}
+            >
+              {t('confirm_delete.confirm')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </div>
+  );
+}
+
+export default PollsPage;
