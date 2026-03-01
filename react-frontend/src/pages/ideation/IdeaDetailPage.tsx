@@ -21,6 +21,7 @@ import {
   Button,
   Chip,
   Spinner,
+  Input,
   Textarea,
   Avatar,
   Dropdown,
@@ -32,6 +33,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Select,
+  SelectItem,
   useDisclosure,
 } from '@heroui/react';
 import {
@@ -45,6 +48,7 @@ import {
   Star,
   Trash2,
   Send,
+  Users,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -131,6 +135,11 @@ export function IdeaDetailPage() {
   // Delete comment state
   const [deletingCommentId, setDeletingCommentId] = useState<number | null>(null);
 
+  // Convert to group modal
+  const [isConvertOpen, setIsConvertOpen] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
+  const [groupForm, setGroupForm] = useState({ name: '', description: '', visibility: 'public' });
+
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
   const isOwner = user?.id === idea?.user_id;
 
@@ -192,6 +201,17 @@ export function IdeaDetailPage() {
     fetchComments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  // Pre-populate group form when idea loads
+  useEffect(() => {
+    if (idea) {
+      setGroupForm(prev => ({
+        ...prev,
+        name: idea.title,
+        description: idea.description,
+      }));
+    }
+  }, [idea?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ───── Actions ───── */
 
@@ -286,6 +306,32 @@ export function IdeaDetailPage() {
       onDeleteClose();
     }
   };
+
+  const handleConvertToGroup = async () => {
+    setIsConverting(true);
+    try {
+      const response = await api.post<{ id: number }>(`/v2/ideation-ideas/${id}/convert-to-group`, {
+        name: groupForm.name,
+        description: groupForm.description,
+        visibility: groupForm.visibility,
+      });
+
+      if (response.data) {
+        toast.success(t('convert_to_group.success'));
+        setIsConvertOpen(false);
+        navigate(tenantPath(`/groups/${response.data.id}`));
+      }
+    } catch (err) {
+      logError('Failed to convert idea to group', err);
+      toast.error(t('convert_to_group.error'));
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
+  const canConvertToGroup = isAuthenticated && idea &&
+    (idea.status === 'shortlisted' || idea.status === 'winner') &&
+    (isAdmin || isOwner);
 
   /* ───── Render ───── */
 
@@ -396,6 +442,20 @@ export function IdeaDetailPage() {
             <p className="text-[var(--color-text-secondary)] whitespace-pre-wrap">
               {idea.description}
             </p>
+
+            {/* Convert to Group Button */}
+            {canConvertToGroup && (
+              <Button
+                color="primary"
+                variant="flat"
+                size="sm"
+                className="mt-4"
+                startContent={<Users className="w-4 h-4" />}
+                onPress={() => setIsConvertOpen(true)}
+              >
+                {t('convert_to_group.button')}
+              </Button>
+            )}
           </div>
 
           {/* Vote + Admin */}
@@ -583,6 +643,61 @@ export function IdeaDetailPage() {
               onPress={handleDeleteIdea}
             >
               {t('ideas.delete')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Convert to Group Modal */}
+      <Modal isOpen={isConvertOpen} onClose={() => setIsConvertOpen(false)} size="lg">
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            <span>{t('convert_to_group.title')}</span>
+            <p className="text-sm font-normal text-[var(--color-text-tertiary)]">
+              {t('convert_to_group.description')}
+            </p>
+          </ModalHeader>
+          <ModalBody>
+            <Input
+              label={t('convert_to_group.name_label')}
+              value={groupForm.name}
+              onValueChange={(val) => setGroupForm(prev => ({ ...prev, name: val }))}
+              variant="bordered"
+              isRequired
+            />
+            <Textarea
+              label={t('convert_to_group.description_label')}
+              value={groupForm.description}
+              onValueChange={(val) => setGroupForm(prev => ({ ...prev, description: val }))}
+              variant="bordered"
+              minRows={3}
+              maxRows={8}
+            />
+            <Select
+              label={t('convert_to_group.visibility_label')}
+              selectedKeys={[groupForm.visibility]}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                if (selected) setGroupForm(prev => ({ ...prev, visibility: selected }));
+              }}
+              variant="bordered"
+            >
+              <SelectItem key="public">{t('convert_to_group.visibility_public')}</SelectItem>
+              <SelectItem key="private">{t('convert_to_group.visibility_private')}</SelectItem>
+            </Select>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={() => setIsConvertOpen(false)}>
+              {t('form.cancel')}
+            </Button>
+            <Button
+              color="primary"
+              isLoading={isConverting}
+              isDisabled={!groupForm.name.trim()}
+              startContent={<Users className="w-4 h-4" />}
+              onPress={handleConvertToGroup}
+            >
+              {isConverting ? t('convert_to_group.creating') : t('convert_to_group.confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>

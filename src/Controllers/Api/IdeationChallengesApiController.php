@@ -35,6 +35,7 @@ use Nexus\Core\TenantContext;
  * - GET    /api/v2/ideation-ideas/{id}/comments     - List comments
  * - POST   /api/v2/ideation-ideas/{id}/comments     - Add comment (auth)
  * - DELETE /api/v2/ideation-comments/{id}           - Delete comment (owner/admin)
+ * - POST   /api/v2/ideation-ideas/{id}/convert-to-group - Convert idea to group (owner/admin)
  *
  * @package Nexus\Controllers\Api
  */
@@ -571,6 +572,35 @@ class IdeationChallengesApiController extends BaseApiController
         }
 
         $this->noContent();
+    }
+
+    // ============================================
+    // IDEA → GROUP CONVERSION
+    // ============================================
+
+    /**
+     * POST /api/v2/ideation-ideas/{id}/convert-to-group
+     *
+     * Convert a shortlisted or winning idea into a Group.
+     * Requires authenticated user who is admin or the idea creator.
+     */
+    public function convertToGroup(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('ideation_convert_group', 5, 60);
+
+        $result = IdeationChallengeService::convertIdeaToGroup($id, $userId);
+
+        if (!$result) {
+            $errors = IdeationChallengeService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData($result, null, 201);
     }
 
     // ============================================

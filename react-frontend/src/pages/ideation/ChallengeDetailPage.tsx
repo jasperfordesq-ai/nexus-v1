@@ -33,6 +33,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Avatar,
+  Tooltip,
   useDisclosure,
 } from '@heroui/react';
 import {
@@ -52,6 +53,7 @@ import {
   Eye,
   Star,
   Copy,
+  Users,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -800,6 +802,24 @@ export function ChallengeDetailPage() {
                       {t('ideas.comments', { count: idea.comments_count })}
                     </span>
                     <span>{formatRelativeTime(idea.created_at)}</span>
+
+                    {/* Create Group shortcut for shortlisted/winner ideas */}
+                    {(idea.status === 'shortlisted' || idea.status === 'winner') &&
+                      isAuthenticated &&
+                      (isAdmin || user?.id === idea.user_id) && (
+                      <Tooltip content={t('convert_to_group.title')}>
+                        <Button
+                          isIconOnly
+                          variant="light"
+                          size="sm"
+                          className="ml-auto min-w-6 w-6 h-6"
+                          onPress={() => navigate(tenantPath(`/ideation/${challenge.id}/ideas/${idea.id}`))}
+                          aria-label={t('convert_to_group.title')}
+                        >
+                          <Users className="w-3.5 h-3.5" />
+                        </Button>
+                      </Tooltip>
+                    )}
                   </div>
                 </div>
               </div>
