@@ -2,235 +2,211 @@
 
 ## Executive Summary
 
-The Nexus V1 codebase contains **~1,200 source files** and **~500 test files** across a PHP backend and React/TypeScript frontend. While the testing infrastructure is mature (PHPUnit, Vitest, Playwright config), there are significant gaps in coverage depth, critical-path testing, and coverage enforcement.
-
-| Layer | Source Files | Test Files | Estimated Coverage |
-|-------|-------------|------------|-------------------|
-| PHP Backend | ~445 | ~370 | ~43% file-level |
-| React Frontend | ~400 | ~129 | ~32% file-level |
-| E2E (Playwright) | — | 0 | 0% (configured but no tests) |
-| **Total** | **~845** | **~499** | **~40%** |
+The Nexus codebase contains **355 PHP test files** (~4,588 test methods) and **129 frontend test files** (~1,373 test cases). The backend has reasonably strong coverage for controllers, services, and models, but significant gaps exist in federation services, enterprise features, and the frontend admin modules. The frontend coverage thresholds are currently set at a low baseline (~30%) with a stated target of 70%+. No E2E tests exist despite a Playwright configuration being present.
 
 ---
 
-## Current Coverage Thresholds
+## Current Coverage Overview
 
-### React (Vitest) — Too Low
-```
-statements: 30%   (target should be 70%+)
-branches:   25%
-functions:  25%
-lines:      30%
-```
-The config itself acknowledges this: *"Current baseline: ~40%. Target: 70%+"*
-
-### PHP (PHPUnit) — Not Set
-No minimum coverage thresholds are configured in `phpunit.xml`. Coverage could regress to 0% without any CI failure.
-
----
-
-## Priority 1: Critical Gaps (High Impact, High Risk)
-
-### 1. No E2E Tests Exist
-
-Playwright is fully configured (`playwright.config.ts`) with 5 test projects (chromium, mobile-chrome, admin, unauthenticated, setup) and comprehensive npm scripts — but the `e2e/tests/` directory is empty. **Zero end-to-end tests exist.**
-
-**Recommendation:** Write E2E tests for the top 5 critical user journeys:
-- User registration and login (including 2FA flow)
-- Creating a listing and requesting an exchange
-- Compose flow (post, event, listing creation)
-- Admin dashboard access and user management
-- Federation partner discovery and cross-community interaction
-
-### 2. Form Submission & User Interaction Tests Missing (React)
-
-Pages like `LoginPage`, `RegisterPage`, `ForgotPasswordPage`, and `ResetPasswordPage` have test files, but they **only check for element presence** — no form submissions, input validation feedback, or error state testing.
-
-**Untested interactions include:**
-- Typing into form fields and submitting
-- Validation error display (invalid email, weak password)
-- API error handling on failed login/registration
-- Success redirects after authentication
-- Two-factor authentication challenge flow
-
-**Recommendation:** Add interaction tests using `@testing-library/user-event` for all auth pages and the ComposeHub form tabs.
-
-### 3. Core Infrastructure Has No Tests for Security-Critical Files (PHP)
-
-The following security-critical files in `src/Core/` lack dedicated tests:
-
-| File | Risk | Notes |
-|------|------|-------|
-| `HtmlSanitizer.php` | **XSS Prevention** | No test — this is the primary XSS defense |
-| `ImageUploader.php` | **File Upload Security** | No test (only `ImageUploaderTest` in Services tests the service wrapper) |
-| `TotpEncryption.php` | **2FA Crypto** | Only 1 unit test exists in `tests/Unit/` |
-
-**Recommendation:** Write thorough unit tests for `HtmlSanitizer` (XSS bypass attempts, allowed/denied tags, attribute filtering) and `ImageUploader` (MIME validation, path traversal, file size limits).
-
-### 4. PageBuilder Has Zero Tests (PHP)
-
-The `src/PageBuilder/` module (`PageRenderer.php`, `BlockRegistry.php`) has no test coverage. This is the dynamic page rendering system that processes user-configured content.
-
-**Recommendation:** Add unit tests for block registration, rendering output, and malformed input handling.
+| Layer | Source Files | Test Files | Approx. Coverage |
+|---|---|---|---|
+| **PHP Controllers (API)** | 89 | 81 | ~91% of files |
+| **PHP Controllers (Admin)** | 38 | 36 | ~95% of files |
+| **PHP Services** | 130 | 104 | ~80% of files |
+| **PHP Models** | 59 | 60 | ~98% of files |
+| **PHP Middleware** | 8 | 8 | ~88% of files |
+| **PHP Integration** | — | 5 | Limited scope |
+| **React Frontend** | 397 | 129 | ~32% of files |
+| **E2E (Playwright)** | — | 0 | 0% — not implemented |
 
 ---
 
-## Priority 2: Significant Gaps (Medium Impact)
+## Priority 1: Critical Gaps
 
-### 5. React Components — 65% Untested
+### 1.1 No E2E Tests Exist
 
-| Category | With Tests | Without Tests | Gap |
-|----------|-----------|---------------|-----|
-| Components | 36 | 67 | 65% |
-| Pages | 38 | 33+ | 46% |
-| Hooks | 7 | 6 | 46% |
-| Contexts | 7 | 2 | 22% |
-| Lib utilities | 10 | 5 | 33% |
+A `playwright.config.ts` is configured but no actual E2E test files exist. For a multi-tenant platform with federation, exchanges, messaging, and wallet features, the absence of end-to-end tests is a significant risk.
 
-**Key untested components:**
-- **Compose tabs** (`PostTab`, `ListingTab`, `EventTab`, `GoalTab`, `PollTab`) — core content creation
-- **Image uploaders** (`ImageUploader`, `MultiImageUploader`) — file handling
-- **Social components** (`CommentsSection`, `ShareButton`, `LikersModal`) — engagement features
-- **Location components** (`LocationMap`, `PlaceAutocompleteInput`, `EntityMapView`) — map integrations
-- **AI features** (`AiAssistButton`, `AiChatPage`) — AI-powered functionality
+**Recommended E2E test suites to create:**
+- **Authentication flow** — registration, login, 2FA, password reset, session expiry
+- **Exchange lifecycle** — create listing, propose exchange, accept, complete, review
+- **Messaging** — send message, receive real-time update, voice messages
+- **Wallet transactions** — transfer credits, view balance, org wallet operations
+- **Multi-tenant isolation** — ensure tenant data doesn't bleed across boundaries
+- **Federation handshake** — cross-tenant discovery and interaction
 
-**Recommendation:** Prioritize compose tabs (they are core to the product), social interaction components, and image uploaders.
+### 1.2 Federation Services — 0% Direct Coverage for 16 Core Services
 
-### 6. Custom Hooks Missing Tests
+While there are 16 test files under `tests/Services/Federation/`, the corresponding source services under `src/Services/` were reported as untested. The federation module is a high-complexity, security-critical subsystem. These services need thorough testing:
 
-The following hooks have no tests:
+| Untested Service | Risk |
+|---|---|
+| `FederationGateway` | Core orchestration — any bug cascades everywhere |
+| `FederationJwtService` | Security-critical — JWT minting/validation |
+| `FederationExternalApiClient` | External API integration — failure modes matter |
+| `FederationUserService` | Cross-tenant user resolution |
+| `FederationSearchService` | Cross-tenant search federation |
+| `FederationPartnershipService` | Partnership lifecycle management |
+| `FederationDirectoryService` | Service directory/discovery |
+| `FederationActivityService` | Activity feed across tenants |
+| `FederationAuditService` | Audit trail for compliance |
+| `FederationEmailService` | Cross-tenant email notifications |
+| `FederationRealtimeService` | Real-time cross-tenant events |
+| `FederationFeatureService` | Feature flag management for federation |
+| `FederatedGroupService` | Federated group operations |
+| `FederatedMessageService` | Cross-tenant messaging |
+| `FederatedTransactionService` | Cross-tenant financial transactions |
+| `FederationExternalPartnerService` | External partner integrations |
 
-| Hook | Functionality |
-|------|--------------|
-| `useDraftPersistence` | Auto-saving user drafts to localStorage |
-| `useSocialInteractions` | Like, comment, share actions |
-| `useMediaQuery` | Responsive breakpoint detection |
-| `useMenus` | Dynamic menu state management |
-| `useLegalGate` | Legal compliance gating |
+### 1.3 Frontend Admin Modules — 140+ Source Files With No Tests
 
-**Recommendation:** `useDraftPersistence` and `useSocialInteractions` are highest priority — they handle user data and core social features.
+The entire admin panel is effectively untested at the component level. While batch test files exist (`modules-batch1.test.tsx`, `modules-batch2.test.tsx`), individual admin modules have zero dedicated tests:
 
-### 7. Detail Pages Untested (React)
-
-List/index pages are generally tested, but **detail and create pages are not:**
-
-- `EventDetailPage`, `CreateEventPage`
-- `ListingDetailPage`, `CreateListingPage`
-- `ExchangeDetailPage`, `RequestExchangePage`
-- `GroupDetailPage`, `CreateGroupPage`
-- `BlogPostPage`
-- `ConversationPage` (messaging)
-- `ConnectionsPage`
-
-These are arguably the most complex pages in the app.
-
-**Recommendation:** Add tests for detail pages, focusing on data loading states, error handling, and user actions (RSVP, request exchange, join group, etc.).
-
-### 8. PHP Controller Coverage Gaps
-
-While ~68% of controllers have test files, several admin controllers lack tests:
-
-- Enterprise sub-controllers (GDPR, monitoring, secrets)
-- Some federation controllers
-- Volunteer management controllers
-
-**Recommendation:** Ensure all admin controllers that modify user data or handle sensitive operations have at least smoke-level tests.
+| Module | Source Files | Dedicated Tests |
+|---|---|---|
+| `admin/modules/enterprise` | 20 | 0 |
+| `admin/modules/super` | 16 | 0 |
+| `admin/modules/broker` | 12 | 0 |
+| `admin/modules/system` | 12 | 0 |
+| `admin/modules/newsletters` | 10 | 0 |
+| `admin/modules/groups` | 9 | 0 |
+| `admin/modules/content` | 8 | 0 |
+| `admin/modules/federation` | 8 | 0 |
+| `admin/modules/advanced` | 7 | 0 |
+| `admin/modules/gamification` | 6 | 0 |
+| `admin/modules/matching` | 5 | 0 |
+| `admin/modules/moderation` | 4 | 0 |
+| `admin/modules/deliverability` | 4 | 0 |
+| `admin/modules/timebanking` | 4 | 0 |
+| **Total** | **~140** | **0** |
 
 ---
 
-## Priority 3: Quality Improvements (Lower Risk, Higher Polish)
+## Priority 2: Important Gaps
 
-### 9. PHP Tests Use "Simulated" Responses
+### 2.1 Untested API Controllers (12 controllers)
 
-Many PHP controller tests assert against `$response['status'] === 'simulated'` rather than validating actual response bodies. This means:
-- Response data structure is never verified
-- Field values aren't checked
-- Pagination metadata isn't validated
-- Error message formats aren't confirmed
+| Controller | Functionality |
+|---|---|
+| `MatchPreferencesApiController` | User matching preferences — core feature |
+| `TwoFactorApiController` | 2FA setup/verification — security-critical |
+| `MetricsApiController` | Platform metrics/analytics |
+| `NewsletterApiController` | Public newsletter operations |
+| `EmailAdminApiController` | Email administration |
+| `HelpApiController` | Help/support system |
+| `LegalAcceptanceApiController` | Legal document acceptance — compliance-critical |
+| `UserInsuranceApiController` | Insurance certificate management |
+| `AdminInsuranceCertificateApiController` | Admin insurance management |
+| `PagesPublicApiController` | Public page rendering |
+| `BaseApiController` | Base controller shared logic |
 
-**Recommendation:** Gradually migrate controller tests from simulated responses to real request/response cycles with full body assertions.
+### 2.2 Untested Backend Services (36 services)
 
-### 10. React Tests Over-Mock Dependencies
+Key untested services beyond federation:
 
-Nearly every React test file mocks `framer-motion`, `react-router-dom`, and translation functions. This:
-- Makes tests brittle to library API changes
-- Reduces confidence that components work in real conditions
-- Creates maintenance burden (updating mocks across 100+ files)
+| Service | Category | Risk Level |
+|---|---|---|
+| `TwoFactorChallengeManager` | Security | High |
+| `SuperAdminAuditService` | Compliance | High |
+| `TenantHierarchyService` | Multi-tenancy | High |
+| `TenantSettingsService` | Multi-tenancy | High |
+| `TenantVisibilityService` | Multi-tenancy | High |
+| `AuditLogService` | Compliance | High |
+| `InsuranceCertificateService` | Business logic | Medium |
+| `PerformanceMonitorService` | Operations | Medium |
+| `PersonalizedSearchService` | Feature | Medium |
+| `SmartMatchingAnalyticsService` | Feature | Medium |
+| `SmartSegmentSuggestionService` | Feature | Medium |
+| `ListingRankingService` | Feature | Medium |
+| `MemberRankingService` | Feature | Medium |
+| `SearchAnalyzerService` | Feature | Medium |
+| `EmailMonitorService` | Operations | Medium |
+| `MailchimpService` | Integration | Medium |
+| `AdminBadgeCountService` | Feature | Low |
+| `HelpService` | Feature | Low |
+| `RedisCache` | Infrastructure | Low |
+| `SentryService` | Infrastructure | Low |
+| `VettingService` | Feature | Low |
 
-**Recommendation:** Create a shared test wrapper that provides real router context and minimal animation stubs, reducing per-file mock boilerplate.
+### 2.3 SuperAdmin Controller Tests Missing
 
-### 11. No Performance or Re-render Tests
+Six SuperAdmin controllers (`AuditController`, `BulkController`, `DashboardController`, `FederationController`, `TenantController`, `UserController`) have no dedicated tests. These controllers manage critical platform administration — tenant management, bulk operations, and audit trails.
 
-No tests verify:
-- Component memoization effectiveness
-- Unnecessary re-renders on state changes
-- Large list virtualization behavior
-- Bundle size regression
+### 2.4 PageBuilder/Renderer Coverage
 
-**Recommendation:** Add `React.Profiler`-based render-count tests for performance-critical components (FeedCard, ComposeHub, DashboardPage).
-
-### 12. Accessibility Testing Is Minimal
-
-Only `LoadingScreen` has explicit accessibility assertions (`aria-busy`, `role="status"`). No other components verify:
-- Keyboard navigation
-- Screen reader announcements
-- ARIA attributes on interactive elements
-- Focus management in modals
-
-**Recommendation:** Add accessibility assertions to all modal components, form components, and navigation elements. Consider integrating `jest-axe` / `vitest-axe` for automated a11y audits.
-
----
-
-## Priority 4: Infrastructure & Process
-
-### 13. Set PHP Coverage Thresholds
-
-Add minimum thresholds to `phpunit.xml` to prevent coverage regression:
-
-```xml
-<coverage>
-  <report>...</report>
-  <thresholds>
-    <line value="50"/>
-    <function value="40"/>
-  </thresholds>
-</coverage>
-```
-
-### 14. Raise React Coverage Thresholds Incrementally
-
-Update `vitest.config.ts` thresholds on a quarterly schedule:
-- **Q1:** statements 40%, branches 35%, functions 35%, lines 40%
-- **Q2:** statements 50%, branches 45%, functions 45%, lines 50%
-- **Q3:** statements 60%, branches 55%, functions 55%, lines 60%
-- **Target:** statements 70%, branches 60%, functions 60%, lines 70%
-
-### 15. Add Coverage Reporting to CI
-
-Ensure the CI pipeline:
-- Runs both PHPUnit and Vitest with coverage
-- Fails on threshold violations
-- Posts coverage diffs on pull requests (e.g., via Codecov or similar)
+15 block renderers and 2 core PageBuilder files have no dedicated tests. The `SmartBlockRendererTest.php` in Core tests may cover some of these, but individual renderer testing is absent.
 
 ---
 
-## Suggested Test Writing Order
+## Priority 3: Quality Improvements
 
-Based on risk, impact, and effort, here is the recommended order for writing new tests:
+### 3.1 Low Use of Data Providers
 
-| Order | Area | Effort | Impact |
-|-------|------|--------|--------|
-| 1 | `HtmlSanitizer.php` unit tests | Low | Critical (XSS) |
-| 2 | Auth page interaction tests (Login, Register) | Medium | Critical (user onboarding) |
-| 3 | Compose tab tests (PostTab, ListingTab, EventTab) | Medium | High (core product) |
-| 4 | E2E: Login + create listing journey | High | Very High (full-stack confidence) |
-| 5 | `useDraftPersistence` and `useSocialInteractions` hooks | Low | Medium (data integrity) |
-| 6 | Detail page tests (EventDetail, ListingDetail) | Medium | High (user-facing) |
-| 7 | PageBuilder unit tests | Low | Medium (content rendering) |
-| 8 | Set PHP coverage thresholds in CI | Low | High (regression prevention) |
-| 9 | Social components (CommentsSection, ShareButton) | Medium | Medium |
-| 10 | Accessibility audit integration (vitest-axe) | Low | Medium (compliance) |
+Only **4 out of 355** PHP test files use `@dataProvider`. Data providers enable testing multiple input scenarios efficiently. Services like `MatchingService`, `WalletService`, `ExchangeWorkflowService`, and `ValidationService` would benefit from parameterized test data.
+
+### 3.2 Limited Exception/Error Path Testing
+
+Only **17 out of 355** PHP test files test for expected exceptions. Error handling paths in these critical services should be tested:
+- Payment/wallet operations (insufficient funds, double-spend)
+- Authentication failures (invalid tokens, expired sessions, rate limiting)
+- Federation failures (network timeouts, invalid JWT, partner unavailable)
+- File upload failures (oversized files, invalid types, storage full)
+
+### 3.3 Frontend Accessibility Testing
+
+Only **35 out of 129** frontend test files use accessibility-related queries (`getByRole`, `getByLabelText`, `aria-`). Given this is a community platform, accessibility compliance is important. Focus areas:
+- Form components (inputs, selects, checkboxes should be labeled)
+- Navigation components (proper ARIA landmarks)
+- Modal dialogs (focus trapping, escape key handling)
+- Dynamic content (live regions for notifications, toasts)
+
+### 3.4 Frontend User Interaction Testing
+
+Only **71 out of 129** frontend test files simulate user interactions. Pages with complex forms and workflows need thorough interaction testing:
+- **Compose Hub** tab components (`compose/tabs/` — 5 files, 0 tests)
+- **Social components** (`components/social/` — 3 files, 0 tests)
+- **Error pages** (`pages/errors/` — 2 files, 0 tests)
+- **Chat page** (`pages/chat/` — 1 file, 0 tests)
+- **Connections page** (`pages/connections/` — 1 file, 0 tests)
+- **Matches page** (`pages/matches/` — 1 file, 0 tests)
+
+### 3.5 Integration Test Coverage
+
+Only **5 integration tests** exist (Exchange, Group, Listing, Message, User journeys). Important cross-cutting flows missing:
+- **Gamification integration** — earning XP, unlocking achievements, leaderboard updates
+- **Federation integration** — cross-tenant resource discovery and interaction
+- **Notification integration** — trigger event -> notification dispatch -> push/email delivery
+- **Admin workflow integration** — moderation actions, content approval flows
+- **Wallet/timebanking integration** — end-to-end credit lifecycle
 
 ---
 
-*Generated: 2026-03-01*
+## Recommendations by Priority
+
+### Immediate (High Impact, High Risk)
+
+1. **Implement E2E tests** for authentication, exchange lifecycle, and wallet operations
+2. **Add tests for `TwoFactorChallengeManager`** and `TwoFactorApiController` — security-critical auth bypass risk
+3. **Test tenant isolation services** (`TenantHierarchyService`, `TenantSettingsService`, `TenantVisibilityService`) — multi-tenancy data leak risk
+4. **Test `LegalAcceptanceApiController`** — compliance risk for legal document acceptance tracking
+5. **Test `SuperAdminAuditService`** and SuperAdmin controllers — privileged operations need verification
+
+### Short-Term (Coverage Expansion)
+
+6. **Add tests for the 16 federation services** — complex distributed operations need safety nets
+7. **Raise frontend coverage thresholds** incrementally (30% → 50% → 70%) and add tests for admin modules starting with `enterprise` (20 files) and `super` (16 files)
+8. **Add error path tests** for wallet, matching, and exchange services using `expectException`
+9. **Add `@dataProvider` parameterized tests** for services with complex input validation
+
+### Medium-Term (Quality Depth)
+
+10. **Add integration tests** for gamification, federation, and notification flows
+11. **Add accessibility tests** for all form-heavy pages (auth, settings, compose, profile)
+12. **Test all 15 PageBuilder renderers** individually — they produce user-facing HTML
+13. **Add frontend tests for social components, chat, connections, and matches pages**
+
+### Long-Term (Sustainability)
+
+14. **Set up coverage gates in CI** — block PRs that decrease line coverage
+15. **Add mutation testing** (e.g., Infection for PHP) to validate that tests catch real bugs, not just execute code paths
+16. **Create a test quality dashboard** tracking coverage trends over time
