@@ -181,6 +181,9 @@ $router->add('GET', '/api/v2/categories', function () {
 $router->add('GET', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@index');
 $router->add('GET', '/api/v2/listings/nearby', 'Nexus\Controllers\Api\ListingsApiController@nearby');
 $router->add('GET', '/api/v2/listings/saved', 'Nexus\Controllers\Api\ListingsApiController@getSavedListings');
+$router->add('GET', '/api/v2/listings/featured', 'Nexus\Controllers\Api\ListingsApiController@featured');
+$router->add('GET', '/api/v2/listings/tags/popular', 'Nexus\Controllers\Api\ListingsApiController@popularTags');
+$router->add('GET', '/api/v2/listings/tags/autocomplete', 'Nexus\Controllers\Api\ListingsApiController@autocompleteTags');
 $router->add('POST', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@store');
 $router->add('GET', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@show');
 $router->add('PUT', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@update');
@@ -2312,11 +2315,8 @@ $router->add('PUT', '/api/v2/admin/moderation/settings', 'Nexus\Controllers\Api\
 
 // ============================================
 // API V2 - LISTING FEATURES (New endpoints)
-// Note: /featured and /tags/* MUST come before /listings/{id}
+// Note: /featured, /tags/* moved above /listings/{id} in main listings section
 // ============================================
-$router->add('GET', '/api/v2/listings/featured', 'Nexus\Controllers\Api\ListingsApiController@featured');
-$router->add('GET', '/api/v2/listings/tags/popular', 'Nexus\Controllers\Api\ListingsApiController@popularTags');
-$router->add('GET', '/api/v2/listings/tags/autocomplete', 'Nexus\Controllers\Api\ListingsApiController@autocompleteTags');
 $router->add('POST', '/api/v2/listings/{id}/renew', 'Nexus\Controllers\Api\ListingsApiController@renew');
 $router->add('GET', '/api/v2/listings/{id}/analytics', 'Nexus\Controllers\Api\ListingsApiController@analytics');
 $router->add('PUT', '/api/v2/listings/{id}/tags', 'Nexus\Controllers\Api\ListingsApiController@setSkillTags');
