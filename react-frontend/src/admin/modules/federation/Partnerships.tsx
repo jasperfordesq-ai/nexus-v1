@@ -135,30 +135,28 @@ export function Partnerships() {
               else if (key === 'reject') handleReject(item);
               else if (key === 'terminate') setTerminateTarget(item);
             }}
+            items={[
+              ...(item.status === 'pending' ? [{ key: 'approve' }, { key: 'reject' }] : []),
+              ...(item.status === 'active' ? [{ key: 'terminate' }] : []),
+            ]}
           >
-            <DropdownItem
-              key="approve"
-              startContent={<CheckCircle size={14} />}
-              className={item.status === 'pending' ? 'text-success' : 'hidden'}
-            >
-              Approve
-            </DropdownItem>
-            <DropdownItem
-              key="reject"
-              startContent={<XCircle size={14} />}
-              className={item.status === 'pending' ? 'text-danger' : 'hidden'}
-              color="danger"
-            >
-              Reject
-            </DropdownItem>
-            <DropdownItem
-              key="terminate"
-              startContent={<Ban size={14} />}
-              className={item.status === 'active' ? 'text-danger' : 'hidden'}
-              color="danger"
-            >
-              Terminate
-            </DropdownItem>
+            {(action) => {
+              if (action.key === 'approve') return (
+                <DropdownItem key="approve" startContent={<CheckCircle size={14} />} className="text-success">
+                  Approve
+                </DropdownItem>
+              );
+              if (action.key === 'reject') return (
+                <DropdownItem key="reject" startContent={<XCircle size={14} />} className="text-danger" color="danger">
+                  Reject
+                </DropdownItem>
+              );
+              return (
+                <DropdownItem key="terminate" startContent={<Ban size={14} />} className="text-danger" color="danger">
+                  Terminate
+                </DropdownItem>
+              );
+            }}
           </DropdownMenu>
         </Dropdown>
       ),

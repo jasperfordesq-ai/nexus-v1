@@ -14,6 +14,7 @@ import { Database, Download, Upload, RefreshCw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import { API_BASE } from '@/lib/api';
 
 interface DataConfig {
   export_formats: string[];
@@ -27,6 +28,7 @@ export function DataManagement() {
   usePageTitle('Admin - Federation Data Management');
   const [config, setConfig] = useState<DataConfig | null>(null);
   const [loading, setLoading] = useState(true);
+  const [exportingType, setExportingType] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -48,6 +50,30 @@ export function DataManagement() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  const handleExport = useCallback(async (type: string) => {
+    setExportingType(type);
+    try {
+      const response = await fetch(`${API_BASE}/v2/admin/federation/export/${type}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('nexus_access_token') || ''}`,
+        },
+      });
+      if (!response.ok) throw new Error('Export failed');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `federation_${type}_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      // Silently handle — could add toast here
+    }
+    setExportingType(null);
+  }, []);
+
   return (
     <div>
       <PageHeader
@@ -68,7 +94,7 @@ export function DataManagement() {
                       <p className="font-medium capitalize">{key}</p>
                       <p className="text-xs text-default-400">{label}</p>
                     </div>
-                    <Button size="sm" variant="flat" startContent={<Download size={14} />}>Export</Button>
+                    <Button size="sm" variant="flat" startContent={<Download size={14} />} isLoading={exportingType === key} onPress={() => handleExport(key)}>Export</Button>
                   </div>
                 ))}
                 <p className="text-xs text-default-400">
