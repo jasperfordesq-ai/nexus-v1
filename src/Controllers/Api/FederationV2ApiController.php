@@ -813,6 +813,8 @@ class FederationV2ApiController extends BaseApiController
                     'location' => $m['location'] ?? null,
                     'service_reach' => $m['service_reach'] ?? 'local_only',
                     'messaging_enabled' => (bool)($m['messaging_enabled_federated'] ?? false),
+                    'tenant_id' => (int)$m['tenant_id'],
+                    'tenant_name' => $m['tenant_name'] ?? '',
                     'timebank' => [
                         'id' => (int)$m['tenant_id'],
                         'name' => $m['tenant_name'],
@@ -915,6 +917,8 @@ class FederationV2ApiController extends BaseApiController
                 'location' => $m['show_location_federated'] ? ($m['location'] ?? null) : null,
                 'service_reach' => $m['service_reach'] ?? 'local_only',
                 'messaging_enabled' => (bool)($m['messaging_enabled_federated'] ?? false),
+                'tenant_id' => (int)$m['tenant_id'],
+                'tenant_name' => $m['tenant_name'] ?? '',
                 'timebank' => [
                     'id' => (int)$m['tenant_id'],
                     'name' => $m['tenant_name'],
@@ -1032,13 +1036,19 @@ class FederationV2ApiController extends BaseApiController
         $body = $this->input('body', '');
         $referenceMessageId = $this->input('reference_message_id');
 
-        // Validate
-        if (empty($receiverId) || empty($receiverTenantId)) {
-            $this->respondWithError('VALIDATION_ERROR', 'receiver_id and receiver_tenant_id are required.');
-            return;
+        // Validate required fields
+        $errors = [];
+        if (empty($receiverId)) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'receiver_id is required.', 'field' => 'receiver_id'];
+        }
+        if (empty($receiverTenantId)) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'receiver_tenant_id is required.', 'field' => 'receiver_tenant_id'];
         }
         if (empty($body)) {
-            $this->respondWithError('VALIDATION_ERROR', 'Message body is required.');
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message body is required.', 'field' => 'body'];
+        }
+        if (!empty($errors)) {
+            $this->respondWithErrors($errors);
             return;
         }
 
