@@ -31,6 +31,9 @@ import {
   Calendar,
   MessageSquarePlus,
   Trophy,
+  Heart,
+  Eye,
+  Star,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -39,6 +42,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAssetUrl } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -56,6 +60,12 @@ interface Challenge {
   prize_description: string | null;
   max_ideas_per_user: number | null;
   created_at: string;
+  tags: string[];
+  cover_image: string | null;
+  is_favorited: boolean;
+  favorites_count: number;
+  views_count: number;
+  is_featured: boolean;
   creator: {
     id: number;
     name: string;
@@ -89,6 +99,7 @@ export function IdeationPage() {
   const [hasMore, setHasMore] = useState(false);
   const [cursor, setCursor] = useState<string | undefined>();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [favoritingIds, setFavoritingIds] = useState<Set<number>>(new Set());
 
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
@@ -145,6 +156,42 @@ export function IdeationPage() {
 
   const handleTabChange = (key: React.Key) => {
     setActiveTab(key as FilterTab);
+  };
+
+  const handleToggleFavorite = async (e: React.MouseEvent, challengeId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (favoritingIds.has(challengeId)) return;
+
+    setFavoritingIds(prev => new Set(prev).add(challengeId));
+
+    try {
+      const response = await api.post<{ favorited: boolean; favorites_count: number }>(
+        `/v2/ideation-challenges/${challengeId}/favorite`
+      );
+
+      if (response.data) {
+        setChallenges(prev => prev.map(c => {
+          if (c.id === challengeId) {
+            return {
+              ...c,
+              is_favorited: response.data!.favorited,
+              favorites_count: response.data!.favorites_count,
+            };
+          }
+          return c;
+        }));
+      }
+    } catch (err) {
+      logError('Failed to toggle favorite', err);
+      toast.error(t('toast.error_generic'));
+    } finally {
+      setFavoritingIds(prev => {
+        const next = new Set(prev);
+        next.delete(challengeId);
+        return next;
+      });
+    }
   };
 
   const truncate = (text: string, maxLength: number) => {
@@ -250,53 +297,118 @@ export function IdeationPage() {
                 to={tenantPath(`/ideation/${challenge.id}`)}
                 className="block"
               >
-                <GlassCard className="p-5 h-full hover:shadow-lg transition-shadow cursor-pointer">
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <h3 className="text-lg font-semibold text-[var(--color-text)] line-clamp-2">
-                      {challenge.title}
-                    </h3>
-                    <Chip
-                      size="sm"
-                      color={STATUS_COLOR_MAP[challenge.status] ?? 'default'}
-                      variant="flat"
-                    >
-                      {t(`status.${challenge.status}`)}
-                    </Chip>
-                  </div>
+                <GlassCard className="h-full hover:shadow-lg transition-shadow cursor-pointer overflow-hidden">
+                  {/* Cover Image */}
+                  {challenge.cover_image && (
+                    <div className="w-full h-40 overflow-hidden">
+                      <img
+                        src={resolveAssetUrl(challenge.cover_image)}
+                        alt={challenge.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
 
-                  <p className="text-sm text-[var(--color-text-secondary)] mb-4 line-clamp-3">
-                    {truncate(challenge.description, 150)}
-                  </p>
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-[var(--color-text)] line-clamp-2">
+                          {challenge.title}
+                        </h3>
+                        {challenge.is_featured && (
+                          <Chip
+                            size="sm"
+                            color="warning"
+                            variant="flat"
+                            startContent={<Star className="w-3 h-3 fill-current" />}
+                          >
+                            {t('featured')}
+                          </Chip>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Chip
+                          size="sm"
+                          color={STATUS_COLOR_MAP[challenge.status] ?? 'default'}
+                          variant="flat"
+                        >
+                          {t(`status.${challenge.status}`)}
+                        </Chip>
+                        {/* Favorite Button */}
+                        <button
+                          onClick={(e) => handleToggleFavorite(e, challenge.id)}
+                          disabled={favoritingIds.has(challenge.id)}
+                          className="p-1 rounded-full hover:bg-[var(--color-surface-hover)] transition-colors disabled:opacity-50"
+                          aria-label={challenge.is_favorited ? t('favorites.remove') : t('favorites.add')}
+                        >
+                          <Heart
+                            className={`w-4 h-4 ${
+                              challenge.is_favorited
+                                ? 'text-red-500 fill-current'
+                                : 'text-[var(--color-text-tertiary)]'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
 
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--color-text-tertiary)]">
-                    {/* Ideas count */}
-                    <span className="flex items-center gap-1">
-                      <MessageSquarePlus className="w-3.5 h-3.5" />
-                      {t('challenge.ideas_count', { count: challenge.ideas_count })}
-                    </span>
+                    <p className="text-sm text-[var(--color-text-secondary)] mb-3 line-clamp-3">
+                      {truncate(challenge.description, 150)}
+                    </p>
 
-                    {/* Submission deadline */}
-                    {challenge.submission_deadline && (
+                    {/* Tags */}
+                    {challenge.tags && challenge.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {challenge.tags.map((tag) => (
+                          <Chip key={tag} size="sm" variant="bordered" className="text-xs">
+                            {tag}
+                          </Chip>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--color-text-tertiary)]">
+                      {/* Ideas count */}
                       <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {t('challenge.submission_deadline', { date: formatDate(challenge.submission_deadline) })}
+                        <MessageSquarePlus className="w-3.5 h-3.5" />
+                        {t('challenge.ideas_count', { count: challenge.ideas_count })}
                       </span>
-                    )}
 
-                    {/* Prize indicator */}
-                    {challenge.prize_description && (
+                      {/* Views count */}
                       <span className="flex items-center gap-1">
-                        <Trophy className="w-3.5 h-3.5 text-amber-500" />
-                        {t('challenge.prize')}
+                        <Eye className="w-3.5 h-3.5" />
+                        {challenge.views_count} {t('views')}
                       </span>
-                    )}
 
-                    {/* Category */}
-                    {challenge.category && (
-                      <Chip size="sm" variant="flat" className="text-xs">
-                        {challenge.category}
-                      </Chip>
-                    )}
+                      {/* Favorites count */}
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-3.5 h-3.5" />
+                        {challenge.favorites_count}
+                      </span>
+
+                      {/* Submission deadline */}
+                      {challenge.submission_deadline && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {t('challenge.submission_deadline', { date: formatDate(challenge.submission_deadline) })}
+                        </span>
+                      )}
+
+                      {/* Prize indicator */}
+                      {challenge.prize_description && (
+                        <span className="flex items-center gap-1">
+                          <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                          {t('challenge.prize')}
+                        </span>
+                      )}
+
+                      {/* Category */}
+                      {challenge.category && (
+                        <Chip size="sm" variant="flat" className="text-xs">
+                          {challenge.category}
+                        </Chip>
+                      )}
+                    </div>
                   </div>
                 </GlassCard>
               </Link>

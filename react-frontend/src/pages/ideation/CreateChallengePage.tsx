@@ -22,9 +22,11 @@ import {
   Select,
   SelectItem,
   Spinner,
+  Chip,
 } from '@heroui/react';
 import {
   ArrowLeft,
+  X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -44,6 +46,8 @@ interface ChallengeForm {
   voting_deadline: string;
   max_ideas_per_user: string;
   status: string;
+  cover_image: string;
+  tags: string[];
 }
 
 interface ChallengeData {
@@ -56,6 +60,8 @@ interface ChallengeData {
   voting_deadline: string | null;
   max_ideas_per_user: number | null;
   status: string;
+  cover_image: string | null;
+  tags: string[];
 }
 
 const INITIAL_FORM: ChallengeForm = {
@@ -67,6 +73,8 @@ const INITIAL_FORM: ChallengeForm = {
   voting_deadline: '',
   max_ideas_per_user: '',
   status: 'draft',
+  cover_image: '',
+  tags: [],
 };
 
 /* ───────────────────────── Main Component ───────────────────────── */
@@ -87,6 +95,7 @@ export function CreateChallengePage() {
   const [isLoading, setIsLoading] = useState(isEdit);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [tagInput, setTagInput] = useState('');
 
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
@@ -123,6 +132,8 @@ export function CreateChallengePage() {
               ? String(challenge.max_ideas_per_user)
               : '',
             status: challenge.status ?? 'draft',
+            cover_image: challenge.cover_image ?? '',
+            tags: challenge.tags ?? [],
           });
         }
       } catch (err) {
@@ -147,6 +158,24 @@ export function CreateChallengePage() {
         return next;
       });
     }
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const tag = tagInput.trim();
+      if (tag && !form.tags.includes(tag)) {
+        setForm(prev => ({ ...prev, tags: [...prev.tags, tag] }));
+      }
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setForm(prev => ({
+      ...prev,
+      tags: prev.tags.filter(t => t !== tagToRemove),
+    }));
   };
 
   const validate = (): boolean => {
@@ -176,6 +205,8 @@ export function CreateChallengePage() {
         submission_deadline: form.submission_deadline || null,
         voting_deadline: form.voting_deadline || null,
         max_ideas_per_user: form.max_ideas_per_user ? parseInt(form.max_ideas_per_user, 10) : null,
+        cover_image: form.cover_image.trim() || null,
+        tags: form.tags,
       };
 
       if (!isEdit) {
@@ -293,6 +324,44 @@ export function CreateChallengePage() {
             onValueChange={(val) => updateField('category', val)}
             variant="bordered"
           />
+
+          {/* Cover Image URL */}
+          <Input
+            label={t('cover_image.label')}
+            placeholder={t('cover_image.placeholder')}
+            description={t('cover_image.helper')}
+            value={form.cover_image}
+            onValueChange={(val) => updateField('cover_image', val)}
+            variant="bordered"
+          />
+
+          {/* Tags */}
+          <div>
+            <Input
+              label={t('tags.label')}
+              placeholder={t('tags.placeholder')}
+              description={t('tags.helper')}
+              value={tagInput}
+              onValueChange={setTagInput}
+              onKeyDown={handleTagKeyDown}
+              variant="bordered"
+            />
+            {form.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {form.tags.map((tag) => (
+                  <Chip
+                    key={tag}
+                    size="sm"
+                    variant="flat"
+                    onClose={() => removeTag(tag)}
+                    endContent={<X className="w-3 h-3" />}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Prize Description */}
           <Textarea

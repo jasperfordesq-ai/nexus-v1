@@ -87,6 +87,7 @@ class IdeationChallengeService
         $limit = $filters['limit'] ?? 20;
         $cursor = $filters['cursor'] ?? null;
         $status = $filters['status'] ?? null;
+        $userId = $filters['user_id'] ?? null;
 
         $params = [$tenantId];
         $where = ["c.tenant_id = ?"];
@@ -137,7 +138,7 @@ class IdeationChallengeService
 
         // Format each item
         foreach ($items as &$item) {
-            $item = self::formatChallenge($item);
+            $item = self::formatChallenge($item, $userId);
         }
 
         return [
@@ -171,7 +172,7 @@ class IdeationChallengeService
             return null;
         }
 
-        $challenge = self::formatChallenge($challenge);
+        $challenge = self::formatChallenge($challenge, $userId);
 
         // Add user's idea count for this challenge
         if ($userId) {
@@ -186,9 +187,13 @@ class IdeationChallengeService
     }
 
     /**
-     * Format challenge with creator info
+     * Format challenge with creator info and enriched fields
+     *
+     * @param array $challenge Raw challenge data from DB
+     * @param int|null $userId Optional user ID for is_favorited check
+     * @return array Formatted challenge
      */
-    private static function formatChallenge(array $challenge): array
+    private static function formatChallenge(array $challenge, ?int $userId = null): array
     {
         $challenge['creator'] = [
             'id' => (int)$challenge['user_id'],
@@ -197,6 +202,25 @@ class IdeationChallengeService
         ];
 
         $challenge['ideas_count'] = (int)($challenge['ideas_count'] ?? 0);
+        $challenge['favorites_count'] = (int)($challenge['favorites_count'] ?? 0);
+        $challenge['views_count'] = (int)($challenge['views_count'] ?? 0);
+        $challenge['is_featured'] = (bool)($challenge['is_featured'] ?? false);
+        $challenge['cover_image'] = $challenge['cover_image'] ?? null;
+
+        // Decode tags JSON to array
+        if (isset($challenge['tags']) && is_string($challenge['tags'])) {
+            $decoded = json_decode($challenge['tags'], true);
+            $challenge['tags'] = is_array($decoded) ? $decoded : [];
+        } else {
+            $challenge['tags'] = [];
+        }
+
+        // Check if current user has favorited this challenge
+        if ($userId) {
+            $challenge['is_favorited'] = self::isFavorited((int)$challenge['id'], $userId);
+        } else {
+            $challenge['is_favorited'] = false;
+        }
 
         unset(
             $challenge['creator_first_name'],
@@ -246,12 +270,14 @@ class IdeationChallengeService
         $votingDeadline = $data['voting_deadline'] ?? null;
         $prizeDescription = !empty($data['prize_description']) ? trim($data['prize_description']) : null;
         $maxIdeasPerUser = isset($data['max_ideas_per_user']) ? (int)$data['max_ideas_per_user'] : null;
+        $tags = isset($data['tags']) && is_array($data['tags']) ? json_encode($data['tags']) : null;
+        $coverImage = !empty($data['cover_image']) ? trim($data['cover_image']) : null;
 
         try {
             Database::query(
                 "INSERT INTO ideation_challenges
-                    (tenant_id, user_id, title, description, category, status, submission_deadline, voting_deadline, prize_description, max_ideas_per_user, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                    (tenant_id, user_id, title, description, category, status, submission_deadline, voting_deadline, prize_description, max_ideas_per_user, tags, cover_image, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
                 [
                     $tenantId,
                     $userId,
@@ -263,6 +289,8 @@ class IdeationChallengeService
                     $votingDeadline,
                     $prizeDescription,
                     $maxIdeasPerUser,
+                    $tags,
+                    $coverImage,
                 ]
             );
 
@@ -350,6 +378,16 @@ class IdeationChallengeService
         if (array_key_exists('max_ideas_per_user', $data)) {
             $updates[] = "max_ideas_per_user = ?";
             $params[] = $data['max_ideas_per_user'] !== null ? (int)$data['max_ideas_per_user'] : null;
+        }
+
+        if (array_key_exists('tags', $data)) {
+            $updates[] = "tags = ?";
+            $params[] = is_array($data['tags']) ? json_encode($data['tags']) : null;
+        }
+
+        if (array_key_exists('cover_image', $data)) {
+            $updates[] = "cover_image = ?";
+            $params[] = !empty($data['cover_image']) ? trim($data['cover_image']) : null;
         }
 
         if (empty($updates)) {
@@ -1116,6 +1154,182 @@ class IdeationChallengeService
             error_log("Comment creation failed: " . $e->getMessage());
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to add comment');
             return null;
+        }
+    }
+
+    // ============================================
+    // FAVORITE METHODS
+    // ============================================
+
+    /**
+     * Toggle favorite on a challenge (insert or delete)
+     *
+     * @return array ['favorited' => bool, 'favorites_count' => int]
+     */
+    public static function toggleFavorite(int $challengeId, int $userId): array
+    {
+        self::clearErrors();
+
+        $tenantId = TenantContext::getId();
+
+        // Verify challenge exists in this tenant
+        $challenge = Database::query(
+            "SELECT id FROM ideation_challenges WHERE id = ? AND tenant_id = ?",
+            [$challengeId, $tenantId]
+        )->fetch();
+
+        if (!$challenge) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Challenge not found');
+            return ['favorited' => false, 'favorites_count' => 0];
+        }
+
+        try {
+            Database::beginTransaction();
+
+            // Check existing favorite
+            $existing = Database::query(
+                "SELECT id FROM challenge_favorites WHERE challenge_id = ? AND user_id = ?",
+                [$challengeId, $userId]
+            )->fetch();
+
+            if ($existing) {
+                // Remove favorite
+                Database::query(
+                    "DELETE FROM challenge_favorites WHERE challenge_id = ? AND user_id = ?",
+                    [$challengeId, $userId]
+                );
+                Database::query(
+                    "UPDATE ideation_challenges SET favorites_count = GREATEST(0, favorites_count - 1) WHERE id = ? AND tenant_id = ?",
+                    [$challengeId, $tenantId]
+                );
+                $favorited = false;
+            } else {
+                // Add favorite
+                Database::query(
+                    "INSERT INTO challenge_favorites (challenge_id, user_id, created_at) VALUES (?, ?, NOW())",
+                    [$challengeId, $userId]
+                );
+                Database::query(
+                    "UPDATE ideation_challenges SET favorites_count = favorites_count + 1 WHERE id = ? AND tenant_id = ?",
+                    [$challengeId, $tenantId]
+                );
+                $favorited = true;
+            }
+
+            Database::commit();
+
+            // Get updated count
+            $updated = Database::query(
+                "SELECT favorites_count FROM ideation_challenges WHERE id = ? AND tenant_id = ?",
+                [$challengeId, $tenantId]
+            )->fetch();
+
+            return [
+                'favorited' => $favorited,
+                'favorites_count' => (int)($updated['favorites_count'] ?? 0),
+            ];
+        } catch (\Throwable $e) {
+            Database::rollback();
+            error_log("Challenge favorite toggle failed: " . $e->getMessage());
+            self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to toggle favorite');
+            return ['favorited' => false, 'favorites_count' => 0];
+        }
+    }
+
+    /**
+     * Check if a user has favorited a challenge
+     */
+    public static function isFavorited(int $challengeId, int $userId): bool
+    {
+        $result = Database::query(
+            "SELECT id FROM challenge_favorites WHERE challenge_id = ? AND user_id = ?",
+            [$challengeId, $userId]
+        )->fetch();
+
+        return !empty($result);
+    }
+
+    // ============================================
+    // DUPLICATE METHOD
+    // ============================================
+
+    /**
+     * Duplicate a challenge as a draft copy
+     *
+     * Clones the challenge with status='draft', reset counts, and no deadlines.
+     * Does NOT copy ideas, votes, comments, or favorites.
+     *
+     * @return int|null New challenge ID on success, null on failure
+     */
+    public static function duplicateChallenge(int $challengeId, int $userId): ?int
+    {
+        self::clearErrors();
+
+        if (!self::isAdmin($userId)) {
+            self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Only admins can duplicate challenges');
+            return null;
+        }
+
+        $tenantId = TenantContext::getId();
+
+        $original = Database::query(
+            "SELECT * FROM ideation_challenges WHERE id = ? AND tenant_id = ?",
+            [$challengeId, $tenantId]
+        )->fetch();
+
+        if (!$original) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Challenge not found');
+            return null;
+        }
+
+        $newTitle = 'Copy of ' . ($original['title'] ?? 'Untitled');
+
+        try {
+            Database::query(
+                "INSERT INTO ideation_challenges
+                    (tenant_id, user_id, title, description, category, tags, cover_image, prize_description, max_ideas_per_user, status, ideas_count, favorites_count, views_count, is_featured, submission_deadline, voting_deadline, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', 0, 0, 0, 0, NULL, NULL, NOW())",
+                [
+                    $tenantId,
+                    $userId,
+                    $newTitle,
+                    $original['description'] ?? '',
+                    $original['category'] ?? null,
+                    $original['tags'] ?? null,
+                    $original['cover_image'] ?? null,
+                    $original['prize_description'] ?? null,
+                    $original['max_ideas_per_user'] ?? null,
+                ]
+            );
+
+            return (int)Database::lastInsertId();
+        } catch (\Throwable $e) {
+            error_log("Challenge duplication failed: " . $e->getMessage());
+            self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to duplicate challenge');
+            return null;
+        }
+    }
+
+    // ============================================
+    // VIEW TRACKING
+    // ============================================
+
+    /**
+     * Increment the view count for a challenge
+     *
+     * Fire-and-forget — does not fail on error.
+     */
+    public static function incrementViews(int $challengeId): void
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            Database::query(
+                "UPDATE ideation_challenges SET views_count = views_count + 1 WHERE id = ? AND tenant_id = ?",
+                [$challengeId, $tenantId]
+            );
+        } catch (\Throwable $e) {
+            // Silently ignore — view tracking is non-critical
+            error_log("Challenge view increment failed: " . $e->getMessage());
         }
     }
 

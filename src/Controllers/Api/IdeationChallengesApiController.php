@@ -23,6 +23,8 @@ use Nexus\Core\TenantContext;
  * - PUT    /api/v2/ideation-challenges/{id}         - Update challenge (admin)
  * - DELETE /api/v2/ideation-challenges/{id}         - Delete challenge (admin)
  * - PUT    /api/v2/ideation-challenges/{id}/status  - Change status (admin)
+ * - POST   /api/v2/ideation-challenges/{id}/favorite - Toggle favorite (auth)
+ * - POST   /api/v2/ideation-challenges/{id}/duplicate - Duplicate challenge (admin)
  * - GET    /api/v2/ideation-challenges/{id}/ideas   - List ideas
  * - POST   /api/v2/ideation-challenges/{id}/ideas   - Submit idea (auth)
  * - GET    /api/v2/ideation-ideas/{id}              - Get idea
@@ -70,6 +72,7 @@ class IdeationChallengesApiController extends BaseApiController
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
+            'user_id' => $userId,
         ];
 
         $status = $this->query('status');
@@ -138,6 +141,9 @@ class IdeationChallengesApiController extends BaseApiController
                 404
             );
         }
+
+        // Track view (fire-and-forget)
+        IdeationChallengeService::incrementViews($id);
 
         $this->respondWithData($challenge);
     }
@@ -227,6 +233,54 @@ class IdeationChallengesApiController extends BaseApiController
         $challenge = IdeationChallengeService::getChallengeById($id, $userId);
 
         $this->respondWithData($challenge);
+    }
+
+    /**
+     * POST /api/v2/ideation-challenges/{id}/favorite
+     *
+     * Toggle favorite on a challenge (authenticated users).
+     */
+    public function toggleFavorite(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('ideation_favorite', 30, 60);
+
+        $result = IdeationChallengeService::toggleFavorite($id, $userId);
+
+        $errors = IdeationChallengeService::getErrors();
+        if (!empty($errors)) {
+            $status = $this->resolveErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+        }
+
+        $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/ideation-challenges/{id}/duplicate
+     *
+     * Duplicate a challenge as a draft copy (admin only).
+     */
+    public function duplicate(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('ideation_duplicate', 10, 60);
+
+        $newId = IdeationChallengeService::duplicateChallenge($id, $userId);
+
+        if ($newId === null) {
+            $errors = IdeationChallengeService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+        }
+
+        $challenge = IdeationChallengeService::getChallengeById($newId, $userId);
+
+        $this->respondWithData($challenge, null, 201);
     }
 
     // ============================================

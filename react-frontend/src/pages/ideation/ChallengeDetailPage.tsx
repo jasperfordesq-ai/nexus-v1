@@ -48,6 +48,10 @@ import {
   MoreVertical,
   Edit3,
   Trash2,
+  Heart,
+  Eye,
+  Star,
+  Copy,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -56,7 +60,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -75,6 +79,12 @@ interface Challenge {
   max_ideas_per_user: number | null;
   created_at: string;
   user_idea_count?: number;
+  tags: string[];
+  cover_image: string | null;
+  is_favorited: boolean;
+  favorites_count: number;
+  views_count: number;
+  is_featured: boolean;
   creator: {
     id: number;
     name: string;
@@ -93,6 +103,7 @@ interface Idea {
   status: 'submitted' | 'shortlisted' | 'winner' | 'withdrawn';
   has_voted: boolean;
   created_at: string;
+  image_url: string | null;
   creator: {
     id: number;
     name: string;
@@ -150,6 +161,12 @@ export function ChallengeDetailPage() {
   // Delete challenge modal
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Favorite toggle
+  const [isFavoriting, setIsFavoriting] = useState(false);
+
+  // Duplicate
+  const [isDuplicating, setIsDuplicating] = useState(false);
 
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
@@ -309,6 +326,49 @@ export function ChallengeDetailPage() {
     }
   };
 
+  const handleToggleFavorite = async () => {
+    if (isFavoriting || !challenge) return;
+
+    setIsFavoriting(true);
+    try {
+      const response = await api.post<{ favorited: boolean; favorites_count: number }>(
+        `/v2/ideation-challenges/${id}/favorite`
+      );
+
+      if (response.data) {
+        setChallenge(prev => prev ? {
+          ...prev,
+          is_favorited: response.data!.favorited,
+          favorites_count: response.data!.favorites_count,
+        } : prev);
+      }
+    } catch (err) {
+      logError('Failed to toggle favorite', err);
+      toast.error(t('toast.error_generic'));
+    } finally {
+      setIsFavoriting(false);
+    }
+  };
+
+  const handleDuplicate = async () => {
+    if (isDuplicating) return;
+
+    setIsDuplicating(true);
+    try {
+      const response = await api.post<{ id: number }>(`/v2/ideation-challenges/${id}/duplicate`);
+
+      if (response.data) {
+        toast.success(t('duplicate.success'));
+        navigate(tenantPath(`/ideation/${response.data.id}/edit`));
+      }
+    } catch (err) {
+      logError('Failed to duplicate challenge', err);
+      toast.error(t('duplicate.error'));
+    } finally {
+      setIsDuplicating(false);
+    }
+  };
+
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null;
     try {
@@ -385,6 +445,12 @@ export function ChallengeDetailPage() {
       onPress: () => handleStatusChange(transition.key),
     })),
     {
+      key: 'duplicate',
+      label: t('duplicate.button'),
+      startContent: <Copy className="w-4 h-4" />,
+      onPress: handleDuplicate,
+    },
+    {
       key: 'edit',
       label: t('admin.edit_challenge'),
       startContent: <Edit3 className="w-4 h-4" />,
@@ -412,6 +478,17 @@ export function ChallengeDetailPage() {
         {t('title')}
       </Button>
 
+      {/* Cover Image Banner */}
+      {challenge.cover_image && (
+        <div className="w-full h-48 sm:h-64 rounded-xl overflow-hidden mb-6">
+          <img
+            src={resolveAssetUrl(challenge.cover_image)}
+            alt={challenge.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       {/* Challenge Header */}
       <GlassCard className="p-6 mb-6">
         <div className="flex items-start justify-between gap-4 mb-4">
@@ -427,6 +504,16 @@ export function ChallengeDetailPage() {
               >
                 {t(`status.${challenge.status}`)}
               </Chip>
+              {challenge.is_featured && (
+                <Chip
+                  size="sm"
+                  color="warning"
+                  variant="flat"
+                  startContent={<Star className="w-3 h-3 fill-current" />}
+                >
+                  {t('featured')}
+                </Chip>
+              )}
             </div>
 
             {challenge.category && (
@@ -436,29 +523,49 @@ export function ChallengeDetailPage() {
             )}
           </div>
 
-          {/* Admin Controls */}
-          {isAdmin && (
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly variant="flat" size="sm">
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu aria-label={t('admin.change_status')} items={adminMenuItems}>
-                {(item) => (
-                  <DropdownItem
-                    key={item.key}
-                    className={item.className}
-                    color={item.color}
-                    startContent={item.startContent}
-                    onPress={item.onPress}
-                  >
-                    {item.label}
-                  </DropdownItem>
-                )}
-              </DropdownMenu>
-            </Dropdown>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Favorite Button */}
+            <Button
+              isIconOnly
+              variant="flat"
+              size="sm"
+              onPress={handleToggleFavorite}
+              isDisabled={isFavoriting}
+              aria-label={challenge.is_favorited ? t('favorites.remove') : t('favorites.add')}
+            >
+              <Heart
+                className={`w-5 h-5 ${
+                  challenge.is_favorited
+                    ? 'text-red-500 fill-current'
+                    : 'text-[var(--color-text-tertiary)]'
+                }`}
+              />
+            </Button>
+
+            {/* Admin Controls */}
+            {isAdmin && (
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button isIconOnly variant="flat" size="sm">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu aria-label={t('admin.change_status')} items={adminMenuItems}>
+                  {(item) => (
+                    <DropdownItem
+                      key={item.key}
+                      className={item.className}
+                      color={item.color}
+                      startContent={item.startContent}
+                      onPress={item.onPress}
+                    >
+                      {item.label}
+                    </DropdownItem>
+                  )}
+                </DropdownMenu>
+              </Dropdown>
+            )}
+          </div>
         </div>
 
         {/* Description */}
@@ -466,8 +573,31 @@ export function ChallengeDetailPage() {
           {challenge.description}
         </p>
 
+        {/* Tags */}
+        {challenge.tags && challenge.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {challenge.tags.map((tag) => (
+              <Chip key={tag} size="sm" variant="bordered" className="text-xs">
+                {tag}
+              </Chip>
+            ))}
+          </div>
+        )}
+
         {/* Meta info */}
         <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--color-text-tertiary)]">
+          {/* Views count */}
+          <span className="flex items-center gap-1.5">
+            <Eye className="w-4 h-4" />
+            {challenge.views_count} {t('views')}
+          </span>
+
+          {/* Favorites count */}
+          <span className="flex items-center gap-1.5">
+            <Heart className="w-4 h-4" />
+            {challenge.favorites_count}
+          </span>
+
           {challenge.submission_deadline && (
             <span className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
@@ -642,6 +772,17 @@ export function ChallengeDetailPage() {
                     <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2 mb-2">
                       {idea.description}
                     </p>
+
+                    {/* Idea image thumbnail */}
+                    {idea.image_url && (
+                      <div className="mb-2">
+                        <img
+                          src={resolveAssetUrl(idea.image_url)}
+                          alt={t('idea_image')}
+                          className="w-24 h-24 object-cover rounded-lg"
+                        />
+                      </div>
+                    )}
                   </Link>
 
                   <div className="flex items-center gap-3 text-xs text-[var(--color-text-tertiary)]">
