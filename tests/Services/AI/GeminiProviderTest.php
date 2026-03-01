@@ -4,7 +4,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-namespace Tests\Services\AI;
+namespace Nexus\Tests\Services\AI;
 
 use PHPUnit\Framework\TestCase;
 use Nexus\Services\AI\Providers\GeminiProvider;
