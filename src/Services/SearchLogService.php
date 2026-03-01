@@ -69,20 +69,26 @@ class SearchLogService
     {
         $tenantId = TenantContext::getId();
 
-        return Database::query(
-            "SELECT
-                LOWER(TRIM(query)) as query,
-                COUNT(*) as search_count,
-                ROUND(AVG(result_count), 1) as avg_results,
-                MAX(created_at) as last_searched
-             FROM search_logs
-             WHERE tenant_id = ?
-               AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
-             GROUP BY LOWER(TRIM(query))
-             ORDER BY search_count DESC
-             LIMIT ?",
-            [$tenantId, $days, $limit]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        try {
+            return Database::query(
+                "SELECT
+                    LOWER(TRIM(query)) as query,
+                    COUNT(*) as search_count,
+                    ROUND(AVG(result_count), 1) as avg_results,
+                    MAX(created_at) as last_searched
+                 FROM search_logs
+                 WHERE tenant_id = ?
+                   AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                 GROUP BY LOWER(TRIM(query))
+                 ORDER BY search_count DESC
+                 LIMIT ?",
+                [$tenantId, $days, $limit]
+            )->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            // Table or column may not exist yet — return empty gracefully
+            error_log("[SearchLogService] getTrendingSearches error: " . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -98,20 +104,25 @@ class SearchLogService
     {
         $tenantId = TenantContext::getId();
 
-        return Database::query(
-            "SELECT
-                LOWER(TRIM(query)) as query,
-                COUNT(*) as search_count,
-                MAX(created_at) as last_searched
-             FROM search_logs
-             WHERE tenant_id = ?
-               AND result_count = 0
-               AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
-             GROUP BY LOWER(TRIM(query))
-             ORDER BY search_count DESC
-             LIMIT ?",
-            [$tenantId, $days, $limit]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        try {
+            return Database::query(
+                "SELECT
+                    LOWER(TRIM(query)) as query,
+                    COUNT(*) as search_count,
+                    MAX(created_at) as last_searched
+                 FROM search_logs
+                 WHERE tenant_id = ?
+                   AND result_count = 0
+                   AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                 GROUP BY LOWER(TRIM(query))
+                 ORDER BY search_count DESC
+                 LIMIT ?",
+                [$tenantId, $days, $limit]
+            )->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("[SearchLogService] getZeroResultSearches error: " . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -124,6 +135,26 @@ class SearchLogService
     {
         $tenantId = TenantContext::getId();
 
+        try {
+            return self::buildAnalyticsSummary($tenantId, $days);
+        } catch (\PDOException $e) {
+            error_log("[SearchLogService] getAnalyticsSummary error: " . $e->getMessage());
+            return [
+                'period_days' => $days,
+                'total_searches' => 0,
+                'unique_searchers' => 0,
+                'unique_queries' => 0,
+                'avg_results' => 0,
+                'zero_result_count' => 0,
+                'zero_result_rate' => 0,
+                'searches_per_day' => [],
+                'searches_by_type' => [],
+            ];
+        }
+    }
+
+    private static function buildAnalyticsSummary(int $tenantId, int $days): array
+    {
         $summary = Database::query(
             "SELECT
                 COUNT(*) as total_searches,
