@@ -233,10 +233,10 @@ export function FeedPage() {
 
   /* ───────── Moderation ───────── */
 
-  const handleHidePost = async (postId: number) => {
+  const handleHidePost = async (postId: number, itemType?: string) => {
     try {
       await api.post(`/v2/feed/posts/${postId}/hide`);
-      setItems((prev) => prev.filter((fi) => !(fi.id === postId && fi.type === 'post')));
+      setItems((prev) => prev.filter((fi) => !(fi.id === postId && fi.type === (itemType ?? fi.type))));
       toast.success(t('toast.post_hidden'));
     } catch (err) {
       logError('Failed to hide post', err);
@@ -515,7 +515,7 @@ export function FeedPage() {
                     <FeedCard
                       item={item}
                       onToggleLike={() => handleToggleLike(item)}
-                      onHidePost={() => handleHidePost(item.id)}
+                      onHidePost={() => handleHidePost(item.id, item.type)}
                       onMuteUser={() => handleMuteUser(getAuthor(item).id)}
                       onReportPost={() => openReportModal(item.id)}
                       onDeletePost={() => handleDeletePost(item)}

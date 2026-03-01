@@ -19,7 +19,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import {
   PageHeader,
@@ -86,6 +86,7 @@ const typeLabel: Record<string, string> = {
 export function JobsAdmin() {
   usePageTitle('Admin - Jobs');
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   // State
   const [items, setItems] = useState<Job[]>([]);
@@ -278,7 +279,7 @@ export function JobsAdmin() {
               variant="flat"
               color="primary"
               as="a"
-              href={`/jobs/${item.id}`}
+              href={tenantPath(`/jobs/${item.id}`)}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="View job"
