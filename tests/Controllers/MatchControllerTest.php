@@ -4,7 +4,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-namespace Tests\Controllers;
+namespace Nexus\Tests\Controllers;
 
 use PHPUnit\Framework\TestCase;
 use Nexus\Controllers\MatchController;

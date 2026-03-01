@@ -54,6 +54,35 @@ vi.mock('@/contexts', () => ({
   useTenant: (...args: any[]) => mockUseTenant(...args),
   useNotifications: (...args: any[]) => mockUseNotifications(...args),
   useTheme: (...args: any[]) => mockUseTheme(...args),
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+}));
+
+vi.mock('@/components/LanguageSwitcher', () => ({
+  LanguageSwitcher: () => null,
+}));
+
+vi.mock('@/components/navigation', () => ({
+  DesktopMenuItems: () => null,
+  MobileMenuItems: () => null,
+}));
+
+const i18nMap: Record<string, string> = {
+  'nav.dashboard': 'Dashboard',
+  'nav.feed': 'Feed',
+  'nav.listings': 'Listings',
+  'nav.messages': 'Messages',
+  'nav.community': 'Community',
+  'nav.more': 'More',
+  'auth.log_in': 'Log In',
+  'auth.sign_up': 'Sign Up',
+  'create.new_listing': 'New Listing',
+  'create.new_event': 'New Event',
+  'create.new_post': 'New Post',
+  'user_menu.log_out': 'Log Out',
+};
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (key: string) => i18nMap[key] ?? key, i18n: { language: 'en', changeLanguage: vi.fn() } }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 vi.mock('@/lib/helpers', () => ({

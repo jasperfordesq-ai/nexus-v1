@@ -264,10 +264,8 @@ describe('usePaginatedApi', () => {
   it('fetches first page on mount', async () => {
     mockApi.get.mockResolvedValue({
       success: true,
-      data: {
-        data: [{ id: 1 }, { id: 2 }],
-        meta: { current_page: 1, last_page: 3, total: 50 },
-      },
+      data: [{ id: 1 }, { id: 2 }],
+      meta: { current_page: 1, total_pages: 3, total: 50 },
     });
 
     const { result } = renderHook(() => usePaginatedApi('/v2/items'));
@@ -288,17 +286,13 @@ describe('usePaginatedApi', () => {
     mockApi.get
       .mockResolvedValueOnce({
         success: true,
-        data: {
-          data: [{ id: 1 }],
-          meta: { current_page: 1, last_page: 2, total: 2 },
-        },
+        data: [{ id: 1 }],
+        meta: { current_page: 1, total_pages: 2, total: 2 },
       })
       .mockResolvedValueOnce({
         success: true,
-        data: {
-          data: [{ id: 2 }],
-          meta: { current_page: 2, last_page: 2, total: 2 },
-        },
+        data: [{ id: 2 }],
+        meta: { current_page: 2, total_pages: 2, total: 2 },
       });
 
     const { result } = renderHook(() => usePaginatedApi('/v2/items'));
@@ -331,10 +325,8 @@ describe('usePaginatedApi', () => {
   it('resets state', async () => {
     mockApi.get.mockResolvedValue({
       success: true,
-      data: {
-        data: [{ id: 1 }],
-        meta: { current_page: 1, last_page: 1, total: 1 },
-      },
+      data: [{ id: 1 }],
+      meta: { current_page: 1, total_pages: 1, total: 1 },
     });
 
     const { result } = renderHook(() => usePaginatedApi('/v2/items'));
@@ -355,10 +347,8 @@ describe('usePaginatedApi', () => {
   it('uses custom page size', async () => {
     mockApi.get.mockResolvedValue({
       success: true,
-      data: {
-        data: [],
-        meta: { current_page: 1, last_page: 1, total: 0 },
-      },
+      data: [],
+      meta: { current_page: 1, total_pages: 1, total: 0 },
     });
 
     renderHook(() => usePaginatedApi('/v2/items', 10));
@@ -371,10 +361,8 @@ describe('usePaginatedApi', () => {
   it('appends query params correctly when endpoint has existing params', async () => {
     mockApi.get.mockResolvedValue({
       success: true,
-      data: {
-        data: [],
-        meta: { current_page: 1, last_page: 1, total: 0 },
-      },
+      data: [],
+      meta: { current_page: 1, total_pages: 1, total: 0 },
     });
 
     renderHook(() => usePaginatedApi('/v2/items?type=offer'));
