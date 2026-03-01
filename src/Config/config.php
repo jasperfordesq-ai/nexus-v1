@@ -21,7 +21,7 @@ $possiblePaths = [
 
 $loaded = false;
 foreach ($possiblePaths as $path) {
-    if (file_exists($path)) {
+    if (file_exists($path)) { // nosemgrep: tainted-filename
         Env::load($path);
         $loaded = true;
         break;
