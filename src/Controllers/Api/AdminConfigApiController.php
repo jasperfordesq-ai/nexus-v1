@@ -47,6 +47,8 @@ class AdminConfigApiController extends BaseApiController
         'connections' => true,
         'reviews' => true,
         'polls' => false,
+        'job_vacancies' => false,
+        'ideation_challenges' => false,
         'direct_messaging' => true,
         'group_exchanges' => false,
     ];

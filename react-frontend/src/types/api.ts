@@ -820,6 +820,8 @@ export interface TenantFeatures {
   connections: boolean;
   reviews: boolean;
   polls: boolean;
+  job_vacancies: boolean;
+  ideation_challenges: boolean;
   direct_messaging: boolean;
   group_exchanges: boolean;
   search: boolean;

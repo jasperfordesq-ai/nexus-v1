@@ -55,6 +55,8 @@ import {
   Compass,
   Cookie,
   Bot,
+  Briefcase,
+  Lightbulb,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent } from '@/contexts';
@@ -105,6 +107,9 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.volunteering'), href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
     { label: t('nav.organisations'), href: '/organisations', icon: Building2, feature: 'organisations' as const },
     { label: t('nav.resources'), href: '/resources', icon: FolderOpen, feature: 'resources' as const },
+    { label: t('nav.polls'), href: '/polls', icon: BarChart3, feature: 'polls' as const },
+    { label: t('nav.jobs'), href: '/jobs', icon: Briefcase, feature: 'job_vacancies' as const },
+    { label: t('nav.ideation'), href: '/ideation', icon: Lightbulb, feature: 'ideation_challenges' as const },
   ];
 
   const exploreNavItems = [
