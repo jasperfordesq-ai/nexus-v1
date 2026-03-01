@@ -294,6 +294,145 @@ class TransactionExportService
     }
 
     /**
+     * Export personal transaction statement for a member (W5)
+     *
+     * Generates a CSV statement with date range filtering and running balance.
+     *
+     * @param int $userId User requesting the export
+     * @param array $filters Optional filters: startDate, endDate, type ('all', 'sent', 'received')
+     * @return array ['success' => bool, 'csv' => string|null, 'filename' => string|null, 'message' => string|null]
+     */
+    public static function exportPersonalStatementCSV(int $userId, array $filters = []): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $sql = "SELECT t.*,
+                       s.name as sender_name,
+                       r.name as receiver_name
+                FROM transactions t
+                JOIN users s ON t.sender_id = s.id
+                JOIN users r ON t.receiver_id = r.id
+                WHERE t.tenant_id = ?
+                  AND ((t.sender_id = ? AND t.deleted_for_sender = 0)
+                    OR (t.receiver_id = ? AND t.deleted_for_receiver = 0))";
+
+        $params = [$tenantId, $userId, $userId];
+
+        // Apply type filter
+        if (!empty($filters['type'])) {
+            if ($filters['type'] === 'sent') {
+                $sql = "SELECT t.*,
+                               s.name as sender_name,
+                               r.name as receiver_name
+                        FROM transactions t
+                        JOIN users s ON t.sender_id = s.id
+                        JOIN users r ON t.receiver_id = r.id
+                        WHERE t.tenant_id = ?
+                          AND t.sender_id = ? AND t.deleted_for_sender = 0";
+                $params = [$tenantId, $userId];
+            } elseif ($filters['type'] === 'received') {
+                $sql = "SELECT t.*,
+                               s.name as sender_name,
+                               r.name as receiver_name
+                        FROM transactions t
+                        JOIN users s ON t.sender_id = s.id
+                        JOIN users r ON t.receiver_id = r.id
+                        WHERE t.tenant_id = ?
+                          AND t.receiver_id = ? AND t.deleted_for_receiver = 0";
+                $params = [$tenantId, $userId];
+            }
+        }
+
+        // Apply date filters
+        if (!empty($filters['startDate'])) {
+            $sql .= " AND t.created_at >= ?";
+            $params[] = $filters['startDate'] . ' 00:00:00';
+        }
+
+        if (!empty($filters['endDate'])) {
+            $sql .= " AND t.created_at <= ?";
+            $params[] = $filters['endDate'] . ' 23:59:59';
+        }
+
+        // Order chronologically for running balance calculation
+        $sql .= " ORDER BY t.created_at ASC, t.id ASC";
+
+        $transactions = Database::query($sql, $params)->fetchAll();
+
+        if (empty($transactions)) {
+            return ['success' => false, 'message' => 'No transactions found for the selected criteria'];
+        }
+
+        // Calculate running balance
+        $runningBalance = 0;
+
+        // Get opening balance (sum of all transactions before startDate)
+        if (!empty($filters['startDate'])) {
+            $openingStmt = Database::query(
+                "SELECT
+                    COALESCE(SUM(CASE WHEN receiver_id = ? THEN amount ELSE 0 END), 0) -
+                    COALESCE(SUM(CASE WHEN sender_id = ? THEN amount ELSE 0 END), 0) as opening
+                 FROM transactions
+                 WHERE tenant_id = ?
+                   AND (sender_id = ? OR receiver_id = ?)
+                   AND created_at < ?",
+                [$userId, $userId, $tenantId, $userId, $userId, $filters['startDate'] . ' 00:00:00']
+            );
+            $opening = $openingStmt->fetch();
+            $runningBalance = (float) ($opening['opening'] ?? 0);
+        }
+
+        $headers = ['Date', 'Type', 'Amount (Hours)', 'Running Balance', 'Category', 'Description', 'Other Party', 'Prep Time', 'Status'];
+        $rows = [];
+
+        foreach ($transactions as $t) {
+            $isSender = (int) $t['sender_id'] === $userId;
+            $amount = (float) $t['amount'];
+
+            if ($isSender) {
+                $runningBalance -= $amount;
+                $type = 'Sent';
+                $otherParty = $t['receiver_name'];
+            } else {
+                $runningBalance += $amount;
+                $type = 'Received';
+                $otherParty = $t['sender_name'];
+            }
+
+            $rows[] = [
+                $t['created_at'],
+                $type,
+                ($isSender ? '-' : '+') . number_format($amount, 2),
+                number_format($runningBalance, 2),
+                $t['transaction_type'] ?? 'transfer',
+                $t['description'] ?? '',
+                $otherParty,
+                $t['prep_time'] ? number_format((float) $t['prep_time'], 2) : '',
+                ucfirst($t['status'] ?? 'completed'),
+            ];
+        }
+
+        $csv = self::buildCSVFromArray($headers, $rows);
+
+        // Generate filename
+        $dateRange = '';
+        if (!empty($filters['startDate']) && !empty($filters['endDate'])) {
+            $dateRange = '_' . $filters['startDate'] . '_to_' . $filters['endDate'];
+        } else {
+            $dateRange = '_' . date('Y-m-d');
+        }
+
+        $filename = "statement_{$userId}{$dateRange}.csv";
+
+        return [
+            'success' => true,
+            'csv' => $csv,
+            'filename' => $filename,
+            'count' => count($transactions),
+        ];
+    }
+
+    /**
      * Send CSV as download response
      */
     public static function sendCSVDownload($csv, $filename)

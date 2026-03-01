@@ -10,6 +10,9 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Services\GroupService;
+use Nexus\Services\ChallengeTagService;
+use Nexus\Services\IdeaMediaService;
+use Nexus\Services\IdeaTeamConversionService;
 
 /**
  * IdeationChallengeService - Business logic for ideation challenges
@@ -94,9 +97,23 @@ class IdeationChallengeService
         $where = ["c.tenant_id = ?"];
 
         // Status filter
-        if ($status && in_array($status, ['draft', 'open', 'voting', 'closed'])) {
+        if ($status && in_array($status, ['draft', 'open', 'voting', 'evaluating', 'closed', 'archived'])) {
             $where[] = "c.status = ?";
             $params[] = $status;
+        }
+
+        // Category filter
+        $categoryId = $filters['category_id'] ?? null;
+        if ($categoryId) {
+            $where[] = "c.category_id = ?";
+            $params[] = (int)$categoryId;
+        }
+
+        // Favorites filter (show only user's favorites)
+        $favoritesOnly = $filters['favorites_only'] ?? false;
+        if ($favoritesOnly && $userId) {
+            $where[] = "EXISTS (SELECT 1 FROM challenge_favorites cf WHERE cf.challenge_id = c.id AND cf.user_id = ?)";
+            $params[] = $userId;
         }
 
         // Cursor pagination
@@ -208,12 +225,44 @@ class IdeationChallengeService
         $challenge['is_featured'] = (bool)($challenge['is_featured'] ?? false);
         $challenge['cover_image'] = $challenge['cover_image'] ?? null;
 
-        // Decode tags JSON to array
+        // Decode legacy JSON tags to array (backward-compatible)
         if (isset($challenge['tags']) && is_string($challenge['tags'])) {
             $decoded = json_decode($challenge['tags'], true);
             $challenge['tags'] = is_array($decoded) ? $decoded : [];
         } else {
             $challenge['tags'] = [];
+        }
+
+        // Merge in normalized tags from challenge_tag_links
+        try {
+            $normalizedTags = ChallengeTagService::getTagsForChallenge((int)$challenge['id']);
+            $tagNames = array_map(fn($t) => $t['name'], $normalizedTags);
+            // Merge with legacy tags, deduplicate
+            $challenge['tags'] = array_values(array_unique(array_merge($challenge['tags'], $tagNames)));
+            $challenge['normalized_tags'] = $normalizedTags;
+        } catch (\Throwable $e) {
+            $challenge['normalized_tags'] = [];
+        }
+
+        // Resolve category from category_id
+        $challenge['category_id'] = $challenge['category_id'] ?? null;
+        if ($challenge['category_id']) {
+            try {
+                $cat = ChallengeCategoryService::getById((int)$challenge['category_id']);
+                $challenge['category_data'] = $cat;
+            } catch (\Throwable $e) {
+                $challenge['category_data'] = null;
+            }
+        } else {
+            $challenge['category_data'] = null;
+        }
+
+        // Decode evaluation_criteria JSON
+        if (isset($challenge['evaluation_criteria']) && is_string($challenge['evaluation_criteria'])) {
+            $decoded = json_decode($challenge['evaluation_criteria'], true);
+            $challenge['evaluation_criteria'] = is_array($decoded) ? $decoded : [];
+        } else {
+            $challenge['evaluation_criteria'] = $challenge['evaluation_criteria'] ?? [];
         }
 
         // Check if current user has favorited this challenge
@@ -273,18 +322,23 @@ class IdeationChallengeService
         $maxIdeasPerUser = isset($data['max_ideas_per_user']) ? (int)$data['max_ideas_per_user'] : null;
         $tags = isset($data['tags']) && is_array($data['tags']) ? json_encode($data['tags']) : null;
         $coverImage = !empty($data['cover_image']) ? trim($data['cover_image']) : null;
+        $categoryId = isset($data['category_id']) ? (int)$data['category_id'] : null;
+        $evaluationCriteria = isset($data['evaluation_criteria']) && is_array($data['evaluation_criteria'])
+            ? json_encode($data['evaluation_criteria'])
+            : null;
 
         try {
             Database::query(
                 "INSERT INTO ideation_challenges
-                    (tenant_id, user_id, title, description, category, status, submission_deadline, voting_deadline, prize_description, max_ideas_per_user, tags, cover_image, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                    (tenant_id, user_id, title, description, category, category_id, status, submission_deadline, voting_deadline, prize_description, max_ideas_per_user, tags, cover_image, evaluation_criteria, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
                 [
                     $tenantId,
                     $userId,
                     $title,
                     $description,
                     $category,
+                    $categoryId,
                     $status,
                     $submissionDeadline,
                     $votingDeadline,
@@ -292,10 +346,22 @@ class IdeationChallengeService
                     $maxIdeasPerUser,
                     $tags,
                     $coverImage,
+                    $evaluationCriteria,
                 ]
             );
 
             $challengeId = Database::lastInsertId();
+
+            // Sync normalized tags if tag_ids provided
+            if (isset($data['tag_ids']) && is_array($data['tag_ids'])) {
+                ChallengeTagService::syncTagsForChallenge((int)$challengeId, $data['tag_ids']);
+            } elseif (isset($data['tags']) && is_array($data['tags'])) {
+                // Auto-create tags from legacy tag names and sync
+                $tagIds = ChallengeTagService::findOrCreateByNames($data['tags']);
+                if (!empty($tagIds)) {
+                    ChallengeTagService::syncTagsForChallenge((int)$challengeId, $tagIds);
+                }
+            }
 
             // Award gamification points
             try {
@@ -391,7 +457,24 @@ class IdeationChallengeService
             $params[] = !empty($data['cover_image']) ? trim($data['cover_image']) : null;
         }
 
+        if (array_key_exists('category_id', $data)) {
+            $updates[] = "category_id = ?";
+            $params[] = $data['category_id'] !== null ? (int)$data['category_id'] : null;
+        }
+
+        if (array_key_exists('evaluation_criteria', $data)) {
+            $updates[] = "evaluation_criteria = ?";
+            $params[] = is_array($data['evaluation_criteria']) ? json_encode($data['evaluation_criteria']) : null;
+        }
+
         if (empty($updates)) {
+            // Still check for tag sync even if no column updates
+            if (isset($data['tag_ids']) && is_array($data['tag_ids'])) {
+                ChallengeTagService::syncTagsForChallenge($id, $data['tag_ids']);
+            } elseif (isset($data['tags']) && is_array($data['tags'])) {
+                $tagIds = ChallengeTagService::findOrCreateByNames($data['tags']);
+                ChallengeTagService::syncTagsForChallenge($id, $tagIds);
+            }
             return true;
         }
 
@@ -404,6 +487,15 @@ class IdeationChallengeService
                 "UPDATE ideation_challenges SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?",
                 $params
             );
+
+            // Sync normalized tags
+            if (isset($data['tag_ids']) && is_array($data['tag_ids'])) {
+                ChallengeTagService::syncTagsForChallenge($id, $data['tag_ids']);
+            } elseif (isset($data['tags']) && is_array($data['tags'])) {
+                $tagIds = ChallengeTagService::findOrCreateByNames($data['tags']);
+                ChallengeTagService::syncTagsForChallenge($id, $tagIds);
+            }
+
             return true;
         } catch (\Throwable $e) {
             error_log("Challenge update failed: " . $e->getMessage());
@@ -459,7 +551,7 @@ class IdeationChallengeService
             return false;
         }
 
-        $validStatuses = ['draft', 'open', 'voting', 'closed'];
+        $validStatuses = ['draft', 'open', 'voting', 'evaluating', 'closed', 'archived'];
         if (!in_array($status, $validStatuses)) {
             self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Invalid status value', 'status');
             return false;
@@ -473,12 +565,16 @@ class IdeationChallengeService
         }
 
         // Validate status transitions
+        // Lifecycle: Draft → Open → Voting → Evaluating → Closed → Archived
+        // With shortcuts: Open can skip to Closed; Closed can reopen
         $currentStatus = $challenge['status'];
         $validTransitions = [
-            'draft' => ['open'],
-            'open' => ['voting', 'closed'],
-            'voting' => ['closed'],
-            'closed' => ['open'], // Allow reopening
+            'draft'      => ['open'],
+            'open'       => ['voting', 'evaluating', 'closed'],
+            'voting'     => ['evaluating', 'closed'],
+            'evaluating' => ['closed'],
+            'closed'     => ['open', 'archived'],
+            'archived'   => ['closed'], // Allow un-archiving
         ];
 
         if (!in_array($status, $validTransitions[$currentStatus] ?? [])) {
@@ -648,6 +744,21 @@ class IdeationChallengeService
             $idea['has_voted'] = !empty($hasVoted);
         } else {
             $idea['has_voted'] = false;
+        }
+
+        // Attach media items
+        try {
+            $idea['media'] = IdeaMediaService::getMediaForIdea((int)$idea['id']);
+        } catch (\Throwable $e) {
+            $idea['media'] = [];
+        }
+
+        // Check for team conversion link
+        try {
+            $teamLink = IdeaTeamConversionService::getLinkForIdea((int)$idea['id']);
+            $idea['team_link'] = $teamLink;
+        } catch (\Throwable $e) {
+            $idea['team_link'] = null;
         }
 
         unset(
@@ -1283,27 +1394,38 @@ class IdeationChallengeService
             return null;
         }
 
-        $newTitle = 'Copy of ' . ($original['title'] ?? 'Untitled');
+        $newTitle = '[Copy] ' . ($original['title'] ?? 'Untitled');
 
         try {
             Database::query(
                 "INSERT INTO ideation_challenges
-                    (tenant_id, user_id, title, description, category, tags, cover_image, prize_description, max_ideas_per_user, status, ideas_count, favorites_count, views_count, is_featured, submission_deadline, voting_deadline, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', 0, 0, 0, 0, NULL, NULL, NOW())",
+                    (tenant_id, user_id, title, description, category, category_id, tags, cover_image, prize_description, max_ideas_per_user, evaluation_criteria, status, ideas_count, favorites_count, views_count, is_featured, submission_deadline, voting_deadline, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', 0, 0, 0, 0, NULL, NULL, NOW())",
                 [
                     $tenantId,
                     $userId,
                     $newTitle,
                     $original['description'] ?? '',
                     $original['category'] ?? null,
+                    $original['category_id'] ?? null,
                     $original['tags'] ?? null,
                     $original['cover_image'] ?? null,
                     $original['prize_description'] ?? null,
                     $original['max_ideas_per_user'] ?? null,
+                    $original['evaluation_criteria'] ?? null,
                 ]
             );
 
-            return (int)Database::lastInsertId();
+            $newId = (int)Database::lastInsertId();
+
+            // Copy tag links from original challenge
+            $originalTags = ChallengeTagService::getTagsForChallenge($challengeId);
+            if (!empty($originalTags)) {
+                $tagIds = array_map(fn($t) => (int)$t['id'], $originalTags);
+                ChallengeTagService::syncTagsForChallenge($newId, $tagIds);
+            }
+
+            return $newId;
         } catch (\Throwable $e) {
             error_log("Challenge duplication failed: " . $e->getMessage());
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to duplicate challenge');

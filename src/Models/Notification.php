@@ -143,6 +143,10 @@ class Notification
             'follow' => 'general',
             'group' => 'general',
             'broker_review' => 'general',
+            'listing_match' => 'general',
+            'listing_expiry' => 'reminder',
+            'hot_match' => 'general',
+            'mutual_match' => 'general',
         ];
 
         return $typeMap[$type] ?? 'general';
@@ -174,6 +178,10 @@ class Notification
             'follow' => 'New Follower',
             'group' => 'Group Update',
             'broker_review' => 'Message for Review',
+            'listing_match' => 'New Match Found',
+            'listing_expiry' => 'Listing Expiring Soon',
+            'hot_match' => 'Hot Match Found',
+            'mutual_match' => 'Mutual Match Found',
         ];
 
         return $titles[$type] ?? 'Notification';

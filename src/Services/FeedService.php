@@ -11,6 +11,7 @@ use Nexus\Core\TenantContext;
 use Nexus\Models\FeedPost;
 use Nexus\Models\User;
 use Nexus\Services\RealtimeService;
+use Nexus\Services\HashtagService;
 
 /**
  * FeedService - Business logic for social feed operations
@@ -996,6 +997,13 @@ class FeedService
             }
 
             $postId = (int)$db->lastInsertId();
+
+            // Process hashtags in the content (F4)
+            try {
+                HashtagService::processPostHashtags($postId, $content);
+            } catch (\Exception $hashtagEx) {
+                error_log("FeedService::createPost hashtag processing failed: " . $hashtagEx->getMessage());
+            }
 
             // Broadcast the new post to all feed subscribers in real time.
             // Failures are swallowed so a Pusher outage never fails post creation.

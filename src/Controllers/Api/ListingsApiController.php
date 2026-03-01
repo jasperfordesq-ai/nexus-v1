@@ -7,6 +7,10 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Services\ListingService;
+use Nexus\Services\ListingAnalyticsService;
+use Nexus\Services\ListingExpiryService;
+use Nexus\Services\ListingSkillTagService;
+use Nexus\Services\ListingFeaturedService;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ImageUploader;
 use Nexus\Helpers\UrlHelper;
@@ -17,12 +21,18 @@ use Nexus\Helpers\UrlHelper;
  * Provides full CRUD operations for listings with standardized response format.
  *
  * Endpoints:
- * - GET    /api/v2/listings           - List all listings (paginated)
- * - POST   /api/v2/listings           - Create a new listing
- * - GET    /api/v2/listings/{id}      - Get a single listing
- * - PUT    /api/v2/listings/{id}      - Update a listing
- * - DELETE /api/v2/listings/{id}      - Delete a listing
- * - GET    /api/v2/listings/nearby    - Get nearby listings (geospatial)
+ * - GET    /api/v2/listings                    - List all listings (paginated)
+ * - POST   /api/v2/listings                    - Create a new listing
+ * - GET    /api/v2/listings/featured           - Get featured listings
+ * - GET    /api/v2/listings/nearby             - Get nearby listings (geospatial)
+ * - GET    /api/v2/listings/tags/popular       - Get popular skill tags
+ * - GET    /api/v2/listings/tags/autocomplete  - Autocomplete skill tags
+ * - GET    /api/v2/listings/{id}               - Get a single listing
+ * - PUT    /api/v2/listings/{id}               - Update a listing
+ * - DELETE /api/v2/listings/{id}               - Delete a listing
+ * - POST   /api/v2/listings/{id}/renew         - Renew an expired listing
+ * - GET    /api/v2/listings/{id}/analytics     - Get listing analytics (owner only)
+ * - PUT    /api/v2/listings/{id}/tags          - Set skill tags for a listing
  *
  * Response Format:
  * Success: { "data": {...}, "meta": {...} }
@@ -73,6 +83,16 @@ class ListingsApiController extends BaseApiController
 
         if ($this->query('user_id')) {
             $filters['user_id'] = $this->queryInt('user_id');
+        }
+
+        // Skills filter: ?skills=cooking,gardening
+        if ($this->query('skills')) {
+            $filters['skills'] = $this->query('skills');
+        }
+
+        // Featured first: ?featured_first=1
+        if ($this->query('featured_first')) {
+            $filters['featured_first'] = true;
         }
 
         if ($this->query('cursor')) {
@@ -162,9 +182,71 @@ class ListingsApiController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/listings/featured
+     *
+     * Get currently featured listings.
+     *
+     * Query Parameters:
+     * - per_page: int (default 10, max 50)
+     *
+     * Response: 200 OK with featured listings
+     */
+    public function featured(): void
+    {
+        $limit = $this->queryInt('per_page', 10, 1, 50);
+        $items = ListingFeaturedService::getFeaturedListings($limit);
+
+        $this->respondWithData($items);
+    }
+
+    /**
+     * GET /api/v2/listings/tags/popular
+     *
+     * Get popular skill tags for the current tenant.
+     *
+     * Query Parameters:
+     * - limit: int (default 20, max 50)
+     *
+     * Response: 200 OK with [{ tag, count }, ...]
+     */
+    public function popularTags(): void
+    {
+        $limit = $this->queryInt('limit', 20, 1, 50);
+        $tags = ListingSkillTagService::getPopularTags($limit);
+
+        $this->respondWithData($tags);
+    }
+
+    /**
+     * GET /api/v2/listings/tags/autocomplete
+     *
+     * Autocomplete skill tags based on a prefix.
+     *
+     * Query Parameters:
+     * - q: string (required, min 2 chars)
+     * - limit: int (default 10, max 20)
+     *
+     * Response: 200 OK with array of tag strings
+     */
+    public function autocompleteTags(): void
+    {
+        $prefix = trim($this->query('q', ''));
+        if (strlen($prefix) < 2) {
+            $this->respondWithData([]);
+            return;
+        }
+
+        $limit = $this->queryInt('limit', 10, 1, 20);
+        $tags = ListingSkillTagService::autocompleteTags($prefix, $limit);
+
+        $this->respondWithData($tags);
+    }
+
+    /**
      * GET /api/v2/listings/{id}
      *
      * Get a single listing by ID.
+     * Records a view for analytics if the viewer is not the owner.
      *
      * Response: 200 OK with listing data, or 404 if not found
      */
@@ -176,6 +258,26 @@ class ListingsApiController extends BaseApiController
         if (!$listing) {
             $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
+
+        // Track view (skip if viewer is the listing owner)
+        if ($userId === null || $userId !== (int)($listing['user_id'] ?? 0)) {
+            try {
+                $ip = \Nexus\Core\ClientIp::get();
+                ListingAnalyticsService::recordView($id, $userId, $ip);
+            } catch (\Exception $e) {
+                // Non-critical
+            }
+        }
+
+        // Attach skill tags
+        try {
+            $listing['skill_tags'] = ListingSkillTagService::getTags($id);
+        } catch (\Exception $e) {
+            $listing['skill_tags'] = [];
+        }
+
+        // Attach featured status
+        $listing['is_featured'] = (bool)($listing['is_featured'] ?? false);
 
         $this->respondWithData($listing);
     }
@@ -320,6 +422,13 @@ class ListingsApiController extends BaseApiController
             $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
 
+        // Update save count cache
+        try {
+            ListingAnalyticsService::updateSaveCount($id, true);
+        } catch (\Exception $e) {
+            // Non-critical
+        }
+
         $this->respondWithData(['saved' => true, 'listing_id' => $id]);
     }
 
@@ -335,6 +444,13 @@ class ListingsApiController extends BaseApiController
         $userId = $this->getUserId();
 
         ListingService::unsaveListing($userId, $id);
+
+        // Update save count cache
+        try {
+            ListingAnalyticsService::updateSaveCount($id, false);
+        } catch (\Exception $e) {
+            // Non-critical
+        }
 
         $this->respondWithData(['saved' => false, 'listing_id' => $id]);
     }
@@ -396,5 +512,112 @@ class ListingsApiController extends BaseApiController
         } catch (\Exception $e) {
             $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
         }
+    }
+
+    /**
+     * POST /api/v2/listings/{id}/renew
+     *
+     * Renew a listing (extend its expiry by 30 days).
+     * Owner or admin only.
+     *
+     * Response: 200 OK with { renewed: true, new_expires_at: string }
+     */
+    public function renew(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('listing_renew', 10, 60);
+
+        $result = ListingExpiryService::renewListing($id, $userId);
+
+        if (!$result['success']) {
+            $status = $result['error'] === 'Listing not found' ? 404
+                : ($result['error'] === 'You do not have permission to renew this listing' ? 403 : 422);
+            $this->respondWithError('RENEWAL_FAILED', $result['error'], null, $status);
+            return;
+        }
+
+        $this->respondWithData([
+            'renewed' => true,
+            'listing_id' => $id,
+            'new_expires_at' => $result['new_expires_at'],
+        ]);
+    }
+
+    /**
+     * GET /api/v2/listings/{id}/analytics
+     *
+     * Get analytics for a listing (owner or admin only).
+     *
+     * Query Parameters:
+     * - days: int (default 30, max 90)
+     *
+     * Response: 200 OK with analytics data
+     */
+    public function analytics(int $id): void
+    {
+        $userId = $this->getUserId();
+
+        // Verify ownership or admin
+        $listing = ListingService::getById($id);
+        if (!$listing) {
+            $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return;
+        }
+
+        if (!ListingService::canModify($listing, $userId)) {
+            $this->respondWithError('FORBIDDEN', 'You do not have permission to view analytics', null, 403);
+            return;
+        }
+
+        $days = $this->queryInt('days', 30, 1, 90);
+        $analytics = ListingAnalyticsService::getAnalytics($id, $days);
+
+        $this->respondWithData($analytics);
+    }
+
+    /**
+     * PUT /api/v2/listings/{id}/tags
+     *
+     * Set skill tags for a listing (owner or admin only).
+     *
+     * Request Body (JSON):
+     * { "tags": ["cooking", "gardening", "repair"] }
+     *
+     * Response: 200 OK with updated tags
+     */
+    public function setSkillTags(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+
+        // Verify ownership or admin
+        $listing = ListingService::getById($id);
+        if (!$listing) {
+            $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return;
+        }
+
+        if (!ListingService::canModify($listing, $userId)) {
+            $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
+            return;
+        }
+
+        $data = $this->getAllInput();
+        $tags = $data['tags'] ?? [];
+
+        if (!is_array($tags)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Tags must be an array of strings', 'tags', 400);
+            return;
+        }
+
+        $success = ListingSkillTagService::setTags($id, $tags);
+
+        if (!$success) {
+            $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return;
+        }
+
+        $updatedTags = ListingSkillTagService::getTags($id);
+        $this->respondWithData(['listing_id' => $id, 'tags' => $updatedTags]);
     }
 }

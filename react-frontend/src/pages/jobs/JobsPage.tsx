@@ -10,14 +10,17 @@
  * - Filter by type (paid/volunteer/timebank) and commitment
  * - Free text search with debounce
  * - Cursor-based pagination
- * - Job cards with type chips, location, deadline
+ * - Job cards with type chips, location, deadline, salary, featured badge
  * - Post vacancy button for authenticated users
+ * - Saved jobs tab (J1)
+ * - Featured jobs appear first (J10)
+ * - Salary display on cards (J9)
  */
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Chip } from '@heroui/react';
+import { Button, Input, Chip, Tabs, Tab } from '@heroui/react';
 import {
   Briefcase,
   Search,
@@ -33,6 +36,10 @@ import {
   DollarSign,
   Heart,
   Timer,
+  Bookmark,
+  BookmarkCheck,
+  Bell,
+  Star,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -71,6 +78,13 @@ interface JobVacancy {
   } | null;
   has_applied: boolean;
   application_status: string | null;
+  is_saved: boolean;
+  is_featured: boolean;
+  salary_min: number | null;
+  salary_max: number | null;
+  salary_type: string | null;
+  salary_currency: string | null;
+  salary_negotiable: boolean;
 }
 
 const ITEMS_PER_PAGE = 20;
@@ -109,6 +123,11 @@ export function JobsPage() {
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [selectedType, setSelectedType] = useState(searchParams.get('type') || 'all');
   const [selectedCommitment, setSelectedCommitment] = useState(searchParams.get('commitment') || 'all');
+
+  // J1: Active tab (browse vs saved)
+  const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'browse');
+  const [savedJobs, setSavedJobs] = useState<JobVacancy[]>([]);
+  const [isLoadingSaved, setIsLoadingSaved] = useState(false);
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -177,10 +196,32 @@ export function JobsPage() {
 
   // Load vacancies when filters change (fresh load)
   useEffect(() => {
-    setNextCursor(null);
-    loadVacancies();
-    setHasMore(true);
-  }, [debouncedQuery, selectedType, selectedCommitment]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (activeTab === 'browse') {
+      setNextCursor(null);
+      loadVacancies();
+      setHasMore(true);
+    }
+  }, [debouncedQuery, selectedType, selectedCommitment, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // J1: Load saved jobs
+  useEffect(() => {
+    if (activeTab === 'saved' && isAuthenticated) {
+      const loadSaved = async () => {
+        setIsLoadingSaved(true);
+        try {
+          const response = await api.get<JobVacancy[]>('/v2/jobs/saved');
+          if (response.success && response.data) {
+            setSavedJobs(response.data);
+          }
+        } catch (err) {
+          logError('Failed to load saved jobs', err);
+        } finally {
+          setIsLoadingSaved(false);
+        }
+      };
+      loadSaved();
+    }
+  }, [activeTab, isAuthenticated]);
 
   // Update URL params
   useEffect(() => {
@@ -188,8 +229,9 @@ export function JobsPage() {
     if (searchQuery) params.set('q', searchQuery);
     if (selectedType !== 'all') params.set('type', selectedType);
     if (selectedCommitment !== 'all') params.set('commitment', selectedCommitment);
+    if (activeTab !== 'browse') params.set('tab', activeTab);
     setSearchParams(params, { replace: true });
-  }, [searchQuery, selectedType, selectedCommitment, setSearchParams]);
+  }, [searchQuery, selectedType, selectedCommitment, activeTab, setSearchParams]);
 
   const loadMore = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
@@ -220,103 +262,216 @@ export function JobsPage() {
           </h1>
           <p className="text-theme-muted mt-1">{t('subtitle')}</p>
         </div>
-        {isAuthenticated && (
-          <Link to={tenantPath('/jobs/create')}>
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('create_vacancy')}
-            </Button>
-          </Link>
-        )}
+        <div className="flex gap-2">
+          {isAuthenticated && (
+            <>
+              <Link to={tenantPath('/jobs/alerts')}>
+                <Button
+                  variant="flat"
+                  className="bg-theme-elevated text-theme-muted"
+                  startContent={<Bell className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('alerts.title')}
+                </Button>
+              </Link>
+              <Link to={tenantPath('/jobs/create')}>
+                <Button
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('create_vacancy')}
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Search */}
-      <GlassCard className="p-4">
-        <Input
-          placeholder={t('search_placeholder')}
-          aria-label={t('search_aria')}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+      {/* J1: Tabs for browse/saved */}
+      {isAuthenticated && (
+        <Tabs
+          selectedKey={activeTab}
+          onSelectionChange={(key) => setActiveTab(key as string)}
+          variant="underlined"
           classNames={{
-            input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
-            inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+            tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
+            cursor: 'bg-primary',
           }}
-        />
-      </GlassCard>
-
-      {/* Type Filter Chips */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label={t('filter_aria')}>
-        {TYPE_FILTERS.map((filter) => {
-          const isSelected = selectedType === filter.id;
-          const IconComp = filter.icon;
-          return (
-            <Chip
-              key={filter.id}
-              variant={isSelected ? 'solid' : 'flat'}
-              color={isSelected ? 'primary' : 'default'}
-              className={
-                isSelected
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
-                  : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
-              }
-              startContent={<IconComp className="w-3.5 h-3.5" aria-hidden="true" />}
-              onClick={() => setSelectedType(filter.id)}
-              aria-pressed={isSelected}
-            >
-              {t(`type.${filter.id}`)}
-            </Chip>
-          );
-        })}
-      </div>
-
-      {/* Commitment Filter Chips */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by commitment">
-        {COMMITMENT_FILTERS.map((filter) => {
-          const isSelected = selectedCommitment === filter.id;
-          return (
-            <Chip
-              key={filter.id}
-              variant={isSelected ? 'solid' : 'flat'}
-              color={isSelected ? 'secondary' : 'default'}
-              className={
-                isSelected
-                  ? 'bg-gradient-to-r from-violet-500 to-fuchsia-600 text-white cursor-pointer'
-                  : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
-              }
-              onClick={() => setSelectedCommitment(filter.id)}
-              aria-pressed={isSelected}
-            >
-              {t(`commitment.${filter.id}`)}
-            </Chip>
-          );
-        })}
-      </div>
-
-      {/* Error State */}
-      {error && !isLoading && (
-        <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
-          <p className="text-theme-muted mb-4">{error}</p>
-          <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-            startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
-            onPress={() => loadVacancies()}
-          >
-            {t('try_again')}
-          </Button>
-        </GlassCard>
+        >
+          <Tab
+            key="browse"
+            title={
+              <span className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4" aria-hidden="true" />
+                {t('title')}
+              </span>
+            }
+          />
+          <Tab
+            key="saved"
+            title={
+              <span className="flex items-center gap-2">
+                <Bookmark className="w-4 h-4" aria-hidden="true" />
+                {t('saved.title')}
+              </span>
+            }
+          />
+        </Tabs>
       )}
 
-      {/* Vacancies List */}
-      {!error && (
+      {/* Browse tab content */}
+      {activeTab === 'browse' && (
         <>
-          {isLoading ? (
+          {/* Search */}
+          <GlassCard className="p-4">
+            <Input
+              placeholder={t('search_placeholder')}
+              aria-label={t('search_aria')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+              classNames={{
+                input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              }}
+            />
+          </GlassCard>
+
+          {/* Type Filter Chips */}
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t('filter_aria')}>
+            {TYPE_FILTERS.map((filter) => {
+              const isSelected = selectedType === filter.id;
+              const IconComp = filter.icon;
+              return (
+                <Chip
+                  key={filter.id}
+                  variant={isSelected ? 'solid' : 'flat'}
+                  color={isSelected ? 'primary' : 'default'}
+                  className={
+                    isSelected
+                      ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
+                      : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
+                  }
+                  startContent={<IconComp className="w-3.5 h-3.5" aria-hidden="true" />}
+                  onClick={() => setSelectedType(filter.id)}
+                  aria-pressed={isSelected}
+                >
+                  {t(`type.${filter.id}`)}
+                </Chip>
+              );
+            })}
+          </div>
+
+          {/* Commitment Filter Chips */}
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by commitment">
+            {COMMITMENT_FILTERS.map((filter) => {
+              const isSelected = selectedCommitment === filter.id;
+              return (
+                <Chip
+                  key={filter.id}
+                  variant={isSelected ? 'solid' : 'flat'}
+                  color={isSelected ? 'secondary' : 'default'}
+                  className={
+                    isSelected
+                      ? 'bg-gradient-to-r from-violet-500 to-fuchsia-600 text-white cursor-pointer'
+                      : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
+                  }
+                  onClick={() => setSelectedCommitment(filter.id)}
+                  aria-pressed={isSelected}
+                >
+                  {t(`commitment.${filter.id}`)}
+                </Chip>
+              );
+            })}
+          </div>
+
+          {/* Error State */}
+          {error && !isLoading && (
+            <GlassCard className="p-8 text-center">
+              <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+              <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
+              <p className="text-theme-muted mb-4">{error}</p>
+              <Button
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+                onPress={() => loadVacancies()}
+              >
+                {t('try_again')}
+              </Button>
+            </GlassCard>
+          )}
+
+          {/* Vacancies List */}
+          {!error && (
+            <>
+              {isLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <GlassCard key={i} className="p-5 animate-pulse">
+                      <div className="flex gap-4">
+                        <div className="flex-1">
+                          <div className="h-5 bg-theme-hover rounded w-1/2 mb-2" />
+                          <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
+                          <div className="h-3 bg-theme-hover rounded w-1/4" />
+                        </div>
+                      </div>
+                    </GlassCard>
+                  ))}
+                </div>
+              ) : vacancies.length === 0 ? (
+                <EmptyState
+                  icon={<Briefcase className="w-12 h-12" aria-hidden="true" />}
+                  title={t('empty_title')}
+                  description={debouncedQuery ? t('empty_search') : t('empty_description')}
+                  action={
+                    isAuthenticated && (
+                      <Link to={tenantPath('/jobs/create')}>
+                        <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                          {t('create_vacancy')}
+                        </Button>
+                      </Link>
+                    )
+                  }
+                />
+              ) : (
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="space-y-4"
+                >
+                  {vacancies.map((vacancy) => (
+                    <motion.div key={vacancy.id} variants={itemVariants}>
+                      <JobCard vacancy={vacancy} />
+                    </motion.div>
+                  ))}
+
+                  {/* Load More */}
+                  {hasMore && (
+                    <div className="pt-4 text-center">
+                      <Button
+                        variant="flat"
+                        className="bg-theme-elevated text-theme-muted"
+                        onPress={loadMore}
+                        isLoading={isLoadingMore}
+                      >
+                        {t('load_more')}
+                      </Button>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </>
+          )}
+        </>
+      )}
+
+      {/* J1: Saved tab content */}
+      {activeTab === 'saved' && (
+        <>
+          {isLoadingSaved ? (
             <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
+              {[1, 2].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="flex gap-4">
                     <div className="flex-1">
@@ -328,20 +483,11 @@ export function JobsPage() {
                 </GlassCard>
               ))}
             </div>
-          ) : vacancies.length === 0 ? (
+          ) : savedJobs.length === 0 ? (
             <EmptyState
-              icon={<Briefcase className="w-12 h-12" aria-hidden="true" />}
-              title={t('empty_title')}
-              description={debouncedQuery ? t('empty_search') : t('empty_description')}
-              action={
-                isAuthenticated && (
-                  <Link to={tenantPath('/jobs/create')}>
-                    <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                      {t('create_vacancy')}
-                    </Button>
-                  </Link>
-                )
-              }
+              icon={<Bookmark className="w-12 h-12" aria-hidden="true" />}
+              title={t('saved.empty_title')}
+              description={t('saved.empty_description')}
             />
           ) : (
             <motion.div
@@ -350,25 +496,11 @@ export function JobsPage() {
               animate="visible"
               className="space-y-4"
             >
-              {vacancies.map((vacancy) => (
+              {savedJobs.map((vacancy) => (
                 <motion.div key={vacancy.id} variants={itemVariants}>
                   <JobCard vacancy={vacancy} />
                 </motion.div>
               ))}
-
-              {/* Load More */}
-              {hasMore && (
-                <div className="pt-4 text-center">
-                  <Button
-                    variant="flat"
-                    className="bg-theme-elevated text-theme-muted"
-                    onPress={loadMore}
-                    isLoading={isLoadingMore}
-                  >
-                    {t('load_more')}
-                  </Button>
-                </div>
-              )}
             </motion.div>
           )}
         </>
@@ -394,6 +526,18 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
   const deadlineDate = vacancy.deadline ? new Date(vacancy.deadline) : null;
   const isPastDeadline = deadlineDate ? deadlineDate < new Date() : false;
 
+  // J9: Format salary
+  const salaryDisplay = (() => {
+    if (!vacancy.salary_min && !vacancy.salary_max) return null;
+    const currency = vacancy.salary_currency || '';
+    if (vacancy.salary_min && vacancy.salary_max) {
+      return `${currency} ${vacancy.salary_min.toLocaleString()} - ${vacancy.salary_max.toLocaleString()}`;
+    }
+    if (vacancy.salary_min) return `${currency} ${vacancy.salary_min.toLocaleString()}+`;
+    if (vacancy.salary_max) return `${t('salary.max_only', { max: `${currency} ${vacancy.salary_max.toLocaleString()}` })}`;
+    return null;
+  })();
+
   return (
     <Link to={tenantPath(`/jobs/${vacancy.id}`)} aria-label={vacancy.title}>
       <article>
@@ -401,8 +545,14 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
           <div className="flex gap-3 sm:gap-4">
             {/* Icon */}
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center relative">
                 <Briefcase className="w-6 h-6 text-blue-400" aria-hidden="true" />
+                {/* J10: Featured star */}
+                {vacancy.is_featured && (
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-warning rounded-full flex items-center justify-center">
+                    <Star className="w-3 h-3 text-white" aria-hidden="true" />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -410,6 +560,12 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold text-theme-primary text-lg">{vacancy.title}</h3>
+                {/* J10: Featured chip */}
+                {vacancy.is_featured && (
+                  <Chip size="sm" variant="flat" color="warning" className="text-xs">
+                    {t('featured')}
+                  </Chip>
+                )}
                 <Chip size="sm" variant="flat" color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'} className="text-xs">
                   {t(`type.${vacancy.type}`)}
                 </Chip>
@@ -420,6 +576,10 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
                   <Chip size="sm" variant="flat" color="warning" className="text-xs">
                     {t('apply.applied')}
                   </Chip>
+                )}
+                {/* J1: Saved indicator */}
+                {vacancy.is_saved && (
+                  <BookmarkCheck className="w-4 h-4 text-warning" aria-label={t('saved.saved')} />
                 )}
               </div>
 
@@ -443,6 +603,17 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
                     {vacancy.location}
                   </span>
                 ) : null}
+
+                {/* J9: Salary on card */}
+                {salaryDisplay && (
+                  <span className="flex items-center gap-1 font-medium text-theme-primary">
+                    <DollarSign className="w-4 h-4" aria-hidden="true" />
+                    {salaryDisplay}
+                    {vacancy.salary_negotiable && (
+                      <span className="text-xs text-theme-subtle">({t('salary.negotiable')})</span>
+                    )}
+                  </span>
+                )}
 
                 {deadlineDate && (
                   <span className={`flex items-center gap-1 ${isPastDeadline ? 'text-danger' : ''}`}>

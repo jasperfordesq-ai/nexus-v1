@@ -46,6 +46,12 @@ interface JobFormData {
   contact_email: string;
   contact_phone: string;
   deadline: string;
+  // J9: Salary fields
+  salary_min: string;
+  salary_max: string;
+  salary_type: string;
+  salary_currency: string;
+  salary_negotiable: boolean;
 }
 
 const INITIAL_FORM: JobFormData = {
@@ -62,6 +68,11 @@ const INITIAL_FORM: JobFormData = {
   contact_email: '',
   contact_phone: '',
   deadline: '',
+  salary_min: '',
+  salary_max: '',
+  salary_type: '',
+  salary_currency: '',
+  salary_negotiable: false,
 };
 
 const JOB_TYPES = ['paid', 'volunteer', 'timebank'] as const;
@@ -114,6 +125,11 @@ export function CreateJobPage() {
             contact_email: (v.contact_email as string) || '',
             contact_phone: (v.contact_phone as string) || '',
             deadline: v.deadline ? (v.deadline as string).split('T')[0] : '',
+            salary_min: v.salary_min != null ? String(v.salary_min) : '',
+            salary_max: v.salary_max != null ? String(v.salary_max) : '',
+            salary_type: (v.salary_type as string) || '',
+            salary_currency: (v.salary_currency as string) || '',
+            salary_negotiable: Boolean(v.salary_negotiable),
           });
         } else {
           toast.error(t('detail.not_found'));
@@ -179,6 +195,13 @@ export function CreateJobPage() {
       if (form.contact_email.trim()) payload.contact_email = form.contact_email.trim();
       if (form.contact_phone.trim()) payload.contact_phone = form.contact_phone.trim();
       if (form.deadline) payload.deadline = form.deadline;
+
+      // J9: Salary fields
+      if (form.salary_min) payload.salary_min = parseFloat(form.salary_min);
+      if (form.salary_max) payload.salary_max = parseFloat(form.salary_max);
+      if (form.salary_type) payload.salary_type = form.salary_type;
+      if (form.salary_currency.trim()) payload.salary_currency = form.salary_currency.trim();
+      payload.salary_negotiable = form.salary_negotiable;
 
       let response;
       if (isEditing && id) {
@@ -430,6 +453,71 @@ export function CreateJobPage() {
               inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
             }}
           />
+
+          {/* J9: Salary/Compensation */}
+          {form.type === 'paid' && (
+            <div className="space-y-4 pt-2">
+              <h3 className="text-sm font-semibold text-theme-primary">{t('form.salary_section')}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  type="number"
+                  label={t('form.salary_min_label')}
+                  value={form.salary_min}
+                  onChange={(e) => updateField('salary_min', e.target.value)}
+                  min="0"
+                  step="100"
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                  }}
+                />
+                <Input
+                  type="number"
+                  label={t('form.salary_max_label')}
+                  value={form.salary_max}
+                  onChange={(e) => updateField('salary_max', e.target.value)}
+                  min="0"
+                  step="100"
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                  }}
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Select
+                  label={t('form.salary_type_label')}
+                  selectedKeys={form.salary_type ? [form.salary_type] : []}
+                  onChange={(e) => updateField('salary_type', e.target.value)}
+                  classNames={{
+                    trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                    value: 'text-theme-primary',
+                  }}
+                >
+                  <SelectItem key="hourly">{t('salary.hourly')}</SelectItem>
+                  <SelectItem key="annual">{t('salary.annual')}</SelectItem>
+                  <SelectItem key="time_credits">{t('salary.time_credits')}</SelectItem>
+                </Select>
+                <Input
+                  label={t('form.salary_currency_label')}
+                  placeholder={t('form.salary_currency_placeholder')}
+                  value={form.salary_currency}
+                  onChange={(e) => updateField('salary_currency', e.target.value)}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                  }}
+                />
+              </div>
+              <Switch
+                isSelected={form.salary_negotiable}
+                onValueChange={(v) => updateField('salary_negotiable', v)}
+                classNames={{ label: 'text-theme-primary text-sm' }}
+              >
+                <p className="text-sm text-theme-primary">{t('form.salary_negotiable_label')}</p>
+              </Switch>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-3 pt-4">

@@ -14,7 +14,8 @@ use Nexus\Core\ApiErrorCodes;
  * JobVacancyService - Business logic for job vacancies
  *
  * Provides methods for job vacancy CRUD operations, applications management,
- * and enrichment with creator info and application status.
+ * enrichment with creator info and application status, saved jobs, skills matching,
+ * pipeline stages, alerts, expiry/renewal, analytics, salary, and featured jobs.
  *
  * @package Nexus\Services
  */
@@ -125,9 +126,17 @@ class JobVacancyService
             }
         }
 
+        // J10: Featured filter
+        $featuredOnly = $filters['featured'] ?? false;
+        if ($featuredOnly) {
+            $where[] = "jv.is_featured = 1";
+            $where[] = "(jv.featured_until IS NULL OR jv.featured_until > NOW())";
+        }
+
         $whereClause = implode(' AND ', $where);
         $params[] = $limit + 1; // Fetch one extra to check for more
 
+        // J10: Featured jobs appear first in listing
         $sql = "
             SELECT
                 jv.*,
@@ -139,7 +148,9 @@ class JobVacancyService
             FROM job_vacancies jv
             LEFT JOIN users u ON jv.user_id = u.id
             WHERE {$whereClause}
-            ORDER BY jv.created_at DESC, jv.id DESC
+            ORDER BY
+                (CASE WHEN jv.is_featured = 1 AND (jv.featured_until IS NULL OR jv.featured_until > NOW()) THEN 0 ELSE 1 END) ASC,
+                jv.created_at DESC, jv.id DESC
             LIMIT ?
         ";
 
@@ -243,17 +254,47 @@ class JobVacancyService
         $vacancy['hours_per_week'] = $vacancy['hours_per_week'] !== null ? (float)$vacancy['hours_per_week'] : null;
         $vacancy['time_credits'] = $vacancy['time_credits'] !== null ? (float)$vacancy['time_credits'] : null;
 
+        // J9: Salary/compensation fields
+        $vacancy['salary_min'] = isset($vacancy['salary_min']) && $vacancy['salary_min'] !== null ? (float)$vacancy['salary_min'] : null;
+        $vacancy['salary_max'] = isset($vacancy['salary_max']) && $vacancy['salary_max'] !== null ? (float)$vacancy['salary_max'] : null;
+        $vacancy['salary_type'] = $vacancy['salary_type'] ?? null;
+        $vacancy['salary_currency'] = $vacancy['salary_currency'] ?? null;
+        $vacancy['salary_negotiable'] = isset($vacancy['salary_negotiable']) ? (bool)$vacancy['salary_negotiable'] : false;
+
+        // J10: Featured jobs
+        $vacancy['is_featured'] = isset($vacancy['is_featured']) ? (bool)$vacancy['is_featured'] : false;
+        $vacancy['featured_until'] = $vacancy['featured_until'] ?? null;
+        // Auto-expire featured status
+        if ($vacancy['is_featured'] && $vacancy['featured_until'] && strtotime($vacancy['featured_until']) < time()) {
+            $vacancy['is_featured'] = false;
+        }
+
+        // J7: Expiry/renewal
+        $vacancy['expired_at'] = $vacancy['expired_at'] ?? null;
+        $vacancy['renewed_at'] = $vacancy['renewed_at'] ?? null;
+        $vacancy['renewal_count'] = isset($vacancy['renewal_count']) ? (int)$vacancy['renewal_count'] : 0;
+
         // Check if user has applied
         if ($userId) {
             $application = Database::query(
-                "SELECT id, status FROM job_vacancy_applications WHERE vacancy_id = ? AND user_id = ?",
+                "SELECT id, status, stage FROM job_vacancy_applications WHERE vacancy_id = ? AND user_id = ?",
                 [$vacancy['id'], $userId]
             )->fetch();
             $vacancy['has_applied'] = !empty($application);
             $vacancy['application_status'] = $application ? $application['status'] : null;
+            $vacancy['application_stage'] = $application ? ($application['stage'] ?? $application['status']) : null;
+
+            // J1: Check if user has saved this job
+            $saved = Database::query(
+                "SELECT id FROM saved_jobs WHERE job_id = ? AND user_id = ? AND tenant_id = ?",
+                [$vacancy['id'], $userId, $vacancy['tenant_id']]
+            )->fetch();
+            $vacancy['is_saved'] = !empty($saved);
         } else {
             $vacancy['has_applied'] = false;
             $vacancy['application_status'] = null;
+            $vacancy['application_stage'] = null;
+            $vacancy['is_saved'] = false;
         }
 
         // Clean up redundant fields
@@ -295,6 +336,13 @@ class JobVacancyService
         $deadline = $data['deadline'] ?? null;
         $status = $data['status'] ?? 'open';
         $organizationId = isset($data['organization_id']) ? (int)$data['organization_id'] : null;
+
+        // J9: Salary fields
+        $salaryMin = isset($data['salary_min']) && $data['salary_min'] !== '' ? (float)$data['salary_min'] : null;
+        $salaryMax = isset($data['salary_max']) && $data['salary_max'] !== '' ? (float)$data['salary_max'] : null;
+        $salaryType = isset($data['salary_type']) && in_array($data['salary_type'], ['hourly', 'annual', 'time_credits']) ? $data['salary_type'] : null;
+        $salaryCurrency = isset($data['salary_currency']) ? trim($data['salary_currency']) : null;
+        $salaryNegotiable = !empty($data['salary_negotiable']) ? 1 : 0;
 
         // Validation
         if (empty($title)) {
@@ -341,16 +389,24 @@ class JobVacancyService
                 "INSERT INTO job_vacancies
                     (tenant_id, user_id, organization_id, title, description, location, is_remote,
                      type, commitment, category, skills_required, hours_per_week, time_credits,
-                     contact_email, contact_phone, deadline, status, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                     contact_email, contact_phone, deadline, status,
+                     salary_min, salary_max, salary_type, salary_currency, salary_negotiable,
+                     created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
                 [
                     $tenantId, $userId, $organizationId, $title, $description, $location, $isRemote,
                     $type, $commitment, $category, $skillsRequired, $hoursPerWeek, $timeCredits,
-                    $contactEmail, $contactPhone, $deadline, $status
+                    $contactEmail, $contactPhone, $deadline, $status,
+                    $salaryMin, $salaryMax, $salaryType, $salaryCurrency, $salaryNegotiable
                 ]
             );
 
             $vacancyId = Database::lastInsertId();
+
+            // J6: Check matching alerts for the new job
+            if ($status === 'open') {
+                self::checkJobAlertsForVacancy((int)$vacancyId);
+            }
 
             // Award gamification points
             try {
@@ -417,6 +473,12 @@ class JobVacancyService
             'deadline' => 'string_nullable',
             'status' => 'enum:open,closed,filled,draft',
             'organization_id' => 'int_nullable',
+            // J9: Salary fields
+            'salary_min' => 'float_nullable',
+            'salary_max' => 'float_nullable',
+            'salary_type' => 'enum_nullable:hourly,annual,time_credits',
+            'salary_currency' => 'string_nullable',
+            'salary_negotiable' => 'bool',
         ];
 
         foreach ($allowedFields as $field => $fieldType) {
@@ -446,6 +508,16 @@ class JobVacancyService
                 $value = $value !== null && $value !== '' ? (float)$value : null;
             } elseif ($fieldType === 'int_nullable') {
                 $value = $value !== null && $value !== '' ? (int)$value : null;
+            } elseif (str_starts_with($fieldType, 'enum_nullable:')) {
+                if ($value !== null && $value !== '') {
+                    $allowed = explode(',', substr($fieldType, 14));
+                    if (!in_array($value, $allowed)) {
+                        self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, "Invalid value for {$field}", $field);
+                        return false;
+                    }
+                } else {
+                    $value = null;
+                }
             } elseif (str_starts_with($fieldType, 'enum:')) {
                 $allowed = explode(',', substr($fieldType, 5));
                 if (!in_array($value, $allowed)) {
@@ -572,19 +644,26 @@ class JobVacancyService
         }
 
         try {
+            // J3: Use 'applied' as initial stage
             Database::query(
-                "INSERT INTO job_vacancy_applications (vacancy_id, user_id, message, status, created_at)
-                 VALUES (?, ?, ?, 'pending', NOW())",
+                "INSERT INTO job_vacancy_applications (vacancy_id, user_id, message, status, stage, created_at)
+                 VALUES (?, ?, ?, 'applied', 'applied', NOW())",
                 [$vacancyId, $userId, $message ? trim($message) : null]
             );
 
             $applicationId = Database::lastInsertId();
+
+            // J4: Log initial application in history
+            self::logApplicationHistory((int)$applicationId, null, 'applied', $userId, 'Application submitted');
 
             // Increment applications count
             Database::query(
                 "UPDATE job_vacancies SET applications_count = applications_count + 1 WHERE id = ?",
                 [$vacancyId]
             );
+
+            // Check for matching job alerts and trigger notifications
+            self::checkJobAlertsForVacancy($vacancyId);
 
             // Award gamification points
             try {
@@ -670,11 +749,29 @@ class JobVacancyService
      * @param string|null $notes
      * @return bool
      */
+    /**
+     * Valid pipeline stages (J3)
+     */
+    private static array $validStages = [
+        'applied', 'screening', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'
+    ];
+
+    /**
+     * Update an application status/stage (J3: full pipeline support)
+     *
+     * @param int $applicationId
+     * @param int $userId
+     * @param string $status
+     * @param string|null $notes
+     * @return bool
+     */
     public static function updateApplicationStatus(int $applicationId, int $userId, string $status, ?string $notes = null): bool
     {
         self::clearErrors();
 
-        if (!in_array($status, ['reviewed', 'accepted', 'rejected'])) {
+        // J3: Support full pipeline stages
+        $validStatuses = ['applied', 'screening', 'reviewed', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'];
+        if (!in_array($status, $validStatuses)) {
             self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Invalid application status', 'status');
             return false;
         }
@@ -709,13 +806,19 @@ class JobVacancyService
             }
         }
 
+        $previousStatus = $application['status'] ?? $application['stage'] ?? 'applied';
+
         try {
+            // J3: Update both status and stage columns
             Database::query(
                 "UPDATE job_vacancy_applications
-                 SET status = ?, reviewer_notes = ?, reviewed_by = ?, reviewed_at = NOW()
+                 SET status = ?, stage = ?, reviewer_notes = ?, reviewed_by = ?, reviewed_at = NOW()
                  WHERE id = ?",
-                [$status, $notes ? trim($notes) : null, $userId, $applicationId]
+                [$status, $status, $notes ? trim($notes) : null, $userId, $applicationId]
             );
+
+            // J4: Log status change in history
+            self::logApplicationHistory($applicationId, $previousStatus, $status, $userId, $notes);
 
             return true;
         } catch (\Throwable $e) {
@@ -742,7 +845,7 @@ class JobVacancyService
         $params = [$userId, $tenantId];
         $where = ["a.user_id = ?", "jv.tenant_id = ?"];
 
-        if ($status && in_array($status, ['pending', 'reviewed', 'accepted', 'rejected', 'withdrawn'])) {
+        if ($status && in_array($status, ['applied', 'pending', 'screening', 'reviewed', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'])) {
             $where[] = "a.status = ?";
             $params[] = $status;
         }
@@ -818,11 +921,12 @@ class JobVacancyService
     }
 
     /**
-     * Increment the views count for a vacancy
+     * Increment the views count for a vacancy (J8: also log to analytics table)
      *
      * @param int $id
+     * @param int|null $userId
      */
-    public static function incrementViews(int $id): void
+    public static function incrementViews(int $id, ?int $userId = null): void
     {
         $tenantId = TenantContext::getId();
         try {
@@ -830,9 +934,949 @@ class JobVacancyService
                 "UPDATE job_vacancies SET views_count = views_count + 1 WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
+
+            // J8: Log individual view for analytics
+            $ipHash = null;
+            if (class_exists('\Nexus\Core\ClientIp')) {
+                $ipHash = hash('sha256', \Nexus\Core\ClientIp::get() . date('Y-m-d'));
+            }
+            Database::query(
+                "INSERT INTO job_vacancy_views (vacancy_id, user_id, tenant_id, viewed_at, ip_hash)
+                 VALUES (?, ?, ?, NOW(), ?)",
+                [$id, $userId, $tenantId, $ipHash]
+            );
         } catch (\Throwable $e) {
             // Non-critical — log and continue
             error_log("Failed to increment job vacancy views: " . $e->getMessage());
+        }
+    }
+
+    // =========================================================================
+    // J1: SAVED JOBS (BOOKMARKS)
+    // =========================================================================
+
+    /**
+     * Save (bookmark) a job for the current user
+     *
+     * @param int $jobId
+     * @param int $userId
+     * @return bool
+     */
+    public static function saveJob(int $jobId, int $userId): bool
+    {
+        self::clearErrors();
+        $tenantId = TenantContext::getId();
+
+        // Verify job exists in this tenant
+        $job = Database::query(
+            "SELECT id FROM job_vacancies WHERE id = ? AND tenant_id = ?",
+            [$jobId, $tenantId]
+        )->fetch();
+
+        if (!$job) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Job vacancy not found');
+            return false;
+        }
+
+        // Check if already saved
+        $existing = Database::query(
+            "SELECT id FROM saved_jobs WHERE job_id = ? AND user_id = ? AND tenant_id = ?",
+            [$jobId, $userId, $tenantId]
+        )->fetch();
+
+        if ($existing) {
+            return true; // Already saved, idempotent
+        }
+
+        try {
+            Database::query(
+                "INSERT INTO saved_jobs (user_id, job_id, tenant_id, saved_at) VALUES (?, ?, ?, NOW())",
+                [$userId, $jobId, $tenantId]
+            );
+            return true;
+        } catch (\Throwable $e) {
+            error_log("Failed to save job: " . $e->getMessage());
+            self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to save job');
+            return false;
+        }
+    }
+
+    /**
+     * Unsave (remove bookmark) a job for the current user
+     *
+     * @param int $jobId
+     * @param int $userId
+     * @return bool
+     */
+    public static function unsaveJob(int $jobId, int $userId): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            Database::query(
+                "DELETE FROM saved_jobs WHERE job_id = ? AND user_id = ? AND tenant_id = ?",
+                [$jobId, $userId, $tenantId]
+            );
+            return true;
+        } catch (\Throwable $e) {
+            error_log("Failed to unsave job: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get saved jobs for a user
+     *
+     * @param int $userId
+     * @param array $filters Optional: cursor, limit
+     * @return array ['items' => [...], 'cursor' => ?string, 'has_more' => bool]
+     */
+    public static function getSavedJobs(int $userId, array $filters = []): array
+    {
+        $tenantId = TenantContext::getId();
+        $limit = $filters['limit'] ?? 20;
+        $cursor = $filters['cursor'] ?? null;
+
+        $params = [$userId, $tenantId];
+        $where = ["sj.user_id = ?", "sj.tenant_id = ?"];
+
+        if ($cursor) {
+            $cursorId = base64_decode($cursor);
+            if ($cursorId !== false) {
+                $where[] = "sj.id < ?";
+                $params[] = (int)$cursorId;
+            }
+        }
+
+        $whereClause = implode(' AND ', $where);
+        $params[] = $limit + 1;
+
+        $sql = "
+            SELECT
+                jv.*,
+                u.first_name as creator_first_name,
+                u.last_name as creator_last_name,
+                u.avatar_url as creator_avatar,
+                NULL as organization_name,
+                NULL as organization_logo,
+                sj.id as saved_id,
+                sj.saved_at
+            FROM saved_jobs sj
+            JOIN job_vacancies jv ON sj.job_id = jv.id
+            LEFT JOIN users u ON jv.user_id = u.id
+            WHERE {$whereClause}
+            ORDER BY sj.saved_at DESC, sj.id DESC
+            LIMIT ?
+        ";
+
+        $rows = Database::query($sql, $params)->fetchAll();
+
+        $hasMore = count($rows) > $limit;
+        if ($hasMore) {
+            array_pop($rows);
+        }
+
+        $nextCursor = null;
+        if ($hasMore && !empty($rows)) {
+            $lastItem = end($rows);
+            $nextCursor = base64_encode((string)$lastItem['saved_id']);
+        }
+
+        // Enrich
+        foreach ($rows as &$row) {
+            $savedAt = $row['saved_at'];
+            $row = self::enrichVacancy($row, $userId);
+            $row['saved_at'] = $savedAt;
+            $row['is_saved'] = true;
+        }
+
+        return [
+            'items' => $rows,
+            'cursor' => $nextCursor,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    // =========================================================================
+    // J2: SKILLS MATCHING WITH MATCH PERCENTAGE
+    // =========================================================================
+
+    /**
+     * Calculate match percentage between a user's skills and a job's required skills
+     *
+     * @param int $userId
+     * @param int $jobId
+     * @return array ['percentage' => int, 'matched' => array, 'missing' => array, 'user_skills' => array, 'required_skills' => array]
+     */
+    public static function calculateMatchPercentage(int $userId, int $jobId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        // Get user skills
+        $user = Database::query(
+            "SELECT skills FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        )->fetch();
+
+        $userSkills = [];
+        if ($user && !empty($user['skills'])) {
+            $userSkills = array_map(function ($s) {
+                return strtolower(trim($s));
+            }, explode(',', $user['skills']));
+            $userSkills = array_filter($userSkills);
+        }
+
+        // Get job required skills
+        $job = Database::query(
+            "SELECT skills_required FROM job_vacancies WHERE id = ? AND tenant_id = ?",
+            [$jobId, $tenantId]
+        )->fetch();
+
+        $requiredSkills = [];
+        if ($job && !empty($job['skills_required'])) {
+            $requiredSkills = array_map(function ($s) {
+                return strtolower(trim($s));
+            }, explode(',', $job['skills_required']));
+            $requiredSkills = array_filter($requiredSkills);
+        }
+
+        if (empty($requiredSkills)) {
+            return [
+                'percentage' => 100,
+                'matched' => [],
+                'missing' => [],
+                'user_skills' => $userSkills,
+                'required_skills' => $requiredSkills,
+            ];
+        }
+
+        if (empty($userSkills)) {
+            return [
+                'percentage' => 0,
+                'matched' => [],
+                'missing' => $requiredSkills,
+                'user_skills' => $userSkills,
+                'required_skills' => $requiredSkills,
+            ];
+        }
+
+        // Match skills — use fuzzy matching (substring/partial match)
+        $matched = [];
+        $missing = [];
+
+        foreach ($requiredSkills as $required) {
+            $isMatched = false;
+            foreach ($userSkills as $userSkill) {
+                // Exact match or substring containment in either direction
+                if ($required === $userSkill
+                    || str_contains($required, $userSkill)
+                    || str_contains($userSkill, $required)
+                    || similar_text($required, $userSkill, $pct) !== false && $pct >= 75
+                ) {
+                    $matched[] = $required;
+                    $isMatched = true;
+                    break;
+                }
+            }
+            if (!$isMatched) {
+                $missing[] = $required;
+            }
+        }
+
+        $percentage = (int)round((count($matched) / count($requiredSkills)) * 100);
+
+        return [
+            'percentage' => $percentage,
+            'matched' => $matched,
+            'missing' => $missing,
+            'user_skills' => $userSkills,
+            'required_skills' => $requiredSkills,
+        ];
+    }
+
+    // =========================================================================
+    // J4: APPLICATION STATUS HISTORY
+    // =========================================================================
+
+    /**
+     * Log an application status change to history
+     *
+     * @param int $applicationId
+     * @param string|null $fromStatus
+     * @param string $toStatus
+     * @param int $changedBy
+     * @param string|null $notes
+     */
+    private static function logApplicationHistory(int $applicationId, ?string $fromStatus, string $toStatus, int $changedBy, ?string $notes = null): void
+    {
+        try {
+            Database::query(
+                "INSERT INTO job_application_history (application_id, from_status, to_status, changed_by, changed_at, notes)
+                 VALUES (?, ?, ?, ?, NOW(), ?)",
+                [$applicationId, $fromStatus, $toStatus, $changedBy, $notes ? trim($notes) : null]
+            );
+        } catch (\Throwable $e) {
+            // Non-critical — log and continue
+            error_log("Failed to log application history: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get status history for an application
+     *
+     * @param int $applicationId
+     * @param int $userId Requesting user
+     * @return array|null
+     */
+    public static function getApplicationHistory(int $applicationId, int $userId): ?array
+    {
+        self::clearErrors();
+
+        // Get the application with its vacancy to check permissions
+        $application = Database::query(
+            "SELECT a.*, jv.user_id as vacancy_owner_id, jv.tenant_id
+             FROM job_vacancy_applications a
+             JOIN job_vacancies jv ON a.vacancy_id = jv.id
+             WHERE a.id = ?",
+            [$applicationId]
+        )->fetch();
+
+        if (!$application) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Application not found');
+            return null;
+        }
+
+        $tenantId = TenantContext::getId();
+        if ((int)$application['tenant_id'] !== $tenantId) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Application not found');
+            return null;
+        }
+
+        // Must be either the applicant or vacancy owner or admin
+        $isApplicant = (int)$application['user_id'] === $userId;
+        $isOwner = (int)$application['vacancy_owner_id'] === $userId;
+
+        if (!$isApplicant && !$isOwner) {
+            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
+                self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Access denied');
+                return null;
+            }
+        }
+
+        $history = Database::query(
+            "SELECT h.*, u.first_name, u.last_name
+             FROM job_application_history h
+             LEFT JOIN users u ON h.changed_by = u.id
+             WHERE h.application_id = ?
+             ORDER BY h.changed_at ASC",
+            [$applicationId]
+        )->fetchAll();
+
+        foreach ($history as &$entry) {
+            $entry['id'] = (int)$entry['id'];
+            $entry['application_id'] = (int)$entry['application_id'];
+            $entry['changed_by_name'] = trim(($entry['first_name'] ?? '') . ' ' . ($entry['last_name'] ?? ''));
+            unset($entry['first_name'], $entry['last_name']);
+        }
+
+        return $history;
+    }
+
+    // =========================================================================
+    // J5: "AM I QUALIFIED?" TOOL
+    // =========================================================================
+
+    /**
+     * Get qualification assessment for a user against a job
+     *
+     * @param int $userId
+     * @param int $jobId
+     * @return array|null
+     */
+    public static function getQualificationAssessment(int $userId, int $jobId): ?array
+    {
+        self::clearErrors();
+        $tenantId = TenantContext::getId();
+
+        $vacancy = self::getById($jobId, $userId);
+        if (!$vacancy) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Job vacancy not found');
+            return null;
+        }
+
+        $matchData = self::calculateMatchPercentage($userId, $jobId);
+
+        $totalRequired = count($matchData['required_skills']);
+        $totalMatched = count($matchData['matched']);
+
+        // Build detailed breakdown
+        $breakdown = [];
+        foreach ($matchData['required_skills'] as $skill) {
+            $isMatched = in_array($skill, $matchData['matched']);
+            $breakdown[] = [
+                'skill' => $skill,
+                'matched' => $isMatched,
+            ];
+        }
+
+        // Determine qualification level
+        $level = 'low';
+        if ($matchData['percentage'] >= 80) {
+            $level = 'excellent';
+        } elseif ($matchData['percentage'] >= 60) {
+            $level = 'good';
+        } elseif ($matchData['percentage'] >= 40) {
+            $level = 'moderate';
+        }
+
+        return [
+            'job_id' => $jobId,
+            'job_title' => $vacancy['title'],
+            'percentage' => $matchData['percentage'],
+            'level' => $level,
+            'total_required' => $totalRequired,
+            'total_matched' => $totalMatched,
+            'total_missing' => count($matchData['missing']),
+            'breakdown' => $breakdown,
+            'matched_skills' => $matchData['matched'],
+            'missing_skills' => $matchData['missing'],
+            'user_skills' => $matchData['user_skills'],
+        ];
+    }
+
+    // =========================================================================
+    // J6: JOB ALERTS / NOTIFICATIONS
+    // =========================================================================
+
+    /**
+     * Create or update a job alert subscription
+     *
+     * @param int $userId
+     * @param array $preferences
+     * @return int|null Alert ID
+     */
+    public static function subscribeAlert(int $userId, array $preferences): ?int
+    {
+        self::clearErrors();
+        $tenantId = TenantContext::getId();
+
+        $keywords = isset($preferences['keywords']) ? trim($preferences['keywords']) : null;
+        $categories = isset($preferences['categories']) ? trim($preferences['categories']) : null;
+        $type = isset($preferences['type']) && in_array($preferences['type'], ['paid', 'volunteer', 'timebank']) ? $preferences['type'] : null;
+        $commitment = isset($preferences['commitment']) && in_array($preferences['commitment'], ['full_time', 'part_time', 'flexible', 'one_off']) ? $preferences['commitment'] : null;
+        $location = isset($preferences['location']) ? trim($preferences['location']) : null;
+        $isRemoteOnly = !empty($preferences['is_remote_only']) ? 1 : 0;
+
+        try {
+            Database::query(
+                "INSERT INTO job_alerts (user_id, tenant_id, keywords, categories, type, commitment, location, is_remote_only, is_active, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())",
+                [$userId, $tenantId, $keywords, $categories, $type, $commitment, $location, $isRemoteOnly]
+            );
+
+            return (int)Database::lastInsertId();
+        } catch (\Throwable $e) {
+            error_log("Failed to create job alert: " . $e->getMessage());
+            self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to create alert');
+            return null;
+        }
+    }
+
+    /**
+     * Unsubscribe (deactivate) a job alert
+     *
+     * @param int $alertId
+     * @param int $userId
+     * @return bool
+     */
+    public static function unsubscribeAlert(int $alertId, int $userId): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            Database::query(
+                "UPDATE job_alerts SET is_active = 0 WHERE id = ? AND user_id = ? AND tenant_id = ?",
+                [$alertId, $userId, $tenantId]
+            );
+            return true;
+        } catch (\Throwable $e) {
+            error_log("Failed to unsubscribe alert: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Delete a job alert permanently
+     *
+     * @param int $alertId
+     * @param int $userId
+     * @return bool
+     */
+    public static function deleteAlert(int $alertId, int $userId): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            Database::query(
+                "DELETE FROM job_alerts WHERE id = ? AND user_id = ? AND tenant_id = ?",
+                [$alertId, $userId, $tenantId]
+            );
+            return true;
+        } catch (\Throwable $e) {
+            error_log("Failed to delete alert: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get alerts for a user
+     *
+     * @param int $userId
+     * @return array
+     */
+    public static function getAlerts(int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $alerts = Database::query(
+            "SELECT * FROM job_alerts WHERE user_id = ? AND tenant_id = ? ORDER BY created_at DESC",
+            [$userId, $tenantId]
+        )->fetchAll();
+
+        foreach ($alerts as &$alert) {
+            $alert['id'] = (int)$alert['id'];
+            $alert['user_id'] = (int)$alert['user_id'];
+            $alert['tenant_id'] = (int)$alert['tenant_id'];
+            $alert['is_active'] = (bool)$alert['is_active'];
+            $alert['is_remote_only'] = (bool)$alert['is_remote_only'];
+        }
+
+        return $alerts;
+    }
+
+    /**
+     * Check all active alerts against a newly posted vacancy
+     * Called when a new job is created
+     *
+     * @param int $vacancyId
+     */
+    private static function checkJobAlertsForVacancy(int $vacancyId): void
+    {
+        // Non-critical — silently fail
+        try {
+            $tenantId = TenantContext::getId();
+
+            $vacancy = Database::query(
+                "SELECT * FROM job_vacancies WHERE id = ? AND tenant_id = ?",
+                [$vacancyId, $tenantId]
+            )->fetch();
+
+            if (!$vacancy) {
+                return;
+            }
+
+            $alerts = Database::query(
+                "SELECT ja.* FROM job_alerts ja
+                 WHERE ja.tenant_id = ? AND ja.is_active = 1",
+                [$tenantId]
+            )->fetchAll();
+
+            foreach ($alerts as $alert) {
+                if (self::alertMatchesVacancy($alert, $vacancy)) {
+                    // Update last_notified_at
+                    Database::query(
+                        "UPDATE job_alerts SET last_notified_at = NOW() WHERE id = ?",
+                        [$alert['id']]
+                    );
+
+                    // Create in-app notification if NotificationService exists
+                    try {
+                        if (class_exists('\Nexus\Services\NotificationService')) {
+                            \Nexus\Services\NotificationService::create(
+                                (int)$alert['user_id'],
+                                'job_alert',
+                                'New job matching your alert: ' . $vacancy['title'],
+                                '/jobs/' . $vacancy['id'],
+                                $tenantId
+                            );
+                        }
+                    } catch (\Throwable $e) {
+                        // Notifications are optional
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log("Job alert check failed: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Check if an alert matches a vacancy
+     *
+     * @param array $alert
+     * @param array $vacancy
+     * @return bool
+     */
+    private static function alertMatchesVacancy(array $alert, array $vacancy): bool
+    {
+        // Type filter
+        if (!empty($alert['type']) && $alert['type'] !== $vacancy['type']) {
+            return false;
+        }
+
+        // Commitment filter
+        if (!empty($alert['commitment']) && $alert['commitment'] !== $vacancy['commitment']) {
+            return false;
+        }
+
+        // Remote filter
+        if ($alert['is_remote_only'] && !$vacancy['is_remote']) {
+            return false;
+        }
+
+        // Keywords
+        if (!empty($alert['keywords'])) {
+            $keywords = array_map('trim', explode(',', strtolower($alert['keywords'])));
+            $searchText = strtolower($vacancy['title'] . ' ' . $vacancy['description'] . ' ' . ($vacancy['category'] ?? ''));
+            $anyMatch = false;
+            foreach ($keywords as $kw) {
+                if (!empty($kw) && str_contains($searchText, $kw)) {
+                    $anyMatch = true;
+                    break;
+                }
+            }
+            if (!$anyMatch) {
+                return false;
+            }
+        }
+
+        // Categories
+        if (!empty($alert['categories']) && !empty($vacancy['category'])) {
+            $alertCats = array_map('trim', explode(',', strtolower($alert['categories'])));
+            if (!in_array(strtolower($vacancy['category']), $alertCats)) {
+                return false;
+            }
+        }
+
+        // Location
+        if (!empty($alert['location']) && !empty($vacancy['location'])) {
+            if (!str_contains(strtolower($vacancy['location']), strtolower($alert['location']))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // =========================================================================
+    // J7: JOB EXPIRY + RENEWAL
+    // =========================================================================
+
+    /**
+     * Expire jobs past their deadline
+     * Called by cron job
+     *
+     * @return int Number of jobs expired
+     */
+    public static function expireOverdueJobs(): int
+    {
+        try {
+            $result = Database::query(
+                "UPDATE job_vacancies
+                 SET status = 'closed', expired_at = NOW()
+                 WHERE status = 'open'
+                 AND deadline IS NOT NULL
+                 AND deadline < NOW()
+                 AND expired_at IS NULL"
+            );
+            return $result->rowCount();
+        } catch (\Throwable $e) {
+            error_log("Failed to expire overdue jobs: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Get jobs expiring within N days (for renewal reminders)
+     *
+     * @param int $daysBeforeDeadline
+     * @return array
+     */
+    public static function getJobsExpiringWithin(int $daysBeforeDeadline = 3): array
+    {
+        try {
+            return Database::query(
+                "SELECT jv.*, u.email as owner_email, u.first_name as owner_name
+                 FROM job_vacancies jv
+                 JOIN users u ON jv.user_id = u.id
+                 WHERE jv.status = 'open'
+                 AND jv.deadline IS NOT NULL
+                 AND jv.deadline BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? DAY)
+                 AND jv.expired_at IS NULL",
+                [$daysBeforeDeadline]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            error_log("Failed to get expiring jobs: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Renew a job vacancy (extend deadline)
+     *
+     * @param int $jobId
+     * @param int $userId
+     * @param int $daysToExtend
+     * @return bool
+     */
+    public static function renewJob(int $jobId, int $userId, int $daysToExtend = 30): bool
+    {
+        self::clearErrors();
+
+        $vacancy = self::getById($jobId);
+        if (!$vacancy) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Job vacancy not found');
+            return false;
+        }
+
+        // Check ownership or admin
+        if ((int)$vacancy['user_id'] !== $userId) {
+            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
+                self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'You can only renew your own job vacancies');
+                return false;
+            }
+        }
+
+        $tenantId = TenantContext::getId();
+
+        try {
+            // New deadline: from today + extension, or from current deadline + extension
+            $baseDate = ($vacancy['deadline'] && strtotime($vacancy['deadline']) > time())
+                ? $vacancy['deadline']
+                : date('Y-m-d H:i:s');
+            $newDeadline = date('Y-m-d H:i:s', strtotime($baseDate . " +{$daysToExtend} days"));
+
+            Database::query(
+                "UPDATE job_vacancies
+                 SET deadline = ?, status = 'open', expired_at = NULL,
+                     renewed_at = NOW(), renewal_count = renewal_count + 1
+                 WHERE id = ? AND tenant_id = ?",
+                [$newDeadline, $jobId, $tenantId]
+            );
+
+            return true;
+        } catch (\Throwable $e) {
+            error_log("Job renewal failed: " . $e->getMessage());
+            self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to renew job');
+            return false;
+        }
+    }
+
+    // =========================================================================
+    // J8: JOB ANALYTICS
+    // =========================================================================
+
+    /**
+     * Get analytics for a job vacancy
+     *
+     * @param int $jobId
+     * @param int $userId
+     * @return array|null
+     */
+    public static function getAnalytics(int $jobId, int $userId): ?array
+    {
+        self::clearErrors();
+
+        $vacancy = self::getById($jobId);
+        if (!$vacancy) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Job vacancy not found');
+            return null;
+        }
+
+        // Check ownership or admin
+        if ((int)$vacancy['user_id'] !== $userId) {
+            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
+                self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Access denied');
+                return null;
+            }
+        }
+
+        $tenantId = TenantContext::getId();
+
+        // Views over time (last 30 days, grouped by day)
+        $viewsByDay = Database::query(
+            "SELECT DATE(viewed_at) as date, COUNT(*) as count
+             FROM job_vacancy_views
+             WHERE vacancy_id = ? AND tenant_id = ?
+             AND viewed_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+             GROUP BY DATE(viewed_at)
+             ORDER BY date ASC",
+            [$jobId, $tenantId]
+        )->fetchAll();
+
+        // Unique viewers
+        $uniqueViewers = Database::query(
+            "SELECT COUNT(DISTINCT COALESCE(user_id, ip_hash)) as count
+             FROM job_vacancy_views
+             WHERE vacancy_id = ? AND tenant_id = ?",
+            [$jobId, $tenantId]
+        )->fetch();
+
+        // Application count by status
+        $applicationsByStatus = Database::query(
+            "SELECT COALESCE(stage, status) as stage, COUNT(*) as count
+             FROM job_vacancy_applications
+             WHERE vacancy_id = ?
+             GROUP BY COALESCE(stage, status)",
+            [$jobId]
+        )->fetchAll();
+
+        // Conversion rate (views to applications)
+        $totalViews = (int)$vacancy['views_count'];
+        $totalApps = (int)$vacancy['applications_count'];
+        $conversionRate = $totalViews > 0 ? round(($totalApps / $totalViews) * 100, 1) : 0;
+
+        // Average time to first application
+        $avgTimeToApply = Database::query(
+            "SELECT AVG(TIMESTAMPDIFF(HOUR, jv.created_at, a.created_at)) as avg_hours
+             FROM job_vacancy_applications a
+             JOIN job_vacancies jv ON a.vacancy_id = jv.id
+             WHERE a.vacancy_id = ?",
+            [$jobId]
+        )->fetch();
+
+        // Time to fill (if filled)
+        $timeToFill = null;
+        if ($vacancy['status'] === 'filled') {
+            $firstAccepted = Database::query(
+                "SELECT MIN(reviewed_at) as accepted_at
+                 FROM job_vacancy_applications
+                 WHERE vacancy_id = ? AND status = 'accepted'",
+                [$jobId]
+            )->fetch();
+            if ($firstAccepted && $firstAccepted['accepted_at']) {
+                $timeToFill = (int)((strtotime($firstAccepted['accepted_at']) - strtotime($vacancy['created_at'])) / 86400);
+            }
+        }
+
+        return [
+            'job_id' => $jobId,
+            'total_views' => $totalViews,
+            'unique_viewers' => (int)($uniqueViewers['count'] ?? 0),
+            'total_applications' => $totalApps,
+            'conversion_rate' => $conversionRate,
+            'avg_time_to_apply_hours' => $avgTimeToApply ? round((float)$avgTimeToApply['avg_hours'], 1) : null,
+            'time_to_fill_days' => $timeToFill,
+            'views_by_day' => $viewsByDay,
+            'applications_by_stage' => $applicationsByStatus,
+            'created_at' => $vacancy['created_at'],
+            'status' => $vacancy['status'],
+        ];
+    }
+
+    // =========================================================================
+    // J10: FEATURED JOBS
+    // =========================================================================
+
+    /**
+     * Feature a job vacancy (admin only)
+     *
+     * @param int $jobId
+     * @param int $userId Admin user ID
+     * @param int $durationDays How many days the job stays featured
+     * @return bool
+     */
+    public static function featureJob(int $jobId, int $userId, int $durationDays = 7): bool
+    {
+        self::clearErrors();
+        $tenantId = TenantContext::getId();
+
+        // Admin check
+        $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+        if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
+            self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Only admins can feature jobs');
+            return false;
+        }
+
+        $job = Database::query(
+            "SELECT id FROM job_vacancies WHERE id = ? AND tenant_id = ?",
+            [$jobId, $tenantId]
+        )->fetch();
+
+        if (!$job) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Job vacancy not found');
+            return false;
+        }
+
+        try {
+            $featuredUntil = date('Y-m-d H:i:s', strtotime("+{$durationDays} days"));
+            Database::query(
+                "UPDATE job_vacancies SET is_featured = 1, featured_until = ? WHERE id = ? AND tenant_id = ?",
+                [$featuredUntil, $jobId, $tenantId]
+            );
+            return true;
+        } catch (\Throwable $e) {
+            error_log("Failed to feature job: " . $e->getMessage());
+            self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to feature job');
+            return false;
+        }
+    }
+
+    /**
+     * Unfeature a job vacancy (admin only)
+     *
+     * @param int $jobId
+     * @param int $userId Admin user ID
+     * @return bool
+     */
+    public static function unfeatureJob(int $jobId, int $userId): bool
+    {
+        self::clearErrors();
+        $tenantId = TenantContext::getId();
+
+        // Admin check
+        $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+        if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
+            self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Only admins can unfeature jobs');
+            return false;
+        }
+
+        try {
+            Database::query(
+                "UPDATE job_vacancies SET is_featured = 0, featured_until = NULL WHERE id = ? AND tenant_id = ?",
+                [$jobId, $tenantId]
+            );
+            return true;
+        } catch (\Throwable $e) {
+            error_log("Failed to unfeature job: " . $e->getMessage());
+            self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to unfeature job');
+            return false;
+        }
+    }
+
+    /**
+     * Auto-expire featured status for jobs past their featured_until date
+     * Called by cron job
+     *
+     * @return int Number updated
+     */
+    public static function expireFeaturedJobs(): int
+    {
+        try {
+            $result = Database::query(
+                "UPDATE job_vacancies
+                 SET is_featured = 0
+                 WHERE is_featured = 1
+                 AND featured_until IS NOT NULL
+                 AND featured_until < NOW()"
+            );
+            return $result->rowCount();
+        } catch (\Throwable $e) {
+            error_log("Failed to expire featured jobs: " . $e->getMessage());
+            return 0;
         }
     }
 }

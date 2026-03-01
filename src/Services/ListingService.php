@@ -10,6 +10,8 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\Listing;
 use Nexus\Models\ActivityLog;
+use Nexus\Services\ListingModerationService;
+use Nexus\Services\ListingSkillTagService;
 
 /**
  * ListingService - Business logic for listings
@@ -44,6 +46,8 @@ class ListingService
      *   - user_id: int (filter by owner)
      *   - include_deleted: bool (default false)
      *   - current_user_id: int|null (when provided, adds is_favorited field)
+     *   - skills: string|array (comma-separated or array of skill tags)
+     *   - featured_first: bool (default false - sort featured to top)
      * @return array ['items' => [], 'cursor' => string|null, 'has_more' => bool]
      */
     public static function getAll(array $filters = []): array
@@ -139,6 +143,25 @@ class ListingService
             $params[] = $searchTerm;
         }
 
+        // Skills filter — filter by skill tags
+        if (!empty($filters['skills'])) {
+            $skills = is_array($filters['skills']) ? $filters['skills'] : explode(',', $filters['skills']);
+            $skills = array_map('trim', $skills);
+            $skills = array_filter($skills);
+
+            if (!empty($skills)) {
+                $skillPlaceholders = implode(',', array_fill(0, count($skills), '?'));
+                $sql .= " AND l.id IN (
+                    SELECT lst.listing_id FROM listing_skill_tags lst
+                    WHERE lst.tenant_id = ? AND lst.tag IN ({$skillPlaceholders})
+                )";
+                $params[] = $tenantId;
+                foreach ($skills as $skill) {
+                    $params[] = strtolower(trim($skill));
+                }
+            }
+        }
+
         // Cursor-based pagination
         if ($cursor !== null) {
             $cursorId = base64_decode($cursor, true);
@@ -148,8 +171,12 @@ class ListingService
             }
         }
 
-        // Order by ID descending (for consistent cursor pagination)
-        $sql .= " ORDER BY l.id DESC LIMIT ?";
+        // Order: featured first (when requested), then by ID descending
+        if (!empty($filters['featured_first'])) {
+            $sql .= " ORDER BY l.is_featured DESC, l.id DESC LIMIT ?";
+        } else {
+            $sql .= " ORDER BY l.id DESC LIMIT ?";
+        }
         $params[] = $limit + 1; // Fetch one extra to determine has_more
 
         $items = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
@@ -393,11 +420,24 @@ class ListingService
             }
         }
 
+        // Check if moderation is enabled — new listings enter pending_review
+        $initialStatus = 'active';
+        $moderationStatus = null;
+        try {
+            $moderationStatus = ListingModerationService::getInitialModerationStatus();
+            if ($moderationStatus === 'pending_review') {
+                $initialStatus = 'pending';
+            }
+        } catch (\Exception $e) {
+            // If moderation service unavailable, default to active
+        }
+
         // Insert listing
         $sql = "INSERT INTO listings (
                     tenant_id, user_id, title, description, type, category_id,
-                    image_url, location, latitude, longitude, federated_visibility, hours_estimate, status, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())";
+                    image_url, location, latitude, longitude, federated_visibility, hours_estimate,
+                    status, moderation_status, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
         Database::query($sql, [
             $tenantId,
@@ -412,6 +452,8 @@ class ListingService
             $longitude,
             $federatedVisibility,
             isset($data['hours_estimate']) ? floatval($data['hours_estimate']) : null,
+            $initialStatus,
+            $moderationStatus,
         ]);
 
         $listingId = Database::lastInsertId();
@@ -419,6 +461,16 @@ class ListingService
         // Handle attributes
         if (!empty($data['attributes']) && is_array($data['attributes'])) {
             self::saveAttributes($listingId, $data['attributes']);
+        }
+
+        // Handle skill tags
+        if (!empty($data['skill_tags']) && is_array($data['skill_tags'])) {
+            try {
+                ListingSkillTagService::setTags($listingId, $data['skill_tags']);
+            } catch (\Exception $e) {
+                // Non-critical — table may not exist yet
+                error_log("ListingService::create skill_tags error: " . $e->getMessage());
+            }
         }
 
         // Handle SDGs
@@ -447,6 +499,16 @@ class ListingService
             }
         } catch (\Exception $e) {
             // Non-critical
+        }
+
+        // Send real-time match notifications to users with complementary listings
+        try {
+            if (class_exists('\Nexus\Services\MatchNotificationService')) {
+                \Nexus\Services\MatchNotificationService::onListingCreated($listingId, $userId, $data);
+            }
+        } catch (\Exception $e) {
+            // Non-critical — match notifications should never block listing creation
+            error_log("MatchNotificationService error: " . $e->getMessage());
         }
 
         return $listingId;

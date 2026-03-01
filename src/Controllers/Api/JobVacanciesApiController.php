@@ -13,18 +13,33 @@ use Nexus\Core\TenantContext;
 /**
  * JobVacanciesApiController - RESTful API v2 for job vacancies
  *
- * Provides full CRUD operations for job vacancies plus application management.
+ * Provides full CRUD, applications pipeline, saved jobs, skills matching,
+ * qualification assessment, alerts, renewal, analytics, and featured jobs.
  *
  * Endpoints:
- * - GET    /api/v2/jobs              - List all job vacancies (paginated)
- * - POST   /api/v2/jobs              - Create a new job vacancy
- * - GET    /api/v2/jobs/{id}         - Get a single job vacancy
- * - PUT    /api/v2/jobs/{id}         - Update a job vacancy
- * - DELETE /api/v2/jobs/{id}         - Delete a job vacancy
- * - POST   /api/v2/jobs/{id}/apply   - Apply to a job vacancy
- * - GET    /api/v2/jobs/{id}/applications - List applications (owner only)
- * - PUT    /api/v2/jobs/applications/{id} - Update application status
- * - GET    /api/v2/jobs/my-applications   - List current user's applications
+ * - GET    /api/v2/jobs                         - List all job vacancies (paginated)
+ * - POST   /api/v2/jobs                         - Create a new job vacancy
+ * - GET    /api/v2/jobs/saved                   - List saved/bookmarked jobs
+ * - GET    /api/v2/jobs/my-applications         - List current user's applications
+ * - GET    /api/v2/jobs/alerts                  - List user's job alerts
+ * - POST   /api/v2/jobs/alerts                  - Create a job alert
+ * - DELETE /api/v2/jobs/alerts/{id}             - Delete a job alert
+ * - PUT    /api/v2/jobs/alerts/{id}/unsubscribe - Deactivate alert
+ * - GET    /api/v2/jobs/{id}                    - Get a single job vacancy
+ * - PUT    /api/v2/jobs/{id}                    - Update a job vacancy
+ * - DELETE /api/v2/jobs/{id}                    - Delete a job vacancy
+ * - POST   /api/v2/jobs/{id}/apply              - Apply to a job vacancy
+ * - POST   /api/v2/jobs/{id}/save               - Save/bookmark a job
+ * - DELETE /api/v2/jobs/{id}/save               - Unsave a job
+ * - GET    /api/v2/jobs/{id}/match              - Get match percentage for a job
+ * - GET    /api/v2/jobs/{id}/qualified           - Am I Qualified assessment
+ * - GET    /api/v2/jobs/{id}/applications       - List applications (owner only)
+ * - GET    /api/v2/jobs/{id}/analytics          - Job analytics (owner only)
+ * - POST   /api/v2/jobs/{id}/renew              - Renew a job vacancy
+ * - POST   /api/v2/jobs/{id}/feature            - Feature a job (admin)
+ * - DELETE /api/v2/jobs/{id}/feature            - Unfeature a job (admin)
+ * - PUT    /api/v2/jobs/applications/{id}       - Update application status/stage
+ * - GET    /api/v2/jobs/applications/{id}/history - Application status history
  *
  * @package Nexus\Controllers\Api
  */
@@ -87,6 +102,9 @@ class JobVacanciesApiController extends BaseApiController
         }
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
+        }
+        if ($this->query('featured')) {
+            $filters['featured'] = $this->query('featured') === '1' || $this->query('featured') === 'true';
         }
 
         $result = JobVacancyService::getAll($filters);
@@ -157,8 +175,8 @@ class JobVacanciesApiController extends BaseApiController
             );
         }
 
-        // Increment views (fire-and-forget)
-        JobVacancyService::incrementViews($id);
+        // Increment views (fire-and-forget) — J8: pass userId for analytics
+        JobVacancyService::incrementViews($id, $userId);
 
         $this->respondWithData($vacancy);
     }
@@ -388,5 +406,382 @@ class JobVacanciesApiController extends BaseApiController
             $filters['limit'],
             $result['has_more']
         );
+    }
+
+    // =========================================================================
+    // J1: SAVED JOBS
+    // =========================================================================
+
+    /**
+     * POST /api/v2/jobs/{id}/save
+     *
+     * Save (bookmark) a job vacancy.
+     */
+    public function saveJob(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('jobs_save', 30, 60);
+
+        $success = JobVacancyService::saveJob($id, $userId);
+
+        if (!$success) {
+            $errors = JobVacancyService::getErrors();
+            $this->respondWithErrors($errors, 400);
+        }
+
+        $this->respondWithData(['message' => 'Job saved successfully', 'is_saved' => true], null, 201);
+    }
+
+    /**
+     * DELETE /api/v2/jobs/{id}/save
+     *
+     * Unsave (remove bookmark) a job vacancy.
+     */
+    public function unsaveJob(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('jobs_unsave', 30, 60);
+
+        JobVacancyService::unsaveJob($id, $userId);
+
+        $this->respondWithData(['message' => 'Job removed from saved', 'is_saved' => false]);
+    }
+
+    /**
+     * GET /api/v2/jobs/saved
+     *
+     * List saved/bookmarked jobs.
+     */
+    public function savedJobs(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_saved_list', 30, 60);
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ];
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = JobVacancyService::getSavedJobs($userId, $filters);
+
+        $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
+    }
+
+    // =========================================================================
+    // J2: SKILLS MATCHING
+    // =========================================================================
+
+    /**
+     * GET /api/v2/jobs/{id}/match
+     *
+     * Get match percentage between current user and job requirements.
+     */
+    public function matchPercentage(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_match', 30, 60);
+
+        $result = JobVacancyService::calculateMatchPercentage($userId, $id);
+
+        $this->respondWithData($result);
+    }
+
+    // =========================================================================
+    // J5: "AM I QUALIFIED?" TOOL
+    // =========================================================================
+
+    /**
+     * GET /api/v2/jobs/{id}/qualified
+     *
+     * Get full qualification assessment for the current user against a job.
+     */
+    public function qualificationAssessment(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_qualified', 20, 60);
+
+        $result = JobVacancyService::getQualificationAssessment($userId, $id);
+
+        if ($result === null) {
+            $errors = JobVacancyService::getErrors();
+            $this->respondWithErrors($errors, 404);
+        }
+
+        $this->respondWithData($result);
+    }
+
+    // =========================================================================
+    // J4: APPLICATION HISTORY
+    // =========================================================================
+
+    /**
+     * GET /api/v2/jobs/applications/{id}/history
+     *
+     * Get status change history for an application.
+     */
+    public function applicationHistory(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_app_history', 30, 60);
+
+        $history = JobVacancyService::getApplicationHistory($id, $userId);
+
+        if ($history === null) {
+            $errors = JobVacancyService::getErrors();
+            $httpStatus = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === ApiErrorCodes::RESOURCE_NOT_FOUND) {
+                    $httpStatus = 404;
+                    break;
+                }
+                if ($error['code'] === ApiErrorCodes::RESOURCE_FORBIDDEN) {
+                    $httpStatus = 403;
+                    break;
+                }
+            }
+            $this->respondWithErrors($errors, $httpStatus);
+        }
+
+        $this->respondWithData($history);
+    }
+
+    // =========================================================================
+    // J6: JOB ALERTS
+    // =========================================================================
+
+    /**
+     * GET /api/v2/jobs/alerts
+     *
+     * List user's job alert subscriptions.
+     */
+    public function listAlerts(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_alerts_list', 30, 60);
+
+        $alerts = JobVacancyService::getAlerts($userId);
+
+        $this->respondWithData($alerts);
+    }
+
+    /**
+     * POST /api/v2/jobs/alerts
+     *
+     * Create a new job alert subscription.
+     */
+    public function createAlert(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('jobs_alerts_create', 5, 60);
+
+        $data = $this->getAllInput();
+
+        $alertId = JobVacancyService::subscribeAlert($userId, $data);
+
+        if ($alertId === null) {
+            $errors = JobVacancyService::getErrors();
+            $this->respondWithErrors($errors, 422);
+        }
+
+        $this->respondWithData([
+            'id' => $alertId,
+            'message' => 'Job alert created successfully',
+        ], null, 201);
+    }
+
+    /**
+     * DELETE /api/v2/jobs/alerts/{id}
+     *
+     * Delete a job alert.
+     */
+    public function deleteAlert(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('jobs_alerts_delete', 10, 60);
+
+        JobVacancyService::deleteAlert($id, $userId);
+
+        $this->noContent();
+    }
+
+    /**
+     * PUT /api/v2/jobs/alerts/{id}/unsubscribe
+     *
+     * Deactivate a job alert (soft unsubscribe).
+     */
+    public function unsubscribeAlert(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('jobs_alerts_unsub', 10, 60);
+
+        JobVacancyService::unsubscribeAlert($id, $userId);
+
+        $this->respondWithData(['message' => 'Alert unsubscribed successfully']);
+    }
+
+    // =========================================================================
+    // J7: JOB RENEWAL
+    // =========================================================================
+
+    /**
+     * POST /api/v2/jobs/{id}/renew
+     *
+     * Renew a job vacancy (extend deadline, reopen).
+     */
+    public function renewJob(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('jobs_renew', 5, 60);
+
+        $days = $this->input('days') ?? 30;
+        $days = max(1, min(90, (int)$days));
+
+        $success = JobVacancyService::renewJob($id, $userId, $days);
+
+        if (!$success) {
+            $errors = JobVacancyService::getErrors();
+            $httpStatus = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === ApiErrorCodes::RESOURCE_NOT_FOUND) {
+                    $httpStatus = 404;
+                    break;
+                }
+                if ($error['code'] === ApiErrorCodes::RESOURCE_FORBIDDEN) {
+                    $httpStatus = 403;
+                    break;
+                }
+            }
+            $this->respondWithErrors($errors, $httpStatus);
+        }
+
+        $vacancy = JobVacancyService::getById($id, $userId);
+
+        $this->respondWithData($vacancy);
+    }
+
+    // =========================================================================
+    // J8: JOB ANALYTICS
+    // =========================================================================
+
+    /**
+     * GET /api/v2/jobs/{id}/analytics
+     *
+     * Get analytics for a job vacancy (owner only).
+     */
+    public function analytics(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_analytics', 20, 60);
+
+        $analytics = JobVacancyService::getAnalytics($id, $userId);
+
+        if ($analytics === null) {
+            $errors = JobVacancyService::getErrors();
+            $httpStatus = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === ApiErrorCodes::RESOURCE_NOT_FOUND) {
+                    $httpStatus = 404;
+                    break;
+                }
+                if ($error['code'] === ApiErrorCodes::RESOURCE_FORBIDDEN) {
+                    $httpStatus = 403;
+                    break;
+                }
+            }
+            $this->respondWithErrors($errors, $httpStatus);
+        }
+
+        $this->respondWithData($analytics);
+    }
+
+    // =========================================================================
+    // J10: FEATURED JOBS
+    // =========================================================================
+
+    /**
+     * POST /api/v2/jobs/{id}/feature
+     *
+     * Feature a job vacancy (admin only).
+     */
+    public function featureJob(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('jobs_feature', 10, 60);
+
+        $days = $this->input('days') ?? 7;
+        $days = max(1, min(30, (int)$days));
+
+        $success = JobVacancyService::featureJob($id, $userId, $days);
+
+        if (!$success) {
+            $errors = JobVacancyService::getErrors();
+            $httpStatus = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === ApiErrorCodes::RESOURCE_NOT_FOUND) {
+                    $httpStatus = 404;
+                    break;
+                }
+                if ($error['code'] === ApiErrorCodes::RESOURCE_FORBIDDEN) {
+                    $httpStatus = 403;
+                    break;
+                }
+            }
+            $this->respondWithErrors($errors, $httpStatus);
+        }
+
+        $vacancy = JobVacancyService::getById($id, $userId);
+
+        $this->respondWithData($vacancy);
+    }
+
+    /**
+     * DELETE /api/v2/jobs/{id}/feature
+     *
+     * Unfeature a job vacancy (admin only).
+     */
+    public function unfeatureJob(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('jobs_unfeature', 10, 60);
+
+        $success = JobVacancyService::unfeatureJob($id, $userId);
+
+        if (!$success) {
+            $errors = JobVacancyService::getErrors();
+            $this->respondWithErrors($errors, 400);
+        }
+
+        $vacancy = JobVacancyService::getById($id, $userId);
+
+        $this->respondWithData($vacancy);
     }
 }

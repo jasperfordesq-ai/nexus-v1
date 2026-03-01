@@ -28,6 +28,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
@@ -507,6 +508,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           }`}>
             {listing.type === 'offer' ? t('offering') : t('requesting')}
           </span>
+          {listing.is_featured && <FeaturedBadge />}
           {listing.category_name && (
             <span className="text-xs px-2 py-1 rounded-full bg-theme-hover text-theme-muted">
               {listing.category_name}

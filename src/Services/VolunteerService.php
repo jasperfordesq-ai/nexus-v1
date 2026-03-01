@@ -909,6 +909,14 @@ class VolunteerService
             // Update application with shift assignment
             $stmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE id = ?");
             $stmt->execute([$shiftId, $app['id']]);
+
+            // Generate QR check-in token for this shift+user
+            try {
+                VolunteerCheckInService::generateToken($shiftId, $userId);
+            } catch (\Throwable $e) {
+                error_log("QR token generation failed: " . $e->getMessage());
+            }
+
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::signUpForShift error: " . $e->getMessage());
@@ -949,6 +957,13 @@ class VolunteerService
             if ($stmt->rowCount() === 0) {
                 self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'You are not signed up for this shift'];
                 return false;
+            }
+
+            // Trigger waitlist processing — notify next person in queue
+            try {
+                ShiftWaitlistService::processSpotOpening($shiftId);
+            } catch (\Throwable $e) {
+                error_log("Waitlist processing failed after cancellation: " . $e->getMessage());
             }
 
             return true;

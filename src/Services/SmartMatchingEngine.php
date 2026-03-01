@@ -603,7 +603,7 @@ class SmartMatchingEngine
     /**
      * Extract keywords from text
      */
-    private static function extractKeywords(string $text): array
+    public static function extractKeywords(string $text): array
     {
         // Convert to lowercase
         $text = strtolower($text);

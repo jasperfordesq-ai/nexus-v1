@@ -7,6 +7,10 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Services\GoalService;
+use Nexus\Services\GoalCheckinService;
+use Nexus\Services\GoalProgressService;
+use Nexus\Services\GoalTemplateService;
+use Nexus\Services\GoalReminderService;
 use Nexus\Core\ApiErrorCodes;
 
 /**
@@ -489,5 +493,368 @@ class GoalsApiController extends BaseApiController
         $goal['is_owner'] = true;
 
         $this->respondWithData($goal);
+    }
+
+    // ============================================
+    // CHECK-INS (G3)
+    // ============================================
+
+    /**
+     * POST /api/v2/goals/{id}/checkins
+     *
+     * Create a check-in for a goal.
+     *
+     * Request Body (JSON):
+     * {
+     *   "progress_percent": "float (optional, 0-100)",
+     *   "note": "string (optional)",
+     *   "mood": "string (optional) - great|good|neutral|struggling|stuck"
+     * }
+     *
+     * Response: 201 Created with check-in data
+     */
+    public function createCheckin(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('goal_checkin', 20, 60);
+
+        $data = $this->getAllInput();
+
+        $checkinId = GoalCheckinService::create($id, $userId, $data);
+
+        if ($checkinId === null) {
+            $errors = GoalCheckinService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === ApiErrorCodes::RESOURCE_NOT_FOUND) { $status = 404; break; }
+                if ($error['code'] === ApiErrorCodes::RESOURCE_FORBIDDEN) { $status = 403; break; }
+            }
+            $this->respondWithErrors($errors, $status);
+        }
+
+        // Return the check-in list for the goal
+        $checkins = GoalCheckinService::getByGoalId($id, ['limit' => 1]);
+
+        $this->respondWithData($checkins['items'][0] ?? ['id' => $checkinId], null, 201);
+    }
+
+    /**
+     * GET /api/v2/goals/{id}/checkins
+     *
+     * Get check-in history for a goal.
+     *
+     * Query Parameters:
+     * - cursor: string (pagination cursor)
+     * - per_page: int (default 20, max 100)
+     *
+     * Response: 200 OK with check-in list
+     */
+    public function listCheckins(int $id): void
+    {
+        $this->getUserId();
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ];
+
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = GoalCheckinService::getByGoalId($id, $filters);
+
+        $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
+    }
+
+    // ============================================
+    // PROGRESS HISTORY (G5)
+    // ============================================
+
+    /**
+     * GET /api/v2/goals/{id}/history
+     *
+     * Get the full progress timeline for a goal.
+     *
+     * Query Parameters:
+     * - cursor: string (pagination cursor)
+     * - per_page: int (default 50, max 100)
+     * - event_type: string (optional filter)
+     *
+     * Response: 200 OK with timeline events
+     */
+    public function history(int $id): void
+    {
+        $this->getUserId();
+
+        // Verify goal exists
+        $goal = GoalService::getById($id);
+        if (!$goal) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Goal not found', null, 404);
+        }
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 50, 1, 100),
+        ];
+
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        if ($this->query('event_type')) {
+            $filters['event_type'] = $this->query('event_type');
+        }
+
+        $result = GoalProgressService::getProgressHistory($id, $filters);
+
+        // Also include summary
+        $summary = GoalProgressService::getSummary($id);
+
+        $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
+    }
+
+    /**
+     * GET /api/v2/goals/{id}/history/summary
+     *
+     * Get a summary of progress history for a goal.
+     *
+     * Response: 200 OK with summary data
+     */
+    public function historySummary(int $id): void
+    {
+        $this->getUserId();
+
+        $goal = GoalService::getById($id);
+        if (!$goal) {
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Goal not found', null, 404);
+        }
+
+        $summary = GoalProgressService::getSummary($id);
+
+        $this->respondWithData($summary);
+    }
+
+    // ============================================
+    // TEMPLATES (G1)
+    // ============================================
+
+    /**
+     * GET /api/v2/goals/templates
+     *
+     * List available goal templates.
+     *
+     * Query Parameters:
+     * - category: string (filter by category)
+     * - cursor: string (pagination cursor)
+     * - per_page: int (default 50)
+     *
+     * Response: 200 OK with template list
+     */
+    public function templates(): void
+    {
+        $this->getUserId();
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 50, 1, 100),
+        ];
+
+        if ($this->query('category')) {
+            $filters['category'] = $this->query('category');
+        }
+
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = GoalTemplateService::getAll($filters);
+
+        $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
+    }
+
+    /**
+     * GET /api/v2/goals/templates/categories
+     *
+     * List available template categories.
+     *
+     * Response: 200 OK with category strings
+     */
+    public function templateCategories(): void
+    {
+        $this->getUserId();
+
+        $categories = GoalTemplateService::getCategories();
+
+        $this->respondWithData($categories);
+    }
+
+    /**
+     * POST /api/v2/goals/templates
+     *
+     * Create a new goal template (admin only).
+     *
+     * Request Body (JSON):
+     * {
+     *   "title": "string (required)",
+     *   "description": "string (optional)",
+     *   "category": "string (optional)",
+     *   "default_target_value": "float (optional)",
+     *   "default_milestones": "[{title, target_value}] (optional)",
+     *   "is_public": "bool (optional, default true)"
+     * }
+     *
+     * Response: 201 Created with template data
+     */
+    public function createTemplate(): void
+    {
+        $userId = $this->requireAdmin();
+        $this->verifyCsrf();
+        $this->rateLimit('goal_template_create', 10, 60);
+
+        $data = $this->getAllInput();
+
+        $templateId = GoalTemplateService::create($userId, $data);
+
+        if ($templateId === null) {
+            $this->respondWithErrors(GoalTemplateService::getErrors(), 422);
+        }
+
+        $template = GoalTemplateService::getById($templateId);
+
+        $this->respondWithData($template, null, 201);
+    }
+
+    /**
+     * POST /api/v2/goals/from-template/{templateId}
+     *
+     * Create a new goal from a template.
+     *
+     * Request Body (JSON):
+     * {
+     *   "title": "string (optional - overrides template)",
+     *   "description": "string (optional)",
+     *   "target_value": "float (optional)",
+     *   "deadline": "datetime (optional)",
+     *   "is_public": "bool (optional)"
+     * }
+     *
+     * Response: 201 Created with new goal data
+     */
+    public function createFromTemplate(int $templateId): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('goal_create', 10, 60);
+
+        $overrides = $this->getAllInput();
+
+        $goalId = GoalTemplateService::createGoalFromTemplate($templateId, $userId, $overrides);
+
+        if ($goalId === null) {
+            $errors = GoalTemplateService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === ApiErrorCodes::RESOURCE_NOT_FOUND) { $status = 404; break; }
+            }
+            $this->respondWithErrors($errors, $status);
+        }
+
+        $goal = GoalService::getById($goalId);
+        $goal['is_owner'] = true;
+
+        $this->respondWithData($goal, null, 201);
+    }
+
+    // ============================================
+    // REMINDERS (G4)
+    // ============================================
+
+    /**
+     * GET /api/v2/goals/{id}/reminder
+     *
+     * Get the reminder settings for a goal.
+     *
+     * Response: 200 OK with reminder data, or 204 if no reminder set
+     */
+    public function getReminder(int $id): void
+    {
+        $userId = $this->getUserId();
+
+        $reminder = GoalReminderService::getReminder($id, $userId);
+
+        if ($reminder === null) {
+            $this->respondWithData(null);
+            return;
+        }
+
+        $this->respondWithData($reminder);
+    }
+
+    /**
+     * PUT /api/v2/goals/{id}/reminder
+     *
+     * Set or update reminder for a goal.
+     *
+     * Request Body (JSON):
+     * {
+     *   "frequency": "string (daily|weekly|biweekly|monthly)",
+     *   "enabled": "bool (optional, default true)"
+     * }
+     *
+     * Response: 200 OK with reminder data
+     */
+    public function setReminder(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('goal_reminder', 20, 60);
+
+        $data = $this->getAllInput();
+
+        $reminder = GoalReminderService::setReminder($id, $userId, $data);
+
+        if ($reminder === null) {
+            $errors = GoalReminderService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === ApiErrorCodes::RESOURCE_NOT_FOUND) { $status = 404; break; }
+                if ($error['code'] === ApiErrorCodes::RESOURCE_FORBIDDEN) { $status = 403; break; }
+                if ($error['code'] === ApiErrorCodes::RESOURCE_CONFLICT) { $status = 409; break; }
+            }
+            $this->respondWithErrors($errors, $status);
+        }
+
+        $this->respondWithData($reminder);
+    }
+
+    /**
+     * DELETE /api/v2/goals/{id}/reminder
+     *
+     * Remove the reminder for a goal.
+     *
+     * Response: 204 No Content
+     */
+    public function deleteReminder(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+
+        GoalReminderService::deleteReminder($id, $userId);
+
+        $this->noContent();
     }
 }

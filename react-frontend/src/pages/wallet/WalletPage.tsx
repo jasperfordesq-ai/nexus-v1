@@ -27,7 +27,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { TransferModal } from '@/components/wallet';
+import { TransferModal, DonateModal, CommunityFundCard } from '@/components/wallet';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -49,6 +49,7 @@ export function WalletPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<TransactionFilter>('all');
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
   const toast = useToast();
 
   // Check for ?to=userId URL param to auto-open transfer modal
@@ -291,18 +292,40 @@ export function WalletPage() {
               {balance?.pending_in ? t('pending_in', { count: balance.pending_in }) : t('no_pending')}
             </p>
 
-            {/* Send Credits Button */}
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium px-8"
-              size="lg"
-              startContent={<Send className="w-5 h-5" />}
-              onClick={() => setIsTransferModalOpen(true)}
-              isDisabled={isLoading || !balance || balance.balance <= 0}
-            >
-              {t('send_credits')}
-            </Button>
+            {/* Action Buttons */}
+            <div className="flex gap-3 justify-center flex-wrap">
+              <Button
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium px-8"
+                size="lg"
+                startContent={<Send className="w-5 h-5" />}
+                onClick={() => setIsTransferModalOpen(true)}
+                isDisabled={isLoading || !balance || balance.balance <= 0}
+              >
+                {t('send_credits')}
+              </Button>
+              <Button
+                variant="flat"
+                size="lg"
+                className="bg-rose-500/10 text-rose-400 font-medium px-6"
+                startContent={<ArrowDownLeft className="w-5 h-5" />}
+                onClick={() => setIsDonateModalOpen(true)}
+                isDisabled={isLoading || !balance || balance.balance <= 0}
+              >
+                Donate
+              </Button>
+            </div>
           </div>
         </GlassCard>
+      </motion.div>
+      )}
+
+      {/* Community Fund */}
+      {!error && (
+      <motion.div variants={itemVariants}>
+        <CommunityFundCard
+          compact
+          onDonateClick={() => setIsDonateModalOpen(true)}
+        />
       </motion.div>
       )}
 
@@ -424,6 +447,14 @@ export function WalletPage() {
         currentBalance={balance?.balance ?? 0}
         onTransferComplete={handleTransferComplete}
         initialRecipientId={savedRecipientId}
+      />
+
+      {/* Donate Modal */}
+      <DonateModal
+        isOpen={isDonateModalOpen}
+        onClose={() => setIsDonateModalOpen(false)}
+        currentBalance={balance?.balance ?? 0}
+        onDonationComplete={() => loadWalletData()}
       />
     </motion.div>
   );

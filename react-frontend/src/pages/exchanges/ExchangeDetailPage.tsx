@@ -42,18 +42,20 @@ import {
   Circle,
   Ban,
   UserCheck,
+  Star,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { RatingModal } from '@/components/wallet';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { EXCHANGE_STATUS_CONFIG, MAX_EXCHANGE_HOURS, getStatusIconBgClass } from '@/lib/exchange-status';
-import type { Exchange, ExchangeHistoryEntry } from '@/types/api';
+import type { Exchange, ExchangeHistoryEntry, ExchangeRating } from '@/types/api';
 
 /* ───────────────────────── Timeline Helpers ───────────────────────── */
 
@@ -156,6 +158,9 @@ export function ExchangeDetailPage() {
   const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [hasRated, setHasRated] = useState(false);
+  const [ratings, setRatings] = useState<ExchangeRating[]>([]);
   const [declineReason, setDeclineReason] = useState('');
   const [confirmHours, setConfirmHours] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -184,6 +189,24 @@ export function ExchangeDetailPage() {
   useEffect(() => {
     loadExchange();
   }, [loadExchange]);
+
+  // Load ratings for completed exchanges
+  useEffect(() => {
+    if (!exchange || exchange.status !== 'completed' || !id) return;
+
+    async function loadRatings() {
+      try {
+        const response = await api.get<{ ratings: ExchangeRating[]; has_rated: boolean }>(`/v2/exchanges/${id}/ratings`);
+        if (response.success && response.data) {
+          setRatings(response.data.ratings || []);
+          setHasRated(response.data.has_rated || false);
+        }
+      } catch (err) {
+        // Ratings endpoint may not exist yet — fail silently
+      }
+    }
+    loadRatings();
+  }, [exchange?.status, id]);
 
   const isRequester = exchange?.requester_id === user?.id;
   const isProvider = exchange?.provider_id === user?.id;
@@ -490,11 +513,62 @@ export function ExchangeDetailPage() {
           </div>
         )}
 
+        {/* Prep Time */}
+        {exchange.prep_time != null && exchange.prep_time > 0 && (
+          <div className="bg-theme-elevated rounded-lg p-4 mb-6">
+            <h3 className="text-sm font-medium text-theme-muted mb-1">Preparation Time</h3>
+            <p className="text-lg font-semibold text-theme-primary">{exchange.prep_time}h</p>
+          </div>
+        )}
+
         {/* Broker Notes */}
         {exchange.broker_notes && (
           <div className="bg-amber-500/10 rounded-lg p-4 mb-6">
             <h3 className="text-sm font-medium text-amber-400 mb-2">{t('detail.broker_notes')}</h3>
             <p className="text-theme-primary">{exchange.broker_notes}</p>
+          </div>
+        )}
+
+        {/* Ratings Display (W10) */}
+        {exchange.status === 'completed' && ratings.length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-sm font-medium text-theme-muted mb-3 flex items-center gap-2">
+              <Star className="w-4 h-4 text-amber-400" />
+              Ratings
+            </h3>
+            <div className="space-y-3">
+              {ratings.map((r) => (
+                <div key={r.id} className="bg-theme-elevated rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-theme-primary">{r.rater.name}</span>
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star
+                          key={s}
+                          className={`w-4 h-4 ${s <= r.rating ? 'text-amber-400 fill-amber-400' : 'text-theme-muted'}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  {r.comment && <p className="text-sm text-theme-muted">{r.comment}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Rate Exchange Button (W10) */}
+        {exchange.status === 'completed' && !hasRated && (
+          <div className="mb-4">
+            <Button
+              color="warning"
+              variant="flat"
+              className="w-full"
+              startContent={<Star className="w-4 h-4" />}
+              onPress={() => setShowRatingModal(true)}
+            >
+              Rate This Exchange
+            </Button>
           </div>
         )}
 
@@ -762,6 +836,18 @@ export function ExchangeDetailPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Rating Modal (W10) */}
+      <RatingModal
+        isOpen={showRatingModal}
+        onClose={() => setShowRatingModal(false)}
+        exchangeId={exchange.id}
+        otherPartyName={otherParty?.name}
+        onRatingComplete={() => {
+          setHasRated(true);
+          loadExchange();
+        }}
+      />
     </motion.div>
   );
 }

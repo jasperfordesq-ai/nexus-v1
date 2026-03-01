@@ -48,7 +48,7 @@ class NotificationService
         'social' => ['like', 'comment', 'mention', 'post_like', 'post_comment'],
         'events' => ['event', 'event_reminder', 'event_rsvp', 'event_update'],
         'groups' => ['group_invite', 'group_join', 'group_post'],
-        'listings' => ['listing', 'listing_interest', 'listing_match'],
+        'listings' => ['listing', 'listing_interest', 'listing_match', 'listing_expiry', 'hot_match', 'mutual_match'],
         'system' => ['system', 'announcement', 'welcome', 'badge', 'achievement', 'level_up'],
     ];
 

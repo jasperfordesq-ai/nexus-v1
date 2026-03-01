@@ -25,12 +25,16 @@ import {
   AlertCircle,
   ArrowRightLeft,
   Bookmark,
+  RefreshCw,
+  BarChart3,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { CommentsSection, LikersModal, ShareButton } from '@/components/social';
+import { ListingAnalyticsPanel } from '@/components/listings/ListingAnalyticsPanel';
+import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle, useSocialInteractions } from '@/hooks';
 import { api } from '@/lib/api';
@@ -56,6 +60,8 @@ export function ListingDetailPage() {
   const [exchangeConfig, setExchangeConfig] = useState<ExchangeConfig | null>(null);
   const [activeExchange, setActiveExchange] = useState<{ id: number; status: string; role: string; proposed_hours: number } | null>(null);
   const [showComments, setShowComments] = useState(false);
+  const [isRenewing, setIsRenewing] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   // Social fields from API response (set after listing loads)
   const [socialInit, setSocialInit] = useState<{ liked: boolean; likes: number; comments: number }>({ liked: false, likes: 0, comments: 0 });
@@ -166,6 +172,23 @@ export function ListingDetailPage() {
     }
   };
 
+  const handleRenew = async () => {
+    if (!listing || isRenewing) return;
+    setIsRenewing(true);
+    try {
+      const response = await api.post<{ renewed: boolean; new_expires_at: string }>(`/v2/listings/${listing.id}/renew`, {});
+      if (response.success) {
+        toast.success('Listing renewed successfully');
+        loadListing(); // Reload to get updated data
+      }
+    } catch (err) {
+      logError('Failed to renew listing', err);
+      toast.error('Failed to renew listing');
+    } finally {
+      setIsRenewing(false);
+    }
+  };
+
   function toggleComments() {
     setShowComments((prev) => !prev);
     if (!social.commentsLoaded) {
@@ -219,6 +242,7 @@ export function ListingDetailPage() {
             `}>
               {listing.type === 'offer' ? t('offering') : t('requesting')}
             </span>
+            {listing.is_featured && <FeaturedBadge size="md" />}
             {(listing.category || listing.category_name) && (
               <span className="text-sm px-3 py-1.5 rounded-full bg-theme-hover text-theme-muted flex items-center gap-1">
                 <Tag className="w-3 h-3" aria-hidden="true" />
@@ -239,6 +263,27 @@ export function ListingDetailPage() {
                   {t('detail_edit')}
                 </Button>
               </Link>
+              <Button
+                size="sm"
+                variant="flat"
+                className="bg-theme-elevated text-theme-primary"
+                startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
+                onPress={() => setShowAnalytics(!showAnalytics)}
+              >
+                Analytics
+              </Button>
+              {(listing.status === 'expired' || listing.expires_at) && (
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="bg-emerald-500/10 text-emerald-500"
+                  startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+                  onPress={handleRenew}
+                  isLoading={isRenewing}
+                >
+                  {listing.status === 'expired' ? 'Renew Listing' : 'Extend'}
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="flat"
@@ -486,6 +531,50 @@ export function ListingDetailPage() {
           </GlassCard>
         );
       })()}
+
+      {/* Skill Tags */}
+      {listing.skill_tags && listing.skill_tags.length > 0 && (
+        <GlassCard className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Tag className="w-4 h-4 text-theme-muted" aria-hidden="true" />
+            <span className="text-sm font-medium text-theme-muted">Skills</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {listing.skill_tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </GlassCard>
+      )}
+
+      {/* Listing Analytics (owner only) */}
+      {isOwner && showAnalytics && (
+        <ListingAnalyticsPanel listingId={listing.id} />
+      )}
+
+      {/* Expiry / Renewal Info */}
+      {listing.expires_at && (
+        <GlassCard className="p-4">
+          <div className="flex items-center gap-2 text-sm">
+            <Calendar className="w-4 h-4 text-theme-muted" aria-hidden="true" />
+            <span className="text-theme-muted">
+              {listing.status === 'expired'
+                ? `Expired on ${new Date(listing.expires_at).toLocaleDateString()}`
+                : `Expires ${new Date(listing.expires_at).toLocaleDateString()}`}
+            </span>
+            {listing.renewal_count !== undefined && listing.renewal_count > 0 && (
+              <span className="text-xs text-theme-subtle">
+                (renewed {listing.renewal_count} {listing.renewal_count === 1 ? 'time' : 'times'})
+              </span>
+            )}
+          </div>
+        </GlassCard>
+      )}
 
       {/* Comments Section — threaded with reactions, replies, edit, delete */}
       {showComments && (

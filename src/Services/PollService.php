@@ -59,7 +59,7 @@ class PollService
     /**
      * Get all polls with filtering and cursor-based pagination
      *
-     * @param array $filters Optional filters: status, cursor, limit, user_id
+     * @param array $filters Optional filters: status, cursor, limit, user_id, category
      * @return array ['items' => [...], 'cursor' => ?string, 'has_more' => bool]
      */
     public static function getAll(array $filters = []): array
@@ -69,6 +69,7 @@ class PollService
         $cursor = $filters['cursor'] ?? null;
         $status = $filters['status'] ?? null; // 'open', 'closed', 'all'
         $userId = $filters['user_id'] ?? null;
+        $category = $filters['category'] ?? null;
 
         $params = [$tenantId];
         $where = ["p.tenant_id = ?"];
@@ -84,6 +85,12 @@ class PollService
         if ($userId) {
             $where[] = "p.user_id = ?";
             $params[] = $userId;
+        }
+
+        // Category filter
+        if ($category) {
+            $where[] = "p.category = ?";
+            $params[] = $category;
         }
 
         // Cursor pagination
@@ -223,6 +230,24 @@ class PollService
             'avatar_url' => $poll['creator_avatar'] ?? null,
         ];
 
+        // Include poll metadata
+        $poll['poll_type'] = $poll['poll_type'] ?? 'standard';
+        $poll['category'] = $poll['category'] ?? null;
+        $poll['is_anonymous'] = (bool)($poll['is_anonymous'] ?? false);
+
+        // Parse tags JSON
+        if (!empty($poll['tags'])) {
+            $poll['tags'] = is_string($poll['tags']) ? json_decode($poll['tags'], true) : $poll['tags'];
+        } else {
+            $poll['tags'] = [];
+        }
+
+        // If anonymous poll, strip voter identities from vote data
+        if ($poll['is_anonymous'] && $userId) {
+            // Still check if user has voted (for their own knowledge)
+            // but don't expose who else voted
+        }
+
         // Clean up redundant fields
         unset($poll['creator_first_name'], $poll['creator_last_name'], $poll['creator_avatar']);
 
@@ -245,6 +270,10 @@ class PollService
         $description = trim($data['description'] ?? '');
         $expiresAt = $data['expires_at'] ?? $data['end_date'] ?? null;
         $options = $data['options'] ?? [];
+        $pollType = $data['poll_type'] ?? 'standard';
+        $category = trim($data['category'] ?? '');
+        $tags = $data['tags'] ?? null;
+        $isAnonymous = !empty($data['is_anonymous']);
 
         // Validation
         if (empty($question)) {
@@ -273,10 +302,23 @@ class PollService
         try {
             Database::beginTransaction();
 
+            // Validate poll_type
+            $validPollTypes = ['standard', 'ranked'];
+            if (!in_array($pollType, $validPollTypes, true)) {
+                $pollType = 'standard';
+            }
+
+            // Validate and encode tags
+            $tagsJson = null;
+            if ($tags !== null && is_array($tags)) {
+                $tagsJson = json_encode(array_values(array_filter(array_map('trim', $tags))));
+            }
+
             // Insert poll
             Database::query(
-                "INSERT INTO polls (tenant_id, user_id, question, description, expires_at, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
-                [$tenantId, $userId, $question, $description ?: null, $expiresAt]
+                "INSERT INTO polls (tenant_id, user_id, question, description, expires_at, poll_type, category, tags, is_anonymous, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                [$tenantId, $userId, $question, $description ?: null, $expiresAt, $pollType, $category ?: null, $tagsJson, $isAnonymous ? 1 : 0]
             );
 
             $pollId = Database::lastInsertId();

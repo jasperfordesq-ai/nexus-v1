@@ -27,8 +27,12 @@
     "draft": "Draft"
   },
   "application_status": {
+    "applied": "Applied",
     "pending": "Pending",
+    "screening": "Screening",
     "reviewed": "Reviewed",
+    "interview": "Interview",
+    "offer": "Offer",
     "accepted": "Accepted",
     "rejected": "Rejected",
     "withdrawn": "Withdrawn"
@@ -44,12 +48,134 @@
   "posted_by": "Posted by",
   "load_more": "Load More",
   "try_again": "Try Again",
+  "featured": "Featured",
 
   "empty_title": "No vacancies found",
   "empty_description": "There are no job vacancies matching your criteria",
   "empty_search": "No vacancies match your search",
   "unable_to_load": "Unable to Load Vacancies",
   "error_load_more": "Failed to load more vacancies",
+
+  "saved": {
+    "title": "Saved Jobs",
+    "empty_title": "No saved jobs",
+    "empty_description": "Jobs you bookmark will appear here",
+    "save": "Save",
+    "unsave": "Unsave",
+    "saved": "Saved",
+    "save_success": "Job saved",
+    "unsave_success": "Job removed from saved",
+    "save_error": "Failed to save job"
+  },
+
+  "match": {
+    "title": "Skills Match",
+    "percentage": "{{count}}% match",
+    "excellent": "Excellent Match",
+    "good": "Good Match",
+    "moderate": "Moderate Match",
+    "low": "Low Match",
+    "matched": "Matched Skills",
+    "missing": "Missing Skills",
+    "no_skills_required": "No specific skills required",
+    "no_user_skills": "Add skills to your profile to see your match"
+  },
+
+  "qualified": {
+    "title": "Am I Qualified?",
+    "subtitle": "See how your skills match this role",
+    "matched_count": "You match {{matched}} of {{total}} required skills",
+    "level_excellent": "You are an excellent fit for this role!",
+    "level_good": "You are a good fit for this role",
+    "level_moderate": "You have some relevant skills",
+    "level_low": "You may want to develop more skills for this role",
+    "check_button": "Check Qualification"
+  },
+
+  "pipeline": {
+    "title": "Application Pipeline",
+    "applied": "Applied",
+    "screening": "Screening",
+    "interview": "Interview",
+    "offer": "Offer",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "move_to": "Move to {{stage}}"
+  },
+
+  "history": {
+    "title": "Status History",
+    "changed_from": "Changed from {{from}} to {{to}}",
+    "initial": "Application submitted",
+    "by": "by {{name}}",
+    "empty": "No history available"
+  },
+
+  "alerts": {
+    "title": "Job Alerts",
+    "subtitle": "Get notified when new jobs match your preferences",
+    "create": "Create Alert",
+    "keywords_label": "Keywords",
+    "keywords_placeholder": "e.g. gardening, teaching",
+    "categories_label": "Categories",
+    "categories_placeholder": "e.g. Admin, Teaching",
+    "type_label": "Job Type",
+    "commitment_label": "Commitment Level",
+    "location_label": "Location",
+    "location_placeholder": "e.g. London",
+    "remote_only": "Remote positions only",
+    "any": "Any",
+    "create_success": "Alert created successfully",
+    "create_error": "Failed to create alert",
+    "delete_success": "Alert deleted",
+    "unsubscribe_success": "Alert paused",
+    "active": "Active",
+    "paused": "Paused",
+    "empty_title": "No alerts set up",
+    "empty_description": "Create an alert to get notified about matching jobs"
+  },
+
+  "renew": {
+    "button": "Renew",
+    "title": "Renew Job Vacancy",
+    "description": "Extend the application deadline and reopen the listing",
+    "days_label": "Extend by (days)",
+    "success": "Job renewed successfully",
+    "error": "Failed to renew job",
+    "expiring_soon": "Expiring soon"
+  },
+
+  "analytics": {
+    "title": "Job Analytics",
+    "total_views": "Total Views",
+    "unique_viewers": "Unique Viewers",
+    "total_applications": "Applications",
+    "conversion_rate": "Conversion Rate",
+    "avg_time_to_apply": "Avg. Time to Apply",
+    "time_to_fill": "Time to Fill",
+    "hours": "hours",
+    "days": "days",
+    "views_over_time": "Views Over Time",
+    "applications_by_stage": "Applications by Stage",
+    "no_data": "No analytics data yet"
+  },
+
+  "salary": {
+    "label": "Compensation",
+    "range": "{{min}} - {{max}}",
+    "min_only": "From {{min}}",
+    "max_only": "Up to {{max}}",
+    "negotiable": "Negotiable",
+    "hourly": "per hour",
+    "annual": "per year",
+    "time_credits": "time credits",
+    "form_min_label": "Minimum",
+    "form_max_label": "Maximum",
+    "form_type_label": "Pay Type",
+    "form_currency_label": "Currency",
+    "form_currency_placeholder": "e.g. USD, EUR, GBP",
+    "form_negotiable_label": "Salary is negotiable"
+  },
 
   "detail": {
     "loading": "Loading vacancy...",
@@ -84,8 +210,14 @@
     "accept": "Accept",
     "reject": "Reject",
     "review": "Mark Reviewed",
+    "screening": "Screen",
+    "interview": "Interview",
+    "offer": "Offer",
     "status_updated": "Application status updated",
-    "status_update_error": "Failed to update application status"
+    "status_update_error": "Failed to update application status",
+    "renew": "Renew",
+    "analytics": "Analytics",
+    "check_qualification": "Am I Qualified?"
   },
 
   "apply": {
@@ -130,6 +262,13 @@
     "contact_phone_label": "Contact Phone",
     "contact_phone_placeholder": "+1 555 123 4567",
     "deadline_label": "Application Deadline",
+    "salary_section": "Compensation",
+    "salary_min_label": "Minimum",
+    "salary_max_label": "Maximum",
+    "salary_type_label": "Pay Type",
+    "salary_currency_label": "Currency",
+    "salary_currency_placeholder": "e.g. USD, EUR, GBP",
+    "salary_negotiable_label": "Salary is negotiable",
     "submit_create": "Post Vacancy",
     "submit_update": "Save Changes",
     "cancel": "Cancel",

@@ -7,14 +7,19 @@
     "all": "All",
     "open": "Open",
     "voting": "Voting",
-    "closed": "Closed"
+    "evaluating": "Evaluating",
+    "closed": "Closed",
+    "archived": "Archived",
+    "favorites": "My Favorites"
   },
 
   "status": {
     "draft": "Draft",
     "open": "Open",
     "voting": "Voting",
-    "closed": "Closed"
+    "evaluating": "Evaluating",
+    "closed": "Closed",
+    "archived": "Archived"
   },
 
   "idea_status": {
@@ -33,7 +38,10 @@
     "category": "Category",
     "max_ideas": "Max {{count}} ideas per person",
     "created_by": "Created by {{name}}",
-    "no_deadline": "No deadline"
+    "no_deadline": "No deadline",
+    "evaluation_criteria": "Evaluation Criteria",
+    "outcome": "Outcome",
+    "team_links": "Project Teams"
   },
 
   "challenges": {
@@ -93,7 +101,9 @@
     "description_label": "Description",
     "description_placeholder": "Describe the challenge or your idea in detail",
     "category_label": "Category",
-    "category_placeholder": "e.g. Environment, Technology, Community",
+    "category_placeholder": "Select a category",
+    "category_free_label": "Category (free text)",
+    "category_free_placeholder": "e.g. Environment, Technology, Community",
     "prize_label": "Prize Description",
     "prize_placeholder": "Describe what the winner receives (optional)",
     "submission_deadline_label": "Submission Deadline",
@@ -101,6 +111,11 @@
     "max_ideas_label": "Max Ideas Per User",
     "max_ideas_placeholder": "Leave empty for unlimited",
     "status_label": "Initial Status",
+    "evaluation_criteria_label": "Evaluation Criteria",
+    "evaluation_criteria_placeholder": "Add a criterion (press Enter)",
+    "evaluation_criteria_helper": "Define how ideas will be judged",
+    "template_label": "Start from Template",
+    "template_placeholder": "Select a template (optional)",
     "save": "Save",
     "saving": "Saving...",
     "create": "Create Challenge",
@@ -125,8 +140,11 @@
     "change_status": "Change Status",
     "set_open": "Open for Submissions",
     "set_voting": "Move to Voting",
+    "set_evaluating": "Move to Evaluation",
     "set_closed": "Close Challenge",
+    "set_archived": "Archive Challenge",
     "reopen": "Reopen Challenge",
+    "unarchive": "Un-archive Challenge",
     "set_shortlisted": "Mark as Shortlisted",
     "set_winner": "Mark as Winner",
     "remove_status": "Reset to Submitted",
@@ -148,12 +166,37 @@
     "vote_removed": "Vote removed",
     "comment_added": "Comment posted",
     "comment_deleted": "Comment deleted",
+    "media_added": "Media added",
+    "media_deleted": "Media removed",
+    "category_created": "Category created",
+    "category_updated": "Category updated",
+    "category_deleted": "Category deleted",
+    "tag_created": "Tag created",
+    "tag_deleted": "Tag deleted",
+    "campaign_created": "Campaign created",
+    "campaign_updated": "Campaign updated",
+    "campaign_deleted": "Campaign deleted",
+    "template_created": "Template created",
+    "template_updated": "Template updated",
+    "template_deleted": "Template deleted",
+    "outcome_saved": "Outcome saved",
+    "task_created": "Task created",
+    "task_updated": "Task updated",
+    "task_deleted": "Task deleted",
+    "document_uploaded": "Document uploaded",
+    "document_deleted": "Document deleted",
+    "chatroom_created": "Channel created",
+    "chatroom_deleted": "Channel deleted",
+    "message_posted": "Message posted",
     "error_generic": "Something went wrong. Please try again."
   },
 
   "favorites": {
     "add": "Add to favorites",
-    "remove": "Remove from favorites"
+    "remove": "Remove from favorites",
+    "my_favorites": "My Favorites",
+    "empty_title": "No Favorites Yet",
+    "empty_description": "Heart a challenge to add it to your favorites."
   },
 
   "views": "views",
@@ -163,7 +206,10 @@
   "tags": {
     "label": "Tags",
     "placeholder": "Add tags (press Enter)",
-    "helper": "Add skills or topics relevant to this challenge"
+    "helper": "Add skills or topics relevant to this challenge",
+    "interests": "Areas of Interest",
+    "skills": "Skills Needed",
+    "general": "General Tags"
   },
 
   "cover_image": {
@@ -180,24 +226,139 @@
 
   "idea_image": "Idea image",
 
+  "media": {
+    "title": "Attachments",
+    "add": "Add Attachment",
+    "add_image": "Add Image",
+    "add_link": "Add Link",
+    "url_label": "URL",
+    "url_placeholder": "https://...",
+    "caption_label": "Caption",
+    "caption_placeholder": "Brief description (optional)",
+    "type_label": "Type",
+    "type_image": "Image",
+    "type_video": "Video",
+    "type_document": "Document",
+    "type_link": "Link",
+    "delete_confirm": "Remove this attachment?",
+    "empty": "No attachments"
+  },
+
   "convert_to_group": {
-    "button": "Create Group",
-    "title": "Create Group from Idea",
-    "description": "Convert this winning idea into an action group where members can collaborate to bring it to life.",
-    "name_label": "Group Name",
-    "description_label": "Group Description",
+    "button": "Create Team",
+    "title": "Create Project Team from Idea",
+    "description": "Convert this winning idea into a project team where members can collaborate, manage tasks, share documents, and chat.",
+    "name_label": "Team Name",
+    "description_label": "Team Description",
     "visibility_label": "Visibility",
     "visibility_public": "Public",
     "visibility_private": "Private",
-    "confirm": "Create Group",
+    "confirm": "Create Team",
     "creating": "Creating...",
-    "success": "Group created successfully! Redirecting...",
-    "error": "Failed to create group"
+    "success": "Project team created successfully! Redirecting...",
+    "error": "Failed to create team",
+    "already_converted": "This idea has already been converted to a team"
+  },
+
+  "campaigns": {
+    "title": "Campaigns",
+    "page_title": "Campaigns",
+    "empty_title": "No Campaigns Yet",
+    "empty_description": "Create a campaign to group related challenges together.",
+    "create": "Create Campaign",
+    "challenges_count": "{{count}} challenges",
+    "challenges_count_one": "{{count}} challenge",
+    "link_challenge": "Link Challenge",
+    "unlink_challenge": "Unlink Challenge"
+  },
+
+  "templates": {
+    "title": "Challenge Templates",
+    "page_title": "Challenge Templates",
+    "empty_title": "No Templates Yet",
+    "empty_description": "Create reusable templates to streamline challenge creation.",
+    "create": "Create Template",
+    "use_template": "Use This Template",
+    "start_from_template": "Start from Template"
+  },
+
+  "outcomes": {
+    "title": "Impact Tracking",
+    "page_title": "Impact Dashboard",
+    "status_not_started": "Not Started",
+    "status_in_progress": "In Progress",
+    "status_implemented": "Implemented",
+    "status_abandoned": "Abandoned",
+    "winning_idea": "Winning Idea",
+    "impact_description": "Impact Description",
+    "impact_placeholder": "Describe the impact and results...",
+    "save": "Save Outcome",
+    "saving": "Saving...",
+    "dashboard": "Impact Dashboard",
+    "total_challenges": "Total Tracked",
+    "implemented_count": "Implemented",
+    "in_progress_count": "In Progress"
+  },
+
+  "tasks": {
+    "title": "Tasks",
+    "create": "Add Task",
+    "empty_title": "No Tasks Yet",
+    "empty_description": "Create tasks to organize your team's work.",
+    "status_todo": "To Do",
+    "status_in_progress": "In Progress",
+    "status_done": "Done",
+    "priority_low": "Low",
+    "priority_medium": "Medium",
+    "priority_high": "High",
+    "priority_urgent": "Urgent",
+    "assigned_to": "Assigned to",
+    "unassigned": "Unassigned",
+    "due_date": "Due date",
+    "overdue": "Overdue",
+    "stats": "Task Stats"
+  },
+
+  "documents": {
+    "title": "Documents",
+    "upload": "Upload Document",
+    "empty_title": "No Documents Yet",
+    "empty_description": "Upload files to share with your team.",
+    "delete_confirm": "Delete this document?",
+    "max_size": "Max file size: 10 MB"
+  },
+
+  "chatrooms": {
+    "title": "Channels",
+    "create": "Create Channel",
+    "general": "General",
+    "empty_title": "No Messages Yet",
+    "empty_description": "Start the conversation!",
+    "message_placeholder": "Type a message...",
+    "send": "Send",
+    "delete_channel": "Delete Channel",
+    "delete_channel_confirm": "Delete this channel and all its messages?"
+  },
+
+  "categories": {
+    "title": "Categories",
+    "manage": "Manage Categories",
+    "all": "All Categories",
+    "create": "Add Category",
+    "name_label": "Category Name",
+    "name_placeholder": "e.g. Environment",
+    "icon_label": "Icon",
+    "icon_placeholder": "Lucide icon name (e.g. Leaf)",
+    "color_label": "Color",
+    "delete_confirm": "Delete this category?"
   },
 
   "validation": {
     "title_required": "Title is required",
     "description_required": "Description is required",
-    "comment_required": "Comment cannot be empty"
+    "comment_required": "Comment cannot be empty",
+    "url_required": "URL is required",
+    "name_required": "Name is required",
+    "file_required": "File is required"
   }
 }

@@ -843,6 +843,622 @@ class VolunteerApiController extends BaseApiController
     }
 
     // ========================================
+    // WAITLIST (V1)
+    // ========================================
+
+    /**
+     * POST /api/v2/volunteering/shifts/{id}/waitlist
+     * Join the waitlist for a full shift
+     */
+    public function joinWaitlist(int $shiftId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_waitlist_join', 20, 60);
+
+        $entryId = \Nexus\Services\ShiftWaitlistService::join($shiftId, $userId);
+
+        if ($entryId === null) {
+            $errors = \Nexus\Services\ShiftWaitlistService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $position = \Nexus\Services\ShiftWaitlistService::getUserPosition($shiftId, $userId);
+
+        $this->respondWithData([
+            'id' => $entryId,
+            'position' => $position['position'] ?? 1,
+            'message' => 'Successfully joined the waitlist',
+        ], null, 201);
+    }
+
+    /**
+     * DELETE /api/v2/volunteering/shifts/{id}/waitlist
+     * Leave the waitlist for a shift
+     */
+    public function leaveWaitlist(int $shiftId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_waitlist_leave', 20, 60);
+
+        $success = \Nexus\Services\ShiftWaitlistService::leave($shiftId, $userId);
+
+        if (!$success) {
+            $errors = \Nexus\Services\ShiftWaitlistService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->noContent();
+    }
+
+    /**
+     * POST /api/v2/volunteering/shifts/{id}/waitlist/promote
+     * Accept a waitlist promotion (claim the spot)
+     */
+    public function promoteFromWaitlist(int $shiftId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_waitlist_promote', 10, 60);
+
+        $success = \Nexus\Services\ShiftWaitlistService::promoteUser($shiftId, $userId);
+
+        if (!$success) {
+            $errors = \Nexus\Services\ShiftWaitlistService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['message' => 'Successfully claimed the shift spot']);
+    }
+
+    // ========================================
+    // SHIFT SWAPPING (V2)
+    // ========================================
+
+    /**
+     * POST /api/v2/volunteering/swaps
+     * Request a shift swap
+     */
+    public function requestSwap(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_swap_request', 10, 60);
+
+        $data = [
+            'from_shift_id' => $this->inputInt('from_shift_id'),
+            'to_shift_id' => $this->inputInt('to_shift_id'),
+            'to_user_id' => $this->inputInt('to_user_id'),
+            'message' => trim($this->input('message', '')),
+        ];
+
+        $swapId = \Nexus\Services\ShiftSwapService::requestSwap($userId, $data);
+
+        if ($swapId === null) {
+            $errors = \Nexus\Services\ShiftSwapService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['id' => $swapId, 'message' => 'Swap request sent'], null, 201);
+    }
+
+    /**
+     * GET /api/v2/volunteering/swaps
+     * Get swap requests for the current user
+     */
+    public function getSwapRequests(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_swaps_list', 60, 60);
+
+        $direction = $this->query('direction') ?? 'all';
+        $requests = \Nexus\Services\ShiftSwapService::getSwapRequests($userId, $direction);
+
+        $this->respondWithData(['swaps' => $requests]);
+    }
+
+    /**
+     * PUT /api/v2/volunteering/swaps/{id}
+     * Respond to a swap request (accept/reject)
+     */
+    public function respondToSwap(int $swapId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_swap_respond', 20, 60);
+
+        $action = $this->input('action');
+        if (!$action || !in_array($action, ['accept', 'reject'])) {
+            $this->respondWithError('VALIDATION_ERROR', 'Action must be accept or reject', 'action', 400);
+            return;
+        }
+
+        $success = \Nexus\Services\ShiftSwapService::respond($swapId, $userId, $action);
+
+        if (!$success) {
+            $errors = \Nexus\Services\ShiftSwapService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['id' => $swapId, 'status' => $action === 'accept' ? 'accepted' : 'rejected']);
+    }
+
+    /**
+     * DELETE /api/v2/volunteering/swaps/{id}
+     * Cancel a pending swap request
+     */
+    public function cancelSwap(int $swapId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_swap_cancel', 20, 60);
+
+        $success = \Nexus\Services\ShiftSwapService::cancel($swapId, $userId);
+
+        if (!$success) {
+            $errors = \Nexus\Services\ShiftSwapService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->noContent();
+    }
+
+    // ========================================
+    // GROUP RESERVATIONS (V3)
+    // ========================================
+
+    /**
+     * POST /api/v2/volunteering/shifts/{id}/group-reserve
+     * Reserve shift slots for a group
+     */
+    public function groupReserve(int $shiftId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_group_reserve', 10, 60);
+
+        $groupId = $this->inputInt('group_id');
+        $slots = $this->inputInt('reserved_slots') ?: 1;
+        $notes = trim($this->input('notes', ''));
+
+        if (!$groupId) {
+            $this->respondWithError('VALIDATION_ERROR', 'Group ID is required', 'group_id', 400);
+            return;
+        }
+
+        $reservationId = \Nexus\Services\ShiftGroupReservationService::reserve($shiftId, $groupId, $userId, $slots, $notes ?: null);
+
+        if ($reservationId === null) {
+            $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['id' => $reservationId, 'message' => "Reserved {$slots} slots"], null, 201);
+    }
+
+    /**
+     * POST /api/v2/volunteering/group-reservations/{id}/members
+     * Add a member to a group reservation
+     */
+    public function addGroupMember(int $reservationId): void
+    {
+        $this->checkFeature();
+        $leaderId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_group_member', 20, 60);
+
+        $userId = $this->inputInt('user_id');
+        if (!$userId) {
+            $this->respondWithError('VALIDATION_ERROR', 'User ID is required', 'user_id', 400);
+            return;
+        }
+
+        $success = \Nexus\Services\ShiftGroupReservationService::addMember($reservationId, $userId, $leaderId);
+
+        if (!$success) {
+            $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['message' => 'Member added to group reservation']);
+    }
+
+    /**
+     * DELETE /api/v2/volunteering/group-reservations/{id}/members/{userId}
+     * Remove a member from a group reservation
+     */
+    public function removeGroupMember(int $reservationId, int $userId): void
+    {
+        $this->checkFeature();
+        $leaderId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_group_member_remove', 20, 60);
+
+        $success = \Nexus\Services\ShiftGroupReservationService::removeMember($reservationId, $userId, $leaderId);
+
+        if (!$success) {
+            $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->noContent();
+    }
+
+    /**
+     * DELETE /api/v2/volunteering/group-reservations/{id}
+     * Cancel a group reservation
+     */
+    public function cancelGroupReservation(int $reservationId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_group_cancel', 10, 60);
+
+        $success = \Nexus\Services\ShiftGroupReservationService::cancelReservation($reservationId, $userId);
+
+        if (!$success) {
+            $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->noContent();
+    }
+
+    // ========================================
+    // SKILLS MATCHING (V4)
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/recommended-shifts
+     * Get recommended shifts based on user skills
+     */
+    public function recommendedShifts(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_recommended', 30, 60);
+
+        $limit = $this->queryInt('limit', 10, 1, 20);
+        $minScore = $this->queryInt('min_score', 20, 0, 100);
+
+        $shifts = \Nexus\Services\VolunteerMatchingService::getRecommendedShifts($userId, [
+            'limit' => $limit,
+            'min_match_score' => $minScore,
+        ]);
+
+        $this->respondWithData(['shifts' => $shifts]);
+    }
+
+    // ========================================
+    // CERTIFICATES (V6)
+    // ========================================
+
+    /**
+     * POST /api/v2/volunteering/certificates
+     * Generate a volunteer impact certificate
+     */
+    public function generateCertificate(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_certificate', 5, 60);
+
+        $options = [
+            'start_date' => $this->input('start_date') ?: date('Y-01-01'),
+            'end_date' => $this->input('end_date') ?: date('Y-m-d'),
+        ];
+
+        if ($this->inputInt('organization_id')) {
+            $options['organization_id'] = $this->inputInt('organization_id');
+        }
+
+        $cert = \Nexus\Services\VolunteerCertificateService::generate($userId, $options);
+
+        if ($cert === null) {
+            $errors = \Nexus\Services\VolunteerCertificateService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData($cert, null, 201);
+    }
+
+    /**
+     * GET /api/v2/volunteering/certificates
+     * Get user's certificates
+     */
+    public function myCertificates(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_certificates_list', 30, 60);
+
+        $certs = \Nexus\Services\VolunteerCertificateService::getUserCertificates($userId);
+
+        $this->respondWithData(['certificates' => $certs]);
+    }
+
+    /**
+     * GET /api/v2/volunteering/certificates/verify/{code}
+     * Verify a certificate (public endpoint)
+     */
+    public function verifyCertificate(string $code): void
+    {
+        $this->rateLimit('volunteering_cert_verify', 60, 60);
+
+        $cert = \Nexus\Services\VolunteerCertificateService::verify($code);
+
+        if ($cert === null) {
+            $this->respondWithError('NOT_FOUND', 'Certificate not found or invalid', null, 404);
+            return;
+        }
+
+        $this->respondWithData($cert);
+    }
+
+    /**
+     * GET /api/v2/volunteering/certificates/{code}/html
+     * Get certificate HTML for printing/PDF
+     */
+    public function certificateHtml(string $code): void
+    {
+        $this->rateLimit('volunteering_cert_html', 10, 60);
+
+        $html = \Nexus\Services\VolunteerCertificateService::generateHtml($code);
+
+        if ($html === null) {
+            $this->respondWithError('NOT_FOUND', 'Certificate not found', null, 404);
+            return;
+        }
+
+        \Nexus\Services\VolunteerCertificateService::markDownloaded($code);
+
+        header('Content-Type: text/html; charset=utf-8');
+        echo $html;
+        exit;
+    }
+
+    // ========================================
+    // QR CHECK-IN (V7)
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/shifts/{id}/checkin
+     * Get QR check-in info for a shift (for the current user)
+     */
+    public function getCheckIn(int $shiftId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_checkin_get', 60, 60);
+
+        $checkin = \Nexus\Services\VolunteerCheckInService::getUserCheckIn($shiftId, $userId);
+
+        if (!$checkin) {
+            // Try generating a token
+            $token = \Nexus\Services\VolunteerCheckInService::generateToken($shiftId, $userId);
+            if ($token) {
+                $checkin = \Nexus\Services\VolunteerCheckInService::getUserCheckIn($shiftId, $userId);
+            }
+        }
+
+        if (!$checkin) {
+            $this->respondWithError('NOT_FOUND', 'No check-in available for this shift', null, 404);
+            return;
+        }
+
+        $this->respondWithData($checkin);
+    }
+
+    /**
+     * POST /api/v2/volunteering/checkin/verify/{token}
+     * Verify QR check-in (scan QR code)
+     */
+    public function verifyCheckIn(string $token): void
+    {
+        $this->rateLimit('volunteering_checkin_verify', 30, 60);
+
+        $result = \Nexus\Services\VolunteerCheckInService::verifyCheckIn($token);
+
+        if ($result === null) {
+            $errors = \Nexus\Services\VolunteerCheckInService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/volunteering/checkin/checkout/{token}
+     * Check out a volunteer
+     */
+    public function checkOut(string $token): void
+    {
+        $this->rateLimit('volunteering_checkout', 30, 60);
+
+        $success = \Nexus\Services\VolunteerCheckInService::checkOut($token);
+
+        if (!$success) {
+            $errors = \Nexus\Services\VolunteerCheckInService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['message' => 'Successfully checked out']);
+    }
+
+    /**
+     * GET /api/v2/volunteering/shifts/{id}/checkins
+     * Get all check-ins for a shift (coordinator view)
+     */
+    public function shiftCheckIns(int $shiftId): void
+    {
+        $this->checkFeature();
+        $this->getUserId();
+        $this->rateLimit('volunteering_shift_checkins', 60, 60);
+
+        $checkins = \Nexus\Services\VolunteerCheckInService::getShiftCheckIns($shiftId);
+
+        $this->respondWithData(['checkins' => $checkins]);
+    }
+
+    // ========================================
+    // EMERGENCY ALERTS (V9)
+    // ========================================
+
+    /**
+     * POST /api/v2/volunteering/emergency-alerts
+     * Create an emergency volunteer alert
+     */
+    public function createEmergencyAlert(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_emergency_create', 5, 60);
+
+        $data = [
+            'shift_id' => $this->inputInt('shift_id'),
+            'message' => trim($this->input('message', '')),
+            'priority' => $this->input('priority', 'urgent'),
+            'required_skills' => $this->input('required_skills'),
+            'expires_hours' => $this->inputInt('expires_hours') ?: 24,
+        ];
+
+        $alertId = \Nexus\Services\VolunteerEmergencyAlertService::createAlert($userId, $data);
+
+        if ($alertId === null) {
+            $errors = \Nexus\Services\VolunteerEmergencyAlertService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['id' => $alertId, 'message' => 'Emergency alert sent'], null, 201);
+    }
+
+    /**
+     * GET /api/v2/volunteering/emergency-alerts
+     * Get emergency alerts for the current user
+     */
+    public function myEmergencyAlerts(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_emergency_list', 60, 60);
+
+        $alerts = \Nexus\Services\VolunteerEmergencyAlertService::getUserAlerts($userId);
+
+        $this->respondWithData(['alerts' => $alerts]);
+    }
+
+    /**
+     * PUT /api/v2/volunteering/emergency-alerts/{id}
+     * Respond to an emergency alert (accept/decline)
+     */
+    public function respondToEmergencyAlert(int $alertId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_emergency_respond', 10, 60);
+
+        $response = $this->input('response');
+        if (!$response || !in_array($response, ['accepted', 'declined'])) {
+            $this->respondWithError('VALIDATION_ERROR', 'Response must be accepted or declined', 'response', 400);
+            return;
+        }
+
+        $success = \Nexus\Services\VolunteerEmergencyAlertService::respond($alertId, $userId, $response);
+
+        if (!$success) {
+            $errors = \Nexus\Services\VolunteerEmergencyAlertService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['id' => $alertId, 'response' => $response]);
+    }
+
+    /**
+     * DELETE /api/v2/volunteering/emergency-alerts/{id}
+     * Cancel an emergency alert
+     */
+    public function cancelEmergencyAlert(int $alertId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_emergency_cancel', 10, 60);
+
+        $success = \Nexus\Services\VolunteerEmergencyAlertService::cancelAlert($alertId, $userId);
+
+        if (!$success) {
+            $errors = \Nexus\Services\VolunteerEmergencyAlertService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->noContent();
+    }
+
+    // ========================================
+    // WELLBEING / BURNOUT DETECTION (V10)
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/wellbeing/my-status
+     * Get burnout risk assessment for current user
+     */
+    public function myWellbeingStatus(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_wellbeing_status', 10, 60);
+
+        $assessment = \Nexus\Services\VolunteerWellbeingService::detectBurnoutRisk($userId);
+
+        $this->respondWithData($assessment);
+    }
+
+    // ========================================
     // HELPERS
     // ========================================
 

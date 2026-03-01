@@ -87,6 +87,7 @@ class ExchangeWorkflowService
             return null;
         }
         $proposedHours = max(0.25, min(24, (float) ($data['proposed_hours'] ?? $listing['hours'] ?? 1)));
+        $prepTime = isset($data['prep_time']) ? max(0, min(8, (float) $data['prep_time'])) : null;
 
         // Determine initial status
         $initialStatus = self::STATUS_PENDING_PROVIDER;
@@ -96,14 +97,15 @@ class ExchangeWorkflowService
 
         Database::query(
             "INSERT INTO exchange_requests
-             (tenant_id, listing_id, requester_id, provider_id, proposed_hours, requester_notes, status, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+             (tenant_id, listing_id, requester_id, provider_id, proposed_hours, prep_time, requester_notes, status, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
             [
                 $tenantId,
                 $listingId,
                 $requesterId,
                 $providerId,
                 $proposedHours,
+                $prepTime,
                 $data['message'] ?? null,
                 $initialStatus,
             ]
@@ -1013,12 +1015,16 @@ class ExchangeWorkflowService
 
         // Use WalletService to create transaction
         try {
+            $prepTime = isset($exchange['prep_time']) ? (float) $exchange['prep_time'] : null;
+
             $transactionId = WalletService::transfer(
                 $exchange['requester_id'],
                 $exchange['provider_id'],
                 $hours,
                 'exchange',
-                "Exchange #$exchangeId for listing: {$exchange['listing_title']}"
+                "Exchange #$exchangeId for listing: {$exchange['listing_title']}",
+                null, // categoryId
+                $prepTime
             );
 
             return $transactionId;

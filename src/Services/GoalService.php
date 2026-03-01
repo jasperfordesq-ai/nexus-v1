@@ -9,6 +9,7 @@ namespace Nexus\Services;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
+use Nexus\Services\GoalProgressService;
 
 /**
  * GoalService - Business logic for goals
@@ -424,7 +425,13 @@ class GoalService
                 [$tenantId, $userId, $title, $description ?: null, $targetValue, $deadline, $isPublic ? 1 : 0]
             );
 
-            $goalId = Database::lastInsertId();
+            $goalId = (int)Database::lastInsertId();
+
+            // Log creation in progress history
+            GoalProgressService::logEvent($goalId, $tenantId, 'created', null, null, $userId, [
+                'title' => $title,
+                'target_value' => $targetValue,
+            ]);
 
             // Award gamification points
             try {
@@ -435,7 +442,7 @@ class GoalService
                 // Gamification is optional
             }
 
-            return (int)$goalId;
+            return $goalId;
         } catch (\Throwable $e) {
             error_log("Goal creation failed: " . $e->getMessage());
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to create goal');
@@ -560,10 +567,18 @@ class GoalService
         $targetValue = (float)$goal['target_value'];
 
         try {
+            $oldValue = (float)$goal['current_value'];
+
             Database::query(
                 "UPDATE goals SET current_value = ? WHERE id = ?",
                 [$newValue, $id]
             );
+
+            // Log progress update in history
+            $tenantId = TenantContext::getId();
+            GoalProgressService::logEvent($id, $tenantId, 'progress_update', (string)$oldValue, (string)$newValue, $userId, [
+                'increment' => $increment,
+            ]);
 
             // Check if goal is now completed
             if ($targetValue > 0 && $newValue >= $targetValue) {
@@ -571,6 +586,9 @@ class GoalService
                     "UPDATE goals SET status = 'completed', completed_at = NOW() WHERE id = ?",
                     [$id]
                 );
+
+                // Log completion
+                GoalProgressService::logEvent($id, $tenantId, 'completed', 'active', 'completed', $userId);
 
                 // Award gamification points for completion
                 try {
@@ -627,10 +645,15 @@ class GoalService
         }
 
         try {
+            $tenantId = TenantContext::getId();
+
             Database::query(
                 "UPDATE goals SET mentor_id = ? WHERE id = ?",
                 [$userId, $goalId]
             );
+
+            // Log buddy joined in progress history
+            GoalProgressService::logEvent($goalId, $tenantId, 'buddy_joined', null, (string)$userId, $userId);
 
             // Award gamification points
             try {
@@ -643,7 +666,6 @@ class GoalService
 
             // Create notification for goal owner
             try {
-                $tenantId = TenantContext::getId();
                 Database::query(
                     "INSERT INTO notifications (tenant_id, user_id, type, title, message, link, created_at)
                      VALUES (?, ?, 'goal_buddy', 'New Goal Buddy!', 'Someone offered to be your goal buddy', ?, NOW())",
