@@ -45,6 +45,8 @@ const FEATURE_META: Record<string, { label: string; description: string }> = {
   connections: { label: 'Connections', description: 'User connections and friend requests' },
   reviews: { label: 'Reviews', description: 'Member reviews and ratings' },
   polls: { label: 'Polls', description: 'Community polls and voting' },
+  job_vacancies: { label: 'Job Vacancies', description: 'Job postings and application management' },
+  ideation_challenges: { label: 'Ideation Challenges', description: 'Community challenges with idea voting' },
   direct_messaging: { label: 'Direct Messaging', description: 'Private messaging between members' },
   group_exchanges: { label: 'Group Exchanges', description: 'Multi-party group exchange sessions' },
 };

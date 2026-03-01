@@ -66,6 +66,11 @@ class PollsApiController extends BaseApiController
             $filters['user_id'] = $this->queryInt('user_id');
         }
 
+        // "My Polls" tab — filter to current user's polls
+        if ($this->query('mine') === '1') {
+            $filters['user_id'] = $userId;
+        }
+
         // Get polls
         $result = PollService::getAll($filters);
 

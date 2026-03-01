@@ -374,10 +374,11 @@ class PollService
         }
 
         $params[] = $id;
+        $params[] = TenantContext::getId();
 
         try {
             Database::query(
-                "UPDATE polls SET " . implode(', ', $updates) . " WHERE id = ?",
+                "UPDATE polls SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?",
                 $params
             );
             return true;
