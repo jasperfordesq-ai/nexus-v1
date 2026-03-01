@@ -104,6 +104,24 @@ const VolunteeringOverview = lazy(() => import('./modules/volunteering/Volunteer
 const VolunteerApprovals = lazy(() => import('./modules/volunteering/VolunteerApprovals'));
 const VolunteerOrganizations = lazy(() => import('./modules/volunteering/VolunteerOrganizations'));
 
+// Events module
+const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
+
+// Polls module
+const PollsAdmin = lazy(() => import('./modules/polls/PollsAdmin'));
+
+// Goals module
+const GoalsAdmin = lazy(() => import('./modules/goals/GoalsAdmin'));
+
+// Resources / Knowledge Base module
+const ResourcesAdmin = lazy(() => import('./modules/resources/ResourcesAdmin'));
+
+// Jobs module
+const JobsAdmin = lazy(() => import('./modules/jobs/JobsAdmin'));
+
+// Ideation / Challenges module
+const IdeationAdmin = lazy(() => import('./modules/ideation/IdeationAdmin'));
+
 // Federation module
 const FederationSettings = lazy(() => import('./modules/federation/FederationSettings'));
 const Partnerships = lazy(() => import('./modules/federation/Partnerships'));
@@ -378,6 +396,24 @@ export function AdminRoutes() {
       <Route path="volunteering" element={<Lazy><VolunteeringOverview /></Lazy>} />
       <Route path="volunteering/approvals" element={<Lazy><VolunteerApprovals /></Lazy>} />
       <Route path="volunteering/organizations" element={<Lazy><VolunteerOrganizations /></Lazy>} />
+
+      {/* ─── EVENTS ─── */}
+      <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />
+
+      {/* ─── POLLS ─── */}
+      <Route path="polls" element={<Lazy><PollsAdmin /></Lazy>} />
+
+      {/* ─── GOALS ─── */}
+      <Route path="goals" element={<Lazy><GoalsAdmin /></Lazy>} />
+
+      {/* ─── RESOURCES / KNOWLEDGE BASE ─── */}
+      <Route path="resources" element={<Lazy><ResourcesAdmin /></Lazy>} />
+
+      {/* ─── JOBS ─── */}
+      <Route path="jobs" element={<Lazy><JobsAdmin /></Lazy>} />
+
+      {/* ─── IDEATION / CHALLENGES ─── */}
+      <Route path="ideation" element={<Lazy><IdeationAdmin /></Lazy>} />
 
       {/* ─── DELIVERABILITY ─── */}
       <Route path="deliverability" element={<Lazy><DeliverabilityDashboard /></Lazy>} />

@@ -70,6 +70,11 @@ import {
   FileCheck,
   UserX,
   DollarSign,
+  Calendar,
+  BarChart2,
+  Lightbulb,
+  Briefcase,
+  BookOpen,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -134,6 +139,7 @@ function useAdminNav(): NavSection[] {
         icon: Newspaper,
         items: [
           { label: 'Blog Posts', href: '/admin/blog', icon: FileText },
+          { label: 'Resources', href: '/admin/resources', icon: BookOpen },
           { label: 'Pages', href: '/admin/pages', icon: FileText },
           { label: 'Menus', href: '/admin/menus', icon: Menu },
           { label: 'Categories', href: '/admin/categories', icon: FolderTree },
@@ -187,6 +193,11 @@ function useAdminNav(): NavSection[] {
           { label: 'Group Types', href: '/admin/groups/types', icon: FolderTree },
           { label: 'Group Recommendations', href: '/admin/groups/recommendations', icon: Brain },
           { label: 'Group Ranking', href: '/admin/groups/ranking', icon: Trophy },
+          { label: 'Events', href: '/admin/events', icon: Calendar },
+          { label: 'Polls', href: '/admin/polls', icon: BarChart2 },
+          { label: 'Goals', href: '/admin/goals', icon: Target },
+          { label: 'Ideation', href: '/admin/ideation', icon: Lightbulb },
+          { label: 'Jobs', href: '/admin/jobs', icon: Briefcase },
           { label: 'Volunteering', href: '/admin/volunteering', icon: Heart },
         ],
       },
