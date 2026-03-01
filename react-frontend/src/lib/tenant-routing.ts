@@ -29,15 +29,21 @@ export const RESERVED_SUBDOMAINS = new Set([
  * If the first path segment matches, it is a React route, NOT a tenant slug.
  */
 export const RESERVED_PATHS = new Set([
+  // Auth & core pages
   'login', 'register', 'password', 'logout', 'dashboard', 'listings',
   'events', 'groups', 'messages', 'notifications', 'wallet', 'feed',
   'search', 'members', 'connections', 'profile', 'settings', 'exchanges', 'achievements',
   'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
   'organisations', 'federation', 'onboarding', 'group-exchanges', 'matches', 'newsletter',
   'chat',
+  // Feature modules added 2026-03-01
+  'ideation', 'jobs', 'polls', 'kb', 'activity', 'skills', 'reviews',
+  // Public/info pages
   'help', 'contact', 'about', 'faq', 'legal', 'terms', 'platform',
   'privacy', 'accessibility', 'cookies', 'development-status',
+  'community-guidelines', 'acceptable-use',
   'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
+  // System paths
   'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
   'uploads', 'classic', 'health', 'favicon.ico', 'robots.txt',
   'sitemap.xml', 'manifest.json', 'service-worker.js', '.well-known',
