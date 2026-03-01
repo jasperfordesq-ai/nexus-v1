@@ -291,43 +291,43 @@ class TenantIsolationTest extends TestCase
     }
 
     /**
-     * REGRESSION: AdminSuperApiController must sync JWT context to session
-     * BEFORE checking SuperPanelAccess.
+     * REGRESSION: AdminSuperApiController must pass $userId directly to
+     * SuperPanelAccess::getAccess(), bypassing $_SESSION dependency.
      *
-     * SuperPanelAccess reads from $_SESSION, but API requests use JWT tokens.
-     * If session sync happens AFTER the access check, the check would use
-     * stale/missing session data and incorrectly deny access.
+     * The controller uses JWT auth, so it passes the authenticated user ID
+     * directly to getAccess($userId). Session sync is best-effort fallback
+     * that happens AFTER the access check for any legacy code that reads
+     * $_SESSION.
      */
     public function testAdminSuperApiControllerSyncsSessionBeforeAccessCheck(): void
     {
         $controllerPath = $this->getProjectRoot() . '/src/Controllers/Api/AdminSuperApiController.php';
         $source = file_get_contents($controllerPath);
 
-        // Session sync code must appear BEFORE the SuperPanelAccess check.
-        // Use the actual code assignment pattern (not the comment mentioning it)
-        // to avoid false position match from the docblock at line 60.
-        $sessionSyncPos = strpos($source, '$_SESSION[\'user_id\']');
+        // getAccess must receive $userId directly — no session dependency
         $accessCheckPos = strpos($source, '$access = ');
-
-        $this->assertNotFalse($sessionSyncPos, 'Session sync code must exist');
         $this->assertNotFalse(
             $accessCheckPos,
             'SuperPanelAccess result assignment ($access = ...) must exist'
         );
 
-        // Also verify the actual getAccess() call is on the same line
         $accessLineEnd = strpos($source, "\n", $accessCheckPos);
         $accessLine = substr($source, $accessCheckPos, $accessLineEnd - $accessCheckPos);
         $this->assertStringContainsString(
-            'SuperPanelAccess::getAccess()',
+            'SuperPanelAccess::getAccess($userId)',
             $accessLine,
-            'The $access assignment must call SuperPanelAccess::getAccess()'
+            'The $access assignment must call SuperPanelAccess::getAccess($userId)'
         );
 
-        $this->assertLessThan(
+        // Session sync must still exist (best-effort fallback for legacy code)
+        $sessionSyncPos = strpos($source, '$_SESSION[\'user_id\']');
+        $this->assertNotFalse($sessionSyncPos, 'Session sync code must exist as legacy fallback');
+
+        // Session sync happens AFTER access check (it depends on $access['tenant_id'])
+        $this->assertGreaterThan(
             $accessCheckPos,
             $sessionSyncPos,
-            'Session sync must happen BEFORE SuperPanelAccess::getAccess() is called'
+            'Session sync must happen AFTER getAccess() since it uses the access result'
         );
     }
 
