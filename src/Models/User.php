@@ -648,9 +648,9 @@ class User
         $sql = "SELECT * FROM users WHERE is_super_admin = 1";
         return Database::query($sql)->fetchAll();
     }
-    public static function updateAdminFields($id, $role, $isApproved, $isSuperAdmin = null)
+    public static function updateAdminFields($id, $role, $isApproved, $isSuperAdmin = null, ?int $tenantId = null)
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = $tenantId ?? TenantContext::getId();
 
         // SECURITY: Defense-in-depth check for super admin changes
         // Only GOD users can grant/change super admin status

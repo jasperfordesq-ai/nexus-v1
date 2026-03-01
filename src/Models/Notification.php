@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 use Nexus\Services\WebPushService;
 use Nexus\Services\FCMPushService;
 use Nexus\Services\RealtimeService;
@@ -21,12 +22,14 @@ class Notification
      * @param string|null $link URL to open when clicked
      * @param string $type Notification type (system, message, transaction, event, reminder, etc.)
      * @param bool $sendPush Whether to send Web Push notification (default: true)
+     * @param int|null $tenantId Tenant ID (defaults to current tenant context)
      * @return void
      */
-    public static function create($userId, $message, $link = null, $type = 'system', $sendPush = true)
+    public static function create($userId, $message, $link = null, $type = 'system', $sendPush = true, $tenantId = null)
     {
-        $sql = "INSERT INTO notifications (user_id, message, link, type) VALUES (?, ?, ?, ?)";
-        Database::query($sql, [$userId, $message, $link, $type]);
+        $tenantId = $tenantId ?? TenantContext::getId();
+        $sql = "INSERT INTO notifications (user_id, tenant_id, message, link, type) VALUES (?, ?, ?, ?, ?)";
+        Database::query($sql, [$userId, $tenantId, $message, $link, $type]);
 
         // Get the inserted notification ID
         $notificationId = Database::getConnection()->lastInsertId();

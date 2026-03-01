@@ -691,7 +691,7 @@ class AdminConfigApiController extends BaseApiController
         'timezone', 'registration_mode', 'welcome_message',
         'maintenance_mode', 'default_currency', 'date_format',
         'time_format', 'items_per_page', 'max_upload_size_mb',
-        'email_verification', 'admin_approval',
+        'email_verification', 'admin_approval', 'welcome_credits',
     ];
 
     /**
@@ -871,6 +871,16 @@ class AdminConfigApiController extends BaseApiController
                 "UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?",
                 $params
             );
+        }
+
+        // Validate specific settings before writing
+        if (isset($kvUpdates['welcome_credits'])) {
+            $wc = (int) $kvUpdates['welcome_credits'];
+            if ($wc < 0 || $wc > 100) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'welcome_credits must be between 0 and 100', 'welcome_credits', 422);
+                return;
+            }
+            $kvUpdates['welcome_credits'] = (string) $wc;
         }
 
         // Upsert key-value settings
