@@ -59,8 +59,11 @@ class ResourceApiController extends BaseApiController
             $catId = $res['category_id'] ?? 0;
             if (!isset($grouped[$catId])) $catId = 0;
 
-            // Format URL
-            $res['file_url'] = '/uploads/' . TenantContext::getId() . '/resources/' . $res['file_path'];
+            // Format URL — legacy records store full path, new records store just filename
+            $filePath = $res['file_path'] ?? '';
+            $res['file_url'] = str_starts_with($filePath, '/uploads/')
+                ? $filePath
+                : '/uploads/' . TenantContext::getId() . '/resources/' . $filePath;
 
             $grouped[$catId]['items'][] = $res;
         }

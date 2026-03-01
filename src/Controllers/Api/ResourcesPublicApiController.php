@@ -97,9 +97,15 @@ class ResourcesPublicApiController extends BaseApiController
 
         $formatted = array_map(function ($row) use ($baseUrl, $tenantId) {
             $filePath = $row['file_path'] ?? '';
-            $fileUrl = $filePath
-                ? $baseUrl . '/uploads/' . $tenantId . '/resources/' . $filePath
-                : '';
+            // Legacy records store full web path (e.g. /uploads/resources/file.pdf)
+            // New records store just the filename (e.g. file.pdf)
+            if ($filePath && str_starts_with($filePath, '/uploads/')) {
+                $fileUrl = $baseUrl . $filePath;
+            } else {
+                $fileUrl = $filePath
+                    ? $baseUrl . '/uploads/' . $tenantId . '/resources/' . $filePath
+                    : '';
+            }
 
             return [
                 'id' => (int) $row['id'],
