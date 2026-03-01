@@ -210,3 +210,47 @@ Only **5 integration tests** exist (Exchange, Group, Listing, Message, User jour
 14. **Set up coverage gates in CI** — block PRs that decrease line coverage
 15. **Add mutation testing** (e.g., Infection for PHP) to validate that tests catch real bugs, not just execute code paths
 16. **Create a test quality dashboard** tracking coverage trends over time
+
+---
+
+## Infrastructure Issues Found & Fixed
+
+### Fixed: PSR-4 Namespace Mismatches (77 test files)
+
+77 test files used `namespace Tests\...` instead of the correct `namespace Nexus\Tests\...` as defined in `composer.json` (`"Nexus\\Tests\\": "tests/"`). This caused Composer autoloader warnings and meant these test classes could not be autoloaded by other tests or tooling.
+
+**Breakdown by directory:**
+| Directory | Files Fixed |
+|---|---|
+| `tests/Services/` | 64 |
+| `tests/Services/AI/` | 6 |
+| `tests/Models/` | 5 |
+| `tests/Controllers/Api/` | 1 |
+| `tests/Controllers/` | 1 |
+| **Total** | **77** |
+
+### Fixed: PHPUnit XML Schema Deprecation
+
+The `phpunit.xml` validated against a deprecated schema. Migrated to the PHPUnit 10.5 schema using `--migrate-configuration`, eliminating the deprecation warning that would cause CI failures when `failOnWarning="true"` is set.
+
+### Noted: Model Test Gap
+
+Only 1 model (`UserBadge`) out of 59 lacks a dedicated test file.
+
+### Noted: Middleware Test Gap
+
+Only 1 middleware (`PerformanceMonitoringMiddleware`) out of 8 lacks a dedicated test file.
+
+### Noted: Core Test Gaps
+
+4 Core classes lack dedicated tests:
+- `AdminAuth` — has Unit test but no Core-level integration test
+- `HtmlSanitizer` — tested in `Services/HtmlSanitizerTest` (duplicate exists in both `src/Core/` and `src/Helpers/`)
+- `ImageUploader` — tested in `Services/ImageUploaderTest`
+- `TotpEncryption` — security-critical TOTP encryption, partially tested via `TotpServiceUnitTest`
+
+### Noted: 25 Front-facing Controllers Without Tests
+
+These non-API, non-admin controllers serve pages and handle user-facing routes but have no test coverage:
+
+`AchievementsController`, `ContactController`, `CronController`, `ExchangesController`, `FederationStreamController`, `FeedController`, `GroupAnalyticsController`, `HelpController`, `InsightsController`, `LeaderboardController`, `LegalDocumentController`, `MasterController`, `MessageController`, `NewsletterSubscriptionController`, `NewsletterTrackingController`, `NexusScoreController`, `NotificationController`, `OnboardingController`, `OrgWalletController`, `ReportController`, `RobotsController`, `SitemapController`, `SocialAuthController`, `UserPreferenceController`, `AdminController`

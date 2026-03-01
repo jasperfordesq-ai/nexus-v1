@@ -4,7 +4,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-namespace Tests\Services;
+namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
 use Nexus\Services\NotificationService;

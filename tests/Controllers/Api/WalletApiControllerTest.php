@@ -4,7 +4,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-namespace Tests\Controllers\Api;
+namespace Nexus\Tests\Controllers\Api;
 
 use PHPUnit\Framework\TestCase;
 use Nexus\Models\Transaction;
