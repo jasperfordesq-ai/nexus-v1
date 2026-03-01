@@ -332,6 +332,9 @@ export function FeedPage() {
     { key: 'events', label: t('filter.events') },
     { key: 'polls', label: t('filter.polls') },
     { key: 'goals', label: t('filter.goals') },
+    { key: 'jobs', label: t('filter.jobs', 'Jobs') },
+    { key: 'challenges', label: t('filter.challenges', 'Challenges') },
+    { key: 'volunteering', label: t('filter.volunteering', 'Volunteering') },
   ];
 
   const containerVariants = {

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-export type FeedFilter = 'all' | 'posts' | 'listings' | 'events' | 'polls' | 'goals';
+export type FeedFilter = 'all' | 'posts' | 'listings' | 'events' | 'polls' | 'goals' | 'jobs' | 'challenges' | 'volunteering';
 export type PostMode = 'text' | 'poll';
 
 export interface FeedItem {
@@ -20,7 +20,7 @@ export interface FeedItem {
     avatar_url?: string;
   };
   created_at: string;
-  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review';
+  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer';
   likes_count: number;
   comments_count: number;
   is_liked: boolean;
@@ -33,8 +33,20 @@ export interface FeedItem {
   };
   /** Event-specific: start date/time */
   start_date?: string;
-  /** Event-specific: location name */
+  /** Event/Job/Volunteer-specific: location name */
   location?: string;
+  /** Job-specific: job type (paid, volunteer, timebank) */
+  job_type?: string;
+  /** Job-specific: commitment level */
+  commitment?: string;
+  /** Challenge-specific: submission deadline */
+  submission_deadline?: string;
+  /** Challenge-specific: number of ideas submitted */
+  ideas_count?: number;
+  /** Volunteer-specific: time credits offered */
+  credits_offered?: number;
+  /** Volunteer-specific: organization name */
+  organization?: string;
 }
 
 export interface PollData {
@@ -94,6 +106,12 @@ export function getItemDetailPath(item: FeedItem): string | null {
       return '/goals';
     case 'review':
       return item.receiver ? `/profile/${item.receiver.id}` : null;
+    case 'job':
+      return `/jobs/${item.id}`;
+    case 'challenge':
+      return `/ideation/${item.id}`;
+    case 'volunteer':
+      return `/volunteering/opportunities/${item.id}`;
     default:
       return null;
   }
@@ -110,6 +128,12 @@ export function getItemDetailLabel(item: FeedItem): string | null {
       return 'View Goals';
     case 'review':
       return 'View Profile';
+    case 'job':
+      return 'View Job';
+    case 'challenge':
+      return 'View Challenge';
+    case 'volunteer':
+      return 'View Opportunity';
     default:
       return null;
   }

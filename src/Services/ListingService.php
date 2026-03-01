@@ -458,6 +458,18 @@ class ListingService
 
         $listingId = Database::lastInsertId();
 
+        // Record in feed_activity table
+        try {
+            FeedActivityService::recordActivity(TenantContext::getId(), $userId, 'listing', (int)$listingId, [
+                'title' => trim($data['title']),
+                'content' => trim($data['description']),
+                'image_url' => $data['image_url'] ?? null,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Exception $e) {
+            error_log("ListingService::create feed_activity record failed: " . $e->getMessage());
+        }
+
         // Handle attributes
         if (!empty($data['attributes']) && is_array($data['attributes'])) {
             self::saveAttributes($listingId, $data['attributes']);
@@ -657,6 +669,13 @@ class ListingService
             "UPDATE listings SET status = 'deleted', updated_at = NOW() WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         );
+
+        // Hide from feed_activity
+        try {
+            FeedActivityService::hideActivity('listing', $id);
+        } catch (\Exception $e) {
+            error_log("ListingService::delete feed_activity hide failed: " . $e->getMessage());
+        }
 
         return true;
     }

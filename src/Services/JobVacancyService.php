@@ -403,6 +403,22 @@ class JobVacancyService
 
             $vacancyId = Database::lastInsertId();
 
+            // Record in feed_activity table
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'job', (int)$vacancyId, [
+                    'title' => $title,
+                    'content' => $description,
+                    'metadata' => [
+                        'location' => $location,
+                        'job_type' => $type,
+                        'commitment' => $commitment,
+                    ],
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log("JobVacancyService::create feed_activity record failed: " . $faEx->getMessage());
+            }
+
             // J6: Check matching alerts for the new job
             if ($status === 'open') {
                 self::checkJobAlertsForVacancy((int)$vacancyId);
@@ -597,6 +613,13 @@ class JobVacancyService
                 "DELETE FROM job_vacancies WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
+
+            // Remove from feed_activity
+            try {
+                FeedActivityService::removeActivity('job', $id);
+            } catch (\Exception $faEx) {
+                error_log("JobVacancyService::delete feed_activity remove failed: " . $faEx->getMessage());
+            }
 
             return true;
         } catch (\Throwable $e) {

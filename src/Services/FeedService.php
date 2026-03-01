@@ -46,6 +46,7 @@ class FeedService
      * @param int|null $userId Current user (for like status)
      * @param array $filters [
      *   'type' => 'all' (default), 'posts', 'listings', 'events', 'polls', 'goals',
+     *            'jobs', 'challenges', 'volunteering',
      *   'user_id' => int (for user profile feed),
      *   'group_id' => int (for group feed),
      *   'cursor' => string,
@@ -64,34 +65,68 @@ class FeedService
         $groupId = $filters['group_id'] ?? null;
         $cursor = $filters['cursor'] ?? null;
 
-        // Decode cursor (format: "type_timestamp_id" e.g., "post_2026-01-30 12:00:00_123")
+        // Decode cursor — supports both new (activity_id) and legacy (type_timestamp_id) formats
+        $cursorActivityId = null;
         $cursorData = null;
         if ($cursor) {
             $decoded = base64_decode($cursor, true);
-            if ($decoded) {
-                $parts = explode('_', $decoded, 3);
-                if (count($parts) === 3) {
-                    $cursorData = [
-                        'type' => $parts[0],
-                        'created_at' => $parts[1],
-                        'id' => (int)$parts[2],
-                    ];
+            if ($decoded !== false) {
+                if (ctype_digit($decoded)) {
+                    // New format: just the activity_id
+                    $cursorActivityId = (int)$decoded;
+                } else {
+                    // Legacy format: "type_timestamp_id"
+                    $parts = explode('_', $decoded, 3);
+                    if (count($parts) === 3) {
+                        $cursorData = [
+                            'type' => $parts[0],
+                            'created_at' => $parts[1],
+                            'id' => (int)$parts[2],
+                        ];
+                    }
                 }
             }
         }
 
         $items = [];
 
-        // For aggregated feed, we need to merge different content types
-        // For single type or specific views (user/group), we can query directly
-        if ($groupId) {
-            $items = self::loadGroupFeed($groupId, $userId, $tenantId, $limit + 1, $cursorData);
-        } elseif ($profileUserId) {
-            $items = self::loadUserFeed($profileUserId, $userId, $tenantId, $limit + 1, $cursorData);
-        } elseif ($type !== 'all') {
-            $items = self::loadTypedFeed($type, $userId, $tenantId, $limit + 1, $cursorData);
+        // Try feed_activity table first (unified single-query approach)
+        $useFeedActivity = false;
+        try {
+            $db->query("SELECT 1 FROM feed_activity LIMIT 1");
+            $useFeedActivity = true;
+        } catch (\Exception $e) {
+            // Table doesn't exist yet — fall back to legacy N-query approach
+        }
+
+        if ($useFeedActivity) {
+            // Map plural filter names to source_type values
+            $sourceType = null;
+            if ($type !== 'all') {
+                $typeMap = [
+                    'posts' => 'post', 'listings' => 'listing', 'events' => 'event',
+                    'polls' => 'poll', 'goals' => 'goal', 'jobs' => 'job',
+                    'challenges' => 'challenge', 'volunteering' => 'volunteer',
+                ];
+                $sourceType = $typeMap[$type] ?? $type;
+            }
+
+            $items = self::loadFromFeedActivity(
+                $userId, $tenantId, $limit + 1,
+                $cursorActivityId, $cursorData,
+                $sourceType, $profileUserId, $groupId
+            );
         } else {
-            $items = self::loadAggregatedFeed($userId, $tenantId, $limit + 1, $cursorData);
+            // Legacy fallback: N-query aggregation (removed once migration is confirmed)
+            if ($groupId) {
+                $items = self::loadGroupFeed($groupId, $userId, $tenantId, $limit + 1, $cursorData);
+            } elseif ($profileUserId) {
+                $items = self::loadUserFeed($profileUserId, $userId, $tenantId, $limit + 1, $cursorData);
+            } elseif ($type !== 'all') {
+                $items = self::loadTypedFeed($type, $userId, $tenantId, $limit + 1, $cursorData);
+            } else {
+                $items = self::loadAggregatedFeed($userId, $tenantId, $limit + 1, $cursorData);
+            }
         }
 
         // Check if there are more items
@@ -104,7 +139,21 @@ class FeedService
         $nextCursor = null;
         if ($hasMore && !empty($items)) {
             $lastItem = end($items);
-            $nextCursor = base64_encode("{$lastItem['type']}_{$lastItem['created_at']}_{$lastItem['id']}");
+            if ($useFeedActivity && isset($lastItem['_activity_id'])) {
+                // New cursor format: just the activity_id
+                $nextCursor = base64_encode((string)$lastItem['_activity_id']);
+            } else {
+                // Legacy cursor format
+                $nextCursor = base64_encode("{$lastItem['type']}_{$lastItem['created_at']}_{$lastItem['id']}");
+            }
+        }
+
+        // Strip internal _activity_id from output
+        if ($useFeedActivity) {
+            foreach ($items as &$item) {
+                unset($item['_activity_id']);
+            }
+            unset($item);
         }
 
         return [
@@ -112,6 +161,160 @@ class FeedService
             'cursor' => $nextCursor,
             'has_more' => $hasMore,
         ];
+    }
+
+    /**
+     * Load feed from the unified feed_activity table (single query).
+     *
+     * Replaces the N-query aggregation with a single indexed query.
+     * Supports all feed modes: main, user profile, group, type-filtered.
+     */
+    private static function loadFromFeedActivity(
+        ?int $userId,
+        int $tenantId,
+        int $limit,
+        ?int $cursorActivityId,
+        ?array $legacyCursorData,
+        ?string $sourceType = null,
+        ?int $profileUserId = null,
+        ?int $groupId = null
+    ): array {
+        $db = Database::getConnection();
+
+        $sql = "
+            SELECT fa.id as activity_id, fa.source_type, fa.source_id, fa.user_id,
+                   fa.title, fa.content, fa.image_url, fa.metadata, fa.group_id, fa.created_at,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = fa.source_type AND target_id = fa.source_id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = fa.source_type AND target_id = fa.source_id) as comments_count
+            FROM feed_activity fa
+            JOIN users u ON fa.user_id = u.id
+            WHERE fa.tenant_id = ? AND fa.is_visible = 1
+        ";
+        $params = [$tenantId];
+
+        // Apply filters
+        if ($sourceType !== null) {
+            $sql .= " AND fa.source_type = ?";
+            $params[] = $sourceType;
+        }
+
+        if ($profileUserId !== null) {
+            $sql .= " AND fa.user_id = ?";
+            $params[] = $profileUserId;
+        }
+
+        if ($groupId !== null) {
+            $sql .= " AND fa.group_id = ?";
+            $params[] = $groupId;
+        }
+
+        // Cursor: new format (activity_id) takes priority
+        if ($cursorActivityId !== null) {
+            $sql .= " AND fa.id < ?";
+            $params[] = $cursorActivityId;
+        } elseif ($legacyCursorData !== null) {
+            // Legacy cursor: convert timestamp+id to activity_id boundary
+            $sql .= " AND (fa.created_at < ? OR (fa.created_at = ? AND fa.id < ?))";
+            $params[] = $legacyCursorData['created_at'];
+            $params[] = $legacyCursorData['created_at'];
+            // Use a high fallback since legacy id may not match activity_id
+            $params[] = PHP_INT_MAX;
+        }
+
+        $sql .= " ORDER BY fa.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Transform rows into the format expected by formatItems()
+        $items = [];
+        foreach ($rows as $row) {
+            $meta = $row['metadata'] ? json_decode($row['metadata'], true) : [];
+
+            $item = [
+                'id' => (int)$row['source_id'],
+                'type' => $row['source_type'],
+                'title' => $row['title'],
+                'content' => $row['content'],
+                'image_url' => $row['image_url'],
+                'user_id' => (int)$row['user_id'],
+                'author_name' => $row['author_name'],
+                'author_avatar' => $row['author_avatar'],
+                'likes_count' => (int)$row['likes_count'],
+                'comments_count' => (int)$row['comments_count'],
+                'created_at' => $row['created_at'],
+                // Event metadata
+                'start_date' => $meta['start_date'] ?? null,
+                'location' => $meta['location'] ?? null,
+                // Review metadata
+                'rating' => isset($meta['rating']) ? (int)$meta['rating'] : null,
+                'receiver' => isset($meta['receiver_id']) ? ['id' => (int)$meta['receiver_id'], 'name' => ''] : null,
+                // Job metadata
+                'job_type' => $meta['job_type'] ?? null,
+                'commitment' => $meta['commitment'] ?? null,
+                // Challenge metadata
+                'submission_deadline' => $meta['submission_deadline'] ?? null,
+                'ideas_count' => isset($meta['ideas_count']) ? (int)$meta['ideas_count'] : null,
+                // Volunteer metadata
+                'credits_offered' => isset($meta['credits_offered']) ? (int)$meta['credits_offered'] : null,
+                'organization' => $meta['organization'] ?? null,
+            ];
+
+            $items[] = $item;
+        }
+
+        // Enrich with like status and poll data via existing batch methods
+        $formatted = self::formatItems($items, $userId);
+
+        // Attach activity_id for cursor generation (stripped before output)
+        foreach ($formatted as $i => &$fItem) {
+            $fItem['_activity_id'] = (int)$rows[$i]['activity_id'];
+        }
+        unset($fItem);
+
+        // For reviews, enrich receiver names
+        self::enrichReviewReceivers($formatted);
+
+        return $formatted;
+    }
+
+    /**
+     * Batch-load receiver names for review-type items.
+     * The feed_activity metadata only stores receiver_id, not the name.
+     */
+    private static function enrichReviewReceivers(array &$items): void
+    {
+        $receiverIds = [];
+        foreach ($items as $item) {
+            if ($item['type'] === 'review' && isset($item['receiver']['id']) && $item['receiver']['id'] > 0) {
+                $receiverIds[] = $item['receiver']['id'];
+            }
+        }
+
+        if (empty($receiverIds)) {
+            return;
+        }
+
+        $db = Database::getConnection();
+        $placeholders = implode(',', array_fill(0, count($receiverIds), '?'));
+        $stmt = $db->prepare(
+            "SELECT id, COALESCE(name, CONCAT(first_name, ' ', last_name)) as name FROM users WHERE id IN ($placeholders)"
+        );
+        $stmt->execute($receiverIds);
+        $nameMap = [];
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $nameMap[(int)$row['id']] = $row['name'];
+        }
+
+        foreach ($items as &$item) {
+            if ($item['type'] === 'review' && isset($item['receiver']['id'])) {
+                $item['receiver']['name'] = $nameMap[$item['receiver']['id']] ?? 'Unknown';
+            }
+        }
+        unset($item);
     }
 
     /**
@@ -174,6 +377,9 @@ class FeedService
         $items = array_merge($items, self::loadUserPolls($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
         $items = array_merge($items, self::loadUserGoals($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
         $items = array_merge($items, self::loadUserReviews($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadUserJobs($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadUserChallenges($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadUserVolunteerOpportunities($profileUserId, $userId, $tenantId, (int)ceil($perTypeLimit / 3), $cursorData));
 
         // Sort by created_at descending, then id descending
         usort($items, function ($a, $b) {
@@ -439,6 +645,12 @@ class FeedService
                 return self::loadPolls($userId, $tenantId, $limit, $cursorData);
             case 'goals':
                 return self::loadGoals($userId, $tenantId, $limit, $cursorData);
+            case 'jobs':
+                return self::loadJobs($userId, $tenantId, $limit, $cursorData);
+            case 'challenges':
+                return self::loadChallenges($userId, $tenantId, $limit, $cursorData);
+            case 'volunteering':
+                return self::loadVolunteerOpportunities($userId, $tenantId, $limit, $cursorData);
             default:
                 return [];
         }
@@ -460,6 +672,9 @@ class FeedService
         $items = array_merge($items, self::loadPolls($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
         $items = array_merge($items, self::loadGoals($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
         $items = array_merge($items, self::loadReviews($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadJobs($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadChallenges($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
+        $items = array_merge($items, self::loadVolunteerOpportunities($userId, $tenantId, ceil($perTypeLimit / 3), $cursorData));
 
         // Sort by created_at descending
         usort($items, function ($a, $b) {
@@ -713,6 +928,282 @@ class FeedService
     }
 
     /**
+     * Load job vacancies
+     */
+    private static function loadJobs(?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        // Guard: table may not exist yet
+        try {
+            $db->query("SELECT 1 FROM job_vacancies LIMIT 1");
+        } catch (\Exception $e) {
+            return [];
+        }
+
+        $sql = "
+            SELECT j.id, j.title, j.description as content, j.created_at, j.user_id,
+                   'job' as type,
+                   j.location, j.type as job_type, j.commitment,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'job' AND target_id = j.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'job' AND target_id = j.id) as comments_count
+            FROM job_vacancies j
+            JOIN users u ON j.user_id = u.id
+            WHERE j.tenant_id = ? AND j.status = 'open'
+        ";
+        $params = [$tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'job') {
+            $sql .= " AND (j.created_at < ? OR (j.created_at = ? AND j.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY j.created_at DESC, j.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load ideation challenges
+     */
+    private static function loadChallenges(?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        // Guard: table may not exist yet
+        try {
+            $db->query("SELECT 1 FROM ideation_challenges LIMIT 1");
+        } catch (\Exception $e) {
+            return [];
+        }
+
+        $sql = "
+            SELECT ic.id, ic.title, ic.description as content, ic.cover_image as image_url,
+                   ic.created_at, ic.user_id,
+                   'challenge' as type,
+                   ic.submission_deadline, ic.ideas_count,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'challenge' AND target_id = ic.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'challenge' AND target_id = ic.id) as comments_count
+            FROM ideation_challenges ic
+            JOIN users u ON ic.user_id = u.id
+            WHERE ic.tenant_id = ? AND ic.status = 'open'
+        ";
+        $params = [$tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'challenge') {
+            $sql .= " AND (ic.created_at < ? OR (ic.created_at = ? AND ic.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY ic.created_at DESC, ic.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load volunteer opportunities
+     */
+    private static function loadVolunteerOpportunities(?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        // Guard: table may not exist yet
+        try {
+            $db->query("SELECT 1 FROM vol_opportunities LIMIT 1");
+        } catch (\Exception $e) {
+            return [];
+        }
+
+        $sql = "
+            SELECT vo.id, vo.title, vo.description as content, vo.created_at,
+                   COALESCE(vo.created_by, org.user_id) as user_id,
+                   'volunteer' as type,
+                   vo.location, vo.credits_offered,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   org.name as organization_name,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'volunteer' AND target_id = vo.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'volunteer' AND target_id = vo.id) as comments_count
+            FROM vol_opportunities vo
+            LEFT JOIN vol_organizations org ON vo.organization_id = org.id
+            JOIN users u ON COALESCE(vo.created_by, org.user_id) = u.id
+            WHERE vo.tenant_id = ? AND vo.status = 'open' AND vo.is_active = 1
+        ";
+        $params = [$tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'volunteer') {
+            $sql .= " AND (vo.created_at < ? OR (vo.created_at = ? AND vo.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY vo.created_at DESC, vo.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Add organization name to each item
+        foreach ($items as &$item) {
+            $item['organization'] = $item['organization_name'] ?? null;
+        }
+
+        return self::formatItems($items, $userId);
+    }
+
+    /**
+     * Load jobs for a specific user's profile feed
+     */
+    private static function loadUserJobs(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        try {
+            $db->query("SELECT 1 FROM job_vacancies LIMIT 1");
+        } catch (\Exception $e) {
+            return [];
+        }
+
+        $sql = "
+            SELECT j.id, j.title, j.description as content, j.created_at, j.user_id,
+                   'job' as type,
+                   j.location, j.type as job_type, j.commitment,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'job' AND target_id = j.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'job' AND target_id = j.id) as comments_count
+            FROM job_vacancies j
+            JOIN users u ON j.user_id = u.id
+            WHERE j.user_id = ? AND j.tenant_id = ? AND j.status = 'open'
+        ";
+        $params = [$profileUserId, $tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'job') {
+            $sql .= " AND (j.created_at < ? OR (j.created_at = ? AND j.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY j.created_at DESC, j.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load challenges for a specific user's profile feed
+     */
+    private static function loadUserChallenges(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        try {
+            $db->query("SELECT 1 FROM ideation_challenges LIMIT 1");
+        } catch (\Exception $e) {
+            return [];
+        }
+
+        $sql = "
+            SELECT ic.id, ic.title, ic.description as content, ic.cover_image as image_url,
+                   ic.created_at, ic.user_id,
+                   'challenge' as type,
+                   ic.submission_deadline, ic.ideas_count,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'challenge' AND target_id = ic.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'challenge' AND target_id = ic.id) as comments_count
+            FROM ideation_challenges ic
+            JOIN users u ON ic.user_id = u.id
+            WHERE ic.user_id = ? AND ic.tenant_id = ? AND ic.status = 'open'
+        ";
+        $params = [$profileUserId, $tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'challenge') {
+            $sql .= " AND (ic.created_at < ? OR (ic.created_at = ? AND ic.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY ic.created_at DESC, ic.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        return self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+    }
+
+    /**
+     * Load volunteer opportunities for a specific user's profile feed
+     */
+    private static function loadUserVolunteerOpportunities(int $profileUserId, ?int $userId, int $tenantId, int $limit, ?array $cursorData): array
+    {
+        $db = Database::getConnection();
+
+        try {
+            $db->query("SELECT 1 FROM vol_opportunities LIMIT 1");
+        } catch (\Exception $e) {
+            return [];
+        }
+
+        $sql = "
+            SELECT vo.id, vo.title, vo.description as content, vo.created_at,
+                   COALESCE(vo.created_by, org.user_id) as user_id,
+                   'volunteer' as type,
+                   vo.location, vo.credits_offered,
+                   COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                   u.avatar_url as author_avatar,
+                   org.name as organization_name,
+                   (SELECT COUNT(*) FROM likes WHERE target_type = 'volunteer' AND target_id = vo.id) as likes_count,
+                   (SELECT COUNT(*) FROM comments WHERE target_type = 'volunteer' AND target_id = vo.id) as comments_count
+            FROM vol_opportunities vo
+            LEFT JOIN vol_organizations org ON vo.organization_id = org.id
+            JOIN users u ON COALESCE(vo.created_by, org.user_id) = u.id
+            WHERE COALESCE(vo.created_by, org.user_id) = ? AND vo.tenant_id = ? AND vo.status = 'open' AND vo.is_active = 1
+        ";
+        $params = [$profileUserId, $tenantId];
+
+        if ($cursorData && $cursorData['type'] === 'volunteer') {
+            $sql .= " AND (vo.created_at < ? OR (vo.created_at = ? AND vo.id < ?))";
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['created_at'];
+            $params[] = $cursorData['id'];
+        }
+
+        $sql .= " ORDER BY vo.created_at DESC, vo.id DESC LIMIT {$limit}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        foreach ($items as &$item) {
+            $item['organization'] = $item['organization_name'] ?? null;
+        }
+
+        return self::formatItems($items, $userId);
+    }
+
+    /**
      * Format feed items with like status (batch-loaded to avoid N+1 queries)
      * Also includes poll_data for poll-type items to avoid frontend N+1 requests.
      */
@@ -760,6 +1251,15 @@ class FeedService
                 // Include extra fields for reviews
                 'rating' => isset($item['rating']) ? (int)$item['rating'] : null,
                 'receiver' => $item['receiver'] ?? null,
+                // Include extra fields for jobs
+                'job_type' => $item['job_type'] ?? null,
+                'commitment' => $item['commitment'] ?? null,
+                // Include extra fields for challenges
+                'submission_deadline' => $item['submission_deadline'] ?? null,
+                'ideas_count' => isset($item['ideas_count']) ? (int)$item['ideas_count'] : null,
+                // Include extra fields for volunteer opportunities
+                'credits_offered' => isset($item['credits_offered']) ? (int)$item['credits_offered'] : null,
+                'organization' => $item['organization'] ?? null,
             ];
 
             // Include poll_data for poll-type items (avoids frontend N+1 requests)
@@ -997,6 +1497,18 @@ class FeedService
             }
 
             $postId = (int)$db->lastInsertId();
+
+            // Record in feed_activity table
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'post', $postId, [
+                    'content' => $content,
+                    'image_url' => $imageUrl,
+                    'group_id' => $groupId ?: null,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log("FeedService::createPost feed_activity record failed: " . $faEx->getMessage());
+            }
 
             // Process hashtags in the content (F4)
             try {
