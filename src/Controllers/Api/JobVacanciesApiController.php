@@ -8,6 +8,7 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Services\JobVacancyService;
 use Nexus\Core\ApiErrorCodes;
+use Nexus\Core\TenantContext;
 
 /**
  * JobVacanciesApiController - RESTful API v2 for job vacancies
@@ -32,6 +33,13 @@ class JobVacanciesApiController extends BaseApiController
     /** Mark as v2 API for correct headers */
     protected bool $isV2Api = true;
 
+    private function checkFeature(): void
+    {
+        if (!TenantContext::hasFeature('job_vacancies')) {
+            $this->respondWithError('FEATURE_DISABLED', 'Job Vacancies module is not enabled for this community', null, 403);
+        }
+    }
+
     /**
      * GET /api/v2/jobs
      *
@@ -49,6 +57,7 @@ class JobVacanciesApiController extends BaseApiController
      */
     public function index(): void
     {
+        $this->checkFeature();
         $this->rateLimit('jobs_list', 60, 60);
 
         // Optional auth — if logged in, enrich with has_applied
@@ -106,6 +115,7 @@ class JobVacanciesApiController extends BaseApiController
      */
     public function store(): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('jobs_create', 5, 60);
@@ -131,6 +141,7 @@ class JobVacanciesApiController extends BaseApiController
      */
     public function show(int $id): void
     {
+        $this->checkFeature();
         $this->rateLimit('jobs_show', 60, 60);
 
         $userId = $this->getOptionalUserId();
@@ -159,6 +170,7 @@ class JobVacanciesApiController extends BaseApiController
      */
     public function update(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('jobs_update', 10, 60);
@@ -197,6 +209,7 @@ class JobVacanciesApiController extends BaseApiController
      */
     public function destroy(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('jobs_delete', 5, 60);
@@ -231,6 +244,7 @@ class JobVacanciesApiController extends BaseApiController
      */
     public function apply(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('jobs_apply', 5, 60);
@@ -270,6 +284,7 @@ class JobVacanciesApiController extends BaseApiController
      */
     public function applications(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->rateLimit('jobs_applications', 30, 60);
 
@@ -303,6 +318,7 @@ class JobVacanciesApiController extends BaseApiController
      */
     public function updateApplication(int $id): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('jobs_app_update', 10, 60);
@@ -349,6 +365,7 @@ class JobVacanciesApiController extends BaseApiController
      */
     public function myApplications(): void
     {
+        $this->checkFeature();
         $userId = $this->getUserId();
         $this->rateLimit('jobs_my_apps', 30, 60);
 
