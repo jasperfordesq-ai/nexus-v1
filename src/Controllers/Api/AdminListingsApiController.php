@@ -121,6 +121,7 @@ class AdminListingsApiController extends BaseApiController
         )->fetch()['cnt'];
 
         // Paginated results — join tenants table for cross-tenant name display
+        // nosemgrep: tainted-sql-string — $sortColumn from allowlist map, $order validated against ['ASC','DESC'], $where from parameterized conditions
         $items = Database::query(
             "SELECT l.id, l.title, l.description, l.type, l.status, l.created_at, l.updated_at,
                     l.user_id, l.category_id, l.price, l.tenant_id,

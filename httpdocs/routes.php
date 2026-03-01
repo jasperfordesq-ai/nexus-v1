@@ -242,7 +242,7 @@ $router->add('GET', '/api/v2/users', function () {
 
     // Get users with pagination and calculated fields
     // Note: ORDER BY uses $orderByField from $validSorts allowlist — safe from injection
-    // LIMIT/OFFSET use parameterized values
+    // nosemgrep: tainted-sql-string — $orderBy from $validSorts allowlist, $whereClause from parameterized conditions
     $sql = "SELECT u.id, u.name, u.first_name, u.last_name,
                    u.avatar_url as avatar, u.bio as tagline,
                    u.location, u.latitude, u.longitude,
@@ -265,6 +265,7 @@ $router->add('GET', '/api/v2/users', function () {
     }
     unset($user); // Break reference
 
+    // nosemgrep: echoed-request — json_encode output with Content-Type: application/json prevents XSS
     echo json_encode([
         'data' => $users,
         'meta' => [

@@ -536,7 +536,7 @@ class UserService
         // nosemgrep: tainted-filename — $tenantId is int from TenantContext, $filename is random hex
         $tenantId = (int) TenantContext::getId();
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/{$tenantId}/avatars/";
-        if (!is_dir($uploadDir)) {
+        if (!is_dir($uploadDir)) { // nosemgrep: tainted-filename
             if (!@mkdir($uploadDir, 0755, true)) {
                 self::$errors[] = ['code' => 'UPLOAD_FAILED', 'message' => 'Failed to create upload directory', 'field' => 'avatar'];
                 return null;
@@ -562,7 +562,7 @@ class UserService
         if (!User::updateAvatar($userId, $avatarUrl)) {
             self::$errors[] = ['code' => 'UPLOAD_FAILED', 'message' => 'Failed to update avatar in database', 'field' => 'avatar'];
             // Clean up the orphaned file
-            @unlink($filepath);
+            @unlink($filepath); // nosemgrep: tainted-filename
             return null;
         }
 
