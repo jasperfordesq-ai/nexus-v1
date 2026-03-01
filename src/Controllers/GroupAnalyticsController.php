@@ -340,7 +340,7 @@ class GroupAnalyticsController
     {
         try {
             return Database::query(
-                "SELECT u.id, u.first_name, u.last_name, u.profile_image_url,
+                "SELECT u.id, u.first_name, u.last_name, u.avatar_url,
                         CONCAT(u.first_name, ' ', u.last_name) as name,
                         (
                             SELECT COUNT(*) FROM feed_posts
@@ -373,7 +373,7 @@ class GroupAnalyticsController
         } catch (\Exception $e) {
             // Simplified fallback if tables don't exist
             return Database::query(
-                "SELECT u.id, u.first_name, u.last_name, u.profile_image_url,
+                "SELECT u.id, u.first_name, u.last_name, u.avatar_url,
                         CONCAT(u.first_name, ' ', u.last_name) as name,
                         gm.created_at as joined_at
                  FROM users u
@@ -433,7 +433,7 @@ class GroupAnalyticsController
         try {
             return Database::query(
                 "SELECT fp.id, fp.content, fp.created_at,
-                        u.first_name, u.last_name, u.profile_image_url,
+                        u.first_name, u.last_name, u.avatar_url,
                         CONCAT(u.first_name, ' ', u.last_name) as author_name,
                         (
                             SELECT COUNT(*) FROM comments
@@ -464,7 +464,7 @@ class GroupAnalyticsController
         try {
             return Database::query(
                 "SELECT gd.id, gd.title, gd.created_at,
-                        u.first_name, u.last_name, u.profile_image_url,
+                        u.first_name, u.last_name, u.avatar_url,
                         CONCAT(u.first_name, ' ', u.last_name) as author_name,
                         (
                             SELECT COUNT(*) FROM group_discussion_messages

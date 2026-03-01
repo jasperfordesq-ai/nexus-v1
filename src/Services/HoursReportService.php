@@ -127,7 +127,7 @@ class HoursReportService
         };
 
         $stmt = Database::query(
-            "SELECT u.id, u.first_name, u.last_name, u.profile_image_url,
+            "SELECT u.id, u.first_name, u.last_name, u.avatar_url,
                     COALESCE(
                         (SELECT SUM(amount) FROM transactions WHERE sender_id = u.id AND tenant_id = ? AND status = 'completed' AND created_at >= ? AND created_at <= ?),
                         0
@@ -156,7 +156,7 @@ class HoursReportService
             $members[] = [
                 'id' => (int) $row['id'],
                 'name' => trim($row['first_name'] . ' ' . $row['last_name']),
-                'profile_image_url' => $row['profile_image_url'],
+                'profile_image_url' => $row['avatar_url'],
                 'hours_given' => $given,
                 'hours_received' => $received,
                 'total_hours' => round($given + $received, 1),
