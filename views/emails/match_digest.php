@@ -30,16 +30,17 @@ $borderColor = '#c4b5fd';
 
 $tenantName = $tenantName ?? 'Community';
 $userName = $userName ?? 'there';
-$appUrl = rtrim(Env::get('APP_URL') ?? '', '/');
-$basePath = TenantContext::getBasePath();
+$appUrl = TenantContext::getFrontendUrl();
+$basePath = TenantContext::getSlugPrefix();
 $year = date('Y');
 
 $matchesUrl = $appUrl . $basePath . '/matches';
 $settingsUrl = $appUrl . $basePath . '/settings?tab=notifications';
 
-$period = $period ?? 'daily';
+$period = $period ?? 'fortnightly';
 $periodTitle = ucfirst($period);
-$periodLabel = $period === 'daily' ? 'day' : 'week';
+$periodLabels = ['daily' => 'day', 'weekly' => 'week', 'fortnightly' => 'fortnight'];
+$periodLabel = $periodLabels[$period] ?? $period;
 $totalCount = count($matches);
 $hotCount = $stats['hotCount'] ?? count(array_filter($matches, fn($m) => ($m['match_score'] ?? 0) >= 85));
 $mutualCount = $stats['mutualCount'] ?? count(array_filter($matches, fn($m) => ($m['match_type'] ?? '') === 'mutual'));
@@ -298,7 +299,7 @@ $remainingCount = max(0, $totalCount - 5);
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 13px; color: <?= $textMuted ?>; line-height: 1.6;">
-                                            You're receiving this <?= $periodLabel ?>ly digest because you have matches enabled.
+                                            You're receiving this <?= $periodTitle ?> digest because you have matches enabled.
                                         </p>
                                     </td>
                                 </tr>

@@ -2980,7 +2980,7 @@ CREATE TABLE `match_preferences` (
   `tenant_id` int(11) NOT NULL,
   `max_distance_km` int(11) DEFAULT 25 COMMENT 'Maximum distance for matches in km',
   `min_match_score` int(11) DEFAULT 50 COMMENT 'Minimum score (0-100) to show as match',
-  `notification_frequency` enum('instant','daily','weekly','off') DEFAULT 'daily',
+  `notification_frequency` enum('daily','weekly','fortnightly','never') DEFAULT 'fortnightly',
   `notify_hot_matches` tinyint(1) DEFAULT 1 COMMENT 'Instant notify for hot matches (>80%)',
   `notify_mutual_matches` tinyint(1) DEFAULT 1 COMMENT 'Instant notify for mutual matches',
   `categories` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Array of category IDs to match, null = all' CHECK (json_valid(`categories`)),

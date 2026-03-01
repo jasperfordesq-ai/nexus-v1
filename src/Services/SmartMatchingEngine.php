@@ -781,7 +781,7 @@ class SmartMatchingEngine
         return [
             'max_distance_km' => $config['max_distance_km'],
             'min_match_score' => $config['min_match_score'],
-            'notification_frequency' => 'daily',
+            'notification_frequency' => 'fortnightly',
             'categories' => null,
         ];
     }
