@@ -250,8 +250,15 @@ class ListingsApiController extends BaseApiController
      *
      * Response: 200 OK with listing data, or 404 if not found
      */
-    public function show(int $id): void
+    public function show(int|string $id): void
     {
+        // Guard against non-numeric IDs (e.g. "featured" leaking through route ordering)
+        if (!is_numeric($id)) {
+            $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return;
+        }
+        $id = (int) $id;
+
         $userId  = $this->getOptionalUserId();
         $listing = ListingService::getById($id, false, $userId);
 
