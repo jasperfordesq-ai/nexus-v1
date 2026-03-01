@@ -202,7 +202,13 @@ export function UserList() {
     }
 
     if (res?.success) {
-      toast.success(`User ${type}d successfully`);
+      const data = res.data as Record<string, unknown> | undefined;
+      if ((type === 'approve' || type === 'reactivate') && data?.email_sent === false) {
+        const action = type === 'approve' ? 'approved' : 'reactivated';
+        toast.success(`User ${action}, but the notification email could not be sent. Please check your email configuration.`);
+      } else {
+        toast.success(`User ${type}d successfully`);
+      }
       loadUsers();
     } else {
       toast.error(res?.error || `Failed to ${type} user`);

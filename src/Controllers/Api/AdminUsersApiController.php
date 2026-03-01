@@ -10,8 +10,10 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Models\User;
+use Nexus\Models\Notification;
 use Nexus\Models\ActivityLog;
 use Nexus\Services\AuditLogService;
+use Nexus\Services\TenantSettingsService;
 
 /**
  * AdminUsersApiController - V2 API for React admin user management
@@ -533,6 +535,18 @@ class AdminUsersApiController extends BaseApiController
             AuditLogService::logAdminRoleChanged($adminId, $id, $user['role'] ?? 'member', $input['role']);
         }
 
+        // If user was just approved via status change (was unapproved, now active), trigger full welcome flow
+        $wasUnapproved = empty($user['is_approved']);
+        $nowApproved = isset($input['status']) && $input['status'] === 'active';
+        if ($wasUnapproved && $nowApproved) {
+            // Re-fetch to pick up any email/name changes applied in this same request
+            $freshUser = User::findById($id, !$isSuperAdmin) ?? $user;
+            $creditsAwarded = $this->grantWelcomeCredits($freshUser, $adminId);
+            $this->sendApprovalWelcomeEmail($freshUser, $creditsAwarded);
+            $this->sendApprovalInAppNotification($freshUser, $creditsAwarded);
+            ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$freshUser['email']}) via status update");
+        }
+
         // Return updated user
         $this->show($id);
     }
@@ -602,52 +616,301 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        User::updateAdminFields($id, $user['role'] ?? 'member', 1);
+        // Idempotency: prevent double-approval (and double welcome credits)
+        if (!empty($user['is_approved'])) {
+            $this->respondWithData(['approved' => true, 'id' => $id, 'already_approved' => true]);
+            return;
+        }
+
+        User::updateAdminFields($id, $user['role'] ?? 'member', 1, null, (int) $user['tenant_id']);
 
         ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$user['tenant_id']})" : ''));
         AuditLogService::logUserApproved($adminId, $id, $user['email']);
 
-        // Send approval notification email to the user
-        $this->sendApprovalNotificationEmail($user);
+        // Grant welcome credits + send combined welcome email + in-app notification
+        $creditsAwarded = $this->grantWelcomeCredits($user, $adminId);
+        $emailSent = $this->sendApprovalWelcomeEmail($user, $creditsAwarded);
+        $this->sendApprovalInAppNotification($user, $creditsAwarded);
 
-        $this->respondWithData(['approved' => true, 'id' => $id]);
+        $this->respondWithData([
+            'approved' => true,
+            'id' => $id,
+            'email_sent' => $emailSent,
+            'welcome_credits' => $creditsAwarded,
+        ]);
     }
 
     /**
-     * Send approval notification email to the approved user.
+     * Resolve the tenant name and slug for a user's tenant.
+     * Uses the user's tenant_id to look up the correct values, which is critical
+     * when a super admin approves a user from a different tenant.
+     *
+     * @param array $user User record from the database
+     * @return array{tenant_id: int, name: string, slug_prefix: string}
+     */
+    private function resolveUserTenant(array $user): array
+    {
+        if (empty($user['tenant_id'])) {
+            throw new \RuntimeException("User #{$user['id']} has no tenant_id — cannot resolve tenant for notifications");
+        }
+        $userTenantId = (int) $user['tenant_id'];
+        $tenantName = 'Project NEXUS';
+        $slugPrefix = '';
+
+        $tenant = Database::query("SELECT name, slug FROM tenants WHERE id = ?", [$userTenantId])->fetch();
+        if ($tenant) {
+            $tenantName = $tenant['name'];
+            $slug = $tenant['slug'] ?? '';
+            $slugPrefix = $slug ? '/' . $slug : '';
+        }
+
+        return ['tenant_id' => $userTenantId, 'name' => $tenantName, 'slug_prefix' => $slugPrefix];
+    }
+
+    /**
+     * Grant welcome time credits to a newly approved user.
+     *
+     * Amount is configurable per tenant via the 'welcome_credits' setting
+     * (defaults to 5). Set to 0 to disable welcome credits for a tenant.
+     *
+     * Creates a transaction record for audit trail and updates the user's balance.
+     * All queries are scoped by the USER's tenant_id (not the admin's).
+     *
+     * @param array $user User record from the database
+     * @param int $adminId ID of the approving admin
+     * @return int The number of credits awarded (0 if disabled or on error)
+     */
+    private function grantWelcomeCredits(array $user, int $adminId): int
+    {
+        try {
+            if (empty($user['tenant_id'])) {
+                throw new \RuntimeException("User #{$user['id']} has no tenant_id — cannot grant credits");
+            }
+            $userTenantId = (int) $user['tenant_id'];
+            $userId = (int) $user['id'];
+
+            // Read the welcome credits amount for the user's tenant (default: 5)
+            $creditAmount = (int) TenantSettingsService::get($userTenantId, 'welcome_credits', 5);
+            if ($creditAmount <= 0) {
+                return 0;
+            }
+
+            $pdo = Database::getConnection();
+            $pdo->beginTransaction();
+
+            try {
+                // Lock the user row to prevent concurrent double-credit (TOCTOU race).
+                // The idempotency guard in approve() checks is_approved BEFORE we get here,
+                // but two concurrent requests could both pass that check. This lock serializes them.
+                Database::query(
+                    "SELECT id FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                    [$userId, $userTenantId]
+                );
+
+                // Check if a welcome bonus was already granted (true idempotency key)
+                $existing = Database::query(
+                    "SELECT id FROM transactions WHERE tenant_id = ? AND receiver_id = ? AND description LIKE '[Welcome Bonus]%' LIMIT 1",
+                    [$userTenantId, $userId]
+                )->fetch();
+
+                if ($existing) {
+                    $pdo->rollBack();
+                    error_log("[AdminUsers] Welcome credits already exist for user #{$userId} (tenant {$userTenantId}) — skipping");
+                    return 0;
+                }
+
+                // Update user balance (scoped by user's tenant)
+                Database::query(
+                    "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                    [$creditAmount, $userId, $userTenantId]
+                );
+
+                // Create transaction record for audit trail.
+                // Use userId as both sender and receiver (self-credit) so the record
+                // stays within the user's tenant. Cross-tenant admin IDs would produce
+                // orphaned sender references in wallet queries that join by tenant.
+                Database::query(
+                    "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at)
+                     VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
+                    [$userTenantId, $userId, $userId, $creditAmount, "[Welcome Bonus] New member welcome credits (approved by admin #{$adminId})"]
+                );
+
+                $pdo->commit();
+
+                ActivityLog::log($adminId, 'welcome_credits_issued', "Awarded {$creditAmount} welcome credits to user #{$userId} ({$user['email']}) on approval");
+                error_log("[AdminUsers] Granted {$creditAmount} welcome credits to user #{$userId} (tenant {$userTenantId})");
+
+                return $creditAmount;
+            } catch (\Throwable $e) {
+                $pdo->rollBack();
+                throw $e;
+            }
+        } catch (\Throwable $e) {
+            error_log("[AdminUsers] Failed to grant welcome credits to user #{$user['id']}: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Send the combined welcome email when a user is approved.
+     * Includes the approval confirmation and welcome credits (if any were awarded).
+     *
+     * @param array $user User record from the database
+     * @param int $creditsAwarded Number of welcome credits awarded (0 = none)
+     * @return bool Whether the email was sent successfully
+     */
+    private function sendApprovalWelcomeEmail(array $user, int $creditsAwarded): bool
+    {
+        try {
+            $tenant = $this->resolveUserTenant($user);
+            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+
+            // Build the email body — include credit info if credits were awarded
+            $body = "<p>Great news, {$firstName}! Your account has been approved and you're now a full member of the <strong>{$tenantNameSafe}</strong> community.</p>";
+
+            if ($creditsAwarded > 0) {
+                $body .= "<p>To help you get started, we've added <strong>{$creditsAwarded} time credit" . ($creditsAwarded !== 1 ? 's' : '') . "</strong> to your wallet. "
+                       . "Use them to request services from other members, or earn more by offering your own skills and time.</p>";
+            }
+
+            $body .= '<p>Here are a few things you can do right away:</p>'
+                    . '<ul style="padding-left: 20px; margin: 10px 0;">'
+                    . '<li style="margin-bottom: 8px;">Browse <strong>listings</strong> to see what services are available</li>'
+                    . '<li style="margin-bottom: 8px;">Create your own <strong>listing</strong> to offer your skills</li>'
+                    . '<li style="margin-bottom: 8px;">Connect with other <strong>members</strong> in your community</li>'
+                    . '<li style="margin-bottom: 8px;">Check out upcoming <strong>events</strong> and get involved</li>'
+                    . '</ul>'
+                    . "<p>We're glad to have you on board. Welcome to the community!</p>";
+
+            $html = \Nexus\Core\EmailTemplate::render(
+                'Welcome to the Community!',
+                "You're all set, {$firstName}!",
+                $body,
+                'Get Started',
+                $loginUrl,
+                $tenant['name']
+            );
+
+            $subject = $creditsAwarded > 0
+                ? "Welcome to {$tenantNameSafe} — {$creditsAwarded} time credits are waiting for you!"
+                : "Welcome to {$tenantNameSafe} — your account is approved!";
+
+            $result = (new \Nexus\Core\Mailer())->send($user['email'], $subject, $html);
+
+            if ($result) {
+                error_log("[AdminUsers] Welcome email sent to {$user['email']} (user #{$user['id']}, credits: {$creditsAwarded})");
+            } else {
+                error_log("[AdminUsers] Mailer returned false for welcome email to {$user['email']} (user #{$user['id']}) — check SMTP/Gmail config");
+            }
+
+            return (bool) $result;
+        } catch (\Throwable $e) {
+            error_log("[AdminUsers] Failed to send welcome email to user #{$user['id']} ({$user['email']}): " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Create an in-app notification for the approved user.
+     * Includes mention of welcome credits if any were awarded.
+     *
+     * @param array $user User record from the database
+     * @param int $creditsAwarded Number of welcome credits awarded (0 = none)
+     */
+    private function sendApprovalInAppNotification(array $user, int $creditsAwarded = 0): void
+    {
+        try {
+            $tenant = $this->resolveUserTenant($user);
+
+            $message = "Your account has been approved! Welcome to {$tenant['name']}.";
+            if ($creditsAwarded > 0) {
+                $message .= " You've received {$creditsAwarded} welcome time credit" . ($creditsAwarded !== 1 ? 's' : '') . " to get started.";
+            }
+
+            // Use absolute URL — push notifications (FCM/Web Push) require a full URL
+            $link = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/dashboard';
+
+            Notification::create(
+                (int) $user['id'],
+                $message,
+                $link,
+                'system',
+                true,
+                $tenant['tenant_id']
+            );
+        } catch (\Throwable $e) {
+            error_log("[AdminUsers] Failed to create approval notification for user #{$user['id']}: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send reactivation notification email to a reactivated user.
+     *
+     * @param array $user User record from the database
+     * @return bool Whether the email was sent successfully
+     */
+    private function sendReactivationNotificationEmail(array $user): bool
+    {
+        try {
+            $tenant = $this->resolveUserTenant($user);
+            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+
+            $html = \Nexus\Core\EmailTemplate::render(
+                'Account Reactivated',
+                "Welcome back, {$firstName}!",
+                '<p>Your account on ' . $tenantNameSafe . ' has been reactivated by an administrator.</p>
+                 <p>You can now log in and access the platform again.</p>',
+                'Log In Now',
+                $loginUrl,
+                $tenant['name']
+            );
+
+            $result = (new \Nexus\Core\Mailer())->send(
+                $user['email'],
+                "Your account has been reactivated - {$tenantNameSafe}",
+                $html
+            );
+
+            if ($result) {
+                error_log("[AdminUsers] Reactivation email sent to {$user['email']} (user #{$user['id']})");
+            } else {
+                error_log("[AdminUsers] Mailer returned false for reactivation email to {$user['email']} (user #{$user['id']}) — check SMTP/Gmail config");
+            }
+
+            return (bool) $result;
+        } catch (\Throwable $e) {
+            error_log("[AdminUsers] Failed to send reactivation email to user #{$user['id']} ({$user['email']}): " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Create an in-app notification for a reactivated user.
      *
      * @param array $user User record from the database
      */
-    private function sendApprovalNotificationEmail(array $user): void
+    private function sendReactivationInAppNotification(array $user): void
     {
         try {
-            $userTenantId = (int) ($user['tenant_id'] ?? TenantContext::getId());
-            $tenantName = 'Project NEXUS';
-            $tenant = Database::query("SELECT name FROM tenants WHERE id = ?", [$userTenantId])->fetch();
-            if ($tenant) {
-                $tenantName = $tenant['name'];
-            }
+            $tenant = $this->resolveUserTenant($user);
 
-            $firstName = $user['first_name'] ?? 'there';
-            $loginUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/login';
+            // Use absolute URL — push notifications (FCM/Web Push) require a full URL
+            $link = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/dashboard';
 
-            $html = \Nexus\Core\EmailTemplate::render(
-                'Account Approved!',
-                "Welcome to {$tenantName}, {$firstName}!",
-                '<p>Great news! Your account has been approved by a community administrator.</p>
-                 <p>You can now log in and start using the platform.</p>',
-                'Log In Now',
-                $loginUrl,
-                $tenantName
-            );
-
-            (new \Nexus\Core\Mailer())->send(
-                $user['email'],
-                "Your account has been approved - {$tenantName}",
-                $html
+            Notification::create(
+                (int) $user['id'],
+                "Your account has been reactivated. Welcome back to {$tenant['name']}!",
+                $link,
+                'system',
+                true,
+                $tenant['tenant_id']
             );
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to send approval email to user #{$user['id']}: " . $e->getMessage());
+            error_log("[AdminUsers] Failed to create reactivation notification for user #{$user['id']}: " . $e->getMessage());
         }
     }
 
@@ -783,7 +1046,11 @@ class AdminUsersApiController extends BaseApiController
         ActivityLog::log($adminId, 'admin_reactivate_user', "Reactivated user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
         AuditLogService::logUserReactivated($adminId, $id, $user['status'] ?? 'unknown');
 
-        $this->respondWithData(['reactivated' => true, 'id' => $id]);
+        // Notify the reactivated user (email + in-app + push)
+        $emailSent = $this->sendReactivationNotificationEmail($user);
+        $this->sendReactivationInAppNotification($user);
+
+        $this->respondWithData(['reactivated' => true, 'id' => $id, 'email_sent' => $emailSent]);
     }
 
     /**
@@ -1418,23 +1685,23 @@ class AdminUsersApiController extends BaseApiController
                 [$token, $expiry, $id, $userTenantId]
             );
 
-            $tenant = TenantContext::get();
-            $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            $resetLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/reset-password?token={$token}&email=" . urlencode($user['email']);
+            $tenant = $this->resolveUserTenant($user);
+            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            $resetLink = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . "/reset-password?token={$token}&email=" . urlencode($user['email']);
 
             $html = \Nexus\Core\EmailTemplate::render(
                 "Password Reset",
-                "Reset your password for {$tenantName}",
-                "<p>Hello <strong>" . htmlspecialchars($user['first_name'] ?? '') . "</strong>,</p>
+                "Reset your password for {$tenantNameSafe}",
+                "<p>Hello <strong>" . htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8') . "</strong>,</p>
                 <p>An administrator has requested a password reset for your account.</p>
                 <p>Click the button below to set a new password. This link expires in 24 hours.</p>",
                 "Reset Password",
                 $resetLink,
-                "Project NEXUS"
+                $tenant['name']
             );
 
             $mailer = new \Nexus\Core\Mailer();
-            $mailer->send($user['email'], "Password Reset - {$tenantName}", $html);
+            $mailer->send($user['email'], "Password Reset - {$tenantNameSafe}", $html);
 
             ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
 
@@ -1468,42 +1735,48 @@ class AdminUsersApiController extends BaseApiController
         }
 
         try {
-            $tenant = TenantContext::get();
-            $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            $config = json_decode($tenant['configuration'] ?? '{}', true);
+            // Resolve tenant from the USER's tenant_id (not admin's context)
+            $resolvedTenant = $this->resolveUserTenant($user);
+            $userTenantId = $resolvedTenant['tenant_id'];
+            $tenantName = $resolvedTenant['name'];
+            $tenantNameSafe = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+
+            // Read tenant configuration for custom welcome email content
+            $tenantRow = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$userTenantId])->fetch();
+            $config = json_decode($tenantRow['configuration'] ?? '{}', true);
             $welcomeConfig = $config['welcome_email'] ?? [];
 
-            $subject = !empty($welcomeConfig['subject']) ? $welcomeConfig['subject'] : "Welcome to {$tenantName}";
+            $subject = !empty($welcomeConfig['subject']) ? $welcomeConfig['subject'] : "Welcome to {$tenantNameSafe}";
 
-            $firstName = htmlspecialchars($user['first_name'] ?? '');
+            $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
 
             if (!empty($welcomeConfig['body'])) {
                 $mainMessage = $welcomeConfig['body'];
             } else {
                 $mainMessage = "<p>Hello <strong>{$firstName}</strong>,</p>
-                <p>Welcome to {$tenantName}! Your account is ready to use.</p>
+                <p>Welcome to {$tenantNameSafe}! Your account is ready to use.</p>
                 <p>Log in to start connecting with your community, browse available services, and offer your own skills.</p>";
             }
 
-            $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
+            $loginLink = TenantContext::getFrontendUrl() . $resolvedTenant['slug_prefix'] . "/login";
 
             if (stripos($mainMessage, '<!DOCTYPE') !== false || stripos($mainMessage, '<html') !== false) {
                 $html = $mainMessage;
             } else {
                 $html = \Nexus\Core\EmailTemplate::render(
                     "Welcome!",
-                    "You are a member of {$tenantName}",
+                    "You are a member of {$tenantNameSafe}",
                     $mainMessage,
                     "Login & Get Started",
                     $loginLink,
-                    "Project NEXUS"
+                    $tenantName
                 );
             }
 
             $mailer = new \Nexus\Core\Mailer();
             $mailer->send($user['email'], $subject, $html);
 
-            ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$user['tenant_id']})" : ''));
+            ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})" . ($isSuperAdmin ? " (tenant {$userTenantId})" : ''));
 
             $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
