@@ -360,6 +360,32 @@ class AdminFederationApiController extends BaseApiController
             } catch (\Exception $e) {}
         }
 
+        if ($this->tableExists('federation_transactions')) {
+            try {
+                $stmt = Database::query(
+                    "SELECT COUNT(*) as total
+                     FROM federation_transactions
+                     WHERE sender_tenant_id = ? OR receiver_tenant_id = ?",
+                    [$tenantId, $tenantId]
+                );
+                $row = $stmt->fetch();
+                $data['cross_community_transactions'] = (int) ($row['total'] ?? 0);
+            } catch (\Exception $e) {}
+        }
+
+        if ($this->tableExists('federation_messages')) {
+            try {
+                $stmt = Database::query(
+                    "SELECT COUNT(*) as total
+                     FROM federation_messages
+                     WHERE sender_tenant_id = ? OR receiver_tenant_id = ?",
+                    [$tenantId, $tenantId]
+                );
+                $row = $stmt->fetch();
+                $data['cross_community_messages'] = (int) ($row['total'] ?? 0);
+            } catch (\Exception $e) {}
+        }
+
         $this->respondWithData($data);
     }
 
