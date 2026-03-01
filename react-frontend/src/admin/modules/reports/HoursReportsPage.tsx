@@ -80,30 +80,30 @@ interface CategoryHours {
 interface MemberHours {
   id: number;
   name: string;
-  avatar_url: string | null;
+  profile_image_url: string | null;
   hours_given: number;
   hours_received: number;
+  total_hours: number;
   balance: number;
-  transaction_count: number;
 }
 
 interface PeriodHours {
-  period: string;
-  hours_given: number;
-  hours_received: number;
+  month: string;
   total_hours: number;
   transaction_count: number;
+  unique_givers: number;
+  unique_receivers: number;
 }
 
 interface HoursSummary {
+  period?: { from: string; to: string };
   total_hours: number;
   total_transactions: number;
-  avg_hours_per_member: number;
   avg_hours_per_transaction: number;
   unique_givers: number;
   unique_receivers: number;
-  busiest_category: string;
-  busiest_month: string;
+  min_hours: number;
+  max_hours: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -224,7 +224,7 @@ export function HoursReportsPage() {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
       <StatCard
         label="Total Hours"
-        value={summary ? summary.total_hours.toFixed(1) : '\u2014'}
+        value={summary ? (summary.total_hours ?? 0).toFixed(1) : '\u2014'}
         icon={Clock}
         color="warning"
         loading={!summary}
@@ -237,15 +237,15 @@ export function HoursReportsPage() {
         loading={!summary}
       />
       <StatCard
-        label="Avg Hours / Member"
-        value={summary ? summary.avg_hours_per_member.toFixed(1) : '\u2014'}
+        label="Unique Givers"
+        value={summary?.unique_givers ?? '\u2014'}
         icon={Users}
         color="success"
         loading={!summary}
       />
       <StatCard
         label="Avg Hours / Transaction"
-        value={summary ? summary.avg_hours_per_transaction.toFixed(1) : '\u2014'}
+        value={summary ? (summary.avg_hours_per_transaction ?? 0).toFixed(1) : '\u2014'}
         icon={Activity}
         color="secondary"
         loading={!summary}
@@ -324,7 +324,7 @@ export function HoursReportsPage() {
                   <Tooltip
                     contentStyle={tooltipStyle}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={((value: number, name: string) => [`${value.toFixed(1)} hours`, name]) as any}
+                    formatter={((value: number, name: string) => [`${(value ?? 0).toFixed(1)} hours`, name]) as any}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -371,8 +371,8 @@ export function HoursReportsPage() {
             <TableColumn>Member</TableColumn>
             <TableColumn>Hours Given</TableColumn>
             <TableColumn>Hours Received</TableColumn>
+            <TableColumn>Total</TableColumn>
             <TableColumn>Balance</TableColumn>
-            <TableColumn>Transactions</TableColumn>
           </TableHeader>
           <TableBody
             emptyContent="No member hours data found"
@@ -383,22 +383,22 @@ export function HoursReportsPage() {
               <TableRow key={m.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Avatar size="sm" src={m.avatar_url ?? undefined} name={m.name} />
+                    <Avatar size="sm" src={m.profile_image_url ?? undefined} name={m.name} />
                     <span className="text-sm font-medium">{m.name}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm text-success font-medium">{m.hours_given.toFixed(1)}</TableCell>
-                <TableCell className="text-sm text-warning font-medium">{m.hours_received.toFixed(1)}</TableCell>
+                <TableCell className="text-sm text-success font-medium">{(m.hours_given ?? 0).toFixed(1)}</TableCell>
+                <TableCell className="text-sm text-warning font-medium">{(m.hours_received ?? 0).toFixed(1)}</TableCell>
+                <TableCell className="text-sm text-default-600 font-medium">{(m.total_hours ?? 0).toFixed(1)}</TableCell>
                 <TableCell>
                   <Chip
                     size="sm"
                     variant="flat"
-                    color={m.balance >= 0 ? 'success' : 'danger'}
+                    color={(m.balance ?? 0) >= 0 ? 'success' : 'danger'}
                   >
-                    {m.balance >= 0 ? '+' : ''}{m.balance.toFixed(1)}
+                    {(m.balance ?? 0) >= 0 ? '+' : ''}{(m.balance ?? 0).toFixed(1)}
                   </Chip>
                 </TableCell>
-                <TableCell className="text-sm text-default-600">{m.transaction_count}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -427,34 +427,34 @@ export function HoursReportsPage() {
             <ResponsiveContainer width="100%" height={350}>
               <AreaChart data={periods} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="hrGivenGrad" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="hrTotalGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="hrTxGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
-                  <linearGradient id="hrReceivedGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                  </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                <XAxis dataKey="period" tick={{ fontSize: 11 }} tickLine={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} />
                 <YAxis tick={{ fontSize: 12 }} tickLine={false} />
                 <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
                 <Legend />
                 <Area
                   type="monotone"
-                  dataKey="hours_given"
-                  name="Hours Given"
-                  stroke="#10b981"
-                  fill="url(#hrGivenGrad)"
+                  dataKey="total_hours"
+                  name="Total Hours"
+                  stroke="#6366f1"
+                  fill="url(#hrTotalGrad)"
                   strokeWidth={2}
                 />
                 <Area
                   type="monotone"
-                  dataKey="hours_received"
-                  name="Hours Received"
-                  stroke="#f59e0b"
-                  fill="url(#hrReceivedGrad)"
+                  dataKey="transaction_count"
+                  name="Transactions"
+                  stroke="#10b981"
+                  fill="url(#hrTxGrad)"
                   strokeWidth={2}
                 />
               </AreaChart>

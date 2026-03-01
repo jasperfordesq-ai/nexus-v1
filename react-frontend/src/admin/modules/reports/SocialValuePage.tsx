@@ -80,7 +80,10 @@ interface SocialValueData {
   hours: {
     total_hours: number;
     total_transactions: number;
-    monthly_breakdown: Array<{
+    unique_givers: number;
+    unique_receivers: number;
+    avg_hours_per_transaction: number;
+    monthly: Array<{
       month: string;
       hours: number;
       transactions: number;
@@ -93,17 +96,22 @@ interface SocialValueData {
     currency: string;
   };
   members: {
-    active_members: number;
-    unique_givers: number;
-    unique_receivers: number;
+    total_registered: number;
+    active_traders: number;
+    participation_rate: number;
+    new_members: number;
+    logged_in: number;
   };
   skills: {
-    total_skills_shared: number;
     unique_categories: number;
-    top_skills: Array<{ name: string; count: number }>;
+    total_listings: number;
+    unique_skills: number;
+    skills_offered: number;
+    skills_requested: number;
   };
   events: {
     total_events: number;
+    unique_organizers: number;
     total_attendees: number;
   };
   summary: string;
@@ -248,7 +256,7 @@ export function SocialValuePage() {
     }
   };
 
-  const chartData = (data?.hours.monthly_breakdown ?? []).map((entry) => ({
+  const chartData = (data?.hours?.monthly ?? []).map((entry) => ({
     ...entry,
     label: formatMonth(entry.month),
   }));
@@ -313,28 +321,28 @@ export function SocialValuePage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
           label="Total Hours Exchanged"
-          value={data ? data.hours.total_hours.toFixed(1) : '\u2014'}
+          value={data ? (data.hours?.total_hours ?? 0).toFixed(1) : '\u2014'}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
           label="Monetary Value"
-          value={data ? formatCurrency(data.valuation.monetary_value, currency) : '\u2014'}
+          value={data ? formatCurrency(data.valuation?.monetary_value ?? 0, currency) : '\u2014'}
           icon={DollarSign}
           color="primary"
           loading={loading}
         />
         <StatCard
           label="Social Value"
-          value={data ? formatCurrency(data.valuation.social_value, currency) : '\u2014'}
+          value={data ? formatCurrency(data.valuation?.social_value ?? 0, currency) : '\u2014'}
           icon={Sparkles}
           color="success"
           loading={loading}
         />
         <StatCard
           label="SROI Ratio"
-          value={data ? `${data.valuation.sroi_ratio}:1` : '\u2014'}
+          value={data ? `${data.valuation?.sroi_ratio ?? 0}:1` : '\u2014'}
           icon={TrendingUp}
           color="secondary"
           loading={loading}
@@ -345,35 +353,35 @@ export function SocialValuePage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
         <StatCard
           label="Active Members"
-          value={data?.members.active_members ?? '\u2014'}
+          value={data?.members?.active_traders ?? '\u2014'}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
           label="Skills Shared"
-          value={data?.skills.total_skills_shared ?? '\u2014'}
+          value={data?.skills?.unique_skills ?? '\u2014'}
           icon={Lightbulb}
           color="secondary"
           loading={loading}
         />
         <StatCard
           label="Events Held"
-          value={data?.events.total_events ?? '\u2014'}
+          value={data?.events?.total_events ?? '\u2014'}
           icon={Calendar}
           color="success"
           loading={loading}
         />
         <StatCard
           label="Transactions"
-          value={data?.hours.total_transactions ?? '\u2014'}
+          value={data?.hours?.total_transactions ?? '\u2014'}
           icon={TrendingUp}
           color="warning"
           loading={loading}
         />
         <StatCard
           label="Unique Categories"
-          value={data?.skills.unique_categories ?? '\u2014'}
+          value={data?.skills?.unique_categories ?? '\u2014'}
           icon={Award}
           color="danger"
           loading={loading}
@@ -435,35 +443,39 @@ export function SocialValuePage() {
 
       {/* Top Skills + Impact Summary */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-6">
-        {/* Top Skills */}
+        {/* Skills Overview */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Lightbulb size={18} className="text-warning" />
-            <h3 className="font-semibold">Top Skills Shared</h3>
+            <h3 className="font-semibold">Skills Overview</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
               <div className="flex h-48 items-center justify-center"><Spinner /></div>
-            ) : data && data.skills.top_skills.length > 0 ? (
-              <div className="space-y-3">
-                {data.skills.top_skills.slice(0, 10).map((skill, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <span className="text-xs text-default-400 w-6 shrink-0">{i + 1}.</span>
-                    <span className="text-sm text-foreground flex-1 truncate">{skill.name}</span>
-                    <span className="text-sm font-semibold text-primary">{skill.count}</span>
-                    <div className="w-20 h-1.5 rounded-full bg-default-100 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-primary"
-                        style={{
-                          width: `${Math.min(
-                            (skill.count / (data.skills.top_skills[0]?.count || 1)) * 100,
-                            100
-                          )}%`,
-                        }}
-                      />
-                    </div>
+            ) : data?.skills ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg bg-default-50">
+                    <p className="text-xs text-default-500 mb-1">Skills Offered</p>
+                    <p className="text-2xl font-bold text-primary">{data.skills.skills_offered ?? 0}</p>
                   </div>
-                ))}
+                  <div className="p-4 rounded-lg bg-default-50">
+                    <p className="text-xs text-default-500 mb-1">Skills Requested</p>
+                    <p className="text-2xl font-bold text-secondary">{data.skills.skills_requested ?? 0}</p>
+                  </div>
+                  <div className="p-4 rounded-lg bg-default-50">
+                    <p className="text-xs text-default-500 mb-1">Unique Skills</p>
+                    <p className="text-2xl font-bold text-success">{data.skills.unique_skills ?? 0}</p>
+                  </div>
+                  <div className="p-4 rounded-lg bg-default-50">
+                    <p className="text-xs text-default-500 mb-1">Active Listings</p>
+                    <p className="text-2xl font-bold text-warning">{data.skills.total_listings ?? 0}</p>
+                  </div>
+                </div>
+                <Divider />
+                <div className="text-xs text-default-400">
+                  <p>Across <strong>{data.skills.unique_categories ?? 0}</strong> service categories</p>
+                </div>
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">No skill data available</p>
