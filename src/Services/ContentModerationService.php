@@ -177,7 +177,7 @@ class ContentModerationService
             "SELECT q.*,
                     CONCAT(author.first_name, ' ', author.last_name) as author_name,
                     author.email as author_email,
-                    author.profile_image_url as author_avatar,
+                    author.avatar_url as author_avatar,
                     CONCAT(reviewer.first_name, ' ', reviewer.last_name) as reviewer_name
              FROM content_moderation_queue q
              LEFT JOIN users author ON q.author_id = author.id

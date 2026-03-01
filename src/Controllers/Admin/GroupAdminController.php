@@ -277,7 +277,7 @@ class GroupAdminController
 
         // Get members with details
         $members = Database::query(
-            "SELECT gm.*, u.first_name, u.last_name, u.email, u.profile_image_url,
+            "SELECT gm.*, u.first_name, u.last_name, u.email, u.avatar_url,
                     CONCAT(u.first_name, ' ', u.last_name) as name
              FROM group_members gm
              JOIN users u ON gm.user_id = u.id
