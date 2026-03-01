@@ -138,7 +138,7 @@ class GroupReportingService
                     u.id,
                     u.first_name,
                     u.last_name,
-                    u.profile_image_url,
+                    u.avatar_url,
                     (
                         SELECT COUNT(*) FROM feed_posts
                         WHERE user_id = u.id AND group_id = ?

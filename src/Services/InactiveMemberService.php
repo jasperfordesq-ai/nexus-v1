@@ -156,7 +156,7 @@ class InactiveMemberService
         // Fetch with user details
         $queryParams = array_merge($params, [$limit, $offset]);
         $stmt = Database::query(
-            "SELECT f.*, u.first_name, u.last_name, u.email, u.profile_image_url, u.created_at as member_since
+            "SELECT f.*, u.first_name, u.last_name, u.email, u.avatar_url, u.created_at as member_since
              FROM member_activity_flags f
              JOIN users u ON f.user_id = u.id
              WHERE {$where}
@@ -171,7 +171,7 @@ class InactiveMemberService
                 'id' => (int) $row['user_id'],
                 'name' => trim($row['first_name'] . ' ' . $row['last_name']),
                 'email' => $row['email'],
-                'profile_image_url' => $row['profile_image_url'],
+                'profile_image_url' => $row['avatar_url'],
                 'flag_type' => $row['flag_type'],
                 'last_activity_at' => $row['last_activity_at'],
                 'last_login_at' => $row['last_login_at'],

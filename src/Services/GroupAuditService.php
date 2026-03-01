@@ -350,7 +350,7 @@ class GroupAuditService
         $sql = "SELECT al.*,
                        u.first_name, u.last_name,
                        CONCAT(u.first_name, ' ', u.last_name) as user_name,
-                       u.profile_image_url,
+                       u.avatar_url,
                        tu.first_name as target_first_name, tu.last_name as target_last_name,
                        CONCAT(tu.first_name, ' ', tu.last_name) as target_user_name
                 FROM group_audit_log al

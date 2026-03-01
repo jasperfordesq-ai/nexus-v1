@@ -43,7 +43,7 @@ class MemberReportService
 
         $stmt = Database::query(
             "SELECT u.id, u.first_name, u.last_name, u.email, u.last_login_at, u.created_at,
-                    u.profile_image_url,
+                    u.avatar_url,
                     (SELECT COUNT(*) FROM transactions t WHERE (t.sender_id = u.id OR t.receiver_id = u.id) AND t.tenant_id = ? AND t.status = 'completed') as transaction_count,
                     (SELECT COALESCE(SUM(t.amount), 0) FROM transactions t WHERE t.sender_id = u.id AND t.tenant_id = ? AND t.status = 'completed') as hours_given,
                     (SELECT COALESCE(SUM(t.amount), 0) FROM transactions t WHERE t.receiver_id = u.id AND t.tenant_id = ? AND t.status = 'completed') as hours_received
@@ -62,7 +62,7 @@ class MemberReportService
                 'email' => $row['email'],
                 'last_login_at' => $row['last_login_at'],
                 'created_at' => $row['created_at'],
-                'profile_image_url' => $row['profile_image_url'],
+                'profile_image_url' => $row['avatar_url'],
                 'transaction_count' => (int) $row['transaction_count'],
                 'hours_given' => round((float) $row['hours_given'], 1),
                 'hours_received' => round((float) $row['hours_received'], 1),
@@ -298,7 +298,7 @@ class MemberReportService
         $cutoff = date('Y-m-d H:i:s', strtotime("-{$days} days"));
 
         $stmt = Database::query(
-            "SELECT u.id, u.first_name, u.last_name, u.profile_image_url,
+            "SELECT u.id, u.first_name, u.last_name, u.avatar_url,
                     COALESCE(
                         (SELECT SUM(t.amount) FROM transactions t WHERE t.sender_id = u.id AND t.tenant_id = ? AND t.status = 'completed' AND t.created_at >= ?),
                         0
@@ -324,7 +324,7 @@ class MemberReportService
             $contributors[] = [
                 'id' => (int) $row['id'],
                 'name' => trim($row['first_name'] . ' ' . $row['last_name']),
-                'profile_image_url' => $row['profile_image_url'],
+                'profile_image_url' => $row['avatar_url'],
                 'hours_given' => round((float) $row['hours_given'], 1),
                 'hours_received' => round((float) $row['hours_received'], 1),
                 'total_hours' => round((float) $row['hours_given'] + (float) $row['hours_received'], 1),

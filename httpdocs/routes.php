@@ -882,6 +882,13 @@ $router->add('DELETE', '/api/v2/admin/reviews/{id}', 'Nexus\Controllers\Api\Admi
 // Admin Content Moderation - Reports
 $router->add('GET', '/api/v2/admin/reports', 'Nexus\Controllers\Api\AdminReportsApiController@index');
 $router->add('GET', '/api/v2/admin/reports/stats', 'Nexus\Controllers\Api\AdminReportsApiController@stats');
+// Admin Analytics & Reports — named paths MUST come before {id} catch-all
+$router->add('GET', '/api/v2/admin/reports/social-value', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@socialValue');
+$router->add('PUT', '/api/v2/admin/reports/social-value/config', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@updateSocialValueConfig');
+$router->add('GET', '/api/v2/admin/reports/members', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@memberReports');
+$router->add('GET', '/api/v2/admin/reports/hours', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@hoursReports');
+$router->add('GET', '/api/v2/admin/reports/export-types', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@exportTypes');
+$router->add('GET', '/api/v2/admin/reports/{type}/export', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@exportReport');
 $router->add('GET', '/api/v2/admin/reports/{id}', 'Nexus\Controllers\Api\AdminReportsApiController@show');
 $router->add('POST', '/api/v2/admin/reports/{id}/resolve', 'Nexus\Controllers\Api\AdminReportsApiController@resolve');
 $router->add('POST', '/api/v2/admin/reports/{id}/dismiss', 'Nexus\Controllers\Api\AdminReportsApiController@dismiss');
@@ -2297,17 +2304,13 @@ $router->add('POST', '/api/v2/groups/{id}/documents', 'Nexus\Controllers\Api\Ide
 $router->add('DELETE', '/api/v2/team-documents/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteDocument');
 
 // ============================================
-// API V2 - ADMIN ANALYTICS & REPORTS (New endpoints)
+// API V2 - ADMIN ANALYTICS & REPORTS (Additional endpoints)
+// Note: /reports/social-value, /members, /hours, /export-types, /{type}/export
+//       moved above /reports/{id} catch-all in the Admin Reports section
 // ============================================
-$router->add('GET', '/api/v2/admin/reports/social-value', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@socialValue');
-$router->add('PUT', '/api/v2/admin/reports/social-value/config', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@updateSocialValueConfig');
-$router->add('GET', '/api/v2/admin/reports/members', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@memberReports');
-$router->add('GET', '/api/v2/admin/reports/hours', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@hoursReports');
 $router->add('GET', '/api/v2/admin/members/inactive', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@inactiveMembers');
 $router->add('POST', '/api/v2/admin/members/inactive/detect', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@detectInactive');
 $router->add('POST', '/api/v2/admin/members/inactive/notify', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@markInactiveNotified');
-$router->add('GET', '/api/v2/admin/reports/{type}/export', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@exportReport');
-$router->add('GET', '/api/v2/admin/reports/export-types', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@exportTypes');
 $router->add('GET', '/api/v2/admin/moderation/queue', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationQueue');
 $router->add('POST', '/api/v2/admin/moderation/{id}/review', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationReview');
 $router->add('GET', '/api/v2/admin/moderation/stats', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationStats');
