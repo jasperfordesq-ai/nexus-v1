@@ -48,6 +48,10 @@ import {
   Sparkles,
   Award,
   Siren,
+  Smile,
+  ShieldCheck,
+  ArrowLeftRight,
+  Users,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -59,6 +63,11 @@ import { logError } from '@/lib/logger';
 import { RecommendedShiftsTab } from './RecommendedShiftsTab';
 import { EmergencyAlertsTab } from './EmergencyAlertsTab';
 import { CertificatesTab } from './CertificatesTab';
+import { WellbeingTab } from './WellbeingTab';
+import { CredentialVerificationTab } from './CredentialVerificationTab';
+import { WaitlistTab } from './WaitlistTab';
+import { ShiftSwapsTab } from './ShiftSwapsTab';
+import { GroupSignUpTab } from './GroupSignUpTab';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -114,7 +123,7 @@ interface HoursSummary {
   by_month: { month: string; total: number }[];
 }
 
-type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts';
+type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups';
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
@@ -226,6 +235,46 @@ export function VolunteeringPage() {
             >
               Alerts
             </Button>
+            <Button
+              variant={tab === 'wellbeing' ? 'solid' : 'flat'}
+              className={tab === 'wellbeing' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('wellbeing')}
+              startContent={<Smile className="w-4 h-4" aria-hidden="true" />}
+            >
+              Wellbeing
+            </Button>
+            <Button
+              variant={tab === 'credentials' ? 'solid' : 'flat'}
+              className={tab === 'credentials' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('credentials')}
+              startContent={<ShieldCheck className="w-4 h-4" aria-hidden="true" />}
+            >
+              Credentials
+            </Button>
+            <Button
+              variant={tab === 'waitlist' ? 'solid' : 'flat'}
+              className={tab === 'waitlist' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('waitlist')}
+              startContent={<Clock className="w-4 h-4" aria-hidden="true" />}
+            >
+              Waitlist
+            </Button>
+            <Button
+              variant={tab === 'swaps' ? 'solid' : 'flat'}
+              className={tab === 'swaps' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('swaps')}
+              startContent={<ArrowLeftRight className="w-4 h-4" aria-hidden="true" />}
+            >
+              Swap Requests
+            </Button>
+            <Button
+              variant={tab === 'group-signups' ? 'solid' : 'flat'}
+              className={tab === 'group-signups' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('group-signups')}
+              startContent={<Users className="w-4 h-4" aria-hidden="true" />}
+            >
+              Group Sign-ups
+            </Button>
           </>
         )}
       </div>
@@ -237,6 +286,11 @@ export function VolunteeringPage() {
       {tab === 'recommended' && <RecommendedShiftsTab />}
       {tab === 'certificates' && <CertificatesTab />}
       {tab === 'alerts' && <EmergencyAlertsTab />}
+      {tab === 'wellbeing' && <WellbeingTab />}
+      {tab === 'credentials' && <CredentialVerificationTab />}
+      {tab === 'waitlist' && <WaitlistTab />}
+      {tab === 'swaps' && <ShiftSwapsTab />}
+      {tab === 'group-signups' && <GroupSignUpTab />}
     </div>
   );
 }

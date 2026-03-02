@@ -38,6 +38,7 @@ const TimebankingDashboard = lazy(() => import('./modules/timebanking/Timebankin
 const FraudAlerts = lazy(() => import('./modules/timebanking/FraudAlerts'));
 const OrgWallets = lazy(() => import('./modules/timebanking/OrgWallets'));
 const UserReport = lazy(() => import('./modules/timebanking/UserReport'));
+const StartingBalances = lazy(() => import('./modules/timebanking/StartingBalances'));
 const BrokerDashboard = lazy(() => import('./modules/broker/BrokerDashboard'));
 const ExchangeManagement = lazy(() => import('./modules/broker/ExchangeManagement'));
 const RiskTags = lazy(() => import('./modules/broker/RiskTags'));
@@ -316,6 +317,7 @@ export function AdminRoutes() {
       <Route path="timebanking/user-report/:id" element={<Lazy><UserReport /></Lazy>} />
       <Route path="timebanking/org-wallets" element={<Lazy><OrgWallets /></Lazy>} />
       <Route path="timebanking/create-org" element={<Lazy><OrgWallets /></Lazy>} />
+      <Route path="timebanking/starting-balances" element={<Lazy><StartingBalances /></Lazy>} />
       <Route path="plans" element={<Lazy><PlansAdmin /></Lazy>} />
       <Route path="plans/create" element={<Lazy><PlanForm /></Lazy>} />
       <Route path="plans/edit/:id" element={<Lazy><PlanForm /></Lazy>} />

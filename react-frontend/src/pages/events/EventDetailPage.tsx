@@ -23,6 +23,9 @@ import {
   ModalFooter,
   Tabs,
   Tab,
+  Card,
+  CardBody,
+  Skeleton,
 } from '@heroui/react';
 import {
   Calendar,
@@ -44,6 +47,8 @@ import {
   ListOrdered,
   Link2,
   Repeat,
+  ArrowRight,
+  CalendarRange,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
@@ -89,6 +94,8 @@ export function EventDetailPage() {
   const [checkingInUserId, setCheckingInUserId] = useState<number | null>(null);
   const [isWaitlisted, setIsWaitlisted] = useState(false);
   const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
+  const [seriesEvents, setSeriesEvents] = useState<Event[]>([]);
+  const [isLoadingSeriesEvents, setIsLoadingSeriesEvents] = useState(false);
 
   /** Map backend rsvp_status to our 3-option model */
   function normalizeRsvpStatus(status: string | null | undefined): RsvpOption | null {
@@ -130,6 +137,35 @@ export function EventDetailPage() {
   useEffect(() => {
     loadEvent();
   }, [loadEvent]);
+
+  // Fetch other events in the same series
+  useEffect(() => {
+    if (!event?.series?.id) {
+      setSeriesEvents([]);
+      return;
+    }
+
+    let cancelled = false;
+    async function fetchSeriesEvents() {
+      setIsLoadingSeriesEvents(true);
+      try {
+        const res = await api.get<Event[]>(`/v2/events?series_id=${event!.series!.id}&limit=5`);
+        if (!cancelled && res.success && res.data) {
+          // Filter out the current event
+          setSeriesEvents(
+            (Array.isArray(res.data) ? res.data : []).filter((e) => e.id !== event!.id)
+          );
+        }
+      } catch (err) {
+        logError('Failed to load series events', err);
+      } finally {
+        if (!cancelled) setIsLoadingSeriesEvents(false);
+      }
+    }
+
+    fetchSeriesEvents();
+    return () => { cancelled = true; };
+  }, [event?.series?.id, event?.id]);
 
   async function handleRsvp(newStatus: RsvpOption) {
     if (!event || !isAuthenticated) return;
@@ -513,17 +549,23 @@ export function EventDetailPage() {
           </div>
         )}
 
-        {/* E7: Series link */}
+        {/* E7: Series link (navigable) */}
         {event.series && (
-          <div className="mb-4">
-            <Chip
-              variant="flat"
-              color="primary"
-              size="sm"
-              startContent={<Link2 className="w-3 h-3" aria-hidden="true" />}
-            >
-              Part of: {event.series.title} ({event.series.event_count} events)
-            </Chip>
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <Link to={tenantPath(`/events?series=${event.series.id}`)}>
+              <Chip
+                variant="flat"
+                color="primary"
+                size="sm"
+                startContent={<Link2 className="w-3 h-3" aria-hidden="true" />}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                {event.series.title}
+              </Chip>
+            </Link>
+            <span className="text-sm text-theme-subtle">
+              {event.series.event_count} {event.series.event_count === 1 ? 'event' : 'events'} in series
+            </span>
           </div>
         )}
 
@@ -1008,6 +1050,80 @@ export function EventDetailPage() {
           </div>
         )}
       </GlassCard>
+
+      {/* E7: Other Events in This Series */}
+      {event.series && (
+        <GlassCard className="p-6">
+          <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+            <CalendarRange className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            Other events in this series
+          </h2>
+
+          {isLoadingSeriesEvents ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="w-full h-16 rounded-lg" />
+              ))}
+            </div>
+          ) : seriesEvents.length > 0 ? (
+            <div className="space-y-3">
+              {seriesEvents.map((seriesEvent) => {
+                const evtDate = new Date(seriesEvent.start_date);
+                return (
+                  <Link key={seriesEvent.id} to={tenantPath(`/events/${seriesEvent.id}`)}>
+                    <Card
+                      isPressable
+                      className="bg-theme-elevated border border-theme-default hover:border-indigo-500/50 transition-colors"
+                    >
+                      <CardBody className="flex flex-row items-center gap-4 p-3">
+                        {/* Mini Date Badge */}
+                        <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-lg p-2 text-center min-w-[48px]">
+                          <div className="text-amber-400 text-[10px] font-medium uppercase leading-none">
+                            {evtDate.toLocaleString('default', { month: 'short' })}
+                          </div>
+                          <div className="text-theme-primary text-lg font-bold leading-tight">
+                            {evtDate.getDate()}
+                          </div>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <p className="text-theme-primary font-medium truncate">
+                            {seriesEvent.title}
+                          </p>
+                          <p className="text-theme-subtle text-sm">
+                            {evtDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {seriesEvent.location && ` \u00B7 ${seriesEvent.location}`}
+                          </p>
+                        </div>
+
+                        <ArrowRight className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
+                      </CardBody>
+                    </Card>
+                  </Link>
+                );
+              })}
+
+              {/* View all link */}
+              {event.series.event_count > 5 && (
+                <Link to={tenantPath(`/events?series=${event.series.id}`)} className="block text-center">
+                  <Button
+                    variant="flat"
+                    size="sm"
+                    className="bg-theme-elevated text-theme-primary"
+                    endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}
+                  >
+                    View all {event.series.event_count} events in series
+                  </Button>
+                </Link>
+              )}
+            </div>
+          ) : (
+            <p className="text-theme-subtle text-sm text-center py-4">
+              No other events found in this series.
+            </p>
+          )}
+        </GlassCard>
+      )}
 
       {/* Delete Confirmation Modal */}
       <Modal

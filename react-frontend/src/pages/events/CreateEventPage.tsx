@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Select, SelectItem, DatePicker, TimeInput } from '@heroui/react';
+import { Button, Input, Textarea, Select, SelectItem, DatePicker, TimeInput, Switch, CheckboxGroup, Checkbox } from '@heroui/react';
 import type { DateInputValue, TimeInputValue } from '@heroui/react';
 import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
 import {
@@ -26,6 +26,7 @@ import {
   ImagePlus,
   X,
   Tag,
+  Repeat,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
@@ -44,6 +45,9 @@ const EVENT_CATEGORY_IDS = ['workshop', 'social', 'outdoor', 'online', 'meeting'
 const MAX_IMAGE_SIZE_MB = 5;
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
+type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly';
+type RecurrenceEndType = 'after_count' | 'on_date';
+
 interface FormData {
   title: string;
   description: string;
@@ -56,7 +60,17 @@ interface FormData {
   longitude?: number;
   max_attendees: string;
   category: string;
+  // Recurrence
+  isRecurring: boolean;
+  recurrenceFrequency: RecurrenceFrequency;
+  recurrenceDays: string[];
+  recurrenceEndType: RecurrenceEndType;
+  recurrenceCount: string;
+  recurrenceEndDate: DateInputValue | null;
 }
+
+const WEEKDAY_KEYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'] as const;
+const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const initialFormData: FormData = {
   title: '',
@@ -68,6 +82,12 @@ const initialFormData: FormData = {
   location: '',
   max_attendees: '',
   category: '',
+  isRecurring: false,
+  recurrenceFrequency: 'weekly',
+  recurrenceDays: [],
+  recurrenceEndType: 'after_count',
+  recurrenceCount: '10',
+  recurrenceEndDate: null,
 };
 
 /** Convert a DateInputValue + TimeInputValue into a JS Date */
@@ -79,6 +99,43 @@ function toJSDate(date: DateInputValue, time: TimeInputValue | null): Date {
     return new Date(`${dateStr}T${h}:${m}:00`);
   }
   return new Date(`${dateStr}T00:00:00`);
+}
+
+/** Build an RRULE string from recurrence form data */
+function buildRecurrenceRule(data: FormData): string | null {
+  if (!data.isRecurring) return null;
+
+  const parts: string[] = [];
+
+  // Frequency
+  if (data.recurrenceFrequency === 'biweekly') {
+    parts.push('FREQ=WEEKLY');
+    parts.push('INTERVAL=2');
+  } else {
+    parts.push(`FREQ=${data.recurrenceFrequency.toUpperCase()}`);
+  }
+
+  // Days of week (for weekly/biweekly)
+  if (
+    (data.recurrenceFrequency === 'weekly' || data.recurrenceFrequency === 'biweekly') &&
+    data.recurrenceDays.length > 0
+  ) {
+    parts.push(`BYDAY=${data.recurrenceDays.join(',')}`);
+  }
+
+  // End condition
+  if (data.recurrenceEndType === 'after_count' && data.recurrenceCount) {
+    const count = parseInt(data.recurrenceCount);
+    if (!isNaN(count) && count > 0) {
+      parts.push(`COUNT=${count}`);
+    }
+  } else if (data.recurrenceEndType === 'on_date' && data.recurrenceEndDate) {
+    // Format as YYYYMMDD for RRULE UNTIL
+    const dateStr = data.recurrenceEndDate.toString().replace(/-/g, '');
+    parts.push(`UNTIL=${dateStr}T235959Z`);
+  }
+
+  return `RRULE:${parts.join(';')}`;
 }
 
 export function CreateEventPage() {
@@ -127,6 +184,13 @@ export function CreateEventPage() {
           longitude: event.coordinates?.lng,
           max_attendees: event.max_attendees?.toString() || '',
           category: event.category_name || '',
+          // Recurrence fields default (editing a recurring event is not supported yet)
+          isRecurring: false,
+          recurrenceFrequency: 'weekly',
+          recurrenceDays: [],
+          recurrenceEndType: 'after_count',
+          recurrenceCount: '10',
+          recurrenceEndDate: null,
         });
 
         if (event.cover_image) {
@@ -246,6 +310,27 @@ export function CreateEventPage() {
       }
     }
 
+    // Recurrence validation
+    if (formData.isRecurring) {
+      if (
+        (formData.recurrenceFrequency === 'weekly' || formData.recurrenceFrequency === 'biweekly') &&
+        formData.recurrenceDays.length === 0
+      ) {
+        newErrors.recurrenceDays = 'Please select at least one day of the week';
+      }
+
+      if (formData.recurrenceEndType === 'after_count') {
+        const count = parseInt(formData.recurrenceCount);
+        if (isNaN(count) || count < 2 || count > 52) {
+          newErrors.recurrenceCount = 'Occurrences must be between 2 and 52';
+        }
+      }
+
+      if (formData.recurrenceEndType === 'on_date' && !formData.recurrenceEndDate) {
+        newErrors.recurrenceEndDate = 'Please select an end date for the series';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -298,6 +383,26 @@ export function CreateEventPage() {
         const categoryInt = parseInt(formData.category);
         if (!isNaN(categoryInt)) {
           payload.category_id = categoryInt;
+        }
+      }
+
+      // Recurrence
+      const recurrenceRule = buildRecurrenceRule(formData);
+      if (recurrenceRule) {
+        payload.recurrence_rule = recurrenceRule;
+        // Also send structured fields for backend flexibility
+        payload.recurrence_frequency = formData.recurrenceFrequency === 'biweekly' ? 'weekly' : formData.recurrenceFrequency;
+        if (formData.recurrenceFrequency === 'biweekly') {
+          payload.recurrence_interval = 2;
+        }
+        if (formData.recurrenceDays.length > 0) {
+          payload.recurrence_days = formData.recurrenceDays.join(',');
+        }
+        payload.recurrence_ends_type = formData.recurrenceEndType;
+        if (formData.recurrenceEndType === 'after_count') {
+          payload.recurrence_ends_after_count = parseInt(formData.recurrenceCount) || 10;
+        } else if (formData.recurrenceEndType === 'on_date' && formData.recurrenceEndDate) {
+          payload.recurrence_ends_on_date = formData.recurrenceEndDate.toString();
         }
       }
 
@@ -589,6 +694,160 @@ export function CreateEventPage() {
               />
             </div>
           </fieldset>
+
+          {/* Recurring Event Toggle */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-theme-elevated border border-theme-default">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-purple-500/20">
+                  <Repeat className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className="font-medium text-theme-primary">
+                    {t('form.recurring_toggle', { defaultValue: 'Make this a recurring event' })}
+                  </p>
+                  <p className="text-sm text-theme-subtle">
+                    {t('form.recurring_desc', { defaultValue: 'Automatically create multiple occurrences' })}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                aria-label="Toggle recurring event"
+                isSelected={formData.isRecurring}
+                onValueChange={(checked) => setFormData((prev) => ({ ...prev, isRecurring: checked }))}
+                classNames={{
+                  wrapper: 'group-data-[selected=true]:bg-purple-500',
+                }}
+              />
+            </div>
+
+            {/* Recurrence Options (shown when toggled on) */}
+            {formData.isRecurring && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 p-4 rounded-xl border border-purple-500/30 bg-purple-500/5"
+              >
+                {/* Frequency */}
+                <Select
+                  label={t('form.recurrence_frequency', { defaultValue: 'Frequency' })}
+                  aria-label="Recurrence frequency"
+                  selectedKeys={[formData.recurrenceFrequency]}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, recurrenceFrequency: e.target.value as RecurrenceFrequency }))}
+                  classNames={{
+                    trigger: 'bg-theme-elevated border-theme-default',
+                    value: 'text-theme-primary',
+                    label: 'text-theme-muted',
+                  }}
+                >
+                  <SelectItem key="daily">{t('form.freq_daily', { defaultValue: 'Daily' })}</SelectItem>
+                  <SelectItem key="weekly">{t('form.freq_weekly', { defaultValue: 'Weekly' })}</SelectItem>
+                  <SelectItem key="biweekly">{t('form.freq_biweekly', { defaultValue: 'Biweekly (every 2 weeks)' })}</SelectItem>
+                  <SelectItem key="monthly">{t('form.freq_monthly', { defaultValue: 'Monthly' })}</SelectItem>
+                </Select>
+
+                {/* Days of Week (for weekly/biweekly) */}
+                {(formData.recurrenceFrequency === 'weekly' || formData.recurrenceFrequency === 'biweekly') && (
+                  <div>
+                    <label className="block text-sm font-medium text-theme-muted mb-2">
+                      {t('form.recurrence_days', { defaultValue: 'Repeat on' })}
+                    </label>
+                    <CheckboxGroup
+                      orientation="horizontal"
+                      value={formData.recurrenceDays}
+                      onChange={(val) => {
+                        setFormData((prev) => ({ ...prev, recurrenceDays: val as string[] }));
+                        if (errors.recurrenceDays) setErrors((prev) => ({ ...prev, recurrenceDays: '' }));
+                      }}
+                      classNames={{
+                        wrapper: 'gap-2 flex-wrap',
+                      }}
+                    >
+                      {WEEKDAY_KEYS.map((key, idx) => (
+                        <Checkbox
+                          key={key}
+                          value={key}
+                          classNames={{
+                            base: 'px-3 py-1.5 rounded-lg border border-theme-default bg-theme-elevated data-[selected=true]:bg-purple-500/20 data-[selected=true]:border-purple-500/50 cursor-pointer',
+                            label: 'text-sm text-theme-primary',
+                          }}
+                        >
+                          {WEEKDAY_LABELS[idx]}
+                        </Checkbox>
+                      ))}
+                    </CheckboxGroup>
+                    {errors.recurrenceDays && (
+                      <p className="text-tiny text-danger mt-1">{errors.recurrenceDays}</p>
+                    )}
+                  </div>
+                )}
+
+                {/* End Condition */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <Select
+                    label={t('form.recurrence_end_type', { defaultValue: 'Ends' })}
+                    aria-label="How the series ends"
+                    selectedKeys={[formData.recurrenceEndType]}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, recurrenceEndType: e.target.value as RecurrenceEndType }))}
+                    classNames={{
+                      trigger: 'bg-theme-elevated border-theme-default',
+                      value: 'text-theme-primary',
+                      label: 'text-theme-muted',
+                    }}
+                  >
+                    <SelectItem key="after_count">{t('form.end_after_count', { defaultValue: 'After X occurrences' })}</SelectItem>
+                    <SelectItem key="on_date">{t('form.end_on_date', { defaultValue: 'On a specific date' })}</SelectItem>
+                  </Select>
+
+                  {formData.recurrenceEndType === 'after_count' ? (
+                    <Input
+                      type="number"
+                      label={t('form.recurrence_count', { defaultValue: 'Number of occurrences' })}
+                      placeholder="10"
+                      value={formData.recurrenceCount}
+                      onChange={(e) => {
+                        setFormData((prev) => ({ ...prev, recurrenceCount: e.target.value }));
+                        if (errors.recurrenceCount) setErrors((prev) => ({ ...prev, recurrenceCount: '' }));
+                      }}
+                      min={2}
+                      max={52}
+                      isInvalid={!!errors.recurrenceCount}
+                      errorMessage={errors.recurrenceCount}
+                      classNames={{
+                        input: 'bg-transparent text-theme-primary',
+                        inputWrapper: 'bg-theme-elevated border-theme-default',
+                        label: 'text-theme-muted',
+                      }}
+                    />
+                  ) : (
+                    <DatePicker
+                      label={t('form.recurrence_end_date', { defaultValue: 'Series end date' })}
+                      value={formData.recurrenceEndDate}
+                      onChange={(val) => {
+                        setFormData((prev) => ({ ...prev, recurrenceEndDate: val }));
+                        if (errors.recurrenceEndDate) setErrors((prev) => ({ ...prev, recurrenceEndDate: '' }));
+                      }}
+                      minValue={formData.startDate || today(getLocalTimeZone())}
+                      isInvalid={!!errors.recurrenceEndDate}
+                      errorMessage={errors.recurrenceEndDate}
+                      classNames={{
+                        inputWrapper: 'bg-theme-elevated border-theme-default',
+                        label: 'text-theme-muted',
+                      }}
+                    />
+                  )}
+                </div>
+
+                {/* Preview of generated RRULE (for transparency) */}
+                {formData.isRecurring && (
+                  <div className="text-xs text-theme-subtle p-2 rounded-lg bg-theme-elevated font-mono break-all">
+                    {buildRecurrenceRule(formData) || 'RRULE:...'}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </div>
 
           {/* Location & Max Attendees */}
           <div className="grid sm:grid-cols-2 gap-4">

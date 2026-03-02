@@ -734,6 +734,13 @@ export interface EventReminder {
   scheduled_for: string;
 }
 
+// E4: Reminder Preferences
+export interface EventReminderPreferences {
+  remind_before_minutes: number;
+  email_enabled: boolean;
+  push_enabled: boolean;
+}
+
 export interface WaitlistEntry {
   id: number;
   name: string;

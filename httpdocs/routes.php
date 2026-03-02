@@ -2293,6 +2293,12 @@ $router->add('POST', '/api/v2/volunteering/checkin/verify/{token}', 'Nexus\Contr
 $router->add('POST', '/api/v2/volunteering/checkin/checkout/{token}', 'Nexus\Controllers\Api\VolunteerApiController@checkOut');
 $router->add('GET', '/api/v2/volunteering/shifts/{id}/checkins', 'Nexus\Controllers\Api\VolunteerApiController@shiftCheckIns');
 
+// V8: Recurring shift patterns
+$router->add('GET', '/api/v2/volunteering/opportunities/{id}/recurring-patterns', 'Nexus\Controllers\Api\VolunteerApiController@recurringPatterns');
+$router->add('POST', '/api/v2/volunteering/opportunities/{id}/recurring-patterns', 'Nexus\Controllers\Api\VolunteerApiController@createRecurringPattern');
+$router->add('PUT', '/api/v2/volunteering/recurring-patterns/{id}', 'Nexus\Controllers\Api\VolunteerApiController@updateRecurringPattern');
+$router->add('DELETE', '/api/v2/volunteering/recurring-patterns/{id}', 'Nexus\Controllers\Api\VolunteerApiController@deleteRecurringPattern');
+
 // ============================================
 // API V2 - IDEATION FEATURES (New endpoints)
 // ============================================

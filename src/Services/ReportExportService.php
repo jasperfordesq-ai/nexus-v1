@@ -8,6 +8,8 @@ namespace Nexus\Services;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Dompdf\Dompdf;
+use Dompdf\Options as DompdfOptions;
 
 /**
  * ReportExportService
@@ -563,5 +565,198 @@ class ReportExportService
             'inactive_members' => 'Inactive Members',
             'social_value' => 'Social Value (SROI) Report',
         ];
+    }
+
+    // =========================================================================
+    // PDF EXPORT
+    // =========================================================================
+
+    /**
+     * Export a report as PDF
+     *
+     * @param string $type Report type (same as CSV export types)
+     * @param int $tenantId
+     * @param array $filters Optional filters
+     * @return array ['success' => bool, 'pdf' => string|null, 'filename' => string|null, 'count' => int, 'message' => string|null]
+     */
+    public static function exportPdf(string $type, int $tenantId, array $filters = []): array
+    {
+        $csvResult = self::export($type, $tenantId, $filters);
+        if (!$csvResult['success']) {
+            return [
+                'success' => false,
+                'pdf' => null,
+                'filename' => null,
+                'count' => 0,
+                'message' => $csvResult['message'],
+            ];
+        }
+
+        $typeName = self::getSupportedTypes()[$type] ?? ucfirst($type);
+        $tenantName = self::getTenantName($tenantId);
+
+        $rows = self::csvToArray($csvResult['csv']);
+        $headers = array_shift($rows) ?? [];
+
+        $html = self::buildPdfHtml($typeName, $tenantName, $headers, $rows, $filters);
+
+        try {
+            $options = new DompdfOptions();
+            $options->set('isRemoteEnabled', false);
+            $options->set('defaultFont', 'Helvetica');
+
+            $dompdf = new Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+
+            $pdfContent = $dompdf->output();
+
+            $dateRange = '';
+            if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+                $dateRange = '_' . $filters['date_from'] . '_to_' . $filters['date_to'];
+            } else {
+                $dateRange = '_' . date('Y-m-d');
+            }
+
+            $filename = "{$type}{$dateRange}.pdf";
+
+            return [
+                'success' => true,
+                'pdf' => $pdfContent,
+                'filename' => $filename,
+                'count' => count($rows),
+                'message' => null,
+            ];
+        } catch (\Throwable $e) {
+            error_log("[ReportExportService] PDF generation failed: " . $e->getMessage());
+            return [
+                'success' => false,
+                'pdf' => null,
+                'filename' => null,
+                'count' => 0,
+                'message' => 'PDF generation failed: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Send PDF as download response
+     */
+    public static function sendPdfDownload(string $pdf, string $filename): void
+    {
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        header('Content-Length: ' . strlen($pdf));
+
+        echo $pdf;
+        exit;
+    }
+
+    /**
+     * Build HTML for PDF report
+     */
+    private static function buildPdfHtml(string $title, string $tenantName, array $headers, array $rows, array $filters): string
+    {
+        $dateStr = date('F j, Y');
+        $filterInfo = '';
+        if (!empty($filters['date_from']) || !empty($filters['date_to'])) {
+            $from = $filters['date_from'] ?? 'start';
+            $to = $filters['date_to'] ?? 'present';
+            $filterInfo = "<p style=\"color:#666;font-size:11px;\">Date range: {$from} to {$to}</p>";
+        }
+
+        $rowCount = count($rows);
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+body { font-family: Helvetica, Arial, sans-serif; font-size: 10px; color: #333; margin: 20px; }
+h1 { font-size: 18px; color: #1a1a2e; margin-bottom: 4px; }
+.meta { color: #666; font-size: 11px; margin-bottom: 12px; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th { background: #1a1a2e; color: white; padding: 6px 8px; text-align: left; font-size: 9px; text-transform: uppercase; }
+td { padding: 5px 8px; border-bottom: 1px solid #eee; font-size: 9px; }
+tr:nth-child(even) td { background: #f8f9fa; }
+.footer { margin-top: 20px; font-size: 8px; color: #999; text-align: center; }
+</style>
+</head>
+<body>
+<h1>{$title}</h1>
+<div class="meta">
+<p>{$tenantName} &mdash; Generated {$dateStr} &mdash; {$rowCount} records</p>
+{$filterInfo}
+</div>
+<table>
+<thead><tr>
+HTML;
+
+        foreach ($headers as $h) {
+            $h = htmlspecialchars($h, ENT_QUOTES, 'UTF-8');
+            $html .= "<th>{$h}</th>";
+        }
+
+        $html .= "</tr></thead><tbody>";
+
+        foreach ($rows as $row) {
+            $html .= "<tr>";
+            foreach ($row as $cell) {
+                $cell = htmlspecialchars((string)$cell, ENT_QUOTES, 'UTF-8');
+                $html .= "<td>{$cell}</td>";
+            }
+            $html .= "</tr>";
+        }
+
+        $html .= <<<HTML
+</tbody></table>
+<div class="footer">Project NEXUS &mdash; Report generated automatically</div>
+</body>
+</html>
+HTML;
+
+        return $html;
+    }
+
+    /**
+     * Parse CSV string back into array of rows
+     */
+    private static function csvToArray(string $csv): array
+    {
+        // Remove BOM if present
+        $csv = ltrim($csv, "\xEF\xBB\xBF");
+
+        $rows = [];
+        $handle = fopen('php://temp', 'r+');
+        fwrite($handle, $csv);
+        rewind($handle);
+
+        while (($row = fgetcsv($handle)) !== false) {
+            $rows[] = $row;
+        }
+
+        fclose($handle);
+        return $rows;
+    }
+
+    /**
+     * Get tenant name for report header
+     */
+    private static function getTenantName(int $tenantId): string
+    {
+        try {
+            $tenant = Database::query(
+                "SELECT name FROM tenants WHERE id = ?",
+                [$tenantId]
+            )->fetch();
+            return $tenant['name'] ?? "Tenant #{$tenantId}";
+        } catch (\Throwable $e) {
+            return "Tenant #{$tenantId}";
+        }
     }
 }

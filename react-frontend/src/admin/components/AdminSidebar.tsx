@@ -249,6 +249,7 @@ function useAdminNav(): NavSection[] {
           { label: 'Timebanking', href: '/admin/timebanking', icon: Clock },
           { label: 'Fraud Alerts', href: '/admin/timebanking/alerts', icon: AlertTriangle },
           { label: 'Org Wallets', href: '/admin/timebanking/org-wallets', icon: Wallet },
+          { label: 'Starting Balances', href: '/admin/timebanking/starting-balances', icon: Wallet },
           { label: 'Plans & Pricing', href: '/admin/plans', icon: CreditCard },
         ],
       },

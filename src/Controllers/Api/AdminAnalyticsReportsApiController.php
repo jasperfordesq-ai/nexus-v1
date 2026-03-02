@@ -279,7 +279,7 @@ class AdminAnalyticsReportsApiController extends BaseApiController
     /**
      * GET /api/v2/admin/reports/{type}/export
      *
-     * Query params: format (csv), date_from, date_to, days (for inactive_members)
+     * Query params: format (csv|pdf), date_from, date_to, days (for inactive_members)
      */
     public function exportReport(string $type): void
     {
@@ -288,8 +288,8 @@ class AdminAnalyticsReportsApiController extends BaseApiController
 
         $format = $this->query('format', 'csv');
 
-        if ($format !== 'csv') {
-            $this->respondWithError('VALIDATION_ERROR', 'Only CSV format is currently supported', 'format', 400);
+        if (!in_array($format, ['csv', 'pdf'], true)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Supported formats: csv, pdf', 'format', 400);
             return;
         }
 
@@ -307,6 +307,16 @@ class AdminAnalyticsReportsApiController extends BaseApiController
             'status' => $this->query('status'),
             'days' => $this->queryInt('days', 90),
         ];
+
+        if ($format === 'pdf') {
+            $result = ReportExportService::exportPdf($type, $tenantId, $filters);
+            if (!$result['success']) {
+                $this->respondWithError('NO_DATA', $result['message'] ?? 'No data found for export', null, 404);
+                return;
+            }
+            ReportExportService::sendPdfDownload($result['pdf'], $result['filename']);
+            return;
+        }
 
         $result = ReportExportService::export($type, $tenantId, $filters);
 
