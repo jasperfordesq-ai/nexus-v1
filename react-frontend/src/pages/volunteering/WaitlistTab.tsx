@@ -91,7 +91,7 @@ export function WaitlistTab() {
   const handleLeaveWaitlist = async (shiftId: number) => {
     try {
       setRemovingId(shiftId);
-      const response = await api.delete(`/v2/volunteering/waitlist/${shiftId}`);
+      const response = await api.delete(`/v2/volunteering/shifts/${shiftId}/waitlist`);
       if (response.success) {
         setEntries((prev) => prev.filter((e) => e.shift.id !== shiftId));
       }
