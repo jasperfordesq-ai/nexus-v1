@@ -127,7 +127,7 @@ interface Idea {
   description: string;
   votes_count: number;
   comments_count: number;
-  status: 'submitted' | 'shortlisted' | 'winner' | 'withdrawn';
+  status: 'draft' | 'submitted' | 'shortlisted' | 'winner' | 'withdrawn';
   has_voted: boolean;
   created_at: string;
   image_url: string | null;
@@ -169,6 +169,7 @@ const STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 'dang
 };
 
 const IDEA_STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 'secondary'> = {
+  draft: 'warning',
   submitted: 'default',
   shortlisted: 'warning',
   winner: 'success',
@@ -211,6 +212,11 @@ export function ChallengeDetailPage() {
   const [newIdeaMediaUrl, setNewIdeaMediaUrl] = useState('');
   const [newIdeaMediaType, setNewIdeaMediaType] = useState<string>('link');
   const [newIdeaMediaCaption, setNewIdeaMediaCaption] = useState('');
+
+  // Draft ideas
+  const [drafts, setDrafts] = useState<Array<{id: number; title: string; description: string; created_at: string; updated_at: string | null}>>([]);
+  const [isLoadingDrafts, setIsLoadingDrafts] = useState(false);
+  const [editingDraftId, setEditingDraftId] = useState<number | null>(null);
 
   // Delete challenge modal
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
@@ -316,6 +322,22 @@ export function ChallengeDetailPage() {
     }
   }, [id, challenge?.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* ───── Fetch user's draft ideas ───── */
+  const fetchDrafts = useCallback(async () => {
+    if (!isAuthenticated || !challenge) return;
+    setIsLoadingDrafts(true);
+    try {
+      const response = await api.get<typeof drafts>(`/v2/ideation-challenges/${challenge.id}/ideas/drafts`);
+      if (response.success && response.data) {
+        setDrafts(Array.isArray(response.data) ? response.data : []);
+      }
+    } catch (err) {
+      logError('Failed to fetch drafts', err);
+    } finally {
+      setIsLoadingDrafts(false);
+    }
+  }, [isAuthenticated, challenge]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     fetchChallenge();
   }, [fetchChallenge]);
@@ -333,6 +355,16 @@ export function ChallengeDetailPage() {
       fetchOutcome();
     }
   }, [challenge?.status, fetchOutcome]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch drafts when submit modal opens
+  useEffect(() => {
+    if (isSubmitOpen) {
+      fetchDrafts();
+    } else {
+      // Reset draft editing state when modal closes
+      setEditingDraftId(null);
+    }
+  }, [isSubmitOpen, fetchDrafts]);
 
   /* ───── Actions ───── */
 
@@ -375,6 +407,48 @@ export function ChallengeDetailPage() {
   const handleSubmitIdea = async () => {
     if (!newIdea.title.trim() || !newIdea.description.trim()) return;
 
+    // If editing a draft, publish it instead of creating new
+    if (editingDraftId) {
+      setIsSubmitting(true);
+      try {
+        await api.put(`/v2/ideation-ideas/${editingDraftId}/draft`, {
+          title: newIdea.title.trim(),
+          description: newIdea.description.trim(),
+          publish: true,
+        });
+
+        // If media URL provided, attach it (I2)
+        if (newIdeaMediaUrl.trim()) {
+          try {
+            await api.post(`/v2/ideation-ideas/${editingDraftId}/media`, {
+              type: newIdeaMediaType,
+              url: newIdeaMediaUrl.trim(),
+              caption: newIdeaMediaCaption.trim() || null,
+            });
+          } catch (mediaErr) {
+            logError('Failed to attach media to published draft', mediaErr);
+          }
+        }
+
+        toast.success(t('toast.idea_submitted'));
+        onSubmitClose();
+        setNewIdea({ title: '', description: '' });
+        setNewIdeaMediaUrl('');
+        setNewIdeaMediaType('link');
+        setNewIdeaMediaCaption('');
+        setEditingDraftId(null);
+        setCursor(undefined);
+        fetchIdeas(sortMode, false);
+        fetchChallenge();
+      } catch (err) {
+        logError('Failed to publish draft', err);
+        toast.error(t('toast.error_generic'));
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const ideaResponse = await api.post<{ id: number }>(`/v2/ideation-challenges/${id}/ideas`, {
@@ -409,6 +483,41 @@ export function ChallengeDetailPage() {
       fetchChallenge();
     } catch (err) {
       logError('Failed to submit idea', err);
+      toast.error(t('toast.error_generic'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (!newIdea.title.trim()) {
+      toast.error(t('validation.title_required'));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (editingDraftId) {
+        // Update existing draft
+        await api.put(`/v2/ideation-ideas/${editingDraftId}/draft`, {
+          title: newIdea.title.trim(),
+          description: newIdea.description.trim(),
+        });
+      } else {
+        // Create new draft
+        await api.post(`/v2/ideation-challenges/${challenge!.id}/ideas`, {
+          title: newIdea.title.trim(),
+          description: newIdea.description.trim(),
+          is_draft: true,
+        });
+      }
+
+      toast.success(t('ideas.draft_saved'));
+      setNewIdea({ title: '', description: '' });
+      setEditingDraftId(null);
+      fetchDrafts();
+    } catch (err) {
+      logError('Failed to save draft', err);
       toast.error(t('toast.error_generic'));
     } finally {
       setIsSubmitting(false);
@@ -1148,11 +1257,74 @@ export function ChallengeDetailPage() {
         </div>
       )}
 
-      {/* Submit Idea Modal (I2 - with media attachment) */}
+      {/* Submit Idea Modal (I2 - with media attachment + draft support) */}
       <Modal isOpen={isSubmitOpen} onClose={onSubmitClose} size="lg">
         <ModalContent>
-          <ModalHeader>{t('ideas.submit_title')}</ModalHeader>
+          <ModalHeader>{editingDraftId ? t('ideas.edit') : t('ideas.submit_title')}</ModalHeader>
           <ModalBody>
+            {/* Drafts Section */}
+            {isLoadingDrafts && (
+              <div className="flex justify-center py-2">
+                <Spinner size="sm" />
+              </div>
+            )}
+            {!isLoadingDrafts && drafts.length > 0 && (
+              <div className="mb-2 p-3 rounded-lg bg-[var(--color-surface-hover)]">
+                <p className="text-sm font-medium text-[var(--color-text)] mb-2">
+                  {t('ideas.your_drafts')}
+                </p>
+                <div className="space-y-2">
+                  {drafts.map((draft) => (
+                    <div
+                      key={draft.id}
+                      role="button"
+                      tabIndex={0}
+                      className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
+                        editingDraftId === draft.id
+                          ? 'bg-primary/10 border border-primary/30'
+                          : 'hover:bg-[var(--color-surface)] border border-transparent'
+                      }`}
+                      onClick={() => {
+                        setEditingDraftId(draft.id);
+                        setNewIdea({ title: draft.title, description: draft.description });
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          setEditingDraftId(draft.id);
+                          setNewIdea({ title: draft.title, description: draft.description });
+                        }
+                      }}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-[var(--color-text)] truncate">
+                          {draft.title || t('ideas.untitled_draft')}
+                        </p>
+                        <p className="text-xs text-[var(--color-text-tertiary)]">
+                          {draft.updated_at
+                            ? t('ideas.draft_updated', { date: new Date(draft.updated_at).toLocaleDateString() })
+                            : t('ideas.draft_created', { date: new Date(draft.created_at).toLocaleDateString() })}
+                        </p>
+                      </div>
+                      <Chip size="sm" variant="flat" color="warning">{t('ideas.draft')}</Chip>
+                    </div>
+                  ))}
+                </div>
+                {editingDraftId && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    className="mt-2"
+                    onPress={() => {
+                      setEditingDraftId(null);
+                      setNewIdea({ title: '', description: '' });
+                    }}
+                  >
+                    {t('ideas.new_idea')}
+                  </Button>
+                )}
+              </div>
+            )}
+
             <Input
               label={t('form.title_label')}
               placeholder={t('form.title_placeholder')}
@@ -1216,12 +1388,20 @@ export function ChallengeDetailPage() {
               {t('form.cancel')}
             </Button>
             <Button
+              variant="bordered"
+              isLoading={isSubmitting}
+              isDisabled={!newIdea.title.trim()}
+              onPress={handleSaveDraft}
+            >
+              {t('ideas.save_draft')}
+            </Button>
+            <Button
               color="primary"
               isLoading={isSubmitting}
               isDisabled={!newIdea.title.trim() || !newIdea.description.trim()}
               onPress={handleSubmitIdea}
             >
-              {isSubmitting ? t('form.saving') : t('ideas.submit')}
+              {editingDraftId ? t('ideas.publish_draft') : t('ideas.submit')}
             </Button>
           </ModalFooter>
         </ModalContent>

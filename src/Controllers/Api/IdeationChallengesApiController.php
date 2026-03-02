@@ -68,6 +68,8 @@ class IdeationChallengesApiController extends BaseApiController
      * - status: string ('draft', 'open', 'voting', 'evaluating', 'closed', 'archived')
      * - category_id: int - filter by category
      * - favorites: '1' - show only favorites (auth required)
+     * - search: string - full-text search on title/description
+     * - tags: string - comma-separated tag names to filter by
      * - cursor: string (pagination cursor)
      * - per_page: int (default 20, max 100)
      */
@@ -98,6 +100,16 @@ class IdeationChallengesApiController extends BaseApiController
 
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
+        }
+
+        $search = $this->query('search');
+        if ($search) {
+            $filters['search'] = $search;
+        }
+
+        $tags = $this->query('tags');
+        if ($tags) {
+            $filters['tags'] = array_map('trim', explode(',', $tags));
         }
 
         $result = IdeationChallengeService::getAllChallenges($filters);
@@ -441,6 +453,46 @@ class IdeationChallengesApiController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/ideation-challenges/{id}/ideas/drafts
+     *
+     * Get current user's draft ideas for a challenge.
+     */
+    public function ideaDrafts(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+
+        $drafts = IdeationChallengeService::getUserDrafts($id, $userId);
+        $this->respondWithData($drafts);
+    }
+
+    /**
+     * PUT /api/v2/ideation-ideas/{id}/draft
+     *
+     * Update a draft idea (save draft or publish).
+     * Body: { "title": "string", "description": "string", "publish": bool }
+     */
+    public function updateDraft(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('ideation_update_draft', 20, 60);
+
+        $data = $this->getAllInput();
+
+        $success = IdeationChallengeService::updateDraftIdea($id, $userId, $data);
+
+        if (!$success) {
+            $errors = IdeationChallengeService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+        }
+
+        $this->respondWithData(['success' => true]);
+    }
+
+    /**
      * POST /api/v2/ideation-ideas/{id}/vote
      *
      * Toggle vote on an idea (authenticated users).
@@ -715,6 +767,18 @@ class IdeationChallengesApiController extends BaseApiController
         $this->checkFeature();
         $tagType = $this->query('type');
         $tags = ChallengeTagService::getAll($tagType);
+        $this->respondWithData($tags);
+    }
+
+    /**
+     * GET /api/v2/ideation-tags/popular
+     *
+     * Get popular tags for filtering — returns distinct tag names with usage counts.
+     */
+    public function popularTags(): void
+    {
+        $this->checkFeature();
+        $tags = IdeationChallengeService::getAllTags();
         $this->respondWithData($tags);
     }
 

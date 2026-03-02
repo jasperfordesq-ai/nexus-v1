@@ -38,6 +38,7 @@ import {
   X,
   FileText,
   Eye,
+  HelpCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -423,6 +424,75 @@ export function CreateChallengePage() {
       {/* Form */}
       <GlassCard className="p-6">
         <div className="space-y-5">
+          {/* Challenge Framing Guidance */}
+          {!isEdit && (
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+              <div className="flex items-start gap-2">
+                <HelpCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--color-text)] mb-1">
+                    {t('guidance.title')}
+                  </h3>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    {t('guidance.intro')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-[var(--color-text)]">
+                    {t('guidance.tips.clear_problem.title')}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-tertiary)]">
+                    {t('guidance.tips.clear_problem.description')}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-[var(--color-text)]">
+                    {t('guidance.tips.scope.title')}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-tertiary)]">
+                    {t('guidance.tips.scope.description')}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-[var(--color-text)]">
+                    {t('guidance.tips.criteria.title')}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-tertiary)]">
+                    {t('guidance.tips.criteria.description')}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-[var(--color-text)]">
+                    {t('guidance.tips.engagement.title')}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-tertiary)]">
+                    {t('guidance.tips.engagement.description')}
+                  </p>
+                </div>
+              </div>
+
+              <details className="group">
+                <summary className="text-xs font-medium text-primary cursor-pointer hover:underline">
+                  {t('guidance.examples_toggle')}
+                </summary>
+                <div className="mt-2 space-y-2 text-xs text-[var(--color-text-secondary)]">
+                  <div className="p-2 rounded-lg bg-[var(--color-surface)]">
+                    <p className="font-medium text-[var(--color-text)]">{t('guidance.example_good.label')}</p>
+                    <p className="italic mt-0.5">&ldquo;{t('guidance.example_good.text')}&rdquo;</p>
+                  </div>
+                  <div className="p-2 rounded-lg bg-[var(--color-surface)]">
+                    <p className="font-medium text-[var(--color-text)]">{t('guidance.example_weak.label')}</p>
+                    <p className="italic mt-0.5">&ldquo;{t('guidance.example_weak.text')}&rdquo;</p>
+                    <p className="text-[var(--color-text-tertiary)] mt-0.5">{t('guidance.example_weak.why')}</p>
+                  </div>
+                </div>
+              </details>
+            </div>
+          )}
+
           {/* Title */}
           <Input
             label={t('form.title_label')}
@@ -439,6 +509,7 @@ export function CreateChallengePage() {
           <Textarea
             label={t('form.description_label')}
             placeholder={t('form.description_placeholder')}
+            description={t('form.description_helper')}
             value={form.description}
             onValueChange={(val) => updateField('description', val)}
             variant="bordered"
@@ -519,6 +590,7 @@ export function CreateChallengePage() {
           <Textarea
             label={t('form.prize_label')}
             placeholder={t('form.prize_placeholder')}
+            description={t('form.prize_helper')}
             value={form.prize_description}
             onValueChange={(val) => updateField('prize_description', val)}
             variant="bordered"
@@ -548,6 +620,7 @@ export function CreateChallengePage() {
             type="number"
             label={t('form.max_ideas_label')}
             placeholder={t('form.max_ideas_placeholder')}
+            description={t('form.max_ideas_helper')}
             value={form.max_ideas_per_user}
             onValueChange={(val) => updateField('max_ideas_per_user', val)}
             variant="bordered"

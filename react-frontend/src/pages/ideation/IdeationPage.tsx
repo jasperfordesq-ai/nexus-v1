@@ -25,6 +25,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Button,
   Chip,
+  Input,
   Tabs,
   Tab,
   Spinner,
@@ -44,6 +45,8 @@ import {
   Star,
   Layers,
   BarChart3,
+  Search,
+  X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -126,6 +129,12 @@ export function IdeationPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
+  // Search + tag filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [availableTags, setAvailableTags] = useState<{tag: string; count: number}[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
   // Fetch categories on mount
@@ -143,7 +152,30 @@ export function IdeationPage() {
     fetchCategories();
   }, []);
 
-  const fetchChallenges = useCallback(async (tab: FilterTab, loadMore = false, categoryFilter?: string) => {
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch available tags for filtering
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await api.get<{tag: string; count: number}[]>('/v2/ideation-tags/popular');
+        if (response.success && response.data) {
+          setAvailableTags(Array.isArray(response.data) ? response.data : []);
+        }
+      } catch (err) {
+        logError('Failed to fetch ideation tags', err);
+      }
+    };
+    fetchTags();
+  }, []);
+
+  const fetchChallenges = useCallback(async (tab: FilterTab, loadMore = false, categoryFilter?: string, searchTerm?: string, tagFilter?: string[]) => {
     try {
       if (loadMore) {
         setIsLoadingMore(true);
@@ -163,6 +195,14 @@ export function IdeationPage() {
 
       if (categoryFilter) {
         params.set('category', categoryFilter);
+      }
+
+      if (searchTerm) {
+        params.set('search', searchTerm);
+      }
+
+      if (tagFilter && tagFilter.length > 0) {
+        params.set('tags', tagFilter.join(','));
       }
 
       if (loadMore && cursor) {
@@ -198,9 +238,9 @@ export function IdeationPage() {
 
   useEffect(() => {
     setCursor(undefined);
-    fetchChallenges(activeTab, false, selectedCategory);
+    fetchChallenges(activeTab, false, selectedCategory, debouncedSearch, selectedTags);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, selectedCategory]);
+  }, [activeTab, selectedCategory, debouncedSearch, selectedTags]);
 
   const handleTabChange = (key: React.Key) => {
     setActiveTab(key as FilterTab);
@@ -357,6 +397,64 @@ export function IdeationPage() {
         )}
       </div>
 
+      {/* Search + Tag Filters */}
+      <div className="space-y-3 mb-6">
+        {/* Search Bar */}
+        <Input
+          placeholder={t('search.placeholder')}
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+          startContent={<Search className="w-4 h-4 text-[var(--color-text-tertiary)]" />}
+          endContent={searchQuery ? (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="p-0.5 rounded hover:bg-[var(--color-surface-hover)]"
+            >
+              <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+            </button>
+          ) : null}
+          variant="bordered"
+          size="sm"
+          className="max-w-md"
+          aria-label={t('search.label')}
+        />
+
+        {/* Tag Filter Chips */}
+        {availableTags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {availableTags.slice(0, 15).map(({ tag, count }) => (
+              <Chip
+                key={tag}
+                size="sm"
+                variant={selectedTags.includes(tag) ? 'solid' : 'bordered'}
+                color={selectedTags.includes(tag) ? 'primary' : 'default'}
+                className="cursor-pointer"
+                onClick={() => {
+                  setSelectedTags(prev =>
+                    prev.includes(tag)
+                      ? prev.filter(t => t !== tag)
+                      : [...prev, tag]
+                  );
+                }}
+              >
+                {tag} ({count})
+              </Chip>
+            ))}
+            {selectedTags.length > 0 && (
+              <Chip
+                size="sm"
+                variant="flat"
+                color="danger"
+                className="cursor-pointer"
+                onClick={() => setSelectedTags([])}
+              >
+                {t('search.clear_tags')}
+              </Chip>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Loading */}
       {isLoading && (
         <div className="flex justify-center py-12">
@@ -375,7 +473,7 @@ export function IdeationPage() {
               color="primary"
               variant="flat"
               startContent={<RefreshCw className="w-4 h-4" />}
-              onPress={() => fetchChallenges(activeTab, false, selectedCategory)}
+              onPress={() => fetchChallenges(activeTab, false, selectedCategory, debouncedSearch, selectedTags)}
             >
               {t('ideas.load_more')}
             </Button>
@@ -537,7 +635,7 @@ export function IdeationPage() {
               <Button
                 variant="flat"
                 isLoading={isLoadingMore}
-                onPress={() => fetchChallenges(activeTab, true, selectedCategory)}
+                onPress={() => fetchChallenges(activeTab, true, selectedCategory, debouncedSearch, selectedTags)}
               >
                 {t('challenges.load_more')}
               </Button>
