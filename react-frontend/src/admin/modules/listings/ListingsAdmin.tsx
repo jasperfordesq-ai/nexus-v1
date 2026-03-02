@@ -10,8 +10,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Tabs, Tab, Button, Chip } from '@heroui/react';
-import { CheckCircle, Trash2 } from 'lucide-react';
+import { Tabs, Tab, Button, Chip, Tooltip } from '@heroui/react';
+import { CheckCircle, Trash2, Star, StarOff } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminListings } from '../../api/adminApi';
@@ -96,6 +96,26 @@ export function ListingsAdmin() {
     }
   };
 
+  const handleFeatureToggle = async (item: AdminListing) => {
+    try {
+      const res = item.is_featured
+        ? await adminListings.unfeature(item.id)
+        : await adminListings.feature(item.id);
+      if (res?.success) {
+        toast.success(
+          item.is_featured
+            ? `"${item.title}" removed from featured`
+            : `"${item.title}" is now featured`
+        );
+        loadItems();
+      } else {
+        toast.error(res?.error || 'Failed to update featured status');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
+    }
+  };
+
   const columns: Column<AdminListing>[] = [
     {
       key: 'title',
@@ -153,6 +173,18 @@ export function ListingsAdmin() {
               <CheckCircle size={14} />
             </Button>
           )}
+          <Tooltip content={item.is_featured ? 'Unfeature' : 'Feature'}>
+            <Button
+              isIconOnly
+              size="sm"
+              variant="flat"
+              color="warning"
+              onPress={() => handleFeatureToggle(item)}
+              aria-label={item.is_featured ? 'Unfeature listing' : 'Feature listing'}
+            >
+              {item.is_featured ? <Star size={14} className="fill-warning" /> : <StarOff size={14} />}
+            </Button>
+          </Tooltip>
           <Button
             isIconOnly
             size="sm"
