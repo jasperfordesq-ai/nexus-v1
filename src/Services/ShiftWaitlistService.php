@@ -314,4 +314,73 @@ class ShiftWaitlistService
             return false;
         }
     }
+
+    /**
+     * Get all waitlist entries for a user across all shifts
+     *
+     * @param int $userId User ID
+     * @return array Waitlist entries with shift, opportunity, and organization details
+     */
+    public static function getUserWaitlists(int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $db = Database::getConnection();
+
+            $stmt = $db->prepare("
+                SELECT
+                    w.id,
+                    w.position,
+                    w.created_at AS joined_at,
+                    s.id AS shift_id,
+                    s.start_time,
+                    s.end_time,
+                    s.capacity,
+                    opp.id AS opportunity_id,
+                    opp.title AS opportunity_title,
+                    opp.location AS opportunity_location,
+                    org.id AS organization_id,
+                    org.name AS organization_name,
+                    org.logo_url AS organization_logo_url
+                FROM vol_shift_waitlist w
+                JOIN vol_shifts s ON w.shift_id = s.id
+                JOIN vol_opportunities opp ON s.opportunity_id = opp.id
+                LEFT JOIN vol_organizations org ON opp.organization_id = org.id
+                WHERE w.user_id = ?
+                  AND w.tenant_id = ?
+                  AND w.status = 'waiting'
+                ORDER BY s.start_time ASC
+            ");
+            $stmt->execute([$userId, $tenantId]);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            return array_map(function (array $row): array {
+                return [
+                    'id' => (int)$row['id'],
+                    'position' => (int)$row['position'],
+                    'shift' => [
+                        'id' => (int)$row['shift_id'],
+                        'start_time' => $row['start_time'],
+                        'end_time' => $row['end_time'],
+                        'capacity' => $row['capacity'] !== null ? (int)$row['capacity'] : null,
+                    ],
+                    'opportunity' => [
+                        'id' => (int)$row['opportunity_id'],
+                        'title' => $row['opportunity_title'],
+                        'location' => $row['opportunity_location'] ?? '',
+                    ],
+                    'organization' => [
+                        'id' => $row['organization_id'] ? (int)$row['organization_id'] : 0,
+                        'name' => $row['organization_name'] ?? '',
+                        'logo_url' => $row['organization_logo_url'] ?? null,
+                    ],
+                    'joined_at' => $row['joined_at'],
+                ];
+            }, $rows);
+        } catch (\Exception $e) {
+            error_log("ShiftWaitlistService::getUserWaitlists error: " . $e->getMessage());
+            return [];
+        }
+    }
 }

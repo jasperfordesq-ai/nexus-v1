@@ -125,7 +125,7 @@ export function CredentialVerificationTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: Credential[] }>('/v2/volunteering/credentials');
+      const response = await api.get<{ data: Credential[] }>('/v2/volunteering/certificates');
 
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
@@ -180,7 +180,7 @@ export function CredentialVerificationTab() {
         formData.append('expiry_date', uploadForm.expiry_date);
       }
 
-      const response = await api.upload('/v2/volunteering/credentials', formData);
+      const response = await api.upload('/v2/volunteering/certificates', formData);
 
       if (response.success) {
         onClose();

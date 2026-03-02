@@ -976,6 +976,21 @@ class VolunteerApiController extends BaseApiController
         $this->respondWithData(['message' => 'Successfully claimed the shift spot']);
     }
 
+    /**
+     * GET /api/v2/volunteering/my-waitlists
+     * List all shift waitlist entries for the current user
+     */
+    public function myWaitlists(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_waitlists_list', 60, 60);
+
+        $entries = \Nexus\Services\ShiftWaitlistService::getUserWaitlists($userId);
+
+        $this->respondWithData($entries);
+    }
+
     // ========================================
     // SHIFT SWAPPING (V2)
     // ========================================
@@ -1187,6 +1202,21 @@ class VolunteerApiController extends BaseApiController
         }
 
         $this->noContent();
+    }
+
+    /**
+     * GET /api/v2/volunteering/group-reservations
+     * List all group reservations for the current user
+     */
+    public function myGroupReservations(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_group_reservations_list', 60, 60);
+
+        $reservations = \Nexus\Services\ShiftGroupReservationService::getUserReservations($userId);
+
+        $this->respondWithData($reservations);
     }
 
     // ========================================
@@ -1511,6 +1541,161 @@ class VolunteerApiController extends BaseApiController
         $assessment = \Nexus\Services\VolunteerWellbeingService::detectBurnoutRisk($userId);
 
         $this->respondWithData($assessment);
+    }
+
+    /**
+     * GET /api/v2/volunteering/wellbeing
+     * Composite wellbeing dashboard data for the frontend
+     */
+    public function wellbeingDashboard(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_wellbeing_dashboard', 30, 60);
+
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        $db = \Nexus\Core\Database::getConnection();
+
+        // Get burnout risk assessment
+        $assessment = \Nexus\Services\VolunteerWellbeingService::detectBurnoutRisk($userId);
+
+        // Wellbeing score = inverse of risk score (higher is better)
+        $score = max(0, min(100, 100 - (int)$assessment['risk_score']));
+
+        // Hours this week
+        try {
+            $stmt = $db->prepare("SELECT COALESCE(SUM(hours), 0) as total FROM vol_logs WHERE user_id = ? AND status = 'approved' AND date_logged >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
+            $stmt->execute([$userId]);
+            $hoursThisWeek = round((float)$stmt->fetch(\PDO::FETCH_ASSOC)['total'], 1);
+        } catch (\Throwable $e) { $hoursThisWeek = 0; }
+
+        // Hours this month
+        try {
+            $stmt = $db->prepare("SELECT COALESCE(SUM(hours), 0) as total FROM vol_logs WHERE user_id = ? AND status = 'approved' AND date_logged >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+            $stmt->execute([$userId]);
+            $hoursThisMonth = round((float)$stmt->fetch(\PDO::FETCH_ASSOC)['total'], 1);
+        } catch (\Throwable $e) { $hoursThisMonth = 0; }
+
+        // Streak: consecutive days with logged hours
+        try {
+            $stmt = $db->prepare("SELECT DISTINCT DATE(date_logged) as d FROM vol_logs WHERE user_id = ? AND status = 'approved' ORDER BY d DESC LIMIT 90");
+            $stmt->execute([$userId]);
+            $dates = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            $streak = 0;
+            $today = new \DateTime();
+            foreach ($dates as $i => $dateStr) {
+                $expected = (clone $today)->modify("-{$i} days")->format('Y-m-d');
+                if ($dateStr === $expected) {
+                    $streak++;
+                } else {
+                    break;
+                }
+            }
+        } catch (\Throwable $e) { $streak = 0; }
+
+        // Map risk level to burnout_risk
+        $burnoutRisk = match ($assessment['risk_level'] ?? 'low') {
+            'critical', 'high' => 'high',
+            'moderate' => 'moderate',
+            default => 'low',
+        };
+
+        // Build warnings from indicators
+        $warnings = [];
+        $indicators = $assessment['indicators'] ?? [];
+        if (($indicators['shift_frequency']['trend'] ?? '') === 'declining') {
+            $warnings[] = 'Your volunteering frequency has decreased compared to last month.';
+        }
+        if (($indicators['cancellation_rate']['rate_percent'] ?? 0) > 30) {
+            $warnings[] = 'Your cancellation rate is higher than usual. Consider taking on fewer commitments.';
+        }
+        if (($indicators['hours_trend']['trend'] ?? '') === 'declining_significantly') {
+            $warnings[] = 'Your logged hours have dropped significantly. Remember to take breaks when needed.';
+        }
+        if (($indicators['engagement_gap']['days_since_last_activity'] ?? 0) > 30) {
+            $warnings[] = 'It has been a while since your last volunteer activity. We miss you!';
+        }
+
+        // Suggested rest days (next 7 days that have no scheduled shifts)
+        $suggestedRest = [];
+        try {
+            $stmt = $db->prepare("SELECT DISTINCT DATE(s.start_time) as shift_date FROM vol_applications a JOIN vol_shifts s ON a.shift_id = s.id WHERE a.user_id = ? AND a.status = 'approved' AND s.start_time >= NOW() AND s.start_time <= DATE_ADD(NOW(), INTERVAL 7 DAY)");
+            $stmt->execute([$userId]);
+            $busyDays = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            for ($i = 0; $i < 7; $i++) {
+                $day = (new \DateTime())->modify("+{$i} days")->format('Y-m-d');
+                if (!in_array($day, $busyDays)) {
+                    $suggestedRest[] = $day;
+                    if (count($suggestedRest) >= 3) break;
+                }
+            }
+        } catch (\Throwable $e) { /* no suggestions */ }
+
+        // Recent mood check-ins
+        $recentCheckins = [];
+        try {
+            $stmt = $db->prepare("SELECT id, mood, note, created_at FROM vol_mood_checkins WHERE user_id = ? AND tenant_id = ? ORDER BY created_at DESC LIMIT 10");
+            $stmt->execute([$userId, $tenantId]);
+            $recentCheckins = array_map(function ($row) {
+                return [
+                    'id' => (int)$row['id'],
+                    'mood' => (int)$row['mood'],
+                    'note' => $row['note'],
+                    'created_at' => $row['created_at'],
+                ];
+            }, $stmt->fetchAll(\PDO::FETCH_ASSOC));
+        } catch (\Throwable $e) { /* table may not exist yet */ }
+
+        $this->respondWithData([
+            'score' => $score,
+            'hours_this_week' => $hoursThisWeek,
+            'hours_this_month' => $hoursThisMonth,
+            'streak_days' => $streak,
+            'burnout_risk' => $burnoutRisk,
+            'warnings' => $warnings,
+            'suggested_rest_days' => $suggestedRest,
+            'recent_checkins' => $recentCheckins,
+        ]);
+    }
+
+    /**
+     * POST /api/v2/volunteering/wellbeing/checkin
+     * Submit a mood check-in
+     */
+    public function wellbeingCheckin(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_wellbeing_checkin', 10, 60);
+
+        $mood = (int)$this->input('mood');
+        if ($mood < 1 || $mood > 5) {
+            $this->respondWithError('VALIDATION_ERROR', 'Mood must be between 1 and 5', 'mood', 400);
+            return;
+        }
+
+        $note = $this->input('note');
+        if ($note) {
+            $note = trim(mb_substr($note, 0, 500));
+        }
+
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        $db = \Nexus\Core\Database::getConnection();
+
+        try {
+            $stmt = $db->prepare("INSERT INTO vol_mood_checkins (tenant_id, user_id, mood, note, created_at) VALUES (?, ?, ?, ?, NOW())");
+            $stmt->execute([$tenantId, $userId, $mood, $note ?: null]);
+
+            $this->respondWithData([
+                'id' => (int)$db->lastInsertId(),
+                'mood' => $mood,
+                'note' => $note ?: null,
+            ]);
+        } catch (\Throwable $e) {
+            error_log("Wellbeing checkin failed: " . $e->getMessage());
+            $this->respondWithError('SERVER_ERROR', 'Failed to save check-in', null, 500);
+        }
     }
 
     // ========================================
