@@ -1514,6 +1514,115 @@ class VolunteerApiController extends BaseApiController
     }
 
     // ========================================
+    // RECURRING SHIFTS (V8)
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/opportunities/{id}/recurring-patterns
+     * Get recurring shift patterns for an opportunity
+     */
+    public function recurringPatterns(int $opportunityId): void
+    {
+        $this->checkFeature();
+        $this->getUserId();
+        $this->rateLimit('volunteering_recurring_list', 60, 60);
+
+        $patterns = \Nexus\Services\RecurringShiftService::getPatternsForOpportunity($opportunityId);
+
+        $this->respondWithData(['patterns' => $patterns]);
+    }
+
+    /**
+     * POST /api/v2/volunteering/opportunities/{id}/recurring-patterns
+     * Create a recurring shift pattern
+     */
+    public function createRecurringPattern(int $opportunityId): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_recurring_create', 10, 60);
+
+        $data = [
+            'title' => $this->input('title'),
+            'frequency' => $this->input('frequency'),
+            'days_of_week' => $this->input('days_of_week'),
+            'start_time' => $this->input('start_time'),
+            'end_time' => $this->input('end_time'),
+            'capacity' => $this->inputInt('capacity', 1),
+            'start_date' => $this->input('start_date'),
+            'end_date' => $this->input('end_date'),
+            'max_occurrences' => $this->input('max_occurrences'),
+        ];
+
+        $patternId = \Nexus\Services\RecurringShiftService::createPattern($opportunityId, $userId, $data);
+
+        if ($patternId === null) {
+            $errors = \Nexus\Services\RecurringShiftService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $pattern = \Nexus\Services\RecurringShiftService::getPattern($patternId);
+        $this->respondWithData($pattern, null, 201);
+    }
+
+    /**
+     * PUT /api/v2/volunteering/recurring-patterns/{id}
+     * Update a recurring shift pattern
+     */
+    public function updateRecurringPattern(int $patternId): void
+    {
+        $this->checkFeature();
+        $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_recurring_update', 10, 60);
+
+        $data = $this->getAllInput();
+
+        $success = \Nexus\Services\RecurringShiftService::updatePattern($patternId, $data);
+
+        if (!$success) {
+            $errors = \Nexus\Services\RecurringShiftService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $pattern = \Nexus\Services\RecurringShiftService::getPattern($patternId);
+        $this->respondWithData($pattern);
+    }
+
+    /**
+     * DELETE /api/v2/volunteering/recurring-patterns/{id}
+     * Deactivate a recurring shift pattern and remove future unbooked shifts
+     */
+    public function deleteRecurringPattern(int $patternId): void
+    {
+        $this->checkFeature();
+        $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_recurring_delete', 10, 60);
+
+        $deactivated = \Nexus\Services\RecurringShiftService::deactivatePattern($patternId);
+
+        if (!$deactivated) {
+            $errors = \Nexus\Services\RecurringShiftService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $deleted = \Nexus\Services\RecurringShiftService::deleteFutureShifts($patternId);
+
+        $this->respondWithData([
+            'message' => 'Recurring pattern deactivated',
+            'future_shifts_removed' => $deleted,
+        ]);
+    }
+
+    // ========================================
     // HELPERS
     // ========================================
 

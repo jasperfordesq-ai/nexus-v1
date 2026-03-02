@@ -243,6 +243,17 @@ export interface AdminListing {
   updated_at?: string | null;
 }
 
+export interface FeaturedListing {
+  id: number;
+  listing_id: number;
+  title: string;
+  type: string;
+  user_id: number;
+  user_name: string;
+  featured_at: string;
+  featured_by?: string;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Categories & Attributes
 // ─────────────────────────────────────────────────────────────────────────────
@@ -438,6 +449,17 @@ export interface UserFinancialReport {
   total_earned: number;
   total_spent: number;
   transaction_count: number;
+}
+
+export interface WalletGrant {
+  id: number;
+  user_id: number;
+  user_name: string;
+  user_email: string;
+  amount: number;
+  reason: string;
+  granted_by: string;
+  created_at: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

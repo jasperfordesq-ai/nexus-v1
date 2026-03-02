@@ -31,6 +31,8 @@ use Nexus\Services\InactiveMemberService;
 use Nexus\Services\EventReminderService;
 use Nexus\Services\ListingExpiryService;
 use Nexus\Services\ListingExpiryReminderService;
+use Nexus\Services\JobVacancyService;
+use Nexus\Services\RecurringShiftService;
 
 class CronController
 {
@@ -643,8 +645,9 @@ class CronController
      *   00:00:        Daily cleanup, leaderboard snapshot
      *   01:00:        Streak milestones
      *   03:00:        Gamification daily tasks
+     *   06:00:        Recurring shift generation
      *   07:00:        Abuse daily report
-     *   08:00:        Daily digest, balance alerts
+     *   08:00:        Daily digest, balance alerts, job expiry
      *   09:00:        Match digest daily
      *   Fri 17:00:    Weekly digest
      *   Sun 02:00:    Abuse cleanup
@@ -773,6 +776,12 @@ class CronController
                 $this->gamificationDailyInternal();
             }
 
+            if ($hour === 6 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Recurring shift generation...\n";
+                $this->recurringShiftGenerationInternal();
+            }
+
             if ($hour === 7 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Abuse daily report...\n";
@@ -799,6 +808,14 @@ class CronController
                 $taskNum++;
                 echo "\n[{$taskNum}] Listing expiry reminders...\n";
                 $this->listingExpiryRemindersInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Job expiry processing...\n";
+                $this->jobExpiryInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Featured job expiry...\n";
+                $this->featuredJobExpiryInternal();
             }
 
             if ($hour === 2 && $minute === 0) {
@@ -2030,6 +2047,68 @@ class CronController
             });
             ListingExpiryReminderService::cleanupOldRecords();
             echo "   Listing expiry reminders complete ($totalSent total).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * J7: Expire overdue job vacancies across all tenants
+     */
+    private function jobExpiryInternal(): void
+    {
+        try {
+            $totalExpired = 0;
+            $this->forEachTenant(function (int $tenantId, string $slug) use (&$totalExpired) {
+                $expired = JobVacancyService::expireOverdueJobs();
+                $totalExpired += $expired;
+                if ($expired > 0) {
+                    echo "   [$slug] Expired $expired overdue jobs.\n";
+                }
+            });
+            echo "   Job expiry complete ($totalExpired total).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * J7: Expire featured status on jobs past their featured_until date
+     */
+    private function featuredJobExpiryInternal(): void
+    {
+        try {
+            $totalExpired = 0;
+            $this->forEachTenant(function (int $tenantId, string $slug) use (&$totalExpired) {
+                $expired = JobVacancyService::expireFeaturedJobs();
+                $totalExpired += $expired;
+                if ($expired > 0) {
+                    echo "   [$slug] Expired featured status on $expired jobs.\n";
+                }
+            });
+            echo "   Featured job expiry complete ($totalExpired total).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * V8: Generate upcoming recurring shift occurrences across all tenants
+     */
+    private function recurringShiftGenerationInternal(): void
+    {
+        try {
+            $totalGenerated = 0;
+            $totalPatterns = 0;
+            $this->forEachTenant(function (int $tenantId, string $slug) use (&$totalGenerated, &$totalPatterns) {
+                $result = RecurringShiftService::processAllPatterns(14);
+                $totalGenerated += $result['shifts_generated'];
+                $totalPatterns += $result['patterns_processed'];
+                if ($result['shifts_generated'] > 0) {
+                    echo "   [$slug] Generated {$result['shifts_generated']} shifts from {$result['patterns_processed']} patterns.\n";
+                }
+            });
+            echo "   Recurring shift generation complete ($totalGenerated shifts from $totalPatterns patterns).\n";
         } catch (\Throwable $e) {
             echo "   Error: " . $e->getMessage() . "\n";
         }

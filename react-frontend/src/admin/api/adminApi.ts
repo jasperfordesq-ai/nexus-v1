@@ -22,6 +22,7 @@ import type {
   CacheStats,
   BackgroundJob,
   AdminListing,
+  FeaturedListing,
   AdminCategory,
   AdminAttribute,
   GamificationStats,
@@ -35,6 +36,7 @@ import type {
   FraudAlert,
   OrgWallet,
   UserFinancialReport,
+  WalletGrant,
   CronJob,
   PaginatedResponse,
   AdminBlogPost,
@@ -282,6 +284,16 @@ export const adminListings = {
 
   delete: (id: number) =>
     api.delete(`/v2/admin/listings/${id}`),
+
+  // Featured listings
+  getFeatured: () =>
+    api.get<FeaturedListing[]>('/v2/admin/listings/featured'),
+
+  feature: (id: number) =>
+    api.post(`/v2/admin/listings/${id}/feature`),
+
+  unfeature: (id: number) =>
+    api.post(`/v2/admin/listings/${id}/unfeature`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -462,6 +474,15 @@ export const adminTimebanking = {
     a.remove();
     window.URL.revokeObjectURL(url);
   },
+
+  // Starting balance grants
+  getGrants: (params: { page?: number; search?: string } = {}) =>
+    api.get<PaginatedResponse<WalletGrant>>(
+      `/v2/admin/wallet/grants${buildQuery(params)}`
+    ),
+
+  grantCredits: (data: { user_id: number; amount: number; reason: string }) =>
+    api.post('/v2/admin/wallet/grant', data),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

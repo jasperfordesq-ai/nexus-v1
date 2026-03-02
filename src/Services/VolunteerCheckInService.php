@@ -9,6 +9,9 @@ namespace Nexus\Services;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\VolShift;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
+use chillerlan\QRCode\Output\QROutputInterface;
 
 /**
  * VolunteerCheckInService - QR-based check-in for volunteer shifts
@@ -92,11 +95,10 @@ class VolunteerCheckInService
     }
 
     /**
-     * Generate QR code SVG for a token
+     * Generate a scannable QR code SVG for a check-in token
      *
-     * Simple QR code generation using a basic matrix encoding.
-     * For production, a proper QR library would be used, but this
-     * generates a functional data-matrix-style code.
+     * Uses chillerlan/php-qrcode to produce a real, scanner-compatible
+     * QR code encoding the check-in URL.
      *
      * @param string $token QR token
      * @return string SVG string of QR code
@@ -104,55 +106,25 @@ class VolunteerCheckInService
     public static function generateQrSvg(string $token): string
     {
         $url = self::getCheckInUrl($token);
-        $size = 200;
-        $moduleSize = 4;
 
-        // Simple hash-based visual pattern (not a real QR code scanner-compatible)
-        // For real QR codes, we'd use a library like chillerlan/php-qrcode
-        // This generates a visual representation with the URL embedded as text
-        $hash = hash('sha256', $url);
-        $modules = [];
+        try {
+            $options = new QROptions([
+                'outputType'   => QROutputInterface::MARKUP_SVG,
+                'eccLevel'     => \chillerlan\QRCode\Common\EccLevel::M,
+                'svgViewBoxSize' => 200,
+                'addQuietzone' => true,
+                'drawLightModules' => false,
+            ]);
 
-        // Generate a 25x25 grid from the hash
-        $gridSize = 25;
-        for ($i = 0; $i < $gridSize * $gridSize; $i++) {
-            $charIndex = $i % strlen($hash);
-            $modules[$i] = hexdec($hash[$charIndex]) > 7 ? 1 : 0;
+            return (new QRCode($options))->render($url);
+        } catch (\Throwable $e) {
+            error_log("[VolunteerCheckInService] QR generation failed: " . $e->getMessage());
+            // Fallback: return a minimal SVG with the URL as text
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">'
+                . '<rect width="200" height="200" fill="white"/>'
+                . '<text x="100" y="100" text-anchor="middle" font-size="10">QR Error</text>'
+                . '</svg>';
         }
-
-        // Add finder patterns (top-left, top-right, bottom-left)
-        for ($i = 0; $i < 7; $i++) {
-            for ($j = 0; $j < 7; $j++) {
-                $isEdge = ($i === 0 || $i === 6 || $j === 0 || $j === 6);
-                $isInner = ($i >= 2 && $i <= 4 && $j >= 2 && $j <= 4);
-                $val = ($isEdge || $isInner) ? 1 : 0;
-
-                // Top-left
-                $modules[$i * $gridSize + $j] = $val;
-                // Top-right
-                $modules[$i * $gridSize + ($gridSize - 7 + $j)] = $val;
-                // Bottom-left
-                $modules[($gridSize - 7 + $i) * $gridSize + $j] = $val;
-            }
-        }
-
-        // Build SVG
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' . ($gridSize * $moduleSize + 8) . ' ' . ($gridSize * $moduleSize + 8) . '">';
-        $svg .= '<rect width="100%" height="100%" fill="white"/>';
-
-        for ($row = 0; $row < $gridSize; $row++) {
-            for ($col = 0; $col < $gridSize; $col++) {
-                if ($modules[$row * $gridSize + $col]) {
-                    $x = $col * $moduleSize + 4;
-                    $y = $row * $moduleSize + 4;
-                    $svg .= '<rect x="' . $x . '" y="' . $y . '" width="' . $moduleSize . '" height="' . $moduleSize . '" fill="black"/>';
-                }
-            }
-        }
-
-        $svg .= '</svg>';
-
-        return $svg;
     }
 
     /**
