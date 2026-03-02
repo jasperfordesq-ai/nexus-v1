@@ -13,6 +13,36 @@ import { render, screen, waitFor } from '@/test/test-utils';
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn().mockImplementation((url: string) => {
+      if (url.includes('/verification-badges')) {
+        return Promise.resolve({
+          success: true,
+          data: [],
+        });
+      }
+      if (url.includes('/v2/gamification/profile')) {
+        return Promise.resolve({
+          success: true,
+          data: {
+            xp: 120,
+            level: 2,
+            badges_count: 1,
+          },
+        });
+      }
+      if (url.includes('/v2/gamification/badges')) {
+        return Promise.resolve({
+          success: true,
+          data: [
+            {
+              badge_key: 'first_exchange',
+              name: 'First Exchange',
+              description: 'Completed first exchange',
+              icon: '🏅',
+              earned_at: '2026-01-01T00:00:00Z',
+            },
+          ],
+        });
+      }
       if (url.includes('/v2/users/')) {
         return Promise.resolve({
           success: true,

@@ -79,6 +79,38 @@ interface GamificationSummary {
   badges: ProfileBadge[];
 }
 
+interface ProfileStats {
+  listings_count?: number;
+}
+
+interface ProfileApiBadge {
+  name: string;
+  badge_key: string;
+  icon: string;
+  description: string;
+  earned_at: string;
+}
+
+interface ProfileApiUser extends UserType {
+  badges?: ProfileApiBadge[];
+  stats?: ProfileStats;
+}
+
+interface GamificationProfileResponse {
+  xp?: number;
+  level?: number;
+  badges_count?: number;
+}
+
+interface GamificationBadgeResponse {
+  badge_key?: string;
+  key?: string;
+  name?: string;
+  description?: string;
+  icon?: string;
+  earned_at?: string | null;
+}
+
 export function ProfilePage() {
   const { t } = useTranslation('profile');
   const { id } = useParams<{ id: string }>();
@@ -88,7 +120,7 @@ export function ProfilePage() {
   const hasReviews = useFeature('reviews');
   const toast = useToast();
 
-  const [profile, setProfile] = useState<UserType | null>(null);
+  const [profile, setProfile] = useState<ProfileApiUser | null>(null);
   usePageTitle(profile?.name ? `${profile.name}` : 'Profile');
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -123,6 +155,13 @@ export function ProfilePage() {
         api.get<Listing[]>(`/v2/users/${profileId}/listings?limit=6`),
       ];
 
+      if (hasGamification) {
+        requests.push(
+          api.get<GamificationProfileResponse>(`/v2/gamification/profile?user_id=${profileId}`),
+          api.get<GamificationBadgeResponse[]>(`/v2/gamification/badges?user_id=${profileId}`)
+        );
+      }
+
       // Check connection status if viewing another user's profile
       if (isAuthenticated && currentUser && profileId !== currentUser.id.toString()) {
         requests.push(
@@ -131,34 +170,65 @@ export function ProfilePage() {
       }
 
       const results = await Promise.all(requests);
-      const connectionIdx = (isAuthenticated && currentUser && profileId !== currentUser.id.toString()) ? 2 : -1;
+      const connectionIdx = (isAuthenticated && currentUser && profileId !== currentUser.id.toString())
+        ? (hasGamification ? 4 : 2)
+        : -1;
 
       const [profileRes, listingsRes] = results as [
-        { success: boolean; data?: UserType & { badges?: Array<{ name: string; badge_key: string; icon: string; description: string; earned_at: string }> } },
+        { success: boolean; data?: ProfileApiUser },
         { success: boolean; data?: Listing[] },
       ];
+      const gamificationProfileRes = hasGamification
+        ? (results[2] as { success: boolean; data?: GamificationProfileResponse } | undefined)
+        : undefined;
+      const gamificationBadgesRes = hasGamification
+        ? (results[3] as { success: boolean; data?: GamificationBadgeResponse[] } | undefined)
+        : undefined;
       const connectionRes = connectionIdx >= 0 ? results[connectionIdx] as { success: boolean; data?: { status: ConnectionStatus; connection_id?: number } } | undefined : undefined;
 
       if (profileRes.success && profileRes.data) {
         setProfile(profileRes.data);
 
-        // Use badges from the profile API response (already scoped to this user)
-        if (hasGamification && Array.isArray(profileRes.data.badges) && profileRes.data.badges.length > 0) {
-          const profileBadges: ProfileBadge[] = profileRes.data.badges.map(b => ({
-            key: b.badge_key,
-            name: b.name,
-            description: b.description || '',
-            icon: b.icon || '',
-            tier: '',
-            earned: true,
-            earned_at: b.earned_at,
-          }));
+        if (hasGamification) {
+          const profileBadges: ProfileBadge[] = Array.isArray(profileRes.data.badges)
+            ? profileRes.data.badges.map((b) => ({
+                key: b.badge_key,
+                name: b.name,
+                description: b.description || '',
+                icon: b.icon || '',
+                tier: '',
+                earned: true,
+                earned_at: b.earned_at,
+              }))
+            : [];
+
+          const gamificationBadges: ProfileBadge[] =
+            gamificationBadgesRes?.success && Array.isArray(gamificationBadgesRes.data)
+              ? gamificationBadgesRes.data
+                  .map((b) => {
+                    const key = b.badge_key || b.key;
+                    if (!key || !b.name) return null;
+                    return {
+                      key,
+                      name: b.name,
+                      description: b.description || '',
+                      icon: b.icon || '',
+                      tier: '',
+                      earned: true,
+                      earned_at: b.earned_at ?? null,
+                    };
+                  })
+                  .filter((b): b is ProfileBadge => b !== null)
+              : [];
+
+          const mergedBadges = gamificationBadges.length > 0 ? gamificationBadges : profileBadges;
+
           setGamification({
-            level: profileRes.data.level ?? 1,
+            level: gamificationProfileRes?.data?.level ?? profileRes.data.level ?? 1,
             level_name: '',
-            xp: profileRes.data.xp ?? 0,
-            total_badges: profileBadges.length,
-            badges: profileBadges.slice(0, 12),
+            xp: gamificationProfileRes?.data?.xp ?? profileRes.data.xp ?? 0,
+            total_badges: gamificationProfileRes?.data?.badges_count ?? mergedBadges.length,
+            badges: mergedBadges.slice(0, 12),
           });
         }
       } else {
@@ -528,7 +598,7 @@ export function ProfilePage() {
         <ProfileStatCard
           icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}
           label={t('stats.active_listings')}
-          value={listings.length}
+          value={profile.stats?.listings_count ?? listings.length}
           color="purple"
         />
         <ProfileStatCard
