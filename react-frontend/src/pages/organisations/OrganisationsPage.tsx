@@ -24,12 +24,13 @@ import {
   Clock,
   Star,
   Users,
+  Plus,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -59,6 +60,8 @@ const SEARCH_DEBOUNCE_MS = 300;
 export function OrganisationsPage() {
   const { t } = useTranslation('community');
   usePageTitle(t('organisations.page_title'));
+  const { isAuthenticated } = useAuth();
+  const { tenantPath } = useTenant();
 
   const [organisations, setOrganisations] = useState<Organisation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -155,6 +158,16 @@ export function OrganisationsPage() {
           </h1>
           <p className="text-theme-muted mt-1">{t('organisations.subtitle')}</p>
         </div>
+        {isAuthenticated && (
+          <Link to={tenantPath('/organisations/register')}>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<Plus className="w-4 h-4" />}
+            >
+              {t('organisations.register_button')}
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Search */}

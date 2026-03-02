@@ -761,6 +761,61 @@ class VolunteerApiController extends BaseApiController
         $this->respondWithData($org);
     }
 
+    /**
+     * POST /api/v2/volunteering/organisations
+     *
+     * Register a new volunteer organisation (pending admin approval).
+     *
+     * Request Body (JSON):
+     * {
+     *   "name": "string" (required, min 3 chars),
+     *   "description": "string" (required, min 20 chars),
+     *   "contact_email": "string" (required, valid email),
+     *   "website": "string" (optional, valid URL)
+     * }
+     */
+    public function createOrganisation(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('volunteering_org_create', 5, 60);
+
+        $data = [
+            'name' => trim($this->input('name', '')),
+            'description' => trim($this->input('description', '')),
+            'contact_email' => trim($this->input('contact_email', '')),
+            'website' => trim($this->input('website', '')),
+        ];
+
+        $orgId = VolunteerService::createOrganization($userId, $data);
+
+        if ($orgId === null) {
+            $errors = VolunteerService::getErrors();
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $org = VolunteerService::getOrganizationById($orgId);
+        $this->respondWithData($org, null, 201);
+    }
+
+    /**
+     * GET /api/v2/volunteering/my-organisations
+     *
+     * Get organisations the current user owns or is a member of.
+     */
+    public function myOrganisations(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_my_orgs', 60, 60);
+
+        $orgs = VolunteerService::getMyOrganizations($userId);
+        $this->respondWithData($orgs);
+    }
+
     // ========================================
     // REVIEWS
     // ========================================
