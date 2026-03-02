@@ -2232,13 +2232,13 @@ $router->add('GET', '/api/v2/wallet/categories', 'Nexus\Controllers\Api\WalletFe
 $router->add('POST', '/api/v2/wallet/categories', 'Nexus\Controllers\Api\WalletFeaturesApiController@createCategory');
 $router->add('PUT', '/api/v2/wallet/categories/{id}', 'Nexus\Controllers\Api\WalletFeaturesApiController@updateCategory');
 $router->add('DELETE', '/api/v2/wallet/categories/{id}', 'Nexus\Controllers\Api\WalletFeaturesApiController@deleteCategory');
-$router->add('GET', '/api/v2/wallet/community-fund', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFund');
+$router->add('GET', '/api/v2/wallet/community-fund', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundBalance');
 $router->add('GET', '/api/v2/wallet/community-fund/transactions', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundTransactions');
 $router->add('POST', '/api/v2/wallet/community-fund/deposit', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundDeposit');
 $router->add('POST', '/api/v2/wallet/community-fund/withdraw', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundWithdraw');
 $router->add('POST', '/api/v2/wallet/community-fund/donate', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundDonate');
 $router->add('POST', '/api/v2/wallet/donate', 'Nexus\Controllers\Api\WalletFeaturesApiController@donate');
-$router->add('GET', '/api/v2/wallet/donations', 'Nexus\Controllers\Api\WalletFeaturesApiController@donations');
+$router->add('GET', '/api/v2/wallet/donations', 'Nexus\Controllers\Api\WalletFeaturesApiController@donationHistory');
 $router->add('GET', '/api/v2/wallet/starting-balance', 'Nexus\Controllers\Api\WalletFeaturesApiController@getStartingBalance');
 $router->add('PUT', '/api/v2/wallet/starting-balance', 'Nexus\Controllers\Api\WalletFeaturesApiController@setStartingBalance');
 $router->add('POST', '/api/v2/exchanges/{id}/rate', 'Nexus\Controllers\Api\WalletFeaturesApiController@rateExchange');
@@ -2360,11 +2360,11 @@ $router->add('PUT', '/api/v2/admin/moderation/settings', 'Nexus\Controllers\Api\
 $router->add('POST', '/api/v2/listings/{id}/renew', 'Nexus\Controllers\Api\ListingsApiController@renew');
 $router->add('GET', '/api/v2/listings/{id}/analytics', 'Nexus\Controllers\Api\ListingsApiController@analytics');
 $router->add('PUT', '/api/v2/listings/{id}/tags', 'Nexus\Controllers\Api\ListingsApiController@setSkillTags');
-$router->add('POST', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\ListingsApiController@featureListing');
-$router->add('DELETE', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\ListingsApiController@unfeatureListing');
-$router->add('POST', '/api/v2/admin/listings/{id}/reject', 'Nexus\Controllers\Api\ListingsApiController@rejectListing');
-$router->add('GET', '/api/v2/admin/listings/moderation-queue', 'Nexus\Controllers\Api\ListingsApiController@moderationQueue');
-$router->add('GET', '/api/v2/admin/listings/moderation-stats', 'Nexus\Controllers\Api\ListingsApiController@moderationStats');
+$router->add('POST', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\AdminListingsApiController@feature');
+$router->add('DELETE', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\AdminListingsApiController@unfeature');
+$router->add('POST', '/api/v2/admin/listings/{id}/reject', 'Nexus\Controllers\Api\AdminListingsApiController@reject');
+$router->add('GET', '/api/v2/admin/listings/moderation-queue', 'Nexus\Controllers\Api\AdminListingsApiController@moderationQueue');
+$router->add('GET', '/api/v2/admin/listings/moderation-stats', 'Nexus\Controllers\Api\AdminListingsApiController@moderationStats');
 
 // ============================================
 // API V2 - SEARCH FEATURES (New endpoints)
@@ -2374,9 +2374,9 @@ $router->add('POST', '/api/v2/search/saved', 'Nexus\Controllers\Api\SearchApiCon
 $router->add('DELETE', '/api/v2/search/saved/{id}', 'Nexus\Controllers\Api\SearchApiController@deleteSavedSearch');
 $router->add('POST', '/api/v2/search/saved/{id}/run', 'Nexus\Controllers\Api\SearchApiController@runSavedSearch');
 $router->add('GET', '/api/v2/search/trending', 'Nexus\Controllers\Api\SearchApiController@trending');
-$router->add('GET', '/api/v2/admin/search/analytics', 'Nexus\Controllers\Api\SearchApiController@searchAnalytics');
-$router->add('GET', '/api/v2/admin/search/trending', 'Nexus\Controllers\Api\SearchApiController@searchTrending');
-$router->add('GET', '/api/v2/admin/search/zero-results', 'Nexus\Controllers\Api\SearchApiController@searchZeroResults');
+$router->add('GET', '/api/v2/admin/search/analytics', 'Nexus\Controllers\Api\AdminListingsApiController@searchAnalytics');
+$router->add('GET', '/api/v2/admin/search/trending', 'Nexus\Controllers\Api\AdminListingsApiController@searchTrending');
+$router->add('GET', '/api/v2/admin/search/zero-results', 'Nexus\Controllers\Api\AdminListingsApiController@searchZeroResults');
 
 // ============================================
 // API V2 - CROSS-MODULE MATCHING (New endpoints)
