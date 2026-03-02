@@ -197,7 +197,7 @@ function useAdminNav(): NavSection[] {
           { label: 'Events', href: '/admin/events', icon: Calendar },
           { label: 'Polls', href: '/admin/polls', icon: BarChart2 },
           { label: 'Goals', href: '/admin/goals', icon: Target },
-          { label: 'Ideation', href: '/admin/ideation', icon: Lightbulb },
+          { label: 'Ideation Challenges', href: '/admin/ideation', icon: Lightbulb },
           { label: 'Jobs', href: '/admin/jobs', icon: Briefcase },
           { label: 'Volunteering', href: '/admin/volunteering', icon: Heart },
         ],
