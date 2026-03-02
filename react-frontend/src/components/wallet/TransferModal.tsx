@@ -14,6 +14,7 @@ import { Button, Input, Textarea, Avatar, Spinner } from '@heroui/react';
 import { X, Send, Search, User, AlertCircle } from 'lucide-react';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { CategorySelect } from './CategorySelect';
 import type { WalletUserSearchResult, Transaction } from '@/types/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -32,6 +33,7 @@ interface TransferFormData {
   recipient: WalletUserSearchResult | null;
   amount: string;
   description: string;
+  category_id: number | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -50,6 +52,7 @@ export function TransferModal({
     recipient: null,
     amount: '',
     description: '',
+    category_id: null,
   });
 
   // Search state
@@ -70,7 +73,7 @@ export function TransferModal({
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      setFormData({ recipient: null, amount: '', description: '' });
+      setFormData({ recipient: null, amount: '', description: '', category_id: null });
       setSearchQuery('');
       setSearchResults([]);
       setError(null);
@@ -206,6 +209,7 @@ export function TransferModal({
         recipient: formData.recipient!.id,
         amount: parseFloat(formData.amount),
         description: formData.description.trim() || undefined,
+        category_id: formData.category_id || undefined,
       });
 
       if (response.success && response.data) {
@@ -426,6 +430,12 @@ export function TransferModal({
                     </p>
                   )}
                 </div>
+
+                {/* Category (W8) */}
+                <CategorySelect
+                  value={formData.category_id}
+                  onChange={(id) => setFormData((prev) => ({ ...prev, category_id: id }))}
+                />
 
                 {/* Description Input */}
                 <div className="space-y-2">

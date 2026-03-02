@@ -50,7 +50,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
@@ -230,6 +230,7 @@ const FeedCard = React.memo(function FeedCard({
 }: FeedCardProps) {
   const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
+  const toast = useToast();
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
@@ -702,9 +703,14 @@ const FeedCard = React.memo(function FeedCard({
                 startContent={<Repeat2 className="w-[18px] h-[18px]" aria-hidden="true" />}
                 onPress={async () => {
                   try {
-                    await api.post(`/v2/feed/posts/${item.id}/share`);
+                    const res = await api.post(`/v2/feed/posts/${item.id}/share`);
+                    if (res.success) {
+                      toast.success(t('card.shared_success', 'Post shared to your feed'));
+                    } else {
+                      toast.error(res.error || t('card.share_failed', 'Failed to share'));
+                    }
                   } catch {
-                    // Ignore share errors
+                    toast.error(t('card.share_failed', 'Failed to share'));
                   }
                 }}
               >

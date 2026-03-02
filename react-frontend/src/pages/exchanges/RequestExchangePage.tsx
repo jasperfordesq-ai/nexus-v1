@@ -46,6 +46,7 @@ export function RequestExchangePage() {
   const [error, setError] = useState<string | null>(null);
 
   const [proposedHours, setProposedHours] = useState('');
+  const [prepTime, setPrepTime] = useState('');
   const [message, setMessage] = useState('');
 
   const loadData = useCallback(async () => {
@@ -108,9 +109,11 @@ export function RequestExchangePage() {
 
     try {
       setIsSubmitting(true);
+      const prepTimeVal = parseFloat(prepTime);
       const response = await api.post<{ id: number }>('/v2/exchanges', {
         listing_id: listing.id,
         proposed_hours: hours,
+        prep_time: !isNaN(prepTimeVal) && prepTimeVal > 0 ? prepTimeVal : undefined,
         message: message.trim() || undefined,
       });
 
@@ -245,6 +248,25 @@ export function RequestExchangePage() {
               isRequired
               endContent={<span className="text-theme-muted">{t('request.hours_unit')}</span>}
               description={t('request.proposed_hours_description', { max: MAX_EXCHANGE_HOURS })}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
+            />
+          </div>
+
+          <div>
+            <Input
+              type="number"
+              label={t('request.prep_time_label', 'Preparation Time')}
+              placeholder={t('request.prep_time_placeholder', '0')}
+              value={prepTime}
+              onChange={(e) => setPrepTime(e.target.value)}
+              min="0"
+              max="10"
+              step="0.25"
+              endContent={<span className="text-theme-muted">{t('request.hours_unit')}</span>}
+              description={t('request.prep_time_description', 'Additional time needed for preparation (optional)')}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',

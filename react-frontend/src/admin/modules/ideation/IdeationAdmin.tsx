@@ -26,9 +26,11 @@ import {
   MoreVertical,
   RefreshCw,
   CheckCircle,
-  Clock,
   Archive,
   XCircle,
+  FileEdit,
+  Vote,
+  ClipboardCheck,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -44,7 +46,7 @@ interface Challenge {
   title: string;
   creator_name: string;
   ideas_count: number;
-  status: 'open' | 'reviewing' | 'closed' | 'archived';
+  status: 'draft' | 'open' | 'voting' | 'evaluating' | 'closed' | 'archived';
   start_date: string;
   end_date: string;
   created_at: string;
@@ -59,10 +61,12 @@ interface ChallengeMeta {
 
 type ChallengeStatus = Challenge['status'];
 
-const statusColors: Record<ChallengeStatus, 'success' | 'warning' | 'default' | 'secondary'> = {
+const statusColors: Record<ChallengeStatus, 'success' | 'warning' | 'default' | 'secondary' | 'primary' | 'danger'> = {
+  draft: 'default',
   open: 'success',
-  reviewing: 'warning',
-  closed: 'default',
+  voting: 'primary',
+  evaluating: 'warning',
+  closed: 'danger',
   archived: 'secondary',
 };
 
@@ -103,6 +107,13 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           View Details
         </DropdownItem>
         <DropdownItem
+          key="draft"
+          startContent={<FileEdit size={14} />}
+          className={challenge.status !== 'draft' ? '' : 'hidden'}
+        >
+          Mark as Draft
+        </DropdownItem>
+        <DropdownItem
           key="open"
           startContent={<CheckCircle size={14} />}
           color="success"
@@ -111,12 +122,20 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           Mark as Open
         </DropdownItem>
         <DropdownItem
-          key="reviewing"
-          startContent={<Clock size={14} />}
-          color="warning"
-          className={challenge.status !== 'reviewing' ? 'text-warning' : 'hidden'}
+          key="voting"
+          startContent={<Vote size={14} />}
+          color="primary"
+          className={challenge.status !== 'voting' ? 'text-primary' : 'hidden'}
         >
-          Mark as Reviewing
+          Mark as Voting
+        </DropdownItem>
+        <DropdownItem
+          key="evaluating"
+          startContent={<ClipboardCheck size={14} />}
+          color="warning"
+          className={challenge.status !== 'evaluating' ? 'text-warning' : 'hidden'}
+        >
+          Mark as Evaluating
         </DropdownItem>
         <DropdownItem
           key="closed"
@@ -343,8 +362,10 @@ export function IdeationAdmin() {
           size="sm"
         >
           <Tab key="all" title="All" />
+          <Tab key="draft" title="Draft" />
           <Tab key="open" title="Open" />
-          <Tab key="reviewing" title="Reviewing" />
+          <Tab key="voting" title="Voting" />
+          <Tab key="evaluating" title="Evaluating" />
           <Tab key="closed" title="Closed" />
           <Tab key="archived" title="Archived" />
         </Tabs>
