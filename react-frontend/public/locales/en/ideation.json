@@ -3,6 +3,10 @@
   "title": "Ideation Challenges",
   "subtitle": "Share ideas, vote, and help shape your community",
 
+  "actions": {
+    "retry": "Retry"
+  },
+
   "tabs": {
     "all": "All",
     "open": "Open",
@@ -46,6 +50,7 @@
   },
 
   "challenges": {
+    "title": "Challenges",
     "empty_title": "No Challenges Yet",
     "empty_description": "There are no ideation challenges at the moment. Check back soon!",
     "empty_filtered": "No challenges match the selected filter.",
@@ -201,6 +206,7 @@
     "chatroom_created": "Channel created",
     "chatroom_deleted": "Channel deleted",
     "message_posted": "Message posted",
+    "template_applied": "Template applied successfully",
     "error_generic": "Something went wrong. Please try again."
   },
 
@@ -338,6 +344,9 @@
   "outcomes": {
     "title": "Impact Tracking",
     "page_title": "Impact Dashboard",
+    "empty_title": "No outcomes yet",
+    "status_label": "Status",
+    "implementation_status_label": "Implementation Status",
     "status_not_started": "Not Started",
     "status_in_progress": "In Progress",
     "status_implemented": "Implemented",
@@ -355,6 +364,8 @@
 
   "tasks": {
     "title": "Tasks",
+    "status_label": "Status",
+    "priority_label": "Priority",
     "create": "Add Task",
     "empty_title": "No Tasks Yet",
     "empty_description": "Create tasks to organize your team's work.",

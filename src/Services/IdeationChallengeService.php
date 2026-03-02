@@ -63,9 +63,10 @@ class IdeationChallengeService
      */
     private static function isAdmin(int $userId): bool
     {
+        $tenantId = TenantContext::getId();
         $user = Database::query(
-            "SELECT role FROM users WHERE id = ?",
-            [$userId]
+            "SELECT role FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         if (!$user) {
@@ -102,6 +103,13 @@ class IdeationChallengeService
             $params[] = $status;
         }
 
+        // Block draft challenges for non-admin users
+        if ($status === 'draft') {
+            if (!$userId || !self::isAdmin($userId)) {
+                $where[] = "1 = 0"; // Return no results for non-admins requesting drafts
+            }
+        }
+
         // Category filter
         $categoryId = $filters['category_id'] ?? null;
         if ($categoryId) {
@@ -120,7 +128,8 @@ class IdeationChallengeService
         $search = $filters['search'] ?? null;
         if ($search) {
             $where[] = "(c.title LIKE ? OR c.description LIKE ?)";
-            $searchTerm = '%' . $search . '%';
+            $escapedSearch = str_replace(['%', '_'], ['\\%', '\\_'], $search);
+            $searchTerm = '%' . $escapedSearch . '%';
             $params[] = $searchTerm;
             $params[] = $searchTerm;
         }
@@ -240,7 +249,7 @@ class IdeationChallengeService
         // Add user's idea count for this challenge
         if ($userId) {
             $userIdeaCount = Database::query(
-                "SELECT COUNT(*) AS cnt FROM challenge_ideas WHERE challenge_id = ? AND user_id = ? AND status != 'draft'",
+                "SELECT COUNT(*) AS cnt FROM challenge_ideas WHERE challenge_id = ? AND user_id = ? AND status NOT IN ('draft', 'withdrawn')",
                 [$id, $userId]
             )->fetch();
             $challenge['user_idea_count'] = (int)($userIdeaCount['cnt'] ?? 0);
@@ -702,7 +711,7 @@ class IdeationChallengeService
         $where = ["i.challenge_id = ?"];
 
         // Exclude draft ideas from public listing (drafts are private to the author)
-        $where[] = "i.status != 'draft'";
+        $where[] = "i.status NOT IN ('draft', 'withdrawn')";
 
         // Cursor pagination
         if ($cursor) {
@@ -1002,11 +1011,13 @@ class IdeationChallengeService
             return true;
         }
 
+        $tenantId = TenantContext::getId();
         $params[] = $id;
+        $params[] = $tenantId;
 
         try {
             Database::query(
-                "UPDATE challenge_ideas SET " . implode(', ', $updates) . " WHERE id = ?",
+                "UPDATE challenge_ideas SET " . implode(', ', $updates) . " WHERE id = ? AND challenge_id IN (SELECT id FROM ideation_challenges WHERE tenant_id = ?)",
                 $params
             );
             return true;
@@ -1149,7 +1160,10 @@ class IdeationChallengeService
             $challengeId = (int)$idea['challenge_id'];
 
             // FK cascade will delete votes and comments
-            Database::query("DELETE FROM challenge_ideas WHERE id = ?", [$id]);
+            Database::query(
+                "DELETE FROM challenge_ideas WHERE id = ? AND challenge_id IN (SELECT id FROM ideation_challenges WHERE tenant_id = ?)",
+                [$id, $tenantId]
+            );
 
             // Decrement ideas_count on the challenge
             Database::query(
@@ -1180,6 +1194,12 @@ class IdeationChallengeService
 
         if (!$idea) {
             self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Idea not found');
+            return null;
+        }
+
+        // Cannot vote on withdrawn or draft ideas
+        if (in_array($idea['status'] ?? '', ['withdrawn', 'draft'])) {
+            self::addError(ApiErrorCodes::RESOURCE_CONFLICT, 'Cannot vote on a withdrawn or draft idea');
             return null;
         }
 
@@ -1290,10 +1310,12 @@ class IdeationChallengeService
             return false;
         }
 
+        $tenantId = TenantContext::getId();
+
         try {
             Database::query(
-                "UPDATE challenge_ideas SET status = ? WHERE id = ?",
-                [$status, $ideaId]
+                "UPDATE challenge_ideas SET status = ? WHERE id = ? AND challenge_id IN (SELECT id FROM ideation_challenges WHERE tenant_id = ?)",
+                [$status, $ideaId, $tenantId]
             );
 
             // Award gamification points for winning
@@ -1413,6 +1435,12 @@ class IdeationChallengeService
 
         if (!$idea) {
             self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Idea not found');
+            return null;
+        }
+
+        // Cannot comment on withdrawn or draft ideas
+        if (in_array($idea['status'] ?? '', ['withdrawn', 'draft'])) {
+            self::addError(ApiErrorCodes::RESOURCE_CONFLICT, 'Cannot comment on a withdrawn or draft idea');
             return null;
         }
 

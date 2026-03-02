@@ -40,6 +40,36 @@ class Router
         ];
     }
 
+    /**
+     * Cast route parameters to match the controller method's type-hints.
+     * Converts string URL segments to int when the method expects int.
+     */
+    private static function castParamsToMethodTypes(object $controller, string $action, array $params): array
+    {
+        try {
+            $ref = new \ReflectionMethod($controller, $action);
+            $refParams = $ref->getParameters();
+            foreach ($refParams as $i => $rp) {
+                if (!isset($params[$i])) {
+                    break;
+                }
+                $type = $rp->getType();
+                if ($type instanceof \ReflectionNamedType && $type->getName() === 'int') {
+                    if (!ctype_digit((string)$params[$i]) && $params[$i] !== '0') {
+                        // Non-numeric value for int param — let TypeError be thrown
+                        // so the caller's catch block returns a clean 404
+                        $params[$i] = $params[$i]; // leave as-is, TypeError will fire
+                    } else {
+                        $params[$i] = (int)$params[$i];
+                    }
+                }
+            }
+        } catch (\ReflectionException $e) {
+            // Method not found — will fail at call_user_func_array naturally
+        }
+        return $params;
+    }
+
     public function hasRoute($method, $route)
     {
         foreach ($this->routes as $r) {
@@ -87,22 +117,36 @@ class Router
 
                 $callback = $route['callback'];
 
-                if (is_string($callback) && strpos($callback, '@') !== false) {
-                    [$controllerClass, $action] = explode('@', $callback);
-                    $controller = new $controllerClass();
-                    return call_user_func_array([$controller, $action], array_values($params));
-                }
+                // Cast numeric route params (e.g., {id}) to int when the
+                // controller method has an int type-hint. This prevents
+                // TypeErrors when non-numeric values like "abc" are passed.
+                $castParams = array_values($params);
 
-                if (is_array($callback)) {
-                    $controller = new $callback[0]();
-                    $action = $callback[1];
-                    // PHP 8 Fix: Use array_values to force positional arguments
-                    // This prevents "Unknown named parameter" errors if Controller var names don't match Route names
-                    return call_user_func_array([$controller, $action], array_values($params));
-                }
+                try {
+                    if (is_string($callback) && strpos($callback, '@') !== false) {
+                        [$controllerClass, $action] = explode('@', $callback);
+                        $controller = new $controllerClass();
+                        $castParams = self::castParamsToMethodTypes($controller, $action, $castParams);
+                        return call_user_func_array([$controller, $action], $castParams);
+                    }
 
-                // PHP 8 Fix for Closures
-                return call_user_func_array($callback, array_values($params));
+                    if (is_array($callback)) {
+                        $controller = new $callback[0]();
+                        $action = $callback[1];
+                        $castParams = self::castParamsToMethodTypes($controller, $action, $castParams);
+                        // PHP 8 Fix: Use array_values to force positional arguments
+                        return call_user_func_array([$controller, $action], $castParams);
+                    }
+
+                    // PHP 8 Fix for Closures
+                    return call_user_func_array($callback, $castParams);
+                } catch (\TypeError $e) {
+                    // Non-numeric value for an int param — return 404 JSON
+                    http_response_code(404);
+                    header('Content-Type: application/json');
+                    echo json_encode(['errors' => [['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Resource not found']]]);
+                    return;
+                }
             }
         }
 

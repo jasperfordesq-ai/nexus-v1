@@ -686,7 +686,7 @@ export function ChallengeDetailPage() {
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={() => fetchChallenge()}
             >
-              {t('ideas.load_more')}
+              {t('actions.retry', { defaultValue: 'Retry' })}
             </Button>
           }
         />
@@ -982,7 +982,7 @@ export function ChallengeDetailPage() {
 
             <div>
               <span className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                Status
+                {t('outcomes.status_label', { defaultValue: 'Status' })}
               </span>
               <div className="mt-0.5">
                 <Chip
@@ -1017,7 +1017,7 @@ export function ChallengeDetailPage() {
 
         <div className="flex items-center gap-2">
           {/* Sort Toggle */}
-          <div className="flex rounded-lg overflow-hidden border border-[var(--color-border)]">
+          <div className="flex rounded-lg overflow-hidden border border-[var(--color-border)]" role="group" aria-label={t('ideas.sort_label', { defaultValue: 'Sort ideas' })}>
             <button
               className={`px-3 py-1.5 text-sm transition-colors ${
                 sortMode === 'votes'
@@ -1025,6 +1025,7 @@ export function ChallengeDetailPage() {
                   : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
               }`}
               onClick={() => setSortMode('votes')}
+              aria-pressed={sortMode === 'votes'}
             >
               {t('ideas.sort_votes')}
             </button>
@@ -1035,6 +1036,7 @@ export function ChallengeDetailPage() {
                   : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
               }`}
               onClick={() => setSortMode('newest')}
+              aria-pressed={sortMode === 'newest'}
             >
               {t('ideas.sort_newest')}
             </button>
@@ -1460,7 +1462,7 @@ export function ChallengeDetailPage() {
             )}
 
             <Select
-              label="Implementation Status"
+              label={t('outcomes.implementation_status_label', { defaultValue: 'Implementation Status' })}
               selectedKeys={[outcomeForm.implementation_status]}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0];

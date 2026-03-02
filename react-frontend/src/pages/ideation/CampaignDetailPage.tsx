@@ -173,14 +173,18 @@ export function CampaignDetailPage() {
     }
   };
 
+  const [unlinkTargetId, setUnlinkTargetId] = useState<number | null>(null);
+
   const handleUnlinkChallenge = async (challengeId: number) => {
     try {
       await api.delete(`/v2/ideation-campaigns/${id}/challenges/${challengeId}`);
       toast.success(t('campaigns.unlink_challenge'));
+      setUnlinkTargetId(null);
       fetchCampaign();
     } catch (err) {
       logError('Failed to unlink challenge', err);
       toast.error(t('toast.error_generic'));
+      setUnlinkTargetId(null);
     }
   };
 
@@ -218,7 +222,7 @@ export function CampaignDetailPage() {
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={() => fetchCampaign()}
             >
-              {t('ideas.load_more')}
+              {t('actions.retry', { defaultValue: 'Retry' })}
             </Button>
           }
         />
@@ -290,7 +294,7 @@ export function CampaignDetailPage() {
 
       {/* Linked Challenges */}
       <h2 className="text-xl font-semibold text-[var(--color-text)] mb-4">
-        {t('challenges.load_more', { defaultValue: 'Challenges' })} ({campaign.challenges.length})
+        {t('challenges.title', { defaultValue: 'Challenges' })} ({campaign.challenges.length})
       </h2>
 
       {campaign.challenges.length === 0 ? (
@@ -367,19 +371,39 @@ export function CampaignDetailPage() {
                   </div>
                 </GlassCard>
               </Link>
-              {/* Unlink button */}
-              {isAdmin && (
+              {/* Unlink button with confirmation */}
+              {isAdmin && unlinkTargetId === ch.id ? (
+                <div className="absolute top-2 right-2 z-10 flex gap-1">
+                  <Button
+                    size="sm"
+                    color="danger"
+                    variant="flat"
+                    onPress={() => handleUnlinkChallenge(ch.id)}
+                    aria-label={t('campaigns.confirm_unlink', { defaultValue: 'Confirm unlink' })}
+                  >
+                    {t('campaigns.confirm_unlink', { defaultValue: 'Confirm' })}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    onPress={() => setUnlinkTargetId(null)}
+                    aria-label={t('actions.cancel', { defaultValue: 'Cancel' })}
+                  >
+                    {t('actions.cancel', { defaultValue: 'Cancel' })}
+                  </Button>
+                </div>
+              ) : isAdmin ? (
                 <Button
                   isIconOnly
                   variant="flat"
                   size="sm"
                   className="absolute top-2 right-2 z-10"
-                  onPress={() => handleUnlinkChallenge(ch.id)}
+                  onPress={() => setUnlinkTargetId(ch.id)}
                   aria-label={t('campaigns.unlink_challenge')}
                 >
                   <Unlink className="w-3.5 h-3.5" />
                 </Button>
-              )}
+              ) : null}
             </div>
           ))}
         </div>
