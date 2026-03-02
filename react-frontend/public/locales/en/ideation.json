@@ -23,6 +23,7 @@
   },
 
   "idea_status": {
+    "draft": "Draft",
     "submitted": "Submitted",
     "shortlisted": "Shortlisted",
     "winner": "Winner",
@@ -73,7 +74,16 @@
     "edit": "Edit Idea",
     "delete": "Delete Idea",
     "delete_confirm": "Are you sure you want to delete this idea? This action cannot be undone.",
-    "load_error": "Unable to load ideas"
+    "load_error": "Unable to load ideas",
+    "save_draft": "Save Draft",
+    "publish_draft": "Publish Idea",
+    "draft_saved": "Draft saved",
+    "draft": "Draft",
+    "your_drafts": "Your Drafts",
+    "untitled_draft": "Untitled Draft",
+    "draft_updated": "Updated {{date}}",
+    "draft_created": "Created {{date}}",
+    "new_idea": "New Idea"
   },
 
   "idea_detail": {
@@ -100,16 +110,19 @@
     "title_placeholder": "Enter a clear, descriptive title",
     "description_label": "Description",
     "description_placeholder": "Describe the challenge or your idea in detail",
+    "description_helper": "Describe the problem clearly, including who is affected, why it matters, and what a successful solution looks like",
     "category_label": "Category",
     "category_placeholder": "Select a category",
     "category_free_label": "Category (free text)",
     "category_free_placeholder": "e.g. Environment, Technology, Community",
     "prize_label": "Prize Description",
     "prize_placeholder": "Describe what the winner receives (optional)",
+    "prize_helper": "Incentives boost participation — consider time credits, recognition, or implementation support",
     "submission_deadline_label": "Submission Deadline",
     "voting_deadline_label": "Voting Deadline",
     "max_ideas_label": "Max Ideas Per User",
     "max_ideas_placeholder": "Leave empty for unlimited",
+    "max_ideas_helper": "Limiting ideas per person encourages higher quality submissions",
     "status_label": "Initial Status",
     "evaluation_criteria_label": "Evaluation Criteria",
     "evaluation_criteria_placeholder": "Add a criterion (press Enter)",
@@ -203,6 +216,13 @@
 
   "featured": "Featured",
 
+  "search": {
+    "label": "Search challenges",
+    "placeholder": "Search challenges by title or description...",
+    "clear_tags": "Clear tags",
+    "no_results": "No challenges match your search"
+  },
+
   "tags": {
     "label": "Tags",
     "placeholder": "Add tags (press Enter)",
@@ -216,6 +236,39 @@
     "label": "Cover Image URL",
     "placeholder": "https://example.com/image.jpg",
     "helper": "Banner image for the challenge (recommended 600x400)"
+  },
+
+  "guidance": {
+    "title": "Tips for Writing a Great Challenge",
+    "intro": "A well-framed challenge inspires better ideas. Here are some tips to help you create an effective problem statement.",
+    "tips": {
+      "clear_problem": {
+        "title": "\uD83C\uDFAF Define a Clear Problem",
+        "description": "State the specific issue you want the community to address. Avoid vague or overly broad statements."
+      },
+      "scope": {
+        "title": "\uD83D\uDCCF Set Realistic Scope",
+        "description": "Define clear boundaries and constraints so ideas remain focused and actionable."
+      },
+      "criteria": {
+        "title": "\u2696\uFE0F Explain Evaluation Criteria",
+        "description": "Tell participants how ideas will be judged \u2014 feasibility, creativity, impact, or cost-effectiveness."
+      },
+      "engagement": {
+        "title": "\uD83D\uDCA1 Encourage Participation",
+        "description": "Use inviting language. Add a prize or recognition to motivate submissions."
+      }
+    },
+    "examples_toggle": "Show examples of good vs. weak challenges \u25B8",
+    "example_good": {
+      "label": "\u2705 Strong challenge:",
+      "text": "How might we reduce food waste in our community by 25% over the next year? We're looking for practical, low-cost ideas that local businesses and residents can implement together."
+    },
+    "example_weak": {
+      "label": "\u274C Weak challenge:",
+      "text": "We need ideas about the environment.",
+      "why": "Too vague \u2014 no specific problem, no constraints, no success criteria."
+    }
   },
 
   "duplicate": {
