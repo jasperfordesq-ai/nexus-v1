@@ -197,7 +197,7 @@ export function SafeguardingDashboard() {
     if (!reviewTarget) return;
     setReviewing(true);
     try {
-      const res = await api.post(`/api/v2/admin/safeguarding/flagged-messages/${reviewTarget.id}/review`, {
+      const res = await api.post(`/v2/admin/safeguarding/flagged-messages/${reviewTarget.id}/review`, {
         notes: reviewNotes,
       });
       if (res.success) {
@@ -244,7 +244,7 @@ export function SafeguardingDashboard() {
   // ─── Revoke assignment ───
   const handleRevokeAssignment = useCallback(async (assignmentId: number) => {
     try {
-      await api.delete(`/api/v2/admin/safeguarding/assignments/${assignmentId}`);
+      await api.delete(`/v2/admin/safeguarding/assignments/${assignmentId}`);
       toast.success('Assignment revoked');
       setAssignments((prev) =>
         prev.map((a) => a.id === assignmentId ? { ...a, status: 'revoked' as const } : a)
