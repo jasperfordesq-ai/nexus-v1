@@ -120,8 +120,10 @@ const CampaignsPage = lazyWithRetry(() => import('@/pages/ideation/CampaignsPage
 const CampaignDetailPage = lazyWithRetry(() => import('@/pages/ideation/CampaignDetailPage'));
 const OutcomesDashboardPage = lazyWithRetry(() => import('@/pages/ideation/OutcomesDashboardPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
+const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/CreateOpportunityPage'));
 const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
 const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
+const RegisterOrganisationPage = lazyWithRetry(() => import('@/pages/organisations/RegisterOrganisationPage'));
 const FeedPage = lazyWithRetry(() => import('@/pages/feed/FeedPage'));
 const BlogPage = lazyWithRetry(() => import('@/pages/blog/BlogPage'));
 const BlogPostPage = lazyWithRetry(() => import('@/pages/blog/BlogPostPage'));
@@ -634,6 +636,20 @@ function AppRoutes() {
             <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
               <FeatureErrorBoundary featureName="Volunteering">
                 <VolunteeringPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="volunteering/create" element={
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
+              <FeatureErrorBoundary featureName="Volunteering">
+                <CreateOpportunityPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="organisations/register" element={
+            <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
+              <FeatureErrorBoundary featureName="Organisations">
+                <RegisterOrganisationPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

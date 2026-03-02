@@ -14,6 +14,7 @@ use Nexus\Models\VolShift;
 use Nexus\Models\VolLog;
 use Nexus\Models\VolOrganization;
 use Nexus\Models\VolReview;
+use Nexus\Models\OrgMember;
 use Nexus\Models\ActivityLog;
 use Nexus\Models\Transaction;
 
@@ -1545,5 +1546,175 @@ class VolunteerService
                 'created_at' => $r['created_at'],
             ];
         }, $reviews);
+    }
+
+    // ========================================
+    // ORGANIZATION REGISTRATION
+    // ========================================
+
+    /**
+     * Register a new volunteer organisation (created with status='pending')
+     */
+    public static function createOrganization(int $userId, array $data): ?int
+    {
+        self::$errors = [];
+        $tenantId = TenantContext::getId();
+
+        // Validate required fields
+        $name = trim($data['name'] ?? '');
+        $description = trim($data['description'] ?? '');
+        $contactEmail = trim($data['contact_email'] ?? '');
+        $website = trim($data['website'] ?? '');
+
+        if (empty($name)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name is required', 'field' => 'name'];
+            return null;
+        }
+
+        if (mb_strlen($name) < 3) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name must be at least 3 characters', 'field' => 'name'];
+            return null;
+        }
+
+        if (mb_strlen($name) > 200) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name must be under 200 characters', 'field' => 'name'];
+            return null;
+        }
+
+        if (empty($description)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description is required', 'field' => 'description'];
+            return null;
+        }
+
+        if (mb_strlen($description) < 20) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description must be at least 20 characters', 'field' => 'description'];
+            return null;
+        }
+
+        if (empty($contactEmail)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Contact email is required', 'field' => 'contact_email'];
+            return null;
+        }
+
+        if (!filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Please enter a valid email address', 'field' => 'contact_email'];
+            return null;
+        }
+
+        if (!empty($website) && !filter_var($website, FILTER_VALIDATE_URL)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Please enter a valid URL', 'field' => 'website'];
+            return null;
+        }
+
+        // Check for duplicate name in tenant (case-insensitive, excluding declined)
+        $existing = Database::query(
+            "SELECT id FROM vol_organizations WHERE tenant_id = ? AND LOWER(name) = LOWER(?) AND status != 'declined'",
+            [$tenantId, $name]
+        )->fetch();
+
+        if ($existing) {
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'An organisation with this name already exists', 'field' => 'name'];
+            return null;
+        }
+
+        // Generate slug
+        $slug = self::generateOrgSlug($name, $tenantId);
+
+        try {
+            $orgId = VolOrganization::create(
+                $tenantId,
+                $userId,
+                $name,
+                $description,
+                $contactEmail,
+                $website ?: null,
+                $slug
+            );
+
+            // Initialize owner membership
+            OrgMember::initializeOwner((int)$orgId, $userId);
+
+            // Record in feed_activity table
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'org_registered', (int)$orgId, [
+                    'title' => $name,
+                    'content' => $description,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log("VolunteerService::createOrganization feed_activity record failed: " . $faEx->getMessage());
+            }
+
+            // Log activity
+            try {
+                ActivityLog::log($userId, 'org_registered', 'vol_organizations', (int)$orgId, [
+                    'name' => $name,
+                ]);
+            } catch (\Exception $alEx) {
+                error_log("VolunteerService::createOrganization activity_log failed: " . $alEx->getMessage());
+            }
+
+            return (int)$orgId;
+        } catch (\Throwable $e) {
+            error_log("VolunteerService::createOrganization error: " . $e->getMessage());
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
+            return null;
+        }
+    }
+
+    /**
+     * Get organisations the current user owns or is admin of
+     */
+    public static function getMyOrganizations(int $userId): array
+    {
+        $orgs = OrgMember::getUserOrganizations($userId);
+
+        return array_map(function ($org) {
+            return [
+                'id' => (int)$org['id'],
+                'name' => $org['name'],
+                'description' => $org['description'] ?? null,
+                'status' => $org['status'] ?? 'pending',
+                'member_role' => $org['member_role'] ?? 'member',
+                'logo_url' => $org['logo_url'] ?? null,
+                'contact_email' => $org['contact_email'] ?? null,
+                'website' => $org['website'] ?? null,
+                'created_at' => $org['created_at'] ?? null,
+            ];
+        }, $orgs);
+    }
+
+    /**
+     * Generate a unique slug for an organisation within a tenant
+     */
+    private static function generateOrgSlug(string $name, int $tenantId): string
+    {
+        // Transliterate to ASCII, lowercase, replace non-alnum with hyphens
+        $slug = mb_strtolower($name, 'UTF-8');
+        $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
+        $slug = trim($slug, '-');
+
+        if (empty($slug)) {
+            $slug = 'organisation';
+        }
+
+        // Check uniqueness
+        $baseSlug = $slug;
+        $suffix = 0;
+        while (true) {
+            $existing = Database::query(
+                "SELECT id FROM vol_organizations WHERE tenant_id = ? AND slug = ?",
+                [$tenantId, $slug]
+            )->fetch();
+
+            if (!$existing) {
+                break;
+            }
+
+            $suffix++;
+            $slug = $baseSlug . '-' . $suffix;
+        }
+
+        return $slug;
     }
 }
