@@ -39,6 +39,7 @@ import {
   AlertTriangle,
   CheckCircle,
 } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -252,7 +253,7 @@ export function KBArticlePage() {
               prose-pre:bg-theme-elevated prose-pre:border prose-pre:border-theme-default
               prose-img:rounded-lg prose-blockquote:border-blue-400
               prose-li:text-theme-secondary"
-            dangerouslySetInnerHTML={{ __html: article.content }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}
           />
         </GlassCard>
       </motion.div>
