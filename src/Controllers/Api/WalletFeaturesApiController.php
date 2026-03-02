@@ -521,7 +521,7 @@ class WalletFeaturesApiController extends BaseApiController
     /**
      * Require admin role
      */
-    private function requireAdmin(): void
+    protected function requireAdmin(): int
     {
         $userId = $this->getUserId();
 
@@ -541,5 +541,7 @@ class WalletFeaturesApiController extends BaseApiController
                 $this->error('Admin access required', 403);
             }
         }
+
+        return $userId;
     }
 }
