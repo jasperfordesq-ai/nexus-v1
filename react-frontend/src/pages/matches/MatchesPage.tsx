@@ -100,7 +100,7 @@ export function MatchesPage() {
     else setLoading(true);
 
     try {
-      const res = await api.get('/api/v2/matches/all');
+      const res = await api.get('/v2/matches/all');
       if (res.success) {
         const payload = res.data;
         const items = Array.isArray(payload)

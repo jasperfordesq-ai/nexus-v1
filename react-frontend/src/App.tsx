@@ -121,6 +121,7 @@ const CampaignDetailPage = lazyWithRetry(() => import('@/pages/ideation/Campaign
 const OutcomesDashboardPage = lazyWithRetry(() => import('@/pages/ideation/OutcomesDashboardPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/CreateOpportunityPage'));
+const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/OpportunityDetailPage'));
 const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
 const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
 const RegisterOrganisationPage = lazyWithRetry(() => import('@/pages/organisations/RegisterOrganisationPage'));
@@ -643,6 +644,13 @@ function AppRoutes() {
             <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
               <FeatureErrorBoundary featureName="Volunteering">
                 <CreateOpportunityPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="volunteering/opportunities/:id" element={
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
+              <FeatureErrorBoundary featureName="Volunteering">
+                <OpportunityDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
