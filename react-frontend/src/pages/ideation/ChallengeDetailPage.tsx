@@ -386,7 +386,7 @@ export function ChallengeDetailPage() {
       if (ideaResponse.data?.id && newIdeaMediaUrl.trim()) {
         try {
           await api.post(`/v2/ideation-ideas/${ideaResponse.data.id}/media`, {
-            type: newIdeaMediaType,
+            media_type: newIdeaMediaType,
             url: newIdeaMediaUrl.trim(),
             caption: newIdeaMediaCaption.trim() || null,
           });
