@@ -356,7 +356,7 @@ export function IdeaDetailPage() {
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={() => fetchIdea()}
             >
-              {t('ideas.load_more')}
+              {t('actions.retry', { defaultValue: 'Retry' })}
             </Button>
           }
         />
