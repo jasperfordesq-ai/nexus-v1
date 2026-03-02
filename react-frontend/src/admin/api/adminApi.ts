@@ -282,18 +282,18 @@ export const adminListings = {
   approve: (id: number) =>
     api.post(`/v2/admin/listings/${id}/approve`),
 
+  feature: (id: number) =>
+    api.post(`/v2/admin/listings/${id}/feature`),
+
+  unfeature: (id: number) =>
+    api.delete(`/v2/admin/listings/${id}/feature`),
+
   delete: (id: number) =>
     api.delete(`/v2/admin/listings/${id}`),
 
   // Featured listings
   getFeatured: () =>
     api.get<FeaturedListing[]>('/v2/admin/listings/featured'),
-
-  feature: (id: number) =>
-    api.post(`/v2/admin/listings/${id}/feature`),
-
-  unfeature: (id: number) =>
-    api.post(`/v2/admin/listings/${id}/unfeature`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -131,6 +131,9 @@ export function ProfilePage() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [gamification, setGamification] = useState<GamificationSummary | null>(null);
 
+  // Endorsement data keyed by skill name
+  const [endorsements, setEndorsements] = useState<Record<string, { count: number; isEndorsed: boolean }>>({});
+
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState(false);
@@ -241,6 +244,33 @@ export function ProfilePage() {
       if (connectionRes?.success && connectionRes.data) {
         setConnectionStatus(connectionRes.data.status);
         setConnectionId(connectionRes.data.connection_id ?? null);
+      }
+
+      // Fetch endorsement data for skills
+      if (profileRes.success && profileRes.data?.skills?.length) {
+        try {
+          const endorseRes = await api.get<{
+            endorsements?: Record<string, {
+              skill_name: string;
+              count: number;
+              endorsed_by_ids?: string;
+            }>;
+          }>(`/v2/members/${profileId}/endorsements`);
+          if (endorseRes.success && endorseRes.data?.endorsements) {
+            const currentUserId = currentUser?.id?.toString() || '';
+            const map: Record<string, { count: number; isEndorsed: boolean }> = {};
+            for (const [skill, info] of Object.entries(endorseRes.data.endorsements)) {
+              const endorserIds = info.endorsed_by_ids?.split(',') || [];
+              map[skill] = {
+                count: info.count || 0,
+                isEndorsed: currentUserId ? endorserIds.includes(currentUserId) : false,
+              };
+            }
+            setEndorsements(map);
+          }
+        } catch {
+          // Endorsement data is supplementary — don't fail the whole page
+        }
       }
     } catch (err) {
       logError('Failed to load profile', err);
@@ -728,8 +758,8 @@ export function ProfilePage() {
                           <EndorseButton
                             memberId={profile.id}
                             skillName={skill}
-                            endorsementCount={0}
-                            isEndorsed={false}
+                            endorsementCount={endorsements[skill]?.count ?? 0}
+                            isEndorsed={endorsements[skill]?.isEndorsed ?? false}
                             compact
                           />
                         )}
