@@ -2,12 +2,16 @@
 
 Comprehensive feature enhancement plan based on competitive analysis of MadeOpen, hOurworld, global job platforms, volunteering platforms, and Timebanking UK.
 
-**Date:** 2026-03-01 | **Audited against codebase:** 2026-03-01 | **Last build:** 2026-03-01
-**Current state:** 18+ modules, 450+ API endpoints. **106 DONE, 0 PARTIAL, 0 TODO (100% backend complete)**
+**Date:** 2026-03-01 | **Audited against codebase:** 2026-03-02 | **Last build:** 2026-03-01
+**Current state:** 18+ modules, 450+ API endpoints. **87 DONE, 18 PARTIAL, 1 TODO (82% fully wired)**
 
 > **BUILD COMPLETED 2026-03-01**: All 96 features (50 TODO + 46 PARTIAL) implemented across 11 parallel agents.
-> ~60 new PHP services, ~15 new controllers, ~12 migrations (73 new tables), ~15 React components, ~250 new API endpoints.
-> Audit: 73/73 tables verified, all PHP files pass `php -l`, all SPDX headers present.
+> ~60 new PHP services, ~15 new controllers, ~12 migrations (82 new tables), ~15 React components, ~250 new API endpoints.
+> Audit: 82/82 tables verified, all PHP files pass `php -l`, all SPDX headers present.
+>
+> **AUDIT 2026-03-02**: Full-stack verification by 8 Claude Opus 4.6 agents. Found 31.1% of features not fully wired.
+> 6 critical route bugs (runtime 500s), 4 features with zero code, 12 backend-only features needing React UI.
+> See AUDIT_REPORT.md for complete findings.
 
 **Research sources:**
 - MadeOpen deep-dive (UK community platform, NHS Talent Timebanking)
@@ -29,16 +33,16 @@ Comprehensive feature enhancement plan based on competitive analysis of MadeOpen
 
 | # | Feature | Status | Description |
 |---|---------|--------|-------------|
-| V1 | Shift waitlist automation | DONE | When a shift cancels, auto-notify next person on waitlist |
-| V2 | Shift swapping | DONE | Volunteers trade shifts with qualified peers (admin approval) |
-| V3 | Team/group sign-ups | DONE | Reserve a block of shifts for a company team or group |
+| V1 | Shift waitlist automation | PARTIAL | Backend: VolunteerWaitlistService. **No React UI** for waitlist management |
+| V2 | Shift swapping | PARTIAL | Backend: ShiftSwapService. **No React UI**; dead `adminDecision()` method |
+| V3 | Team/group sign-ups | PARTIAL | Backend: GroupShiftReservationService. **No React UI**; DELETE route missing `{userId}` |
 | V4 | Skills-based matching | DONE | VolunteerMatchingService with multi-factor scoring (skills 50%, proximity 25%, time 15%, quality 10%) |
-| V5 | Credential/cert tracking | DONE | InsuranceCertificateService.php fully implemented with admin API |
+| V5 | Credential/cert tracking | PARTIAL | InsuranceCertificateService.php implemented. **No React verification workflow UI** |
 | V6 | Impact certificates | DONE | VolunteerCertificateService generates HTML certificates with verification QR codes |
-| V7 | Volunteer check-in (QR) | DONE | VolunteerCheckInService with unique tokens, SVG QR generation, check-in/check-out |
-| V8 | Recurring shifts | DONE | Recurrence patterns implemented in VolShift model |
+| V7 | Volunteer check-in (QR) | PARTIAL | VolunteerCheckInService with unique tokens. **QR is non-scannable SVG placeholder** |
+| V8 | Recurring shifts | TODO | **Zero code exists** — no migration, model, service, controller, or UI |
 | V9 | Emergency/urgent alerts | DONE | VolunteerEmergencyAlertService with priority-based targeting by skills |
-| V10 | Volunteer burnout detection | DONE | VolunteerWellbeingService with 5-indicator risk scoring (frequency, cancellation, hours, response, engagement) |
+| V10 | Volunteer burnout detection | PARTIAL | VolunteerWellbeingService implemented. **No React dashboard**; dead admin methods |
 
 ### Module 2: JOB VACANCIES (10 features)
 
@@ -50,7 +54,7 @@ Comprehensive feature enhancement plan based on competitive analysis of MadeOpen
 | J4 | Application status history | DONE | job_application_history table, auto-logged on every status change |
 | J5 | "Am I Qualified?" tool | DONE | Skill-by-skill breakdown modal with progress bar and qualification level |
 | J6 | Job alerts/notifications | DONE | job_alerts table with keyword/category/location matching, auto-trigger on new jobs |
-| J7 | Job expiry + renewal | DONE | Auto-expire, 3-day reminders, one-click renewal (7/14/30/60 day options) |
+| J7 | Job expiry + renewal | PARTIAL | Renewal wired. **No cron trigger** for auto-expiry & 3-day reminders |
 | J8 | Job analytics | DONE | job_vacancy_views table, views over time, conversion rate, time-to-fill dashboard |
 | J9 | Salary/compensation display | DONE | salary_min/max/type/currency/negotiable fields, form + display on cards |
 | J10 | Featured jobs | DONE | is_featured + featured_until, admin feature/unfeature, auto-expire, star badge |
@@ -65,7 +69,7 @@ Comprehensive feature enhancement plan based on competitive analysis of MadeOpen
 | W4 | Prep time tracking | DONE | prep_time column on exchanges + transactions, full flow through creation to display |
 | W5 | Transaction statements | DONE | CSV export with date range filtering, running balance, opening balance |
 | W6 | Credit donation | DONE | Donate credits to community fund or another member |
-| W7 | Starting balances | DONE | Admin grants new members initial credits |
+| W7 | Starting balances | PARTIAL | Backend: admin grants credits. **No React admin UI** for managing starting balances |
 | W8 | Transaction descriptions | DONE | TransactionCategoryService with 12 default categories, CRUD API, CategorySelect component |
 | W9 | Double confirmation | DONE | Dual-party confirmation verified: requester + provider must both confirm before credit transfer |
 | W10 | Satisfaction rating on exchange | DONE | Rate satisfaction after each exchange |
@@ -78,13 +82,13 @@ Comprehensive feature enhancement plan based on competitive analysis of MadeOpen
 
 | # | Feature | Status | Description |
 |---|---------|--------|-------------|
-| E1 | Recurring events | DONE | RRULE recurrence rules, occurrence generation (up to 52), single vs all editing |
+| E1 | Recurring events | PARTIAL | Backend: RRULE recurrence rules, occurrence generation. **No React recurring event creation UI** |
 | E2 | Capacity limits | DONE | max_attendees enforcement on RSVP, "X spots left" badges, auto-waitlist when full |
 | E3 | Waitlist management | DONE | event_waitlist table, position tracking, auto-promote on cancellation |
-| E4 | Event reminders | DONE | Configurable 1hr/1day/1week reminders, auto-created on RSVP, cron processor |
+| E4 | Event reminders | PARTIAL | Backend: configurable reminders, auto-created on RSVP. **No React reminder preferences UI**; standalone cron only |
 | E5 | Event cancellation notifications | DONE | Status system (active/cancelled/postponed/draft), bulk notify all RSVPs + waitlist |
 | E6 | Event attendance tracking | DONE | event_attendance table, organizer check-in, bulk marking, hours calculation |
-| E7 | Event series linking | DONE | event_series table, CRUD, "Part of: [Series]" navigable chips |
+| E7 | Event series linking | PARTIAL | event_series table, CRUD. **Static chip display only** — not navigable, no series pages |
 
 ### Module 13: NOTIFICATIONS (6 features)
 
@@ -125,11 +129,11 @@ Comprehensive feature enhancement plan based on competitive analysis of MadeOpen
 
 | # | Feature | Status | Description |
 |---|---------|--------|-------------|
-| L1 | Auto-expiry with renewal | DONE | ListingExpiryService: cron processor, one-click 30-day renewal, max 12 renewals |
+| L1 | Auto-expiry with renewal | PARTIAL | Renewal wired. **Auto-expiry has NO cron script** — `processAllTenants()` is never called |
 | L2 | Listing analytics | DONE | ListingAnalyticsService: views/contacts/saves tracking, 1hr dedup, sparkline chart |
 | L3 | Skills tag filtering | DONE | listing_skill_tags table, popular tags, autocomplete, filter by skills in search |
-| L4 | Listing boost/featured | DONE | ListingFeaturedService: admin feature/unfeature, auto-expire, star badge, sort to top |
-| L5 | Listing QA workflow | DONE | ListingModerationService: pending_review status, admin queue, approve/reject with reason |
+| L4 | Listing boost/featured | PARTIAL | Display works. **Admin `featureListing`/`unfeatureListing` methods MISSING** from controller |
+| L5 | Listing QA workflow | PARTIAL | Service done. **3 controller methods MISSING** (`rejectListing`/`moderationQueue`/`moderationStats`), no React UI |
 
 ### Module 6: SEARCH (4 features)
 
@@ -137,7 +141,7 @@ Comprehensive feature enhancement plan based on competitive analysis of MadeOpen
 |---|---------|--------|-------------|
 | S1 | Saved searches | DONE | saved_searches table, save/re-run/delete, max 25 per user, notification toggle |
 | S2 | Advanced filters | DONE | Category, date range, location, skills, sort order filters in UnifiedSearch |
-| S3 | Search analytics | DONE | search_logs table, trending terms, zero-result detection, admin dashboard |
+| S3 | Search analytics | PARTIAL | search_logs table, trending terms. **Admin routes point to wrong controller** (method mismatch) |
 | S4 | Boolean search | DONE | Exact phrases (""), NOT/exclusion (-), AND operators with prepared statements |
 
 ### Module 8: GOALS (5 features)
@@ -145,9 +149,9 @@ Comprehensive feature enhancement plan based on competitive analysis of MadeOpen
 | # | Feature | Status | Description |
 |---|---------|--------|-------------|
 | G1 | Goal templates | DONE | goal_templates table, admin-created, create-from-template with pre-filled milestones |
-| G2 | Milestone tracking | DONE | goal_milestones table with full milestone system (195 references) |
+| G2 | Milestone tracking | PARTIAL | **Audit conflict**: roadmap claims 195 refs, audit found no table/service/routes/UI. Needs verification. |
 | G3 | Goal check-ins | DONE | goal_checkins table: progress %, notes, mood indicator, configurable frequency |
-| G4 | Goal reminders | DONE | goal_reminders table: daily/weekly/biweekly/monthly, cron-compatible sender |
+| G4 | Goal reminders | PARTIAL | goal_reminders table, full CRUD + UI. **NO cron trigger** — `sendDueReminders()` never called |
 | G5 | Progress history | DONE | goal_progress_log table: chronological timeline of all changes, summary stats |
 
 ### Module 9: POLLS (4 features)
@@ -208,7 +212,7 @@ The MadeOpen Challenges module is a **full innovation pipeline**:
 | A2 | Member activity reports | DONE | MemberReportService: active members, registrations, retention cohorts, top contributors |
 | A3 | Hours by category report | DONE | HoursReportService: hours by category/member/period, summary stats |
 | A4 | Inactive member detection | DONE | InactiveMemberService: auto-detect inactive/dormant, flag management, auto-resolve |
-| A5 | CSV export for all reports | DONE | ReportExportService: 8 export types, date range filtering, Excel-compatible BOM |
+| A5 | CSV export for all reports | PARTIAL | ReportExportService: 8 export types, CSV only. **No PDF export** — no PDF library integrated |
 | A6 | Admin activity log | DONE | admin_actions table with comprehensive audit logging (251 references) |
 | A7 | Content QA workflow | DONE | ContentModerationService: queue, auto-spam filtering, approve/reject, per-tenant settings |
 
@@ -216,7 +220,7 @@ The MadeOpen Challenges module is a **full innovation pipeline**:
 
 | # | Feature | Status | Description |
 |---|---------|--------|-------------|
-| MA1 | Cross-module matching | DONE | CrossModuleMatchingService: unified matching across listings/jobs/volunteering/groups with scoring |
+| MA1 | Cross-module matching | PARTIAL | **CRITICAL: `MatchingApiController.php` DOES NOT EXIST** — route returns 500. Service exists. |
 | MA2 | Predictive staffing | DONE | PredictiveStaffingService: multi-factor shortage risk scoring, seasonal analysis, coordinator alerts |
 | MA3 | Match digest email | DONE | MatchDigestService: weekly top-5 matches email with HTML templates, deduplication |
 
@@ -246,43 +250,83 @@ The MadeOpen Challenges module is a **full innovation pipeline**:
 
 ---
 
+## Phase 5 — Gap Features (15 features: 0 DONE, 0 PARTIAL, 15 TODO)
+
+Identified by competitive gap analysis (2026-03-02) against MadeOpen, hOurworld, Indeed/LinkedIn, POINT/Better Impact/Rosterfy, Timebanking UK.
+
+| # | Feature | Status | Description | Effort |
+|---|---------|--------|-------------|--------|
+| GAP1 | Multi-language / i18n framework | TODO | React i18next + PHP translation files, language switcher, RTL support | XL (6-8 wk) |
+| GAP2 | Stripe / payment integration | TODO | Stripe Connect for paid tiers, tenant subscriptions, donation processing | L (3-4 wk) |
+| GAP3 | Native mobile app (Capacitor) | TODO | Capacitor build wrapper, app store deployment, native push, deep links | L (3-4 wk) |
+| GAP4 | Bulk CSV data import | TODO | Admin CSV import for members, listings, transactions with validation & preview | M (2-3 wk) |
+| GAP5 | Accessibility audit + WCAG fixes | TODO | axe-core integration, contrast checker, keyboard nav audit, ARIA fixes | S (1 wk) |
+| GAP6 | Video conferencing integration | TODO | Zoom/Google Meet URL fields on events, "Join Meeting" button | S (1 wk) |
+| GAP7 | Organization volunteering portal | TODO | Organization-level volunteer management, corporate team dashboards | L (3-4 wk) |
+| GAP8 | Advanced analytics dashboards | TODO | Chart.js/Recharts for trends, member growth, engagement over time | M (2-3 wk) |
+| GAP9 | SMS notifications | TODO | Twilio/Vonage SMS channel in NotificationService, opt-in/out per user | M (2-3 wk) |
+| GAP10 | Document signing / e-signatures | TODO | Volunteer agreement signing workflow, DocuSign or simple built-in | L (3-4 wk) |
+| GAP11 | API webhooks | TODO | Webhook subscription CRUD, event delivery, retry logic, admin management | M (2-3 wk) |
+| GAP12 | White-label theming per tenant | TODO | Admin theme editor (colors, logo, fonts), tenant CSS override system | M (2-3 wk) |
+| GAP13 | Community currency models | TODO | Non-time-credit currencies (points, local currency), exchange rate config | M (2-3 wk) |
+| GAP14 | Notification analytics dashboard | TODO | Delivery rates, open rates, click-through tracking, admin dashboard | M (2-3 wk) |
+| GAP15 | Quiet hours / DND mode | TODO | Per-user quiet hours schedule, notification suppression, DND toggle | S (1 wk) |
+
+---
+
 ## Summary
 
 | Phase | Features | DONE | PARTIAL | TODO | % Complete |
 |-------|----------|------|---------|------|------------|
-| Phase 1 — High Impact | 30 | 30 | 0 | 0 | 100% |
-| Phase 2 — Engagement | 23 | 23 | 0 | 0 | 100% |
-| Phase 3 — Polish | 22 | 22 | 0 | 0 | 100% |
-| Phase 4 — Advanced | 31 | 31 | 0 | 0 | 100% |
-| **TOTAL** | **106** | **106** | **0** | **0** | **100%** |
+| Phase 1 — High Impact | 30 | 22 | 7 | 1 | 73% |
+| Phase 2 — Engagement | 23 | 20 | 3 | 0 | 87% |
+| Phase 3 — Polish | 22 | 16 | 6 | 0 | 73% |
+| Phase 4 — Advanced | 31 | 29 | 2 | 0 | 94% |
+| Phase 5 — Gap Features | 15 | 0 | 0 | 15 | 0% |
+| **TOTAL** | **121** | **87** | **18** | **16** | **72%** |
 
-### All 106 Features Implemented
+> **Note:** Phases 1-4 totals reflect the 2026-03-02 audit downgrades. Original 106 features: 87 DONE + 18 PARTIAL + 1 TODO.
+> Phase 5 adds 15 new competitive gap features identified by the audit.
 
-**Previously complete (10):** V5, V8, N1, N5, N6, F1, F3, G2, A6, MS3
+### Audit-Downgraded Features (18 PARTIAL + 1 TODO)
 
-**Built 2026-03-01 (96 features across 11 parallel agents):**
-- **Wallet (10):** W1-W10 — Community fund, group transactions, prep time, statements, categories, donations, starting balances, double confirmation, satisfaction ratings
-- **Events (7):** E1-E7 — Recurring events, capacity, waitlist, reminders, cancellation, attendance, series
-- **Jobs (10):** J1-J10 — Saved jobs, match %, pipeline, status history, qualification tool, alerts, expiry, analytics, salary, featured
-- **Volunteering (8):** V1-V4, V6-V7, V9-V10 — Waitlist, swaps, group sign-ups, matching, certificates, QR check-in, emergency alerts, burnout detection
-- **Notifications (3):** N2-N4 — Event reminders, listing expiry, match notifications
-- **Profiles (6):** M1-M6 — Skills taxonomy, availability, endorsements, activity dashboard, badges, sub-accounts
-- **Feed (2):** F2, F4 — Post sharing, hashtags
-- **Listings (5):** L1-L5 — Auto-expiry, analytics, skill tags, featured, moderation
-- **Search (4):** S1-S4 — Saved searches, advanced filters, analytics, boolean search
-- **Goals (4):** G1, G3-G5 — Templates, check-ins, reminders, progress history
-- **Polls (4):** P1-P4 — Ranked-choice voting, categories, anonymous, export
-- **Resources (4):** R1-R4 — Categories, rich content, ordering, knowledge base
-- **Ideation (12):** I1-I12 — Full innovation pipeline (categories, media, idea-to-team, chatrooms, tasks, docs, campaigns, templates, impact tracking)
-- **Admin (6):** A1-A5, A7 — SROI, member reports, hours reports, inactive detection, CSV export, content moderation
-- **Groups (3):** GR1-GR3 — File sharing, group events, announcements
-- **Matching (3):** MA1-MA3 — Cross-module matching, predictive staffing, match digest
-- **Federation (3):** FD1-FD3 — Credit pooling, neighborhoods, federated search caching
-- **Messaging (2):** MS1-MS2 — Contextual messaging, safeguarding
+| Feature | Previous | Current | Reason |
+|---------|----------|---------|--------|
+| V1 | DONE | PARTIAL | No React UI for waitlist management |
+| V2 | DONE | PARTIAL | No React UI; dead adminDecision() |
+| V3 | DONE | PARTIAL | No React UI; DELETE route missing param |
+| V5 | DONE | PARTIAL | No React verification workflow UI |
+| V7 | DONE | PARTIAL | QR is non-scannable SVG placeholder |
+| V8 | DONE | **TODO** | **Zero code exists at any layer** |
+| V10 | DONE | PARTIAL | No React dashboard |
+| J7 | DONE | PARTIAL | No cron trigger for auto-expiry |
+| W7 | DONE | PARTIAL | No React admin UI |
+| E1 | DONE | PARTIAL | No React recurring event creation UI |
+| E4 | DONE | PARTIAL | No React reminder preferences UI |
+| E7 | DONE | PARTIAL | Static chip, not navigable |
+| L1 | DONE | PARTIAL | Auto-expiry has no cron |
+| L4 | DONE | PARTIAL | Admin methods missing from controller |
+| L5 | DONE | PARTIAL | 3 controller methods missing |
+| S3 | DONE | PARTIAL | Routes point to wrong controller |
+| G2 | DONE | PARTIAL | Audit conflict — needs verification |
+| G4 | DONE | PARTIAL | No cron trigger |
+| MA1 | DONE | PARTIAL | **CRITICAL: MatchingApiController.php does not exist** |
 
-### Remaining Work: 0 features remaining (all 106 implemented on 2026-03-01)
+### Critical Bugs (P0 — Fix Immediately)
 
-**Next steps:** Frontend React pages for new features, end-to-end testing, production deployment.
+1. `MatchingApiController.php` does not exist (routes.php:2384 → 500)
+2. `communityFund` should be `communityFundBalance` (routes.php:2235 → 500)
+3. `donations` should be `donationHistory` (routes.php:2241 → 500)
+4. 5 missing methods in ListingsApiController (routes.php:2363-2367 → 500)
+5. Search analytics routes point to wrong controller (routes.php:2378-2379 → 500)
+
+### Remaining Work: 16 TODO + 18 PARTIAL features
+
+**Next steps:**
+1. **P0 (Today):** Fix 6 runtime-crashing route bugs
+2. **P1 (This week):** Wire missing controller methods
+3. **P2 (Next sprint):** Build React UIs for 12 backend-only features
+4. **P3 (Sprint 3+):** Build 1 TODO feature (V8) + Phase 5 gap features
 
 ---
 

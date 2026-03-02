@@ -26,6 +26,11 @@ use Nexus\Services\GroupReportingService;
 use Nexus\Services\BalanceAlertService;
 use Nexus\Services\SmartMatchingEngine;
 use Nexus\Services\BrokerMessageVisibilityService;
+use Nexus\Services\GoalReminderService;
+use Nexus\Services\InactiveMemberService;
+use Nexus\Services\EventReminderService;
+use Nexus\Services\ListingExpiryService;
+use Nexus\Services\ListingExpiryReminderService;
 
 class CronController
 {
@@ -696,6 +701,10 @@ class CronController
                 } catch (\Exception $e) {
                     echo "   Error: " . $e->getMessage() . "\n";
                 }
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Event reminders...\n";
+                $this->eventRemindersInternal();
             }
 
             // ── EVERY 30 MINUTES ──
@@ -778,6 +787,24 @@ class CronController
                 $taskNum++;
                 echo "\n[{$taskNum}] Balance alerts...\n";
                 $this->balanceAlertsInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Goal reminders...\n";
+                $this->goalRemindersInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Listing expiry processing...\n";
+                $this->listingExpiryInternal();
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Listing expiry reminders...\n";
+                $this->listingExpiryRemindersInternal();
+            }
+
+            if ($hour === 2 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Inactive member detection...\n";
+                $this->inactiveMemberDetectionInternal();
             }
 
             if ($hour === 9 && $minute === 0) {
@@ -1902,6 +1929,107 @@ class CronController
                 echo "   [$slug] Sent {$stats['sent']}/{$stats['total_groups']} group digests.\n";
             });
             echo "   Group weekly digests complete.\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Goal reminders — send due reminders across all tenants (daily 8am)
+     */
+    private function goalRemindersInternal(): void
+    {
+        try {
+            $totalSent = 0;
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalSent) {
+                if (!TenantContext::hasFeature('goals')) return;
+
+                $sent = GoalReminderService::sendDueReminders();
+                $totalSent += $sent;
+                if ($sent > 0) {
+                    echo "   [$slug] Sent $sent goal reminders.\n";
+                }
+            });
+            echo "   Goal reminders complete ($totalSent total).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Inactive member detection — flag inactive/dormant members (daily 2am)
+     */
+    private function inactiveMemberDetectionInternal(): void
+    {
+        try {
+            $totalFlagged = 0;
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalFlagged) {
+                $result = InactiveMemberService::detectInactive($tenantId);
+                $totalFlagged += $result['total_flagged'];
+                if ($result['total_flagged'] > 0) {
+                    echo "   [$slug] Flagged {$result['flagged_inactive']} inactive, {$result['flagged_dormant']} dormant.\n";
+                }
+            });
+            echo "   Inactive member detection complete ($totalFlagged total flagged).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Event reminders — send 24h and 1h reminders (every 15 minutes)
+     */
+    private function eventRemindersInternal(): void
+    {
+        try {
+            $totalSent = 0;
+            $totalErrors = 0;
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalSent, &$totalErrors) {
+                if (!TenantContext::hasFeature('events')) return;
+
+                $result = EventReminderService::sendDueReminders();
+                $totalSent += $result['sent'];
+                $totalErrors += $result['errors'];
+                if ($result['sent'] > 0) {
+                    echo "   [$slug] Sent {$result['sent']} event reminders.\n";
+                }
+            });
+            EventReminderService::cleanupOldRecords();
+            echo "   Event reminders complete ($totalSent sent, $totalErrors errors).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Listing expiry — expire overdue listings across all tenants (daily 8am)
+     */
+    private function listingExpiryInternal(): void
+    {
+        try {
+            $result = ListingExpiryService::processAllTenants();
+            echo "   Listing expiry complete ({$result['total_expired']} expired across {$result['tenants_processed']} tenants).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Listing expiry reminders — send 3-day warning emails (daily 8am)
+     */
+    private function listingExpiryRemindersInternal(): void
+    {
+        try {
+            $totalSent = 0;
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalSent) {
+                $result = ListingExpiryReminderService::sendDueReminders();
+                $totalSent += $result['sent'];
+                if ($result['sent'] > 0) {
+                    echo "   [$slug] Sent {$result['sent']} listing expiry reminders.\n";
+                }
+            });
+            ListingExpiryReminderService::cleanupOldRecords();
+            echo "   Listing expiry reminders complete ($totalSent total).\n";
         } catch (\Throwable $e) {
             echo "   Error: " . $e->getMessage() . "\n";
         }
