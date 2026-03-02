@@ -122,7 +122,7 @@ export function JobsAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, search]);
+  }, [page, status, search, toast]);
 
   useEffect(() => {
     loadJobs();

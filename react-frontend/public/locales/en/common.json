@@ -38,7 +38,10 @@
     "leaderboard": "Leaderboard",
     "polls": "Polls",
     "jobs": "Jobs",
-    "ideation": "Ideation"
+    "ideation": "Ideation",
+    "matches": "Matches",
+    "connections": "Connections",
+    "ai_chat": "AI Assistant"
   },
   "user_menu": {
     "my_profile": "My Profile",
