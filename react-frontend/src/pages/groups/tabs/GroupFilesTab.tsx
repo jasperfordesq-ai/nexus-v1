@@ -112,7 +112,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
   const loadFiles = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/api/v2/groups/${groupId}/files`);
+      const res = await api.get(`/v2/groups/${groupId}/files`);
       if (res.success) {
         const payload = res.data;
         setFiles(Array.isArray(payload) ? payload : (payload as { files?: GroupFile[] })?.files ?? []);
@@ -139,7 +139,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
         const formData = new FormData();
         formData.append('file', file);
 
-        await api.upload(`/api/v2/groups/${groupId}/files`, formData);
+        await api.upload(`/v2/groups/${groupId}/files`, formData);
         setUploadProgress(Math.round(((i + 1) / totalFiles) * 100));
       }
       toast.success(`${totalFiles} file(s) uploaded`);
@@ -156,7 +156,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
   // ─── Download ───
   const handleDownload = useCallback((file: GroupFile) => {
     const token = localStorage.getItem('nexus_access_token');
-    const url = `${API_BASE}/api/v2/groups/${groupId}/files/${file.id}/download`;
+    const url = `${API_BASE}/v2/groups/${groupId}/files/${file.id}/download`;
     const link = document.createElement('a');
     link.href = url + (token ? `?token=${token}` : '');
     link.download = file.original_name;
@@ -171,7 +171,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await api.delete(`/api/v2/groups/${groupId}/files/${deleteTarget.id}`);
+      await api.delete(`/v2/groups/${groupId}/files/${deleteTarget.id}`);
       toast.success('File deleted');
       setFiles((prev) => prev.filter((f) => f.id !== deleteTarget.id));
       setDeleteTarget(null);

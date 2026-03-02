@@ -171,7 +171,7 @@ export function CreditAgreements() {
   // ─── Status change ───
   const handleStatusChange = useCallback(async (agreementId: number, action: 'approve' | 'suspend' | 'terminate' | 'reactivate') => {
     try {
-      const res = await api.post(`/api/v2/admin/federation/credit-agreements/${agreementId}/${action}`);
+      const res = await api.post(`/v2/admin/federation/credit-agreements/${agreementId}/${action}`);
       if (res.success) {
         toast.success(`Agreement ${action}d`);
         loadData();

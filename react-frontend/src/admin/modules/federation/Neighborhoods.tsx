@@ -159,7 +159,7 @@ export function Neighborhoods() {
     if (!addToNeighborhood || !selectedTenantId) return;
     setAddingTenant(true);
     try {
-      const res = await api.post(`/api/v2/admin/federation/neighborhoods/${addToNeighborhood.id}/tenants`, {
+      const res = await api.post(`/v2/admin/federation/neighborhoods/${addToNeighborhood.id}/tenants`, {
         tenant_id: parseInt(selectedTenantId),
       });
       if (res.success) {
@@ -179,7 +179,7 @@ export function Neighborhoods() {
   // ─── Remove tenant from neighborhood ───
   const handleRemoveTenant = useCallback(async (neighborhoodId: number, tenantId: number) => {
     try {
-      await api.delete(`/api/v2/admin/federation/neighborhoods/${neighborhoodId}/tenants/${tenantId}`);
+      await api.delete(`/v2/admin/federation/neighborhoods/${neighborhoodId}/tenants/${tenantId}`);
       toast.success('Tenant removed from neighborhood');
       loadData();
     } catch (err) {
@@ -191,7 +191,7 @@ export function Neighborhoods() {
   // ─── Delete neighborhood ───
   const handleDelete = useCallback(async (neighborhoodId: number) => {
     try {
-      await api.delete(`/api/v2/admin/federation/neighborhoods/${neighborhoodId}`);
+      await api.delete(`/v2/admin/federation/neighborhoods/${neighborhoodId}`);
       toast.success('Neighborhood deleted');
       loadData();
     } catch (err) {
