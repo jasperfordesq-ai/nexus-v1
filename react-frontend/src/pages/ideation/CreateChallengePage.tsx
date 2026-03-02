@@ -35,7 +35,6 @@ import {
 } from '@heroui/react';
 import {
   ArrowLeft,
-  X,
   FileText,
   Eye,
   HelpCircle,
@@ -359,7 +358,7 @@ export function CreateChallengePage() {
           tags: td.tags ?? [],
         });
         onTemplateClose();
-        toast.success(t('templates.use_template'));
+        toast.success(t('toast.template_applied', { defaultValue: 'Template applied successfully' }));
       }
     } catch (err) {
       logError('Failed to apply template', err);
@@ -577,7 +576,6 @@ export function CreateChallengePage() {
                     size="sm"
                     variant="flat"
                     onClose={() => removeTag(tag)}
-                    endContent={<X className="w-3 h-3" />}
                   >
                     {tag}
                   </Chip>

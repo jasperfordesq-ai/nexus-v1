@@ -475,7 +475,7 @@ export function IdeationPage() {
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={() => fetchChallenges(activeTab, false, selectedCategory, debouncedSearch, selectedTags)}
             >
-              {t('ideas.load_more')}
+              {t('actions.retry', { defaultValue: 'Retry' })}
             </Button>
           }
         />

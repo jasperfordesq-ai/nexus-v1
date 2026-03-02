@@ -995,7 +995,7 @@ class IdeationChallengesApiController extends BaseApiController
      * POST /api/v2/ideation-campaigns/{id}/challenges
      * Body: { "challenge_id": int, "sort_order": int }
      */
-    public function linkChallengeToCompaign(int $id): void
+    public function linkChallengeToCampaign(int $id): void
     {
         $this->checkFeature();
         $userId = $this->getUserId();
