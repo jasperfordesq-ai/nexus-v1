@@ -86,7 +86,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
   const loadAnnouncements = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/api/v2/groups/${groupId}/announcements`);
+      const res = await api.get(`/v2/groups/${groupId}/announcements`);
       if (res.success) {
         const payload = res.data;
         const items = Array.isArray(payload)
@@ -114,7 +114,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
     if (!title.trim() || !content.trim()) return;
     setCreating(true);
     try {
-      const res = await api.post(`/api/v2/groups/${groupId}/announcements`, {
+      const res = await api.post(`/v2/groups/${groupId}/announcements`, {
         title: title.trim(),
         content: content.trim(),
         is_pinned: isPinned,
@@ -137,7 +137,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
   // ─── Toggle pin ───
   const handleTogglePin = useCallback(async (announcement: Announcement) => {
     try {
-      await api.put(`/api/v2/groups/${groupId}/announcements/${announcement.id}`, {
+      await api.put(`/v2/groups/${groupId}/announcements/${announcement.id}`, {
         is_pinned: !announcement.is_pinned,
       });
       setAnnouncements((prev) =>
@@ -161,7 +161,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await api.delete(`/api/v2/groups/${groupId}/announcements/${deleteTarget.id}`);
+      await api.delete(`/v2/groups/${groupId}/announcements/${deleteTarget.id}`);
       toast.success('Announcement deleted');
       setAnnouncements((prev) => prev.filter((a) => a.id !== deleteTarget.id));
       setDeleteTarget(null);

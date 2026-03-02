@@ -69,7 +69,7 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
           return;
         }
 
-        const res = await api.get(`/api/v2${config.basePath}/${contextId}`);
+        const res = await api.get(`/v2${config.basePath}/${contextId}`);
         if (res.success && res.data) {
           const data = res.data as Record<string, unknown>;
           setContext({

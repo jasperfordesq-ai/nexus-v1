@@ -82,7 +82,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { FeedCard } from '@/components/feed/FeedCard';
-import { TeamChatrooms, TeamTasks, TeamDocuments } from '@/components/ideation';
+import { TeamChatrooms, TeamTasks } from '@/components/ideation';
 import type { FeedItem } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
 import type { Group, User, FeedPost, Event } from '@/types/api';
@@ -1229,15 +1229,6 @@ export function GroupDetailPage() {
             </span>
           }
         />
-        <Tab
-          key="documents"
-          title={
-            <span className="flex items-center gap-2">
-              <FileText className="w-4 h-4" aria-hidden="true" />
-              Documents
-            </span>
-          }
-        />
         {hasSubGroups && (
           <Tab
             key="subgroups"
@@ -1813,13 +1804,6 @@ export function GroupDetailPage() {
           </GlassCard>
         )}
 
-        {/* ─── Documents Tab (I6) ─── */}
-        {activeTab === 'documents' && userIsMember && (
-          <GlassCard className="p-6">
-            <TeamDocuments groupId={group.id} isGroupAdmin={userIsAdmin} />
-          </GlassCard>
-        )}
-
         {/* ─── Subgroups Tab ─── */}
         {activeTab === 'subgroups' && hasSubGroups && (
           <GlassCard className="p-6">
@@ -2181,7 +2165,7 @@ function PinnedAnnouncementsBanner({ groupId }: { groupId: number }) {
   useEffect(() => {
     async function load() {
       try {
-        const res = await api.get(`/api/v2/groups/${groupId}/announcements?pinned=1`);
+        const res = await api.get(`/v2/groups/${groupId}/announcements?pinned=1`);
         if (res.success) {
           const payload = res.data;
           const items = Array.isArray(payload)
