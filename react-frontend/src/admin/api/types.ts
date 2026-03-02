@@ -239,6 +239,7 @@ export interface AdminListing {
   category_id?: number | null;
   category_name?: string | null;
   hours_estimated?: number | null;
+  is_featured?: boolean;
   created_at: string;
   updated_at?: string | null;
 }
