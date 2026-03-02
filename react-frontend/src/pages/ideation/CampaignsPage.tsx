@@ -46,7 +46,7 @@ import { resolveAssetUrl } from '@/lib/helpers';
 
 interface Campaign {
   id: number;
-  name: string;
+  title: string;
   description: string | null;
   cover_image: string | null;
   challenges_count: number;
@@ -102,7 +102,7 @@ export function CampaignsPage() {
     setIsCreating(true);
     try {
       const response = await api.post<Campaign>('/v2/ideation-campaigns', {
-        name: newCampaign.name.trim(),
+        title: newCampaign.name.trim(),
         description: newCampaign.description.trim() || null,
       });
 
@@ -209,14 +209,14 @@ export function CampaignsPage() {
                   <div className="w-full h-32 overflow-hidden">
                     <img
                       src={resolveAssetUrl(campaign.cover_image)}
-                      alt={campaign.name}
+                      alt={campaign.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
                 )}
                 <div className="p-5">
                   <h3 className="text-lg font-semibold text-[var(--color-text)] mb-2">
-                    {campaign.name}
+                    {campaign.title}
                   </h3>
                   {campaign.description && (
                     <p className="text-sm text-[var(--color-text-secondary)] mb-3 line-clamp-2">

@@ -54,7 +54,7 @@ import { resolveAssetUrl } from '@/lib/helpers';
 
 interface Campaign {
   id: number;
-  name: string;
+  title: string;
   description: string | null;
   cover_image: string | null;
   challenges_count: number;
@@ -112,7 +112,7 @@ export function CampaignDetailPage() {
 
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
-  usePageTitle(campaign?.name ?? t('campaigns.page_title'));
+  usePageTitle(campaign?.title ?? t('campaigns.page_title'));
 
   const fetchCampaign = useCallback(async () => {
     try {
@@ -122,7 +122,7 @@ export function CampaignDetailPage() {
       if (response.success && response.data) {
         setCampaign(response.data);
         setEditForm({
-          name: response.data.name,
+          name: response.data.title,
           description: response.data.description ?? '',
         });
       }
@@ -144,7 +144,7 @@ export function CampaignDetailPage() {
     setIsSaving(true);
     try {
       await api.put(`/v2/ideation-campaigns/${id}`, {
-        name: editForm.name.trim(),
+        title: editForm.name.trim(),
         description: editForm.description.trim() || null,
       });
       toast.success(t('toast.campaign_updated'));
@@ -248,7 +248,7 @@ export function CampaignDetailPage() {
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-[var(--color-text)] flex items-center gap-3 mb-2">
               <Layers className="w-7 h-7" />
-              {campaign.name}
+              {campaign.title}
             </h1>
             {campaign.description && (
               <p className="text-[var(--color-text-secondary)] whitespace-pre-wrap mb-3">
