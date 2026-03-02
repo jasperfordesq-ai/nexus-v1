@@ -74,11 +74,15 @@ export function ShiftSwapsTab() {
       setError(null);
 
       const response = await api.get<{ data: ShiftSwap[] }>(
-        '/v2/volunteering/shift-swaps'
+        '/v2/volunteering/swaps'
       );
 
       if (response.success && response.data) {
-        const items = Array.isArray(response.data) ? response.data : [];
+        // Backend returns {swaps: [...]} wrapper
+        const raw = response.data as Record<string, unknown>;
+        const items = Array.isArray(raw.swaps) ? raw.swaps as ShiftSwap[]
+          : Array.isArray(response.data) ? response.data as ShiftSwap[]
+          : [];
         setSwaps(items);
       } else {
         setError('Failed to load shift swap requests.');
@@ -98,7 +102,7 @@ export function ShiftSwapsTab() {
   const handleAccept = async (swapId: number) => {
     try {
       setActioningId(swapId);
-      const response = await api.post(`/v2/volunteering/shift-swaps/${swapId}/accept`);
+      const response = await api.put(`/v2/volunteering/swaps/${swapId}`, { action: 'accept' });
       if (response.success) {
         setSwaps((prev) =>
           prev.map((s) => (s.id === swapId ? { ...s, status: 'accepted' as const } : s))
@@ -114,7 +118,7 @@ export function ShiftSwapsTab() {
   const handleReject = async (swapId: number) => {
     try {
       setActioningId(swapId);
-      const response = await api.post(`/v2/volunteering/shift-swaps/${swapId}/reject`);
+      const response = await api.put(`/v2/volunteering/swaps/${swapId}`, { action: 'reject' });
       if (response.success) {
         setSwaps((prev) =>
           prev.map((s) => (s.id === swapId ? { ...s, status: 'rejected' as const } : s))

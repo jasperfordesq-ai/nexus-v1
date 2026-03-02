@@ -320,6 +320,115 @@ class ShiftGroupReservationService
     }
 
     /**
+     * Get all group reservations a user is involved in (as leader or member)
+     *
+     * @param int $userId User ID
+     * @return array Group reservations with shift, opportunity, organization, and member details
+     */
+    public static function getUserReservations(int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $db = Database::getConnection();
+
+            // Find reservations where user is the leader or a confirmed member
+            $stmt = $db->prepare("
+                SELECT DISTINCT
+                    r.id,
+                    r.reserved_slots,
+                    r.filled_slots,
+                    r.reserved_by,
+                    r.status,
+                    r.notes,
+                    r.created_at,
+                    r.group_id,
+                    s.id AS shift_id,
+                    s.start_time,
+                    s.end_time,
+                    opp.id AS opportunity_id,
+                    opp.title AS opportunity_title,
+                    opp.location AS opportunity_location,
+                    org.id AS organization_id,
+                    org.name AS organization_name,
+                    org.logo_url AS organization_logo_url
+                FROM vol_shift_group_reservations r
+                JOIN vol_shifts s ON r.shift_id = s.id
+                JOIN vol_opportunities opp ON s.opportunity_id = opp.id
+                LEFT JOIN vol_organizations org ON opp.organization_id = org.id
+                LEFT JOIN vol_shift_group_members gm ON gm.reservation_id = r.id AND gm.user_id = ? AND gm.status = 'confirmed'
+                WHERE r.tenant_id = ?
+                  AND (r.reserved_by = ? OR gm.id IS NOT NULL)
+                ORDER BY s.start_time ASC
+            ");
+            $stmt->execute([$userId, $tenantId, $userId]);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            // Look up group names and members for each reservation
+            return array_map(function (array $row) use ($db, $tenantId, $userId): array {
+                $groupName = '';
+
+                // Try groups_table first (same pattern as reserve())
+                try {
+                    $gStmt = $db->prepare("SELECT name FROM groups_table WHERE id = ? AND tenant_id = ?");
+                    $gStmt->execute([$row['group_id'], $tenantId]);
+                    $group = $gStmt->fetch(\PDO::FETCH_ASSOC);
+                    if ($group) {
+                        $groupName = $group['name'];
+                    }
+                } catch (\Throwable $e) {
+                    // Table might not exist
+                }
+
+                // Fallback to `groups` table
+                if (!$groupName) {
+                    try {
+                        $gStmt = $db->prepare("SELECT name FROM `groups` WHERE id = ? AND tenant_id = ?");
+                        $gStmt->execute([$row['group_id'], $tenantId]);
+                        $group = $gStmt->fetch(\PDO::FETCH_ASSOC);
+                        if ($group) {
+                            $groupName = $group['name'];
+                        }
+                    } catch (\Throwable $e) {
+                        // Silent
+                    }
+                }
+
+                // Get members via the existing helper
+                $members = self::getReservationMembers((int)$row['id']);
+
+                return [
+                    'id' => (int)$row['id'],
+                    'group_name' => $groupName,
+                    'status' => $row['status'],
+                    'is_leader' => (int)$row['reserved_by'] === $userId,
+                    'shift' => [
+                        'id' => (int)$row['shift_id'],
+                        'start_time' => $row['start_time'],
+                        'end_time' => $row['end_time'],
+                    ],
+                    'opportunity' => [
+                        'id' => (int)$row['opportunity_id'],
+                        'title' => $row['opportunity_title'],
+                        'location' => $row['opportunity_location'] ?? '',
+                    ],
+                    'organization' => [
+                        'id' => $row['organization_id'] ? (int)$row['organization_id'] : 0,
+                        'name' => $row['organization_name'] ?? '',
+                        'logo_url' => $row['organization_logo_url'] ?? null,
+                    ],
+                    'members' => $members,
+                    'max_members' => $row['reserved_slots'] !== null ? (int)$row['reserved_slots'] : null,
+                    'created_at' => $row['created_at'],
+                ];
+            }, $rows);
+        } catch (\Exception $e) {
+            error_log("ShiftGroupReservationService::getUserReservations error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Calculate available slots for a shift (accounting for regular signups + group reservations)
      */
     private static function getAvailableSlots(int $shiftId, array $shift): ?int
