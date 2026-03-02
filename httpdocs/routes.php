@@ -567,6 +567,7 @@ $router->add('GET', '/api/v2/ideation-challenges', 'Nexus\Controllers\Api\Ideati
 $router->add('POST', '/api/v2/ideation-challenges', 'Nexus\Controllers\Api\IdeationChallengesApiController@store');
 $router->add('GET', '/api/v2/ideation-ideas/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@showIdea');
 $router->add('PUT', '/api/v2/ideation-ideas/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateIdea');
+$router->add('PUT', '/api/v2/ideation-ideas/{id}/draft', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateDraft');
 $router->add('DELETE', '/api/v2/ideation-ideas/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteIdea');
 $router->add('POST', '/api/v2/ideation-ideas/{id}/vote', 'Nexus\Controllers\Api\IdeationChallengesApiController@voteIdea');
 $router->add('PUT', '/api/v2/ideation-ideas/{id}/status', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateIdeaStatus');
@@ -577,6 +578,7 @@ $router->add('GET', '/api/v2/ideation-challenges/{id}', 'Nexus\Controllers\Api\I
 $router->add('PUT', '/api/v2/ideation-challenges/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@update');
 $router->add('DELETE', '/api/v2/ideation-challenges/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@destroy');
 $router->add('PUT', '/api/v2/ideation-challenges/{id}/status', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateStatus');
+$router->add('GET', '/api/v2/ideation-challenges/{id}/ideas/drafts', 'Nexus\Controllers\Api\IdeationChallengesApiController@ideaDrafts');
 $router->add('GET', '/api/v2/ideation-challenges/{id}/ideas', 'Nexus\Controllers\Api\IdeationChallengesApiController@ideas');
 $router->add('POST', '/api/v2/ideation-challenges/{id}/ideas', 'Nexus\Controllers\Api\IdeationChallengesApiController@submitIdea');
 $router->add('POST', '/api/v2/ideation-challenges/{id}/favorite', 'Nexus\Controllers\Api\IdeationChallengesApiController@toggleFavorite');
@@ -2306,6 +2308,7 @@ $router->add('GET', '/api/v2/ideation-categories', 'Nexus\Controllers\Api\Ideati
 $router->add('POST', '/api/v2/ideation-categories', 'Nexus\Controllers\Api\IdeationChallengesApiController@createCategory');
 $router->add('PUT', '/api/v2/ideation-categories/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateCategory');
 $router->add('DELETE', '/api/v2/ideation-categories/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteCategory');
+$router->add('GET', '/api/v2/ideation-tags/popular', 'Nexus\Controllers\Api\IdeationChallengesApiController@popularTags');
 $router->add('GET', '/api/v2/ideation-tags', 'Nexus\Controllers\Api\IdeationChallengesApiController@listTags');
 $router->add('POST', '/api/v2/ideation-tags', 'Nexus\Controllers\Api\IdeationChallengesApiController@createTag');
 $router->add('DELETE', '/api/v2/ideation-tags/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteTag');

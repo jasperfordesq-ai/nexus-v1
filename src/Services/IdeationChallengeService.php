@@ -116,6 +116,27 @@ class IdeationChallengeService
             $params[] = $userId;
         }
 
+        // Full-text search on title and description
+        $search = $filters['search'] ?? null;
+        if ($search) {
+            $where[] = "(c.title LIKE ? OR c.description LIKE ?)";
+            $searchTerm = '%' . $search . '%';
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
+        // Tag filter — match by tag name through the pivot table
+        $tags = $filters['tags'] ?? null;
+        if ($tags && is_array($tags) && count($tags) > 0) {
+            $tagPlaceholders = implode(',', array_fill(0, count($tags), '?'));
+            $where[] = "EXISTS (
+                SELECT 1 FROM challenge_tag_links ctl
+                INNER JOIN challenge_tags ct ON ctl.tag_id = ct.id
+                WHERE ctl.challenge_id = c.id AND ct.name IN ({$tagPlaceholders})
+            )";
+            $params = array_merge($params, $tags);
+        }
+
         // Cursor pagination
         if ($cursor) {
             $cursorId = base64_decode($cursor);
@@ -167,6 +188,30 @@ class IdeationChallengeService
     }
 
     /**
+     * Get all unique tags used across challenges for this tenant.
+     *
+     * Returns tag names with usage counts, ordered by popularity then alphabetically.
+     *
+     * @return array<array{tag: string, count: int}>
+     */
+    public static function getAllTags(): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $sql = "
+            SELECT ct.name AS tag, COUNT(*) AS count
+            FROM challenge_tag_links ctl
+            INNER JOIN challenge_tags ct ON ctl.tag_id = ct.id
+            INNER JOIN ideation_challenges c ON ctl.challenge_id = c.id
+            WHERE c.tenant_id = ?
+            GROUP BY ct.name
+            ORDER BY count DESC, ct.name ASC
+        ";
+
+        return Database::query($sql, [$tenantId])->fetchAll();
+    }
+
+    /**
      * Get a single challenge by ID
      */
     public static function getChallengeById(int $id, ?int $userId = null): ?array
@@ -195,7 +240,7 @@ class IdeationChallengeService
         // Add user's idea count for this challenge
         if ($userId) {
             $userIdeaCount = Database::query(
-                "SELECT COUNT(*) AS cnt FROM challenge_ideas WHERE challenge_id = ? AND user_id = ?",
+                "SELECT COUNT(*) AS cnt FROM challenge_ideas WHERE challenge_id = ? AND user_id = ? AND status != 'draft'",
                 [$id, $userId]
             )->fetch();
             $challenge['user_idea_count'] = (int)($userIdeaCount['cnt'] ?? 0);
@@ -656,6 +701,9 @@ class IdeationChallengeService
         $params = [$challengeId];
         $where = ["i.challenge_id = ?"];
 
+        // Exclude draft ideas from public listing (drafts are private to the author)
+        $where[] = "i.status != 'draft'";
+
         // Cursor pagination
         if ($cursor) {
             $cursorId = base64_decode($cursor);
@@ -837,11 +885,16 @@ class IdeationChallengeService
         $title = trim($data['title'] ?? '');
         $description = trim($data['description'] ?? '');
 
+        // Determine if this is a draft save (check before validation)
+        $isDraft = !empty($data['is_draft']);
+        $status = $isDraft ? 'draft' : 'submitted';
+
         if (empty($title)) {
             self::addError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Title is required', 'title');
         }
 
-        if (empty($description)) {
+        // Description is required for submissions but optional for drafts
+        if (!$isDraft && empty($description)) {
             self::addError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Description is required', 'description');
         }
 
@@ -853,28 +906,32 @@ class IdeationChallengeService
             Database::beginTransaction();
 
             Database::query(
-                "INSERT INTO challenge_ideas (challenge_id, user_id, title, description, created_at) VALUES (?, ?, ?, ?, NOW())",
-                [$challengeId, $userId, $title, $description]
+                "INSERT INTO challenge_ideas (challenge_id, user_id, title, description, status, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
+                [$challengeId, $userId, $title, $description, $status]
             );
 
             $ideaId = Database::lastInsertId();
 
-            // Increment ideas_count on the challenge
-            $tenantId = TenantContext::getId();
-            Database::query(
-                "UPDATE ideation_challenges SET ideas_count = ideas_count + 1 WHERE id = ? AND tenant_id = ?",
-                [$challengeId, $tenantId]
-            );
+            // Only increment ideas_count and award points for submitted ideas (not drafts)
+            if (!$isDraft) {
+                $tenantId = TenantContext::getId();
+                Database::query(
+                    "UPDATE ideation_challenges SET ideas_count = ideas_count + 1 WHERE id = ? AND tenant_id = ?",
+                    [$challengeId, $tenantId]
+                );
+            }
 
             Database::commit();
 
-            // Award gamification points
-            try {
-                if (class_exists('\Nexus\Models\Gamification')) {
-                    \Nexus\Models\Gamification::awardPoints($userId, 5, 'Submitted an idea');
+            // Award gamification points (only for submitted ideas)
+            if (!$isDraft) {
+                try {
+                    if (class_exists('\Nexus\Models\Gamification')) {
+                        \Nexus\Models\Gamification::awardPoints($userId, 5, 'Submitted an idea');
+                    }
+                } catch (\Throwable $e) {
+                    // Gamification is optional
                 }
-            } catch (\Throwable $e) {
-                // Gamification is optional
             }
 
             return (int)$ideaId;
@@ -958,6 +1015,108 @@ class IdeationChallengeService
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update idea');
             return false;
         }
+    }
+
+    /**
+     * Update a draft idea (only drafts can be edited this way).
+     * Can also publish a draft by setting 'publish' => true.
+     */
+    public static function updateDraftIdea(int $ideaId, int $userId, array $data): bool
+    {
+        self::clearErrors();
+        $tenantId = TenantContext::getId();
+
+        // Fetch the idea with tenant scoping
+        $idea = Database::query(
+            "SELECT ci.*, c.tenant_id, c.id AS challenge_id_ref FROM challenge_ideas ci
+             INNER JOIN ideation_challenges c ON ci.challenge_id = c.id
+             WHERE ci.id = ? AND c.tenant_id = ? AND ci.user_id = ?",
+            [$ideaId, $tenantId, $userId]
+        )->fetch();
+
+        if (!$idea) {
+            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Idea not found');
+            return false;
+        }
+
+        if ($idea['status'] !== 'draft') {
+            self::addError(ApiErrorCodes::RESOURCE_CONFLICT, 'Only draft ideas can be edited');
+            return false;
+        }
+
+        $title = trim($data['title'] ?? '');
+        $description = trim($data['description'] ?? '');
+        $publish = !empty($data['publish']);
+
+        if (empty($title)) {
+            self::addError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Title is required', 'title');
+        }
+
+        // Description is required when publishing but optional for draft saves
+        if ($publish && empty($description)) {
+            self::addError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Description is required', 'description');
+        }
+
+        if (!empty(self::$errors)) {
+            return false;
+        }
+
+        $newStatus = $publish ? 'submitted' : 'draft';
+
+        try {
+            Database::beginTransaction();
+
+            Database::query(
+                "UPDATE challenge_ideas SET title = ?, description = ?, status = ?, updated_at = NOW() WHERE id = ?",
+                [$title, $description, $newStatus, $ideaId]
+            );
+
+            // If publishing, increment challenge ideas_count and award points
+            if ($publish) {
+                Database::query(
+                    "UPDATE ideation_challenges SET ideas_count = ideas_count + 1 WHERE id = ? AND tenant_id = ?",
+                    [$idea['challenge_id'], $tenantId]
+                );
+            }
+
+            Database::commit();
+
+            // Award gamification points when publishing
+            if ($publish) {
+                try {
+                    if (class_exists('\Nexus\Models\Gamification')) {
+                        \Nexus\Models\Gamification::awardPoints($userId, 5, 'Submitted an idea');
+                    }
+                } catch (\Throwable $e) {
+                    // Gamification is optional
+                }
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            Database::rollback();
+            error_log("Draft idea update failed: " . $e->getMessage());
+            self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update draft');
+            return false;
+        }
+    }
+
+    /**
+     * Get user's draft ideas for a challenge
+     */
+    public static function getUserDrafts(int $challengeId, int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $sql = "
+            SELECT ci.id, ci.title, ci.description, ci.status, ci.created_at, ci.updated_at
+            FROM challenge_ideas ci
+            INNER JOIN ideation_challenges c ON ci.challenge_id = c.id
+            WHERE ci.challenge_id = ? AND ci.user_id = ? AND ci.status = 'draft' AND c.tenant_id = ?
+            ORDER BY ci.updated_at DESC, ci.created_at DESC
+        ";
+
+        return Database::query($sql, [$challengeId, $userId, $tenantId])->fetchAll();
     }
 
     /**
