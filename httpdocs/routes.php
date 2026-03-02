@@ -2272,26 +2272,26 @@ $router->add('GET', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\
 $router->add('POST', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\VolunteerApiController@generateCertificate');
 $router->add('GET', '/api/v2/volunteering/certificates/verify/{code}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCertificate');
 $router->add('GET', '/api/v2/volunteering/certificates/{code}/html', 'Nexus\Controllers\Api\VolunteerApiController@certificateHtml');
-$router->add('GET', '/api/v2/volunteering/emergency-alerts', 'Nexus\Controllers\Api\VolunteerApiController@listEmergencyAlerts');
+$router->add('GET', '/api/v2/volunteering/emergency-alerts', 'Nexus\Controllers\Api\VolunteerApiController@myEmergencyAlerts');
 $router->add('POST', '/api/v2/volunteering/emergency-alerts', 'Nexus\Controllers\Api\VolunteerApiController@createEmergencyAlert');
-$router->add('PUT', '/api/v2/volunteering/emergency-alerts/{id}', 'Nexus\Controllers\Api\VolunteerApiController@respondEmergencyAlert');
+$router->add('PUT', '/api/v2/volunteering/emergency-alerts/{id}', 'Nexus\Controllers\Api\VolunteerApiController@respondToEmergencyAlert');
 $router->add('DELETE', '/api/v2/volunteering/emergency-alerts/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelEmergencyAlert');
-$router->add('GET', '/api/v2/volunteering/wellbeing/my-status', 'Nexus\Controllers\Api\VolunteerApiController@wellbeingStatus');
-$router->add('GET', '/api/v2/volunteering/swaps', 'Nexus\Controllers\Api\VolunteerApiController@listSwapRequests');
+$router->add('GET', '/api/v2/volunteering/wellbeing/my-status', 'Nexus\Controllers\Api\VolunteerApiController@myWellbeingStatus');
+$router->add('GET', '/api/v2/volunteering/swaps', 'Nexus\Controllers\Api\VolunteerApiController@getSwapRequests');
 $router->add('POST', '/api/v2/volunteering/swaps', 'Nexus\Controllers\Api\VolunteerApiController@requestSwap');
-$router->add('PUT', '/api/v2/volunteering/swaps/{id}', 'Nexus\Controllers\Api\VolunteerApiController@respondSwap');
+$router->add('PUT', '/api/v2/volunteering/swaps/{id}', 'Nexus\Controllers\Api\VolunteerApiController@respondToSwap');
 $router->add('DELETE', '/api/v2/volunteering/swaps/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelSwap');
-$router->add('POST', '/api/v2/volunteering/shifts/{id}/waitlist', 'Nexus\Controllers\Api\VolunteerApiController@joinShiftWaitlist');
-$router->add('DELETE', '/api/v2/volunteering/shifts/{id}/waitlist', 'Nexus\Controllers\Api\VolunteerApiController@leaveShiftWaitlist');
+$router->add('POST', '/api/v2/volunteering/shifts/{id}/waitlist', 'Nexus\Controllers\Api\VolunteerApiController@joinWaitlist');
+$router->add('DELETE', '/api/v2/volunteering/shifts/{id}/waitlist', 'Nexus\Controllers\Api\VolunteerApiController@leaveWaitlist');
 $router->add('POST', '/api/v2/volunteering/shifts/{id}/waitlist/promote', 'Nexus\Controllers\Api\VolunteerApiController@promoteFromWaitlist');
 $router->add('POST', '/api/v2/volunteering/shifts/{id}/group-reserve', 'Nexus\Controllers\Api\VolunteerApiController@groupReserve');
 $router->add('POST', '/api/v2/volunteering/group-reservations/{id}/members', 'Nexus\Controllers\Api\VolunteerApiController@addGroupMember');
 $router->add('DELETE', '/api/v2/volunteering/group-reservations/{id}/members', 'Nexus\Controllers\Api\VolunteerApiController@removeGroupMember');
 $router->add('DELETE', '/api/v2/volunteering/group-reservations/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelGroupReservation');
-$router->add('GET', '/api/v2/volunteering/shifts/{id}/checkin', 'Nexus\Controllers\Api\VolunteerApiController@getCheckinToken');
-$router->add('POST', '/api/v2/volunteering/checkin/verify/{token}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCheckin');
-$router->add('POST', '/api/v2/volunteering/checkin/checkout/{token}', 'Nexus\Controllers\Api\VolunteerApiController@checkout');
-$router->add('GET', '/api/v2/volunteering/shifts/{id}/checkins', 'Nexus\Controllers\Api\VolunteerApiController@shiftCheckins');
+$router->add('GET', '/api/v2/volunteering/shifts/{id}/checkin', 'Nexus\Controllers\Api\VolunteerApiController@getCheckIn');
+$router->add('POST', '/api/v2/volunteering/checkin/verify/{token}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCheckIn');
+$router->add('POST', '/api/v2/volunteering/checkin/checkout/{token}', 'Nexus\Controllers\Api\VolunteerApiController@checkOut');
+$router->add('GET', '/api/v2/volunteering/shifts/{id}/checkins', 'Nexus\Controllers\Api\VolunteerApiController@shiftCheckIns');
 
 // ============================================
 // API V2 - IDEATION FEATURES (New endpoints)
