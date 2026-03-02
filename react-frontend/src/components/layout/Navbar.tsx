@@ -307,6 +307,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
     { label: t('nav.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
     { label: t('nav.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' as const },
+    { label: t('nav.matches', 'Matches'), href: tenantPath('/matches'), icon: Handshake },
     { label: t('nav.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
     { label: t('nav.ai_chat', 'AI Assistant'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' as const },
   ].filter(item => {

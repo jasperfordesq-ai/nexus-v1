@@ -170,6 +170,7 @@ function useAdminNav(): NavSection[] {
           { label: 'Vetting Records', href: '/admin/broker-controls/vetting', icon: ShieldCheck },
           { label: 'Insurance Certificates', href: '/admin/broker-controls/insurance', icon: FileCheck },
           { label: 'Review Archive', href: '/admin/broker-controls/archives', icon: Archive },
+          { label: 'Safeguarding', href: '/admin/safeguarding', icon: ShieldCheck },
         ],
       },
       {
