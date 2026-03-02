@@ -421,7 +421,7 @@ export function ChallengeDetailPage() {
         if (newIdeaMediaUrl.trim()) {
           try {
             await api.post(`/v2/ideation-ideas/${editingDraftId}/media`, {
-              type: newIdeaMediaType,
+              media_type: newIdeaMediaType,
               url: newIdeaMediaUrl.trim(),
               caption: newIdeaMediaCaption.trim() || null,
             });
