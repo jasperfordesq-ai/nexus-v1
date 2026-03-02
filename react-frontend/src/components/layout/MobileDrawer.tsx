@@ -113,6 +113,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   ];
 
   const exploreNavItems = [
+    { label: t('nav.matches', 'Matches'), href: '/matches', icon: Handshake },
     { label: t('nav.achievements'), href: '/achievements', icon: Trophy, feature: 'gamification' as const },
     { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
     { label: t('nav.goals'), href: '/goals', icon: Target, feature: 'goals' as const },
