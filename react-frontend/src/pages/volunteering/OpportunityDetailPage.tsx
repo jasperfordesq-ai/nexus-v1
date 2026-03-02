@@ -41,7 +41,6 @@ import {
   Send,
   CheckCircle,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
@@ -91,7 +90,6 @@ interface OpportunityDetail {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function OpportunityDetailPage() {
-  const { t } = useTranslation('community');
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
@@ -147,7 +145,7 @@ export function OpportunityDetailPage() {
         setSelectedShiftId(null);
         load(); // Refresh to show applied state
       } else {
-        toast.error(response.error?.message || 'Failed to apply.');
+        toast.error(response.error || 'Failed to apply.');
       }
     } catch (err) {
       logError('Failed to apply', err);
