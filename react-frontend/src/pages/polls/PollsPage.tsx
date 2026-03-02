@@ -1183,11 +1183,54 @@ export function PollsPage() {
                       View Ranked Results
                     </Button>
                     {rankedResults && (
-                      <div className="mt-3 p-3 rounded-xl bg-theme-elevated">
-                        <h4 className="text-sm font-semibold text-theme-primary mb-2">Round-by-Round Results</h4>
-                        <pre className="text-xs text-theme-muted whitespace-pre-wrap overflow-x-auto">
-                          {JSON.stringify(rankedResults, null, 2)}
-                        </pre>
+                      <div className="mt-3 p-3 rounded-xl bg-theme-elevated space-y-3">
+                        <h4 className="text-sm font-semibold text-theme-primary">Round-by-Round Results</h4>
+                        {/* Winner */}
+                        {rankedResults.winner ? (
+                          <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                            <TrendingUp className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+                            <span className="text-sm font-medium text-emerald-400">
+                              Winner: {String(rankedResults.winner)}
+                            </span>
+                          </div>
+                        ) : null}
+                        {/* Rounds */}
+                        {Array.isArray(rankedResults.rounds) && (rankedResults.rounds as Array<Record<string, unknown>>).map((round, idx) => {
+                          const votes = round.votes as Record<string, number> | undefined;
+                          const eliminated = round.eliminated as string | undefined;
+                          return (
+                            <div key={idx} className="p-2 rounded-lg border border-[var(--border-default)]">
+                              <p className="text-xs font-semibold text-theme-muted mb-1.5">Round {idx + 1}</p>
+                              {votes && Object.entries(votes)
+                                .sort(([, a], [, b]) => b - a)
+                                .map(([option, count]) => {
+                                  const totalBallots = Number(rankedResults.total_ballots) || Object.values(votes).reduce((s, v) => s + v, 0);
+                                  const pct = totalBallots > 0 ? Math.round((count / totalBallots) * 100) : 0;
+                                  return (
+                                    <div key={option} className="flex items-center gap-2 mb-1">
+                                      <span className={`text-xs flex-1 truncate ${eliminated === option ? 'line-through text-theme-subtle' : 'text-theme-primary'}`}>
+                                        {option}
+                                      </span>
+                                      <div className="w-24 h-1.5 rounded-full bg-[var(--surface-hover)] overflow-hidden">
+                                        <div
+                                          className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-500"
+                                          style={{ width: `${pct}%` }}
+                                        />
+                                      </div>
+                                      <span className="text-xs text-theme-muted w-12 text-right">{count} ({pct}%)</span>
+                                    </div>
+                                  );
+                                })}
+                              {eliminated && (
+                                <p className="text-[10px] text-red-400 mt-1">Eliminated: {eliminated}</p>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {/* Total ballots */}
+                        {rankedResults.total_ballots ? (
+                          <p className="text-xs text-theme-subtle">Total ballots: {String(rankedResults.total_ballots)}</p>
+                        ) : null}
                       </div>
                     )}
                   </div>
