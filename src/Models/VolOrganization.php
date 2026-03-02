@@ -10,11 +10,11 @@ use Nexus\Core\Database;
 
 class VolOrganization
 {
-    public static function create($tenantId, $userId, $name, $description, $email, $website = null)
+    public static function create($tenantId, $userId, $name, $description, $email, $website = null, $slug = null)
     {
         // Default status is 'pending'
-        $sql = "INSERT INTO vol_organizations (tenant_id, user_id, name, description, contact_email, website, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')";
-        Database::query($sql, [$tenantId, $userId, $name, $description, $email, $website]);
+        $sql = "INSERT INTO vol_organizations (tenant_id, user_id, name, description, contact_email, website, slug, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')";
+        Database::query($sql, [$tenantId, $userId, $name, $description, $email, $website, $slug]);
         return Database::getConnection()->lastInsertId();
     }
 

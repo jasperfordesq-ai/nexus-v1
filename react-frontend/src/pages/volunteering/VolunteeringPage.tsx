@@ -124,6 +124,21 @@ export function VolunteeringPage() {
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const [tab, setTab] = useState<VolunteerTab>('opportunities');
+  const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      api.get<Array<{ status: string; member_role: string }>>('/v2/volunteering/my-organisations')
+        .then((res) => {
+          if (res.success && Array.isArray(res.data)) {
+            setHasApprovedOrg(
+              res.data.some((org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role)),
+            );
+          }
+        })
+        .catch(() => { /* silent — button just won't show */ });
+    }
+  }, [isAuthenticated]);
 
   return (
     <div className="space-y-6">
@@ -136,15 +151,27 @@ export function VolunteeringPage() {
           </h1>
           <p className="text-theme-muted mt-1">{t('volunteering.subtitle')}</p>
         </div>
-        <Link to={tenantPath("/organisations")}>
-          <Button
-            variant="flat"
-            className="bg-theme-elevated text-theme-muted"
-            startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
-          >
-            {t('volunteering.browse_organisations')}
-          </Button>
-        </Link>
+        <div className="flex gap-2 flex-wrap">
+          {hasApprovedOrg && (
+            <Link to={tenantPath('/volunteering/create')}>
+              <Button
+                className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+                startContent={<Plus className="w-4 h-4" />}
+              >
+                {t('volunteering.post_opportunity')}
+              </Button>
+            </Link>
+          )}
+          <Link to={tenantPath('/organisations')}>
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-muted"
+              startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('volunteering.browse_organisations')}
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Tabs */}

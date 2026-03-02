@@ -656,7 +656,9 @@ $router->add('GET', '/api/v2/volunteering/hours/summary', 'Nexus\Controllers\Api
 $router->add('PUT', '/api/v2/volunteering/hours/{id}/verify', 'Nexus\Controllers\Api\VolunteerApiController@verifyHours');
 
 // Organisations
+$router->add('GET', '/api/v2/volunteering/my-organisations', 'Nexus\Controllers\Api\VolunteerApiController@myOrganisations');
 $router->add('GET', '/api/v2/volunteering/organisations', 'Nexus\Controllers\Api\VolunteerApiController@organisations');
+$router->add('POST', '/api/v2/volunteering/organisations', 'Nexus\Controllers\Api\VolunteerApiController@createOrganisation');
 $router->add('GET', '/api/v2/volunteering/organisations/{id}', 'Nexus\Controllers\Api\VolunteerApiController@showOrganisation');
 
 // Volunteering Reviews (separate from main reviews)
