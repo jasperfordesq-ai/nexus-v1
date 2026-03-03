@@ -1016,7 +1016,7 @@ class FederationPartnershipService
     private static function notifyTenantAdmins(
         int $tenantId,
         string $message,
-        string $link = '/admin-legacy/federation/partnerships',
+        string $link = '/admin/federation/partnerships',
         string $type = 'federation_partnership',
         bool $sendPush = true
     ): void {

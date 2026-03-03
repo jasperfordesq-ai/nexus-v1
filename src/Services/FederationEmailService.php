@@ -870,7 +870,7 @@ HTML;
         $dangerColor = '#ef4444';
         $successColor = self::SUCCESS_COLOR;
 
-        $partnershipUrl = $siteUrl . $basePath . '/admin-legacy/federation/partnerships';
+        $partnershipUrl = $siteUrl . $basePath . '/admin/federation/partnerships';
 
         switch ($type) {
             case 'partnership_request':

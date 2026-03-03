@@ -608,7 +608,7 @@ class GamificationService
                 \Nexus\Models\Notification::create(
                     $userId,
                     "Congratulations! You've reached Level $newLevel! 🎉",
-                    "{$basePath}/profile/me",
+                    "/profile",
                     'achievement'
                 );
 
@@ -842,7 +842,7 @@ class GamificationService
             \Nexus\Models\Notification::create(
                 $userId,
                 "You earned the '{$def['name']}' badge! {$def['icon']}",
-                "{$basePath}/profile/me",
+                "/profile",
                 'achievement'
             );
 

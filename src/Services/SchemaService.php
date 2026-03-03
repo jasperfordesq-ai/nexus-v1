@@ -530,7 +530,7 @@ class SchemaService
 
         if (!empty($user['id'])) {
             $baseUrl = self::getBaseUrl();
-            $person['url'] = $baseUrl . '/profile/' . $user['id'];
+            $person['url'] = $baseUrl . '/members/' . $user['id'];
         }
 
         return $person;

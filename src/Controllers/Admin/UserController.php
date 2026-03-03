@@ -392,7 +392,7 @@ class UserController
                 \Nexus\Models\Notification::create(
                     $userId,
                     "You were awarded the '{$name}' badge! {$icon}",
-                    "{$basePath}/profile/me",
+                    "/profile",
                     "achievement"
                 );
 
@@ -408,7 +408,7 @@ class UserController
                              <p style='font-size: 48px; text-align: center; margin: 20px 0;'>{$icon}</p>
                              <p>Log in to your profile to view your latest achievement.</p>",
                             "View My Badges",
-                            TenantContext::getFrontendUrl() . $basePath . "/profile/me"
+                            TenantContext::getFrontendUrl() . $basePath . "/profile"
                         );
                         $mailer->send($user['email'], "You earned a new badge! {$icon}", $body);
                     }
@@ -503,7 +503,7 @@ class UserController
                 \Nexus\Models\Notification::create(
                     $userId,
                     "You were awarded the '{$badge['name']}' badge! {$badge['icon']}",
-                    "{$basePath}/profile/me",
+                    "/profile",
                     "achievement"
                 );
                 $awarded++;

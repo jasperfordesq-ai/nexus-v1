@@ -242,8 +242,8 @@ class ConnectionService
                 $requester = User::findById($requesterId);
                 $requesterName = $requester['name'] ?? 'Someone';
 
-                // Create notification
-                Notification::create($receiverId, "You have a new connection request from {$requesterName}");
+                // Create notification (link to connections page where they can accept/reject)
+                Notification::create($receiverId, "You have a new connection request from {$requesterName}", "/connections", 'connection_request');
 
                 // Send email
                 self::sendRequestEmail($receiverId, $requester);
@@ -307,8 +307,8 @@ class ConnectionService
                 $receiver = User::findById($receiverId);
                 $receiverName = $receiver['name'] ?? 'Someone';
 
-                // Notify requester
-                Notification::create($requesterId, "{$receiverName} accepted your connection request.");
+                // Notify requester (link to the accepted user's profile via members page)
+                Notification::create($requesterId, "{$receiverName} accepted your connection request.", "/members/{$receiverId}", 'connection_accepted');
 
                 // Send acceptance email
                 self::sendAcceptanceEmail($requesterId, $receiver);
@@ -466,8 +466,9 @@ class ConnectionService
             }
 
             $mailer = new Mailer();
-            $baseUrl = TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
-            $profileLink = rtrim($baseUrl, '/') . "/profile/{$requester['id']}";
+            $frontendUrl = TenantContext::getFrontendUrl();
+            $slugPrefix = TenantContext::getSlugPrefix();
+            $profileLink = $frontendUrl . $slugPrefix . "/members/{$requester['id']}";
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
 
             $html = EmailTemplate::render(
@@ -497,8 +498,9 @@ class ConnectionService
             }
 
             $mailer = new Mailer();
-            $baseUrl = TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
-            $profileLink = rtrim($baseUrl, '/') . "/profile/{$receiver['id']}";
+            $frontendUrl = TenantContext::getFrontendUrl();
+            $slugPrefix = TenantContext::getSlugPrefix();
+            $profileLink = $frontendUrl . $slugPrefix . "/members/{$receiver['id']}";
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
 
             $html = EmailTemplate::render(
