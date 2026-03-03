@@ -12,6 +12,11 @@ import { motion } from 'framer-motion';
 import {
   Button,
   Chip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@heroui/react';
 import {
   Clock,
@@ -64,6 +69,7 @@ export function WaitlistTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const [leaveTarget, setLeaveTarget] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -78,11 +84,11 @@ export function WaitlistTab() {
         const items = Array.isArray(response.data) ? response.data : [];
         setEntries(items);
       } else {
-        setError('Failed to load waitlist entries.');
+        setError(t('waitlist.load_error', 'Unable to load your waitlist entries. Please try again.'));
       }
     } catch (err) {
       logError('Failed to load waitlists', err);
-      setError('Unable to load your waitlist entries. Please try again.');
+      setError(t('waitlist.load_error', 'Unable to load your waitlist entries. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -92,16 +98,14 @@ export function WaitlistTab() {
     load();
   }, [load]);
 
-  const handleLeaveWaitlist = async (shiftId: number) => {
-    if (!window.confirm(t('waitlist.leave_confirm', 'Are you sure you want to leave this waitlist? You will lose your position.'))) {
-      return;
-    }
+  const handleLeaveWaitlist = async () => {
+    if (!leaveTarget) return;
 
     try {
-      setRemovingId(shiftId);
-      const response = await api.delete(`/v2/volunteering/shifts/${shiftId}/waitlist`);
+      setRemovingId(leaveTarget);
+      const response = await api.delete(`/v2/volunteering/shifts/${leaveTarget}/waitlist`);
       if (response.success) {
-        setEntries((prev) => prev.filter((e) => e.shift.id !== shiftId));
+        setEntries((prev) => prev.filter((e) => e.shift.id !== leaveTarget));
         toast.success(t('waitlist.leave_success', 'You have left the waitlist.'));
       } else {
         toast.error(t('waitlist.leave_failed', 'Failed to leave waitlist.'));
@@ -111,6 +115,7 @@ export function WaitlistTab() {
       toast.error(t('waitlist.leave_failed', 'Failed to leave waitlist.'));
     } finally {
       setRemovingId(null);
+      setLeaveTarget(null);
     }
   };
 
@@ -243,7 +248,7 @@ export function WaitlistTab() {
                     variant="flat"
                     color="danger"
                     startContent={<X className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() => handleLeaveWaitlist(entry.shift.id)}
+                    onPress={() => setLeaveTarget(entry.shift.id)}
                     isLoading={removingId === entry.shift.id}
                   >
                     {t('waitlist.leave', 'Leave')}
@@ -254,6 +259,33 @@ export function WaitlistTab() {
           ))}
         </motion.div>
       )}
+      {/* Leave Waitlist Confirmation Modal */}
+      <Modal
+        isOpen={leaveTarget !== null}
+        onOpenChange={(open) => !open && setLeaveTarget(null)}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-theme-primary">{t('waitlist.leave', 'Leave')}</ModalHeader>
+              <ModalBody>
+                <p className="text-theme-secondary">
+                  {t('waitlist.leave_confirm', 'Are you sure you want to leave this waitlist? You will lose your position.')}
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>{t('volunteering.cancel', 'Cancel')}</Button>
+                <Button color="danger" onPress={handleLeaveWaitlist}>{t('waitlist.leave', 'Leave')}</Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

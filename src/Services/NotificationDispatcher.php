@@ -74,7 +74,7 @@ class NotificationDispatcher
      */
     private static function getFrequencySetting($userId, $contextType, $contextId)
     {
-        $db = Database::getInstance();
+        $db = Database::getConnection();
 
         // 1. Thread Level (Specific Discussion)
         // Only if context is 'thread'
@@ -152,7 +152,7 @@ class NotificationDispatcher
 
     private static function queueNotification($userId, $activityType, $content, $link, $frequency = 'daily', $emailBody = null)
     {
-        $db = Database::getInstance();
+        $db = Database::getConnection();
         $stmt = $db->prepare("INSERT INTO notification_queue (tenant_id, user_id, activity_type, content_snippet, link, frequency, email_body, created_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'pending')");
         // Truncate content for snippet
         $snippet = substr($content, 0, 250);

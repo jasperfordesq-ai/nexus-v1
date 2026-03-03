@@ -106,6 +106,7 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $this->requireAdmin();
+        $this->verifyCsrf();
 
         if (!TenantContext::hasFeature('wallet')) {
             $this->error('Wallet is not enabled', 400);
@@ -145,6 +146,7 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $this->requireAdmin();
+        $this->verifyCsrf();
 
         if (!TenantContext::hasFeature('wallet')) {
             $this->error('Wallet is not enabled', 400);
@@ -189,6 +191,7 @@ class WalletFeaturesApiController extends BaseApiController
     public function communityFundDonate(): void
     {
         $userId = $this->requireAuth();
+        $this->verifyCsrf();
 
         if (!TenantContext::hasFeature('wallet')) {
             $this->error('Wallet is not enabled', 400);
@@ -249,6 +252,7 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $this->requireAuth();
         $this->requireAdmin();
+        $this->verifyCsrf();
 
         $data = $this->getAllInput();
 
@@ -277,6 +281,7 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $this->requireAuth();
         $this->requireAdmin();
+        $this->verifyCsrf();
 
         $data = $this->getAllInput();
 
@@ -300,6 +305,7 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $this->requireAuth();
         $this->requireAdmin();
+        $this->verifyCsrf();
 
         $success = TransactionCategoryService::delete($id);
 
@@ -482,6 +488,7 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $this->requireAuth();
         $this->requireAdmin();
+        $this->verifyCsrf();
 
         $data = $this->getAllInput();
 

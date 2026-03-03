@@ -82,7 +82,8 @@ class UrlFuzzyMatcher
      */
     private static function findSimilarContent($url)
     {
-        $db = Database::getInstance();
+        $db = Database::getConnection();
+        $tenantId = \Nexus\Core\TenantContext::getId();
 
         // Extract path segments and search terms
         $segments = array_filter(explode('/', trim($url, '/')));
@@ -99,11 +100,11 @@ class UrlFuzzyMatcher
             if (count($segments) > 0 && $segments[0] === 'help') {
                 $stmt = $db->prepare("
                     SELECT slug FROM help_articles
-                    WHERE slug LIKE ? OR title LIKE ?
+                    WHERE (slug LIKE ? OR title LIKE ?) AND tenant_id = ?
                     LIMIT 1
                 ");
                 $searchTerm = '%' . $lastSegment . '%';
-                $stmt->execute([$searchTerm, $searchTerm]);
+                $stmt->execute([$searchTerm, $searchTerm, $tenantId]);
                 $result = $stmt->fetch();
 
                 if ($result) {
@@ -115,11 +116,11 @@ class UrlFuzzyMatcher
             if (count($segments) > 0 && ($segments[0] === 'blog' || $segments[0] === 'news')) {
                 $stmt = $db->prepare("
                     SELECT slug FROM posts
-                    WHERE slug LIKE ? OR title LIKE ?
+                    WHERE (slug LIKE ? OR title LIKE ?) AND tenant_id = ?
                     LIMIT 1
                 ");
                 $searchTerm = '%' . $lastSegment . '%';
-                $stmt->execute([$searchTerm, $searchTerm]);
+                $stmt->execute([$searchTerm, $searchTerm, $tenantId]);
                 $result = $stmt->fetch();
 
                 if ($result) {
@@ -130,8 +131,8 @@ class UrlFuzzyMatcher
             // Check listings (by ID if it looks like a number, otherwise by title)
             if (count($segments) > 0 && $segments[0] === 'listings') {
                 if (is_numeric($lastSegment)) {
-                    $stmt = $db->prepare("SELECT id FROM listings WHERE id = ? LIMIT 1");
-                    $stmt->execute([$lastSegment]);
+                    $stmt = $db->prepare("SELECT id FROM listings WHERE id = ? AND tenant_id = ? LIMIT 1");
+                    $stmt->execute([$lastSegment, $tenantId]);
                     $result = $stmt->fetch();
 
                     if ($result) {
@@ -141,11 +142,11 @@ class UrlFuzzyMatcher
                     // Try to find by title
                     $stmt = $db->prepare("
                         SELECT id FROM listings
-                        WHERE title LIKE ? OR description LIKE ?
+                        WHERE (title LIKE ? OR description LIKE ?) AND tenant_id = ?
                         LIMIT 1
                     ");
                     $searchTerm = '%' . str_replace('-', ' ', $lastSegment) . '%';
-                    $stmt->execute([$searchTerm, $searchTerm]);
+                    $stmt->execute([$searchTerm, $searchTerm, $tenantId]);
                     $result = $stmt->fetch();
 
                     if ($result) {
@@ -157,8 +158,8 @@ class UrlFuzzyMatcher
             // Check groups
             if (count($segments) > 0 && $segments[0] === 'groups') {
                 if (is_numeric($lastSegment)) {
-                    $stmt = $db->prepare("SELECT id FROM groups WHERE id = ? LIMIT 1");
-                    $stmt->execute([$lastSegment]);
+                    $stmt = $db->prepare("SELECT id FROM `groups` WHERE id = ? AND tenant_id = ? LIMIT 1");
+                    $stmt->execute([$lastSegment, $tenantId]);
                     $result = $stmt->fetch();
 
                     if ($result) {
@@ -167,12 +168,12 @@ class UrlFuzzyMatcher
                 } else {
                     // Try to find by name
                     $stmt = $db->prepare("
-                        SELECT id FROM groups
-                        WHERE name LIKE ? OR description LIKE ?
+                        SELECT id FROM `groups`
+                        WHERE (name LIKE ? OR description LIKE ?) AND tenant_id = ?
                         LIMIT 1
                     ");
                     $searchTerm = '%' . str_replace('-', ' ', $lastSegment) . '%';
-                    $stmt->execute([$searchTerm, $searchTerm]);
+                    $stmt->execute([$searchTerm, $searchTerm, $tenantId]);
                     $result = $stmt->fetch();
 
                     if ($result) {

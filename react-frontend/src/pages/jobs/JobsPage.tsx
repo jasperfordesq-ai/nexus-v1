@@ -113,21 +113,6 @@ export function JobsPage() {
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Feature gate
-  if (!hasFeature('job_vacancies')) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center mb-4">
-          <Briefcase className="w-8 h-8 text-blue-500" aria-hidden="true" />
-        </div>
-        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_not_available', 'Jobs Not Available')}</h2>
-        <p className="text-[var(--color-text-muted)] max-w-sm">
-          {t('feature_not_available_desc', 'The jobs feature is not enabled for this community. Contact your timebank administrator to learn more.')}
-        </p>
-      </div>
-    );
-  }
-
   const [vacancies, setVacancies] = useState<JobVacancy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -139,7 +124,6 @@ export function JobsPage() {
   const [selectedType, setSelectedType] = useState(searchParams.get('type') || 'all');
   const [selectedCommitment, setSelectedCommitment] = useState(searchParams.get('commitment') || 'all');
 
-  // J1: Active tab (browse vs saved)
   const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'browse');
   const [savedJobs, setSavedJobs] = useState<JobVacancy[]>([]);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
@@ -254,6 +238,20 @@ export function JobsPage() {
     if (isLoadingMore || !hasMore) return;
     loadVacancies(true);
   }, [isLoadingMore, hasMore, loadVacancies]);
+
+  if (!hasFeature('job_vacancies')) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center mb-4">
+          <Briefcase className="w-8 h-8 text-blue-500" aria-hidden="true" />
+        </div>
+        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_not_available', 'Jobs Not Available')}</h2>
+        <p className="text-[var(--color-text-muted)] max-w-sm">
+          {t('feature_not_available_desc', 'The jobs feature is not enabled for this community. Contact your timebank administrator to learn more.')}
+        </p>
+      </div>
+    );
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -380,7 +378,7 @@ export function JobsPage() {
           </div>
 
           {/* Commitment Filter Chips */}
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by commitment">
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t('filter_by_commitment', 'Filter by commitment')}>
             {COMMITMENT_FILTERS.map((filter) => {
               const isSelected = selectedCommitment === filter.id;
               return (

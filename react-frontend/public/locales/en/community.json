@@ -88,7 +88,12 @@
     "tab_credentials": "Credentials",
     "tab_waitlist": "Waitlist",
     "tab_swap_requests": "Swap Requests",
-    "tab_group_signups": "Group Sign-ups"
+    "tab_group_signups": "Group Sign-ups",
+    "feature_not_available": "Volunteering Not Available",
+    "feature_not_available_desc": "The volunteering feature is not enabled for this community.",
+    "applied_success": "Successfully applied!",
+    "apply_error": "Failed to apply",
+    "view_details": "View Details"
   },
   "credentials": {
     "heading": "Credential Verification",
@@ -112,9 +117,9 @@
     "file_types": "PDF, JPG, PNG, or WebP up to 10MB",
     "cancel": "Cancel",
     "upload_credential": "Upload Credential",
-    "type_garda_vetting": "Garda Vetting",
+    "type_police_check": "Police/Background Check",
     "type_first_aid": "First Aid",
-    "type_dbs_check": "DBS Check",
+    "type_background_check": "Background Check",
     "type_safeguarding": "Safeguarding",
     "type_manual_handling": "Manual Handling",
     "type_food_hygiene": "Food Hygiene",
@@ -122,7 +127,11 @@
     "type_professional_registration": "Professional Registration",
     "type_other": "Other",
     "load_failed": "Failed to load credentials.",
-    "load_error": "Unable to load credentials. Please try again."
+    "load_error": "Unable to load credentials. Please try again.",
+    "file_too_large": "File size must be under 10MB.",
+    "invalid_file_type": "Please upload a PDF or image file (JPG, PNG, WebP).",
+    "upload_failed": "Failed to upload credential. Please try again.",
+    "upload_error": "An error occurred while uploading. Please try again."
   },
   "swaps": {
     "heading": "Shift Swaps",
@@ -139,7 +148,11 @@
     "proposed_shift": "Proposed Shift",
     "requested": "Requested",
     "accept": "Accept",
-    "reject": "Reject"
+    "reject": "Reject",
+    "load_error": "Unable to load shift swap requests. Please try again.",
+    "accept_failed": "Failed to accept swap request.",
+    "reject_failed": "Failed to reject swap request.",
+    "reject_confirm": "Are you sure you want to reject this swap request?"
   },
   "waitlist": {
     "heading": "My Waitlists",
@@ -150,7 +163,11 @@
     "position": "Position {{position}}",
     "spots": "{{count}} spots",
     "joined": "Joined waitlist",
-    "leave": "Leave"
+    "leave": "Leave",
+    "load_error": "Unable to load your waitlist entries. Please try again.",
+    "leave_confirm": "Are you sure you want to leave this waitlist? You will lose your position.",
+    "leave_success": "You have left the waitlist.",
+    "leave_failed": "Failed to leave waitlist."
   },
   "wellbeing": {
     "heading": "Volunteer Wellbeing",
@@ -177,7 +194,21 @@
     "checkin_desc": "Take a moment to check in with yourself. Your responses help us suggest when you might need a break.",
     "select_mood": "Select your mood",
     "cancel": "Cancel",
-    "submit_checkin": "Submit Check-in"
+    "submit_checkin": "Submit Check-in",
+    "checkin_failed": "Failed to submit check-in. Please try again.",
+    "load_error": "Unable to load wellbeing data. Please try again.",
+    "log_mood": "Log How I'm Feeling",
+    "mood_struggling": "Struggling",
+    "mood_low": "Low",
+    "mood_okay": "Okay",
+    "mood_good": "Good",
+    "mood_great": "Great",
+    "mood_unknown": "Unknown",
+    "score_excellent": "Excellent",
+    "score_good": "Good",
+    "score_fair": "Fair",
+    "score_needs_attention": "Needs Attention",
+    "score_critical": "Critical"
   },
   "organisations": {
     "page_title": "Organisations",

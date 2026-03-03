@@ -136,17 +136,15 @@ class UserController
                     $tenantName = $tenant['name'] ?? 'Project NEXUS';
                     $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
 
+                    $resetLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/forgot-password";
+
                     $html = \Nexus\Core\EmailTemplate::render(
                         "Your Account Has Been Created",
                         "Welcome to {$tenantName}!",
                         "<p>Hello <strong>{$firstName}</strong>,</p>
                         <p>An administrator has created an account for you on {$tenantName}.</p>
-                        <p>Your login credentials are:</p>
-                        <ul>
-                            <li><strong>Email:</strong> {$email}</li>
-                            <li><strong>Password:</strong> {$password}</li>
-                        </ul>
-                        <p>We recommend changing your password after your first login.</p>",
+                        <p>Your login email is: <strong>{$email}</strong></p>
+                        <p>Please use the <a href=\"{$resetLink}\">password reset link</a> to set your password.</p>",
                         "Login Now",
                         $loginLink,
                         "Project NEXUS"
@@ -494,8 +492,15 @@ class UserController
             exit;
         }
 
+        $tenantId = TenantContext::getId();
+        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+        $validUsers = \Nexus\Core\Database::query(
+            "SELECT id FROM users WHERE id IN ($placeholders) AND tenant_id = ?",
+            array_merge($userIds, [$tenantId])
+        )->fetchAll(\PDO::FETCH_COLUMN);
+
         $awarded = 0;
-        foreach ($userIds as $userId) {
+        foreach ($validUsers as $userId) {
             if (!\Nexus\Models\UserBadge::hasBadge($userId, $badgeKey)) {
                 \Nexus\Models\UserBadge::award($userId, $badgeKey, $badge['name'], $badge['icon']);
 
@@ -568,10 +573,9 @@ class UserController
             exit;
         }
 
-        // Update status to suspended
         \Nexus\Core\Database::query(
-            "UPDATE users SET status = 'suspended' WHERE id = ?",
-            [$id]
+            "UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?",
+            [$id, \Nexus\Core\TenantContext::getId()]
         );
 
         // Log the action
@@ -612,10 +616,9 @@ class UserController
             exit;
         }
 
-        // Update status to banned
         \Nexus\Core\Database::query(
-            "UPDATE users SET status = 'banned' WHERE id = ?",
-            [$id]
+            "UPDATE users SET status = 'banned' WHERE id = ? AND tenant_id = ?",
+            [$id, \Nexus\Core\TenantContext::getId()]
         );
 
         // Log the action
@@ -649,10 +652,9 @@ class UserController
             exit;
         }
 
-        // Update status to active
         \Nexus\Core\Database::query(
-            "UPDATE users SET status = 'active' WHERE id = ?",
-            [$id]
+            "UPDATE users SET status = 'active' WHERE id = ? AND tenant_id = ?",
+            [$id, \Nexus\Core\TenantContext::getId()]
         );
 
         // Log the action
@@ -686,10 +688,9 @@ class UserController
             exit;
         }
 
-        // Revoke super admin status
         \Nexus\Core\Database::query(
-            "UPDATE users SET is_super_admin = 0 WHERE id = ?",
-            [$id]
+            "UPDATE users SET is_super_admin = 0 WHERE id = ? AND tenant_id = ?",
+            [$id, \Nexus\Core\TenantContext::getId()]
         );
 
         // Log the action

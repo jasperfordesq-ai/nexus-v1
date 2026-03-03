@@ -78,6 +78,7 @@ class ExchangesApiController extends BaseApiController
     public function store(): void
     {
         $userId = $this->requireAuth();
+        $this->verifyCsrf();
 
         if (!BrokerControlConfigService::isExchangeWorkflowEnabled()) {
             $this->error('Exchange workflow is not enabled for this community', 400);
@@ -175,6 +176,7 @@ class ExchangesApiController extends BaseApiController
     public function accept(int $id): void
     {
         $userId = $this->requireAuth();
+        $this->verifyCsrf();
 
         $exchange = ExchangeWorkflowService::getExchange($id);
 
@@ -222,6 +224,7 @@ class ExchangesApiController extends BaseApiController
     public function decline(int $id): void
     {
         $userId = $this->requireAuth();
+        $this->verifyCsrf();
 
         $exchange = ExchangeWorkflowService::getExchange($id);
 
@@ -258,6 +261,7 @@ class ExchangesApiController extends BaseApiController
     public function start(int $id): void
     {
         $userId = $this->requireAuth();
+        $this->verifyCsrf();
 
         $exchange = ExchangeWorkflowService::getExchange($id);
 
@@ -294,6 +298,7 @@ class ExchangesApiController extends BaseApiController
     public function complete(int $id): void
     {
         $userId = $this->requireAuth();
+        $this->verifyCsrf();
 
         $exchange = ExchangeWorkflowService::getExchange($id);
 
@@ -331,6 +336,7 @@ class ExchangesApiController extends BaseApiController
     public function confirm(int $id): void
     {
         $userId = $this->requireAuth();
+        $this->verifyCsrf();
 
         $exchange = ExchangeWorkflowService::getExchange($id);
 
@@ -389,6 +395,7 @@ class ExchangesApiController extends BaseApiController
     public function cancel(int $id): void
     {
         $userId = $this->requireAuth();
+        $this->verifyCsrf();
 
         $exchange = ExchangeWorkflowService::getExchange($id);
 

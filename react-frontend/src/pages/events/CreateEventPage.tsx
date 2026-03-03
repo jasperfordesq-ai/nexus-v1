@@ -70,7 +70,7 @@ interface FormData {
 }
 
 const WEEKDAY_KEYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'] as const;
-const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const WEEKDAY_LABEL_KEYS = ['weekday_mon', 'weekday_tue', 'weekday_wed', 'weekday_thu', 'weekday_fri', 'weekday_sat', 'weekday_sun'] as const;
 
 const initialFormData: FormData = {
   title: '',
@@ -624,7 +624,7 @@ export function CreateEventPage() {
 
           {/* Start Date & Time */}
           <fieldset className="grid sm:grid-cols-2 gap-4">
-            <legend className="sr-only">Start date and time</legend>
+            <legend className="sr-only">{t('form.legend_start_datetime', 'Start date and time')}</legend>
             <div>
               <DatePicker
                 label={t('form.start_date_label')}
@@ -663,7 +663,7 @@ export function CreateEventPage() {
 
           {/* End Date & Time (optional) */}
           <fieldset className="grid sm:grid-cols-2 gap-4">
-            <legend className="sr-only">End date and time (optional)</legend>
+            <legend className="sr-only">{t('form.legend_end_datetime', 'End date and time (optional)')}</legend>
             <div>
               <DatePicker
                 label={t('form.end_date_label')}
@@ -773,7 +773,7 @@ export function CreateEventPage() {
                             label: 'text-sm text-theme-primary',
                           }}
                         >
-                          {WEEKDAY_LABELS[idx]}
+                          {t(`form.${WEEKDAY_LABEL_KEYS[idx]}`)}
                         </Checkbox>
                       ))}
                     </CheckboxGroup>

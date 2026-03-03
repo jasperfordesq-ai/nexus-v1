@@ -173,8 +173,8 @@ class ShiftSwapService
 
         try {
             if ($action === 'reject') {
-                $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'rejected' WHERE id = ?");
-                $stmt->execute([$swapId]);
+                $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'rejected' WHERE id = ? AND tenant_id = ?");
+                $stmt->execute([$swapId, $tenantId]);
 
                 // Notify requester
                 try {
@@ -197,8 +197,8 @@ class ShiftSwapService
             // Accept flow
             if ($swap['requires_admin_approval']) {
                 // Move to admin pending
-                $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'admin_pending' WHERE id = ?");
-                $stmt->execute([$swapId]);
+                $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'admin_pending' WHERE id = ? AND tenant_id = ?");
+                $stmt->execute([$swapId, $tenantId]);
 
                 // Notify requester that admin approval is needed
                 try {
@@ -258,8 +258,8 @@ class ShiftSwapService
 
         try {
             if ($action === 'reject') {
-                $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'admin_rejected', admin_id = ? WHERE id = ?");
-                $stmt->execute([$adminId, $swapId]);
+                $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'admin_rejected', admin_id = ? WHERE id = ? AND tenant_id = ?");
+                $stmt->execute([$adminId, $swapId, $tenantId]);
 
                 // Notify both users
                 foreach ([(int)$swap['from_user_id'], (int)$swap['to_user_id']] as $uid) {
@@ -285,8 +285,8 @@ class ShiftSwapService
             $result = self::executeSwap($swap);
 
             if ($result) {
-                $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET admin_id = ? WHERE id = ?");
-                $stmt->execute([$adminId, $swapId]);
+                $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET admin_id = ? WHERE id = ? AND tenant_id = ?");
+                $stmt->execute([$adminId, $swapId, $tenantId]);
             }
 
             return $result;
@@ -398,8 +398,8 @@ class ShiftSwapService
         }
 
         try {
-            $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'cancelled' WHERE id = ?");
-            $stmt->execute([$swapId]);
+            $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'cancelled' WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$swapId, $tenantId]);
             return true;
         } catch (\Exception $e) {
             error_log("ShiftSwapService::cancel error: " . $e->getMessage());
@@ -429,8 +429,8 @@ class ShiftSwapService
             $stmt->execute([$swap['from_shift_id'], $swap['to_user_id'], $swap['to_shift_id'], $tenantId]);
 
             // Update swap status
-            $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'accepted' WHERE id = ?");
-            $stmt->execute([$swap['id']]);
+            $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'accepted' WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$swap['id'], $tenantId]);
 
             $db->commit();
 

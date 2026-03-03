@@ -58,7 +58,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { Event, User, RsvpResponse } from '@/types/api';
 
 type RsvpOption = 'going' | 'interested' | 'not_going';
@@ -452,7 +452,7 @@ export function EventDetailPage() {
       {event.cover_image && (
         <div className="rounded-xl overflow-hidden">
           <img
-            src={event.cover_image}
+            src={resolveAssetUrl(event.cover_image)}
             alt={t('detail.cover_alt', { title: event.title })}
             className="w-full h-48 sm:h-64 object-cover"
           />

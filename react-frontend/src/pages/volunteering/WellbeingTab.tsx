@@ -65,20 +65,22 @@ interface MoodCheckin {
 
 /* ───────────────────────── Mood Helpers ───────────────────────── */
 
-const MOOD_OPTIONS = [
-  { value: 1, label: 'Struggling', emoji: '😞' },
-  { value: 2, label: 'Low', emoji: '😔' },
-  { value: 3, label: 'Okay', emoji: '😐' },
-  { value: 4, label: 'Good', emoji: '😊' },
-  { value: 5, label: 'Great', emoji: '😄' },
-] as const;
+type TranslateFn = (key: string, defaultValue: string) => string;
 
-function getMoodEmoji(value: number): string {
-  return MOOD_OPTIONS.find((m) => m.value === value)?.emoji ?? '😐';
+const getMoodOptions = (t: TranslateFn) => [
+  { value: 1, label: t('wellbeing.mood_struggling', 'Struggling'), emoji: '😞' },
+  { value: 2, label: t('wellbeing.mood_low', 'Low'), emoji: '😔' },
+  { value: 3, label: t('wellbeing.mood_okay', 'Okay'), emoji: '😐' },
+  { value: 4, label: t('wellbeing.mood_good', 'Good'), emoji: '😊' },
+  { value: 5, label: t('wellbeing.mood_great', 'Great'), emoji: '😄' },
+];
+
+function getMoodEmoji(value: number, t: TranslateFn): string {
+  return getMoodOptions(t).find((m) => m.value === value)?.emoji ?? '😐';
 }
 
-function getMoodLabel(value: number): string {
-  return MOOD_OPTIONS.find((m) => m.value === value)?.label ?? 'Unknown';
+function getMoodLabel(value: number, t: TranslateFn): string {
+  return getMoodOptions(t).find((m) => m.value === value)?.label ?? t('wellbeing.mood_unknown', 'Unknown');
 }
 
 /* ───────────────────────── Score Color ───────────────────────── */
@@ -89,12 +91,12 @@ function getScoreColor(score: number): { text: string; bg: string; indicator: st
   return { text: 'text-rose-400', bg: 'bg-rose-500/10', indicator: 'bg-gradient-to-r from-rose-500 to-red-400' };
 }
 
-function getScoreLabel(score: number): string {
-  if (score >= 80) return 'Excellent';
-  if (score >= 70) return 'Good';
-  if (score >= 50) return 'Fair';
-  if (score >= 30) return 'Needs Attention';
-  return 'Critical';
+function getScoreLabel(score: number, t: TranslateFn): string {
+  if (score >= 80) return t('wellbeing.score_excellent', 'Excellent');
+  if (score >= 70) return t('wellbeing.score_good', 'Good');
+  if (score >= 50) return t('wellbeing.score_fair', 'Fair');
+  if (score >= 30) return t('wellbeing.score_needs_attention', 'Needs Attention');
+  return t('wellbeing.score_critical', 'Critical');
 }
 
 function getRiskColor(risk: string): 'success' | 'warning' | 'danger' {
@@ -111,6 +113,7 @@ function getRiskColor(risk: string): 'success' | 'warning' | 'danger' {
 export function WellbeingTab() {
   const { t } = useTranslation('community');
   const toast = useToast();
+  const moodOptions = getMoodOptions(t);
   const [data, setData] = useState<WellbeingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -132,11 +135,11 @@ export function WellbeingTab() {
       if (response.success && response.data) {
         setData(response.data as WellbeingData);
       } else {
-        setError('Failed to load wellbeing data.');
+        setError(t('wellbeing.load_error', 'Unable to load wellbeing data. Please try again.'));
       }
     } catch (err) {
       logError('Failed to load wellbeing data', err);
-      setError('Unable to load wellbeing data. Please try again.');
+      setError(t('wellbeing.load_error', 'Unable to load wellbeing data. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -243,7 +246,7 @@ export function WellbeingTab() {
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={onOpen}
             >
-              Log How I'm Feeling
+              {t('wellbeing.log_mood', "Log How I'm Feeling")}
             </Button>
           }
         />
@@ -325,7 +328,7 @@ export function WellbeingTab() {
                     {data.burnout_risk === 'low' ? t('wellbeing.risk_low', 'Low Risk') : data.burnout_risk === 'moderate' ? t('wellbeing.risk_moderate', 'Moderate Risk') : t('wellbeing.risk_high', 'High Risk')}
                   </Chip>
                   <span className={`text-sm font-semibold ${getScoreColor(data.score).text}`}>
-                    {data.score}/100 &mdash; {getScoreLabel(data.score)}
+                    {data.score}/100 &mdash; {getScoreLabel(data.score, t)}
                   </span>
                 </div>
               </div>
@@ -398,12 +401,12 @@ export function WellbeingTab() {
                 <div className="space-y-3">
                   {data.recent_checkins.map((checkin) => (
                     <div key={checkin.id} className="flex items-center gap-3 p-3 rounded-xl bg-theme-elevated">
-                      <span className="text-2xl" role="img" aria-label={getMoodLabel(checkin.mood)}>
-                        {getMoodEmoji(checkin.mood)}
+                      <span className="text-2xl" role="img" aria-label={getMoodLabel(checkin.mood, t)}>
+                        {getMoodEmoji(checkin.mood, t)}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-theme-primary">{getMoodLabel(checkin.mood)}</span>
+                          <span className="text-sm font-medium text-theme-primary">{getMoodLabel(checkin.mood, t)}</span>
                           <span className="text-xs text-theme-subtle">
                             {new Date(checkin.created_at).toLocaleDateString(undefined, {
                               month: 'short',
@@ -481,7 +484,7 @@ export function WellbeingTab() {
             <div>
               <p className="text-sm font-medium text-theme-primary mb-3">{t('wellbeing.select_mood', 'Select your mood')}</p>
               <div className="flex justify-center gap-3">
-                {MOOD_OPTIONS.map((mood) => (
+                {moodOptions.map((mood) => (
                   <button
                     key={mood.value}
                     type="button"
