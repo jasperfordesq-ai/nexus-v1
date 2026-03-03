@@ -8,7 +8,6 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Services\ExchangeWorkflowService;
 use Nexus\Services\BrokerControlConfigService;
-use Nexus\Core\TenantContext;
 
 /**
  * ExchangesApiController
@@ -460,7 +459,7 @@ class ExchangesApiController extends BaseApiController
 
         $this->jsonResponse([
             'data' => [
-                'exchange_workflow_enabled' => ($config['enabled'] ?? false) || TenantContext::hasFeature('exchange_workflow'),
+                'exchange_workflow_enabled' => BrokerControlConfigService::isExchangeWorkflowEnabled(),
                 'direct_messaging_enabled' => $directMessaging,
                 'require_broker_approval' => $config['require_broker_approval'] ?? false,
                 'confirmation_deadline_hours' => $config['confirmation_deadline_hours'] ?? 72,
