@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class VolOpportunity
 {
@@ -19,8 +20,8 @@ class VolOpportunity
 
     public static function update($id, $title, $description, $location, $skills, $start, $end, $categoryId)
     {
-        $sql = "UPDATE vol_opportunities SET title = ?, description = ?, location = ?, skills_needed = ?, start_date = ?, end_date = ?, category_id = ? WHERE id = ?";
-        Database::query($sql, [$title, $description, $location, $skills, $start, $end, $categoryId, $id]);
+        $sql = "UPDATE vol_opportunities SET title = ?, description = ?, location = ?, skills_needed = ?, start_date = ?, end_date = ?, category_id = ? WHERE id = ? AND tenant_id = ?";
+        Database::query($sql, [$title, $description, $location, $skills, $start, $end, $categoryId, $id, TenantContext::getId()]);
     }
 
     public static function search($tenantId, $query = null, $catId = null, $isRemote = false)
@@ -59,12 +60,12 @@ class VolOpportunity
         $sql = "SELECT opp.*, org.name as org_name, org.website as org_website, org.contact_email as org_email, org.user_id as org_owner_id
                 FROM vol_opportunities opp
                 JOIN vol_organizations org ON opp.organization_id = org.id
-                WHERE opp.id = ?";
-        return Database::query($sql, [$id])->fetch();
+                WHERE opp.id = ? AND opp.tenant_id = ?";
+        return Database::query($sql, [$id, TenantContext::getId()])->fetch();
     }
 
     public static function getForOrg($orgId)
     {
-        return Database::query("SELECT * FROM vol_opportunities WHERE organization_id = ? ORDER BY created_at DESC", [$orgId])->fetchAll();
+        return Database::query("SELECT * FROM vol_opportunities WHERE organization_id = ? AND tenant_id = ? ORDER BY created_at DESC", [$orgId, TenantContext::getId()])->fetchAll();
     }
 }

@@ -31,6 +31,9 @@ class AdminVolunteeringApiController extends BaseApiController
     public function index(): void
     {
         $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            $this->jsonResponse(['error' => 'Feature not available'], 403);
+        }
         $tenantId = TenantContext::getId();
 
         $data = [
@@ -111,6 +114,9 @@ class AdminVolunteeringApiController extends BaseApiController
     public function approvals(): void
     {
         $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            $this->jsonResponse(['error' => 'Feature not available'], 403);
+        }
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('vol_applications')) {
@@ -137,6 +143,9 @@ class AdminVolunteeringApiController extends BaseApiController
     public function approveApplication(): void
     {
         $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            $this->jsonResponse(['error' => 'Feature not available'], 403);
+        }
         $tenantId = TenantContext::getId();
         $id = $this->getRouteParam('id');
 
@@ -161,8 +170,8 @@ class AdminVolunteeringApiController extends BaseApiController
             }
 
             Database::query(
-                "UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ?",
-                [$id]
+                "UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
             );
 
             $this->respondWithData(['message' => 'Application approved']);
@@ -174,6 +183,9 @@ class AdminVolunteeringApiController extends BaseApiController
     public function declineApplication(): void
     {
         $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            $this->jsonResponse(['error' => 'Feature not available'], 403);
+        }
         $tenantId = TenantContext::getId();
         $id = $this->getRouteParam('id');
 
@@ -196,8 +208,8 @@ class AdminVolunteeringApiController extends BaseApiController
             }
 
             Database::query(
-                "UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ?",
-                [$id]
+                "UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
             );
 
             $this->respondWithData(['message' => 'Application declined']);
@@ -209,6 +221,9 @@ class AdminVolunteeringApiController extends BaseApiController
     public function organizations(): void
     {
         $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            $this->jsonResponse(['error' => 'Feature not available'], 403);
+        }
         $tenantId = TenantContext::getId();
 
         // Try org_wallets or organizations table for volunteer orgs

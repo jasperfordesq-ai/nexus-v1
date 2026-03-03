@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class VolLog
 {
@@ -18,13 +19,13 @@ class VolLog
 
     public static function getForUser($userId)
     {
-        $sql = "SELECT l.*, o.name as org_name, opp.title as opp_title 
+        $sql = "SELECT l.*, o.name as org_name, opp.title as opp_title
                 FROM vol_logs l
                 LEFT JOIN vol_organizations o ON l.organization_id = o.id
                 LEFT JOIN vol_opportunities opp ON l.opportunity_id = opp.id
-                WHERE l.user_id = ?
+                WHERE l.user_id = ? AND l.tenant_id = ?
                 ORDER BY l.date_logged DESC";
-        return Database::query($sql, [$userId])->fetchAll();
+        return Database::query($sql, [$userId, TenantContext::getId()])->fetchAll();
     }
 
     public static function getForOrg($orgId, $status = null)
@@ -49,19 +50,19 @@ class VolLog
 
     public static function updateStatus($id, $status)
     {
-        $sql = "UPDATE vol_logs SET status = ? WHERE id = ?";
-        Database::query($sql, [$status, $id]);
+        $sql = "UPDATE vol_logs SET status = ? WHERE id = ? AND tenant_id = ?";
+        Database::query($sql, [$status, $id, TenantContext::getId()]);
     }
 
     public static function find($id)
     {
-        return Database::query("SELECT * FROM vol_logs WHERE id = ?", [$id])->fetch();
+        return Database::query("SELECT * FROM vol_logs WHERE id = ? AND tenant_id = ?", [$id, TenantContext::getId()])->fetch();
     }
 
     public static function getTotalVerifiedHours($userId)
     {
-        $sql = "SELECT SUM(hours) as total FROM vol_logs WHERE user_id = ? AND status = 'approved'";
-        $res = Database::query($sql, [$userId])->fetch();
+        $sql = "SELECT SUM(hours) as total FROM vol_logs WHERE user_id = ? AND status = 'approved' AND tenant_id = ?";
+        $res = Database::query($sql, [$userId, TenantContext::getId()])->fetch();
         return (float) ($res['total'] ?? 0);
     }
 }

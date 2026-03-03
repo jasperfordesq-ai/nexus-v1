@@ -121,11 +121,12 @@ class ShiftGroupReservationService
     public static function addMember(int $reservationId, int $userId, int $leaderUserId): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT * FROM vol_shift_group_reservations WHERE id = ? AND status = 'active'");
-        $stmt->execute([$reservationId]);
+        $stmt = $db->prepare("SELECT * FROM vol_shift_group_reservations WHERE id = ? AND status = 'active' AND tenant_id = ?");
+        $stmt->execute([$reservationId, $tenantId]);
         $reservation = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$reservation) {
@@ -187,8 +188,17 @@ class ShiftGroupReservationService
     public static function removeMember(int $reservationId, int $userId, int $leaderUserId): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
+
+        // Verify reservation belongs to this tenant
+        $stmt = $db->prepare("SELECT id FROM vol_shift_group_reservations WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$reservationId, $tenantId]);
+        if (!$stmt->fetch()) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
+            return false;
+        }
 
         $stmt = $db->prepare("SELECT id FROM vol_shift_group_members WHERE reservation_id = ? AND user_id = ? AND status = 'confirmed'");
         $stmt->execute([$reservationId, $userId]);
@@ -224,11 +234,12 @@ class ShiftGroupReservationService
     public static function cancelReservation(int $reservationId, int $leaderUserId): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT * FROM vol_shift_group_reservations WHERE id = ? AND reserved_by = ? AND status = 'active'");
-        $stmt->execute([$reservationId, $leaderUserId]);
+        $stmt = $db->prepare("SELECT * FROM vol_shift_group_reservations WHERE id = ? AND reserved_by = ? AND status = 'active' AND tenant_id = ?");
+        $stmt->execute([$reservationId, $leaderUserId, $tenantId]);
         $reservation = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$reservation) {
@@ -260,16 +271,17 @@ class ShiftGroupReservationService
      */
     public static function getReservationsForShift(int $shiftId): array
     {
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
         $stmt = $db->prepare("
             SELECT r.*, u.name as reserved_by_name
             FROM vol_shift_group_reservations r
             JOIN users u ON r.reserved_by = u.id
-            WHERE r.shift_id = ? AND r.status = 'active'
+            WHERE r.shift_id = ? AND r.status = 'active' AND r.tenant_id = ?
             ORDER BY r.created_at DESC
         ");
-        $stmt->execute([$shiftId]);
+        $stmt->execute([$shiftId, $tenantId]);
         $reservations = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return array_map(function ($r) {
@@ -294,16 +306,18 @@ class ShiftGroupReservationService
      */
     public static function getReservationMembers(int $reservationId): array
     {
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
         $stmt = $db->prepare("
             SELECT gm.*, u.name as user_name, u.avatar_url as user_avatar, u.email as user_email
             FROM vol_shift_group_members gm
+            JOIN vol_shift_group_reservations r ON gm.reservation_id = r.id
             JOIN users u ON gm.user_id = u.id
-            WHERE gm.reservation_id = ? AND gm.status = 'confirmed'
+            WHERE gm.reservation_id = ? AND gm.status = 'confirmed' AND r.tenant_id = ?
             ORDER BY gm.created_at ASC
         ");
-        $stmt->execute([$reservationId]);
+        $stmt->execute([$reservationId, $tenantId]);
         $members = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return array_map(function ($m) {
