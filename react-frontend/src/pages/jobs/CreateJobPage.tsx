@@ -111,24 +111,25 @@ export function CreateJobPage() {
         const response = await api.get<Record<string, unknown>>(`/v2/jobs/${id}`);
         if (response.success && response.data) {
           const v = response.data;
+          const str = (val: unknown): string => (typeof val === 'string' ? val : '');
           setForm({
-            title: (v.title as string) || '',
-            description: (v.description as string) || '',
-            type: (v.type as string) || 'paid',
-            commitment: (v.commitment as string) || 'flexible',
-            category: (v.category as string) || '',
-            location: (v.location as string) || '',
+            title: str(v.title),
+            description: str(v.description),
+            type: str(v.type) || 'paid',
+            commitment: str(v.commitment) || 'flexible',
+            category: str(v.category),
+            location: str(v.location),
             is_remote: Boolean(v.is_remote),
-            skills_required: (v.skills_required as string) || '',
+            skills_required: str(v.skills_required),
             hours_per_week: v.hours_per_week != null ? String(v.hours_per_week) : '',
             time_credits: v.time_credits != null ? String(v.time_credits) : '',
-            contact_email: (v.contact_email as string) || '',
-            contact_phone: (v.contact_phone as string) || '',
-            deadline: v.deadline ? (v.deadline as string).split('T')[0] : '',
+            contact_email: str(v.contact_email),
+            contact_phone: str(v.contact_phone),
+            deadline: v.deadline ? String(v.deadline).split('T')[0] : '',
             salary_min: v.salary_min != null ? String(v.salary_min) : '',
             salary_max: v.salary_max != null ? String(v.salary_max) : '',
-            salary_type: (v.salary_type as string) || '',
-            salary_currency: (v.salary_currency as string) || '',
+            salary_type: str(v.salary_type),
+            salary_currency: str(v.salary_currency),
             salary_negotiable: Boolean(v.salary_negotiable),
           });
         } else {

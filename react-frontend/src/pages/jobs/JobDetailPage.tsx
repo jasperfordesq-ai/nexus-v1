@@ -205,6 +205,7 @@ export function JobDetailPage() {
   const applyModal = useDisclosure();
   const qualifiedModal = useDisclosure();
   const renewModal = useDisclosure();
+  const deleteModal = useDisclosure();
 
   const [vacancy, setVacancy] = useState<JobVacancy | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -319,11 +320,12 @@ export function JobDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!id || !confirm(t('detail.confirm_delete'))) return;
+    if (!id) return;
     try {
       const response = await api.delete(`/v2/jobs/${id}`);
       if (response.success) {
         toast.success(t('detail.deleted'));
+        deleteModal.onClose();
         navigate(tenantPath('/jobs'));
       } else {
         toast.error(t('detail.delete_error'));
@@ -586,7 +588,7 @@ export function JobDetailPage() {
                   variant="flat"
                   color="danger"
                   startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                  onPress={handleDelete}
+                  onPress={deleteModal.onOpen}
                 >
                   {t('detail.delete')}
                 </Button>
@@ -995,6 +997,28 @@ export function JobDetailPage() {
           )}
         </ModalContent>
       </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={deleteModal.isOpen} onOpenChange={deleteModal.onOpenChange} size="sm">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>{t('detail.confirm_delete_title')}</ModalHeader>
+              <ModalBody>
+                <p className="text-theme-muted">{t('detail.confirm_delete')}</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>
+                  {t('apply.cancel')}
+                </Button>
+                <Button color="danger" onPress={handleDelete}>
+                  {t('detail.delete')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 
@@ -1006,7 +1030,7 @@ export function JobDetailPage() {
             <p className="text-theme-muted mb-3">{t('apply.login_required')}</p>
             <Link to={tenantPath('/login')}>
               <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full">
-                {t('apply.login_required')}
+                {t('apply.button')}
               </Button>
             </Link>
           </div>
