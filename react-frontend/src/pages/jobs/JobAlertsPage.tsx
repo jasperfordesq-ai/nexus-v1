@@ -133,6 +133,10 @@ export function JobAlertsPage() {
   };
 
   const handleDelete = async (alertId: number) => {
+    if (!window.confirm(t('alerts.delete_confirm', 'Are you sure you want to delete this alert? This cannot be undone.'))) {
+      return;
+    }
+
     try {
       await api.delete(`/v2/jobs/alerts/${alertId}`);
       toast.success(t('alerts.delete_success'));
@@ -294,7 +298,7 @@ export function JobAlertsPage() {
                       isIconOnly
                       className="text-theme-muted"
                       onPress={() => handleTogglePause(alert.id, alert.is_active)}
-                      aria-label={alert.is_active ? 'Pause alert' : 'Resume alert'}
+                      aria-label={alert.is_active ? t('alerts.pause') : t('alerts.resume')}
                     >
                       {alert.is_active ? (
                         <Pause className="w-4 h-4" />
@@ -308,7 +312,7 @@ export function JobAlertsPage() {
                       isIconOnly
                       color="danger"
                       onPress={() => handleDelete(alert.id)}
-                      aria-label="Delete alert"
+                      aria-label={t('alerts.delete')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -338,7 +342,7 @@ export function JobAlertsPage() {
                     placeholder={t('alerts.keywords_placeholder')}
                     value={keywords}
                     onChange={(e) => setKeywords(e.target.value)}
-                    description="Comma-separated keywords to match in job titles and descriptions"
+                    description={t('alerts.keywords_description')}
                     classNames={{
                       input: 'bg-transparent text-theme-primary',
                       inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',

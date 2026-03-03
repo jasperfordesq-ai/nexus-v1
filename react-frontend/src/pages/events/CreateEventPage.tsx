@@ -316,18 +316,18 @@ export function CreateEventPage() {
         (formData.recurrenceFrequency === 'weekly' || formData.recurrenceFrequency === 'biweekly') &&
         formData.recurrenceDays.length === 0
       ) {
-        newErrors.recurrenceDays = 'Please select at least one day of the week';
+        newErrors.recurrenceDays = t('form.validation.select_day');
       }
 
       if (formData.recurrenceEndType === 'after_count') {
         const count = parseInt(formData.recurrenceCount);
         if (isNaN(count) || count < 2 || count > 52) {
-          newErrors.recurrenceCount = 'Occurrences must be between 2 and 52';
+          newErrors.recurrenceCount = t('form.validation.occurrences_range');
         }
       }
 
       if (formData.recurrenceEndType === 'on_date' && !formData.recurrenceEndDate) {
-        newErrors.recurrenceEndDate = 'Please select an end date for the series';
+        newErrors.recurrenceEndDate = t('form.validation.select_end_date');
       }
     }
 

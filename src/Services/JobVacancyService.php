@@ -1257,10 +1257,11 @@ class JobVacancyService
     private static function logApplicationHistory(int $applicationId, ?string $fromStatus, string $toStatus, int $changedBy, ?string $notes = null): void
     {
         try {
+            $tenantId = TenantContext::getId();
             Database::query(
-                "INSERT INTO job_application_history (application_id, from_status, to_status, changed_by, changed_at, notes)
-                 VALUES (?, ?, ?, ?, NOW(), ?)",
-                [$applicationId, $fromStatus, $toStatus, $changedBy, $notes ? trim($notes) : null]
+                "INSERT INTO job_application_history (tenant_id, application_id, from_status, to_status, changed_by, changed_at, notes)
+                 VALUES (?, ?, ?, ?, ?, NOW(), ?)",
+                [$tenantId, $applicationId, $fromStatus, $toStatus, $changedBy, $notes ? trim($notes) : null]
             );
         } catch (\Throwable $e) {
             // Non-critical — log and continue

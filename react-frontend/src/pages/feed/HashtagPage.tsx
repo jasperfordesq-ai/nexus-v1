@@ -27,6 +27,7 @@ import { EmptyState } from '@/components/feedback';
 import { FeedCard } from '@/components/feed/FeedCard';
 import type { FeedItem, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -55,10 +56,11 @@ function FeedSkeleton() {
 }
 
 export function HashtagPage() {
+  const { t } = useTranslation('feed');
   const { tag } = useParams<{ tag: string }>();
   const { tenantPath } = useTenant();
   const { isAuthenticated, user } = useAuth();
-  usePageTitle(tag ? `#${tag}` : 'Hashtag');
+  usePageTitle(tag ? `#${tag}` : t('hashtag.title'));
 
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,11 +100,11 @@ export function HashtagPage() {
           setPostCount(response.meta.total_items);
         }
       } else {
-        if (!append) setError('Failed to load posts');
+        if (!append) setError(t('hashtag.load_failed'));
       }
     } catch (err) {
       logError('Failed to load hashtag posts', err);
-      if (!append) setError('Failed to load posts. Please try again.');
+      if (!append) setError(t('hashtag.load_failed'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -191,7 +193,7 @@ export function HashtagPage() {
             isIconOnly
             variant="flat"
             className="bg-theme-elevated text-theme-muted"
-            aria-label="Back to feed"
+            aria-label={t('hashtag.back_to_feed')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -203,7 +205,7 @@ export function HashtagPage() {
           </h1>
           {postCount > 0 && (
             <p className="text-sm text-theme-muted">
-              {postCount} post{postCount !== 1 ? 's' : ''}
+              {t('hashtag.post_count', { count: postCount })}
             </p>
           )}
         </div>
@@ -213,14 +215,14 @@ export function HashtagPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to load</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('hashtag.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadPosts()}
           >
-            Try Again
+            {t('hashtag.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -235,8 +237,8 @@ export function HashtagPage() {
           ) : items.length === 0 ? (
             <EmptyState
               icon={<Sparkles className="w-12 h-12" aria-hidden="true" />}
-              title="No posts yet"
-              description={`No posts have been tagged with #${tag} yet.`}
+              title={t('hashtag.no_posts')}
+              description={t('hashtag.no_posts_desc', { tag })}
             />
           ) : (
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4">
@@ -267,7 +269,7 @@ export function HashtagPage() {
                     isLoading={isLoadingMore}
                     startContent={!isLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
                   >
-                    Load More
+                    {t('hashtag.load_more')}
                   </Button>
                 </div>
               )}

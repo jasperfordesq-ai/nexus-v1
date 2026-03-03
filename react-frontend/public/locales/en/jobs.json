@@ -132,7 +132,15 @@
     "active": "Active",
     "paused": "Paused",
     "empty_title": "No alerts set up",
-    "empty_description": "Create an alert to get notified about matching jobs"
+    "empty_description": "Create an alert to get notified about matching jobs",
+    "pause": "Pause alert",
+    "resume": "Resume alert",
+    "delete": "Delete alert",
+    "delete_confirm": "Are you sure you want to delete this alert? This cannot be undone.",
+    "keywords_description": "Comma-separated keywords",
+    "resubscribe_success": "Alert resumed",
+    "toggle_error": "Failed to toggle alert",
+    "delete_error": "Failed to delete alert"
   },
 
   "renew": {

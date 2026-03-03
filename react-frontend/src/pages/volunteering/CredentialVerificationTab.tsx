@@ -59,16 +59,16 @@ interface Credential {
 
 /* ───────────────────────── Credential Type Options ───────────────────────── */
 
-const CREDENTIAL_TYPES = [
-  { key: 'garda_vetting', label: 'Garda Vetting' },
-  { key: 'first_aid', label: 'First Aid Certificate' },
-  { key: 'dbs_check', label: 'DBS Check' },
-  { key: 'safeguarding', label: 'Safeguarding Training' },
-  { key: 'manual_handling', label: 'Manual Handling' },
-  { key: 'food_hygiene', label: 'Food Hygiene Certificate' },
-  { key: 'driving_licence', label: 'Driving Licence' },
-  { key: 'professional_registration', label: 'Professional Registration' },
-  { key: 'other', label: 'Other' },
+const CREDENTIAL_TYPE_KEYS = [
+  'garda_vetting',
+  'first_aid',
+  'dbs_check',
+  'safeguarding',
+  'manual_handling',
+  'food_hygiene',
+  'driving_licence',
+  'professional_registration',
+  'other',
 ] as const;
 
 /* ───────────────────────── Status Helpers ───────────────────────── */
@@ -133,11 +133,11 @@ export function CredentialVerificationTab() {
         const items = Array.isArray(response.data) ? response.data : [];
         setCredentials(items as Credential[]);
       } else {
-        setError('Failed to load credentials.');
+        setError(t('credentials.load_failed', 'Failed to load credentials.'));
       }
     } catch (err) {
       logError('Failed to load credentials', err);
-      setError('Unable to load credentials. Please try again.');
+      setError(t('credentials.load_error', 'Unable to load credentials. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -467,8 +467,8 @@ export function CredentialVerificationTab() {
               }}
               startContent={<ShieldCheck className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
-              {CREDENTIAL_TYPES.map((type) => (
-                <SelectItem key={type.key}>{type.label}</SelectItem>
+              {CREDENTIAL_TYPE_KEYS.map((key) => (
+                <SelectItem key={key}>{t(`credentials.type_${key}`, key)}</SelectItem>
               ))}
             </Select>
 

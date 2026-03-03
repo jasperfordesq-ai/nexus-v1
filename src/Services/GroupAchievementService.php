@@ -116,12 +116,13 @@ class GroupAchievementService
     public static function calculateProgress($groupId, $targetType, $targetValue)
     {
         $current = 0;
+        $tenantId = TenantContext::getId();
 
         switch ($targetType) {
             case 'member_count':
                 $result = Database::query(
-                    "SELECT COUNT(*) as count FROM group_members WHERE group_id = ? AND status = 'active'",
-                    [$groupId]
+                    "SELECT COUNT(*) as count FROM group_members WHERE group_id = ? AND status = 'active' AND tenant_id = ?",
+                    [$groupId, $tenantId]
                 )->fetch();
                 $current = (int)($result['count'] ?? 0);
                 break;
@@ -129,16 +130,16 @@ class GroupAchievementService
             case 'post_count':
                 // Count discussions and posts in group
                 $result = Database::query(
-                    "SELECT COUNT(*) as count FROM group_discussions WHERE group_id = ?",
-                    [$groupId]
+                    "SELECT COUNT(*) as count FROM group_discussions WHERE group_id = ? AND tenant_id = ?",
+                    [$groupId, $tenantId]
                 )->fetch();
                 $current = (int)($result['count'] ?? 0);
                 break;
 
             case 'event_count':
                 $result = Database::query(
-                    "SELECT COUNT(*) as count FROM events WHERE group_id = ?",
-                    [$groupId]
+                    "SELECT COUNT(*) as count FROM events WHERE group_id = ? AND tenant_id = ?",
+                    [$groupId, $tenantId]
                 )->fetch();
                 $current = (int)($result['count'] ?? 0);
                 break;
@@ -147,9 +148,10 @@ class GroupAchievementService
                 // Transactions between group members
                 $result = Database::query(
                     "SELECT COUNT(*) as count FROM transactions t
-                     WHERE t.sender_id IN (SELECT user_id FROM group_members WHERE group_id = ?)
-                     AND t.receiver_id IN (SELECT user_id FROM group_members WHERE group_id = ?)",
-                    [$groupId, $groupId]
+                     WHERE t.sender_id IN (SELECT user_id FROM group_members WHERE group_id = ? AND tenant_id = ?)
+                     AND t.receiver_id IN (SELECT user_id FROM group_members WHERE group_id = ? AND tenant_id = ?)
+                     AND t.tenant_id = ?",
+                    [$groupId, $tenantId, $groupId, $tenantId, $tenantId]
                 )->fetch();
                 $current = (int)($result['count'] ?? 0);
                 break;
@@ -158,8 +160,8 @@ class GroupAchievementService
                 $result = Database::query(
                     "SELECT COALESCE(SUM(vl.hours), 0) as total FROM vol_logs vl
                      JOIN group_members gm ON vl.user_id = gm.user_id
-                     WHERE gm.group_id = ? AND vl.status = 'approved'",
-                    [$groupId]
+                     WHERE gm.group_id = ? AND vl.status = 'approved' AND gm.tenant_id = ? AND vl.tenant_id = ?",
+                    [$groupId, $tenantId, $tenantId]
                 )->fetch();
                 $current = (int)($result['total'] ?? 0);
                 break;
@@ -168,8 +170,8 @@ class GroupAchievementService
                 $result = Database::query(
                     "SELECT COALESCE(SUM(u.xp), 0) as total FROM users u
                      JOIN group_members gm ON u.id = gm.user_id
-                     WHERE gm.group_id = ? AND gm.status = 'active'",
-                    [$groupId]
+                     WHERE gm.group_id = ? AND gm.status = 'active' AND gm.tenant_id = ? AND u.tenant_id = ?",
+                    [$groupId, $tenantId, $tenantId]
                 )->fetch();
                 $current = (int)($result['total'] ?? 0);
                 break;
@@ -246,17 +248,17 @@ class GroupAchievementService
         if ($achievementDef) {
             // Record progress as completed
             Database::query(
-                "INSERT INTO group_achievement_progress (group_id, achievement_id, current_count, completed_at)
-                 VALUES (?, ?, ?, NOW())
+                "INSERT INTO group_achievement_progress (tenant_id, group_id, achievement_id, current_count, completed_at)
+                 VALUES (?, ?, ?, ?, NOW())
                  ON DUPLICATE KEY UPDATE completed_at = NOW(), current_count = ?",
-                [$groupId, $achievementDef['id'], $achievement['target_value'], $achievement['target_value']]
+                [$tenantId, $groupId, $achievementDef['id'], $achievement['target_value'], $achievement['target_value']]
             );
         }
 
         // Get group members to distribute XP
         $members = Database::query(
-            "SELECT user_id FROM group_members WHERE group_id = ? AND status = 'approved'",
-            [$groupId]
+            "SELECT user_id FROM group_members WHERE group_id = ? AND status = 'approved' AND tenant_id = ?",
+            [$groupId, $tenantId]
         )->fetchAll();
 
         // Calculate XP per member (shared equally)
@@ -273,7 +275,7 @@ class GroupAchievementService
         }
 
         // Get group name for notification
-        $group = Database::query("SELECT name FROM groups WHERE id = ?", [$groupId])->fetch();
+        $group = Database::query("SELECT name FROM groups WHERE id = ? AND tenant_id = ?", [$groupId, $tenantId])->fetch();
         $groupName = $group['name'] ?? 'Your group';
 
         // Notify all members
@@ -332,14 +334,14 @@ class GroupAchievementService
         return Database::query(
             "SELECT g.id, g.name, g.image_url,
                     COUNT(gap.id) as achievement_count,
-                    (SELECT COUNT(*) FROM group_members WHERE group_id = g.id AND status = 'approved') as member_count
+                    (SELECT COUNT(*) FROM group_members WHERE group_id = g.id AND status = 'approved' AND tenant_id = ?) as member_count
              FROM `groups` g
              LEFT JOIN group_achievement_progress gap ON g.id = gap.group_id AND gap.completed_at IS NOT NULL
              WHERE g.tenant_id = ?
              GROUP BY g.id
              ORDER BY achievement_count DESC, member_count DESC
              LIMIT ?",
-            [$tenantId, $limit]
+            [$tenantId, $tenantId, $limit]
         )->fetchAll();
     }
 }

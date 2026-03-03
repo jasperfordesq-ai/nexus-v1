@@ -422,10 +422,14 @@ class VolunteerEmergencyAlertService
                         $mailer = new \Nexus\Core\Mailer();
                         $priorityBadge = $priority === 'critical' ? '🔴 CRITICAL' : '🟠 URGENT';
                         $subject = "[{$priorityBadge}] Volunteer Needed: Shift on {$shiftDate}";
+                        $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+                        $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
+                        $volunteeringUrl = $baseUrl . $basePath . '/volunteering';
                         $body = "<h2>{$priorityBadge}: Volunteer Needed!</h2>"
                             . "<p>{$message}</p>"
                             . "<p><strong>Shift:</strong> {$shiftDate}</p>"
-                            . "<p>Log in to your dashboard to respond to this request.</p>";
+                            . "<p><a href=\"{$volunteeringUrl}\" style=\"display:inline-block;padding:10px 20px;background-color:#0070f3;color:#ffffff;text-decoration:none;border-radius:6px;\">Respond Now</a></p>"
+                            . "<p>Or visit: {$volunteeringUrl}</p>";
                         $mailer->send($candidate['email'], $subject, $body);
                     } catch (\Throwable $e) {
                         error_log("Emergency alert email failed: " . $e->getMessage());

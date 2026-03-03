@@ -88,7 +88,7 @@ interface VersionComparison {
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return 'Unknown';
-  return new Date(dateStr).toLocaleDateString('en-IE', {
+  return new Date(dateStr).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

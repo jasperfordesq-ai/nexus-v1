@@ -563,7 +563,7 @@ class GamificationService
             Database::query("UPDATE users SET xp = xp + ? WHERE id = ? AND tenant_id = ?", [$amount, $userId, $tenantId]);
 
             // Get updated user info for real-time broadcast
-            $user = Database::query("SELECT xp, level FROM users WHERE id = ?", [$userId])->fetch();
+            $user = Database::query("SELECT xp, level FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
             $levelInfo = [
                 'total_xp' => (int)($user['xp'] ?? 0),
                 'level' => (int)($user['level'] ?? 1),
@@ -591,7 +591,8 @@ class GamificationService
     public static function checkLevelUp($userId)
     {
         try {
-            $user = Database::query("SELECT xp, level FROM users WHERE id = ?", [$userId])->fetch();
+            $tenantId = TenantContext::getId();
+            $user = Database::query("SELECT xp, level FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
             if (!$user) return;
 
             $currentXP = (int)$user['xp'];
@@ -686,99 +687,110 @@ class GamificationService
 
     private static function getTotalSpent($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE sender_id = ? AND deleted_for_sender = 0",
-            [$userId]
+            "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE sender_id = ? AND deleted_for_sender = 0 AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getTransactionCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(*) as total FROM transactions WHERE (sender_id = ? OR receiver_id = ?)",
-            [$userId, $userId]
+            "SELECT COUNT(*) as total FROM transactions WHERE (sender_id = ? OR receiver_id = ?) AND tenant_id = ?",
+            [$userId, $userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getUniqueReceiversCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(DISTINCT receiver_id) as total FROM transactions WHERE sender_id = ?",
-            [$userId]
+            "SELECT COUNT(DISTINCT receiver_id) as total FROM transactions WHERE sender_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getConnectionCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(*) as total FROM connections WHERE (requester_id = ? OR receiver_id = ?) AND status = 'accepted'",
-            [$userId, $userId]
+            "SELECT COUNT(*) as total FROM connections WHERE (requester_id = ? OR receiver_id = ?) AND status = 'accepted' AND tenant_id = ?",
+            [$userId, $userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getMessagesSentCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(*) as total FROM messages WHERE sender_id = ?",
-            [$userId]
+            "SELECT COUNT(*) as total FROM messages WHERE sender_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getReviewsGivenCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(*) as total FROM reviews WHERE reviewer_id = ?",
-            [$userId]
+            "SELECT COUNT(*) as total FROM reviews WHERE reviewer_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getFiveStarReceivedCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(*) as total FROM reviews WHERE receiver_id = ? AND rating = 5",
-            [$userId]
+            "SELECT COUNT(*) as total FROM reviews WHERE receiver_id = ? AND rating = 5 AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getEventsAttendedCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(*) as total FROM event_rsvps WHERE user_id = ? AND status = 'going'",
-            [$userId]
+            "SELECT COUNT(*) as total FROM event_rsvps WHERE user_id = ? AND status = 'going' AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getEventsHostedCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(*) as total FROM events WHERE user_id = ?",
-            [$userId]
+            "SELECT COUNT(*) as total FROM events WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getGroupsJoinedCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(*) as total FROM group_members WHERE user_id = ? AND status = 'active'",
-            [$userId]
+            "SELECT COUNT(*) as total FROM group_members WHERE user_id = ? AND status = 'active' AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
 
     private static function getPostCount($userId)
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT COUNT(*) as total FROM feed_posts WHERE user_id = ?",
-            [$userId]
+            "SELECT COUNT(*) as total FROM feed_posts WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
         return (int)($result['total'] ?? 0);
     }
@@ -786,9 +798,10 @@ class GamificationService
     private static function getLikesReceivedCount($userId)
     {
         try {
+            $tenantId = TenantContext::getId();
             $result = Database::query(
-                "SELECT COUNT(*) as total FROM post_likes pl JOIN feed_posts fp ON pl.post_id = fp.id WHERE fp.user_id = ?",
-                [$userId]
+                "SELECT COUNT(*) as total FROM post_likes pl JOIN feed_posts fp ON pl.post_id = fp.id WHERE fp.user_id = ? AND fp.tenant_id = ?",
+                [$userId, $tenantId]
             )->fetch();
             return (int)($result['total'] ?? 0);
         } catch (\Throwable $e) {
@@ -815,7 +828,8 @@ class GamificationService
 
     private static function getDaysSinceJoined($userId)
     {
-        $user = Database::query("SELECT created_at FROM users WHERE id = ?", [$userId])->fetch();
+        $tenantId = TenantContext::getId();
+        $user = Database::query("SELECT created_at FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
         if (!$user) return 0;
 
         $joined = new \DateTime($user['created_at']);

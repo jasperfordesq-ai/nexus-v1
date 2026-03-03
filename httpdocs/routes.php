@@ -169,15 +169,22 @@ $router->add('GET', '/api/v2/platform/stats', 'Nexus\Controllers\Api\TenantBoots
 
 // Categories endpoint (public - for listing/event forms)
 $router->add('GET', '/api/v2/categories', function () {
-    header('Content-Type: application/json');
-    $type = $_GET['type'] ?? 'listing';
-    // Validate type against allowlist to prevent tainted input
-    $allowedTypes = ['listing', 'event', 'volunteering', 'resource'];
-    if (!in_array($type, $allowedTypes, true)) {
-        $type = 'listing';
+    try {
+        header('Content-Type: application/json');
+        $type = $_GET['type'] ?? 'listing';
+        // Validate type against allowlist to prevent tainted input
+        $allowedTypes = ['listing', 'event', 'volunteering', 'resource'];
+        if (!in_array($type, $allowedTypes, true)) {
+            $type = 'listing';
+        }
+        $categories = \Nexus\Models\Category::getByType($type);
+        echo json_encode(['data' => $categories]); // nosemgrep: echoed-request — json_encode + Content-Type: application/json
+    } catch (\Throwable $e) {
+        error_log("API /v2/categories error: " . $e->getMessage());
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['error' => 'Internal server error']);
     }
-    $categories = \Nexus\Models\Category::getByType($type);
-    echo json_encode(['data' => $categories]); // nosemgrep: echoed-request — json_encode + Content-Type: application/json
 });
 
 $router->add('GET', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@index');
@@ -199,6 +206,7 @@ $router->add('POST', '/api/v2/listings/{id}/image', 'Nexus\Controllers\Api\Listi
 // ============================================
 // List users (public directory)
 $router->add('GET', '/api/v2/users', function () {
+  try {
     header('Content-Type: application/json');
     $tenantId = \Nexus\Core\TenantContext::getId();
 
@@ -277,6 +285,12 @@ $router->add('GET', '/api/v2/users', function () {
             'has_more' => ($offset + $limit) < $totalCount
         ]
     ]);
+  } catch (\Throwable $e) {
+    error_log("API /v2/users error: " . $e->getMessage());
+    header('Content-Type: application/json');
+    http_response_code(500);
+    echo json_encode(['error' => 'Internal server error']);
+  }
 });
 $router->add('GET', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@me');
 $router->add('PUT', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@update');
@@ -434,6 +448,10 @@ $router->add('POST', '/api/v2/groups/{id}/discussions', 'Nexus\Controllers\Api\G
 $router->add('GET', '/api/v2/groups/{id}/discussions/{discussionId}', 'Nexus\Controllers\Api\GroupsApiController@discussionMessages');
 $router->add('POST', '/api/v2/groups/{id}/discussions/{discussionId}/messages', 'Nexus\Controllers\Api\GroupsApiController@postToDiscussion');
 $router->add('POST', '/api/v2/groups/{id}/image', 'Nexus\Controllers\Api\GroupsApiController@uploadImage');
+$router->add('GET', '/api/v2/groups/{id}/announcements', 'Nexus\Controllers\Api\GroupsApiController@announcements');
+$router->add('POST', '/api/v2/groups/{id}/announcements', 'Nexus\Controllers\Api\GroupsApiController@createAnnouncement');
+$router->add('PUT', '/api/v2/groups/{id}/announcements/{announcementId}', 'Nexus\Controllers\Api\GroupsApiController@updateAnnouncement');
+$router->add('DELETE', '/api/v2/groups/{id}/announcements/{announcementId}', 'Nexus\Controllers\Api\GroupsApiController@deleteAnnouncement');
 
 // ============================================
 // API V2 - CONNECTIONS (User Friend Requests)
@@ -485,9 +503,16 @@ $router->add('GET', '/api/v2/feed/hashtags/{tag}', 'Nexus\Controllers\Api\FeedSo
 // API V2 - REALTIME (Pusher Configuration)
 // ============================================
 $router->add('GET', '/api/v2/realtime/config', function () {
-    header('Content-Type: application/json');
-    $config = \Nexus\Services\RealtimeService::getFrontendConfig();
-    echo json_encode(['data' => $config]);
+    try {
+        header('Content-Type: application/json');
+        $config = \Nexus\Services\RealtimeService::getFrontendConfig();
+        echo json_encode(['data' => $config]);
+    } catch (\Throwable $e) {
+        error_log("API /v2/realtime/config error: " . $e->getMessage());
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['error' => 'Internal server error']);
+    }
 });
 
 // ============================================
@@ -762,6 +787,8 @@ $router->add('POST', '/api/v2/admin/users/{id}/send-welcome-email', 'Nexus\Contr
 
 // Admin Listings/Content
 $router->add('GET', '/api/v2/admin/listings', 'Nexus\Controllers\Api\AdminListingsApiController@index');
+$router->add('GET', '/api/v2/admin/listings/moderation-queue', 'Nexus\Controllers\Api\AdminListingsApiController@moderationQueue');
+$router->add('GET', '/api/v2/admin/listings/moderation-stats', 'Nexus\Controllers\Api\AdminListingsApiController@moderationStats');
 $router->add('GET', '/api/v2/admin/listings/{id}', 'Nexus\Controllers\Api\AdminListingsApiController@show');
 $router->add('POST', '/api/v2/admin/listings/{id}/approve', 'Nexus\Controllers\Api\AdminListingsApiController@approve');
 $router->add('DELETE', '/api/v2/admin/listings/{id}', 'Nexus\Controllers\Api\AdminListingsApiController@destroy');
@@ -2382,9 +2409,6 @@ $router->add('PUT', '/api/v2/listings/{id}/tags', 'Nexus\Controllers\Api\Listing
 $router->add('POST', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\AdminListingsApiController@feature');
 $router->add('DELETE', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\AdminListingsApiController@unfeature');
 $router->add('POST', '/api/v2/admin/listings/{id}/reject', 'Nexus\Controllers\Api\AdminListingsApiController@reject');
-$router->add('GET', '/api/v2/admin/listings/moderation-queue', 'Nexus\Controllers\Api\AdminListingsApiController@moderationQueue');
-$router->add('GET', '/api/v2/admin/listings/moderation-stats', 'Nexus\Controllers\Api\AdminListingsApiController@moderationStats');
-
 // ============================================
 // API V2 - SEARCH FEATURES (New endpoints)
 // ============================================

@@ -121,7 +121,7 @@ export function ProfilePage() {
   const toast = useToast();
 
   const [profile, setProfile] = useState<ProfileApiUser | null>(null);
-  usePageTitle(profile?.name ? `${profile.name}` : 'Profile');
+  usePageTitle(profile?.name ? `${profile.name}` : t('page_title'));
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -235,7 +235,7 @@ export function ProfilePage() {
           });
         }
       } else {
-        setError('Profile not found');
+        setError(t('not_found'));
         return;
       }
       if (listingsRes.success && listingsRes.data) {
@@ -489,7 +489,7 @@ export function ProfilePage() {
                   <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" aria-hidden="true" />
                     <time dateTime={profile.created_at}>
-                      {t('joined', { date: new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) })}
+                      {t('joined', { date: new Date(profile.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) })}
                     </time>
                   </span>
                 )}
@@ -1070,7 +1070,7 @@ function ReviewCard({ review }: ReviewCardProps) {
               dateTime={review.created_at}
               className="text-xs text-theme-subtle flex-shrink-0"
             >
-              {new Date(review.created_at).toLocaleDateString('en-US', {
+              {new Date(review.created_at).toLocaleDateString(undefined, {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',

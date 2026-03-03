@@ -91,11 +91,11 @@ export function MessagesPage() {
       if (response.success && response.data) {
         setConversations(response.data);
       } else {
-        setError('Failed to load conversations');
+        setError(t('load_failed'));
       }
     } catch (err) {
       logError('Failed to load conversations', err);
-      setError('Failed to load conversations. Please try again.');
+      setError(t('load_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -258,11 +258,11 @@ export function MessagesPage() {
         setArchivedConversations((prev) => prev.filter((c) => c.id !== conversationId));
         // Reload main inbox to show restored conversation
         loadConversations();
-        toast.success('Conversation restored', 'The conversation has been moved back to your inbox.');
+        toast.success(t('conversation_restored'), t('conversation_restored_desc'));
       }
     } catch (error) {
       logError('Failed to restore conversation', error);
-      toast.error(t('error_title'), 'Failed to restore conversation. Please try again.');
+      toast.error(t('error_title'), t('restore_failed'));
     }
   }
 
@@ -283,11 +283,11 @@ export function MessagesPage() {
         const filtered = response.data.filter(u => u.id !== currentUser?.id);
         setUserSearchResults(filtered);
       } else {
-        setUserSearchError('Failed to search members');
+        setUserSearchError(t('search_members_failed'));
       }
     } catch (error) {
       logError('Failed to search users', error);
-      setUserSearchError('Failed to search members. Please try again.');
+      setUserSearchError(t('search_members_failed'));
     } finally {
       setIsSearchingUsers(false);
     }
@@ -358,9 +358,9 @@ export function MessagesPage() {
           <div className="flex items-start gap-3" role="alert">
             <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1">
-              <h3 className="font-semibold text-red-700 dark:text-red-300">Messaging Restricted</h3>
+              <h3 className="font-semibold text-red-700 dark:text-red-300">{t('messaging_restricted_title')}</h3>
               <p className="text-sm text-red-600/80 dark:text-red-400/80 mt-1">
-                Your messaging has been temporarily restricted. You can view existing conversations but cannot send new messages. If you believe this is an error, please contact your timebank coordinator.
+                {t('messaging_restricted_desc')}
               </p>
             </div>
           </div>

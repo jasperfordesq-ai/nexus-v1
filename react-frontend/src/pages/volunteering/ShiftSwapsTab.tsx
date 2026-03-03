@@ -123,6 +123,10 @@ export function ShiftSwapsTab() {
   };
 
   const handleReject = async (swapId: number) => {
+    if (!window.confirm(t('swaps.reject_confirm', 'Are you sure you want to reject this swap request?'))) {
+      return;
+    }
+
     try {
       setActioningId(swapId);
       const response = await api.put(`/v2/volunteering/swaps/${swapId}`, { action: 'reject' });

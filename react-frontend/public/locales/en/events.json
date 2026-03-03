@@ -79,7 +79,30 @@
     "delete_confirm": "Are you sure you want to delete \u201c{{title}}\u201d? This action cannot be undone.",
     "cancel": "Cancel",
     "delete_confirm_btn": "Delete Event",
-    "cover_alt": "Cover for {{title}}"
+    "cover_alt": "Cover for {{title}}",
+    "event_cancelled": "Event Cancelled",
+    "cancellation_reason": "Reason: {{reason}}",
+    "recurring_event": "Recurring Event",
+    "events_in_series": "{{count}} events in series",
+    "on_waitlist": "On Waitlist",
+    "spots_left": "{{count}} spots left",
+    "event_full": "Full",
+    "waitlist_count": "{{count}} on waitlist",
+    "cancel_modal_title": "Cancel Event",
+    "cancel_confirm": "Are you sure you want to cancel \u201c{{title}}\u201d? This will notify all attendees.",
+    "cancel_reason_placeholder": "Reason for cancellation (optional)",
+    "keep_event": "Keep Event",
+    "cancel_event": "Cancel Event",
+    "join_waitlist": "Join Waitlist",
+    "leave_waitlist": "Leave Waitlist",
+    "other_series_events": "Other events in this series",
+    "view_all_series": "View all {{count}} events in series",
+    "no_other_series_events": "No other events found in this series."
+  },
+  "card": {
+    "cancelled": "Cancelled",
+    "spots_left": "{{count}} spots left",
+    "full": "Full"
   },
   "form": {
     "create_title": "Create New Event",
@@ -124,7 +147,10 @@
       "start_date_required": "Start date is required",
       "start_time_required": "Start time is required",
       "end_date_before_start": "End date must be after start date",
-      "max_attendees_range": "Must be between 1 and 10,000"
+      "max_attendees_range": "Must be between 1 and 10,000",
+      "select_day": "Please select at least one day of the week",
+      "occurrences_range": "Occurrences must be between 2 and 52",
+      "select_end_date": "Please select an end date for the series"
     },
     "toast": {
       "image_type": "Please select a JPEG, PNG, WebP, or GIF image",
@@ -149,6 +175,11 @@
     "delete_failed": "Failed to delete event",
     "checkin_success": "Attendee checked in",
     "checkin_failed": "Failed to check in attendee",
-    "something_wrong": "Something went wrong"
+    "something_wrong": "Something went wrong",
+    "event_cancelled": "Event cancelled",
+    "cancel_failed": "Failed to cancel event",
+    "added_to_waitlist": "You have been added to the waitlist.",
+    "waitlist_join_failed": "Failed to join waitlist.",
+    "removed_from_waitlist": "You have been removed from the waitlist."
   }
 }
