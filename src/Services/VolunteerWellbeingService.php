@@ -267,17 +267,18 @@ class VolunteerWellbeingService
      */
     private static function calculateShiftFrequencyTrend(\PDO $db, int $userId): array
     {
+        $tenantId = TenantContext::getId();
         $stmt = $db->prepare("
             SELECT
                 (SELECT COUNT(*) FROM vol_applications
-                 WHERE user_id = ? AND shift_id IS NOT NULL AND status = 'approved'
+                 WHERE user_id = ? AND tenant_id = ? AND shift_id IS NOT NULL AND status = 'approved'
                  AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as recent_shifts,
                 (SELECT COUNT(*) FROM vol_applications
-                 WHERE user_id = ? AND shift_id IS NOT NULL AND status = 'approved'
+                 WHERE user_id = ? AND tenant_id = ? AND shift_id IS NOT NULL AND status = 'approved'
                  AND created_at >= DATE_SUB(NOW(), INTERVAL 60 DAY)
                  AND created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)) as previous_shifts
         ");
-        $stmt->execute([$userId, $userId]);
+        $stmt->execute([$userId, $tenantId, $userId, $tenantId]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         $recent = (int)$result['recent_shifts'];
@@ -310,16 +311,17 @@ class VolunteerWellbeingService
      */
     private static function calculateCancellationRate(\PDO $db, int $userId): array
     {
+        $tenantId = TenantContext::getId();
         // Count cancelled vs total shift signups
         $stmt = $db->prepare("
             SELECT
                 COUNT(*) as total,
                 SUM(CASE WHEN status = 'declined' OR (shift_id IS NULL AND status = 'approved') THEN 1 ELSE 0 END) as cancelled
             FROM vol_applications
-            WHERE user_id = ?
+            WHERE user_id = ? AND tenant_id = ?
             AND created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
         ");
-        $stmt->execute([$userId]);
+        $stmt->execute([$userId, $tenantId]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         $total = (int)$result['total'];
@@ -350,17 +352,18 @@ class VolunteerWellbeingService
      */
     private static function calculateHoursLoggedTrend(\PDO $db, int $userId): array
     {
+        $tenantId = TenantContext::getId();
         $stmt = $db->prepare("
             SELECT
                 COALESCE((SELECT SUM(hours) FROM vol_logs
-                 WHERE user_id = ? AND status = 'approved'
+                 WHERE user_id = ? AND tenant_id = ? AND status = 'approved'
                  AND date_logged >= DATE_SUB(NOW(), INTERVAL 30 DAY)), 0) as recent_hours,
                 COALESCE((SELECT SUM(hours) FROM vol_logs
-                 WHERE user_id = ? AND status = 'approved'
+                 WHERE user_id = ? AND tenant_id = ? AND status = 'approved'
                  AND date_logged >= DATE_SUB(NOW(), INTERVAL 60 DAY)
                  AND date_logged < DATE_SUB(NOW(), INTERVAL 30 DAY)), 0) as previous_hours
         ");
-        $stmt->execute([$userId, $userId]);
+        $stmt->execute([$userId, $tenantId, $userId, $tenantId]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         $recent = (float)$result['recent_hours'];
@@ -430,13 +433,14 @@ class VolunteerWellbeingService
      */
     private static function calculateEngagementGap(\PDO $db, int $userId): array
     {
+        $tenantId = TenantContext::getId();
         $stmt = $db->prepare("
             SELECT MAX(date_logged) as last_hours_log,
-                   (SELECT MAX(created_at) FROM vol_applications WHERE user_id = ?) as last_application
+                   (SELECT MAX(created_at) FROM vol_applications WHERE user_id = ? AND tenant_id = ?) as last_application
             FROM vol_logs
-            WHERE user_id = ?
+            WHERE user_id = ? AND tenant_id = ?
         ");
-        $stmt->execute([$userId, $userId]);
+        $stmt->execute([$userId, $tenantId, $userId, $tenantId]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         $lastActivity = null;

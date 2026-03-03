@@ -81,9 +81,9 @@ class PredictiveStaffingService
             $stmt = Database::query(
                 "SELECT v.id, v.title, v.start_date, v.end_date, v.slots_needed,
                         v.organization_id, o.name as org_name,
-                        (SELECT COUNT(*) FROM volunteer_signups vs WHERE vs.opportunity_id = v.id AND vs.status = 'confirmed') as filled_slots
-                 FROM volunteer_opportunities v
-                 LEFT JOIN organizations o ON v.organization_id = o.id
+                        (SELECT COUNT(*) FROM vol_applications vs WHERE vs.opportunity_id = v.id AND vs.status = 'approved') as filled_slots
+                 FROM vol_opportunities v
+                 LEFT JOIN vol_organizations o ON v.organization_id = o.id
                  WHERE v.tenant_id = ? AND v.status = 'active'
                    AND v.start_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL ? DAY)
                  ORDER BY v.start_date ASC",
@@ -147,11 +147,11 @@ class PredictiveStaffingService
                 "SELECT
                     COALESCE(AVG(
                         CASE WHEN v.slots_needed > 0
-                            THEN LEAST(100, (SELECT COUNT(*) FROM volunteer_signups vs WHERE vs.opportunity_id = v.id AND vs.status = 'confirmed') * 100.0 / v.slots_needed)
+                            THEN LEAST(100, (SELECT COUNT(*) FROM vol_applications vs WHERE vs.opportunity_id = v.id AND vs.status = 'approved') * 100.0 / v.slots_needed)
                             ELSE 100
                         END
                     ), 75) as avg_fill_rate
-                 FROM volunteer_opportunities v
+                 FROM vol_opportunities v
                  WHERE v.tenant_id = ?
                    AND v.start_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 90 DAY) AND CURDATE()",
                 [$tenantId]
@@ -178,8 +178,8 @@ class PredictiveStaffingService
             // Day-of-week signup rates
             $dayStmt = Database::query(
                 "SELECT DAYOFWEEK(vs.created_at) as dow, COUNT(*) as signups
-                 FROM volunteer_signups vs
-                 JOIN volunteer_opportunities v ON vs.opportunity_id = v.id
+                 FROM vol_applications vs
+                 JOIN vol_opportunities v ON vs.opportunity_id = v.id
                  WHERE v.tenant_id = ? AND vs.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
                  GROUP BY DAYOFWEEK(vs.created_at)",
                 [$tenantId]
@@ -192,8 +192,8 @@ class PredictiveStaffingService
             // Monthly patterns
             $monthStmt = Database::query(
                 "SELECT MONTH(vs.created_at) as month, COUNT(*) as signups
-                 FROM volunteer_signups vs
-                 JOIN volunteer_opportunities v ON vs.opportunity_id = v.id
+                 FROM vol_applications vs
+                 JOIN vol_opportunities v ON vs.opportunity_id = v.id
                  WHERE v.tenant_id = ? AND vs.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
                  GROUP BY MONTH(vs.created_at)",
                 [$tenantId]

@@ -2277,6 +2277,10 @@ $router->add('GET', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\
 $router->add('POST', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\VolunteerApiController@generateCertificate');
 $router->add('GET', '/api/v2/volunteering/certificates/verify/{code}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCertificate');
 $router->add('GET', '/api/v2/volunteering/certificates/{code}/html', 'Nexus\Controllers\Api\VolunteerApiController@certificateHtml');
+// Credential verification (separate from impact certificates)
+$router->add('GET', '/api/v2/volunteering/credentials', 'Nexus\Controllers\Api\VolunteerApiController@myCredentials');
+$router->add('POST', '/api/v2/volunteering/credentials', 'Nexus\Controllers\Api\VolunteerApiController@uploadCredential');
+$router->add('DELETE', '/api/v2/volunteering/credentials/{id}', 'Nexus\Controllers\Api\VolunteerApiController@deleteCredential');
 $router->add('GET', '/api/v2/volunteering/emergency-alerts', 'Nexus\Controllers\Api\VolunteerApiController@myEmergencyAlerts');
 $router->add('POST', '/api/v2/volunteering/emergency-alerts', 'Nexus\Controllers\Api\VolunteerApiController@createEmergencyAlert');
 $router->add('PUT', '/api/v2/volunteering/emergency-alerts/{id}', 'Nexus\Controllers\Api\VolunteerApiController@respondToEmergencyAlert');

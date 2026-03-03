@@ -72,8 +72,9 @@ class VolunteerCertificateService
             JOIN vol_organizations org ON l.organization_id = org.id
             WHERE l.user_id = ? AND l.status = 'approved'
             AND l.date_logged >= ? AND l.date_logged <= ?
+            AND l.tenant_id = ?
         ";
-        $params = [$userId, $startDate, $endDate];
+        $params = [$userId, $startDate, $endDate, $tenantId];
 
         if ($orgId) {
             $sql .= " AND l.organization_id = ?";
@@ -334,9 +335,10 @@ HTML;
     public static function markDownloaded(string $code): void
     {
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
         try {
-            $stmt = $db->prepare("UPDATE vol_certificates SET downloaded_at = NOW() WHERE verification_code = ?");
-            $stmt->execute([$code]);
+            $stmt = $db->prepare("UPDATE vol_certificates SET downloaded_at = NOW() WHERE verification_code = ? AND tenant_id = ?");
+            $stmt->execute([$code, $tenantId]);
         } catch (\Throwable $e) {
             // Silent fail
         }

@@ -104,10 +104,11 @@ class RecurringShiftService
      */
     public static function generateOccurrences(int $patternId, int $daysAhead = 14): int
     {
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT * FROM recurring_shift_patterns WHERE id = ? AND is_active = 1");
-        $stmt->execute([$patternId]);
+        $stmt = $db->prepare("SELECT * FROM recurring_shift_patterns WHERE id = ? AND is_active = 1 AND tenant_id = ?");
+        $stmt->execute([$patternId, $tenantId]);
         $pattern = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$pattern) {
@@ -356,15 +357,23 @@ class RecurringShiftService
      */
     public static function deleteFutureShifts(int $patternId): int
     {
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
+
+        // Verify pattern belongs to this tenant
+        $stmt = $db->prepare("SELECT id FROM recurring_shift_patterns WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$patternId, $tenantId]);
+        if (!$stmt->fetch()) {
+            return 0;
+        }
 
         // Only delete shifts that haven't started and have no signups
         $stmt = $db->prepare("
             DELETE vs FROM vol_shifts vs
-            LEFT JOIN vol_shift_signups vss ON vs.id = vss.shift_id
+            LEFT JOIN vol_applications va ON vs.id = va.shift_id
             WHERE vs.recurring_pattern_id = ?
               AND vs.start_time > NOW()
-              AND vss.id IS NULL
+              AND va.id IS NULL
         ");
         $stmt->execute([$patternId]);
 

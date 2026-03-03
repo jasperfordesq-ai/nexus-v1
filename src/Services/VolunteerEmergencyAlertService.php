@@ -155,8 +155,9 @@ class VolunteerEmergencyAlertService
         }
 
         // Check alert is still active
-        $stmt = $db->prepare("SELECT * FROM vol_emergency_alerts WHERE id = ? AND status = 'active'");
-        $stmt->execute([$alertId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("SELECT * FROM vol_emergency_alerts WHERE id = ? AND status = 'active' AND tenant_id = ?");
+        $stmt->execute([$alertId, $tenantId]);
         $alert = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$alert) {
@@ -322,9 +323,10 @@ class VolunteerEmergencyAlertService
         self::$errors = [];
 
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
-        $stmt = $db->prepare("SELECT * FROM vol_emergency_alerts WHERE id = ? AND created_by = ? AND status = 'active'");
-        $stmt->execute([$alertId, $userId]);
+        $stmt = $db->prepare("SELECT * FROM vol_emergency_alerts WHERE id = ? AND created_by = ? AND status = 'active' AND tenant_id = ?");
+        $stmt->execute([$alertId, $userId, $tenantId]);
         $alert = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$alert) {
@@ -333,8 +335,8 @@ class VolunteerEmergencyAlertService
         }
 
         try {
-            $stmt = $db->prepare("UPDATE vol_emergency_alerts SET status = 'cancelled' WHERE id = ?");
-            $stmt->execute([$alertId]);
+            $stmt = $db->prepare("UPDATE vol_emergency_alerts SET status = 'cancelled' WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$alertId, $tenantId]);
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerEmergencyAlertService::cancelAlert error: " . $e->getMessage());

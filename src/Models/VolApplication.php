@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class VolApplication
 {
@@ -18,7 +19,7 @@ class VolApplication
 
     public static function hasApplied($oppId, $userId)
     {
-        $res = Database::query("SELECT id FROM vol_applications WHERE opportunity_id = ? AND user_id = ?", [$oppId, $userId])->fetch();
+        $res = Database::query("SELECT id FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ?", [$oppId, $userId, TenantContext::getId()])->fetch();
         return (bool) $res;
     }
 
@@ -29,9 +30,9 @@ class VolApplication
                 FROM vol_applications app
                 JOIN users u ON app.user_id = u.id
                 LEFT JOIN vol_shifts s ON app.shift_id = s.id
-                WHERE app.opportunity_id = ?
+                WHERE app.opportunity_id = ? AND app.tenant_id = ?
                 ORDER BY app.created_at DESC";
-        return Database::query($sql, [$oppId])->fetchAll();
+        return Database::query($sql, [$oppId, TenantContext::getId()])->fetchAll();
     }
     public static function getByUser($userId)
     {
@@ -39,8 +40,8 @@ class VolApplication
                 FROM vol_applications app
                 JOIN vol_opportunities opp ON app.opportunity_id = opp.id
                 JOIN vol_organizations org ON opp.organization_id = org.id
-                WHERE app.user_id = ?
+                WHERE app.user_id = ? AND app.tenant_id = ?
                 ORDER BY app.created_at DESC";
-        return Database::query($sql, [$userId])->fetchAll();
+        return Database::query($sql, [$userId, TenantContext::getId()])->fetchAll();
     }
 }

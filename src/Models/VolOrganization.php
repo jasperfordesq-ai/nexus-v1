@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class VolOrganization
 {
@@ -20,24 +21,24 @@ class VolOrganization
 
     public static function update($id, $name, $description, $email, $website, $autoPay = false)
     {
-        $sql = "UPDATE vol_organizations SET name = ?, description = ?, contact_email = ?, website = ?, auto_pay_enabled = ? WHERE id = ?";
-        Database::query($sql, [$name, $description, $email, $website, $autoPay ? 1 : 0, $id]);
+        $sql = "UPDATE vol_organizations SET name = ?, description = ?, contact_email = ?, website = ?, auto_pay_enabled = ? WHERE id = ? AND tenant_id = ?";
+        Database::query($sql, [$name, $description, $email, $website, $autoPay ? 1 : 0, $id, TenantContext::getId()]);
     }
 
     public static function updateStatus($id, $status)
     {
-        $sql = "UPDATE vol_organizations SET status = ? WHERE id = ?";
-        Database::query($sql, [$status, $id]);
+        $sql = "UPDATE vol_organizations SET status = ? WHERE id = ? AND tenant_id = ?";
+        Database::query($sql, [$status, $id, TenantContext::getId()]);
     }
 
     public static function find($id)
     {
-        return Database::query("SELECT * FROM vol_organizations WHERE id = ?", [$id])->fetch();
+        return Database::query("SELECT * FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$id, TenantContext::getId()])->fetch();
     }
 
     public static function findByOwner($userId)
     {
-        return Database::query("SELECT * FROM vol_organizations WHERE user_id = ?", [$userId])->fetchAll();
+        return Database::query("SELECT * FROM vol_organizations WHERE user_id = ? AND tenant_id = ?", [$userId, TenantContext::getId()])->fetchAll();
     }
 
     public static function all($tenantId)
