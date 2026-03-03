@@ -374,8 +374,9 @@ class RecurringShiftService
             WHERE vs.recurring_pattern_id = ?
               AND vs.start_time > NOW()
               AND va.id IS NULL
+              AND vs.tenant_id = ?
         ");
-        $stmt->execute([$patternId]);
+        $stmt->execute([$patternId, $tenantId]);
 
         return $stmt->rowCount();
     }

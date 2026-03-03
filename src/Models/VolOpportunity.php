@@ -35,10 +35,11 @@ class VolOpportunity
         $params = [$tenantId];
 
         if ($query) {
+            $escapedQuery = addcslashes($query, '%_');
             $sql .= " AND (opp.title LIKE ? OR opp.description LIKE ? OR org.name LIKE ?)";
-            $params[] = "%$query%";
-            $params[] = "%$query%";
-            $params[] = "%$query%";
+            $params[] = "%$escapedQuery%";
+            $params[] = "%$escapedQuery%";
+            $params[] = "%$escapedQuery%";
         }
 
         if ($catId) {
@@ -47,7 +48,7 @@ class VolOpportunity
         }
 
         if ($isRemote) {
-            $sql .= " AND (opp.is_remote = 1 OR opp.location LIKE '%Remote%')";
+            $sql .= " AND opp.location LIKE '%Remote%'";
         }
 
         $sql .= " ORDER BY opp.created_at DESC";

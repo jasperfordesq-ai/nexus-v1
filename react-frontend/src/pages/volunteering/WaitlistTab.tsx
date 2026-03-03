@@ -93,6 +93,10 @@ export function WaitlistTab() {
   }, [load]);
 
   const handleLeaveWaitlist = async (shiftId: number) => {
+    if (!window.confirm(t('waitlist.leave_confirm', 'Are you sure you want to leave this waitlist? You will lose your position.'))) {
+      return;
+    }
+
     try {
       setRemovingId(shiftId);
       const response = await api.delete(`/v2/volunteering/shifts/${shiftId}/waitlist`);

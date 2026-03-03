@@ -70,7 +70,7 @@ export function WalletPage() {
       if (balanceRes.success && balanceRes.data) {
         setBalance(balanceRes.data);
       } else {
-        setError('Failed to load wallet balance');
+        setError(t('error.load_balance'));
         return;
       }
       if (transactionsRes.success && transactionsRes.data) {
@@ -80,7 +80,7 @@ export function WalletPage() {
       }
     } catch (err) {
       logError('Failed to load wallet data', err);
-      setError('Failed to load wallet data. Please try again.');
+      setError(t('error.load_wallet'));
     } finally {
       setIsLoading(false);
     }

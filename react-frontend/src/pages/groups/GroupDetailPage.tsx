@@ -1723,7 +1723,7 @@ export function GroupDetailPage() {
                         {/* Date Badge */}
                         <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex flex-col items-center justify-center text-center">
                           <span className="text-xs font-medium text-indigo-400 uppercase">
-                            {eventDate.toLocaleDateString('en-US', { month: 'short' })}
+                            {eventDate.toLocaleDateString(undefined, { month: 'short' })}
                           </span>
                           <span className="text-lg font-bold text-theme-primary leading-none">
                             {eventDate.getDate()}
@@ -1735,7 +1735,7 @@ export function GroupDetailPage() {
                           <div className="flex items-center gap-3 mt-1 text-xs text-theme-subtle">
                             <span className="flex items-center gap-1">
                               <Clock className="w-3 h-3" aria-hidden="true" />
-                              {eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                              {eventDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                             </span>
                             {event.location && (
                               <span className="flex items-center gap-1 truncate">

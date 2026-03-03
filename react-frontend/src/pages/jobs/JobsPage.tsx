@@ -109,9 +109,24 @@ export function JobsPage() {
   const { t } = useTranslation('jobs');
   usePageTitle(t('title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Feature gate
+  if (!hasFeature('job_vacancies')) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center mb-4">
+          <Briefcase className="w-8 h-8 text-blue-500" aria-hidden="true" />
+        </div>
+        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_not_available', 'Jobs Not Available')}</h2>
+        <p className="text-[var(--color-text-muted)] max-w-sm">
+          {t('feature_not_available_desc', 'The jobs feature is not enabled for this community. Contact your timebank administrator to learn more.')}
+        </p>
+      </div>
+    );
+  }
 
   const [vacancies, setVacancies] = useState<JobVacancy[]>([]);
   const [isLoading, setIsLoading] = useState(true);

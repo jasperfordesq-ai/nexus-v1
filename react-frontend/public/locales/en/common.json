@@ -144,6 +144,24 @@
     "essential_only": "Essential only",
     "save": "Save preferences"
   },
+  "footer": {
+    "platform": "Platform",
+    "support": "Support",
+    "help_center": "Help Center",
+    "contact_us": "Contact Us",
+    "about": "About",
+    "report_bug": "Report a Bug",
+    "legal": "Legal",
+    "pages": "Pages",
+    "cookie_settings": "Cookie Settings",
+    "built_on_nexus": "Built on Project NEXUS — Open Source Community Platform",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "mobile_tab": {
+    "create": "Create",
+    "menu": "Menu"
+  },
   "attribution": "Built on Project NEXUS by Jasper Ford",
   "members": {
     "title": "Members",
@@ -166,6 +184,8 @@
     "load_more": "Load More",
     "results_matching": "{{shown}} of {{total}} members matching \"{{query}}\"",
     "no_location": "No members with location data",
-    "fallback_name": "Member"
+    "fallback_name": "Member",
+    "load_failed": "Failed to load members",
+    "load_more_failed": "Failed to load more members"
   }
 }

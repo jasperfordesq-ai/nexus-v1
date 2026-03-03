@@ -54,5 +54,9 @@
     "exported_desc": "Transactions exported to CSV",
     "transfer_success": "Transfer successful",
     "transfer_desc": "Sent {{amount}} hours to {{recipient}}"
+  },
+  "error": {
+    "load_balance": "Failed to load wallet balance",
+    "load_wallet": "Failed to load wallet data. Please try again."
   }
 }

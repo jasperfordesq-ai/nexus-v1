@@ -111,7 +111,18 @@
     "click_to_browse": "Click to browse or drag and drop",
     "file_types": "PDF, JPG, PNG, or WebP up to 10MB",
     "cancel": "Cancel",
-    "upload_credential": "Upload Credential"
+    "upload_credential": "Upload Credential",
+    "type_garda_vetting": "Garda Vetting",
+    "type_first_aid": "First Aid",
+    "type_dbs_check": "DBS Check",
+    "type_safeguarding": "Safeguarding",
+    "type_manual_handling": "Manual Handling",
+    "type_food_hygiene": "Food Hygiene",
+    "type_driving_licence": "Driving Licence",
+    "type_professional_registration": "Professional Registration",
+    "type_other": "Other",
+    "load_failed": "Failed to load credentials.",
+    "load_error": "Unable to load credentials. Please try again."
   },
   "swaps": {
     "heading": "Shift Swaps",

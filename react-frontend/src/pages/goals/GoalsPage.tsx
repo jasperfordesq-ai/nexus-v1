@@ -856,7 +856,7 @@ export function GoalsPage() {
                         {t('goals.detail.deadline')}
                       </div>
                       <p className="text-sm text-theme-primary font-medium">
-                        {new Date(detailGoal.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        {new Date(detailGoal.deadline).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                       </p>
                     </div>
                   )}
@@ -866,7 +866,7 @@ export function GoalsPage() {
                       {t('goals.detail.created')}
                     </div>
                     <p className="text-sm text-theme-primary font-medium">
-                      {new Date(detailGoal.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {new Date(detailGoal.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                   </div>
                   {detailGoal.buddy_name && (

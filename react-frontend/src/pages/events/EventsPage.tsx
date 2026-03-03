@@ -472,7 +472,7 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                 {event.status === 'cancelled' && (
                   <span className="flex items-center gap-1 text-red-400 font-medium">
                     <Ban className="w-4 h-4" aria-hidden="true" />
-                    Cancelled
+                    {t('card.cancelled')}
                   </span>
                 )}
                 <span className="flex items-center gap-1">
@@ -496,11 +496,11 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                 </span>
                 {event.max_attendees != null && event.spots_left != null && event.spots_left > 0 && event.status !== 'cancelled' && (
                   <span className={`text-xs font-medium ${event.spots_left <= 3 ? 'text-red-400' : 'text-emerald-400'}`}>
-                    {event.spots_left} {event.spots_left === 1 ? 'spot' : 'spots'} left
+                    {t('card.spots_left', { count: event.spots_left })}
                   </span>
                 )}
                 {event.is_full && event.status !== 'cancelled' && (
-                  <span className="text-xs font-medium text-red-400">Full</span>
+                  <span className="text-xs font-medium text-red-400">{t('card.full')}</span>
                 )}
               </div>
             </div>

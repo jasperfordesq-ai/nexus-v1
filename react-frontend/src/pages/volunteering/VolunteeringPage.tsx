@@ -131,9 +131,24 @@ export function VolunteeringPage() {
   const { t } = useTranslation('community');
   usePageTitle(t('volunteering.page_title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const [tab, setTab] = useState<VolunteerTab>('opportunities');
   const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
+
+  // Feature gate
+  if (!hasFeature('volunteering')) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-100 to-orange-100 dark:from-rose-900/30 dark:to-orange-900/30 flex items-center justify-center mb-4">
+          <Heart className="w-8 h-8 text-rose-500" aria-hidden="true" />
+        </div>
+        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('volunteering.feature_not_available', 'Volunteering Not Available')}</h2>
+        <p className="text-[var(--color-text-muted)] max-w-sm">
+          {t('volunteering.feature_not_available_desc', 'The volunteering feature is not enabled for this community. Contact your timebank administrator to learn more.')}
+        </p>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (isAuthenticated) {

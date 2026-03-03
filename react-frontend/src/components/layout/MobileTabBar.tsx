@@ -12,6 +12,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Badge, Button } from '@heroui/react';
 import {
@@ -32,6 +33,7 @@ interface MobileTabBarProps {
 const hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/onboarding'];
 
 export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
+  const { t } = useTranslation('common');
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -66,11 +68,11 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
     badgeCount?: number;
     module?: string;
   }[] = [
-    { key: 'home',     label: 'Home',     icon: House,         path: tenantPath('/dashboard'), module: 'dashboard' },
-    { key: 'listings', label: 'Listings', icon: ListTodo,      path: tenantPath('/listings'),  module: 'listings' },
-    { key: 'create',   label: 'Create',   icon: Plus,          action: handleCreateOpen,       isCreate: true },
-    { key: 'messages', label: 'Messages', icon: MessageSquare, path: tenantPath('/messages'),  badgeCount: counts.messages, module: 'messages' },
-    { key: 'menu',     label: 'Menu',     icon: Menu,          action: onMenuOpen },
+    { key: 'home',     label: t('nav.home'),     icon: House,         path: tenantPath('/dashboard'), module: 'dashboard' },
+    { key: 'listings', label: t('nav.listings'), icon: ListTodo,      path: tenantPath('/listings'),  module: 'listings' },
+    { key: 'create',   label: t('mobile_tab.create'),   icon: Plus,          action: handleCreateOpen,       isCreate: true },
+    { key: 'messages', label: t('nav.messages'), icon: MessageSquare, path: tenantPath('/messages'),  badgeCount: counts.messages, module: 'messages' },
+    { key: 'menu',     label: t('mobile_tab.menu'),     icon: Menu,          action: onMenuOpen },
   ];
 
   const visibleTabs = tabs.filter((tab) => {

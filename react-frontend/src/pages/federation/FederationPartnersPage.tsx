@@ -292,7 +292,7 @@ export function FederationPartnersPage() {
                       <span className="flex items-center gap-1.5 text-theme-muted">
                         <Shield className="w-4 h-4" aria-hidden="true" />
                         {t('partners.partner_since', {
-                          date: new Date(selectedPartner.partnership_since).toLocaleDateString('en-US', {
+                          date: new Date(selectedPartner.partnership_since).toLocaleDateString(undefined, {
                             month: 'long',
                             year: 'numeric',
                           }),
@@ -457,7 +457,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
           {partner.partnership_since && (
             <span className="text-xs text-theme-subtle">
               {t('partners.since_date', {
-                date: new Date(partner.partnership_since).toLocaleDateString('en-US', {
+                date: new Date(partner.partnership_since).toLocaleDateString(undefined, {
                   month: 'short',
                   year: 'numeric',
                 }),
