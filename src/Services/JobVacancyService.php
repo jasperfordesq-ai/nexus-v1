@@ -63,7 +63,7 @@ class JobVacancyService
      * @param array $filters Optional filters: status, type, commitment, category, search, user_id, cursor, limit
      * @return array ['items' => [...], 'cursor' => ?string, 'has_more' => bool]
      */
-    public static function getAll(array $filters = []): array
+    public static function getAll(array $filters = [], ?int $userId = null): array
     {
         $tenantId = TenantContext::getId();
         $limit = $filters['limit'] ?? 20;
@@ -102,10 +102,11 @@ class JobVacancyService
             $params[] = $category;
         }
 
-        // Search filter
+        // Search filter (escape LIKE wildcards to prevent pattern injection)
         if ($search) {
             $where[] = "(jv.title LIKE ? OR jv.description LIKE ? OR jv.category LIKE ?)";
-            $searchTerm = '%' . $search . '%';
+            $escapedSearch = addcslashes($search, '%_\\');
+            $searchTerm = '%' . $escapedSearch . '%';
             $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
@@ -143,10 +144,11 @@ class JobVacancyService
                 u.first_name as creator_first_name,
                 u.last_name as creator_last_name,
                 u.avatar_url as creator_avatar,
-                NULL as organization_name,
-                NULL as organization_logo
+                o.name as organization_name,
+                o.logo_url as organization_logo
             FROM job_vacancies jv
             LEFT JOIN users u ON jv.user_id = u.id
+            LEFT JOIN organizations o ON jv.organization_id = o.id
             WHERE {$whereClause}
             ORDER BY
                 (CASE WHEN jv.is_featured = 1 AND (jv.featured_until IS NULL OR jv.featured_until > NOW()) THEN 0 ELSE 1 END) ASC,
@@ -167,9 +169,9 @@ class JobVacancyService
             $nextCursor = base64_encode((string)$lastItem['id']);
         }
 
-        // Enrich each vacancy
+        // Enrich each vacancy (pass userId for has_applied/is_saved checks)
         foreach ($vacancies as &$vacancy) {
-            $vacancy = self::enrichVacancy($vacancy);
+            $vacancy = self::enrichVacancy($vacancy, $userId);
         }
 
         return [
@@ -196,10 +198,11 @@ class JobVacancyService
                 u.first_name as creator_first_name,
                 u.last_name as creator_last_name,
                 u.avatar_url as creator_avatar,
-                NULL as organization_name,
-                NULL as organization_logo
+                o.name as organization_name,
+                o.logo_url as organization_logo
             FROM job_vacancies jv
             LEFT JOIN users u ON jv.user_id = u.id
+            LEFT JOIN organizations o ON jv.organization_id = o.id
             WHERE jv.id = ? AND jv.tenant_id = ?
         ";
 
@@ -373,10 +376,23 @@ class JobVacancyService
             self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Invalid contact email', 'contact_email');
         }
 
+        // J9: Salary validation
+        if ($salaryMin !== null && $salaryMin < 0) {
+            self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Salary minimum must be non-negative', 'salary_min');
+        }
+        if ($salaryMax !== null && $salaryMax < 0) {
+            self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Salary maximum must be non-negative', 'salary_max');
+        }
+        if ($salaryMin !== null && $salaryMax !== null && $salaryMin > $salaryMax) {
+            self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Salary minimum cannot exceed maximum', 'salary_min');
+        }
+
         if ($deadline) {
             $deadlineTs = strtotime($deadline);
             if ($deadlineTs === false) {
                 self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Invalid deadline format', 'deadline');
+            } elseif ($deadlineTs < time()) {
+                self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Deadline must be in the future', 'deadline');
             }
         }
 
@@ -416,7 +432,7 @@ class JobVacancyService
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             } catch (\Exception $faEx) {
-                error_log("JobVacancyService::create feed_activity record failed: " . $faEx->getMessage());
+                error_log("JobVacancyService: feed_activity record failed (create): " . get_class($faEx));
             }
 
             // J6: Check matching alerts for the new job
@@ -430,12 +446,12 @@ class JobVacancyService
                     \Nexus\Models\Gamification::awardPoints($userId, 10, 'Posted a job vacancy');
                 }
             } catch (\Throwable $e) {
-                // Gamification is optional
+                error_log("JobVacancyService: Gamification award failed (create): " . get_class($e));
             }
 
             return (int)$vacancyId;
         } catch (\Throwable $e) {
-            error_log("Job vacancy creation failed: " . $e->getMessage());
+            error_log("JobVacancyService: Job vacancy creation failed: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to create job vacancy');
             return null;
         }
@@ -567,7 +583,7 @@ class JobVacancyService
             );
             return true;
         } catch (\Throwable $e) {
-            error_log("Job vacancy update failed: " . $e->getMessage());
+            error_log("JobVacancyService: Job vacancy update failed: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update job vacancy');
             return false;
         }
@@ -618,12 +634,12 @@ class JobVacancyService
             try {
                 FeedActivityService::removeActivity('job', $id);
             } catch (\Exception $faEx) {
-                error_log("JobVacancyService::delete feed_activity remove failed: " . $faEx->getMessage());
+                error_log("JobVacancyService: feed_activity remove failed (delete): " . get_class($faEx));
             }
 
             return true;
         } catch (\Throwable $e) {
-            error_log("Job vacancy deletion failed: " . $e->getMessage());
+            error_log("JobVacancyService: Job vacancy deletion failed: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to delete job vacancy');
             return false;
         }
@@ -667,6 +683,8 @@ class JobVacancyService
         }
 
         try {
+            Database::beginTransaction();
+
             // J3: Use 'applied' as initial stage
             Database::query(
                 "INSERT INTO job_vacancy_applications (vacancy_id, user_id, message, status, stage, created_at)
@@ -679,11 +697,13 @@ class JobVacancyService
             // J4: Log initial application in history
             self::logApplicationHistory((int)$applicationId, null, 'applied', $userId, 'Application submitted');
 
-            // Increment applications count
+            // Increment applications count (atomic within transaction)
             Database::query(
                 "UPDATE job_vacancies SET applications_count = applications_count + 1 WHERE id = ?",
                 [$vacancyId]
             );
+
+            Database::commit();
 
             // Check for matching job alerts and trigger notifications
             self::checkJobAlertsForVacancy($vacancyId);
@@ -694,12 +714,13 @@ class JobVacancyService
                     \Nexus\Models\Gamification::awardPoints($userId, 3, 'Applied to a job vacancy');
                 }
             } catch (\Throwable $e) {
-                // Gamification is optional
+                error_log("JobVacancyService: Gamification award failed (apply): " . get_class($e));
             }
 
             return (int)$applicationId;
         } catch (\Throwable $e) {
-            error_log("Job application failed: " . $e->getMessage());
+            Database::rollBack();
+            error_log("JobVacancyService: Job application failed: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to submit application');
             return null;
         }
@@ -792,8 +813,8 @@ class JobVacancyService
     {
         self::clearErrors();
 
-        // J3: Support full pipeline stages
-        $validStatuses = ['applied', 'screening', 'reviewed', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'];
+        // J3: Support full pipeline stages (includes 'pending' for backwards compatibility)
+        $validStatuses = ['applied', 'pending', 'screening', 'reviewed', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'];
         if (!in_array($status, $validStatuses)) {
             self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Invalid application status', 'status');
             return false;
@@ -845,7 +866,7 @@ class JobVacancyService
 
             return true;
         } catch (\Throwable $e) {
-            error_log("Application status update failed: " . $e->getMessage());
+            error_log("JobVacancyService: Application status update failed: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update application');
             return false;
         }
@@ -970,7 +991,7 @@ class JobVacancyService
             );
         } catch (\Throwable $e) {
             // Non-critical — log and continue
-            error_log("Failed to increment job vacancy views: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to increment views: " . get_class($e));
         }
     }
 
@@ -1018,7 +1039,7 @@ class JobVacancyService
             );
             return true;
         } catch (\Throwable $e) {
-            error_log("Failed to save job: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to save job: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to save job');
             return false;
         }
@@ -1042,7 +1063,7 @@ class JobVacancyService
             );
             return true;
         } catch (\Throwable $e) {
-            error_log("Failed to unsave job: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to unsave job: " . get_class($e));
             return false;
         }
     }
@@ -1080,13 +1101,14 @@ class JobVacancyService
                 u.first_name as creator_first_name,
                 u.last_name as creator_last_name,
                 u.avatar_url as creator_avatar,
-                NULL as organization_name,
-                NULL as organization_logo,
+                o.name as organization_name,
+                o.logo_url as organization_logo,
                 sj.id as saved_id,
                 sj.saved_at
             FROM saved_jobs sj
             JOIN job_vacancies jv ON sj.job_id = jv.id
             LEFT JOIN users u ON jv.user_id = u.id
+            LEFT JOIN organizations o ON jv.organization_id = o.id
             WHERE {$whereClause}
             ORDER BY sj.saved_at DESC, sj.id DESC
             LIMIT ?
@@ -1240,7 +1262,7 @@ class JobVacancyService
             );
         } catch (\Throwable $e) {
             // Non-critical — log and continue
-            error_log("Failed to log application history: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to log application history: " . get_class($e));
         }
     }
 
@@ -1290,10 +1312,12 @@ class JobVacancyService
         $history = Database::query(
             "SELECT h.*, u.first_name, u.last_name
              FROM job_application_history h
+             JOIN job_vacancy_applications a ON h.application_id = a.id
+             JOIN job_vacancies jv ON a.vacancy_id = jv.id AND jv.tenant_id = ?
              LEFT JOIN users u ON h.changed_by = u.id
              WHERE h.application_id = ?
              ORDER BY h.changed_at ASC",
-            [$applicationId]
+            [$tenantId, $applicationId]
         )->fetchAll();
 
         foreach ($history as &$entry) {
@@ -1400,7 +1424,7 @@ class JobVacancyService
 
             return (int)Database::lastInsertId();
         } catch (\Throwable $e) {
-            error_log("Failed to create job alert: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to create job alert: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to create alert');
             return null;
         }
@@ -1415,6 +1439,7 @@ class JobVacancyService
      */
     public static function unsubscribeAlert(int $alertId, int $userId): bool
     {
+        self::clearErrors();
         $tenantId = TenantContext::getId();
 
         try {
@@ -1424,7 +1449,31 @@ class JobVacancyService
             );
             return true;
         } catch (\Throwable $e) {
-            error_log("Failed to unsubscribe alert: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to unsubscribe alert: " . get_class($e));
+            return false;
+        }
+    }
+
+    /**
+     * Resubscribe (reactivate) a paused job alert
+     *
+     * @param int $alertId
+     * @param int $userId
+     * @return bool
+     */
+    public static function resubscribeAlert(int $alertId, int $userId): bool
+    {
+        self::clearErrors();
+        $tenantId = TenantContext::getId();
+
+        try {
+            Database::query(
+                "UPDATE job_alerts SET is_active = 1 WHERE id = ? AND user_id = ? AND tenant_id = ?",
+                [$alertId, $userId, $tenantId]
+            );
+            return true;
+        } catch (\Throwable $e) {
+            error_log("JobVacancyService: Failed to resubscribe alert: " . get_class($e));
             return false;
         }
     }
@@ -1438,6 +1487,7 @@ class JobVacancyService
      */
     public static function deleteAlert(int $alertId, int $userId): bool
     {
+        self::clearErrors();
         $tenantId = TenantContext::getId();
 
         try {
@@ -1447,7 +1497,7 @@ class JobVacancyService
             );
             return true;
         } catch (\Throwable $e) {
-            error_log("Failed to delete alert: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to delete alert: " . get_class($e));
             return false;
         }
     }
@@ -1530,7 +1580,7 @@ class JobVacancyService
                 }
             }
         } catch (\Throwable $e) {
-            error_log("Job alert check failed: " . $e->getMessage());
+            error_log("JobVacancyService: Job alert check failed: " . get_class($e));
         }
     }
 
@@ -1615,7 +1665,7 @@ class JobVacancyService
             );
             return $result->rowCount();
         } catch (\Throwable $e) {
-            error_log("Failed to expire overdue jobs: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to expire overdue jobs: " . get_class($e));
             return 0;
         }
     }
@@ -1640,7 +1690,7 @@ class JobVacancyService
                 [$daysBeforeDeadline]
             )->fetchAll();
         } catch (\Throwable $e) {
-            error_log("Failed to get expiring jobs: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to get expiring jobs: " . get_class($e));
             return [];
         }
     }
@@ -1691,7 +1741,7 @@ class JobVacancyService
 
             return true;
         } catch (\Throwable $e) {
-            error_log("Job renewal failed: " . $e->getMessage());
+            error_log("JobVacancyService: Job renewal failed: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to renew job');
             return false;
         }
@@ -1748,13 +1798,14 @@ class JobVacancyService
             [$jobId, $tenantId]
         )->fetch();
 
-        // Application count by status
+        // Application count by status (tenant-scoped via join)
         $applicationsByStatus = Database::query(
-            "SELECT COALESCE(stage, status) as stage, COUNT(*) as count
-             FROM job_vacancy_applications
-             WHERE vacancy_id = ?
-             GROUP BY COALESCE(stage, status)",
-            [$jobId]
+            "SELECT COALESCE(a.stage, a.status) as stage, COUNT(*) as count
+             FROM job_vacancy_applications a
+             JOIN job_vacancies jv ON a.vacancy_id = jv.id AND jv.tenant_id = ?
+             WHERE a.vacancy_id = ?
+             GROUP BY COALESCE(a.stage, a.status)",
+            [$tenantId, $jobId]
         )->fetchAll();
 
         // Conversion rate (views to applications)
@@ -1817,6 +1868,9 @@ class JobVacancyService
         self::clearErrors();
         $tenantId = TenantContext::getId();
 
+        // Validate duration bounds
+        $durationDays = max(1, min(90, $durationDays));
+
         // Admin check
         $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
         if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
@@ -1842,7 +1896,7 @@ class JobVacancyService
             );
             return true;
         } catch (\Throwable $e) {
-            error_log("Failed to feature job: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to feature job: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to feature job');
             return false;
         }
@@ -1874,7 +1928,7 @@ class JobVacancyService
             );
             return true;
         } catch (\Throwable $e) {
-            error_log("Failed to unfeature job: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to unfeature job: " . get_class($e));
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to unfeature job');
             return false;
         }
@@ -1898,7 +1952,7 @@ class JobVacancyService
             );
             return $result->rowCount();
         } catch (\Throwable $e) {
-            error_log("Failed to expire featured jobs: " . $e->getMessage());
+            error_log("JobVacancyService: Failed to expire featured jobs: " . get_class($e));
             return 0;
         }
     }

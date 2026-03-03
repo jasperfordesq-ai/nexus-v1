@@ -35,6 +35,7 @@ import {
   ArrowLeft,
   Trash2,
   Pause,
+  Play,
   MapPin,
   Tag,
   Briefcase,
@@ -138,6 +139,7 @@ export function JobAlertsPage() {
       setAlerts((prev) => prev.filter((a) => a.id !== alertId));
     } catch (err) {
       logError('Failed to delete alert', err);
+      toast.error(t('alerts.delete_error'));
     }
   };
 
@@ -146,11 +148,14 @@ export function JobAlertsPage() {
       if (isActive) {
         await api.put(`/v2/jobs/alerts/${alertId}/unsubscribe`, {});
         toast.success(t('alerts.unsubscribe_success'));
+      } else {
+        await api.put(`/v2/jobs/alerts/${alertId}/resubscribe`, {});
+        toast.success(t('alerts.resubscribe_success'));
       }
-      // Reload to reflect changes
       loadAlerts();
     } catch (err) {
       logError('Failed to toggle alert', err);
+      toast.error(t('alerts.toggle_error'));
     }
   };
 
@@ -283,18 +288,20 @@ export function JobAlertsPage() {
                   </div>
 
                   <div className="flex gap-1">
-                    {alert.is_active && (
-                      <Button
-                        size="sm"
-                        variant="flat"
-                        isIconOnly
-                        className="text-theme-muted"
-                        onPress={() => handleTogglePause(alert.id, true)}
-                        aria-label="Pause alert"
-                      >
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      isIconOnly
+                      className="text-theme-muted"
+                      onPress={() => handleTogglePause(alert.id, alert.is_active)}
+                      aria-label={alert.is_active ? 'Pause alert' : 'Resume alert'}
+                    >
+                      {alert.is_active ? (
                         <Pause className="w-4 h-4" />
-                      </Button>
-                    )}
+                      ) : (
+                        <Play className="w-4 h-4" />
+                      )}
+                    </Button>
                     <Button
                       size="sm"
                       variant="flat"

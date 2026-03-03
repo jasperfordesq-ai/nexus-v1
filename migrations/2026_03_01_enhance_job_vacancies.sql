@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS `saved_jobs` (
     UNIQUE KEY `uq_saved_job_user` (`user_id`, `job_id`),
     INDEX `idx_saved_jobs_tenant_user` (`tenant_id`, `user_id`),
     INDEX `idx_saved_jobs_job` (`job_id`),
-    CONSTRAINT `fk_saved_jobs_vacancy` FOREIGN KEY (`job_id`) REFERENCES `job_vacancies` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_saved_jobs_vacancy` FOREIGN KEY (`job_id`) REFERENCES `job_vacancies` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_saved_jobs_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================================================
@@ -251,3 +252,32 @@ END //
 DELIMITER ;
 CALL add_featured_index();
 DROP PROCEDURE IF EXISTS add_featured_index;
+
+-- =============================================================================
+-- Additional indexes for analytics and common queries
+-- =============================================================================
+DROP PROCEDURE IF EXISTS add_analytics_indexes;
+DELIMITER //
+CREATE PROCEDURE add_analytics_indexes()
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'job_vacancy_applications'
+        AND INDEX_NAME = 'idx_app_vacancy_status'
+    ) THEN
+        ALTER TABLE `job_vacancy_applications` ADD INDEX `idx_app_vacancy_status` (`vacancy_id`, `status`);
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'job_alerts'
+        AND INDEX_NAME = 'idx_job_alerts_is_active'
+    ) THEN
+        ALTER TABLE `job_alerts` ADD INDEX `idx_job_alerts_is_active` (`is_active`);
+    END IF;
+END //
+DELIMITER ;
+CALL add_analytics_indexes();
+DROP PROCEDURE IF EXISTS add_analytics_indexes;

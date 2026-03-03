@@ -544,6 +544,7 @@ $router->add('GET', '/api/v2/jobs/alerts', 'Nexus\Controllers\Api\JobVacanciesAp
 $router->add('POST', '/api/v2/jobs/alerts', 'Nexus\Controllers\Api\JobVacanciesApiController@createAlert');
 $router->add('DELETE', '/api/v2/jobs/alerts/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@deleteAlert');
 $router->add('PUT', '/api/v2/jobs/alerts/{id}/unsubscribe', 'Nexus\Controllers\Api\JobVacanciesApiController@unsubscribeAlert');
+$router->add('PUT', '/api/v2/jobs/alerts/{id}/resubscribe', 'Nexus\Controllers\Api\JobVacanciesApiController@resubscribeAlert');
 $router->add('GET', '/api/v2/jobs/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@show');
 $router->add('PUT', '/api/v2/jobs/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@update');
 $router->add('DELETE', '/api/v2/jobs/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@destroy');
@@ -555,6 +556,8 @@ $router->add('GET', '/api/v2/jobs/{id}/qualified', 'Nexus\Controllers\Api\JobVac
 $router->add('GET', '/api/v2/jobs/{id}/applications', 'Nexus\Controllers\Api\JobVacanciesApiController@applications');
 $router->add('GET', '/api/v2/jobs/{id}/analytics', 'Nexus\Controllers\Api\JobVacanciesApiController@analytics');
 $router->add('POST', '/api/v2/jobs/{id}/renew', 'Nexus\Controllers\Api\JobVacanciesApiController@renewJob');
+// Feature/unfeature routes are admin-only, served via /api/v2/admin/jobs/{id}/feature and /unfeature
+// Legacy public routes kept but point to admin-gated controller methods
 $router->add('POST', '/api/v2/jobs/{id}/feature', 'Nexus\Controllers\Api\JobVacanciesApiController@featureJob');
 $router->add('DELETE', '/api/v2/jobs/{id}/feature', 'Nexus\Controllers\Api\JobVacanciesApiController@unfeatureJob');
 $router->add('PUT', '/api/v2/jobs/applications/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@updateApplication');

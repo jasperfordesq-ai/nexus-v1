@@ -107,16 +107,7 @@ class JobVacanciesApiController extends BaseApiController
             $filters['featured'] = $this->query('featured') === '1' || $this->query('featured') === 'true';
         }
 
-        $result = JobVacancyService::getAll($filters);
-
-        // Enrich with has_applied for authenticated users
-        if ($userId) {
-            foreach ($result['items'] as &$vacancy) {
-                if (!isset($vacancy['has_applied'])) {
-                    $vacancy = JobVacancyService::getById($vacancy['id'], $userId);
-                }
-            }
-        }
+        $result = JobVacancyService::getAll($filters, $userId);
 
         $this->respondWithCollection(
             $result['items'],
@@ -641,6 +632,23 @@ class JobVacanciesApiController extends BaseApiController
         $this->respondWithData(['message' => 'Alert unsubscribed successfully']);
     }
 
+    /**
+     * PUT /api/v2/jobs/alerts/{id}/resubscribe
+     *
+     * Reactivate a paused job alert.
+     */
+    public function resubscribeAlert(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('jobs_alerts_resub', 10, 60);
+
+        JobVacancyService::resubscribeAlert($id, $userId);
+
+        $this->respondWithData(['message' => 'Alert resubscribed successfully']);
+    }
+
     // =========================================================================
     // J7: JOB RENEWAL
     // =========================================================================
@@ -731,7 +739,7 @@ class JobVacanciesApiController extends BaseApiController
     public function featureJob(int $id): void
     {
         $this->checkFeature();
-        $userId = $this->getUserId();
+        $userId = $this->requireAdmin();
         $this->verifyCsrf();
         $this->rateLimit('jobs_feature', 10, 60);
 
@@ -769,7 +777,7 @@ class JobVacanciesApiController extends BaseApiController
     public function unfeatureJob(int $id): void
     {
         $this->checkFeature();
-        $userId = $this->getUserId();
+        $userId = $this->requireAdmin();
         $this->verifyCsrf();
         $this->rateLimit('jobs_unfeature', 10, 60);
 
