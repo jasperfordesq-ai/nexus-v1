@@ -81,6 +81,11 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $this->requireAuth();
 
+        if (!TenantContext::hasFeature('wallet')) {
+            $this->error('Wallet is not enabled', 400);
+            return;
+        }
+
         $limit = $this->queryInt('limit', 20, 1, 100);
         $offset = $this->queryInt('offset', 0, 0);
 
@@ -101,6 +106,11 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $this->requireAdmin();
+
+        if (!TenantContext::hasFeature('wallet')) {
+            $this->error('Wallet is not enabled', 400);
+            return;
+        }
 
         $data = $this->getAllInput();
 
@@ -135,6 +145,11 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $this->requireAdmin();
+
+        if (!TenantContext::hasFeature('wallet')) {
+            $this->error('Wallet is not enabled', 400);
+            return;
+        }
 
         $data = $this->getAllInput();
 
@@ -175,6 +190,11 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
+        if (!TenantContext::hasFeature('wallet')) {
+            $this->error('Wallet is not enabled', 400);
+            return;
+        }
+
         $data = $this->getAllInput();
 
         if (empty($data['amount']) || (float) $data['amount'] <= 0) {
@@ -209,6 +229,11 @@ class WalletFeaturesApiController extends BaseApiController
     public function listCategories(): void
     {
         $this->requireAuth();
+
+        if (!TenantContext::hasFeature('wallet')) {
+            $this->error('Wallet is not enabled', 400);
+            return;
+        }
 
         $categories = TransactionCategoryService::getAll();
 

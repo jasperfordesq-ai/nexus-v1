@@ -69,8 +69,10 @@ class ShiftWaitlistService
         }
 
         try {
-            // Get next position
-            $stmt = $db->prepare("SELECT COALESCE(MAX(position), 0) + 1 as next_pos FROM vol_shift_waitlist WHERE shift_id = ? AND status = 'waiting' AND tenant_id = ?");
+            $db->beginTransaction();
+
+            // Get next position (inside transaction to prevent race condition)
+            $stmt = $db->prepare("SELECT COALESCE(MAX(position), 0) + 1 as next_pos FROM vol_shift_waitlist WHERE shift_id = ? AND status = 'waiting' AND tenant_id = ? FOR UPDATE");
             $stmt->execute([$shiftId, $tenantId]);
             $nextPos = (int)$stmt->fetch(\PDO::FETCH_ASSOC)['next_pos'];
 
@@ -80,8 +82,13 @@ class ShiftWaitlistService
             ");
             $stmt->execute([$tenantId, $shiftId, $userId, $nextPos]);
 
-            return (int)$db->lastInsertId();
+            $id = (int)$db->lastInsertId();
+            $db->commit();
+            return $id;
         } catch (\Exception $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
             error_log("ShiftWaitlistService::join error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to join waitlist'];
             return null;

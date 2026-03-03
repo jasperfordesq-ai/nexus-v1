@@ -27,6 +27,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -64,6 +65,7 @@ interface ShiftSwap {
 
 export function ShiftSwapsTab() {
   const { t } = useTranslation('community');
+  const toast = useToast();
   const [swaps, setSwaps] = useState<ShiftSwap[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -109,9 +111,12 @@ export function ShiftSwapsTab() {
         setSwaps((prev) =>
           prev.map((s) => (s.id === swapId ? { ...s, status: 'accepted' as const } : s))
         );
+      } else {
+        toast.error(t('swaps.accept_failed', 'Failed to accept swap request.'));
       }
     } catch (err) {
       logError('Failed to accept shift swap', err);
+      toast.error(t('swaps.accept_failed', 'Failed to accept swap request.'));
     } finally {
       setActioningId(null);
     }
@@ -125,9 +130,12 @@ export function ShiftSwapsTab() {
         setSwaps((prev) =>
           prev.map((s) => (s.id === swapId ? { ...s, status: 'rejected' as const } : s))
         );
+      } else {
+        toast.error(t('swaps.reject_failed', 'Failed to reject swap request.'));
       }
     } catch (err) {
       logError('Failed to reject shift swap', err);
+      toast.error(t('swaps.reject_failed', 'Failed to reject swap request.'));
     } finally {
       setActioningId(null);
     }

@@ -249,10 +249,10 @@ export const adminConfig = {
     api.post('/v2/admin/cache/clear', { type }),
 
   getJobs: () =>
-    api.get<BackgroundJob[]>('/v2/admin/jobs'),
+    api.get<BackgroundJob[]>('/v2/admin/background-jobs'),
 
   runJob: (jobId: string) =>
-    api.post(`/v2/admin/jobs/${jobId}/run`),
+    api.post(`/v2/admin/background-jobs/${jobId}/run`),
 
   getLanguageConfig: () =>
     api.get<{ default_language: string; supported_languages: string[] }>(

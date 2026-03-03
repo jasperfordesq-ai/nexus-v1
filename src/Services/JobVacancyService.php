@@ -481,7 +481,7 @@ class JobVacancyService
         // Check ownership
         if ((int)$vacancy['user_id'] !== $userId) {
             // Check if user is admin
-            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, TenantContext::getId()])->fetch();
             if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
                 self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'You can only edit your own job vacancies');
                 return false;
@@ -611,7 +611,7 @@ class JobVacancyService
 
         // Check ownership (or admin)
         if ((int)$vacancy['user_id'] !== $userId) {
-            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, TenantContext::getId()])->fetch();
             if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
                 self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'You can only delete your own job vacancies');
                 return false;
@@ -748,7 +748,7 @@ class JobVacancyService
 
         // Check ownership or admin
         if ((int)$vacancy['user_id'] !== $userId) {
-            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, TenantContext::getId()])->fetch();
             if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
                 self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Only the vacancy owner can view applications');
                 return null;
@@ -845,7 +845,7 @@ class JobVacancyService
 
         // Check vacancy ownership or admin
         if ((int)$application['vacancy_owner_id'] !== $userId) {
-            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, TenantContext::getId()])->fetch();
             if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
                 self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Only the vacancy owner can update applications');
                 return false;

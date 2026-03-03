@@ -163,7 +163,14 @@ class MatchDigestService
             $source = ucfirst($match['source']);
             $description = htmlspecialchars(mb_substr($match['description'] ?? '', 0, 120));
             $reasons = !empty($match['match_reasons']) ? htmlspecialchars(implode(' · ', $match['match_reasons'])) : '';
-            $link = $baseUrl . '/' . $match['source'] . 's/' . $match['source_id'];
+            $pathMap = [
+                'listing' => 'listings',
+                'job' => 'jobs',
+                'volunteering' => 'volunteering/opportunities',
+                'group' => 'groups',
+            ];
+            $path = $pathMap[$match['source']] ?? $match['source'] . 's';
+            $link = $baseUrl . '/' . $path . '/' . $match['source_id'];
 
             $scoreColor = $score >= 80 ? '#22c55e' : ($score >= 60 ? '#f59e0b' : '#6366f1');
 

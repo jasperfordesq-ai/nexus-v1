@@ -116,8 +116,8 @@ class VolunteerWellbeingService
             FROM users u
             WHERE u.tenant_id = ?
             AND (
-                u.id IN (SELECT user_id FROM vol_applications WHERE status = 'approved')
-                OR u.id IN (SELECT user_id FROM vol_logs)
+                u.id IN (SELECT user_id FROM vol_applications WHERE status = 'approved' AND tenant_id = u.tenant_id)
+                OR u.id IN (SELECT user_id FROM vol_logs WHERE tenant_id = u.tenant_id)
             )
             LIMIT 500
         ");

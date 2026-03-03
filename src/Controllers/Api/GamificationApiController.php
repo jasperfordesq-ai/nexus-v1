@@ -140,8 +140,8 @@ class GamificationApiController extends BaseApiController
         try {
             // Get basic stats
             $user = \Nexus\Core\Database::query(
-                "SELECT xp, level FROM users WHERE id = ?",
-                [$userId]
+                "SELECT xp, level FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, \Nexus\Core\TenantContext::getId()]
             )->fetch();
 
             $badges = \Nexus\Models\UserBadge::getForUser($userId);

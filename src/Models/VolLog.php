@@ -13,8 +13,8 @@ class VolLog
 {
     public static function create($userId, $orgId, $oppId, $date, $hours, $desc)
     {
-        $sql = "INSERT INTO vol_logs (user_id, organization_id, opportunity_id, date_logged, hours, description) VALUES (?, ?, ?, ?, ?, ?)";
-        Database::query($sql, [$userId, $orgId, $oppId, $date, $hours, $desc]);
+        $sql = "INSERT INTO vol_logs (tenant_id, user_id, organization_id, opportunity_id, date_logged, hours, description) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        Database::query($sql, [TenantContext::getId(), $userId, $orgId, $oppId, $date, $hours, $desc]);
     }
 
     public static function getForUser($userId)
@@ -34,9 +34,9 @@ class VolLog
                 FROM vol_logs l
                 JOIN users u ON l.user_id = u.id
                 LEFT JOIN vol_opportunities opp ON l.opportunity_id = opp.id
-                WHERE l.organization_id = ?";
+                WHERE l.organization_id = ? AND l.tenant_id = ?";
 
-        $params = [$orgId];
+        $params = [$orgId, TenantContext::getId()];
 
         if ($status) {
             $sql .= " AND l.status = ?";

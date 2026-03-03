@@ -145,8 +145,9 @@ class VolunteerEmergencyAlertService
         $db = Database::getConnection();
 
         // Verify the user was a recipient
-        $stmt = $db->prepare("SELECT id FROM vol_emergency_alert_recipients WHERE alert_id = ? AND user_id = ? AND response = 'pending'");
-        $stmt->execute([$alertId, $userId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("SELECT r.id FROM vol_emergency_alert_recipients r JOIN vol_emergency_alerts a ON r.alert_id = a.id WHERE r.alert_id = ? AND r.user_id = ? AND r.response = 'pending' AND a.tenant_id = ?");
+        $stmt->execute([$alertId, $userId, $tenantId]);
         $recipient = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$recipient) {
@@ -172,8 +173,8 @@ class VolunteerEmergencyAlertService
 
             if ($response === 'accepted') {
                 // Mark alert as filled
-                $stmt = $db->prepare("UPDATE vol_emergency_alerts SET status = 'filled', filled_at = NOW() WHERE id = ?");
-                $stmt->execute([$alertId]);
+                $stmt = $db->prepare("UPDATE vol_emergency_alerts SET status = 'filled', filled_at = NOW() WHERE id = ? AND tenant_id = ?");
+                $stmt->execute([$alertId, $tenantId]);
 
                 // Sign up the volunteer for the shift
                 $signupResult = VolunteerService::signUpForShift((int)$alert['shift_id'], $userId);

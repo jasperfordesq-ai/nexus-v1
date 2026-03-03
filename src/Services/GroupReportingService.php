@@ -25,9 +25,10 @@ class GroupReportingService
      */
     public static function generateWeeklyDigest($groupId, $ownerId)
     {
+        $tenantId = TenantContext::getId();
         $group = Database::query(
-            "SELECT * FROM `groups` WHERE id = ?",
-            [$groupId]
+            "SELECT * FROM `groups` WHERE id = ? AND tenant_id = ?",
+            [$groupId, $tenantId]
         )->fetch();
 
         if (!$group) {
@@ -282,7 +283,7 @@ class GroupReportingService
                         <div class="section-title">⚠️ Actions Needed</div>
                         <?php foreach ($actions as $action): ?>
                         <div class="action-item">
-                            <strong><?= $action['message'] ?></strong>
+                            <strong><?= htmlspecialchars($action['message']) ?></strong>
                         </div>
                         <?php endforeach; ?>
                     </div>
@@ -312,8 +313,8 @@ class GroupReportingService
     private static function getOwnerEmail($userId)
     {
         $user = Database::query(
-            "SELECT email FROM users WHERE id = ?",
-            [$userId]
+            "SELECT email FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, TenantContext::getId()]
         )->fetch();
 
         return $user['email'] ?? null;
@@ -329,7 +330,7 @@ class GroupReportingService
      */
     public static function generateCustomReport($groupId, $startDate, $endDate)
     {
-        $group = Database::query("SELECT * FROM `groups` WHERE id = ?", [$groupId])->fetch();
+        $group = Database::query("SELECT * FROM `groups` WHERE id = ? AND tenant_id = ?", [$groupId, TenantContext::getId()])->fetch();
 
         if (!$group) {
             return ['success' => false, 'error' => 'Group not found'];

@@ -637,9 +637,9 @@ class VolunteerService
             FROM vol_applications a
             JOIN users u ON a.user_id = u.id
             LEFT JOIN vol_shifts s ON a.shift_id = s.id
-            WHERE a.opportunity_id = ?
+            WHERE a.opportunity_id = ? AND a.tenant_id = ?
         ";
-        $params = [$opportunityId];
+        $params = [$opportunityId, TenantContext::getId()];
 
         if (!empty($filters['status'])) {
             $sql .= " AND a.status = ?";
@@ -916,8 +916,8 @@ class VolunteerService
 
         // Check user has approved application for this opportunity
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT id FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND status = 'approved'");
-        $stmt->execute([$opportunityId, $userId]);
+        $stmt = $db->prepare("SELECT id FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND status = 'approved' AND tenant_id = ?");
+        $stmt->execute([$opportunityId, $userId, TenantContext::getId()]);
         $app = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$app) {

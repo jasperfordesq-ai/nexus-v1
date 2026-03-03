@@ -27,6 +27,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -58,6 +59,7 @@ interface WaitlistEntry {
 
 export function WaitlistTab() {
   const { t } = useTranslation('community');
+  const toast = useToast();
   const [entries, setEntries] = useState<WaitlistEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,9 +98,13 @@ export function WaitlistTab() {
       const response = await api.delete(`/v2/volunteering/shifts/${shiftId}/waitlist`);
       if (response.success) {
         setEntries((prev) => prev.filter((e) => e.shift.id !== shiftId));
+        toast.success(t('waitlist.leave_success', 'You have left the waitlist.'));
+      } else {
+        toast.error(t('waitlist.leave_failed', 'Failed to leave waitlist.'));
       }
     } catch (err) {
       logError('Failed to leave waitlist', err);
+      toast.error(t('waitlist.leave_failed', 'Failed to leave waitlist.'));
     } finally {
       setRemovingId(null);
     }

@@ -493,7 +493,7 @@ class ConnectionService
     public static function areConnected(int $user1, int $user2): bool
     {
         $status = self::getStatus($user1, $user2);
-        return $status['status'] === 'accepted';
+        return $status['status'] === 'connected';
     }
 
     /**

@@ -53,7 +53,7 @@ class VolOrganization
     {
         return Database::query(
             "SELECT vo.*, CONCAT(u.first_name, ' ', u.last_name) as owner_name, u.avatar_url as owner_avatar,
-                    (SELECT COUNT(*) FROM vol_opportunities WHERE organization_id = vo.id) as opportunity_count
+                    (SELECT COUNT(*) FROM vol_opportunities WHERE organization_id = vo.id AND tenant_id = vo.tenant_id) as opportunity_count
              FROM vol_organizations vo
              JOIN users u ON vo.user_id = u.id
              WHERE vo.tenant_id = ? AND vo.status = 'approved'
@@ -70,7 +70,7 @@ class VolOrganization
         $searchTerm = '%' . $query . '%';
         return Database::query(
             "SELECT vo.*, CONCAT(u.first_name, ' ', u.last_name) as owner_name, u.avatar_url as owner_avatar,
-                    (SELECT COUNT(*) FROM vol_opportunities WHERE organization_id = vo.id) as opportunity_count
+                    (SELECT COUNT(*) FROM vol_opportunities WHERE organization_id = vo.id AND tenant_id = vo.tenant_id) as opportunity_count
              FROM vol_organizations vo
              JOIN users u ON vo.user_id = u.id
              WHERE vo.tenant_id = ? AND vo.status = 'approved'

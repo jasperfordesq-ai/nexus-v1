@@ -173,7 +173,6 @@ function isGroupAdmin(group: GroupDetails): boolean {
 
 export function GroupDetailPage() {
   const { t } = useTranslation('groups');
-  usePageTitle(t('title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser, isAuthenticated } = useAuth();
@@ -186,6 +185,8 @@ export function GroupDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  usePageTitle(group?.name ?? t('title'));
 
   // Feed state
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
