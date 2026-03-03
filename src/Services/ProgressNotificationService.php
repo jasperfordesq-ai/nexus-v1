@@ -101,8 +101,8 @@ class ProgressNotificationService
             $message = "{$icon} Great progress! You're halfway to earning the '{$name}' badge!";
         }
 
-        // Create notification
-        \Nexus\Models\Notification::create($userId, $message);
+        // Create notification (link to achievements page)
+        \Nexus\Models\Notification::create($userId, $message, '/achievements', 'badge_progress');
 
         // Record that we sent this notification
         self::recordNotification($userId, $badgeKey, $threshold);

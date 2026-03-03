@@ -58,7 +58,8 @@ class Message
             $receiverName = $receiver['first_name'] ?? 'there';
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            $baseUrl = TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
+            $baseUrl = TenantContext::getFrontendUrl();
+            $slugPrefix = TenantContext::getSlugPrefix();
 
             $htmlBody = <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -72,14 +73,14 @@ class Message
             <p style="color: #1e293b; margin: 0; font-style: italic;">"{$messagePreview}"</p>
         </div>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$baseUrl}{$link}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+            <a href="{$baseUrl}{$slugPrefix}{$link}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">
                 Read Message
             </a>
         </div>
     </div>
     <div style="text-align: center; padding: 16px; color: #94a3b8; font-size: 12px;">
         <p>You received this because you have a {$tenantName} account.</p>
-        <p><a href="{$baseUrl}/settings?tab=notifications" style="color: #6366f1;">Manage notification preferences</a></p>
+        <p><a href="{$baseUrl}{$slugPrefix}/settings?tab=notifications" style="color: #6366f1;">Manage notification preferences</a></p>
     </div>
 </div>
 HTML;

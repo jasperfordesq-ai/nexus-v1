@@ -153,7 +153,7 @@ class MatchDigestService
         // Get tenant info for branding
         $tenant = Database::query("SELECT name FROM tenants WHERE id = ?", [$tenantId])->fetch();
         $tenantName = $tenant['name'] ?? 'Project NEXUS';
-        $baseUrl = TenantContext::getSetting('site_url', 'https://app.project-nexus.ie');
+        $baseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
 
         // Build match cards HTML
         $matchCardsHtml = '';
