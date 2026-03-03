@@ -400,13 +400,15 @@ class VolunteerWellbeingService
     {
         // Check if tables exist
         try {
+            $tenantId = TenantContext::getId();
             $stmt = $db->prepare("
-                SELECT AVG(TIMESTAMPDIFF(HOUR, notified_at, responded_at)) as avg_response_hours
-                FROM vol_emergency_alert_recipients
-                WHERE user_id = ? AND responded_at IS NOT NULL
-                AND notified_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+                SELECT AVG(TIMESTAMPDIFF(HOUR, r.notified_at, r.responded_at)) as avg_response_hours
+                FROM vol_emergency_alert_recipients r
+                JOIN vol_emergency_alerts a ON r.alert_id = a.id AND a.tenant_id = ?
+                WHERE r.user_id = ? AND r.responded_at IS NOT NULL
+                AND r.notified_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
             ");
-            $stmt->execute([$userId]);
+            $stmt->execute([$tenantId, $userId]);
             $result = $stmt->fetch(\PDO::FETCH_ASSOC);
             $avgHours = (float)($result['avg_response_hours'] ?? 0);
         } catch (\Throwable $e) {

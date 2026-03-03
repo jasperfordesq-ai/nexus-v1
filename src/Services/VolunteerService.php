@@ -438,8 +438,9 @@ class VolunteerService
 
         try {
             $db = Database::getConnection();
-            $stmt = $db->prepare("INSERT INTO vol_applications (opportunity_id, user_id, message, shift_id, status, created_at) VALUES (?, ?, ?, ?, 'pending', NOW())");
-            $stmt->execute([$opportunityId, $userId, $data['message'] ?? '', $shiftId]);
+            $tenantId = TenantContext::getId();
+            $stmt = $db->prepare("INSERT INTO vol_applications (tenant_id, opportunity_id, user_id, message, shift_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', NOW())");
+            $stmt->execute([$tenantId, $opportunityId, $userId, $data['message'] ?? '', $shiftId]);
 
             $appId = $db->lastInsertId();
 
@@ -523,6 +524,8 @@ class VolunteerService
             }
         }
 
+        $tenantId = TenantContext::getId();
+
         $sql = "
             SELECT a.*, o.title as opp_title, o.location, org.id as org_id, org.name as org_name, org.logo_url as org_logo,
                    s.start_time as shift_start, s.end_time as shift_end
@@ -530,9 +533,9 @@ class VolunteerService
             JOIN vol_opportunities o ON a.opportunity_id = o.id
             JOIN vol_organizations org ON o.organization_id = org.id
             LEFT JOIN vol_shifts s ON a.shift_id = s.id
-            WHERE a.user_id = ?
+            WHERE a.user_id = ? AND a.tenant_id = ?
         ";
-        $params = [$userId];
+        $params = [$userId, $tenantId];
 
         if (!empty($filters['status'])) {
             $sql .= " AND a.status = ?";
@@ -710,15 +713,17 @@ class VolunteerService
 
         $db = Database::getConnection();
 
-        // Get application with ownership check
+        $tenantId = TenantContext::getId();
+
+        // Get application with ownership check and tenant scoping
         $stmt = $db->prepare("
             SELECT a.*, org.user_id as org_owner_id
             FROM vol_applications a
             JOIN vol_opportunities opp ON a.opportunity_id = opp.id
             JOIN vol_organizations org ON opp.organization_id = org.id
-            WHERE a.id = ?
+            WHERE a.id = ? AND a.tenant_id = ?
         ");
-        $stmt->execute([$applicationId]);
+        $stmt->execute([$applicationId, $tenantId]);
         $app = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$app) {
@@ -734,8 +739,8 @@ class VolunteerService
         $status = $action === 'approve' ? 'approved' : 'declined';
 
         try {
-            $stmt = $db->prepare("UPDATE vol_applications SET status = ? WHERE id = ?");
-            $stmt->execute([$status, $applicationId]);
+            $stmt = $db->prepare("UPDATE vol_applications SET status = ? WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$status, $applicationId, $tenantId]);
 
             // Notify applicant
             try {
@@ -764,8 +769,9 @@ class VolunteerService
     private static function getUserApplicationForOpportunity(int $opportunityId, int $userId): ?array
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT * FROM vol_applications WHERE opportunity_id = ? AND user_id = ?");
-        $stmt->execute([$opportunityId, $userId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("SELECT * FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ?");
+        $stmt->execute([$opportunityId, $userId, $tenantId]);
         $app = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$app) {
@@ -1007,8 +1013,9 @@ class VolunteerService
     private static function getShiftSignupCount(int $shiftId): int
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved'");
-        $stmt->execute([$shiftId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?");
+        $stmt->execute([$shiftId, $tenantId]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         return (int)($result['cnt'] ?? 0);
     }

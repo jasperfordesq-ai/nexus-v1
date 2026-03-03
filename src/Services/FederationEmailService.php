@@ -70,7 +70,7 @@ class FederationEmailService
 
         // Get recipient's tenant info for branding
         $recipientTenant = Database::query(
-            "SELECT name FROM tenants WHERE id = ?",
+            "SELECT name, slug FROM tenants WHERE id = ?",
             [$recipient['tenant_id']]
         )->fetch();
 
@@ -78,8 +78,8 @@ class FederationEmailService
         $siteName = $recipientTenant['name'] ?? 'Timebank';
 
         // Temporarily set tenant context for URL generation
-        $basePath = '/' . ($recipientTenant['name'] ?? '');
-        $siteUrl = $_ENV['APP_URL'] ?? 'http://localhost';
+        $basePath = '/' . ($recipientTenant['slug'] ?? '');
+        $siteUrl = TenantContext::getFrontendUrl();
 
         $subject = "New federated message from {$senderName}";
 
@@ -145,14 +145,14 @@ class FederationEmailService
 
         // Get recipient's tenant info for branding
         $recipientTenant = Database::query(
-            "SELECT name FROM tenants WHERE id = ?",
+            "SELECT name, slug FROM tenants WHERE id = ?",
             [$recipient['tenant_id']]
         )->fetch();
 
         $senderName = trim($sender['first_name'] . ' ' . $sender['last_name']);
         $siteName = $recipientTenant['name'] ?? 'Timebank';
-        $basePath = '/' . ($recipientTenant['name'] ?? '');
-        $siteUrl = $_ENV['APP_URL'] ?? 'http://localhost';
+        $basePath = '/' . ($recipientTenant['slug'] ?? '');
+        $siteUrl = TenantContext::getFrontendUrl();
 
         $subject = "You received {$amount} hours from {$senderName}";
 
@@ -220,14 +220,14 @@ class FederationEmailService
 
         // Get sender's tenant info for branding
         $senderTenant = Database::query(
-            "SELECT name, domain FROM tenants WHERE id = ?",
+            "SELECT name, slug FROM tenants WHERE id = ?",
             [$sender['tenant_id']]
         )->fetch();
 
         $recipientName = trim($recipient['first_name'] . ' ' . $recipient['last_name']);
         $siteName = $senderTenant['name'] ?? 'Timebank';
-        $basePath = '/' . ($senderTenant['domain'] ?? '');
-        $siteUrl = $_ENV['APP_URL'] ?? 'http://localhost';
+        $basePath = '/' . ($senderTenant['slug'] ?? '');
+        $siteUrl = TenantContext::getFrontendUrl();
 
         $subject = "Transfer confirmed: {$amount} hours sent to {$recipientName}";
 
@@ -302,10 +302,10 @@ class FederationEmailService
         }
 
         // Get tenant info for branding
-        $tenant = Database::query("SELECT name FROM tenants WHERE id = ?", [$tenantId])->fetch();
+        $tenant = Database::query("SELECT name, slug FROM tenants WHERE id = ?", [$tenantId])->fetch();
         $siteName = $tenant['name'] ?? 'Timebank';
-        $basePath = '/' . ($tenant['name'] ?? '');
-        $siteUrl = $_ENV['APP_URL'] ?? 'http://localhost';
+        $basePath = '/' . ($tenant['slug'] ?? '');
+        $siteUrl = TenantContext::getFrontendUrl();
 
         $subject = "Your Federation Activity This Week - {$siteName}";
 
@@ -790,7 +790,7 @@ HTML;
     ): bool {
         // Get tenant info
         $tenant = Database::query(
-            "SELECT id, name, domain FROM tenants WHERE id = ?",
+            "SELECT id, name, slug FROM tenants WHERE id = ?",
             [$tenantId]
         )->fetch();
 
@@ -816,8 +816,8 @@ HTML;
         }
 
         $siteName = $tenant['name'];
-        $basePath = '/' . $tenant['domain'];
-        $siteUrl = $_ENV['APP_URL'] ?? 'http://localhost';
+        $basePath = '/' . ($tenant['slug'] ?? '');
+        $siteUrl = TenantContext::getFrontendUrl();
 
         // Generate email content based on type
         $emailContent = self::generatePartnershipEmailContent($notificationType, $data, $basePath, $siteName, $siteUrl);

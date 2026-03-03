@@ -35,9 +35,10 @@ import {
   FolderOpen,
   CloudUpload,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
@@ -96,6 +97,8 @@ function formatFileSize(bytes: number): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps) {
+  const { t } = useTranslation('groups');
+  const { user } = useAuth();
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
@@ -119,7 +122,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
       }
     } catch (err) {
       logError('GroupFilesTab.loadFiles', err);
-      toast.error('Failed to load files');
+      toast.error(t('files.load_failed', 'Failed to load files'));
     }
     setLoading(false);
   }, [groupId, toast]);
@@ -142,11 +145,11 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
         await api.upload(`/v2/groups/${groupId}/files`, formData);
         setUploadProgress(Math.round(((i + 1) / totalFiles) * 100));
       }
-      toast.success(`${totalFiles} file(s) uploaded`);
+      toast.success(t('files.upload_success', '{{count}} file(s) uploaded', { count: totalFiles }));
       loadFiles();
     } catch (err) {
       logError('GroupFilesTab.upload', err);
-      toast.error('Failed to upload file(s)');
+      toast.error(t('files.upload_failed', 'Failed to upload file(s)'));
     }
 
     setUploading(false);
@@ -154,17 +157,30 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
   }, [groupId, toast, loadFiles]);
 
   // ─── Download ───
-  const handleDownload = useCallback((file: GroupFile) => {
-    const token = localStorage.getItem('nexus_access_token');
-    const url = `${API_BASE}/v2/groups/${groupId}/files/${file.id}/download`;
-    const link = document.createElement('a');
-    link.href = url + (token ? `?token=${token}` : '');
-    link.download = file.original_name;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }, [groupId]);
+  const handleDownload = useCallback(async (file: GroupFile) => {
+    try {
+      const url = `${API_BASE}/v2/groups/${groupId}/files/${file.id}/download`;
+      const token = localStorage.getItem('nexus_access_token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const response = await fetch(url, { headers });
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = file.original_name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      logError('GroupFilesTab.download', err);
+      toast.error(t('files.download_failed', 'Failed to download file'));
+    }
+  }, [groupId, toast, t]);
 
   // ─── Delete ───
   const handleDelete = useCallback(async () => {
@@ -172,12 +188,12 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
     setDeleting(true);
     try {
       await api.delete(`/v2/groups/${groupId}/files/${deleteTarget.id}`);
-      toast.success('File deleted');
+      toast.success(t('files.file_deleted', 'File deleted'));
       setFiles((prev) => prev.filter((f) => f.id !== deleteTarget.id));
       setDeleteTarget(null);
     } catch (err) {
       logError('GroupFilesTab.delete', err);
-      toast.error('Failed to delete file');
+      toast.error(t('files.delete_failed', 'Failed to delete file'));
     }
     setDeleting(false);
   }, [groupId, deleteTarget, toast]);
@@ -210,7 +226,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
           <FolderOpen className="w-5 h-5" aria-hidden="true" />
-          Files
+          {t('files.heading', 'Files')}
         </h2>
         {isMember && (
           <Button
@@ -220,7 +236,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
             isLoading={uploading}
             onPress={() => fileInputRef.current?.click()}
           >
-            Upload
+            {t('files.upload', 'Upload')}
           </Button>
         )}
       </div>
@@ -244,7 +260,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
             className="max-w-full"
             aria-label="Upload progress"
           />
-          <p className="text-xs text-theme-subtle mt-1">Uploading... {uploadProgress}%</p>
+          <p className="text-xs text-theme-subtle mt-1">{t('files.uploading_progress', 'Uploading... {{progress}}%', { progress: uploadProgress })}</p>
         </div>
       )}
 
@@ -263,13 +279,13 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
         >
           <CloudUpload className={`w-10 h-10 mx-auto mb-2 ${isDragging ? 'text-primary' : 'text-theme-subtle'}`} />
           <p className="text-sm text-theme-subtle">
-            Drag and drop files here, or{' '}
+            {t('files.drag_and_drop', 'Drag and drop files here, or')}{' '}
             <button
               type="button"
               className="text-primary hover:underline"
               onClick={() => fileInputRef.current?.click()}
             >
-              browse
+              {t('files.browse', 'browse')}
             </button>
           </p>
         </div>
@@ -283,8 +299,8 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
       ) : files.length === 0 ? (
         <EmptyState
           icon={<FolderOpen className="w-12 h-12" />}
-          title="No files yet"
-          description={isMember ? 'Upload files to share with the group' : 'No files have been shared in this group'}
+          title={t('files.no_files_title', 'No files yet')}
+          description={isMember ? t('files.no_files_member_desc', 'Upload files to share with the group') : t('files.no_files_desc', 'No files have been shared in this group')}
         />
       ) : (
         <div className="space-y-2">
@@ -312,7 +328,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
 
               {file.download_count !== undefined && (
                 <Chip size="sm" variant="flat" className="bg-theme-hover text-theme-subtle">
-                  {file.download_count} downloads
+                  {t('files.download_count', '{{count}} downloads', { count: file.download_count })}
                 </Chip>
               )}
 
@@ -326,7 +342,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
                 >
                   <Download className="w-4 h-4" />
                 </Button>
-                {(isAdmin || file.uploaded_by.id === parseInt(localStorage.getItem('nexus_user_id') || '0')) && (
+                {(isAdmin || (user && file.uploaded_by.id === user.id)) && (
                   <Button
                     isIconOnly
                     variant="light"
@@ -357,15 +373,15 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-theme-primary">Delete File</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('files.delete_title', 'Delete File')}</ModalHeader>
               <ModalBody>
                 <p className="text-theme-secondary">
-                  Are you sure you want to delete <strong>{deleteTarget?.original_name}</strong>? This action cannot be undone.
+                  {t('files.delete_confirm', 'Are you sure you want to delete {{name}}? This action cannot be undone.', { name: deleteTarget?.original_name })}
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>Cancel</Button>
-                <Button color="danger" isLoading={deleting} onPress={handleDelete}>Delete</Button>
+                <Button variant="flat" onPress={onClose}>{t('files.cancel', 'Cancel')}</Button>
+                <Button color="danger" isLoading={deleting} onPress={handleDelete}>{t('files.delete', 'Delete')}</Button>
               </ModalFooter>
             </>
           )}

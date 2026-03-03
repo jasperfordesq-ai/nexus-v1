@@ -35,6 +35,7 @@ import {
   MoreVertical,
   AlertCircle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
@@ -70,6 +71,7 @@ interface GroupAnnouncementsTabProps {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTabProps) {
+  const { t } = useTranslation('groups');
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -180,7 +182,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
             <Megaphone className="w-5 h-5" aria-hidden="true" />
-            Announcements
+            {t('announcements.heading', 'Announcements')}
           </h2>
           {isAdmin && (
             <Button
@@ -189,7 +191,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
               startContent={<Plus className="w-4 h-4" />}
               onPress={onOpen}
             >
-              New Announcement
+              {t('announcements.new', 'New Announcement')}
             </Button>
           )}
         </div>
@@ -201,8 +203,8 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         ) : announcements.length === 0 ? (
           <EmptyState
             icon={<Megaphone className="w-12 h-12" />}
-            title="No announcements"
-            description={isAdmin ? 'Create an announcement to share with the group' : 'No announcements have been posted yet'}
+            title={t('announcements.no_announcements_title', 'No announcements')}
+            description={isAdmin ? t('announcements.no_announcements_admin_desc', 'Create an announcement to share with the group') : t('announcements.no_announcements_desc', 'No announcements have been posted yet')}
           />
         ) : (
           <div className="space-y-3">
@@ -226,7 +228,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                       </h3>
                       {announcement.is_pinned && (
                         <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">
-                          Pinned
+                          {t('announcements.pinned', 'Pinned')}
                         </Chip>
                       )}
                     </div>
@@ -253,7 +255,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                           startContent={announcement.is_pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                           onPress={() => handleTogglePin(announcement)}
                         >
-                          {announcement.is_pinned ? 'Unpin' : 'Pin'}
+                          {announcement.is_pinned ? t('announcements.unpin', 'Unpin') : t('announcements.pin', 'Pin')}
                         </DropdownItem>
                         <DropdownItem
                           key="delete"
@@ -262,7 +264,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                           color="danger"
                           onPress={() => setDeleteTarget(announcement)}
                         >
-                          Delete
+                          {t('announcements.delete', 'Delete')}
                         </DropdownItem>
                       </DropdownMenu>
                     </Dropdown>
@@ -289,7 +291,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
                 <Megaphone className="w-5 h-5 text-purple-400" />
-                New Announcement
+                {t('announcements.new', 'New Announcement')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
@@ -323,19 +325,19 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                     startContent={<Pin className="w-4 h-4" />}
                     onPress={() => setIsPinned(!isPinned)}
                   >
-                    {isPinned ? 'Pinned' : 'Pin this announcement'}
+                    {isPinned ? t('announcements.pinned', 'Pinned') : t('announcements.pin_this', 'Pin this announcement')}
                   </Button>
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onModalClose}>Cancel</Button>
+                <Button variant="flat" onPress={onModalClose}>{t('announcements.cancel', 'Cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                   isLoading={creating}
                   isDisabled={!title.trim() || !content.trim()}
                   onPress={handleCreate}
                 >
-                  Post Announcement
+                  {t('announcements.post', 'Post Announcement')}
                 </Button>
               </ModalFooter>
             </>
@@ -356,18 +358,18 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         <ModalContent>
           {(onModalClose) => (
             <>
-              <ModalHeader className="text-theme-primary">Delete Announcement</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('announcements.delete_title', 'Delete Announcement')}</ModalHeader>
               <ModalBody>
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
                   <p className="text-theme-secondary">
-                    Are you sure you want to delete &quot;{deleteTarget?.title}&quot;? This action cannot be undone.
+                    {t('announcements.delete_confirm', 'Are you sure you want to delete "{{name}}"? This action cannot be undone.', { name: deleteTarget?.title })}
                   </p>
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onModalClose}>Cancel</Button>
-                <Button color="danger" isLoading={deleting} onPress={handleDelete}>Delete</Button>
+                <Button variant="flat" onPress={onModalClose}>{t('announcements.cancel', 'Cancel')}</Button>
+                <Button color="danger" isLoading={deleting} onPress={handleDelete}>{t('announcements.delete', 'Delete')}</Button>
               </ModalFooter>
             </>
           )}

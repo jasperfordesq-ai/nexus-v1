@@ -194,6 +194,7 @@ class GroupReportingService
     private static function renderWeeklyDigestEmail($data)
     {
         $basePath = TenantContext::getSlugPrefix();
+        $frontendUrl = TenantContext::getFrontendUrl();
         $group = $data['group'];
         $stats = $data['stats'];
         $contributors = $data['topContributors'];
@@ -288,7 +289,7 @@ class GroupReportingService
                     <?php endif; ?>
 
                     <center>
-                        <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>/analytics" class="cta-button">
+                        <a href="<?= $frontendUrl ?><?= $basePath ?>/groups/<?= $group['id'] ?>/analytics" class="cta-button">
                             View Full Analytics →
                         </a>
                     </center>
@@ -296,7 +297,7 @@ class GroupReportingService
 
                 <div class="footer">
                     <p>You're receiving this because you're an owner/admin of <?= htmlspecialchars($group['name']) ?>.</p>
-                    <p><a href="<?= $basePath ?>/settings/notifications">Manage email preferences</a></p>
+                    <p><a href="<?= $frontendUrl ?><?= $basePath ?>/settings/notifications">Manage email preferences</a></p>
                 </div>
             </div>
         </body>

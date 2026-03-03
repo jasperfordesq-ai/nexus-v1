@@ -24,6 +24,7 @@ import {
   RefreshCw,
   Hash,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
@@ -56,6 +57,7 @@ interface WaitlistEntry {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function WaitlistTab() {
+  const { t } = useTranslation('community');
   const [entries, setEntries] = useState<WaitlistEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export function WaitlistTab() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Clock className="w-5 h-5 text-amber-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">My Waitlists</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('waitlist.heading', 'My Waitlists')}</h2>
         </div>
         <Button
           size="sm"
@@ -128,7 +130,7 @@ export function WaitlistTab() {
           onPress={load}
           isDisabled={isLoading}
         >
-          Refresh
+          {t('waitlist.refresh', 'Refresh')}
         </Button>
       </div>
 
@@ -138,7 +140,7 @@ export function WaitlistTab() {
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            Try Again
+            {t('waitlist.try_again', 'Try Again')}
           </Button>
         </GlassCard>
       )}
@@ -160,8 +162,8 @@ export function WaitlistTab() {
       {!error && !isLoading && entries.length === 0 && (
         <EmptyState
           icon={<Clock className="w-12 h-12" aria-hidden="true" />}
-          title="No waitlist entries"
-          description="You are not currently on any shift waitlists. When a shift is full, you can join the waitlist and be notified when a spot opens up."
+          title={t('waitlist.no_entries_title', 'No waitlist entries')}
+          description={t('waitlist.no_entries_desc', 'You are not currently on any shift waitlists. When a shift is full, you can join the waitlist and be notified when a spot opens up.')}
         />
       )}
 
@@ -188,7 +190,7 @@ export function WaitlistTab() {
                         variant="flat"
                         startContent={<Hash className="w-3 h-3" />}
                       >
-                        Position {entry.position}
+                        {t('waitlist.position', 'Position {{position}}', { position: entry.position })}
                       </Chip>
                     </div>
 
@@ -216,13 +218,13 @@ export function WaitlistTab() {
                       {entry.shift.capacity && (
                         <span className="flex items-center gap-1">
                           <Users className="w-3 h-3" aria-hidden="true" />
-                          {entry.shift.capacity} spots
+                          {t('waitlist.spots', '{{count}} spots', { count: entry.shift.capacity })}
                         </span>
                       )}
                     </div>
 
                     <p className="text-xs text-theme-subtle">
-                      Joined waitlist {new Date(entry.joined_at).toLocaleDateString()}
+                      {t('waitlist.joined', 'Joined waitlist')} {new Date(entry.joined_at).toLocaleDateString()}
                     </p>
                   </div>
 
@@ -234,7 +236,7 @@ export function WaitlistTab() {
                     onPress={() => handleLeaveWaitlist(entry.shift.id)}
                     isLoading={removingId === entry.shift.id}
                   >
-                    Leave
+                    {t('waitlist.leave', 'Leave')}
                   </Button>
                 </div>
               </GlassCard>

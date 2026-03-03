@@ -52,6 +52,7 @@ DROP PROCEDURE IF EXISTS add_application_stage_column;
 CREATE TABLE IF NOT EXISTS `job_application_history` (
     `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     `application_id` int(11) UNSIGNED NOT NULL,
+    `tenant_id` int(11) UNSIGNED NOT NULL,
     `from_status` varchar(30) DEFAULT NULL,
     `to_status` varchar(30) NOT NULL,
     `changed_by` int(11) DEFAULT NULL,
@@ -59,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `job_application_history` (
     `notes` text DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_app_history_application` (`application_id`),
+    INDEX `idx_app_history_tenant` (`tenant_id`),
     INDEX `idx_app_history_changed_at` (`changed_at`),
     CONSTRAINT `fk_app_history_application` FOREIGN KEY (`application_id`) REFERENCES `job_vacancy_applications` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

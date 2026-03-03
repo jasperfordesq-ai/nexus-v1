@@ -165,6 +165,43 @@
       "something_wrong": "Something went wrong"
     }
   },
+  "announcements": {
+    "heading": "Announcements",
+    "new": "New Announcement",
+    "no_announcements_title": "No announcements",
+    "no_announcements_admin_desc": "Create an announcement to share with the group",
+    "no_announcements_desc": "No announcements have been posted yet",
+    "pinned": "Pinned",
+    "unpin": "Unpin",
+    "pin": "Pin",
+    "pin_this": "Pin this announcement",
+    "delete": "Delete",
+    "delete_title": "Delete Announcement",
+    "delete_confirm": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+    "cancel": "Cancel",
+    "post": "Post Announcement"
+  },
+  "files": {
+    "heading": "Files",
+    "upload": "Upload",
+    "uploading_progress": "Uploading... {{progress}}%",
+    "drag_and_drop": "Drag and drop files here, or",
+    "browse": "browse",
+    "no_files_title": "No files yet",
+    "no_files_member_desc": "Upload files to share with the group",
+    "no_files_desc": "No files have been shared in this group",
+    "download_count": "{{count}} downloads",
+    "delete_title": "Delete File",
+    "delete_confirm": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "load_failed": "Failed to load files",
+    "upload_success": "{{count}} file(s) uploaded",
+    "upload_failed": "Failed to upload file(s)",
+    "download_failed": "Failed to download file",
+    "file_deleted": "File deleted",
+    "delete_failed": "Failed to delete file"
+  },
   "toast": {
     "left": "Left the group",
     "leave_failed": "Failed to leave group",

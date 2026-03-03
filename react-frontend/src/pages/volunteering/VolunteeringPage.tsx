@@ -217,7 +217,7 @@ export function VolunteeringPage() {
               onPress={() => setTab('recommended')}
               startContent={<Sparkles className="w-4 h-4" aria-hidden="true" />}
             >
-              For You
+              {t('volunteering.tab_for_you', 'For You')}
             </Button>
             <Button
               variant={tab === 'certificates' ? 'solid' : 'flat'}
@@ -225,7 +225,7 @@ export function VolunteeringPage() {
               onPress={() => setTab('certificates')}
               startContent={<Award className="w-4 h-4" aria-hidden="true" />}
             >
-              Certificates
+              {t('volunteering.tab_certificates', 'Certificates')}
             </Button>
             <Button
               variant={tab === 'alerts' ? 'solid' : 'flat'}
@@ -233,7 +233,7 @@ export function VolunteeringPage() {
               onPress={() => setTab('alerts')}
               startContent={<Siren className="w-4 h-4" aria-hidden="true" />}
             >
-              Alerts
+              {t('volunteering.tab_alerts', 'Alerts')}
             </Button>
             <Button
               variant={tab === 'wellbeing' ? 'solid' : 'flat'}
@@ -241,7 +241,7 @@ export function VolunteeringPage() {
               onPress={() => setTab('wellbeing')}
               startContent={<Smile className="w-4 h-4" aria-hidden="true" />}
             >
-              Wellbeing
+              {t('volunteering.tab_wellbeing', 'Wellbeing')}
             </Button>
             <Button
               variant={tab === 'credentials' ? 'solid' : 'flat'}
@@ -249,7 +249,7 @@ export function VolunteeringPage() {
               onPress={() => setTab('credentials')}
               startContent={<ShieldCheck className="w-4 h-4" aria-hidden="true" />}
             >
-              Credentials
+              {t('volunteering.tab_credentials', 'Credentials')}
             </Button>
             <Button
               variant={tab === 'waitlist' ? 'solid' : 'flat'}
@@ -257,7 +257,7 @@ export function VolunteeringPage() {
               onPress={() => setTab('waitlist')}
               startContent={<Clock className="w-4 h-4" aria-hidden="true" />}
             >
-              Waitlist
+              {t('volunteering.tab_waitlist', 'Waitlist')}
             </Button>
             <Button
               variant={tab === 'swaps' ? 'solid' : 'flat'}
@@ -265,7 +265,7 @@ export function VolunteeringPage() {
               onPress={() => setTab('swaps')}
               startContent={<ArrowLeftRight className="w-4 h-4" aria-hidden="true" />}
             >
-              Swap Requests
+              {t('volunteering.tab_swap_requests', 'Swap Requests')}
             </Button>
             <Button
               variant={tab === 'group-signups' ? 'solid' : 'flat'}
@@ -273,7 +273,7 @@ export function VolunteeringPage() {
               onPress={() => setTab('group-signups')}
               startContent={<Users className="w-4 h-4" aria-hidden="true" />}
             >
-              Group Sign-ups
+              {t('volunteering.tab_group_signups', 'Group Sign-ups')}
             </Button>
           </>
         )}

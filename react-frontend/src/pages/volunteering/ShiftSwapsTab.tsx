@@ -24,6 +24,7 @@ import {
   Send,
   Inbox,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
@@ -62,6 +63,7 @@ interface ShiftSwap {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function ShiftSwapsTab() {
+  const { t } = useTranslation('community');
   const [swaps, setSwaps] = useState<ShiftSwap[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -170,7 +172,7 @@ export function ShiftSwapsTab() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ArrowLeftRight className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">Shift Swaps</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('swaps.heading', 'Shift Swaps')}</h2>
         </div>
         <Button
           size="sm"
@@ -180,7 +182,7 @@ export function ShiftSwapsTab() {
           onPress={load}
           isDisabled={isLoading}
         >
-          Refresh
+          {t('swaps.refresh', 'Refresh')}
         </Button>
       </div>
 
@@ -192,7 +194,7 @@ export function ShiftSwapsTab() {
           className={view === 'all' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
           onPress={() => setView('all')}
         >
-          All ({swaps.length})
+          {t('swaps.all', 'All')} ({swaps.length})
         </Button>
         <Button
           size="sm"
@@ -201,7 +203,7 @@ export function ShiftSwapsTab() {
           onPress={() => setView('sent')}
           startContent={<Send className="w-3 h-3" aria-hidden="true" />}
         >
-          Sent ({sentCount})
+          {t('swaps.sent', 'Sent')} ({sentCount})
         </Button>
         <Button
           size="sm"
@@ -210,7 +212,7 @@ export function ShiftSwapsTab() {
           onPress={() => setView('received')}
           startContent={<Inbox className="w-3 h-3" aria-hidden="true" />}
         >
-          Received ({receivedCount})
+          {t('swaps.received', 'Received')} ({receivedCount})
         </Button>
       </div>
 
@@ -220,7 +222,7 @@ export function ShiftSwapsTab() {
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            Try Again
+            {t('swaps.try_again', 'Try Again')}
           </Button>
         </GlassCard>
       )}
@@ -242,13 +244,13 @@ export function ShiftSwapsTab() {
       {!error && !isLoading && filteredSwaps.length === 0 && (
         <EmptyState
           icon={<ArrowLeftRight className="w-12 h-12" aria-hidden="true" />}
-          title="No swap requests"
+          title={t('swaps.no_swaps_title', 'No swap requests')}
           description={
             view === 'sent'
-              ? 'You have not sent any shift swap requests yet.'
+              ? t('swaps.no_sent', 'You have not sent any shift swap requests yet.')
               : view === 'received'
-                ? 'You have not received any shift swap requests.'
-                : 'No shift swap requests found. You can request a swap from the shift details page.'
+                ? t('swaps.no_received', 'You have not received any shift swap requests.')
+                : t('swaps.no_swaps_desc', 'No shift swap requests found. You can request a swap from the shift details page.')
           }
         />
       )}
@@ -277,7 +279,7 @@ export function ShiftSwapsTab() {
                           : <Inbox className="w-3 h-3" />
                         }
                       >
-                        {swap.direction === 'sent' ? 'Sent' : 'Received'}
+                        {swap.direction === 'sent' ? t('swaps.sent', 'Sent') : t('swaps.received', 'Received')}
                       </Chip>
                       <Chip
                         size="sm"
@@ -302,7 +304,7 @@ export function ShiftSwapsTab() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                       {/* Original shift */}
                       <div className="rounded-lg bg-theme-hover/50 p-3">
-                        <p className="text-xs font-medium text-theme-muted mb-1">Your Shift</p>
+                        <p className="text-xs font-medium text-theme-muted mb-1">{t('swaps.your_shift', 'Your Shift')}</p>
                         <p className="text-sm font-semibold text-theme-primary">
                           {swap.original_shift.opportunity_title}
                         </p>
@@ -320,7 +322,7 @@ export function ShiftSwapsTab() {
 
                       {/* Proposed shift */}
                       <div className="rounded-lg bg-theme-hover/50 p-3">
-                        <p className="text-xs font-medium text-theme-muted mb-1">Proposed Shift</p>
+                        <p className="text-xs font-medium text-theme-muted mb-1">{t('swaps.proposed_shift', 'Proposed Shift')}</p>
                         <p className="text-sm font-semibold text-theme-primary">
                           {swap.proposed_shift.opportunity_title}
                         </p>
@@ -344,7 +346,7 @@ export function ShiftSwapsTab() {
                     )}
 
                     <p className="text-xs text-theme-subtle">
-                      Requested {new Date(swap.created_at).toLocaleDateString()}
+                      {t('swaps.requested', 'Requested')} {new Date(swap.created_at).toLocaleDateString()}
                     </p>
                   </div>
 
@@ -358,7 +360,7 @@ export function ShiftSwapsTab() {
                         onPress={() => handleAccept(swap.id)}
                         isLoading={actioningId === swap.id}
                       >
-                        Accept
+                        {t('swaps.accept', 'Accept')}
                       </Button>
                       <Button
                         size="sm"
@@ -368,7 +370,7 @@ export function ShiftSwapsTab() {
                         onPress={() => handleReject(swap.id)}
                         isLoading={actioningId === swap.id}
                       >
-                        Reject
+                        {t('swaps.reject', 'Reject')}
                       </Button>
                     </div>
                   )}
