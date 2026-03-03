@@ -125,7 +125,7 @@ export function CredentialVerificationTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: Credential[] }>('/v2/volunteering/certificates');
+      const response = await api.get<{ data: Credential[] }>('/v2/volunteering/credentials');
 
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
@@ -180,7 +180,7 @@ export function CredentialVerificationTab() {
         formData.append('expiry_date', uploadForm.expiry_date);
       }
 
-      const response = await api.upload('/v2/volunteering/certificates', formData);
+      const response = await api.upload('/v2/volunteering/credentials', formData);
 
       if (response.success) {
         onClose();
@@ -474,7 +474,7 @@ export function CredentialVerificationTab() {
                 Document <span className="text-rose-400">*</span>
               </label>
               <div
-                className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
+                className={`relative overflow-hidden border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
                   selectedFile
                     ? 'border-emerald-500/50 bg-emerald-500/5'
                     : 'border-theme-default bg-theme-elevated hover:border-rose-500/50'
@@ -516,17 +516,9 @@ export function CredentialVerificationTab() {
                   accept=".pdf,.jpg,.jpeg,.png,.webp"
                   onChange={handleFileChange}
                   className={selectedFile ? 'hidden' : 'absolute inset-0 w-full h-full opacity-0 cursor-pointer'}
-                  style={selectedFile ? {} : { position: 'absolute', inset: 0 }}
                   aria-label="Upload credential document"
                 />
               </div>
-              {/* Make the container relative for the absolute file input */}
-              <style>{`
-                div:has(> input[type="file"][style*="absolute"]) {
-                  position: relative;
-                  overflow: hidden;
-                }
-              `}</style>
             </div>
 
             {/* Expiry Date */}

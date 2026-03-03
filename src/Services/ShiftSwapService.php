@@ -146,6 +146,7 @@ class ShiftSwapService
     public static function respond(int $swapId, int $userId, string $action): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         if (!in_array($action, ['accept', 'reject'])) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be accept or reject'];
@@ -154,8 +155,8 @@ class ShiftSwapService
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT * FROM vol_shift_swap_requests WHERE id = ? AND status = 'pending'");
-        $stmt->execute([$swapId]);
+        $stmt = $db->prepare("SELECT * FROM vol_shift_swap_requests WHERE id = ? AND status = 'pending' AND tenant_id = ?");
+        $stmt->execute([$swapId, $tenantId]);
         $swap = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$swap) {
@@ -235,6 +236,7 @@ class ShiftSwapService
     public static function adminDecision(int $swapId, int $adminId, string $action): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         if (!in_array($action, ['approve', 'reject'])) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or reject'];
@@ -243,8 +245,8 @@ class ShiftSwapService
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT * FROM vol_shift_swap_requests WHERE id = ? AND status = 'admin_pending'");
-        $stmt->execute([$swapId]);
+        $stmt = $db->prepare("SELECT * FROM vol_shift_swap_requests WHERE id = ? AND status = 'admin_pending' AND tenant_id = ?");
+        $stmt->execute([$swapId, $tenantId]);
         $swap = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$swap) {
@@ -380,11 +382,12 @@ class ShiftSwapService
     public static function cancel(int $swapId, int $userId): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT * FROM vol_shift_swap_requests WHERE id = ? AND from_user_id = ? AND status IN ('pending', 'admin_pending')");
-        $stmt->execute([$swapId, $userId]);
+        $stmt = $db->prepare("SELECT * FROM vol_shift_swap_requests WHERE id = ? AND from_user_id = ? AND status IN ('pending', 'admin_pending') AND tenant_id = ?");
+        $stmt->execute([$swapId, $userId, $tenantId]);
         $swap = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$swap) {

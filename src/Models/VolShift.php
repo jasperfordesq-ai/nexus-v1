@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class VolShift
 {
@@ -18,19 +19,19 @@ class VolShift
 
     public static function getForOpportunity($oppId)
     {
-        $sql = "SELECT * FROM vol_shifts WHERE opportunity_id = ? ORDER BY start_time ASC";
-        return Database::query($sql, [$oppId])->fetchAll();
+        $sql = "SELECT * FROM vol_shifts WHERE opportunity_id = ? AND tenant_id = ? ORDER BY start_time ASC";
+        return Database::query($sql, [$oppId, TenantContext::getId()])->fetchAll();
     }
 
     public static function delete($id)
     {
-        $sql = "DELETE FROM vol_shifts WHERE id = ?";
-        Database::query($sql, [$id]);
+        $sql = "DELETE FROM vol_shifts WHERE id = ? AND tenant_id = ?";
+        Database::query($sql, [$id, TenantContext::getId()]);
     }
 
     public static function find($id)
     {
-        $sql = "SELECT * FROM vol_shifts WHERE id = ?";
-        return Database::query($sql, [$id])->fetch();
+        $sql = "SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ?";
+        return Database::query($sql, [$id, TenantContext::getId()])->fetch();
     }
 }

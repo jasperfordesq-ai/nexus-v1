@@ -136,6 +136,7 @@ class VolunteerCheckInService
     public static function verifyCheckIn(string $token): ?array
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
 
@@ -145,9 +146,9 @@ class VolunteerCheckInService
             FROM vol_shift_checkins c
             JOIN vol_shifts s ON c.shift_id = s.id
             JOIN users u ON c.user_id = u.id
-            WHERE c.qr_token = ?
+            WHERE c.qr_token = ? AND c.tenant_id = ?
         ");
-        $stmt->execute([$token]);
+        $stmt->execute([$token, $tenantId]);
         $checkin = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$checkin) {
@@ -228,11 +229,12 @@ class VolunteerCheckInService
     public static function checkOut(string $token): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT id, status FROM vol_shift_checkins WHERE qr_token = ?");
-        $stmt->execute([$token]);
+        $stmt = $db->prepare("SELECT id, status FROM vol_shift_checkins WHERE qr_token = ? AND tenant_id = ?");
+        $stmt->execute([$token, $tenantId]);
         $checkin = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$checkin) {
@@ -264,16 +266,17 @@ class VolunteerCheckInService
      */
     public static function getShiftCheckIns(int $shiftId): array
     {
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
         $stmt = $db->prepare("
             SELECT c.*, u.name as user_name, u.avatar_url as user_avatar
             FROM vol_shift_checkins c
             JOIN users u ON c.user_id = u.id
-            WHERE c.shift_id = ?
+            WHERE c.shift_id = ? AND c.tenant_id = ?
             ORDER BY c.created_at ASC
         ");
-        $stmt->execute([$shiftId]);
+        $stmt->execute([$shiftId, $tenantId]);
         $checkins = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return array_map(function ($c) {
@@ -301,10 +304,11 @@ class VolunteerCheckInService
      */
     public static function getUserCheckIn(int $shiftId, int $userId): ?array
     {
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT * FROM vol_shift_checkins WHERE shift_id = ? AND user_id = ?");
-        $stmt->execute([$shiftId, $userId]);
+        $stmt = $db->prepare("SELECT * FROM vol_shift_checkins WHERE shift_id = ? AND user_id = ? AND tenant_id = ?");
+        $stmt->execute([$shiftId, $userId, $tenantId]);
         $checkin = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$checkin) {
