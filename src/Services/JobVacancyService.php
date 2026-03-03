@@ -73,7 +73,7 @@ class JobVacancyService
         $commitment = $filters['commitment'] ?? null;
         $category = $filters['category'] ?? null;
         $search = $filters['search'] ?? null;
-        $userId = $filters['user_id'] ?? null;
+        $userId = $userId ?? ($filters['user_id'] ?? null);
 
         $params = [$tenantId];
         $where = ["jv.tenant_id = ?"];
@@ -277,11 +277,13 @@ class JobVacancyService
         $vacancy['renewed_at'] = $vacancy['renewed_at'] ?? null;
         $vacancy['renewal_count'] = isset($vacancy['renewal_count']) ? (int)$vacancy['renewal_count'] : 0;
 
-        // Check if user has applied
+        // Check if user has applied (scoped through vacancy's tenant)
         if ($userId) {
             $application = Database::query(
-                "SELECT id, status, stage FROM job_vacancy_applications WHERE vacancy_id = ? AND user_id = ?",
-                [$vacancy['id'], $userId]
+                "SELECT jva.id, jva.status, jva.stage FROM job_vacancy_applications jva
+                 JOIN job_vacancies jv ON jva.vacancy_id = jv.id AND jv.tenant_id = ?
+                 WHERE jva.vacancy_id = ? AND jva.user_id = ?",
+                [$vacancy['tenant_id'], $vacancy['id'], $userId]
             )->fetch();
             $vacancy['has_applied'] = !empty($application);
             $vacancy['application_status'] = $application ? $application['status'] : null;
@@ -619,10 +621,10 @@ class JobVacancyService
         try {
             $tenantId = TenantContext::getId();
 
-            // Applications cascade via FK, but delete explicitly for safety
+            // Applications cascade via FK, but delete explicitly for safety — scope by tenant
             Database::query(
-                "DELETE FROM job_vacancy_applications WHERE vacancy_id = ?",
-                [$id]
+                "DELETE FROM job_vacancy_applications WHERE vacancy_id = ? AND vacancy_id IN (SELECT id FROM job_vacancies WHERE tenant_id = ?)",
+                [$id, $tenantId]
             );
 
             Database::query(

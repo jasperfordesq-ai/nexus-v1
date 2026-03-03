@@ -357,7 +357,7 @@ HTML;
      */
     private static function getVerificationUrl(string $code): string
     {
-        $baseUrl = $_ENV['REACT_APP_URL'] ?? 'https://app.project-nexus.ie';
+        $baseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
         return $baseUrl . '/verify/cert/' . $code;
     }
 }

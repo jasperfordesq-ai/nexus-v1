@@ -53,16 +53,16 @@ class ShiftWaitlistService
         $db = Database::getConnection();
 
         // Check if already on waitlist
-        $stmt = $db->prepare("SELECT id FROM vol_shift_waitlist WHERE shift_id = ? AND user_id = ? AND status = 'waiting'");
-        $stmt->execute([$shiftId, $userId]);
+        $stmt = $db->prepare("SELECT id FROM vol_shift_waitlist WHERE shift_id = ? AND user_id = ? AND status = 'waiting' AND tenant_id = ?");
+        $stmt->execute([$shiftId, $userId, $tenantId]);
         if ($stmt->fetch()) {
             self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already on the waitlist for this shift'];
             return null;
         }
 
         // Check if already signed up for the shift
-        $stmt = $db->prepare("SELECT id FROM vol_applications WHERE shift_id = ? AND user_id = ? AND status = 'approved'");
-        $stmt->execute([$shiftId, $userId]);
+        $stmt = $db->prepare("SELECT id FROM vol_applications WHERE shift_id = ? AND user_id = ? AND status = 'approved' AND tenant_id = ?");
+        $stmt->execute([$shiftId, $userId, $tenantId]);
         if ($stmt->fetch()) {
             self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already signed up for this shift'];
             return null;
@@ -70,8 +70,8 @@ class ShiftWaitlistService
 
         try {
             // Get next position
-            $stmt = $db->prepare("SELECT COALESCE(MAX(position), 0) + 1 as next_pos FROM vol_shift_waitlist WHERE shift_id = ? AND status = 'waiting'");
-            $stmt->execute([$shiftId]);
+            $stmt = $db->prepare("SELECT COALESCE(MAX(position), 0) + 1 as next_pos FROM vol_shift_waitlist WHERE shift_id = ? AND status = 'waiting' AND tenant_id = ?");
+            $stmt->execute([$shiftId, $tenantId]);
             $nextPos = (int)$stmt->fetch(\PDO::FETCH_ASSOC)['next_pos'];
 
             $stmt = $db->prepare("
@@ -120,9 +120,9 @@ class ShiftWaitlistService
             $stmt = $db->prepare("
                 UPDATE vol_shift_waitlist
                 SET position = position - 1
-                WHERE shift_id = ? AND status = 'waiting' AND position > ?
+                WHERE shift_id = ? AND status = 'waiting' AND position > ? AND tenant_id = ?
             ");
-            $stmt->execute([$shiftId, $entry['position']]);
+            $stmt->execute([$shiftId, $entry['position'], $tenantId]);
 
             return true;
         } catch (\Exception $e) {

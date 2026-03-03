@@ -75,6 +75,8 @@ class ConnectionService
             }
         }
 
+        $tenantId = TenantContext::getId();
+
         // Build query based on status filter
         if ($status === 'pending_sent') {
             // Requests sent by the user
@@ -84,6 +86,7 @@ class ConnectionService
                 FROM connections c
                 JOIN users u ON c.receiver_id = u.id
                 WHERE c.requester_id = ? AND c.status = 'pending'
+                  AND u.tenant_id = ?
             ";
         } elseif ($status === 'pending_received') {
             // Requests received by the user
@@ -93,6 +96,7 @@ class ConnectionService
                 FROM connections c
                 JOIN users u ON c.requester_id = u.id
                 WHERE c.receiver_id = ? AND c.status = 'pending'
+                  AND u.tenant_id = ?
             ";
         } else {
             // Accepted connections (friends)
@@ -102,14 +106,15 @@ class ConnectionService
                 FROM connections c
                 JOIN users u ON (CASE WHEN c.requester_id = ? THEN c.receiver_id ELSE c.requester_id END) = u.id
                 WHERE (c.requester_id = ? OR c.receiver_id = ?) AND c.status = 'accepted'
+                  AND u.tenant_id = ?
             ";
         }
 
         $params = [];
         if ($status === 'accepted') {
-            $params = [$userId, $userId, $userId];
+            $params = [$userId, $userId, $userId, $tenantId];
         } else {
-            $params = [$userId];
+            $params = [$userId, $tenantId];
         }
 
         if ($cursorId) {
@@ -277,9 +282,17 @@ class ConnectionService
 
         $db = Database::getConnection();
 
-        // Verify the request exists and user is the receiver
-        $stmt = $db->prepare("SELECT * FROM connections WHERE id = ?");
-        $stmt->execute([$connectionId]);
+        $tenantId = TenantContext::getId();
+
+        // Verify the request exists, user is the receiver, and both users belong to this tenant
+        $stmt = $db->prepare("
+            SELECT c.*
+            FROM connections c
+            JOIN users u1 ON c.requester_id = u1.id AND u1.tenant_id = ?
+            JOIN users u2 ON c.receiver_id = u2.id AND u2.tenant_id = ?
+            WHERE c.id = ?
+        ");
+        $stmt->execute([$tenantId, $tenantId, $connectionId]);
         $connection = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$connection) {
@@ -342,10 +355,17 @@ class ConnectionService
         self::$errors = [];
 
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
-        // Verify the request exists and user is involved
-        $stmt = $db->prepare("SELECT * FROM connections WHERE id = ? AND status = 'pending'");
-        $stmt->execute([$connectionId]);
+        // Verify the request exists, user is involved, and both users belong to this tenant
+        $stmt = $db->prepare("
+            SELECT c.*
+            FROM connections c
+            JOIN users u1 ON c.requester_id = u1.id AND u1.tenant_id = ?
+            JOIN users u2 ON c.receiver_id = u2.id AND u2.tenant_id = ?
+            WHERE c.id = ? AND c.status = 'pending'
+        ");
+        $stmt->execute([$tenantId, $tenantId, $connectionId]);
         $connection = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$connection) {
@@ -382,10 +402,17 @@ class ConnectionService
         self::$errors = [];
 
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
-        // Verify the connection exists and user is part of it
-        $stmt = $db->prepare("SELECT * FROM connections WHERE id = ? AND status = 'accepted'");
-        $stmt->execute([$connectionId]);
+        // Verify the connection exists, user is part of it, and both users belong to this tenant
+        $stmt = $db->prepare("
+            SELECT c.*
+            FROM connections c
+            JOIN users u1 ON c.requester_id = u1.id AND u1.tenant_id = ?
+            JOIN users u2 ON c.receiver_id = u2.id AND u2.tenant_id = ?
+            WHERE c.id = ? AND c.status = 'accepted'
+        ");
+        $stmt->execute([$tenantId, $tenantId, $connectionId]);
         $connection = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$connection) {
@@ -419,13 +446,22 @@ class ConnectionService
     public static function getPendingCounts(int $userId): array
     {
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
-        $received = $db->prepare("SELECT COUNT(*) FROM connections WHERE receiver_id = ? AND status = 'pending'");
-        $received->execute([$userId]);
+        $received = $db->prepare("
+            SELECT COUNT(*) FROM connections c
+            JOIN users u ON c.requester_id = u.id AND u.tenant_id = ?
+            WHERE c.receiver_id = ? AND c.status = 'pending'
+        ");
+        $received->execute([$tenantId, $userId]);
         $receivedCount = (int)$received->fetchColumn();
 
-        $sent = $db->prepare("SELECT COUNT(*) FROM connections WHERE requester_id = ? AND status = 'pending'");
-        $sent->execute([$userId]);
+        $sent = $db->prepare("
+            SELECT COUNT(*) FROM connections c
+            JOIN users u ON c.receiver_id = u.id AND u.tenant_id = ?
+            WHERE c.requester_id = ? AND c.status = 'pending'
+        ");
+        $sent->execute([$tenantId, $userId]);
         $sentCount = (int)$sent->fetchColumn();
 
         return [
@@ -440,8 +476,14 @@ class ConnectionService
     public static function getFriendsCount(int $userId): int
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT COUNT(*) FROM connections WHERE (requester_id = ? OR receiver_id = ?) AND status = 'accepted'");
-        $stmt->execute([$userId, $userId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("
+            SELECT COUNT(*) FROM connections c
+            JOIN users u1 ON c.requester_id = u1.id AND u1.tenant_id = ?
+            JOIN users u2 ON c.receiver_id = u2.id AND u2.tenant_id = ?
+            WHERE (c.requester_id = ? OR c.receiver_id = ?) AND c.status = 'accepted'
+        ");
+        $stmt->execute([$tenantId, $tenantId, $userId, $userId]);
         return (int)$stmt->fetchColumn();
     }
 

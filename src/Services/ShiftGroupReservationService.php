@@ -87,8 +87,8 @@ class ShiftGroupReservationService
         }
 
         // Check for existing reservation
-        $stmt = $db->prepare("SELECT id FROM vol_shift_group_reservations WHERE shift_id = ? AND group_id = ? AND status = 'active'");
-        $stmt->execute([$shiftId, $groupId]);
+        $stmt = $db->prepare("SELECT id FROM vol_shift_group_reservations WHERE shift_id = ? AND group_id = ? AND status = 'active' AND tenant_id = ?");
+        $stmt->execute([$shiftId, $groupId, $tenantId]);
         if ($stmt->fetch()) {
             self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'This group already has a reservation for this shift'];
             return null;
@@ -452,15 +452,16 @@ class ShiftGroupReservationService
         }
 
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
         // Count regular signups
-        $stmt = $db->prepare("SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved'");
-        $stmt->execute([$shiftId]);
+        $stmt = $db->prepare("SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?");
+        $stmt->execute([$shiftId, $tenantId]);
         $regularSignups = (int)$stmt->fetch(\PDO::FETCH_ASSOC)['cnt'];
 
         // Count reserved slots from active group reservations
-        $stmt = $db->prepare("SELECT COALESCE(SUM(reserved_slots), 0) as total FROM vol_shift_group_reservations WHERE shift_id = ? AND status = 'active'");
-        $stmt->execute([$shiftId]);
+        $stmt = $db->prepare("SELECT COALESCE(SUM(reserved_slots), 0) as total FROM vol_shift_group_reservations WHERE shift_id = ? AND status = 'active' AND tenant_id = ?");
+        $stmt->execute([$shiftId, $tenantId]);
         $reservedSlots = (int)$stmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
         return max(0, (int)$shift['capacity'] - $regularSignups - $reservedSlots);

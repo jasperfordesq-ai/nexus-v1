@@ -55,16 +55,17 @@ class ShiftSwapService
         $db = Database::getConnection();
 
         // Verify requester is signed up for from_shift
-        $stmt = $db->prepare("SELECT id FROM vol_applications WHERE shift_id = ? AND user_id = ? AND status = 'approved'");
-        $stmt->execute([$fromShiftId, $fromUserId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("SELECT id FROM vol_applications WHERE shift_id = ? AND user_id = ? AND status = 'approved' AND tenant_id = ?");
+        $stmt->execute([$fromShiftId, $fromUserId, $tenantId]);
         if (!$stmt->fetch()) {
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not signed up for the source shift'];
             return null;
         }
 
         // Verify target user is signed up for to_shift
-        $stmt = $db->prepare("SELECT id FROM vol_applications WHERE shift_id = ? AND user_id = ? AND status = 'approved'");
-        $stmt->execute([$toShiftId, $toUserId]);
+        $stmt = $db->prepare("SELECT id FROM vol_applications WHERE shift_id = ? AND user_id = ? AND status = 'approved' AND tenant_id = ?");
+        $stmt->execute([$toShiftId, $toUserId, $tenantId]);
         if (!$stmt->fetch()) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Target user is not signed up for the requested shift'];
             return null;
@@ -89,8 +90,9 @@ class ShiftSwapService
             SELECT id FROM vol_shift_swap_requests
             WHERE from_user_id = ? AND to_user_id = ? AND from_shift_id = ? AND to_shift_id = ?
             AND status IN ('pending', 'admin_pending')
+            AND tenant_id = ?
         ");
-        $stmt->execute([$fromUserId, $toUserId, $fromShiftId, $toShiftId]);
+        $stmt->execute([$fromUserId, $toUserId, $fromShiftId, $toShiftId, $tenantId]);
         if ($stmt->fetch()) {
             self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'A swap request already exists for these shifts'];
             return null;
@@ -417,13 +419,14 @@ class ShiftSwapService
             $db->beginTransaction();
 
             // Swap shift assignments in vol_applications
+            $tenantId = TenantContext::getId();
             // User A: from_shift -> to_shift
-            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE user_id = ? AND shift_id = ? AND status = 'approved'");
-            $stmt->execute([$swap['to_shift_id'], $swap['from_user_id'], $swap['from_shift_id']]);
+            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE user_id = ? AND shift_id = ? AND status = 'approved' AND tenant_id = ?");
+            $stmt->execute([$swap['to_shift_id'], $swap['from_user_id'], $swap['from_shift_id'], $tenantId]);
 
             // User B: to_shift -> from_shift
-            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE user_id = ? AND shift_id = ? AND status = 'approved'");
-            $stmt->execute([$swap['from_shift_id'], $swap['to_user_id'], $swap['to_shift_id']]);
+            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE user_id = ? AND shift_id = ? AND status = 'approved' AND tenant_id = ?");
+            $stmt->execute([$swap['from_shift_id'], $swap['to_user_id'], $swap['to_shift_id'], $tenantId]);
 
             // Update swap status
             $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'accepted' WHERE id = ?");

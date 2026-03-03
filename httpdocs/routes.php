@@ -286,14 +286,18 @@ $router->add('POST', '/api/v2/users/me/avatar', 'Nexus\Controllers\Api\UsersApiC
 $router->add('POST', '/api/v2/users/me/password', 'Nexus\Controllers\Api\UsersApiController@updatePassword');
 $router->add('DELETE', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@deleteAccount');
 $router->add('GET', '/api/v2/users/me/listings', 'Nexus\Controllers\Api\UsersApiController@myListings'); // Must be before {id}/listings
-$router->add('GET', '/api/v2/users/{id}', 'Nexus\Controllers\Api\UsersApiController@show');
-$router->add('GET', '/api/v2/users/{id}/listings', 'Nexus\Controllers\Api\UsersApiController@listings');
 $router->add('GET', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@notificationPreferences');
 $router->add('PUT', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@updateNotificationPreferences');
 $router->add('GET', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@getConsent');
 $router->add('PUT', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@updateConsent');
 $router->add('POST', '/api/v2/users/me/gdpr-request', 'Nexus\Controllers\Api\UsersApiController@createGdprRequest');
 $router->add('GET', '/api/v2/users/me/sessions', 'Nexus\Controllers\Api\UsersApiController@sessions');
+$router->add('GET', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@show');
+$router->add('PUT', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@update');
+$router->add('GET', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@list');
+$router->add('POST', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@upload');
+$router->add('GET', '/api/v2/users/{id}', 'Nexus\Controllers\Api\UsersApiController@show');
+$router->add('GET', '/api/v2/users/{id}/listings', 'Nexus\Controllers\Api\UsersApiController@listings');
 $router->add('GET', '/api/v2/members/nearby', 'Nexus\Controllers\Api\UsersApiController@nearby');
 
 // ============================================
@@ -1043,14 +1047,6 @@ $router->add('PUT', '/api/v2/admin/insurance/{id}', 'Nexus\Controllers\Api\Admin
 $router->add('POST', '/api/v2/admin/insurance/{id}/verify', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@verify');
 $router->add('POST', '/api/v2/admin/insurance/{id}/reject', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@reject');
 $router->add('DELETE', '/api/v2/admin/insurance/{id}', 'Nexus\Controllers\Api\AdminInsuranceCertificateApiController@destroy');
-
-// Match Preferences (digest frequency)
-$router->add('GET', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@show');
-$router->add('PUT', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@update');
-
-// User Insurance (self-service)
-$router->add('GET', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@list');
-$router->add('POST', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@upload');
 
 // Admin Newsletters
 $router->add('GET', '/api/v2/admin/newsletters', 'Nexus\Controllers\Api\AdminNewsletterApiController@index');
@@ -2299,7 +2295,7 @@ $router->add('POST', '/api/v2/volunteering/shifts/{id}/waitlist/promote', 'Nexus
 $router->add('GET', '/api/v2/volunteering/group-reservations', 'Nexus\Controllers\Api\VolunteerApiController@myGroupReservations');
 $router->add('POST', '/api/v2/volunteering/shifts/{id}/group-reserve', 'Nexus\Controllers\Api\VolunteerApiController@groupReserve');
 $router->add('POST', '/api/v2/volunteering/group-reservations/{id}/members', 'Nexus\Controllers\Api\VolunteerApiController@addGroupMember');
-$router->add('DELETE', '/api/v2/volunteering/group-reservations/{id}/members', 'Nexus\Controllers\Api\VolunteerApiController@removeGroupMember');
+$router->add('DELETE', '/api/v2/volunteering/group-reservations/{id}/members/{userId}', 'Nexus\Controllers\Api\VolunteerApiController@removeGroupMember');
 $router->add('DELETE', '/api/v2/volunteering/group-reservations/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelGroupReservation');
 $router->add('GET', '/api/v2/volunteering/shifts/{id}/checkin', 'Nexus\Controllers\Api\VolunteerApiController@getCheckIn');
 $router->add('POST', '/api/v2/volunteering/checkin/verify/{token}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCheckIn');

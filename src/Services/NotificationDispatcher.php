@@ -515,6 +515,7 @@ HTML;
         $tenant = \Nexus\Core\TenantContext::get();
         $tenantName = $tenant['name'] ?? 'Community';
         $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
+        $frontendUrl = \Nexus\Core\TenantContext::getFrontendUrl();
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -534,7 +535,7 @@ HTML;
             Please review this match to ensure the member is suitable (mobility, health considerations) and the activity is within insurance coverage.
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$basePath}/admin/match-approvals" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Review Match</a>
+            <a href="{$frontendUrl}{$basePath}/admin/match-approvals" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Review Match</a>
         </div>
     </div>
 </div>
@@ -549,6 +550,7 @@ HTML;
         $tenant = \Nexus\Core\TenantContext::get();
         $tenantName = $tenant['name'] ?? 'Community';
         $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
+        $frontendUrl = \Nexus\Core\TenantContext::getFrontendUrl();
         $scoreText = $matchScore > 0 ? " ({$matchScore}% match)" : "";
 
         return <<<HTML
@@ -567,7 +569,7 @@ HTML;
             Click below to view the listing and get in touch with the member.
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$basePath}/listings/{$listingId}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">View Match</a>
+            <a href="{$frontendUrl}{$basePath}/listings/{$listingId}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">View Match</a>
         </div>
     </div>
 </div>
@@ -582,6 +584,7 @@ HTML;
         $tenant = \Nexus\Core\TenantContext::get();
         $tenantName = $tenant['name'] ?? 'Community';
         $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
+        $frontendUrl = \Nexus\Core\TenantContext::getFrontendUrl();
 
         $reasonHtml = '';
         if (!empty($reason)) {
@@ -609,7 +612,7 @@ HTML;
             Don't worry - there are plenty of other opportunities in your community! Browse more matches to find a good fit.
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$basePath}/matches" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Browse Matches</a>
+            <a href="{$frontendUrl}{$basePath}/matches" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Browse Matches</a>
         </div>
     </div>
 </div>

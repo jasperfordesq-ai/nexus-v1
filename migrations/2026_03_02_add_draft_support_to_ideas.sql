@@ -11,10 +11,29 @@ MODIFY COLUMN status ENUM('draft','submitted','shortlisted','winner','withdrawn'
 ALTER TABLE challenge_ideas
 ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP NULL DEFAULT NULL AFTER created_at;
 
--- 3. Add index on status for efficient filtering of drafts
-ALTER TABLE challenge_ideas
-ADD INDEX idx_status (status);
+-- 3. Add indexes for efficient filtering (idempotent via procedure)
+DROP PROCEDURE IF EXISTS add_draft_indexes;
+DELIMITER //
+CREATE PROCEDURE add_draft_indexes()
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'challenge_ideas'
+        AND INDEX_NAME = 'idx_status'
+    ) THEN
+        ALTER TABLE `challenge_ideas` ADD INDEX `idx_status` (`status`);
+    END IF;
 
--- 4. Add composite index for efficient draft queries (user + status + challenge)
-ALTER TABLE challenge_ideas
-ADD INDEX idx_user_status (user_id, status, challenge_id);
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'challenge_ideas'
+        AND INDEX_NAME = 'idx_user_status'
+    ) THEN
+        ALTER TABLE `challenge_ideas` ADD INDEX `idx_user_status` (`user_id`, `status`, `challenge_id`);
+    END IF;
+END //
+DELIMITER ;
+CALL add_draft_indexes();
+DROP PROCEDURE IF EXISTS add_draft_indexes;
