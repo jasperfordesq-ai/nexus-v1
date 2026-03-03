@@ -100,6 +100,8 @@
     "title": "Goals",
     "subtitle": "Set goals and track your progress",
     "new_goal": "New Goal",
+    "from_template": "From Template",
+    "load_error": "Failed to load goals. Please try again.",
     "tab_my": "My Goals",
     "tab_discover": "Discover",
     "tab_buddying": "Goal Buddies",

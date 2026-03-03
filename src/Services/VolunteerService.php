@@ -834,6 +834,7 @@ class VolunteerService
             }
         }
 
+        $tenantId = TenantContext::getId();
         $sql = "
             SELECT a.id as application_id, a.status as app_status,
                    s.*, o.title as opp_title, org.name as org_name, org.logo_url as org_logo
@@ -842,10 +843,11 @@ class VolunteerService
             JOIN vol_opportunities o ON a.opportunity_id = o.id
             JOIN vol_organizations org ON o.organization_id = org.id
             WHERE a.user_id = ?
+            AND a.tenant_id = ?
             AND a.status = 'approved'
             AND a.shift_id IS NOT NULL
         ";
-        $params = [$userId];
+        $params = [$userId, $tenantId];
 
         if (!empty($filters['upcoming_only'])) {
             $sql .= " AND s.start_time > NOW()";
@@ -941,8 +943,8 @@ class VolunteerService
 
         try {
             // Update application with shift assignment
-            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE id = ?");
-            $stmt->execute([$shiftId, $app['id']]);
+            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$shiftId, $app['id'], TenantContext::getId()]);
 
             // Generate QR check-in token for this shift+user
             try {

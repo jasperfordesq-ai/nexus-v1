@@ -15,7 +15,7 @@
  * - Discover tab for community goals
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -171,7 +171,8 @@ export function GoalsPage() {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<GoalTab>('my');
   const [hasMore, setHasMore] = useState(false);
-  const [cursor, setCursor] = useState<string | undefined>();
+  const [, setCursor] = useState<string | undefined>();
+  const cursorRef = useRef<string | undefined>();
 
   // Create modal
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -224,7 +225,7 @@ export function GoalsPage() {
 
       const params = new URLSearchParams();
       params.set('per_page', '20');
-      if (append && cursor) params.set('cursor', cursor);
+      if (append && cursorRef.current) params.set('cursor', cursorRef.current);
 
       const endpoint = tab === 'discover'
         ? `/v2/goals/discover?${params}`
@@ -243,22 +244,25 @@ export function GoalsPage() {
           setGoals(items);
         }
         setHasMore(response.meta?.has_more ?? false);
-        setCursor(response.meta?.cursor ?? undefined);
+        const newCursor = response.meta?.cursor ?? undefined;
+        cursorRef.current = newCursor;
+        setCursor(newCursor);
       } else {
-        if (!append) setError('Failed to load goals.');
+        if (!append) setError(t('goals.load_error', 'Failed to load goals. Please try again.'));
       }
     } catch (err) {
       logError('Failed to load goals', err);
-      if (!append) setError('Failed to load goals. Please try again.');
+      if (!append) setError(t('goals.load_error', 'Failed to load goals. Please try again.'));
     } finally {
       setIsLoading(false);
     }
-  }, [tab, cursor]);
+  }, [tab, t]);
 
   useEffect(() => {
+    cursorRef.current = undefined;
     setCursor(undefined);
     loadGoals();
-  }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tab, loadGoals]);
 
   const handleCreate = async () => {
     if (!newGoal.title.trim()) return;
@@ -474,7 +478,7 @@ export function GoalsPage() {
               startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
               onPress={onTemplateOpen}
             >
-              From Template
+              {t('goals.from_template', 'From Template')}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"

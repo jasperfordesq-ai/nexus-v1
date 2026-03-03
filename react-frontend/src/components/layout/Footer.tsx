@@ -169,6 +169,10 @@ export function Footer({ children, copyright }: FooterProps) {
                 >
                   {t('footer.built_on_nexus')}
                 </a>
+                <span className="text-theme-subtle/30">|</span>
+                <span className="text-[10px] text-theme-subtle">
+                  {t('footer.agpl_notice', 'AGPL-3.0 — Copyright \u00A9 2024\u2013{{year}} Jasper Ford', { year })}
+                </span>
                 <span className="text-theme-subtle/30">&middot;</span>
                 <Link
                   to={tenantPath('/platform/terms')}

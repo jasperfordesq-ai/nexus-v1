@@ -829,8 +829,9 @@ class GroupsApiController extends BaseApiController
     public function createAnnouncement(int $groupId): void
     {
         $this->requireAuth();
+        $this->verifyCsrf();
         $userId = $this->getUserId();
-        $data = $this->getJsonInput();
+        $data = $this->getAllInput();
 
         $result = GroupAnnouncementService::create($groupId, $userId, $data);
 
@@ -850,8 +851,9 @@ class GroupsApiController extends BaseApiController
     public function updateAnnouncement(int $groupId, int $announcementId): void
     {
         $this->requireAuth();
+        $this->verifyCsrf();
         $userId = $this->getUserId();
-        $data = $this->getJsonInput();
+        $data = $this->getAllInput();
 
         $result = GroupAnnouncementService::update($groupId, $announcementId, $userId, $data);
 
@@ -871,6 +873,7 @@ class GroupsApiController extends BaseApiController
     public function deleteAnnouncement(int $groupId, int $announcementId): void
     {
         $this->requireAuth();
+        $this->verifyCsrf();
         $userId = $this->getUserId();
 
         $success = GroupAnnouncementService::delete($groupId, $announcementId, $userId);

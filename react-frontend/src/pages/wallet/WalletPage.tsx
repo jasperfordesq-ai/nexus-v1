@@ -118,7 +118,7 @@ export function WalletPage() {
       }
     } catch (err) {
       logError('Failed to load more transactions', err);
-      toast.error(t('toast.load_error'), t('toast.load_more_error'));
+      toast.error(t('toast.load_error'));
     } finally {
       setIsLoadingMore(false);
     }
@@ -181,7 +181,7 @@ export function WalletPage() {
   // Export transactions to CSV
   function handleExport() {
     if (transactions.length === 0) {
-      toast.info(t('toast.no_data'), t('toast.no_export'));
+      toast.info(t('toast.no_data'));
       return;
     }
 

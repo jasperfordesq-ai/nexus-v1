@@ -40,6 +40,8 @@ import {
   Tag,
   Briefcase,
   Wifi,
+  AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -76,6 +78,7 @@ export function JobAlertsPage() {
 
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Create form state
   const [keywords, setKeywords] = useState('');
@@ -85,9 +88,11 @@ export function JobAlertsPage() {
   const [alertLocation, setAlertLocation] = useState('');
   const [isRemoteOnly, setIsRemoteOnly] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   const loadAlerts = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const response = await api.get<JobAlert[]>('/v2/jobs/alerts');
       if (response.success && response.data) {
@@ -95,10 +100,11 @@ export function JobAlertsPage() {
       }
     } catch (err) {
       logError('Failed to load job alerts', err);
+      setError(t('alerts.load_error', 'Failed to load alerts. Please try again.'));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadAlerts();
@@ -132,18 +138,18 @@ export function JobAlertsPage() {
     }
   };
 
-  const handleDelete = async (alertId: number) => {
-    if (!window.confirm(t('alerts.delete_confirm', 'Are you sure you want to delete this alert? This cannot be undone.'))) {
-      return;
-    }
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
 
     try {
-      await api.delete(`/v2/jobs/alerts/${alertId}`);
+      await api.delete(`/v2/jobs/alerts/${deleteTarget}`);
       toast.success(t('alerts.delete_success'));
-      setAlerts((prev) => prev.filter((a) => a.id !== alertId));
+      setAlerts((prev) => prev.filter((a) => a.id !== deleteTarget));
     } catch (err) {
       logError('Failed to delete alert', err);
       toast.error(t('alerts.delete_error'));
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -201,6 +207,22 @@ export function JobAlertsPage() {
         </Button>
       </div>
 
+      {/* Error State */}
+      {error && !isLoading && (
+        <GlassCard className="p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('alerts.load_error', 'Failed to load alerts')}</h2>
+          <p className="text-theme-muted mb-4">{error}</p>
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+            onPress={loadAlerts}
+          >
+            {t('alerts.retry', 'Retry')}
+          </Button>
+        </GlassCard>
+      )}
+
       {/* Alerts List */}
       {isLoading ? (
         <div className="space-y-4">
@@ -211,7 +233,7 @@ export function JobAlertsPage() {
             </GlassCard>
           ))}
         </div>
-      ) : alerts.length === 0 ? (
+      ) : !error && alerts.length === 0 ? (
         <EmptyState
           icon={<Bell className="w-12 h-12" aria-hidden="true" />}
           title={t('alerts.empty_title')}
@@ -311,7 +333,7 @@ export function JobAlertsPage() {
                       variant="flat"
                       isIconOnly
                       color="danger"
-                      onPress={() => handleDelete(alert.id)}
+                      onPress={() => setDeleteTarget(alert.id)}
                       aria-label={t('alerts.delete')}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -425,6 +447,34 @@ export function JobAlertsPage() {
                 >
                   {t('alerts.create')}
                 </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteTarget !== null}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-theme-primary">{t('alerts.delete', 'Delete alert')}</ModalHeader>
+              <ModalBody>
+                <p className="text-theme-secondary">
+                  {t('alerts.delete_confirm', 'Are you sure you want to delete this alert? This cannot be undone.')}
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>{t('apply.cancel', 'Cancel')}</Button>
+                <Button color="danger" onPress={handleDelete}>{t('alerts.delete', 'Delete alert')}</Button>
               </ModalFooter>
             </>
           )}

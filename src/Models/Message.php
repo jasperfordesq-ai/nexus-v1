@@ -259,10 +259,12 @@ HTML;
                 FROM messages
                 WHERE (sender_id = :uid4 OR receiver_id = :uid5)
                 AND sender_id != receiver_id
+                AND tenant_id = :tenantId2
                 GROUP BY
                     CASE WHEN sender_id = :uid6 THEN receiver_id ELSE sender_id END
             )
             AND m.sender_id != m.receiver_id
+            AND m.tenant_id = :tenantId
             ORDER BY m.created_at DESC
         ";
 
@@ -272,7 +274,9 @@ HTML;
             'uid3' => $userId,
             'uid4' => $userId,
             'uid5' => $userId,
-            'uid6' => $userId
+            'uid6' => $userId,
+            'tenantId' => $tenantId,
+            'tenantId2' => $tenantId,
         ];
 
         if ($hasLastActive) {
