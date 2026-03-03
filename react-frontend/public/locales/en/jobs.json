@@ -7,6 +7,7 @@
   "search_aria": "Search job vacancies",
   "filter_aria": "Filter by category",
 
+  "filter_by_commitment": "Filter by commitment",
   "type": {
     "all": "All Types",
     "paid": "Paid",

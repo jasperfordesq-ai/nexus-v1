@@ -248,6 +248,9 @@ export function GroupDetailPage() {
   // Member management state
   const [updatingMember, setUpdatingMember] = useState<number | null>(null);
 
+  // Leave confirmation state
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+
   // Events state
   const [events, setEvents] = useState<Event[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
@@ -564,43 +567,60 @@ export function GroupDetailPage() {
   async function handleJoinLeave() {
     if (!group || !isAuthenticated) return;
 
+    if (isMember(group)) {
+      setShowLeaveConfirm(true);
+      return;
+    }
+
     try {
       setIsJoining(true);
       const memberCount = getMemberCount(group);
-      if (isMember(group)) {
-        const response = await api.delete(`/v2/groups/${group.id}/membership`);
-        if (response.success) {
-          setGroup((prev) => prev ? {
-            ...prev,
-            is_member: false,
-            viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'none' } : undefined,
-            member_count: memberCount - 1,
-            members_count: memberCount - 1,
-          } : null);
-          toast.success(t('toast.left'));
-        } else {
-          toast.error(t('toast.leave_failed'));
-        }
+      const response = await api.post(`/v2/groups/${group.id}/join`);
+      if (response.success) {
+        setGroup((prev) => prev ? {
+          ...prev,
+          is_member: true,
+          viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'active' } : { status: 'active', role: 'member', is_admin: false },
+          member_count: memberCount + 1,
+          members_count: memberCount + 1,
+        } : null);
+        toast.success(t('toast.joined'));
       } else {
-        const response = await api.post(`/v2/groups/${group.id}/join`);
-        if (response.success) {
-          setGroup((prev) => prev ? {
-            ...prev,
-            is_member: true,
-            viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'active' } : { status: 'active', role: 'member', is_admin: false },
-            member_count: memberCount + 1,
-            members_count: memberCount + 1,
-          } : null);
-          toast.success(t('toast.joined'));
-        } else {
-          toast.error(t('toast.join_failed'));
-        }
+        toast.error(t('toast.join_failed'));
       }
     } catch (err) {
-      logError('Failed to update membership', err);
+      logError('Failed to join group', err);
       toast.error(t('toast.something_wrong'));
     } finally {
       setIsJoining(false);
+    }
+  }
+
+  async function handleConfirmLeave() {
+    if (!group) return;
+
+    try {
+      setIsJoining(true);
+      const memberCount = getMemberCount(group);
+      const response = await api.delete(`/v2/groups/${group.id}/membership`);
+      if (response.success) {
+        setGroup((prev) => prev ? {
+          ...prev,
+          is_member: false,
+          viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'none' } : undefined,
+          member_count: memberCount - 1,
+          members_count: memberCount - 1,
+        } : null);
+        toast.success(t('toast.left'));
+      } else {
+        toast.error(t('toast.leave_failed'));
+      }
+    } catch (err) {
+      logError('Failed to leave group', err);
+      toast.error(t('toast.something_wrong'));
+    } finally {
+      setIsJoining(false);
+      setShowLeaveConfirm(false);
     }
   }
 
@@ -2033,6 +2053,45 @@ export function GroupDetailPage() {
                   onPress={handleSaveSettings}
                 >
                   {t('detail.save_changes')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* ─── Leave Group Confirmation Modal ─── */}
+      <Modal
+        isOpen={showLeaveConfirm}
+        onOpenChange={setShowLeaveConfirm}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-theme-primary flex items-center gap-2">
+                <UserMinus className="w-5 h-5" aria-hidden="true" />
+                {t('detail.leave_group_title', 'Leave Group')}
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-theme-secondary">
+                  {t('detail.leave_group_confirm', 'Are you sure you want to leave {{name}}? You will lose access to group discussions and files.', { name: group?.name })}
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={onClose}>
+                  {t('detail.cancel')}
+                </Button>
+                <Button
+                  color="danger"
+                  isLoading={isJoining}
+                  onPress={handleConfirmLeave}
+                >
+                  {t('detail.leave_group')}
                 </Button>
               </ModalFooter>
             </>

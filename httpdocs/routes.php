@@ -953,10 +953,8 @@ $router->add('GET', '/api/v2/admin/groups/approvals', 'Nexus\Controllers\Api\Adm
 $router->add('POST', '/api/v2/admin/groups/approvals/{id}/approve', 'Nexus\Controllers\Api\AdminGroupsApiController@approveMember');
 $router->add('POST', '/api/v2/admin/groups/approvals/{id}/reject', 'Nexus\Controllers\Api\AdminGroupsApiController@rejectMember');
 $router->add('GET', '/api/v2/admin/groups/moderation', 'Nexus\Controllers\Api\AdminGroupsApiController@moderation');
-$router->add('PUT', '/api/v2/admin/groups/{id}/status', 'Nexus\Controllers\Api\AdminGroupsApiController@updateStatus');
-$router->add('DELETE', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@deleteGroup');
 
-// Admin Groups - Types & Policies (Phase 3)
+// Admin Groups - Types & Policies (Phase 3) — static paths BEFORE {id} catch-all
 $router->add('GET', '/api/v2/admin/groups/types', 'Nexus\Controllers\Api\AdminGroupsApiController@getGroupTypes');
 $router->add('POST', '/api/v2/admin/groups/types', 'Nexus\Controllers\Api\AdminGroupsApiController@createGroupType');
 $router->add('PUT', '/api/v2/admin/groups/types/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@updateGroupType');
@@ -967,12 +965,14 @@ $router->add('PUT', '/api/v2/admin/groups/types/{id}/policies', 'Nexus\Controlle
 // Admin Groups - Geocoding (Phase 3)
 $router->add('POST', '/api/v2/admin/groups/batch-geocode', 'Nexus\Controllers\Api\AdminGroupsApiController@batchGeocode');
 
-// Admin Groups - Recommendations & Ranking (Phase 3) — static paths BEFORE {id} catch-all
+// Admin Groups - Recommendations & Ranking (Phase 3)
 $router->add('GET', '/api/v2/admin/groups/recommendations', 'Nexus\Controllers\Api\AdminGroupsApiController@getRecommendationData');
 $router->add('GET', '/api/v2/admin/groups/featured', 'Nexus\Controllers\Api\AdminGroupsApiController@getFeaturedGroups');
 $router->add('POST', '/api/v2/admin/groups/featured/update', 'Nexus\Controllers\Api\AdminGroupsApiController@updateFeaturedGroups');
 
 // Admin Groups - Detail & Members (Phase 3) — {id} catch-all MUST be last
+$router->add('PUT', '/api/v2/admin/groups/{id}/status', 'Nexus\Controllers\Api\AdminGroupsApiController@updateStatus');
+$router->add('DELETE', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@deleteGroup');
 $router->add('GET', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@getGroup');
 $router->add('PUT', '/api/v2/admin/groups/{id}', 'Nexus\Controllers\Api\AdminGroupsApiController@updateGroup');
 $router->add('PUT', '/api/v2/admin/groups/{id}/toggle-featured', 'Nexus\Controllers\Api\AdminGroupsApiController@toggleFeatured');

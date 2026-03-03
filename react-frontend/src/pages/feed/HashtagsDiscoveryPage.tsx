@@ -193,12 +193,12 @@ export function HashtagsDiscoveryPage() {
               animate="visible"
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
             >
-              {displayHashtags.map((hashtag, idx) => (
+              {displayHashtags.map((hashtag) => (
                 <motion.div key={hashtag.tag} variants={itemVariants}>
                   <Link to={tenantPath(`/feed/hashtag/${hashtag.tag}`)}>
                     <GlassCard hoverable className="p-4 text-center">
                       <div className="flex items-center justify-center gap-1.5 mb-1">
-                        {idx < 3 && (
+                        {hashtag.trend_direction === 'up' && (
                           <TrendingUp className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                         )}
                         <span className="font-semibold text-theme-primary text-sm">

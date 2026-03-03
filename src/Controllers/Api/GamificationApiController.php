@@ -49,7 +49,8 @@ class GamificationApiController extends BaseApiController
             $status = DailyRewardService::getTodayStatus($userId);
             $this->success(['status' => $status]);
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 
@@ -65,7 +66,8 @@ class GamificationApiController extends BaseApiController
             $challenges = ChallengeService::getChallengesWithProgress($userId);
             $this->success(['challenges' => $challenges]);
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 
@@ -81,7 +83,8 @@ class GamificationApiController extends BaseApiController
             $collections = BadgeCollectionService::getCollectionsWithProgress($userId);
             $this->success(['collections' => $collections]);
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 
@@ -97,7 +100,8 @@ class GamificationApiController extends BaseApiController
             $data = XPShopService::getItemsWithUserStatus($userId);
             $this->success($data);
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 
@@ -125,7 +129,8 @@ class GamificationApiController extends BaseApiController
                 $this->error($result['error'] ?? 'Purchase failed', 400, 'PURCHASE_FAILED');
             }
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 
@@ -156,7 +161,8 @@ class GamificationApiController extends BaseApiController
                 )
             ]);
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 
@@ -175,7 +181,8 @@ class GamificationApiController extends BaseApiController
             \Nexus\Models\UserBadge::updateShowcase($userId, $badgeKeys);
             $this->success(['message' => 'Showcase updated']);
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 
@@ -205,7 +212,8 @@ class GamificationApiController extends BaseApiController
 
             $this->success(['badges' => $badges]);
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 
@@ -267,7 +275,8 @@ class GamificationApiController extends BaseApiController
             $seasons = LeaderboardSeasonService::getAllSeasons();
             $this->success(['seasons' => $seasons]);
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 
@@ -283,7 +292,8 @@ class GamificationApiController extends BaseApiController
             $data = LeaderboardSeasonService::getSeasonWithUserData($userId);
             $this->success($data);
         } catch (\Throwable $e) {
-            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
+            error_log('GamificationApiController error: ' . $e->getMessage());
+            $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
     }
 }

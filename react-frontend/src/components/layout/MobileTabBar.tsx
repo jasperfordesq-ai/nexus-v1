@@ -109,7 +109,7 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
                       radius="full"
                       onPress={tab.action}
                       className="w-13 h-13 min-w-0 bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/40 hover:shadow-indigo-500/60 hover:scale-105 active:scale-95 transition-all duration-200"
-                      aria-label="Create new content"
+                      aria-label={t('mobile_tab.create_new_content', 'Create new content')}
                       style={{ width: '52px', height: '52px' }}
                     >
                       <motion.div

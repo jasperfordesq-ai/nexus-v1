@@ -7,7 +7,7 @@
  * CredentialVerificationTab - Manage volunteer credentials/certifications (V5)
  *
  * Upload, view, and track status of volunteer credentials such as
- * Garda Vetting, First Aid, DBS Check, Safeguarding, etc.
+ * Police Check, First Aid, Background Check, Safeguarding, etc.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -60,9 +60,9 @@ interface Credential {
 /* ───────────────────────── Credential Type Options ───────────────────────── */
 
 const CREDENTIAL_TYPE_KEYS = [
-  'garda_vetting',
+  'police_check',
   'first_aid',
-  'dbs_check',
+  'background_check',
   'safeguarding',
   'manual_handling',
   'food_hygiene',
@@ -152,14 +152,14 @@ export function CredentialVerificationTab() {
     if (file) {
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
-        setUploadError('File size must be under 10MB.');
+        setUploadError(t('credentials.file_too_large', 'File size must be under 10MB.'));
         setSelectedFile(null);
         return;
       }
       // Validate file type
       const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
       if (!allowed.includes(file.type)) {
-        setUploadError('Please upload a PDF or image file (JPG, PNG, WebP).');
+        setUploadError(t('credentials.invalid_file_type', 'Please upload a PDF or image file (JPG, PNG, WebP).'));
         setSelectedFile(null);
         return;
       }
@@ -189,11 +189,11 @@ export function CredentialVerificationTab() {
         resetUploadForm();
         load();
       } else {
-        setUploadError('Failed to upload credential. Please try again.');
+        setUploadError(t('credentials.upload_failed', 'Failed to upload credential. Please try again.'));
       }
     } catch (err) {
       logError('Failed to upload credential', err);
-      setUploadError('An error occurred while uploading. Please try again.');
+      setUploadError(t('credentials.upload_error', 'An error occurred while uploading. Please try again.'));
     } finally {
       setIsUploading(false);
     }
@@ -300,7 +300,7 @@ export function CredentialVerificationTab() {
               startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
               onPress={onOpen}
             >
-              Upload New Credential
+              {t('credentials.upload_new', 'Upload New Credential')}
             </Button>
           }
         />

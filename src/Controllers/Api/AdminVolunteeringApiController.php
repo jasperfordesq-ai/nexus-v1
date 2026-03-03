@@ -140,14 +140,13 @@ class AdminVolunteeringApiController extends BaseApiController
         }
     }
 
-    public function approveApplication(): void
+    public function approveApplication(int $id): void
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             $this->jsonResponse(['error' => 'Feature not available'], 403);
         }
         $tenantId = TenantContext::getId();
-        $id = $this->getRouteParam('id');
 
         if (!$id || !$this->tableExists('vol_applications')) {
             $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
@@ -176,18 +175,17 @@ class AdminVolunteeringApiController extends BaseApiController
 
             $this->respondWithData(['message' => 'Application approved']);
         } catch (\Exception $e) {
-            $this->respondWithError('Failed to approve application');
+            $this->respondWithError('SERVER_ERROR', 'Failed to approve application', null, 500);
         }
     }
 
-    public function declineApplication(): void
+    public function declineApplication(int $id): void
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             $this->jsonResponse(['error' => 'Feature not available'], 403);
         }
         $tenantId = TenantContext::getId();
-        $id = $this->getRouteParam('id');
 
         if (!$id || !$this->tableExists('vol_applications')) {
             $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
@@ -214,7 +212,7 @@ class AdminVolunteeringApiController extends BaseApiController
 
             $this->respondWithData(['message' => 'Application declined']);
         } catch (\Exception $e) {
-            $this->respondWithError('Failed to decline application');
+            $this->respondWithError('SERVER_ERROR', 'Failed to decline application', null, 500);
         }
     }
 

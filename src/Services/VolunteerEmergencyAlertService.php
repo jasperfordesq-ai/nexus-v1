@@ -168,8 +168,8 @@ class VolunteerEmergencyAlertService
 
         try {
             // Update recipient response
-            $stmt = $db->prepare("UPDATE vol_emergency_alert_recipients SET response = ?, responded_at = NOW() WHERE id = ?");
-            $stmt->execute([$response, $recipient['id']]);
+            $stmt = $db->prepare("UPDATE vol_emergency_alert_recipients SET response = ?, responded_at = NOW() WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$response, $recipient['id'], $tenantId]);
 
             if ($response === 'accepted') {
                 // Mark alert as filled

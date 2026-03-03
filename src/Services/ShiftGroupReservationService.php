@@ -59,20 +59,9 @@ class ShiftGroupReservationService
         $db = Database::getConnection();
 
         // Verify group exists and user is a leader/admin of the group
-        $stmt = $db->prepare("SELECT id, name FROM groups_table WHERE id = ? AND tenant_id = ?");
+        $stmt = $db->prepare("SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?");
         $stmt->execute([$groupId, $tenantId]);
         $group = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-        if (!$group) {
-            // Try alternate table name
-            try {
-                $stmt = $db->prepare("SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?");
-                $stmt->execute([$groupId, $tenantId]);
-                $group = $stmt->fetch(\PDO::FETCH_ASSOC);
-            } catch (\Throwable $e) {
-                // Table might not exist
-            }
-        }
 
         if (!$group) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
@@ -153,8 +142,8 @@ class ShiftGroupReservationService
             $stmt = $db->prepare("INSERT INTO vol_shift_group_members (reservation_id, user_id, status, created_at) VALUES (?, ?, 'confirmed', NOW())");
             $stmt->execute([$reservationId, $userId]);
 
-            $stmt = $db->prepare("UPDATE vol_shift_group_reservations SET filled_slots = filled_slots + 1 WHERE id = ?");
-            $stmt->execute([$reservationId]);
+            $stmt = $db->prepare("UPDATE vol_shift_group_reservations SET filled_slots = filled_slots + 1 WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$reservationId, $tenantId]);
 
             $db->commit();
 
@@ -215,8 +204,8 @@ class ShiftGroupReservationService
             $stmt = $db->prepare("UPDATE vol_shift_group_members SET status = 'cancelled' WHERE id = ?");
             $stmt->execute([$member['id']]);
 
-            $stmt = $db->prepare("UPDATE vol_shift_group_reservations SET filled_slots = GREATEST(filled_slots - 1, 0) WHERE id = ?");
-            $stmt->execute([$reservationId]);
+            $stmt = $db->prepare("UPDATE vol_shift_group_reservations SET filled_slots = GREATEST(filled_slots - 1, 0) WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$reservationId, $tenantId]);
 
             $db->commit();
             return true;
@@ -250,11 +239,11 @@ class ShiftGroupReservationService
         try {
             $db->beginTransaction();
 
-            $stmt = $db->prepare("UPDATE vol_shift_group_reservations SET status = 'cancelled' WHERE id = ?");
-            $stmt->execute([$reservationId]);
+            $stmt = $db->prepare("UPDATE vol_shift_group_reservations SET status = 'cancelled' WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$reservationId, $tenantId]);
 
-            $stmt = $db->prepare("UPDATE vol_shift_group_members SET status = 'cancelled' WHERE reservation_id = ? AND status = 'confirmed'");
-            $stmt->execute([$reservationId]);
+            $stmt = $db->prepare("UPDATE vol_shift_group_members SET status = 'cancelled' WHERE reservation_id = ? AND tenant_id = ?");
+            $stmt->execute([$reservationId, $tenantId]);
 
             $db->commit();
             return true;
@@ -382,30 +371,15 @@ class ShiftGroupReservationService
             return array_map(function (array $row) use ($db, $tenantId, $userId): array {
                 $groupName = '';
 
-                // Try groups_table first (same pattern as reserve())
                 try {
-                    $gStmt = $db->prepare("SELECT name FROM groups_table WHERE id = ? AND tenant_id = ?");
+                    $gStmt = $db->prepare("SELECT name FROM `groups` WHERE id = ? AND tenant_id = ?");
                     $gStmt->execute([$row['group_id'], $tenantId]);
                     $group = $gStmt->fetch(\PDO::FETCH_ASSOC);
                     if ($group) {
                         $groupName = $group['name'];
                     }
                 } catch (\Throwable $e) {
-                    // Table might not exist
-                }
-
-                // Fallback to `groups` table
-                if (!$groupName) {
-                    try {
-                        $gStmt = $db->prepare("SELECT name FROM `groups` WHERE id = ? AND tenant_id = ?");
-                        $gStmt->execute([$row['group_id'], $tenantId]);
-                        $group = $gStmt->fetch(\PDO::FETCH_ASSOC);
-                        if ($group) {
-                            $groupName = $group['name'];
-                        }
-                    } catch (\Throwable $e) {
-                        // Silent
-                    }
+                    // Silent
                 }
 
                 // Get members via the existing helper
