@@ -7,8 +7,8 @@
  * Volunteering Page - Browse opportunities, track hours, manage applications
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -56,7 +56,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -300,12 +300,14 @@ export function VolunteeringPage() {
 function OpportunitiesTab() {
   const { t } = useTranslation('community');
   const { isAuthenticated } = useAuth();
+  const toast = useToast();
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [hasMore, setHasMore] = useState(false);
-  const [cursor, setCursor] = useState<string | undefined>();
+  const [, setCursor] = useState<string | undefined>();
+  const cursorRef = useRef<string | undefined>(undefined);
 
   // Apply modal
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -322,7 +324,7 @@ function OpportunitiesTab() {
 
       const params = new URLSearchParams();
       params.set('per_page', '20');
-      if (append && cursor) params.set('cursor', cursor);
+      if (append && cursorRef.current) params.set('cursor', cursorRef.current);
       if (searchQuery.trim()) params.set('search', searchQuery.trim());
 
       const response = await api.get<{ data: Opportunity[]; meta: { cursor: string | null; has_more: boolean } }>(
@@ -338,7 +340,9 @@ function OpportunitiesTab() {
           setOpportunities(items);
         }
         setHasMore(response.meta?.has_more ?? false);
-        setCursor(response.meta?.cursor ?? undefined);
+        const newCursor = response.meta?.cursor ?? undefined;
+        cursorRef.current = newCursor;
+        setCursor(newCursor);
       } else {
         if (!append) setError(t('volunteering.error_load_opportunities'));
       }
@@ -348,9 +352,10 @@ function OpportunitiesTab() {
     } finally {
       setIsLoading(false);
     }
-  }, [cursor, searchQuery]);
+  }, [searchQuery]);
 
   useEffect(() => {
+    cursorRef.current = undefined;
     setCursor(undefined);
     loadOpportunities();
   }, [searchQuery, loadOpportunities]);
@@ -365,13 +370,17 @@ function OpportunitiesTab() {
       });
 
       if (response.success) {
+        toast.success(t('volunteering.applied_success', 'Successfully applied!'));
         onClose();
         setApplyMessage('');
         setSelectedOpportunity(null);
         loadOpportunities();
+      } else {
+        toast.error(response.error || t('volunteering.apply_error', 'Failed to apply'));
       }
     } catch (err) {
       logError('Failed to apply', err);
+      toast.error(t('volunteering.apply_error', 'Something went wrong. Please try again.'));
     } finally {
       setIsApplying(false);
     }
@@ -529,6 +538,7 @@ interface OpportunityCardProps {
 function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
   const { t } = useTranslation('community');
   const { tenantPath } = useTenant();
+  const navigate = useNavigate();
   const startDate = opportunity.start_date ? new Date(opportunity.start_date) : null;
   const endDate = opportunity.end_date ? new Date(opportunity.end_date) : null;
 
@@ -546,7 +556,12 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
               />
             </Link>
             <div className="min-w-0">
-              <h3 className="font-semibold text-theme-primary text-lg truncate">{opportunity.title}</h3>
+              <Link
+                to={tenantPath(`/volunteering/opportunities/${opportunity.id}`)}
+                className="font-semibold text-theme-primary text-lg truncate block hover:text-indigo-500 transition-colors"
+              >
+                {opportunity.title}
+              </Link>
               <Link
                 to={tenantPath(`/organisations/${opportunity.organization.id}`)}
                 className="text-sm text-theme-muted hover:text-indigo-500 hover:underline transition-colors"
@@ -599,19 +614,28 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
           )}
         </div>
 
-        {/* Apply Button */}
-        {onApply && (
-          <div className="flex-shrink-0">
+        {/* Actions */}
+        <div className="flex flex-col gap-2 flex-shrink-0">
+          <Button
+            size="sm"
+            variant="light"
+            className="text-theme-muted"
+            onPress={() => navigate(tenantPath(`/volunteering/opportunities/${opportunity.id}`))}
+            endContent={<ChevronRight className="w-4 h-4" aria-hidden="true" />}
+          >
+            {t('volunteering.view_details', 'View Details')}
+          </Button>
+          {onApply && (
             <Button
               size="sm"
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={onApply}
-              endContent={<ChevronRight className="w-4 h-4" aria-hidden="true" />}
+              endContent={<Send className="w-4 h-4" aria-hidden="true" />}
             >
               {t('volunteering.apply')}
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </GlassCard>
   );
@@ -627,7 +651,8 @@ function ApplicationsTab() {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [hasMore, setHasMore] = useState(false);
-  const [cursor, setCursor] = useState<string | undefined>();
+  const [, setCursor] = useState<string | undefined>();
+  const cursorRef = useRef<string | undefined>(undefined);
 
   const loadApplications = useCallback(async (append = false) => {
     try {
@@ -638,7 +663,7 @@ function ApplicationsTab() {
 
       const params = new URLSearchParams();
       params.set('per_page', '20');
-      if (append && cursor) params.set('cursor', cursor);
+      if (append && cursorRef.current) params.set('cursor', cursorRef.current);
       if (statusFilter) params.set('status', statusFilter);
 
       const response = await api.get<{ data: Application[]; meta: { cursor: string | null; has_more: boolean } }>(
@@ -654,7 +679,9 @@ function ApplicationsTab() {
           setApplications(items);
         }
         setHasMore(response.meta?.has_more ?? false);
-        setCursor(response.meta?.cursor ?? undefined);
+        const newCursor = response.meta?.cursor ?? undefined;
+        cursorRef.current = newCursor;
+        setCursor(newCursor);
       } else {
         if (!append) setError(t('volunteering.error_load_applications'));
       }
@@ -664,9 +691,10 @@ function ApplicationsTab() {
     } finally {
       setIsLoading(false);
     }
-  }, [cursor, statusFilter]);
+  }, [statusFilter]);
 
   useEffect(() => {
+    cursorRef.current = undefined;
     setCursor(undefined);
     loadApplications();
   }, [statusFilter, loadApplications]);

@@ -110,6 +110,7 @@ export function WellbeingTab() {
   const [data, setData] = useState<WellbeingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showTips, setShowTips] = useState(false);
 
   // Check-in modal state
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -433,9 +434,19 @@ export function WellbeingTab() {
                       variant="flat"
                       className="bg-theme-elevated text-theme-muted"
                       startContent={<Coffee className="w-4 h-4" aria-hidden="true" />}
+                      onPress={() => setShowTips(!showTips)}
                     >
-                      View Self-Care Tips
+                      {showTips ? 'Hide Self-Care Tips' : 'View Self-Care Tips'}
                     </Button>
+                    {showTips && (
+                      <div className="mt-4 space-y-2">
+                        <p className="text-sm text-default-600">&#8226; Take regular breaks between volunteer shifts</p>
+                        <p className="text-sm text-default-600">&#8226; Set boundaries on your availability</p>
+                        <p className="text-sm text-default-600">&#8226; Connect with fellow volunteers for support</p>
+                        <p className="text-sm text-default-600">&#8226; Celebrate your impact -- every hour counts</p>
+                        <p className="text-sm text-default-600">&#8226; Consider reducing frequency if feeling overwhelmed</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </GlassCard>

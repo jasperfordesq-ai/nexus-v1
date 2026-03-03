@@ -98,11 +98,12 @@ class ShiftWaitlistService
     public static function leave(int $shiftId, int $userId): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT id, position FROM vol_shift_waitlist WHERE shift_id = ? AND user_id = ? AND status = 'waiting'");
-        $stmt->execute([$shiftId, $userId]);
+        $stmt = $db->prepare("SELECT id, position FROM vol_shift_waitlist WHERE shift_id = ? AND user_id = ? AND status = 'waiting' AND tenant_id = ?");
+        $stmt->execute([$shiftId, $userId, $tenantId]);
         $entry = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$entry) {
@@ -139,16 +140,17 @@ class ShiftWaitlistService
      */
     public static function getWaitlist(int $shiftId): array
     {
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
         $stmt = $db->prepare("
             SELECT w.*, u.name as user_name, u.avatar_url as user_avatar
             FROM vol_shift_waitlist w
             JOIN users u ON w.user_id = u.id
-            WHERE w.shift_id = ? AND w.status = 'waiting'
+            WHERE w.shift_id = ? AND w.status = 'waiting' AND w.tenant_id = ?
             ORDER BY w.position ASC
         ");
-        $stmt->execute([$shiftId]);
+        $stmt->execute([$shiftId, $tenantId]);
         $entries = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return array_map(function ($e) {
@@ -174,15 +176,16 @@ class ShiftWaitlistService
      */
     public static function getUserPosition(int $shiftId, int $userId): ?array
     {
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
         $stmt = $db->prepare("
             SELECT w.*,
-                   (SELECT COUNT(*) FROM vol_shift_waitlist WHERE shift_id = ? AND status = 'waiting') as total_waiting
+                   (SELECT COUNT(*) FROM vol_shift_waitlist WHERE shift_id = ? AND status = 'waiting' AND tenant_id = ?) as total_waiting
             FROM vol_shift_waitlist w
-            WHERE w.shift_id = ? AND w.user_id = ? AND w.status = 'waiting'
+            WHERE w.shift_id = ? AND w.user_id = ? AND w.status = 'waiting' AND w.tenant_id = ?
         ");
-        $stmt->execute([$shiftId, $shiftId, $userId]);
+        $stmt->execute([$shiftId, $tenantId, $shiftId, $userId, $tenantId]);
         $entry = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$entry) {
@@ -205,6 +208,7 @@ class ShiftWaitlistService
      */
     public static function processSpotOpening(int $shiftId): bool
     {
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
         // Find next person on waitlist
@@ -212,11 +216,11 @@ class ShiftWaitlistService
             SELECT w.*, u.email as user_email, u.name as user_name
             FROM vol_shift_waitlist w
             JOIN users u ON w.user_id = u.id
-            WHERE w.shift_id = ? AND w.status = 'waiting'
+            WHERE w.shift_id = ? AND w.status = 'waiting' AND w.tenant_id = ?
             ORDER BY w.position ASC
             LIMIT 1
         ");
-        $stmt->execute([$shiftId]);
+        $stmt->execute([$shiftId, $tenantId]);
         $nextPerson = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$nextPerson) {
@@ -278,11 +282,12 @@ class ShiftWaitlistService
     public static function promoteUser(int $shiftId, int $userId): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT id FROM vol_shift_waitlist WHERE shift_id = ? AND user_id = ? AND status = 'notified'");
-        $stmt->execute([$shiftId, $userId]);
+        $stmt = $db->prepare("SELECT id FROM vol_shift_waitlist WHERE shift_id = ? AND user_id = ? AND status = 'notified' AND tenant_id = ?");
+        $stmt->execute([$shiftId, $userId, $tenantId]);
         $entry = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$entry) {

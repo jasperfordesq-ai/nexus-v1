@@ -1564,22 +1564,22 @@ class VolunteerApiController extends BaseApiController
 
         // Hours this week
         try {
-            $stmt = $db->prepare("SELECT COALESCE(SUM(hours), 0) as total FROM vol_logs WHERE user_id = ? AND status = 'approved' AND date_logged >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
-            $stmt->execute([$userId]);
+            $stmt = $db->prepare("SELECT COALESCE(SUM(hours), 0) as total FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND status = 'approved' AND date_logged >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
+            $stmt->execute([$userId, $tenantId]);
             $hoursThisWeek = round((float)$stmt->fetch(\PDO::FETCH_ASSOC)['total'], 1);
         } catch (\Throwable $e) { $hoursThisWeek = 0; }
 
         // Hours this month
         try {
-            $stmt = $db->prepare("SELECT COALESCE(SUM(hours), 0) as total FROM vol_logs WHERE user_id = ? AND status = 'approved' AND date_logged >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
-            $stmt->execute([$userId]);
+            $stmt = $db->prepare("SELECT COALESCE(SUM(hours), 0) as total FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND status = 'approved' AND date_logged >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+            $stmt->execute([$userId, $tenantId]);
             $hoursThisMonth = round((float)$stmt->fetch(\PDO::FETCH_ASSOC)['total'], 1);
         } catch (\Throwable $e) { $hoursThisMonth = 0; }
 
         // Streak: consecutive days with logged hours
         try {
-            $stmt = $db->prepare("SELECT DISTINCT DATE(date_logged) as d FROM vol_logs WHERE user_id = ? AND status = 'approved' ORDER BY d DESC LIMIT 90");
-            $stmt->execute([$userId]);
+            $stmt = $db->prepare("SELECT DISTINCT DATE(date_logged) as d FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND status = 'approved' ORDER BY d DESC LIMIT 90");
+            $stmt->execute([$userId, $tenantId]);
             $dates = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             $streak = 0;
             $today = new \DateTime();
@@ -1619,8 +1619,8 @@ class VolunteerApiController extends BaseApiController
         // Suggested rest days (next 7 days that have no scheduled shifts)
         $suggestedRest = [];
         try {
-            $stmt = $db->prepare("SELECT DISTINCT DATE(s.start_time) as shift_date FROM vol_applications a JOIN vol_shifts s ON a.shift_id = s.id WHERE a.user_id = ? AND a.status = 'approved' AND s.start_time >= NOW() AND s.start_time <= DATE_ADD(NOW(), INTERVAL 7 DAY)");
-            $stmt->execute([$userId]);
+            $stmt = $db->prepare("SELECT DISTINCT DATE(s.start_time) as shift_date FROM vol_applications a JOIN vol_shifts s ON a.shift_id = s.id WHERE a.user_id = ? AND a.tenant_id = ? AND a.status = 'approved' AND s.start_time >= NOW() AND s.start_time <= DATE_ADD(NOW(), INTERVAL 7 DAY)");
+            $stmt->execute([$userId, $tenantId]);
             $busyDays = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             for ($i = 0; $i < 7; $i++) {
                 $day = (new \DateTime())->modify("+{$i} days")->format('Y-m-d');
@@ -1843,5 +1843,111 @@ class VolunteerApiController extends BaseApiController
             }
         }
         return 400;
+    }
+
+    // ========================================
+    // CREDENTIAL VERIFICATION
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/credentials
+     * Get user's uploaded credentials
+     */
+    public function myCredentials(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('vol_credentials', 30, 60);
+
+        $tenantId = TenantContext::getId();
+        $db = \Nexus\Core\Database::getConnection();
+
+        $stmt = $db->prepare("
+            SELECT id, credential_type, file_url, file_name, status, expires_at, created_at, updated_at
+            FROM vol_credentials
+            WHERE user_id = ? AND tenant_id = ?
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute([$userId, $tenantId]);
+        $credentials = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $this->respondWithData(['credentials' => $credentials]);
+    }
+
+    /**
+     * POST /api/v2/volunteering/credentials
+     * Upload a new credential document
+     */
+    public function uploadCredential(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_credential_upload', 10, 60);
+
+        $tenantId = TenantContext::getId();
+        $type = $this->input('credential_type');
+        $expiresAt = $this->input('expires_at');
+
+        if (empty($type)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Credential type is required', 'credential_type');
+        }
+
+        // Handle file upload
+        $fileUrl = null;
+        $fileName = null;
+        if (!empty($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+            // Validate file type
+            $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $mimeType = $finfo->file($_FILES['file']['tmp_name']);
+            if (!in_array($mimeType, $allowedMimes, true)) {
+                $this->respondWithError('VALIDATION_ERROR', 'Only PDF, JPEG, PNG, and WebP files are allowed', 'file');
+            }
+
+            // 10 MB limit
+            if ($_FILES['file']['size'] > 10 * 1024 * 1024) {
+                $this->respondWithError('VALIDATION_ERROR', 'File size must be under 10 MB', 'file');
+            }
+
+            $fileUrl = \Nexus\Core\ImageUploader::upload($_FILES['file'], 'credentials');
+            $fileName = $_FILES['file']['name'] ?? null;
+        }
+
+        $db = \Nexus\Core\Database::getConnection();
+        $stmt = $db->prepare("
+            INSERT INTO vol_credentials (tenant_id, user_id, credential_type, file_url, file_name, status, expires_at, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, 'pending', ?, NOW(), NOW())
+        ");
+        $stmt->execute([$tenantId, $userId, $type, $fileUrl, $fileName, $expiresAt ?: null]);
+
+        $this->respondWithData([
+            'success' => true,
+            'id' => (int)$db->lastInsertId(),
+        ], null, 201);
+    }
+
+    /**
+     * DELETE /api/v2/volunteering/credentials/{id}
+     * Delete a credential
+     */
+    public function deleteCredential(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_credential_delete', 10, 60);
+
+        $tenantId = TenantContext::getId();
+        $db = \Nexus\Core\Database::getConnection();
+
+        $stmt = $db->prepare("DELETE FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?");
+        $stmt->execute([$id, $userId, $tenantId]);
+
+        if ($stmt->rowCount() === 0) {
+            $this->respondWithError('NOT_FOUND', 'Credential not found', null, 404);
+        }
+
+        $this->respondWithData(['success' => true]);
     }
 }

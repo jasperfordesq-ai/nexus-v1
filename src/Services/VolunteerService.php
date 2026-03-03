@@ -341,8 +341,9 @@ class VolunteerService
 
         try {
             $db = Database::getConnection();
-            $stmt = $db->prepare("UPDATE vol_opportunities SET is_active = 0 WHERE id = ?");
-            $stmt->execute([$id]);
+            $tenantId = TenantContext::getId();
+            $stmt = $db->prepare("UPDATE vol_opportunities SET is_active = 0 WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$id, $tenantId]);
 
             // Hide from feed_activity
             try {
@@ -474,8 +475,9 @@ class VolunteerService
         self::$errors = [];
 
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT * FROM vol_applications WHERE id = ?");
-        $stmt->execute([$applicationId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("SELECT * FROM vol_applications WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$applicationId, $tenantId]);
         $app = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$app) {
@@ -489,8 +491,8 @@ class VolunteerService
         }
 
         try {
-            $stmt = $db->prepare("DELETE FROM vol_applications WHERE id = ?");
-            $stmt->execute([$applicationId]);
+            $stmt = $db->prepare("DELETE FROM vol_applications WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$applicationId, $tenantId]);
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::withdrawApplication error: " . $e->getMessage());
@@ -1233,6 +1235,7 @@ class VolunteerService
     public static function getHoursSummary(int $userId): array
     {
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
         // Total verified hours
         $totalVerified = VolLog::getTotalVerifiedHours($userId);
@@ -1241,10 +1244,10 @@ class VolunteerService
         $stmt = $db->prepare("
             SELECT status, SUM(hours) as total
             FROM vol_logs
-            WHERE user_id = ?
+            WHERE user_id = ? AND tenant_id = ?
             GROUP BY status
         ");
-        $stmt->execute([$userId]);
+        $stmt->execute([$userId, $tenantId]);
         $byStatus = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         // Hours by organization
@@ -1252,24 +1255,24 @@ class VolunteerService
             SELECT org.name, SUM(l.hours) as total
             FROM vol_logs l
             JOIN vol_organizations org ON l.organization_id = org.id
-            WHERE l.user_id = ? AND l.status = 'approved'
+            WHERE l.user_id = ? AND l.status = 'approved' AND l.tenant_id = ?
             GROUP BY org.id
             ORDER BY total DESC
             LIMIT 10
         ");
-        $stmt->execute([$userId]);
+        $stmt->execute([$userId, $tenantId]);
         $byOrg = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         // Hours by month (last 12 months)
         $stmt = $db->prepare("
             SELECT DATE_FORMAT(date_logged, '%Y-%m') as month, SUM(hours) as total
             FROM vol_logs
-            WHERE user_id = ? AND status = 'approved'
+            WHERE user_id = ? AND status = 'approved' AND tenant_id = ?
             AND date_logged >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
             GROUP BY month
             ORDER BY month DESC
         ");
-        $stmt->execute([$userId]);
+        $stmt->execute([$userId, $tenantId]);
         $byMonth = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return [
@@ -1387,15 +1390,16 @@ class VolunteerService
         }
 
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
         // Get opportunity count
-        $stmt = $db->prepare("SELECT COUNT(*) as cnt FROM vol_opportunities WHERE organization_id = ? AND is_active = 1");
-        $stmt->execute([$id]);
+        $stmt = $db->prepare("SELECT COUNT(*) as cnt FROM vol_opportunities WHERE organization_id = ? AND is_active = 1 AND tenant_id = ?");
+        $stmt->execute([$id, $tenantId]);
         $oppCount = (int)$stmt->fetch(\PDO::FETCH_ASSOC)['cnt'];
 
         // Get total hours logged
-        $stmt = $db->prepare("SELECT SUM(hours) as total FROM vol_logs WHERE organization_id = ? AND status = 'approved'");
-        $stmt->execute([$id]);
+        $stmt = $db->prepare("SELECT SUM(hours) as total FROM vol_logs WHERE organization_id = ? AND status = 'approved' AND tenant_id = ?");
+        $stmt->execute([$id, $tenantId]);
         $totalHours = (float)($stmt->fetch(\PDO::FETCH_ASSOC)['total'] ?? 0);
 
         // Get reviews
