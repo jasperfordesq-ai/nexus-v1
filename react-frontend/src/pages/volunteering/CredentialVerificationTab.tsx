@@ -422,7 +422,10 @@ export function CredentialVerificationTab() {
                         size="sm"
                         className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                         startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
-                        onPress={onOpen}
+                        onPress={() => {
+                          setUploadForm((prev) => ({ ...prev, type: credential.type }));
+                          onOpen();
+                        }}
                       >
                         {t('credentials.re_upload', 'Re-upload')}
                       </Button>

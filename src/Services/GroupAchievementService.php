@@ -192,8 +192,8 @@ class GroupAchievementService
             "SELECT gap.*, ga.achievement_key, ga.name, ga.description, ga.icon
              FROM group_achievement_progress gap
              JOIN group_achievements ga ON gap.achievement_id = ga.id
-             WHERE gap.group_id = ? AND gap.completed_at IS NOT NULL",
-            [$groupId]
+             WHERE gap.group_id = ? AND gap.completed_at IS NOT NULL AND gap.tenant_id = ?",
+            [$groupId, TenantContext::getId()]
         )->fetchAll();
 
         $earned = [];

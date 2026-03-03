@@ -39,6 +39,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -109,6 +110,7 @@ function getRiskColor(risk: string): 'success' | 'warning' | 'danger' {
 
 export function WellbeingTab() {
   const { t } = useTranslation('community');
+  const toast = useToast();
   const [data, setData] = useState<WellbeingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -158,9 +160,12 @@ export function WellbeingTab() {
         setSelectedMood(3);
         setCheckinNote('');
         load();
+      } else {
+        toast.error(t('wellbeing.checkin_failed', 'Failed to submit check-in. Please try again.'));
       }
     } catch (err) {
       logError('Failed to submit wellbeing check-in', err);
+      toast.error(t('wellbeing.checkin_failed', 'Failed to submit check-in. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }

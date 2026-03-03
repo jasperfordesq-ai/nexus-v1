@@ -56,8 +56,8 @@ class ProgressNotificationService
     {
         $result = Database::query(
             "SELECT id FROM progress_notifications
-             WHERE user_id = ? AND badge_key = ? AND threshold = ?",
-            [$userId, $badgeKey, $threshold]
+             WHERE user_id = ? AND badge_key = ? AND threshold = ? AND tenant_id = ?",
+            [$userId, $badgeKey, $threshold, TenantContext::getId()]
         )->fetch();
 
         return (bool)$result;

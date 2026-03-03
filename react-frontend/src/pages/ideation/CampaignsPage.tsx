@@ -180,7 +180,7 @@ export function CampaignsPage() {
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={fetchCampaigns}
             >
-              {t('ideas.load_more')}
+              {t('campaigns.retry', 'Retry')}
             </Button>
           }
         />

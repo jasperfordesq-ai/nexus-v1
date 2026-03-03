@@ -170,11 +170,11 @@ class RecurringShiftService
 
                 if (!$existsStmt->fetch()) {
                     $insertStmt = $db->prepare("
-                        INSERT INTO vol_shifts (opportunity_id, recurring_pattern_id, start_time, end_time, capacity)
-                        VALUES (?, ?, ?, ?, ?)
+                        INSERT INTO vol_shifts (tenant_id, opportunity_id, recurring_pattern_id, start_time, end_time, capacity)
+                        VALUES (?, ?, ?, ?, ?, ?)
                     ");
                     $insertStmt->execute([
-                        $pattern['opportunity_id'], $patternId,
+                        $tenantId, $pattern['opportunity_id'], $patternId,
                         $shiftStart, $shiftEnd, $pattern['capacity'],
                     ]);
                     $generated++;
@@ -189,8 +189,8 @@ class RecurringShiftService
             $db->prepare("
                 UPDATE recurring_shift_patterns
                 SET occurrences_generated = occurrences_generated + ?, updated_at = NOW()
-                WHERE id = ?
-            ")->execute([$generated, $patternId]);
+                WHERE id = ? AND tenant_id = ?
+            ")->execute([$generated, $patternId, $tenantId]);
         }
 
         return $generated;

@@ -104,7 +104,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
       }
     } catch (err) {
       logError('GroupAnnouncementsTab.load', err);
-      toast.error('Failed to load announcements');
+      toast.error(t('announcements.load_failed', 'Failed to load announcements'));
     }
     setLoading(false);
   }, [groupId, toast]);
@@ -122,7 +122,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         is_pinned: isPinned,
       });
       if (res.success) {
-        toast.success('Announcement created');
+        toast.success(t('announcements.created', 'Announcement created'));
         setTitle('');
         setContent('');
         setIsPinned(false);
@@ -131,7 +131,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
       }
     } catch (err) {
       logError('GroupAnnouncementsTab.create', err);
-      toast.error('Failed to create announcement');
+      toast.error(t('announcements.create_failed', 'Failed to create announcement'));
     }
     setCreating(false);
   }, [groupId, title, content, isPinned, toast, onClose, loadAnnouncements]);
@@ -151,10 +151,10 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         })
       );
-      toast.success(announcement.is_pinned ? 'Unpinned' : 'Pinned');
+      toast.success(announcement.is_pinned ? t('announcements.unpinned', 'Unpinned') : t('announcements.pinned_success', 'Pinned'));
     } catch (err) {
       logError('GroupAnnouncementsTab.togglePin', err);
-      toast.error('Failed to update announcement');
+      toast.error(t('announcements.update_failed', 'Failed to update announcement'));
     }
   }, [groupId, toast]);
 
@@ -164,12 +164,12 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
     setDeleting(true);
     try {
       await api.delete(`/v2/groups/${groupId}/announcements/${deleteTarget.id}`);
-      toast.success('Announcement deleted');
+      toast.success(t('announcements.deleted', 'Announcement deleted'));
       setAnnouncements((prev) => prev.filter((a) => a.id !== deleteTarget.id));
       setDeleteTarget(null);
     } catch (err) {
       logError('GroupAnnouncementsTab.delete', err);
-      toast.error('Failed to delete announcement');
+      toast.error(t('announcements.delete_failed', 'Failed to delete announcement'));
     }
     setDeleting(false);
   }, [groupId, deleteTarget, toast]);
@@ -295,8 +295,8 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label="Title"
-                  placeholder="Announcement title"
+                  label={t('announcements.title_label', 'Title')}
+                  placeholder={t('announcements.title_placeholder', 'Announcement title')}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   classNames={{
@@ -306,8 +306,8 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                   }}
                 />
                 <Textarea
-                  label="Content"
-                  placeholder="Write your announcement..."
+                  label={t('announcements.content_label', 'Content')}
+                  placeholder={t('announcements.content_placeholder', 'Write your announcement...')}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   minRows={4}

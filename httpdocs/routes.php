@@ -106,10 +106,11 @@ $router->add('GET', '/api/wallet/balance', 'Nexus\Controllers\Api\WalletApiContr
 // Cookie Consent API (EU Compliance)
 $router->add('GET', '/api/cookie-consent', 'Nexus\Controllers\Api\CookieConsentController@show');
 $router->add('POST', '/api/cookie-consent', 'Nexus\Controllers\Api\CookieConsentController@store');
-$router->add('PUT', '/api/cookie-consent/{id}', 'Nexus\Controllers\Api\CookieConsentController@update');
-$router->add('DELETE', '/api/cookie-consent/{id}', 'Nexus\Controllers\Api\CookieConsentController@withdraw');
+// IMPORTANT: Literal GET routes must come before {id} wildcard to avoid being shadowed
 $router->add('GET', '/api/cookie-consent/inventory', 'Nexus\Controllers\Api\CookieConsentController@inventory');
 $router->add('GET', '/api/cookie-consent/check/{category}', 'Nexus\Controllers\Api\CookieConsentController@check');
+$router->add('PUT', '/api/cookie-consent/{id}', 'Nexus\Controllers\Api\CookieConsentController@update');
+$router->add('DELETE', '/api/cookie-consent/{id}', 'Nexus\Controllers\Api\CookieConsentController@withdraw');
 
 // Legal Documents API (Public Content + User Acceptance Tracking)
 // IMPORTANT: Literal routes MUST come before parameterized {type} routes — the router
@@ -118,10 +119,11 @@ $router->add('GET', '/api/cookie-consent/check/{category}', 'Nexus\Controllers\A
 $router->add('GET', '/api/v2/legal/versions/compare', 'Nexus\Controllers\LegalDocumentController@apiCompareVersions');
 $router->add('GET', '/api/v2/legal/version/{versionId}', 'Nexus\Controllers\LegalDocumentController@apiGetVersion');
 $router->add('GET', '/api/v2/legal/{type}/versions', 'Nexus\Controllers\LegalDocumentController@apiGetVersions');
-$router->add('GET', '/api/v2/legal/{type}', 'Nexus\Controllers\LegalDocumentController@apiGetDocument');
 // V2 user acceptance endpoints (Bearer token + session auth via ApiAuth trait)
+// IMPORTANT: Must come before {type} wildcard to avoid being shadowed
 $router->add('GET', '/api/v2/legal/acceptance/status', 'Nexus\Controllers\Api\LegalAcceptanceApiController@getStatus');
 $router->add('POST', '/api/v2/legal/acceptance/accept-all', 'Nexus\Controllers\Api\LegalAcceptanceApiController@acceptAll');
+$router->add('GET', '/api/v2/legal/{type}', 'Nexus\Controllers\LegalDocumentController@apiGetDocument');
 // Legacy session-based acceptance endpoints (kept for PHP admin views)
 $router->add('POST', '/api/legal/accept', 'Nexus\Controllers\LegalDocumentController@accept');
 $router->add('POST', '/api/legal/accept-all', 'Nexus\Controllers\LegalDocumentController@acceptAll');
@@ -785,9 +787,9 @@ $router->add('PUT', '/api/v2/admin/config/modules', 'Nexus\Controllers\Api\Admin
 $router->add('GET', '/api/v2/admin/cache/stats', 'Nexus\Controllers\Api\AdminConfigApiController@cacheStats');
 $router->add('POST', '/api/v2/admin/cache/clear', 'Nexus\Controllers\Api\AdminConfigApiController@clearCache');
 
-// Admin Background Jobs
-$router->add('GET', '/api/v2/admin/jobs', 'Nexus\Controllers\Api\AdminConfigApiController@getJobs');
-$router->add('POST', '/api/v2/admin/jobs/{id}/run', 'Nexus\Controllers\Api\AdminConfigApiController@runJob');
+// Admin Background Jobs (uses /background-jobs to avoid collision with /admin/jobs for job vacancies)
+$router->add('GET', '/api/v2/admin/background-jobs', 'Nexus\Controllers\Api\AdminConfigApiController@getJobs');
+$router->add('POST', '/api/v2/admin/background-jobs/{id}/run', 'Nexus\Controllers\Api\AdminConfigApiController@runJob');
 
 // Admin Settings (General Tenant Settings)
 $router->add('GET', '/api/v2/admin/settings', 'Nexus\Controllers\Api\AdminConfigApiController@getSettings');
@@ -826,14 +828,15 @@ $router->add('GET', '/api/v2/admin/system/cron-jobs/logs', 'Nexus\Controllers\Ap
 $router->add('GET', '/api/v2/admin/system/cron-jobs/logs/{id}', 'Nexus\Controllers\Api\AdminCronApiController@getLogDetail');
 $router->add('DELETE', '/api/v2/admin/system/cron-jobs/logs', 'Nexus\Controllers\Api\AdminCronApiController@clearLogs');
 
-// Admin System - Cron Jobs - Settings
-$router->add('GET', '/api/v2/admin/system/cron-jobs/{jobId}/settings', 'Nexus\Controllers\Api\AdminCronApiController@getJobSettings');
-$router->add('PUT', '/api/v2/admin/system/cron-jobs/{jobId}/settings', 'Nexus\Controllers\Api\AdminCronApiController@updateJobSettings');
+// Admin System - Cron Jobs - Global Settings & Health
+// IMPORTANT: Literal routes must come before {jobId} wildcard to avoid being shadowed
 $router->add('GET', '/api/v2/admin/system/cron-jobs/settings', 'Nexus\Controllers\Api\AdminCronApiController@getGlobalSettings');
 $router->add('PUT', '/api/v2/admin/system/cron-jobs/settings', 'Nexus\Controllers\Api\AdminCronApiController@updateGlobalSettings');
-
-// Admin System - Cron Jobs - Health
 $router->add('GET', '/api/v2/admin/system/cron-jobs/health', 'Nexus\Controllers\Api\AdminCronApiController@getHealthMetrics');
+
+// Admin System - Cron Jobs - Per-Job Settings
+$router->add('GET', '/api/v2/admin/system/cron-jobs/{jobId}/settings', 'Nexus\Controllers\Api\AdminCronApiController@getJobSettings');
+$router->add('PUT', '/api/v2/admin/system/cron-jobs/{jobId}/settings', 'Nexus\Controllers\Api\AdminCronApiController@updateJobSettings');
 
 // Admin System - Activity Log
 $router->add('GET', '/api/v2/admin/system/activity-log', 'Nexus\Controllers\Api\AdminDashboardApiController@activity');

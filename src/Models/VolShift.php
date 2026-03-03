@@ -13,8 +13,8 @@ class VolShift
 {
     public static function create($oppId, $startTime, $endTime, $capacity)
     {
-        $sql = "INSERT INTO vol_shifts (opportunity_id, start_time, end_time, capacity) VALUES (?, ?, ?, ?)";
-        Database::query($sql, [$oppId, $startTime, $endTime, $capacity]);
+        $sql = "INSERT INTO vol_shifts (tenant_id, opportunity_id, start_time, end_time, capacity) VALUES (?, ?, ?, ?, ?)";
+        Database::query($sql, [TenantContext::getId(), $oppId, $startTime, $endTime, $capacity]);
     }
 
     public static function getForOpportunity($oppId)
