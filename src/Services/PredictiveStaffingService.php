@@ -349,7 +349,7 @@ class PredictiveStaffingService
                     \Nexus\Models\Notification::create(
                         (int)$adminId,
                         $message,
-                        '/admin/staffing',
+                        '/admin/volunteering',
                         'staffing_alert'
                     );
                 }

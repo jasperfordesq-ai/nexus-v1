@@ -280,7 +280,9 @@ class GroupAchievementService
         foreach ($members as $member) {
             \Nexus\Models\Notification::create(
                 $member['user_id'],
-                "{$achievement['icon']} {$groupName} earned the '{$achievement['name']}' achievement! You received {$xpPerMember} XP."
+                "{$achievement['icon']} {$groupName} earned the '{$achievement['name']}' achievement! You received {$xpPerMember} XP.",
+                "/groups/{$groupId}",
+                'group_achievement'
             );
         }
 

@@ -235,7 +235,7 @@ class GamificationApiController extends BaseApiController
                 if ($badge) {
                     $shareData['title'] = "I earned the {$badge['name']} badge!";
                     $shareData['text'] = "{$badge['icon']} I just earned the '{$badge['name']}' badge on our Timebank!";
-                    $shareData['url'] = $baseUrl . $basePath . '/profile/me';
+                    $shareData['url'] = $baseUrl . $basePath . '/profile';
                 }
                 break;
 
