@@ -7,6 +7,7 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Services\GroupService;
+use Nexus\Services\GroupAnnouncementService;
 use Nexus\Core\ImageUploader;
 
 /**
@@ -32,6 +33,10 @@ use Nexus\Core\ImageUploader;
  * - GET    /api/v2/groups/{id}/discussions/{discId} - Get discussion messages
  * - POST   /api/v2/groups/{id}/discussions/{discId}/messages - Post to discussion
  * - POST   /api/v2/groups/{id}/image                - Upload group image
+ * - GET    /api/v2/groups/{id}/announcements        - List announcements (cursor paginated)
+ * - POST   /api/v2/groups/{id}/announcements        - Create announcement (admin)
+ * - PUT    /api/v2/groups/{id}/announcements/{aId}  - Update announcement (admin)
+ * - DELETE /api/v2/groups/{id}/announcements/{aId}  - Delete announcement (admin)
  *
  * Response Format:
  * Success: { "data": {...}, "meta": {...} }
@@ -788,5 +793,109 @@ class GroupsApiController extends BaseApiController
         } catch (\Exception $e) {
             $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
         }
+    }
+
+    /* ───────────────────────── Announcements ───────────────────────── */
+
+    /**
+     * GET /api/v2/groups/{id}/announcements
+     */
+    public function announcements(int $groupId): void
+    {
+        $this->requireAuth();
+        $userId = $this->getUserId();
+
+        $filters = [
+            'cursor' => $_GET['cursor'] ?? null,
+            'limit' => isset($_GET['limit']) ? (int)$_GET['limit'] : 20,
+            'include_expired' => ($_GET['include_expired'] ?? '') === '1',
+        ];
+
+        $result = GroupAnnouncementService::list($groupId, $userId, $filters);
+
+        if ($result === null) {
+            $errors = GroupAnnouncementService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/groups/{id}/announcements
+     */
+    public function createAnnouncement(int $groupId): void
+    {
+        $this->requireAuth();
+        $userId = $this->getUserId();
+        $data = $this->getJsonInput();
+
+        $result = GroupAnnouncementService::create($groupId, $userId, $data);
+
+        if ($result === null) {
+            $errors = GroupAnnouncementService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData($result, null, 201);
+    }
+
+    /**
+     * PUT /api/v2/groups/{id}/announcements/{announcementId}
+     */
+    public function updateAnnouncement(int $groupId, int $announcementId): void
+    {
+        $this->requireAuth();
+        $userId = $this->getUserId();
+        $data = $this->getJsonInput();
+
+        $result = GroupAnnouncementService::update($groupId, $announcementId, $userId, $data);
+
+        if ($result === null) {
+            $errors = GroupAnnouncementService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData($result);
+    }
+
+    /**
+     * DELETE /api/v2/groups/{id}/announcements/{announcementId}
+     */
+    public function deleteAnnouncement(int $groupId, int $announcementId): void
+    {
+        $this->requireAuth();
+        $userId = $this->getUserId();
+
+        $success = GroupAnnouncementService::delete($groupId, $announcementId, $userId);
+
+        if (!$success) {
+            $errors = GroupAnnouncementService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
+
+        $this->respondWithData(['deleted' => true]);
+    }
+
+    /* ───────────────────────── Helpers ───────────────────────── */
+
+    /**
+     * Resolve HTTP status from error codes
+     */
+    private function resolveErrorStatus(array $errors): int
+    {
+        foreach ($errors as $error) {
+            if ($error['code'] === 'NOT_FOUND') return 404;
+            if ($error['code'] === 'FORBIDDEN') return 403;
+        }
+        return 400;
     }
 }

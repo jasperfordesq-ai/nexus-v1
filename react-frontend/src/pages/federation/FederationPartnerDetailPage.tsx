@@ -244,7 +244,7 @@ export function FederationPartnerDetailPage() {
                   <span className="flex items-center gap-1.5">
                     <Shield className="w-4 h-4" aria-hidden="true" />
                     {t('partner_detail.partner_since', {
-                      date: new Date(partner.partnership_since).toLocaleDateString('en-US', {
+                      date: new Date(partner.partnership_since).toLocaleDateString(undefined, {
                         month: 'long',
                         year: 'numeric',
                       }),

@@ -5,6 +5,7 @@
 
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTenant, useFeature, useCookieConsent } from '@/contexts';
 import { Hexagon, Mail, Phone, MapPin, Cookie, Bug } from 'lucide-react';
 
@@ -21,6 +22,7 @@ export interface FooterProps {
  * Hidden on mobile (md:block) — mobile uses MobileDrawer for nav links.
  */
 export function Footer({ children, copyright }: FooterProps) {
+  const { t } = useTranslation('common');
   const { tenant, branding, tenantPath } = useTenant();
   const hasEvents = useFeature('events');
   const hasBlog = useFeature('blog');
@@ -89,22 +91,22 @@ export function Footer({ children, copyright }: FooterProps) {
 
               {/* Platform */}
               <div>
-                <h3 className="text-sm font-semibold text-theme-primary mb-3">Platform</h3>
+                <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('footer.platform')}</h3>
                 <ul className="space-y-2">
-                  <li><FooterLink href={tenantPath('/listings')}>Listings</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/members')}>Members</FooterLink></li>
-                  {hasEvents && <li><FooterLink href={tenantPath('/events')}>Events</FooterLink></li>}
-                  {hasBlog && <li><FooterLink href={tenantPath('/blog')}>Blog</FooterLink></li>}
+                  <li><FooterLink href={tenantPath('/listings')}>{t('nav.listings')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/members')}>{t('nav.members')}</FooterLink></li>
+                  {hasEvents && <li><FooterLink href={tenantPath('/events')}>{t('nav.events')}</FooterLink></li>}
+                  {hasBlog && <li><FooterLink href={tenantPath('/blog')}>{t('nav.blog')}</FooterLink></li>}
                 </ul>
               </div>
 
               {/* Support */}
               <div>
-                <h3 className="text-sm font-semibold text-theme-primary mb-3">Support</h3>
+                <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('footer.support')}</h3>
                 <ul className="space-y-2">
-                  <li><FooterLink href={tenantPath('/help')}>Help Center</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/contact')}>Contact Us</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/about')}>About</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/help')}>{t('footer.help_center')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/contact')}>{t('footer.contact_us')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/about')}>{t('footer.about')}</FooterLink></li>
                   <li>
                     <a
                       href="https://project-nexus.canny.io/"
@@ -113,7 +115,7 @@ export function Footer({ children, copyright }: FooterProps) {
                       className="inline-flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors"
                     >
                       <Bug className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                      Report Bug
+                      {t('footer.report_bug')}
                     </a>
                   </li>
                 </ul>
@@ -121,13 +123,13 @@ export function Footer({ children, copyright }: FooterProps) {
 
               {/* Legal */}
               <div>
-                <h3 className="text-sm font-semibold text-theme-primary mb-3">Legal</h3>
+                <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('footer.legal')}</h3>
                 <ul className="space-y-2">
-                  <li><FooterLink href={tenantPath('/legal')}>Legal Hub</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/terms')}>Terms of Service</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/privacy')}>Privacy Policy</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/cookies')}>Cookie Policy</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/accessibility')}>Accessibility</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/legal')}>{t('legal.legal_hub')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/terms')}>{t('legal.terms_of_service')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/privacy')}>{t('legal.privacy_policy')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/cookies')}>{t('legal.cookie_policy')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/accessibility')}>{t('legal.accessibility')}</FooterLink></li>
                 </ul>
               </div>
             </div>
@@ -136,7 +138,7 @@ export function Footer({ children, copyright }: FooterProps) {
             {tenant?.menu_pages?.footer?.length ? (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
                 <div>
-                  <h3 className="text-sm font-semibold text-theme-primary mb-3">Pages</h3>
+                  <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('footer.pages')}</h3>
                   <ul className="space-y-2">
                     {tenant.menu_pages.footer.map((p) => (
                       <li key={p.slug}><FooterLink href={tenantPath(`/page/${p.slug}`)}>{p.title}</FooterLink></li>
@@ -156,7 +158,7 @@ export function Footer({ children, copyright }: FooterProps) {
                   aria-label="Cookie settings"
                 >
                   <Cookie className="w-3 h-3" aria-hidden="true" />
-                  Cookie Settings
+                  {t('footer.cookie_settings')}
                 </button>
                 <span className="text-theme-subtle/30">|</span>
                 <a
@@ -165,21 +167,21 @@ export function Footer({ children, copyright }: FooterProps) {
                   rel="noopener noreferrer"
                   className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
                 >
-                  Built on Project NEXUS
+                  {t('footer.built_on_nexus')}
                 </a>
                 <span className="text-theme-subtle/30">&middot;</span>
                 <Link
                   to={tenantPath('/platform/terms')}
                   className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
                 >
-                  Terms
+                  {t('footer.terms')}
                 </Link>
                 <span className="text-theme-subtle/30">&middot;</span>
                 <Link
                   to={tenantPath('/platform/privacy')}
                   className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
                 >
-                  Privacy
+                  {t('footer.privacy')}
                 </Link>
                 <span className="text-[10px] text-theme-subtle/50 font-mono" title={`Built ${__BUILD_TIME__}`}>
                   {__BUILD_COMMIT__}

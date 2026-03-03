@@ -109,7 +109,8 @@ class VolunteerService
 
         // Search filter
         if (!empty($filters['search'])) {
-            $searchTerm = '%' . $filters['search'] . '%';
+            $escapedSearch = addcslashes($filters['search'], '%_');
+            $searchTerm = '%' . $escapedSearch . '%';
             $sql .= " AND (opp.title LIKE ? OR opp.description LIKE ? OR org.name LIKE ?)";
             $params[] = $searchTerm;
             $params[] = $searchTerm;
@@ -118,7 +119,7 @@ class VolunteerService
 
         // Remote filter
         if (!empty($filters['is_remote'])) {
-            $sql .= " AND (opp.is_remote = 1 OR opp.location LIKE '%Remote%')";
+            $sql .= " AND opp.location LIKE '%Remote%'";
         }
 
         // Cursor pagination

@@ -60,9 +60,24 @@ export function CampaignsPage() {
   const { t } = useTranslation('ideation');
   usePageTitle(t('campaigns.page_title'));
   const { user } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
+
+  // Feature gate
+  if (!hasFeature('ideation_challenges')) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 flex items-center justify-center mb-4">
+          <Lightbulb className="w-8 h-8 text-amber-500" aria-hidden="true" />
+        </div>
+        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('campaigns.feature_not_available', 'Ideation Not Available')}</h2>
+        <p className="text-[var(--color-text-muted)] max-w-sm">
+          {t('campaigns.feature_not_available_desc', 'The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.')}
+        </p>
+      </div>
+    );
+  }
 
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);

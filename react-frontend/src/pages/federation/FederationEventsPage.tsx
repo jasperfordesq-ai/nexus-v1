@@ -370,12 +370,12 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
   const avatarSrc = resolveAvatarUrl(event.organizer?.avatar);
   const coverSrc = event.cover_image ? resolveAssetUrl(event.cover_image) : null;
 
-  const formattedDate = startDate.toLocaleDateString('en-US', {
+  const formattedDate = startDate.toLocaleDateString(undefined, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
   });
-  const formattedTime = startDate.toLocaleTimeString('en-US', {
+  const formattedTime = startDate.toLocaleTimeString(undefined, {
     hour: 'numeric',
     minute: '2-digit',
   });

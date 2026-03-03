@@ -67,7 +67,7 @@ class VolOrganization
      */
     public static function search($tenantId, $query)
     {
-        $searchTerm = '%' . $query . '%';
+        $searchTerm = '%' . addcslashes($query, '%_') . '%';
         return Database::query(
             "SELECT vo.*, CONCAT(u.first_name, ' ', u.last_name) as owner_name, u.avatar_url as owner_avatar,
                     (SELECT COUNT(*) FROM vol_opportunities WHERE organization_id = vo.id AND tenant_id = vo.tenant_id) as opportunity_count

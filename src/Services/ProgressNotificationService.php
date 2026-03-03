@@ -238,9 +238,10 @@ class ProgressNotificationService
      */
     public static function cleanupOldRecords($days = 30)
     {
+        $tenantId = TenantContext::getId();
         Database::query(
-            "DELETE FROM progress_notifications WHERE sent_at < DATE_SUB(NOW(), INTERVAL ? DAY)",
-            [$days]
+            "DELETE FROM progress_notifications WHERE sent_at < DATE_SUB(NOW(), INTERVAL ? DAY) AND tenant_id = ?",
+            [$days, $tenantId]
         );
     }
 }

@@ -243,8 +243,9 @@ class VolunteerWellbeingService
                 $sql .= ", resolved_at = NOW()";
             }
 
-            $sql .= " WHERE id = ?";
+            $sql .= " WHERE id = ? AND tenant_id = ?";
             $params[] = $alertId;
+            $params[] = $tenantId;
 
             $stmt = $db->prepare($sql);
             $stmt->execute($params);

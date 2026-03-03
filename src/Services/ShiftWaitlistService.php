@@ -262,10 +262,14 @@ class ShiftWaitlistService
             try {
                 if (!empty($nextPerson['user_email'])) {
                     $mailer = new \Nexus\Core\Mailer();
+                    $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+                    $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
+                    $volunteeringUrl = $baseUrl . $basePath . '/volunteering';
                     $subject = "A Volunteer Shift Spot Has Opened Up!";
                     $body = "<h2>Good news, {$nextPerson['user_name']}!</h2>"
                         . "<p>A spot has opened up for the volunteer shift on <strong>{$shiftDate}</strong>.</p>"
-                        . "<p>Log in to your dashboard to claim the spot before someone else does.</p>";
+                        . "<p><a href=\"{$volunteeringUrl}\" style=\"display:inline-block;padding:10px 20px;background-color:#0070f3;color:#ffffff;text-decoration:none;border-radius:6px;\">Claim Your Spot</a></p>"
+                        . "<p>Or visit: {$volunteeringUrl}</p>";
                     $mailer->send($nextPerson['user_email'], $subject, $body);
                 }
             } catch (\Throwable $e) {

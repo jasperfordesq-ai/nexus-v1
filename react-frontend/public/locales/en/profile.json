@@ -1,5 +1,6 @@
 {
   "title": "Profile",
+  "page_title": "Profile",
   "edit_profile": "Edit Profile",
   "joined": "Joined {{date}}",
   "bio": "About",

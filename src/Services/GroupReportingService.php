@@ -66,14 +66,15 @@ class GroupReportingService
      */
     private static function getWeeklyStats($groupId)
     {
+        $tenantId = TenantContext::getId();
         $stats = [];
 
         // New members this week
         $stats['new_members'] = Database::query(
             "SELECT COUNT(*) FROM group_members
              WHERE group_id = ? AND status = 'active'
-             AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
-            [$groupId]
+             AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND tenant_id = ?",
+            [$groupId, $tenantId]
         )->fetchColumn();
 
         // New posts this week
@@ -81,8 +82,8 @@ class GroupReportingService
             $stats['new_posts'] = Database::query(
                 "SELECT COUNT(*) FROM feed_posts
                  WHERE group_id = ?
-                 AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
-                [$groupId]
+                 AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND tenant_id = ?",
+                [$groupId, $tenantId]
             )->fetchColumn();
         } catch (\Exception $e) {
             $stats['new_posts'] = 0;
@@ -93,8 +94,8 @@ class GroupReportingService
             $stats['new_discussions'] = Database::query(
                 "SELECT COUNT(*) FROM group_discussions
                  WHERE group_id = ?
-                 AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
-                [$groupId]
+                 AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND tenant_id = ?",
+                [$groupId, $tenantId]
             )->fetchColumn();
         } catch (\Exception $e) {
             $stats['new_discussions'] = 0;
@@ -105,14 +106,14 @@ class GroupReportingService
             $stats['total_engagement'] = Database::query(
                 "SELECT (
                     (SELECT COUNT(*) FROM comments WHERE content_type = 'post'
-                     AND content_id IN (SELECT id FROM feed_posts WHERE group_id = ?)
-                     AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY))
+                     AND content_id IN (SELECT id FROM feed_posts WHERE group_id = ? AND tenant_id = ?)
+                     AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND tenant_id = ?)
                     +
                     (SELECT COUNT(*) FROM reactions WHERE content_type = 'post'
-                     AND content_id IN (SELECT id FROM feed_posts WHERE group_id = ?)
-                     AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY))
+                     AND content_id IN (SELECT id FROM feed_posts WHERE group_id = ? AND tenant_id = ?)
+                     AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND tenant_id = ?)
                 ) as total",
-                [$groupId, $groupId]
+                [$groupId, $tenantId, $tenantId, $groupId, $tenantId, $tenantId]
             )->fetchColumn();
         } catch (\Exception $e) {
             $stats['total_engagement'] = 0;
@@ -121,8 +122,8 @@ class GroupReportingService
         // Pending join requests
         $stats['pending_requests'] = Database::query(
             "SELECT COUNT(*) FROM group_members
-             WHERE group_id = ? AND status = 'pending'",
-            [$groupId]
+             WHERE group_id = ? AND status = 'pending' AND tenant_id = ?",
+            [$groupId, $tenantId]
         )->fetchColumn();
 
         return $stats;
@@ -133,6 +134,7 @@ class GroupReportingService
      */
     private static function getTopContributors($groupId, $days = 7, $limit = 5)
     {
+        $tenantId = TenantContext::getId();
         try {
             return Database::query("
                 SELECT
@@ -142,22 +144,22 @@ class GroupReportingService
                     u.avatar_url,
                     (
                         SELECT COUNT(*) FROM feed_posts
-                        WHERE user_id = u.id AND group_id = ?
+                        WHERE user_id = u.id AND group_id = ? AND tenant_id = ?
                         AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
                     ) as post_count,
                     (
                         SELECT COUNT(*) FROM comments
                         WHERE user_id = u.id AND content_type = 'post'
-                        AND content_id IN (SELECT id FROM feed_posts WHERE group_id = ?)
-                        AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                        AND content_id IN (SELECT id FROM feed_posts WHERE group_id = ? AND tenant_id = ?)
+                        AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY) AND tenant_id = ?
                     ) as comment_count
                 FROM users u
                 JOIN group_members gm ON u.id = gm.user_id
-                WHERE gm.group_id = ? AND gm.status = 'active'
+                WHERE gm.group_id = ? AND gm.status = 'active' AND gm.tenant_id = ?
                 HAVING (post_count + comment_count) > 0
                 ORDER BY (post_count + comment_count) DESC
                 LIMIT ?
-            ", [$groupId, $days, $groupId, $days, $groupId, $limit])->fetchAll();
+            ", [$groupId, $tenantId, $days, $groupId, $tenantId, $days, $tenantId, $groupId, $tenantId, $limit])->fetchAll();
         } catch (\Exception $e) {
             return [];
         }
@@ -171,10 +173,11 @@ class GroupReportingService
         $actions = [];
 
         // Pending member requests
+        $tenantId = TenantContext::getId();
         $pendingMembers = Database::query(
             "SELECT COUNT(*) as count FROM group_members
-             WHERE group_id = ? AND status = 'pending'",
-            [$groupId]
+             WHERE group_id = ? AND status = 'pending' AND tenant_id = ?",
+            [$groupId, $tenantId]
         )->fetch();
 
         if ($pendingMembers['count'] > 0) {
@@ -345,6 +348,8 @@ class GroupReportingService
             'metrics' => [],
         ];
 
+        $tenantId = TenantContext::getId();
+
         // Member growth
         $report['metrics']['member_growth'] = Database::query("
             SELECT DATE(created_at) as date, COUNT(*) as count
@@ -352,9 +357,10 @@ class GroupReportingService
             WHERE group_id = ?
             AND status = 'active'
             AND created_at BETWEEN ? AND ?
+            AND tenant_id = ?
             GROUP BY DATE(created_at)
             ORDER BY date ASC
-        ", [$groupId, $startDate, $endDate])->fetchAll();
+        ", [$groupId, $startDate, $endDate, $tenantId])->fetchAll();
 
         // Activity summary
         try {
@@ -362,7 +368,8 @@ class GroupReportingService
                 SELECT COUNT(*) as count FROM feed_posts
                 WHERE group_id = ?
                 AND created_at BETWEEN ? AND ?
-            ", [$groupId, $startDate, $endDate])->fetchColumn();
+                AND tenant_id = ?
+            ", [$groupId, $startDate, $endDate, $tenantId])->fetchColumn();
         } catch (\Exception $e) {
             $report['metrics']['posts'] = 0;
         }
@@ -372,7 +379,8 @@ class GroupReportingService
                 SELECT COUNT(*) as count FROM group_discussions
                 WHERE group_id = ?
                 AND created_at BETWEEN ? AND ?
-            ", [$groupId, $startDate, $endDate])->fetchColumn();
+                AND tenant_id = ?
+            ", [$groupId, $startDate, $endDate, $tenantId])->fetchColumn();
         } catch (\Exception $e) {
             $report['metrics']['discussions'] = 0;
         }
@@ -393,25 +401,26 @@ class GroupReportingService
      */
     private static function getTopContributorsInPeriod($groupId, $startDate, $endDate, $limit = 10)
     {
+        $tenantId = TenantContext::getId();
         try {
             return Database::query("
                 SELECT
                     u.id,
                     CONCAT(u.first_name, ' ', u.last_name) as name,
                     (SELECT COUNT(*) FROM feed_posts
-                     WHERE user_id = u.id AND group_id = ?
+                     WHERE user_id = u.id AND group_id = ? AND tenant_id = ?
                      AND created_at BETWEEN ? AND ?) as posts,
                     (SELECT COUNT(*) FROM comments
                      WHERE user_id = u.id AND content_type = 'post'
-                     AND content_id IN (SELECT id FROM feed_posts WHERE group_id = ?)
-                     AND created_at BETWEEN ? AND ?) as comments
+                     AND content_id IN (SELECT id FROM feed_posts WHERE group_id = ? AND tenant_id = ?)
+                     AND created_at BETWEEN ? AND ? AND tenant_id = ?) as comments
                 FROM users u
                 JOIN group_members gm ON u.id = gm.user_id
-                WHERE gm.group_id = ? AND gm.status = 'active'
+                WHERE gm.group_id = ? AND gm.status = 'active' AND gm.tenant_id = ?
                 HAVING (posts + comments) > 0
                 ORDER BY (posts + comments) DESC
                 LIMIT ?
-            ", [$groupId, $startDate, $endDate, $groupId, $startDate, $endDate, $groupId, $limit])->fetchAll();
+            ", [$groupId, $tenantId, $startDate, $endDate, $groupId, $tenantId, $startDate, $endDate, $tenantId, $groupId, $tenantId, $limit])->fetchAll();
         } catch (\Exception $e) {
             return [];
         }

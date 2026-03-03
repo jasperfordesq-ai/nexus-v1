@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -37,7 +38,8 @@ interface HashtagItem {
 }
 
 export function HashtagsDiscoveryPage() {
-  usePageTitle('Discover Hashtags');
+  const { t } = useTranslation('feed');
+  usePageTitle(t('hashtags.title'));
   const { tenantPath } = useTenant();
 
   const [hashtags, setHashtags] = useState<HashtagItem[]>([]);
@@ -60,11 +62,11 @@ export function HashtagsDiscoveryPage() {
       if (response.success && response.data) {
         setHashtags(response.data);
       } else {
-        setError('Failed to load hashtags');
+        setError(t('hashtags.load_failed'));
       }
     } catch (err) {
       logError('Failed to load trending hashtags', err);
-      setError('Failed to load hashtags. Please try again.');
+      setError(t('hashtags.load_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +120,7 @@ export function HashtagsDiscoveryPage() {
             isIconOnly
             variant="flat"
             className="bg-theme-elevated text-theme-muted"
-            aria-label="Back to feed"
+            aria-label={t('hashtags.back_to_feed')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -128,10 +130,10 @@ export function HashtagsDiscoveryPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <Hash className="w-5 h-5 text-white" aria-hidden="true" />
             </div>
-            Discover Hashtags
+            {t('hashtags.title')}
           </h1>
           <p className="text-theme-muted mt-1 text-sm">
-            Explore trending topics in your community.
+            {t('hashtags.subtitle')}
           </p>
         </div>
       </div>
@@ -139,7 +141,7 @@ export function HashtagsDiscoveryPage() {
       {/* Search */}
       <GlassCard className="p-4">
         <Input
-          placeholder="Search hashtags..."
+          placeholder={t('hashtags.search_placeholder')}
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -148,7 +150,7 @@ export function HashtagsDiscoveryPage() {
             input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
             inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
           }}
-          aria-label="Search hashtags"
+          aria-label={t('hashtags.search_placeholder')}
         />
       </GlassCard>
 
@@ -156,14 +158,14 @@ export function HashtagsDiscoveryPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">Unable to load</h3>
+          <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('hashtags.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadTrending}
           >
-            Try Again
+            {t('hashtags.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -181,8 +183,8 @@ export function HashtagsDiscoveryPage() {
           {displayHashtags.length === 0 ? (
             <EmptyState
               icon={<Hash className="w-12 h-12" aria-hidden="true" />}
-              title="No hashtags found"
-              description={searchQuery ? `No hashtags match "${searchQuery}"` : 'No trending hashtags yet. Be the first to start a trend!'}
+              title={t('hashtags.no_hashtags')}
+              description={searchQuery ? t('hashtags.no_match', { query: searchQuery }) : t('hashtags.no_trending')}
             />
           ) : (
             <motion.div
@@ -204,7 +206,7 @@ export function HashtagsDiscoveryPage() {
                         </span>
                       </div>
                       <p className="text-xs text-theme-subtle">
-                        {hashtag.post_count} post{hashtag.post_count !== 1 ? 's' : ''}
+                        {t('hashtags.post_count', { count: hashtag.post_count })}
                       </p>
                     </GlassCard>
                   </Link>

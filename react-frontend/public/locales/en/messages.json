@@ -59,6 +59,7 @@
   "message_edited_indicator": "(edited)",
   "message_edit": "Edit",
   "message_delete": "Delete",
+  "error": "Error",
   "error_title": "Error",
   "save": "Save",
   "search_result_count": "{{current}} of {{total}}",
@@ -69,5 +70,16 @@
   "aria_add_reaction": "Add reaction",
   "aria_react_with": "React with {{emoji}}",
   "aria_message_options": "Message options",
-  "aria_toggle_reaction": "{{emoji}} reaction, click to toggle"
+  "aria_toggle_reaction": "{{emoji}} reaction, click to toggle",
+  "load_failed": "Failed to load conversations",
+  "conversation_restored": "Conversation restored",
+  "conversation_restored_desc": "The conversation has been moved back to your inbox.",
+  "restore_failed": "Failed to restore conversation",
+  "search_members_failed": "Failed to search members",
+  "messaging_restricted_title": "Messaging Restricted",
+  "messaging_restricted_desc": "Your messaging privileges have been restricted by a community administrator. If you believe this is an error, please contact support.",
+  "conversation_archived": "Conversation archived",
+  "conversation_archived_desc": "The conversation has been moved to your archive.",
+  "archive_failed": "Failed to archive conversation",
+  "messaging_restricted": "Your messaging has been restricted"
 }

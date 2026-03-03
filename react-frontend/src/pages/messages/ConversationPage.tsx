@@ -520,14 +520,14 @@ export function ConversationPage() {
       const response = await api.delete(`/v2/messages/conversations/${id}`);
 
       if (response.success) {
-        toast.success('Conversation archived', 'This conversation has been moved to your archive.');
+        toast.success(t('conversation_archived'), t('conversation_archived_desc'));
         navigate(tenantPath('/messages'));
       } else {
-        throw new Error(response.error || 'Failed to archive conversation');
+        throw new Error(response.error || t('archive_failed'));
       }
     } catch (error) {
       logError('Failed to archive conversation', error);
-      toast.error(t('error_title'), 'Failed to archive conversation. Please try again.');
+      toast.error(t('error_title'), t('archive_failed'));
     } finally {
       setIsArchiving(false);
       setShowArchiveModal(false);
@@ -634,7 +634,7 @@ export function ConversationPage() {
   async function sendVoiceMessage() {
     if (!audioBlob || !targetId || isSending) return;
     if (messagingRestriction?.messaging_disabled) {
-      toast.error(t('error'), 'Your messaging has been restricted');
+      toast.error(t('error'), t('messaging_restricted'));
       return;
     }
 
@@ -823,7 +823,7 @@ export function ConversationPage() {
     e.preventDefault();
     if ((!newMessage.trim() && attachments.length === 0) || !targetId || isSending) return;
     if (messagingRestriction?.messaging_disabled) {
-      toast.error(t('error'), 'Your messaging has been restricted');
+      toast.error(t('error'), t('messaging_restricted'));
       return;
     }
 

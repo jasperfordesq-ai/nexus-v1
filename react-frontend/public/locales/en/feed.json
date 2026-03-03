@@ -196,5 +196,29 @@
     "comment_action": "Comment",
     "write_comment": "Write a comment...",
     "no_comments": "No comments yet. Be the first to share your thoughts!"
+  },
+  "hashtag": {
+    "title": "Hashtag",
+    "load_failed": "Failed to load posts for this hashtag.",
+    "back_to_feed": "Back to feed",
+    "post_count": "{{count}} posts",
+    "unable_to_load": "Unable to Load Posts",
+    "try_again": "Try Again",
+    "no_posts": "No posts found",
+    "no_posts_desc": "No posts have been tagged with #{{tag}} yet.",
+    "load_more": "Load More"
+  },
+  "hashtags": {
+    "title": "Trending Hashtags",
+    "subtitle": "Discover what your community is talking about",
+    "back_to_feed": "Back to feed",
+    "search_placeholder": "Search hashtags...",
+    "load_failed": "Failed to load hashtags.",
+    "unable_to_load": "Unable to Load Hashtags",
+    "try_again": "Try Again",
+    "no_hashtags": "No hashtags found",
+    "no_match": "No hashtags matching \"{{query}}\"",
+    "no_trending": "No trending hashtags in your community yet.",
+    "post_count": "{{count}} posts"
   }
 }

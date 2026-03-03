@@ -158,17 +158,17 @@ export function MembersPage() {
         }
       } else {
         if (!append) {
-          setError('Failed to load members. Please try again.');
+          setError(t('members.load_failed'));
         } else {
-          toast.error('Failed to load more members');
+          toast.error(t('members.load_more_failed'));
         }
       }
     } catch (err) {
       logError('Failed to load members', err);
       if (!append) {
-        setError('Failed to load members. Please try again.');
+        setError(t('members.load_failed'));
       } else {
-        toast.error('Failed to load more members');
+        toast.error(t('members.load_more_failed'));
       }
     } finally {
       setIsLoading(false);

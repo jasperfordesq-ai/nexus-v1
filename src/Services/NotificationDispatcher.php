@@ -8,6 +8,7 @@ namespace Nexus\Services;
 
 use Nexus\Core\Database;
 use Nexus\Core\Mailer;
+use Nexus\Core\TenantContext;
 use Nexus\Models\Notification;
 use Nexus\Models\User;
 use Nexus\Services\WebPushService;
@@ -78,8 +79,8 @@ class NotificationDispatcher
         // 1. Thread Level (Specific Discussion)
         // Only if context is 'thread'
         if ($contextType === 'thread') {
-            $stmt = $db->prepare("SELECT frequency FROM notification_settings WHERE user_id = ? AND context_type = 'thread' AND context_id = ?");
-            $stmt->execute([$userId, $contextId]);
+            $stmt = $db->prepare("SELECT frequency FROM notification_settings WHERE user_id = ? AND context_type = 'thread' AND context_id = ? AND tenant_id = ?");
+            $stmt->execute([$userId, $contextId, TenantContext::getId()]);
             $res = $stmt->fetch();
             if ($res) return $res['frequency'];
 
@@ -116,17 +117,17 @@ class NotificationDispatcher
         // REFACTOR: Let's do a direct lookup approach.
 
         // Check exact match first
-        $sql = "SELECT frequency FROM notification_settings WHERE user_id = ? AND context_type = ? AND context_id = ?";
+        $sql = "SELECT frequency FROM notification_settings WHERE user_id = ? AND context_type = ? AND context_id = ? AND tenant_id = ?";
         $stmt = $db->prepare($sql);
-        $stmt->execute([$userId, $contextType, $contextId]);
+        $stmt->execute([$userId, $contextType, $contextId, TenantContext::getId()]);
         $row = $stmt->fetch();
         if ($row) return $row['frequency'];
 
         // If 'thread', try 'group' parent
         if ($contextType === 'thread') {
             // Fetch Group ID from Thread
-            $stmt = $db->prepare("SELECT group_id FROM group_discussions WHERE id = ?");
-            $stmt->execute([$contextId]);
+            $stmt = $db->prepare("SELECT group_id FROM group_discussions WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$contextId, TenantContext::getId()]);
             $thread = $stmt->fetch();
             if ($thread) {
                 return self::getFrequencySetting($userId, 'group', $thread['group_id']);
@@ -152,10 +153,10 @@ class NotificationDispatcher
     private static function queueNotification($userId, $activityType, $content, $link, $frequency = 'daily', $emailBody = null)
     {
         $db = Database::getInstance();
-        $stmt = $db->prepare("INSERT INTO notification_queue (user_id, activity_type, content_snippet, link, frequency, email_body, created_at, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'pending')");
+        $stmt = $db->prepare("INSERT INTO notification_queue (tenant_id, user_id, activity_type, content_snippet, link, frequency, email_body, created_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'pending')");
         // Truncate content for snippet
         $snippet = substr($content, 0, 250);
-        $stmt->execute([$userId, $activityType, $snippet, $link, $frequency, $emailBody]);
+        $stmt->execute([TenantContext::getId(), $userId, $activityType, $snippet, $link, $frequency, $emailBody]);
     }
 
     /**
@@ -638,8 +639,8 @@ HTML;
     {
         try {
             $user = Database::query(
-                "SELECT email, name, first_name FROM users WHERE id = ?",
-                [$recipientUserId]
+                "SELECT email, name, first_name FROM users WHERE id = ? AND tenant_id = ?",
+                [$recipientUserId, TenantContext::getId()]
             )->fetch();
 
             if (!$user || empty($user['email'])) {

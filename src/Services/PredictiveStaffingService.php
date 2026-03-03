@@ -84,7 +84,7 @@ class PredictiveStaffingService
                         (SELECT COUNT(*) FROM vol_applications vs WHERE vs.opportunity_id = v.id AND vs.status = 'approved') as filled_slots
                  FROM vol_opportunities v
                  LEFT JOIN vol_organizations o ON v.organization_id = o.id
-                 WHERE v.tenant_id = ? AND v.status = 'active'
+                 WHERE v.tenant_id = ? AND v.status = 'open' AND v.is_active = 1
                    AND v.start_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL ? DAY)
                  ORDER BY v.start_date ASC",
                 [$tenantId, $nextDays]
@@ -346,10 +346,11 @@ class PredictiveStaffingService
             foreach ($admins as $adminId) {
                 foreach ($criticalPredictions as $prediction) {
                     $message = "Staffing alert: {$prediction['title']} on {$prediction['date']} — {$prediction['shortfall']} volunteer(s) still needed ({$prediction['risk_level']} risk)";
+                    $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
                     \Nexus\Models\Notification::create(
                         (int)$adminId,
                         $message,
-                        '/admin/volunteering',
+                        $basePath . '/admin/volunteering',
                         'staffing_alert'
                     );
                 }

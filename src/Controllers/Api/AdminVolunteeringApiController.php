@@ -56,7 +56,7 @@ class AdminVolunteeringApiController extends BaseApiController
         try {
             $stmt = Database::query(
                 "SELECT COUNT(*) as total,
-                        SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) as active_count
+                        SUM(CASE WHEN status='open' AND is_active=1 THEN 1 ELSE 0 END) as active_count
                  FROM vol_opportunities WHERE tenant_id = ?",
                 [$tenantId]
             );

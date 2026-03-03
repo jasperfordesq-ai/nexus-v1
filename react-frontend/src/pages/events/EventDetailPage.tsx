@@ -209,7 +209,7 @@ export function EventDetailPage() {
         if (rsvpData.status === 'waitlisted') {
           setIsWaitlisted(true);
           setWaitlistPosition(rsvpData.waitlist_position ?? null);
-          toast.info(rsvpData.message || 'Event is full. You have been added to the waitlist.');
+          toast.info(rsvpData.message || t('toast.added_to_waitlist'));
           return;
         }
 
@@ -322,14 +322,14 @@ export function EventDetailPage() {
       const response = await api.post(`/v2/events/${event.id}/cancel`, { reason: cancelReason });
       if (response.success) {
         setEvent((prev) => prev ? { ...prev, status: 'cancelled', cancellation_reason: cancelReason } : null);
-        toast.success('Event cancelled. All attendees have been notified.');
+        toast.success(t('toast.event_cancelled'));
         setShowCancelModal(false);
       } else {
-        toast.error('Failed to cancel event.');
+        toast.error(t('toast.cancel_failed'));
       }
     } catch (err) {
       logError('Failed to cancel event', err);
-      toast.error('Something went wrong.');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setIsCancelling(false);
     }
@@ -344,13 +344,13 @@ export function EventDetailPage() {
       if (response.success && response.data) {
         setIsWaitlisted(true);
         setWaitlistPosition((response.data as { position?: number }).position ?? null);
-        toast.success('You have been added to the waitlist.');
+        toast.success(t('toast.added_to_waitlist'));
       } else {
-        toast.error('Failed to join waitlist.');
+        toast.error(t('toast.waitlist_join_failed'));
       }
     } catch (err) {
       logError('Failed to join waitlist', err);
-      toast.error('Something went wrong.');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setIsSubmitting(false);
     }
@@ -365,11 +365,11 @@ export function EventDetailPage() {
       if (response.success) {
         setIsWaitlisted(false);
         setWaitlistPosition(null);
-        toast.success('You have been removed from the waitlist.');
+        toast.success(t('toast.removed_from_waitlist'));
       }
     } catch (err) {
       logError('Failed to leave waitlist', err);
-      toast.error('Something went wrong.');
+      toast.error(t('toast.something_wrong'));
     } finally {
       setIsSubmitting(false);
     }
@@ -507,7 +507,7 @@ export function EventDetailPage() {
                 startContent={<Ban className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => setShowCancelModal(true)}
               >
-                Cancel Event
+                {t('detail.cancel_event')}
               </Button>
               <Button
                 size="sm"
@@ -531,9 +531,9 @@ export function EventDetailPage() {
             <div className="flex items-center gap-3">
               <Ban className="w-5 h-5 text-red-400 flex-shrink-0" aria-hidden="true" />
               <div>
-                <p className="text-red-400 font-semibold">This event has been cancelled</p>
+                <p className="text-red-400 font-semibold">{t('detail.event_cancelled')}</p>
                 {event.cancellation_reason && (
-                  <p className="text-red-300/80 text-sm mt-1">Reason: {event.cancellation_reason}</p>
+                  <p className="text-red-300/80 text-sm mt-1">{t('detail.cancellation_reason', { reason: event.cancellation_reason })}</p>
                 )}
               </div>
             </div>
@@ -544,7 +544,7 @@ export function EventDetailPage() {
         {event.is_recurring && (
           <div className="mb-4">
             <Chip variant="flat" color="secondary" size="sm" startContent={<Repeat className="w-3 h-3" aria-hidden="true" />}>
-              Recurring Event
+              {t('detail.recurring_event')}
             </Chip>
           </div>
         )}
@@ -564,7 +564,7 @@ export function EventDetailPage() {
               </Chip>
             </Link>
             <span className="text-sm text-theme-subtle">
-              {event.series.event_count} {event.series.event_count === 1 ? 'event' : 'events'} in series
+              {t('detail.events_in_series', { count: event.series.event_count })}
             </span>
           </div>
         )}
@@ -590,7 +590,7 @@ export function EventDetailPage() {
             )}
             {isWaitlisted && (
               <Chip variant="flat" color="warning" size="lg" startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}>
-                On waitlist{waitlistPosition ? ` (#${waitlistPosition})` : ''}
+                {t('detail.on_waitlist')}{waitlistPosition ? ` (#${waitlistPosition})` : ''}
               </Chip>
             )}
           </div>
@@ -614,22 +614,22 @@ export function EventDetailPage() {
             <>
               <div className="flex items-center gap-2 text-sm">
                 <div className="w-2.5 h-2.5 rounded-full bg-gray-400" />
-                <span className="text-theme-muted">Max {event.max_attendees}</span>
+                <span className="text-theme-muted">{t('detail.max_capacity', { count: event.max_attendees })}</span>
               </div>
               {event.spots_left != null && event.spots_left > 0 && (
                 <Chip size="sm" variant="flat" color={event.spots_left <= 3 ? 'danger' : 'success'}>
-                  {event.spots_left} {event.spots_left === 1 ? 'spot' : 'spots'} left
+                  {t('detail.spots_left', { count: event.spots_left })}
                 </Chip>
               )}
               {event.is_full && (
-                <Chip size="sm" variant="flat" color="danger">Event Full</Chip>
+                <Chip size="sm" variant="flat" color="danger">{t('detail.event_full')}</Chip>
               )}
             </>
           )}
           {(event.waitlist_count ?? 0) > 0 && (
             <div className="flex items-center gap-2 text-sm">
               <ListOrdered className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />
-              <span className="text-theme-muted">{event.waitlist_count} on waitlist</span>
+              <span className="text-theme-muted">{t('detail.waitlist_count', { count: event.waitlist_count })}</span>
             </div>
           )}
         </div>
@@ -643,7 +643,7 @@ export function EventDetailPage() {
             <div>
               <div className="text-xs text-theme-subtle">{t('detail.date_label')}</div>
               <time dateTime={event.start_date} className="text-theme-primary block">
-                {startDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                {startDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
               </time>
             </div>
           </div>
@@ -1009,7 +1009,7 @@ export function EventDetailPage() {
                   onPress={handleJoinWaitlist}
                   isLoading={isSubmitting}
                 >
-                  Join Waitlist
+                  {t('detail.join_waitlist')}
                 </Button>
               )}
               {isWaitlisted && (
@@ -1020,7 +1020,7 @@ export function EventDetailPage() {
                   onPress={handleLeaveWaitlist}
                   isLoading={isSubmitting}
                 >
-                  Leave Waitlist
+                  {t('detail.leave_waitlist')}
                 </Button>
               )}
             </div>
@@ -1056,7 +1056,7 @@ export function EventDetailPage() {
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <CalendarRange className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-            Other events in this series
+            {t('detail.other_series_events')}
           </h2>
 
           {isLoadingSeriesEvents ? (
@@ -1112,14 +1112,14 @@ export function EventDetailPage() {
                     className="bg-theme-elevated text-theme-primary"
                     endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}
                   >
-                    View all {event.series.event_count} events in series
+                    {t('detail.view_all_series', { count: event.series.event_count })}
                   </Button>
                 </Link>
               )}
             </div>
           ) : (
             <p className="text-theme-subtle text-sm text-center py-4">
-              No other events found in this series.
+              {t('detail.no_other_series_events')}
             </p>
           )}
         </GlassCard>
@@ -1174,15 +1174,15 @@ export function EventDetailPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Cancel Event</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('detail.cancel_modal_title')}</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted mb-4">
-              Are you sure you want to cancel &quot;{event.title}&quot;? All attendees and waitlisted users will be notified.
+              {t('detail.cancel_confirm', { title: event.title })}
             </p>
             <textarea
               className="w-full p-3 rounded-lg bg-theme-elevated border border-theme-default text-theme-primary placeholder:text-theme-subtle resize-none"
               rows={3}
-              placeholder="Reason for cancellation (optional)"
+              placeholder={t('detail.cancel_reason_placeholder')}
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
             />
@@ -1193,7 +1193,7 @@ export function EventDetailPage() {
               className="bg-theme-elevated text-theme-primary"
               onPress={() => setShowCancelModal(false)}
             >
-              Keep Event
+              {t('detail.keep_event')}
             </Button>
             <Button
               className="bg-amber-500 text-white"
@@ -1201,7 +1201,7 @@ export function EventDetailPage() {
               onPress={handleCancelEvent}
               isLoading={isCancelling}
             >
-              Cancel Event
+              {t('detail.cancel_event')}
             </Button>
           </ModalFooter>
         </ModalContent>
