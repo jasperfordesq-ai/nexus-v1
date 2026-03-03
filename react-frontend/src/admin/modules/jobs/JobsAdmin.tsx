@@ -138,7 +138,7 @@ export function JobsAdmin() {
         ? `/v2/admin/jobs/${job.id}/unfeature`
         : `/v2/admin/jobs/${job.id}/feature`;
       const res = await api.post(endpoint);
-      if (res?.success) {
+      if (res && res.success) {
         toast.success(
           job.is_featured
             ? `"${job.title}" removed from featured`
@@ -146,7 +146,7 @@ export function JobsAdmin() {
         );
         loadJobs();
       } else {
-        toast.error(res?.error || 'Failed to update featured status');
+        toast.error((res && res.error) || 'Failed to update featured status');
       }
     } catch {
       toast.error('An unexpected error occurred');
@@ -158,11 +158,11 @@ export function JobsAdmin() {
     setActionLoading(true);
     try {
       const res = await api.delete(`/v2/admin/jobs/${confirmDelete.id}`);
-      if (res?.success) {
+      if (res && res.success) {
         toast.success('Job deleted successfully');
         loadJobs();
       } else {
-        toast.error(res?.error || 'Failed to delete job');
+        toast.error((res && res.error) || 'Failed to delete job');
       }
     } catch {
       toast.error('An unexpected error occurred');

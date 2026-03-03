@@ -195,11 +195,13 @@ export function JobsPage() {
   }, [debouncedQuery, selectedType, selectedCommitment, nextCursor, t, toast]);
 
   // Load vacancies when filters change (fresh load)
+  // loadVacancies is intentionally excluded from deps — it depends on nextCursor,
+  // which would cause infinite loops. We reset cursor and call it directly on filter change.
   useEffect(() => {
     if (activeTab === 'browse') {
       setNextCursor(null);
-      loadVacancies();
       setHasMore(true);
+      loadVacancies();
     }
   }, [debouncedQuery, selectedType, selectedCommitment, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
