@@ -155,12 +155,14 @@
     "pages": "Pages",
     "cookie_settings": "Cookie Settings",
     "built_on_nexus": "Built on Project NEXUS — Open Source Community Platform",
+    "agpl_notice": "AGPL-3.0 — Copyright \u00a9 2024\u2013{{year}} Jasper Ford",
     "terms": "Terms",
     "privacy": "Privacy"
   },
   "mobile_tab": {
     "create": "Create",
-    "menu": "Menu"
+    "menu": "Menu",
+    "create_new_content": "Create new content"
   },
   "attribution": "Built on Project NEXUS by Jasper Ford",
   "members": {

@@ -75,7 +75,8 @@ export function EventsPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [, setNextCursor] = useState<string | null>(null);
+  const nextCursorRef = useRef<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [filter, setFilter] = useState<EventFilter>('upcoming');
@@ -113,8 +114,8 @@ export function EventsPage() {
       if (debouncedQuery) params.set('q', debouncedQuery);
       if (filter !== 'all') params.set('when', filter);
       params.set('per_page', String(ITEMS_PER_PAGE));
-      if (append && nextCursor) {
-        params.set('cursor', nextCursor);
+      if (append && nextCursorRef.current) {
+        params.set('cursor', nextCursorRef.current);
       }
       if (selectedCategory && selectedCategory !== 'all') {
         const categoryInt = parseInt(selectedCategory);
@@ -131,6 +132,7 @@ export function EventsPage() {
           setEvents(response.data);
         }
         const cursor = response.meta?.cursor ?? null;
+        nextCursorRef.current = cursor;
         setNextCursor(cursor);
         setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
       } else {
@@ -149,14 +151,14 @@ export function EventsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, filter, selectedCategory, nextCursor]);
+  }, [debouncedQuery, filter, selectedCategory, t, toast]);
 
-  // Load events when filter, category, or debounced query changes (fresh load — reset cursor)
   useEffect(() => {
+    nextCursorRef.current = null;
     setNextCursor(null);
-    loadEvents();
     setHasMore(true);
-  }, [debouncedQuery, filter, selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
+    loadEvents();
+  }, [debouncedQuery, filter, selectedCategory, loadEvents]);
 
   // Update URL params
   useEffect(() => {
@@ -389,7 +391,7 @@ export function EventsPage() {
               className="space-y-8"
             >
               {Object.entries(groupedEvents).map(([month, monthEvents]) => (
-                <section key={month} aria-label={`Events in ${month}`}>
+                <section key={month} aria-label={t('events_in_month', 'Events in {{month}}', { month })}>
                   <h2 className="text-lg font-semibold text-theme-secondary mb-4 flex items-center gap-2">
                     <CalendarDays className="w-5 h-5 text-amber-400" aria-hidden="true" />
                     {month}

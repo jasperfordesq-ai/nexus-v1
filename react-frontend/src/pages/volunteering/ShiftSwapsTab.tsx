@@ -12,6 +12,11 @@ import { motion } from 'framer-motion';
 import {
   Button,
   Chip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@heroui/react';
 import {
   ArrowLeftRight,
@@ -70,6 +75,7 @@ export function ShiftSwapsTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actioningId, setActioningId] = useState<number | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<number | null>(null);
   const [view, setView] = useState<'all' | 'sent' | 'received'>('all');
 
   const load = useCallback(async () => {
@@ -89,11 +95,11 @@ export function ShiftSwapsTab() {
           : [];
         setSwaps(items);
       } else {
-        setError('Failed to load shift swap requests.');
+        setError(t('swaps.load_error', 'Unable to load shift swap requests. Please try again.'));
       }
     } catch (err) {
       logError('Failed to load shift swaps', err);
-      setError('Unable to load shift swap requests. Please try again.');
+      setError(t('swaps.load_error', 'Unable to load shift swap requests. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -122,17 +128,15 @@ export function ShiftSwapsTab() {
     }
   };
 
-  const handleReject = async (swapId: number) => {
-    if (!window.confirm(t('swaps.reject_confirm', 'Are you sure you want to reject this swap request?'))) {
-      return;
-    }
+  const handleReject = async () => {
+    if (!rejectTarget) return;
 
     try {
-      setActioningId(swapId);
-      const response = await api.put(`/v2/volunteering/swaps/${swapId}`, { action: 'reject' });
+      setActioningId(rejectTarget);
+      const response = await api.put(`/v2/volunteering/swaps/${rejectTarget}`, { action: 'reject' });
       if (response.success) {
         setSwaps((prev) =>
-          prev.map((s) => (s.id === swapId ? { ...s, status: 'rejected' as const } : s))
+          prev.map((s) => (s.id === rejectTarget ? { ...s, status: 'rejected' as const } : s))
         );
       } else {
         toast.error(t('swaps.reject_failed', 'Failed to reject swap request.'));
@@ -142,6 +146,7 @@ export function ShiftSwapsTab() {
       toast.error(t('swaps.reject_failed', 'Failed to reject swap request.'));
     } finally {
       setActioningId(null);
+      setRejectTarget(null);
     }
   };
 
@@ -379,7 +384,7 @@ export function ShiftSwapsTab() {
                         variant="flat"
                         color="danger"
                         startContent={<X className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => handleReject(swap.id)}
+                        onPress={() => setRejectTarget(swap.id)}
                         isLoading={actioningId === swap.id}
                       >
                         {t('swaps.reject', 'Reject')}
@@ -392,6 +397,33 @@ export function ShiftSwapsTab() {
           ))}
         </motion.div>
       )}
+      {/* Reject Confirmation Modal */}
+      <Modal
+        isOpen={rejectTarget !== null}
+        onOpenChange={(open) => !open && setRejectTarget(null)}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-theme-primary">{t('swaps.reject', 'Reject')}</ModalHeader>
+              <ModalBody>
+                <p className="text-theme-secondary">
+                  {t('swaps.reject_confirm', 'Are you sure you want to reject this swap request?')}
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>{t('volunteering.cancel', 'Cancel')}</Button>
+                <Button color="danger" onPress={handleReject}>{t('swaps.reject', 'Reject')}</Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

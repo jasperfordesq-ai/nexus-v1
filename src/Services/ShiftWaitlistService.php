@@ -120,8 +120,8 @@ class ShiftWaitlistService
 
         try {
             // Cancel the entry
-            $stmt = $db->prepare("UPDATE vol_shift_waitlist SET status = 'cancelled' WHERE id = ?");
-            $stmt->execute([$entry['id']]);
+            $stmt = $db->prepare("UPDATE vol_shift_waitlist SET status = 'cancelled' WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$entry['id'], $tenantId]);
 
             // Reorder remaining positions
             $stmt = $db->prepare("
@@ -236,8 +236,8 @@ class ShiftWaitlistService
 
         try {
             // Mark as notified
-            $stmt = $db->prepare("UPDATE vol_shift_waitlist SET status = 'notified', notified_at = NOW() WHERE id = ?");
-            $stmt->execute([$nextPerson['id']]);
+            $stmt = $db->prepare("UPDATE vol_shift_waitlist SET status = 'notified', notified_at = NOW() WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$nextPerson['id'], $tenantId]);
 
             // Get shift details for notification
             $shift = VolShift::find($shiftId);
@@ -308,16 +308,16 @@ class ShiftWaitlistService
 
         try {
             // Mark as promoted
-            $stmt = $db->prepare("UPDATE vol_shift_waitlist SET status = 'promoted', promoted_at = NOW() WHERE id = ?");
-            $stmt->execute([$entry['id']]);
+            $stmt = $db->prepare("UPDATE vol_shift_waitlist SET status = 'promoted', promoted_at = NOW() WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$entry['id'], $tenantId]);
 
             // Actually sign them up for the shift via VolunteerService
             $result = VolunteerService::signUpForShift($shiftId, $userId);
 
             if (!$result) {
                 // Revert promotion if signup fails
-                $stmt = $db->prepare("UPDATE vol_shift_waitlist SET status = 'waiting' WHERE id = ?");
-                $stmt->execute([$entry['id']]);
+                $stmt = $db->prepare("UPDATE vol_shift_waitlist SET status = 'waiting' WHERE id = ? AND tenant_id = ?");
+                $stmt->execute([$entry['id'], $tenantId]);
 
                 self::$errors = VolunteerService::getErrors();
                 return false;

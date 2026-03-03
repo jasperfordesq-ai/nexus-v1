@@ -63,7 +63,8 @@ interface PaginationState {
 
 export function ConversationPage() {
   const { t } = useTranslation('messages');
-  usePageTitle(t('title'));
+  const [pageTitle, setPageTitle] = useState(t('title'));
+  usePageTitle(pageTitle);
   const { id, userId } = useParams<{ id?: string; userId?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -139,6 +140,13 @@ export function ConversationPage() {
     under_monitoring: boolean;
     restriction_reason: string | null;
   } | null>(null);
+
+  // Update page title when conversation loads
+  useEffect(() => {
+    if (conversation?.meta?.other_user?.name) {
+      setPageTitle(t('conversation_with', '{{name}} \u2014 Messages', { name: conversation.meta.other_user.name }));
+    }
+  }, [conversation?.meta?.other_user?.name, t]);
 
   // Track document visibility for polling optimization
   useEffect(() => {

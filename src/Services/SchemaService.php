@@ -356,7 +356,7 @@ class SchemaService
         $schema['offers'] = [
             '@type' => 'Offer',
             'price' => '0',
-            'priceCurrency' => 'EUR',
+            'priceCurrency' => 'USD',
             'availability' => 'https://schema.org/InStock',
             'url' => $url,
         ];

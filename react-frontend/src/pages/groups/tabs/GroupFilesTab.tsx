@@ -39,7 +39,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
-import { api, API_BASE } from '@/lib/api';
+import { api, API_BASE, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 
@@ -139,10 +139,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
       const totalFiles = selectedFiles.length;
       for (let i = 0; i < totalFiles; i++) {
         const file = selectedFiles[i];
-        const formData = new FormData();
-        formData.append('file', file);
-
-        await api.upload(`/v2/groups/${groupId}/files`, formData);
+        await api.upload(`/v2/groups/${groupId}/files`, file, 'file');
         setUploadProgress(Math.round(((i + 1) / totalFiles) * 100));
       }
       toast.success(t('files.upload_success', '{{count}} file(s) uploaded', { count: totalFiles }));
@@ -160,7 +157,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
   const handleDownload = useCallback(async (file: GroupFile) => {
     try {
       const url = `${API_BASE}/v2/groups/${groupId}/files/${file.id}/download`;
-      const token = localStorage.getItem('nexus_access_token');
+      const token = tokenManager.getAccessToken();
       const headers: HeadersInit = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;

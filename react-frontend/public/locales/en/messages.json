@@ -1,5 +1,6 @@
 {
   "title": "Messages",
+  "conversation_with": "{{name}} — Messages",
   "new_message": "New Message",
   "search_placeholder": "Search conversations...",
   "empty": "No messages yet",
