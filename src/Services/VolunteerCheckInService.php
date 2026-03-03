@@ -196,8 +196,8 @@ class VolunteerCheckInService
         }
 
         try {
-            $stmt = $db->prepare("UPDATE vol_shift_checkins SET status = 'checked_in', checked_in_at = NOW() WHERE id = ?");
-            $stmt->execute([$checkin['id']]);
+            $stmt = $db->prepare("UPDATE vol_shift_checkins SET status = 'checked_in', checked_in_at = NOW() WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$checkin['id'], TenantContext::getId()]);
 
             return [
                 'status' => 'checked_in',
@@ -248,8 +248,8 @@ class VolunteerCheckInService
         }
 
         try {
-            $stmt = $db->prepare("UPDATE vol_shift_checkins SET status = 'checked_out', checked_out_at = NOW() WHERE id = ?");
-            $stmt->execute([$checkin['id']]);
+            $stmt = $db->prepare("UPDATE vol_shift_checkins SET status = 'checked_out', checked_out_at = NOW() WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$checkin['id'], $tenantId]);
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerCheckInService::checkOut error: " . $e->getMessage());

@@ -118,7 +118,7 @@ export function JobsPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const cursorRef = useRef<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [selectedType, setSelectedType] = useState(searchParams.get('type') || 'all');
@@ -162,8 +162,8 @@ export function JobsPage() {
       if (selectedCommitment !== 'all') params.set('commitment', selectedCommitment);
       params.set('status', 'open');
       params.set('per_page', String(ITEMS_PER_PAGE));
-      if (append && nextCursor) {
-        params.set('cursor', nextCursor);
+      if (append && cursorRef.current) {
+        params.set('cursor', cursorRef.current);
       }
 
       const response = await api.get<JobVacancy[]>(`/v2/jobs?${params}`);
@@ -174,7 +174,7 @@ export function JobsPage() {
           setVacancies(response.data);
         }
         const cursor = response.meta?.cursor ?? null;
-        setNextCursor(cursor);
+        cursorRef.current = cursor;
         setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
       } else {
         if (!append) {
@@ -192,14 +192,14 @@ export function JobsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, selectedType, selectedCommitment, nextCursor, t, toast]);
+  }, [debouncedQuery, selectedType, selectedCommitment, t, toast]);
 
   // Load vacancies when filters change (fresh load)
-  // loadVacancies is intentionally excluded from deps — it depends on nextCursor,
+  // loadVacancies is intentionally excluded from deps — it depends on cursorRef,
   // which would cause infinite loops. We reset cursor and call it directly on filter change.
   useEffect(() => {
     if (activeTab === 'browse') {
-      setNextCursor(null);
+      cursorRef.current = null;
       setHasMore(true);
       loadVacancies();
     }

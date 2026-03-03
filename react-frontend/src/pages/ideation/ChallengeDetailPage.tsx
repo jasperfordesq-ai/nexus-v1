@@ -376,9 +376,9 @@ export function ChallengeDetailPage() {
 
     try {
       const response = await api.post<VoteResult>(`/v2/ideation-ideas/${ideaId}/vote`);
-      const result = response.data;
 
-      if (result) {
+      if (response.success && response.data) {
+        const result = response.data;
         setIdeas(prev => prev.map(idea => {
           if (idea.id === ideaId) {
             return {
@@ -559,7 +559,7 @@ export function ChallengeDetailPage() {
         `/v2/ideation-challenges/${id}/favorite`
       );
 
-      if (response.data) {
+      if (response.success && response.data) {
         setChallenge(prev => prev ? {
           ...prev,
           is_favorited: response.data!.favorited,
@@ -581,7 +581,7 @@ export function ChallengeDetailPage() {
     try {
       const response = await api.post<{ id: number }>(`/v2/ideation-challenges/${id}/duplicate`);
 
-      if (response.data) {
+      if (response.success && response.data) {
         toast.success(t('duplicate.success'));
         navigate(tenantPath(`/ideation/${response.data.id}/edit`));
       }

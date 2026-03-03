@@ -9,7 +9,7 @@
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS `saved_jobs` (
     `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `user_id` int(11) NOT NULL,
+    `user_id` int(11) UNSIGNED NOT NULL,
     `job_id` int(11) UNSIGNED NOT NULL,
     `tenant_id` int(11) UNSIGNED NOT NULL,
     `saved_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `job_application_history` (
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS `job_alerts` (
     `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `user_id` int(11) NOT NULL,
+    `user_id` int(11) UNSIGNED NOT NULL,
     `tenant_id` int(11) UNSIGNED NOT NULL,
     `keywords` varchar(500) DEFAULT NULL,
     `categories` varchar(500) DEFAULT NULL,

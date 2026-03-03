@@ -13,8 +13,8 @@ class VolApplication
 {
     public static function create($oppId, $userId, $message, $shiftId = null)
     {
-        $sql = "INSERT INTO vol_applications (opportunity_id, user_id, message, shift_id) VALUES (?, ?, ?, ?)";
-        Database::query($sql, [$oppId, $userId, $message, $shiftId]);
+        $sql = "INSERT INTO vol_applications (tenant_id, opportunity_id, user_id, message, shift_id) VALUES (?, ?, ?, ?, ?)";
+        Database::query($sql, [TenantContext::getId(), $oppId, $userId, $message, $shiftId]);
     }
 
     public static function hasApplied($oppId, $userId)
