@@ -772,32 +772,25 @@ class IdeationChallengeService
      */
     public static function getIdeaById(int $id, ?int $userId = null): ?array
     {
+        $tenantId = TenantContext::getId();
+
         $sql = "
             SELECT
                 i.*,
                 u.first_name AS creator_first_name,
                 u.last_name AS creator_last_name,
-                u.avatar_url AS creator_avatar,
-                ic.tenant_id
+                u.avatar_url AS creator_avatar
             FROM challenge_ideas i
             LEFT JOIN users u ON i.user_id = u.id
-            LEFT JOIN ideation_challenges ic ON i.challenge_id = ic.id
-            WHERE i.id = ?
+            JOIN ideation_challenges ic ON i.challenge_id = ic.id
+            WHERE i.id = ? AND ic.tenant_id = ?
         ";
 
-        $idea = Database::query($sql, [$id])->fetch();
+        $idea = Database::query($sql, [$id, $tenantId])->fetch();
 
         if (!$idea) {
             return null;
         }
-
-        // Tenant scope check
-        $tenantId = TenantContext::getId();
-        if ((int)($idea['tenant_id'] ?? 0) !== $tenantId) {
-            return null;
-        }
-
-        unset($idea['tenant_id']);
 
         return self::formatIdea($idea, $userId);
     }

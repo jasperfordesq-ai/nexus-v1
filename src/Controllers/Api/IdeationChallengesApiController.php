@@ -510,6 +510,7 @@ class IdeationChallengesApiController extends BaseApiController
             $errors = IdeationChallengeService::getErrors();
             $status = $this->resolveErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
+            return;
         }
 
         $this->respondWithData($result);

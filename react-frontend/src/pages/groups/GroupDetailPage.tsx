@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef, Fragment } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
@@ -175,6 +175,7 @@ export function GroupDetailPage() {
   const { t } = useTranslation('groups');
   usePageTitle(t('title'));
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user: currentUser, isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -796,7 +797,7 @@ export function GroupDetailPage() {
       if (response.success) {
         toast.success(t('toast.deleted'));
         // Navigate away after deletion
-        window.location.href = tenantPath('/groups');
+        navigate(tenantPath('/groups'));
       } else {
         toast.error(response.error || t('toast.delete_failed'));
       }
