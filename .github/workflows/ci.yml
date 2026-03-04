@@ -342,7 +342,25 @@ jobs:
         run: bash scripts/check-migration-ci.sh origin/${{ github.base_ref || 'main' }}
 
   # ─────────────────────────────────────────────────────────────────
-  # Stage 6: Regression Pattern Detection
+  # Stage 6: Translation Drift Detection
+  # ─────────────────────────────────────────────────────────────────
+  i18n-drift:
+    name: Translation Drift Detection
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: "BLOCKING: Check for translation key mismatches"
+        run: node scripts/check-i18n-drift.mjs
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 7: Regression Pattern Detection
   # ─────────────────────────────────────────────────────────────────
   regression-patterns:
     name: Regression Pattern Detection
