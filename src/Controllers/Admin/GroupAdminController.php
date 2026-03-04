@@ -28,7 +28,7 @@ class GroupAdminController
         // Must be admin
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         $tenantId = TenantContext::getId();
@@ -74,7 +74,9 @@ class GroupAdminController
 
         $sql .= " GROUP BY g.id
                   ORDER BY g.is_featured DESC, g.created_at DESC
-                  LIMIT $perPage OFFSET " . (($page - 1) * $perPage);
+                  LIMIT ? OFFSET ?";
+        $params[] = $perPage;
+        $params[] = ($page - 1) * $perPage;
 
         $groups = Database::query($sql, $params)->fetchAll();
 
@@ -118,7 +120,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         $groupId = $_POST['group_id'] ?? 0;
@@ -127,7 +129,7 @@ class GroupAdminController
         $group = Group::findById($groupId);
         if (!$group) {
             http_response_code(404);
-            die("Group not found");
+            echo 'Group not found'; exit;
         }
 
         // Toggle featured status
@@ -149,7 +151,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         $groupId = $_POST['group_id'] ?? 0;
@@ -157,7 +159,7 @@ class GroupAdminController
         $group = Group::findById($groupId);
         if (!$group) {
             http_response_code(404);
-            die("Group not found");
+            echo 'Group not found'; exit;
         }
 
         // Log the deletion
@@ -181,7 +183,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         $analytics = $this->getAnalytics();
@@ -249,7 +251,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         View::render('admin/groups/recommendations', [
@@ -264,7 +266,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         $groupId = $_GET['id'] ?? 0;
@@ -272,7 +274,7 @@ class GroupAdminController
 
         if (!$group) {
             http_response_code(404);
-            die("Group not found");
+            echo 'Group not found'; exit;
         }
 
         // Get members with details
@@ -323,7 +325,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         $groupId = $_POST['group_id'] ?? 0;
@@ -393,7 +395,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         // Handle form submission
@@ -439,7 +441,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         // Handle form submission
@@ -585,7 +587,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         $format = $_GET['format'] ?? 'csv';
@@ -648,7 +650,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         // Get pending flags
@@ -699,7 +701,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         // Get pending approval requests
@@ -768,7 +770,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied");
+            echo 'Access denied'; exit;
         }
 
         // Handle form submission

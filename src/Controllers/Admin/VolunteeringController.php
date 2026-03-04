@@ -129,7 +129,7 @@ class VolunteeringController
         $org = \Nexus\Models\VolOrganization::find($id);
         // Security: Use strict comparison to prevent type juggling attacks
         if (!$org || (int)$org['tenant_id'] !== (int)TenantContext::getId()) {
-            die("Access Denied or Organization Not Found");
+            http_response_code(403); echo 'Access denied'; exit;
         }
 
         // Delete (We assume cascade or soft delete, but for now strict delete)

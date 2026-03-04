@@ -347,8 +347,8 @@ class EnterpriseController
              LEFT JOIN consent_types ct ON uc.consent_type = ct.slug
              WHERE {$whereClause}
              ORDER BY uc.created_at DESC
-             LIMIT {$perPage} OFFSET {$offset}",
-            $params
+             LIMIT ? OFFSET ?",
+            array_merge($params, [$perPage, $offset])
         )->fetchAll();
 
         $selectedTypeName = null;

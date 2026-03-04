@@ -537,7 +537,9 @@ class BlogRestoreController
             $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             if (empty($posts)) {
-                die("No posts found to export");
+                http_response_code(404);
+                echo 'No posts found to export';
+                exit;
             }
 
             // Generate SQL
@@ -559,7 +561,9 @@ class BlogRestoreController
             exit;
 
         } catch (\Exception $e) {
-            die("Export failed: " . $e->getMessage());
+            http_response_code(500);
+            echo 'Export failed. Please try again.';
+            exit;
         }
     }
 

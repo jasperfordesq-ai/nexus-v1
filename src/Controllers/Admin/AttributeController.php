@@ -77,7 +77,7 @@ class AttributeController
     {
         $this->requireAdmin();
         $attribute = Attribute::find($id);
-        if (!$attribute) die("Attribute not found");
+        if (!$attribute) { http_response_code(404); echo 'Attribute not found'; exit; }
 
         $categories = Category::getByType('listing');
 

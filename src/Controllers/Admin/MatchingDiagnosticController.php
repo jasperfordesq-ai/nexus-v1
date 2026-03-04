@@ -20,7 +20,7 @@ class MatchingDiagnosticController
         // Must be admin
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            die("Access denied - Admin only");
+            echo 'Access denied'; exit;
         }
 
         $tenantId = TenantContext::getId();
