@@ -140,7 +140,6 @@ const SafeguardingDashboard = lazy(() => import('./modules/safeguarding/Safeguar
 
 // Advanced/SEO module
 const AiSettings = lazy(() => import('./modules/advanced/AiSettings'));
-const FeedAlgorithm = lazy(() => import('./modules/advanced/FeedAlgorithm'));
 const AlgorithmSettings = lazy(() => import('./modules/advanced/AlgorithmSettings'));
 const SeoOverview = lazy(() => import('./modules/advanced/SeoOverview'));
 const SeoAudit = lazy(() => import('./modules/advanced/SeoAudit'));
@@ -303,7 +302,7 @@ export function AdminRoutes() {
 
       {/* ─── ADVANCED ─── */}
       <Route path="ai-settings" element={<Lazy><AiSettings /></Lazy>} />
-      <Route path="feed-algorithm" element={<Lazy><FeedAlgorithm /></Lazy>} />
+      <Route path="feed-algorithm" element={<Navigate to="/admin/algorithm-settings" replace />} />
       <Route path="algorithm-settings" element={<Lazy><AlgorithmSettings /></Lazy>} />
       <Route path="seo" element={<Lazy><SeoOverview /></Lazy>} />
       <Route path="seo/audit" element={<Lazy><SeoAudit /></Lazy>} />

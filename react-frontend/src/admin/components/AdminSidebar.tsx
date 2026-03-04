@@ -75,6 +75,7 @@ import {
   Lightbulb,
   Briefcase,
   BookOpen,
+  Cpu,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -235,7 +236,7 @@ function useAdminNav(): NavSection[] {
         icon: Sparkles,
         items: [
           { label: 'AI Settings', href: '/admin/ai-settings', icon: Brain },
-          { label: 'Feed Algorithm', href: '/admin/feed-algorithm', icon: Sparkles },
+          { label: 'Algorithm Settings', href: '/admin/algorithm-settings', icon: Cpu },
           { label: 'SEO Overview', href: '/admin/seo', icon: Search },
           { label: '404 Tracking', href: '/admin/404-errors', icon: AlertTriangle },
           { label: 'Diagnostics', href: '/admin/matching-diagnostic', icon: Stethoscope },

@@ -22,7 +22,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { SavedSearches } from '@/components/search/SavedSearches';
 import { AdvancedSearchFilters, defaultFilters } from '@/components/search/AdvancedSearchFilters';
@@ -260,6 +260,11 @@ export function SearchPage() {
       {/* Results */}
       {hasSearched && (
         <>
+          {/* Algorithm indicator */}
+          <div className="flex justify-end">
+            <AlgorithmLabel area="matching" />
+          </div>
+
           {/* Tabs */}
           <Tabs
             selectedKey={activeTab}
