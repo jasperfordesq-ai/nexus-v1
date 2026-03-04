@@ -106,9 +106,35 @@ class EndorsementService
             Notification::create(
                 $endorsedId,
                 "{$endorserName} endorsed your skill: {$skillName}",
-                "{$basePath}/members/{$endorsedId}",
+                "{$basePath}/profile/{$endorsedId}",
                 'endorsement'
             );
+
+            // Send email notification
+            $endorsedUser = Database::query(
+                "SELECT email, first_name, name FROM users WHERE id = ? AND tenant_id = ?",
+                [$endorsedId, $tenantId]
+            )->fetch();
+
+            if ($endorsedUser && !empty($endorsedUser['email'])) {
+                $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $frontendUrl = TenantContext::getFrontendUrl();
+                $profileUrl = $frontendUrl . $basePath . '/profile/' . $endorsedId;
+
+                $html = \Nexus\Core\EmailTemplate::render(
+                    "New Skill Endorsement",
+                    "{$endorserName} endorsed your skill",
+                    "<strong>Skill:</strong> " . htmlspecialchars($skillName) . "<br><br>" .
+                    ($comment ? "<strong>Comment:</strong> " . htmlspecialchars($comment) . "<br><br>" : "") .
+                    "Endorsements help build trust in your community profile.",
+                    "View Profile",
+                    $profileUrl,
+                    $tenantName
+                );
+
+                $mailer = new \Nexus\Core\Mailer();
+                $mailer->send($endorsedUser['email'], "New Skill Endorsement - {$tenantName}", $html);
+            }
         } catch (\Exception $e) {
             // Non-critical
         }

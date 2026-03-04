@@ -281,6 +281,13 @@ class EventsApiController extends BaseApiController
             $this->respondWithErrors($errors, $status);
         }
 
+        // Notify attendees of meaningful changes
+        try {
+            \Nexus\Services\EventNotificationService::notifyEventUpdated($id, $data);
+        } catch (\Throwable $e) {
+            error_log("Event update notification error: " . $e->getMessage());
+        }
+
         // Fetch the updated event
         $event = EventService::getById($id, $userId);
 
@@ -388,6 +395,13 @@ class EventsApiController extends BaseApiController
 
         // Get updated event with RSVP counts
         $event = EventService::getById($id, $userId);
+
+        // Notify event organizer of RSVP
+        try {
+            \Nexus\Services\EventNotificationService::notifyRsvp($id, $userId, $status);
+        } catch (\Throwable $e) {
+            error_log("RSVP notification error: " . $e->getMessage());
+        }
 
         $this->respondWithData([
             'status' => $status,
