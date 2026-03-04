@@ -346,11 +346,10 @@ class PredictiveStaffingService
             foreach ($admins as $adminId) {
                 foreach ($criticalPredictions as $prediction) {
                     $message = "Staffing alert: {$prediction['title']} on {$prediction['date']} — {$prediction['shortfall']} volunteer(s) still needed ({$prediction['risk_level']} risk)";
-                    $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
                     \Nexus\Models\Notification::create(
                         (int)$adminId,
                         $message,
-                        $basePath . '/admin/volunteering',
+                        '/admin/volunteering',
                         'staffing_alert'
                     );
                 }

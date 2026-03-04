@@ -53,9 +53,8 @@ class SocialNotificationService
             $contentLabel = self::getContentLabel($contentType);
             $message = "$likerName liked your $contentLabel";
 
-            // Build link
-            $basePath = class_exists('\Nexus\Core\TenantContext') ? TenantContext::getSlugPrefix() : '';
-            $link = self::getContentLink($basePath, $contentType, $contentId);
+            // Build link — bare path for in-app (React tenantPath() adds slug prefix)
+            $link = self::getContentLink($contentType, $contentId);
 
             // 1. Create platform notification (bell)
             if (class_exists('\Nexus\Models\Notification')) {
@@ -64,7 +63,8 @@ class SocialNotificationService
 
             // 2. Send email notification (if user has email and hasn't opted out)
             if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'like')) {
-                self::sendLikeEmail($owner, $liker, $contentType, $contentId, $contentPreview, $link);
+                $emailLink = TenantContext::getSlugPrefix() . $link;
+                self::sendLikeEmail($owner, $liker, $contentType, $contentId, $contentPreview, $emailLink);
             }
 
         } catch (\Throwable $e) {
@@ -105,9 +105,8 @@ class SocialNotificationService
             $shortComment = strlen($commentText) > 50 ? substr($commentText, 0, 50) . '...' : $commentText;
             $message = "$commenterName commented on your $contentLabel: \"$shortComment\"";
 
-            // Build link
-            $basePath = class_exists('\Nexus\Core\TenantContext') ? TenantContext::getSlugPrefix() : '';
-            $link = self::getContentLink($basePath, $contentType, $contentId);
+            // Build link — bare path for in-app (React tenantPath() adds slug prefix)
+            $link = self::getContentLink($contentType, $contentId);
 
             // 1. Create platform notification (bell)
             if (class_exists('\Nexus\Models\Notification')) {
@@ -116,7 +115,8 @@ class SocialNotificationService
 
             // 2. Send email notification (if user has email and hasn't opted out)
             if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'comment')) {
-                self::sendCommentEmail($owner, $commenter, $contentType, $contentId, $commentText, $link);
+                $emailLink = TenantContext::getSlugPrefix() . $link;
+                self::sendCommentEmail($owner, $commenter, $contentType, $contentId, $commentText, $emailLink);
             }
 
         } catch (\Throwable $e) {
@@ -154,9 +154,8 @@ class SocialNotificationService
             $contentLabel = self::getContentLabel($contentType);
             $message = "$sharerName shared your $contentLabel";
 
-            // Build link
-            $basePath = class_exists('\Nexus\Core\TenantContext') ? TenantContext::getSlugPrefix() : '';
-            $link = self::getContentLink($basePath, $contentType, $contentId);
+            // Build link — bare path for in-app (React tenantPath() adds slug prefix)
+            $link = self::getContentLink($contentType, $contentId);
 
             // 1. Create platform notification (bell)
             if (class_exists('\Nexus\Models\Notification')) {
@@ -165,7 +164,8 @@ class SocialNotificationService
 
             // 2. Send email notification (if user has email and hasn't opted out)
             if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'share')) {
-                self::sendShareEmail($owner, $sharer, $contentType, $contentId, $link);
+                $emailLink = TenantContext::getSlugPrefix() . $link;
+                self::sendShareEmail($owner, $sharer, $contentType, $contentId, $emailLink);
             }
 
         } catch (\Throwable $e) {
@@ -194,7 +194,7 @@ class SocialNotificationService
     /**
      * Get link to content
      */
-    private static function getContentLink($basePath, $contentType, $contentId)
+    private static function getContentLink($contentType, $contentId)
     {
         $routes = [
             'post' => '/feed',
@@ -206,7 +206,7 @@ class SocialNotificationService
             'volunteering' => '/volunteering/opportunities/' . $contentId,
             'review' => '/dashboard',
         ];
-        return $basePath . ($routes[$contentType] ?? '/');
+        return $routes[$contentType] ?? '/';
     }
 
     /**

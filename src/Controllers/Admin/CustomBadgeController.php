@@ -279,7 +279,8 @@ class CustomBadgeController
                 // Notify user
                 \Nexus\Models\Notification::create(
                     $userId,
-                    "{$badge['icon']} You've been awarded the '{$badge['name']}' badge! +{$badge['xp']} XP"
+                    "{$badge['icon']} You've been awarded the '{$badge['name']}' badge! +{$badge['xp']} XP",
+                    '/achievements'
                 );
 
                 $awarded++;

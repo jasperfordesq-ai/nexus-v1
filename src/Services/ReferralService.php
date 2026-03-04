@@ -193,7 +193,8 @@ class ReferralService
         // Notify the referrer
         \Nexus\Models\Notification::create(
             $referrerId,
-            "🎉 Someone just signed up using your referral link! You earned " . self::REFERRAL_XP['signup'] . " XP."
+            "🎉 Someone just signed up using your referral link! You earned " . self::REFERRAL_XP['signup'] . " XP.",
+            '/achievements'
         );
 
         // Check for referral badges
@@ -236,7 +237,8 @@ class ReferralService
         // Notify the referrer
         \Nexus\Models\Notification::create(
             $referral['referrer_id'],
-            "🌟 Your referral just became active! You earned " . self::REFERRAL_XP['active'] . " bonus XP."
+            "🌟 Your referral just became active! You earned " . self::REFERRAL_XP['active'] . " bonus XP.",
+            '/achievements'
         );
 
         // Check for referral badges
@@ -279,7 +281,8 @@ class ReferralService
         // Notify the referrer
         \Nexus\Models\Notification::create(
             $referral['referrer_id'],
-            "🏅 Your referral just earned their first badge! You earned " . self::REFERRAL_XP['engaged'] . " bonus XP."
+            "🏅 Your referral just earned their first badge! You earned " . self::REFERRAL_XP['engaged'] . " bonus XP.",
+            '/achievements'
         );
 
         return true;

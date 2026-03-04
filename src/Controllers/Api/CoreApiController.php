@@ -366,7 +366,7 @@ class CoreApiController extends BaseApiController
                     \Nexus\Models\Notification::create(
                         $receiverId,
                         "New message from " . $senderName,
-                        TenantContext::getBasePath() . "/messages/" . $userId,
+                        "/messages/" . $userId,
                         'message'
                     );
                 }

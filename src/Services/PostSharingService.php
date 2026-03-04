@@ -109,11 +109,10 @@ class PostSharingService
                     [$userId]
                 )->fetchColumn();
 
-                $basePath = TenantContext::getSlugPrefix();
                 Notification::create(
                     (int)$original['user_id'],
                     "{$sharerName} shared your post",
-                    "{$basePath}/feed",
+                    '/feed',
                     'share'
                 );
             } catch (\Exception $e) {
