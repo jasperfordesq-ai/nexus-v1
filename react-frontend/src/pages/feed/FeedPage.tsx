@@ -41,7 +41,7 @@ import {
   ArrowUp,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
 import { TrendingHashtags } from '@/components/hashtags/TrendingHashtags';
@@ -360,7 +360,10 @@ export function FeedPage() {
             </div>
             {t('title')}
           </h1>
-          <p className="text-[var(--text-muted)] mt-1 text-sm">{t('subtitle')}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-[var(--text-muted)] text-sm">{t('subtitle')}</p>
+            <AlgorithmLabel area="feed" />
+          </div>
         </div>
 
         {isAuthenticated && (

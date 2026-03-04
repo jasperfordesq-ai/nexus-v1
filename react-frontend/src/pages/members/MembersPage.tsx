@@ -27,7 +27,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, MemberCardSkeleton } from '@/components/ui';
+import { GlassCard, MemberCardSkeleton, AlgorithmLabel } from '@/components/ui';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant } from '@/contexts';
@@ -219,9 +219,12 @@ export function MembersPage() {
             <Users className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
             {t('members.title')}
           </h1>
-          <p className="text-theme-muted mt-1">
-            {t('members.subtitle')}
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-theme-muted">
+              {t('members.subtitle')}
+            </p>
+            <AlgorithmLabel area="members" />
+          </div>
         </div>
       </div>
 

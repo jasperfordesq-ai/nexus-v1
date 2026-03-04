@@ -10,6 +10,9 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Services\RedisCache;
+use Nexus\Services\FeedRankingService;
+use Nexus\Services\ListingRankingService;
+use Nexus\Services\MemberRankingService;
 
 /**
  * AdminConfigApiController - V2 API for React admin system configuration
@@ -1657,6 +1660,67 @@ class AdminConfigApiController extends BaseApiController
         $this->respondWithData([
             'default_language' => $config['default_language'] ?? 'en',
             'supported_languages' => $config['supported_languages'] ?? ['en'],
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Public Algorithm Info (no admin required)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * GET /api/v2/config/algorithms
+     *
+     * Returns the active algorithm labels for feed, listings, and members.
+     * This is a PUBLIC endpoint — no admin auth required.
+     */
+    public function getAlgorithmInfo(): void
+    {
+        // Feed algorithm
+        $feedEnabled = FeedRankingService::isEnabled();
+        $feed = [
+            'name' => $feedEnabled ? 'EdgeRank' : 'Chronological',
+            'key' => $feedEnabled ? 'edgerank' : 'chronological',
+            'description' => $feedEnabled
+                ? 'Ranked by engagement, freshness, social connections, and content quality'
+                : 'Showing newest posts first',
+        ];
+
+        // Listings algorithm
+        $listingsEnabled = ListingRankingService::isEnabled();
+        $listings = [
+            'name' => $listingsEnabled ? 'MatchRank' : 'Newest First',
+            'key' => $listingsEnabled ? 'matchrank' : 'newest',
+            'description' => $listingsEnabled
+                ? 'Ranked by relevance, proximity, engagement, and reciprocity'
+                : 'Showing newest listings first',
+        ];
+
+        // Members algorithm
+        $membersEnabled = MemberRankingService::isEnabled();
+        $members = [
+            'name' => $membersEnabled ? 'CommunityRank' : 'Alphabetical',
+            'key' => $membersEnabled ? 'communityrank' : 'alphabetical',
+            'description' => $membersEnabled
+                ? 'Ranked by activity, contributions, reputation, and connections'
+                : 'Sorted alphabetically by name',
+        ];
+
+        // Smart matching — check config directly (no isEnabled method)
+        $matchingConfig = \Nexus\Services\SmartMatchingEngine::getConfig();
+        $matchingEnabled = !empty($matchingConfig['enabled']);
+        $matching = [
+            'name' => $matchingEnabled ? 'SmartMatch' : 'Disabled',
+            'key' => $matchingEnabled ? 'smartmatch' : 'disabled',
+            'description' => $matchingEnabled
+                ? 'AI-powered matching based on skills, proximity, and reciprocity'
+                : 'Smart matching is not active',
+        ];
+
+        $this->respondWithData([
+            'feed' => $feed,
+            'listings' => $listings,
+            'members' => $members,
+            'matching' => $matching,
         ]);
     }
 }

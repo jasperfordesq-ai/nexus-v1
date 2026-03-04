@@ -1262,7 +1262,6 @@ class FeedRankingService
                     'icon' => 'fa-hand-holding-heart',
                     'color' => '#f59e0b', // amber/orange
                     'description' => 'This member hasn\'t been active recently - show them some love!',
-                    'admin_only' => true // Only show to admins
                 ];
             }
 
@@ -1319,21 +1318,18 @@ class FeedRankingService
     }
 
     /**
-     * Filter badges for display based on user role
+     * Filter badges for display.
+     *
+     * All badges are now visible to all users — the admin_only restriction
+     * has been removed so every user sees algorithm context labels.
      *
      * @param array $badges Array of badge data
-     * @param bool $isAdmin Whether the viewing user is an admin
-     * @return array Filtered badges
+     * @param bool $isAdmin Deprecated — kept for backwards compatibility, ignored
+     * @return array Filtered badges (currently returns all)
      */
     public static function filterBadgesForUser(array $badges, bool $isAdmin = false): array
     {
-        return array_filter($badges, function($badge) use ($isAdmin) {
-            // If badge is admin-only, only show to admins
-            if (!empty($badge['admin_only']) && !$isAdmin) {
-                return false;
-            }
-            return true;
-        });
+        return array_values($badges);
     }
 
     /**
