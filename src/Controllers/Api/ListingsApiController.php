@@ -9,6 +9,7 @@ namespace Nexus\Controllers\Api;
 use Nexus\Services\ListingService;
 use Nexus\Services\ListingAnalyticsService;
 use Nexus\Services\ListingExpiryService;
+use Nexus\Services\ListingRankingService;
 use Nexus\Services\ListingSkillTagService;
 use Nexus\Services\ListingFeaturedService;
 use Nexus\Core\TenantContext;
@@ -108,6 +109,15 @@ class ListingsApiController extends BaseApiController
 
         // Get listings
         $result = ListingService::getAll($filters);
+
+        // Apply MatchRank if enabled (re-sorts fetched page by relevance, freshness, quality, etc.)
+        if (ListingRankingService::isEnabled() && !empty($result['items'])) {
+            $result['items'] = ListingRankingService::rankListings(
+                $result['items'],
+                $userId,
+                ['search' => $filters['search'] ?? null]
+            );
+        }
 
         // Return with cursor-based pagination
         $this->respondWithCollection(
