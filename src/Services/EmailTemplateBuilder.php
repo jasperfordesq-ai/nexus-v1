@@ -964,7 +964,7 @@ HTML;
 
             $name = htmlspecialchars(trim($member['first_name'] . ' ' . $member['last_name']));
             $bio = htmlspecialchars(substr($member['bio'] ?? '', 0, 150)) . (strlen($member['bio'] ?? '') > 150 ? '...' : '');
-            $profileUrl = $appUrl . $basePath . '/members/' . $member['id'];
+            $profileUrl = $appUrl . $basePath . '/profile/' . $member['id'];
 
             $avatar = '';
             if (!empty($member['profile_image'])) {

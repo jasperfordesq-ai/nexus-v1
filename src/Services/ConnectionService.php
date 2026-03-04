@@ -321,7 +321,7 @@ class ConnectionService
                 $receiverName = $receiver['name'] ?? 'Someone';
 
                 // Notify requester (link to the accepted user's profile via members page)
-                Notification::create($requesterId, "{$receiverName} accepted your connection request.", "/members/{$receiverId}", 'connection_accepted');
+                Notification::create($requesterId, "{$receiverName} accepted your connection request.", "/profile/{$receiverId}", 'connection_accepted');
 
                 // Send acceptance email
                 self::sendAcceptanceEmail($requesterId, $receiver);
