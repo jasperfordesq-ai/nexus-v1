@@ -51,6 +51,9 @@ services:
       - PUSHER_APP_ID=${PUSHER_APP_ID:-}
       - PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER:-eu}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      # Meilisearch (search engine)
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - MEILISEARCH_KEY=${MEILISEARCH_KEY:-}
       # GOOGLE_MAPS_API_KEY loaded via env_file: .env.docker (not here, to avoid empty override)
       # Sentry error tracking
       - SENTRY_DSN_PHP=${SENTRY_DSN_PHP:-}
@@ -60,6 +63,8 @@ services:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      meilisearch:
         condition: service_healthy
     networks:
       - nexus-internal
@@ -123,6 +128,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Meilisearch v1 (Full-text + semantic search engine)
+  # ---------------------------------------------------------------------------
+  meilisearch:
+    image: getmeili/meilisearch:v1.7
+    container_name: nexus-meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_ENV: development
+      MEILI_NO_ANALYTICS: "true"
+    ports:
+      - "7700:7700"
+    volumes:
+      - nexus-meili-data:/meili_data
+    networks:
+      - nexus-internal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7700/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   # ---------------------------------------------------------------------------
   # React Frontend (Vite Dev Server)
@@ -206,6 +234,8 @@ volumes:
     name: nexus-mysql-data
   nexus-redis-data:
     name: nexus-redis-data
+  nexus-meili-data:
+    name: nexus-meili-data
   nexus-uploads:
     name: nexus-uploads
   nexus-httpdocs-uploads:

@@ -12,6 +12,7 @@ use Nexus\Models\Listing;
 use Nexus\Models\ActivityLog;
 use Nexus\Services\ListingModerationService;
 use Nexus\Services\ListingSkillTagService;
+use Nexus\Services\SearchService;
 
 /**
  * ListingService - Business logic for listings
@@ -129,20 +130,37 @@ class ListingService
             $params[] = (int)$filters['user_id'];
         }
 
-        // Search filter (title, description, location, author name)
+        // Search filter — Meilisearch first, fall back to MySQL FULLTEXT
         if (!empty($filters['search'])) {
-            $searchTerm = '%' . $filters['search'] . '%';
-            $sql .= " AND (l.title LIKE ? OR l.description LIKE ? OR l.location LIKE ?
-                       OR u.first_name LIKE ? OR u.last_name LIKE ?
-                       OR CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) LIKE ?
-                       OR u.organization_name LIKE ?)";
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
+            $searchIds = SearchService::searchListings($filters['search'], $tenantId);
+            if ($searchIds !== false && !empty($searchIds)) {
+                // Meilisearch path: restrict to the ranked ID set
+                $placeholders = implode(',', array_fill(0, count($searchIds), '?'));
+                $sql .= " AND l.id IN ($placeholders)";
+                $params = array_merge($params, array_map('intval', $searchIds));
+                // Note: ORDER BY l.id DESC still applies — MatchRank or the
+                // caller's ranking service re-orders by Meilisearch relevance.
+            } elseif ($searchIds !== false) {
+                // Meilisearch available but returned no hits
+                $sql .= " AND 1=0";
+            } else {
+                // Meilisearch unavailable — fall back to MySQL FULLTEXT + LIKE
+                $likeTerm = '%' . $filters['search'] . '%';
+                $sql .= " AND (
+                    MATCH(l.title, l.description) AGAINST(? IN BOOLEAN MODE)
+                    OR l.location LIKE ?
+                    OR u.first_name LIKE ?
+                    OR u.last_name LIKE ?
+                    OR CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) LIKE ?
+                    OR u.organization_name LIKE ?
+                )";
+                $params[] = $filters['search']; // FULLTEXT — no % wrapping
+                $params[] = $likeTerm;
+                $params[] = $likeTerm;
+                $params[] = $likeTerm;
+                $params[] = $likeTerm;
+                $params[] = $likeTerm;
+            }
         }
 
         // Skills filter — filter by skill tags

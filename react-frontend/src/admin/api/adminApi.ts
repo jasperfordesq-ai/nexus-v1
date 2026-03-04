@@ -1045,6 +1045,10 @@ export const adminSettings = {
   getFeedAlgorithm: () => api.get<Record<string, unknown>>('/v2/admin/config/feed-algorithm'),
   updateFeedAlgorithm: (data: Record<string, unknown>) => api.put('/v2/admin/config/feed-algorithm', data),
 
+  getAlgorithmConfig: () => api.get<Record<string, unknown>>('/v2/admin/config/algorithms'),
+  updateAlgorithmConfig: (area: string, data: Record<string, unknown>) => api.put(`/v2/admin/config/algorithm/${area}`, data),
+  getAlgorithmHealth: () => api.get<Record<string, unknown>>('/v2/admin/config/algorithm-health'),
+
   getImageSettings: () => api.get<Record<string, unknown>>('/v2/admin/config/images'),
   updateImageSettings: (data: Record<string, unknown>) => api.put('/v2/admin/config/images', data),
 

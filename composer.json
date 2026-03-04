@@ -49,6 +49,8 @@
         "symfony/polyfill-ctype": "v1.33.0",
         "symfony/polyfill-mbstring": "v1.33.0",
         "symfony/polyfill-php80": "v1.33.0",
+        "meilisearch/meilisearch-php": "^1.10",
+        "rubixmd/rubix-ml": "^2.5",
         "vlucas/phpdotenv": "v5.6.2"
     },
     "require-dev": {
