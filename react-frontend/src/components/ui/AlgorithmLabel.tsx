@@ -26,7 +26,10 @@ interface AlgorithmsResponse {
   matching: AlgorithmInfo;
 }
 
-type AlgorithmArea = 'feed' | 'listings' | 'members';
+type AlgorithmArea = 'feed' | 'listings' | 'members' | 'matching';
+
+// Default/fallback keys — not worth surfacing to users, only show smart algorithms
+const DEFAULT_KEYS = new Set(['chronological', 'newest', 'alphabetical', 'disabled']);
 
 // Module-level cache so we don't re-fetch on every page navigation
 let cachedData: AlgorithmsResponse | null = null;
@@ -70,7 +73,7 @@ export function AlgorithmLabel({ area }: AlgorithmLabelProps) {
     });
   }, [area, info]);
 
-  if (!info) return null;
+  if (!info || DEFAULT_KEYS.has(info.key)) return null;
 
   return (
     <Tooltip content={info.description} placement="bottom" delay={300}>
