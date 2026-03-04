@@ -59,7 +59,8 @@ class ListingService
 
         if ($currentUserId !== null) {
             $sql = "SELECT l.id, l.title, l.description, l.type, l.category_id, l.image_url,
-                           l.location, l.latitude, l.longitude, l.status, l.federated_visibility,
+                           COALESCE(l.location, u.location) as location,
+                           l.latitude, l.longitude, l.status, l.federated_visibility,
                            l.created_at, l.updated_at, l.user_id, l.hours_estimate,
                            CASE
                                WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
@@ -78,7 +79,8 @@ class ListingService
             $params = [$currentUserId, $tenantId, $tenantId];
         } else {
             $sql = "SELECT l.id, l.title, l.description, l.type, l.category_id, l.image_url,
-                           l.location, l.latitude, l.longitude, l.status, l.federated_visibility,
+                           COALESCE(l.location, u.location) as location,
+                           l.latitude, l.longitude, l.status, l.federated_visibility,
                            l.created_at, l.updated_at, l.user_id, l.hours_estimate,
                            CASE
                                WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
@@ -235,6 +237,7 @@ class ListingService
             : '';
 
         $sql = "SELECT l.*,
+                       COALESCE(l.location, u.location) as location,
                        CASE
                            WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
                            THEN u.organization_name
