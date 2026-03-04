@@ -1516,7 +1516,7 @@ class VolunteerService
                         0,
                         'new_review',
                         $content,
-                        '/volunteering/dashboard',
+                        '/volunteering',
                         null
                     );
                 }
