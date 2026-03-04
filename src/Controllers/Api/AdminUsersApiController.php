@@ -830,13 +830,11 @@ class AdminUsersApiController extends BaseApiController
                 $message .= " You've received {$creditsAwarded} welcome time credit" . ($creditsAwarded !== 1 ? 's' : '') . " to get started.";
             }
 
-            // Use absolute URL — push notifications (FCM/Web Push) require a full URL
-            $link = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/dashboard';
-
+            // Bare path — React tenantPath() adds slug prefix for in-app navigation
             Notification::create(
                 (int) $user['id'],
                 $message,
-                $link,
+                '/dashboard',
                 'system',
                 true,
                 $tenant['tenant_id']
@@ -899,13 +897,11 @@ class AdminUsersApiController extends BaseApiController
         try {
             $tenant = $this->resolveUserTenant($user);
 
-            // Use absolute URL — push notifications (FCM/Web Push) require a full URL
-            $link = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/dashboard';
-
+            // Bare path — React tenantPath() adds slug prefix for in-app navigation
             Notification::create(
                 (int) $user['id'],
                 "Your account has been reactivated. Welcome back to {$tenant['name']}!",
-                $link,
+                '/dashboard',
                 'system',
                 true,
                 $tenant['tenant_id']
@@ -1674,28 +1670,43 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        // Use the user's own tenant_id for the UPDATE query (safety)
+        // Capture user's tenant_id for activity logging
         $userTenantId = (int) $user['tenant_id'];
 
         try {
             $token = bin2hex(random_bytes(32));
-            $expiry = date('Y-m-d H:i:s', strtotime('+24 hours'));
+            $hashedToken = password_hash($token, PASSWORD_DEFAULT);
 
+            // Store in password_resets table (same as user-initiated flow)
+            // so the same resetPassword() endpoint can validate it
             Database::query(
-                "UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ? AND tenant_id = ?",
-                [$token, $expiry, $id, $userTenantId]
+                "DELETE FROM password_resets WHERE email = ?",
+                [$user['email']]
+            );
+            Database::query(
+                "INSERT INTO password_resets (email, token, created_at) VALUES (?, ?, NOW())",
+                [$user['email'], $hashedToken]
             );
 
             $tenant = $this->resolveUserTenant($user);
             $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
-            $resetLink = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . "/reset-password?token={$token}&email=" . urlencode($user['email']);
+
+            // Build frontend URL with defensive fallback
+            $appUrl = TenantContext::getFrontendUrl();
+            if (!$appUrl || str_contains($appUrl, 'api.')) {
+                $appUrl = \Nexus\Core\Env::get('APP_URL', 'https://app.project-nexus.ie');
+                if (str_contains($appUrl, 'api.')) {
+                    $appUrl = str_replace('api.', 'app.', $appUrl);
+                }
+            }
+            $resetLink = $appUrl . $tenant['slug_prefix'] . "/password/reset?token={$token}";
 
             $html = \Nexus\Core\EmailTemplate::render(
                 "Password Reset",
                 "Reset your password for {$tenantNameSafe}",
                 "<p>Hello <strong>" . htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8') . "</strong>,</p>
                 <p>An administrator has requested a password reset for your account.</p>
-                <p>Click the button below to set a new password. This link expires in 24 hours.</p>",
+                <p>Click the button below to set a new password. This link expires in 1 hour.</p>",
                 "Reset Password",
                 $resetLink,
                 $tenant['name']

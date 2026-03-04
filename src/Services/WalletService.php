@@ -248,12 +248,11 @@ class WalletService
             // Send in-app + email notification to recipient
             try {
                 $senderName = $sender['name'] ?? trim(($sender['first_name'] ?? '') . ' ' . ($sender['last_name'] ?? ''));
-                $basePath = TenantContext::getSlugPrefix();
                 $hourLabel = $amount == 1 ? 'hour' : 'hours';
                 \Nexus\Models\Notification::create(
                     $receiverId,
                     "{$senderName} sent you {$amount} {$hourLabel}" . ($description ? ": {$description}" : ''),
-                    "{$basePath}/wallet",
+                    '/wallet',
                     'credit_received'
                 );
                 NotificationDispatcher::sendCreditEmail($receiverId, $senderName, $amount, $description);

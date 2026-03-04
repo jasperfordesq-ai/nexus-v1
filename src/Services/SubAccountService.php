@@ -145,11 +145,10 @@ class SubAccountService
                 [$parentUserId]
             )->fetchColumn();
 
-            $basePath = TenantContext::getSlugPrefix();
             Notification::create(
                 $childUserId,
                 "{$parentName} has requested to manage your account as a {$relationshipType}",
-                "{$basePath}/settings/sub-accounts",
+                '/settings',
                 'account'
             );
         } catch (\Exception $e) {

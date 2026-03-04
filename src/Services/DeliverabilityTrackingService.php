@@ -110,7 +110,7 @@ class DeliverabilityTrackingService
             'deliverable_status_changed',
             "Changed deliverable status from {$oldStatus} to {$newStatus}",
             true,
-            "/deliverables/{$deliverableId}",
+            "/dashboard",
             'status_change',
             'deliverable',
             $deliverableId
@@ -167,7 +167,7 @@ class DeliverabilityTrackingService
                 'deliverable_completed',
                 "Completed deliverable: {$deliverable['title']}",
                 true,
-                "/deliverables/{$deliverableId}",
+                "/dashboard",
                 'completion',
                 'deliverable',
                 $deliverableId
@@ -262,7 +262,7 @@ class DeliverabilityTrackingService
         $assignedBy = User::findById($assignedByUserId);
 
         $message = "{$assignedBy['first_name']} {$assignedBy['last_name']} assigned you to: {$deliverable['title']}";
-        $link = "/deliverables/{$deliverableId}";
+        $link = "/dashboard";
 
         Notification::create($assignedUserId, $message, $link, 'deliverable_assigned', true);
     }
@@ -282,7 +282,7 @@ class DeliverabilityTrackingService
         // Get group members (would need GroupMember model)
         // For now, placeholder
         $message = "{$assignedBy['first_name']} assigned your group to: {$deliverable['title']}";
-        $link = "/deliverables/{$deliverableId}";
+        $link = "/dashboard";
 
         // TODO: Implement group member notification loop
         // foreach ($groupMembers as $member) {
@@ -313,7 +313,7 @@ class DeliverabilityTrackingService
         $usersToNotify = array_diff($usersToNotify, [$changedByUserId]);
 
         $message = "{$changedBy['first_name']} changed '{$deliverable['title']}' status to {$newStatus}";
-        $link = "/deliverables/{$deliverableId}";
+        $link = "/dashboard";
 
         foreach ($usersToNotify as $userId) {
             Notification::create($userId, $message, $link, 'deliverable_status_changed', true);
@@ -343,7 +343,7 @@ class DeliverabilityTrackingService
         // Notify owner if different from completer
         if ($deliverable['owner_id'] != $completedByUserId) {
             $message = "{$completedBy['first_name']} completed deliverable: {$deliverable['title']}";
-            $link = "/deliverables/{$deliverableId}";
+            $link = "/dashboard";
 
             Notification::create($deliverable['owner_id'], $message, $link, 'deliverable_completed', true);
         }
@@ -351,7 +351,7 @@ class DeliverabilityTrackingService
         // Notify collaborators
         if (!empty($deliverable['collaborators'])) {
             $message = "Deliverable completed: {$deliverable['title']}";
-            $link = "/deliverables/{$deliverableId}";
+            $link = "/dashboard";
 
             foreach ($deliverable['collaborators'] as $collaboratorId) {
                 if ($collaboratorId != $completedByUserId) {

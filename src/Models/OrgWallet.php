@@ -243,7 +243,7 @@ class OrgWallet
             Notification::create(
                 $userId,
                 "You received $amount time credits from $orgName",
-                TenantContext::getBasePath() . '/wallet',
+                '/wallet',
                 'transaction'
             );
 
