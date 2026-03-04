@@ -522,6 +522,33 @@ class ListingsApiController extends BaseApiController
     }
 
     /**
+     * DELETE /api/v2/listings/{id}/image
+     *
+     * Remove the image from a listing.
+     *
+     * Response: 200 OK with { image_url: null }
+     */
+    public function deleteImage(int $id): void
+    {
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+
+        $listing = ListingService::getById($id);
+
+        if (!$listing) {
+            $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        if (!ListingService::canModify($listing, $userId)) {
+            $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
+        }
+
+        ListingService::update($id, $userId, ['image_url' => null]);
+
+        $this->respondWithData(['image_url' => null]);
+    }
+
+    /**
      * POST /api/v2/listings/{id}/renew
      *
      * Renew a listing (extend its expiry by 30 days).

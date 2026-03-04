@@ -125,7 +125,7 @@ describe('Create Pages', () => {
     it('shows type selection (offer/request)', async () => {
       render(<CreateListingPage />);
       await waitFor(() => {
-        expect(screen.getByText(/Offer a Service/i)).toBeInTheDocument();
+        expect(screen.getByText(/Offer Help/i)).toBeInTheDocument();
         expect(screen.getByText(/Request Help/i)).toBeInTheDocument();
       });
     });

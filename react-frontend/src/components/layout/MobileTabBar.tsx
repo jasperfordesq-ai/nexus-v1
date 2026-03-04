@@ -30,7 +30,7 @@ interface MobileTabBarProps {
 }
 
 /** Routes where the tab bar should be hidden */
-const hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/onboarding'];
+const hiddenRoutes = ['/login', '/register', '/password/forgot', '/password/reset', '/onboarding'];
 
 export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
   const { t } = useTranslation('common');

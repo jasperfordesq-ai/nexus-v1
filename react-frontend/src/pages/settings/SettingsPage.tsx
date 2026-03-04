@@ -1675,7 +1675,7 @@ export function SettingsPage() {
           <div className="space-y-6">
             {/* Password & 2FA */}
             <GlassCard className="p-6">
-              <h2 className="text-lg font-semibold text-theme-primary mb-6">Security Settings</h2>
+              <h2 className="text-lg font-semibold text-theme-primary mb-6">{t('security_settings')}</h2>
 
               <div className="space-y-4">
                 {/* Change Password */}
@@ -1689,8 +1689,8 @@ export function SettingsPage() {
                       <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                     </div>
                     <div>
-                      <p className="font-medium text-theme-primary">Change Password</p>
-                      <p className="text-sm text-theme-subtle">Update your account password</p>
+                      <p className="font-medium text-theme-primary">{t('change_password')}</p>
+                      <p className="text-sm text-theme-subtle">{t('change_password_subtitle')}</p>
                     </div>
                   </div>
                 </Button>
@@ -1703,24 +1703,24 @@ export function SettingsPage() {
                         <Key className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                       </div>
                       <div>
-                        <p className="font-medium text-theme-primary">Two-Factor Authentication</p>
+                        <p className="font-medium text-theme-primary">{t('twofa_title')}</p>
                         <p className="text-sm text-theme-subtle">
                           {twoFactorLoading ? (
-                            'Checking status...'
+                            t('twofa_checking')
                           ) : twoFactorEnabled ? (
                             <span className="flex items-center gap-1">
                               <ShieldCheck className="w-3 h-3 text-emerald-500" aria-hidden="true" />
-                              Enabled
+                              {t('twofa_enabled')}
                               {backupCodesRemaining > 0 && (
                                 <span className="text-theme-subtle">
-                                  {' '}-- {backupCodesRemaining} backup codes remaining
+                                  {' '}&mdash; {t('twofa_backup_remaining', { count: backupCodesRemaining })}
                                 </span>
                               )}
                             </span>
                           ) : (
                             <span className="flex items-center gap-1">
                               <ShieldOff className="w-3 h-3 text-amber-500" aria-hidden="true" />
-                              Not enabled
+                              {t('twofa_not_enabled')}
                             </span>
                           )}
                         </p>
@@ -1735,7 +1735,7 @@ export function SettingsPage() {
                             className="bg-red-500/10 text-red-500"
                             onPress={twoFactorDisableModal.onOpen}
                           >
-                            Disable
+                            {t('twofa_disable')}
                           </Button>
                         ) : (
                           <Button
@@ -1743,7 +1743,7 @@ export function SettingsPage() {
                             className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
                             onPress={handleSetup2FA}
                           >
-                            Enable
+                            {t('twofa_enable')}
                           </Button>
                         )}
                       </div>
@@ -1757,7 +1757,7 @@ export function SettingsPage() {
             <GlassCard className="p-6">
               <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                 <Monitor className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-                Active Sessions
+                {t('active_sessions')}
               </h2>
 
               {sessionsLoading ? (
@@ -1782,13 +1782,13 @@ export function SettingsPage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-theme-primary flex items-center gap-2">
-                            {session.browser} on {session.device}
+                            {session.browser} {t('session_on')} {session.device}
                             {session.is_current && (
-                              <Chip size="sm" color="success" variant="flat">Current</Chip>
+                              <Chip size="sm" color="success" variant="flat">{t('session_current')}</Chip>
                             )}
                           </p>
                           <p className="text-xs text-theme-subtle">
-                            {session.ip_address} -- Last active: {new Date(session.last_active).toLocaleDateString()}
+                            {session.ip_address} &mdash; {t('session_last_active')} {new Date(session.last_active).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
@@ -1798,14 +1798,14 @@ export function SettingsPage() {
               ) : (
                 <div className="text-center py-6">
                   <Monitor className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-                  <p className="text-theme-muted">Session management coming soon</p>
+                  <p className="text-theme-muted">{t('sessions_coming_soon')}</p>
                 </div>
               )}
             </GlassCard>
 
             {/* Account Actions */}
             <GlassCard className="p-6">
-              <h2 className="text-lg font-semibold text-theme-primary mb-4">Account Actions</h2>
+              <h2 className="text-lg font-semibold text-theme-primary mb-4">{t('account_actions')}</h2>
 
               <div className="space-y-3">
                 <Button
@@ -1814,7 +1814,7 @@ export function SettingsPage() {
                   startContent={<LogOut className="w-4 h-4" aria-hidden="true" />}
                   onPress={logoutModal.onOpen}
                 >
-                  Log Out
+                  {t('log_out')}
                 </Button>
 
                 <Button
@@ -1823,7 +1823,7 @@ export function SettingsPage() {
                   startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                   onPress={deleteModal.onOpen}
                 >
-                  Delete Account
+                  {t('delete_account')}
                 </Button>
               </div>
             </GlassCard>
@@ -2052,7 +2052,7 @@ export function SettingsPage() {
         <ModalContent>
           <ModalHeader className="text-theme-primary flex items-center gap-2">
             <QrCode className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-            Set Up Two-Factor Authentication
+            {t('twofa_setup_title')}
           </ModalHeader>
           <ModalBody>
             {!twoFactorSetupData ? (
@@ -2061,9 +2061,31 @@ export function SettingsPage() {
               </div>
             ) : (
               <div className="space-y-6">
+                {/* What is an authenticator app? */}
+                <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                  <p className="text-sm font-medium text-theme-primary mb-2">{t('twofa_what_is')}</p>
+                  <p className="text-xs text-theme-muted mb-3">
+                    {t('twofa_what_is_desc')}
+                  </p>
+                  <p className="text-xs text-theme-muted mb-2">
+                    {t('twofa_download_prompt')}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1 rounded-full bg-theme-elevated text-indigo-500 hover:bg-theme-hover transition-colors">
+                      Google Authenticator
+                    </a>
+                    <a href="https://www.microsoft.com/en-us/security/mobile-authenticator-app" target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1 rounded-full bg-theme-elevated text-indigo-500 hover:bg-theme-hover transition-colors">
+                      Microsoft Authenticator
+                    </a>
+                    <a href="https://authy.com/download/" target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1 rounded-full bg-theme-elevated text-indigo-500 hover:bg-theme-hover transition-colors">
+                      Authy
+                    </a>
+                  </div>
+                </div>
+
                 <div className="text-center">
                   <p className="text-theme-muted mb-4">
-                    Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
+                    {t('twofa_scan_qr')}
                   </p>
                   <div className="inline-block p-4 bg-white rounded-xl">
                     <img
@@ -2075,27 +2097,27 @@ export function SettingsPage() {
                 </div>
 
                 <div className="p-3 rounded-lg bg-theme-elevated">
-                  <p className="text-xs text-theme-subtle mb-1">Manual entry key:</p>
+                  <p className="text-xs text-theme-subtle mb-1">{t('twofa_manual_key')}</p>
                   <p className="font-mono text-sm text-theme-primary break-all select-all">
                     {twoFactorSetupData.secret}
                   </p>
                 </div>
 
                 <Input
-                  label="Verification Code"
-                  placeholder="Enter 6-digit code"
+                  label={t('twofa_verification_code')}
+                  placeholder={t('twofa_enter_code')}
                   value={twoFactorVerifyCode}
                   onChange={(e) => setTwoFactorVerifyCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   maxLength={6}
                   classNames={inputClassNames}
-                  description="Enter the 6-digit code from your authenticator app"
+                  description={t('twofa_code_description')}
                 />
               </div>
             )}
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={twoFactorSetupModal.onClose}>
-              Cancel
+              {t('twofa_cancel')}
             </Button>
             <Button
               className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
@@ -2103,7 +2125,7 @@ export function SettingsPage() {
               isLoading={isVerifying2FA}
               isDisabled={!twoFactorSetupData || twoFactorVerifyCode.length < 6}
             >
-              Verify & Enable
+              {t('twofa_verify_enable')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -2123,19 +2145,19 @@ export function SettingsPage() {
         <ModalContent>
           <ModalHeader className="text-red-600 dark:text-red-400 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" aria-hidden="true" />
-            Disable Two-Factor Authentication
+            {t('twofa_disable_title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                <p className="text-amber-600 dark:text-amber-400 font-medium">This will reduce your account security</p>
+                <p className="text-amber-600 dark:text-amber-400 font-medium">{t('twofa_disable_warning')}</p>
                 <p className="text-theme-muted text-sm mt-1">
-                  Without 2FA, your account will only be protected by your password.
+                  {t('twofa_disable_desc')}
                 </p>
               </div>
               <Input
                 type="password"
-                label="Confirm Your Password"
+                label={t('twofa_confirm_password')}
                 value={twoFactorDisablePassword}
                 onChange={(e) => setTwoFactorDisablePassword(e.target.value)}
                 classNames={inputClassNames}
@@ -2144,7 +2166,7 @@ export function SettingsPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={twoFactorDisableModal.onClose}>
-              Cancel
+              {t('twofa_cancel')}
             </Button>
             <Button
               className="bg-red-500 text-white"
@@ -2152,7 +2174,7 @@ export function SettingsPage() {
               isLoading={isDisabling2FA}
               isDisabled={!twoFactorDisablePassword}
             >
-              Disable 2FA
+              {t('twofa_disable_confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -2173,15 +2195,14 @@ export function SettingsPage() {
         <ModalContent>
           <ModalHeader className="text-theme-primary flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-            Your Backup Codes
+            {t('backup_codes_title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                <p className="text-amber-600 dark:text-amber-400 font-medium">Save these codes in a safe place</p>
+                <p className="text-amber-600 dark:text-amber-400 font-medium">{t('backup_codes_warning')}</p>
                 <p className="text-theme-muted text-sm mt-1">
-                  Each backup code can only be used once. If you lose access to your authenticator app,
-                  you can use these codes to sign in.
+                  {t('backup_codes_desc')}
                 </p>
               </div>
 
@@ -2199,7 +2220,7 @@ export function SettingsPage() {
                 startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
                 onPress={handleCopyBackupCodes}
               >
-                Copy All Codes
+                {t('backup_codes_copy')}
               </Button>
             </div>
           </ModalBody>
@@ -2208,7 +2229,7 @@ export function SettingsPage() {
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={backupCodesModal.onClose}
             >
-              I&apos;ve Saved My Codes
+              {t('backup_codes_saved')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -37,7 +37,7 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { Listing, Category } from '@/types/api';
 
 type ListingType = 'all' | 'offer' | 'request';
@@ -435,18 +435,29 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     }
   }
 
+  const imageUrl = listing.image_url ? resolveAssetUrl(listing.image_url) : null;
+
   if (!isGrid) {
     // ─── List View ───
     return (
       <Link to={tenantPath(`/listings/${listing.id}`)}>
         <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
           <div className="flex items-start gap-4">
-            <Avatar
-              src={avatarSrc}
-              name={listing.author_name || 'User'}
-              size="md"
-              className="shrink-0 ring-2 ring-theme-muted/20"
-            />
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt=""
+                className="w-16 h-16 rounded-lg object-cover shrink-0"
+                loading="lazy"
+              />
+            ) : (
+              <Avatar
+                src={avatarSrc}
+                name={listing.author_name || 'User'}
+                size="md"
+                className="shrink-0 ring-2 ring-theme-muted/20"
+              />
+            )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
@@ -500,7 +511,18 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   // ─── Grid View ───
   return (
     <Link to={tenantPath(`/listings/${listing.id}`)}>
-      <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full flex flex-col">
+      <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
+        {/* Listing Image */}
+        {imageUrl && (
+          <img
+            src={imageUrl}
+            alt=""
+            className="w-full h-36 object-cover"
+            loading="lazy"
+          />
+        )}
+
+        <div className="p-5 flex flex-col flex-1">
         {/* Type + Category Badges */}
         <div className="flex items-center gap-2 mb-3">
           <span className={`text-xs px-2 py-1 rounded-full font-medium ${
@@ -560,6 +582,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             )}
           </div>
         </div>
+        </div>{/* end p-5 wrapper */}
       </GlassCard>
     </Link>
   );

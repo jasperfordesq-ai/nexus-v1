@@ -31,7 +31,7 @@ import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import type { Listing, User as UserType, Event, Group } from '@/types/api';
 
@@ -325,19 +325,29 @@ export function SearchPage() {
                     {results.listings.slice(0, activeTab === 'all' ? 4 : undefined).map((listing) => (
                       <motion.div key={listing.id} variants={itemVariants}>
                         <Link to={tenantPath(`/listings/${listing.id}`)}>
-                          <GlassCard className="p-5 hover:scale-[1.02] transition-transform h-full">
-                            <span className={`
-                              text-xs px-2 py-1 rounded-full
-                              ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}
-                            `}>
-                              {listing.type === 'offer' ? t('listing_offering') : t('listing_requesting')}
-                            </span>
-                            {listing.is_featured && <FeaturedBadge />}
-                            <h3 className="font-semibold text-theme-primary mt-2">{listing.title}</h3>
-                            <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{listing.description}</p>
-                            <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
-                              <Clock className="w-3 h-3" aria-hidden="true" />
-                              {listing.hours_estimate ?? listing.estimated_hours ?? '—'}h
+                          <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
+                            {listing.image_url && (
+                              <img
+                                src={resolveAssetUrl(listing.image_url)}
+                                alt=""
+                                className="w-full h-32 object-cover"
+                                loading="lazy"
+                              />
+                            )}
+                            <div className="p-5 flex flex-col flex-1">
+                              <span className={`
+                                text-xs px-2 py-1 rounded-full self-start
+                                ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}
+                              `}>
+                                {listing.type === 'offer' ? t('listing_offering') : t('listing_requesting')}
+                              </span>
+                              {listing.is_featured && <FeaturedBadge />}
+                              <h3 className="font-semibold text-theme-primary mt-2">{listing.title}</h3>
+                              <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{listing.description}</p>
+                              <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
+                                <Clock className="w-3 h-3" aria-hidden="true" />
+                                {listing.hours_estimate ?? listing.estimated_hours ?? '—'}h
+                              </div>
                             </div>
                           </GlassCard>
                         </Link>
