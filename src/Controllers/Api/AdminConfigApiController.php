@@ -13,6 +13,7 @@ use Nexus\Services\RedisCache;
 use Nexus\Services\FeedRankingService;
 use Nexus\Services\ListingRankingService;
 use Nexus\Services\MemberRankingService;
+use Nexus\Services\SearchService;
 
 /**
  * AdminConfigApiController - V2 API for React admin system configuration
@@ -1721,6 +1722,232 @@ class AdminConfigApiController extends BaseApiController
             'listings' => $listings,
             'members' => $members,
             'matching' => $matching,
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Algorithm Configuration (per-area weights + enable/disable)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * GET /api/v2/admin/config/algorithms
+     *
+     * Returns full algorithm configuration for all areas (feed, listings, members, matching).
+     * Used by the React admin AlgorithmSettings page.
+     */
+    public function getAlgorithmConfig(): void
+    {
+        $this->requireAdmin();
+
+        $this->respondWithData([
+            'feed'     => FeedRankingService::getConfig(),
+            'listings' => ListingRankingService::getConfig(),
+            'members'  => MemberRankingService::getConfig(),
+        ]);
+    }
+
+    /**
+     * PUT /api/v2/admin/config/algorithm/{area}
+     *
+     * Update algorithm weights and enabled state for a specific area.
+     * Area must be one of: feed, listings, members.
+     *
+     * Body: { "enabled": true, "like_weight": 0.4, ... }
+     */
+    public function updateAlgorithmConfig(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $area = $this->routeParam('area');
+        $validAreas = ['feed', 'listings', 'members'];
+
+        if (!in_array($area, $validAreas, true)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Area must be: feed, listings, or members', 'area', 422);
+            return;
+        }
+
+        $input = $this->getAllInput();
+        if (empty($input)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Request body is empty', null, 422);
+            return;
+        }
+
+        // Load current config for the area
+        $currentConfig = match ($area) {
+            'feed'     => FeedRankingService::getConfig(),
+            'listings' => ListingRankingService::getConfig(),
+            'members'  => MemberRankingService::getConfig(),
+        };
+
+        // Only allow known keys from the area's config
+        $updated = [];
+        foreach ($input as $key => $value) {
+            if (!array_key_exists($key, $currentConfig)) {
+                continue; // Ignore unknown keys
+            }
+
+            // Validate weight values
+            if (str_ends_with($key, '_weight') || str_ends_with($key, '_boost') || str_ends_with($key, '_minimum')) {
+                $val = (float)$value;
+                if ($val < 0.0 || $val > 10.0) {
+                    $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, "{$key} must be between 0 and 10", $key, 422);
+                    return;
+                }
+            }
+
+            $updated[$key] = $value;
+        }
+
+        if (empty($updated)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'No recognized algorithm settings provided', null, 422);
+            return;
+        }
+
+        // Read current tenant configuration JSON
+        $tenant = Database::query(
+            "SELECT configuration FROM tenants WHERE id = ?",
+            [$tenantId]
+        )->fetch();
+
+        $config = [];
+        if ($tenant && !empty($tenant['configuration'])) {
+            $config = json_decode($tenant['configuration'], true) ?: [];
+        }
+
+        if (!isset($config['algorithms'])) {
+            $config['algorithms'] = [];
+        }
+
+        if (!isset($config['algorithms'][$area])) {
+            $config['algorithms'][$area] = [];
+        }
+
+        foreach ($updated as $key => $value) {
+            $config['algorithms'][$area][$key] = $value;
+        }
+
+        Database::query(
+            "UPDATE tenants SET configuration = ? WHERE id = ?",
+            [json_encode($config), $tenantId]
+        );
+
+        // Clear ranking service cache
+        match ($area) {
+            'feed'     => FeedRankingService::clearCache(),
+            'listings' => ListingRankingService::clearCache(),
+            'members'  => MemberRankingService::clearCache(),
+            default    => null,
+        };
+
+        $this->clearBootstrapCache($tenantId);
+
+        $this->respondWithData([
+            'updated'      => true,
+            'area'         => $area,
+            'keys_updated' => array_keys($updated),
+        ]);
+    }
+
+    /**
+     * GET /api/v2/admin/config/algorithm-health
+     *
+     * Returns health status for all algorithm subsystems:
+     * FULLTEXT indexes, collaborative filtering data, embeddings availability.
+     * Used by the Algorithm Health Dashboard in React admin.
+     */
+    public function getAlgorithmHealth(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        // 1. Check FULLTEXT indexes
+        $fulltextIndexes = [];
+        $indexChecks = [
+            ['table' => 'listings',      'index' => 'ft_listings_search'],
+            ['table' => 'users',         'index' => 'ft_users_search'],
+            ['table' => 'feed_activity', 'index' => 'ft_feed_search'],
+        ];
+
+        foreach ($indexChecks as $check) {
+            try {
+                $exists = Database::query(
+                    "SELECT COUNT(*) FROM information_schema.STATISTICS
+                     WHERE table_schema = DATABASE()
+                       AND table_name = ?
+                       AND index_name = ?",
+                    [$check['table'], $check['index']]
+                )->fetchColumn();
+
+                $fulltextIndexes[$check['table']] = (int)$exists > 0;
+            } catch (\Throwable $e) {
+                $fulltextIndexes[$check['table']] = false;
+            }
+        }
+
+        // 2. Collaborative filtering training data
+        $cfData = [];
+        try {
+            $listingSaves = Database::query(
+                "SELECT COUNT(*) FROM listing_favorites lf
+                 JOIN listings l ON lf.listing_id = l.id
+                 WHERE l.tenant_id = ?",
+                [$tenantId]
+            )->fetchColumn();
+            $cfData['listing_interactions'] = (int)$listingSaves;
+        } catch (\Throwable $e) {
+            $cfData['listing_interactions'] = 0;
+        }
+
+        try {
+            $memberTxns = Database::query(
+                "SELECT COUNT(DISTINCT CONCAT(LEAST(sender_id, receiver_id), '-', GREATEST(sender_id, receiver_id)))
+                 FROM transactions
+                 WHERE tenant_id = ? AND status = 'completed'",
+                [$tenantId]
+            )->fetchColumn();
+            $cfData['member_pairs'] = (int)$memberTxns;
+        } catch (\Throwable $e) {
+            $cfData['member_pairs'] = 0;
+        }
+
+        // 3. Embeddings coverage
+        $embeddings = [];
+        try {
+            $embRows = Database::query(
+                "SELECT content_type, COUNT(*) as cnt
+                 FROM content_embeddings
+                 WHERE tenant_id = ?
+                 GROUP BY content_type",
+                [$tenantId]
+            )->fetchAll(\PDO::FETCH_KEY_PAIR);
+
+            $embeddings['listing_count'] = (int)($embRows['listing'] ?? 0);
+            $embeddings['user_count']    = (int)($embRows['user'] ?? 0);
+        } catch (\Throwable $e) {
+            $embeddings['listing_count'] = 0;
+            $embeddings['user_count']    = 0;
+        }
+
+        // 4. Algorithm enabled states
+        $enabled = [
+            'edgerank'  => FeedRankingService::isEnabled(),
+            'matchrank' => ListingRankingService::isEnabled(),
+            'communityrank' => MemberRankingService::isEnabled(),
+        ];
+
+        // 5. Meilisearch availability
+        $searchHealth = [
+            'meilisearch_available' => SearchService::isAvailable(),
+            'listing_index_count'   => 0,
+        ];
+
+        $this->respondWithData([
+            'fulltext_indexes'     => $fulltextIndexes,
+            'collaborative_filter' => $cfData,
+            'embeddings'           => $embeddings,
+            'enabled'              => $enabled,
+            'search'               => $searchHealth,
         ]);
     }
 }

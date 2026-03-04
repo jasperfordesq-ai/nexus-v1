@@ -78,9 +78,14 @@ $router->add('PUT', '/api/v2/admin/settings', 'Nexus\Controllers\Api\AdminConfig
 $router->add('GET', '/api/v2/admin/config/ai', 'Nexus\Controllers\Api\AdminConfigApiController@getAiConfig');
 $router->add('PUT', '/api/v2/admin/config/ai', 'Nexus\Controllers\Api\AdminConfigApiController@updateAiConfig');
 
-// Admin Config - Feed Algorithm
+// Admin Config - Feed Algorithm (legacy per-area endpoint)
 $router->add('GET', '/api/v2/admin/config/feed-algorithm', 'Nexus\Controllers\Api\AdminConfigApiController@getFeedAlgorithmConfig');
 $router->add('PUT', '/api/v2/admin/config/feed-algorithm', 'Nexus\Controllers\Api\AdminConfigApiController@updateFeedAlgorithmConfig');
+
+// Admin Config - Algorithms (unified per-area endpoint)
+$router->add('GET', '/api/v2/admin/config/algorithms', 'Nexus\Controllers\Api\AdminConfigApiController@getAlgorithmConfig');
+$router->add('PUT', '/api/v2/admin/config/algorithm/{area}', 'Nexus\Controllers\Api\AdminConfigApiController@updateAlgorithmConfig');
+$router->add('GET', '/api/v2/admin/config/algorithm-health', 'Nexus\Controllers\Api\AdminConfigApiController@getAlgorithmHealth');
 
 // Admin Config - Images
 $router->add('GET', '/api/v2/admin/config/images', 'Nexus\Controllers\Api\AdminConfigApiController@getImageConfig');

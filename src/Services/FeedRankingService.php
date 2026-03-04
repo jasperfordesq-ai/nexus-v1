@@ -94,9 +94,9 @@ class FeedRankingService
         }
 
         // Default values from constants
-        // EdgeRank defaults to disabled until wired into the feed pipeline
+        // EdgeRank is enabled — wired into FeedService::getFeed() via rankFeedItems()
         $defaults = [
-            'enabled' => false,
+            'enabled' => true,
             'like_weight' => self::LIKE_WEIGHT,
             'comment_weight' => self::COMMENT_WEIGHT,
             'share_weight' => self::SHARE_WEIGHT,
@@ -183,6 +183,143 @@ class FeedRankingService
     // =========================================================================
     // MAIN PUBLIC METHODS
     // =========================================================================
+
+    /**
+     * Rank feed_activity items in-memory using EdgeRank
+     *
+     * Designed for use with FeedService::getFeed() results. Applies page-level
+     * ranking — cursor pagination continues to work correctly since the cursor
+     * is set chronologically by the SQL layer before this method is called.
+     *
+     * Score = time_decay × log_engagement × type_weight × affinity × quality
+     *
+     * @param array    $items    Feed items from FeedService::getFeed()['items']
+     * @param int|null $viewerId Authenticated user ID (null for anonymous)
+     * @return array Re-ranked items (same shape, no internal fields added)
+     */
+    public static function rankFeedItems(array $items, ?int $viewerId = null): array
+    {
+        if (!self::isEnabled() || count($items) < 2) {
+            return $items;
+        }
+
+        $config = self::getConfig();
+
+        // Content type weights — community actions rank above passive content
+        $typeWeights = [
+            'event'      => 1.4,
+            'challenge'  => 1.3,
+            'poll'       => 1.25,
+            'volunteer'  => 1.2,
+            'goal'       => 1.1,
+            'post'       => 1.0,
+            'listing'    => 0.9,
+            'job'        => 0.9,
+            'review'     => 0.8,
+        ];
+
+        // Batch-load viewer's social connections for affinity scoring
+        $connectedSet = [];
+        if ($viewerId) {
+            $connectedIds = self::getViewerConnectedUserIds($viewerId);
+            $connectedSet = array_flip($connectedIds);
+        }
+
+        foreach ($items as &$item) {
+            $score = 1.0;
+
+            // 1. Hacker News time decay — fresh content scores highest
+            $createdAt = $item['created_at'] ?? null;
+            if ($createdAt) {
+                $hoursAgo = max(0, (int)round((time() - strtotime($createdAt)) / 3600));
+                $score   *= self::hackerNewsDecay($hoursAgo);
+            }
+
+            // 2. Engagement boost — logarithmic to prevent viral runaway
+            $likes    = (int)($item['likes_count'] ?? 0);
+            $comments = (int)($item['comments_count'] ?? 0);
+            $points   = ($likes * $config['like_weight']) + ($comments * $config['comment_weight']);
+            if ($points > 0) {
+                $score *= 1.0 + log(1.0 + $points) * 0.3;
+            }
+
+            // 3. Content type weight
+            $sourceType = $item['source_type'] ?? 'post';
+            $score     *= $typeWeights[$sourceType] ?? 1.0;
+
+            // 4. Social graph affinity — connected users get a boost
+            $authorId = (int)($item['user_id'] ?? 0);
+            if ($authorId && isset($connectedSet[$authorId])) {
+                $score *= (float)$config['social_graph_follower_boost'];
+            }
+
+            // 5. Content quality signals
+            if ($config['quality_enabled']) {
+                if (!empty($item['image_url'])) {
+                    $score *= (float)$config['quality_image_boost'];
+                }
+                if (strlen((string)($item['content'] ?? '')) >= $config['quality_length_min']) {
+                    $score *= (float)$config['quality_length_bonus'];
+                }
+            }
+
+            $item['_edge_rank'] = $score;
+        }
+        unset($item);
+
+        usort($items, static function (array $a, array $b): int {
+            return $b['_edge_rank'] <=> $a['_edge_rank'];
+        });
+
+        foreach ($items as &$item) {
+            unset($item['_edge_rank']);
+        }
+        unset($item);
+
+        return $items;
+    }
+
+    /**
+     * Hacker News-style time decay factor
+     *
+     * Formula: 1 / (1 + hoursAgo/halfLife)^gravity
+     * Returns a value between freshness_minimum and 1.0.
+     * Fresh items (0h) → 1.0; at halfLife hours → ~0.5; old items → minimum.
+     *
+     * References: https://news.ycombinator.com/item?id=1781417
+     */
+    private static function hackerNewsDecay(int $hoursAgo): float
+    {
+        $config   = self::getConfig();
+        $halfLife = max(1.0, (float)$config['freshness_half_life']); // default 72h
+        $gravity  = 1.8; // HN gravity constant
+
+        $decay = 1.0 / pow(1.0 + $hoursAgo / $halfLife, $gravity);
+
+        return max((float)$config['freshness_minimum'], $decay);
+    }
+
+    /**
+     * Get IDs of users the viewer has exchanged hours with (social graph proxy)
+     * Used for affinity boosting in EdgeRank.
+     */
+    private static function getViewerConnectedUserIds(int $viewerId): array
+    {
+        try {
+            $rows = Database::query(
+                "SELECT DISTINCT
+                    CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END as connected_id
+                 FROM transactions
+                 WHERE (sender_id = ? OR receiver_id = ?)
+                   AND status = 'completed'",
+                [$viewerId, $viewerId, $viewerId]
+            )->fetchAll(\PDO::FETCH_COLUMN);
+
+            return array_map('intval', $rows);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
 
     /**
      * Build a ranked feed SQL query that calculates Total_Score

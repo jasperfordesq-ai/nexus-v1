@@ -196,6 +196,19 @@ class ListingRankingService
         }
 
         $searchTerm = $options['search'] ?? null;
+
+        // Collaborative filtering: find CF-similar listing IDs based on viewer's saves
+        $cfSimilarIds = [];
+        if ($viewerId) {
+            $tenantId        = TenantContext::getId();
+            $savedListingIds = self::getViewerSavedListingIds($viewerId);
+            foreach ($savedListingIds as $savedId) {
+                foreach (CollaborativeFilteringService::getSimilarListings($savedId, $tenantId, 10) as $sid) {
+                    $cfSimilarIds[$sid] = true;
+                }
+            }
+        }
+
         $rankedListings = [];
 
         foreach ($listings as $listing) {
@@ -216,6 +229,11 @@ class ListingRankingService
                 $scores['proximity'] *
                 $scores['quality'] *
                 $scores['reciprocity'];
+
+            // Collaborative filtering boost: listings similar to what viewer saved
+            if (!empty($cfSimilarIds[$listing['id'] ?? 0])) {
+                $finalScore *= 1.15;
+            }
 
             $listing['_match_rank'] = $finalScore;
             $listing['_score_breakdown'] = $scores;
@@ -493,22 +511,43 @@ class ListingRankingService
     }
 
     /**
-     * Calculate engagement score
+     * Calculate engagement score using Bayesian average
+     *
+     * Bayesian shrinkage prevents low-interaction listings from dominating.
+     * Prior weight of 10 "average" interactions stabilises new listings.
+     * Uses contact_count (DB column) instead of the previous inquiry_count alias.
      */
     private static function calculateEngagementScore(array $listing): float
     {
         $config = self::getConfig();
 
-        $views = (int)($listing['view_count'] ?? 0);
-        $inquiries = (int)($listing['inquiry_count'] ?? 0);
-        $saves = (int)($listing['save_count'] ?? 0);
+        $views    = (int)($listing['view_count'] ?? 0);
+        $contacts = (int)($listing['contact_count'] ?? 0);
+        $saves    = (int)($listing['save_count'] ?? 0);
 
-        $score =
-            ($views * $config['engagement_view_weight']) +
-            ($inquiries * $config['engagement_inquiry_weight']) +
-            ($saves * $config['engagement_save_weight']);
+        $n = $views + $contacts + $saves;
 
-        return max($config['engagement_minimum'], 1.0 + ($score / 10));
+        if ($n === 0) {
+            return $config['engagement_minimum'];
+        }
+
+        // Weighted raw score per interaction
+        $rawWeighted =
+            ($views    * $config['engagement_view_weight']) +
+            ($contacts * $config['engagement_inquiry_weight']) +
+            ($saves    * $config['engagement_save_weight']);
+
+        // Bayesian average: shrink toward prior mean for low-count listings
+        // p_hat = rawWeighted / n (average quality per interaction)
+        // Bayesian = (C * m + rawWeighted) / (C + n)
+        $priorStrength = 10.0;  // Confidence equivalent to 10 mean interactions
+        $priorMean     = 0.5;   // Neutral prior (mid-range engagement quality)
+
+        $bayesian = ($priorStrength * $priorMean + $rawWeighted)
+                  / ($priorStrength + $n);
+
+        // Map to [engagement_minimum, 2.0] range
+        return max($config['engagement_minimum'], 1.0 + $bayesian);
     }
 
     /**
@@ -627,13 +666,31 @@ class ListingRankingService
     }
 
     /**
-     * SQL snippet for engagement score
+     * SQL snippet for engagement score (Bayesian average)
+     *
+     * Mirrors calculateEngagementScore() in SQL using view_count, contact_count, save_count.
+     * Bayesian prior: C=10, m=0.5 — stabilises new listings with few interactions.
      */
     private static function getEngagementScoreSql(): string
     {
-        // Return neutral score - engagement metrics not yet implemented
-        // Future: add view_count, inquiry_count, save_count columns to listings table
-        return "1.0";
+        $config = self::getConfig();
+        $viewW    = (float)$config['engagement_view_weight'];
+        $contactW = (float)$config['engagement_inquiry_weight'];
+        $saveW    = (float)$config['engagement_save_weight'];
+        $minimum  = (float)$config['engagement_minimum'];
+
+        return "
+            GREATEST({$minimum},
+                1.0 + (
+                    (10.0 * 0.5 + (
+                        COALESCE(l.view_count, 0) * {$viewW} +
+                        COALESCE(l.contact_count, 0) * {$contactW} +
+                        COALESCE(l.save_count, 0) * {$saveW}
+                    )) /
+                    (10.0 + COALESCE(l.view_count, 0) + COALESCE(l.contact_count, 0) + COALESCE(l.save_count, 0))
+                )
+            )
+        ";
     }
 
     /**
@@ -713,6 +770,21 @@ class ListingRankingService
             // Get categories from listings they've viewed/contacted (if tracking exists)
             // For now, just return their own categories
             return $ownCategories ?: [];
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get IDs of listings the viewer has saved/favourited
+     */
+    private static function getViewerSavedListingIds(int $userId): array
+    {
+        try {
+            return Database::query(
+                "SELECT listing_id FROM listing_favorites WHERE user_id = ?",
+                [$userId]
+            )->fetchAll(\PDO::FETCH_COLUMN);
         } catch (\Exception $e) {
             return [];
         }

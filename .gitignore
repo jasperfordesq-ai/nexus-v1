@@ -41,6 +41,9 @@ CLAUDE.md
 !/scripts/add-spdx-headers.mjs
 !/scripts/check-spdx.mjs
 !/scripts/safe_migrate.php
+!/scripts/backfill_embeddings.php
+!/scripts/sync_search_index.php
+!/scripts/train_recommendations.php
 !/scripts/migrate-production.sh
 !/scripts/backup-production-db.sh
 !/scripts/check-migration-drift.sh
