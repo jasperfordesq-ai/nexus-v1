@@ -300,7 +300,7 @@ class BalanceAlertService
         }
 
         $basePath = TenantContext::getSlugPrefix();
-        $link = $basePath . "/organizations/{$organizationId}/wallet";
+        $link = $basePath . "/organisations/{$organizationId}";
 
         $formattedBalance = number_format($balance, 2);
 
