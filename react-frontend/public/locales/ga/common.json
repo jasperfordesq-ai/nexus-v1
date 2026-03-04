@@ -35,7 +35,13 @@
     "impact_report": "Tuarascáil Tionchair",
     "strategic_plan": "Plean Straitéiseach",
     "home": "Baile",
-    "leaderboard": "Clárcheannais"
+    "leaderboard": "Clárcheannais",
+    "polls": "Pobalbhreitheanna",
+    "jobs": "Poist",
+    "ideation": "Dúshláin Idéalaithe",
+    "matches": "Meaitseálacha",
+    "connections": "Naisc",
+    "ai_chat": "Cúntóir AI"
   },
   "user_menu": {
     "my_profile": "Mo Phróifíl",
@@ -138,6 +144,26 @@
     "essential_only": "Riachtanach amháin",
     "save": "Sábháil sainroghanna"
   },
+  "footer": {
+    "platform": "Ardán",
+    "support": "Tacaíocht",
+    "help_center": "Ionad Cabhraigh",
+    "contact_us": "Déan Teagmháil Linn",
+    "about": "Faoi",
+    "report_bug": "Tuairiscigh Fabht",
+    "legal": "Dlíthiúil",
+    "pages": "Leathanaigh",
+    "cookie_settings": "Socruithe Fianán",
+    "built_on_nexus": "Tógtha ar Project NEXUS — Ardán Pobail Foinse Oscailte",
+    "agpl_notice": "AGPL-3.0 — Cóipcheart \u00a9 2024\u2013{{year}} Jasper Ford",
+    "terms": "Téarmaí",
+    "privacy": "Príobháideachas"
+  },
+  "mobile_tab": {
+    "create": "Cruthaigh",
+    "menu": "Roghchlár",
+    "create_new_content": "Cruthaigh ábhar nua"
+  },
   "attribution": "Tógtha ar Project NEXUS le Jasper Ford",
   "members": {
     "title": "Baill",
@@ -160,6 +186,8 @@
     "load_more": "Luchtaigh Tuilleadh",
     "results_matching": "{{shown}} as {{total}} ball ag meaitseáil \"{{query}}\"",
     "no_location": "Gan baill le sonraí suíomh",
-    "fallback_name": "Ball"
+    "fallback_name": "Ball",
+    "load_failed": "Theip ar luchtú ball",
+    "load_more_failed": "Theip ar luchtú tuilleadh ball"
   }
 }

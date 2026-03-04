@@ -1,0 +1,47 @@
+{
+  "welcome": {
+    "subject": "¡Bienvenido a {{community}}!",
+    "greeting": "¡Bienvenido, {{name}}!",
+    "body": "Gracias por unirte a {{community}}. Tu cuenta ha sido creada y ya puedes empezar a explorar la plataforma.",
+    "cta": "Empezar"
+  },
+  "verification": {
+    "subject": "Verifica tu dirección de correo electrónico",
+    "greeting": "Hola {{name}},",
+    "body": "Por favor verifica tu dirección de correo electrónico haciendo clic en el botón de abajo.",
+    "cta": "Verificar Correo",
+    "expiry": "Este enlace expira en {{hours}} horas."
+  },
+  "password_reset": {
+    "subject": "Restablece tu contraseña",
+    "greeting": "Hola {{name}},",
+    "body": "Solicitaste un restablecimiento de contraseña. Haz clic en el botón de abajo para establecer una nueva contraseña.",
+    "cta": "Restablecer Contraseña",
+    "expiry": "Este enlace expira en {{hours}} horas.",
+    "ignore": "Si no solicitaste esto, puedes ignorar este correo con tranquilidad."
+  },
+  "transaction": {
+    "subject": "Transacción de créditos de tiempo — {{amount}}h",
+    "greeting": "Hola {{name}},",
+    "sent": "Enviaste {{amount}} hora(s) a {{recipient}}.",
+    "received": "Recibiste {{amount}} hora(s) de {{sender}}.",
+    "description": "Descripción: {{description}}"
+  },
+  "review_request": {
+    "subject": "Deja una reseña para {{name}}",
+    "greeting": "Hola {{name}},",
+    "body": "Recientemente intercambiaste servicios con {{other_party}}. Por favor tómate un momento para dejar una reseña.",
+    "cta": "Dejar Reseña"
+  },
+  "new_message": {
+    "subject": "Nuevo mensaje de {{sender}}",
+    "greeting": "Hola {{name}},",
+    "body": "{{sender}} te envió un mensaje.",
+    "cta": "Ver Mensaje"
+  },
+  "footer": {
+    "unsubscribe": "Cancelar suscripción a estos correos",
+    "sent_by": "Enviado por {{community}} con tecnología de Project NEXUS",
+    "address": "{{community}}"
+  }
+}

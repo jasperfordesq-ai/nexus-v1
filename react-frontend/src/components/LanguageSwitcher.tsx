@@ -40,6 +40,8 @@ const ALL_LANGUAGES: Language[] = [
   { code: 'de', label: 'Deutsch', short: 'DE' },
   { code: 'fr', label: 'Français', short: 'FR' },
   { code: 'it', label: 'Italiano', short: 'IT' },
+  { code: 'pt', label: 'Português', short: 'PT' },
+  { code: 'es', label: 'Español', short: 'ES' },
 ];
 
 interface LanguageSwitcherProps {

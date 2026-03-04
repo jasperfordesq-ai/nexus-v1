@@ -23,6 +23,7 @@
   "no_location": "Aucun événement avec des données de localisation",
   "going": "{{count}} participant(s)",
   "interested": "{{count}} intéressé(s)",
+  "events_in_month": "Événements en {{month}}",
   "error_load_more": "Impossible de charger plus d'événements",
   "category": {
     "all": "Tous",
@@ -79,7 +80,30 @@
     "delete_confirm": "Êtes-vous sûr(e) de vouloir supprimer «\u202f{{title}}\u202f» ? Cette action est irréversible.",
     "cancel": "Annuler",
     "delete_confirm_btn": "Supprimer l'événement",
-    "cover_alt": "Couverture de {{title}}"
+    "cover_alt": "Couverture de {{title}}",
+    "event_cancelled": "Événement annulé",
+    "cancellation_reason": "Motif : {{reason}}",
+    "recurring_event": "Événement récurrent",
+    "events_in_series": "{{count}} événements dans la série",
+    "on_waitlist": "Sur liste d'attente",
+    "spots_left": "{{count}} places restantes",
+    "event_full": "Complet",
+    "waitlist_count": "{{count}} en liste d'attente",
+    "cancel_modal_title": "Annuler l'événement",
+    "cancel_confirm": "Êtes-vous sûr(e) de vouloir annuler «\u202f{{title}}\u202f» ? Tous les participants seront notifiés.",
+    "cancel_reason_placeholder": "Motif de l'annulation (facultatif)",
+    "keep_event": "Garder l'événement",
+    "cancel_event": "Annuler l'événement",
+    "join_waitlist": "Rejoindre la liste d'attente",
+    "leave_waitlist": "Quitter la liste d'attente",
+    "other_series_events": "Autres événements de cette série",
+    "view_all_series": "Voir les {{count}} événements de la série",
+    "no_other_series_events": "Aucun autre événement trouvé dans cette série."
+  },
+  "card": {
+    "cancelled": "Annulé",
+    "spots_left": "{{count}} places restantes",
+    "full": "Complet"
   },
   "form": {
     "create_title": "Créer un nouvel événement",
@@ -106,8 +130,10 @@
     "description_placeholder": "Décrivez votre événement en détail...",
     "start_date_label": "Date de début",
     "start_time_label": "Heure de début",
+    "legend_start_datetime": "Date et heure de début",
     "end_date_label": "Date de fin (optionnel)",
     "end_time_label": "Heure de fin (optionnel)",
+    "legend_end_datetime": "Date et heure de fin (optionnel)",
     "location_label": "Lieu (optionnel)",
     "location_placeholder": "ex. : En ligne, Centre communautaire...",
     "max_attendees_label": "Nombre max. de participants (optionnel)",
@@ -116,6 +142,13 @@
     "submit_update": "Mettre à jour l'événement",
     "submit_saving": "Enregistrement et téléchargement de l'image...",
     "cancel": "Annuler",
+    "weekday_mon": "Lun",
+    "weekday_tue": "Mar",
+    "weekday_wed": "Mer",
+    "weekday_thu": "Jeu",
+    "weekday_fri": "Ven",
+    "weekday_sat": "Sam",
+    "weekday_sun": "Dim",
     "validation": {
       "title_required": "Le titre est obligatoire",
       "title_min": "Le titre doit comporter au moins 5 caractères",
@@ -124,7 +157,10 @@
       "start_date_required": "La date de début est obligatoire",
       "start_time_required": "L'heure de début est obligatoire",
       "end_date_before_start": "La date de fin doit être après la date de début",
-      "max_attendees_range": "Doit être entre 1 et 10 000"
+      "max_attendees_range": "Doit être entre 1 et 10 000",
+      "select_day": "Veuillez sélectionner au moins un jour de la semaine",
+      "occurrences_range": "Le nombre d'occurrences doit être entre 2 et 52",
+      "select_end_date": "Veuillez sélectionner une date de fin pour la série"
     },
     "toast": {
       "image_type": "Veuillez sélectionner une image JPEG, PNG, WebP ou GIF",
@@ -149,6 +185,11 @@
     "delete_failed": "Impossible de supprimer l'événement",
     "checkin_success": "Participant enregistré",
     "checkin_failed": "L'enregistrement a échoué",
-    "something_wrong": "Une erreur s'est produite"
+    "something_wrong": "Une erreur s'est produite",
+    "event_cancelled": "Événement annulé",
+    "cancel_failed": "Impossible d'annuler l'événement",
+    "added_to_waitlist": "Vous avez été ajouté(e) à la liste d'attente.",
+    "waitlist_join_failed": "Impossible de rejoindre la liste d'attente.",
+    "removed_from_waitlist": "Vous avez été retiré(e) de la liste d'attente."
   }
 }

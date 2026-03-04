@@ -1,0 +1,19 @@
+{
+  "title": "Definições",
+  "account": "Conta",
+  "notifications": "Notificações",
+  "privacy": "Privacidade",
+  "language": "Idioma",
+  "appearance": "Aparência",
+  "security": "Segurança",
+  "save": "Guardar Definições",
+  "saved": "Definições guardadas",
+  "language_preference": "Preferência de Idioma",
+  "select_language": "Escolha o seu idioma preferido para a interface",
+  "theme": {
+    "title": "Tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  }
+}

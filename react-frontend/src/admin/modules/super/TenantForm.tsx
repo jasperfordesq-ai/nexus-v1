@@ -73,6 +73,8 @@ const PLATFORM_LANGUAGES = [
   { code: 'de', label: 'Deutsch', short: 'DE' },
   { code: 'fr', label: 'Français', short: 'FR' },
   { code: 'it', label: 'Italiano', short: 'IT' },
+  { code: 'pt', label: 'Português', short: 'PT' },
+  { code: 'es', label: 'Español', short: 'ES' },
 ];
 
 export function TenantForm() {

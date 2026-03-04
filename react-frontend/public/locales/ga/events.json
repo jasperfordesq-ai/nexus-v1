@@ -23,6 +23,7 @@
   "no_location": "Gan imeachtaí le sonraí suíomh",
   "going": "{{count}} ag dul",
   "interested": "{{count}} suim acu",
+  "events_in_month": "Imeachtaí i {{month}}",
   "error_load_more": "Theip ar luchtú tuilleadh imeachtaí",
   "category": {
     "all": "Gach Ceann",
@@ -79,7 +80,30 @@
     "delete_confirm": "An bhfuil tú cinnte gur mhaith leat \"{{title}}\" a scriosadh? Ní féidir an gníomh seo a chur ar ceal.",
     "cancel": "Cealaigh",
     "delete_confirm_btn": "Scrios Imeacht",
-    "cover_alt": "Clúdach do {{title}}"
+    "cover_alt": "Clúdach do {{title}}",
+    "event_cancelled": "Imeacht Cealaithe",
+    "cancellation_reason": "Cúis: {{reason}}",
+    "recurring_event": "Imeacht Athfhillteach",
+    "events_in_series": "{{count}} imeacht sa tsraith",
+    "on_waitlist": "Ar an Liosta Feithimh",
+    "spots_left": "{{count}} áit fágtha",
+    "event_full": "Lán",
+    "waitlist_count": "{{count}} ar an liosta feithimh",
+    "cancel_modal_title": "Cealaigh Imeacht",
+    "cancel_confirm": "An bhfuil tú cinnte gur mhaith leat \u201c{{title}}\u201d a chealú? Cuirfear gach freastalaitheoir ar an eolas.",
+    "cancel_reason_placeholder": "Cúis le cealú (roghnach)",
+    "keep_event": "Coinnigh an tImeacht",
+    "cancel_event": "Cealaigh Imeacht",
+    "join_waitlist": "Bí ar an Liosta Feithimh",
+    "leave_waitlist": "Fág an Liosta Feithimh",
+    "other_series_events": "Imeachtaí eile sa tsraith seo",
+    "view_all_series": "Féach ar gach {{count}} imeacht sa tsraith",
+    "no_other_series_events": "Níor aimsíodh aon imeachtaí eile sa tsraith seo."
+  },
+  "card": {
+    "cancelled": "Cealaithe",
+    "spots_left": "{{count}} áit fágtha",
+    "full": "Lán"
   },
   "form": {
     "create_title": "Cruthaigh Imeacht Nua",
@@ -106,8 +130,10 @@
     "description_placeholder": "Déan cur síos mionsonraithe ar d'imeacht...",
     "start_date_label": "Dáta Tosaigh",
     "start_time_label": "Am Tosaigh",
+    "legend_start_datetime": "Dáta agus am tosaigh",
     "end_date_label": "Dáta Deiridh (roghnach)",
     "end_time_label": "Am Deiridh (roghnach)",
+    "legend_end_datetime": "Dáta agus am deiridh (roghnach)",
     "location_label": "Suíomh (roghnach)",
     "location_placeholder": "m.sh., Ar Líne, Ionad Pobail...",
     "max_attendees_label": "Uaslíon Freastalaitheoirí (roghnach)",
@@ -116,6 +142,13 @@
     "submit_update": "Nuashonraigh Imeacht",
     "submit_saving": "Ag sábháil agus ag uaslódáil íomhá...",
     "cancel": "Cealaigh",
+    "weekday_mon": "Lua",
+    "weekday_tue": "Mái",
+    "weekday_wed": "Céa",
+    "weekday_thu": "Déa",
+    "weekday_fri": "Aoi",
+    "weekday_sat": "Sat",
+    "weekday_sun": "Dom",
     "validation": {
       "title_required": "Tá teideal ag teastáil",
       "title_min": "Caithfidh an teideal a bheith ar a laghad 5 carachtar",
@@ -124,7 +157,10 @@
       "start_date_required": "Tá dáta tosaigh ag teastáil",
       "start_time_required": "Tá am tosaigh ag teastáil",
       "end_date_before_start": "Caithfidh dáta deiridh a bheith tar éis dáta tosaigh",
-      "max_attendees_range": "Caithfidh a bheith idir 1 agus 10,000"
+      "max_attendees_range": "Caithfidh a bheith idir 1 agus 10,000",
+      "select_day": "Roghnaigh lá amháin na seachtaine ar a laghad le do thoil",
+      "occurrences_range": "Caithfidh an líon tarluithe a bheith idir 2 agus 52",
+      "select_end_date": "Roghnaigh dáta deiridh don tsraith le do thoil"
     },
     "toast": {
       "image_type": "Roghnaigh íomhá JPEG, PNG, WebP, nó GIF le do thoil",
@@ -149,6 +185,11 @@
     "delete_failed": "Theip ar scriosadh imeachta",
     "checkin_success": "Freastalaitheoir seiceáilte isteach",
     "checkin_failed": "Theip ar sheiceáil isteach",
-    "something_wrong": "Chuaigh rud éigin mícheart"
+    "something_wrong": "Chuaigh rud éigin mícheart",
+    "event_cancelled": "Imeacht cealaithe",
+    "cancel_failed": "Theip ar chealú an imeachta",
+    "added_to_waitlist": "Cuireadh ar an liosta feithimh thú.",
+    "waitlist_join_failed": "Theip ar bhaint leis an liosta feithimh.",
+    "removed_from_waitlist": "Baineadh den liosta feithimh thú."
   }
 }

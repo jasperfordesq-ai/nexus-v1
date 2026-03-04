@@ -1,0 +1,19 @@
+{
+  "title": "Configuración",
+  "account": "Cuenta",
+  "notifications": "Notificaciones",
+  "privacy": "Privacidad",
+  "language": "Idioma",
+  "appearance": "Apariencia",
+  "security": "Seguridad",
+  "save": "Guardar Configuración",
+  "saved": "Configuración guardada",
+  "language_preference": "Preferencia de Idioma",
+  "select_language": "Elige tu idioma preferido para la interfaz",
+  "theme": {
+    "title": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  }
+}

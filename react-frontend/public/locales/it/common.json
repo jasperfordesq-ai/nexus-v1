@@ -35,7 +35,13 @@
     "impact_report": "Report d'Impatto",
     "strategic_plan": "Piano Strategico",
     "home": "Home",
-    "leaderboard": "Classifica"
+    "leaderboard": "Classifica",
+    "polls": "Sondaggi",
+    "jobs": "Lavori",
+    "ideation": "Sfide di Ideazione",
+    "matches": "Abbinamenti",
+    "connections": "Connessioni",
+    "ai_chat": "Assistente IA"
   },
   "user_menu": {
     "my_profile": "Il Mio Profilo",
@@ -138,6 +144,26 @@
     "essential_only": "Solo essenziali",
     "save": "Salva preferenze"
   },
+  "footer": {
+    "platform": "Piattaforma",
+    "support": "Assistenza",
+    "help_center": "Centro Assistenza",
+    "contact_us": "Contattaci",
+    "about": "Chi Siamo",
+    "report_bug": "Segnala un Bug",
+    "legal": "Legale",
+    "pages": "Pagine",
+    "cookie_settings": "Impostazioni Cookie",
+    "built_on_nexus": "Realizzato su Project NEXUS — Piattaforma Comunitaria Open Source",
+    "agpl_notice": "AGPL-3.0 — Copyright \u00a9 2024\u2013{{year}} Jasper Ford",
+    "terms": "Termini",
+    "privacy": "Privacy"
+  },
+  "mobile_tab": {
+    "create": "Crea",
+    "menu": "Menu",
+    "create_new_content": "Crea nuovo contenuto"
+  },
   "attribution": "Realizzato su Project NEXUS di Jasper Ford",
   "members": {
     "title": "Membri",
@@ -160,6 +186,8 @@
     "load_more": "Carica altro",
     "results_matching": "{{shown}} di {{total}} membri che corrispondono a \"{{query}}\"",
     "no_location": "Nessun membro con dati di posizione",
-    "fallback_name": "Membro"
+    "fallback_name": "Membro",
+    "load_failed": "Impossibile caricare i membri",
+    "load_more_failed": "Impossibile caricare altri membri"
   }
 }

@@ -1,5 +1,6 @@
 {
   "title": "Nachrichten",
+  "conversation_with": "{{name}} — Nachrichten",
   "new_message": "Neue Nachricht",
   "search_placeholder": "Gespräche suchen...",
   "empty": "Noch keine Nachrichten",
@@ -59,6 +60,7 @@
   "message_edited_indicator": "(bearbeitet)",
   "message_edit": "Bearbeiten",
   "message_delete": "Löschen",
+  "error": "Fehler",
   "error_title": "Fehler",
   "save": "Speichern",
   "search_result_count": "{{current}} von {{total}}",
@@ -69,5 +71,16 @@
   "aria_add_reaction": "Reaktion hinzufügen",
   "aria_react_with": "Mit {{emoji}} reagieren",
   "aria_message_options": "Nachrichtenoptionen",
-  "aria_toggle_reaction": "{{emoji}}-Reaktion, zum Umschalten klicken"
+  "aria_toggle_reaction": "{{emoji}}-Reaktion, zum Umschalten klicken",
+  "load_failed": "Gespräche konnten nicht geladen werden",
+  "conversation_restored": "Gespräch wiederhergestellt",
+  "conversation_restored_desc": "Das Gespräch wurde zurück in Ihren Posteingang verschoben.",
+  "restore_failed": "Gespräch konnte nicht wiederhergestellt werden",
+  "search_members_failed": "Mitgliedersuche fehlgeschlagen",
+  "messaging_restricted_title": "Nachrichten eingeschränkt",
+  "messaging_restricted_desc": "Ihre Nachrichtenfunktion wurde von einem Gemeinschaftsadministrator eingeschränkt. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Support.",
+  "conversation_archived": "Gespräch archiviert",
+  "conversation_archived_desc": "Das Gespräch wurde in Ihr Archiv verschoben.",
+  "archive_failed": "Gespräch konnte nicht archiviert werden",
+  "messaging_restricted": "Ihre Nachrichtenfunktion wurde eingeschränkt"
 }

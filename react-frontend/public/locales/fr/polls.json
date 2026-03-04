@@ -1,0 +1,78 @@
+{
+  "title": "Sondages",
+  "subtitle": "Votez et decouvrez ce que pense la communaute",
+  "page_title": "Sondages",
+
+  "create_poll": "Creer un sondage",
+  "question": "Question",
+  "question_placeholder": "Que souhaitez-vous demander ?",
+  "description": "Description (optionnel)",
+  "description_placeholder": "Ajoutez du contexte a votre sondage...",
+  "options": "Options",
+  "option_placeholder": "Option {{number}}",
+  "add_option": "Ajouter une option",
+  "remove_option": "Supprimer l'option",
+  "expires_at": "Date de fin (optionnel)",
+  "no_deadline": "Laisser vide pour aucune date limite",
+  "submit": "Creer le sondage",
+
+  "vote": "Voter",
+  "votes": "votes",
+  "votes_one": "vote",
+  "voted": "Vous avez vote",
+  "results": "Resultats",
+  "total_votes": "{{count}} votes",
+  "total_votes_one": "{{count}} vote",
+
+  "status": {
+    "open": "Ouvert",
+    "closed": "Ferme"
+  },
+
+  "tabs": {
+    "open": "Ouverts",
+    "closed": "Fermes",
+    "mine": "Mes sondages",
+    "aria_label": "Onglets de filtre des sondages"
+  },
+
+  "empty": {
+    "title": "Aucun sondage pour le moment",
+    "description": "Soyez le premier a creer un sondage et a recueillir l'avis de la communaute.",
+    "description_closed": "Aucun sondage ferme a afficher.",
+    "description_mine": "Vous n'avez pas encore cree de sondage."
+  },
+
+  "time_remaining": "{{time}} restant",
+  "expired": "Expire",
+  "created_by": "par",
+  "delete_poll": "Supprimer le sondage",
+
+  "confirm_delete": {
+    "title": "Supprimer le sondage",
+    "message": "Etes-vous sur de vouloir supprimer ce sondage ? Cette action est irreversible.",
+    "confirm": "Supprimer",
+    "cancel": "Annuler"
+  },
+
+  "toast": {
+    "created": "Sondage cree avec succes !",
+    "create_failed": "Echec de la creation du sondage. Veuillez reessayer.",
+    "voted": "Vote enregistre !",
+    "vote_failed": "Echec de l'enregistrement du vote. Veuillez reessayer.",
+    "deleted": "Sondage supprime.",
+    "delete_failed": "Echec de la suppression du sondage. Veuillez reessayer."
+  },
+
+  "errors": {
+    "question_required": "Veuillez entrer une question pour votre sondage.",
+    "min_options": "Veuillez fournir au moins 2 options.",
+    "load_failed": "Impossible de charger les sondages.",
+    "load_more_failed": "Echec du chargement des sondages supplementaires."
+  },
+
+  "load_more": "Charger plus",
+  "try_again": "Reessayer",
+  "collapse": "Reduire",
+  "expand": "Creer un sondage"
+}

@@ -23,6 +23,7 @@
   "no_location": "Keine Veranstaltungen mit Standortdaten",
   "going": "{{count}} Teilnehmer",
   "interested": "{{count}} Interessierte",
+  "events_in_month": "Veranstaltungen im {{month}}",
   "error_load_more": "Weitere Veranstaltungen konnten nicht geladen werden",
   "category": {
     "all": "Alle",
@@ -79,7 +80,30 @@
     "delete_confirm": "Sind Sie sicher, dass Sie \"{{title}}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
     "cancel": "Abbrechen",
     "delete_confirm_btn": "Veranstaltung löschen",
-    "cover_alt": "Cover für {{title}}"
+    "cover_alt": "Cover für {{title}}",
+    "event_cancelled": "Veranstaltung abgesagt",
+    "cancellation_reason": "Grund: {{reason}}",
+    "recurring_event": "Wiederkehrende Veranstaltung",
+    "events_in_series": "{{count}} Veranstaltungen in der Reihe",
+    "on_waitlist": "Auf Warteliste",
+    "spots_left": "{{count}} Plätze frei",
+    "event_full": "Ausgebucht",
+    "waitlist_count": "{{count}} auf der Warteliste",
+    "cancel_modal_title": "Veranstaltung absagen",
+    "cancel_confirm": "Sind Sie sicher, dass Sie \"{{title}}\" absagen möchten? Alle Teilnehmer werden benachrichtigt.",
+    "cancel_reason_placeholder": "Grund für die Absage (optional)",
+    "keep_event": "Veranstaltung beibehalten",
+    "cancel_event": "Veranstaltung absagen",
+    "join_waitlist": "Auf Warteliste setzen",
+    "leave_waitlist": "Von Warteliste entfernen",
+    "other_series_events": "Weitere Veranstaltungen in dieser Reihe",
+    "view_all_series": "Alle {{count}} Veranstaltungen der Reihe anzeigen",
+    "no_other_series_events": "Keine weiteren Veranstaltungen in dieser Reihe gefunden."
+  },
+  "card": {
+    "cancelled": "Abgesagt",
+    "spots_left": "{{count}} Plätze frei",
+    "full": "Ausgebucht"
   },
   "form": {
     "create_title": "Neue Veranstaltung erstellen",
@@ -106,8 +130,10 @@
     "description_placeholder": "Beschreiben Sie Ihre Veranstaltung detailliert...",
     "start_date_label": "Startdatum",
     "start_time_label": "Startzeit",
+    "legend_start_datetime": "Startdatum und -uhrzeit",
     "end_date_label": "Enddatum (optional)",
     "end_time_label": "Endzeit (optional)",
+    "legend_end_datetime": "Enddatum und -uhrzeit (optional)",
     "location_label": "Ort (optional)",
     "location_placeholder": "z.B. Online, Gemeindezentrum...",
     "max_attendees_label": "Max. Teilnehmer (optional)",
@@ -116,6 +142,13 @@
     "submit_update": "Veranstaltung aktualisieren",
     "submit_saving": "Speichern und Bild hochladen...",
     "cancel": "Abbrechen",
+    "weekday_mon": "Mo",
+    "weekday_tue": "Di",
+    "weekday_wed": "Mi",
+    "weekday_thu": "Do",
+    "weekday_fri": "Fr",
+    "weekday_sat": "Sa",
+    "weekday_sun": "So",
     "validation": {
       "title_required": "Titel ist erforderlich",
       "title_min": "Titel muss mindestens 5 Zeichen lang sein",
@@ -124,7 +157,10 @@
       "start_date_required": "Startdatum ist erforderlich",
       "start_time_required": "Startzeit ist erforderlich",
       "end_date_before_start": "Enddatum muss nach dem Startdatum liegen",
-      "max_attendees_range": "Muss zwischen 1 und 10.000 liegen"
+      "max_attendees_range": "Muss zwischen 1 und 10.000 liegen",
+      "select_day": "Bitte wählen Sie mindestens einen Wochentag aus",
+      "occurrences_range": "Wiederholungen müssen zwischen 2 und 52 liegen",
+      "select_end_date": "Bitte wählen Sie ein Enddatum für die Reihe aus"
     },
     "toast": {
       "image_type": "Bitte wählen Sie ein JPEG-, PNG-, WebP- oder GIF-Bild",
@@ -149,6 +185,11 @@
     "delete_failed": "Veranstaltung konnte nicht gelöscht werden",
     "checkin_success": "Teilnehmer eingecheckt",
     "checkin_failed": "Einchecken fehlgeschlagen",
-    "something_wrong": "Etwas ist schiefgelaufen"
+    "something_wrong": "Etwas ist schiefgelaufen",
+    "event_cancelled": "Veranstaltung abgesagt",
+    "cancel_failed": "Veranstaltung konnte nicht abgesagt werden",
+    "added_to_waitlist": "Sie wurden auf die Warteliste gesetzt.",
+    "waitlist_join_failed": "Eintrag auf Warteliste fehlgeschlagen.",
+    "removed_from_waitlist": "Sie wurden von der Warteliste entfernt."
   }
 }
