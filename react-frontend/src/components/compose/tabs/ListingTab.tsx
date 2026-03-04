@@ -10,12 +10,14 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Input, Textarea, Select, SelectItem, Chip } from '@heroui/react';
+import { ImagePlus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { compressImage } from '@/lib/compress-image';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { AiAssistButton } from '../shared/AiAssistButton';
 import { SdgGoalsPicker } from '../shared/SdgGoalsPicker';
@@ -61,7 +63,17 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
   const [longitude, setLongitude] = useState<number | undefined>();
   const [sdgGoals, setSdgGoals] = useState<number[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  // Cleanup object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
   // Apply template data when selected from TemplatePicker
   useEffect(() => {
@@ -100,6 +112,36 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
     [setDraft],
   );
 
+  const handleImageSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (imageInputRef.current) imageInputRef.current.value = '';
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error(t('compose.image_select_error'));
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t('compose.image_size_error', { size: 5 }));
+      return;
+    }
+
+    try {
+      const compressed = await compressImage(file);
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      setImageFile(compressed);
+      setImagePreview(URL.createObjectURL(compressed));
+    } catch {
+      toast.error(t('compose.image_select_error'));
+    }
+  }, [imagePreview, toast, t]);
+
+  const handleImageRemove = useCallback(() => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImageFile(null);
+    setImagePreview(null);
+  }, [imagePreview]);
+
   useEffect(() => {
     async function loadCategories() {
       try {
@@ -133,11 +175,22 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
 
       const res = await api.post<{ id: number }>('/v2/listings', payload);
       if (res.success) {
-        const id = res.data?.id;
+        const listingId = res.data?.id;
+
+        // Upload image if selected (after listing creation, same pattern as CreateListingPage)
+        if (imageFile && listingId) {
+          try {
+            await api.upload(`/v2/listings/${listingId}/image`, imageFile, 'image');
+          } catch (imgErr) {
+            logError('Failed to upload listing image', imgErr);
+          }
+        }
+
         clearDraft();
+        handleImageRemove();
         toast.success(t('compose.listing_created'));
         onClose();
-        onSuccess('listing', id);
+        onSuccess('listing', listingId);
       } else {
         toast.error(t('compose.listing_failed'));
       }
@@ -224,6 +277,46 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
             onGenerated={setDescription}
           />
         </div>
+      </div>
+
+      {/* Image upload */}
+      <div>
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={handleImageSelect}
+        />
+        {imagePreview ? (
+          <div className="relative inline-block rounded-xl overflow-hidden border border-[var(--border-default)]">
+            <img
+              src={imagePreview}
+              alt="Listing preview"
+              className="h-24 w-auto max-w-full object-cover rounded-xl"
+            />
+            <Button
+              isIconOnly
+              variant="flat"
+              size="sm"
+              className="absolute top-1 right-1 bg-black/60 text-white min-w-7 w-7 h-7 backdrop-blur-sm"
+              onPress={handleImageRemove}
+              aria-label={t('compose.image_remove_aria')}
+            >
+              <X className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+        ) : (
+          <Button
+            size="sm"
+            variant="flat"
+            className="bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--color-primary)] min-h-[44px]"
+            startContent={<ImagePlus className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => imageInputRef.current?.click()}
+          >
+            {t('compose.image_add')}
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
