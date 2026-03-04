@@ -258,9 +258,13 @@ $router->add('GET', '/api/v2/users', function () {
     $sql = "SELECT u.id, u.name, u.first_name, u.last_name,
                    u.avatar_url as avatar, u.bio as tagline,
                    u.location, u.latitude, u.longitude,
-                   u.created_at,
+                   u.created_at, u.last_login_at, u.is_verified,
                    (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as rating,
-                   (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given
+                   (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given,
+                   (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as hours_given,
+                   (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as hours_received,
+                   (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'offer' AND tenant_id = u.tenant_id) as offer_count,
+                   (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'request' AND tenant_id = u.tenant_id) as request_count
             FROM users u
             WHERE $whereClause
             ORDER BY $orderBy
@@ -269,6 +273,33 @@ $router->add('GET', '/api/v2/users', function () {
     $params[] = (int)$offset;
 
     $users = \Nexus\Core\Database::query($sql, $params)->fetchAll();
+
+    // Apply CommunityRank for the default smart view (when no explicit sort param is set)
+    if (!isset($_GET['sort']) && \Nexus\Services\MemberRankingService::isEnabled() && !empty($users)) {
+        $viewerId = null;
+        try {
+            $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+            if (preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
+                $payload = \Nexus\Services\TokenService::validateToken($matches[1]);
+                if ($payload && ($payload['type'] ?? 'access') === 'access' && isset($payload['user_id'])) {
+                    if ((int)($payload['tenant_id'] ?? 0) === $tenantId) {
+                        $viewerId = (int)$payload['user_id'];
+                    }
+                }
+            }
+            if (!$viewerId) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+                if (!empty($_SESSION['user_id']) && (int)($_SESSION['tenant_id'] ?? 0) === $tenantId) {
+                    $viewerId = (int)$_SESSION['user_id'];
+                }
+            }
+        } catch (\Throwable $e) {
+            // Continue with anonymous ranking
+        }
+        $users = \Nexus\Services\MemberRankingService::rankMembers($users, $viewerId, ['search' => $search]);
+    }
 
     // Convert numeric fields from strings to numbers
     foreach ($users as &$user) {
