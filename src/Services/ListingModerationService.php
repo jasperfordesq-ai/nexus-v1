@@ -155,6 +155,25 @@ class ListingModerationService
             [$adminId, $listingId, $tenantId]
         );
 
+        // Record in feed_activity now that listing is active
+        try {
+            $full = Database::query(
+                "SELECT description, image_url, location FROM listings WHERE id = ? AND tenant_id = ?",
+                [$listingId, $tenantId]
+            )->fetch(\PDO::FETCH_ASSOC);
+            if ($full) {
+                FeedActivityService::recordActivity($tenantId, (int)$listing['user_id'], 'listing', $listingId, [
+                    'title' => $listing['title'],
+                    'content' => $full['description'],
+                    'image_url' => $full['image_url'],
+                    'metadata' => ['location' => $full['location']],
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+        } catch (\Exception $e) {
+            error_log("ListingModerationService::approve feed_activity failed: " . $e->getMessage());
+        }
+
         // Notify owner
         $title = htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8');
         Notification::create(

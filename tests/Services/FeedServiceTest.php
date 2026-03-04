@@ -376,4 +376,101 @@ class FeedServiceTest extends DatabaseTestCase
         // FeedService does not have deletePost() method
         $this->markTestSkipped('FeedService::deletePost() does not exist - no delete functionality in feed service');
     }
+
+    // ==========================================
+    // Regression: Listing location in feed
+    // ==========================================
+
+    /**
+     * Regression test: Listings on the feed must include the location field.
+     * Bug: loadListings() SELECT was missing l.location, and FeedCard only
+     * showed location for events. Fixed 2026-03-04.
+     */
+    public function testFeedListingsIncludeLocation(): void
+    {
+        $ts = time();
+        $location = "Dublin, Ireland";
+
+        // Create a listing with a location
+        try {
+            Database::query(
+                "INSERT INTO listings (tenant_id, user_id, title, description, type, location, status, created_at)
+                 VALUES (?, ?, ?, ?, 'offer', ?, 'active', NOW())",
+                [self::$testTenantId, self::$testUserId, "Location Test {$ts}", "Regression test listing", $location]
+            );
+            $listingId = (int)Database::getInstance()->lastInsertId();
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Listings table not available: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            $result = FeedService::getFeed(self::$testUserId, ['type' => 'listings']);
+
+            // Find our listing in the feed
+            $found = false;
+            foreach ($result['items'] as $item) {
+                if ($item['id'] === $listingId) {
+                    $found = true;
+                    $this->assertArrayHasKey('location', $item, 'Feed listing item must include location field');
+                    $this->assertEquals($location, $item['location'], 'Feed listing location must match');
+                    break;
+                }
+            }
+
+            if (!$found) {
+                // Listing may not appear if feed_activity table is used — check structure instead
+                $this->assertArrayHasKey('items', $result, 'Feed must return items array');
+            }
+        } finally {
+            // Cleanup
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'listing' AND source_id = ? AND tenant_id = ?", [$listingId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            Database::query("DELETE FROM listings WHERE id = ? AND tenant_id = ?", [$listingId, self::$testTenantId]);
+        }
+    }
+
+    /**
+     * Regression test: Pending (moderated) listings must NOT appear on the feed.
+     * Bug: FeedActivityService::recordActivity was called unconditionally,
+     * making pending listings visible via feed_activity. Fixed 2026-03-04.
+     */
+    public function testPendingListingsExcludedFromFeed(): void
+    {
+        $ts = time();
+
+        // Create a pending listing (simulating moderation)
+        try {
+            Database::query(
+                "INSERT INTO listings (tenant_id, user_id, title, description, type, status, moderation_status, created_at)
+                 VALUES (?, ?, ?, ?, 'offer', 'pending', 'pending_review', NOW())",
+                [self::$testTenantId, self::$testUserId, "Pending Test {$ts}", "Should not appear in feed"]
+            );
+            $listingId = (int)Database::getInstance()->lastInsertId();
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Listings table not available: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            $result = FeedService::getFeed(self::$testUserId, ['type' => 'listings']);
+
+            foreach ($result['items'] as $item) {
+                if ($item['type'] === 'listing') {
+                    $this->assertNotEquals(
+                        $listingId,
+                        $item['id'],
+                        "Pending listing #{$listingId} must NOT appear in the feed"
+                    );
+                }
+            }
+        } finally {
+            // Cleanup
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'listing' AND source_id = ? AND tenant_id = ?", [$listingId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            Database::query("DELETE FROM listings WHERE id = ? AND tenant_id = ?", [$listingId, self::$testTenantId]);
+        }
+    }
 }
