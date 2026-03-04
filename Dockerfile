@@ -110,7 +110,7 @@ RUN printf '<IfModule remoteip_module>\n\
 
 # Pass environment variables to PHP via Apache
 # This ensures Docker env vars are available to PHP via $_SERVER and getenv()
-RUN echo 'PassEnv DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_TYPE REDIS_HOST REDIS_PORT APP_ENV APP_DEBUG APP_URL SENTRY_DSN_PHP SENTRY_ENVIRONMENT SENTRY_TRACES_SAMPLE_RATE ADMIN_NOTIFICATION_EMAIL' >> /etc/apache2/conf-available/passenv.conf \
+RUN echo 'PassEnv DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_TYPE REDIS_HOST REDIS_PORT APP_ENV APP_DEBUG APP_URL SENTRY_DSN_PHP SENTRY_ENVIRONMENT SENTRY_TRACES_SAMPLE_RATE ADMIN_NOTIFICATION_EMAIL MEILISEARCH_HOST MEILISEARCH_KEY' >> /etc/apache2/conf-available/passenv.conf \
     && a2enconf passenv
 
 # =============================================================================

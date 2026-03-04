@@ -206,6 +206,15 @@ class MemberRankingService
         // Batch load all interactions with viewer in 1 query
         $viewerInteractions = $viewerId ? self::getBatchViewerInteractions($viewerId, $memberIds) : [];
 
+        // Collaborative filtering: CF-suggested member IDs for the viewer
+        $cfSuggestedIds = [];
+        if ($viewerId) {
+            $tenantId = TenantContext::getId();
+            foreach (CollaborativeFilteringService::getSuggestedMembers($viewerId, $tenantId, 20) as $sid) {
+                $cfSuggestedIds[$sid] = true;
+            }
+        }
+
         $rankedMembers = [];
 
         foreach ($members as $member) {
@@ -239,6 +248,11 @@ class MemberRankingService
                 $scores['proximity'] *
                 $scores['complementary'];
 
+            // Collaborative filtering boost: members suggested by CF get a small lift
+            if (!empty($cfSuggestedIds[$memberId])) {
+                $finalScore *= 1.15;
+            }
+
             $member['_community_rank'] = $finalScore;
             $member['_score_breakdown'] = $scores;
             $rankedMembers[] = $member;
@@ -263,7 +277,6 @@ class MemberRankingService
         ?int $viewerId = null,
         array $filters = []
     ): array {
-        $config = self::getConfig();
         $tenantId = TenantContext::getId();
 
         // Get viewer coordinates
@@ -382,9 +395,7 @@ class MemberRankingService
      */
     public static function getSuggestedMembers(int $userId, int $limit = 10): array
     {
-        $tenantId = TenantContext::getId();
         $viewerListings = self::getUserListingTypes($userId);
-        $viewerCoords = RankingService::getViewerCoordinates($userId);
 
         // Get base ranked query
         $query = self::buildRankedQuery($userId, ['limit' => $limit * 3]);
@@ -517,7 +528,6 @@ class MemberRankingService
      */
     private static function calculateContributionScore(array $member): float
     {
-        $config = self::getConfig();
         $score = 0.5; // Base score
 
         // Listing count contribution
@@ -540,29 +550,65 @@ class MemberRankingService
     }
 
     /**
+     * Wilson Score lower bound (95% confidence interval)
+     *
+     * https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval
+     *
+     * Provides a statistically stable reputation estimate even for members with
+     * few interactions. New members with no data return 0.5 (uncertain/neutral).
+     * Consistent net-givers with many hours earn scores approaching 1.0.
+     *
+     * @param float $positive Positive signal (hours given to the community)
+     * @param float $total    Total activity (hours given + hours received)
+     * @return float Score in [0.0, 1.0]
+     */
+    private static function wilsonScore(float $positive, float $total): float
+    {
+        if ($total <= 0.0) {
+            return 0.5; // No data — assume neutral
+        }
+
+        $p = $positive / $total;    // Observed proportion
+        $z = 1.96;                  // 95% confidence z-score
+
+        $center  = $p + ($z * $z) / (2.0 * $total);
+        $margin  = $z * sqrt(($p * (1.0 - $p) + ($z * $z) / (4.0 * $total)) / $total);
+        $denom   = 1.0 + ($z * $z) / $total;
+
+        return max(0.0, min(1.0, ($center - $margin) / $denom));
+    }
+
+    /**
      * Calculate reputation score
+     *
+     * Uses Wilson Score as the primary signal, replacing a simple base-0.5
+     * heuristic. Members with more hours given than received score higher;
+     * new members with no data get a neutral 0.5.
      */
     private static function calculateReputationScore(array $member): float
     {
         $config = self::getConfig();
-        $score = 0.5; // Base score
 
-        // Account age factor
+        // 1. Wilson Score on community contribution (primary signal, max 0.5)
+        $given    = (float)($member['hours_given'] ?? 0);
+        $received = (float)($member['hours_received'] ?? 0);
+        $score    = self::wilsonScore($given, $given + $received) * 0.5;
+
+        // 2. Account age factor — trust builds over time (max +0.2)
         $createdAt = $member['created_at'] ?? null;
         if ($createdAt) {
-            $daysOld = RankingService::getDaysSince($createdAt);
+            $daysOld   = RankingService::getDaysSince($createdAt);
             $ageFactor = min(0.2, $daysOld / $config['reputation_account_age_days'] * 0.2);
-            $score += $ageFactor;
+            $score    += $ageFactor;
         }
 
-        // Verified boost
+        // 3. Verified status boost (+0.15)
         if (!empty($member['is_verified'])) {
             $score += 0.15;
         }
 
-        // Profile completeness
-        $profileScore = self::calculateProfileCompletenessBonus($member);
-        $score += $profileScore;
+        // 4. Profile completeness bonus (max +0.16)
+        $score += self::calculateProfileCompletenessBonus($member);
 
         return min(1.0, max($config['reputation_minimum'], $score));
     }
@@ -887,7 +933,6 @@ class MemberRankingService
         try {
             $placeholders = implode(',', array_fill(0, count($memberIds), '?'));
             // Find all transactions where viewer was sender/receiver with any of these members
-            $params = array_merge([$viewerId], $memberIds, [$viewerId], $memberIds);
             $rows = Database::query(
                 "SELECT DISTINCT
                     CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END as member_id

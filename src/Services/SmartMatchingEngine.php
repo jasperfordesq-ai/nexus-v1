@@ -229,6 +229,45 @@ class SmartMatchingEngine
             }
         }
 
+        // Semantic embedding boost: re-weight scores using cosine similarity
+        // Silently skips if embeddings are not yet generated for this tenant
+        if (!empty($matches)) {
+            $userListingIds = array_column($userListings, 'id');
+            $firstListingId = $userListingIds[0] ?? null;
+
+            if ($firstListingId) {
+                $semanticSimilar = EmbeddingService::findSimilar(
+                    (int)$firstListingId,
+                    'listing',
+                    $tenantId,
+                    50
+                );
+                $semanticSet = array_flip($semanticSimilar);
+
+                foreach ($matches as &$match) {
+                    if (isset($semanticSet[$match['id'] ?? 0])) {
+                        // Blend: 75% original score + 25% semantic boost
+                        $match['match_score'] = min(1.0, $match['match_score'] * 1.1);
+                    }
+                }
+                unset($match);
+            }
+        }
+
+        // Check for pre-trained KNN member recommendations (offline training pipeline).
+        // KNN-recommended members get a 12% score boost to surface them higher.
+        $knnKey  = "recs_members_{$tenantId}_{$userId}";
+        $knnRecs = RedisCache::get($knnKey, $tenantId);
+        if ($knnRecs !== null && !empty($knnRecs)) {
+            $knnSet = array_flip($knnRecs);
+            foreach ($matches as &$match) {
+                if (isset($knnSet[$match['id'] ?? 0])) {
+                    $match['match_score'] = min(1.0, ($match['match_score'] ?? 0) * 1.12);
+                }
+            }
+            unset($match);
+        }
+
         // Sort by score descending
         usort($matches, fn($a, $b) => $b['match_score'] <=> $a['match_score']);
 

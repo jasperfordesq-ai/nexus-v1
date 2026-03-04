@@ -11,6 +11,7 @@ use Nexus\Core\TenantContext;
 use Nexus\Services\CommentService;
 use Nexus\Services\SocialNotificationService;
 use Nexus\Services\FeedService;
+use Nexus\Services\FeedRankingService;
 use Nexus\Models\FeedPost;
 
 /**
@@ -84,6 +85,11 @@ class SocialApiController extends BaseApiController
         }
 
         $result = FeedService::getFeed($userId, $filters);
+
+        // Apply EdgeRank algorithm (page-level ranking; cursor pagination is unaffected)
+        if (FeedRankingService::isEnabled() && !empty($result['items'])) {
+            $result['items'] = FeedRankingService::rankFeedItems($result['items'], $userId);
+        }
 
         $this->respondWithCollection(
             $result['items'],

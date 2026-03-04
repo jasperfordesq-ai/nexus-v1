@@ -65,15 +65,27 @@ $router->add('GET', '/api/v2/users', function () {
     $whereClause = "u.tenant_id = ? AND u.status = ?";
 
     if ($search) {
-        // FULLTEXT on name/bio/skills; LIKE fallback for location
-        $whereClause .= " AND (
-            MATCH(u.first_name, u.last_name, u.bio, u.skills) AGAINST(? IN BOOLEAN MODE)
-            OR u.name LIKE ?
-            OR u.location LIKE ?
-        )";
-        $params[] = $search;         // FULLTEXT — no % wrapping
-        $params[] = "%$search%";
-        $params[] = "%$search%";
+        // Meilisearch first, fall back to MySQL FULLTEXT
+        $memberIds = \Nexus\Services\SearchService::searchUsers($search, $tenantId);
+        if ($memberIds !== false && !empty($memberIds)) {
+            // Meilisearch path: restrict to the ranked ID set
+            $placeholders = implode(',', array_fill(0, count($memberIds), '?'));
+            $whereClause .= " AND u.id IN ($placeholders)";
+            $params = array_merge($params, array_map('intval', $memberIds));
+        } elseif ($memberIds !== false) {
+            // Meilisearch available but returned no hits
+            $whereClause .= " AND 1=0";
+        } else {
+            // Meilisearch unavailable — fall back to MySQL FULLTEXT + LIKE
+            $whereClause .= " AND (
+                MATCH(u.first_name, u.last_name, u.bio, u.skills) AGAINST(? IN BOOLEAN MODE)
+                OR u.name LIKE ?
+                OR u.location LIKE ?
+            )";
+            $params[] = $search;         // FULLTEXT — no % wrapping
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+        }
     }
 
     // Exclude the viewer from the member directory (they know who they are)
