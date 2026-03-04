@@ -390,6 +390,11 @@ class UserService
             return false;
         }
 
+        // Geocode updated location so geo-based ranking works immediately
+        if (isset($updateData['location'])) {
+            GeocodingService::updateUserCoordinates($userId, $updateData['location']);
+        }
+
         return true;
     }
 

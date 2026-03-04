@@ -225,6 +225,22 @@ class FeedRankingService
             $connectedSet = array_flip($connectedIds);
         }
 
+        // Batch-load viewer coordinates for geo decay scoring
+        $viewerLat = null;
+        $viewerLon = null;
+        if ($viewerId) {
+            [$viewerLat, $viewerLon] = self::getUserCoordinates($viewerId);
+        }
+
+        // Batch-load author coordinates for all unique authors in feed
+        $authorCoords = [];
+        $authorIds = array_unique(array_filter(array_map(
+            static fn($i) => (int)($i['user_id'] ?? 0), $items
+        )));
+        if (!empty($authorIds)) {
+            $authorCoords = self::getBatchUserCoordinates($authorIds);
+        }
+
         foreach ($items as &$item) {
             $score = 1.0;
 
@@ -253,7 +269,13 @@ class FeedRankingService
                 $score *= (float)$config['social_graph_follower_boost'];
             }
 
-            // 5. Content quality signals
+            // 5. Geo decay — penalise content from far-away authors
+            if ($viewerLat !== null && $authorId && isset($authorCoords[$authorId])) {
+                [$authorLat, $authorLon] = $authorCoords[$authorId];
+                $score *= self::calculateGeoDecayScore($viewerLat, $viewerLon, $authorLat, $authorLon);
+            }
+
+            // 6. Content quality signals
             if ($config['quality_enabled']) {
                 if (!empty($item['image_url'])) {
                     $score *= (float)$config['quality_image_boost'];
@@ -297,6 +319,62 @@ class FeedRankingService
         $decay = 1.0 / pow(1.0 + $hoursAgo / $halfLife, $gravity);
 
         return max((float)$config['freshness_minimum'], $decay);
+    }
+
+    /**
+     * Get lat/lon for a single user. Returns [lat, lon] or [null, null].
+     *
+     * @return array{0: float|null, 1: float|null}
+     */
+    private static function getUserCoordinates(int $userId): array
+    {
+        try {
+            $row = Database::query(
+                "SELECT latitude, longitude FROM users WHERE id = ? LIMIT 1",
+                [$userId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            if ($row && $row['latitude'] !== null && $row['longitude'] !== null) {
+                return [(float)$row['latitude'], (float)$row['longitude']];
+            }
+        } catch (\Exception $e) {
+            // Ignore — geo is best-effort
+        }
+
+        return [null, null];
+    }
+
+    /**
+     * Batch-load lat/lon for a list of user IDs.
+     * Returns an array keyed by user_id => [lat, lon].
+     *
+     * @param  int[]  $userIds
+     * @return array<int, array{0: float, 1: float}>
+     */
+    private static function getBatchUserCoordinates(array $userIds): array
+    {
+        if (empty($userIds)) {
+            return [];
+        }
+
+        try {
+            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+            $rows = Database::query(
+                "SELECT id, latitude, longitude FROM users
+                  WHERE id IN ($placeholders)
+                    AND latitude IS NOT NULL AND longitude IS NOT NULL",
+                $userIds
+            )->fetchAll(\PDO::FETCH_ASSOC);
+
+            $result = [];
+            foreach ($rows as $row) {
+                $result[(int)$row['id']] = [(float)$row['latitude'], (float)$row['longitude']];
+            }
+
+            return $result;
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     /**
