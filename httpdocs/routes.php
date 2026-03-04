@@ -161,6 +161,7 @@ $router->add('POST', '/api/listings/delete', 'Nexus\Controllers\ListingControlle
 $router->add('GET', '/api/v2/tenant/bootstrap', 'Nexus\Controllers\Api\TenantBootstrapController@bootstrap');
 $router->add('GET', '/api/v2/tenants', 'Nexus\Controllers\Api\TenantBootstrapController@list');
 $router->add('GET', '/api/v2/platform/stats', 'Nexus\Controllers\Api\TenantBootstrapController@platformStats');
+$router->add('GET', '/api/v2/config/algorithms', 'Nexus\Controllers\Api\AdminConfigApiController@getAlgorithmInfo');
 
 // ============================================
 // LISTINGS API v2 - RESTful CRUD

@@ -27,7 +27,7 @@ import {
   AlertTriangle,
   RefreshCw,
 } from 'lucide-react';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
@@ -203,7 +203,10 @@ export function ListingsPage() {
               <ListTodo className="w-7 h-7 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               {t('title')}
             </h1>
-            <p className="text-theme-muted mt-1">{t('page_subtitle')}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-theme-muted">{t('page_subtitle')}</p>
+              <AlgorithmLabel area="listings" />
+            </div>
           </div>
         {isAuthenticated && (
           <Link to={tenantPath('/listings/create')}>
