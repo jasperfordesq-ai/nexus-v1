@@ -300,7 +300,8 @@ class BalanceAlertService
         }
 
         $basePath = TenantContext::getSlugPrefix();
-        $link = $basePath . "/organisations/{$organizationId}";
+        $notifLink = "/organisations/{$organizationId}";
+        $emailLink = $basePath . "/organisations/{$organizationId}";
 
         $formattedBalance = number_format($balance, 2);
 
@@ -319,9 +320,9 @@ class BalanceAlertService
         }
 
         foreach ($recipients as $admin) {
-            // Platform notification
+            // Platform notification (bare path — React tenantPath() adds slug)
             try {
-                Notification::create($admin['user_id'], $message, $link, 'balance_alert');
+                Notification::create($admin['user_id'], $message, $notifLink, 'balance_alert');
             } catch (\Exception $e) {
                 error_log("BalanceAlertService: Failed to create notification - " . $e->getMessage());
             }
@@ -332,7 +333,7 @@ class BalanceAlertService
                 $prefs = User::getNotificationPreferences($admin['user_id']);
                 // Use org_admin preference for balance alerts
                 if (!isset($prefs['email_org_admin']) || $prefs['email_org_admin']) {
-                    self::sendAlertEmail($user, $subject, $body, $link, $orgName);
+                    self::sendAlertEmail($user, $subject, $body, $emailLink, $orgName);
                 }
             }
         }

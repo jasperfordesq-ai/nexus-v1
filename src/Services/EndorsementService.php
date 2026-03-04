@@ -103,10 +103,11 @@ class EndorsementService
             )->fetchColumn();
 
             $basePath = TenantContext::getSlugPrefix();
+            // In-app notification uses bare path (React tenantPath() adds slug)
             Notification::create(
                 $endorsedId,
                 "{$endorserName} endorsed your skill: {$skillName}",
-                "{$basePath}/profile/{$endorsedId}",
+                "/profile/{$endorsedId}",
                 'endorsement'
             );
 
