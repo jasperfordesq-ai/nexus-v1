@@ -126,9 +126,11 @@ function TenantGuard({
                        location.pathname.includes('/admin') ||
                        (slugPrefix ? location.pathname.startsWith(`/${slugPrefix}/admin`) : false);
 
-  const isAuthRoute = location.pathname === '/login' ||
-                      location.pathname === '/register' ||
-                      (slugPrefix && (location.pathname === `/${slugPrefix}/login` || location.pathname === `/${slugPrefix}/register`));
+  const authPaths = ['login', 'register', 'password/forgot', 'password/reset', 'verify-email'];
+  const isAuthRoute = authPaths.some((p) =>
+    location.pathname === `/${p}` ||
+    (slugPrefix && location.pathname === `/${slugPrefix}/${p}`)
+  );
 
   if (maintenanceMode && !isAdmin && !isAdminRoute && !isAuthRoute) {
     return (

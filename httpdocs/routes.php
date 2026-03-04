@@ -200,6 +200,7 @@ $router->add('DELETE', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsA
 $router->add('POST', '/api/v2/listings/{id}/save', 'Nexus\Controllers\Api\ListingsApiController@saveListing');
 $router->add('DELETE', '/api/v2/listings/{id}/save', 'Nexus\Controllers\Api\ListingsApiController@unsaveListing');
 $router->add('POST', '/api/v2/listings/{id}/image', 'Nexus\Controllers\Api\ListingsApiController@uploadImage');
+$router->add('DELETE', '/api/v2/listings/{id}/image', 'Nexus\Controllers\Api\ListingsApiController@deleteImage');
 
 // ============================================
 // API V2 - USERS (RESTful User/Profile Management)

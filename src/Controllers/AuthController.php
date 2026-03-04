@@ -809,7 +809,14 @@ class AuthController
             $sql = "INSERT INTO password_resets (email, token, created_at) VALUES (?, ?, NOW())";
             \Nexus\Core\Database::query($sql, [$email, $hashedToken]);
 
-            $link = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . \Nexus\Core\TenantContext::getBasePath() . "/password/reset?token=$token";
+            $appUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+            if (!$appUrl || str_contains($appUrl, 'api.')) {
+                $appUrl = \Nexus\Core\Env::get('APP_URL', 'https://app.project-nexus.ie');
+                if (str_contains($appUrl, 'api.')) {
+                    $appUrl = str_replace('api.', 'app.', $appUrl);
+                }
+            }
+            $link = $appUrl . \Nexus\Core\TenantContext::getSlugPrefix() . "/password/reset?token=$token";
 
             // Send Reset Email
             try {

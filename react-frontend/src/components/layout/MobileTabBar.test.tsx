@@ -123,7 +123,7 @@ describe('MobileTabBar', () => {
     });
 
     it('does NOT render on forgot-password page', () => {
-      mockPathname = '/forgot-password';
+      mockPathname = '/password/forgot';
       render(<MobileTabBar />);
       expect(screen.queryByLabelText('Mobile navigation')).not.toBeInTheDocument();
     });
