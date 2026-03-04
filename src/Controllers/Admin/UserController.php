@@ -136,7 +136,7 @@ class UserController
                     $tenantName = $tenant['name'] ?? 'Project NEXUS';
                     $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
 
-                    $resetLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/forgot-password";
+                    $resetLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/password/forgot";
 
                     $html = \Nexus\Core\EmailTemplate::render(
                         "Your Account Has Been Created",
@@ -504,7 +504,6 @@ class UserController
             if (!\Nexus\Models\UserBadge::hasBadge($userId, $badgeKey)) {
                 \Nexus\Models\UserBadge::award($userId, $badgeKey, $badge['name'], $badge['icon']);
 
-                $basePath = TenantContext::getSlugPrefix();
                 \Nexus\Models\Notification::create(
                     $userId,
                     "You were awarded the '{$badge['name']}' badge! {$badge['icon']}",
