@@ -39,7 +39,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle, useSocialInteractions } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { Listing, ExchangeConfig } from '@/types/api';
 
 export function ListingDetailPage() {
@@ -227,7 +227,7 @@ export function ListingDetailPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: '/listings' },
+        { label: t('title'), href: tenantPath('/listings') },
         { label: listing?.title || 'Listing' },
       ]} />
 
@@ -297,6 +297,17 @@ export function ListingDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Listing Image */}
+        {listing.image_url && (
+          <div className="mb-6 -mx-6 sm:-mx-8 -mt-2">
+            <img
+              src={resolveAssetUrl(listing.image_url)}
+              alt={listing.title}
+              className="w-full h-48 sm:h-64 object-cover"
+            />
+          </div>
+        )}
 
         {/* Title */}
         <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">{listing.title}</h1>

@@ -8,6 +8,7 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\Database;
+use Nexus\Core\Env;
 use Nexus\Core\TenantContext;
 use Nexus\Core\RateLimiter;
 use Nexus\Core\Mailer;
@@ -170,11 +171,10 @@ class PasswordResetApiController extends BaseApiController
         $email = $resetRecord['email'];
         $hashedPassword = password_hash($password, PASSWORD_ARGON2ID);
 
-        // Find the specific user for this tenant (or globally if no tenant context)
-        $tenantId = TenantContext::getId();
-        $user = $tenantId
-            ? User::findByEmail($email)
-            : User::findGlobalByEmail($email);
+        // Find the user globally — the reset token validates identity, and the user
+        // may be resetting from a different tenant context than where they belong
+        // (e.g. clicking link without tenant slug prefix, or from a different device)
+        $user = User::findGlobalByEmail($email);
 
         if (!$user) {
             $this->respondWithError(
@@ -255,6 +255,17 @@ class PasswordResetApiController extends BaseApiController
         $appUrl = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getSlugPrefix();
 
+        // Defensive: ensure frontend URL is never the API URL
+        // If FRONTEND_URL is not set, getFrontendUrl() may return the PHP API URL
+        // which would cause a 404 when the user clicks the reset link
+        if (!$appUrl || str_contains($appUrl, 'api.')) {
+            $appUrl = Env::get('APP_URL', 'https://app.project-nexus.ie');
+            // Try to derive frontend URL from APP_URL by replacing api. with app.
+            if (str_contains($appUrl, 'api.')) {
+                $appUrl = str_replace('api.', 'app.', $appUrl);
+            }
+        }
+
         // For API clients, provide a deep link or web fallback
         // Mobile apps can intercept this URL pattern
         $resetUrl = $appUrl . $basePath . "/password/reset?token=" . $token;
@@ -288,9 +299,16 @@ class PasswordResetApiController extends BaseApiController
      */
     private function findValidResetToken(string $token): ?array
     {
-        // Find recent tokens (within expiry window), capped to prevent O(n) scans
+        // First, clean up expired tokens to keep the table small
+        Database::query(
+            "DELETE FROM password_resets WHERE created_at < DATE_SUB(NOW(), INTERVAL ? SECOND)",
+            [self::TOKEN_EXPIRY_SECONDS]
+        );
+
+        // Fetch all non-expired tokens (table is small: max 1 per email due to
+        // DELETE-before-INSERT in processPasswordResetRequest)
         $records = Database::query(
-            "SELECT * FROM password_resets WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND) ORDER BY created_at DESC LIMIT 100",
+            "SELECT * FROM password_resets WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND) ORDER BY created_at DESC LIMIT 500",
             [self::TOKEN_EXPIRY_SECONDS]
         )->fetchAll();
 

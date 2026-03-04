@@ -699,7 +699,7 @@ class UserService
             // Delete sensitive data
             Database::query("DELETE FROM user_sessions WHERE user_id = ?", [$userId]);
             Database::query("DELETE FROM user_tokens WHERE user_id = ?", [$userId]);
-            Database::query("DELETE FROM password_resets WHERE user_id = ?", [$userId]);
+            Database::query("DELETE FROM password_resets WHERE email = ?", [$user['email']]);
 
             // Anonymize messages (keep for other party's history)
             Database::query(
