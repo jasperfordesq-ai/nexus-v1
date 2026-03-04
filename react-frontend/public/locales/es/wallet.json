@@ -1,0 +1,62 @@
+{
+  "title": "Billetera",
+  "balance": "Saldo",
+  "time_credits": "Créditos de Tiempo",
+  "hours": "Horas",
+  "transactions": "Transacciones",
+  "pending": "Pendiente",
+  "completed": "Completado",
+  "sent": "Enviado",
+  "received": "Recibido",
+  "empty": "Aún no hay transacciones",
+  "transfer": "Transferir Créditos",
+  "pending_reviews": "Reseñas Pendientes",
+  "review": "Dejar Reseña",
+  "subtitle": "Rastrea tus créditos de tiempo y transacciones",
+  "unable_to_load": "No se Pudo Cargar la Billetera",
+  "try_again": "Intentar de Nuevo",
+  "your_balance": "Tu Saldo",
+  "pending_in": "+{{count}}h pendientes",
+  "no_pending": "Sin transacciones pendientes",
+  "send_credits": "Enviar Créditos",
+  "history": "Historial de Transacciones",
+  "export": "Exportar",
+  "load_more": "Cargar Más",
+  "no_transactions": "Sin transacciones",
+  "no_transactions_desc": "Tu historial de transacciones aparecerá aquí",
+  "stats": {
+    "earned": "Ganado",
+    "spent": "Gastado",
+    "pending": "Pendiente"
+  },
+  "filter": {
+    "all": "Todo",
+    "earned": "Ganado",
+    "spent": "Gastado",
+    "pending": "Pendiente"
+  },
+  "csv": {
+    "date": "Fecha",
+    "type": "Tipo",
+    "amount": "Cantidad",
+    "description": "Descripción",
+    "other_party": "Otra Parte",
+    "status": "Estado",
+    "received": "Recibido",
+    "sent": "Enviado"
+  },
+  "toast": {
+    "no_data": "Sin datos",
+    "no_export": "No hay transacciones para exportar",
+    "load_error": "Error",
+    "load_more_error": "Error al cargar más transacciones",
+    "exported": "Exportado",
+    "exported_desc": "Transacciones exportadas a CSV",
+    "transfer_success": "Transferencia exitosa",
+    "transfer_desc": "Enviadas {{amount}} horas a {{recipient}}"
+  },
+  "error": {
+    "load_balance": "Error al cargar el saldo de la billetera",
+    "load_wallet": "Error al cargar los datos de la billetera. Por favor intenta de nuevo."
+  }
+}

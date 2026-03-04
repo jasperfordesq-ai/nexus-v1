@@ -35,7 +35,13 @@
     "impact_report": "Wirkungsbericht",
     "strategic_plan": "Strategischer Plan",
     "home": "Startseite",
-    "leaderboard": "Rangliste"
+    "leaderboard": "Rangliste",
+    "polls": "Umfragen",
+    "jobs": "Stellenangebote",
+    "ideation": "Ideenwettbewerbe",
+    "matches": "Matches",
+    "connections": "Verbindungen",
+    "ai_chat": "KI-Assistent"
   },
   "user_menu": {
     "my_profile": "Mein Profil",
@@ -138,6 +144,26 @@
     "essential_only": "Nur essenzielle",
     "save": "Einstellungen speichern"
   },
+  "footer": {
+    "platform": "Plattform",
+    "support": "Support",
+    "help_center": "Hilfezentrum",
+    "contact_us": "Kontaktieren Sie uns",
+    "about": "Über uns",
+    "report_bug": "Fehler melden",
+    "legal": "Rechtliches",
+    "pages": "Seiten",
+    "cookie_settings": "Cookie-Einstellungen",
+    "built_on_nexus": "Erstellt auf Project NEXUS — Open-Source-Gemeinschaftsplattform",
+    "agpl_notice": "AGPL-3.0 — Copyright \u00a9 2024\u2013{{year}} Jasper Ford",
+    "terms": "AGB",
+    "privacy": "Datenschutz"
+  },
+  "mobile_tab": {
+    "create": "Erstellen",
+    "menu": "Menü",
+    "create_new_content": "Neuen Inhalt erstellen"
+  },
   "attribution": "Erstellt auf Basis von Project NEXUS von Jasper Ford",
   "members": {
     "title": "Mitglieder",
@@ -160,6 +186,8 @@
     "load_more": "Mehr laden",
     "results_matching": "{{shown}} von {{total}} Mitgliedern, die \"{{query}}\" entsprechen",
     "no_location": "Keine Mitglieder mit Standortdaten",
-    "fallback_name": "Mitglied"
+    "fallback_name": "Mitglied",
+    "load_failed": "Mitglieder konnten nicht geladen werden",
+    "load_more_failed": "Weitere Mitglieder konnten nicht geladen werden"
   }
 }

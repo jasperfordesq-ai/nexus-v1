@@ -54,5 +54,9 @@
     "exported_desc": "Transazioni esportate in CSV",
     "transfer_success": "Trasferimento riuscito",
     "transfer_desc": "Inviati {{amount}} ore a {{recipient}}"
+  },
+  "error": {
+    "load_balance": "Impossibile caricare il saldo del portafoglio",
+    "load_wallet": "Impossibile caricare i dati del portafoglio. La preghiamo di riprovare."
   }
 }

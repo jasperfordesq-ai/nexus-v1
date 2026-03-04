@@ -1562,7 +1562,7 @@ class AdminConfigApiController extends BaseApiController
     // ─────────────────────────────────────────────────────────────────────────
 
     /** All platform-supported language codes */
-    private const VALID_LANGUAGES = ['en', 'ga', 'de', 'fr', 'it'];
+    private const VALID_LANGUAGES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'];
 
     /**
      * GET /api/v2/admin/config/languages

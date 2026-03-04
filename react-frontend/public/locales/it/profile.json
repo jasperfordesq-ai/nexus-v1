@@ -1,5 +1,6 @@
 {
   "title": "Profilo",
+  "page_title": "Profilo",
   "edit_profile": "Modifica Profilo",
   "joined": "Iscritto/a il {{date}}",
   "bio": "Informazioni",
@@ -36,7 +37,8 @@
     "about": "Informazioni",
     "listings": "Annunci",
     "reviews": "Recensioni",
-    "achievements": "Traguardi"
+    "achievements": "Traguardi",
+    "activity": "Attività"
   },
   "about": {
     "heading": "Informazioni",

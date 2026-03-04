@@ -1,0 +1,68 @@
+{
+  "title": "Sondagens",
+  "subtitle": "Vote e veja o que a comunidade pensa",
+  "page_title": "Sondagens",
+  "create_poll": "Criar Sondagem",
+  "question": "Pergunta",
+  "question_placeholder": "O que gostaria de perguntar?",
+  "description": "Descrição (opcional)",
+  "description_placeholder": "Adicione algum contexto à sua sondagem...",
+  "options": "Opções",
+  "option_placeholder": "Opção {{number}}",
+  "add_option": "Adicionar Opção",
+  "remove_option": "Remover opção",
+  "expires_at": "Data de fim (opcional)",
+  "no_deadline": "Deixe em branco para sem prazo",
+  "submit": "Criar Sondagem",
+  "vote": "Votar",
+  "votes": "votos",
+  "votes_one": "voto",
+  "voted": "Votou",
+  "results": "Resultados",
+  "total_votes": "{{count}} votos",
+  "total_votes_one": "{{count}} voto",
+  "status": {
+    "open": "Aberta",
+    "closed": "Fechada"
+  },
+  "tabs": {
+    "open": "Abertas",
+    "closed": "Fechadas",
+    "mine": "As Minhas Sondagens",
+    "aria_label": "Separadores de filtro de sondagens"
+  },
+  "empty": {
+    "title": "Ainda sem sondagens",
+    "description": "Seja o primeiro a criar uma sondagem e obter a opinião da comunidade.",
+    "description_closed": "Sem sondagens fechadas para mostrar.",
+    "description_mine": "Ainda não criou nenhuma sondagem."
+  },
+  "time_remaining": "{{time}} restante",
+  "expired": "Expirada",
+  "created_by": "por",
+  "delete_poll": "Eliminar Sondagem",
+  "confirm_delete": {
+    "title": "Eliminar Sondagem",
+    "message": "Tem a certeza de que pretende eliminar esta sondagem? Esta ação não pode ser revertida.",
+    "confirm": "Eliminar",
+    "cancel": "Cancelar"
+  },
+  "toast": {
+    "created": "Sondagem criada com sucesso!",
+    "create_failed": "Falha ao criar sondagem. Tente novamente.",
+    "voted": "Voto registado!",
+    "vote_failed": "Falha ao registar voto. Tente novamente.",
+    "deleted": "Sondagem eliminada.",
+    "delete_failed": "Falha ao eliminar sondagem. Tente novamente."
+  },
+  "errors": {
+    "question_required": "Introduza uma pergunta para a sua sondagem.",
+    "min_options": "Forneça pelo menos 2 opções.",
+    "load_failed": "Não foi possível carregar sondagens.",
+    "load_more_failed": "Falha ao carregar mais sondagens."
+  },
+  "load_more": "Carregar Mais",
+  "try_again": "Tentar Novamente",
+  "collapse": "Recolher",
+  "expand": "Criar uma sondagem"
+}

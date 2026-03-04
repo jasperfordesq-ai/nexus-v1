@@ -1,5 +1,6 @@
 {
   "title": "Teachtaireachtaí",
+  "conversation_with": "{{name}} — Teachtaireachtaí",
   "new_message": "Teachtaireacht Nua",
   "search_placeholder": "Cuardaigh comhráite...",
   "empty": "Gan teachtaireachtaí fós",
@@ -59,6 +60,7 @@
   "message_edited_indicator": "(curtha in eagar)",
   "message_edit": "Cuir in Eagar",
   "message_delete": "Scrios",
+  "error": "Earráid",
   "error_title": "Earráid",
   "save": "Sábháil",
   "search_result_count": "{{current}} as {{total}}",
@@ -69,5 +71,16 @@
   "aria_add_reaction": "Cuir imoibriú leis",
   "aria_react_with": "Imoibrigh le {{emoji}}",
   "aria_message_options": "Roghanna teachtaireachta",
-  "aria_toggle_reaction": "Imoibriú {{emoji}}, cliceáil le scoránú"
+  "aria_toggle_reaction": "Imoibriú {{emoji}}, cliceáil le scoránú",
+  "load_failed": "Theip ar luchtú comhráite",
+  "conversation_restored": "Comhrá athchóirithe",
+  "conversation_restored_desc": "Aistríodh an comhrá ar ais go dtí do bhosca isteach.",
+  "restore_failed": "Theip ar athchóiriú an chomhrá",
+  "search_members_failed": "Theip ar chuardach comhaltaí",
+  "messaging_restricted_title": "Teachtaireachtaí Srianta",
+  "messaging_restricted_desc": "Tá do phribhléidí teachtaireachta srianta ag riarthóir an phobail. Más earráid é seo dar leat, déan teagmháil le tacaíocht le do thoil.",
+  "conversation_archived": "Comhrá cartlannaithe",
+  "conversation_archived_desc": "Aistríodh an comhrá go dtí do chartlann.",
+  "archive_failed": "Theip ar chartlannú an chomhrá",
+  "messaging_restricted": "Tá do theachtaireachtaí srianta"
 }

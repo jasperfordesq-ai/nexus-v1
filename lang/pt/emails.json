@@ -1,0 +1,47 @@
+{
+  "welcome": {
+    "subject": "Bem-vindo a {{community}}!",
+    "greeting": "Bem-vindo, {{name}}!",
+    "body": "Obrigado por aderir a {{community}}. A sua conta foi criada e pode agora começar a explorar a plataforma.",
+    "cta": "Começar"
+  },
+  "verification": {
+    "subject": "Verifique o seu endereço de email",
+    "greeting": "Olá {{name}},",
+    "body": "Verifique o seu endereço de email clicando no botão abaixo.",
+    "cta": "Verificar Email",
+    "expiry": "Este link expira em {{hours}} horas."
+  },
+  "password_reset": {
+    "subject": "Repor a sua palavra-passe",
+    "greeting": "Olá {{name}},",
+    "body": "Solicitou uma reposição de palavra-passe. Clique no botão abaixo para definir uma nova palavra-passe.",
+    "cta": "Repor Palavra-passe",
+    "expiry": "Este link expira em {{hours}} horas.",
+    "ignore": "Se não solicitou isto, pode ignorar este email com segurança."
+  },
+  "transaction": {
+    "subject": "Transação de créditos de tempo — {{amount}}h",
+    "greeting": "Olá {{name}},",
+    "sent": "Enviou {{amount}} hora(s) para {{recipient}}.",
+    "received": "Recebeu {{amount}} hora(s) de {{sender}}.",
+    "description": "Descrição: {{description}}"
+  },
+  "review_request": {
+    "subject": "Deixe uma avaliação para {{name}}",
+    "greeting": "Olá {{name}},",
+    "body": "Trocou recentemente serviços com {{other_party}}. Reserve um momento para deixar uma avaliação.",
+    "cta": "Deixar Avaliação"
+  },
+  "new_message": {
+    "subject": "Nova mensagem de {{sender}}",
+    "greeting": "Olá {{name}},",
+    "body": "{{sender}} enviou-lhe uma mensagem.",
+    "cta": "Ver Mensagem"
+  },
+  "footer": {
+    "unsubscribe": "Cancelar subscrição destes emails",
+    "sent_by": "Enviado por {{community}} com tecnologia Project NEXUS",
+    "address": "{{community}}"
+  }
+}

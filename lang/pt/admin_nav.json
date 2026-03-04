@@ -1,0 +1,31 @@
+{
+  "dashboard": "Painel",
+  "users": "Utilizadores",
+  "listings": "Anúncios",
+  "transactions": "Transações",
+  "events": "Eventos",
+  "groups": "Grupos",
+  "organizations": "Organizações",
+  "volunteering": "Voluntariado",
+  "messages": "Mensagens",
+  "reviews": "Avaliações",
+  "reports": "Relatórios",
+  "blog": "Blogue",
+  "pages": "Páginas",
+  "newsletters": "Newsletters",
+  "settings": "Definições",
+  "activity_log": "Registo de Atividade",
+  "federation": "Federação",
+  "gamification": "Gamificação",
+  "enterprise": "Enterprise",
+  "super_admin": "Super Admin",
+  "back_to_site": "Voltar ao Site",
+  "logout": "Terminar Sessão",
+  "sections": {
+    "content": "Conteúdo",
+    "community": "Comunidade",
+    "intelligence": "Inteligência",
+    "engagement": "Envolvimento",
+    "system": "Sistema"
+  }
+}

@@ -1,5 +1,6 @@
 {
   "title": "Messaggi",
+  "conversation_with": "{{name}} — Messaggi",
   "new_message": "Nuovo Messaggio",
   "search_placeholder": "Cerca conversazioni...",
   "empty": "Nessun messaggio ancora",
@@ -69,5 +70,17 @@
   "aria_add_reaction": "Aggiungi reazione",
   "aria_react_with": "Reagisci con {{emoji}}",
   "aria_message_options": "Opzioni messaggio",
-  "aria_toggle_reaction": "Reazione {{emoji}}, clicca per attivare/disattivare"
+  "aria_toggle_reaction": "Reazione {{emoji}}, clicca per attivare/disattivare",
+  "error": "Errore",
+  "load_failed": "Impossibile caricare le conversazioni",
+  "conversation_restored": "Conversazione ripristinata",
+  "conversation_restored_desc": "La conversazione è stata spostata nella posta in arrivo.",
+  "restore_failed": "Impossibile ripristinare la conversazione",
+  "search_members_failed": "Impossibile cercare i membri",
+  "messaging_restricted_title": "Messaggistica limitata",
+  "messaging_restricted_desc": "I Suoi privilegi di messaggistica sono stati limitati da un amministratore della comunità. Se ritiene che si tratti di un errore, contatti l'assistenza.",
+  "conversation_archived": "Conversazione archiviata",
+  "conversation_archived_desc": "La conversazione è stata spostata nell'archivio.",
+  "archive_failed": "Impossibile archiviare la conversazione",
+  "messaging_restricted": "La Sua messaggistica è stata limitata"
 }

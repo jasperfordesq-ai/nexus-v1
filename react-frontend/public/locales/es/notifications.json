@@ -1,0 +1,22 @@
+{
+  "page_title": "Notificaciones",
+  "title": "Notificaciones",
+  "subtitle": "Mantente al día con tu actividad",
+  "unread_badge": "{{count}} nuevas",
+  "mark_all_read": "Marcar todo como leído",
+  "settings_aria": "Configuración de notificaciones",
+  "filter_all": "Todas",
+  "filter_unread": "Sin leer ({{count}})",
+  "empty_title": "Sin notificaciones",
+  "empty_desc": "Verás nuevas notificaciones aquí",
+  "empty_caught_up": "¡Todo al día!",
+  "empty_caught_up_desc": "Has leído todas tus notificaciones",
+  "mark_read_aria": "Marcar como leída",
+  "delete_aria": "Eliminar notificación",
+  "toast": {
+    "mark_read_failed": "Error al marcar la notificación como leída",
+    "all_read": "Todas las notificaciones marcadas como leídas",
+    "mark_all_failed": "Error al marcar todas como leídas",
+    "delete_failed": "Error al eliminar la notificación"
+  }
+}

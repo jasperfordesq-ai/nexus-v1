@@ -54,5 +54,9 @@
     "exported_desc": "Idirbhearta easpórtáilte go CSV",
     "transfer_success": "Aistriú rathúil",
     "transfer_desc": "Seoladh {{amount}} uaireanta chuig {{recipient}}"
+  },
+  "error": {
+    "load_balance": "Theip ar luchtú iarmhéid an sparáin",
+    "load_wallet": "Theip ar luchtú sonraí an sparáin. Bain triail eile as le do thoil."
   }
 }

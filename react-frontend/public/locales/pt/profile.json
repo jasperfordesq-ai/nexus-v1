@@ -1,0 +1,93 @@
+{
+  "title": "Perfil",
+  "page_title": "Perfil",
+  "edit_profile": "Editar Perfil",
+  "joined": "Aderiu {{date}}",
+  "bio": "Sobre",
+  "skills": "Competências",
+  "interests": "Interesses",
+  "listings": "Anúncios",
+  "reviews": "Avaliações",
+  "badges": "Insígnias",
+  "credits": "Créditos de Tempo",
+  "send_message": "Enviar Mensagem",
+  "connect": "Conectar",
+  "connected": "Conectado",
+  "loading": "A carregar perfil...",
+  "unable_to_load": "Não Foi Possível Carregar o Perfil",
+  "browse_members": "Explorar Membros",
+  "try_again": "Tentar Novamente",
+  "not_found": "Perfil não encontrado",
+  "not_found_desc": "Este perfil de utilizador não existe ou foi removido",
+  "settings": "Definições",
+  "pending": "Pendente",
+  "accept": "Aceitar",
+  "write_review": "Escrever Avaliação",
+  "send_credits": "Enviar Créditos",
+  "level": "Nv {{level}}",
+  "location_title": "Localização",
+  "stats": {
+    "hours_given": "Horas Dadas",
+    "hours_received": "Horas Recebidas",
+    "active_listings": "Anúncios Ativos",
+    "groups": "Grupos",
+    "events": "Eventos"
+  },
+  "tabs": {
+    "about": "Sobre",
+    "listings": "Anúncios",
+    "reviews": "Avaliações",
+    "achievements": "Conquistas",
+    "activity": "Atividade"
+  },
+  "about": {
+    "heading": "Sobre",
+    "no_bio": "Ainda sem biografia.",
+    "skills": "Competências"
+  },
+  "listing_type": {
+    "offer": "A Oferecer",
+    "request": "A Solicitar"
+  },
+  "no_listings": "Sem anúncios",
+  "no_listings_own": "Ainda não criou nenhum anúncio",
+  "no_listings_other": "Este utilizador não criou nenhum anúncio",
+  "create_listing": "Criar Anúncio",
+  "reviews_count_one": "{{count}} avaliação",
+  "reviews_count_other": "{{count}} avaliações",
+  "no_reviews": "Ainda sem avaliações",
+  "no_reviews_own": "Conclua trocas para receber avaliações de outros membros",
+  "no_reviews_other": "Este membro ainda não recebeu avaliações",
+  "for_listing": "Para: {{title}}",
+  "anonymous": "Anónimo",
+  "achievements": {
+    "badges_one": "{{count}} Insígnia Obtida",
+    "badges_other": "{{count}} Insígnias Obtidas",
+    "level": "Nível {{level}}",
+    "view_all": "Ver Tudo",
+    "badge_earned": "Obtida",
+    "badge_locked": "Bloqueada",
+    "no_achievements": "Ainda sem conquistas",
+    "no_achievements_own": "Comece a participar para ganhar insígnias e conquistas!",
+    "no_achievements_other": "Este utilizador ainda não obteve conquistas",
+    "view_badges": "Ver Insígnias Disponíveis"
+  },
+  "toast": {
+    "request_sent_title": "Pedido enviado",
+    "request_sent": "Pedido de conexão enviado com sucesso",
+    "connected_title": "Conectado",
+    "connected": "Está agora conectado",
+    "removed_title": "Removido",
+    "removed": "Conexão removida",
+    "failed": "Falhou",
+    "error": "Algo correu mal"
+  },
+  "form": {
+    "first_name": "Nome Próprio",
+    "last_name": "Apelido",
+    "bio": "Sobre Mim",
+    "location": "Localização",
+    "phone": "Telefone",
+    "save": "Guardar Alterações"
+  }
+}
