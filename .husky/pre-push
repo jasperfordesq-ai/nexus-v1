@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-cd react-frontend && npx tsc --noEmit && npm run build
+node scripts/check-i18n-drift.mjs --summary && cd react-frontend && npx tsc --noEmit && npm run build
