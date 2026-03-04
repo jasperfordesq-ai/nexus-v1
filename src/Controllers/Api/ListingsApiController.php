@@ -12,9 +12,7 @@ use Nexus\Services\ListingExpiryService;
 use Nexus\Services\ListingRankingService;
 use Nexus\Services\ListingSkillTagService;
 use Nexus\Services\ListingFeaturedService;
-use Nexus\Core\TenantContext;
 use Nexus\Core\ImageUploader;
-use Nexus\Helpers\UrlHelper;
 
 /**
  * ListingsApiController - RESTful API for listings
@@ -110,13 +108,18 @@ class ListingsApiController extends BaseApiController
         // Get listings
         $result = ListingService::getAll($filters);
 
-        // Apply MatchRank if enabled (re-sorts fetched page by relevance, freshness, quality, etc.)
-        if (ListingRankingService::isEnabled() && !empty($result['items'])) {
+        // Apply MatchRank if enabled; skip when featured_first is set (respect intentional curation)
+        if (ListingRankingService::isEnabled() && !empty($result['items']) && empty($filters['featured_first'])) {
             $result['items'] = ListingRankingService::rankListings(
                 $result['items'],
                 $userId,
                 ['search' => $filters['search'] ?? null]
             );
+            // Strip internal scoring fields — not part of the public API contract
+            $result['items'] = array_map(static function (array $item): array {
+                unset($item['_match_rank'], $item['_score_breakdown']);
+                return $item;
+            }, $result['items']);
         }
 
         // Return with cursor-based pagination

@@ -212,6 +212,30 @@ $router->add('GET', '/api/v2/users', function () {
     header('Content-Type: application/json');
     $tenantId = \Nexus\Core\TenantContext::getId();
 
+    // Resolve viewer identity early — needed to exclude them from queries and personalise ranking
+    $viewerId = null;
+    try {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        if (preg_match('/Bearer\s+(.+)$/i', $authHeader, $m)) {
+            $payload = \Nexus\Services\TokenService::validateToken($m[1]);
+            if ($payload && ($payload['type'] ?? 'access') === 'access' && isset($payload['user_id'])) {
+                if ((int)($payload['tenant_id'] ?? 0) === $tenantId) {
+                    $viewerId = (int)$payload['user_id'];
+                }
+            }
+        }
+        if (!$viewerId) {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            if (!empty($_SESSION['user_id']) && (int)($_SESSION['tenant_id'] ?? 0) === $tenantId) {
+                $viewerId = (int)$_SESSION['user_id'];
+            }
+        }
+    } catch (\Throwable $e) {
+        // Anonymous
+    }
+
     // Pagination
     $limit = min(intval($_GET['limit'] ?? 50), 100);
     $offset = max(intval($_GET['offset'] ?? 0), 0);
@@ -248,6 +272,12 @@ $router->add('GET', '/api/v2/users', function () {
         $params[] = "%$search%";
     }
 
+    // Exclude the viewer from the member directory (they know who they are)
+    if ($viewerId) {
+        $whereClause .= " AND u.id != ?";
+        $params[] = $viewerId;
+    }
+
     // Get total count for meta
     $countSql = "SELECT COUNT(*) as total FROM users u WHERE $whereClause";
     $totalCount = \Nexus\Core\Database::query($countSql, $params)->fetch()['total'] ?? 0;
@@ -276,29 +306,12 @@ $router->add('GET', '/api/v2/users', function () {
 
     // Apply CommunityRank for the default smart view (when no explicit sort param is set)
     if (!isset($_GET['sort']) && \Nexus\Services\MemberRankingService::isEnabled() && !empty($users)) {
-        $viewerId = null;
-        try {
-            $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-            if (preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
-                $payload = \Nexus\Services\TokenService::validateToken($matches[1]);
-                if ($payload && ($payload['type'] ?? 'access') === 'access' && isset($payload['user_id'])) {
-                    if ((int)($payload['tenant_id'] ?? 0) === $tenantId) {
-                        $viewerId = (int)$payload['user_id'];
-                    }
-                }
-            }
-            if (!$viewerId) {
-                if (session_status() === PHP_SESSION_NONE) {
-                    session_start();
-                }
-                if (!empty($_SESSION['user_id']) && (int)($_SESSION['tenant_id'] ?? 0) === $tenantId) {
-                    $viewerId = (int)$_SESSION['user_id'];
-                }
-            }
-        } catch (\Throwable $e) {
-            // Continue with anonymous ranking
-        }
         $users = \Nexus\Services\MemberRankingService::rankMembers($users, $viewerId, ['search' => $search]);
+        // Strip internal scoring fields — not part of the public API contract
+        $users = array_map(static function (array $u): array {
+            unset($u['_community_rank'], $u['_score_breakdown']);
+            return $u;
+        }, $users);
     }
 
     // Convert numeric fields from strings to numbers
