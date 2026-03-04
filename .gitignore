@@ -44,6 +44,7 @@ CLAUDE.md
 !/scripts/backfill_embeddings.php
 !/scripts/sync_search_index.php
 !/scripts/train_recommendations.php
+!/scripts/post-deploy-algorithms.sh
 !/scripts/migrate-production.sh
 !/scripts/backup-production-db.sh
 !/scripts/check-migration-drift.sh
