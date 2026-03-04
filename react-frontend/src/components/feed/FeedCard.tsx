@@ -475,8 +475,8 @@ const FeedCard = React.memo(function FeedCard({
           />
         </div>
 
-        {/* Event metadata */}
-        {item.type === 'event' && (item.start_date || item.location) && (
+        {/* Event/Listing metadata */}
+        {(item.type === 'event' || item.type === 'listing') && (item.start_date || item.location) && (
           <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[var(--text-muted)]">
             {item.start_date && (
               <span className="flex items-center gap-1.5">

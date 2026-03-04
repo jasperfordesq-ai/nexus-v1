@@ -746,6 +746,7 @@ class FeedService
 
         $sql = "
             SELECT l.id, l.title, l.description as content, l.image_url, l.created_at, l.user_id,
+                   l.location,
                    'listing' as type,
                    COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                    u.avatar_url as author_avatar,

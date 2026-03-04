@@ -458,16 +458,19 @@ class ListingService
 
         $listingId = Database::lastInsertId();
 
-        // Record in feed_activity table
-        try {
-            FeedActivityService::recordActivity(TenantContext::getId(), $userId, 'listing', (int)$listingId, [
-                'title' => trim($data['title']),
-                'content' => trim($data['description']),
-                'image_url' => $data['image_url'] ?? null,
-                'created_at' => date('Y-m-d H:i:s'),
-            ]);
-        } catch (\Exception $e) {
-            error_log("ListingService::create feed_activity record failed: " . $e->getMessage());
+        // Record in feed_activity table — only for active listings (not pending moderation)
+        if ($initialStatus === 'active') {
+            try {
+                FeedActivityService::recordActivity(TenantContext::getId(), $userId, 'listing', (int)$listingId, [
+                    'title' => trim($data['title']),
+                    'content' => trim($data['description']),
+                    'image_url' => $data['image_url'] ?? null,
+                    'metadata' => ['location' => $location],
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $e) {
+                error_log("ListingService::create feed_activity record failed: " . $e->getMessage());
+            }
         }
 
         // Handle attributes
