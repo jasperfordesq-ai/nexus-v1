@@ -462,7 +462,7 @@ class ReviewsApiController extends BaseApiController
                 0,
                 'new_review',
                 $content,
-                '/profile?id=' . $receiverId,
+                '/profile/' . $receiverId,
                 null
             );
         } catch (\Throwable $e) {
