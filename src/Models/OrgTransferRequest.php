@@ -62,7 +62,7 @@ class OrgTransferRequest
                 Notification::create(
                     $admin['user_id'],
                     "$requesterName requested a transfer of $amount credits from $orgName",
-                    TenantContext::getSlugPrefix() . "/organisations/$organizationId",
+                    "/organisations/$organizationId",
                     'org_transfer_request'
                 );
             }
@@ -156,7 +156,7 @@ class OrgTransferRequest
             Notification::create(
                 $request['requester_id'],
                 "Your transfer request for {$request['amount']} credits has been approved",
-                TenantContext::getBasePath() . '/wallet',
+                '/wallet',
                 'org_transfer_approved'
             );
 
@@ -215,7 +215,7 @@ class OrgTransferRequest
         Notification::create(
             $request['requester_id'],
             "Your transfer request for {$request['amount']} credits has been rejected.$reasonText",
-            TenantContext::getSlugPrefix() . "/organisations/{$request['organization_id']}",
+            "/organisations/{$request['organization_id']}",
             'org_transfer_rejected'
         );
 

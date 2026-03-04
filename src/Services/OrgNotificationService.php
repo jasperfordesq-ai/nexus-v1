@@ -541,7 +541,10 @@ class OrgNotificationService
     {
         try {
             if (class_exists('\Nexus\Models\Notification')) {
-                Notification::create($userId, $message, $link, $type);
+                // Strip tenant slug prefix from link — the React frontend's tenantPath() adds it
+                $basePath = TenantContext::getSlugPrefix();
+                $notifLink = $basePath ? str_replace($basePath, '', $link) : $link;
+                Notification::create($userId, $message, $notifLink, $type);
             }
         } catch (\Throwable $e) {
             error_log("OrgNotificationService::createNotification error: " . $e->getMessage());

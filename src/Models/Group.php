@@ -310,8 +310,7 @@ class Group
             }
         }
 
-        $basePath = TenantContext::getBasePath();
-        $link = $basePath . '/groups/' . $groupId . '?tab=settings';
+        $link = '/groups/' . $groupId . '?tab=settings';
         $message = $requesterName . ' has requested to join ' . $group['name'];
 
         // Send notification to each organizer

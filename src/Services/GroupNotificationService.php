@@ -16,11 +16,12 @@ use Nexus\Models\User;
 /**
  * GroupNotificationService
  *
- * Handles in-app (bell) and email notifications for group-related actions:
- * - Join requests (notify admins)
- * - Join request approved/rejected (notify user)
- * - New discussions (notify members)
- * - New announcements (notify members)
+ * Handles in-app (bell) and email notifications for group-related actions.
+ *
+ * IMPORTANT: In-app notification links must be bare paths (e.g., "/groups/5")
+ * because the React frontend's tenantPath() adds the tenant slug prefix.
+ * Email links need the full path with slug prefix (e.g., "/hour-timebank/groups/5")
+ * because sendEmail() only prepends the frontend domain.
  */
 class GroupNotificationService
 {
@@ -37,8 +38,7 @@ class GroupNotificationService
 
             $userName = $user['name'] ?? trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
             $groupName = $group['name'];
-            $basePath = TenantContext::getSlugPrefix();
-            $link = $basePath . '/groups/' . $groupId;
+            $path = '/groups/' . $groupId;
             $message = "{$userName} requested to join {$groupName}";
 
             $admins = self::getGroupAdmins($groupId, $tenantId);
@@ -46,7 +46,7 @@ class GroupNotificationService
                 $adminId = (int)$admin['user_id'];
                 if ($adminId === $userId) continue;
 
-                Notification::create($adminId, $message, $link, 'group_join_request');
+                Notification::create($adminId, $message, $path, 'group_join_request');
 
                 self::sendEmail(
                     $adminId,
@@ -56,7 +56,7 @@ class GroupNotificationService
                     "<strong>Member:</strong> " . htmlspecialchars($userName) . "<br><br>" .
                     "Please review this membership request.",
                     "Review Request",
-                    $link
+                    $path
                 );
             }
         } catch (\Throwable $e) {
@@ -75,11 +75,10 @@ class GroupNotificationService
             if (!$group) return;
 
             $groupName = $group['name'];
-            $basePath = TenantContext::getSlugPrefix();
-            $link = $basePath . '/groups/' . $groupId;
+            $path = '/groups/' . $groupId;
             $message = "Welcome to {$groupName}! You are now a member.";
 
-            Notification::create($userId, $message, $link, 'group_joined');
+            Notification::create($userId, $message, $path, 'group_joined');
 
             self::sendEmail(
                 $userId,
@@ -88,7 +87,7 @@ class GroupNotificationService
                 "You've been accepted into <strong>" . htmlspecialchars($groupName) . "</strong>.<br><br>" .
                 "You can now participate in group discussions, events, and activities.",
                 "View Group",
-                $link
+                $path
             );
         } catch (\Throwable $e) {
             error_log("GroupNotificationService::notifyJoined error: " . $e->getMessage());
@@ -106,11 +105,10 @@ class GroupNotificationService
             if (!$group) return;
 
             $groupName = $group['name'];
-            $basePath = TenantContext::getSlugPrefix();
-            $link = $basePath . '/groups';
+            $path = '/groups';
             $message = "Your request to join {$groupName} was not approved";
 
-            Notification::create($userId, $message, $link, 'group_join_rejected');
+            Notification::create($userId, $message, $path, 'group_join_rejected');
 
             self::sendEmail(
                 $userId,
@@ -119,7 +117,7 @@ class GroupNotificationService
                 "Your request to join <strong>" . htmlspecialchars($groupName) . "</strong> was not approved at this time.<br><br>" .
                 "You can browse other groups to find communities that match your interests.",
                 "Browse Groups",
-                $link
+                $path
             );
         } catch (\Throwable $e) {
             error_log("GroupNotificationService::notifyJoinRejected error: " . $e->getMessage());
@@ -139,8 +137,7 @@ class GroupNotificationService
 
             $authorName = $author['name'] ?? trim(($author['first_name'] ?? '') . ' ' . ($author['last_name'] ?? ''));
             $groupName = $group['name'];
-            $basePath = TenantContext::getSlugPrefix();
-            $link = $basePath . '/groups/' . $groupId;
+            $path = '/groups/' . $groupId;
             $message = "{$authorName} started a discussion in {$groupName}: \"{$title}\"";
 
             $members = self::getGroupMembers($groupId, $tenantId);
@@ -148,7 +145,7 @@ class GroupNotificationService
                 $memberId = (int)$member['user_id'];
                 if ($memberId === $authorId) continue;
 
-                Notification::create($memberId, $message, $link, 'group_discussion');
+                Notification::create($memberId, $message, $path, 'group_discussion');
             }
 
             // Email group members (batch — limit to first 50 to avoid overload)
@@ -166,7 +163,7 @@ class GroupNotificationService
                     "<strong>Topic:</strong> " . htmlspecialchars($title) . "<br><br>" .
                     "Join the conversation and share your thoughts.",
                     "View Discussion",
-                    $link
+                    $path
                 );
                 $emailCount++;
             }
@@ -188,8 +185,7 @@ class GroupNotificationService
 
             $authorName = $author['name'] ?? trim(($author['first_name'] ?? '') . ' ' . ($author['last_name'] ?? ''));
             $groupName = $group['name'];
-            $basePath = TenantContext::getSlugPrefix();
-            $link = $basePath . '/groups/' . $groupId;
+            $path = '/groups/' . $groupId;
             $message = "New announcement in {$groupName}: \"{$title}\"";
 
             $members = self::getGroupMembers($groupId, $tenantId);
@@ -197,7 +193,7 @@ class GroupNotificationService
                 $memberId = (int)$member['user_id'];
                 if ($memberId === $authorId) continue;
 
-                Notification::create($memberId, $message, $link, 'group_announcement');
+                Notification::create($memberId, $message, $path, 'group_announcement');
             }
 
             // Email all members
@@ -215,7 +211,7 @@ class GroupNotificationService
                     "<strong>Announcement:</strong> " . htmlspecialchars($title) . "<br><br>" .
                     "Check the group page for full details.",
                     "View Announcement",
-                    $link
+                    $path
                 );
                 $emailCount++;
             }
@@ -253,7 +249,11 @@ class GroupNotificationService
         )->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    private static function sendEmail(int $userId, string $title, string $subtitle, string $body, string $btnText, string $relativeLink): void
+    /**
+     * Send email — automatically adds tenant slug prefix to the path for the full URL.
+     * Callers pass bare paths like "/groups/5", this method builds the full email URL.
+     */
+    private static function sendEmail(int $userId, string $title, string $subtitle, string $body, string $btnText, string $path): void
     {
         try {
             $user = User::findById($userId);
@@ -261,7 +261,8 @@ class GroupNotificationService
 
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
             $frontendUrl = TenantContext::getFrontendUrl();
-            $fullUrl = $frontendUrl . $relativeLink;
+            $basePath = TenantContext::getSlugPrefix();
+            $fullUrl = $frontendUrl . $basePath . $path;
 
             $html = EmailTemplate::render($title, $subtitle, $body, $btnText, $fullUrl, $tenantName);
 
