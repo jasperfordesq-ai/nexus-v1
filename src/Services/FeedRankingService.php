@@ -94,8 +94,9 @@ class FeedRankingService
         }
 
         // Default values from constants
+        // EdgeRank defaults to disabled until wired into the feed pipeline
         $defaults = [
-            'enabled' => true,
+            'enabled' => false,
             'like_weight' => self::LIKE_WEIGHT,
             'comment_weight' => self::COMMENT_WEIGHT,
             'share_weight' => self::SHARE_WEIGHT,
