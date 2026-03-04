@@ -50,19 +50,19 @@ class EventNotificationService
             $organizerId = (int)$event['user_id'];
             $statusLabel = $status === 'going' ? 'is going to' : 'is interested in';
 
-            $basePath = TenantContext::getSlugPrefix();
-            $link = $basePath . '/events/' . $eventId;
+            $path = '/events/' . $eventId;
             $message = "{$userName} {$statusLabel} your event: {$eventTitle}";
 
-            // In-app notification
-            Notification::create($organizerId, $message, $link, 'event_rsvp');
+            // In-app notification (bare path — React tenantPath() adds slug prefix)
+            Notification::create($organizerId, $message, $path, 'event_rsvp');
 
-            // Email notification
+            // Email notification (full URL with slug prefix)
             $organizer = User::findById($organizerId);
             if ($organizer && !empty($organizer['email'])) {
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $frontendUrl = TenantContext::getFrontendUrl();
-                $eventUrl = $frontendUrl . $link;
+                $basePath = TenantContext::getSlugPrefix();
+                $eventUrl = $frontendUrl . $basePath . $path;
 
                 $emoji = $status === 'going' ? '&#9989;' : '&#11088;';
                 $html = EmailTemplate::render(
@@ -113,8 +113,7 @@ class EventNotificationService
             if (empty($attendees)) return;
 
             $eventTitle = $event['title'];
-            $basePath = TenantContext::getSlugPrefix();
-            $link = $basePath . '/events/' . $eventId;
+            $path = '/events/' . $eventId;
             $organizerId = (int)$event['user_id'];
 
             // Build change summary
@@ -130,14 +129,15 @@ class EventNotificationService
                 $attendeeId = (int)$attendeeId;
                 if ($attendeeId === $organizerId) continue;
 
-                // In-app notification
-                Notification::create($attendeeId, $message, $link, 'event_update');
+                // In-app notification (bare path — React tenantPath() adds slug)
+                Notification::create($attendeeId, $message, $path, 'event_update');
             }
 
-            // Email to attendees
+            // Email to attendees (full URL with slug prefix)
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
             $frontendUrl = TenantContext::getFrontendUrl();
-            $eventUrl = $frontendUrl . $link;
+            $basePath = TenantContext::getSlugPrefix();
+            $eventUrl = $frontendUrl . $basePath . $path;
 
             $bodyParts = [];
             if (isset($meaningfulChanges['start_time'])) {
