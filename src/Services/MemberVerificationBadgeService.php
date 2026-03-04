@@ -125,11 +125,10 @@ class MemberVerificationBadgeService
         // Send notification
         try {
             $label = self::BADGE_LABELS[$badgeType] ?? $badgeType;
-            $basePath = TenantContext::getSlugPrefix();
             Notification::create(
                 $userId,
                 "You have been granted the '{$label}' verification badge",
-                "{$basePath}/settings",
+                '/settings',
                 'verification'
             );
         } catch (\Exception $e) {

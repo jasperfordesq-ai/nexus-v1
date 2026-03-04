@@ -266,7 +266,7 @@ class MessageController
             \Nexus\Models\Notification::create(
                 $receiverId,
                 "New message from " . $sender['name'],
-                TenantContext::getBasePath() . "/messages/" . $senderId,
+                "/messages/" . $senderId,
                 'message'
             );
 

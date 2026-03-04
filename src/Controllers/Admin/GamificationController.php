@@ -173,11 +173,10 @@ class GamificationController
             if (!UserBadge::hasBadge($userId, $badgeKey)) {
                 UserBadge::award($userId, $badgeKey, $badge['name'], $badge['icon']);
 
-                $basePath = TenantContext::getBasePath();
                 \Nexus\Models\Notification::create(
                     $userId,
                     "You were awarded the '{$badge['name']}' badge! {$badge['icon']}",
-                    "{$basePath}/achievements/badges",
+                    '/achievements',
                     "achievement"
                 );
                 $awarded++;
@@ -216,11 +215,10 @@ class GamificationController
             if (!UserBadge::hasBadge($user['id'], $badgeKey)) {
                 UserBadge::award($user['id'], $badgeKey, $badge['name'], $badge['icon']);
 
-                $basePath = TenantContext::getBasePath();
                 \Nexus\Models\Notification::create(
                     $user['id'],
                     "You were awarded the '{$badge['name']}' badge! {$badge['icon']}",
-                    "{$basePath}/achievements/badges",
+                    '/achievements',
                     "achievement"
                 );
                 $awarded++;
