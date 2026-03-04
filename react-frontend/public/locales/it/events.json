@@ -23,6 +23,7 @@
   "no_location": "Nessun evento con dati di posizione",
   "going": "{{count}} partecipante/i",
   "interested": "{{count}} interessato/i",
+  "events_in_month": "Eventi a {{month}}",
   "error_load_more": "Impossibile caricare altri eventi",
   "category": {
     "all": "Tutti",
@@ -79,7 +80,30 @@
     "delete_confirm": "Sei sicuro/a di voler eliminare «{{title}}»? Questa azione non può essere annullata.",
     "cancel": "Annulla",
     "delete_confirm_btn": "Elimina evento",
-    "cover_alt": "Copertina di {{title}}"
+    "cover_alt": "Copertina di {{title}}",
+    "event_cancelled": "Evento annullato",
+    "cancellation_reason": "Motivo: {{reason}}",
+    "recurring_event": "Evento ricorrente",
+    "events_in_series": "{{count}} eventi nella serie",
+    "on_waitlist": "In lista d'attesa",
+    "spots_left": "{{count}} posti rimasti",
+    "event_full": "Completo",
+    "waitlist_count": "{{count}} in lista d'attesa",
+    "cancel_modal_title": "Annulla evento",
+    "cancel_confirm": "È sicuro/a di voler annullare «{{title}}»? Tutti i partecipanti verranno avvisati.",
+    "cancel_reason_placeholder": "Motivo dell'annullamento (facoltativo)",
+    "keep_event": "Mantieni evento",
+    "cancel_event": "Annulla evento",
+    "join_waitlist": "Iscriviti alla lista d'attesa",
+    "leave_waitlist": "Lascia la lista d'attesa",
+    "other_series_events": "Altri eventi in questa serie",
+    "view_all_series": "Visualizza tutti i {{count}} eventi della serie",
+    "no_other_series_events": "Nessun altro evento trovato in questa serie."
+  },
+  "card": {
+    "cancelled": "Annullato",
+    "spots_left": "{{count}} posti rimasti",
+    "full": "Completo"
   },
   "form": {
     "create_title": "Crea nuovo evento",
@@ -106,8 +130,10 @@
     "description_placeholder": "Descrivi il tuo evento in dettaglio...",
     "start_date_label": "Data di inizio",
     "start_time_label": "Ora di inizio",
+    "legend_start_datetime": "Data e ora di inizio",
     "end_date_label": "Data di fine (opzionale)",
     "end_time_label": "Ora di fine (opzionale)",
+    "legend_end_datetime": "Data e ora di fine (opzionale)",
     "location_label": "Luogo (opzionale)",
     "location_placeholder": "es. Online, Centro comunitario...",
     "max_attendees_label": "Partecipanti massimi (opzionale)",
@@ -116,6 +142,13 @@
     "submit_update": "Aggiorna evento",
     "submit_saving": "Salvataggio e caricamento immagine...",
     "cancel": "Annulla",
+    "weekday_mon": "Lun",
+    "weekday_tue": "Mar",
+    "weekday_wed": "Mer",
+    "weekday_thu": "Gio",
+    "weekday_fri": "Ven",
+    "weekday_sat": "Sab",
+    "weekday_sun": "Dom",
     "validation": {
       "title_required": "Il titolo è obbligatorio",
       "title_min": "Il titolo deve avere almeno 5 caratteri",
@@ -124,7 +157,10 @@
       "start_date_required": "La data di inizio è obbligatoria",
       "start_time_required": "L'ora di inizio è obbligatoria",
       "end_date_before_start": "La data di fine deve essere successiva alla data di inizio",
-      "max_attendees_range": "Deve essere compreso tra 1 e 10.000"
+      "max_attendees_range": "Deve essere compreso tra 1 e 10.000",
+      "select_day": "La preghiamo di selezionare almeno un giorno della settimana",
+      "occurrences_range": "Le occorrenze devono essere comprese tra 2 e 52",
+      "select_end_date": "La preghiamo di selezionare una data di fine per la serie"
     },
     "toast": {
       "image_type": "Seleziona un'immagine JPEG, PNG, WebP o GIF",
@@ -149,6 +185,11 @@
     "delete_failed": "Impossibile eliminare l'evento",
     "checkin_success": "Partecipante registrato",
     "checkin_failed": "Registrazione non riuscita",
-    "something_wrong": "Qualcosa è andato storto"
+    "something_wrong": "Qualcosa è andato storto",
+    "event_cancelled": "Evento annullato",
+    "cancel_failed": "Impossibile annullare l'evento",
+    "added_to_waitlist": "Sei stato/a aggiunto/a alla lista d'attesa.",
+    "waitlist_join_failed": "Impossibile iscriversi alla lista d'attesa.",
+    "removed_from_waitlist": "Sei stato/a rimosso/a dalla lista d'attesa."
   }
 }

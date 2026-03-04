@@ -1,5 +1,6 @@
 {
   "title": "Próifíl",
+  "page_title": "Próifíl",
   "edit_profile": "Cuir Próifíl in Eagar",
   "joined": "Chláraithe {{date}}",
   "bio": "Faoi",
@@ -36,7 +37,8 @@
     "about": "Faoi",
     "listings": "Liostaí",
     "reviews": "Léirmheasanna",
-    "achievements": "Éachtaí"
+    "achievements": "Éachtaí",
+    "activity": "Gníomhaíocht"
   },
   "about": {
     "heading": "Faoi",

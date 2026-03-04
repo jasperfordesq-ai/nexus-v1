@@ -1,0 +1,19 @@
+{
+  "review": "Revisar",
+  "view_all": "Ver Todo",
+  "details": "Detalles",
+  "live": "EN VIVO",
+  "active": "Activo",
+  "completed": "Completado",
+  "new": "NUEVO",
+  "last_checked": "Última comprobación: {{time}}",
+  "no_data": "No hay datos disponibles",
+  "status": {
+    "online": "En línea",
+    "warning": "Advertencia",
+    "offline": "Fuera de línea",
+    "all_operational": "Todos los sistemas operativos",
+    "some_attention": "Algunos servicios necesitan atención",
+    "issues_detected": "Problemas detectados"
+  }
+}

@@ -1,5 +1,6 @@
 {
   "title": "Profil",
+  "page_title": "Profil",
   "edit_profile": "Profil bearbeiten",
   "joined": "Mitglied seit {{date}}",
   "bio": "Über mich",
@@ -36,7 +37,8 @@
     "about": "Über mich",
     "listings": "Inserate",
     "reviews": "Bewertungen",
-    "achievements": "Erfolge"
+    "achievements": "Erfolge",
+    "activity": "Aktivität"
   },
   "about": {
     "heading": "Über mich",

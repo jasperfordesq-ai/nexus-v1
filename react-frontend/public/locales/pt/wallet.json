@@ -1,0 +1,62 @@
+{
+  "title": "Carteira",
+  "balance": "Saldo",
+  "time_credits": "Créditos de Tempo",
+  "hours": "Horas",
+  "transactions": "Transações",
+  "pending": "Pendente",
+  "completed": "Concluído",
+  "sent": "Enviado",
+  "received": "Recebido",
+  "empty": "Ainda sem transações",
+  "transfer": "Transferir Créditos",
+  "pending_reviews": "Avaliações Pendentes",
+  "review": "Deixar Avaliação",
+  "subtitle": "Acompanhe os seus créditos de tempo e transações",
+  "unable_to_load": "Não Foi Possível Carregar a Carteira",
+  "try_again": "Tentar Novamente",
+  "your_balance": "O Seu Saldo",
+  "pending_in": "+{{count}}h pendentes",
+  "no_pending": "Sem transações pendentes",
+  "send_credits": "Enviar Créditos",
+  "history": "Histórico de Transações",
+  "export": "Exportar",
+  "load_more": "Carregar Mais",
+  "no_transactions": "Sem transações",
+  "no_transactions_desc": "O seu histórico de transações aparecerá aqui",
+  "stats": {
+    "earned": "Ganhos",
+    "spent": "Gastos",
+    "pending": "Pendente"
+  },
+  "filter": {
+    "all": "Todos",
+    "earned": "Ganhos",
+    "spent": "Gastos",
+    "pending": "Pendente"
+  },
+  "csv": {
+    "date": "Data",
+    "type": "Tipo",
+    "amount": "Montante",
+    "description": "Descrição",
+    "other_party": "Outra Parte",
+    "status": "Estado",
+    "received": "Recebido",
+    "sent": "Enviado"
+  },
+  "toast": {
+    "no_data": "Sem dados",
+    "no_export": "Sem transações para exportar",
+    "load_error": "Erro",
+    "load_more_error": "Falha ao carregar mais transações",
+    "exported": "Exportado",
+    "exported_desc": "Transações exportadas para CSV",
+    "transfer_success": "Transferência bem-sucedida",
+    "transfer_desc": "Enviou {{amount}} horas para {{recipient}}"
+  },
+  "error": {
+    "load_balance": "Falha ao carregar saldo da carteira",
+    "load_wallet": "Falha ao carregar dados da carteira. Tente novamente."
+  }
+}

@@ -1,0 +1,428 @@
+{
+  "page_title": "Dushshlain Smaointeoireachta",
+  "title": "Dushshlain Smaointeoireachta",
+  "subtitle": "Roinn smaointe, votail, agus cabhraigh le do phobal a mhunlu",
+
+  "actions": {
+    "retry": "Bain triail eile as"
+  },
+
+  "tabs": {
+    "all": "Gach ceann",
+    "open": "Oscailte",
+    "voting": "Votail",
+    "evaluating": "Measunu",
+    "closed": "Dunta",
+    "archived": "Cartlannaithe",
+    "favorites": "Mo Chuid Ceanain"
+  },
+
+  "status": {
+    "draft": "Dreacht",
+    "open": "Oscailte",
+    "voting": "Votail",
+    "evaluating": "Measunu",
+    "closed": "Dunta",
+    "archived": "Cartlannaithe"
+  },
+
+  "idea_status": {
+    "draft": "Dreacht",
+    "submitted": "Curtha isteach",
+    "shortlisted": "Ar an ngearrliosta",
+    "winner": "Buaiteoir",
+    "withdrawn": "Tarraingthe siar"
+  },
+
+  "challenge": {
+    "ideas_count": "{{count}} smaoineamh",
+    "ideas_count_one": "{{count}} smaoineamh",
+    "submission_deadline": "Spriocdhata aighneachta {{date}}",
+    "voting_deadline": "Votail ag criochnu {{date}}",
+    "prize": "Duais",
+    "category": "Catagoir",
+    "max_ideas": "Uasmheid {{count}} smaoineamh in aghaidh an duine",
+    "created_by": "Cruthaithe ag {{name}}",
+    "no_deadline": "Gan spriocdhata",
+    "evaluation_criteria": "Criteir Measunaithe",
+    "outcome": "Toradh",
+    "team_links": "Foirne Tionscadail"
+  },
+
+  "challenges": {
+    "title": "Dushshlain",
+    "empty_title": "Gan Dushshlain Fos",
+    "empty_description": "Nil aon dushshlain smaointeoireachta ann faoi lathair. Tar ar ais go luath!",
+    "empty_filtered": "Nil aon dushshlan ag freagairt don scagaire roghnaithe.",
+    "create": "Cruthaigh Dushshlan",
+    "load_error": "Ni feidir dushshlain a luchtú",
+    "load_more": "Luchtaigh Tuilleadh"
+  },
+
+  "ideas": {
+    "title": "Smaointe",
+    "empty_title": "Gan Smaointe Fos",
+    "empty_description": "Bi ar an gcead duine a roinneann smaoineamh don dushshlan seo!",
+    "submit": "Cuir Smaoineamh Isteach",
+    "submit_title": "Cuir Do Smaoineamh Isteach",
+    "sort_votes": "Is Mo Votai",
+    "sort_newest": "Is Nuai",
+    "vote": "Votail",
+    "unvote": "Tarraing Vota Siar",
+    "votes": "{{count}} vota",
+    "votes_one": "{{count}} vota",
+    "comments": "{{count}} tracht",
+    "comments_one": "{{count}} tracht",
+    "load_more": "Luchtaigh Tuilleadh Smaointe",
+    "back_to_challenge": "Ar Ais go dti an Dushshlan",
+    "your_ideas": "Do chuid smaointe: {{count}}/{{max}}",
+    "edit": "Cuir Smaoineamh in Eagar",
+    "delete": "Scrios Smaoineamh",
+    "delete_confirm": "An bhfuil tu cinnte gur mhaith leat an smaoineamh seo a scriosadh? Ni feidir an gniomh seo a chur ar ceal.",
+    "load_error": "Ni feidir smaointe a luchtú",
+    "save_draft": "Sabháil Dreacht",
+    "publish_draft": "Foilsigh Smaoineamh",
+    "draft_saved": "Dreacht sabhailte",
+    "draft": "Dreacht",
+    "your_drafts": "Do Chuid Dreachtai",
+    "untitled_draft": "Dreacht Gan Teideal",
+    "draft_updated": "Nuashonraithe {{date}}",
+    "draft_created": "Cruthaithe {{date}}",
+    "new_idea": "Smaoineamh Nua"
+  },
+
+  "idea_detail": {
+    "page_title": "Sonrai an Smaoineamh",
+    "back_to_challenge": "Ar Ais go dti an Dushshlan",
+    "submitted_by": "Curtha isteach ag {{name}}",
+    "submitted_on": "Curtha isteach ar {{date}}"
+  },
+
+  "comments": {
+    "title": "Trachtanna",
+    "empty_title": "Gan Trachtanna Fos",
+    "empty_description": "Bi ar an gcead duine a roinneann do thuairimi ar an smaoineamh seo.",
+    "add_placeholder": "Roinn do thuairimi...",
+    "add_button": "Postail Tracht",
+    "delete": "Scrios",
+    "delete_confirm": "An bhfuil tu cinnte gur mhaith leat an tracht seo a scriosadh?",
+    "load_more": "Luchtaigh Tuilleadh Trachtanna",
+    "load_error": "Ni feidir trachtanna a luchtú"
+  },
+
+  "form": {
+    "title_label": "Teideal",
+    "title_placeholder": "Cuir isteach teideal soileir, tuairisc\u00fail",
+    "description_label": "Cur Sios",
+    "description_placeholder": "Cur sios ar an dushshlan no do smaoineamh go mion",
+    "description_helper": "Mínigh an fhadhb go soiléir, lena n-áirítear cé atá buailte, cén fáth a bhfuil sé tábhachtach, agus cad é an réiteach rathúil",
+    "category_label": "Catagóir",
+    "category_placeholder": "Roghnaigh catagóir",
+    "category_free_label": "Catagóir (téacs saor)",
+    "category_free_placeholder": "m.sh. Comhshaol, Teicneolaíocht, Pobal",
+    "prize_label": "Cur Síos ar an Duais",
+    "prize_placeholder": "Cur síos ar a bhfaigheann an buaiteoir (roghnach)",
+    "prize_helper": "Spreagann dreasachtaí rannpháirtíocht — smaoinigh ar chreidmheasanna ama, aitheantas, nó tacaíocht cur i bhfeidhm",
+    "submission_deadline_label": "Spriocdháta Aighneachta",
+    "voting_deadline_label": "Spriocdháta Vótála",
+    "max_ideas_label": "Uasmhéid Smaointe in aghaidh an Úsáideora",
+    "max_ideas_placeholder": "Fág folamh le haghaidh neamhtheoranta",
+    "max_ideas_helper": "Ciallaíonn teorainn ar smaointe in aghaidh an duine go mbíonn aighneachtaí níos fearr",
+    "status_label": "Stádas Tosaigh",
+    "evaluation_criteria_label": "Critéir Mheasúnaithe",
+    "evaluation_criteria_placeholder": "Cuir critéar leis (brúigh Enter)",
+    "evaluation_criteria_helper": "Sainigh conas a mheasfar smaointe",
+    "template_label": "Tosaigh ó Theimpléad",
+    "template_placeholder": "Roghnaigh teimpléad (roghnach)",
+    "save": "Sábháil",
+    "saving": "Á shábháil...",
+    "create": "Cruthaigh Dúshlán",
+    "creating": "Á chruthú...",
+    "update": "Nuashonraigh Dúshlán",
+    "updating": "Á nuashonrú...",
+    "cancel": "Cealaigh"
+  },
+
+  "create_page": {
+    "page_title": "Cruthaigh Dúshlán",
+    "title": "Cruthaigh Dúshlán Smaointeoireachta",
+    "subtitle": "Postáil ráiteas fadhbe le réiteach ag do phobal"
+  },
+
+  "edit_page": {
+    "page_title": "Cuir Dúshlán in Eagar",
+    "title": "Cuir Dúshlán Smaointeoireachta in Eagar"
+  },
+
+  "admin": {
+    "change_status": "Athraigh Stádas",
+    "set_open": "Oscail d'Aighneachtaí",
+    "set_voting": "Bog go Vótáil",
+    "set_evaluating": "Bog go Measúnú",
+    "set_closed": "Dún an Dúshlán",
+    "set_archived": "Cartlannaigh an Dúshlán",
+    "reopen": "Athoscail an Dúshlán",
+    "unarchive": "Díchartlannaigh an Dúshlán",
+    "set_shortlisted": "Marcáil mar Ghearrliostaithe",
+    "set_winner": "Marcáil mar Bhuaiteoir",
+    "remove_status": "Athshocraigh go Curtha Isteach",
+    "edit_challenge": "Cuir Dúshlán in Eagar",
+    "delete_challenge": "Scrios Dúshlán",
+    "delete_confirm": "An bhfuil tú cinnte gur mhaith leat an dúshlán seo a scriosadh? Scriosfar gach smaoineamh, vóta agus trácht go buan.",
+    "status_updated": "Stádas an dúshláin nuashonraithe",
+    "idea_status_updated": "Stádas an smaoineamh nuashonraithe"
+  },
+
+  "toast": {
+    "challenge_created": "Dúshlán cruthaithe go rathúil",
+    "challenge_updated": "Dúshlán nuashonraithe go rathúil",
+    "challenge_deleted": "Dúshlán scriosta go rathúil",
+    "idea_submitted": "Smaoineamh curtha isteach go rathúil",
+    "idea_updated": "Smaoineamh nuashonraithe go rathúil",
+    "idea_deleted": "Smaoineamh scriosta go rathúil",
+    "vote_added": "Vóta taifeadta",
+    "vote_removed": "Vóta bainte",
+    "comment_added": "Trácht postáilte",
+    "comment_deleted": "Trácht scriosta",
+    "media_added": "Meán curtha leis",
+    "media_deleted": "Meán bainte",
+    "category_created": "Catagóir cruthaithe",
+    "category_updated": "Catagóir nuashonraithe",
+    "category_deleted": "Catagóir scriosta",
+    "tag_created": "Clib cruthaithe",
+    "tag_deleted": "Clib scriosta",
+    "campaign_created": "Feachtas cruthaithe",
+    "campaign_updated": "Feachtas nuashonraithe",
+    "campaign_deleted": "Feachtas scriosta",
+    "template_created": "Teimpléad cruthaithe",
+    "template_updated": "Teimpléad nuashonraithe",
+    "template_deleted": "Teimpléad scriosta",
+    "outcome_saved": "Toradh sábháilte",
+    "task_created": "Tasc cruthaithe",
+    "task_updated": "Tasc nuashonraithe",
+    "task_deleted": "Tasc scriosta",
+    "document_uploaded": "Doiciméad uaslódáilte",
+    "document_deleted": "Doiciméad scriosta",
+    "chatroom_created": "Cainéal cruthaithe",
+    "chatroom_deleted": "Cainéal scriosta",
+    "message_posted": "Teachtaireacht postáilte",
+    "template_applied": "Teimpléad curtha i bhfeidhm go rathúil",
+    "error_generic": "Chuaigh rud éigin mícheart. Bain triail eile as le do thoil."
+  },
+
+  "favorites": {
+    "add": "Cuir le ceanáin",
+    "remove": "Bain ó cheanáin",
+    "my_favorites": "Mo Chuid Ceanáin",
+    "empty_title": "Gan Ceanáin Fós",
+    "empty_description": "Cuir croí ar dhúshlán chun é a chur le do chuid ceanáin."
+  },
+
+  "views": "amhairc",
+
+  "featured": "Molta",
+
+  "search": {
+    "label": "Cuardaigh dúshláin",
+    "placeholder": "Cuardaigh dúshláin de réir teidil nó cur síos...",
+    "clear_tags": "Glan clibeanna",
+    "no_results": "Níl aon dúshlán ag freagairt do do chuardach"
+  },
+
+  "tags": {
+    "label": "Clibeanna",
+    "placeholder": "Cuir clibeanna leis (brúigh Enter)",
+    "helper": "Cuir scileanna nó ábhair ábhartha don dúshlán seo leis",
+    "interests": "Réimsí Spéise",
+    "skills": "Scileanna a Theastaíonn",
+    "general": "Clibeanna Ginearálta"
+  },
+
+  "cover_image": {
+    "label": "URL an Íomhá Clúdaigh",
+    "placeholder": "https://example.com/iomha.jpg",
+    "helper": "Íomhá bhratach don dúshlán (moltar 600x400)"
+  },
+
+  "guidance": {
+    "title": "Leideanna chun Dúshlán Iontach a Scríobh",
+    "intro": "Spreagann dúshlán dea-fhrámacha smaointe níos fearr. Seo roinnt leideanna chun ráiteas fadhbe éifeachtach a chruthú.",
+    "tips": {
+      "clear_problem": {
+        "title": "\uD83C\uDFAF Sainigh Fadhb Shoiléir",
+        "description": "Luaigh an tsaincheist shonrach a dteastaíonn uait go ndéileálfadh an pobal léi. Seachain ráitis dhoiléire nó ró-leathana."
+      },
+      "scope": {
+        "title": "\uD83D\uDCCF Socraigh Raon Réalaíoch",
+        "description": "Sainigh teorainneacha agus srianta soiléire ionas go bhfanfaidh smaointe dírithe agus indéanta."
+      },
+      "criteria": {
+        "title": "\u2696\uFE0F Mínigh na Critéir Mheasúnaithe",
+        "description": "Inis do na rannpháirtithe conas a mheasfar smaointe — indéantacht, cruthaitheacht, tionchar, nó costéifeachtúlacht."
+      },
+      "engagement": {
+        "title": "\uD83D\uDCA1 Spreag Rannpháirtíocht",
+        "description": "Úsáid teanga fháilteach. Cuir duais nó aitheantas leis chun aighneachtaí a spreagadh."
+      }
+    },
+    "examples_toggle": "Taispeáin samplaí de dhúshláin mhaithe vs. laga \u25B8",
+    "example_good": {
+      "label": "\u2705 Dúshlán láidir:",
+      "text": "Conas a d'fhéadfaimis dramhaíl bia inár bpobal a laghdú 25% sa bhliain atá romhainn? Táimid ag lorg smaointe praiticiúla, ísealchostais is féidir le gnólachtaí áitiúla agus cónaitheoirí a chur i bhfeidhm le chéile."
+    },
+    "example_weak": {
+      "label": "\u274C Dúshlán lag:",
+      "text": "Teastaíonn smaointe uainn faoin gcomhshaol.",
+      "why": "Ró-dhoiléir — gan fadhb shonrach, gan srianta, gan critéir ratha."
+    }
+  },
+
+  "duplicate": {
+    "button": "Dúblaigh Dúshlán",
+    "success": "Dúshlán dúblaithe go rathúil",
+    "error": "Theip ar dhúbailt an dúshláin"
+  },
+
+  "idea_image": "Íomhá smaoineamh",
+
+  "media": {
+    "title": "Ceangaltáin",
+    "add": "Cuir Ceangaltán Leis",
+    "add_image": "Cuir Íomhá Leis",
+    "add_link": "Cuir Nasc Leis",
+    "url_label": "URL",
+    "url_placeholder": "https://...",
+    "caption_label": "Fotheideal",
+    "caption_placeholder": "Cur síos gairid (roghnach)",
+    "type_label": "Cineál",
+    "type_image": "Íomhá",
+    "type_video": "Físeán",
+    "type_document": "Doiciméad",
+    "type_link": "Nasc",
+    "delete_confirm": "Bain an ceangaltán seo?",
+    "empty": "Gan ceangaltáin"
+  },
+
+  "convert_to_group": {
+    "button": "Cruthaigh Foireann",
+    "title": "Cruthaigh Foireann Tionscadail ón Smaoineamh",
+    "description": "Tiontaigh an smaoineamh buach seo ina fhoireann tionscadail inar féidir le baill comhoibriú, tascanna a bhainistiú, doiciméid a roinnt, agus comhrá a dhéanamh.",
+    "name_label": "Ainm na Foirne",
+    "description_label": "Cur Síos ar an bhFoireann",
+    "visibility_label": "Infheictheacht",
+    "visibility_public": "Poiblí",
+    "visibility_private": "Príobháideach",
+    "confirm": "Cruthaigh Foireann",
+    "creating": "Á chruthú...",
+    "success": "Foireann tionscadail cruthaithe go rathúil! Á atreorú...",
+    "error": "Theip ar chruthú na foirne",
+    "already_converted": "Tá an smaoineamh seo tiontaithe ina fhoireann cheana féin"
+  },
+
+  "campaigns": {
+    "title": "Feachtais",
+    "page_title": "Feachtais",
+    "empty_title": "Gan Feachtais Fós",
+    "empty_description": "Cruthaigh feachtas chun dúshláin ghaolmhara a ghrúpáil le chéile.",
+    "create": "Cruthaigh Feachtas",
+    "challenges_count": "{{count}} dúshlán",
+    "challenges_count_one": "{{count}} dúshlán",
+    "link_challenge": "Nasc Dúshlán",
+    "unlink_challenge": "Dínasc Dúshlán"
+  },
+
+  "templates": {
+    "title": "Teimpléid Dúshláin",
+    "page_title": "Teimpléid Dúshláin",
+    "empty_title": "Gan Teimpléid Fós",
+    "empty_description": "Cruthaigh teimpléid in-athúsáidte chun cruthú dúshlán a shimpliú.",
+    "create": "Cruthaigh Teimpléad",
+    "use_template": "Úsáid an Teimpléad Seo",
+    "start_from_template": "Tosaigh ó Theimpléad"
+  },
+
+  "outcomes": {
+    "title": "Rianú Tionchair",
+    "page_title": "Painéal Tionchair",
+    "empty_title": "Gan torthaí fós",
+    "status_label": "Stádas",
+    "implementation_status_label": "Stádas Cur i bhFeidhm",
+    "status_not_started": "Gan Tosú",
+    "status_in_progress": "Ar Siúl",
+    "status_implemented": "Curtha i bhFeidhm",
+    "status_abandoned": "Tréigthe",
+    "winning_idea": "Smaoineamh Buach",
+    "impact_description": "Cur Síos ar an Tionchar",
+    "impact_placeholder": "Cuir síos ar an tionchar agus na torthaí...",
+    "save": "Sábháil Toradh",
+    "saving": "Á shábháil...",
+    "dashboard": "Painéal Tionchair",
+    "total_challenges": "Iomlán Rianta",
+    "implemented_count": "Curtha i bhFeidhm",
+    "in_progress_count": "Ar Siúl"
+  },
+
+  "tasks": {
+    "title": "Tascanna",
+    "status_label": "Stádas",
+    "priority_label": "Tosaíocht",
+    "create": "Cuir Tasc Leis",
+    "empty_title": "Gan Tascanna Fós",
+    "empty_description": "Cruthaigh tascanna chun obair d'fhoirne a eagrú.",
+    "status_todo": "Le Déanamh",
+    "status_in_progress": "Ar Siúl",
+    "status_done": "Déanta",
+    "priority_low": "Íseal",
+    "priority_medium": "Meánach",
+    "priority_high": "Ard",
+    "priority_urgent": "Práinneach",
+    "assigned_to": "Sannta do",
+    "unassigned": "Gan sannadh",
+    "due_date": "Dáta dlite",
+    "overdue": "Thar téarma",
+    "stats": "Staitisticí Tascanna"
+  },
+
+  "documents": {
+    "title": "Doiciméid",
+    "upload": "Uaslódáil Doiciméad",
+    "empty_title": "Gan Doiciméid Fós",
+    "empty_description": "Uaslódáil comhaid le roinnt le d'fhoireann.",
+    "delete_confirm": "Scrios an doiciméad seo?",
+    "max_size": "Uasmhéid comhaid: 10 MB"
+  },
+
+  "chatrooms": {
+    "title": "Cainéil",
+    "create": "Cruthaigh Cainéal",
+    "general": "Ginearálta",
+    "empty_title": "Gan Teachtaireachtaí Fós",
+    "empty_description": "Tosaigh an comhrá!",
+    "message_placeholder": "Scríobh teachtaireacht...",
+    "send": "Seol",
+    "delete_channel": "Scrios Cainéal",
+    "delete_channel_confirm": "Scrios an cainéal seo agus a chuid teachtaireachtaí go léir?"
+  },
+
+  "categories": {
+    "title": "Catagóirí",
+    "manage": "Bainistigh Catagóirí",
+    "all": "Gach Catagóir",
+    "create": "Cuir Catagóir Leis",
+    "name_label": "Ainm na Catagóire",
+    "name_placeholder": "m.sh. Comhshaol",
+    "icon_label": "Deilbhín",
+    "icon_placeholder": "Ainm deilbhín Lucide (m.sh. Leaf)",
+    "color_label": "Dath",
+    "delete_confirm": "Scrios an chatagóir seo?"
+  },
+
+  "validation": {
+    "title_required": "Tá teideal ag teastáil",
+    "description_required": "Tá cur síos ag teastáil",
+    "comment_required": "Ní féidir leis an trácht a bheith folamh",
+    "url_required": "Tá URL ag teastáil",
+    "name_required": "Tá ainm ag teastáil",
+    "file_required": "Tá comhad ag teastáil"
+  }
+}

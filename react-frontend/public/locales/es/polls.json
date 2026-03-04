@@ -1,0 +1,78 @@
+{
+  "title": "Encuestas",
+  "subtitle": "Vota y mira lo que piensa la comunidad",
+  "page_title": "Encuestas",
+
+  "create_poll": "Crear Encuesta",
+  "question": "Pregunta",
+  "question_placeholder": "¿Qué te gustaría preguntar?",
+  "description": "Descripción (opcional)",
+  "description_placeholder": "Añade algo de contexto a tu encuesta...",
+  "options": "Opciones",
+  "option_placeholder": "Opción {{number}}",
+  "add_option": "Agregar Opción",
+  "remove_option": "Eliminar opción",
+  "expires_at": "Fecha de fin (opcional)",
+  "no_deadline": "Dejar en blanco para sin fecha límite",
+  "submit": "Crear Encuesta",
+
+  "vote": "Votar",
+  "votes": "votos",
+  "votes_one": "voto",
+  "voted": "Votaste",
+  "results": "Resultados",
+  "total_votes": "{{count}} votos",
+  "total_votes_one": "{{count}} voto",
+
+  "status": {
+    "open": "Abierta",
+    "closed": "Cerrada"
+  },
+
+  "tabs": {
+    "open": "Abiertas",
+    "closed": "Cerradas",
+    "mine": "Mis Encuestas",
+    "aria_label": "Pestañas de filtro de encuestas"
+  },
+
+  "empty": {
+    "title": "Aún no hay encuestas",
+    "description": "Sé el primero en crear una encuesta y conocer la opinión de la comunidad.",
+    "description_closed": "No hay encuestas cerradas para mostrar.",
+    "description_mine": "Aún no has creado ninguna encuesta."
+  },
+
+  "time_remaining": "{{time}} restante",
+  "expired": "Expirada",
+  "created_by": "por",
+  "delete_poll": "Eliminar Encuesta",
+
+  "confirm_delete": {
+    "title": "Eliminar Encuesta",
+    "message": "¿Estás seguro de que quieres eliminar esta encuesta? Esta acción no se puede deshacer.",
+    "confirm": "Eliminar",
+    "cancel": "Cancelar"
+  },
+
+  "toast": {
+    "created": "¡Encuesta creada con éxito!",
+    "create_failed": "Error al crear la encuesta. Por favor intenta de nuevo.",
+    "voted": "¡Voto registrado!",
+    "vote_failed": "Error al registrar el voto. Por favor intenta de nuevo.",
+    "deleted": "Encuesta eliminada.",
+    "delete_failed": "Error al eliminar la encuesta. Por favor intenta de nuevo."
+  },
+
+  "errors": {
+    "question_required": "Por favor introduce una pregunta para tu encuesta.",
+    "min_options": "Por favor proporciona al menos 2 opciones.",
+    "load_failed": "No se pudieron cargar las encuestas.",
+    "load_more_failed": "Error al cargar más encuestas."
+  },
+
+  "load_more": "Cargar Más",
+  "try_again": "Intentar de Nuevo",
+  "collapse": "Colapsar",
+  "expand": "Crear una encuesta"
+}

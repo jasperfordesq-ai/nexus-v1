@@ -1,0 +1,28 @@
+{
+  "page_title": "Pesquisa",
+  "title": "Pesquisa",
+  "subtitle": "Encontre anúncios, membros, eventos e grupos",
+  "search_placeholder": "Pesquisar qualquer coisa...",
+  "tab_all": "Todos ({{count}})",
+  "tab_listings": "Anúncios ({{count}})",
+  "tab_members": "Membros ({{count}})",
+  "tab_events": "Eventos ({{count}})",
+  "tab_groups": "Grupos ({{count}})",
+  "error_title": "Erro de Pesquisa",
+  "error_message": "A pesquisa falhou. Tente novamente.",
+  "try_again": "Tentar Novamente",
+  "no_results_title": "Sem resultados encontrados",
+  "no_results_desc": "Sem resultados para \"{{query}}\". Tente um termo de pesquisa diferente.",
+  "section_listings": "Anúncios ({{count}})",
+  "section_members": "Membros ({{count}})",
+  "section_events": "Eventos ({{count}})",
+  "section_groups": "Grupos ({{count}})",
+  "listing_offering": "A Oferecer",
+  "listing_requesting": "A Solicitar",
+  "members_count": "{{count}} membros",
+  "initial_title": "Comece a pesquisar",
+  "initial_desc": "Introduza um termo de pesquisa para encontrar anúncios, membros, eventos e grupos",
+  "toast": {
+    "search_failed": "Pesquisa falhou"
+  }
+}

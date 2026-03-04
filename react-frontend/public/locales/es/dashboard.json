@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "title": "Panel",
+    "description": "Tu panel personal. Consulta tu saldo, anuncios y actividad."
+  },
+  "welcome_back": "¡Bienvenido de nuevo, {{name}}!",
+  "community_activity": "Esto es lo que está pasando en tu comunidad {{community}}",
+  "unable_to_load": "No se Pudo Cargar el Panel",
+  "try_again": "Intentar de Nuevo",
+  "onboarding": {
+    "banner_title": "Completa la configuración de tu perfil",
+    "banner_subtitle": "Cuéntanos sobre tus intereses y habilidades para obtener coincidencias personalizadas",
+    "get_started": "Empezar"
+  },
+  "new_listing": "Nuevo Anuncio",
+  "stats": {
+    "balance": "Saldo",
+    "active_listings": "Anuncios Activos",
+    "messages": "Mensajes",
+    "pending": "Pendientes"
+  },
+  "sections": {
+    "recent_listings": "Anuncios Recientes",
+    "recent_activity": "Actividad Reciente",
+    "quick_actions": "Acciones Rápidas",
+    "suggested_for_you": "Sugerido para Ti",
+    "my_groups": "Mis Grupos",
+    "upcoming_events": "Próximos Eventos",
+    "your_progress": "Tu Progreso",
+    "pending_reviews": "Reseñas Pendientes"
+  },
+  "view_all": "Ver todo",
+  "view_all_caps": "Ver Todo",
+  "browse_all": "Explorar Todo",
+  "view_achievements": "Ver Logros",
+  "view_all_transactions": "Ver Todas las Transacciones",
+  "quick_actions": {
+    "create_listing": "Crear Anuncio",
+    "messages": "Mensajes",
+    "view_wallet": "Ver Billetera",
+    "find_members": "Buscar Miembros",
+    "browse_events": "Explorar Eventos",
+    "notifications": "Notificaciones"
+  },
+  "listings": {
+    "offering": "Ofreciendo",
+    "requesting": "Solicitando",
+    "offer": "Oferta",
+    "request": "Solicitud",
+    "empty": "No hay anuncios recientes",
+    "create_first": "Crea tu primer anuncio"
+  },
+  "activity": {
+    "action_listing": "compartió un anuncio",
+    "action_event": "publicó sobre un evento",
+    "action_poll": "creó una encuesta",
+    "action_goal": "estableció una nueva meta",
+    "action_post": "compartió una publicación",
+    "empty": "No hay actividad reciente",
+    "check_feed": "Consulta el feed"
+  },
+  "suggestions": {
+    "empty": "Aún no hay sugerencias"
+  },
+  "groups": {
+    "members_count": "{{count}} miembros",
+    "empty": "Aún no te has unido a ningún grupo",
+    "discover": "Descubrir grupos"
+  },
+  "events": {
+    "online_event": "Evento en línea",
+    "empty": "No hay próximos eventos",
+    "browse": "Explorar eventos"
+  },
+  "gamification": {
+    "level": "Nivel {{level}}",
+    "badges": "Insignias",
+    "streak": "Racha",
+    "xp_progress": "Progreso de XP",
+    "start_earning": "¡Empieza a ganar XP participando en la comunidad!"
+  },
+  "reviews": {
+    "sent": "Enviado {{amount}}h",
+    "received": "Recibido {{amount}}h",
+    "review": "Reseña"
+  }
+}
