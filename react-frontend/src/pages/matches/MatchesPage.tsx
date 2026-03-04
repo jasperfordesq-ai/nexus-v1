@@ -35,7 +35,7 @@ import {
   Filter,
   Zap,
 } from 'lucide-react';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -148,9 +148,10 @@ export function MatchesPage() {
             </div>
             Your Matches
           </h1>
-          <p className="text-theme-subtle mt-1">
-            Discover connections across listings, jobs, volunteering, and groups
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-theme-subtle">Discover connections across listings, jobs, volunteering, and groups</p>
+            <AlgorithmLabel area="matching" />
+          </div>
         </div>
         <Button
           variant="flat"
