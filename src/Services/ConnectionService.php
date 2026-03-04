@@ -510,7 +510,7 @@ class ConnectionService
             $mailer = new Mailer();
             $frontendUrl = TenantContext::getFrontendUrl();
             $slugPrefix = TenantContext::getSlugPrefix();
-            $profileLink = $frontendUrl . $slugPrefix . "/members/{$requester['id']}";
+            $profileLink = $frontendUrl . $slugPrefix . "/profile/{$requester['id']}";
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
 
             $html = EmailTemplate::render(
@@ -542,7 +542,7 @@ class ConnectionService
             $mailer = new Mailer();
             $frontendUrl = TenantContext::getFrontendUrl();
             $slugPrefix = TenantContext::getSlugPrefix();
-            $profileLink = $frontendUrl . $slugPrefix . "/members/{$receiver['id']}";
+            $profileLink = $frontendUrl . $slugPrefix . "/profile/{$receiver['id']}";
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
 
             $html = EmailTemplate::render(

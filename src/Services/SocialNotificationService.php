@@ -197,14 +197,14 @@ class SocialNotificationService
     private static function getContentLink($basePath, $contentType, $contentId)
     {
         $routes = [
-            'post' => '/post/' . $contentId,
+            'post' => '/feed',
             'listing' => '/listings/' . $contentId,
             'event' => '/events/' . $contentId,
-            'goal' => '/goals/' . $contentId,
-            'poll' => '/polls/' . $contentId,
-            'resource' => '/resources/' . $contentId,
-            'volunteering' => '/volunteering/' . $contentId,
-            'review' => '/home', // Reviews appear in the home feed
+            'goal' => '/goals',
+            'poll' => '/polls',
+            'resource' => '/resources',
+            'volunteering' => '/volunteering/opportunities/' . $contentId,
+            'review' => '/dashboard',
         ];
         return $basePath . ($routes[$contentType] ?? '/');
     }
