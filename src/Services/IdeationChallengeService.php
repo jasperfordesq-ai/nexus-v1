@@ -670,6 +670,18 @@ class IdeationChallengeService
                 "UPDATE ideation_challenges SET status = ? WHERE id = ? AND tenant_id = ?",
                 [$status, $id, $tenantId]
             );
+
+            // Sync feed_activity visibility with challenge status
+            try {
+                if (in_array($status, ['closed', 'archived', 'draft'])) {
+                    FeedActivityService::hideActivity('challenge', $id);
+                } elseif ($status === 'open') {
+                    FeedActivityService::showActivity('challenge', $id);
+                }
+            } catch (\Exception $faEx) {
+                error_log("IdeationChallengeService::updateChallengeStatus feed_activity sync failed: " . $faEx->getMessage());
+            }
+
             return true;
         } catch (\Throwable $e) {
             error_log("Challenge status update failed: " . $e->getMessage());
