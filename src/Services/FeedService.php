@@ -136,6 +136,7 @@ class FeedService
                    fa.title, fa.content, fa.image_url, fa.metadata, fa.group_id, fa.created_at,
                    COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                    u.avatar_url as author_avatar,
+                   u.location as user_location,
                    (SELECT COUNT(*) FROM likes WHERE target_type = fa.source_type AND target_id = fa.source_id) as likes_count,
                    (SELECT COUNT(*) FROM comments WHERE target_type = fa.source_type AND target_id = fa.source_id) as comments_count
             FROM feed_activity fa
@@ -191,7 +192,7 @@ class FeedService
                 'created_at' => $row['created_at'],
                 // Event metadata
                 'start_date' => $meta['start_date'] ?? null,
-                'location' => $meta['location'] ?? null,
+                'location' => $meta['location'] ?? ($row['source_type'] === 'listing' ? $row['user_location'] : null),
                 // Review metadata
                 'rating' => isset($meta['rating']) ? (int)$meta['rating'] : null,
                 'receiver' => isset($meta['receiver_id']) ? ['id' => (int)$meta['receiver_id'], 'name' => ''] : null,
