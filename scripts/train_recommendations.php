@@ -30,7 +30,7 @@ if (php_sapi_name() !== 'cli') {
 }
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../httpdocs/bootstrap.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
@@ -68,7 +68,7 @@ $typeFilter = $opts['type'] ?? null; // null = both
 $tenantIds = [];
 
 if (isset($opts['all-tenants'])) {
-    $rows      = Database::query("SELECT id FROM tenants WHERE status = 'active' ORDER BY id")->fetchAll(\PDO::FETCH_ASSOC);
+    $rows      = Database::query("SELECT id FROM tenants WHERE is_active = 1 ORDER BY id")->fetchAll(\PDO::FETCH_ASSOC);
     $tenantIds = array_column($rows, 'id');
 } elseif (isset($opts['tenant'])) {
     $tenantIds = [(int)$opts['tenant']];
@@ -94,7 +94,7 @@ $totalErrors = 0;
 
 foreach ($tenantIds as $tenantId) {
     $tenantId = (int)$tenantId;
-    TenantContext::setId($tenantId);
+    TenantContext::setById($tenantId);
 
     $startTime = microtime(true);
     echo "=== Tenant {$tenantId} ===\n";
@@ -139,7 +139,7 @@ function processListingRecommendations(int $tenantId, bool $dryRun, bool $rubixA
     // Load active listings
     try {
         $listings = Database::query(
-            "SELECT l.id, l.skills, l.description, l.location, l.view_count, l.save_count
+            "SELECT l.id, l.description, l.location, l.view_count, l.save_count
              FROM listings l
              WHERE l.tenant_id = ? AND l.status = 'active'
              ORDER BY l.id",
@@ -180,7 +180,7 @@ function processListingRecommendations(int $tenantId, bool $dryRun, bool $rubixA
         }
 
         $rawVectors[(int)$listing['id']] = [
-            'skills'   => normaliseSkillsToSet($listing['skills'] ?? ''),
+            'skills'   => [],
             'has_loc'  => empty(trim($listing['location'] ?? '')) ? 0.0 : 1.0,
             'desc_len' => (float)$descLen,
             'views'    => (float)$views,
@@ -288,16 +288,18 @@ function processMemberRecommendations(int $tenantId, bool $dryRun, bool $rubixAv
     try {
         $rows = Database::query(
             "SELECT u.id, u.skills, u.bio,
-                    COALESCE(u.hours_given, 0)    AS hours_given,
-                    COALESCE(u.hours_received, 0) AS hours_received,
+                    COALESCE((SELECT SUM(t.amount) FROM transactions t
+                              WHERE t.giver_id = u.id AND t.tenant_id = ? AND t.status = 'completed'), 0) AS hours_given,
+                    COALESCE((SELECT SUM(t.amount) FROM transactions t
+                              WHERE t.receiver_id = u.id AND t.tenant_id = ? AND t.status = 'completed'), 0) AS hours_received,
                     COUNT(DISTINCT l.id)           AS listing_count,
                     COALESCE(AVG(r.rating), 0)     AS avg_rating
              FROM users u
              LEFT JOIN listings l ON l.user_id = u.id AND l.status = 'active' AND l.tenant_id = ?
-             LEFT JOIN reviews r  ON r.reviewed_id = u.id AND r.tenant_id = ?
+             LEFT JOIN reviews r  ON r.receiver_id = u.id AND r.tenant_id = ?
              WHERE u.tenant_id = ? AND u.status = 'active'
              GROUP BY u.id",
-            [$tenantId, $tenantId, $tenantId]
+            [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId]
         )->fetchAll(\PDO::FETCH_ASSOC);
     } catch (\Throwable $e) {
         fwrite(STDERR, "  member query failed for tenant {$tenantId}: " . $e->getMessage() . "\n");

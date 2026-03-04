@@ -75,7 +75,7 @@ $tenantIds = [];
 
 if (isset($opts['all-tenants'])) {
     $rows = Database::query(
-        "SELECT id FROM tenants WHERE status = 'active' ORDER BY id"
+        "SELECT id FROM tenants WHERE is_active = 1 ORDER BY id"
     )->fetchAll(\PDO::FETCH_ASSOC);
     $tenantIds = array_column($rows, 'id');
 } elseif (isset($opts['tenant'])) {
@@ -118,7 +118,7 @@ $totalErrors    = 0;
 
 foreach ($tenantIds as $tenantId) {
     $tenantId = (int)$tenantId;
-    TenantContext::setId($tenantId);
+    TenantContext::setById($tenantId);
 
     echo "=== Tenant {$tenantId} ===\n";
 
@@ -156,7 +156,7 @@ exit($totalErrors > 0 ? 1 : 0);
 function syncListings(int $tenantId, bool $dryRun): array
 {
     $rows = Database::query(
-        "SELECT l.id, l.tenant_id, l.title, l.description, l.location, l.skills, l.status,
+        "SELECT l.id, l.tenant_id, l.title, l.description, l.location, l.status,
                 CONCAT(u.first_name, ' ', u.last_name) as author_name
          FROM listings l
          LEFT JOIN users u ON l.user_id = u.id
