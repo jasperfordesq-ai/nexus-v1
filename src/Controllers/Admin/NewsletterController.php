@@ -50,11 +50,6 @@ class NewsletterController
     {
         $this->checkAdmin();
 
-        // DEBUG: Remove after fixing
-        $debugTenantId = TenantContext::getId();
-        $debugUserCount = \Nexus\Core\Database::query("SELECT COUNT(*) as c FROM users WHERE tenant_id = ?", [$debugTenantId])->fetch()['c'];
-        error_log("Newsletter Debug - Session tenant_id: " . ($_SESSION['tenant_id'] ?? 'NOT SET') . ", TenantContext: $debugTenantId, Users in tenant: $debugUserCount");
-
         // Get audience counts for each target type
         $audienceCounts = [
             'all_members' => NewsletterService::getRecipientCount('all_members'),
@@ -1580,22 +1575,6 @@ class NewsletterController
             }
         } catch (\Exception $e) {
             // Ignore
-        }
-
-        // Check group filter debug info
-        if (!empty($_GET['debug_group'])) {
-            $groupId = intval($_GET['debug_group']);
-            try {
-                $stmt = $db->prepare("SELECT gm.user_id, gm.status as member_status, u.email, u.first_name, u.last_name, u.is_approved
-                                      FROM group_members gm
-                                      JOIN users u ON gm.user_id = u.id
-                                      WHERE gm.group_id = ? AND u.tenant_id = ?");
-                $stmt->execute([$groupId, $tenantId]);
-                $diagnostics['group_members'] = $stmt->fetchAll();
-                $diagnostics['debug_group_id'] = $groupId;
-            } catch (\Exception $e) {
-                $diagnostics['group_error'] = $e->getMessage();
-            }
         }
 
         View::render('admin/newsletters/diagnostics', [

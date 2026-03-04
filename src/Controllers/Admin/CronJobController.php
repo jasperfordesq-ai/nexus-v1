@@ -649,7 +649,8 @@ class CronJobController
             // Cast to int to ensure proper binding (avoid quoted numeric literals)
             $limit = (int)$limit;
             $logs = Database::query(
-                "SELECT * FROM cron_logs ORDER BY executed_at DESC LIMIT " . $limit
+                "SELECT * FROM cron_logs ORDER BY executed_at DESC LIMIT ?",
+                [$limit]
             )->fetchAll();
             return $logs ?: [];
         } catch (\Exception $e) {

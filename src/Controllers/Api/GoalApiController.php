@@ -15,14 +15,15 @@ class GoalApiController extends BaseApiController
     public function index()
     {
         $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
 
         // Fetch My Goals
         $goals = $db->query("
-            SELECT * FROM goals 
-            WHERE user_id = ? 
+            SELECT * FROM goals
+            WHERE user_id = ? AND tenant_id = ?
             ORDER BY created_at DESC
-        ", [$userId])->fetchAll();
+        ", [$userId, $tenantId])->fetchAll();
 
         // Calculate progress just in case
         foreach ($goals as &$g) {
@@ -42,6 +43,7 @@ class GoalApiController extends BaseApiController
         \Nexus\Core\Csrf::verifyOrDieJson();
 
         $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
         $input = json_decode(file_get_contents('php://input'), true);
         $goalId = $input['goal_id'] ?? null;
         $increment = $input['increment'] ?? 0;
@@ -51,16 +53,16 @@ class GoalApiController extends BaseApiController
         $db = Database::getConnection();
 
         // Verify Ownership
-        $goal = $db->query("SELECT * FROM goals WHERE id = ? AND user_id = ?", [$goalId, $userId])->fetch();
+        $goal = $db->query("SELECT * FROM goals WHERE id = ? AND user_id = ? AND tenant_id = ?", [$goalId, $userId, $tenantId])->fetch();
         if (!$goal) $this->jsonResponse(['error' => 'Goal not found'], 404);
 
         // Update
         $newVal = $goal['current_value'] + $increment;
-        $db->query("UPDATE goals SET current_value = ? WHERE id = ?", [$newVal, $goalId]);
+        $db->query("UPDATE goals SET current_value = ? WHERE id = ? AND tenant_id = ?", [$newVal, $goalId, $tenantId]);
 
         // Check Completion
         if ($newVal >= $goal['target_value'] && $goal['status'] !== 'completed') {
-            $db->query("UPDATE goals SET status = 'completed', completed_at = NOW() WHERE id = ?", [$goalId]);
+            $db->query("UPDATE goals SET status = 'completed', completed_at = NOW() WHERE id = ? AND tenant_id = ?", [$goalId, $tenantId]);
             \Nexus\Models\Gamification::awardPoints($userId, 10, 'Completed Goal: ' . $goal['title']);
         }
 
@@ -90,9 +92,11 @@ class GoalApiController extends BaseApiController
 
             $db = Database::getConnection();
 
-            // Get the goal (search by ID only, then verify it's public for buddy offers)
-            $stmt = $db->prepare("SELECT * FROM goals WHERE id = ?");
-            $stmt->execute([$goalId]);
+            $tenantId = TenantContext::getId();
+
+            // Get the goal — scoped by tenant, then verify it's public for buddy offers
+            $stmt = $db->prepare("SELECT * FROM goals WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$goalId, $tenantId]);
             $goal = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$goal) {
