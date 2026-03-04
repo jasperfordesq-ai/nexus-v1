@@ -12,6 +12,7 @@ use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\FeedService;
+use Nexus\Services\FeedActivityService;
 
 /**
  * FeedService Tests
@@ -471,6 +472,650 @@ class FeedServiceTest extends DatabaseTestCase
                 Database::query("DELETE FROM feed_activity WHERE source_type = 'listing' AND source_id = ? AND tenant_id = ?", [$listingId, self::$testTenantId]);
             } catch (\Exception $e) {}
             Database::query("DELETE FROM listings WHERE id = ? AND tenant_id = ?", [$listingId, self::$testTenantId]);
+        }
+    }
+
+    // ==========================================
+    // Feed Item Structure Contract Tests
+    // ==========================================
+
+    /**
+     * Helper: assert that a feed item contains all core fields every type must have.
+     */
+    private function assertCoreFields(array $item, string $expectedType): void
+    {
+        $this->assertArrayHasKey('id', $item, "Feed item must have 'id'");
+        $this->assertArrayHasKey('type', $item, "Feed item must have 'type'");
+        $this->assertEquals($expectedType, $item['type'], "Feed item type must be '{$expectedType}'");
+        $this->assertArrayHasKey('title', $item, "Feed item must have 'title'");
+        $this->assertArrayHasKey('content', $item, "Feed item must have 'content'");
+        $this->assertArrayHasKey('author', $item, "Feed item must have 'author'");
+        $this->assertIsArray($item['author'], "Feed item 'author' must be an array");
+        $this->assertArrayHasKey('id', $item['author'], "Author must have 'id'");
+        $this->assertArrayHasKey('name', $item['author'], "Author must have 'name'");
+        $this->assertArrayHasKey('likes_count', $item, "Feed item must have 'likes_count'");
+        $this->assertArrayHasKey('comments_count', $item, "Feed item must have 'comments_count'");
+        $this->assertArrayHasKey('is_liked', $item, "Feed item must have 'is_liked'");
+        $this->assertArrayHasKey('created_at', $item, "Feed item must have 'created_at'");
+    }
+
+    /**
+     * Helper: check if a table exists in the database.
+     */
+    private function tableExists(string $table): bool
+    {
+        try {
+            Database::query("SELECT 1 FROM `{$table}` LIMIT 1");
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Data contract: listing feed items must include 'location'.
+     */
+    public function testFeedItemContractListing(): void
+    {
+        if (!$this->tableExists('feed_activity')) {
+            $this->markTestSkipped('feed_activity table does not exist');
+        }
+        if (!$this->tableExists('listings')) {
+            $this->markTestSkipped('listings table does not exist');
+        }
+
+        $ts = time();
+        $sourceId = 900000 + $ts % 100000; // unique source_id based on timestamp
+
+        // Insert a source row in listings so likes/comments subqueries work
+        try {
+            Database::query(
+                "INSERT INTO listings (id, tenant_id, user_id, title, description, type, location, status, created_at)
+                 VALUES (?, ?, ?, ?, ?, 'offer', 'Dublin, Ireland', 'active', NOW())",
+                [$sourceId, self::$testTenantId, self::$testUserId, "Contract Listing {$ts}", "Listing contract test"]
+            );
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Could not insert listing: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            // Insert feed_activity row with metadata
+            Database::query(
+                "INSERT INTO feed_activity (tenant_id, user_id, source_type, source_id, title, content, metadata, is_visible, created_at)
+                 VALUES (?, ?, 'listing', ?, ?, ?, ?, 1, NOW())",
+                [
+                    self::$testTenantId,
+                    self::$testUserId,
+                    $sourceId,
+                    "Contract Listing {$ts}",
+                    "Listing contract test",
+                    json_encode(['location' => 'Dublin, Ireland']),
+                ]
+            );
+
+            $result = FeedService::getFeed(self::$testUserId, ['type' => 'listings']);
+
+            $found = null;
+            foreach ($result['items'] as $item) {
+                if ((int)$item['id'] === $sourceId) {
+                    $found = $item;
+                    break;
+                }
+            }
+
+            $this->assertNotNull($found, "Listing feed item with source_id {$sourceId} must appear in feed");
+            $this->assertCoreFields($found, 'listing');
+            $this->assertArrayHasKey('location', $found, "Listing feed item must have 'location'");
+            $this->assertEquals('Dublin, Ireland', $found['location']);
+        } finally {
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'listing' AND source_id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            try {
+                Database::query("DELETE FROM listings WHERE id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+        }
+    }
+
+    /**
+     * Data contract: event feed items must include 'start_date' and 'location'.
+     */
+    public function testFeedItemContractEvent(): void
+    {
+        if (!$this->tableExists('feed_activity')) {
+            $this->markTestSkipped('feed_activity table does not exist');
+        }
+        if (!$this->tableExists('events')) {
+            $this->markTestSkipped('events table does not exist');
+        }
+
+        $ts = time();
+        $sourceId = 910000 + $ts % 100000;
+        $startDate = '2026-06-15 14:00:00';
+
+        // Insert a source row in events
+        try {
+            Database::query(
+                "INSERT INTO events (id, tenant_id, user_id, title, description, location, start_time, end_time, created_at)
+                 VALUES (?, ?, ?, ?, ?, 'Community Hall', ?, DATE_ADD(?, INTERVAL 2 HOUR), NOW())",
+                [$sourceId, self::$testTenantId, self::$testUserId, "Contract Event {$ts}", "Event contract test", $startDate, $startDate]
+            );
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Could not insert event: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            Database::query(
+                "INSERT INTO feed_activity (tenant_id, user_id, source_type, source_id, title, content, metadata, is_visible, created_at)
+                 VALUES (?, ?, 'event', ?, ?, ?, ?, 1, NOW())",
+                [
+                    self::$testTenantId,
+                    self::$testUserId,
+                    $sourceId,
+                    "Contract Event {$ts}",
+                    "Event contract test",
+                    json_encode(['start_date' => $startDate, 'location' => 'Community Hall']),
+                ]
+            );
+
+            $result = FeedService::getFeed(self::$testUserId, ['type' => 'events']);
+
+            $found = null;
+            foreach ($result['items'] as $item) {
+                if ((int)$item['id'] === $sourceId) {
+                    $found = $item;
+                    break;
+                }
+            }
+
+            $this->assertNotNull($found, "Event feed item with source_id {$sourceId} must appear in feed");
+            $this->assertCoreFields($found, 'event');
+            $this->assertArrayHasKey('start_date', $found, "Event feed item must have 'start_date'");
+            $this->assertEquals($startDate, $found['start_date']);
+            $this->assertArrayHasKey('location', $found, "Event feed item must have 'location'");
+            $this->assertEquals('Community Hall', $found['location']);
+        } finally {
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'event' AND source_id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            try {
+                Database::query("DELETE FROM events WHERE id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+        }
+    }
+
+    /**
+     * Data contract: review feed items must include 'rating' and 'receiver' (with id, name).
+     */
+    public function testFeedItemContractReview(): void
+    {
+        if (!$this->tableExists('feed_activity')) {
+            $this->markTestSkipped('feed_activity table does not exist');
+        }
+        if (!$this->tableExists('reviews')) {
+            $this->markTestSkipped('reviews table does not exist');
+        }
+
+        $ts = time();
+        $sourceId = 920000 + $ts % 100000;
+
+        // Create a receiver user for name enrichment
+        $receiverUserId = null;
+        try {
+            Database::query(
+                "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, 0, 1, NOW())",
+                [self::$testTenantId, "feedcontract_receiver_{$ts}@test.com", "feedcontract_receiver_{$ts}", 'Review', 'Receiver', 'Review Receiver']
+            );
+            $receiverUserId = (int)Database::getInstance()->lastInsertId();
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Could not create receiver user: ' . $e->getMessage());
+            return;
+        }
+
+        // Insert a source row in reviews
+        try {
+            Database::query(
+                "INSERT INTO reviews (id, tenant_id, reviewer_id, receiver_id, rating, comment, status, created_at)
+                 VALUES (?, ?, ?, ?, 5, 'Excellent service', 'approved', NOW())",
+                [$sourceId, self::$testTenantId, self::$testUserId, $receiverUserId]
+            );
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Could not insert review: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            Database::query(
+                "INSERT INTO feed_activity (tenant_id, user_id, source_type, source_id, title, content, metadata, is_visible, created_at)
+                 VALUES (?, ?, 'review', ?, ?, ?, ?, 1, NOW())",
+                [
+                    self::$testTenantId,
+                    self::$testUserId,
+                    $sourceId,
+                    "Review by Feed Author",
+                    "Excellent service",
+                    json_encode(['rating' => 5, 'receiver_id' => $receiverUserId]),
+                ]
+            );
+
+            // Use 'all' type since there's no 'reviews' filter — source_type is 'review'
+            $result = FeedService::getFeed(self::$testUserId);
+
+            $found = null;
+            foreach ($result['items'] as $item) {
+                if ($item['type'] === 'review' && (int)$item['id'] === $sourceId) {
+                    $found = $item;
+                    break;
+                }
+            }
+
+            $this->assertNotNull($found, "Review feed item with source_id {$sourceId} must appear in feed");
+            $this->assertCoreFields($found, 'review');
+            $this->assertArrayHasKey('rating', $found, "Review feed item must have 'rating'");
+            $this->assertEquals(5, $found['rating']);
+            $this->assertArrayHasKey('receiver', $found, "Review feed item must have 'receiver'");
+            $this->assertIsArray($found['receiver'], "Review 'receiver' must be an array");
+            $this->assertArrayHasKey('id', $found['receiver'], "Review receiver must have 'id'");
+            $this->assertArrayHasKey('name', $found['receiver'], "Review receiver must have 'name'");
+            $this->assertEquals($receiverUserId, $found['receiver']['id']);
+            $this->assertEquals('Review Receiver', $found['receiver']['name'], "Receiver name must be enriched from users table");
+        } finally {
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'review' AND source_id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            try {
+                Database::query("DELETE FROM reviews WHERE id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            try {
+                if ($receiverUserId) {
+                    Database::query("DELETE FROM users WHERE id = ? AND tenant_id = ?", [$receiverUserId, self::$testTenantId]);
+                }
+            } catch (\Exception $e) {}
+        }
+    }
+
+    /**
+     * Data contract: job feed items must include 'location', 'job_type', and 'commitment'.
+     */
+    public function testFeedItemContractJob(): void
+    {
+        if (!$this->tableExists('feed_activity')) {
+            $this->markTestSkipped('feed_activity table does not exist');
+        }
+        if (!$this->tableExists('job_vacancies')) {
+            $this->markTestSkipped('job_vacancies table does not exist');
+        }
+
+        $ts = time();
+        $sourceId = 930000 + $ts % 100000;
+
+        // Insert a source row in job_vacancies
+        try {
+            Database::query(
+                "INSERT INTO job_vacancies (id, tenant_id, user_id, title, description, location, type, commitment, status, created_at)
+                 VALUES (?, ?, ?, ?, ?, 'Remote', 'full_time', 'permanent', 'active', NOW())",
+                [$sourceId, self::$testTenantId, self::$testUserId, "Contract Job {$ts}", "Job contract test"]
+            );
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Could not insert job vacancy: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            Database::query(
+                "INSERT INTO feed_activity (tenant_id, user_id, source_type, source_id, title, content, metadata, is_visible, created_at)
+                 VALUES (?, ?, 'job', ?, ?, ?, ?, 1, NOW())",
+                [
+                    self::$testTenantId,
+                    self::$testUserId,
+                    $sourceId,
+                    "Contract Job {$ts}",
+                    "Job contract test",
+                    json_encode(['location' => 'Remote', 'job_type' => 'full_time', 'commitment' => 'permanent']),
+                ]
+            );
+
+            $result = FeedService::getFeed(self::$testUserId, ['type' => 'jobs']);
+
+            $found = null;
+            foreach ($result['items'] as $item) {
+                if ((int)$item['id'] === $sourceId) {
+                    $found = $item;
+                    break;
+                }
+            }
+
+            $this->assertNotNull($found, "Job feed item with source_id {$sourceId} must appear in feed");
+            $this->assertCoreFields($found, 'job');
+            $this->assertArrayHasKey('location', $found, "Job feed item must have 'location'");
+            $this->assertEquals('Remote', $found['location']);
+            $this->assertArrayHasKey('job_type', $found, "Job feed item must have 'job_type'");
+            $this->assertEquals('full_time', $found['job_type']);
+            $this->assertArrayHasKey('commitment', $found, "Job feed item must have 'commitment'");
+            $this->assertEquals('permanent', $found['commitment']);
+        } finally {
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'job' AND source_id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            try {
+                Database::query("DELETE FROM job_vacancies WHERE id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+        }
+    }
+
+    /**
+     * Data contract: challenge feed items must include 'submission_deadline' and 'ideas_count'.
+     */
+    public function testFeedItemContractChallenge(): void
+    {
+        if (!$this->tableExists('feed_activity')) {
+            $this->markTestSkipped('feed_activity table does not exist');
+        }
+        if (!$this->tableExists('challenges')) {
+            $this->markTestSkipped('challenges table does not exist');
+        }
+
+        $ts = time();
+        $sourceId = 940000 + $ts % 100000;
+        $deadline = '2026-12-31 23:59:59';
+
+        // Insert a source row in challenges
+        try {
+            Database::query(
+                "INSERT INTO challenges (id, tenant_id, title, description, challenge_type, action_type, target_count, xp_reward, start_date, end_date, is_active)
+                 VALUES (?, ?, ?, ?, 'community', 'custom', 10, 100, NOW(), ?, 1)",
+                [$sourceId, self::$testTenantId, "Contract Challenge {$ts}", "Challenge contract test", $deadline]
+            );
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Could not insert challenge: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            Database::query(
+                "INSERT INTO feed_activity (tenant_id, user_id, source_type, source_id, title, content, metadata, is_visible, created_at)
+                 VALUES (?, ?, 'challenge', ?, ?, ?, ?, 1, NOW())",
+                [
+                    self::$testTenantId,
+                    self::$testUserId,
+                    $sourceId,
+                    "Contract Challenge {$ts}",
+                    "Challenge contract test",
+                    json_encode(['submission_deadline' => $deadline, 'ideas_count' => 7]),
+                ]
+            );
+
+            $result = FeedService::getFeed(self::$testUserId, ['type' => 'challenges']);
+
+            $found = null;
+            foreach ($result['items'] as $item) {
+                if ((int)$item['id'] === $sourceId) {
+                    $found = $item;
+                    break;
+                }
+            }
+
+            $this->assertNotNull($found, "Challenge feed item with source_id {$sourceId} must appear in feed");
+            $this->assertCoreFields($found, 'challenge');
+            $this->assertArrayHasKey('submission_deadline', $found, "Challenge feed item must have 'submission_deadline'");
+            $this->assertEquals($deadline, $found['submission_deadline']);
+            $this->assertArrayHasKey('ideas_count', $found, "Challenge feed item must have 'ideas_count'");
+            $this->assertEquals(7, $found['ideas_count']);
+        } finally {
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'challenge' AND source_id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            try {
+                Database::query("DELETE FROM challenges WHERE id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+        }
+    }
+
+    /**
+     * Data contract: volunteer feed items must include 'location', 'credits_offered', and 'organization'.
+     */
+    public function testFeedItemContractVolunteer(): void
+    {
+        if (!$this->tableExists('feed_activity')) {
+            $this->markTestSkipped('feed_activity table does not exist');
+        }
+        if (!$this->tableExists('vol_opportunities')) {
+            $this->markTestSkipped('vol_opportunities table does not exist');
+        }
+
+        $ts = time();
+        $sourceId = 950000 + $ts % 100000;
+
+        // Insert a volunteer organization (required for vol_opportunities FK)
+        $orgId = null;
+        try {
+            Database::query(
+                "INSERT INTO vol_organizations (tenant_id, user_id, name, description, status, created_at)
+                 VALUES (?, ?, ?, 'Test org for feed contract', 'approved', NOW())",
+                [self::$testTenantId, self::$testUserId, "Feed Contract Org {$ts}"]
+            );
+            $orgId = (int)Database::getInstance()->lastInsertId();
+        } catch (\Exception $e) {
+            // org table may not exist or FK not required — try inserting opp directly
+        }
+
+        // Insert a source row in vol_opportunities
+        try {
+            $oppFields = "id, title, description, location, is_active, created_at";
+            $oppValues = "?, ?, ?, 'Town Centre', 1, NOW()";
+            $oppParams = [$sourceId, "Contract Volunteer {$ts}", "Volunteer contract test"];
+            if ($orgId) {
+                $oppFields = "id, organization_id, title, description, location, is_active, created_at";
+                $oppValues = "?, ?, ?, ?, 'Town Centre', 1, NOW()";
+                $oppParams = [$sourceId, $orgId, "Contract Volunteer {$ts}", "Volunteer contract test"];
+            }
+            Database::query(
+                "INSERT INTO vol_opportunities ({$oppFields}) VALUES ({$oppValues})",
+                $oppParams
+            );
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Could not insert vol_opportunity: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            Database::query(
+                "INSERT INTO feed_activity (tenant_id, user_id, source_type, source_id, title, content, metadata, is_visible, created_at)
+                 VALUES (?, ?, 'volunteer', ?, ?, ?, ?, 1, NOW())",
+                [
+                    self::$testTenantId,
+                    self::$testUserId,
+                    $sourceId,
+                    "Contract Volunteer {$ts}",
+                    "Volunteer contract test",
+                    json_encode(['location' => 'Town Centre', 'credits_offered' => 3, 'organization' => 'Local Charity']),
+                ]
+            );
+
+            $result = FeedService::getFeed(self::$testUserId, ['type' => 'volunteering']);
+
+            $found = null;
+            foreach ($result['items'] as $item) {
+                if ((int)$item['id'] === $sourceId) {
+                    $found = $item;
+                    break;
+                }
+            }
+
+            $this->assertNotNull($found, "Volunteer feed item with source_id {$sourceId} must appear in feed");
+            $this->assertCoreFields($found, 'volunteer');
+            $this->assertArrayHasKey('location', $found, "Volunteer feed item must have 'location'");
+            $this->assertEquals('Town Centre', $found['location']);
+            $this->assertArrayHasKey('credits_offered', $found, "Volunteer feed item must have 'credits_offered'");
+            $this->assertEquals(3, $found['credits_offered']);
+            $this->assertArrayHasKey('organization', $found, "Volunteer feed item must have 'organization'");
+            $this->assertEquals('Local Charity', $found['organization']);
+        } finally {
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'volunteer' AND source_id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            try {
+                Database::query("DELETE FROM vol_opportunities WHERE id = ?", [$sourceId]);
+            } catch (\Exception $e) {}
+            try {
+                if ($orgId) {
+                    Database::query("DELETE FROM vol_organizations WHERE id = ?", [$orgId]);
+                }
+            } catch (\Exception $e) {}
+        }
+    }
+
+    // ==========================================
+    // Visibility Contract Tests
+    // ==========================================
+
+    /**
+     * Visibility gate: feed_activity rows with is_visible = 0 must NOT appear in getFeed().
+     */
+    public function testHiddenFeedActivityExcludedFromFeed(): void
+    {
+        if (!$this->tableExists('feed_activity')) {
+            $this->markTestSkipped('feed_activity table does not exist');
+        }
+
+        $ts = time();
+        $sourceId = 960000 + $ts % 100000;
+
+        // Insert a feed_activity row with is_visible = 0
+        try {
+            Database::query(
+                "INSERT INTO feed_activity (tenant_id, user_id, source_type, source_id, title, content, metadata, is_visible, created_at)
+                 VALUES (?, ?, 'post', ?, ?, ?, NULL, 0, NOW())",
+                [
+                    self::$testTenantId,
+                    self::$testUserId,
+                    $sourceId,
+                    "Hidden Post {$ts}",
+                    "This should not appear in the feed",
+                ]
+            );
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Could not insert feed_activity: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            // Fetch all feed items (no type filter) and verify the hidden item is absent
+            $result = FeedService::getFeed(self::$testUserId);
+
+            foreach ($result['items'] as $item) {
+                $this->assertFalse(
+                    $item['type'] === 'post' && (int)$item['id'] === $sourceId,
+                    "Hidden feed_activity row (is_visible=0) with source_id {$sourceId} must NOT appear in feed"
+                );
+            }
+
+            // Also check with type filter
+            $result = FeedService::getFeed(self::$testUserId, ['type' => 'posts']);
+
+            foreach ($result['items'] as $item) {
+                $this->assertFalse(
+                    (int)$item['id'] === $sourceId,
+                    "Hidden feed_activity row must NOT appear even with type filter"
+                );
+            }
+        } finally {
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'post' AND source_id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+        }
+    }
+
+    // ==========================================
+    // Feed Activity Sync Tests
+    // ==========================================
+
+    /**
+     * FeedActivityService::recordActivity() creates a visible row,
+     * hideActivity() sets is_visible = 0, showActivity() restores is_visible = 1.
+     */
+    public function testFeedActivityServiceRecordHideShow(): void
+    {
+        if (!$this->tableExists('feed_activity')) {
+            $this->markTestSkipped('feed_activity table does not exist');
+        }
+        if (!$this->tableExists('listings')) {
+            $this->markTestSkipped('listings table does not exist');
+        }
+
+        $ts = time();
+        $sourceId = 970000 + $ts % 100000;
+
+        // Create a listing as the source record
+        try {
+            Database::query(
+                "INSERT INTO listings (id, tenant_id, user_id, title, description, type, status, created_at)
+                 VALUES (?, ?, ?, ?, ?, 'offer', 'active', NOW())",
+                [$sourceId, self::$testTenantId, self::$testUserId, "Sync Test Listing {$ts}", "Activity sync test"]
+            );
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Could not insert listing: ' . $e->getMessage());
+            return;
+        }
+
+        try {
+            // Ensure tenant context is set for hide/show calls
+            TenantContext::setById(self::$testTenantId);
+
+            // Step 1: recordActivity should create a visible row
+            FeedActivityService::recordActivity(
+                self::$testTenantId,
+                self::$testUserId,
+                'listing',
+                $sourceId,
+                [
+                    'title' => "Sync Test Listing {$ts}",
+                    'content' => "Activity sync test",
+                    'metadata' => ['location' => 'Test Location'],
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]
+            );
+
+            // Verify the row exists with is_visible = 1
+            $stmt = Database::query(
+                "SELECT is_visible FROM feed_activity WHERE tenant_id = ? AND source_type = 'listing' AND source_id = ?",
+                [self::$testTenantId, $sourceId]
+            );
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $this->assertNotFalse($row, "recordActivity() must create a row in feed_activity");
+            $this->assertEquals(1, (int)$row['is_visible'], "recordActivity() must create row with is_visible = 1");
+
+            // Step 2: hideActivity should set is_visible = 0
+            FeedActivityService::hideActivity('listing', $sourceId);
+
+            $stmt = Database::query(
+                "SELECT is_visible FROM feed_activity WHERE tenant_id = ? AND source_type = 'listing' AND source_id = ?",
+                [self::$testTenantId, $sourceId]
+            );
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $this->assertNotFalse($row, "hideActivity() must not delete the row");
+            $this->assertEquals(0, (int)$row['is_visible'], "hideActivity() must set is_visible = 0");
+
+            // Step 3: showActivity should restore is_visible = 1
+            FeedActivityService::showActivity('listing', $sourceId);
+
+            $stmt = Database::query(
+                "SELECT is_visible FROM feed_activity WHERE tenant_id = ? AND source_type = 'listing' AND source_id = ?",
+                [self::$testTenantId, $sourceId]
+            );
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $this->assertNotFalse($row, "showActivity() must not delete the row");
+            $this->assertEquals(1, (int)$row['is_visible'], "showActivity() must restore is_visible = 1");
+        } finally {
+            try {
+                Database::query("DELETE FROM feed_activity WHERE source_type = 'listing' AND source_id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
+            try {
+                Database::query("DELETE FROM listings WHERE id = ? AND tenant_id = ?", [$sourceId, self::$testTenantId]);
+            } catch (\Exception $e) {}
         }
     }
 }

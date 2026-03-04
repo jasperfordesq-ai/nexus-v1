@@ -1658,14 +1658,36 @@ class JobVacancyService
     public static function expireOverdueJobs(): int
     {
         try {
-            $result = Database::query(
-                "UPDATE job_vacancies
-                 SET status = 'closed', expired_at = NOW()
+            // Fetch IDs before updating so we can hide them from feed_activity
+            $expiring = Database::query(
+                "SELECT id FROM job_vacancies
                  WHERE status = 'open'
                  AND deadline IS NOT NULL
                  AND deadline < NOW()
                  AND expired_at IS NULL"
+            )->fetchAll(\PDO::FETCH_COLUMN);
+
+            if (empty($expiring)) {
+                return 0;
+            }
+
+            $placeholders = implode(',', array_fill(0, count($expiring), '?'));
+            $result = Database::query(
+                "UPDATE job_vacancies
+                 SET status = 'closed', expired_at = NOW()
+                 WHERE id IN ({$placeholders})",
+                $expiring
             );
+
+            // Hide expired jobs from feed
+            foreach ($expiring as $jobId) {
+                try {
+                    FeedActivityService::hideActivity('job', (int)$jobId);
+                } catch (\Exception $faEx) {
+                    error_log("JobVacancyService::expireOverdueJobs feed_activity hide failed for job {$jobId}");
+                }
+            }
+
             return $result->rowCount();
         } catch (\Throwable $e) {
             error_log("JobVacancyService: Failed to expire overdue jobs: " . get_class($e));

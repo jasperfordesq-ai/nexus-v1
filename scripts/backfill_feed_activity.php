@@ -60,7 +60,7 @@ $totalInserted += backfillType($db, 'posts', "
     FROM feed_posts p
 ");
 
-// 2. Listings
+// 2. Listings (metadata includes location for feed display)
 $totalInserted += backfillType($db, 'listings', "
     INSERT IGNORE INTO feed_activity (tenant_id, user_id, source_type, source_id, group_id, title, content, image_url, metadata, is_visible, created_at)
     SELECT
@@ -72,7 +72,7 @@ $totalInserted += backfillType($db, 'listings', "
         l.title,
         l.description,
         l.image_url,
-        NULL,
+        CASE WHEN l.location IS NOT NULL THEN JSON_OBJECT('location', l.location) ELSE NULL END,
         CASE WHEN l.status = 'active' THEN 1 ELSE 0 END,
         l.created_at
     FROM listings l
@@ -206,3 +206,36 @@ $totalInserted += backfillType($db, 'volunteer opportunities', "
 ");
 
 echo "\nBackfill complete. Total rows inserted: {$totalInserted}\n";
+
+// Verification: Report feed_activity counts vs source tables
+echo "\n--- Verification Report ---\n";
+$checks = [
+    ['feed_posts', 'post', "SELECT COUNT(*) FROM feed_posts"],
+    ['listings', 'listing', "SELECT COUNT(*) FROM listings"],
+    ['events', 'event', "SELECT COUNT(*) FROM events"],
+    ['polls', 'poll', "SELECT COUNT(*) FROM polls"],
+    ['goals', 'goal', "SELECT COUNT(*) FROM goals"],
+    ['reviews', 'review', "SELECT COUNT(*) FROM reviews"],
+    ['job_vacancies', 'job', "SELECT COUNT(*) FROM job_vacancies"],
+    ['ideation_challenges', 'challenge', "SELECT COUNT(*) FROM ideation_challenges"],
+    ['vol_opportunities', 'volunteer', "SELECT COUNT(*) FROM vol_opportunities"],
+];
+
+foreach ($checks as [$table, $sourceType, $countSql]) {
+    try {
+        $sourceCount = (int)$db->query($countSql)->fetchColumn();
+        $activityRow = $db->query(
+            "SELECT COUNT(*) as total, SUM(is_visible) as visible FROM feed_activity WHERE source_type = '{$sourceType}'"
+        )->fetch(\PDO::FETCH_ASSOC);
+        $activityTotal = (int)$activityRow['total'];
+        $activityVisible = (int)$activityRow['visible'];
+        $gap = $sourceCount - $activityTotal;
+        $status = $gap === 0 ? 'OK' : "MISSING {$gap}";
+        echo sprintf("  %-25s source: %5d  feed_activity: %5d (visible: %5d)  [%s]\n",
+            $table, $sourceCount, $activityTotal, $activityVisible, $status);
+    } catch (\Exception $e) {
+        echo sprintf("  %-25s SKIPPED (%s)\n", $table, $e->getMessage());
+    }
+}
+
+echo "\nDone.\n";
