@@ -297,6 +297,17 @@ class GroupsApiController extends BaseApiController
             $this->respondWithErrors($errors, $httpStatus);
         }
 
+        // Notify based on join result
+        try {
+            if ($status === 'active') {
+                \Nexus\Services\GroupNotificationService::notifyJoined($id, $userId);
+            } elseif ($status === 'pending') {
+                \Nexus\Services\GroupNotificationService::notifyJoinRequest($id, $userId);
+            }
+        } catch (\Throwable $e) {
+            error_log("Group join notification error: " . $e->getMessage());
+        }
+
         $this->respondWithData([
             'status' => $status,
             'message' => $status === 'active' ? 'Successfully joined the group' : 'Join request submitted',
@@ -546,6 +557,17 @@ class GroupsApiController extends BaseApiController
             $this->respondWithErrors($errors, $status);
         }
 
+        // Notify requester of approval/rejection
+        try {
+            if ($action === 'accept') {
+                \Nexus\Services\GroupNotificationService::notifyJoined($id, $requesterId);
+            } else {
+                \Nexus\Services\GroupNotificationService::notifyJoinRejected($id, $requesterId);
+            }
+        } catch (\Throwable $e) {
+            error_log("Group request notification error: " . $e->getMessage());
+        }
+
         $this->respondWithData([
             'user_id' => $requesterId,
             'action' => $action,
@@ -636,6 +658,15 @@ class GroupsApiController extends BaseApiController
             }
 
             $this->respondWithErrors($errors, $status);
+        }
+
+        // Notify group members of new discussion
+        try {
+            $discussionTitle = $discussion['title'] ?? $data['title'] ?? 'New Discussion';
+            $discussionId = $discussion['id'] ?? 0;
+            \Nexus\Services\GroupNotificationService::notifyNewDiscussion($id, $discussionId, $userId, $discussionTitle);
+        } catch (\Throwable $e) {
+            error_log("Group discussion notification error: " . $e->getMessage());
         }
 
         $this->respondWithData($discussion, null, 201);
@@ -840,6 +871,14 @@ class GroupsApiController extends BaseApiController
             $status = $this->resolveErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
             return;
+        }
+
+        // Notify group members of new announcement
+        try {
+            $announcementTitle = $result['title'] ?? $data['title'] ?? 'New Announcement';
+            \Nexus\Services\GroupNotificationService::notifyNewAnnouncement($groupId, $userId, $announcementTitle);
+        } catch (\Throwable $e) {
+            error_log("Group announcement notification error: " . $e->getMessage());
         }
 
         $this->respondWithData($result, null, 201);
