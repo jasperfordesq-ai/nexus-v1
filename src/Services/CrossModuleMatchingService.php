@@ -47,7 +47,7 @@ class CrossModuleMatchingService
             return ['matches' => [], 'total' => 0];
         }
 
-        // Load dismissed listing IDs so we can exclude them
+        // Load dismissed IDs once — reused across all modules
         $dismissedListingIds = self::getDismissedListingIds($userId, $tenantId);
 
         // Match across each enabled module
@@ -57,12 +57,12 @@ class CrossModuleMatchingService
         }
 
         if (in_array('jobs', $modules)) {
-            $jobMatches = self::matchJobs($userId, $userProfile, $tenantId, $limit, $debugMode);
+            $jobMatches = self::matchJobs($userId, $userProfile, $tenantId, $limit, $debugMode, $dismissedListingIds);
             $allMatches = array_merge($allMatches, $jobMatches);
         }
 
         if (in_array('volunteering', $modules)) {
-            $volMatches = self::matchVolunteering($userId, $userProfile, $tenantId, $limit, $debugMode);
+            $volMatches = self::matchVolunteering($userId, $userProfile, $tenantId, $limit, $debugMode, $dismissedListingIds);
             $allMatches = array_merge($allMatches, $volMatches);
         }
 
@@ -238,12 +238,21 @@ class CrossModuleMatchingService
     /**
      * Match against jobs (qualifications matching)
      */
-    private static function matchJobs(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false): array
+    private static function matchJobs(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false, array $dismissedIds = []): array
     {
         $matches = [];
         $userSkills = $profile['skills_array'];
 
         try {
+            $dismissSql = '';
+            $params = [$tenantId];
+            if (!empty($dismissedIds)) {
+                $placeholders = implode(',', array_fill(0, count($dismissedIds), '?'));
+                $dismissSql = " AND j.id NOT IN ($placeholders)";
+                $params = array_merge($params, $dismissedIds);
+            }
+            $params[] = (int)$limit;
+
             $stmt = Database::query(
                 "SELECT j.id, j.title, j.description, j.location,
                         COALESCE(j.latitude, NULL) AS latitude,
@@ -252,10 +261,10 @@ class CrossModuleMatchingService
                  FROM job_vacancies j
                  LEFT JOIN organizations o ON j.organization_id = o.id
                  WHERE j.tenant_id = ? AND j.status = 'open'
-                   AND (j.deadline IS NULL OR j.deadline >= CURDATE())
+                   AND (j.deadline IS NULL OR j.deadline >= CURDATE()){$dismissSql}
                  ORDER BY j.created_at DESC
                  LIMIT ?",
-                [$tenantId, (int)$limit]
+                $params
             );
 
             $jobs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -337,12 +346,21 @@ class CrossModuleMatchingService
     /**
      * Match against volunteering opportunities
      */
-    private static function matchVolunteering(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false): array
+    private static function matchVolunteering(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false, array $dismissedIds = []): array
     {
         $matches = [];
         $userSkills = $profile['skills_array'];
 
         try {
+            $dismissSql = '';
+            $params = [$tenantId];
+            if (!empty($dismissedIds)) {
+                $placeholders = implode(',', array_fill(0, count($dismissedIds), '?'));
+                $dismissSql = " AND v.id NOT IN ($placeholders)";
+                $params = array_merge($params, $dismissedIds);
+            }
+            $params[] = (int)$limit;
+
             $stmt = Database::query(
                 "SELECT v.id, v.title, v.description, v.location,
                         COALESCE(v.latitude, NULL) AS latitude,
@@ -352,10 +370,10 @@ class CrossModuleMatchingService
                  FROM vol_opportunities v
                  LEFT JOIN vol_organizations o ON v.organization_id = o.id
                  WHERE v.tenant_id = ? AND v.status = 'open' AND v.is_active = 1
-                   AND (v.end_date IS NULL OR v.end_date >= CURDATE())
+                   AND (v.end_date IS NULL OR v.end_date >= CURDATE()){$dismissSql}
                  ORDER BY v.start_date ASC
                  LIMIT ?",
-                [$tenantId, (int)$limit]
+                $params
             );
 
             $opportunities = $stmt->fetchAll(\PDO::FETCH_ASSOC);

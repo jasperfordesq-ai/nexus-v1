@@ -293,6 +293,10 @@ class FeedRankingService
                 }
             }
 
+            // 7. Context-aware boost — time-of-day and day-of-week signals
+            // Boosts content types that perform better at certain times/days.
+            $score *= self::contextualBoost($sourceType);
+
             $item['_edge_rank'] = $score;
         }
         unset($item);
@@ -307,6 +311,64 @@ class FeedRankingService
         unset($item);
 
         return $items;
+    }
+
+    /**
+     * Context-aware boost based on time-of-day and day-of-week.
+     *
+     * Certain content types perform better at specific times:
+     * - Events: boosted on Monday morning (planning week) and Friday afternoon
+     * - Volunteering: boosted weekends when people have free time
+     * - Jobs: boosted Monday–Wednesday mornings (job-seeking behaviour)
+     * - Social posts: boosted evenings (7–10pm) across all days
+     *
+     * Multiplier range: 0.90–1.20 to stay subtle.
+     */
+    private static function contextualBoost(string $sourceType): float
+    {
+        $hour = (int)date('G');      // 0–23 server UTC; close enough for population-level signals
+        $dow  = (int)date('N');      // 1=Monday … 7=Sunday
+
+        $isWeekend  = $dow >= 6;
+        $isWeekday  = !$isWeekend;
+        $isMorning  = $hour >= 7  && $hour < 12;
+        $isEvening  = $hour >= 19 && $hour < 22;
+        $isMonday   = $dow === 1;
+        $isFriday   = $dow === 5;
+
+        switch ($sourceType) {
+            case 'event':
+                // People plan their week on Monday morning, browse on Friday
+                if ($isMonday && $isMorning) return 1.20;
+                if ($isFriday && $hour >= 14) return 1.15;
+                return 1.0;
+
+            case 'volunteer':
+                // Volunteering sign-ups spike on weekends
+                if ($isWeekend) return 1.18;
+                return 1.0;
+
+            case 'job':
+                // Job browsing peaks Mon–Wed mornings
+                if ($isWeekday && $isMorning && $dow <= 3) return 1.15;
+                return 1.0;
+
+            case 'post':
+            case 'poll':
+                // Social content peaks in evenings
+                if ($isEvening) return 1.12;
+                // Suppress slightly during dead hours (2–6am)
+                if ($hour >= 2 && $hour < 6) return 0.90;
+                return 1.0;
+
+            case 'listing':
+                // Listings browsed weekend mornings
+                if ($isWeekend && $isMorning) return 1.10;
+                return 1.0;
+
+            default:
+                return 1.0;
+        }
     }
 
     /**
