@@ -49,40 +49,60 @@ import { formatRelativeTime } from '@/lib/helpers';
 
 interface ActivityItem {
   id: number;
-  type: string;
+  activity_type: string;
   description: string;
   created_at: string;
-  metadata?: Record<string, unknown>;
 }
 
-interface ActivityStats {
+interface HoursSummary {
   hours_given: number;
   hours_received: number;
-  listings_count: number;
-  connections_count: number;
-  events_attended: number;
-  messages_sent: number;
-  reviews_given: number;
+  transactions_given: number;
+  transactions_received: number;
+  net_balance: number;
+}
+
+interface ConnectionStats {
+  total_connections: number;
+  pending_requests: number;
+  groups_joined: number;
+}
+
+interface EngagementMetrics {
   posts_count: number;
+  comments_count: number;
+  likes_given: number;
+  likes_received: number;
 }
 
-interface MonthlyData {
-  month: string;
-  hours_given: number;
-  hours_received: number;
-}
-
-interface SkillBreakdown {
+interface SkillEntry {
   skill_name: string;
-  hours: number;
-  percentage: number;
+  is_offering: boolean;
+  is_requesting: boolean;
+  proficiency: string | null;
+  endorsements: number;
+}
+
+interface SkillsBreakdown {
+  skills: SkillEntry[];
+  offering_count: number;
+  requesting_count: number;
+}
+
+interface MonthlyEntry {
+  month: string;
+  label: string;
+  given: number;
+  received: number;
 }
 
 interface DashboardData {
-  stats: ActivityStats;
-  recent_activity: ActivityItem[];
-  monthly_activity: MonthlyData[];
-  skills_breakdown: SkillBreakdown[];
+  timeline: ActivityItem[];
+  hours_summary: HoursSummary;
+  connection_stats: ConnectionStats;
+  engagement: EngagementMetrics;
+  skills_breakdown: SkillsBreakdown;
+  monthly_hours: MonthlyEntry[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -130,10 +150,10 @@ function StatCard({
 // Simple Bar Chart (no recharts dependency for basic display)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function SimpleBarChart({ data }: { data: MonthlyData[] }) {
+function SimpleBarChart({ data }: { data: MonthlyEntry[] }) {
   if (data.length === 0) return null;
 
-  const maxVal = Math.max(...data.flatMap((d) => [d.hours_given, d.hours_received]), 1);
+  const maxVal = Math.max(...data.flatMap((d) => [d.given, d.received]), 1);
 
   return (
     <div className="space-y-2">
@@ -153,15 +173,15 @@ function SimpleBarChart({ data }: { data: MonthlyData[] }) {
             <div className="w-full flex gap-0.5 items-end" style={{ height: '100%' }}>
               <div
                 className="flex-1 bg-emerald-500/60 rounded-t-sm transition-all"
-                style={{ height: `${Math.max((item.hours_given / maxVal) * 100, 4)}%` }}
+                style={{ height: `${Math.max((item.given / maxVal) * 100, 4)}%` }}
               />
               <div
                 className="flex-1 bg-indigo-500/60 rounded-t-sm transition-all"
-                style={{ height: `${Math.max((item.hours_received / maxVal) * 100, 4)}%` }}
+                style={{ height: `${Math.max((item.received / maxVal) * 100, 4)}%` }}
               />
             </div>
             <span className="text-[10px] text-theme-subtle truncate w-full text-center">
-              {item.month.slice(0, 3)}
+              {item.label ? item.label.slice(0, 3) : item.month.slice(5)}
             </span>
           </div>
         ))}
@@ -241,7 +261,7 @@ export function ActivityDashboardPage() {
 
   if (!dashboard) return null;
 
-  const { stats, recent_activity, monthly_activity, skills_breakdown } = dashboard;
+  const { timeline, hours_summary, connection_stats, engagement, skills_breakdown, monthly_hours } = dashboard;
 
   return (
     <motion.div
@@ -268,25 +288,25 @@ export function ActivityDashboardPage() {
         <StatCard
           icon={<ArrowUpRight className="w-5 h-5" aria-hidden="true" />}
           label="Hours Given"
-          value={stats.hours_given}
+          value={hours_summary.hours_given}
           color="from-emerald-500/20 to-teal-500/20 text-emerald-500"
         />
         <StatCard
           icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
           label="Hours Received"
-          value={stats.hours_received}
+          value={hours_summary.hours_received}
           color="from-indigo-500/20 to-blue-500/20 text-indigo-500"
         />
         <StatCard
           icon={<Users className="w-5 h-5" aria-hidden="true" />}
           label="Connections"
-          value={stats.connections_count}
+          value={connection_stats.total_connections}
           color="from-blue-500/20 to-cyan-500/20 text-blue-500"
         />
         <StatCard
           icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}
-          label="Active Listings"
-          value={stats.listings_count}
+          label="Exchanges"
+          value={hours_summary.transactions_given + hours_summary.transactions_received}
           color="from-purple-500/20 to-fuchsia-500/20 text-purple-500"
         />
       </motion.div>
@@ -296,13 +316,13 @@ export function ActivityDashboardPage() {
         {/* Left Column - Activity Timeline */}
         <motion.div variants={itemVariants} className="lg:col-span-2 space-y-4">
           {/* Monthly Chart */}
-          {monthly_activity.length > 0 && (
+          {monthly_hours.some(m => m.given > 0 || m.received > 0) && (
             <GlassCard className="p-5">
               <div className="flex items-center gap-2 mb-4">
                 <BarChart3 className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                 <h3 className="font-semibold text-theme-primary">Monthly Activity</h3>
               </div>
-              <SimpleBarChart data={monthly_activity} />
+              <SimpleBarChart data={monthly_hours} />
             </GlassCard>
           )}
 
@@ -315,12 +335,12 @@ export function ActivityDashboardPage() {
               </div>
             </div>
 
-            {recent_activity.length > 0 ? (
+            {timeline.length > 0 ? (
               <div className="space-y-4">
-                {recent_activity.map((item) => {
-                  const config = activityIcons[item.type] || activityIcons.default;
+                {timeline.map((item, idx) => {
+                  const config = activityIcons[item.activity_type] || activityIcons.default;
                   return (
-                    <div key={item.id} className="flex items-start gap-3">
+                    <div key={`${item.id}-${idx}`} className="flex items-start gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${config.color}`}>
                         {config.icon}
                       </div>
@@ -352,51 +372,52 @@ export function ActivityDashboardPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-theme-muted flex items-center gap-2">
-                  <CalendarCheck className="w-4 h-4" aria-hidden="true" />
-                  Events Attended
+                  <Users className="w-4 h-4" aria-hidden="true" />
+                  Groups Joined
                 </span>
-                <span className="font-semibold text-theme-primary">{stats.events_attended}</span>
+                <span className="font-semibold text-theme-primary">{connection_stats.groups_joined}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-theme-muted flex items-center gap-2">
                   <MessageSquare className="w-4 h-4" aria-hidden="true" />
-                  Messages Sent
+                  Posts (30d)
                 </span>
-                <span className="font-semibold text-theme-primary">{stats.messages_sent}</span>
+                <span className="font-semibold text-theme-primary">{engagement.posts_count}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-theme-muted flex items-center gap-2">
                   <Star className="w-4 h-4" aria-hidden="true" />
-                  Reviews Given
+                  Likes Received (30d)
                 </span>
-                <span className="font-semibold text-theme-primary">{stats.reviews_given}</span>
+                <span className="font-semibold text-theme-primary">{engagement.likes_received}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-theme-muted flex items-center gap-2">
                   <TrendingUp className="w-4 h-4" aria-hidden="true" />
-                  Posts Created
+                  Net Balance
                 </span>
-                <span className="font-semibold text-theme-primary">{stats.posts_count}</span>
+                <span className={`font-semibold ${hours_summary.net_balance >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                  {hours_summary.net_balance >= 0 ? '+' : ''}{hours_summary.net_balance}h
+                </span>
               </div>
             </div>
           </GlassCard>
 
-          {/* Skills Breakdown */}
-          {skills_breakdown.length > 0 && (
+          {/* Skills */}
+          {skills_breakdown.skills.length > 0 && (
             <GlassCard className="p-5">
-              <h3 className="font-semibold text-theme-primary mb-3 text-sm">Skills Breakdown</h3>
-              <div className="space-y-3">
-                {skills_breakdown.map((skill, idx) => (
-                  <div key={idx}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-theme-muted">{skill.skill_name}</span>
-                      <span className="text-xs font-medium text-theme-primary">{skill.hours}h</span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-theme-hover overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all"
-                        style={{ width: `${skill.percentage}%` }}
-                      />
+              <h3 className="font-semibold text-theme-primary mb-3 text-sm">My Skills</h3>
+              <div className="space-y-2">
+                {skills_breakdown.skills.slice(0, 6).map((skill, idx) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <span className="text-sm text-theme-muted truncate">{skill.skill_name}</span>
+                    <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                      {skill.is_offering && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">Offer</span>
+                      )}
+                      {skill.endorsements > 0 && (
+                        <span className="text-[10px] text-indigo-500 font-semibold">×{skill.endorsements}</span>
+                      )}
                     </div>
                   </div>
                 ))}
