@@ -145,6 +145,7 @@ const SeoOverview = lazy(() => import('./modules/advanced/SeoOverview'));
 const SeoAudit = lazy(() => import('./modules/advanced/SeoAudit'));
 const Redirects = lazy(() => import('./modules/advanced/Redirects'));
 const Error404Tracking = lazy(() => import('./modules/advanced/Error404Tracking'));
+const MatchDebugPanel = lazy(() => import('./modules/advanced/MatchDebugPanel'));
 
 // System tools
 const AdminSettings = lazy(() => import('./modules/system/AdminSettings'));
@@ -308,6 +309,7 @@ export function AdminRoutes() {
       <Route path="seo/audit" element={<Lazy><SeoAudit /></Lazy>} />
       <Route path="seo/redirects" element={<Lazy><Redirects /></Lazy>} />
       <Route path="404-errors" element={<Lazy><Error404Tracking /></Lazy>} />
+      <Route path="match-debug" element={<Lazy><MatchDebugPanel /></Lazy>} />
 
       {/* ─── FINANCIAL ─── */}
       <Route path="timebanking" element={<Lazy><TimebankingDashboard /></Lazy>} />
