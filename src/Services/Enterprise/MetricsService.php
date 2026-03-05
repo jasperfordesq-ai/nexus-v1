@@ -16,6 +16,11 @@ namespace Nexus\Services\Enterprise;
  */
 class MetricsService
 {
+    public const STATUS_OK = 0;
+    public const STATUS_WARNING = 1;
+    public const STATUS_CRITICAL = 2;
+    public const STATUS_UNKNOWN = 3;
+
     private static ?MetricsService $instance = null;
     private ?object $statsd = null;
     private bool $enabled;
@@ -80,12 +85,14 @@ class MetricsService
                     {
                         $this->host = $host;
                         $this->port = $port;
-                        $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+                        $this->socket = function_exists('socket_create')
+                            ? socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)
+                            : false;
                     }
 
                     public function send(string $message): void
                     {
-                        if ($this->socket) {
+                        if ($this->socket && function_exists('socket_sendto')) {
                             @socket_sendto($this->socket, $message, strlen($message), 0, $this->host, $this->port);
                         }
                     }
@@ -114,17 +121,32 @@ class MetricsService
 
     /**
      * Increment a counter
+     *
+     * Accepts either (metric, value, tags) or (metric, tags) for convenience.
      */
-    public function increment(string $metric, array $tags = [], int $value = 1): void
+    public function increment(string $metric, int|array $value = 1, array $tags = [], float $sampleRate = 1.0): void
     {
+        if (is_array($value)) {
+            $tags = $value;
+            $value = 1;
+        }
+        if ($sampleRate < 1.0 && (mt_rand() / mt_getrandmax()) > $sampleRate) {
+            return;
+        }
         $this->sendMetric($metric, $value, 'c', $tags);
     }
 
     /**
      * Decrement a counter
+     *
+     * Accepts either (metric, value, tags) or (metric, tags) for convenience.
      */
-    public function decrement(string $metric, array $tags = [], int $value = 1): void
+    public function decrement(string $metric, int|array $value = 1, array $tags = []): void
     {
+        if (is_array($value)) {
+            $tags = $value;
+            $value = 1;
+        }
         $this->sendMetric($metric, -$value, 'c', $tags);
     }
 
@@ -193,10 +215,15 @@ class MetricsService
     /**
      * Send a service check
      */
-    public function serviceCheck(string $name, int $status, array $options = []): void
+    public function serviceCheck(string $name, int $status, string|array $options = []): void
     {
         if (!$this->enabled) {
             return;
+        }
+
+        // Accept a plain message string or options array
+        if (is_string($options)) {
+            $options = ['message' => $options];
         }
 
         $tags = array_merge($this->globalTags, $options['tags'] ?? []);

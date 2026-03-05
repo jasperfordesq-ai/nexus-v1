@@ -98,6 +98,67 @@ class OnboardingApiController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/onboarding/interests
+     *
+     * Save user interest selections (category IDs).
+     *
+     * Request Body: { "interests": [1, 2, 3] }
+     * Response: 200 OK { "data": { "saved": 3 } }
+     */
+    public function saveInterests(): void
+    {
+        $userId = $this->getUserId();
+        $interests = $this->input('interests', []);
+
+        if (is_array($interests)) {
+            $interests = array_map('intval', $interests);
+            $interests = array_filter($interests, fn($id) => $id > 0);
+        } else {
+            $interests = [];
+        }
+
+        OnboardingService::saveInterests($userId, $interests);
+
+        $this->respondWithData(['saved' => count($interests)]);
+    }
+
+    /**
+     * POST /api/v2/onboarding/skills
+     *
+     * Save user skill selections (offers and needs).
+     *
+     * Request Body: { "offers": [1, 3], "needs": [5, 7] }
+     * Response: 200 OK { "data": { "offers_saved": 2, "needs_saved": 2 } }
+     */
+    public function saveSkills(): void
+    {
+        $userId = $this->getUserId();
+        $offers = $this->input('offers', []);
+        $needs = $this->input('needs', []);
+
+        if (is_array($offers)) {
+            $offers = array_map('intval', $offers);
+            $offers = array_filter($offers, fn($id) => $id > 0);
+        } else {
+            $offers = [];
+        }
+
+        if (is_array($needs)) {
+            $needs = array_map('intval', $needs);
+            $needs = array_filter($needs, fn($id) => $id > 0);
+        } else {
+            $needs = [];
+        }
+
+        OnboardingService::saveSkills($userId, $offers, $needs);
+
+        $this->respondWithData([
+            'offers_saved' => count($offers),
+            'needs_saved' => count($needs),
+        ]);
+    }
+
+    /**
      * POST /api/v2/onboarding/complete
      *
      * Complete the onboarding process:
