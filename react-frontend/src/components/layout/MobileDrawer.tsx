@@ -57,6 +57,9 @@ import {
   Bot,
   Briefcase,
   Lightbulb,
+  GraduationCap,
+  Activity,
+  Library,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent } from '@/contexts';
@@ -107,6 +110,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.volunteering'), href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
     { label: t('nav.organisations'), href: '/organisations', icon: Building2, feature: 'organisations' as const },
     { label: t('nav.resources'), href: '/resources', icon: FolderOpen, feature: 'resources' as const },
+    { label: t('nav.knowledge_base', 'Knowledge Base'), href: '/kb', icon: Library, feature: 'resources' as keyof TenantFeatures },
     { label: t('nav.polls'), href: '/polls', icon: BarChart3, feature: 'polls' as const },
     { label: t('nav.jobs'), href: '/jobs', icon: Briefcase, feature: 'job_vacancies' as const },
     { label: t('nav.ideation'), href: '/ideation', icon: Lightbulb, feature: 'ideation_challenges' as const },
@@ -117,6 +121,8 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.achievements'), href: '/achievements', icon: Trophy, feature: 'gamification' as const },
     { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
     { label: t('nav.goals'), href: '/goals', icon: Target, feature: 'goals' as const },
+    { label: t('nav.skills', 'Skills'), href: '/skills', icon: GraduationCap },
+    { label: t('nav.activity', 'My Activity'), href: '/activity', icon: Activity },
     { label: t('nav.ai_chat', 'AI Assistant'), href: '/chat', icon: Bot, feature: 'ai_chat' as keyof TenantFeatures },
   ];
 

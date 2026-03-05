@@ -242,11 +242,12 @@ class GamificationV2ApiController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         // ── Map frontend type → LeaderboardService type ──────────────────────
-        // Supported frontend values: 'xp', 'volunteer_hours', 'credits_earned'
+        // Supported frontend values: 'xp', 'volunteer_hours', 'credits_earned', 'nexus_score'
         $typeMap = [
             'xp'             => 'xp',
             'volunteer_hours' => 'vol_hours',
             'credits_earned' => 'credits_earned',
+            'nexus_score'    => 'nexus_score',
         ];
         $serviceType = $typeMap[$type] ?? 'xp';
 
@@ -261,6 +262,60 @@ class GamificationV2ApiController extends BaseApiController
             'week'   => 'weekly',
         ];
         $servicePeriod = $periodMap[$period] ?? 'all_time';
+
+        // ── NexusScore leaderboard (reads from nexus_score_cache directly) ──────
+        if ($serviceType === 'nexus_score') {
+            $tableCheck = Database::query("SHOW TABLES LIKE 'nexus_score_cache'")->fetch();
+            if (!$tableCheck) {
+                $this->respondWithData([], ['period' => $period, 'type' => $type, 'your_position' => null, 'total_entries' => 0]);
+                return;
+            }
+
+            $placeholders = implode(',', array_fill(0, $limit, '?'));
+            $rows = Database::query(
+                "SELECT n.user_id, n.total_score, n.percentile, u.name, u.avatar_url, u.xp, u.level,
+                        @rownum := @rownum + 1 AS rank_pos
+                 FROM nexus_score_cache n
+                 JOIN users u ON u.id = n.user_id
+                 JOIN (SELECT @rownum := 0) r
+                 WHERE n.tenant_id = ? AND u.tenant_id = ? AND u.is_approved = 1
+                 ORDER BY n.total_score DESC
+                 LIMIT ?",
+                [$tenantId, $tenantId, $limit]
+            )->fetchAll();
+
+            $leaderboard = [];
+            foreach ($rows as $pos => $row) {
+                $leaderboard[] = [
+                    'position'        => $pos + 1,
+                    'user'            => [
+                        'id'         => (int)$row['user_id'],
+                        'name'       => trim($row['name'] ?? ''),
+                        'avatar_url' => $row['avatar_url'] ?? null,
+                    ],
+                    'xp'              => (int)($row['xp'] ?? 0),
+                    'level'           => (int)($row['level'] ?? 1),
+                    'score'           => (float)$row['total_score'],
+                    'is_current_user' => ((int)$row['user_id'] === $userId),
+                ];
+            }
+
+            $currentUserPosition = null;
+            foreach ($leaderboard as $entry) {
+                if ($entry['is_current_user']) {
+                    $currentUserPosition = $entry['position'];
+                    break;
+                }
+            }
+
+            $this->respondWithData($leaderboard, [
+                'period'        => $period,
+                'type'          => $type,
+                'your_position' => $currentUserPosition,
+                'total_entries' => count($leaderboard),
+            ]);
+            return;
+        }
 
         // ── Fetch via LeaderboardService ──────────────────────────────────────
         // LeaderboardService::getLeaderboard() already scopes by tenant_id,

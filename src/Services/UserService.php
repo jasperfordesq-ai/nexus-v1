@@ -115,6 +115,19 @@ class UserService
         // Add badges
         $profile['badges'] = self::getUserBadges($userId);
 
+        // Add NexusScore summary (cached, non-blocking)
+        try {
+            $tenantId = TenantContext::getId();
+            $score = NexusScoreCacheService::getScore($userId, $tenantId);
+            $profile['nexus_score'] = [
+                'total_score' => $score['total_score'] ?? 0,
+                'tier'        => $score['tier'] ?? 'newcomer',
+                'percentile'  => $score['percentile'] ?? 0,
+            ];
+        } catch (\Throwable $e) {
+            $profile['nexus_score'] = null;
+        }
+
         return $profile;
     }
 

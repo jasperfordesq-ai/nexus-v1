@@ -92,9 +92,16 @@ interface ProfileApiBadge {
   earned_at: string;
 }
 
+interface NexusScoreSummary {
+  total_score: number;
+  tier: string;
+  percentile: number;
+}
+
 interface ProfileApiUser extends UserType {
   badges?: ProfileApiBadge[];
   stats?: ProfileStats;
+  nexus_score?: NexusScoreSummary | null;
 }
 
 interface GamificationProfileResponse {
@@ -500,6 +507,16 @@ export function ProfilePage() {
                   <span className="flex items-center gap-1" aria-label={`Rating: ${profile.rating.toFixed(1)} out of 5`}>
                     <Star className="w-4 h-4 text-amber-400" aria-hidden="true" />
                     <span aria-hidden="true">{profile.rating.toFixed(1)}</span>
+                  </span>
+                )}
+                {profile.nexus_score && (
+                  <span
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-semibold"
+                    aria-label={`NexusScore: ${profile.nexus_score.total_score} (${profile.nexus_score.tier})`}
+                  >
+                    <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
+                    {profile.nexus_score.total_score}
+                    <span className="text-[10px] opacity-70 capitalize">{profile.nexus_score.tier}</span>
                   </span>
                 )}
               </div>

@@ -65,6 +65,9 @@ import {
   Bot,
   Briefcase,
   Lightbulb,
+  GraduationCap,
+  Activity,
+  Library,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
@@ -297,6 +300,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.volunteering'), href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
     { label: t('nav.organisations'), href: tenantPath('/organisations'), icon: Building2, feature: 'organisations' as const },
     { label: t('nav.resources'), href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
+    { label: t('nav.knowledge_base', 'Knowledge Base'), href: tenantPath('/kb'), icon: Library, feature: 'resources' as const },
     { label: t('nav.polls'), href: tenantPath('/polls'), icon: BarChart3, feature: 'polls' as const },
     { label: t('nav.jobs'), href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
     { label: t('nav.ideation'), href: tenantPath('/ideation'), icon: Lightbulb, feature: 'ideation_challenges' as const },
@@ -311,6 +315,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.leaderboard'), href: tenantPath('/leaderboard'), icon: Medal, feature: 'gamification' as const },
     { label: t('nav.matches', 'Matches'), href: tenantPath('/matches'), icon: Handshake },
     { label: t('nav.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
+    { label: t('nav.skills', 'Skills'), href: tenantPath('/skills'), icon: GraduationCap },
+    { label: t('nav.activity', 'My Activity'), href: tenantPath('/activity'), icon: Activity },
     { label: t('nav.ai_chat', 'AI Assistant'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' as const },
   ].filter(item => {
     if (item.feature && !hasFeature(item.feature)) return false;

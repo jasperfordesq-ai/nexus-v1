@@ -16,6 +16,13 @@ console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
 import { initSentry, SentryErrorBoundary } from '@/lib/sentry';
 initSentry();
 
+// Register PWA service worker (production only — dev uses Vite HMR)
+if (import.meta.env.PROD) {
+  import('virtual:pwa-register').then(({ registerSW }) => {
+    registerSW({ immediate: true });
+  });
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <SentryErrorBoundary fallback={<ErrorFallback />}>

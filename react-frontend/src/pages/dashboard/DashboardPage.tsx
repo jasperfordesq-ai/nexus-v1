@@ -39,6 +39,7 @@ import {
   UserPlus,
   Award,
   Star,
+  ThumbsUp,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -76,6 +77,11 @@ interface FeedActivityItem {
   is_liked: boolean;
 }
 
+interface EndorsementEntry {
+  skill: string;
+  count: number;
+}
+
 interface DashboardStats {
   walletBalance: WalletBalance | null;
   recentListings: Listing[];
@@ -86,6 +92,7 @@ interface DashboardStats {
   suggestedListings: Listing[];
   myGroups: Group[];
   upcomingEvents: Event[];
+  myEndorsements: EndorsementEntry[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -133,6 +140,7 @@ export function DashboardPage() {
     suggestedListings: [],
     myGroups: [],
     upcomingEvents: [],
+    myEndorsements: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -190,6 +198,14 @@ export function DashboardPage() {
         optionalRequests.push({
           key: 'groups',
           promise: api.get<Group[]>('/v2/groups?my_groups=1&limit=3').catch(() => null),
+        });
+      }
+
+      // Always fetch endorsements for the current user (non-blocking)
+      if (user?.id) {
+        optionalRequests.push({
+          key: 'endorsements',
+          promise: api.get(`/v2/members/${user.id}/endorsements`).catch(() => null),
         });
       }
 
@@ -270,6 +286,22 @@ export function DashboardPage() {
         }
       }
 
+      // Parse endorsements
+      let endorsementsData: EndorsementEntry[] = [];
+      if (optionalResults.endorsements) {
+        const eRes = optionalResults.endorsements as {
+          success?: boolean;
+          data?: { endorsements?: Record<string, { count: number }> };
+        };
+        if (eRes?.success && eRes.data?.endorsements) {
+          endorsementsData = Object.entries(eRes.data.endorsements)
+            .map(([skill, info]) => ({ skill, count: info.count || 0 }))
+            .filter((e) => e.count > 0)
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 6);
+        }
+      }
+
       // Get total count from meta if available
       const listingsCount = listingsData?.meta?.total_items
         ?? listingsData?.data?.length
@@ -285,6 +317,7 @@ export function DashboardPage() {
         suggestedListings: suggestedData,
         myGroups: groupsData,
         upcomingEvents: eventsData,
+        myEndorsements: endorsementsData,
       });
     } catch (err) {
       logError('Failed to load dashboard data', err);
@@ -296,7 +329,7 @@ export function DashboardPage() {
       setGroupsLoading(false);
       setEventsLoading(false);
     }
-  }, [hasGamification, hasFeedModule, hasListingsModule, hasGroups, hasEvents, t]);
+  }, [hasGamification, hasFeedModule, hasListingsModule, hasGroups, hasEvents, user?.id, t]);
 
   useEffect(() => {
     loadDashboardData();
@@ -618,6 +651,51 @@ export function DashboardPage() {
             <motion.div variants={itemVariants}>
               <PendingReviewsCard />
             </motion.div>
+
+            {/* Endorsements Received */}
+            {(isLoading || stats.myEndorsements.length > 0) && (
+              <motion.div variants={itemVariants}>
+                <GlassCard className="p-6">
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2 min-w-0">
+                      <ThumbsUp className="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0" aria-hidden="true" />
+                      <span className="truncate">{t('sections.endorsements', 'Endorsements')}</span>
+                    </h2>
+                    <Link
+                      to={tenantPath(`/profile/${user?.id}`)}
+                      className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap"
+                    >
+                      {t('view_all')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                    </Link>
+                  </div>
+                  {isLoading ? (
+                    <div className="space-y-2">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="animate-pulse flex items-center justify-between p-2">
+                          <div className="h-4 bg-theme-elevated rounded w-2/3" />
+                          <div className="h-5 bg-theme-elevated rounded-full w-8" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {stats.myEndorsements.map(({ skill, count }) => (
+                        <div
+                          key={skill}
+                          className="flex items-center justify-between px-3 py-2 rounded-lg bg-theme-elevated"
+                        >
+                          <span className="text-sm text-theme-primary truncate">{skill}</span>
+                          <span className="flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 ml-2 shrink-0">
+                            <ThumbsUp className="w-3 h-3" aria-hidden="true" />
+                            {count}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </GlassCard>
+              </motion.div>
+            )}
 
             {/* Suggested Matches */}
             {hasListingsModule && (
