@@ -231,7 +231,7 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
 
 # Step 3: Run SQL against the DB container (from the server)
 sudo docker exec -i nexus-php-db \
-    mysql -u nexus -pREDACTED_DB_PASS nexus \
+    mysql -u nexus -pYOUR_DB_PASS nexus \
     < /opt/nexus-php/migrations/your_migration.sql
 ```
 
@@ -239,7 +239,7 @@ Or as a one-liner from local machine (no interactive SSH needed):
 ```bash
 # Must pipe the file in via stdin — docker exec -i reads from stdin
 ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
-    "sudo docker exec -i nexus-php-db mysql -u nexus -pREDACTED_DB_PASS nexus \
+    "sudo docker exec -i nexus-php-db mysql -u nexus -pYOUR_DB_PASS nexus \
     < /opt/nexus-php/migrations/your_migration.sql; echo EXIT:\$?"
 ```
 
@@ -252,20 +252,12 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
 
 ### DB Credentials (production)
 
-```
-DB_HOST=db (internal Docker network)
-DB_NAME=nexus
-DB_USER=nexus
-DB_PASS=REDACTED_DB_PASS
-DB_ROOT_PASSWORD=REDACTED_DB_ROOT_PASS
-```
-
-These are in `/opt/nexus-php/.env` on the server.
+Production credentials are stored in `/opt/nexus-php/.env` on the server. **Never commit credentials to the repository.**
 
 ### Verify migrations ran
 
 ```bash
 ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
-    "sudo docker exec nexus-php-db mysql -u nexus -pREDACTED_DB_PASS nexus \
+    "sudo docker exec nexus-php-db mysql -u nexus -pYOUR_DB_PASS nexus \
     -e \"SHOW TABLES LIKE 'your_table%';\""
 ```
