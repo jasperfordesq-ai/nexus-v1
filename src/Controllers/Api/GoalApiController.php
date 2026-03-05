@@ -74,13 +74,9 @@ class GoalApiController extends BaseApiController
      */
     public function offerBuddy()
     {
-        // Clear any previous output (e.g., from TenantContext debug)
-        if (ob_get_level()) {
-            ob_clean();
-        }
-
         try {
             $userId = $this->getUserId();
+            $tenantId = TenantContext::getId();
 
             $input = json_decode(file_get_contents('php://input'), true);
             $goalId = $input['goal_id'] ?? null;
@@ -92,8 +88,6 @@ class GoalApiController extends BaseApiController
 
             $db = Database::getConnection();
 
-            $tenantId = TenantContext::getId();
-
             // Get the goal — scoped by tenant, then verify it's public for buddy offers
             $stmt = $db->prepare("SELECT * FROM goals WHERE id = ? AND tenant_id = ?");
             $stmt->execute([$goalId, $tenantId]);
@@ -103,9 +97,6 @@ class GoalApiController extends BaseApiController
                 $this->jsonResponse(['success' => false, 'error' => 'Goal not found'], 404);
                 return;
             }
-
-            // Store tenant ID for notification (from goal data, fallback to context)
-            $tenantId = $goal['tenant_id'] ?? TenantContext::getId() ?? 1;
 
             // Verify goal is public (only public goals can have buddies)
             if (empty($goal['is_public'])) {
@@ -126,8 +117,8 @@ class GoalApiController extends BaseApiController
             }
 
             // Set this user as mentor
-            $stmt = $db->prepare("UPDATE goals SET mentor_id = ? WHERE id = ?");
-            $stmt->execute([$userId, $goalId]);
+            $stmt = $db->prepare("UPDATE goals SET mentor_id = ? WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$userId, $goalId, $tenantId]);
 
             // Award points for becoming a buddy
             if (class_exists('\Nexus\Models\Gamification')) {
@@ -148,11 +139,7 @@ class GoalApiController extends BaseApiController
             $this->jsonResponse(['success' => true, 'message' => 'You are now a buddy for this goal']);
 
         } catch (\Exception $e) {
-            // Clear any output that may have been generated
-            if (ob_get_level()) {
-                ob_clean();
-            }
-            $this->jsonResponse(['success' => false, 'error' => $e->getMessage()], 500);
+            $this->jsonResponse(['success' => false, 'error' => 'An error occurred'], 500);
         }
     }
 }

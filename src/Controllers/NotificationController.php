@@ -144,7 +144,7 @@ class NotificationController
         } elseif (isset($input['all']) && ($input['all'] === true || $input['all'] === 'true')) {
             Notification::deleteAll($userId);
         } else {
-            echo json_encode(['success' => false, 'error' => 'Missing ID or Action', 'debug_input' => $input]);
+            echo json_encode(['success' => false, 'error' => 'Missing ID or Action']);
             exit;
         }
 

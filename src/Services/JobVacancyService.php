@@ -1280,22 +1280,18 @@ class JobVacancyService
     {
         self::clearErrors();
 
-        // Get the application with its vacancy to check permissions
+        $tenantId = TenantContext::getId();
+
+        // Get the application with its vacancy to check permissions (scoped to tenant)
         $application = Database::query(
-            "SELECT a.*, jv.user_id as vacancy_owner_id, jv.tenant_id
+            "SELECT a.*, jv.user_id as vacancy_owner_id
              FROM job_vacancy_applications a
-             JOIN job_vacancies jv ON a.vacancy_id = jv.id
+             JOIN job_vacancies jv ON a.vacancy_id = jv.id AND jv.tenant_id = ?
              WHERE a.id = ?",
-            [$applicationId]
+            [$tenantId, $applicationId]
         )->fetch();
 
         if (!$application) {
-            self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Application not found');
-            return null;
-        }
-
-        $tenantId = TenantContext::getId();
-        if ((int)$application['tenant_id'] !== $tenantId) {
             self::addError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Application not found');
             return null;
         }
@@ -1305,7 +1301,7 @@ class JobVacancyService
         $isOwner = (int)$application['vacancy_owner_id'] === $userId;
 
         if (!$isApplicant && !$isOwner) {
-            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
             if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
                 self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Access denied');
                 return null;
@@ -1315,12 +1311,10 @@ class JobVacancyService
         $history = Database::query(
             "SELECT h.*, u.first_name, u.last_name
              FROM job_application_history h
-             JOIN job_vacancy_applications a ON h.application_id = a.id
-             JOIN job_vacancies jv ON a.vacancy_id = jv.id AND jv.tenant_id = ?
              LEFT JOIN users u ON h.changed_by = u.id
              WHERE h.application_id = ?
              ORDER BY h.changed_at ASC",
-            [$tenantId, $applicationId]
+            [$applicationId]
         )->fetchAll();
 
         foreach ($history as &$entry) {
@@ -1411,11 +1405,14 @@ class JobVacancyService
         self::clearErrors();
         $tenantId = TenantContext::getId();
 
-        $keywords = isset($preferences['keywords']) ? trim($preferences['keywords']) : null;
-        $categories = isset($preferences['categories']) ? trim($preferences['categories']) : null;
+        $keywords = isset($preferences['keywords']) ? mb_substr(trim($preferences['keywords']), 0, 500) : null;
+        $keywords = $keywords === '' ? null : $keywords;
+        $categories = isset($preferences['categories']) ? mb_substr(trim($preferences['categories']), 0, 500) : null;
+        $categories = $categories === '' ? null : $categories;
         $type = isset($preferences['type']) && in_array($preferences['type'], ['paid', 'volunteer', 'timebank']) ? $preferences['type'] : null;
         $commitment = isset($preferences['commitment']) && in_array($preferences['commitment'], ['full_time', 'part_time', 'flexible', 'one_off']) ? $preferences['commitment'] : null;
-        $location = isset($preferences['location']) ? trim($preferences['location']) : null;
+        $location = isset($preferences['location']) ? mb_substr(trim($preferences['location']), 0, 500) : null;
+        $location = $location === '' ? null : $location;
         $isRemoteOnly = !empty($preferences['is_remote_only']) ? 1 : 0;
 
         try {
@@ -1657,6 +1654,8 @@ class JobVacancyService
      */
     public static function expireOverdueJobs(): int
     {
+        $tenantId = TenantContext::getId();
+
         try {
             // Fetch IDs before updating so we can hide them from feed_activity
             $expiring = Database::query(
@@ -1664,7 +1663,9 @@ class JobVacancyService
                  WHERE status = 'open'
                  AND deadline IS NOT NULL
                  AND deadline < NOW()
-                 AND expired_at IS NULL"
+                 AND expired_at IS NULL
+                 AND tenant_id = ?",
+                [$tenantId]
             )->fetchAll(\PDO::FETCH_COLUMN);
 
             if (empty($expiring)) {
@@ -1703,6 +1704,8 @@ class JobVacancyService
      */
     public static function getJobsExpiringWithin(int $daysBeforeDeadline = 3): array
     {
+        $tenantId = TenantContext::getId();
+
         try {
             return Database::query(
                 "SELECT jv.*, u.email as owner_email, u.first_name as owner_name
@@ -1711,8 +1714,9 @@ class JobVacancyService
                  WHERE jv.status = 'open'
                  AND jv.deadline IS NOT NULL
                  AND jv.deadline BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? DAY)
-                 AND jv.expired_at IS NULL",
-                [$daysBeforeDeadline]
+                 AND jv.expired_at IS NULL
+                 AND jv.tenant_id = ?",
+                [$daysBeforeDeadline, $tenantId]
             )->fetchAll();
         } catch (\Throwable $e) {
             error_log("JobVacancyService: Failed to get expiring jobs: " . get_class($e));
@@ -1738,16 +1742,16 @@ class JobVacancyService
             return false;
         }
 
+        $tenantId = TenantContext::getId();
+
         // Check ownership or admin
         if ((int)$vacancy['user_id'] !== $userId) {
-            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
             if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
                 self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'You can only renew your own job vacancies');
                 return false;
             }
         }
-
-        $tenantId = TenantContext::getId();
 
         try {
             // New deadline: from today + extension, or from current deadline + extension
@@ -1766,7 +1770,7 @@ class JobVacancyService
 
             return true;
         } catch (\Throwable $e) {
-            error_log("JobVacancyService: Job renewal failed: " . get_class($e));
+            error_log("JobVacancyService: Job renewal failed for job={$jobId} user={$userId} days={$daysToExtend}: " . get_class($e) . ': ' . $e->getMessage());
             self::addError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to renew job');
             return false;
         }
@@ -1793,16 +1797,16 @@ class JobVacancyService
             return null;
         }
 
+        $tenantId = TenantContext::getId();
+
         // Check ownership or admin
         if ((int)$vacancy['user_id'] !== $userId) {
-            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+            $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
             if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
                 self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Access denied');
                 return null;
             }
         }
-
-        $tenantId = TenantContext::getId();
 
         // Views over time (last 30 days, grouped by day)
         $viewsByDay = Database::query(
@@ -1897,7 +1901,7 @@ class JobVacancyService
         $durationDays = max(1, min(90, $durationDays));
 
         // Admin check
-        $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+        $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
         if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
             self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Only admins can feature jobs');
             return false;
@@ -1940,7 +1944,7 @@ class JobVacancyService
         $tenantId = TenantContext::getId();
 
         // Admin check
-        $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
+        $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
         if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
             self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Only admins can unfeature jobs');
             return false;
@@ -1967,13 +1971,17 @@ class JobVacancyService
      */
     public static function expireFeaturedJobs(): int
     {
+        $tenantId = TenantContext::getId();
+
         try {
             $result = Database::query(
                 "UPDATE job_vacancies
                  SET is_featured = 0
                  WHERE is_featured = 1
                  AND featured_until IS NOT NULL
-                 AND featured_until < NOW()"
+                 AND featured_until < NOW()
+                 AND tenant_id = ?",
+                [$tenantId]
             );
             return $result->rowCount();
         } catch (\Throwable $e) {
