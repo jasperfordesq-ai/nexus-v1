@@ -86,6 +86,10 @@ class MatchNotificationService
 
         $notified = 0;
 
+        // Batch-load preferences for all matched users in one query
+        $matchedUserIds = array_map(fn($m) => (int)$m['user_id'], $matchedUsers);
+        $prefsByUser = self::getBatchPreferences($tenantId, $matchedUserIds);
+
         foreach ($matchedUsers as $match) {
             $matchedUserId = (int)$match['user_id'];
 
@@ -94,17 +98,15 @@ class MatchNotificationService
                 continue;
             }
 
-            // Check user's match notification preferences
-            try {
-                $prefs = MatchingService::getPreferences($matchedUserId);
+            // Check user's match notification preferences (from pre-loaded batch)
+            $prefs = $prefsByUser[$matchedUserId] ?? null;
+            if ($prefs !== null) {
                 if (empty($prefs['notify_hot_matches']) && empty($prefs['notify_mutual_matches'])) {
                     continue; // User has disabled match notifications
                 }
                 if (($prefs['notification_frequency'] ?? 'fortnightly') === 'never') {
                     continue;
                 }
-            } catch (\Exception $e) {
-                // If preferences can't be loaded, send notification by default
             }
 
             // Check if broker approval is required
@@ -276,6 +278,45 @@ class MatchNotificationService
 
         // Create in-app notification (also triggers push + FCM + Pusher via Notification model)
         Notification::create($userId, $message, $link, 'listing_match');
+    }
+
+    /**
+     * Batch-load match preferences for multiple users in a single query.
+     *
+     * Returns a map of user_id => prefs array. Users with no row get null
+     * (caller should treat null as "use defaults / allow notification").
+     *
+     * @param int   $tenantId
+     * @param int[] $userIds
+     * @return array<int, array>
+     */
+    private static function getBatchPreferences(int $tenantId, array $userIds): array
+    {
+        if (empty($userIds)) {
+            return [];
+        }
+
+        try {
+            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+            $rows = Database::query(
+                "SELECT user_id, notification_frequency, notify_hot_matches, notify_mutual_matches
+                 FROM match_preferences
+                 WHERE tenant_id = ? AND user_id IN ({$placeholders})",
+                array_merge([$tenantId], $userIds)
+            )->fetchAll(\PDO::FETCH_ASSOC);
+
+            $map = [];
+            foreach ($rows as $row) {
+                $map[(int)$row['user_id']] = [
+                    'notification_frequency' => $row['notification_frequency'],
+                    'notify_hot_matches'     => (bool)$row['notify_hot_matches'],
+                    'notify_mutual_matches'  => (bool)$row['notify_mutual_matches'],
+                ];
+            }
+            return $map;
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     /**
