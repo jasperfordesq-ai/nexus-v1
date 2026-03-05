@@ -326,6 +326,11 @@ class RegistrationApiController extends BaseApiController
         $requiresVerification = \Nexus\Services\TenantSettingsService::requiresEmailVerification($tenantId);
         $requiresApproval = \Nexus\Services\TenantSettingsService::requiresAdminApproval($tenantId);
 
+        // If no approval gate, grant welcome credits now (approval flow grants them on approve)
+        if (!$requiresApproval) {
+            $this->grantWelcomeCredits($userId, $tenantId);
+        }
+
         // SECURITY: If verification or approval is required, do NOT issue tokens.
         // The user must verify their email and/or be approved before they can log in.
         if ($requiresVerification || $requiresApproval) {
@@ -687,6 +692,63 @@ class RegistrationApiController extends BaseApiController
         } catch (\Exception $e) {
             // Log but don't fail registration if email fails
             error_log('[Registration] Failed to send verification email: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Grant welcome time credits to a newly registered user (no-approval tenants).
+     *
+     * For tenants that require admin approval, credits are granted in
+     * AdminUsersApiController::grantWelcomeCredits() on approve instead.
+     */
+    private function grantWelcomeCredits(int $userId, int $tenantId): void
+    {
+        try {
+            $creditAmount = (int) TenantSettingsService::get($tenantId, 'welcome_credits', 5);
+            if ($creditAmount <= 0) {
+                return;
+            }
+
+            $pdo = Database::getConnection();
+            $pdo->beginTransaction();
+
+            try {
+                // Lock user row to prevent concurrent double-credit
+                Database::query(
+                    "SELECT id FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                    [$userId, $tenantId]
+                );
+
+                // Idempotency: skip if already granted
+                $existing = Database::query(
+                    "SELECT id FROM transactions WHERE tenant_id = ? AND receiver_id = ? AND description LIKE '[Welcome Bonus]%' LIMIT 1",
+                    [$tenantId, $userId]
+                )->fetch();
+
+                if ($existing) {
+                    $pdo->rollBack();
+                    return;
+                }
+
+                Database::query(
+                    "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                    [$creditAmount, $userId, $tenantId]
+                );
+
+                Database::query(
+                    "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at)
+                     VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
+                    [$tenantId, $userId, $userId, $creditAmount, '[Welcome Bonus] New member welcome credits (auto-granted on registration)']
+                );
+
+                $pdo->commit();
+                error_log("[Registration] Granted {$creditAmount} welcome credits to user #{$userId} (tenant {$tenantId})");
+            } catch (\Throwable $e) {
+                $pdo->rollBack();
+                throw $e;
+            }
+        } catch (\Throwable $e) {
+            error_log("[Registration] Failed to grant welcome credits to user #{$userId}: " . $e->getMessage());
         }
     }
 }
