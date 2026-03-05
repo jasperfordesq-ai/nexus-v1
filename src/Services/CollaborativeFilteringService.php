@@ -65,7 +65,8 @@ class CollaborativeFilteringService
         $interactions = self::loadListingInteractions($tenantId);
 
         if (empty($interactions)) {
-            return [];
+            // Cold-start: no interaction data yet — fall back to recently active listings
+            return self::getPopularListingsFallback($tenantId, $limit);
         }
 
         $similar = self::itemBasedRecommendations($listingId, $interactions, $limit);
@@ -102,7 +103,8 @@ class CollaborativeFilteringService
         $interactions = self::loadMemberInteractions($tenantId);
 
         if (empty($interactions)) {
-            return [];
+            // Cold-start: no interaction data yet — fall back to recently active members
+            return self::getPopularMembersFallback($tenantId, $limit);
         }
 
         $similar = self::itemBasedRecommendations($userId, $interactions, $limit);
@@ -199,6 +201,54 @@ class CollaborativeFilteringService
         $denominator = sqrt($normA) * sqrt($normB);
 
         return $denominator > 0.0 ? $dotProduct / $denominator : 0.0;
+    }
+
+    /**
+     * Cold-start fallback: return recently active listing IDs when CF has no data.
+     *
+     * @param int $tenantId
+     * @param int $limit
+     * @return int[]
+     */
+    private static function getPopularListingsFallback(int $tenantId, int $limit): array
+    {
+        try {
+            $rows = Database::query(
+                "SELECT id FROM listings
+                  WHERE tenant_id = ?
+                    AND status = 'active'
+                  ORDER BY created_at DESC
+                  LIMIT " . (int)$limit,
+                [$tenantId]
+            )->fetchAll(\PDO::FETCH_COLUMN);
+            return array_map('intval', $rows);
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Cold-start fallback: return recently joined member IDs when CF has no data.
+     *
+     * @param int $tenantId
+     * @param int $limit
+     * @return int[]
+     */
+    private static function getPopularMembersFallback(int $tenantId, int $limit): array
+    {
+        try {
+            $rows = Database::query(
+                "SELECT id FROM users
+                  WHERE tenant_id = ?
+                    AND status = 'active'
+                  ORDER BY created_at DESC
+                  LIMIT " . (int)$limit,
+                [$tenantId]
+            )->fetchAll(\PDO::FETCH_COLUMN);
+            return array_map('intval', $rows);
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     // =========================================================================

@@ -209,3 +209,63 @@ docker compose logs db --tail=50         # Database
 4. **Cloudflare cache purge after every deploy** — automated in deploy script
 5. **Never run dev compose on production** — always use `compose.prod.yml`
 6. **Never touch other project containers** — only manage `nexus-php-*`, `nexus-react-prod`, `nexus-sales-site`
+
+---
+
+## Running Database Migrations on Production
+
+`php scripts/safe_migrate.php` **does NOT work** via `docker exec` because:
+- `bootstrap.php`, `scripts/`, and `migrations/` are **NOT volume-mounted** into `nexus-php-app`
+- Only `httpdocs/`, `src/`, `views/`, `config/` are mounted (read-only)
+- `sudo` requires a PTY (`use_pty` in sudoers) which breaks non-interactive SSH
+
+### ✅ Correct Method: Run SQL directly via the DB container
+
+```bash
+# Step 1: SCP migration files to the server (from local machine)
+scp -i "C:\ssh-keys\project-nexus.pem" migrations/your_migration.sql \
+    azureuser@20.224.171.253:/opt/nexus-php/migrations/
+
+# Step 2: SSH in with RequestTTY=force for sudo support
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253
+
+# Step 3: Run SQL against the DB container (from the server)
+sudo docker exec -i nexus-php-db \
+    mysql -u nexus -pREDACTED_DB_PASS nexus \
+    < /opt/nexus-php/migrations/your_migration.sql
+```
+
+Or as a one-liner from local machine (no interactive SSH needed):
+```bash
+# Must pipe the file in via stdin — docker exec -i reads from stdin
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+    "sudo docker exec -i nexus-php-db mysql -u nexus -pREDACTED_DB_PASS nexus \
+    < /opt/nexus-php/migrations/your_migration.sql; echo EXIT:\$?"
+```
+
+### Why `-o RequestTTY=force` is required
+
+`/etc/sudoers` has `use_pty` set — sudo refuses to run without a terminal.
+- `ssh ... "sudo ..."` → exit 255, no output
+- `ssh -t ...` → "Pseudo-terminal will not be allocated because stdin is not a terminal"
+- `ssh -o RequestTTY=force ...` → works ✅
+
+### DB Credentials (production)
+
+```
+DB_HOST=db (internal Docker network)
+DB_NAME=nexus
+DB_USER=nexus
+DB_PASS=REDACTED_DB_PASS
+DB_ROOT_PASSWORD=REDACTED_DB_ROOT_PASS
+```
+
+These are in `/opt/nexus-php/.env` on the server.
+
+### Verify migrations ran
+
+```bash
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+    "sudo docker exec nexus-php-db mysql -u nexus -pREDACTED_DB_PASS nexus \
+    -e \"SHOW TABLES LIKE 'your_table%';\""
+```

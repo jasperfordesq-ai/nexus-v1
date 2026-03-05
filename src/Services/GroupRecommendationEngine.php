@@ -69,6 +69,16 @@ class GroupRecommendationEngine
             'activity' => self::WEIGHT_ACTIVITY,
         ]);
 
+        // Apply temporal trend boost: groups gaining members in the last 30 days
+        // get up to 20% additional score to surface growing communities.
+        $trendBoosts = self::getTrendBoosts($tenantId);
+        foreach ($fusedScores as $groupId => &$score) {
+            if (!empty($trendBoosts[$groupId])) {
+                $score = min(1.0, $score + $trendBoosts[$groupId] * 0.2);
+            }
+        }
+        unset($score);
+
         // Exclude groups user already joined
         $excludeIds = array_column($userGroups, 'group_id');
         if (!empty($options['exclude_ids'])) {
@@ -119,7 +129,7 @@ class GroupRecommendationEngine
             HAVING overlap_count >= 2
             ORDER BY jaccard_similarity DESC, overlap_count DESC
             LIMIT 100
-        ", array_merge([$userId, $tenantId], $userGroupIds, [$userId, $tenantId]))->fetchAll();
+        ", array_merge([$userId], $userGroupIds, [$userId, $tenantId]))->fetchAll();
 
         if (empty($similarUsers)) {
             return [];
@@ -204,8 +214,9 @@ class GroupRecommendationEngine
             "SELECT id, name, description
              FROM `groups`
              WHERE tenant_id = ?
-             AND (visibility IS NULL OR visibility = 'public')
-             AND description IS NOT NULL",
+               AND status = 'active'
+               AND (visibility IS NULL OR visibility = 'public')
+               AND description IS NOT NULL",
             [$tenantId]
         )->fetchAll();
 
@@ -323,7 +334,8 @@ class GroupRecommendationEngine
             "SELECT id, name, description
              FROM `groups`
              WHERE tenant_id = ?
-             AND (visibility IS NULL OR visibility = 'public')",
+               AND status = 'active'
+               AND (visibility IS NULL OR visibility = 'public')",
             [$tenantId]
         )->fetchAll();
 
@@ -413,7 +425,8 @@ class GroupRecommendationEngine
             LEFT JOIN group_types gt ON g.type_id = gt.id
             LEFT JOIN group_members gm ON g.id = gm.group_id AND gm.status = 'active'
             WHERE g.tenant_id = ?
-            AND g.id IN ($placeholders)
+              AND g.status = 'active'
+              AND g.id IN ($placeholders)
             GROUP BY g.id
         ", $params)->fetchAll();
 
@@ -476,13 +489,63 @@ class GroupRecommendationEngine
     }
 
     /**
+     * Get trend boost scores for groups gaining members recently.
+     * Groups with recent join velocity get a boost proportional to their momentum.
+     *
+     * @param int $tenantId
+     * @return array<int, float> group_id => boost_factor (0.0–1.0)
+     */
+    private static function getTrendBoosts(int $tenantId): array
+    {
+        try {
+            $rows = Database::query("
+                SELECT gm.group_id,
+                       COUNT(*) as recent_joins
+                FROM group_members gm
+                JOIN `groups` g ON gm.group_id = g.id
+                WHERE g.tenant_id = ?
+                  AND g.status = 'active'
+                  AND gm.status = 'active'
+                  AND gm.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                GROUP BY gm.group_id
+                HAVING recent_joins >= 2
+                ORDER BY recent_joins DESC
+                LIMIT 50
+            ", [$tenantId])->fetchAll();
+        } catch (\Exception $e) {
+            return [];
+        }
+
+        if (empty($rows)) {
+            return [];
+        }
+
+        $maxJoins = max(array_column($rows, 'recent_joins'));
+        $boosts = [];
+        foreach ($rows as $row) {
+            // Normalize: fastest-growing group = 1.0, proportional below
+            $boosts[(int)$row['group_id']] = $maxJoins > 0
+                ? (float)$row['recent_joins'] / $maxJoins
+                : 0.0;
+        }
+
+        return $boosts;
+    }
+
+    /**
      * Get user's current group memberships
      */
     private static function getUserGroups($userId)
     {
+        $tenantId = TenantContext::getId();
         return Database::query(
-            "SELECT group_id FROM group_members WHERE user_id = ? AND status = 'active'",
-            [$userId]
+            "SELECT gm.group_id
+             FROM group_members gm
+             JOIN `groups` g ON gm.group_id = g.id
+             WHERE gm.user_id = ?
+               AND gm.status = 'active'
+               AND g.tenant_id = ?",
+            [$userId, $tenantId]
         )->fetchAll();
     }
 

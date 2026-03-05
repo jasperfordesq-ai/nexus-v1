@@ -9,6 +9,7 @@ namespace Nexus\Controllers\Api;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\RedisCache;
+use Nexus\Services\TenantFeatureConfig;
 use Nexus\Services\BrokerControlConfigService;
 use Nexus\Helpers\UrlHelper;
 
@@ -354,51 +355,7 @@ class TenantBootstrapController extends BaseApiController
      */
     private function buildFeaturesData(?array $features): array
     {
-        // Default feature set — must match AdminConfigApiController::FEATURE_DEFAULTS
-        // Features are optional add-ons toggled via Admin > Tenant Features
-        $defaults = [
-            'events' => true,
-            'groups' => true,
-            'gamification' => false,
-            'goals' => false,
-            'blog' => true,
-            'resources' => false,
-            'volunteering' => false,
-            'exchange_workflow' => false,
-            'organisations' => false,
-            'federation' => false,
-            'connections' => true,
-            'reviews' => true,
-            'polls' => false,
-            'job_vacancies' => false,
-            'ideation_challenges' => false,
-            'direct_messaging' => true,
-            'group_exchanges' => false,
-            'search' => true,
-        ];
-
-        if ($features === null) {
-            $features = [];
-        }
-
-        // Merge with defaults (explicit false should override default true)
-        $result = [];
-        foreach ($defaults as $key => $defaultValue) {
-            if (array_key_exists($key, $features)) {
-                $result[$key] = (bool) $features[$key];
-            } else {
-                $result[$key] = $defaultValue;
-            }
-        }
-
-        // Also include any DB features not in defaults (future-proofing)
-        foreach ($features as $key => $value) {
-            if (!array_key_exists($key, $result)) {
-                $result[$key] = (bool) $value;
-            }
-        }
-
-        return $result;
+        return TenantFeatureConfig::mergeFeatures($features);
     }
 
     /**
@@ -412,28 +369,12 @@ class TenantBootstrapController extends BaseApiController
      */
     private function buildModulesData(?array $config): array
     {
-        $defaults = [
-            'feed' => true,
-            'listings' => true,
-            'messages' => true,
-            'wallet' => true,
-            'notifications' => true,
-            'profile' => true,
-            'settings' => true,
-            'dashboard' => true,
-        ];
-
-        $modules = [];
+        $modules = null;
         if ($config !== null && isset($config['modules']) && is_array($config['modules'])) {
             $modules = $config['modules'];
         }
 
-        $result = [];
-        foreach ($defaults as $key => $defaultValue) {
-            $result[$key] = array_key_exists($key, $modules) ? (bool) $modules[$key] : $defaultValue;
-        }
-
-        return $result;
+        return TenantFeatureConfig::mergeModules($modules);
     }
 
     /**

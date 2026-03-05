@@ -269,8 +269,32 @@ sudo bash scripts/safe-deploy.sh status     # Check current deployment status
 
 Located in `/migrations/` with timestamp naming. Always use `IF EXISTS`/`IF NOT EXISTS` for idempotency.
 
+### 🔴 Running migrations on production — CORRECT METHOD
+
+`php scripts/safe_migrate.php` **does NOT work** on production. `scripts/` and `migrations/` are not volume-mounted into the PHP container, and `bootstrap.php` is not available inside it.
+
+**Always run migrations directly via the DB container:**
+
 ```bash
-php scripts/safe_migrate.php
+# Step 1 — SCP the file to the server (from local machine)
+scp -i "C:\ssh-keys\project-nexus.pem" migrations/your_file.sql \
+    azureuser@20.224.171.253:/opt/nexus-php/migrations/
+
+# Step 2 — Run it (from local machine, one-liner)
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+    "sudo docker exec -i nexus-php-db mysql -u nexus -pREDACTED_DB_PASS nexus \
+    < /opt/nexus-php/migrations/your_file.sql; echo EXIT:\$?"
+
+# Expected output: EXIT:0
+```
+
+**Why `-o RequestTTY=force`?** Sudoers has `use_pty` — sudo refuses without a terminal. `-t` and `-tt` fail because stdin isn't a TTY when called from Claude. `-o RequestTTY=force` is the only flag that works.
+
+**Verify:**
+```bash
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+    "sudo docker exec nexus-php-db mysql -u nexus -pREDACTED_DB_PASS nexus \
+    -e \"SHOW TABLES LIKE 'your_table%';\""
 ```
 
 ---

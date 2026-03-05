@@ -253,12 +253,18 @@ class FeedRankingService
                 $score   *= self::hackerNewsDecay($hoursAgo);
             }
 
-            // 2. Engagement boost — logarithmic to prevent viral runaway
+            // 2. Engagement boost — logarithmic to prevent viral runaway.
+            // Zero-engagement posts get a small cold-start boost (0.05) so they compete
+            // against older posts with minimal engagement rather than scoring identical.
             $likes    = (int)($item['likes_count'] ?? 0);
             $comments = (int)($item['comments_count'] ?? 0);
             $points   = ($likes * $config['like_weight']) + ($comments * $config['comment_weight']);
             if ($points > 0) {
-                $score *= 1.0 + log(1.0 + $points) * 0.3;
+                // cap at log(1001) * 0.3 ≈ 2.07 to prevent one viral post dominating
+                $score *= 1.0 + min(log(1.0 + $points) * 0.3, 2.0);
+            } else {
+                // Cold-start: brand-new posts with no engagement yet
+                $score *= 1.05;
             }
 
             // 3. Content type weight

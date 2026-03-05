@@ -77,13 +77,15 @@ class SearchService
             }
 
             $listingsIndex = $client->index(self::INDEX_LISTINGS);
-            $listingsIndex->updateFilterableAttributes(['tenant_id', 'status']);
+            $listingsIndex->updateFilterableAttributes(['tenant_id', 'status', 'type']);
+            $listingsIndex->updateSortableAttributes(['created_at']);
             $listingsIndex->updateSearchableAttributes([
-                'title', 'description', 'location', 'skills', 'author_name',
+                'title', 'description', 'skills', 'author_name', 'location',
             ]);
             $listingsIndex->updateRankingRules([
                 'words', 'typo', 'proximity', 'attribute', 'sort', 'exactness',
             ]);
+            $listingsIndex->updateSynonyms(self::synonyms());
 
             // ── Users index ────────────────────────────────────────────────
             try {
@@ -94,15 +96,55 @@ class SearchService
 
             $usersIndex = $client->index(self::INDEX_USERS);
             $usersIndex->updateFilterableAttributes(['tenant_id', 'status']);
+            $usersIndex->updateSortableAttributes(['created_at']);
             $usersIndex->updateSearchableAttributes([
                 'first_name', 'last_name', 'bio', 'skills', 'location',
             ]);
             $usersIndex->updateRankingRules([
                 'words', 'typo', 'proximity', 'attribute', 'sort', 'exactness',
             ]);
+            $usersIndex->updateSynonyms(self::synonyms());
         } catch (\Throwable $e) {
             error_log('SearchService::ensureIndexes error — ' . $e->getMessage());
         }
+    }
+
+    // ─── Synonyms ─────────────────────────────────────────────────────────────
+
+    /**
+     * Platform-wide synonym dictionary for Meilisearch.
+     *
+     * Keys are canonical terms; values are arrays of equivalent terms.
+     * Meilisearch synonym matching is bi-directional when using updateSynonyms().
+     *
+     * @return array<string, string[]>
+     */
+    private static function synonyms(): array
+    {
+        return [
+            // Timebanking core vocabulary
+            'timebank'      => ['time bank', 'time banking', 'timebanking', 'community exchange', 'time credit'],
+            'time credit'   => ['hour credit', 'credit', 'time token', 'community hour'],
+            'offer'         => ['offering', 'provide', 'available', 'service offered'],
+            'request'       => ['need', 'seeking', 'wanted', 'help needed', 'looking for'],
+            'volunteer'     => ['volunteering', 'voluntary', 'unpaid', 'community service'],
+            'skill'         => ['skills', 'expertise', 'ability', 'capability', 'experience'],
+
+            // Common service categories
+            'gardening'     => ['garden', 'landscaping', 'yard work', 'horticulture'],
+            'cooking'       => ['baking', 'meal preparation', 'food', 'chef'],
+            'teaching'      => ['tutoring', 'lessons', 'instruction', 'training', 'coaching'],
+            'transport'     => ['transportation', 'driving', 'lift', 'car', 'vehicle'],
+            'childcare'     => ['babysitting', 'childminding', 'childminder', 'kids', 'children'],
+            'elderly care'  => ['senior care', 'care for elderly', 'older people', 'companionship'],
+            'it support'    => ['computer help', 'tech support', 'technology', 'computing'],
+            'diy'           => ['handyman', 'repairs', 'home repair', 'fixing', 'maintenance'],
+            'language'      => ['translation', 'interpreter', 'bilingual', 'foreign language'],
+            'music'         => ['musician', 'instrument', 'singing', 'vocals', 'band'],
+            'photography'   => ['photo', 'photographer', 'camera', 'videography'],
+            'wellness'      => ['health', 'wellbeing', 'fitness', 'exercise', 'yoga'],
+            'sewing'        => ['tailoring', 'alterations', 'mending', 'knitting', 'crochet'],
+        ];
     }
 
     // ─── Indexing ─────────────────────────────────────────────────────────────
@@ -247,7 +289,15 @@ class SearchService
         try {
             $filter = "tenant_id = $tenantId AND status = \"active\"";
             if (!empty($extraFilters)) {
-                $filter .= ' AND ' . implode(' AND ', $extraFilters);
+                // Validate each filter expression contains only safe characters
+                // (alphanumeric, spaces, =, <, >, ", _, -, ., quotes).
+                // This is an internal API but defence-in-depth prevents filter injection.
+                $safeFilters = array_filter($extraFilters, static function (string $f): bool {
+                    return (bool)preg_match('/^[\w\s=<>!".\'_\-\[\]]+$/', $f);
+                });
+                if (!empty($safeFilters)) {
+                    $filter .= ' AND ' . implode(' AND ', $safeFilters);
+                }
             }
 
             $result = $client->index(self::INDEX_LISTINGS)->search($query, [
@@ -297,7 +347,15 @@ class SearchService
         try {
             $filter = "tenant_id = $tenantId AND status = \"active\"";
             if (!empty($extraFilters)) {
-                $filter .= ' AND ' . implode(' AND ', $extraFilters);
+                // Validate each filter expression contains only safe characters
+                // (alphanumeric, spaces, =, <, >, ", _, -, ., quotes).
+                // This is an internal API but defence-in-depth prevents filter injection.
+                $safeFilters = array_filter($extraFilters, static function (string $f): bool {
+                    return (bool)preg_match('/^[\w\s=<>!".\'_\-\[\]]+$/', $f);
+                });
+                if (!empty($safeFilters)) {
+                    $filter .= ' AND ' . implode(' AND ', $safeFilters);
+                }
             }
 
             $result = $client->index(self::INDEX_USERS)->search($query, [

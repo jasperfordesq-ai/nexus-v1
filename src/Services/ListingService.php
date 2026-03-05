@@ -547,6 +547,18 @@ class ListingService
             error_log("MatchNotificationService error: " . $e->getMessage());
         }
 
+        // Generate semantic embedding for matching and search boosting
+        try {
+            if (class_exists('\Nexus\Services\EmbeddingService')) {
+                $embeddingRow = self::getById((int)$listingId);
+                if ($embeddingRow) {
+                    \Nexus\Services\EmbeddingService::generateForListing($embeddingRow);
+                }
+            }
+        } catch (\Exception $e) {
+            // Non-critical — embedding generation is async-safe
+        }
+
         return $listingId;
     }
 
@@ -659,6 +671,20 @@ class ListingService
         if (isset($data['sdg_goals'])) {
             $sdgJson = is_array($data['sdg_goals']) ? json_encode($data['sdg_goals']) : $data['sdg_goals'];
             Database::query("UPDATE listings SET sdg_goals = ? WHERE id = ? AND tenant_id = ?", [$sdgJson, $id, $tenantId]);
+        }
+
+        // Refresh semantic embedding when content changes
+        if (array_intersect(array_keys($data), ['title', 'description', 'skills'])) {
+            try {
+                if (class_exists('\Nexus\Services\EmbeddingService')) {
+                    $embeddingRow = self::getById($id);
+                    if ($embeddingRow) {
+                        \Nexus\Services\EmbeddingService::generateForListing($embeddingRow);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Non-critical
+            }
         }
 
         return true;

@@ -633,19 +633,29 @@ class MemberRankingService
             $memberId = (int)($member['id'] ?? 0);
             if ($memberId > 0) {
                 $reviewData = Database::query(
-                    "SELECT AVG(rating) as avg_rating, COUNT(*) as review_count
+                    "SELECT
+                         AVG(rating) as avg_rating,
+                         SUM(
+                             CASE
+                                 WHEN created_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR) THEN 1.0
+                                 WHEN created_at >= DATE_SUB(NOW(), INTERVAL 2 YEAR) THEN 0.5
+                                 ELSE 0.25
+                             END
+                         ) as weighted_count,
+                         COUNT(*) as review_count
                      FROM reviews
                      WHERE receiver_id = ? AND tenant_id = ?",
                     [$memberId, $tenantId]
                 )->fetch(\PDO::FETCH_ASSOC);
 
                 if ($reviewData && $reviewData['review_count'] !== null) {
-                    $avgRating   = (float)($reviewData['avg_rating'] ?? 0);
-                    $reviewCount = (int)($reviewData['review_count'] ?? 0);
+                    $avgRating     = (float)($reviewData['avg_rating'] ?? 0);
+                    $weightedCount = (float)($reviewData['weighted_count'] ?? 0);
 
-                    if ($avgRating >= 4.0 && $reviewCount >= 2) {
+                    // Use weighted count so recent reviews matter more than old ones
+                    if ($avgRating >= 4.0 && $weightedCount >= 2.0) {
                         $score += 0.15;
-                    } elseif ($avgRating >= 3.0 && $reviewCount >= 1) {
+                    } elseif ($avgRating >= 3.0 && $weightedCount >= 1.0) {
                         $score += 0.08;
                     }
                 }
@@ -808,6 +818,11 @@ class MemberRankingService
 
     /**
      * SQL snippet for contribution score
+     *
+     * Listings and transactions are time-decayed so recent activity matters more:
+     *   - Within 6 months: 1.0×
+     *   - 6–12 months:     0.5×
+     *   - Older:           0.25×
      */
     private static function getContributionScoreSql(): string
     {
@@ -815,7 +830,15 @@ class MemberRankingService
             LEAST(1.0,
                 0.5
                 + LEAST(0.3, (
-                    (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active')
+                    SELECT COALESCE(SUM(
+                        CASE
+                            WHEN created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) THEN 1.0
+                            WHEN created_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)  THEN 0.5
+                            ELSE 0.25
+                        END
+                    ), 0)
+                    FROM listings
+                    WHERE user_id = u.id AND status = 'active'
                 ) * 0.05)
                 + CASE
                     WHEN (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed') >

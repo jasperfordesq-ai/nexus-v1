@@ -49,6 +49,7 @@ const FEATURE_META: Record<string, { label: string; description: string }> = {
   ideation_challenges: { label: 'Ideation Challenges', description: 'Community challenges with idea voting' },
   direct_messaging: { label: 'Direct Messaging', description: 'Private messaging between members' },
   group_exchanges: { label: 'Group Exchanges', description: 'Multi-party group exchange sessions' },
+  search: { label: 'Search', description: 'Full-text search across listings, members, and content' },
   ai_chat: { label: 'AI Assistant', description: 'AI-powered chat assistant for members' },
 };
 

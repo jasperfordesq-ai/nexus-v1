@@ -64,7 +64,7 @@ interface TenantContextValue extends TenantState {
   defaultLanguage: string;
 }
 
-// Default features — synced with PHP TenantBootstrapController::buildFeaturesData() defaults
+// Default features — synced with PHP TenantFeatureConfig::FEATURE_DEFAULTS
 const defaultFeatures: TenantFeatures = {
   events: true,
   groups: true,

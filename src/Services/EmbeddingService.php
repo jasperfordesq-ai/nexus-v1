@@ -139,6 +139,11 @@ class EmbeddingService
      */
     public static function cosineSimilarity(array $a, array $b): float
     {
+        // Guard: log dimension mismatch (silent, won't throw)
+        if (count($a) !== count($b)) {
+            error_log('EmbeddingService::cosineSimilarity dimension mismatch: ' . count($a) . ' vs ' . count($b));
+        }
+
         $dot  = 0.0;
         $normA = 0.0;
         $normB = 0.0;
@@ -152,7 +157,11 @@ class EmbeddingService
 
         $denom = sqrt($normA) * sqrt($normB);
 
-        return $denom > 0.0 ? $dot / $denom : 0.0;
+        if ($denom <= 0.0) {
+            return 0.0;
+        }
+        $result = $dot / $denom;
+        return (is_nan($result) || is_infinite($result)) ? 0.0 : (float)max(-1.0, min(1.0, $result));
     }
 
     // =========================================================================

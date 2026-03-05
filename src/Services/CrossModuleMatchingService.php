@@ -54,17 +54,17 @@ class CrossModuleMatchingService
         }
 
         if (in_array('jobs', $modules)) {
-            $jobMatches = self::matchJobs($userId, $userProfile, $tenantId, $limit);
+            $jobMatches = self::matchJobs($userId, $userProfile, $tenantId, $limit, $debugMode);
             $allMatches = array_merge($allMatches, $jobMatches);
         }
 
         if (in_array('volunteering', $modules)) {
-            $volMatches = self::matchVolunteering($userId, $userProfile, $tenantId, $limit);
+            $volMatches = self::matchVolunteering($userId, $userProfile, $tenantId, $limit, $debugMode);
             $allMatches = array_merge($allMatches, $volMatches);
         }
 
         if (in_array('groups', $modules)) {
-            $groupMatches = self::matchGroups($userId, $userProfile, $tenantId, $limit);
+            $groupMatches = self::matchGroups($userId, $userProfile, $tenantId, $limit, $debugMode);
             $allMatches = array_merge($allMatches, $groupMatches);
         }
 
@@ -137,7 +137,6 @@ class CrossModuleMatchingService
 
         try {
             // Find listings that need skills the user has (offers) and vice versa
-            $limitInt = (int)$limit;
             $stmt = Database::query(
                 "SELECT l.id, l.title, l.description, l.type, l.category_id,
                         l.location, l.latitude, l.longitude,
@@ -149,8 +148,8 @@ class CrossModuleMatchingService
                  LEFT JOIN categories c ON l.category_id = c.id
                  WHERE l.tenant_id = ? AND l.user_id != ? AND l.status = 'active'
                  ORDER BY l.created_at DESC
-                 LIMIT {$limitInt}",
-                [$tenantId, $userId]
+                 LIMIT ?",
+                [$tenantId, $userId, (int)$limit]
             );
 
             $listings = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -199,13 +198,12 @@ class CrossModuleMatchingService
     /**
      * Match against jobs (qualifications matching)
      */
-    private static function matchJobs(int $userId, array $profile, int $tenantId, int $limit): array
+    private static function matchJobs(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false): array
     {
         $matches = [];
         $userSkills = $profile['skills_array'];
 
         try {
-            $limitInt = (int)$limit;
             $stmt = Database::query(
                 "SELECT j.id, j.title, j.description, j.location,
                         COALESCE(j.latitude, NULL) AS latitude,
@@ -216,8 +214,8 @@ class CrossModuleMatchingService
                  WHERE j.tenant_id = ? AND j.status = 'open'
                    AND (j.deadline IS NULL OR j.deadline >= CURDATE())
                  ORDER BY j.created_at DESC
-                 LIMIT {$limitInt}",
-                [$tenantId]
+                 LIMIT ?",
+                [$tenantId, (int)$limit]
             );
 
             $jobs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -261,7 +259,7 @@ class CrossModuleMatchingService
                 }
 
                 if ($score > 0) {
-                    $matches[] = [
+                    $matchItem = [
                         'id' => (int)$job['id'],
                         'source_type' => 'job',
                         'source_id' => (int)$job['id'],
@@ -280,6 +278,13 @@ class CrossModuleMatchingService
                             ? self::calculateDistance($profileLat, $profileLon, $itemLat, $itemLon)
                             : null,
                     ];
+                    if ($debugMode) {
+                        $matchItem['_debug_scores'] = [
+                            'skill' => self::calculateSkillOverlapScore($userSkills, $requiredSkills),
+                            'location_boost' => $score - self::calculateSkillOverlapScore($userSkills, $requiredSkills),
+                        ];
+                    }
+                    $matches[] = $matchItem;
                 }
             }
         } catch (\Exception $e) {
@@ -292,13 +297,12 @@ class CrossModuleMatchingService
     /**
      * Match against volunteering opportunities
      */
-    private static function matchVolunteering(int $userId, array $profile, int $tenantId, int $limit): array
+    private static function matchVolunteering(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false): array
     {
         $matches = [];
         $userSkills = $profile['skills_array'];
 
         try {
-            $limitInt = (int)$limit;
             $stmt = Database::query(
                 "SELECT v.id, v.title, v.description, v.location,
                         COALESCE(v.latitude, NULL) AS latitude,
@@ -310,8 +314,8 @@ class CrossModuleMatchingService
                  WHERE v.tenant_id = ? AND v.status = 'open' AND v.is_active = 1
                    AND (v.end_date IS NULL OR v.end_date >= CURDATE())
                  ORDER BY v.start_date ASC
-                 LIMIT {$limitInt}",
-                [$tenantId]
+                 LIMIT ?",
+                [$tenantId, (int)$limit]
             );
 
             $opportunities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -355,7 +359,7 @@ class CrossModuleMatchingService
                 }
 
                 if ($score > 0) {
-                    $matches[] = [
+                    $matchItem = [
                         'id' => (int)$vol['id'],
                         'source_type' => 'volunteering',
                         'source_id' => (int)$vol['id'],
@@ -374,6 +378,13 @@ class CrossModuleMatchingService
                             ? self::calculateDistance($profileLat, $profileLon, $itemLat, $itemLon)
                             : null,
                     ];
+                    if ($debugMode) {
+                        $matchItem['_debug_scores'] = [
+                            'skill' => self::calculateSkillOverlapScore($userSkills, $neededSkills),
+                            'location_boost' => $score - self::calculateSkillOverlapScore($userSkills, $neededSkills),
+                        ];
+                    }
+                    $matches[] = $matchItem;
                 }
             }
         } catch (\Exception $e) {
@@ -386,7 +397,7 @@ class CrossModuleMatchingService
     /**
      * Match against groups (interest overlap)
      */
-    private static function matchGroups(int $userId, array $profile, int $tenantId, int $limit): array
+    private static function matchGroups(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false): array
     {
         $matches = [];
         $userInterests = array_merge($profile['interests_array'], $profile['skills_array']);
@@ -396,7 +407,6 @@ class CrossModuleMatchingService
         }
 
         try {
-            $limitInt = (int)$limit;
             // Find groups user is NOT a member of
             $stmt = Database::query(
                 "SELECT g.id, g.name, g.description, g.image_url, g.cached_member_count as member_count,
@@ -408,8 +418,8 @@ class CrossModuleMatchingService
                    AND g.id NOT IN (SELECT group_id FROM group_members WHERE user_id = ? AND status = 'active')
                    AND g.visibility = 'public'
                  ORDER BY g.cached_member_count DESC
-                 LIMIT {$limitInt}",
-                [$tenantId, $userId]
+                 LIMIT ?",
+                [$tenantId, $userId, (int)$limit]
             );
 
             $groups = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -459,7 +469,7 @@ class CrossModuleMatchingService
                 }
 
                 if ($score > 0) {
-                    $matches[] = [
+                    $matchItem = [
                         'id' => (int)$group['id'],
                         'source_type' => 'group',
                         'source_id' => (int)$group['id'],
@@ -478,6 +488,13 @@ class CrossModuleMatchingService
                             ? self::calculateDistance($profileLat, $profileLon, $itemLat, $itemLon)
                             : null,
                     ];
+                    if ($debugMode) {
+                        $matchItem['_debug_scores'] = [
+                            'keyword' => self::calculateKeywordOverlapScore($userInterests, $groupKeywords),
+                            'location_boost' => $score - self::calculateKeywordOverlapScore($userInterests, $groupKeywords),
+                        ];
+                    }
+                    $matches[] = $matchItem;
                 }
             }
         } catch (\Exception $e) {
@@ -600,7 +617,7 @@ class CrossModuleMatchingService
     private static function calculateSkillOverlapScore(array $userSkills, array $requiredSkills): int
     {
         if (empty($userSkills) || empty($requiredSkills)) {
-            return 0;
+            return 50; // Uncertain — no skills data, not a zero match
         }
 
         $overlap = count(array_intersect($userSkills, $requiredSkills));
@@ -656,6 +673,20 @@ class CrossModuleMatchingService
         $words = array_filter($words, function ($w) use ($stopWords) {
             return strlen($w) > 2 && !in_array($w, $stopWords);
         });
+
+        $words = array_unique(array_values($words));
+
+        // Preserve important 2-char domain terms (ai, ml, ux, etc.)
+        static $twoCharDomainTerms = [
+            'ai', 'ml', 'ux', 'ui', 'go', 'vr', 'ar', 'it', 'hr', 'pr',
+            'qa', 'db', 'uk', 'eu', 'us',
+        ];
+        preg_match_all('/\b[a-z]{1,2}\b/', $text, $shortMatches);
+        foreach ($shortMatches[0] ?? [] as $short) {
+            if (in_array($short, $twoCharDomainTerms, true)) {
+                $words[] = $short;
+            }
+        }
 
         return array_unique(array_values($words));
     }

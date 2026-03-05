@@ -8,9 +8,16 @@
 // ============================================
 $router->add('GET', '/api/v2/groups', 'Nexus\Controllers\Api\GroupsApiController@index');
 $router->add('POST', '/api/v2/groups', 'Nexus\Controllers\Api\GroupsApiController@store');
+
+// ── Group Recommendations (static paths must precede /{id} wildcards) ──────
+$router->add('GET',  '/api/v2/groups/recommendations',             'Nexus\Controllers\Api\GroupRecommendationController@index');
+$router->add('POST', '/api/v2/groups/recommendations/track',       'Nexus\Controllers\Api\GroupRecommendationController@track');
+$router->add('GET',  '/api/v2/groups/recommendations/metrics',     'Nexus\Controllers\Api\GroupRecommendationController@metrics');
+
 $router->add('GET', '/api/v2/groups/{id}', 'Nexus\Controllers\Api\GroupsApiController@show');
 $router->add('PUT', '/api/v2/groups/{id}', 'Nexus\Controllers\Api\GroupsApiController@update');
 $router->add('DELETE', '/api/v2/groups/{id}', 'Nexus\Controllers\Api\GroupsApiController@destroy');
+$router->add('GET',  '/api/v2/groups/{id}/similar', 'Nexus\Controllers\Api\GroupRecommendationController@similar');
 $router->add('POST', '/api/v2/groups/{id}/join', 'Nexus\Controllers\Api\GroupsApiController@join');
 $router->add('DELETE', '/api/v2/groups/{id}/membership', 'Nexus\Controllers\Api\GroupsApiController@leave');
 $router->add('GET', '/api/v2/groups/{id}/members', 'Nexus\Controllers\Api\GroupsApiController@members');

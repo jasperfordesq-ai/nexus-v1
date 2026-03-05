@@ -31,11 +31,17 @@ class MatchingApiController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
+        // Admin override: allow viewing any user's matches for MatchDebugPanel
+        $adminRoles = ['admin', 'tenant_admin', 'super_admin', 'god'];
+        $callerRole = $this->getAuthenticatedUserRole() ?? '';
+        if (!empty($_GET['user_id']) && in_array($callerRole, $adminRoles)) {
+            $userId = (int)$_GET['user_id'];
+        }
+
         $options = [
             'limit' => min(100, max(1, (int)($_GET['limit'] ?? 20))),
             'min_score' => max(0, min(100, (int)($_GET['min_score'] ?? 30))),
-            'debug' => ($_GET['debug'] ?? '') === 'true'
-                       && in_array($this->getAuthenticatedUserRole() ?? '', ['admin', 'tenant_admin', 'super_admin', 'god']),
+            'debug' => ($_GET['debug'] ?? '') === 'true' && in_array($callerRole, $adminRoles),
         ];
 
         if (!empty($_GET['modules'])) {

@@ -26,12 +26,13 @@ class MatchLearningService
      * Interaction weights for learning
      */
     private const INTERACTION_WEIGHTS = [
-        'viewed' => 0.1,
-        'saved' => 0.3,
-        'contacted' => 0.5,
-        'completed' => 1.0,
-        'dismissed' => -0.5,
-        'reported' => -1.0,
+        'completed'  => 5.0,  // Transaction completed — highest intent
+        'contacted'  => 3.0,  // User reached out — strong intent
+        'saved'      => 2.0,  // Saved for later — moderate interest
+        'viewed'     => 0.5,  // Passive view — weak signal
+        'impression' => 0.1,  // Shown in feed — minimal signal
+        'dismissed'  => -1.0, // Explicitly rejected — negative signal
+        'reported'   => -1.0,
     ];
 
     /**
@@ -185,7 +186,16 @@ class MatchLearningService
     private static function updateCategoryAffinity($userId, $categoryId, $action): void
     {
         $tenantId = TenantContext::getId();
-        $weight = self::INTERACTION_WEIGHTS[$action] ?? 0;
+        // Interaction weights — completed transactions are the strongest learning signal
+        $actionWeights = [
+            'completed'  => 5.0,  // Transaction completed — highest intent
+            'contacted'  => 3.0,  // User reached out — strong intent
+            'saved'      => 2.0,  // Saved for later — moderate interest
+            'viewed'     => 0.5,  // Passive view — weak signal
+            'impression' => 0.1,  // Shown in feed — minimal signal
+            'dismissed'  => -1.0, // Explicitly rejected — negative signal
+        ];
+        $weight = $actionWeights[$action] ?? 0.5;
 
         // Determine which count column to increment
         $countColumn = match ($action) {
