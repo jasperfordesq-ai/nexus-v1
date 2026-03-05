@@ -55,6 +55,7 @@ class AdminConfigApiController extends BaseApiController
         'ideation_challenges' => false,
         'direct_messaging' => true,
         'group_exchanges' => false,
+        'ai_chat' => false,
     ];
 
     /**
