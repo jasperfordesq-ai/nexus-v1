@@ -310,8 +310,8 @@ class MatchApprovalWorkflowService
                  JOIN users o ON ma.listing_owner_id = o.id
                  WHERE ma.tenant_id = ? AND ma.status = ?
                  ORDER BY ma.submitted_at ASC
-                 LIMIT $limit OFFSET $offset",
-                [$tenantId, self::STATUS_PENDING]
+                 LIMIT ? OFFSET ?",
+                [$tenantId, self::STATUS_PENDING, $limit, $offset]
             )->fetchAll();
         } catch (\Exception $e) {
             error_log("MatchApprovalWorkflowService: Failed to get pending requests - " . $e->getMessage());
@@ -359,7 +359,8 @@ class MatchApprovalWorkflowService
             $params[] = $filters['reviewer_id'];
         }
 
-        $sql .= " ORDER BY ma.reviewed_at DESC LIMIT $limit OFFSET $offset";
+        $sql .= " ORDER BY ma.reviewed_at DESC LIMIT ? OFFSET ?";
+        $params = array_merge($params, [$limit, $offset]);
 
         try {
             return Database::query($sql, $params)->fetchAll();
@@ -574,7 +575,8 @@ class MatchApprovalWorkflowService
     }
 
     /**
-     * Ensure match_approvals table exists
+     * Verify match_approvals table is accessible (created by migration 2026_02_07_match_approval_workflow).
+     * Throws if the migration has not been run.
      */
     private static function ensureTableExists(): void
     {
@@ -582,36 +584,8 @@ class MatchApprovalWorkflowService
         if ($checked) {
             return;
         }
-
-        try {
-            Database::query("SELECT 1 FROM match_approvals LIMIT 1");
-        } catch (\Exception $e) {
-            Database::query("
-                CREATE TABLE IF NOT EXISTS match_approvals (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    tenant_id INT NOT NULL,
-                    user_id INT NOT NULL,
-                    listing_id INT NOT NULL,
-                    listing_owner_id INT NOT NULL,
-                    match_score DECIMAL(5,2) NOT NULL,
-                    match_type VARCHAR(50) DEFAULT 'one_way',
-                    match_reasons JSON,
-                    distance_km DECIMAL(8,2),
-                    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-                    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    reviewed_by INT NULL,
-                    reviewed_at TIMESTAMP NULL,
-                    review_notes TEXT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    INDEX idx_tenant_status (tenant_id, status),
-                    INDEX idx_pending (tenant_id, status, submitted_at),
-                    INDEX idx_user (user_id),
-                    INDEX idx_listing (listing_id)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-            ");
-        }
-
+        // Will throw if table is missing — run php scripts/safe_migrate.php to fix
+        Database::query("SELECT 1 FROM match_approvals LIMIT 1");
         $checked = true;
     }
 }

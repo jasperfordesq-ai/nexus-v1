@@ -87,6 +87,9 @@ class SmartMatchingEngine
 
     /**
      * Get configuration from tenant settings
+     *
+     * Cached in process memory for the lifetime of the request, and in Redis
+     * for 5 minutes across requests (TTL = 300s).
      */
     public static function getConfig(): array
     {
@@ -116,25 +119,33 @@ class SmartMatchingEngine
             ],
         ];
 
-        try {
-            $tenantId = TenantContext::getId();
-            $configJson = Database::query(
-                "SELECT configuration FROM tenants WHERE id = ?",
-                [$tenantId]
-            )->fetchColumn();
+        $tenantId = TenantContext::getId();
 
-            if ($configJson) {
-                $configArr = json_decode($configJson, true);
-                if (is_array($configArr) && isset($configArr['algorithms']['smart_matching'])) {
-                    self::$configCache = array_merge($defaults, $configArr['algorithms']['smart_matching']);
-                    return self::$configCache;
+        $cached = RedisCache::remember(
+            'smart_matching_config',
+            function () use ($tenantId, $defaults) {
+                try {
+                    $configJson = Database::query(
+                        "SELECT configuration FROM tenants WHERE id = ?",
+                        [$tenantId]
+                    )->fetchColumn();
+
+                    if ($configJson) {
+                        $configArr = json_decode($configJson, true);
+                        if (is_array($configArr) && isset($configArr['algorithms']['smart_matching'])) {
+                            return array_merge($defaults, $configArr['algorithms']['smart_matching']);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    error_log('[SmartMatchingEngine] getConfig DB fetch failed: ' . $e->getMessage());
                 }
-            }
-        } catch (\Exception $e) {
-            // Fall back to defaults
-        }
+                return $defaults;
+            },
+            300, // 5-minute TTL
+            $tenantId
+        );
 
-        self::$configCache = $defaults;
+        self::$configCache = is_array($cached) ? $cached : $defaults;
         return self::$configCache;
     }
 
@@ -147,6 +158,8 @@ class SmartMatchingEngine
         self::$userDataCache = [];
         self::$userBlocksTableExistsCache = null;
         self::$categoryCache = [];
+        // Also evict the cross-request Redis config cache
+        RedisCache::delete('smart_matching_config', TenantContext::getId());
     }
 
     // =========================================================================

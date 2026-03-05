@@ -57,64 +57,41 @@ class SmartMatchingAnalyticsService
         ];
 
         try {
-            // Today's matches (from cache)
-            $stats['total_matches_today'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_cache WHERE tenant_id = ? AND DATE(created_at) = CURDATE()",
+            $row = Database::query(
+                "SELECT
+                    COUNT(*) AS cache_entries,
+                    SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) AS total_matches_today,
+                    SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS total_matches_week,
+                    SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS total_matches_month,
+                    SUM(CASE WHEN match_score >= 85 THEN 1 ELSE 0 END) AS hot_matches_count,
+                    SUM(CASE WHEN match_type = 'mutual' THEN 1 ELSE 0 END) AS mutual_matches_count,
+                    AVG(match_score) AS avg_match_score,
+                    AVG(CASE WHEN distance_km IS NOT NULL THEN distance_km END) AS avg_distance_km
+                 FROM match_cache
+                 WHERE tenant_id = ?",
                 [$tenantId]
-            )->fetchColumn();
+            )->fetch(\PDO::FETCH_ASSOC);
 
-            // This week's matches
-            $stats['total_matches_week'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_cache WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
-                [$tenantId]
-            )->fetchColumn();
+            if ($row) {
+                $stats['cache_entries']        = (int) $row['cache_entries'];
+                $stats['total_matches_today']  = (int) $row['total_matches_today'];
+                $stats['total_matches_week']   = (int) $row['total_matches_week'];
+                $stats['total_matches_month']  = (int) $row['total_matches_month'];
+                $stats['hot_matches_count']    = (int) $row['hot_matches_count'];
+                $stats['mutual_matches_count'] = (int) $row['mutual_matches_count'];
+                $stats['avg_match_score']      = $row['avg_match_score'] ? round((float)$row['avg_match_score'], 1) : 0;
+                $stats['avg_distance_km']      = $row['avg_distance_km'] ? round((float)$row['avg_distance_km'], 1) : 0;
+            }
 
-            // This month's matches
-            $stats['total_matches_month'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_cache WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
-                [$tenantId]
-            )->fetchColumn();
-
-            // Hot matches (score >= 85)
-            $stats['hot_matches_count'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_cache WHERE tenant_id = ? AND match_score >= 85",
-                [$tenantId]
-            )->fetchColumn();
-
-            // Mutual matches
-            $stats['mutual_matches_count'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_cache WHERE tenant_id = ? AND match_type = 'mutual'",
-                [$tenantId]
-            )->fetchColumn();
-
-            // Average match score
-            $avgScore = Database::query(
-                "SELECT AVG(match_score) FROM match_cache WHERE tenant_id = ?",
-                [$tenantId]
-            )->fetchColumn();
-            $stats['avg_match_score'] = $avgScore ? round((float)$avgScore, 1) : 0;
-
-            // Average distance
-            $avgDist = Database::query(
-                "SELECT AVG(distance_km) FROM match_cache WHERE tenant_id = ? AND distance_km IS NOT NULL",
-                [$tenantId]
-            )->fetchColumn();
-            $stats['avg_distance_km'] = $avgDist ? round((float)$avgDist, 1) : 0;
-
-            // Cache entries
-            $stats['cache_entries'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_cache WHERE tenant_id = ?",
-                [$tenantId]
-            )->fetchColumn();
-
-            // Active users using matching
+            // Active users in last 7 days (requires DISTINCT — separate query)
             $stats['active_users_matching'] = (int) Database::query(
-                "SELECT COUNT(DISTINCT user_id) FROM match_cache WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+                "SELECT COUNT(DISTINCT user_id) FROM match_cache
+                 WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
                 [$tenantId]
             )->fetchColumn();
 
         } catch (\Exception $e) {
-            // Tables might not exist yet
+            error_log('[SmartMatchingAnalytics] getOverallStats failed: ' . $e->getMessage());
         }
 
         return $stats;
@@ -151,7 +128,9 @@ class SmartMatchingAnalyticsService
                 $distribution['60-80'] = (int) $results['good'];
                 $distribution['80-100'] = (int) $results['hot'];
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            error_log('[SmartMatchingAnalytics] getScoreDistribution failed: ' . $e->getMessage());
+        }
 
         return $distribution;
     }
@@ -190,7 +169,9 @@ class SmartMatchingAnalyticsService
                 $distribution['regional'] = (int) $results['regional'];
                 $distribution['distant'] = (int) $results['distant'];
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            error_log('[SmartMatchingAnalytics] getDistanceDistribution failed: ' . $e->getMessage());
+        }
 
         return $distribution;
     }
@@ -211,36 +192,31 @@ class SmartMatchingAnalyticsService
         ];
 
         try {
-            // Total matches generated
-            $funnel['matched'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_history WHERE tenant_id = ?",
+            $row = Database::query(
+                "SELECT
+                    COUNT(*) AS matched,
+                    SUM(CASE WHEN action = 'viewed' THEN 1 ELSE 0 END) AS viewed,
+                    SUM(CASE WHEN action = 'contacted' THEN 1 ELSE 0 END) AS contacted,
+                    SUM(CASE WHEN resulted_in_transaction = 1 THEN 1 ELSE 0 END) AS completed
+                 FROM match_history
+                 WHERE tenant_id = ?",
                 [$tenantId]
-            )->fetchColumn();
+            )->fetch(\PDO::FETCH_ASSOC);
 
-            // Viewed matches
-            $funnel['viewed'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_history WHERE tenant_id = ? AND action = 'viewed'",
-                [$tenantId]
-            )->fetchColumn();
+            if ($row) {
+                $funnel['matched']   = (int) $row['matched'];
+                $funnel['viewed']    = (int) $row['viewed'];
+                $funnel['contacted'] = (int) $row['contacted'];
+                $funnel['completed'] = (int) $row['completed'];
 
-            // Contacted (user reached out)
-            $funnel['contacted'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_history WHERE tenant_id = ? AND action = 'contacted'",
-                [$tenantId]
-            )->fetchColumn();
-
-            // Completed (resulted in transaction)
-            $funnel['completed'] = (int) Database::query(
-                "SELECT COUNT(*) FROM match_history WHERE tenant_id = ? AND resulted_in_transaction = 1",
-                [$tenantId]
-            )->fetchColumn();
-
-            // Calculate conversion rate
-            if ($funnel['matched'] > 0) {
-                $funnel['conversion_rate'] = round(($funnel['completed'] / $funnel['matched']) * 100, 2);
+                if ($funnel['matched'] > 0) {
+                    $funnel['conversion_rate'] = round(($funnel['completed'] / $funnel['matched']) * 100, 2);
+                }
             }
 
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            error_log('[SmartMatchingAnalytics] getConversionFunnel failed: ' . $e->getMessage());
+        }
 
         return $funnel;
     }
@@ -253,8 +229,6 @@ class SmartMatchingAnalyticsService
         $tenantId = TenantContext::getId();
 
         try {
-            // Cast limit to int for SQL - safe since it's type-hinted
-            $limitInt = (int) $limit;
             $sql = "SELECT
                     c.id, c.name, c.color,
                     COUNT(mc.id) as match_count,
@@ -268,9 +242,10 @@ class SmartMatchingAnalyticsService
                  GROUP BY c.id, c.name, c.color
                  HAVING match_count > 0
                  ORDER BY match_count DESC
-                 LIMIT " . $limitInt;
-            return Database::query($sql, [$tenantId, $tenantId, $tenantId])->fetchAll();
+                 LIMIT ?";
+            return Database::query($sql, [$tenantId, $tenantId, $tenantId, (int)$limit])->fetchAll();
         } catch (\Exception $e) {
+            error_log('[SmartMatchingAnalytics] getTopCategories failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -283,8 +258,6 @@ class SmartMatchingAnalyticsService
         $tenantId = TenantContext::getId();
 
         try {
-            // Cast limit to int for SQL - safe since it's type-hinted
-            $limitInt = (int) $limit;
             $sql = "SELECT
                     mh.id, mh.action, mh.match_score, mh.distance_km, mh.created_at,
                     mh.resulted_in_transaction,
@@ -295,9 +268,10 @@ class SmartMatchingAnalyticsService
                  LEFT JOIN listings l ON mh.listing_id = l.id
                  WHERE mh.tenant_id = ?
                  ORDER BY mh.created_at DESC
-                 LIMIT " . $limitInt;
-            return Database::query($sql, [$tenantId])->fetchAll();
+                 LIMIT ?";
+            return Database::query($sql, [$tenantId, (int)$limit])->fetchAll();
         } catch (\Exception $e) {
+            error_log('[SmartMatchingAnalytics] getRecentActivity failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -325,6 +299,7 @@ class SmartMatchingAnalyticsService
                 [$tenantId, $weeks]
             )->fetchAll();
         } catch (\Exception $e) {
+            error_log('[SmartMatchingAnalytics] getWeeklyTrends failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -351,6 +326,7 @@ class SmartMatchingAnalyticsService
                 [$tenantId, $days]
             )->fetchAll();
         } catch (\Exception $e) {
+            error_log('[SmartMatchingAnalytics] getDailyTrends failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -411,7 +387,9 @@ class SmartMatchingAnalyticsService
             )->fetchColumn();
             $metrics['avg_time_to_conversion_hours'] = $avgTime ? round((float)$avgTime, 1) : 0;
 
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            error_log('[SmartMatchingAnalytics] getConversionMetrics failed: ' . $e->getMessage());
+        }
 
         return $metrics;
     }
@@ -459,7 +437,9 @@ class SmartMatchingAnalyticsService
             )->fetchColumn();
             $engagement['avg_min_score'] = $avgScore ? round((float)$avgScore, 1) : 50;
 
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            error_log('[SmartMatchingAnalytics] getUserEngagement failed: ' . $e->getMessage());
+        }
 
         return $engagement;
     }

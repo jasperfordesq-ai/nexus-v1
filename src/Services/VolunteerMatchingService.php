@@ -63,25 +63,23 @@ class VolunteerMatchingService
         }
 
         // Get all upcoming shifts with required_skills
-        $db = Database::getConnection();
-        $stmt = $db->prepare("
-            SELECT s.*, o.title as opp_title, o.description as opp_description,
-                   o.location as opp_location, o.skills_needed as opp_skills,
-                   org.name as org_name, org.logo_url as org_logo,
-                   s.required_skills as shift_required_skills
-            FROM vol_shifts s
-            JOIN vol_opportunities o ON s.opportunity_id = o.id
-            JOIN vol_organizations org ON o.organization_id = org.id
-            WHERE org.tenant_id = ? AND o.is_active = 1 AND org.status = 'approved'
-            AND s.start_time > NOW()
-            AND s.id NOT IN (
-                SELECT shift_id FROM vol_applications WHERE user_id = ? AND shift_id IS NOT NULL
-            )
-            ORDER BY s.start_time ASC
-            LIMIT 100
-        ");
-        $stmt->execute([$tenantId, $userId]);
-        $shifts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $shifts = Database::query(
+            "SELECT s.*, o.title as opp_title, o.description as opp_description,
+                    o.location as opp_location, o.skills_needed as opp_skills,
+                    org.name as org_name, org.logo_url as org_logo,
+                    s.required_skills as shift_required_skills
+             FROM vol_shifts s
+             JOIN vol_opportunities o ON s.opportunity_id = o.id
+             JOIN vol_organizations org ON o.organization_id = org.id
+             WHERE org.tenant_id = ? AND o.is_active = 1 AND org.status = 'approved'
+               AND s.start_time > NOW()
+               AND s.id NOT IN (
+                   SELECT shift_id FROM vol_applications WHERE user_id = ? AND shift_id IS NOT NULL
+               )
+             ORDER BY s.start_time ASC
+             LIMIT 100",
+            [$tenantId, $userId]
+        )->fetchAll(\PDO::FETCH_ASSOC);
 
         // Score each shift
         $scoredShifts = [];
@@ -284,18 +282,16 @@ class VolunteerMatchingService
     private static function getUserVolunteerProfile(int $userId): ?array
     {
         $tenantId = TenantContext::getId();
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare("
-            SELECT u.id, u.name, u.skills, u.bio, u.location, u.latitude, u.longitude,
-                   u.is_verified,
-                   COALESCE((SELECT SUM(hours) FROM vol_logs WHERE user_id = u.id AND status = 'approved'), 0) as verified_hours,
-                   COALESCE((SELECT AVG(rating) FROM vol_reviews WHERE target_type = 'user' AND target_id = u.id), 0) as avg_rating
-            FROM users u
-            WHERE u.id = ? AND u.tenant_id = ?
-        ");
-        $stmt->execute([$userId, $tenantId]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+        $result = Database::query(
+            "SELECT u.id, u.name, u.skills, u.bio, u.location, u.latitude, u.longitude,
+                    u.is_verified,
+                    COALESCE((SELECT SUM(hours) FROM vol_logs WHERE user_id = u.id AND status = 'approved'), 0) as verified_hours,
+                    COALESCE((SELECT AVG(rating) FROM vol_reviews WHERE target_type = 'user' AND target_id = u.id), 0) as avg_rating
+             FROM users u
+             WHERE u.id = ? AND u.tenant_id = ?",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
     }
 
     /**
@@ -303,25 +299,22 @@ class VolunteerMatchingService
      */
     private static function getUpcomingShifts(int $tenantId, int $userId, int $limit): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare("
-            SELECT s.*, o.title as opp_title, o.location as opp_location,
-                   o.skills_needed as opp_skills,
-                   org.name as org_name, org.logo_url as org_logo
-            FROM vol_shifts s
-            JOIN vol_opportunities o ON s.opportunity_id = o.id
-            JOIN vol_organizations org ON o.organization_id = org.id
-            WHERE org.tenant_id = ? AND o.is_active = 1 AND org.status = 'approved'
-            AND s.start_time > NOW()
-            AND s.id NOT IN (
-                SELECT shift_id FROM vol_applications WHERE user_id = ? AND shift_id IS NOT NULL
-            )
-            ORDER BY s.start_time ASC
-            LIMIT ?
-        ");
-        $stmt->execute([$tenantId, $userId, $limit]);
-        $shifts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $shifts = Database::query(
+            "SELECT s.*, o.title as opp_title, o.location as opp_location,
+                    o.skills_needed as opp_skills,
+                    org.name as org_name, org.logo_url as org_logo
+             FROM vol_shifts s
+             JOIN vol_opportunities o ON s.opportunity_id = o.id
+             JOIN vol_organizations org ON o.organization_id = org.id
+             WHERE org.tenant_id = ? AND o.is_active = 1 AND org.status = 'approved'
+               AND s.start_time > NOW()
+               AND s.id NOT IN (
+                   SELECT shift_id FROM vol_applications WHERE user_id = ? AND shift_id IS NOT NULL
+               )
+             ORDER BY s.start_time ASC
+             LIMIT ?",
+            [$tenantId, $userId, (int)$limit]
+        )->fetchAll(\PDO::FETCH_ASSOC);
 
         return array_map(function ($shift) {
             return [
