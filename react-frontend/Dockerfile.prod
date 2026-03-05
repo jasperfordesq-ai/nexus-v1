@@ -30,7 +30,7 @@ ENV BUILD_COMMIT=$BUILD_COMMIT
 
 # Install dependencies first (better layer caching)
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --no-audit
 
 # Copy source and build
 COPY . .
